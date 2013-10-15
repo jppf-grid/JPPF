@@ -171,7 +171,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     cleanup(channel);
     if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
       tmpBundle.resubmit();
-      tmpBundle.taskCompleted(new Exception(exception));
+      tmpBundle.getClientJob().taskCompleted(tmpBundle, new Exception(exception));
     }
   }
 
@@ -462,6 +462,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
       if (isDone()) return false;
       if (isCancelled()) return true;
+      if (bundle == null) return false;
       try {
         bundle.cancel();
         cancelJob(bundle.getClientJob().getUuid(), false);

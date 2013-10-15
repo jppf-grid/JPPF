@@ -51,7 +51,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * The list of the incoming bundles.
    */
-  protected final List<ServerTaskBundleClient> bundleList = new ArrayList<>();
+  protected final List<ServerTaskBundleClient> clientBundles = new ArrayList<>();
   /**
    * Listener for handling completed bundles.
    */
@@ -79,7 +79,6 @@ public class AbstractServerJobBase extends AbstractServerJob {
    */
   public AbstractServerJobBase(final Lock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
     super(lock, job);
-
     this.notificationEmitter = notificationEmitter;
     this.dataProvider = dataProvider;
   }
@@ -88,10 +87,10 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * Get list of bundles received from client.
    * @return list of bundles received from client.
    */
-  public List<ServerTaskBundleClient> getBundleList() {
+  public List<ServerTaskBundleClient> getClientBundles() {
     lock.lock();
     try {
-      return new ArrayList<>(bundleList);
+      return new ArrayList<>(clientBundles);
     } finally {
       lock.unlock();
     }
@@ -173,7 +172,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   protected boolean hasPending() {
     lock.lock();
     try {
-      for (ServerTaskBundleClient bundle : bundleList) {
+      for (ServerTaskBundleClient bundle : clientBundles) {
         if (bundle.getPendingTasksCount() > 0) return true;
       }
     } finally {
@@ -261,7 +260,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
         return false;
       } else if (getSubmissionStatus() == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
       else {
-        bundleList.add(bundle);
+        clientBundles.add(bundle);
         this.tasks.addAll(bundle.getTaskList());
         bundle.addCompletionListener(bundleCompletionListener);
         fireJobUpdated();
@@ -301,7 +300,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * @return the number of bundles as an int.
    */
   public int getNbBundles() {
-    return bundleList.size();
+    return clientBundles.size();
   }
 
   /**
@@ -311,7 +310,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
     @Override
     public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
       if (bundle == null) throw new IllegalArgumentException("bundle is null");
-      if (bundle.isCancelled()) cancel(false);
+      //if (bundle.isCancelled()) setCancelled(false);
     }
 
     @Override
@@ -320,10 +319,10 @@ public class AbstractServerJobBase extends AbstractServerJob {
       lock.lock();
       try {
         bundle.removeCompletionListener(this);
-        bundleList.remove(bundle);
+        clientBundles.remove(bundle);
         tasks.removeAll(bundle.getTaskList());
         if (completionBundles != null) completionBundles.remove(bundle);
-        if (bundleList.isEmpty() && tasks.isEmpty() && getSubmissionStatus() == SubmissionStatus.COMPLETE) setSubmissionStatus(SubmissionStatus.ENDED);
+        if (clientBundles.isEmpty() && tasks.isEmpty() && getSubmissionStatus() == SubmissionStatus.COMPLETE) setSubmissionStatus(SubmissionStatus.ENDED);
       } catch(Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       } finally {

@@ -177,7 +177,7 @@ public class ServerDebug implements ServerDebugMBean
       sb.append(hr);
       ServerJob serverJob = queue.getJob(uuid);
       sb.append(serverJob).append('\n');
-      List<ServerTaskBundleClient> bundleList = serverJob.getBundleList();
+      List<ServerTaskBundleClient> bundleList = serverJob.getClientBundles();
       if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
       else
       {

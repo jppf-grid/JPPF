@@ -29,8 +29,7 @@ import java.util.List;
  * and they should be sent back to the client.
  * @author Laurent Cohen
  */
-public class CompletionListener implements ServerTaskBundleClient.CompletionListener
-{
+public class CompletionListener implements ServerTaskBundleClient.CompletionListener {
   /**
    * Logger for this class.
    */
@@ -53,8 +52,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
    * @param channel the client channel.
    * @param transitionManager the channel's transition manager.
    */
-  public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager transitionManager)
-  {
+  public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager transitionManager) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (transitionManager == null) throw new IllegalArgumentException("transitionManager is null");
 
@@ -64,38 +62,29 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
 
   @SuppressWarnings("unchecked")
   @Override
-  public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results)
-  {
+  public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
     if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
-    if (!isChannelValid())
-    {
+    if (!isChannelValid()) {
       ClientContext context = (ClientContext) channel.getContext();
-      context.getInitialBundleWrapper().removeCompletionListener(this);
+      if (context.getInitialBundleWrapper() != null) context.getInitialBundleWrapper().removeCompletionListener(this);
       context.cancelJobOnClose();
       return;
     }
-    if (results.isEmpty())
-    {
+    if (results.isEmpty()) {
       if (debugEnabled) log.debug("empty results list");
       return;
     }
     if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
     if (bundle.isCancelled()) bundle.removeCompletionListener(this);
-    else
-    {
+    else {
       ClientContext context = (ClientContext) channel.getContext();
       context.offerCompletedBundle(bundle);
-      synchronized(channel)
-      {
+      synchronized(channel) {
         if (debugEnabled) log.debug("*** context state=" + context.getState() + " for " + bundle + ", channel=" + channel);
-        if (context.getState() == ClientState.IDLE)
-        {
-          try
-          {
+        if (context.getState() == ClientState.IDLE) {
+          try {
             transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
-          }
-          catch(Exception e)
-          {
+          } catch(Exception e) {
             if (debugEnabled) log.debug(e.getMessage(), e);
             else log.info(e.getClass().getName() + " : " + e.getMessage());
           }
@@ -112,10 +101,8 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
    * Determine whether the channel is valid at the time this method is called.
    * @return <code>true</code> if the channel is valid, <code>false</code> otherwise.
    */
-  private boolean isChannelValid()
-  {
-    if (channel instanceof SelectionKeyWrapper)
-      return ((SelectionKeyWrapper) channel).getChannel().isValid();
+  private boolean isChannelValid() {
+    if (channel instanceof SelectionKeyWrapper) return ((SelectionKeyWrapper) channel).getChannel().isValid();
     return true;
   }
 }

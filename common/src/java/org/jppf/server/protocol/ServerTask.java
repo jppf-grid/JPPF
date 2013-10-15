@@ -151,21 +151,12 @@ public class ServerTask {
   }
 
   /**
-   * Mark this task as cancelled after dispatch expiration.
-   */
-  public void expirationCancel() {
-    if (debugEnabled) log.debug("cancelling {}", this);
-    result = dataLocation;
-    state = TaskState.TIMEOUT_CANCELLED;
-  }
-
-  /**
    * Mark this task as to be resubmitted followxing expiration of a node dispatch.
    */
-  public void expirationResubmit() {
+  public void resubmit() {
     if (debugEnabled) log.debug("expiring {}", this);
     result = null;
-    state = TaskState.TIMEOUT_RESUBMIT;
+    state = TaskState.RESUBMIT;
   }
 
   /**
@@ -180,6 +171,14 @@ public class ServerTask {
   }
 
   /**
+   * Called to notify that the task broadcast was completed.
+   */
+  public void broadcastResultReceived() {
+    this.result = this.dataLocation;
+    this.state = TaskState.RESULT;
+  }
+
+  /**
    * Called to notify that the task received exception during execution.
    * @param exception the exception.
    */
@@ -191,8 +190,7 @@ public class ServerTask {
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("ServerTask[");
     sb.append("state=").append(getState());
@@ -210,8 +208,7 @@ public class ServerTask {
    * Get the position of this task within the job submitted by the client.
    * @return the position as an int.
    */
-  public int getJobPosition()
-  {
+  public int getJobPosition() {
     return jobPosition;
   }
 
@@ -219,8 +216,7 @@ public class ServerTask {
    * Get the number of times a dispatch of this task has expired.
    * @return the number of expirations as an int.
    */
-  public int getExpirationCount()
-  {
+  public int getExpirationCount() {
     return expirationCount;
   }
 
@@ -228,8 +224,16 @@ public class ServerTask {
    * Increment and get the number of times a dispatch of this task has expired.
    * @return the new number of expirations as an int.
    */
-  public int incExpirationCount()
-  {
+  public int incExpirationCount() {
     return ++expirationCount;
+  }
+
+  /**
+   * Determine whether this task has completed.
+   * This encompasses the cases where it received a result, was cancelled or terminated with an exception.
+   * @return <code>true</code> if this task is done, <code>false</code> otherwise.
+   */
+  public boolean isDone() {
+    return state.ordinal() >= TaskState.EXCEPTION.ordinal();
   }
 }

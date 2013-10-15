@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
+import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
@@ -81,6 +82,31 @@ public class TestOfflineNode extends SetupOfflineNode1D2N1C
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    }
+  }
+
+
+  /**
+   * Test that a simple job expires and is cancelled upon first dispatch.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=10000)
+  public void testJobDispatchExpiration() throws Exception
+  {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 5000L);
+    Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
+    job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
+    job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
+    List<JPPFTask> results = client.submit(job);
+    assertNotNull(results);
+    assertEquals(nbTasks, results.size());
+    for (JPPFTask task: results)
+    {
+      assertTrue("task = " + task, task instanceof LifeCycleTask);
+      Throwable t = task.getThrowable();
+      assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
+      assertNull(task.getResult());
     }
   }
 }

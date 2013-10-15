@@ -24,7 +24,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.Pair;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -94,32 +93,34 @@ public class ServerJob extends AbstractServerJobBase {
    */
   @SuppressWarnings("unchecked")
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
-    if (debugEnabled) log.debug("*** received " + results.size() + " results from " + bundle);
-    if (results.isEmpty()) return;
-    CollectionMap<ServerTaskBundleClient, Pair<Integer, DataLocation>> map = new SetIdentityMap<>();
+    if (debugEnabled) log.debug("*** received {} results from {}", (results == null ? "null" : results.size()), bundle);
+    if ((results != null) && results.isEmpty()) return;
+    CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
       List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
       if (isJobExpired() || isCancelled()) {
-        for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), new Pair(task.getPosition(), task.getDataLocation()));
+        for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
       } else {
         for (int index = 0; index < bundleTasks.size(); index++) {
           ServerTask task = bundleTasks.get(index);
-          if (task.getState() == TaskState.TIMEOUT_RESUBMIT) {
+          if (task.getState() == TaskState.RESUBMIT) {
             if (debugEnabled) log.debug("task to resubmit: {}", task);
             task.setState(TaskState.PENDING);
           } else {
-            DataLocation location = results.get(index);
-            if (task.getBundle() != null) map.putValue(task.getBundle(), new Pair(task.getPosition(), location));
+            if (results != null) {
+              DataLocation location = results.get(index);
+              task.resultReceived(location);
+            }
+            map.putValue(task.getBundle(), task);
           }
         }
       }
     } finally {
       lock.unlock();
     }
-    for (Map.Entry<ServerTaskBundleClient, Collection<Pair<Integer, DataLocation>>> entry: map.entrySet()) {
-      entry.getKey().resultReceived(entry.getValue());
-    }
+    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) entry.getKey().resultReceived(entry.getValue());
+    taskCompleted(bundle, null);
   }
 
   /**
@@ -132,13 +133,17 @@ public class ServerJob extends AbstractServerJobBase {
     CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
-      for (ServerTask task : bundle.getTaskList()) map.putValue(task.getBundle(), task);
+      for (ServerTask task : bundle.getTaskList()) {
+        task.resultReceived(throwable);
+        map.putValue(task.getBundle(), task);
+      }
     } finally {
       lock.unlock();
     }
     for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
       entry.getKey().resultReceived(entry.getValue(), throwable);
     }
+    taskCompleted(bundle, throwable);
   }
 
   /**
@@ -170,72 +175,85 @@ public class ServerJob extends AbstractServerJobBase {
    * @param otherStates the other states of the server tasks to exclude.
    */
   private static void addExcluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state, final TaskState...otherStates) {
-    EnumSet<TaskState> set = EnumSet.of(state, otherStates);
+    EnumSet<TaskState> stateSet = EnumSet.of(state, otherStates);
     for (ServerTask item : src) {
-      if (!set.contains(item.getState())) dst.add(item.getDataLocation());
+      if (!stateSet.contains(item.getState())) dst.add(item.getDataLocation());
+    }
+  }
+
+  /**
+   * Utility method - extract DataLocation from list of server tasks filtered by their state (exclusive) and add them to list.
+   * @param dst destination list of <code>DataLocation</code>.
+   * @param src source list of <code>ServerTask</code> objects.
+   * @param state the state of the server tasks to add.
+   */
+  private static void addIncluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state) {
+    for (ServerTask item : src) {
+      if (item.getState() == state) dst.add(item.getDataLocation());
+    }
+  }
+
+  /**
+   * Utility method - extract DataLocation from list of server tasks filtered by their state (inclusive) and add them to list.
+   * @param dst destination list of <code>DataLocation</code>.
+   * @param src source list of <code>ServerTask</code> objects.
+   * @param state the first state of the server tasks to include.
+   * @param otherStates the other states of the server tasks to include.
+   */
+  private static void addIncluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state, final TaskState...otherStates) {
+    EnumSet<TaskState> stateSet = EnumSet.of(state, otherStates);
+    for (ServerTask item : src) {
+      if (stateSet.contains(item.getState())) dst.add(item.getDataLocation());
     }
   }
 
   /**
    * Called to notify that the execution of a task has completed.
    * @param bundle    the completed task.
-   * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
+   * @param throwable the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
+  public void taskCompleted(final ServerTaskBundleNode bundle, final Throwable throwable) {
     boolean requeue = false;
     List<DataLocation> list = new ArrayList<>();
     lock.lock();
     try {
-      if (isCancelled()) handleCancelledStatus();
       if (getSLA().isBroadcastJob()) {
         if (bundle != null) addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
         if (isCancelled() || getBroadcastUUID() == null) addAll(list, this.tasks);
-      } else if (bundle == null) {
-        if (isCancelled()) addAll(list, this.tasks);
       } else {
-        if (bundle.isCancelled()) {
-          addExcluded(list, bundle.getTaskList(), TaskState.RESULT);
-          addAll(list, this.tasks);
+        List<ServerTask> taskList = new ArrayList<>();
+        for (ServerTask task : bundle.getTaskList()) {
+          if (task.getState() == TaskState.RESUBMIT) task.setState(TaskState.PENDING);
+          if (task.getState() == TaskState.PENDING) taskList.add(task);
         }
-        else {
-          List<ServerTask> taskList = new ArrayList<>();
-          for (ServerTask task : bundle.getTaskList()) {
-            if (task.getState() != TaskState.RESULT) taskList.add(task);
-          }
-          requeue = merge(taskList, false);
-        }
+        requeue = merge(taskList, false);
       }
     } finally {
       lock.unlock();
     }
-    if (!list.isEmpty()) {
-      try {
-        resultsReceived(bundle, list);
-      } finally {
-        this.tasks.clear();
-      }
-    }
     if (hasPending()) {
-      if (exception != null) setSubmissionStatus(SubmissionStatus.FAILED);
+      if (throwable != null) setSubmissionStatus(SubmissionStatus.FAILED);
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
       setSubmissionStatus(SubmissionStatus.COMPLETE);
-      fireTaskCompleted(this);
     }
-    if (bundleList.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
+    if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
   }
 
   /**
    * Perform the necessary actions for when this job has been cancelled.
    */
-  private void handleCancelledStatus() {
-    List<Future>   futureList;
+  protected void handleCancelledStatus() {
+    if (debugEnabled) log.debug("cancelling dispatches for {}", this);
+    List<Future> futureList;
+    Map<Long, ServerTaskBundleNode> map;
     synchronized (dispatchSet) {
-      futureList = new ArrayList<>(dispatchSet.size());
-      for (Map.Entry<Long, ServerTaskBundleNode> entry: dispatchSet.entrySet()) futureList.add(entry.getValue().getFuture());
+      map = new HashMap<>(dispatchSet);
     }
-    for (Future future : futureList) {
+    for (Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) {
       try {
+        ServerTaskBundleNode nodeBundle = entry.getValue();
+        Future future = nodeBundle.getFuture();
         if (!future.isDone()) future.cancel(false);
       } catch (Exception e) {
         log.error("Error cancelling job " + this, e);
@@ -244,20 +262,36 @@ public class ServerJob extends AbstractServerJobBase {
   }
 
   /**
-   * Notifies that execution of this task has completed.
-   * @param result the result of the task's execution.
+   * Perform the necessary actions for when this job has been cancelled.
    */
-  protected void fireTaskCompleted(final ServerJob result) {
-    getJob().fireTaskCompleted(result);
+  protected void handleCancelledTasks() {
+    if (debugEnabled) log.debug("cancelling tasks for {}", this);
+    CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
+    for (ServerTask task: tasks) {
+      if (!task.isDone()) {
+        task.cancel();
+        clientMap.putValue(task.getBundle(), task);
+      }
+    }
+    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: clientMap.entrySet()) {
+      entry.getKey().resultReceived(entry.getValue());
+    }
   }
 
-  @Override
+  /**
+   * Cancel this job.
+   * @param mayInterruptIfRunning <code>true</code> if the job may be interrupted.
+   * @return <code>true</code> if the job was effectively cncelled, <code>false</code> if it was already cancelled previously.
+   */
   public boolean cancel(final boolean mayInterruptIfRunning) {
-    if (debugEnabled) log.debug("request to cancel " + this);
+    if (debugEnabled) log.debug("request to cancel {}", this);
     lock.lock();
     try {
-      if (super.cancel(mayInterruptIfRunning)) {
-        taskCompleted(null, null);
+      if (setCancelled(mayInterruptIfRunning)) {
+        handleCancelledStatus();
+        if (!getSLA().isBroadcastJob()) handleCancelledTasks();
+        setSubmissionStatus(SubmissionStatus.COMPLETE);
+        //taskCompleted(null, null);
         return true;
       }
       else return false;

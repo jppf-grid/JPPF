@@ -80,25 +80,25 @@ class ScheduleManager
 
   /**
    * Process the expiration schedule specified in the job SLA.
-   * @param bundleWrapper the job to process.
+   * @param serverJob the job to process.
    */
-  void handleExpirationJobSchedule(final ServerJob bundleWrapper)
+  void handleExpirationJobSchedule(final ServerJob serverJob)
   {
-    JPPFSchedule schedule = bundleWrapper.getSLA().getJobExpirationSchedule();
+    JPPFSchedule schedule = serverJob.getSLA().getJobExpirationSchedule();
     if (schedule != null)
     {
-      String jobId = bundleWrapper.getName();
-      final String uuid = bundleWrapper.getUuid();
+      String jobId = serverJob.getName();
+      final String uuid = serverJob.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
-      long dt = bundleWrapper.getJobReceivedTime();
+      long dt = serverJob.getJobReceivedTime();
       try
       {
-        jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(bundleWrapper), dt);
+        jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(serverJob), dt);
       }
       catch(ParseException e)
       {
         log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-                ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+          ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
   }

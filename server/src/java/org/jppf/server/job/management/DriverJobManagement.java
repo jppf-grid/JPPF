@@ -68,11 +68,11 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public void cancelJob(final String jobUuid) throws Exception
   {
-    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
-    if (bundleWrapper != null)
+    ServerJob serverJob = getJobManager().getBundleForJob(jobUuid);
+    if (serverJob != null)
     {
-      if (debugEnabled) log.debug("Request to cancel job '" + bundleWrapper.getJob().getName() + '\'');
-      bundleWrapper.cancel(false);
+      if (debugEnabled) log.debug("Request to cancel job '{}'", serverJob.getJob().getName());
+      serverJob.cancel(false);
     }
     else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
   }

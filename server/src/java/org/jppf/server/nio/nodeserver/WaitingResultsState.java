@@ -87,7 +87,7 @@ class WaitingResultsState extends NodeServerState {
       exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
       nodeBundle.resultsReceived(t);
     } finally {
-      nodeBundle.taskCompleted(exception);
+      //nodeBundle.taskCompleted(exception);
       context.setBundle(null);
     }
     if (requeue) nodeBundle.resubmit();

@@ -63,25 +63,25 @@ class WaitingJobState extends ClientServerState
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
     if (context.readMessage(channel))
     {
-      ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
-      JPPFTaskBundle header = bundleWrapper.getJob();
+      ServerTaskBundleClient clientBundle = context.deserializeBundle();
+      JPPFTaskBundle header = clientBundle.getJob();
       int count = header.getTaskCount();
-      if (debugEnabled) log.debug("read bundle " + bundleWrapper + " from client " + channel + " done: received " + count + " tasks");
-      if (bundleWrapper.getJobReceivedTime() == 0L) bundleWrapper.setJobReceivedTime(System.currentTimeMillis());
+      if (debugEnabled) log.debug("read bundle " + clientBundle + " from client " + channel + " done: received " + count + " tasks");
+      if (clientBundle.getJobReceivedTime() == 0L) clientBundle.setJobReceivedTime(System.currentTimeMillis());
 
       header.getUuidPath().incPosition();
       header.getUuidPath().add(driver.getUuid());
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
-      bundleWrapper.addCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
-      context.setInitialBundleWrapper(bundleWrapper);
-      JPPFDriver.getQueue().addBundle(bundleWrapper);
+      clientBundle.addCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
+      context.setInitialBundleWrapper(clientBundle);
+      JPPFDriver.getQueue().addBundle(clientBundle);
 
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setClientMessage(null);
       context.setBundle(null);
       //return TO_SENDING_RESULTS;
-      return TO_IDLE;
+      return clientBundle.isDone() ? TO_SENDING_RESULTS : TO_IDLE;
     }
     return TO_WAITING_JOB;
   }

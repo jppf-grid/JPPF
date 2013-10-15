@@ -72,11 +72,15 @@ public class ServerTaskBundleNode {
    */
   private boolean requeued = false;
   /**
-   * Job cancel indicator
+   * Job cancel indicator.
    */
   private boolean cancelled  = false;
   /**
-   * The job this submission is for
+   * Job dispatch expiration indicator.
+   */
+  private boolean expired  = false;
+  /**
+   * The job this submission is for.
    */
   private JPPFTaskBundle taskBundle;
   /**
@@ -166,6 +170,7 @@ public class ServerTaskBundleNode {
    */
   public void resultsReceived(final List<DataLocation> results) {
     job.resultsReceived(this, results);
+    taskCompleted(null);
   }
 
   /**
@@ -174,18 +179,19 @@ public class ServerTaskBundleNode {
    */
   public void resultsReceived(final Throwable throwable) {
     job.resultsReceived(this, throwable);
+    taskCompleted(throwable);
   }
 
   /**
    * Called to notify that the execution of a task has completed.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public void taskCompleted(final Exception exception) {
+  public void taskCompleted(final Throwable exception) {
     if (debugEnabled && (exception != null)) log.debug("received exception for " + this + " : " + ExceptionUtils.getStackTrace(exception));
     try {
       job.jobReturned(this);
     } finally {
-      job.taskCompleted(this, exception);
+      //job.taskCompleted(this, exception);
       this.channel = null;
       this.future = null;
     }
@@ -198,6 +204,7 @@ public class ServerTaskBundleNode {
     if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
     synchronized(this) {
       requeued = true;
+      for (ServerTask task: taskList) task.resubmit();
     }
   }
 
@@ -205,11 +212,14 @@ public class ServerTaskBundleNode {
    * Called when this task bundle should be resubmitted
    */
   public void expire() {
-    if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
+    if (getJob().getSLA().isBroadcastJob()) return; // broadcast jobs cannot expire.
     int max = job.getSLA().getMaxDispatchExpirations();
-    for (ServerTask task: taskList) {
-      if (task.incExpirationCount() > max) task.expirationCancel();
-      else task.expirationResubmit();
+    synchronized(this) {
+      for (ServerTask task: taskList) {
+        if (task.incExpirationCount() > max) task.cancel();
+        else task.resubmit();
+      }
+      expired = true;
     }
   }
 
@@ -226,6 +236,7 @@ public class ServerTaskBundleNode {
    */
   public synchronized void cancel() {
     this.cancelled = true;
+    for (ServerTask task: taskList) task.cancel();
   }
 
   /**
@@ -234,6 +245,14 @@ public class ServerTaskBundleNode {
    */
   public synchronized boolean isCancelled() {
     return cancelled;
+  }
+
+  /**
+   * Get the expired indicator.
+   * @return <code>true</code> if job dispatch is expired, <code>false</code> otherwise.
+   */
+  public synchronized boolean isExpired() {
+    return expired;
   }
 
   /**
@@ -300,8 +319,7 @@ public class ServerTaskBundleNode {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     ServerTaskBundleNode other = (ServerTaskBundleNode) obj;
-    if (id != other.id) return false;
-    return true;
+    return id == other.id;
   }
 
   /**

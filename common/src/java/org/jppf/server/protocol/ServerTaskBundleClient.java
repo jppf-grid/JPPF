@@ -135,7 +135,7 @@ public class ServerTaskBundleClient
     int size = taskList.size();
     //job = source.getJob().copy(size);
     this.job = source.getJob().copy();
-    this.job.setTaskCount(size); 
+    this.job.setTaskCount(size);
     this.job.initialTaskCount = source.getJob().getInitialTaskCount();
     this.job.currentTaskCount = size;
     this.dataProvider = source.getDataProvider();
@@ -177,18 +177,18 @@ public class ServerTaskBundleClient
    * Called to notify that the contained task received result.
    * @param results the tasks for which results were received.
    */
-  public synchronized void resultReceived(final Collection<Pair<Integer, DataLocation>> results) {
+  public synchronized void resultReceived(final Collection<ServerTask> results) {
     if (isCancelled()) return;
     if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
     List<ServerTask> tasks = new ArrayList<>(results.size());
-    for (Pair<Integer, DataLocation> result: results) {
-      ServerTask task = taskList.get(result.first());
+    for (ServerTask task: results) {
       //if (task.getState() != ServerTask.State.RESULT) {
-      if ((task.getState() == TaskState.PENDING) || (task.getState() == TaskState.TIMEOUT_CANCELLED)) {
+      if (task.getState() != TaskState.PENDING) {
+        tasks.add(task);
         tasksToSendList.add(task);
         pendingTasksCount.decrementAndGet();
       }
-      task.resultReceived(result.second());
+      //task.resultReceived(result.second());
     }
     done = pendingTasksCount.get() <= 0;
     boolean fire = strategy.sendResults(this, tasks);
@@ -207,7 +207,7 @@ public class ServerTaskBundleClient
     if (debugEnabled) log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
     for (ServerTask task: tasks)
     {
-      if (task.getState() == TaskState.PENDING) {
+      if (task.getState() != TaskState.PENDING) {
         tasksToSendList.add(task);
         pendingTasksCount.decrementAndGet();
       }
@@ -327,7 +327,7 @@ public class ServerTaskBundleClient
   /**
    * Notifies that tasks have been completed.
    */
-  protected void fireTasksCompleted() {
+  private void fireTasksCompleted() {
     List<ServerTask> completedTasks = new ArrayList<>(tasksToSendList);
     tasksToSendList.clear();
 
@@ -340,7 +340,6 @@ public class ServerTaskBundleClient
    * Notifies that bundle is completely executed.
    */
   public void bundleEnded() {
-    if (dataProvider == null) throw new IllegalArgumentException("dataProvider is null");
     for (CompletionListener listener : listenerList) listener.bundleEnded(this);
   }
 
@@ -369,8 +368,8 @@ public class ServerTaskBundleClient
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
     sb.append(", pendingTasks=").append(pendingTasksCount);
-    sb.append(", cancelled=").append(cancelled); 
-    sb.append(", done=").append(done); 
+    sb.append(", cancelled=").append(cancelled);
+    sb.append(", done=").append(done);
     sb.append(", job=").append(job);
     sb.append(']');
     return sb.toString();

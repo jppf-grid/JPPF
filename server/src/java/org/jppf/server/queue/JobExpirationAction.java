@@ -37,17 +37,16 @@ class JobExpirationAction implements Runnable
   /**
    * The bundle wrapper encapsulating the job.
    */
-  private final ServerJob bundleWrapper;
+  private final ServerJob serverJob;
 
   /**
    * Initialize this action with the specified bundle wrapper.
-   * @param bundleWrapper the bundle wrapper encapsulating the job.
+   * @param serverJob the bundle wrapper encapsulating the job.
    */
-  public JobExpirationAction(final ServerJob bundleWrapper)
+  public JobExpirationAction(final ServerJob serverJob)
   {
-    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-
-    this.bundleWrapper = bundleWrapper;
+    if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
+    this.serverJob = serverJob;
   }
 
   /**
@@ -57,11 +56,12 @@ class JobExpirationAction implements Runnable
   @Override
   public void run()
   {
-    String jobId = bundleWrapper.getName();
+    String jobId = serverJob.getName();
     try
     {
       if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
-      bundleWrapper.jobExpired();
+      serverJob.jobExpired();
+      serverJob.cancel(true);
     }
     catch (Exception e)
     {

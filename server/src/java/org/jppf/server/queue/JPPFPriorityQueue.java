@@ -145,8 +145,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           queued = false;
           if (debugEnabled) log.debug("job already queued");
         }
-        if(serverJob.addBundle(clientBundle)) {
-          if(!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
+        if (serverJob.addBundle(clientBundle)) {
+          if (!queued) priorityMap.removeValue(sla.getPriority(), serverJob);
         } else return;
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
@@ -189,21 +189,17 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks)
-  {
+  public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks) {
     final ServerTaskBundleNode result;
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + serverJob.getTaskCount() + " tasks");
       sizeMap.removeValue(getSize(serverJob), serverJob);
-      if (nbTasks >= serverJob.getTaskCount())
-      {
+      if (nbTasks >= serverJob.getTaskCount()) {
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
         result = serverJob.copy(serverJob.getTaskCount());
         removeBundle(serverJob, false);
-      }
-      else
-      {
+      } else {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
         result = serverJob.copy(nbTasks);
         sizeMap.putValue(getSize(serverJob), serverJob);
@@ -370,26 +366,25 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Process the specified broadcast job.
    * This consists in creating one job per node, each containing the same tasks,
    * and with an execution policy that enforces its execution ont he designated node only.
-   * @param bundleWrapper the broadcast job to process.
+   * @param clientBundle the broadcast job to process.
    */
-  void processBroadcastJob(final ServerTaskBundleClient bundleWrapper)
+  void processBroadcastJob(final ServerTaskBundleClient clientBundle)
   {
-    final String jobUuid = bundleWrapper.getUuid();
+    final String jobUuid = clientBundle.getUuid();
     ServerJob serverJob = jobMap.get(jobUuid);
     if (serverJob == null) {
-      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, jobManager, bundleWrapper.getJob(), bundleWrapper.getDataProvider());
+      ServerJobBroadcast broadcastJob = new ServerJobBroadcast(lock, jobManager, clientBundle.getJob(), clientBundle.getDataProvider());
       broadcastJob.setSubmissionStatus(SubmissionStatus.PENDING);
       broadcastJob.setQueueEntryTime(System.currentTimeMillis());
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
       broadcastJob.addOnDone(new RemoveBundleAction(this, broadcastJob));
 
       jobMap.put(jobUuid, broadcastJob);
-      broadcastJob.addBundle(bundleWrapper);
+      broadcastJob.addBundle(clientBundle);
       jobManager.jobQueued(broadcastJob);
       pendingBroadcasts.offer(broadcastJob);
       processPendingBroadcasts();
-    } else
-      serverJob.addBundle(bundleWrapper);
+    } else serverJob.addBundle(clientBundle);
   }
 
   /**
@@ -443,30 +438,34 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
     JobSLA sla = broadcastJob.getSLA();
     List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
-
     Set<String> uuidSet = new HashSet<>();
+    int count = 0;
     for (AbstractNodeContext connection : connections) {
       ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
         String uuid = connection.getUuid();
         if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid)) {
-          ServerJobBroadcast newBundle = broadcastJob.createBroadcastJob(uuid);
           JPPFManagementInfo info = connection.getManagementInfo();
           ExecutionPolicy policy = sla.getExecutionPolicy();
-          if ((policy != null) && !policy.accepts(info.getSystemInfo())) continue;
+          if ((policy != null) && !policy.accepts(info.getSystemInfo())) {
+            if (debugEnabled) log.debug("node uuid={} refused for broadcast {}", uuid, broadcastJob);
+            continue;
+          }
           ExecutionPolicy broadcastPolicy = new Equal("jppf.uuid", true, uuid);
           if (policy != null) broadcastPolicy = broadcastPolicy.and(policy);
+          ServerJobBroadcast newBundle = broadcastJob.createBroadcastJob(uuid);
           newBundle.setSLA(((JPPFJobSLA) sla).copy());
           newBundle.setMetadata(broadcastJob.getMetadata());
           newBundle.getSLA().setExecutionPolicy(broadcastPolicy);
           newBundle.setName(broadcastJob.getName() + " [node: " + info.toString() + ']');
-          newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
+          newBundle.setUuid(JPPFUuid.normalUUID());
           jobList.add(newBundle);
-          if (debugEnabled) log.debug("Execution policy for job uuid=" + newBundle.getUuid() + " :\n" + newBundle.getBroadcastUUID());
+          if (debugEnabled) log.debug("node uuid={} accepted for broadcast {}", uuid, broadcastJob);
         }
       }
     }
-    if (jobList.isEmpty()) broadcastJob.taskCompleted(null, null);
+    //if (jobList.isEmpty()) broadcastJob.taskCompleted(null, null);
+    if (jobList.isEmpty()) broadcastJob.jobEnded();
     else {
       lock.lock();
       try {

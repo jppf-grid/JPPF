@@ -18,6 +18,9 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import java.util.List;
+
+import org.jppf.io.DataLocation;
 import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -68,8 +71,11 @@ public class NodeDispatchTimeoutAction implements Runnable {
       if (debugEnabled) log.debug("node dispatch expiring : {}", nodeBundle);
       nodeBundle.expire();
       String jobUuid = nodeBundle.getJob().getUuid();
-      if (context == null) server.getOfflineNodeHandler().removeNodeBundle(jobUuid, nodeBundle.getId());
-      else {
+      if (context == null) {
+        server.getOfflineNodeHandler().removeNodeBundle(jobUuid, nodeBundle.getId());
+        nodeBundle.taskCompleted(null);
+        nodeBundle.resultsReceived((List<DataLocation>) null);
+      } else {
         try {
           context.cancelJob(jobUuid, false);
         } catch (Exception e) {
@@ -77,7 +83,6 @@ public class NodeDispatchTimeoutAction implements Runnable {
           else log.warn("error cancelling job {} : {}", context, ExceptionUtils.getMessage(e));
         }
       }
-      //nodeBundle.taskCompleted(null);
     }
   }
 }

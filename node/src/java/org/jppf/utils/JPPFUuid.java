@@ -211,7 +211,7 @@ public class JPPFUuid implements Serializable
 
   /**
    * Create a UUID in a standard format as described in {@link java.util.UUID#toString()}.
-   * @return a normalized UUID reprsented as a string.
+   * @return a normalized UUID represented as a string.
    */
   public static String normalUUID()
   {

@@ -18,11 +18,12 @@
 package org.jppf.server.protocol;
 
 import java.util.*;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.server.protocol.utils.ServerJobStatus;
 import org.jppf.server.submission.SubmissionStatus;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -55,6 +56,10 @@ public class ServerJobBroadcast extends ServerJob {
    * Map of all pending broadcast jobs.
    */
   private final Set<ServerJobBroadcast> broadcastSet = new LinkedHashSet<>();
+  /**
+   * Number of remaining tasks that have not completed.
+   */
+  protected int pendingTasksCount = 0;
 
   /**
    * Initialized broadcast job with task bundle and data provider.
@@ -101,18 +106,17 @@ public class ServerJobBroadcast extends ServerJob {
    */
   public ServerJobBroadcast createBroadcastJob(final String broadcastUUID) {
     if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
-    ServerJobBroadcast clientJob;
+    ServerJobBroadcast broadcastJob;
     lock.lock();
     try {
-      clientJob = new ServerJobBroadcast(lock, notificationEmitter, job, getDataProvider(), this, broadcastUUID);
-      for (ServerTaskBundleClient bundle : getBundleList()) {
-        clientJob.addBundle(bundle);
-      }
-      broadcastSet.add(clientJob);
+      broadcastJob = new ServerJobBroadcast(lock, notificationEmitter, job, getDataProvider(), this, broadcastUUID);
+      broadcastJob.tasks.addAll(tasks);
+      broadcastJob.pendingTasksCount = tasks.size();
+      broadcastSet.add(broadcastJob);
     } finally {
       lock.unlock();
     }
-    return clientJob;
+    return broadcastJob;
   }
 
   @Override
@@ -127,6 +131,7 @@ public class ServerJobBroadcast extends ServerJob {
    */
   protected void broadcastDispatched(final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
+    if (debugEnabled) log.debug("dispatched broadcast {}", broadcastJob);
     boolean empty;
     lock.lock();
     try {
@@ -148,56 +153,100 @@ public class ServerJobBroadcast extends ServerJob {
    */
   protected void broadcastCompleted(final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-    //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
+    if (debugEnabled) log.debug("received broadcast results {}", broadcastJob);
     lock.lock();
     try {
-      if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) throw new IllegalStateException("broadcast job not found");
-      if (broadcastMap.isEmpty()) {
-        taskCompleted(null, null);
-        setSubmissionStatus(SubmissionStatus.ENDED);
-      }
+      if ((broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob) && !broadcastSet.contains(broadcastJob)) throw new IllegalStateException("broadcast job not found");
+      if (broadcastMap.isEmpty()) jobEnded();
     } finally {
       lock.unlock();
     }
   }
 
+  /**
+   * Called when the entire broadcast job is complete.
+   */
+  public void jobEnded() {
+    if (debugEnabled) log.debug("broadcast job ended {}", this);
+    setSubmissionStatus(SubmissionStatus.ENDED);
+    CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
+    for (ServerTask task: tasks) {
+      if (!task.isDone()) {
+        task.broadcastResultReceived();
+        clientMap.putValue(task.getBundle(), task);
+      }
+    }
+    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: clientMap.entrySet()) {
+      entry.getKey().resultReceived(entry.getValue());
+    }
+    tasks.clear();
+  }
+
   @Override
-  protected void fireTaskCompleted(final ServerJob result) {
-    if (parentJob == null) {
-      super.fireTaskCompleted(result);
-    } else {
-      setSubmissionStatus(SubmissionStatus.ENDED);
-      parentJob.broadcastCompleted(this);
+  @SuppressWarnings("unchecked")
+  public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
+    if (debugEnabled) log.debug("received results for {}", this);
+    pendingTasksCount -= bundle.getTaskCount();
+    if (pendingTasksCount <= 0) parentJob.broadcastCompleted(this);
+  }
+
+  @Override
+  public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
+    pendingTasksCount -= bundle.getTaskCount();
+    if (pendingTasksCount <= 0) parentJob.broadcastCompleted(this);
+  }
+
+  @Override
+  public boolean addBundle(final ServerTaskBundleClient clientBundle) {
+    lock.lock();
+    try {
+      if (parentJob == null) {
+        boolean b = super.addBundle(clientBundle);
+        List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
+        list.addAll(broadcastMap.values());
+        list.addAll(broadcastSet);
+        for (ServerJobBroadcast broadcastJob: list) addBundle(broadcastJob, clientBundle);
+        return b;
+      }
+      return false;
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Add a bundle to a child broadcast job.
+   * @param broadcastJob the broadcast job to which to add the bundle.
+   * @param bundle the client bundle to add.
+   */
+  private void addBundle(final ServerJobBroadcast broadcastJob, final ServerTaskBundleClient bundle) {
+    if (broadcastJob.getSubmissionStatus() == SubmissionStatus.COMPLETE) {
+      if (broadcastJob.completionBundles == null) broadcastJob.completionBundles = new ArrayList<>();
+      broadcastJob.completionBundles.add(bundle);
+    } else if (broadcastJob.getSubmissionStatus() == SubmissionStatus.ENDED) throw new IllegalStateException("Job ENDED");
+    else {
+      broadcastJob.clientBundles.add(bundle);
+      broadcastJob.tasks.addAll(bundle.getTaskList());
+      fireJobUpdated();
+      broadcastJob.pendingTasksCount += bundle.getTaskCount();
     }
   }
 
   @Override
-  public void taskCompleted(final ServerTaskBundleNode bundle, final Exception exception) {
+  public boolean cancel(final boolean mayInterruptIfRunning) {
+    if (debugEnabled) log.debug("request to cancel " + this);
     lock.lock();
     try {
-      if (isCancelled()) {
+      if (parentJob == null) {
+        if (!setCancelled(mayInterruptIfRunning)) return false;
         List<ServerJobBroadcast> list = new ArrayList<>(broadcastSet.size() + broadcastMap.size());
         list.addAll(broadcastMap.values());
         list.addAll(broadcastSet);
         broadcastSet.clear();
         for (ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
-      }
-      super.taskCompleted(bundle, exception);
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
-  public boolean addBundle(final ServerTaskBundleClient bundle) {
-    lock.lock();
-    try {
-      if (parentJob == null) {
-        if (!super.addBundle(bundle)) return false;
-        for (ServerJobBroadcast item : broadcastSet) item.addBundle(bundle);
         return true;
       } else {
-        return super.addBundle(new ServerTaskBundleClient(bundle.getJob().copy(), bundle.getDataProvider(), bundle.getDataLocationList()));
+        return super.cancel(mayInterruptIfRunning);
       }
     } finally {
       lock.unlock();

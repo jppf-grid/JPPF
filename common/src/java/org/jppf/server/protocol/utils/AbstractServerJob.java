@@ -223,7 +223,7 @@ public abstract class AbstractServerJob {
    */
   public void setJobExpired(final boolean jobExpired) {
     this.jobExpired = jobExpired;
-    if (this.jobExpired && !isDone()) cancel(true);
+    if (this.jobExpired && !isDone()) setCancelled(true);
   }
 
   /**
@@ -308,8 +308,8 @@ public abstract class AbstractServerJob {
    * @param mayInterruptIfRunning true if the thread executing this task should be interrupted.
    * @return whether cancellation was successful.
    */
-  public boolean cancel(final boolean mayInterruptIfRunning) {
-    if (status.compareTo(ServerJobStatus.EXECUTING) > 0) return false;
+  public boolean setCancelled(final boolean mayInterruptIfRunning) {
+    if (!isSuspended() && (status.ordinal() > ServerJobStatus.EXECUTING.ordinal())) return false;
     status = ServerJobStatus.CANCELLED;
     return true;
   }

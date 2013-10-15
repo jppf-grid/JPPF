@@ -170,7 +170,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * and <code>JPPFJob.getSLA().setCancelUponClientDisconnect(false)</code> has been set.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  @Test(timeout=8000)
   public void testCancelJobUponClientDisconnect() throws Exception {
     String fileName = "testCancelJobUponClientDisconnect";
     File f = new File(fileName + ".tmp");
@@ -241,7 +241,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * Test that a job is only executed on one node at a time.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout=8000)
+  @Test(timeout=8000)
   public void testJobMaxNodes() throws Exception {
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
@@ -346,6 +346,27 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   }
 
   /**
+   * Test that a broadcast job is not executed when no node is available.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000)
+  public void testBroadcastJobNoNodeAvailable() throws Exception {
+    String suffix = "node-";
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
+    job.getSLA().setMaxNodes(2);
+    job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, "no node has this as uuid!"));
+    List<JPPFTask> results = client.submit(job);
+    for (int i=1; i<=2; i++) {
+      File file = new File("node-n" + i + ".tmp");
+      try {
+        assertFalse("file '" + file + "' exists but shouldn't", file.exists());
+      } finally {
+        if (file.exists()) file.delete();
+      }
+    }
+  }
+
+  /**
    * Test that results are returned according to the SendNodeResultsStrategy specified in the SLA.
    * @throws Exception if any error occurs.
    */
@@ -421,7 +442,6 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
         String name = filePath;
         if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         name = name + ".tmp";
-
         File f = new File(name);
         Thread.sleep(2000L);
         Writer writer = new FileWriter(f);

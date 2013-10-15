@@ -69,10 +69,6 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
    */
   protected int initialTaskCount = 0;
   /**
-   * The task completion listener to notify, once the execution of this task has completed.
-   */
-  private transient TaskCompletionListener completionListener = null;
-  /**
    * The time it took a node to execute this task.
    */
   private long nodeExecutionTime = 0L;
@@ -165,30 +161,6 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   }
 
   /**
-   * Get the task completion listener to notify, once the execution of this task has completed.
-   * @return a <code>TaskCompletionListener</code> instance.
-   */
-  public TaskCompletionListener getCompletionListener() {
-    return completionListener;
-  }
-
-  /**
-   * Set the task completion listener to notify, once the execution of this task has completed.
-   * @param listener a <code>TaskCompletionListener</code> instance.
-   */
-  public void setCompletionListener(final TaskCompletionListener listener) {
-    this.completionListener = listener;
-  }
-
-  /**
-   * Notifies that execution of this task has completed.
-   * @param result the result of the task's execution.
-   */
-  public void fireTaskCompleted(final ServerJob result) {
-    if (this.completionListener != null) this.completionListener.taskCompleted(result);
-  }
-
-  /**
    * Compare two task bundles, based on their respective priorities.<br>
    * <b>Note:</b> <i>this class has a natural ordering that is inconsistent with equals.</i>
    * @param bundle the bundle compare this one to.
@@ -218,7 +190,6 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     bundle.setCurrentTaskCount(currentTaskCount);
     bundle.initialTaskCount = initialTaskCount;
     bundle.getAll().putAll(this.getAll());
-    bundle.setCompletionListener(completionListener);
     bundle.setSLA(jobSLA);
     bundle.setMetadata(jobMetadata);
     bundle.setHandshake(handshake);
