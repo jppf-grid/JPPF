@@ -103,13 +103,13 @@ public interface JobSLA extends JobCommonSLA
   void setResultsStrategy(String name);
 
   /**
-   * Get the class path assoiated witht eh job.
+   * Get the class path associated with the job.
    * @return an instance of {@link ClassPath}.
    */
   ClassPath getClassPath();
 
   /**
-   * Set the class path assoiated witht eh job.
+   * Set the class path associated with the job.
    * @param classpath an instance of {@link ClassPath}.
    */
   void setClassPath(ClassPath classpath);

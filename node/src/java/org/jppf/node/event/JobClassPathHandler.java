@@ -63,17 +63,17 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
         }
         if (!validated) continue;
         URL url = null;
-        Location localLocation = elt.getLocalLocation();
-        Location remoteLocation = elt.getRemoteLocation();
+        Location local = elt.getLocalLocation();
+        Location remote = elt.getRemoteLocation();
         try {
-          if (remoteLocation != localLocation) localLocation.copyTo(remoteLocation);
-          if (remoteLocation instanceof MemoryLocation) {
-            cl.getResourceCache().registerResource(elt.getName(), remoteLocation);
+          if (remote != local) local.copyTo(remote);
+          if (remote instanceof MemoryLocation) {
+            cl.getResourceCache().registerResource(elt.getName(), remote);
             url = cl.getResourceCache().getResourceURL(elt.getName());
-          } else if (remoteLocation instanceof FileLocation) {
-            File file = new File(((FileLocation) remoteLocation).getPath());
+          } else if (remote instanceof FileLocation) {
+            File file = new File(((FileLocation) remote).getPath());
             if (file.exists()) url = file.toURI().toURL();
-          } else if (remoteLocation instanceof URLLocation) url = ((URLLocation) remoteLocation).getPath();
+          } else if (remote instanceof URLLocation) url = ((URLLocation) remote).getPath();
         } catch (Exception e) {
           String format = "exception occurred during processing of classpath element '{}' : {}";
           if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(e));

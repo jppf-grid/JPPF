@@ -33,19 +33,22 @@ public interface ClassPathElement extends Serializable
    * @return the name as a string.
    */
   String getName();
+
   /**
    * Get the location of this element, pointing to or embedding the underlying jar or zip file in the client environment.
    * @return a {@link Location} object.
    */
   Location<?> getLocalLocation();
+
   /**
    * Get the location of this element, pointing to or embedding the underlying jar or zip file in the node environment.
    * @return a {@link Location} object.
    */
   Location<?> getRemoteLocation();
+
   /**
    * Perform a validation of this classpath element.
-   * If validation fails, if will not be added tot he node's classpath and its classes will not be loaded nor executed.
+   * If validation fails, if will not be added to the node's classpath and its classes will not be loaded nor executed.
    * <p>An example use is to check that a jar file is signed and that it is secure to use it.
    * @return <code>true</code> if the validation issuccessful, <code>false</code> if it fails.
    */

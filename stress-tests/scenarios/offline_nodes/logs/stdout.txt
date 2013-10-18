@@ -1,13 +1,7 @@
 [driver-1] Listening for transport dt_socket at address: 8000
-[driver-1] driver process id: 4000
-[  node-1] node process id: 4904
-[  node-2] node process id: 884
+[driver-1] driver process id: 5440
+[  node-1] node process id: 4188
 [  node-1] This node is 'offline', no class loader connection is established
-[  node-2] This node is 'offline', no class loader connection is established
-[  node-3] node process id: 792
-[  node-4] node process id: 76
-[  node-3] This node is 'offline', no class loader connection is established
-[  node-4] This node is 'offline', no class loader connection is established
 [driver-1] management initialized and listening on port 11201
 [driver-1] ClientClassServer initialized
 [driver-1] NodeClassServer initialized
@@ -17,6 +11,3 @@
 [driver-1] -  accepting plain connections on port 11101
 [driver-1] JPPF Driver initialization complete
 [  node-1] Node successfully initialized
-[  node-2] Node successfully initialized
-[  node-3] Node successfully initialized
-[  node-4] Node successfully initialized
