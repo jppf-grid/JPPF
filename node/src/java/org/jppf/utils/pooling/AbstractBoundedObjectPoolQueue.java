@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * An extension of {@link AbstractObjectPoolQueue} which specifies a maximum size for the pool.
  * <p>In this implementation, objects are still created dynamically if the pool is empty, however
- * the {@link #put(T)} method does not return an element to the backing queue if the pool size >= max size.
+ * the <code>put(T)</code> method does not return an element to the backing queue if the pool size >= max size.
  * <p> the {@link #size()} method is also overriden to provide results in constant time insteat of O(n) in
  * the super class, since it is used frequently when comparing current pool size with the max size.
  * @param <T> the type of the elements in the pool.

@@ -40,7 +40,7 @@ public class ViewDescriptor
   /**
    * The components attached to this view.
    */
-  private final Set<DetachableComponentDescriptor> components = new HashSet<>();
+  private final Set<DetachableComponentDescriptor> components = new LinkedHashSet<>();
 
   /**
    * Initiailze this view descriptor.

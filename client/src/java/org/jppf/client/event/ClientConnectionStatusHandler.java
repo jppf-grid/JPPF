@@ -24,7 +24,6 @@ import org.jppf.client.JPPFClientConnectionStatus;
  * Interface implemented by all classes that desire to handle a connection status
  * and notify others about status changes.
  * @author Laurent Cohen
- * @exclude
  */
 public interface ClientConnectionStatusHandler
 {

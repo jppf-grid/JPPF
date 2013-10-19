@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * This pool is designed for maximum throughput, thus its size will grow dynamically,
  * up to maximum concurrent usage.
  * <p>Subclasses that wish to avoid a size too large for the pool may for instance
- * introduce a core pool size, and override the {@link #put(T)} method such that it
+ * introduce a core pool size, and override the <code>put(T)</code> method such that it
  * doesn't put released object back into the queue if its size > core size.
  * <p>In this case the {@link #size()} method might need to be overriden as well, as its
  * performance in O(n) may be the main bottleneck of the implementation.
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
 {
   /**
-   * The pool of {@link ByteBuffer}.
+   * The pool of objects.
    */
   protected final Queue<T> queue = new ConcurrentLinkedQueue<>();
 

@@ -89,26 +89,20 @@ class JPPFScreenSaver //extends SimpleScreensaver
   /**
    * Default constructor.
    */
-  public JPPFScreenSaver()
-  {
+  public JPPFScreenSaver() {
   }
 
   /**
    * Initialize the UI components.
    */
-  public void init()
-  {
-    try
-    {
+  public void init() {
+    try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      for (Frame frame: Frame.getFrames())
-      {
+      for (Frame frame: Frame.getFrames()) {
         SwingUtilities.updateComponentTreeUI(frame);
-        frame.addWindowListener(new WindowAdapter()
-        {
+        frame.addWindowListener(new WindowAdapter() {
           @Override
-          public void windowClosing(final WindowEvent e)
-          {
+          public void windowClosing(final WindowEvent e) {
             destroy();
             System.exit(0);
           }
@@ -116,9 +110,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
       }
       Frame frame = Frame.getFrames()[0];
       frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
     }
     initializeSettings();
@@ -137,8 +129,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
 
     Dimension dim = parent.getSize();
     Random rand = new Random(System.currentTimeMillis());
-    for (int i=0; i<nbLogos; i++)
-    {
+    for (int i=0; i<nbLogos; i++) {
       int n = dim.width - imgw;
       if (n <= 0) n = imgw;
       data[i].x = rand.nextInt(n);
@@ -151,17 +142,14 @@ class JPPFScreenSaver //extends SimpleScreensaver
       data[i].stepY *= 2 * rand.nextInt(2) - 1;
     }
     setDoubledBuffering(node);
-    if (timer == null)
-    {
+    if (timer == null) {
       timer = new Timer();
       timer.schedule(new LogoUpdateTask(), 100, 25L + 5L * (11L - speed));
       // 25 frames/sec = 40ms/frame
       timer.schedule(new LogoDisplayTask(), 500L, 25L);
-      TimerTask task = new TimerTask()
-      {
+      TimerTask task = new TimerTask() {
         @Override
-        public void run()
-        {
+        public void run() {
 
           String s = NodePanel.toStringDuration(System.currentTimeMillis() - node.nodeState.startedAt);
           node.nodeState.timeLabel.setText("Active for: "+s);
@@ -174,8 +162,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
   /**
    * Initialize the parameters of the screensaver.
    */
-  private void initializeSettings()
-  {
+  private void initializeSettings() {
     //ScreensaverSettings settings = getContext().getSettings();
     System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "jppf-node.properties");
 
@@ -196,8 +183,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
    * Read the logos image file and initialize the graphics objects
    * required to render them.
    */
-  private void initializeFlyingLogos()
-  {
+  private void initializeFlyingLogos() {
     logo = NodePanel.loadImage(NodePanel.IMAGE_PATH + '/' + "logo-small.gif");
     logoImg = logo.getImage();
     imgw = logo.getIconWidth();
@@ -208,11 +194,9 @@ class JPPFScreenSaver //extends SimpleScreensaver
    * Set a hierarchy of Swing components as double buffered.
    * @param comp the root of the components hierarchy.
    */
-  private static void setDoubledBuffering(final JComponent comp)
-  {
+  private static void setDoubledBuffering(final JComponent comp) {
     comp.setDoubleBuffered(true);
-    for (int i=0; i<comp.getComponentCount(); i++)
-    {
+    for (int i=0; i<comp.getComponentCount(); i++) {
       Component c = comp.getComponent(i);
       if (c instanceof JComponent) setDoubledBuffering((JComponent) c);
     }
@@ -224,19 +208,15 @@ class JPPFScreenSaver //extends SimpleScreensaver
    * @param defValue the default value to use if the setting is not defined.
    * @return the setting as an int value.
    */
-  private static int getIntSetting(final String name, final int defValue)
-  {
+  private static int getIntSetting(final String name, final int defValue) {
     int result = defValue;
-    try
-    {
+    try {
       /*
 			ScreensaverSettings settings = getContext().getSettings();
 			String s = settings.getProperty(name);
 			result = Integer.parseInt(s);
        */
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
     }
     return result;
   }
@@ -245,18 +225,15 @@ class JPPFScreenSaver //extends SimpleScreensaver
    * Called at regular intervals to render the next frame in the screen saver.
    * @param g the graphics on which to paint the frame.
    */
-  public void paint(final Graphics g)
-  {
+  public void paint(final Graphics g) {
   }
 
   /**
    * Invoked when the screen saver terminates, to free the resources used by the node.
    */
-  protected void destroy()
-  {
+  protected void destroy() {
     timer.cancel();
-    if (node != null)
-    {
+    if (node != null) {
       node.cleanup();
       parent.remove(node);
       node = null;
@@ -266,8 +243,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
   /**
    * Data structure holding the position and direction of a flying logo.
    */
-  private static class ImageData
-  {
+  private static class ImageData {
     /**
      * The previous position on the x axis.
      */
@@ -297,8 +273,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
   /**
    * Timer task to display the logos at a rate of 25 frames/sec.
    */
-  public class LogoDisplayTask  extends TimerTask
-  {
+  public class LogoDisplayTask  extends TimerTask {
     /**
      * The task that renders the flying logos.
      */
@@ -307,13 +282,10 @@ class JPPFScreenSaver //extends SimpleScreensaver
     /**
      * Initialize the task that renders the flying logos.
      */
-    public LogoDisplayTask()
-    {
-      task = new Runnable()
-      {
+    public LogoDisplayTask() {
+      task = new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           updateLogos();
         }
       };
@@ -324,8 +296,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
      * @see java.util.TimerTask#run()
      */
     @Override
-    public void run()
-    {
+    public void run() {
       SwingUtilities.invokeLater(task);
     }
   }
@@ -333,37 +304,25 @@ class JPPFScreenSaver //extends SimpleScreensaver
   /**
    * Timer task to update the position and direction of the flying logos.
    */
-  private class LogoUpdateTask extends TimerTask
-  {
+  private class LogoUpdateTask extends TimerTask {
     /**
      * Update the position and direction of the flying logos.
      * @see java.util.TimerTask#run()
      */
     @Override
-    public void run()
-    {
+    public void run() {
       Dimension dim = parent.getSize();
-      for (int i=0; i<data.length; i++)
-      {
+      for (int i=0; i<data.length; i++) {
         ImageData d = data[i];
-        if (collisions)
-        {
-          for (int j=i+1; j<data.length; j++)
-          {
+        if (collisions) {
+          for (int j=i+1; j<data.length; j++) {
             ImageData d2 = data[j];
             checkColliding(d, d2);
           }
         }
-        synchronized(d)
-        {
-          if ((d.x + d.stepX < 0) || (d.x + d.stepX + imgw > dim.width))
-          {
-            d.stepX = -d.stepX;
-          }
-          if ((d.y + d.stepY < 0) || (d.y + d.stepY + imgh > dim.height))
-          {
-            d.stepY = -d.stepY;
-          }
+        synchronized(d) {
+          if ((d.x + d.stepX < 0) || (d.x + d.stepX + imgw > dim.width)) d.stepX = -d.stepX;
+          if ((d.y + d.stepY < 0) || (d.y + d.stepY + imgh > dim.height)) d.stepY = -d.stepY;
           d.x += d.stepX;
           d.y += d.stepY;
         }
@@ -376,64 +335,50 @@ class JPPFScreenSaver //extends SimpleScreensaver
      * @param d2 the position and speed vector data for the second logo.
      * @return true if the two logos are colliding, false otherwise.
      */
-    public boolean checkColliding(final ImageData d1, final ImageData d2)
-    {
+    public boolean checkColliding(final ImageData d1, final ImageData d2) {
       int x1 = d1.x + d1.stepX;
       int x2 = d2.x + d2.stepX;
       int y1 = d1.y + d1.stepY;
       int y2 = d2.y + d2.stepY;
-      boolean b = false;
-      if (isIn(x1, y1, x2, y2))
-      {
-        if (d1.x >= d2.x + imgw)
-        {
+      if (isIn(x1, y1, x2, y2)) {
+        if (d1.x >= d2.x + imgw) {
           d1.stepX  = -d1.stepX;
           d2.stepX  = -d2.stepX;
         }
-        if (d1.y >= d2.y + imgh)
-        {
+        if (d1.y >= d2.y + imgh) {
           d1.stepY  = -d1.stepY;
           d2.stepY  = -d2.stepY;
         }
         return true;
       }
-      if (isIn(x1 + imgw, y1, x2, y2))
-      {
-        if (d1.x + imgw <= d2.x)
-        {
+      if (isIn(x1 + imgw, y1, x2, y2)) {
+        if (d1.x + imgw <= d2.x) {
           d1.stepX  = -d1.stepX;
           d2.stepX  = -d2.stepX;
         }
-        if (d1.y >= d2.y + imgh)
-        {
+        if (d1.y >= d2.y + imgh) {
           d1.stepY  = -d1.stepY;
           d2.stepY  = -d2.stepY;
         }
         return true;
       }
-      if (isIn(x1, y1 + imgh, x2, y2))
-      {
-        if (d1.x >= d2.x + imgw)
-        {
+      if (isIn(x1, y1 + imgh, x2, y2)) {
+        if (d1.x >= d2.x + imgw) {
           d1.stepX  = -d1.stepX;
           d2.stepX  = -d2.stepX;
         }
-        if (d1.y + imgh <= d2.y)
-        {
+        if (d1.y + imgh <= d2.y) {
           d1.stepY  = -d1.stepY;
           d2.stepY  = -d2.stepY;
         }
         return true;
       }
-      if (isIn(x1 + imgw, y1 + imgh, x2, y2))
-      {
-        if (d1.x + imgw <= d2.x)
-        {
+      if (isIn(x1 + imgw, y1 + imgh, x2, y2)) {
+        if (d1.x + imgw <= d2.x) {
           d1.stepX  = -d1.stepX;
           d2.stepX  = -d2.stepX;
         }
-        if (d1.y + imgh <= d2.y)
-        {
+        if (d1.y + imgh <= d2.y) {
           d1.stepY  = -d1.stepY;
           d2.stepY  = -d2.stepY;
         }
@@ -450,8 +395,7 @@ class JPPFScreenSaver //extends SimpleScreensaver
      * @param y2 y coordinate of the top left corner of the second logo.
      * @return true if the corner of the first is logo is inside the second, false otherwise.
      */
-    public boolean isIn(final int x1, final int y1, final int x2, final int y2)
-    {
+    public boolean isIn(final int x1, final int y1, final int x2, final int y2) {
       return (x1 >= x2) && (x1 <= x2 + imgw) && (y1 >= y2) && (y1 <= y2 + imgh);
     }
   }
@@ -460,19 +404,15 @@ class JPPFScreenSaver //extends SimpleScreensaver
    * Performs the repainting of the flying logo images, as well as that of the areas they were
    * occupying within the underlying components.
    */
-  public void updateLogos()
-  {
+  public void updateLogos() {
     Graphics g = parent.getGraphics();
-    if (buffer == null)
-    {
+    if (buffer == null) {
       buffer = parent.createImage(parent.getWidth(),parent.getHeight());
       bufferGraphics = buffer.getGraphics();
     }
     Shape clip = bufferGraphics.getClip();
-    for (ImageData d: data)
-    {
-      synchronized(d)
-      {
+    for (ImageData d: data) {
+      synchronized(d) {
         int minx = Math.min(d.prevx, d.x);
         int maxx = Math.max(d.prevx, d.x);
         int miny = Math.min(d.prevy, d.y);

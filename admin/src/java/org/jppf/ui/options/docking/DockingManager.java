@@ -68,7 +68,7 @@ public final class DockingManager
   /**
    * Mapping of view ids to the corresponding UI frame.
    */
-  private Map<String, ViewDescriptor> viewMap = new TreeMap<>();
+  private final Map<String, ViewDescriptor> viewMap = new TreeMap<>();
   /**
    * Handles what to do when a view frame is closed.
    */
@@ -246,61 +246,6 @@ public final class DockingManager
   }
 
   /**
-   * 
-   */
-  class UndockingMouseAdapter extends MouseAdapter
-  {
-    @Override
-    public void mousePressed(final MouseEvent event)
-    {
-      if (event.getButton() != MouseEvent.BUTTON3) return;
-      Component comp = event.getComponent();
-      int x = event.getX();
-      int y = event.getY();
-      JPopupMenu menu = createPopupMenu(comp);
-      menu.show(comp, x, y);
-    }
-
-    /**
-     * 
-     * @param comp the component to move.
-     * @return a popup menu.
-     */
-    protected JPopupMenu createPopupMenu(final Component comp)
-    {
-      DetachableComponentDescriptor desc = getComponentFromListenerComp(comp);
-      Component realComp = desc.getComponent().getUIComponent();
-      JPopupMenu menu = new JPopupMenu();
-      if (desc.getInitialContainer() != desc.getCurrentContainer())
-        menu.add(new JMenuItem(new DockToInitialContainerAction(realComp, localize("attach.to.initial.container"))));
-      menu.add(new JMenuItem(new DockToNewViewAction(realComp, localize("attach.to.new.view"))));
-      if (viewMap.size() > 1)
-      {
-        JMenu subMenu = new JMenu(localize("attach.to.existing.view"));
-        menu.add(subMenu);
-        for (String id: viewMap.keySet())
-        {
-          if (!id.equals(desc.getViewId()) && (!id.equals(INITIAL_VIEW))) subMenu.add(new JMenuItem(new DockToExistingViewAction(realComp, id, id)));
-        }
-      }
-      return menu;
-    }
-
-    @Override
-    public void mouseClicked(final MouseEvent e)
-    {
-      if (e.getButton() == MouseEvent.BUTTON1)
-      {
-        Component comp = e.getComponent();
-        DetachableComponentDescriptor desc = getComponentFromListenerComp(comp);
-        if (desc == null) return;
-        JTabbedPane pane = (JTabbedPane) desc.getCurrentContainer().getUIComponent();
-        pane.setSelectedComponent(desc.getComponent().getUIComponent());
-      }
-    }
-  }
-
-  /**
    * Get the mouse listener for the popup menu on right-click.
    * @return an {@link UndockingMouseAdapter} object.
    */
@@ -347,8 +292,17 @@ public final class DockingManager
    * @return a message in the current locale, or the default locale
    * if the localization for the current locale is not found.
    */
-  private static String localize(final String message)
+  static String localize(final String message)
   {
     return LocalizationUtils.getLocalized(I18N_BASE, message);
+  }
+
+  /**
+   * Get the Mapping of view ids to the corresponding UI frame.
+   * @return a map of string ids to {@link ViewDescriptor} instances.
+   */
+  public Map<String, ViewDescriptor> getViewMap()
+  {
+    return viewMap;
   }
 }

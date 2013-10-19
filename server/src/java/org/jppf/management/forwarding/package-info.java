@@ -28,8 +28,8 @@
  * </ul>
  * 
  * <h2>Forwarding management requests</h2>
- * <p>The request forwarding mechanism is based on a built-in driver MBean: {@link JPPFNodeForwardingMBean}, which provides methods to invoke methods, or get or set attributes on remote node MBeans.
- * Each of its methods requires a {@link NodeSelector} argument and an MBean name, to determine to which nodes, and which MBean in these nodes, the request will be performed.
+ * <p>The request forwarding mechanism is based on a built-in driver MBean: {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean}, which provides methods to invoke methods, or get or set attributes on remote node MBeans.
+ * Each of its methods requires a {@link org.jppf.management.NodeSelector} argument and an MBean name, to determine to which nodes, and which MBean in these nodes, the request will be performed.
  * The return value is always a map of node UUIDs to the corresponding value returned by the request (if any) to the corresponding node.
  * If an exception is raised when performing the request on a specific node, then that exception is returned in the map.
  * 
@@ -79,7 +79,7 @@
  * </li>
  * <li>to remove a notification listener, use {@link org.jppf.management.JMXDriverConnectionWrapper#unregisterForwardingNotificationListener(String) unregisterForwardingNotificationListener(String listenerID)}.</li>
  * </ul>
- * <p>The notifications forwarded from the nodes are all wrapped into instances of {@link JPPFNodeForwardingNotification}.
+ * <p>The notifications forwarded from the nodes are all wrapped into instances of {@link org.jppf.management.forwarding.JPPFNodeForwardingNotification}.
  * This class, which inherits from {@link javax.management.Notification}, provides additional APIs to identify from which node and which MBean the notification was emitted.
  * <p>The following code sample puts it all together:
  * <pre>

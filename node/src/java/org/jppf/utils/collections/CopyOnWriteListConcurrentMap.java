@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * A {@link ConcurrentHashMap} whose values are {@link CopyOnWriteArryList} instances.
+ * A {@link ConcurrentHashMap} whose values are {@link CopyOnWriteArrayList} instances.
  * @param <K> the type of the keys.
  * @param <V> the type of the objects in the map"'s collection values.
  * @author Laurent Cohen

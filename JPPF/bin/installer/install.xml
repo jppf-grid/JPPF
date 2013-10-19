@@ -68,8 +68,8 @@
       	<include name="**/*.*"/>
         <include name="JPPFDriver"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/startDriver.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/JPPFDriver" stage="never"><os family="unix"/></executable>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/startDriver.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/JPPFDriver" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Node" required="no" preselected="yes">
       <description>The JPPF node librairies and launch scripts</description>
@@ -77,22 +77,22 @@
         <include name="**/*.*"/>
         <include name="JPPFNode"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/startNode.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/JPPFNode" stage="never"><os family="unix"/></executable>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/JPPFNode" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Console" required="no" preselected="yes">
       <description>The JPPF administration and monitoring console librairies and launch scripts</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-admin-ui" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui">
       	<include name="**/*.*"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui/startConsole.sh" stage="never"><os family="unix"/></executable>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui/startConsole.sh" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Application_Template" required="no" preselected="yes">
       <description>A fully working JPPF template application to use as a starting point</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-application-template" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template">
       	<include name="**/*.*"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never"><os family="unix"/></executable>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_User_Guide" required="no" preselected="yes">
       <description>Full user guide in PDF format</description>
@@ -111,20 +111,20 @@
       <fileset dir="./build/@{app.ver}/@{app.ver}-samples-pack" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack">
       	<include name="**/*.*"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/DataDependency/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ExtendedClassLoading/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Fractals/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FTPServer/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/GPU/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/JobRecovery/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/KryoSerializer/build.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/MatrixMultiplication/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Nbody/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/startH2.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/stopH2.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/SequenceAlignment/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/TaskNotifications/run.sh" stage="never"><os family="unix"/></executable>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/WebSearchEngine/run.sh" stage="never"><os family="unix"/></executable>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/DataDependency/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ExtendedClassLoading/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Fractals/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FTPServer/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/GPU/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/JobRecovery/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/KryoSerializer/build.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/MatrixMultiplication/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Nbody/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/startH2.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/stopH2.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/SequenceAlignment/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/TaskNotifications/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/WebSearchEngine/run.sh" stage="never" os="unix"/>
     </pack>
     <pack name="J2EE_Connector" required="no" preselected="no">
       <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>

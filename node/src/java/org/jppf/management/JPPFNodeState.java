@@ -141,25 +141,6 @@ public class JPPFNodeState implements Serializable
   //private int threadPriority = Thread.NORM_PRIORITY;
 
   /**
-   * This method returns <code>null</code>.
-   * @return <code>null</code>.
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener JPPFTaskListener} for a rationale.
-   */
-  public synchronized Serializable getTaskNotification()
-  {
-    return null;
-  }
-
-  /**
-   * This method does nothing.
-   * @param taskEvent the event as an object.
-   * @deprecated see {@link org.jppf.server.protocol.JPPFTaskListener} for a rationale.
-   */
-  public synchronized void setTaskEvent(final Serializable taskEvent)
-  {
-  }
-
-  /**
    * Get the number of tasks executed by the node.
    * @return the number of tasks as an int.
    */

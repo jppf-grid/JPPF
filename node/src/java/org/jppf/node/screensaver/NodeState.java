@@ -189,7 +189,7 @@ class NodeState implements NodeLifeCycleListener
 				break;
 		}
 	}
-   */
+  */
 
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event)
