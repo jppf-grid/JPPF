@@ -152,7 +152,10 @@
   <!--                           Run the JUnit tests                             -->
   <!-- ========================================================================= -->
 
-  <target name="run" depends="compile, generate.tests.list" description="run the junit tests">
+  <target name="run"            depends="compile, generate.tests.list, runtests"/>
+  <target name="run.nogenerate" depends="compile,                      runtests"/>
+
+  <target name="runtests" description="run the junit tests">
     <echo message="Running the tests"/>
     <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
       <jvmarg value="-server"/>

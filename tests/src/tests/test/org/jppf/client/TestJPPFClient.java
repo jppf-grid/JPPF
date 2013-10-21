@@ -425,38 +425,6 @@ public class TestJPPFClient extends Setup1D1N
   }
 
   /**
-   * A task which holds a non-serializable object.
-   */
-  public static class NotSerializableTask extends JPPFTask
-  {
-    /**
-     * A non-serializable object.
-     */
-    private NotSerializableObject nso = null;
-    /**
-     *  <code>true</code> if the non-serializable object should be created in the constructor, <code>false</code> if it should be created in the client.
-     */
-    private final boolean instantiateInClient;
-
-    /**
-     * Initialize with the specified flag.
-     * @param instantiateInClient <code>true</code> if the non-serializable object should be created in the constructor (client side),
-     * <code>false</code> if it should be created in the <code>run()</code> method (node side).
-     */
-    public NotSerializableTask(final boolean instantiateInClient)
-    {
-      this.instantiateInClient = instantiateInClient;
-      if (instantiateInClient) nso = new NotSerializableObject();
-    }
-
-    @Override
-    public void run()
-    {
-      if (!instantiateInClient) nso = new NotSerializableObject();
-    }
-  }
-
-  /**
    * A task that checks the current thread context class loader during its execution.
    */
   public static class ThreadContextClassLoaderTask extends JPPFTask
@@ -482,17 +450,6 @@ public class TestJPPFClient extends Setup1D1N
       }
       setResult(cl.toString());
     }
-  }
-
-  /**
-   * A task which holds a non-serializable object.
-   */
-  public static class NotSerializableObject
-  {
-    /**
-     * Any attribute will do.
-     */
-    public String name = "NotSerializableObject";
   }
 
   /**

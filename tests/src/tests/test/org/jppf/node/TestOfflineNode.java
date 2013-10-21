@@ -85,7 +85,6 @@ public class TestOfflineNode extends SetupOfflineNode1D2N1C
     }
   }
 
-
   /**
    * Test that a simple job expires and is cancelled upon first dispatch.
    * @throws Exception if any error occurs
