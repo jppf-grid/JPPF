@@ -165,13 +165,18 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
+    if (debugEnabled) log.debug("handling {} for {}", exception.getClass().getName(), channel);
     ServerTaskBundleNode tmpBundle = bundle;
     NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
-    server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
-    cleanup(channel);
-    if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
-      tmpBundle.resubmit();
-      tmpBundle.getClientJob().taskCompleted(tmpBundle, new Exception(exception));
+    try {
+      if (tmpBundle != null) server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+      cleanup(channel);
+      if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
+        tmpBundle.resubmit();
+        tmpBundle.getClientJob().taskCompleted(tmpBundle, new Exception(exception));
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -180,6 +185,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param channel the channel to close.
    */
   void cleanup(final ChannelWrapper<?> channel) {
+    if (debugEnabled) log.debug("handling cleanup for {}", channel);
     Bundler bundler = getBundler();
     if (bundler != null) {
       bundler.dispose();

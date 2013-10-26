@@ -25,9 +25,9 @@ import javax.management.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.job.management.*;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -90,7 +90,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * Request the JMX connection information for all the nodes attached to the server.
    * @return a collection of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
    */
   @Override
   @SuppressWarnings("unchecked")
@@ -101,14 +100,13 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
 
   /**
    * Get the latest statistics snapshot from the JPPF driver.
-   * @return a <code>JPPFStats</code> instance.
+   * @return a <code>JPPFStatistics</code> instance.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
    */
   @Override
-  public JPPFStats statistics() throws Exception
+  public JPPFStatistics statistics() throws Exception
   {
-    JPPFStats stats = (JPPFStats) invoke(MBEAN_NAME, "statistics");
+    JPPFStatistics stats = (JPPFStatistics) invoke(MBEAN_NAME, "statistics");
     return stats;
   }
 
@@ -118,7 +116,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
    * @return an acknowledgement message.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
    */
   @Override
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
@@ -133,7 +130,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param parameters the algorithm's parameters.
    * @return an acknowledgement or error message.
    * @throws Exception if an error occurred while updating the settings.
-   * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
    */
   @Override
   public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception
@@ -146,7 +142,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * Obtain the current load-balancing settings.
    * @return an instance of <code>LoadBalancingInformation</code>.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
    */
   @Override
   public LoadBalancingInformation loadBalancerInformation() throws Exception
@@ -158,7 +153,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * Cancel the job with the specified id.
    * @param jobId the id of the job to cancel.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    */
   public void cancelJob(final String jobId) throws Exception
   {
@@ -171,7 +165,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param requeue true if the sub-jobs running on each node should be canceled and requeued,
    * false if they should be left to execute until completion.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
    */
   public void suspendJob(final String jobId, final Boolean requeue) throws Exception
   {
@@ -182,7 +175,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * Resume the job with the specified id.
    * @param jobId the id of the job to resume.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
    */
   public void resumeJob(final String jobId) throws Exception
   {
@@ -194,7 +186,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param jobId the id of the job to update.
    * @param maxNodes the new maximum number of nodes for the job.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
    */
   public void updateMaxNodes(final String jobId, final Integer maxNodes) throws Exception
   {
@@ -206,7 +197,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param jobId the id of the job to update.
    * @param newPriority the new priority of the job.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
    */
   public void updateJobPriority(final String jobId, final Integer newPriority) throws Exception
   {
@@ -217,7 +207,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * Get the set of ids for all the jobs currently queued or executing.
    * @return an array of ids as strings.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#getAllJobIds()
    */
   public String[] getAllJobIds() throws Exception
   {
@@ -229,7 +218,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param jobId the id of the job to get information about.
    * @return an instance of <code>JobInformation</code>.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
    */
   public JobInformation getJobInformation(final String jobId) throws Exception
   {
@@ -241,7 +229,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param jobId the id of the job for which to find node information.
    * @return an array of <code>NodeManagementInfo</code>, <code>JobInformation</code> instances.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
    */
   public NodeJobInformation[] getNodeInformation(final String jobId) throws Exception
   {

@@ -36,6 +36,7 @@ import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -43,8 +44,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> implements JobManager
-{
+public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> implements JobManager {
   /**
    * Logger for this class.
    */
@@ -54,9 +54,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The driver stats manager
+   * The driver.
    */
-  private final JPPFDriverStatsManager statsManager;
+  private final JPPFDriver driver;
   /**
    * The list of registered job listeners.
    */
@@ -93,12 +93,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
   /**
    * Initialize this queue.
-   * @param statsManager reference to statistics manager.
+   * @param driver reference to the driver.
    * @param jobManager the job manager.
    */
-  public JPPFPriorityQueue(final JPPFDriverStatsManager statsManager, final JPPFJobManager jobManager)
-  {
-    this.statsManager = statsManager;
+  public JPPFPriorityQueue(final JPPFDriver driver, final JPPFJobManager jobManager) {
+    this.driver = driver;
     this.jobManager = jobManager;
   }
 
@@ -154,14 +153,17 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           sizeMap.putValue(getSize(serverJob), serverJob);
         }
         updateLatestMaxSize();
-        if (!queued)  JPPFDriver.getInstance().getStatsUpdater().tasksAdded(clientBundle.getTaskCount());
+        if (!queued) {
+          driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
+        }
         fireQueueEvent(new QueueEvent<>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
       lock.unlock();
     }
-    statsManager.taskInQueue(clientBundle.getTaskCount());
+    driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, clientBundle.getTaskCount());
+    driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, clientBundle.getTaskCount());
   }
 
   /**
@@ -172,7 +174,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
-
       priorityMap.putValue(job.getSLA().getPriority(), job);
       sizeMap.putValue(getSize(job), job);
       fireQueueEvent(new QueueEvent<>(this, job, true));
@@ -182,8 +183,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public ServerTaskBundleNode nextBundle(final int nbTasks)
-  {
+  public ServerTaskBundleNode nextBundle(final int nbTasks) {
     Iterator<ServerJob> it = iterator();
     return it.hasNext() ? nextBundle(it.next(), nbTasks) : null;
   }
@@ -211,7 +211,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     } finally {
       lock.unlock();
     }
-    statsManager.taskOutOfQueue(result.getTaskCount(), System.currentTimeMillis() - serverJob.getQueueEntryTime());
+    driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -result.getTaskCount());
+    driver.getStatistics().addValues(JPPFStatisticsHelper.TASK_QUEUE_TIME, System.currentTimeMillis() - serverJob.getQueueEntryTime(), result.getTaskCount());
     return result;
   }
 
@@ -221,8 +222,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @return the removed bundle.
    */
   @Override
-  public ServerJob removeBundle(final ServerJob serverJob)
-  {
+  public ServerJob removeBundle(final ServerJob serverJob) {
     return removeBundle(serverJob, true);
   }
 
@@ -232,10 +232,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * @param removeFromJobMap flag whether bundle should be removed from job map.
    * @return the removed bundle.
    */
-  public ServerJob removeBundle(final ServerJob serverJob, final boolean removeFromJobMap)
-  {
+  public ServerJob removeBundle(final ServerJob serverJob, final boolean removeFromJobMap) {
     if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
-
     lock.lock();
     try {
       if (removeFromJobMap) {
@@ -255,15 +253,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public void updatePriority(final String jobUuid, final int newPriority)
-  {
+  public void updatePriority(final String jobUuid, final int newPriority) {
     lock.lock();
     try {
       ServerJob job = jobMap.get(jobUuid);
       if (job == null) return;
       int oldPriority = job.getJob().getSLA().getPriority();
-      if (oldPriority != newPriority)
-      {
+      if (oldPriority != newPriority) {
         job.getJob().getSLA().setPriority(newPriority);
         priorityMap.removeValue(oldPriority, job);
         priorityMap.putValue(newPriority, job);
@@ -275,8 +271,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public boolean cancelJob(final String jobId)
-  {
+  public boolean cancelJob(final String jobId) {
     lock.lock();
     try {
       ServerJob job = jobMap.get(jobId);
@@ -289,8 +284,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * Close this queue and all resources it uses.
    */
-  public void close()
-  {
+  public void close() {
     lock.lock();
     try {
       scheduleManager.close();
@@ -330,7 +324,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   public void addJobListener(final JobListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
     synchronized (jobListeners) {
       jobListeners.add(listener);
     }
@@ -339,7 +332,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   @Override
   public void removeJobListener(final JobListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
-
     synchronized (jobListeners) {
       jobListeners.remove(listener);
     }
@@ -368,8 +360,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * and with an execution policy that enforces its execution ont he designated node only.
    * @param clientBundle the broadcast job to process.
    */
-  void processBroadcastJob(final ServerTaskBundleClient clientBundle)
-  {
+  void processBroadcastJob(final ServerTaskBundleClient clientBundle) {
     final String jobUuid = clientBundle.getUuid();
     ServerJob serverJob = jobMap.get(jobUuid);
     if (serverJob == null) {
@@ -435,7 +426,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   private void processPendingBroadcast(final List<AbstractNodeContext> connections, final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-
     JobSLA sla = broadcastJob.getSLA();
     List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
     Set<String> uuidSet = new HashSet<>();
@@ -464,7 +454,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         }
       }
     }
-    //if (jobList.isEmpty()) broadcastJob.taskCompleted(null, null);
     if (jobList.isEmpty()) broadcastJob.jobEnded();
     else {
       lock.lock();
@@ -481,8 +470,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * Add an broadcast job to the queue, and notify all listeners about it.
    * @param broadcastJob the job with assigned broadcast id to add to the queue.
    */
-  private void addBroadcastJob(final ServerJobBroadcast broadcastJob)
-  {
+  private void addBroadcastJob(final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
 
     final String jobUuid = broadcastJob.getUuid();
@@ -501,7 +489,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     fireQueueEvent(new QueueEvent<>(this, broadcastJob, false));
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
-    statsManager.taskInQueue(broadcastJob.getTaskCount());
+    driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, broadcastJob.getTaskCount());
   }
 
   @Override

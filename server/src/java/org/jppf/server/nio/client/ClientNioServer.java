@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -87,7 +88,8 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
       else log.warn(ExceptionUtils.getMessage(e));
       closeClient(channel);
     }
-    driver.getStatsManager().newClientConnection();
+    //driver.getStatsManager().newClientConnection();
+    driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, 1);
   }
 
   @Override
@@ -146,7 +148,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
     }
     try
     {
-      driver.getStatsManager().clientConnectionClosed();
+      driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
     }
     catch (Exception e)
     {

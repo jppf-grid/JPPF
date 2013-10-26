@@ -191,6 +191,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     sb.append(", uuid=").append(uuid);
     sb.append(", connectionUuid=").append(connectionUuid);
     sb.append(", peer=").append(peer);
+    sb.append(", ssl=").append(ssl);
     sb.append(']');
     return sb.toString();
   }

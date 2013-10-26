@@ -18,6 +18,7 @@
 
 package test.org.jppf.management;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import static org.junit.Assert.*;
 
 import java.io.InputStream;
@@ -26,10 +27,10 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -54,25 +55,25 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
     //waitKeyPressed();
     driver.resetStatistics();
-    JPPFStats stats = driver.statistics();
+    JPPFStatistics stats = driver.statistics();
     assertNotNull(stats);
-    double n = stats.getNodes().getLatest();
-    assertTrue("nb nodes should be 2 but is " + n, n == 2);
-    assertTrue(stats.getTotalTasksExecuted() == 0);
+    double n = stats.getSnapshot(NODES).getLatest();
+    assertTrue("nb nodes should be 2 but is " + n, n == 2d);
+    assertTrue(stats.getSnapshot(EXECUTION).getTotal() == 0d);
     client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     stats = driver.statistics();
-    n = stats.getIdleNodes().getLatest();
-    assertTrue("nb idle nodes should be 2 but is " + n, n == 2);
-    double nodeAvgTime = stats.getNodeExecution().getAvg();
-    assertTrue(nodeAvgTime > 0);
-    double serverAvgTime = stats.getExecution().getAvg();
+    n = stats.getSnapshot(IDLE_NODES).getLatest();
+    assertTrue("nb idle nodes should be 2 but is " + n, n == 2d);
+    double nodeAvgTime = stats.getSnapshot(NODE_EXECUTION).getAvg();
+    assertTrue(nodeAvgTime > 0d);
+    double serverAvgTime = stats.getSnapshot(EXECUTION).getAvg();
     assertTrue(serverAvgTime > 0);
     assertTrue(serverAvgTime >= nodeAvgTime);
-    double serverMaxTime = stats.getExecution().getMax();
-    assertTrue(serverMaxTime >= stats.getNodeExecution().getMax());
+    double serverMaxTime = stats.getSnapshot(EXECUTION).getMax();
+    assertTrue(serverMaxTime >= stats.getSnapshot(NODE_EXECUTION).getMax());
     //assertTrue(stats.getNodeExecution().getMax() >= nodeAvgTime);
-    assertEquals(nbTasks, stats.getTotalTasksExecuted());
+    assertTrue(nbTasks == stats.getSnapshot(EXECUTION).getTotal());
   }
 
   /**
@@ -86,14 +87,13 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     driver.resetStatistics();
-    JPPFStats stats = driver.statistics();
+    JPPFStatistics stats = driver.statistics();
     assertNotNull(stats);
-    int n = (int) stats.getNodes().getLatest();
+    int n = (int) stats.getSnapshot(NODES).getLatest();
     assertEquals(2, n);
-    assertTrue(stats.getTotalTasksExecuted() == 0);
-    assertTrue(stats.getExecution().getAvg() == 0d);
-    assertTrue(stats.getNodeExecution().getMax() == 0d);
-    assertTrue(stats.getTotalTasksExecuted() == 0);
+    assertTrue(stats.getSnapshot(EXECUTION).getTotal() == 0);
+    assertTrue(stats.getSnapshot(EXECUTION).getAvg() == 0d);
+    assertTrue(stats.getSnapshot(NODE_EXECUTION).getMax() == 0d);
   }
 
   /**

@@ -23,10 +23,12 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.nio.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.Pair;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -119,8 +121,7 @@ class WaitingResultsState extends NodeServerState {
       if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
       nodeBundle.resultsReceived(received.data());
       long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
-      server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L, 
-          ((AbstractTaskBundleMessage) context.getMessage()).getLength());
+      updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
       if (bundler instanceof BundlerEx) {
         long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
         ((BundlerEx) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
@@ -133,5 +134,19 @@ class WaitingResultsState extends NodeServerState {
       if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
     }
     return new Pair<>(requeue, exception);
+  }
+
+  /**
+   * Update the statistcis from the received results.
+   * @param nbTasks number of tasks received.
+   * @param elapsed server/node round trip time.
+   * @param elapsedInNode time spent in the node.
+   */
+  private void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
+    //server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L);
+    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    stats.addValues(JPPFStatisticsHelper.EXECUTION, elapsed, nbTasks);
+    stats.addValues(JPPFStatisticsHelper.NODE_EXECUTION, elapsedInNode, nbTasks);
+    stats.addValues(JPPFStatisticsHelper.TRANSPORT_TIME, elapsed - elapsedInNode, nbTasks);
   }
 }

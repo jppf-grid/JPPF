@@ -450,6 +450,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
     }
     sb.append(", peer=").append(peer);
     sb.append(", uuid=").append(uuid);
+    sb.append(", secure=").append(isSecure());
+    sb.append(", ssl=").append(ssl);
     return sb.toString();
   }
 }

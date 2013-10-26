@@ -19,13 +19,14 @@ package org.jppf.example.matrix;
 
 import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.policy.PolicyParser;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,7 @@ public class MatrixRunner {
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
       {
-        JPPFStats stats = jppfClient.getClientConnection().getJmxConnection().statistics();
+        JPPFStatistics stats = jppfClient.getClientConnection().getJmxConnection().statistics();
         output("End statistics :\n" + stats.toString());
       }
     } catch(Exception e) {

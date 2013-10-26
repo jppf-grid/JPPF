@@ -17,11 +17,12 @@
  */
 package org.jppf.ui.monitoring;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.createServerStatistics;
+
 import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.jppf.server.JPPFStats;
 import org.jppf.ui.monitoring.data.*;
 
 /**
@@ -32,7 +33,7 @@ class MonitorTableModel extends AbstractTableModel
   /**
    * Default values to use when the driver connection is no longer available.
    */
-  private static final Map<Fields, String> EMPTY_VALUES = StatsFormatter.getStringValuesMap(new JPPFStats());
+  private static final Map<Fields, String> EMPTY_VALUES = StatsFormatter.getStringValuesMap(createServerStatistics());
   /**
    * The list of fields whose values are displayed in the table.
    */

@@ -21,10 +21,10 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 import sample.dist.matrix.*;
@@ -128,7 +128,7 @@ public class NonBlockingPoolMatrixRunner
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
       System.out.println("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
-      JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)

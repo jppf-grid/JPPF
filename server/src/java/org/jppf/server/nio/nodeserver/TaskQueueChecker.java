@@ -25,12 +25,13 @@ import org.jppf.execute.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.fixedsize.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -60,9 +61,9 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    */
   private final JPPFPriorityQueue queue;
   /**
-   * Reference to the statistics manager.
+   * Reference to the statistics.
    */
-  private final JPPFDriverStatsManager statsManager;
+  private final JPPFStatistics stats;
   /**
    * Lock on the job queue.
    */
@@ -82,14 +83,14 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
 
   /**
    * Initialize this task queue checker with the specified node server.
-   * @param queue        the reference queue to use.
-   * @param statsManager the reference to statistics manager.
+   * @param queue the reference queue to use.
+   * @param stats reference to the statistics.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFDriverStatsManager statsManager)
+  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats)
   {
     this.queue = queue;
     this.jppfContext = new JPPFContextDriver(queue);
-    this.statsManager = statsManager;
+    this.stats = stats;
     this.queueLock = queue.getLock();
     this.bundler = createDefault();
   }
@@ -160,14 +161,12 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
 
     if (traceEnabled) log.trace("Adding idle channel " + channel);
-    int count;
     synchronized(idleChannels)
     {
       idleChannels.add(channel);
-      count = idleChannels.size();
     }
     wakeUp();
-    statsManager.idleNodes(count);
+    stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
   }
 
   /**
@@ -190,13 +189,12 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
   public C removeIdleChannel(final C channel)
   {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
-    int count;
+    boolean removed;
     synchronized(idleChannels)
     {
-      idleChannels.remove(channel);
-      count = idleChannels.size();
+      removed = idleChannels.remove(channel);
     }
-    statsManager.idleNodes(count);
+    if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     return channel;
   }
 

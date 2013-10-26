@@ -53,6 +53,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   private static Logger log = LoggerFactory.getLogger(NioServer.class);
   /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * the selector of all socket channels open with providers or nodes.
    */
   protected Selector selector;
@@ -280,8 +284,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     }
     if (channel == null) return;
     Runnable task = new AcceptChannelTask(channel, ssl);
-    transitionManager.submit(task);
-    //task.run();
+    //transitionManager.submit(task);
+    task.run();
   }
 
   /**
@@ -295,6 +299,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   @SuppressWarnings("unchecked")
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
+    if (debugEnabled) log.debug("performing accept() of channel {}, ssl={}", channel, ssl);
     NioContext context = createNioContext();
     SelectionKeyWrapper wrapper = null;
     lock.lock();
@@ -304,7 +309,9 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       SelectionKey selKey = channel.register(selector,	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
+      context.setSsl(ssl);
       if (ssl && (sslHandler == null) && (sslContext != null)) {
+        if (debugEnabled) log.debug("creating SSLEngine for  {}", wrapper);
         SSLEngine engine = sslContext.createSSLEngine(channel.socket().getInetAddress().getHostAddress(), channel.socket().getPort());
         configureSSLEngine(engine);
         context.setSSLHandler(new SSLHandler(wrapper, engine));
@@ -495,6 +502,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     @Override
     public void run() {
       try {
+        if (debugEnabled) log.debug("accepting channel {}, ssl={}", channel, ssl);
         channel.socket().setSendBufferSize(IO.SOCKET_BUFFER_SIZE);
         channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
         channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);

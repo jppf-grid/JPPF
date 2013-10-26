@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -101,7 +101,7 @@ public class PrimeRunner
       }
       totalTime = System.currentTimeMillis() - totalTime;
       output("Computation time: " + StringUtils.toStringDuration(totalTime));
-      JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
       output("End statistics :\n"+stats.toString());
     }
     catch(Exception e)

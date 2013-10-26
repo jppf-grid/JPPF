@@ -36,6 +36,7 @@ import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -68,10 +69,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * A reference to the driver's tasks queue.
    */
   private final JPPFPriorityQueue queue;
-  /**
-   * The statistics manager.
-   */
-  private final JPPFDriverStatsManager statsManager;
   /**
    * Used to create bundler instances.
    */
@@ -141,12 +138,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     });
     nodeConnectionHandler = driver.getInitializer().getNodeConnectionEventHandler();
     INITIAL_BUNDLE_UUID = driver.getUuid();
-    this.statsManager = driver.getStatsManager();
     this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
 
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
-    taskQueueChecker = new TaskQueueChecker<>(queue, statsManager);
+    taskQueueChecker = new TaskQueueChecker<>(queue, driver.getStatistics());
     taskQueueChecker.setBundler(bundler);
     this.queue.addQueueListener(new QueueListener<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
@@ -157,15 +153,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     });
     initialServerJob = createInitialServerJob();
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
-  }
-
-  /**
-   * Get a reference to the object that generates the statistics events of which all related listeners are notified.
-   * @return a <code>JPPFDriverStatsManager</code> instance.
-   * @exclude
-   */
-  public JPPFDriverStatsManager getStatsManager() {
-    return statsManager;
   }
 
   /**
@@ -269,7 +256,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannel(nodeContext);
     else {
       taskQueueChecker.removeIdleChannel(nodeContext);
-      if(newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
+      if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
     }
     queue.updateWorkingConnections(oldStatus, newStatus);
   }
@@ -281,7 +268,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   @Override
   public void postAccept(final ChannelWrapper channel) {
-    statsManager.newNodeConnection();
+    //statsManager.newNodeConnection();
+    driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     try {
       context.setBundle(getInitialBundle());
@@ -299,6 +287,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     context.setOnClose(new Runnable() {
       @Override
       public void run() {
+        if (debugEnabled) log.debug("runninng onClose() for {}", context);
         closeNode(context);
       }
     });
@@ -360,7 +349,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
       nodeConnectionHandler.fireNodeDisconnected(info);
-      driver.getStatsManager().nodeConnectionClosed();
+      //driver.getStatsManager().nodeConnectionClosed();
+      driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, -1);
       removeConnection(context);
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);

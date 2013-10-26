@@ -84,6 +84,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception
   {
     Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
+    if (debugEnabled) log.debug("invoking {}() on mbean={} for selector={} ({} channels)", new Object[] {methodName, name, selector, channels.size()});
     Map<String, Object> map = new HashMap<>();
     for (AbstractNodeContext context: channels)
     {
@@ -91,6 +92,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
       try
       {
         JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
+        if (debugEnabled) log.debug("invoking {}() on mbean={} for node={} with jmx=", new Object[] {methodName, name, uuid, wrapper});
         Object o = wrapper.invoke(name, methodName, params, signature);
         //if (debugEnabled) log.debug("invoking '" + methodName + "()' on node " + uuid + ", result = " + o);
         map.put(uuid, o);

@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.*;
 
-import org.jppf.server.JPPFStats;
+import org.jppf.utils.stats.JPPFStatistics;
 
 /**
  * Instances of this class hold and manage statistics data snapshots for a single driver connection.
@@ -32,7 +32,7 @@ public class ConnectionDataHolder
    * The list of all snapshots kept in memory. the size of this list is always equal to or less than
    * the rollover position.
    */
-  private List<JPPFStats> dataList = new Vector<>();
+  private List<JPPFStatistics> dataList = new Vector<>();
   /**
    * Cache of the data snapshots fields maps to their corresponding string values.
    */
@@ -46,7 +46,7 @@ public class ConnectionDataHolder
    * Get the list of statistic snapshots for this connection data holder.
    * @return a list of <code>JPPFStats</code> instances.
    */
-  public List<JPPFStats> getDataList()
+  public List<JPPFStatistics> getDataList()
   {
     return dataList;
   }

@@ -17,6 +17,8 @@
  */
 package org.jppf.server;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+
 import java.util.*;
 
 import org.jppf.*;
@@ -30,7 +32,7 @@ import org.jppf.queue.JPPFQueue;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.NioServer;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
-import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.LocalClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.classloader.node.NodeClassNioServer;
 import org.jppf.server.nio.client.ClientNioServer;
@@ -39,9 +41,10 @@ import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.startup.*;
+import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
-import org.jppf.utils.hooks.*;
+import org.jppf.utils.hooks.HookFactory;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -52,11 +55,9 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Lane Schwartz (dynamically allocated server port) 
  */
-public class JPPFDriver
-{
+public class JPPFDriver {
   // this static block must be the first thing executed when this class is loaded
-  static
-  {
+  static {
     JPPFInitializer.init();
   }
   /**
@@ -108,13 +109,9 @@ public class JPPFDriver
    */
   private boolean shuttingDown = false;
   /**
-   * This listener gathers the statistics published through the management interface.
+   * Holds the statistics monitors.
    */
-  private final JPPFDriverStatsUpdater statsUpdater;
-  /**
-   * Generates the statistics events of which all related listeners are notified.
-   */
-  private final JPPFDriverStatsManager statsManager;
+  private final JPPFStatistics statistics = createServerStatistics();
   /**
    * Manages and monitors the jobs throughout their processing within this driver.
    */
@@ -140,8 +137,7 @@ public class JPPFDriver
    * Initialize this JPPFDriver.
    * @exclude
    */
-  protected JPPFDriver()
-  {
+  protected JPPFDriver() {
     instance = this;
     config = JPPFConfiguration.getProperties();
     uuid = config.getString("jppf.driver.uuid", JPPFUuid.normalUUID());
@@ -150,11 +146,8 @@ public class JPPFDriver
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     VersionUtils.logVersionInformation("driver", uuid);
     systemInformation = new JPPFSystemInformation(uuid, false, true);
-    statsUpdater = new JPPFDriverStatsUpdater();
-    statsManager = new JPPFDriverStatsManager();
-    statsManager.addListener(statsUpdater);
     jobManager = new JPPFJobManager();
-    taskQueue = new JPPFPriorityQueue(statsManager, jobManager);
+    taskQueue = new JPPFPriorityQueue(this, jobManager);
     initializer = new DriverInitializer(this, config);
   }
 
@@ -164,8 +157,7 @@ public class JPPFDriver
    * @exclude
    */
   @SuppressWarnings("unchecked")
-  public void run() throws Exception
-  {
+  public void run() throws Exception {
     JPPFConnectionInformation info = initializer.getConnectionInformation();
 
     initializer.registerDebugMBean();
@@ -185,8 +177,7 @@ public class JPPFDriver
     nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL));
     acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts));
 
-    if (config.getBoolean("jppf.local.node.enabled", false))
-    {
+    if (config.getBoolean("jppf.local.node.enabled", false)) {
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
       localClassChannel.getContext().setChannel(localClassChannel);
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
@@ -208,8 +199,7 @@ public class JPPFDriver
    * Get the singleton instance of the JPPFDriver.
    * @return a <code>JPPFDriver</code> instance.
    */
-  public static JPPFDriver getInstance()
-  {
+  public static JPPFDriver getInstance() {
     return instance;
   }
 
@@ -218,8 +208,7 @@ public class JPPFDriver
    * @return a JPPFQueue instance.
    * @exclude
    */
-  public static JPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> getQueue()
-  {
+  public static JPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> getQueue() {
     return getInstance().taskQueue;
   }
 
@@ -228,8 +217,7 @@ public class JPPFDriver
    * @return a <code>ClientNioServer</code> instance.
    * @exclude
    */
-  public ClientNioServer getClientNioServer()
-  {
+  public ClientNioServer getClientNioServer() {
     return clientNioServer;
   }
 
@@ -238,8 +226,7 @@ public class JPPFDriver
    * @return a <code>ClassNioServer</code> instance.
    * @exclude
    */
-  public ClientClassNioServer getClientClassServer()
-  {
+  public ClientClassNioServer getClientClassServer() {
     return clientClassServer;
   }
 
@@ -248,8 +235,7 @@ public class JPPFDriver
    * @return a <code>ClassNioServer</code> instance.
    * @exclude
    */
-  public NodeClassNioServer getNodeClassServer()
-  {
+  public NodeClassNioServer getNodeClassServer() {
     return nodeClassServer;
   }
 
@@ -258,8 +244,7 @@ public class JPPFDriver
    * @return a <code>NodeNioServer</code> instance.
    * @exclude
    */
-  public NodeNioServer getNodeNioServer()
-  {
+  public NodeNioServer getNodeNioServer() {
     return nodeNioServer;
   }
 
@@ -268,8 +253,7 @@ public class JPPFDriver
    * @return a {@link AcceptorNioServer} instance.
    * @exclude
    */
-  public AcceptorNioServer getAcceptorServer()
-  {
+  public AcceptorNioServer getAcceptorServer() {
     return acceptorServer;
   }
 
@@ -277,8 +261,7 @@ public class JPPFDriver
    * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
    * @return true if a shutdown is initiated, false otherwise.
    */
-  public boolean isShuttingDown()
-  {
+  public boolean isShuttingDown() {
     return shuttingDown;
   }
 
@@ -286,8 +269,7 @@ public class JPPFDriver
    * Get this driver's unique identifier.
    * @return the uuid as a string.
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
@@ -303,8 +285,7 @@ public class JPPFDriver
    * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
    * @exclude
    */
-  public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay)
-  {
+  public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
     log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
     shuttingDown = true;
 
@@ -323,33 +304,27 @@ public class JPPFDriver
    * Shutdown this server and all its components.
    * @exclude
    */
-  public void shutdown()
-  {
+  public void shutdown() {
     log.info("Shutting down");
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
-    if (acceptorServer != null)
-    {
+    if (acceptorServer != null) {
       acceptorServer.end();
       acceptorServer = null;
     }
-    if (clientClassServer != null)
-    {
+    if (clientClassServer != null) {
       clientClassServer.end();
       clientClassServer = null;
     }
-    if (nodeClassServer != null)
-    {
+    if (nodeClassServer != null) {
       nodeClassServer.end();
       nodeClassServer = null;
     }
-    if (nodeNioServer != null)
-    {
+    if (nodeNioServer != null) {
       nodeNioServer.end();
       nodeNioServer = null;
     }
-    if (clientNioServer != null)
-    {
+    if (clientNioServer != null) {
       clientNioServer.end();
       clientNioServer = null;
     }
@@ -359,32 +334,11 @@ public class JPPFDriver
   }
 
   /**
-   * Get the listener that gathers the statistics published through the management interface.
-   * @return a <code>JPPFStatsUpdater</code> instance.
-   * @exclude
-   */
-  public JPPFDriverStatsUpdater getStatsUpdater()
-  {
-    return statsUpdater;
-  }
-
-  /**
-   * Get a reference to the object that generates the statistics events of which all related listeners are notified.
-   * @return a <code>JPPFDriverStatsManager</code> instance.
-   * @exclude
-   */
-  public JPPFDriverStatsManager getStatsManager()
-  {
-    return statsManager;
-  }
-
-  /**
    * Get the object that manages and monitors the jobs throughout their processing within this driver.
    * @return an instance of <code>JPPFJobManager</code>.
    * @exclude
    */
-  public JPPFJobManager getJobManager()
-  {
+  public JPPFJobManager getJobManager() {
     return jobManager;
   }
 
@@ -402,22 +356,18 @@ public class JPPFDriver
    * Start the JPPF server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String...args) {
     try
     {
       if (debugEnabled) log.debug("starting the JPPF driver");
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");
-      if (!"noLauncher".equals(args[0]))
-      {
+      if (!"noLauncher".equals(args[0])) {
         int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
       new JPPFDriver().run();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
@@ -448,24 +398,19 @@ public class JPPFDriver
    * @param sslPorts SSL ports for initialization message.
    * @param name the name to use for the server.
    */
-  private static void printInitializedMessage(final int[] ports, final int[] sslPorts, final String name)
-  {
+  private static void printInitializedMessage(final int[] ports, final int[] sslPorts, final String name) {
     StringBuilder sb = new StringBuilder();
-    if (name != null)
-    {
+    if (name != null) {
       sb.append(name);
       sb.append(" initialized");
     }
-    if (ports != null || sslPorts != null)
-    {
-      if ((ports != null) && (ports.length > 0))
-      {
+    if (ports != null || sslPorts != null) {
+      if ((ports != null) && (ports.length > 0)) {
         sb.append("\n-  accepting plain connections on port");
         if (ports.length > 1) sb.append('s');
         for (int n: ports) sb.append(' ').append(n);
       }
-      if ((sslPorts != null) && (sslPorts.length > 0))
-      {
+      if ((sslPorts != null) && (sslPorts.length > 0)) {
         sb.append("\n- accepting secure connections on port");
         if (sslPorts.length > 1) sb.append('s');
         for (int n: sslPorts) sb.append(' ').append(n);
@@ -479,8 +424,7 @@ public class JPPFDriver
    * @return <code>true</code> if management is enabled, <code>false</code> otherwise.
    * @param config the configuration to test whether management is enabled.
    */
-  private static boolean isManagementEnabled(final TypedProperties config)
-  {
+  private static boolean isManagementEnabled(final TypedProperties config) {
     return config.getBoolean("jppf.management.enabled", true) || config.getBoolean("jppf.management.ssl.enabled", false);
   }
 
@@ -488,8 +432,7 @@ public class JPPFDriver
    * Get the system ibnformation for this driver.
    * @return a {@link JPPFSystemInformation} instance.
    */
-  public JPPFSystemInformation getSystemInformation()
-  {
+  public JPPFSystemInformation getSystemInformation() {
     return systemInformation;
   }
 
@@ -498,16 +441,22 @@ public class JPPFDriver
    * @param ports the array of port numbers to check.
    * @return an array, possibly of length 0, containing all the valid port numbers in the input array.
    */
-  private int[] extractValidPorts(final int[] ports)
-  {
+  private int[] extractValidPorts(final int[] ports) {
     if ((ports == null) || (ports.length == 0)) return ports;
     List<Integer> list = new ArrayList<>();
-    for (int port: ports)
-    {
+    for (int port: ports) {
       if (port >= 0) list.add(port);
     }
     int[] result = new int[list.size()];
     for (int i=0; i<result.length; i++) result[i] = list.get(i);
     return result;
+  }
+
+  /**
+   * Get the object holding the statitics monitors.
+   * @return a {@link JPPFStatistics} instance.
+   */
+  public JPPFStatistics getStatistics() {
+    return statistics;
   }
 }

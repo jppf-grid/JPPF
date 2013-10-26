@@ -18,6 +18,8 @@
 
 package org.jppf.management;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+
 import java.util.*;
 
 import org.jppf.node.policy.ExecutionPolicy;
@@ -26,6 +28,7 @@ import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -74,11 +77,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     return getNodeNioServer().getNbNodes();
   }
 
-  /**
-   * Request the JMX connection information for all the nodes attached to the server.
-   * @return a collection of <code>NodeManagementInfo</code> instances.
-   * @see org.jppf.management.JPPFDriverAdminMBean#nodesInformation()
-   */
   @Override
   public Collection<JPPFManagementInfo> nodesInformation()
   {
@@ -100,18 +98,12 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
   }
 
-  /**
-   * Get the latest statistics snapshot from the JPPF driver.
-   * @return a <code>JPPFStats</code> instance.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#statistics()
-   */
   @Override
-  public JPPFStats statistics() throws Exception
+  public JPPFStatistics  statistics() throws Exception
   {
     try
     {
-      JPPFStats  stats = driver.getStatsUpdater().getStats();
+      JPPFStatistics  stats = driver.getStatistics().copy();
       if (debugEnabled) log.debug("stats request = " + stats);
       return stats;
     }
@@ -122,14 +114,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
   }
 
-  /**
-   * Change the bundle size tuning settings.
-   * @param algorithm the name of the load-balancing algorithm to set.
-   * @param parameters the algorithm's parameters.
-   * @return an acknowledgement or error message.
-   * @throws Exception if an error occurred while updating the settings.
-   * @see org.jppf.management.JPPFDriverAdminMBean#changeLoadBalancerSettings(java.lang.String, java.util.Map)
-   */
   @Override
   public String changeLoadBalancerSettings(final String algorithm, final Map<Object, Object> parameters) throws Exception
   {
@@ -155,14 +139,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
   }
 
-  /**
-   * Perform a shutdown or restart of the server.
-   * @param shutdownDelay the delay before shutting down the server, once the command is received.
-   * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
-   * @return an acknowledgement message.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#restartShutdown(java.lang.Long, java.lang.Long)
-   */
   @Override
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
   {
@@ -180,12 +156,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     }
   }
 
-  /**
-   * Obtain the current load-balancing settings.
-   * @return an instance of <code>LoadBalancingInformation</code>.
-   * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFDriverAdminMBean#loadBalancerInformation()
-   */
   @Override
   public LoadBalancingInformation loadBalancerInformation() throws Exception
   {
@@ -235,7 +205,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
   @Override
   public void resetStatistics() throws Exception
   {
-    driver.getStatsManager().reset();
+    JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS);
+    driver.getStatistics().reset(filter);
   }
 
   @Override

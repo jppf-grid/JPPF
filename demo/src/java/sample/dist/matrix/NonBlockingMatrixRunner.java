@@ -22,10 +22,10 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -130,7 +130,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
-      JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)
@@ -187,7 +187,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
-      JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
+      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)

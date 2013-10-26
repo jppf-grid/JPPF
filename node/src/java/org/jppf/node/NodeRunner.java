@@ -123,7 +123,7 @@ public class NodeRunner
           node = createNode();
           node.run();
         } catch(JPPFNodeReconnectionNotification e) {
-          if (debugEnabled) log.debug("received reconnection notification");
+          if (debugEnabled) log.debug("received reconnection notification : {}", ExceptionUtils.getStackTrace(e));
           if (classLoader != null) classLoader.close();
           classLoader = null;
           if (node != null) node.stopNode();

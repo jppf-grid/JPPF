@@ -26,6 +26,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 
 /**
  * Demonstration of the job persistence API to implement jobs failover and recovery
@@ -150,6 +151,6 @@ public class Runner
     // set load-balancing algorithm to "manual" with a size of 1
     jmxDriver.changeLoadBalancerSettings("manual", props);
     // return the current number of nodes
-    return (int) jmxDriver.statistics().getNodes().getLatest();
+    return (int) jmxDriver.statistics().getSnapshot(JPPFStatisticsHelper.NODES).getLatest();
   }
 }

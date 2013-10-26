@@ -49,7 +49,7 @@ public class FileStoreSource implements Callable<InputStream>
   public InputStream call() throws Exception
   {
     InputStream is = FileUtils.getFileInputStream(args[0]);
-    if (is == null) throw new SSLConfigurationException("could not find secure store " + args[0]); 
+    //if (is == null) throw new SSLConfigurationException("could not find secure store " + args[0]); 
     return is;
   }
 }

@@ -21,8 +21,8 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.JPPFStats;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
+import org.jppf.utils.stats.JPPFStatistics;
 
 /**
  * MBean interface for the management of a JPPF driver.
@@ -36,10 +36,10 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
   String MBEAN_NAME = "org.jppf:name=admin,type=driver";
   /**
    * Get the latest statistics snapshot from the JPPF driver.
-   * @return a <code>JPPFStats</code> instance.
+   * @return a <code>JPPFStatistics</code> instance.
    * @throws Exception if any error occurs.
    */
-  JPPFStats statistics() throws Exception;
+  JPPFStatistics statistics() throws Exception;
   /**
    * Get the number of nodes attached to the driver.
    * @return the number of nodes.

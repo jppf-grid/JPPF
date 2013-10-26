@@ -79,7 +79,7 @@ public final class SSLHelper
   {
     if (sslConfig == null) loadSSLProperties();
     boolean b = sslConfig.getBoolean("jppf.ssl.client.distinct.truststore", false);
-    if (debugEnabled) log.debug("using {} trust store for clients, identifier = ", b ? "distinct" : "same", JPPFIdentifiers.asString(identifier));
+    if (debugEnabled) log.debug("using {} trust store for clients, identifier = {}", b ? "distinct" : "same", JPPFIdentifiers.asString(identifier));
     switch(identifier)
     {
       case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
@@ -103,14 +103,22 @@ public final class SSLHelper
     if (sslConfig == null) loadSSLProperties();
     char[] keyPwd = getPassword("jppf.ssl.keystore.password");
     KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
-    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-    kmf.init(keyStore, keyPwd);
+    KeyManagerFactory kmf = null;
+    if (keyStore != null)
+    {
+      kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+      kmf.init(keyStore, keyPwd);
+    }
     char[] trustPwd = getPassword(trustStorePropertyPrefix + ".truststore.password");
     KeyStore trustStore = getStore(trustStorePropertyPrefix + ".truststore", trustPwd);
-    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    tmf.init(trustStore);
+    TrustManagerFactory tmf = null;
+    if (trustStore != null)
+    {
+      tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+      tmf.init(trustStore);
+    }
     SSLContext sslContext = SSLContext.getInstance(sslConfig.getString("jppf.ssl.context.protocol"));
-    sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+    sslContext.init(kmf == null ? null : kmf.getKeyManagers(), tmf == null ? null : tmf.getTrustManagers(), null);
     return sslContext;
   }
 
@@ -201,6 +209,7 @@ public final class SSLHelper
    */
   private static KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd) throws Exception
   {
+    if (is == null) return null;
     KeyStore ks = null;
     try
     {
@@ -287,25 +296,39 @@ public final class SSLHelper
   {
     if (sslConfig == null)
     {
+      String source = null;
       sslConfig = new TypedProperties();
       InputStream is = null;
       TypedProperties config = JPPFConfiguration.getProperties();
-      String configSource = config.getString("jppf.ssl.configuration.source", null);
-      if (configSource != null) is = callSource(configSource);
+      source = config.getString("jppf.ssl.configuration.source", null);
+      if (source != null) is = callSource(source);
       else
       {
-        String filename = config.getString("jppf.ssl.configuration.file", null);
-        is = FileUtils.getFileInputStream(filename);
+        source = config.getString("jppf.ssl.configuration.file", null);
+        is = FileUtils.getFileInputStream(source);
       }
-      if (is == null) throw new SSLConfigurationException("could not load the SSL configuration");
+      if (is == null) throw new SSLConfigurationException("could not load the SSL configuration '" + source + "'");
       try
       {
         sslConfig.load(is);
+        if (debugEnabled) log.debug("successfully loaded the SSL configuration from '{}'", source);
       }
       finally
       {
         StreamUtils.closeSilent(is);
       }
+    }
+  }
+
+  /**
+   * Reset the SSL configuration.
+   */
+  public static void resetConfig()
+  {
+    if (sslConfig != null)
+    {
+      sslConfig.clear();
+      sslConfig = null;
     }
   }
 }

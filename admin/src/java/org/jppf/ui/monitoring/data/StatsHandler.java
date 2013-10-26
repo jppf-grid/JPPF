@@ -28,10 +28,10 @@ import javax.swing.SwingUtilities;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.JPPFStats;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -63,7 +63,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   /**
    * The object holding the current statistics values.
    */
-  private JPPFStats stats = new JPPFStats();
+  private JPPFStatistics stats = new JPPFStatistics();
   /**
    * List of listeners registered with this stats formatter.
    */
@@ -159,7 +159,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
     try {
       if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus()))
       {
-        JPPFStats stats = c.getJmxConnection().statistics();
+        JPPFStatistics stats = c.getJmxConnection().statistics();
         if (stats != null) update(c, stats);
       }
     } catch(Exception e) {
@@ -208,7 +208,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @param connection the client connection from which the data is obtained.
    * @param stats the object holding the new statistics values.
    */
-  public synchronized void update(final JPPFClientConnection connection, final JPPFStats stats) {
+  public synchronized void update(final JPPFClientConnection connection, final JPPFStatistics stats) {
     JPPFClientConnection c = connection;
     if (stats == null) return;
     if (c == null) {
@@ -296,7 +296,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @param position - the position to get the data at.
    * @return a <code>JPPFStats</code> instance.
    */
-  public synchronized JPPFStats getStats(final int position) {
+  public synchronized JPPFStatistics getStats(final int position) {
     if (getCurrentConnection() == null) return stats;
     ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());
     return dataHolder.getDataList().get(position);
@@ -304,9 +304,9 @@ public final class StatsHandler implements StatsConstants, ClientListener {
 
   /**
    * Get the latest data snapshot.
-   * @return a <code>JPPFStats</code> instance.
+   * @return a <code>JPPFStatistics</code> instance.
    */
-  public JPPFStats getLatestStats() {
+  public JPPFStatistics getLatestStats() {
     return getStats(getStatsCount() - 1);
   }
 

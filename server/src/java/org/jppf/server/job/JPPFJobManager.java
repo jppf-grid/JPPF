@@ -28,6 +28,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.protocol.utils.AbstractServerJob;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -148,7 +149,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
     submitEvent(JobEventType.JOB_QUEUED, bundle, null);
-    driver.getStatsUpdater().jobQueued(bundle.getTaskCount());
+    //driver.getStatsUpdater().jobQueued(bundle.getTaskCount());
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
   }
 
   /**
@@ -168,7 +172,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     bundleMap.remove(jobUuid);
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
     submitEvent(JobEventType.JOB_ENDED, bundle, null);
-    driver.getStatsUpdater().jobEnded(time);
+    //driver.getStatsUpdater().jobEnded(time);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TIME, time);
   }
 
   @Override
