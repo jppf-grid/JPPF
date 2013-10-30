@@ -18,28 +18,15 @@
 
 package org.jppf.node.screensaver;
 
-import javax.swing.JComponent;
-
 /**
- * 
+ * Interface implemented by classes who wish to get a reference to the screen saver. 
  * @author Laurent Cohen
  */
-public interface JPPFScreenSaver
+public interface JPPFScreenSaverHolder
 {
   /**
-   * Get the swing component for this screen saver.
-   * @return a {@link JComponent}.
+   * Provide a reference to the screen saver.
+   * @param screensaver a {@link JPPFScreenSaver} instance.
    */
-  JComponent getComponent();
-
-  /**
-   * Initialize the UI components.
-   * @param fullscreen full screen flag.
-   */
-  void init(boolean fullscreen);
-
-  /**
-   * Destroy this screen saver.
-   */
-  void destroy();
+  void setScreenSaver(JPPFScreenSaver screensaver);
 }

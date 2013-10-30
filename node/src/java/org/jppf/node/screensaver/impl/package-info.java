@@ -19,5 +19,5 @@
 /**
  * Support for a screen saver associated with a node.
  */
-package org.jppf.node.screensaver;
+package org.jppf.node.screensaver.impl;
 

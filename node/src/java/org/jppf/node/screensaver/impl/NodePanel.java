@@ -15,15 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.node.screensaver;
+package org.jppf.node.screensaver.impl;
 
 import java.awt.*;
-import java.io.*;
 import java.text.NumberFormat;
 
 import javax.swing.*;
 
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class enables launching a JPPF node as an applet, from a web browser.
@@ -32,9 +32,17 @@ import org.jppf.utils.*;
 class NodePanel extends JPanel
 {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodePanel.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * Path to the images to display in the UI.
    */
-  public static final String IMAGE_PATH = "/org/jppf/node";
+  public static final String IMAGE_PATH = "org/jppf/node";
   /**
    * Image displaying a bright green traffic light.
    */
@@ -52,42 +60,47 @@ class NodePanel extends JPanel
    */
   static final ImageIcon DARK_RED = loadImage(IMAGE_PATH + '/' + "inactive_redlight.gif");
   /**
-   * Holds the states of all nodes.
+   * Default path for the central image.
    */
-  public transient NodeState nodeState = null;
+  static final String DEFAULT_IMG = IMAGE_PATH + '/' + "jppf@home.gif";
+  /**
+   * Number of tasks executed by the node.
+   */
+  private long taskCount = 0L;
+  /**
+   * Holds the statuses for the node connection and tasks execution.
+   */
+  public boolean[] status = new boolean[2];
+  /**
+   * These labels contain the status icons for the nodes connection and task execution activity.
+   * Each status is represented by a green light and a red light, each light dark or bright depending on the node status.
+   */
+  public JLabel[] statusLabels = new JLabel[2];
+  /**
+   * Labels used to display the number of tasks executed by each node.
+   */
+  public JLabel countLabel = null;
+  /**
+   * Label used to display how long the node has been active.
+   */
+  public JLabel timeLabel = null;
+  /**
+   * The time this panel was started.
+   */
+  public long startedAt = 0L;
   /**
    * 
    */
-  private boolean activate = true;
+  private NumberFormat nf = null;
 
   /**
    * Initialize this UI.
-   * @param activate .
    */
-  public NodePanel(final boolean activate)
-  {
-    this.activate = activate;
-    //this.activate = true;
-    init();
-  }
-
-  /**
-   * Initialize this applet.
-   * This method get the applet parameters for the JPPF config file and the log4j config file,
-   * then creates the UI components, then starts the node in a separate thread, so that the
-   * applet is not stuck in the <code>init()</code> method.
-   * @see java.applet.Applet#init()
-   */
-  public void init()
+  public NodePanel()
   {
     try
     {
-      String log4jCfg = "log4j-node.properties";
-      System.setProperty("log4j.configuration", log4jCfg);
-      TypedProperties props = JPPFConfiguration.getProperties();
-      props.remove("jppf.policy.file");
       createUI();
-      if (activate) nodeState.startNode();
     }
     catch(Exception e)
     {
@@ -100,17 +113,53 @@ class NodePanel extends JPanel
    */
   private void createUI()
   {
+    initNodeState();
     GridBagLayout g = new GridBagLayout();
     setLayout(g);
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     setBackground(Color.BLACK);
-    ImageIcon logo = loadImage(IMAGE_PATH + '/' + "jppf-at-home.gif");
+    //ImageIcon logo = loadImage(IMAGE_PATH + '/' + "jppf-at-home.gif");
+    String path = JPPFConfiguration.getProperties().getString("jppf.screensaver.centerimage", DEFAULT_IMG);
+    ImageIcon logo = loadImage(path);
+    if (logo == null) logo = loadImage(DEFAULT_IMG);
     JLabel logoLabel = new JLabel(logo);
     addLayoutComp(this, g, c, logoLabel);
     addLayoutComp(this, g, c, Box.createVerticalStrut(10));
     addLayoutComp(this, g, c, createNodePanel());
     addLayoutComp(this, g, c, Box.createVerticalStrut(5));
+  }
+
+  /**
+   * Initialize this node state.
+   */
+  private void initNodeState()
+  {
+    nf = NumberFormat.getNumberInstance();
+    nf.setGroupingUsed(true);
+    nf.setMaximumFractionDigits(0);
+    nf.setMinimumIntegerDigits(1);
+    startedAt = System.currentTimeMillis();
+    for (int i=0; i<statusLabels.length; i++)
+    {
+      statusLabels[i] = new JLabel(NodePanel.DARK_RED);
+    }
+    Dimension d = new Dimension(8, 8);
+    for (JLabel aStatusLabel : statusLabels) {
+      aStatusLabel.setMinimumSize(d);
+      aStatusLabel.setMaximumSize(d);
+      aStatusLabel.setBackground(Color.BLACK);
+    }
+    countLabel = new JLabel(Long.toString(taskCount));
+    d = new Dimension(60, 20);
+    countLabel.setMinimumSize(d);
+    countLabel.setMaximumSize(d);
+    countLabel.setBackground(Color.BLACK);
+    countLabel.setForeground(Color.WHITE);
+
+    timeLabel = new JLabel("Active for: "+NodePanel.toStringDuration(0));
+    timeLabel.setBackground(Color.BLACK);
+    timeLabel.setForeground(Color.WHITE);
   }
 
   /**
@@ -125,7 +174,6 @@ class NodePanel extends JPanel
     c.gridy = 0;
     panel.setLayout(g);
     panel.setBackground(Color.BLACK);
-    nodeState = new NodeState();
 
     addLayoutComp(panel, g, c, Box.createHorizontalStrut(25));
     JLabel label = new JLabel("JPPF Node");
@@ -133,7 +181,7 @@ class NodePanel extends JPanel
     label.setForeground(Color.WHITE);
     addLayoutComp(panel, g, c, label);
     addLayoutComp(panel, g, c, Box.createHorizontalStrut(50));
-    addLayoutComp(panel, g, c, nodeState.timeLabel);
+    addLayoutComp(panel, g, c, timeLabel);
     addLayoutComp(panel, g, c, Box.createHorizontalStrut(25));
     addLayoutComp(panel, g, c, makeStatusPanel(0, "connection"));
     addLayoutComp(panel, g, c, Box.createHorizontalStrut(15));
@@ -144,8 +192,8 @@ class NodePanel extends JPanel
     label.setForeground(Color.WHITE);
     addLayoutComp(panel, g, c, label);
     panel.add(Box.createHorizontalStrut(5));
-    nodeState.countLabel.setPreferredSize(new Dimension(60, 20));
-    addLayoutComp(panel, g, c, nodeState.countLabel);
+    countLabel.setPreferredSize(new Dimension(60, 20));
+    addLayoutComp(panel, g, c, countLabel);
 
     return panel;
   }
@@ -186,9 +234,7 @@ class NodePanel extends JPanel
     JPanel statusPanel = new JPanel();
     statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.Y_AXIS));
     statusPanel.setBackground(Color.BLACK);
-    statusPanel.add(nodeState.statusLabels[statusIdx][0]);
-    statusPanel.add(Box.createVerticalStrut(4));
-    statusPanel.add(nodeState.statusLabels[statusIdx][1]);
+    statusPanel.add(statusLabels[statusIdx]);
 
     labelPanel.setPreferredSize(new Dimension(60, 20));
     panel.add(labelPanel);
@@ -206,33 +252,18 @@ class NodePanel extends JPanel
    */
   public static ImageIcon loadImage(final String file)
   {
-    int MAX_IMAGE_SIZE = 15000;
-    int count = 0;
-    InputStream is = NodePanel.class.getResourceAsStream(file);
-    if (is == null)
-    {
-      System.err.println("Couldn't find file: " + file);
-      return null;
-    }
-    BufferedInputStream bis = new BufferedInputStream(is);
-    byte[] buf = new byte[MAX_IMAGE_SIZE];
+    byte[] buf = null;
     try
     {
-      count = bis.read(buf);
-      bis.close();
+      buf = FileUtils.getPathAsByte(file);
     }
-    catch (IOException ioe)
+    catch (Exception e)
     {
-      System.err.println("Couldn't read stream from file: " + file);
-      ioe.printStackTrace();
-      return null;
+      String msg = "Could not load image '{}' : {}";
+      if (debugEnabled) log.debug(msg, file, ExceptionUtils.getStackTrace(e));
+      else log.warn(msg, file, ExceptionUtils.getMessage(e));
     }
-    if (count <= 0)
-    {
-      System.err.println("Empty file: " + file);
-      return null;
-    }
-    return new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
+    return (buf == null) ? null : new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
   }
 
   /**
@@ -242,11 +273,40 @@ class NodePanel extends JPanel
   {
     try
     {
-      if (activate) nodeState.stopNode();
     }
     catch (Throwable t)
     {
     }
+  }
+
+  /**
+   * Update the status of the connection to the server.
+   * @param ok <code>true</code> if the status is ok, <code>false</code> otherwise.
+   */
+  public void updateConnectionStatus(final boolean ok)
+  {
+    statusLabels[0].setIcon(ok ? NodePanel.BRIGHT_GREEN : NodePanel.DARK_RED);
+  }
+
+  /**
+   * Update the status of the execution to the server.
+   * @param ok <code>true</code> if the status is ok, <code>false</code> otherwise.
+   */
+  public void updateExecutionStatus(final boolean ok)
+  {
+    statusLabels[1].setIcon(ok ? NodePanel.BRIGHT_GREEN : NodePanel.DARK_RED);
+  }
+
+  /**
+   * Increment the number of tasks executed by the node.
+   * @param increment the number by which to increment.
+   * @return the number of tasks as a long value.
+   */
+  public synchronized long incTaskCount(final long increment)
+  {
+    taskCount += increment;
+    countLabel.setText(nf.format(taskCount));
+    return taskCount;
   }
 
   /**

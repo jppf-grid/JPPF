@@ -1,1 +1,2 @@
 org.jppf.node.event.JobClassPathHandler #handles classpath associated with each job
+org.jppf.node.screensaver.DelegatingNodeListener

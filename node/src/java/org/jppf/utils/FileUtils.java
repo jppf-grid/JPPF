@@ -160,7 +160,11 @@ public final class FileUtils {
     InputStream is = null;
     File file = new File(path);
     if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
-    if (is == null) is = FileUtils.class.getClassLoader().getResourceAsStream(path);
+    if (is == null) {
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      if (cl == null) cl = FileUtils.class.getClassLoader();
+      is = cl.getResourceAsStream(path);
+    }
     return is;
   }
 
@@ -340,9 +344,19 @@ public final class FileUtils {
   }
 
   /**
+   * Get the content of a file or resource on the classpath as an array of bytes.
+   * @param path the path of the file to read from as a string.
+   * @return a byte array with the file content.
+   * @throws IOException if an IO error occurs.
+   */
+  public static byte[] getPathAsByte(final String path) throws IOException {
+    return StreamUtils.getInputStreamAsByte(getFileInputStream(path));
+  }
+
+  /**
    * Get the content of a file as an array of bytes.
    * @param path the path of the file to read from as a string.
-   * @return a byte array.
+   * @return a byte array with the file content.
    * @throws IOException if an IO error occurs.
    */
   public static byte[] getFileAsByte(final String path) throws IOException {
@@ -352,7 +366,7 @@ public final class FileUtils {
   /**
    * Get the content of a file as an array of bytes.
    * @param file the abstract path of the file to read from.
-   * @return a byte array.
+   * @return a byte array with the file content.
    * @throws IOException if an IO error occurs.
    */
   public static byte[] getFileAsByte(final File file) throws IOException {
@@ -441,9 +455,7 @@ public final class FileUtils {
           }
         }
       }
-      if (!path.delete()) {
-        success = false;
-      }
+      if (!path.delete()) success = false;
     } catch (Exception e) {
       success = false;
     }
