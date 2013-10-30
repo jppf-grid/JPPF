@@ -115,9 +115,6 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void reset()
   {

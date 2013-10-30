@@ -23,7 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
@@ -119,17 +119,17 @@ class WaitingNodeRequestState extends ClassServerState
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null))
     {
-      if (resource.getData("multiple") != null)
+      if (resource.getData(ResourceIdentifier.MULTIPLE) != null)
       {
         List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null);
         if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));
-        if (list != null) resource.setData("resource_list", list);
+        if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
       }
-      else if (resource.getData("multiple.resources.names") != null)
+      else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null)
       {
-        String[] names = (String[]) resource.getData("multiple.resources.names");
+        String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
         Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, names);
-        resource.setData("resource_map", map);
+        resource.setData(ResourceIdentifier.RESOURCE_MAP, map);
       }
       else
       {
@@ -167,7 +167,7 @@ class WaitingNodeRequestState extends ClassServerState
     TraversalList<String> uuidPath = resource.getUuidPath();
     ClassContext context = (ClassContext) channel.getContext();
     if (resource.getCallable() == null) b = classCache.getCacheContent(uuidPath.getFirst(), name);
-    if ((b != null) && (resource.getData("multiple") == null) && !(resource.getData("multiple.resources.names") == null))
+    if ((b != null) && (resource.getData(ResourceIdentifier.MULTIPLE) == null) && !(resource.getData(ResourceIdentifier.MULTIPLE_NAMES) == null))
     {
       resource.setDefinition(b);
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);

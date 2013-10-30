@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader.client;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -77,7 +77,7 @@ class WaitingProviderInitialRequestState extends ClassServerState
       // it is a provider
       ((ClientClassNioServer) server).addProviderConnection(uuid, wrapper);
       context.setUuid(uuid);
-      context.setConnectionUuid((String) resource.getData("connection.uuid"));
+      context.setConnectionUuid((String) resource.getData(ResourceIdentifier.CONNECTION_UUID));
       context.setMessage(null);
       context.serializeResource();
       return TO_SENDING_INITIAL_PROVIDER_RESPONSE;

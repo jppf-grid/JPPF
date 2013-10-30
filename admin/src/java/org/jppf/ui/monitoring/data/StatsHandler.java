@@ -326,7 +326,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return a map of field names to their values represented as strings.
    */
   public Map<Fields, String> getLatestStringValues() {
-    if (getCurrentConnection() == null) return null;
+    if (getCurrentConnection() == null) return new HashMap<>();
     int n = getStatsCount() - 1;
     if (n < 0) return null;
     ConnectionDataHolder dataHolder = dataHolderMap.get(getCurrentConnection().getName());

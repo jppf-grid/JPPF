@@ -17,13 +17,16 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import net.miginfocom.swing.MigLayout;
 
+import org.jppf.ui.layout.WrapLayout;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.LocalizationUtils;
@@ -53,7 +56,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   /**
    * Holds a list of table models to update when new stats are received.
    */
-  private List<MonitorTableModel> tableModels = new ArrayList<>();
+  private java.util.List<MonitorTableModel> tableModels = new ArrayList<>();
 
   /**
    * Default constructor.
@@ -61,7 +64,9 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   public MonitoringPanel()
   {
     this.statsHandler = StatsHandler.getInstance();
-    setLayout(new MigLayout("fill, flowy"));
+    WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
+    wl.setAlignOnBaseline(true);
+    setLayout(wl);
     addTablePanel(EXECUTION_PROPS, "ExecutionTable.label");
     addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable.label");
     addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable.label");
@@ -69,6 +74,21 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     addTablePanel(QUEUE_PROPS, "QueueTable.label");
     addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
     statsHandler.addStatsHandlerListener(this);
+    addComponentListener(new ComponentListener() {
+      @Override
+      public void componentShown(final ComponentEvent e){
+      }
+      @Override
+      public void componentResized(final ComponentEvent e) {
+        MonitoringPanel.this.revalidate();
+      }
+      @Override
+      public void componentMoved(final ComponentEvent e) {
+      }
+      @Override
+      public void componentHidden(final ComponentEvent e) {
+      }
+    });
   }
 
   /**
@@ -78,7 +98,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    */
   private void addTablePanel(final Fields[] fields, final String label)
   {
-    add(makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label)), "grow");
+    JComponent comp = makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label));
+    add(comp);
   }
 
   /**
@@ -90,11 +111,9 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   {
     for (final MonitorTableModel model: tableModels)
     {
-      SwingUtilities.invokeLater(new Runnable()
-      {
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           model.fireTableDataChanged();
         }
       });
@@ -110,13 +129,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   private JComponent makeTablePanel(final Fields[] props, final String title)
   {
     JPanel panel = new JPanel();
+    panel.setAlignmentY(0f);
     panel.setLayout(new MigLayout("fill"));
     panel.setBorder(BorderFactory.createTitledBorder(title));
-    JTable table = new JTable()
-    {
+    JTable table = new JTable() {
       @Override
-      public boolean isCellEditable(final int row, final int column)
-      {
+      public boolean isCellEditable(final int row, final int column) {
         return false;
       }
     };
@@ -131,9 +149,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     rend0.setHorizontalAlignment(SwingConstants.LEFT);
     rend0.setOpaque(true);
     table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-    for (int i=0; i<model.getColumnCount(); i++) table.sizeColumnsToFit(i);
+    table.getColumnModel().getColumn(0).setMinWidth(200);
+    table.getColumnModel().getColumn(0).setMaxWidth(300);
     tableModels.add(model);
     panel.add(table, "growx, pushx");
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    table.doLayout();
     table.setShowGrid(false);
     return panel;
   }

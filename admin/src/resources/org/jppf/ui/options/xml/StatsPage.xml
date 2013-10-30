@@ -20,7 +20,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatsPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
-	<property name="scrollable" value="true"/>
+	<property name="scrollable" value="false"/>
 	<property name="layoutConstraints" value="flowy, fill"/>
 	<property name="componentConstraints" value="grow"/>
 
@@ -82,14 +82,20 @@
 
 		<child name="Tables" type="Java">
 			<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
-			<property name="layoutConstraints" value="fill, flowy"/>
-			<property name="componentConstraints" value="grow"/>
+      <!--
+      <property name="layoutConstraints" value="fill, flowy"/>
+      <property name="componentConstraints" value="grow"/>
+			-->
+      <property name="layoutConstraints" value=""/>
+      <property name="componentConstraints" value="grow, pushx"/>
 			<property name="value" value=""/>
 		</child>
 
+    <!--
 		<child name="filler" type="Page">
 			<property name="componentConstraints" value="growx, span 2"/>
 		</child>
+		-->
 
 	</child>
 

@@ -46,9 +46,6 @@ public class JavaOption extends AbstractOption
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void createUI()
   {
@@ -58,7 +55,8 @@ public class JavaOption extends AbstractOption
       if (UIComponent instanceof JPanel)
       {
         JPanel panel = (JPanel) UIComponent;
-        if (!(panel.getLayout() instanceof MigLayout)) panel.setLayout(new MigLayout(layoutConstraints));
+        if (!(panel.getLayout() instanceof MigLayout) && (layoutConstraints != null) && !"".equals(layoutConstraints))
+          panel.setLayout(new MigLayout(layoutConstraints));
       }
       if (mouseListenerClassName != null)
       {

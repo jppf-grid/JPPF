@@ -26,6 +26,10 @@ package org.jppf.utils.stats;
 public final class JPPFStatisticsHelper
 {
   /**
+   * Count of tasks dispatched to nodes.
+   */
+  public static final String TASK_DISPATCH = "task.dispatch";
+  /**
    * Execution times including server/nodes trnasport overhead.
    */
   public static final String EXECUTION = "execution";
@@ -85,7 +89,7 @@ public final class JPPFStatisticsHelper
   public static JPPFStatistics createServerStatistics()
   {
     JPPFStatistics statistics = new JPPFStatistics();
-    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TOTAL, TASK_QUEUE_TIME, JOB_TOTAL, JOB_TIME, JOB_TASKS);
+    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TOTAL, TASK_QUEUE_TIME, JOB_TOTAL, JOB_TIME, JOB_TASKS, TASK_DISPATCH);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);
     return statistics;
   }

@@ -89,8 +89,8 @@ public final class StatsFormatter implements StatsConstants
   public static Map<Fields, String> getStringValuesMap(final JPPFStatistics stats)
   {
     Map<Fields, String> map = new HashMap<>();
+    map.put(TOTAL_TASKS_EXECUTED, formatInt(stats.getSnapshot(TASK_DISPATCH).getTotal()));
     JPPFSnapshot snapshot = stats.getSnapshot(EXECUTION);
-    map.put(TOTAL_TASKS_EXECUTED, formatInt(snapshot.getValueCount()));
     map.put(TOTAL_EXECUTION_TIME, formatTime(snapshot.getTotal()));
     map.put(LATEST_EXECUTION_TIME, formatDouble(snapshot.getLatest()));
     map.put(MIN_EXECUTION_TIME, formatDouble(snapshot.getMin()));
@@ -149,8 +149,8 @@ public final class StatsFormatter implements StatsConstants
   public static Map<Fields, Double> getDoubleValuesMap(final JPPFStatistics stats)
   {
     Map<Fields, Double> map = new HashMap<>();
+    map.put(TOTAL_TASKS_EXECUTED, stats.getSnapshot(TASK_DISPATCH).getTotal());
     JPPFSnapshot snapshot = stats.getSnapshot(EXECUTION);
-    map.put(TOTAL_TASKS_EXECUTED, (double) snapshot.getValueCount());
     map.put(TOTAL_EXECUTION_TIME, snapshot.getTotal());
     map.put(LATEST_EXECUTION_TIME, snapshot.getLatest());
     map.put(MIN_EXECUTION_TIME, snapshot.getMin() == Long.MAX_VALUE ? 0L : snapshot.getMin());

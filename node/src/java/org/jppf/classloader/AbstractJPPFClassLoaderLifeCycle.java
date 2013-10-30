@@ -137,7 +137,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @throws ClassNotFoundException if the class could not be loaded from the remote server.
    * @exclude
    */
-  protected JPPFResourceWrapper loadResource(final Map<String, Object> map) throws ClassNotFoundException {
+  protected JPPFResourceWrapper loadResource(final Map<ResourceIdentifier, Object> map) throws ClassNotFoundException {
     JPPFResourceWrapper resource = null;
     if (!isOffline()) {
       try {
@@ -241,13 +241,13 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         }
         return results;
       }
-      Map<String, Object> map = new HashMap<>();
+      Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
       String[] namesToLookup = new String[indices.size()];
       for (int i=0; i<indices.size(); i++) namesToLookup[i] = names[indices.get(i)];
-      map.put("name", StringUtils.arrayToString(", ", null, null, namesToLookup));
-      map.put("multiple.resources.names", namesToLookup);
+      map.put(ResourceIdentifier.NAME, StringUtils.arrayToString(", ", null, null, namesToLookup));
+      map.put(ResourceIdentifier.MULTIPLE_NAMES, namesToLookup);
       JPPFResourceWrapper resource = loadResource(map);
-      Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData("resource_map");
+      Map<String, List<byte[]>> dataMap = (Map<String, List<byte[]>>) resource.getData(ResourceIdentifier.RESOURCE_MAP);
       for (Integer index : indices) {
         String name = names[index];
         List<byte[]> dataList = dataMap.get(name);

@@ -35,10 +35,6 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Key for the list of requests.
-   */
-  private static final String RESOURCES_KEY = "resources";
-  /**
    * Mapping of futures to corresponding resource requests.
    */
   private final transient Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = new HashMap<>();
@@ -55,7 +51,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   public JPPFResourceWrapper[] getResources()
   {
     synchronized (getMonitor()) {
-      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
+      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
       if(resources == null || resources.isEmpty()) return EMPTY_RESOURCE_WRAPPER_ARRAY;
       else return resources.toArray(new JPPFResourceWrapper[resources.size()]);
     }
@@ -68,10 +64,10 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   @SuppressWarnings("unchecked")
   public void addOrReplaceResource(final JPPFResourceWrapper resource) {
     synchronized (getMonitor()) {
-      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(RESOURCES_KEY);
+      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
       if(resources == null) {
         resources = new HashSet<>();
-        setData(RESOURCES_KEY, resources);
+        setData(ResourceIdentifier.RESOURCES_KEY, resources);
       } else resources.remove(resource);
       resources.add(resource);
     }
@@ -110,7 +106,7 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     synchronized (getMonitor()) {
-      sb.append("resources=").append(getData(RESOURCES_KEY));
+      sb.append("resources=").append(getData(ResourceIdentifier.RESOURCES_KEY));
     }
     sb.append(']');
     return sb.toString();

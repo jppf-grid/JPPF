@@ -63,7 +63,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       if (debugEnabled) log.debug("sending node initiation message");
       JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.NODE_INITIATION);
-      request.setData("node.uuid", NodeRunner.getUuid());
+      request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
       requestRunner.setRequest(request);
       requestRunner.run();
       Throwable t = requestRunner.getThrowable();
@@ -88,7 +88,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
   }
 
   @Override
-  public JPPFResourceWrapper loadResource(final Map<String, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception
+  public JPPFResourceWrapper loadResource(final Map<ResourceIdentifier, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception
   {
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
@@ -96,7 +96,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     TraversalList<String> list = new TraversalList<>(uuidPath);
     resource.setUuidPath(list);
     if (list.size() > 0) list.setPosition(uuidPath.size()-1);
-    for (Map.Entry<String, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
+    for (Map.Entry<ResourceIdentifier, Object> entry: map.entrySet()) resource.setData(entry.getKey(), entry.getValue());
     resource.setRequestUuid(requestUuid);
 
     Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);

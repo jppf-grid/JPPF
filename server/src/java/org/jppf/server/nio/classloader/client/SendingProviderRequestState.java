@@ -23,7 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
@@ -69,7 +69,7 @@ class SendingProviderRequestState extends ClassServerState
       if (request != null) {
         context.setMessage(null);
         JPPFResourceWrapper resource = request.getResource();
-        if ((resource.getCallable() == null) && (resource.getData("multiple") == null) && !(resource.getData("multiple.resources.names") == null)) {
+        if ((resource.getCallable() == null) && (resource.getData(ResourceIdentifier.MULTIPLE) == null) && !(resource.getData(ResourceIdentifier.MULTIPLE_NAMES) == null)) {
           byte[] content = server.getClassCache().getCacheContent(resource.getUuidPath().getFirst(), resource.getName());
           if (content != null) {
             resource.setDefinition(content);

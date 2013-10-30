@@ -39,6 +39,6 @@ public interface ClassLoaderConnection<C> extends NodeConnection<C>
    * @return a <code>JPPFResourceWrapper</code> containing the resource content.
    * @throws Exception if the connection was lost and could not be reestablished.
    */
-  JPPFResourceWrapper loadResource(final Map<String, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception;
+  JPPFResourceWrapper loadResource(final Map<ResourceIdentifier, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception;
 }
 

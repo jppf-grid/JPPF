@@ -143,8 +143,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (debugEnabled) log.debug(build("looking up definition for resource [", name, "]"));
     byte[] b = null;
     String resName = name.replace('.', '/') + ".class";
-    Map<String, Object> map = new HashMap<>();
-    map.put("name", resName);
+    Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
+    map.put(ResourceIdentifier.NAME, resName);
     JPPFResourceWrapper resource = null;
     synchronized(this) {
       resource = loadResource(map);
@@ -199,9 +199,9 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception {
     if (debugEnabled) log.debug(build(this, " requesting remote computation, requestUuid = ", requestUuid));
-    Map<String, Object> map = new HashMap<>();
-    map.put("name", "callable");
-    map.put("callable", callable);
+    Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
+    map.put(ResourceIdentifier.NAME, "callable");
+    map.put(ResourceIdentifier.CALLABLE, callable);
     JPPFResourceWrapper resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
     byte[] b = null;
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) b = resource.getCallable();
@@ -305,12 +305,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     List<URL> urlList = new ArrayList<>();
     JPPFResourceWrapper resource = null;
     if (!notFoundCache.has(name)) {
-      Map<String, Object> map = new HashMap<>();
-      map.put("name", name);
-      map.put("multiple", "true");
+      Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
+      map.put(ResourceIdentifier.NAME, name);
+      map.put(ResourceIdentifier.MULTIPLE, "true");
       resource = loadResource(map);
       List<byte[]> dataList = null;
-      if (resource != null) dataList = (List<byte[]>) resource.getData("resource_list");
+      if (resource != null) dataList = (List<byte[]>) resource.getData(ResourceIdentifier.RESOURCE_LIST);
       boolean found = (dataList != null) && !dataList.isEmpty();
       if (debugEnabled) log.debug(build(this, "resource [", name, "] ", found ? "" : "not ", "found remotely"));
       if (found) {

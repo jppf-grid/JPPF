@@ -17,6 +17,8 @@
  */
 package org.jppf.classloader;
 
+import static org.jppf.classloader.ResourceIdentifier.*;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -39,7 +41,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Used to generate locally unique ids for the remote-computed callables.
    */
-  private static final AtomicLong CALLABLE_ID = new AtomicLong(0L);
+  private static final AtomicLong CALLABLE_ID_SEQUENCE = new AtomicLong(0L);
   /**
    * Used to generate locally unique ids for the remote-computed callables.
    */
@@ -107,7 +109,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Contains data about the kind of lookup that is to be done.
    */
-  private final Map<String, Object> dataMap = new HashMap<>();
+  private final Map<ResourceIdentifier, Object> dataMap = new EnumMap<>(ResourceIdentifier.class);
   /**
    * Performance optimization.
    */
@@ -128,7 +130,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   public String getName()
   {
-    return (String) getData("name");
+    return (String) getData(NAME);
   }
 
   /**
@@ -137,7 +139,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   public void setName(final String name)
   {
-    setData("name", name);
+    setData(NAME, name);
   }
 
   /**
@@ -146,7 +148,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   public byte[] getDefinition()
   {
-    return (byte[]) getData("definition");
+    return (byte[]) getData(DEFINITION);
   }
 
   /**
@@ -155,7 +157,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   public void setDefinition(final byte[] definition)
   {
-    setData("definition", definition);
+    setData(DEFINITION, definition);
   }
 
   /**
@@ -260,7 +262,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   public byte[] getCallable()
   {
-    return (byte[]) getData("callable");
+    return (byte[]) getData(CALLABLE);
   }
 
   /**
@@ -269,7 +271,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   public void setCallable(final byte[] callable)
   {
-    setData("callable", callable);
+    setData(CALLABLE, callable);
   }
 
   /**
@@ -278,7 +280,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   protected long getCallableID()
   {
-    Long id = (Long) getData("callable.id");
+    Long id = (Long) getData(CALLABLE_ID);
     return id == null ? NO_CALLABLE_ID : id;
   }
 
@@ -287,7 +289,7 @@ public class JPPFResourceWrapper implements Serializable
    * @param key the string identifying the metadata.
    * @return an object value or null if the metadata could not be found.
    */
-  public Object getData(final String key)
+  public Object getData(final ResourceIdentifier key)
   {
     synchronized (dataMap) {
       return dataMap.get(key);
@@ -313,7 +315,7 @@ public class JPPFResourceWrapper implements Serializable
    * @param key the string identifying the metadata.
    * @param value the value of the metadata.
    */
-  public void setData(final String key, final Object value)
+  public void setData(final ResourceIdentifier key, final Object value)
   {
     synchronized (dataMap) {
       dataMap.put(key, value);
@@ -354,7 +356,7 @@ public class JPPFResourceWrapper implements Serializable
    */
   void preProcess()
   {
-    if ((getCallable() != null) && (getCallableID() == NO_CALLABLE_ID)) setData("callable.id", CALLABLE_ID.incrementAndGet());
+    if ((getCallable() != null) && (getCallableID() == NO_CALLABLE_ID)) setData(CALLABLE_ID, CALLABLE_ID_SEQUENCE.incrementAndGet());
   }
 
   @Override

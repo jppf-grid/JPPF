@@ -162,7 +162,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.PROVIDER_INITIATION);
     resource.addUuid(clientUuid);
-    resource.setData("connection.uuid", owner.getConnectionUuid());
+    resource.setData(ResourceIdentifier.CONNECTION_UUID, owner.getConnectionUuid());
     writeResource(resource);
     // read the server response
     readResource();
@@ -183,16 +183,16 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     ClassLoader cl = getClassLoader(resource.getRequestUuid());
     //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
     if (debugEnabled) log.debug(formattedName + " using classloader=" + cl);
-    if (resource.getData("multiple") != null)
+    if (resource.getData(ResourceIdentifier.MULTIPLE) != null)
     {
       List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
-      if (list != null) resource.setData("resource_list", list);
+      if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
     }
-    else if (resource.getData("multiple.resources.names") != null)
+    else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null)
     {
-      String[] names = (String[]) resource.getData("multiple.resources.names");
+      String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
       Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
-      resource.setData("resource_map", result);
+      resource.setData(ResourceIdentifier.RESOURCE_MAP, result);
     }
     else
     {

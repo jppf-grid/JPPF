@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader.node;
 
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -74,7 +74,7 @@ class WaitingInitialNodeRequestState extends ClassServerState
       context.setProvider(false);
       context.setPeer((Boolean) resource.getData("peer", Boolean.FALSE));
       if (debugEnabled) log.debug("initiating node: " + wrapper);
-      String uuid = (String) resource.getData("node.uuid");
+      String uuid = (String) resource.getData(ResourceIdentifier.NODE_UUID);
       if (uuid != null)
       {
         context.setUuid(uuid);

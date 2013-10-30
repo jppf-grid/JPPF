@@ -25,7 +25,7 @@ import java.nio.channels.*;
 
 import javax.net.ssl.*;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
@@ -80,8 +80,8 @@ public class SendingPeerChannelIdentifierState extends ClassServerState
       JPPFResourceWrapper resource = new JPPFResourceWrapper();
       resource.setState(JPPFResourceWrapper.State.NODE_INITIATION);
       String uuid = JPPFDriver.getInstance().getUuid();
-      resource.setData("node.uuid", uuid);
-      resource.setData("peer", Boolean.TRUE);
+      resource.setData(ResourceIdentifier.NODE_UUID, uuid);
+      resource.setData(ResourceIdentifier.PEER, Boolean.TRUE);
       resource.setProviderUuid(uuid);
       context.setResource(resource);
       context.serializeResource();

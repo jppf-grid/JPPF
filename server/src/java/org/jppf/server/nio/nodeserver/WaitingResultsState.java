@@ -145,6 +145,7 @@ class WaitingResultsState extends NodeServerState {
   private void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
     //server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L);
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    stats.addValue(JPPFStatisticsHelper.TASK_DISPATCH, nbTasks);
     stats.addValues(JPPFStatisticsHelper.EXECUTION, elapsed, nbTasks);
     stats.addValues(JPPFStatisticsHelper.NODE_EXECUTION, elapsedInNode, nbTasks);
     stats.addValues(JPPFStatisticsHelper.TRANSPORT_TIME, elapsed - elapsedInNode, nbTasks);
