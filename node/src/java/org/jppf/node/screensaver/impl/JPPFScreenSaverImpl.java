@@ -18,6 +18,7 @@
 package org.jppf.node.screensaver.impl;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.Timer;
 
@@ -27,7 +28,7 @@ import org.jppf.node.screensaver.JPPFScreenSaver;
 import org.jppf.utils.*;
 
 /**
- * A panel that serves as a GUI on top of a JPPF node, displayed as a screen saver.
+ * A built-in screen saver implementation.
  * @author Laurent Cohen
  * @author nissalia
  */
@@ -41,17 +42,13 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    */
   private NodePanel nodePanel = null;
   /**
-   * The icon holding the flying logo image.
-   */
-  private ImageIcon logo = null;
-  /**
    * The number of flying logos;
    */
   private int nbLogos = 10;
   /**
-   * The image object for the flying logos.
+   * The icon holding the flying logo image.
    */
-  private Image logoImg = null;
+  private ImageIcon[] logos = null;
   /**
    * The speed of the flying logos;
    */
@@ -69,16 +66,15 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    */
   private Timer timer = null;
   /**
-   * Full screen flag.
+   * The horizontal alignment of the node status panel.
    */
-  private boolean fullscreen = false;
+  private int alignment = 1;
 
   /**
    * Default constructor.
    */
   public JPPFScreenSaverImpl() {
-    setLayout(new BorderLayout());
-    setBackground(Color.BLACK);
+    super(true);
   }
 
   @Override
@@ -88,42 +84,40 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
 
   @Override
   public void init(final boolean fullscreen) {
-    this.fullscreen = fullscreen;
-    initializeSettings();
-    if (nodePanel == null) nodePanel = new NodePanel();
-    nodePanel.setDoubleBuffered(true);
-    this.add(nodePanel, BorderLayout.CENTER);
-
+    configure();
     data = new ImageData[nbLogos];
-    for (int i=0; i<nbLogos; i++) data[i] = new ImageData(logo);
+    for (int i=0; i<nbLogos; i++) data[i] = new ImageData(logos[i % logos.length]);
     Dimension dim = this.getSize();
-    System.out.println("window dimension = " + dim);
-    Random rand = new Random(System.currentTimeMillis());
-    for (int i=0; i<nbLogos; i++) {
-      int n = dim.width - logo.getIconWidth();
-      if (n <= 0) n = logo.getIconWidth();
-      data[i].x = rand.nextInt(n);
-      data[i].prevx = data[i].x;
-      data[i].stepX *= 2 * rand.nextInt(2) - 1;
-      n = dim.height - logo.getIconHeight();
-      if (n <= 0) n = logo.getIconHeight();
-      data[i].y = rand.nextInt(n);
-      data[i].prevy = data[i].y;
-      data[i].stepY *= 2 * rand.nextInt(2) - 1;
+    for (ImageData d: data) d.init(dim);
+
+    if (nodePanel == null) nodePanel = new NodePanel();
+    SpringLayout layout = new SpringLayout();
+    setLayout(layout);
+    this.add(nodePanel);
+    setBackground(Color.BLACK);
+    Dimension dim2 = nodePanel.getPreferredSize();
+    int hmargin = (getWidth() - dim2.width) / 2;
+    int vmargin = (getHeight() - dim2.height) / 2;
+    layout.putConstraint(SpringLayout.WEST, nodePanel, alignment * hmargin, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, nodePanel, vmargin, SpringLayout.NORTH, this);
+    //System.out.println("screensaver size = " + dim + ", nodePanel size = " + nodePanel.getSize() + ", pref = " + nodePanel.getPreferredSize());
+    if (fullscreen) {
+      addMouseListener(new MouseAdapter() {
+        @Override
+        public void mousePressed(final MouseEvent e) {
+          destroy();
+          System.exit(0);
+        }
+      });
     }
-    setDoubleBuffering(this);
     if (timer == null) {
-      timer = new Timer();
-      //timer.schedule(new LogoUpdateTask(), 100, 25L + 5L * (11L - speed));
-      timer.schedule(new LogoUpdateTask(), 100, 1000 / speed);
-      timer.schedule(new LogoPaintTask(), 500L, 25L);
+      timer = new Timer("JPPFScreenSaverTimer");
+      timer.schedule(new LogoUpdateTask(), 100L, 1000L / speed);
+      timer.schedule(new LogoPaintTask(), 100L, 25L);
       TimerTask task = new TimerTask() {
         @Override
         public void run() {
-          if (nodePanel != null) {
-            String s = NodePanel.toStringDuration(System.currentTimeMillis() - nodePanel.startedAt);
-            nodePanel.timeLabel.setText("Active for: "+s);
-          }
+          if (nodePanel != null) nodePanel.updateTimeLabel();
         }
       };
       timer.scheduleAtFixedRate(task, 1000L, 1000L);
@@ -133,67 +127,45 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   /**
    * Initialize the parameters of the screensaver.
    */
-  private void initializeSettings() {
+  private void configure() {
     TypedProperties config = JPPFConfiguration.getProperties();
     collisions = config.getBoolean("jppf.screensaver.handle.collisions", true);
     nbLogos = config.getInt("jppf.screensaver.logos", 10);
     speed = config.getInt("jppf.screensaver.speed", 10);
     if (speed < 1) speed = 1;
     if (speed > MAX_SPEED) speed = MAX_SPEED;
-    String path = config.getString("jppf.screensaver.logo.path", NodePanel.IMAGE_PATH + '/' + "jppf_group_small.gif");
-    logo = NodePanel.loadImage(path);
-    logoImg = logo.getImage();
-  }
-
-  /**
-   * Set a hierarchy of Swing components as double buffered.
-   * @param comp the root of the components hierarchy.
-   */
-  public static void setDoubleBuffering(final JComponent comp) {
-    comp.setDoubleBuffered(true);
-    for (int i=0; i<comp.getComponentCount(); i++) {
-      Component c = comp.getComponent(i);
-      if (c instanceof JComponent) setDoubleBuffering((JComponent) c);
+    String defaultPath = NodePanel.IMAGE_PATH + '/' + "jppf_group_small.gif";
+    String paths = config.getString("jppf.screensaver.logo.path", defaultPath);
+    String[] tokens = paths.split("\\|");
+    java.util.List<ImageIcon> list = new ArrayList<>();
+    for (String s: tokens) {
+      ImageIcon icon = NodePanel.loadImage(s.trim());
+      if (icon != null) list.add(icon);
     }
+    if (list.isEmpty()) list.add(NodePanel.loadImage(defaultPath));
+    logos = list.toArray(new ImageIcon[list.size()]);
+    String s = config.getString("jppf.screensaver.status.panel.alignment", "center").trim().toLowerCase();
+    if (s.startsWith("l")) alignment = 0;
+    else if (s.startsWith("r")) alignment = 2;
+    else alignment = 1;
   }
 
   @Override
   public void destroy() {
     timer.cancel();
-    if (nodePanel != null) {
-      nodePanel.cleanup();
-      nodePanel = null;
-    }
+    if (nodePanel != null) nodePanel = null;
   }
 
   /**
    * Timer task to display the logos at a rate of 25 frames/sec.
    */
-  public class LogoPaintTask  extends TimerTask {
+  private class LogoPaintTask  extends TimerTask {
     /**
-     * The task that renders the flying logos.
-     */
-    Runnable task = null;
-
-    /**
-     * Initialize the task that renders the flying logos.
-     */
-    public LogoPaintTask() {
-      task = new Runnable() {
-        @Override
-        public void run() {
-          paintLogos();
-        }
-      };
-    }
-
-    /**
-     * Update the position and direction of the flying logos.
-     * @see java.util.TimerTask#run()
+     * Request the painting of the flying logos.
      */
     @Override
     public void run() {
-      SwingUtilities.invokeLater(task);
+      JPPFScreenSaverImpl.this.repaint();
     }
   }
 
@@ -206,13 +178,15 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
      */
     @Override
     public void run() {
-      Dimension dim = JPPFScreenSaverImpl.this.getSize();
-      for (int i=0; i<data.length; i++) {
-        ImageData d = data[i];
-        if (collisions) {
-          for (int j=i+1; j<data.length; j++) d.checkColliding(data[j]);
+      if (data == null) return;
+      try {
+        Dimension dim = JPPFScreenSaverImpl.this.getSize();
+        for (int i=0; i<data.length; i++) {
+          ImageData d = data[i];
+          d.update(dim, collisions ? data : null, i+1);
         }
-        d.update(dim);
+      } catch(Throwable t) {
+        t.printStackTrace();
       }
     }
   }
@@ -220,30 +194,38 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   /**
    * Performs the repainting of the flying logo images, as well as that of the areas they were
    * occupying within the underlying components.
+   * @param g the graphics object to use for painting.
    */
-  public void paintLogos() {
-    Graphics g = getGraphics();
-    Image buffer = createVolatileImage(getWidth(), getHeight());
-    Graphics bufferGraphics = buffer.getGraphics();
+  private void paintLogos(final Graphics g) {
+    if (data == null) return;
+    Rectangle r = g.getClipBounds();
     try {
       for (ImageData d: data) {
         synchronized(d) {
-          int minx = Math.min(d.prevx, d.x);
-          int maxx = Math.max(d.prevx, d.x);
-          int miny = Math.min(d.prevy, d.y);
-          int maxy = Math.max(d.prevy, d.y);
-          int w = maxx - minx + logo.getIconWidth();
-          int h = maxy - miny + logo.getIconHeight();
-          bufferGraphics.setClip(minx, miny, w, h);
-          paint(bufferGraphics);
-          bufferGraphics.drawImage(logoImg, d.x, d.y, null);
+          g.setClip(d.x, d.y, d.imgw, d.imgh);
+          g.drawImage(d.img, d.x, d.y, null);
           d.prevx = d.x;
           d.prevy = d.y;
-          g.drawImage(buffer, minx, miny, minx + w, miny + h, minx, miny, minx + w, miny + h, null);
         }
       }
+    } catch(Throwable t) {
+      t.printStackTrace();
     } finally {
-      bufferGraphics.dispose();
+      g.setClip(r);
+    }
+  }
+
+  /**
+   * Performs the repainting of the flying logo images, as well as that of the areas they were
+   * occupying within the underlying components.
+   */
+  private void paintLogos() {
+    Graphics g = getGraphics();
+    try {
+      paintLogos(g);
+    } catch(Throwable t) {
+      t.printStackTrace();
+    } finally {
       g.dispose();
     }
   }
@@ -252,8 +234,13 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    * Get the node panel.
    * @return a {@link NodePanel} instance.
    */
-  public NodePanel getNodePanel()
-  {
+  public NodePanel getNodePanel() {
     return nodePanel;
+  }
+
+  @Override
+  public void paint(final Graphics g) {
+    super.paint(g);
+    paintLogos(g);
   }
 }

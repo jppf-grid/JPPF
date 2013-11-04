@@ -18,14 +18,14 @@
 
 package org.jppf.node.screensaver.impl;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
 
 
 /**
- * Data structure holding the position and direction of a flying logo.
+ * Data structure holding the position and direction of a moving logo.
  */
 public class ImageData {
   /**
@@ -47,21 +47,25 @@ public class ImageData {
   /**
    * The direction on the x axis.
    */
-  public int stepX = 1;
+  public int stepx = 1;
   /**
    * The direction on the y axis.
    */
-  public int stepY = 1;
+  public int stepy = 1;
   /**
-   * 
+   * Width of the moving logo image.
    */
-  private final int imgw;
+  public final int imgw;
   /**
-   * 
+   * Height of the moving logo image.
    */
-  private final int imgh;
+  public final int imgh;
   /**
-   * 
+   * The logo image.
+   */
+  public Image img;
+  /**
+   * Used to generate random steps to avoid fixed paths around the screen.
    */
   private Random rand = new Random(System.nanoTime());
 
@@ -70,8 +74,24 @@ public class ImageData {
    * @param logoIcon an icon contain the imge of a logo.
    */
   public ImageData(final ImageIcon logoIcon) {
+    img = logoIcon.getImage();
     imgw = logoIcon.getIconWidth();
     imgh = logoIcon.getIconHeight();
+  }
+
+  /**
+   * Initialize this image data.
+   * @param dim the dimension of the full screen or of the component the logos are painted in.
+   */
+  public void init(final Dimension dim) {
+    int n = dim.width - imgw;
+    if (n <= 0) n = imgw;
+    prevx = x = rand.nextInt(n);
+    stepx = randomValueInRange(-2, 2);
+    n = dim.height - imgh;
+    if (n <= 0) n = imgh;
+    prevy = y = rand.nextInt(n);
+    stepy = randomValueInRange(-2, 2);
   }
 
   /**
@@ -79,70 +99,72 @@ public class ImageData {
    * @param d the position and speed vector data for the otehr logo logo.
    * @return true if the two logos are colliding, false otherwise.
    */
-  public boolean checkColliding(final ImageData d) {
-    int x1 = x + stepX;
-    int x2 = d.x + d.stepX;
-    int y1 = y + stepY;
-    int y2 = d.y + d.stepY;
-    if (isIn(x1, y1, x2, y2)) {
-      if (x >= d.x + imgw) {
-        stepX  = -stepX;
-        d.stepX  = -d.stepX;
-      }
-      if (y >= d.y + imgh) {
-        stepY  = -stepY;
-        d.stepY  = -d.stepY;
-      }
+  private boolean checkColliding(final ImageData d) {
+    int x1 = x + stepx;
+    int y1 = y + stepy;
+    if (isIn(x1, y1, d)) {
+      if (x >= d.x + d.imgw) reverseX(d);
+      if (y >= d.y + d.imgh) reverseY(d);
       return true;
     }
-    if (isIn(x1 + imgw, y1, x2, y2)) {
-      if (x + imgw <= d.x) {
-        stepX  = -stepX;
-        d.stepX  = -d.stepX;
-      }
-      if (y >= d.y + imgh) {
-        stepY  = -stepY;
-        d.stepY  = -d.stepY;
-      }
+    if (isIn(x1 + imgw, y1, d)) {
+      if (x <= d.x - d.imgw) reverseX(d);
+      if (y >= d.y + d.imgh) reverseY(d);
       return true;
     }
-    if (isIn(x1, y1 + imgh, x2, y2)) {
-      if (x >= d.x + imgw) {
-        stepX  = -stepX;
-        d.stepX  = -d.stepX;
-      }
-      if (y + imgh <= d.y) {
-        stepY  = -stepY;
-        d.stepY  = -d.stepY;
-      }
+    if (isIn(x1, y1 + imgh, d)) {
+      if (x >= d.x + d.imgw) reverseX(d);
+      if (y <= d.y - d.imgh) reverseY(d);
       return true;
     }
-    if (isIn(x1 + imgw, y1 + imgh, x2, y2)) {
-      if (x + imgw <= d.x) {
-        stepX  = -stepX;
-        d.stepX  = -d.stepX;
-      }
-      if (y + imgh <= d.y) {
-        stepY  = -stepY;
-        d.stepY  = -d.stepY;
-      }
+    if (isIn(x1 + imgw, y1 + imgh, d)) {
+      if (x <= d.x - d.imgw) reverseX(d);
+      if (y <= d.y - d.imgh) reverseY(d);
       return true;
     }
     return false;
   }
 
   /**
-   * Update this image data by incrementing the position according tot he direction vector.
-   * @param screenDimension ther dimension of the full screen or of the component the logos are painted in.
+   * Reverse the direction on the X axis of this image and the specified one, when they are colliding.
+   * @param d the colliding image.
    */
-  public synchronized void update(final Dimension screenDimension) {
-    int r = rand.nextInt(10);
-    int n = 1 + (r == 0 ? 1 : 0);
-    for (int i=0; i<n; i++) {
-      if ((x + stepX < 0) || (x + stepX + imgw > screenDimension.width)) stepX = -stepX;
-      if ((y + stepY < 0) || (y + stepY + imgh > screenDimension.height)) stepY = -stepY;
-      x += stepX;
-      y += stepY;
+  private void reverseX(final ImageData d) {
+    stepx  = -stepx;
+    d.stepx  = -d.stepx;
+  }
+
+  /**
+   * Reverse the direction on the Y axis of this image and the specified one, when they are colliding.
+   * @param d the colliding image.
+   */
+  private void reverseY(final ImageData d) {
+    stepy  = -stepy;
+    d.stepy  = -d.stepy;
+  }
+
+  /**
+   * Update this image data by incrementing the position according to the direction vector.
+   * @param screenDimension ther dimension of the full screen or of the component the logos are painted in.
+   * @param data the array of other logos to check for collisions.
+   * @param startIndex the index at which to start checking in the array of logos.
+   */
+  public synchronized void update(final Dimension screenDimension, final ImageData[] data, final int startIndex) {
+    if (data != null) {
+      for (int i=startIndex; i<data.length; i++) checkColliding(data[i]);
+    }
+    if ((x + stepx < 0) || (x + stepx + imgw > screenDimension.width)) stepx = -stepx;
+    if ((y + stepy < 0) || (y + stepy + imgh > screenDimension.height)) stepy = -stepy;
+    x += stepx;
+    y += stepy;
+
+    // change speed vector at random intervals
+    int r = rand.nextInt(100);
+    if (r == 0) {
+      int s = stepx < 0 ? -1 : 1;
+      stepx = s * randomValueInRange(1, 2);
+      s = stepy < 0 ? -1 : 1;
+      stepy = s * randomValueInRange(1, 2);
     }
   }
 
@@ -150,11 +172,27 @@ public class ImageData {
    * Determine whether a corner of a logo is inside another logo.
    * @param x1 x coordinate of the corner of the first logo.
    * @param y1 y coordinate of the corner of the first logo.
-   * @param x2 x coordinate of the top left corner of the second logo.
-   * @param y2 y coordinate of the top left corner of the second logo.
+   * @param d the other logo.
    * @return true if the corner of the first is logo is inside the second, false otherwise.
    */
-  public boolean isIn(final int x1, final int y1, final int x2, final int y2) {
-    return (x1 >= x2) && (x1 <= x2 + imgw) && (y1 >= y2) && (y1 <= y2 + imgh);
+  private boolean isIn(final int x1, final int y1, final ImageData d) {
+    int x2 = d.x + d.stepx;
+    int y2 = d.y + d.stepy;
+    return (x1 >= x2) && (x1 <= x2 + d.imgw) && (y1 >= y2) && (y1 <= y2 + d.imgh);
+  }
+
+  /**
+   * Get a random int value in the specified range, with the exception of zero.
+   * @param min range lower bound.
+   * @param max range upper bound.
+   * @return an int value.
+   */
+  private int randomValueInRange(final int min, final int max) {
+    int result = 0;
+    while (result == 0) {
+      int diff = max - min;
+      result = min + rand.nextInt(diff + 1);
+    }
+    return result;
   }
 }

@@ -20,14 +20,16 @@ package org.jppf.node.screensaver;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 
 import javax.swing.*;
 
 import org.jppf.node.initialization.InitializationHook;
+import org.jppf.node.screensaver.impl.JPPFScreenSaverImpl;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Main entry point for starting the screen saver.
  * @author Laurent Cohen
  */
 public class ScreenSaverMain implements InitializationHook
@@ -51,6 +53,7 @@ public class ScreenSaverMain implements InitializationHook
    */
   public static void main(final String[] args) {
     try {
+      Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       new ScreenSaverMain().startScreenSaver(JPPFConfiguration.getProperties());
     } catch (Exception e) {
       e.printStackTrace();
@@ -87,15 +90,33 @@ public class ScreenSaverMain implements InitializationHook
       System.err.println("This is a headless graphics environment - cannot run in full screen");
       return;
     }
-    boolean fullscreen = config.getBoolean("jppf.screensaver.fullscreen", false);
-    GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    boolean fullscreenRequested = config.getBoolean("jppf.screensaver.fullscreen", false);
+    final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
-    final boolean fullscreenSupported = device.isFullScreenSupported();
-    if (fullscreen && !fullscreenSupported) System.err.println("Full screen is not supported by the current graphics device");
-    JFrame frame = new JFrame("JPPF screensaver");
-    if (fullscreen && fullscreenSupported) {
+    final GraphicsDevice[] devices = env.getScreenDevices();
+    boolean fullscreenSupported = true;
+    Rectangle2D result = new Rectangle2D.Double();
+    for (GraphicsDevice gd : devices) {
+      fullscreenSupported &= gd.isFullScreenSupported();
+      for (GraphicsConfiguration graphicsConfiguration : gd.getConfigurations()) {
+        Rectangle2D.union(result, graphicsConfiguration.getBounds(), result);
+      }
+    }
+
+    if (fullscreenRequested && !fullscreenSupported) System.err.println("Full screen is not supported by the current graphics device");
+    String title = config.getString("jppf.screensaver.title", "JPPF screensaver");
+    JFrame frame = new JFrame(title);
+    if (fullscreenRequested && fullscreenSupported) {
       frame.setUndecorated(true);
+      frame.setSize((int) result.getWidth(), (int) result.getHeight());
       frame.setResizable(false);
+      frame.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(final KeyEvent e) {
+          screensaver.destroy();
+          System.exit(0);
+        }
+      });
     } else {
       frame.setVisible(true);
       Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
@@ -107,20 +128,18 @@ public class ScreenSaverMain implements InitializationHook
     }
     frame.setBackground(Color.BLACK);
     frame.getContentPane().setBackground(Color.BLACK);
-    if (fullscreen && fullscreenSupported) device.setFullScreenWindow(frame);
     final JPPFScreenSaver screensaver = createScreenSaver();
     frame.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
         screensaver.destroy();
-        device.setFullScreenWindow(null);
         System.exit(0);
       }
     });
     JComponent comp = screensaver.getComponent();
-    frame.getContentPane().add(comp);
-    if (fullscreen && fullscreenSupported) comp.setSize(frame.getSize());
-    screensaver.init(fullscreen && fullscreenSupported);
+    frame.add(comp);
+    comp.setSize(frame.getSize());
+    screensaver.init(fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
   }
 
@@ -130,9 +149,13 @@ public class ScreenSaverMain implements InitializationHook
    * @throws Exception if any error occurs.
    */
   private JPPFScreenSaver createScreenSaver() throws Exception {
-    String name = JPPFConfiguration.getProperties().getString("jppf.screensaver.class");
-    Class<?> clazz = Class.forName(name);
-    screensaver = (JPPFScreenSaver) clazz.newInstance();
+    try {
+      String name = JPPFConfiguration.getProperties().getString("jppf.screensaver.class", "org.jppf.node.screensaver.impl.JPPFScreenSaverImpl");
+      Class<?> clazz = Class.forName(name);
+      screensaver = (JPPFScreenSaver) clazz.newInstance();
+    } catch(Exception e) {
+      screensaver = new JPPFScreenSaverImpl();
+    }
     return screensaver;
   }
 

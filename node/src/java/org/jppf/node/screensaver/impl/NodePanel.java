@@ -23,22 +23,12 @@ import java.text.NumberFormat;
 import javax.swing.*;
 
 import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
- * This class enables launching a JPPF node as an applet, from a web browser.
+ * This class displays the connection status, execution status and number of tasks for a node.
  * @author Laurent Cohen
  */
-class NodePanel extends JPanel
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(NodePanel.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
+class NodePanel extends JPanel {
   /**
    * Path to the images to display in the UI.
    */
@@ -47,14 +37,6 @@ class NodePanel extends JPanel
    * Image displaying a bright green traffic light.
    */
   static final ImageIcon BRIGHT_GREEN = loadImage(IMAGE_PATH + '/' + "active_greenlight.gif");
-  /**
-   * Image displaying a dark green traffic light.
-   */
-  static final ImageIcon DARK_GREEN = loadImage(IMAGE_PATH + '/' + "inactive_greenlight.gif");
-  /**
-   * Image displaying a bright red traffic light.
-   */
-  static final ImageIcon BRIGHT_RED = loadImage(IMAGE_PATH + '/' + "active_redlight.gif");
   /**
    * Image displaying a dark red traffic light.
    */
@@ -68,26 +50,22 @@ class NodePanel extends JPanel
    */
   private long taskCount = 0L;
   /**
-   * Holds the statuses for the node connection and tasks execution.
-   */
-  public boolean[] status = new boolean[2];
-  /**
    * These labels contain the status icons for the nodes connection and task execution activity.
    * Each status is represented by a green light and a red light, each light dark or bright depending on the node status.
    */
-  public JLabel[] statusLabels = new JLabel[2];
+  private JLabel[] statusLabels = new JLabel[2];
   /**
    * Labels used to display the number of tasks executed by each node.
    */
-  public JLabel countLabel = null;
+  private JLabel countLabel = null;
   /**
    * Label used to display how long the node has been active.
    */
-  public JLabel timeLabel = null;
+  private JLabel timeLabel = null;
   /**
    * The time this panel was started.
    */
-  public long startedAt = 0L;
+  private long startedAt = 0L;
   /**
    * 
    */
@@ -96,23 +74,15 @@ class NodePanel extends JPanel
   /**
    * Initialize this UI.
    */
-  public NodePanel()
-  {
-    try
-    {
-      createUI();
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
+  public NodePanel() {
+    super(true);
+    createUI();
   }
 
   /**
    * Initialize the user interface for this applet.
    */
-  private void createUI()
-  {
+  private void createUI() {
     initNodeState();
     GridBagLayout g = new GridBagLayout();
     setLayout(g);
@@ -133,17 +103,13 @@ class NodePanel extends JPanel
   /**
    * Initialize this node state.
    */
-  private void initNodeState()
-  {
+  private void initNodeState() {
     nf = NumberFormat.getNumberInstance();
     nf.setGroupingUsed(true);
     nf.setMaximumFractionDigits(0);
     nf.setMinimumIntegerDigits(1);
     startedAt = System.currentTimeMillis();
-    for (int i=0; i<statusLabels.length; i++)
-    {
-      statusLabels[i] = new JLabel(NodePanel.DARK_RED);
-    }
+    for (int i=0; i<statusLabels.length; i++) statusLabels[i] = new JLabel(NodePanel.DARK_RED);
     Dimension d = new Dimension(8, 8);
     for (JLabel aStatusLabel : statusLabels) {
       aStatusLabel.setMinimumSize(d);
@@ -166,8 +132,7 @@ class NodePanel extends JPanel
    * Create a panel showing the activity of a node.
    * @return a panel with some node information about is activity.
    */
-  private JPanel createNodePanel()
-  {
+  private JPanel createNodePanel() {
     JPanel panel = new JPanel();
     GridBagLayout g = new GridBagLayout();
     GridBagConstraints c = new GridBagConstraints();
@@ -205,8 +170,7 @@ class NodePanel extends JPanel
    * @param c the constraints to apply to the component.
    * @param comp the component to add.
    */
-  private void addLayoutComp(final JPanel panel, final GridBagLayout g, final GridBagConstraints c, final Component comp)
-  {
+  private void addLayoutComp(final JPanel panel, final GridBagLayout g, final GridBagConstraints c, final Component comp) {
     g.setConstraints(comp, c);
     panel.add(comp);
   }
@@ -217,8 +181,7 @@ class NodePanel extends JPanel
    * @param text the text to display on the left of the status lights.
    * @return a <code>JPanel</code> instance.
    */
-  private JPanel makeStatusPanel(final int statusIdx, final String text)
-  {
+  private JPanel makeStatusPanel(final int statusIdx, final String text) {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
     panel.setBackground(Color.BLACK);
@@ -236,12 +199,12 @@ class NodePanel extends JPanel
     statusPanel.setBackground(Color.BLACK);
     statusPanel.add(statusLabels[statusIdx]);
 
-    labelPanel.setPreferredSize(new Dimension(60, 20));
+    labelPanel.setPreferredSize(new Dimension(65, 20));
     panel.add(labelPanel);
     panel.add(Box.createHorizontalStrut(5));
     statusPanel.setPreferredSize(new Dimension(8, 20));
     panel.add(statusPanel);
-    panel.setPreferredSize(new Dimension(73, 20));
+    panel.setPreferredSize(new Dimension(78, 20));
     return panel;
   }
 
@@ -250,41 +213,21 @@ class NodePanel extends JPanel
    * @param file the file to get the icon from.
    * @return an <code>ImageIcon</code> instance.
    */
-  public static ImageIcon loadImage(final String file)
-  {
+  public static ImageIcon loadImage(final String file) {
     byte[] buf = null;
-    try
-    {
+    try {
       buf = FileUtils.getPathAsByte(file);
-    }
-    catch (Exception e)
-    {
-      String msg = "Could not load image '{}' : {}";
-      if (debugEnabled) log.debug(msg, file, ExceptionUtils.getStackTrace(e));
-      else log.warn(msg, file, ExceptionUtils.getMessage(e));
+    } catch (Exception e) {
+      System.err.println("Could not load image '" + file + "' : " + ExceptionUtils.getStackTrace(e));
     }
     return (buf == null) ? null : new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
-  }
-
-  /**
-   * Free resources used by the nodes.
-   */
-  public void cleanup()
-  {
-    try
-    {
-    }
-    catch (Throwable t)
-    {
-    }
   }
 
   /**
    * Update the status of the connection to the server.
    * @param ok <code>true</code> if the status is ok, <code>false</code> otherwise.
    */
-  public void updateConnectionStatus(final boolean ok)
-  {
+  public synchronized void updateConnectionStatus(final boolean ok) {
     statusLabels[0].setIcon(ok ? NodePanel.BRIGHT_GREEN : NodePanel.DARK_RED);
   }
 
@@ -292,9 +235,16 @@ class NodePanel extends JPanel
    * Update the status of the execution to the server.
    * @param ok <code>true</code> if the status is ok, <code>false</code> otherwise.
    */
-  public void updateExecutionStatus(final boolean ok)
-  {
+  public synchronized void updateExecutionStatus(final boolean ok) {
     statusLabels[1].setIcon(ok ? NodePanel.BRIGHT_GREEN : NodePanel.DARK_RED);
+  }
+
+  /**
+   * Update the text of the label indicating how long the screensaver has been active.
+   */
+  public synchronized void updateTimeLabel() {
+    String s = toStringDuration(System.currentTimeMillis() - startedAt);
+    timeLabel.setText("Active for: " + s);
   }
 
   /**
@@ -302,8 +252,7 @@ class NodePanel extends JPanel
    * @param increment the number by which to increment.
    * @return the number of tasks as a long value.
    */
-  public synchronized long incTaskCount(final long increment)
-  {
+  public synchronized long incTaskCount(final long increment) {
     taskCount += increment;
     countLabel.setText(nf.format(taskCount));
     return taskCount;
@@ -318,25 +267,18 @@ class NodePanel extends JPanel
    * @param duration the duration to transform, expressed in milliseconds.
    * @return a string specifying the duration in terms of hours, minutes, seconds and milliseconds.
    */
-  public static String toStringDuration(final long duration)
-  {
-    if (integerFormatter == null)
-    {
+  public static String toStringDuration(final long duration) {
+    if (integerFormatter == null) {
       integerFormatter = NumberFormat.getInstance();
       integerFormatter.setGroupingUsed(false);
-      integerFormatter.setMinimumFractionDigits(0);
       integerFormatter.setMaximumFractionDigits(0);
       integerFormatter.setMinimumIntegerDigits(2);
     }
-
     long elapsed = duration;
     StringBuilder sb = new StringBuilder();
-    sb.append(integerFormatter.format(elapsed / 3600000L)).append(" hrs ");
-    elapsed = elapsed % 3600000L;
-    sb.append(integerFormatter.format(elapsed / 60000L)).append(" mn ");
-    elapsed = elapsed % 60000L;
-    sb.append(integerFormatter.format(elapsed / 1000L));
-    sb.append(" sec");
+    sb.append(integerFormatter.format(elapsed / 3_600_000L)).append(" hrs ");
+    sb.append(integerFormatter.format((elapsed %= 3_600_000L) / 60_000L)).append(" mn ");
+    sb.append(integerFormatter.format((elapsed %= 60_000L) / 1_000L)).append(" sec");
     return sb.toString();
   }
 }

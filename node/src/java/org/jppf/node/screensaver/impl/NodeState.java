@@ -23,56 +23,43 @@ import org.jppf.node.screensaver.*;
 /**
  * Instances of this class represent information about a node.
  */
-public class NodeState implements NodeLifeCycleListener, JPPFScreenSaverHolder
-{
+public class NodeState extends NodeLifeCycleListenerAdapter implements  JPPFScreenSaverHolder {
   /**
-   * 
+   * The node panel to update.
    */
   NodePanel nodePanel = null;
 
-  /**
-   * 
-   */
-  public NodeState()
-  {
+  @Override
+  public void nodeStarting(final NodeLifeCycleEvent event) {
+    if (nodePanel != null) {
+      nodePanel.updateConnectionStatus(true);
+      nodePanel.updateExecutionStatus(false);
+    }
   }
 
   @Override
-  public void nodeStarting(final NodeLifeCycleEvent event)
-  {
-    nodePanel.updateConnectionStatus(true);
-    nodePanel.updateExecutionStatus(false);
+  public void nodeEnding(final NodeLifeCycleEvent event) {
+    if (nodePanel != null) {
+      nodePanel.updateConnectionStatus(false);
+      nodePanel.updateExecutionStatus(false);
+    }
   }
 
   @Override
-  public void nodeEnding(final NodeLifeCycleEvent event)
-  {
-    nodePanel.updateConnectionStatus(false);
-    nodePanel.updateExecutionStatus(false);
+  public void jobStarting(final NodeLifeCycleEvent event) {
+    if (nodePanel != null) nodePanel.updateExecutionStatus(true);
   }
 
   @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
-  {
+  public void jobEnding(final NodeLifeCycleEvent event) {
+    if (nodePanel != null) {
+      nodePanel.updateExecutionStatus(false);
+      nodePanel.incTaskCount(event.getTasks().size());
+    }
   }
 
   @Override
-  public void jobStarting(final NodeLifeCycleEvent event)
-  {
-    nodePanel.updateExecutionStatus(true);
-  }
-
-  @Override
-  public void jobEnding(final NodeLifeCycleEvent event)
-  {
-    nodePanel.updateExecutionStatus(false);
-    nodePanel.incTaskCount(event.getTasks().size());
-    
-  }
-
-  @Override
-  public void setScreenSaver(final JPPFScreenSaver screensaver)
-  {
+  public void setScreenSaver(final JPPFScreenSaver screensaver) {
     this.nodePanel = ((JPPFScreenSaverImpl) screensaver).getNodePanel();
   }
 }
