@@ -23,12 +23,12 @@ import org.jppf.scheduling.JPPFSchedule;
 
 /**
  * This interface defines the properties that can be provided to a task
- * submitted by a {@link JPPFExecutorService} and that is not a {@link org.jppf.server.protocol.JPPFTask JPPFTask} instance.
+ * submitted by a {@link JPPFExecutorService} and that is not a {@link org.jppf.node.protocol.Task Task} instance.
  * These properties include:
  * <ul>
  * <li>the task expiration schedule</li>
- * <li>a callback that will replace the task's {@link org.jppf.server.protocol.JPPFTask#onTimeout() onTimeout()} method</li>
- * <li>a callback that will replace the task's {@link org.jppf.server.protocol.JPPFTask#onCancel() onCancel()} method</li>
+ * <li>a callback that will replace the task's {@link org.jppf.node.protocol.Task#onTimeout() onTimeout()} method</li>
+ * <li>a callback that will replace the task's {@link org.jppf.node.protocol.Task#onCancel() onCancel()} method</li>
  * </ul>
  * @author Laurent Cohen
  */

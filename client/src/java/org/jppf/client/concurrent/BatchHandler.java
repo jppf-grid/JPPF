@@ -242,7 +242,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Submit a {@link JPPFTask} that returns the specified type of result.
+   * Submit a {@link Task} that returns the specified type of result.
    * @param <T> the type of result returned by the task.
    * @param task the task to submit.
    * @param result this parameter is only here for type inference (I know, it's ugly).

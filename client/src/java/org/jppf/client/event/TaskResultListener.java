@@ -21,7 +21,7 @@ import java.util.EventListener;
 
 /**
  * Listener interface for receiving notifications of task results received from the server.
- * <p>To properly order the results, implementations of this interface should rely on {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()}.
+ * <p>To properly order the results, implementations of this interface should rely on {@link org.jppf.node.protocol.Task#getPosition() Task.getPosition()}.
  * @author Laurent Cohen
  */
 public interface TaskResultListener extends EventListener

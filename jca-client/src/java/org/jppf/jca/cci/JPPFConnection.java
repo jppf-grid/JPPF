@@ -37,31 +37,6 @@ import org.jppf.server.protocol.JPPFTask;
 public interface JPPFConnection extends Connection, JPPFAccessor
 {
   /**
-   * Submit an asynchronous execution request to the JPPF client.<br>
-   * This method exits immediately after adding the request to the requests queue.<br>
-   * The returned id is used to later retrieve the results and status of the execution.
-   * @param job - the job to execute.
-   * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-   * @throws Exception if an error occurs while submitting the request.
-   * @deprecated use {@link #submit(JPPFJob)} instead.
-   * @exclude
-   */
-  String submitNonBlocking(JPPFJob job) throws Exception;
-
-  /**
-   * Submit an asynchronous execution request to the JPPF client.<br>
-   * This method exits immediately after adding the request to the requests queue.<br>
-   * The returned id is used to later retrieve the results and status of the execution.
-   * @param job the job to execute.
-   * @param listener an optional listener to receive submission status change notifications, may be null.
-   * @return the id of the submission, to use for later retrieval of the results and status of the submission.
-   * @throws Exception if an error occurs while submitting the request.
-   * @deprecated use {@link #submit(JPPFJob, SubmissionStatusListener)} instead.
-   * @exclude
-   */
-  String submitNonBlocking(JPPFJob job, SubmissionStatusListener listener) throws Exception;
-
-  /**
    * Submit a job to the JPPF client.<br>
    * This method exits immediately after adding the request to the requests queue.<br>
    * The returned id is used to later retrieve the results and status of the execution.

@@ -160,7 +160,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 
   /**
    * Get the task associated with this future.
-   * @return a {@link JPPFTask} instance.
+   * @return a {@link Task} instance.
    */
   public Task<?> getTask()
   {

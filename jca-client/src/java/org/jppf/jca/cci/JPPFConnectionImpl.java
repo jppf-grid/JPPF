@@ -124,26 +124,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     throw new NotSupportedException("Method not supported");
   }
 
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #submit(JPPFJob, SubmissionStatusListener)} instead.
-   */
-  @Override
-  public String submitNonBlocking(final JPPFJob job) throws Exception
-  {
-    return submit(job);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #submit(JPPFJob)} instead.
-   */
-  @Override
-  public String submitNonBlocking(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
-  {
-    return submit(job, listener);
-  }
-
   @Override
   public String submit(final JPPFJob job) throws Exception
   {

@@ -36,7 +36,7 @@ public class JPPFAnnotatedTask extends JPPFTask
    */
   private static final long serialVersionUID = 1L;
   /**
-   * Wrapper around a task that is not an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
+   * Wrapper around a task that is not an instance of {@link org.jppf.node.protocol.Task Task<T>}.
    */
   protected TaskObjectWrapper taskObjectWrapper = null;
   /**
@@ -76,7 +76,6 @@ public class JPPFAnnotatedTask extends JPPFTask
 
   /**
    * Run the <code>JPPFRunnable</code>-annotated method of the task object.
-   * @see java.lang.Runnable#run()
    */
   @Override
   public void run()
@@ -95,7 +94,6 @@ public class JPPFAnnotatedTask extends JPPFTask
   /**
    * Get the <code>JPPFRunnable</code>-annotated object or POJO wrapped by this task.
    * @return an object or class that is JPPF-annotated.
-   * @see org.jppf.server.protocol.JPPFTask#getTaskObject()
    */
   @Override
   public Object getTaskObject()
@@ -142,8 +140,8 @@ public class JPPFAnnotatedTask extends JPPFTask
   }
 
   /**
-   * Override of {@link JPPFTask#setDataProvider(DataProvider)} to enable setting the data provider
-   * onto tasks that are not subclasses of {@link JPPFTask} and which implement {@link DataProviderHolder}.
+   * Override of {@link Task#setDataProvider(DataProvider)} to enable setting the data provider
+   * onto tasks that are not subclasses of {@link Task} and which implement {@link DataProviderHolder}.
    * @param dataProvider the data provider to set onto the task.
    */
   @Override

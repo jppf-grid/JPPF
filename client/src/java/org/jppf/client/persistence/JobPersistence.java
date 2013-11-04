@@ -21,7 +21,7 @@ package org.jppf.client.persistence;
 import java.util.*;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Interface for facilities managing the persistence of jobs and their state.
@@ -69,7 +69,7 @@ public interface JobPersistence<K>
    * @param tasks the newly received completed tasks, may be used to only store the delta for better performance.
    * @throws JobPersistenceException if any error occurs while storing the job.
    */
-  void storeJob(K key, JPPFJob job, List<JPPFTask> tasks) throws JobPersistenceException;
+  void storeJob(K key, JPPFJob job, List<Task<?>> tasks) throws JobPersistenceException;
 
   /**
    * Delete the job with the specified key from the persistence store.

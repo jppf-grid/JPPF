@@ -18,6 +18,8 @@
 
 package org.jppf.utils;
 
+import java.lang.reflect.Constructor;
+
 
 /**
  * This class provides a set of utility methods for manipulating {@link Throwable} objects.
@@ -54,5 +56,78 @@ public final class ExceptionUtils
   {
     if (t == null) return "null";
     return t.getClass().getName() + ": " + t.getMessage();
+  }
+
+  /**
+   * Converts a generic Throwable into an Exception.
+   * @param throwable the Throwable to convert.
+   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   */
+  public static Exception toException(final Throwable throwable)
+  {
+    return new Exception(throwable);
+  }
+
+  /**
+   * Converts a generic Throwable into an Exception.
+   * @param throwable the Throwable to convert.
+   * @param message the message of the created exception.
+   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   */
+  public static Exception toException(final String message, final Throwable throwable)
+  {
+    return new Exception(message, throwable);
+  }
+
+  /**
+   * Converts a generic Throwable into an RuntimeException.
+   * @param throwable the Throwable to convert.
+   * @param message the message of the xcreated exception.
+   * @return a new {@link RuntimeException} wrapping the {@link Throwable} as its cause.
+   */
+  public static RuntimeException toRuntimeException(final String message, final Throwable throwable)
+  {
+    return message == null ? new RuntimeException(throwable) : new RuntimeException(message, throwable);
+  }
+
+  /**
+   * Converts a generic Throwable into an Exception of the specified class.
+   * @param <E> the type of exception to return.
+   * @param throwable the Throwable to convert.
+   * @param clazz the class of the exception to convert.
+   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   */
+  public static <E extends Exception> Exception toException(final Throwable throwable, final Class<E> clazz)
+  {
+    try
+    {
+      Constructor<E> constructor = clazz.getConstructor(Throwable.class);
+      return constructor.newInstance(throwable);
+    }
+    catch (Exception e)
+    {
+    }
+    return new Exception(throwable);
+  }
+
+  /**
+   * Converts a generic Throwable into an Exception of the specified class.
+   * @param <E> the type of exception to return.
+   * @param throwable the Throwable to convert.
+   * @param clazz the class of the exception to convert.
+   * @param message the message of the xcreated exception.
+   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   */
+  public static <E extends Exception> Exception toException(final String message, final Throwable throwable, final Class<E> clazz)
+  {
+    try
+    {
+      Constructor<E> constructor = clazz.getConstructor(String.class, Throwable.class);
+      return constructor.newInstance(message, throwable);
+    }
+    catch (Exception e)
+    {
+    }
+    return new Exception(message, throwable);
   }
 }

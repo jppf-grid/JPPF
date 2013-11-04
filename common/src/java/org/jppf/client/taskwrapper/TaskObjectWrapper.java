@@ -21,7 +21,7 @@ package org.jppf.client.taskwrapper;
 import java.io.Serializable;
 
 /**
- * Wrapper interface for tasks that are not sub-classes of {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
+ * Wrapper interface for tasks that are not implementations of {@link org.jppf.node.protocol.Task Task<T>}.
  * @author Laurent Cohen
  * @exclude
  */

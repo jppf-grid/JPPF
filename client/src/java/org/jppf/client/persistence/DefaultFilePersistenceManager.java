@@ -252,7 +252,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @see org.jppf.client.persistence.JobPersistence#storeJob(Object, JPPFJob, List)
    */
   @Override
-  public synchronized void storeJob(final String key, final JPPFJob job, final List<JPPFTask> tasks) throws JobPersistenceException
+  public synchronized void storeJob(final String key, final JPPFJob job, final List<Task<?>> tasks) throws JobPersistenceException
   {
     if (debugEnabled) log.debug("storing job " + job + ", key=" + key + ", nbTasks=" + tasks.size());
     OutputStream os = null;
@@ -270,7 +270,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
       {
         os = new BufferedOutputStream(new FileOutputStream(file, true));
         SerializationUtils.writeInt(tasks.size(), os);
-        for (JPPFTask task: tasks) serializer.serialize(task, os);
+        for (Task<?> task: tasks) serializer.serialize(task, os);
       }
     }
     catch (Exception e)

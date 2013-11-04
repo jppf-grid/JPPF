@@ -20,34 +20,35 @@ package org.jppf.client.taskwrapper;
 
 import java.io.Serializable;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
- * Instances of this class are intended to be delegates for the {@link JPPFTask#onCancel()} and {@link JPPFTask#onTimeout()} methods
- * for tasks that do not directly extend {@link JPPFTask}.
+ * Instances of this class are intended to be delegates for the {@link Task#onCancel()} and {@link Task#onTimeout()} methods
+ * for tasks that do not implement {@link Task}.
+ * @param <T> the ytpe of result returned by the task.
  * @author Laurent Cohen
  */
-public abstract class JPPFTaskCallback implements Runnable, Serializable
+public abstract class JPPFTaskCallback<T> implements Runnable, Serializable
 {
   /**
    * The task this callback is associated with.
    */
-  private JPPFTask task = null;
+  private Task<T> task = null;
 
   /**
    * Get the task this callback is associated with.
-   * @return a <code>JPPFTask</code> instance.
+   * @return a <code>Task</code> instance.
    */
-  public final JPPFTask getTask()
+  public final Task<T> getTask()
   {
     return task;
   }
 
   /**
    * Set the task this callback is associated with.
-   * @param task a <code>JPPFTask</code> instance.
+   * @param task a <code>Task</code> instance.
    */
-  final void setTask(final JPPFTask task)
+  final void setTask(final Task<T> task)
   {
     this.task = task;
   }

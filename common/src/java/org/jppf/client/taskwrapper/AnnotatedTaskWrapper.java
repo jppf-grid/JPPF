@@ -28,7 +28,7 @@ import org.jppf.JPPFException;
 import org.jppf.server.protocol.JPPFRunnable;
 
 /**
- * Wrapper class for a task not extending {@link org.jppf.server.protocol.JPPFTask JPPFTask}.
+ * Wrapper class for a task not implementing {@link org.jppf.node.protocol.Task Task<T>}.
  * @author Laurent Cohen
  * @exclude
  */
