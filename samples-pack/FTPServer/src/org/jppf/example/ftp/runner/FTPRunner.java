@@ -20,10 +20,13 @@ package org.jppf.example.ftp.runner;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.node.protocol.Task;
+import org.jppf.task.storage.DataProvider;
+import org.jppf.task.storage.MemoryMapDataProvider;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the matrix multiplication demo.
@@ -88,11 +91,11 @@ public class FTPRunner
     dataProvider.setParameter("ftp.host", host);
     job.setDataProvider(dataProvider);
     // add a single task
-    job.addTask(new FTPTask("input.txt", "output.html"));
-    List<JPPFTask> results = jppfClient.submit(job);
-    for (JPPFTask t: results)
+    job.add(new FTPTask("input.txt", "output.html"));
+    List<Task<?>> results = jppfClient.submitJob(job);
+    for (Task<?> t: results)
     {
-      if (t.getException() != null) System.out.println("task error: " +  ExceptionUtils.getStackTrace(t.getException()));
+      if (t.getThrowable() != null) System.out.println("task error: " +  ExceptionUtils.getStackTrace(t.getThrowable()));
       else System.out.println("task result: " + t.getResult());
     }
     totalTime = System.nanoTime() - totalTime;

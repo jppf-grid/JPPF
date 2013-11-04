@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Runner for the hello world application.
@@ -40,23 +40,23 @@ public class HelloWorldRunner
     {
       JPPFClient client = new JPPFClient();
       JPPFJob job = new JPPFJob();
-      job.addTask(new HelloWorld());
-      job.addTask(new HelloWorldAnnotated(), "hello message", 1);
-      job.addTask(HelloWorldAnnotatedStatic.class, "hello message", 2);
-      job.addTask(HelloWorldAnnotatedConstructor.class, "hello message", 3);
-      job.addTask("helloPojoMethod", new HelloWorldPojo(), "hello message", 4);
-      job.addTask("helloPojoStaticMethod", HelloWorldPojoStatic.class, "hello message", 5);
-      job.addTask("HelloWorldPojoConstructor", HelloWorldPojoConstructor.class, "hello message", 6);
-      job.addTask(new HelloWorldRunnable());
-      job.addTask(new HelloWorldCallable());
-      List<JPPFTask> results = client.submit(job);
+      job.add(new HelloWorld());
+      job.add(new HelloWorldAnnotated(), "hello message", 1);
+      job.add(HelloWorldAnnotatedStatic.class, "hello message", 2);
+      job.add(HelloWorldAnnotatedConstructor.class, "hello message", 3);
+      job.add("helloPojoMethod", new HelloWorldPojo(), "hello message", 4);
+      job.add("helloPojoStaticMethod", HelloWorldPojoStatic.class, "hello message", 5);
+      job.add("HelloWorldPojoConstructor", HelloWorldPojoConstructor.class, "hello message", 6);
+      job.add(new HelloWorldRunnable());
+      job.add(new HelloWorldCallable());
+      List<Task<?>> results = client.submitJob(job);
       System.out.println("********** Results: **********");
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
-        if (task.getException() != null)
+        if (task.getThrowable() != null)
         {
           StringWriter sw = new StringWriter();
-          task.getException().printStackTrace(new PrintWriter(sw));
+          task.getThrowable().printStackTrace(new PrintWriter(sw));
           System.out.println(sw.toString());
         }
         else System.out.println("" + task.getResult());

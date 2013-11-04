@@ -22,6 +22,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -76,9 +77,9 @@ public class LocalExecutionRunner
 			perform(nbTask, length, 3);
        */
     }
-    catch(Exception e)
+    catch(Throwable t)
     {
-      e.printStackTrace();
+      t.printStackTrace();
     }
     finally
     {
@@ -104,22 +105,22 @@ public class LocalExecutionRunner
       {
         LongTask task = new LongTask(length, false);
         task.setId("" + (iter+1) + ':' + (i+1));
-        job.addTask(task);
+        job.add(task);
       }
       // submit the tasks for execution
-      List<JPPFTask> results = jppfClient.submit(job);
-      for (JPPFTask task: results)
+      List<Task<?>> results = jppfClient.submitJob(job);
+      for (Task task: results)
       {
-        Exception e = task.getException();
+        Throwable e = task.getThrowable();
         if (e != null) throw e;
       }
       long elapsed = System.currentTimeMillis() - start;
       print("run " + iter + " time: "+StringUtils.toStringDuration(elapsed));
 
     }
-    catch(Exception e)
+    catch(Throwable t)
     {
-      throw new JPPFException(e.getMessage(), e);
+      throw new JPPFException(t.getMessage(), t);
     }
   }
 
@@ -147,19 +148,19 @@ public class LocalExecutionRunner
         {
           JPPFTask task = new LongTask(length, false);
           task.setId("task " + i + ':' + j);
-          job.addTask(task);
+          job.add(task);
         }
         job.setResultListener(new JPPFResultCollector(job));
         jobs.add(job);
       }
       long start = System.nanoTime();
       print("submitting the jobs");
-      for (JPPFJob job: jobs) jppfClient.submit(job);
+      for (JPPFJob job: jobs) jppfClient.submitJob(job);
       print("getting the results");
       for (JPPFJob job: jobs)
       {
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        collector.waitForResults();
+        collector.awaitResults();
         print("got results for " + job.getName());
       }
       long elapsed = System.nanoTime() - start;
@@ -196,31 +197,23 @@ public class LocalExecutionRunner
 
   /**
    * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
-   * @throws Exception if an error is raised during the execution.
+   * @throws Throwable if an error is raised during the execution.
    */
-  private static void perform3() throws Exception
+  private static void perform3() throws Throwable
   {
-    try
+    long start = System.nanoTime();
+    JPPFJob job = new JPPFJob();
+    job.setName("test jar download");
+    job.add(new MyTask());
+    //job.setDataProvider(new ClientDataProvider());
+    // submit the tasks for execution
+    List<Task<?>> results = jppfClient.submitJob(job);
+    for (Task task: results)
     {
-      long start = System.nanoTime();
-      JPPFJob job = new JPPFJob();
-      job.setName("test jar download");
-      job.addTask(new Task());
-      //job.setDataProvider(new ClientDataProvider());
-      // submit the tasks for execution
-      List<JPPFTask> results = jppfClient.submit(job);
-      for (JPPFTask task: results)
-      {
-        Exception e = task.getException();
-        if (e != null) throw e;
-      }
-      long elapsed = System.nanoTime() - start;
-      print("run time: " + StringUtils.toStringDuration(elapsed/1000000));
-
+      Throwable e = task.getThrowable();
+      if (e != null) throw e;
     }
-    catch(Exception e)
-    {
-      throw new JPPFException(e.getMessage(), e);
-    }
+    long elapsed = System.nanoTime() - start;
+    print("run time: " + StringUtils.toStringDuration(elapsed/1000000));
   }
 }

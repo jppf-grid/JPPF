@@ -27,6 +27,7 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
@@ -108,8 +109,8 @@ public class TestJMX
     NodeNotificationListener listener = new NodeNotificationListener();
     String listenerID = driverJmx.registerForwardingNotificationListener(new NodeSelector.AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
     JPPFJob job = new JPPFJob();
-    for (int i=0; i<5; i++) job.addTask(new LongTask(100L)).setId(String.valueOf(i+1));
-    List<JPPFTask> results = client.submit(job);
+    for (int i=0; i<5; i++) job.add(new LongTask(100L)).setId(String.valueOf(i+1));
+    List<Task<?>> results = client.submitJob(job);
     Thread.sleep(500L);
     driverJmx.unregisterForwardingNotificationListener(listenerID);
     Thread.sleep(500L);
@@ -131,9 +132,9 @@ public class TestJMX
       {
         JPPFTask task = new LongTask(100L);
         task.setTimeoutSchedule(new JPPFSchedule(50L));
-        job.addTask(task).setId(String.valueOf(j+1));
+        job.add(task).setId(String.valueOf(j+1));
       }
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       output(job.getName() + " : received " + results.size() + " results");
     }
   }

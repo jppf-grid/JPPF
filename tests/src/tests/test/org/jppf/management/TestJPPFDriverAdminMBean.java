@@ -27,7 +27,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -60,7 +60,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     double n = stats.getSnapshot(NODES).getLatest();
     assertTrue("nb nodes should be 2 but is " + n, n == 2d);
     assertTrue(stats.getSnapshot(TASK_DISPATCH).getTotal() == 0d);
-    client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
+    client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, duration));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     stats = driver.statistics();
     n = stats.getSnapshot(IDLE_NODES).getLatest();
@@ -84,7 +84,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testResetStatistics() throws Exception
   {
     JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
-    client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
+    client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     driver.resetStatistics();
     JPPFStatistics stats = driver.statistics();
@@ -238,11 +238,11 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertNotNull(coll);
     assertEquals(2, coll.size());
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(500L);
     coll = driver.idleNodesInformation();
     assertEquals(1, coll.size());
-    ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    ((JPPFResultCollector) job.getResultListener()).awaitResults();
     while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
@@ -260,11 +260,11 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     int n = driver.nbIdleNodes();
     assertEquals(nbNodes, n);
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(500L);
     n = driver.nbIdleNodes();
     assertEquals(nbNodes - 1, n);
-    ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    ((JPPFResultCollector) job.getResultListener()).awaitResults();
     while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
@@ -288,8 +288,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       for (JPPFManagementInfo info: nodesList) nodeUuids[i++] = info.getUuid();
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, nbTasks, LifeCycleTask.class, 0L);
       Set<String> executedOnUuids = new HashSet<>();
-      List<JPPFTask> results = client.submit(job);
-      for (JPPFTask t: results)
+      List<Task<?>> results = client.submitJob(job);
+      for (Task<?> t: results)
       {
         LifeCycleTask task = (LifeCycleTask) t;
         if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());
@@ -302,8 +302,8 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       selector = new NodeSelector.UuidSelector(nodeUuids[1]);
       driver.toggleActiveState(selector);
       job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, nbTasks, LifeCycleTask.class, 0L);
-      results = client.submit(job);
-      for (JPPFTask t: results)
+      results = client.submitJob(job);
+      for (Task<?> t: results)
       {
         LifeCycleTask task = (LifeCycleTask) t;
         if (!executedOnUuids.contains(task.getNodeUuid())) executedOnUuids.add(task.getNodeUuid());

@@ -23,9 +23,10 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.JPPFResultCollector;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * This class reads Wikipedia articles from a file and builds JPPF tasks and jobs from these articles.
@@ -106,7 +107,7 @@ public class JobProvider {
         articleCount++;
       }
       if (articleCount > 0) {
-        job.addTask(new WordCountTask(list));
+        job.add(new WordCountTask(list));
         totalJobArticles += articleCount;
         taskCount++;
       }
@@ -200,7 +201,7 @@ public class JobProvider {
     @Override
     public void resultsReceived(final TaskResultEvent event) {
       super.resultsReceived(event);
-      if (event.getTaskList() != null) executor.submit(new MergerTask(event.getTaskList()));
+      if (event.getTasks() != null) executor.submit(new MergerTask(event.getTasks()));
     }
   }
 
@@ -211,19 +212,19 @@ public class JobProvider {
     /**
      * The tasks whose results are to be merged.
      */
-    private final List<JPPFTask> tasks;
+    private final List<Task<?>> tasks;
 
     /**
      * Initialize with the specified set of tasks.
      * @param tasks the tasks to process.
      */
-    public MergerTask(final List<JPPFTask> tasks) {
+    public MergerTask(final List<Task<?>> tasks) {
       this.tasks = tasks;
     }
 
     @Override
     public void run() {
-      for (JPPFTask task: tasks) {
+      for (Task<?> task: tasks) {
         int nbRedirects = ((WordCountTask) task).getNbRedirects();
         if (nbRedirects > 0) totalRedirects.addAndGet(nbRedirects);
         @SuppressWarnings("unchecked")

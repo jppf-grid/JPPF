@@ -25,7 +25,7 @@ import java.util.*;
 import org.jppf.classloader.DelegationModel;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.*;
 
@@ -109,13 +109,13 @@ public class TestJPPFNodeAdminMBean
     assertEquals(JPPFNodeState.ConnectionState.CONNECTED, state.getConnectionStatus());
     assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(750L);
     state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
     assertEquals(JPPFNodeState.ExecutionState.EXECUTING, state.getExecutionStatus());
-    ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    ((JPPFResultCollector) job.getResultListener()).awaitResults();
     state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(1, state.getNbTasksExecuted());
@@ -181,7 +181,7 @@ public class TestJPPFNodeAdminMBean
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
-    client.submit(job);
+    client.submitJob(job);
     state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(nbTasks, state.getNbTasksExecuted());
@@ -276,10 +276,10 @@ public class TestJPPFNodeAdminMBean
   {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 5000L);
     String uuid = job.getUuid();
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(750L);
     nodeJmx.cancelJob(uuid, false);
-    List<JPPFTask> result = ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    List<Task<?>> result = ((JPPFResultCollector) job.getResultListener()).awaitResults();
     assertNotNull(result);
     assertEquals(1, result.size());
     LifeCycleTask task = (LifeCycleTask) result.get(0);

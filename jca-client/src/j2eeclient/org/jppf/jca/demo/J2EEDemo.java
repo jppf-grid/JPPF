@@ -23,7 +23,7 @@ import java.util.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.cci.JPPFConnection;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Instances of this class encapsulate a simple call to the JPPF resource adapter.
@@ -59,7 +59,7 @@ public class J2EEDemo
     {
       connection = JPPFHelper.getConnection(jndiBinding);
       JPPFJob job = new JPPFJob();
-      job.addTask(new DemoTask(duration));
+      job.add(new DemoTask(duration));
       id = connection.submit(job);
 
       /*
@@ -129,7 +129,7 @@ public class J2EEDemo
       {
         DemoTask task = new DemoTask(duration);
         task.setId(jobId + " task #" + (i+1));
-        job.addTask(task);
+        job.add(task);
       }
       id = connection.submit(job);
     }
@@ -169,11 +169,11 @@ public class J2EEDemo
         String name = jobNamePrefix + ' ' + n;
         job.setName(name);
         job.setBlocking(false);
-        for (int i=1; i<nbTasks; i++) job.addTask(new DemoTask(duration)).setId(name + " task " + i);
+        for (int i=1; i<nbTasks; i++) job.add(new DemoTask(duration)).setId(name + " task " + i);
         id = connection.submit(job);
         idList.add(id);
         JPPFHelper.getStatusMap().put(id, job);
-        if (blocking) connection.waitForResults(id);
+        if (blocking) connection.awaitResults(id);
       }
     }
     finally
@@ -206,10 +206,10 @@ public class J2EEDemo
       {
         DemoTask task = new DemoTask(duration);
         task.setId(jobId + " task #" + (i+1));
-        job.addTask(task);
+        job.add(task);
       }
       id = connection.submit(job);
-      List<JPPFTask> results = connection.waitForResults(id);
+      List<Task<?>> results = connection.awaitResults(id);
       System.out.println("received " + results.size() + " results for job '" + job.getName() + "'");
     }
     finally
@@ -260,15 +260,15 @@ public class J2EEDemo
     try
     {
       connection = JPPFHelper.getConnection(jndiBinding);
-      List<JPPFTask> results = connection.getSubmissionResults(id);
+      List<Task<?>> results = connection.getResults(id);
       if (results == null) msg = "submission is not in queue anymore";
       else
       {
         StringBuilder sb = new StringBuilder();
-        for (JPPFTask task: results)
+        for (Task task: results)
         {
-          if (task.getException() == null) sb.append(task.getResult());
-          else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getException().getMessage());
+          if (task.getThrowable() == null) sb.append(task.getResult());
+          else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
           sb.append("<br/>");
         }
         msg = sb.toString();

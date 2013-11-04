@@ -27,8 +27,8 @@ import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.management.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.ThreadSynchronization;
@@ -299,13 +299,13 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
-    List<JPPFTask> pendingTasks = new ArrayList<>();
+    List<Task<?>> pendingTasks = new ArrayList<>();
     if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector))
     {
       ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
     }
-    List<JPPFTask> tasks = job.getTasks();
-    for (JPPFTask task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
+    List<Task<?>> tasks = job.getJobTasks();
+    for (Task<?> task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
     queue.addBundle(new ClientJob(job, pendingTasks));
     return job.getUuid();
   }

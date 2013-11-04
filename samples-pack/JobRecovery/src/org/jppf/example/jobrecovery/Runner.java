@@ -18,14 +18,17 @@
 
 package org.jppf.example.jobrecovery;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.client.persistence.*;
+import org.jppf.client.persistence.DefaultFilePersistenceManager;
+import org.jppf.client.persistence.JobPersistence;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 
 /**
@@ -65,7 +68,7 @@ public class Runner
         System.out.println("no job found in persistence store, creating a new job with " + nbTasks + " tasks");
         JPPFJob job = new JPPFJob();
         // add 10 tasks per node, each task waiting for 1 second
-        for (int i=0; i<nbTasks; i++) job.addTask(new MyTask(1000L, i+1));
+        for (int i=0; i<nbTasks; i++) job.add(new MyTask(1000L, i+1));
         // set the persistence manager so the job will be persisted
         // each time completed tasks are received from the driver
         job.setPersistenceManager(persistenceManager);
@@ -121,10 +124,10 @@ public class Runner
    */
   private static void executeJob(final JPPFJob job) throws Exception
   {
-    List<JPPFTask> results = client.submit(job);
-    for (JPPFTask task: results)
+    List<Task<?>> results = client.submitJob(job);
+    for (Task<?> task: results)
     {
-      if (task.getException() != null) System.out.println("task "+ task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getException()));
+      if (task.getThrowable() != null) System.out.println("task "+ task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       else System.out.println("task "+ task.getId() + " result: " + task.getResult());
     }
   }

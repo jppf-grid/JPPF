@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXNodeConnectionWrapper;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 
 /**
@@ -88,7 +88,7 @@ public class NioChecksRunner
     JPPFJob job = new JPPFJob();
     job.setName(name);
     NioChecksTask task = new NioChecksTask(1000L);
-    job.addTask(task);
+    job.add(task);
     return job;
   }
 
@@ -101,7 +101,7 @@ public class NioChecksRunner
   {
     job.setBlocking(false);
     job.setResultListener(new JPPFResultCollector(job));
-    jppfClient.submit(job);
+    jppfClient.submitJob(job);
   }
 
   /**
@@ -112,14 +112,14 @@ public class NioChecksRunner
   public void displayResults(final JPPFJob job) throws Exception
   {
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<JPPFTask> results = collector.waitForResults();
+    List<Task<?>> results = collector.awaitResults();
     System.out.println("***** results job #" + job.getName() + " *****\n");
-    for (JPPFTask task: results)
+    for (Task task: results)
     {
-      if (task.getException() != null)
+      if (task.getThrowable() != null)
       {
         System.out.println("Caught exception:");
-        System.out.println(ExceptionUtils.getStackTrace(task.getException()));
+        System.out.println(ExceptionUtils.getStackTrace(task.getThrowable()));
       }
       else
       {

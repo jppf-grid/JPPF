@@ -18,10 +18,10 @@
 
 package test.run.jboss;
 
-import java.util.*;
+import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 
 /**
@@ -65,17 +65,17 @@ public class JBossTestRunner
   public static void perform() throws Exception
   {
     JPPFJob job = new JPPFJob("JBoss Runner");
-    job.addTask(new JBossTask("C:/Tools/jboss-5.1.0.GA", "jppf"));
+    job.add(new JBossTask("C:/Tools/jboss-5.1.0.GA", "jppf"));
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
     job.setBlocking(false);
     job.getSLA().setBroadcastJob(true);
-    client.submit(job);
-    List<JPPFTask> results = collector.waitForResults();
-    JPPFTask task = results.get(0);
-    if (task.getException() != null)
+    client.submitJob(job);
+    List<Task<?>> results = collector.awaitResults();
+    Task task = results.get(0);
+    if (task.getThrowable() != null)
     {
-      System.out.println("task ended with exception:\n" + ExceptionUtils.getStackTrace(task.getException()));
+      System.out.println("task ended with exception:\n" + ExceptionUtils.getStackTrace(task.getThrowable()));
     }
     else
     {

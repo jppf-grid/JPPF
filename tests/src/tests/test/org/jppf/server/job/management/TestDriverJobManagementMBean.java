@@ -18,21 +18,21 @@
 
 package test.org.jppf.server.job.management;
 
-import static org.junit.Assert.*;
 import static org.jppf.utils.ReflectionUtils.getCurrentMethodName;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.JPPFTask;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
- * Unit tests for {@link JPPFTask}.
+ * Unit tests for {@link Task}.
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
@@ -57,16 +57,16 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(TIME_SHORT);
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
-    List<JPPFTask> results = collector.waitForResults();
+    List<Task<?>> results = collector.awaitResults();
     assertEquals(results.size(), nbTasks);
     assertNotNull(results.get(0));
     int count = 0;
-    for (JPPFTask t: results)
+    for (Task<?> t: results)
     {
       if (t.getResult() == null) count++;
     }
@@ -81,7 +81,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   public void testCancelJobAfterCompletion() throws Exception
   {
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertEquals(1, results.size());
     assertNotNull(results.get(0));
     assertNotNull(results.get(0).getResult());
@@ -103,13 +103,13 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     assertNotNull(proxy);
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
     job.getSLA().setSuspended(true);
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(1500L);
     proxy.resumeJob(job.getUuid());
     Thread.sleep(500L);
     proxy.cancelJob(job.getUuid());
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<JPPFTask> results = collector.waitForResults();
+    List<Task<?>> results = collector.awaitResults();
     assertEquals(nbTasks, results.size());
     Thread.sleep(1000L);
     String[] ids = proxy.getAllJobIds();

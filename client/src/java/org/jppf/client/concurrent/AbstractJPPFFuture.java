@@ -48,7 +48,7 @@ abstract class AbstractJPPFFuture<V> implements Future<V>
   /**
    * An exception that may be raised by the execution of the task.
    */
-  protected Exception exception = null;
+  protected Throwable throwable = null;
 
   /**
    * Attempts to cancel execution of this task. This attempt will fail if the task has already completed,

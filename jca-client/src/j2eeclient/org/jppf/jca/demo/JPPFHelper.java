@@ -26,7 +26,7 @@ import javax.resource.cci.ConnectionFactory;
 
 import org.jppf.client.*;
 import org.jppf.jca.cci.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Utility class for obtaining and releasing Resource adapter connections.
@@ -136,15 +136,15 @@ public class JPPFHelper
     JPPFJob job = statusMap.remove(id);
     if (job == null) return "no submission with this id";
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<JPPFTask> results = collector.getResults();
+    List<Task<?>> results = collector.getAllResults();
     if (results == null) msg = "submission is not in queue anymore";
     else
     {
       StringBuilder sb = new StringBuilder();
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
-        if (task.getException() == null) sb.append(task.getResult());
-        else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getException().getMessage());
+        if (task.getThrowable() == null) sb.append(task.getResult());
+        else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
         sb.append("<br/>");
       }
       msg = sb.toString();

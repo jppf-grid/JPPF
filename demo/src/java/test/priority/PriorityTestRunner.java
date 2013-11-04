@@ -21,6 +21,7 @@ package test.priority;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -69,8 +70,8 @@ public class PriorityTestRunner
     List<JPPFJob> jobList = new ArrayList<>();
     jobList.add(createJob(new WaitTask(2000L), 0));
     for (int i=1; i<=n; i++) jobList.add(createJob(new PrioritizedTask(i), i));
-    for (JPPFJob job: jobList) client.submit(job);
-    for (JPPFJob job: jobList) ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    for (JPPFJob job: jobList) client.submitJob(job);
+    for (JPPFJob job: jobList) ((JPPFResultCollector) job.getResultListener()).awaitResults();
   }
 
   /**
@@ -80,12 +81,12 @@ public class PriorityTestRunner
   public static void perform() throws Exception
   {
     JPPFJob job = new JPPFJob();
-    job.addTask(new PrioritizedTask(0));
+    job.add(new PrioritizedTask(0));
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
     job.setBlocking(false);
-    client.submit(job);
-    List<JPPFTask> results = collector.waitForResults();
+    client.submitJob(job);
+    List<Task<?>> results = collector.awaitResults();
   }
 
   /**
@@ -95,8 +96,8 @@ public class PriorityTestRunner
   public static void perform2() throws Exception
   {
     JPPFJob job = new JPPFJob();
-    job.addTask(new PrioritizedTask(0));
-    List<JPPFTask> results = client.submit(job);
+    job.add(new PrioritizedTask(0));
+    List<Task<?>> results = client.submitJob(job);
   }
 
   /**
@@ -109,7 +110,7 @@ public class PriorityTestRunner
   private static JPPFJob createJob(final JPPFTask task, final int priority) throws Exception
   {
     JPPFJob job = new JPPFJob();
-    job.addTask(task);
+    job.add(task);
     job.getSLA().setPriority(priority);
     job.setBlocking(false);
     job.setResultListener(new JPPFResultCollector(job));

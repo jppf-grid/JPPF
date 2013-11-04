@@ -25,7 +25,7 @@ import java.util.*;
 import javax.tools.Diagnostic;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.compilation.SourceCompiler;
 import org.slf4j.*;
@@ -110,10 +110,10 @@ public class JPPFSourceCompiler
     {
       JPPFJob job = new JPPFJob();
       job.setName("compiled class job");
-      job.addTask(task);
-      List<JPPFTask> results = client.submit(job);
-      JPPFTask result = results.get(0);
-      if (result.getException() != null) output("got exception: " + ExceptionUtils.getStackTrace(result.getException()));
+      job.add(task);
+      List<Task<?>> results = client.submitJob(job);
+      Task result = results.get(0);
+      if (result.getThrowable() != null) output("got exception: " + ExceptionUtils.getStackTrace(result.getThrowable()));
       else output("got result: " + result.getResult());
     }
     finally

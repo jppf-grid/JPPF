@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
@@ -60,7 +60,7 @@ public class TestFileDataLocation extends Setup1D1N1C
       DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("bytes", new byte[size]);
       job.setDataProvider(dp);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
     }
     finally
     {

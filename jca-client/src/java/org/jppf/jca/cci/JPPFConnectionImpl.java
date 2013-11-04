@@ -30,6 +30,7 @@ import org.jppf.client.submission.*;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.JcaSubmissionManager;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -153,7 +154,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   public String submit(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
   {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
-    if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
+    if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     job.setBlocking(false);
     return getJppfClient().getSubmissionManager().submitJob(job, listener);
   }
@@ -205,7 +206,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
+   * @deprecated use {@link #getResults(String)} instead.
    */
+  @Deprecated
   @Override
   public List<JPPFTask> getSubmissionResults(final String submissionId) throws Exception
   {
@@ -214,6 +217,26 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
     return res.getResults();
+  }
+
+  /**
+   * Get the results of an execution request.<br>
+   * This method should be called only once a call to
+   * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
+   * either {@link org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
+   * @param submissionId the id of the submission for which to get the execution results.
+   * @return the list of resulting JPPF tasks, or null if the execution failed.
+   * @throws Exception if an error occurs while submitting the request.
+   */
+  @Override
+  public List<Task<?>> getResults(final String submissionId) throws Exception
+  {
+    JcaSubmissionManager mgr = (JcaSubmissionManager) getJppfClient().getSubmissionManager();
+    JPPFResultCollector res = mgr.peekSubmission(submissionId);
+    if (res == null) return null;
+    res = mgr.pollSubmission(submissionId);
+    return res.getAllResults();
   }
 
   /**
@@ -274,6 +297,11 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     this.managedConnection = conn;
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #awaitResults(String)} instead.
+   */
+  @Deprecated
   @Override
   public List<JPPFTask> waitForResults(final String submissionId) throws Exception
   {
@@ -282,6 +310,18 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (result == null) return null;
     result.waitForResults();
     List<JPPFTask> tasks = result.getResults();
+    ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).pollSubmission(submissionId);
+    return tasks;
+  }
+
+  @Override
+  public List<Task<?>> awaitResults(final String submissionId) throws Exception
+  {
+    JPPFResultCollector result = getResultCollector(submissionId);
+    if (debugEnabled) log.debug("result collector = " + result);
+    if (result == null) return null;
+    result.awaitResults();
+    List<Task<?>> tasks = result.getAllResults();
     ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).pollSubmission(submissionId);
     return tasks;
   }

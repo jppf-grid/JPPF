@@ -23,7 +23,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -107,25 +107,25 @@ public class JPPFCallableRunner
       JPPFJob job = new JPPFJob(name);
       job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
-      for (int i=1; i<=nbTasks; i++) job.addTask(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
+      for (int i=1; i<=nbTasks; i++) job.add(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
       job.setResultListener(new JPPFResultCollector(job)
       {
         @Override
         public synchronized void resultsReceived(final TaskResultEvent event)
         {
           super.resultsReceived(event);
-          if (event.getTaskList() != null) print("received " + jobResults.size() + " results");
+          if (event.getTasks() != null) print("received " + jobResults.size() + " results");
         }
       });
       //job.addJobListener(new MyJobListener());
       jobList.add(job);
     }
     callableResult = "from MyCallable";
-    for (JPPFJob job: jobList) jppfClient.submit(job);
+    for (JPPFJob job: jobList) jppfClient.submitJob(job);
     for (JPPFJob job: jobList)
     {
       JPPFResultCollector coll = (JPPFResultCollector) job.getResultListener();
-      List<JPPFTask> results = coll.waitForResults();
+      List<Task<?>> results = coll.awaitResults();
       print("got results for job '" + job.getName() + "'");
     }
     if (loggingHandler != null) loggingHandler.unregister(jmxLogger);

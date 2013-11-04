@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.io.Serializable;
 import java.util.*;
 
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -46,7 +47,7 @@ public class JobResults implements Serializable
    * A map containing the tasks that have been successfully executed,
    * ordered by ascending position in the submitted list of tasks.
    */
-  private final SortedMap<Integer, JPPFTask> resultMap = new TreeMap<>();
+  private final SortedMap<Integer, Task<?>> resultMap = new TreeMap<>();
 
   /**
    * Get the current number of received results.
@@ -71,8 +72,19 @@ public class JobResults implements Serializable
    * Get the result for the task at the specified position.
    * @param position the position of the task to get.
    * @return a <code>JPPFTask</code> instance, or null if no result was received for a task at this position.
+   * @deprecated use {@link #getResultTask(int)} instead.
    */
   public JPPFTask getResult(final int position)
+  {
+    return (JPPFTask) resultMap.get(position);
+  }
+
+  /**
+   * Get the result for the task at the specified position.
+   * @param position the position of the task to get.
+   * @return a <code>Task</code> instance, or null if no result was received for a task at this position.
+   */
+  public Task<?> getResultTask(final int position)
   {
     return resultMap.get(position);
   }
@@ -80,7 +92,9 @@ public class JobResults implements Serializable
   /**
    * Add the specified results to this job.
    * @param tasks the list of tasks for which results were received.
+   * @deprecated use {@link #addResults(List)} instead.
    */
+  @Deprecated
   public synchronized void putResults(final List<JPPFTask> tasks)
   {
     for (JPPFTask task : tasks)
@@ -93,10 +107,38 @@ public class JobResults implements Serializable
   }
 
   /**
+   * Add the specified results to this job.
+   * @param tasks the list of tasks for which results were received.
+   */
+  public synchronized void addResults(final List<Task<?>> tasks)
+  {
+    for (Task<?> task : tasks)
+    {
+      int pos = task.getPosition();
+      if (debugEnabled) log.debug("adding result at positon {}", pos);
+      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
+      resultMap.put(pos, task);
+    }
+  }
+
+  /**
+   * Get all the tasks received as results for this job.
+   * @return a collection of {@link JPPFTask} instances.
+   * @deprecated use {@link #getAllResults()} instead.
+   */
+  @Deprecated
+  public synchronized Collection<JPPFTask> getAll()
+  {
+    List<JPPFTask> list = new ArrayList<>(resultMap.size());
+    for (Task<?> task: resultMap.values()) list.add((JPPFTask) task);
+    return Collections.unmodifiableCollection(list);
+  }
+
+  /**
    * Get all the tasks received as results for this job.
    * @return a collection of {@link JPPFTask} instances.
    */
-  public synchronized Collection<JPPFTask> getAll()
+  public synchronized Collection<Task<?>> getAllResults()
   {
     return Collections.unmodifiableCollection(resultMap.values());
   }

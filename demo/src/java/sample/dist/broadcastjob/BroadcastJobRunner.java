@@ -20,6 +20,7 @@ package sample.dist.broadcastjob;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -40,16 +41,16 @@ public class BroadcastJobRunner {
       System.out.println("Running Broadcast Job with " + nbTasks + " tasks");
       long start = System.currentTimeMillis();
       JPPFJob job = new JPPFJob("broadcast test");
-      for (int i=1; i<=nbTasks; i++) job.addTask(new BroadcastTask()).setId("task " + i);
+      for (int i=1; i<=nbTasks; i++) job.add(new BroadcastTask()).setId("task " + i);
       job.getSLA().setBroadcastJob(true);
-      List<JPPFTask> results = jppfClient.submit(job);
-      for (JPPFTask task: results) {
-        Exception e = task.getException();
+      List<Task<?>> results = jppfClient.submitJob(job);
+      for (Task task: results) {
+        Throwable e = task.getThrowable();
         if (e != null) throw e;
       }
       long elapsed = System.currentTimeMillis() - start;
       System.out.println("Total time: " + elapsed + " ms");
-    } catch(Exception e) {
+    } catch(Throwable e) {
       e.printStackTrace();
     } finally {
       if (jppfClient != null) jppfClient.close();

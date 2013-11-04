@@ -20,7 +20,7 @@ package test.oome;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
 /**
@@ -87,12 +87,12 @@ public class OOMEJobRunner
   {
     JPPFJob job = new JPPFJob();
     job.setName(name);
-    for (int j=1; j<=nbTasks; j++) job.addTask(new OOMEJobTask(time, j, size));
+    for (int j=1; j<=nbTasks; j++) job.add(new OOMEJobTask(time, j, size));
     job.setBlocking(blocking);
     if (blocking)
     {
       output("* submitting job '" + job.getName() + "'");
-      List<JPPFTask> results = jppfClient.submit(job);
+      List<Task<?>> results = jppfClient.submitJob(job);
       output("+ got results for job " + job.getName());
       //for (JPPFTask t: results) output((String) t.getResult());
     }
@@ -101,7 +101,7 @@ public class OOMEJobRunner
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
       job.getSLA().setCancelUponClientDisconnect(true);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
       output("job '" + job.getName() + "' submitted");
     }
   }

@@ -26,7 +26,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.junit.AfterClass;
@@ -98,10 +98,10 @@ public class AbstractSSLSetup
     int nbTasks = 5;
     String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 10L);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (JPPFTask task: results)
+    for (Task<?> task: results)
     {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();
@@ -128,14 +128,14 @@ public class AbstractSSLSetup
       String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 10L));
-      for (JPPFJob job: jobs) client.submit(job);
+      for (JPPFJob job: jobs) client.submitJob(job);
       for (JPPFJob job: jobs)
       {
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        List<JPPFTask> results = collector.waitForResults();
+        List<Task<?>> results = collector.awaitResults();
         assertNotNull(results);
         assertEquals(nbTasks, results.size());
-        for (JPPFTask task: results)
+        for (Task<?> task: results)
         {
           assertTrue("task = " + task, task instanceof LifeCycleTask);
           Throwable t = task.getThrowable();
@@ -161,14 +161,14 @@ public class AbstractSSLSetup
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(1500L);
     client.cancelJob(job.getUuid());
-    List<JPPFTask> results = collector.waitForResults();
+    List<Task<?>> results = collector.awaitResults();
     assertNotNull(results);
     assertEquals("results size should be " + nbTasks + " but is " + results.size(), nbTasks, results.size());
     int count = 0;
-    for (JPPFTask task: results)
+    for (Task<?> task: results)
     {
       Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
@@ -185,15 +185,15 @@ public class AbstractSSLSetup
   {
     int nbTasks = 2;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (JPPFTask task: results)
+    for (Task<?> task: results)
     {
       assertTrue(task instanceof NotSerializableTask);
       assertNull(task.getResult());
-      assertNotNull(task.getException());
-      assertTrue(task.getException() instanceof NotSerializableException);
+      assertNotNull(task.getThrowable());
+      assertTrue(task.getThrowable() instanceof NotSerializableException);
     }
   }
 

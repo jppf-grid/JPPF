@@ -20,7 +20,7 @@ package org.jppf.client.concurrent;
 
 import java.util.concurrent.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.DateTimeUtils;
 import org.slf4j.*;
 
@@ -111,7 +111,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
     long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
     getResult(millis);
     if (timedout.get()) throw new TimeoutException("wait timed out");
-    else if (exception != null) throw new ExecutionException(exception);
+    else if (throwable != null) throw new ExecutionException(throwable);
     return result;
   }
 
@@ -125,7 +125,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   {
     if (!isDone())
     {
-      JPPFTask task = null;
+      Task<?> task = null;
       task = (timeout > 0) ? collector.waitForTask(position, timeout) : collector.getTask(position);
       setDone();
       if (task == null)
@@ -137,7 +137,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
       else
       {
         result = (V) task.getResult();
-        exception = task.getException();
+        throwable = task.getThrowable();
       }
     }
   }
@@ -162,7 +162,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    * Get the task associated with this future.
    * @return a {@link JPPFTask} instance.
    */
-  public JPPFTask getTask()
+  public Task<?> getTask()
   {
     return collector.getTask(position);
   }

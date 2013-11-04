@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.client.persistence.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -73,7 +73,7 @@ public class TestJobPersistence extends Setup1D1N
         }
       };
       job.setResultListener(collector);
-      client.submit(job);
+      client.submitJob(job);
       while (!resultsReceived.get()) Thread.sleep(100L);
       client.close();
       int n = job.getResults().size();
@@ -86,8 +86,8 @@ public class TestJobPersistence extends Setup1D1N
       //assertEquals(n, n2);
       JPPFResultCollector collector2 = new JPPFResultCollector(job2);
       job2.setResultListener(collector2);
-      client.submit(job2);
-      List<JPPFTask> results = collector2.waitForResults();
+      client.submitJob(job2);
+      List<Task<?>> results = collector2.awaitResults();
       assertEquals(nbTasks, results.size());
       assertEquals(nbTasks, job2.getResults().size());
     }

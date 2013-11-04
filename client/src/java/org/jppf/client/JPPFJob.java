@@ -40,7 +40,7 @@ import org.jppf.utils.JPPFUuid;
  * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
-public class JPPFJob implements Serializable, JPPFDistributedJob
+public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<?>>
 {
   /**
    * Explicit serialVersionUID.
@@ -49,7 +49,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * The list of tasks to execute.
    */
-  private final List<JPPFTask> tasks = new ArrayList<>();
+  private final List<Task<?>> tasks = new ArrayList<>();
   /**
    * The container for data shared between tasks.
    * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
@@ -220,24 +220,23 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
   /**
    * Get the list of tasks to execute.
    * @return a list of objects.
+   * @deprectaed use {@link #getJobTasks()} instead.
    */
+  @Deprecated
   public List<JPPFTask> getTasks()
   {
-    return tasks;
+    List<JPPFTask> list = new ArrayList<>(tasks.size());
+    for (Task<?> task: tasks) list.add((JPPFTask) task);
+    return list;
   }
 
   /**
-   * Get the list of tasks that have not yet been executed.
-   * @return a list of <code>JPPFTask</code> objects.
+   * Get the list of tasks to execute.
+   * @return a list of objects.
    */
-  public synchronized List<JPPFTask> getPendingTasks()
+  public List<Task<?>> getJobTasks()
   {
-    List<JPPFTask> list = new LinkedList<>();
-    for (JPPFTask t: tasks)
-    {
-      if (!results.hasResult(t.getPosition())) list.add(t);
-    }
-    return list;
+    return tasks;
   }
 
   /**
@@ -248,7 +247,9 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
    * or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+   * @deprecated use {@link #add(Object, Object...)} instead.
    */
+  @Deprecated
   public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException
   {
     JPPFTask jppfTask = null;
@@ -268,11 +269,51 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @param args arguments to use with a JPPF-annotated class.
    * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
    * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+   * @deprecated use {@link #add(String, Object, Object...)} instead.
    */
+  @Deprecated
   public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException
   {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
+    tasks.add(jppfTask);
+    jppfTask.setPosition(tasks.size()-1);
+    return jppfTask;
+  }
+
+  /**
+   * Add a task to this job. This method is for adding a task that is either an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask},
+   * annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
+   * @param taskObject the task to add to this job.
+   * @param args arguments to use with a JPPF-annotated class.
+   * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * or a wrapper around the input object in the other cases.
+   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+   */
+  public Task<?> add(final Object taskObject, final Object...args) throws JPPFException
+  {
+    if (taskObject == null) throw new JPPFException("null tasks are not accepted");
+    Task<?> jppfTask = null;
+    if (taskObject instanceof Task) jppfTask = (Task) taskObject;
+    else jppfTask = new JPPFAnnotatedTask(taskObject, args);
+    tasks.add(jppfTask);
+    jppfTask.setPosition(tasks.size()-1);
+    return jppfTask;
+  }
+
+  /**
+   * Add a POJO task to this job. The POJO task is identified as a method name associated with either an object for a non-static method,
+   * or a class for a static method or for a constructor.
+   * @param taskObject the task to add to this job.
+   * @param method the name of the method to execute.
+   * @param args arguments to use with a JPPF-annotated class.
+   * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
+   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+   */
+  public Task<?> add(final String method, final Object taskObject, final Object...args) throws JPPFException
+  {
+    if (taskObject == null) throw new JPPFException("null tasks are not accepted");
+    Task <?>jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
     tasks.add(jppfTask);
     jppfTask.setPosition(tasks.size()-1);
     return jppfTask;
@@ -433,19 +474,19 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
    * @param tasks the tasks that were dispatched or returned.
    * @exclude
    */
-  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<JPPFTask> tasks)
+  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<Task<?>> tasks)
   {
     JobEvent event = new JobEvent(this, channel, tasks);
     switch(type)
     {
       case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
-        break;
+      break;
       case JOB_END: for (JobListener listener: listeners) listener.jobEnded(event);
-        break;
+      break;
       case JOB_DISPATCH: for (JobListener listener: listeners) listener.jobDispatched(event);
-        break;
+      break;
       case JOB_RETURN: for (JobListener listener: listeners) listener.jobReturned(event);
-        break;
+      break;
     }
   }
 
@@ -492,5 +533,11 @@ public class JPPFJob implements Serializable, JPPFDistributedJob
     sb.append(", jobSLA=").append(jobSLA);
     sb.append(']');
     return sb.toString();
+  }
+
+  @Override
+  public Iterator<Task<?>> iterator()
+  {
+    return tasks.iterator();
   }
 }

@@ -21,6 +21,7 @@ package org.jppf.test.scenario.classloading;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.test.scenario.AbstractScenarioRunner;
@@ -53,7 +54,7 @@ public class Runner extends AbstractScenarioRunner
       DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("list", list);
       job.setDataProvider(dp);
-      List<JPPFTask> results = getSetup().getClient().submit(job);
+      List<Task<?>> results = getSetup().getClient().submitJob(job);
       long elapsed = System.nanoTime() - start;
       output(job.getName() + " done in " + StringUtils.toStringDuration(elapsed/1000000L));
     }

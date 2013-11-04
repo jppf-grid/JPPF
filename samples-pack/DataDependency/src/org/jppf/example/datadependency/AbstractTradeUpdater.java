@@ -19,17 +19,22 @@
 package org.jppf.example.datadependency;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.client.*;
-import org.jppf.example.datadependency.model.*;
+import org.jppf.example.datadependency.model.MarketData;
+import org.jppf.example.datadependency.model.Trade;
 import org.jppf.example.datadependency.simulation.*;
-import org.jppf.management.*;
-import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -248,10 +253,10 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
       // set an execution policy that forces execution on the node with the specified id
       job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
       // create a task for each trade
-      for (String tradeId: tradeIdList) job.addTask(createTask(tradeId));
+      for (String tradeId: tradeIdList) job.add(createTask(tradeId));
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
       resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
     }
 
@@ -273,10 +278,10 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
         job.setBlocking(false);
         // set an execution policy that forces execution on the node with the specified id
         job.getSLA().setExecutionPolicy(policy);
-        job.addTask(createTask(tradeId));
+        job.add(createTask(tradeId));
         JPPFResultCollector collector = new JPPFResultCollector(job);
         job.setResultListener(collector);
-        jppfClient.submit(job);
+        jppfClient.submitJob(job);
         resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
       }
     }
@@ -328,7 +333,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
     {
       try
       {
-        List<JPPFTask> results = collector.waitForResults();
+        List<Task<?>> results = collector.awaitResults();
         // do something with the results?
         StringBuilder sb = new StringBuilder("Updated trades: ");
         for (int i=0; i<results.size(); i++)

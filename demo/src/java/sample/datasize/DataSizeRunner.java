@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
 
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -96,8 +96,8 @@ public class DataSizeRunner
       long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("Datasize job " + i);
-      for (int j=0; j<nbTasks; j++) job.addTask(new DataTask(datasize, inNodeOnly));
-      List<JPPFTask> results = jppfClient.submit(job);
+      for (int j=0; j<nbTasks; j++) job.add(new DataTask(datasize, inNodeOnly));
+      List<Task<?>> results = jppfClient.submitJob(job);
       /*
 			for (JPPFTask t: results)
 			{
@@ -138,8 +138,8 @@ public class DataSizeRunner
     for (Future<?> f: futureList)
     {
       f.get();
-      JPPFTask t = ((JPPFTaskFuture<?>) f).getTask();
-      if (t.getException() != null) System.out.println("task error: " +  t.getException().getMessage());
+      Task t = ((JPPFTaskFuture<?>) f).getTask();
+      if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
       else System.out.println("task result: " + t.getResult());
     }
     totalTime = System.currentTimeMillis() - totalTime;
@@ -162,8 +162,8 @@ public class DataSizeRunner
       jppfClient = new JPPFClient();
       JPPFJob job = new JPPFJob();
       job.setName("job " + n);
-      job.addTask(new DataTask(10, true));
-      List<JPPFTask> results = jppfClient.submit(job);
+      job.add(new DataTask(10, true));
+      List<Task<?>> results = jppfClient.submitJob(job);
       if (n % 1000 == 0) output("executed " + n + " jobs");
       jppfClient.close();
     }

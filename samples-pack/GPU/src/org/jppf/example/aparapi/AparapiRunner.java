@@ -20,10 +20,12 @@ package org.jppf.example.aparapi;
 
 import java.util.List;
 
-import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -59,9 +61,9 @@ public class AparapiRunner
 
   /**
    * Submit matrix multiplication jobs to the grid, for execution on a GPU on the nodes' machines.
-   * @throws Exception if any error occurs.
+   * @throws Throwable if any error occurs.
    */
-  public static void perform() throws Exception {
+  public static void perform() throws Throwable {
     TypedProperties config = JPPFConfiguration.getProperties();
     int iterations = config.getInt("iterations", 10);
     int tasksPerJob = config.getInt("tasksPerJob", 1);
@@ -84,11 +86,11 @@ public class AparapiRunner
       long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("gpu_job_" + n);
-      for (int i=0; i<tasksPerJob; i++) job.addTask(new AparapiTask(matrixA, matrixB, execMode));
+      for (int i=0; i<tasksPerJob; i++) job.add(new AparapiTask(matrixA, matrixB, execMode));
       // submit and get the results
-      List<JPPFTask> results = client.submit(job);
-      for (JPPFTask task: results) {
-        if (task.getException() != null) throw task.getException();
+      List<Task<?>> results = client.submitJob(job);
+      for (Task<?> task: results) {
+        if (task.getThrowable() != null) throw task.getThrowable();
         AparapiTask t = (AparapiTask) task;
         assert t.getResult() instanceof SquareMatrix;
         //print("result for " + task.getId() + ": " + task.getResult());

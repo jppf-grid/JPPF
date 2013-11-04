@@ -27,6 +27,7 @@ import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.util.JPPFAccessor;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -86,8 +87,18 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @param submissionId the id of the job submission.
    * @return the results as a list of {@link JPPFTask} instances.
    * @throws Exception if any error occurs.
+   * @deprecated use {@link #awaitResults(String)} instead.
    */
+  @Deprecated
   List<JPPFTask> waitForResults(String submissionId) throws Exception;
+
+  /**
+   * Wait until all results for the specified job submission have been received.
+   * @param submissionId the id of the job submission.
+   * @return the results as a list of {@link Task} instances.
+   * @throws Exception if any error occurs.
+   */
+  List<Task<?>> awaitResults(final String submissionId) throws Exception;
 
   /**
    * Cancel the job with the specified id.
@@ -129,8 +140,22 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
+   * @deprecated use {@link #getResults(String)} instead.
    */
+  @Deprecated
   List<JPPFTask> getSubmissionResults(String submissionId) throws Exception;
+
+  /**
+   * Get the results of an execution request.<br>
+   * This method should be called only once a call to
+   * {@link #getSubmissionStatus(java.lang.String) getSubmissionStatus(submissionId)} has returned
+   * either {@link org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
+   * @param submissionId the id of the submission for which to get the execution results.
+   * @return the list of resulting JPPF tasks, or null if the execution failed.
+   * @throws Exception if an error occurs while submitting the request.
+   */
+  List<Task<?>> getResults(final String submissionId) throws Exception;
 
   /**
    * Get the ids of all currently available submissions.

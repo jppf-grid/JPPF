@@ -20,11 +20,13 @@ package org.jppf.example.extendedclassloading.client;
 
 import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
 import org.jppf.example.extendedclassloading.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>This client application maintains a repository of Java libraries that are automatically
@@ -101,7 +103,7 @@ public class MyRunner {
    * @return the newly created job.
    * @throws Exception if any error occurs while creating the job.
    */
-  private static JPPFJob createJob(final ClassPath classpath, final JPPFTask...tasks) throws Exception {
+  private static JPPFJob createJob(final ClassPath classpath, final Task<?>...tasks) throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName("Extended Class Loading " + jobCount++);
 
@@ -113,7 +115,7 @@ public class MyRunner {
     // add the tasks to the job
     int taskNumber = 1;
     String prefix = job.getName() + ":task ";
-    for (JPPFTask task: tasks) job.addTask(task).setId(prefix + taskNumber++);
+    for (Task<?> task: tasks) job.add(task).setId(prefix + taskNumber++);
     return job;
   }
 
@@ -124,15 +126,15 @@ public class MyRunner {
    */
   private static void executeJob(final JPPFJob job) throws Exception {
     // submit the job to the grid
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
 
     // process the results
     output("*** results for job '" + job.getName() + "'");
-    for (JPPFTask task: results) {
+    for (Task<?> task: results) {
       String prefix = "task " + task.getId() + " ";
-      if (task.getException() != null) {
+      if (task.getThrowable() != null) {
         // if an error occurred, show the exception stack trace
-        output(prefix + "got exception: " + ExceptionUtils.getStackTrace(task.getException()));
+        output(prefix + "got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       } else {
         // otherwise show the task result
         output(prefix + "result: " + task.getResult());

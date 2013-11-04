@@ -29,8 +29,8 @@ import org.jppf.execute.*;
 import org.jppf.management.*;
 import org.jppf.node.*;
 import org.jppf.node.event.LifeCycleEventHandler;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.node.NodeExecutionManagerImpl;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -203,12 +203,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     public void run()
     {
       Exception exception = null;
-      List<JPPFTask> tasks = this.bundle.getTasksL();
+      List<Task<?>> tasks = this.bundle.getTasksL();
       try
       {
         long start = System.nanoTime();
         DataProvider dataProvider = bundle.getJob().getDataProvider();
-        for (JPPFTask task : tasks)
+        for (Task<?> task : tasks)
         {
           task.setDataProvider(dataProvider);
         }

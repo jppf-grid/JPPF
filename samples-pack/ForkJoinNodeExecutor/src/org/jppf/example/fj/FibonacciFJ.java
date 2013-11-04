@@ -18,12 +18,14 @@
 
 package org.jppf.example.fj;
 
+import java.util.concurrent.ForkJoinTask;
+
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.*;
-
-import java.util.concurrent.ForkJoinTask;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Sample class for fork join support demonstration.
@@ -56,15 +58,15 @@ public class FibonacciFJ {
       N = config.getInt("fib.fj.N", 10);
       if (N < 1) N = 1;
       System.out.printf("Creating %d tasks: fib(%d)%n", COUNT, N);
-      for (int index = 0; index < COUNT; index++) job.addTask(new JPPFTaskFibonacci(N));
+      for (int index = 0; index < COUNT; index++) job.add(new JPPFTaskFibonacci(N));
 
       System.out.println("Submitting job...");
       long dur = System.nanoTime();
-      client.submit(job);
+      client.submitJob(job);
       dur = System.nanoTime() - dur;
       System.out.printf("Job done in %.3f ms%n", dur / 1000000.0);
 
-      for (JPPFTask task : job.getResults().getAll()) {
+      for (Task<?> task : job.getResults().getAllResults()) {
         if (task.getResult() instanceof FibonacciResult) {
           FibonacciResult result = (FibonacciResult) task.getResult();
           System.out.printf("  %2d. ForkJoin: %s, Result: %d%n", task.getPosition(), result.isForkJoinUsed(), result.getResult());

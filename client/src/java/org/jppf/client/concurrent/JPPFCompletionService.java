@@ -21,7 +21,7 @@ package org.jppf.client.concurrent;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
 /**
@@ -146,7 +146,7 @@ public class JPPFCompletionService<V> implements CompletionService<V>
     @Override
     public void resultsReceived(final FutureResultCollectorEvent event)
     {
-      List<JPPFTask> tasks = event.getResults();
+      List<Task<?>> tasks = event.getResults();
       if (tasks != null)
       {
         FutureResultCollector collector = event.getCollector();
@@ -157,7 +157,7 @@ public class JPPFCompletionService<V> implements CompletionService<V>
           map = futureMap.get(uuid);
         }
         if (map == null) return;
-        for (JPPFTask task: tasks)
+        for (Task<?> task: tasks)
         {
           JPPFTaskFuture<V> future = null;
           synchronized(futureMap)

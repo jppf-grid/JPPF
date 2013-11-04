@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 
@@ -60,18 +61,18 @@ public class JobManagementTestRunner
     {
       JPPFTask task = new LongTask(duration);
       task.setId(jobName + " - task " + i);
-      job.addTask(task);
+      job.add(task);
     }
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
-    client.submit(job);
+    client.submitJob(job);
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
     driver.cancelJob(job.getUuid());
-    List<JPPFTask> results = collector.waitForResults();
-    for (JPPFTask task: results)
+    List<Task<?>> results = collector.awaitResults();
+    for (Task task: results)
     {
-      Exception e = task.getException();
+      Throwable e = task.getThrowable();
       if (e != null) System.out.println("" + task.getId() + " has an exception: " + ExceptionUtils.getStackTrace(e));
       else System.out.println("Result for " + task.getId() + ": " + task.getResult());
     }
@@ -98,14 +99,14 @@ public class JobManagementTestRunner
       }
       for (JMXNodeConnectionWrapper node: nodes) node.updateThreadPoolSize(4);
       Thread.sleep(500L);
-      client.submit(createJob("broadcast1"));
+      client.submitJob(createJob("broadcast1"));
       Thread.sleep(500L);
       ExecutionPolicy policy = new AtLeast("processing.threads", 4);
       int n = driver.matchingNodes(policy);
       System.out.println("found " + n + " nodes, expected = 2");
       nodes[1].updateThreadPoolSize(2);
       Thread.sleep(500L);
-      client.submit(createJob("broadcast2"));
+      client.submitJob(createJob("broadcast2"));
       Thread.sleep(500L);
       n = driver.matchingNodes(policy);
       System.out.println("found " + n + " nodes, expected = 1");
@@ -126,7 +127,7 @@ public class JobManagementTestRunner
   {
     JPPFJob job = new JPPFJob(id);
     job.setName(id);
-    job.addTask(new MyBroadcastTask());
+    job.add(new MyBroadcastTask());
     job.getSLA().setBroadcastJob(true);
     return job;
   }

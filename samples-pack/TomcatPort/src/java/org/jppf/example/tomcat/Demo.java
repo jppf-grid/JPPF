@@ -20,8 +20,9 @@ package org.jppf.example.tomcat;
 
 import java.util.List;
 
-import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
 
 /**
  * This class contains the code for the demo web application
@@ -75,10 +76,10 @@ public class Demo
       {
         LongTask task = new LongTask(taskDuration);
         task.setId("" + i);
-        job.addTask(task);
+        job.add(task);
       }
-      List<JPPFTask> results = getClient().submit(job);
-      for (JPPFTask task: results)
+      List<Task<?>> results = getClient().submitJob(job);
+      for (Task<?> task: results)
       {
         sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
       }

@@ -28,6 +28,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -117,7 +118,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
   {
     ObjectSerializer ser = makeHelper(cl, client.getSerializationHelperClassName()).getSerializer();
-    int count = job.getTasks().size() - job.getResults().size();
+    int count = job.getJobTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(client.getUuid());
     header.setUuidPath(uuidPath);
@@ -128,9 +129,9 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     header.setMetadata(job.getMetadata());
 
     int[] positions = new int[count];
-    JPPFTask[] tasks = new JPPFTask[count];
+    Task<?>[] tasks = new Task<?>[count];
     int i = 0;
-    for (JPPFTask task : job.getTasks())
+    for (Task task : job.getJobTasks())
     {
       int pos = task.getPosition();
       if (!job.getResults().hasResult(pos))
@@ -146,7 +147,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, job.getDataProvider(), ser);
-    for (JPPFTask task : tasks) IOHelper.sendData(socketClient, task, ser);
+    for (Task<?> task : tasks) IOHelper.sendData(socketClient, task, ser);
     socketClient.flush();
   }
 
@@ -182,8 +183,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @throws Exception if an error is raised while reading the results from the server.
    */
   @SuppressWarnings("unchecked")
-  protected Pair<JPPFTaskBundle, List<JPPFTask>> receiveBundleAndResults(final String helperClassName) throws Exception {
-    List<JPPFTask> taskList = new LinkedList<>();
+  protected Pair<JPPFTaskBundle, List<Task<?>>> receiveBundleAndResults(final String helperClassName) throws Exception {
+    List<Task<?>> taskList = new LinkedList<>();
     JPPFTaskBundle bundle = null;
     try {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -212,7 +213,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       if (t != null) {
         if (debugEnabled) log.debug(this.toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
-        for (JPPFTask task : taskList) task.setThrowable(e);
+        for (Task<?> task : taskList) task.setThrowable(e);
       }
       return new Pair(bundle, taskList);
     } catch (AsynchronousCloseException e) {
@@ -233,7 +234,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public List<JPPFTask> receiveResults() throws Exception
+  public List<Task<?>> receiveResults() throws Exception
   {
     return receiveBundleAndResults(client.getSerializationHelperClassName()).second();
   }
@@ -245,11 +246,11 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public List<JPPFTask> receiveResults(final ClassLoader cl) throws Exception
+  public List<Task<?>> receiveResults(final ClassLoader cl) throws Exception
   {
     ClassLoader prevCl = Thread.currentThread().getContextClassLoader();
     if (cl != null) Thread.currentThread().setContextClassLoader(cl);
-    List<JPPFTask> results = null;
+    List<Task<?>> results = null;
     try
     {
       results = receiveResults();

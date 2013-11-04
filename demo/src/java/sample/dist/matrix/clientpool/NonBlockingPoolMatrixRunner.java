@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -100,19 +100,19 @@ public class NonBlockingPoolMatrixRunner
         for (int n=0; n<nbSubmissions; n++)
         {
           JPPFJob job = new JPPFJob(dataProvider);
-          for (int i=0; i<size; i++) job.addTask(new MatrixTask(a.getRow(i)));
+          for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
           job.setBlocking(false);
           job.setResultListener(new JPPFResultCollector(job));
           // create a task for each row in matrix a
           submissions.add(job);
         }
         // submit the tasks for execution
-        for (JPPFJob job: submissions) jppfClient.submit(job);
+        for (JPPFJob job: submissions) jppfClient.submitJob(job);
 
         for (JPPFJob job: submissions)
         {
           JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-          List<JPPFTask> results = collector.waitForResults();
+          List<Task<?>> results = collector.awaitResults();
           // initialize the resulting matrix
           Matrix c = new Matrix(size);
           // Get the matrix values from the tasks results

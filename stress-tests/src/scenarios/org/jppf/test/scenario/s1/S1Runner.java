@@ -21,7 +21,7 @@ package org.jppf.test.scenario.s1;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
@@ -110,16 +110,16 @@ public class S1Runner extends AbstractScenarioRunner
       }
       else rows = new double[remaining][];
       for (int j=0; j<rows.length; j++) rows[j] = a.getRow(i + j);
-      job.addTask(new ExtMatrixTask(rows));
+      job.add(new ExtMatrixTask(rows));
     }
     // create a data provider to share matrix b among all tasks
     job.setDataProvider(new MemoryMapDataProvider());
     job.getDataProvider().setParameter(ExtMatrixTask.DATA_KEY, b);
-    List<JPPFTask> results = getSetup().getClient().submit(job);
+    List<Task<?>> results = getSetup().getClient().submitJob(job);
     Matrix c = new Matrix(size);
     int rowIdx = 0;
-    for (JPPFTask matrixTask : results) {
-      if (matrixTask.getException() != null) throw matrixTask.getException();
+    for (Task<?> matrixTask : results) {
+      if (matrixTask.getThrowable() != null) throw new Exception(matrixTask.getThrowable());
       double[][] rows = (double[][]) matrixTask.getResult();
       for (int j = 0; j < rows.length; j++) {
         for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);

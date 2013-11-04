@@ -19,6 +19,7 @@ package org.jppf.client.event;
 
 import java.util.*;
 
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -38,7 +39,7 @@ public class TaskResultEvent extends EventObject
    * @param taskList the list of tasks whose results have been received from the server.
    * @param throwable the throwable that was raised while receiving the results.
    */
-  public TaskResultEvent(final List<JPPFTask> taskList, final Throwable throwable)
+  public TaskResultEvent(final List<Task<?>> taskList, final Throwable throwable)
   {
     super(taskList);
     this.throwable = throwable;
@@ -48,11 +49,24 @@ public class TaskResultEvent extends EventObject
    * Get the list of tasks whose results have been received from the server.
    * To properly order the results, developers should use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} for each task.
    * @return a list of <code>JPPFTask</code> instances.
+   * @deprecated as of v4.0, use {@link #getTasks()} instead.
    */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public List<JPPFTask> getTaskList()
   {
     return (List<JPPFTask>) getSource();
+  }
+
+  /**
+   * Get the list of tasks whose results have been received from the server.
+   * To properly order the results, developers should use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} for each task.
+   * @return a list of <code>JPPFTask</code> instances.
+   */
+  @SuppressWarnings("unchecked")
+  public List<Task<?>> getTasks()
+  {
+    return (List<Task<?>>) getSource();
   }
 
   /**

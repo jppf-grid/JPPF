@@ -22,6 +22,7 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -80,18 +81,18 @@ public class AnnotatedRunner
     {
       JPPFJob job = new JPPFJob();
       job.setName("demo job " + (i+1));
-      job.addTask(new AnnotatedTask(time, (i+1)));
+      job.add(new AnnotatedTask(time, (i+1)));
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
       job.setBlocking(false);
       jobs.add(job);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
     }
     for (JPPFJob job: jobs)
     {
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<JPPFTask> results = collector.waitForResults();
-      JPPFTask t = results.get(0);
+      List<Task<?>> results = collector.awaitResults();
+      Task t = results.get(0);
       output((String) t.getResult());
     }
     totalTime = System.currentTimeMillis() - totalTime;
@@ -119,18 +120,18 @@ public class AnnotatedRunner
       JPPFJob job = new JPPFJob();
       job.setName("demo job " + (i+1));
       JPPFTask task = (JPPFTask) cl.loadClass("test.TestClass").newInstance();
-      job.addTask(task);
+      job.add(task);
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
       job.setBlocking(false);
       jobs.add(job);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
     }
     for (JPPFJob job: jobs)
     {
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<JPPFTask> results = collector.waitForResults();
-      JPPFTask t = results.get(0);
+      List<Task<?>> results = collector.awaitResults();
+      Task t = results.get(0);
       output((String) t.getResult());
     }
     totalTime = System.currentTimeMillis() - totalTime;

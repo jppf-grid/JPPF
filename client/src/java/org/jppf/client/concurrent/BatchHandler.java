@@ -27,7 +27,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.JobListener;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -175,7 +175,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
           }
           if (isStopped()) break;
           JPPFJob job = currentJobRef.get();
-          if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getTasks().size() + " tasks");
+          if (debugEnabled) log.debug("submitting job " + job.getName() + " with " + job.getJobTasks().size() + " tasks");
           FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
           configureJob(job);
           executor.submitJob(job);
@@ -203,7 +203,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
   private void updateNextJob(final boolean sendSignal)
   {
     JPPFJob job = nextJobRef.get();
-    int size = job.getTasks().size();
+    int size = job.getJobTasks().size();
     if (batchTimeout > 0L) elapsed = System.currentTimeMillis() - start;
     if (size == 0)
     {
@@ -248,7 +248,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
    * @param result this parameter is only here for type inference (I know, it's ugly).
    * @return a {@link Future} representing pending completion of the task.
    */
-  <T> Future<T> addTask(final JPPFTask task, final T result)
+  <T> Future<T> addTask(final Task<?> task, final T result)
   {
     lock.lock();
     try
@@ -259,7 +259,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       try
       {
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-        job.addTask(task);
+        job.add(task);
         future = new JPPFTaskFuture<>(collector, task.getPosition());
       }
       catch (JPPFException e)
@@ -294,7 +294,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       try
       {
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-        JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.addTask(task);
+        JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.add(task);
         t.setResult(result);
         configureTask(t);
         future = new JPPFTaskFuture<>(collector, t.getPosition());
@@ -330,7 +330,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       try
       {
         FutureResultCollector collector = (FutureResultCollector) job.getResultListener();
-        JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.addTask(task);
+        JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.add(task);
         configureTask(jppfTask);
         future = new JPPFTaskFuture<>(collector, jppfTask.getPosition());
       }
@@ -367,11 +367,11 @@ public class BatchHandler extends ThreadSynchronization implements Runnable
       int start = 0;
       try
       {
-        List<JPPFTask> jobTasks = job.getTasks();
+        List<Task<?>> jobTasks = job.getJobTasks();
         start = jobTasks.size();
         for (Callable<?> task: tasks)
         {
-          JPPFTask t = job.addTask(task);
+          Task<?> t = job.add(task);
           configureTask((JPPFAnnotatedTask) t);
         }
       }

@@ -26,7 +26,7 @@ import javax.management.*;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
@@ -117,8 +117,8 @@ public class TestJPPFNodeTaskMonitorMBean
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskCpuTime());
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskElapsedTime());
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
-      job.addTask(new ErrorLifeCycleTask(duration)).setId(job.getName() + " - task 2");
-      List<JPPFTask> result = client.submit(job);
+      job.add(new ErrorLifeCycleTask(duration)).setId(job.getName() + " - task 2");
+      List<Task<?>> result = client.submitJob(job);
       assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksSucessfull());
@@ -145,8 +145,8 @@ public class TestJPPFNodeTaskMonitorMBean
     try
     {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
-      job.addTask(new ErrorLifeCycleTask(duration)).setId(job.getName() + " - task 2");
-      List<JPPFTask> result = client.submit(job);
+      job.add(new ErrorLifeCycleTask(duration)).setId(job.getName() + " - task 2");
+      List<Task<?>> result = client.submitJob(job);
       assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksSucessfull());
@@ -182,13 +182,13 @@ public class TestJPPFNodeTaskMonitorMBean
     {
       nodeMonitorProxy.addNotificationListener(listener, null, null);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
-      job.addTask(new ErrorLifeCycleTask(duration)).setId(job.getName() + " - task " + nbTasks);
-      List<JPPFTask> result = client.submit(job);
+      job.add(new ErrorLifeCycleTask(duration)).setId(job.getName() + " - task " + nbTasks);
+      List<Task<?>> result = client.submitJob(job);
       assertNull(listener.exception);
       assertEquals(nbTasks, listener.notifs.size());
       for (int i=0; i < nbTasks; i++)
       {
-        JPPFTask task = result.get(i);
+        Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);
         assertEquals(job.getUuid(), ti.getJobId());
         assertEquals(task.getId(), ti.getId());

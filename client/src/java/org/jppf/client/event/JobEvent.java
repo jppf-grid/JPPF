@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.execute.ExecutorChannel;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 
 /**
@@ -61,7 +62,7 @@ public class JobEvent extends EventObject
   /**
    * The tasks that were dispatched or returned.
    */
-  private final List<JPPFTask> tasks;
+  private final List<Task<?>> tasks;
 
   /**
    * Initialize this event with the specified job as its source.
@@ -80,7 +81,7 @@ public class JobEvent extends EventObject
    * @param tasks the tasks that were dispatched or returned.
    * @exclude
    */
-  public JobEvent(final JPPFJob source, final ExecutorChannel channel, final List<JPPFTask> tasks)
+  public JobEvent(final JPPFJob source, final ExecutorChannel channel, final List<Task<?>> tasks)
   {
     super(source);
     this.channel = channel;
@@ -111,8 +112,22 @@ public class JobEvent extends EventObject
    * Get the tasks that were dispatched or returned.
    * <p>This method returns a non <code>null</code> value only for <code>jobDispatched()</code> and <code>jobReturned()</code> events.
    * @return a list of {@link JPPFTask} instances.
+   * @deprecated use {@link #getJobTasks()} instead.
    */
+  @Deprecated
   public List<JPPFTask> getTasks()
+  {
+    List<JPPFTask> list = new ArrayList<>(tasks.size());
+    for (Task<?> task: tasks) list.add((JPPFTask) task);
+    return list;
+  }
+
+  /**
+   * Get the tasks that were dispatched or returned.
+   * <p>This method returns a non <code>null</code> value only for <code>jobDispatched()</code> and <code>jobReturned()</code> events.
+   * @return a list of {@link JPPFTask} instances.
+   */
+  public List<Task<?>> getJobTasks()
   {
     return tasks;
   }

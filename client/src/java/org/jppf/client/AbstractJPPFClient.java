@@ -23,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -226,6 +227,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @throws Exception if an error occurs while sending the job for execution.
    */
   public abstract List<JPPFTask> submit(JPPFJob job) throws Exception;
+
+  /**
+   * Submit a JPPFJob for execution.
+   * @param job the job to execute.
+   * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
+   * @throws Exception if an error occurs while sending the job for execution.
+   */
+  public abstract List<Task<?>> submitJob(JPPFJob job) throws Exception;
 
   /**
    * Invoked when the status of a client connection has changed.

@@ -18,10 +18,10 @@
 
 package sample.test.redirect;
 
-import java.util.*;
+import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 
 /**
@@ -46,10 +46,10 @@ public class RedirectOutputRunner {
       String name = "redirect output";
       job.setName(name);
       int nbTasks = 10;
-      for (int i=1; i<=nbTasks; i++) job.addTask(new RedirectOutputTask()).setId(name + " - task " + i);
-      List<JPPFTask> results = client.submit(job);
-      for (JPPFTask task: results) {
-        Exception e = task.getException();
+      for (int i=1; i<=nbTasks; i++) job.add(new RedirectOutputTask()).setId(name + " - task " + i);
+      List<Task<?>> results = client.submitJob(job);
+      for (Task task: results) {
+        Throwable e = task.getThrowable();
         if (e != null)
           System.out.println("'" + task.getId() + "' raised an exception: " + ExceptionUtils.getStackTrace(e));
         else {

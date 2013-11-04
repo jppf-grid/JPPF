@@ -19,7 +19,7 @@
 package org.jppf.gigaspaces.test;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Utility class used from a Java Server Page to invoke a JPPF job execution
@@ -42,7 +42,7 @@ public class TestFromJSP
     try
     {
       JPPFJob job = GSClient.execute(jobName, nbTasks, taskDuration);
-      for (JPPFTask task: job.getTasks())
+      for (Task task: job.getJobTasks())
       {
         sb.append("Task ").append(task.getId()).append(" : ").append(task.getResult()).append("<br/>");
       }

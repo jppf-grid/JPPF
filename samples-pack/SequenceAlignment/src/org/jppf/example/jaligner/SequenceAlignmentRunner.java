@@ -25,16 +25,22 @@ import jaligner.util.SequenceParser;
 import java.awt.*;
 import java.io.*;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.*;
 
-import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
-import org.jppf.ui.options.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
+import org.jppf.task.storage.DataProvider;
+import org.jppf.task.storage.MemoryMapDataProvider;
+import org.jppf.ui.options.AbstractOption;
+import org.jppf.ui.options.Option;
+import org.jppf.utils.FileUtils;
+import org.jppf.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -139,25 +145,25 @@ public class SequenceAlignmentRunner
     {
       String s = dh.nextSequence();
       if (s == null) end = true;
-      else job.addTask(new SequenceAlignmentTask(s, ++n));
+      else job.add(new SequenceAlignmentTask(s, ++n));
     }
     long start2 = System.currentTimeMillis();
     //taskList = client.submit(taskList, dp);
-    AlignmentResultCollector collector = new AlignmentResultCollector(job.getTasks().size());
+    AlignmentResultCollector collector = new AlignmentResultCollector(job.getJobTasks().size());
     job.setBlocking(false);
     job.setResultListener(collector);
-    client.submit(job);
-    List<JPPFTask> results = collector.waitForResults();
+    client.submitJob(job);
+    List<Task<?>> results = collector.awaitResults();
     long elapsed2 = System.currentTimeMillis() - start2;
     float maxScore = 0;
     SequenceAlignmentTask maxTask = null;
-    for (JPPFTask t: results)
+    for (Task<?> t: results)
     {
       SequenceAlignmentTask task = (SequenceAlignmentTask) t;
-      if (task.getException() != null)
+      if (task.getThrowable() != null)
       {
         String msg = "Exception in task #"+task.getNumber()+ ", sequence:\n"+task.getSequence();
-        log.info(msg, task.getException());
+        log.info(msg, task.getThrowable());
       }
       float score = (Float) task.getResult();
       if (score > maxScore)

@@ -19,11 +19,12 @@ package org.jppf.example.matrix;
 
 import java.util.List;
 
+import org.jppf.JPPFException;
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.policy.PolicyParser;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -136,20 +137,21 @@ public class MatrixRunner {
       }
       else rows = new double[remaining][];
       for (int j=0; j<rows.length; j++) rows[j] = a.getRow(i + j);
-      job.addTask(new ExtMatrixTask(rows));
+      job.add(new ExtMatrixTask(rows));
     }
     // create a data provider to share matrix b among all tasks
     job.setDataProvider(new MemoryMapDataProvider());
     job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
     job.getSLA().setExecutionPolicy(policy);
     // submit the tasks for execution
-    List<JPPFTask> results = jppfClient.submit(job);
+    List<Task<?>> results = jppfClient.submitJob(job);
     // initialize the resulting matrix
     Matrix c = new Matrix(size);
     // Get the matrix values from the tasks results
     int rowIdx = 0;
-    for (JPPFTask matrixTask : results) {
-      if (matrixTask.getException() != null) throw matrixTask.getException();
+    for (Task<?> matrixTask : results) {
+      Throwable t = matrixTask.getThrowable();
+      if (t != null) throw t instanceof Exception ? (Exception) t : new JPPFException(t);
       double[][] rows = (double[][]) matrixTask.getResult();
       for (int j = 0; j < rows.length; j++) {
         for (int k = 0; k < size; k++) c.setValueAt(rowIdx + j, k, rows[j][k]);

@@ -21,8 +21,7 @@ package test.org.jppf.client;
 import static org.junit.Assert.*;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -43,10 +42,10 @@ public class TestJPPFJob
   public void testGetTaskObject() throws Exception
   {
     JPPFJob job = new JPPFJob();
-    JPPFTask task = job.addTask(new SimpleRunnable());
+    Task<?> task = job.add(new SimpleRunnable());
     assertNotNull(task);
     assertNotNull(task.getTaskObject());
-    JPPFTask task2 = job.addTask(new SimpleTask());
+    Task<?> task2 = job.add(new SimpleTask());
     assertNotNull(task2);
     assertNotNull(task2.getTaskObject());
   }
@@ -74,7 +73,7 @@ public class TestJPPFJob
       JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 50L);
       CountingJobListener listener = new CountingJobListener();
       job.addJobListener(listener);
-      client.submit(job);
+      client.submitJob(job);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
     }

@@ -95,7 +95,7 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
       listenerID = driverJmx.registerForwardingNotificationListener(selector, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
       JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
-      client.submit(job);
+      client.submitJob(job);
       Thread.sleep(1500L);
       checkNotifs(listener.notifs, nbTasks, expectedNodes);
     }
@@ -157,7 +157,7 @@ public class TestJPPFNodeForwardingMBean2 extends AbstractTestJPPFNodeForwarding
       driverJmx.unregisterForwardingNotificationListener(listenerID);
       String jobName = ReflectionUtils.getCurrentMethodName() + ':' + selector.getClass().getSimpleName();
       JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, NotifyingTask.class, 100L);
-      client.submit(job);
+      client.submitJob(job);
       assertTrue(listener.notifs.isEmpty());
       assertNull(listener.exception);
     }

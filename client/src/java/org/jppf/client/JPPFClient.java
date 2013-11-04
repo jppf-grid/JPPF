@@ -23,6 +23,7 @@ import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -97,12 +98,13 @@ public class JPPFClient extends AbstractGenericClient
    * @return the list of executed tasks with their results for a blocking job, or <code>null</code> for a non-blocking job.
    * @throws IllegalArgumentException if the job is null or empty.
    * @throws Exception if an error occurs while sending the request.
+   * @deprecated use {@link #submitJob(JPPFJob)} instead.
    */
   @Override
   public List<JPPFTask> submit(final JPPFJob job) throws Exception
   {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
-    if (job.getTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
+    if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
         (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     SubmissionManager submissionManager = getSubmissionManager();
@@ -111,6 +113,30 @@ public class JPPFClient extends AbstractGenericClient
     {
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       return collector.waitForResults();
+    }
+    return null;
+  }
+
+  /**
+   * Submit a job execution request.
+   * @param job the job to execute.
+   * @return the list of executed tasks with their results for a blocking job, or <code>null</code> for a non-blocking job.
+   * @throws IllegalArgumentException if the job is null or empty.
+   * @throws Exception if an error occurs while sending the request.
+   */
+  @Override
+  public List<Task<?>> submitJob(final JPPFJob job) throws Exception
+  {
+    if (job == null) throw new IllegalArgumentException("job cannot be null");
+    if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
+    if ((job.getResultListener() == null) ||
+        (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
+    SubmissionManager submissionManager = getSubmissionManager();
+    submissionManager.submitJob(job);
+    if (job.isBlocking())
+    {
+      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      return collector.awaitResults();
     }
     return null;
   }

@@ -20,9 +20,10 @@ package org.jppf.example.datadependency;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * This class collects statistics about job and tasks executions
@@ -60,7 +61,7 @@ public class StatsCollector
    * @param results the results of the job that was processed.
    * @param time the job's total processing time.
    */
-  public void jobProcessed(final List<JPPFTask> results, final long time)
+  public void jobProcessed(final List<Task<?>> results, final long time)
   {
     nbJobs.incrementAndGet();
     nbTasks.addAndGet(results.size());

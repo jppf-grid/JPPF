@@ -25,8 +25,8 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.Equal;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -72,10 +72,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
       Date date = new Date(System.currentTimeMillis() + TIME_SHORT);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNull(task.getResult());
     }
     finally
@@ -98,10 +98,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
       Date date = new Date(System.currentTimeMillis() + TIME_LONG);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(sdf.format(date), DATE_FORMAT));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
     }
@@ -123,10 +123,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       configure(false, true, 1);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNull(task.getResult());
     }
     finally
@@ -147,10 +147,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       configure(false, true, 1);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
     }
@@ -175,14 +175,14 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       job1.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
       JPPFJob job2 = BaseTestHelper.createJob(methodName + "-2", false, false, 1, SimpleTask.class, TIME_SHORT);
       job2.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
-      client.submit(job1);
-      client.submit(job2);
-      List<JPPFTask> results = ((JPPFResultCollector) job1.getResultListener()).waitForResults();
+      client.submitJob(job1);
+      client.submitJob(job2);
+      List<Task<?>> results = ((JPPFResultCollector) job1.getResultListener()).awaitResults();
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNull(task.getResult());
-      results = ((JPPFResultCollector) job2.getResultListener()).waitForResults();
+      results = ((JPPFResultCollector) job2.getResultListener()).awaitResults();
       assertNotNull(results);
       assertEquals(results.size(), 1);
       task = results.get(0);
@@ -209,10 +209,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", false));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      for (JPPFTask t: results)
+      for (Task<?> t: results)
       {
         LifeCycleTask task = (LifeCycleTask) t;
         assertTrue(task.isExecutedInNode());
@@ -240,10 +240,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class);
       job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      for (JPPFTask t: results)
+      for (Task<?> t: results)
       {
         LifeCycleTask task = (LifeCycleTask) t;
         assertFalse(task.isExecutedInNode());
@@ -271,7 +271,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
       job.getClientSLA().setMaxChannels(1);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       // check that no 2 tasks were executing at the same time on different channels
@@ -308,7 +308,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 500L);
       job.getClientSLA().setMaxChannels(2);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       boolean found = false;

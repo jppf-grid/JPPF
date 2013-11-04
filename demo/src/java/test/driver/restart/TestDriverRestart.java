@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.management.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -64,9 +64,9 @@ public class TestDriverRestart
       {
         JPPFJob job = createJPPFJob("test_job_" + i, 1000, 100L, false);
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        client.submit(job);
-        List<JPPFTask> results;
-        while ((results = collector.waitForResults(5000L)) == null)
+        client.submitJob(job);
+        List<Task<?>> results;
+        while ((results = collector.awaitResults(5000L)) == null)
         {
           new KillDriverTask().run();
           RESTART_COUNT.incrementAndGet();
@@ -99,13 +99,13 @@ public class TestDriverRestart
     JPPFJob job = new JPPFJob();
     job.setName(name);
     job.setBlocking(blocking);
-    for (int i=0; i<nbTasks; i++) job.addTask(new LongTask(1000L, true)).setId("task_" + (i+1));
+    for (int i=0; i<nbTasks; i++) job.add(new LongTask(1000L, true)).setId("task_" + (i+1));
     job.setResultListener(new JPPFResultCollector(job) {
       @Override
       public synchronized void resultsReceived(final TaskResultEvent event) {
         super.resultsReceived(event);
         if (event.getThrowable() == null) {
-          List<JPPFTask> list = event.getTaskList();
+          List<Task<?>> list = event.getTasks();
           print("received " + list.size() + " tasks, pending=" + (nbTasks - jobResults.size()) + ", results=" + jobResults.size());
         }
       }

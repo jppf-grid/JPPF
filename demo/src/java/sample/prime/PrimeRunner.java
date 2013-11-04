@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
@@ -87,11 +87,11 @@ public class PrimeRunner
         int nbTasks = (pending > batchSize) ? batchSize : pending;
         for (int i=0; i<nbTasks; i++)
         {
-          job.addTask(new PrimeTask(count++));
+          job.add(new PrimeTask(count++));
         }
         pending -= nbTasks;
-        List<JPPFTask> results = jppfClient.submit(job);
-        for (JPPFTask t: results)
+        List<Task<?>> results = jppfClient.submitJob(job);
+        for (Task t: results)
         {
           if (t.getResult() != null)
           {

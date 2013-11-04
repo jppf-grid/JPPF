@@ -53,7 +53,7 @@ public class DeadlockRunner {
       }
       JPPFJob job = createJob();
       for (int i = 0; i < 100*1000; i++) {
-        job.addTask(new SampleJPPFTask(i));
+        job.add(new SampleJPPFTask(i));
       }
       job.setBlocking(false);
       //job.getSLA().setCancelUponClientDisconnect(false);
@@ -61,14 +61,14 @@ public class DeadlockRunner {
         @Override public void jobStarted(final JobEvent event) {
         }
         @Override public void jobReturned(final JobEvent event) {
-          System.out.println("job '" + event.getJob().getName() + "' : " + event.getTasks().size() + " tasks returned");
+          System.out.println("job '" + event.getJob().getName() + "' : " + event.getJobTasks().size() + " tasks returned");
         }
         @Override public void jobEnded(final JobEvent event) {
           System.out.println("job '" + event.getJob().getName() + "' ended");
           System.exit(0);
         }
         @Override public void jobDispatched(final JobEvent event) {
-          System.out.println("job '" + event.getJob().getName() + "' : " + event.getTasks().size() + " tasks dispatched to channel " + event.getChannel());
+          System.out.println("job '" + event.getJob().getName() + "' : " + event.getJobTasks().size() + " tasks dispatched to channel " + event.getChannel());
         }
       });
 
@@ -80,7 +80,7 @@ public class DeadlockRunner {
           //throw new RuntimeException("Should cause reconnect.");
         }
       });
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
       Thread.sleep(3000L);
       System.out.println("requesting job cancel");
       jppfClient.cancelJob(job.getUuid());

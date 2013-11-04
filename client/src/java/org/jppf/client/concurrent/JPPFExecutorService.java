@@ -388,8 +388,8 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
    */
   void submitJob(final JPPFJob job) throws Exception
   {
-    if (debugEnabled) log.debug("submitting job '" + job.getName() + "' with " + job.getTasks().size() + " tasks");
-    client.submit(job);
+    if (debugEnabled) log.debug("submitting job '" + job.getName() + "' with " + job.getJobTasks().size() + " tasks");
+    client.submitJob(job);
     synchronized(jobMap)
     {
       jobMap.put(job.getUuid(), job);

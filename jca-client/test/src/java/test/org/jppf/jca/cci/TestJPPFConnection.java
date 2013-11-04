@@ -26,7 +26,7 @@ import java.util.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.cci.JPPFConnection;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 import org.junit.Test;
 
@@ -64,13 +64,13 @@ public class TestJPPFConnection
       JPPFJob job = BaseTestHelper.createJob("JCA testSubmit", true, false, 1, LifeCycleTask.class);
       String id = connection.submit(job);
       assertNotNull(id);
-      List<JPPFTask> results = connection.waitForResults(id);
+      List<Task<?>> results = connection.awaitResults(id);
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
-      JPPFTask task = results.get(0);
+      Task task = results.get(0);
       assertNotNull(task);
-      assertNull(task.getException());
+      assertNull(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals(task.getResult(), BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
     }
@@ -107,15 +107,15 @@ public class TestJPPFConnection
     try
     {
       connection = JPPFHelper.getConnection(JNDI_NAME);
-      List<JPPFTask> results = connection.waitForResults(id);
+      List<Task<?>> results = connection.awaitResults(id);
       assertNotNull(results);
       int n = results.size();
       assertEquals("results size should be " + nbTasks + " but is " + n, nbTasks, n);
       int count = 0;
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
         assertNotNull("task" + count + " is null", task);
-        Exception e = task.getException();
+        Throwable e = task.getThrowable();
         assertNull(task.getId() + " exception should be null but is '" + (e == null ? "" : ExceptionUtils.getMessage(e)) + "'", e);
         assertNotNull(task.getId() + " result is null", task.getResult());
         assertEquals(task.getResult(), BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
@@ -143,7 +143,7 @@ public class TestJPPFConnection
       GatheringStatusListener listener = new GatheringStatusListener();
       String id = connection.submit(job, listener);
       assertNotNull(id);
-      List<JPPFTask> results = connection.waitForResults(id);
+      List<Task<?>> results = connection.awaitResults(id);
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
@@ -174,13 +174,13 @@ public class TestJPPFConnection
       assertNotNull(id);
       Thread.sleep(1000L);
       connection.cancelJob(id);
-      List<JPPFTask> results = connection.waitForResults(id);
+      List<Task<?>> results = connection.awaitResults(id);
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
-      JPPFTask task = results.get(0);
+      Task task = results.get(0);
       assertNotNull(task);
-      assertNull(task.getException());
+      assertNull(task.getThrowable());
       assertNull("task result should be null but is '" + task.getResult() + "'" , task.getResult());
     }
     finally
@@ -206,13 +206,13 @@ public class TestJPPFConnection
       assertNotNull(id);
       Thread.sleep(3000L);
       connection.cancelJob(id);
-      List<JPPFTask> results = connection.waitForResults(id);
+      List<Task<?>> results = connection.awaitResults(id);
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
-      JPPFTask task = results.get(0);
+      Task task = results.get(0);
       assertNotNull(task);
-      assertNull(task.getException());
+      assertNull(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
     }
@@ -248,15 +248,15 @@ public class TestJPPFConnection
     try
     {
       connection = JPPFHelper.getConnection(JNDI_NAME);
-      List<JPPFTask> results = connection.getSubmissionResults(id);
+      List<Task<?>> results = connection.getResults(id);
       assertNotNull(results);
       int n = results.size();
       assertEquals("results size should be " + nbTasks + " but is " + n, nbTasks, n);
       int count = 0;
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
         assertNotNull("task" + count + " is null", task);
-        Exception e = task.getException();
+        Throwable e = task.getThrowable();
         assertNull(task.getId() + " exception should be null but is '" + (e == null ? "" : ExceptionUtils.getMessage(e)) + "'", e);
         assertNotNull(task.getId() + " result is null", task.getResult());
         assertEquals(task.getResult(), BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
@@ -285,11 +285,11 @@ public class TestJPPFConnection
       connection = JPPFHelper.getConnection(JNDI_NAME);
       assertNotNull(connection);
       // remove existing submissions
-      for (String id: connection.getAllSubmissionIds()) connection.getSubmissionResults(id);
+      for (String id: connection.getAllSubmissionIds()) connection.getResults(id);
       for (int i=0; i<nbJobs; i++)
       {
         JPPFJob job = new JPPFJob(prefix + i);
-        job.addTask(new LifeCycleTask(1000L));
+        job.add(new LifeCycleTask(1000L));
         jobs[i] = job;
         ids[i] = connection.submit(job);
         assertNotNull(ids[i]);
@@ -310,7 +310,7 @@ public class TestJPPFConnection
       for (int i=0; i<nbJobs; i++) assertTrue(coll.contains(ids[i]));
       for (int i=0; i<nbJobs; i++)
       {
-        List<JPPFTask> results = connection.waitForResults(ids[i]);
+        List<Task<?>> results = connection.awaitResults(ids[i]);
         assertNotNull(results);
       }
     }

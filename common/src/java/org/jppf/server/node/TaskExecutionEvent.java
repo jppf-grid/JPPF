@@ -42,7 +42,7 @@ public class TaskExecutionEvent extends EventObject
    * @param elapsedTime the wall clock time taken by the task.
    * @param error determines whether the task had an exception.
    */
-  public TaskExecutionEvent(final Task task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
+  public TaskExecutionEvent(final Task<?> task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
   {
     super(task);
     this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
@@ -52,9 +52,9 @@ public class TaskExecutionEvent extends EventObject
    * Get the JPPF task from which the event originates.
    * @return a <code>JPPFTask</code> instance.
    */
-  public Task getTask()
+  public Task<?> getTask()
   {
-    return (Task) getSource();
+    return (Task<?>) getSource();
   }
 
   /**

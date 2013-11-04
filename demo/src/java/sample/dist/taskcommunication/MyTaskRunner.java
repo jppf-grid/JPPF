@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Runner for the task communication sample..
@@ -41,17 +41,17 @@ public class MyTaskRunner
     {
       client = new JPPFClient();
       JPPFJob job = new JPPFJob();
-      job.addTask(new MyTask1());
-      job.addTask(new MyTask2());
-      List<JPPFTask> results = client.submit(job);
+      job.add(new MyTask1());
+      job.add(new MyTask2());
+      List<Task<?>> results = client.submitJob(job);
       System.out.println("********** Results: **********");
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
         System.out.println("result for task [" + task.getId() + "]: " + task.getResult());
-        if (task.getException() != null)
+        if (task.getThrowable() != null)
         {
           StringWriter sw = new StringWriter();
-          task.getException().printStackTrace(new PrintWriter(sw));
+          task.getThrowable().printStackTrace(new PrintWriter(sw));
           System.out.println(sw.toString());
         }
       }

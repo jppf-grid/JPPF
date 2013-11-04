@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class TestJobListener extends Setup1D1N
       configure(false, true, 1);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
-      List<JPPFTask> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
+      List<Task<?>> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
@@ -78,7 +78,7 @@ public class TestJobListener extends Setup1D1N
       configure(true, false, 2);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
-      List<JPPFTask> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
+      List<Task<?>> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
@@ -98,12 +98,12 @@ public class TestJobListener extends Setup1D1N
    * @return the execution results.
    * @throws Exception if any error occurs
    */
-  public List<JPPFTask> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception
+  public List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception
   {
     client = BaseSetup.createClient(null, false);
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     Thread.sleep(250L);

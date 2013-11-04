@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * "Hello World" example of a JPPF client. This client simply submits a task that returns the "Hello World" string as
@@ -88,22 +88,22 @@ public class HelloJPPF implements Serializable
   {
     JPPFClient client = new JPPFClient();
     JPPFJob job = new JPPFJob();
-    for (int i = 1; i < 4; i++) job.addTask(new InnerTask(i));
+    for (int i = 1; i < 4; i++) job.add(new InnerTask(i));
     try
     {
       // execute tasks
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       // show results
       System.out.println("Got " + results.size() + " results: ");
-      Iterator<JPPFTask> it = results.iterator();
+      Iterator<Task<?>> it = results.iterator();
       while (it.hasNext())
       {
-        JPPFTask t = it.next();
+        Task t = it.next();
         System.out.println("Result object: " + t);
-        System.out.println("Result: " + t.getResult() + ", Exception: " + t.getException());
-        if (null != t.getException())
+        System.out.println("Result: " + t.getResult() + ", Exception: " + t.getThrowable());
+        if (null != t.getThrowable())
         {
-          t.getException().printStackTrace();
+          t.getThrowable().printStackTrace();
         }
       }
     }

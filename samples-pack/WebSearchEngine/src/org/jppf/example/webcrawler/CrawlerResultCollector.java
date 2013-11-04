@@ -20,10 +20,12 @@ package org.jppf.example.webcrawler;
 
 import javax.swing.SwingUtilities;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.JPPFResultCollector;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.server.protocol.JPPFTask;
-import org.slf4j.*;
+import org.jppf.node.protocol.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Result collector that updates the progress bar's value during the computation.
@@ -60,7 +62,7 @@ public class CrawlerResultCollector extends JPPFResultCollector
     if (event.getThrowable() == null)
     {
       int sum = 0;
-      for (JPPFTask task: event.getTaskList()) sum += ((CrawlerTask) task).getToVisit().size();
+      for (Task<?> task: event.getTasks()) sum += ((CrawlerTask) task).getToVisit().size();
       final int n = sum;
       SwingUtilities.invokeLater(new Runnable()
       {

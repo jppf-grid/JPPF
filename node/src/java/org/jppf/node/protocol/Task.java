@@ -81,6 +81,7 @@ public interface Task<T> extends Runnable, Serializable
   /**
    * Set the provider of shared data for this task.
    * @param dataProvider a <code>DataProvider</code> instance.
+   * @exclude
    */
   void setDataProvider(DataProvider dataProvider);
 
@@ -131,12 +132,14 @@ public interface Task<T> extends Runnable, Serializable
   /**
    * Returns the position of this task in the job in which it was submitted.
    * @return the position of this task as an <code>int</code>.
+   * @exclude
    */
   int getPosition();
 
   /**
    * Set the position of this task in the job in which it was submitted.
    * @param position the position of this task as an <code>int</code>.
+   * @exclude
    */
   void setPosition(int position);
 

@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -75,10 +76,10 @@ public class TestJPPFTask extends Setup1D1N1C
   {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
-    List<JPPFTask> tasks = job.getTasks();
+    List<Task<?>> tasks = job.getJobTasks();
     JPPFSchedule schedule = new JPPFSchedule(TIME_SHORT);
     tasks.get(nbTasks-1).setTimeoutSchedule(schedule);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     LifeCycleTask task = (LifeCycleTask) results.get(0);
@@ -96,11 +97,11 @@ public class TestJPPFTask extends Setup1D1N1C
     int nbTasks = 2;
     long timeout = 200L;
     JPPFJob job = new JPPFJob(ReflectionUtils.getCurrentMethodName());
-    job.addTask(new LifeCycleTask(2*timeout)).setId("task 1");
+    job.add(new LifeCycleTask(2*timeout)).setId("task 1");
     MyTask task = new MyTask(2*timeout);
     task.setTimeoutSchedule(new JPPFSchedule(timeout));
-    job.addTask(task).setId("task 2");
-    List<JPPFTask> results = client.submit(job);
+    job.add(task).setId("task 2");
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     task = (MyTask) results.get(1);
@@ -121,9 +122,9 @@ public class TestJPPFTask extends Setup1D1N1C
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
     Date date = new Date(System.currentTimeMillis() + TIME_SHORT + 10L);
     JPPFSchedule schedule = new JPPFSchedule(sdf.format(date), DATE_FORMAT);
-    List<JPPFTask> tasks = job.getTasks();
+    List<Task<?>> tasks = job.getJobTasks();
     tasks.get(0).setTimeoutSchedule(schedule);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     LifeCycleTask task = (LifeCycleTask) results.get(0);
@@ -142,7 +143,7 @@ public class TestJPPFTask extends Setup1D1N1C
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
         MyComputeCallableTask.class, MyComputeCallable.class.getName());
     callableResult = "test successful";
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
@@ -161,13 +162,13 @@ public class TestJPPFTask extends Setup1D1N1C
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
         MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
     callableResult = "test successful";
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
     assertNull(task.getResult());
-    assertNotNull(task.getException());
-    assertTrue(task.getException() instanceof UnsupportedOperationException);
+    assertNotNull(task.getThrowable());
+    assertTrue(task.getThrowable() instanceof UnsupportedOperationException);
   }
 
   /**
@@ -184,11 +185,11 @@ public class TestJPPFTask extends Setup1D1N1C
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
           MyComputeCallableTask.class, MyComputeCallable.class.getName());
       callableResult = "test successful";
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
-      if (task.getException() != null) throw task.getException();
+      if (task.getThrowable() != null) throw new Exception(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals("test successful", task.getResult());
     }
@@ -207,7 +208,7 @@ public class TestJPPFTask extends Setup1D1N1C
   {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
@@ -227,7 +228,7 @@ public class TestJPPFTask extends Setup1D1N1C
       configure();
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);

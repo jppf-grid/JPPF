@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 
 /**
@@ -45,32 +45,32 @@ public class GenericRunner
       JPPFJob job = new JPPFJob();
       addConfiguredTasks(job);
       //job.addTask(new CallableTask());
-      job.addTask(new LotsOfOutputTask(50000, 200));
+      job.add(new LotsOfOutputTask(50000, 200));
       client = new JPPFClient();
-      List<JPPFTask> results = null;
+      List<Task<?>> results = null;
       //results = client.submit(job);
       JPPFResultCollector collector = new JPPFResultCollector(job)
       {
         @Override
         public synchronized void resultsReceived(final TaskResultEvent event)
         {
-          System.out.println("received " + event.getTaskList().size() + " tasks");
+          System.out.println("received " + event.getTasks().size() + " tasks");
           super.resultsReceived(event);
         }
       };
       job.setBlocking(false);
       job.setResultListener(collector);
-      client.submit(job);
-      results = collector.waitForResults();
-      for (JPPFTask task: results)
+      client.submitJob(job);
+      results = collector.awaitResults();
+      for (Task task: results)
       {
         System.out.println("*****************************************");
         System.out.println("Result: " + task.getResult());
-        if (task.getException() != null)
+        if (task.getThrowable() != null)
         {
           StringWriter sw = new StringWriter();
           PrintWriter pw = new PrintWriter(sw);
-          task.getException().printStackTrace(pw);
+          task.getThrowable().printStackTrace(pw);
           System.out.println("Exception: " + sw.toString());
           pw.close();
         }
@@ -102,7 +102,7 @@ public class GenericRunner
     {
       Class clazz = Class.forName(s);
       Object o = clazz.newInstance();
-      job.addTask(o);
+      job.add(o);
     }
   }
 }

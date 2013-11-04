@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.*;
 
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.junit.Test;
@@ -46,13 +47,13 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   {
     String name = ReflectionUtils.getCurrentMethodName();
     String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
-    List<JPPFTask> results = client.submit(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
-    results = client.submit(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
+    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
+    results = client.submitJob(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
     assertNotNull(results);
     assertEquals(1, results.size());
-    JPPFTask task = results.get(0);
+    Task<?> task = results.get(0);
     assertNotNull(task);
-    assertNull(task.getException());
+    assertNull(task.getThrowable());
     assertEquals("success", task.getResult());
   }
 
@@ -66,13 +67,13 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   {
     String name = ReflectionUtils.getCurrentMethodName();
     String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
-    List<JPPFTask> results = client.submit(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
-    results = client.submit(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
+    List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name + "1", true, false, 1, MyTask.class, resource));
+    results = client.submitJob(BaseTestHelper.createJob(name + "2", true, false, 1, MyTask.class, resource));
     assertNotNull(results);
     assertEquals(1, results.size());
     MyTask task = (MyTask) results.get(0);
     assertNotNull(task);
-    assertNull(task.getException());
+    assertNull(task.getThrowable());
     assertTrue(task.isClassLoaderMatch());
     assertNotNull(task.getContextClassLoaderStr());
     assertNotNull(task.getTaskClassLoaderStr());

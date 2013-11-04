@@ -23,9 +23,11 @@ import java.util.*;
 import javax.swing.SwingUtilities;
 
 import org.jppf.client.JPPFResultCollector;
-import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
-import org.slf4j.*;
+import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.TaskResultListener;
+import org.jppf.node.protocol.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Result collector that updates the progress bar's value during the computation.
@@ -52,11 +54,11 @@ public class AlignmentResultCollector implements TaskResultListener
    * A map containing the resulting tasks, ordered by ascending position in the
    * submitted list of tasks.
    */
-  private Map<Integer, JPPFTask> resultMap = new TreeMap<>();
+  private Map<Integer, Task<?>> resultMap = new TreeMap<>();
   /**
    * The list of final results.
    */
-  private List<JPPFTask> results = null;
+  private List<Task<?>> results = null;
 
   /**
    * Initialize this collector with a specified number of tasks.
@@ -76,9 +78,9 @@ public class AlignmentResultCollector implements TaskResultListener
   @Override
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
-    List<JPPFTask> tasks = event.getTaskList();
+    List<Task<?>> tasks = event.getTasks();
     if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
-    for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+    for (Task<?> task: tasks) resultMap.put(task.getPosition(), task);
     pendingCount -= tasks.size();
     notify();
     final int n = (100 * (initialCount-pendingCount)) / initialCount;
@@ -96,7 +98,7 @@ public class AlignmentResultCollector implements TaskResultListener
    * Wait until all results of a request have been collected.
    * @return the list of resulting tasks.
    */
-  public synchronized List<JPPFTask> waitForResults()
+  public synchronized List<Task<?>> awaitResults()
   {
     while (pendingCount > 0)
     {
@@ -110,7 +112,7 @@ public class AlignmentResultCollector implements TaskResultListener
       }
     }
     results = new ArrayList<>();
-    for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
+    for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet()) results.add(entry.getValue());
     resultMap.clear();
     return results;
   }
@@ -119,7 +121,7 @@ public class AlignmentResultCollector implements TaskResultListener
    * Get the list of final results.
    * @return a list of results as tasks, or null if not all tasks have been executed.
    */
-  public List<JPPFTask> getResults()
+  public List<Task<?>> getResults()
   {
     return results;
   }

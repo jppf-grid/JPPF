@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.policy.Equal;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -73,12 +73,12 @@ public class CascadingTestRunner
   private static void performCommand() throws Exception
   {
     JPPFJob job = new JPPFJob();
-    job.addTask(new Task1());
+    job.add(new Task1());
     job.getSLA().setExecutionPolicy(new Equal("id", 1));
-    List<JPPFTask> results = jppfClient.submit(job);
-    for (JPPFTask task: results)
+    List<Task<?>> results = jppfClient.submitJob(job);
+    for (Task task: results)
     {
-      if (task.getException() != null) task.getException().printStackTrace();
+      if (task.getThrowable() != null) task.getThrowable().printStackTrace();
       else System.out.println("result: " + task.getResult());
     }
   }

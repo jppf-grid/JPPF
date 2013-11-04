@@ -21,17 +21,21 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
+import org.jppf.task.storage.DataProvider;
+import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.ui.options.Option;
 import org.jppf.utils.StringUtils;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the Lyapunov and Mandelbrot fractals sample application.
@@ -106,9 +110,9 @@ public class FractalRunner
     JPPFJob job = new JPPFJob(dp);
     job.setName("Mandelbrot fractal");
     long start = System.currentTimeMillis();
-    for (int i=0; i<nbTask; i++) job.addTask(doMandelbrot ? new MandelbrotTask(i) : new LyapunovTask(i));
+    for (int i=0; i<nbTask; i++) job.add(doMandelbrot ? new MandelbrotTask(i) : new LyapunovTask(i));
     // submit the tasks for execution
-    List<JPPFTask> results = jppfClient.submit(job);
+    List<Task<?>> results = jppfClient.submitJob(job);
     long elapsed = System.currentTimeMillis() - start;
     log.info("Computation performed in "+StringUtils.toStringDuration(elapsed));
     //JPPFStats stats = jppfClient.requestStatistics();
@@ -138,7 +142,7 @@ public class FractalRunner
    * @return an <code>Image</code> instance.
    * @throws Exception if an error is raised during the image generation.
    */
-  public static Image generateLyapunovImage(final List<JPPFTask> taskList, final FractalConfiguration config) throws Exception
+  public static Image generateLyapunovImage(final List<Task<?>> taskList, final FractalConfiguration config) throws Exception
   {
     double min = 0d;
     double max = 0d;
@@ -177,7 +181,7 @@ public class FractalRunner
    * @return an <code>Image</code> instance.
    * @throws Exception if an error is raised during the image generation.
    */
-  public static Image generateMandelbrotImage(final List<JPPFTask> taskList, final FractalConfiguration config) throws Exception
+  public static Image generateMandelbrotImage(final List<Task<?>> taskList, final FractalConfiguration config) throws Exception
   {
     int max = config.nmax;
 

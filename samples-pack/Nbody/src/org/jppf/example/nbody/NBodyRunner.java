@@ -38,18 +38,22 @@
 
 package org.jppf.example.nbody;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 
-import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.task.storage.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
+import org.jppf.task.storage.DataProvider;
+import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the &quot;N-Body demo&quot; demo.
@@ -133,7 +137,7 @@ public class NBodyRunner
     dp.setParameter("qp_qp", Double.valueOf(qp*qp));
     dp.setParameter("qp_b", Double.valueOf(qp*b));
     dp.setParameter("dt", Double.valueOf(dt));
-    List<JPPFTask> tasks = new ArrayList<>(nbTasks);
+    List<Task<?>> tasks = new ArrayList<>(nbTasks);
     for (int i=0; i<nbTasks; i++)
     {
       NBody[] bodies = new NBody[count + bodiesPerTask < nbBodies ? bodiesPerTask : nbBodies - count];
@@ -149,17 +153,17 @@ public class NBodyRunner
       String msg = "got results for iteration " + iter;
       JPPFJob job = new JPPFJob(dp);
       job.setName("Time step #" + iter);
-      for (JPPFTask task: tasks) job.addTask(task);
+      for (Task<?> task: tasks) job.add(task);
       panel.updatePositions(positions);
       dp.setParameter("positions", positions);
       long start = System.currentTimeMillis();
       // submit the tasks for execution
-      List<JPPFTask> results = jppfClient.submit(job);
+      List<Task<?>> results = jppfClient.submitJob(job);
       //System.out.println(msg);
-      for (JPPFTask task: results)
+      for (Task<?> task: results)
       {
-        Exception e = task.getException();
-        if (e != null) throw e;
+        Throwable t = task.getThrowable();
+        if (t != null) throw t instanceof Exception ? (Exception) t : new Exception(t);
       }
       tasks = results;
       positions = new Vector2d[nbBodies];

@@ -81,9 +81,9 @@ public class SubmitQueue extends ThreadSynchronization
       @Override
       public void run() {
         try {
-          client.submit(job);
+          client.submitJob(job);
           JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-          collector.waitForResults();
+          collector.awaitResults();
           resultCount.incrementAndGet();
           // notify submitting threads that a slot is free for submitting a job
           synchronized(SubmitQueue.this) {

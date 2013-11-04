@@ -20,7 +20,7 @@ package sample.dist.xstream;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Runner class for the XStream demo.
@@ -45,16 +45,16 @@ public class XstreamRunner
       long start = System.currentTimeMillis();
       JPPFJob job = new JPPFJob();
       Person person = new Person("John", "Smith", new PhoneNumber(123, "456-7890"));
-      job.addTask(new XstreamTask(person));
+      job.add(new XstreamTask(person));
       // submit the tasks for execution
-      List<JPPFTask> results = jppfClient.submit(job);
+      List<Task<?>> results = jppfClient.submitJob(job);
       long elapsed = System.currentTimeMillis() - start;
       System.out.println("Task executed in " + elapsed + " ms");
-      JPPFTask result = results.get(0);
-      if (result.getException() != null) throw result.getException();
+      Task result = results.get(0);
+      if (result.getThrowable() != null) throw result.getThrowable();
       System.out.println("Task execution result: " + result.getResult());
     }
-    catch(Exception e)
+    catch(Throwable e)
     {
       e.printStackTrace();
     }

@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
 /**
@@ -64,9 +64,9 @@ class FutureResultCollector extends JPPFResultCollector
    * @param position the position of the task in the job it is a part of.
    * @return the task whose results were received, or null if the results were not received.
    */
-  synchronized JPPFTask getTask(final int position)
+  synchronized Task<?> getTask(final int position)
   {
-    return job.getResults().getResult(position);
+    return job.getResults().getResultTask(position);
   }
 
   /**
@@ -74,7 +74,7 @@ class FutureResultCollector extends JPPFResultCollector
    * @param position the position of the task in the job it is a part of.
    * @return the task whose results were received.
    */
-  synchronized JPPFTask waitForTask(final int position)
+  synchronized Task<?> waitForTask(final int position)
   {
     return waitForTask(position, Long.MAX_VALUE);
   }
@@ -85,7 +85,7 @@ class FutureResultCollector extends JPPFResultCollector
    * @param millis maximum number of milliseconds to wait.
    * @return the task whose results were received, or null if the timeout expired before it was received.
    */
-  synchronized JPPFTask waitForTask(final int position, final long millis)
+  synchronized Task<?> waitForTask(final int position, final long millis)
   {
     long start = System.currentTimeMillis();
     long elapsed = 0L;
@@ -104,7 +104,7 @@ class FutureResultCollector extends JPPFResultCollector
       taskReceived = isTaskReceived(position);
       if ((elapsed >= millis) && !taskReceived) return null;
     }
-    return job.getResults().getResult(position);
+    return job.getResults().getResultTask(position);
   }
 
   /**
@@ -126,7 +126,7 @@ class FutureResultCollector extends JPPFResultCollector
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
     super.resultsReceived(event);
-    fireResultsReceived(event.getTaskList());
+    fireResultsReceived(event.getTasks());
   }
 
   @Override
@@ -157,7 +157,7 @@ class FutureResultCollector extends JPPFResultCollector
    * Notify all listeners that all results have been received by this collector.
    * @param results the results that were received.
    */
-  synchronized void fireResultsReceived(final List<JPPFTask> results)
+  synchronized void fireResultsReceived(final List<Task<?>> results)
   {
     FutureResultCollectorEvent event = new FutureResultCollectorEvent(this, results);
     for (FutureResultCollectorListener listener: listeners) listener.resultsReceived(event);

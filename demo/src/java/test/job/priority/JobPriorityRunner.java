@@ -22,8 +22,8 @@ import java.util.List;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -120,7 +120,7 @@ public class JobPriorityRunner
     {
       LongTask task = new LongTask(length, false);
       task.setId("" + (i+1));
-      job.addTask(task);
+      job.add(task);
     }
     job.setBlocking(false);
     job.setResultListener(new JPPFResultCollector(job));
@@ -224,14 +224,14 @@ public class JobPriorityRunner
       try
       {
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        jppfClient.submit(job);
-        List<JPPFTask> results = collector.waitForResults();
+        jppfClient.submitJob(job);
+        List<Task<?>> results = collector.awaitResults();
         print("job '" + job.getName() + "' complete");
-        for (JPPFTask task: results)
+        for (Task task: results)
         {
           StringBuilder sb = new StringBuilder();
           sb.append("results for task [").append(job.getName()).append("] ").append(task.getId()).append(" : ");
-          Exception e = task.getException();
+          Throwable e = task.getThrowable();
           if (e != null) sb.append(ExceptionUtils.getStackTrace(e));
           else sb.append(task.getResult());
           print(sb.toString());

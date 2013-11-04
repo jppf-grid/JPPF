@@ -84,7 +84,7 @@ public class GSClient implements InitializingBean
     {
       HelloTask task = new HelloTask(taskDuration);
       task.setId("" + i);
-      job.addTask(task);
+      job.add(task);
     }
     return jppfService.submitJob(job);
   }

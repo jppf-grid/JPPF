@@ -28,8 +28,9 @@ import java.util.regex.Pattern;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
 import org.jppf.management.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.node.AbstractThreadManager;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -91,17 +92,17 @@ public class TestJPPFClient extends Setup1D1N
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
-      for (JPPFTask task: job.getTasks()) task.setId("" + i++);
-      List<JPPFTask> results = client.submit(job);
+      for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
       String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
       for (i=0; i<nbTasks; i++)
       {
-        JPPFTask t = results.get(i);
-        Exception e = t.getException();
-        assertNull("task " + i +" has an exception " + e, e);
-        assertEquals("result of task " + i + " should be " + msg + " but is " + t.getResult(), msg, t.getResult());
+        Task<?> task = results.get(i);
+        Throwable t = task.getThrowable();
+        assertNull("task " + i +" has an exception " + t, t);
+        assertEquals("result of task " + i + " should be " + msg + " but is " + task.getResult(), msg, task.getResult());
       }
     }
     finally
@@ -124,17 +125,17 @@ public class TestJPPFClient extends Setup1D1N
       JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 5000L);
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       int i = 0;
-      for (JPPFTask task: job.getTasks()) task.setId("" + i++);
-      client.submit(job);
+      for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
+      client.submitJob(job);
       Thread.sleep(1500L);
       client.cancelJob(job.getUuid());
-      List<JPPFTask> results = collector.waitForResults();
+      List<Task<?>> results = collector.awaitResults();
       assertNotNull(results);
       assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
       int count = 0;
-      for (JPPFTask t: results)
+      for (Task<?> task: results)
       {
-        if (t.getResult() == null) count++;
+        if (task.getResult() == null) count++;
       }
       assertTrue(count > 0);
     }
@@ -164,16 +165,16 @@ public class TestJPPFClient extends Setup1D1N
       int nbTasks = 100;
       JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
-      for (JPPFTask task: job.getTasks()) task.setId("" + i++);
-      List<JPPFTask> results = client.submit(job);
+      for (Task<?> task: job) task.setId("" + i++);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
-      for (JPPFTask t: results)
+      for (Task<?> task: results)
       {
-        Exception e = t.getException();
-        assertNull(e);
-        assertEquals(msg, t.getResult());
+        Throwable t = task.getThrowable();
+        assertNull(t);
+        assertEquals(msg, task.getResult());
       }
       ThreadMXBean mxbean = ManagementFactory.getThreadMXBean();
       long[] ids = mxbean.getAllThreadIds();
@@ -210,11 +211,11 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, ThreadContextClassLoaderTask.class);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
-      JPPFTask task = results.get(0);
-      assertEquals(null, task.getException());
+      Task<?> task = results.get(0);
+      assertEquals(null, task.getThrowable());
       assertNotNull(task.getResult());
     }
     finally
@@ -240,13 +241,13 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-      client.submit(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
+      client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, 1, ThreadContextClassLoaderTask.class);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
-      JPPFTask task = results.get(0);
-      assertEquals(null, task.getException());
+      Task<?> task = results.get(0);
+      assertEquals(null, task.getThrowable());
       assertNotNull(task.getResult());
     }
     finally
@@ -267,12 +268,12 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, true);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
-      JPPFTask task = results.get(0);
-      assertNotNull(task.getException());
-      assertTrue(task.getException() instanceof NotSerializableException);
+      Task<?> task = results.get(0);
+      assertNotNull(task.getThrowable());
+      assertTrue(task.getThrowable() instanceof NotSerializableException);
     }
     finally
     {
@@ -291,13 +292,13 @@ public class TestJPPFClient extends Setup1D1N
     try
     {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, false);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertTrue(task instanceof NotSerializableTask);
-      assertNotNull(task.getException());
-      assertTrue(task.getException() instanceof NotSerializableException);
+      assertNotNull(task.getThrowable());
+      assertTrue(task.getThrowable() instanceof NotSerializableException);
     }
     finally
     {

@@ -23,9 +23,10 @@ import java.util.Collection;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.management.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Runner class for the square matrix multiplication demo.
@@ -72,7 +73,7 @@ public class DBRunner
       {
         DBTask task = new DBTask(taskSleepTime);
         task.setId("" + i);
-        job.addTask(task);
+        job.add(task);
       }
       job.setBlocking(false);
       // customize the result listener to display a message each time a task result is received
@@ -81,22 +82,22 @@ public class DBRunner
         @Override
         public synchronized void resultsReceived(final TaskResultEvent event)
         {
-          for (JPPFTask task: event.getTaskList())
+          for (Task<?> task: event.getTasks())
           {
-            if (task.getException() != null) output("task " + task.getId() + " error: " + task.getException().getMessage());
+            if (task.getThrowable() != null) output("task " + task.getId() + " error: " + task.getThrowable().getMessage());
             else output("task " + task.getId() + " result: " + task.getResult());
           }
           super.resultsReceived(event);
         }
       };
       job.setResultListener(collector);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
       Thread.sleep(timeBeforeRestartNode);
       // restart the node to demonstrate the transaction recovery
       output("restarting node");
       restartNode();
       // wait for the job completion
-      collector.waitForResults();
+      collector.awaitResults();
       // display the list of rows in the DB table
       if (config.getBoolean("display.db.content", false)) displayDBContent();
       output("demo ended");

@@ -22,7 +22,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -53,7 +53,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
   /**
    * 
    */
-  private Map<Integer, JPPFTask> resultMap = new TreeMap<>();
+  private Map<Integer, Task<?>> resultMap = new TreeMap<>();
 
   /**
    * Entry point for this class, performs a matrix multiplication a number of times.,<br>
@@ -108,16 +108,16 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         // create a task for each row in matrix a
         JPPFJob job = new JPPFJob();
         job.setName("non-blocking matrix sample");
-        for (int i=0; i<size; i++) job.addTask(new MatrixTask(a.getRow(i)));
+        for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
         // create a data provider to share matrix b among all tasks
         job.setDataProvider(new MemoryMapDataProvider());
         job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
         job.setResultListener(this);
         // submit the tasks for execution
-        jppfClient.submit(job);
+        jppfClient.submitJob(job);
         waitForResults();
-        List<JPPFTask> results = new ArrayList<>();
-        for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
+        List<Task> results = new ArrayList<>();
+        for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet()) results.add(entry.getValue());
         // initialize the resulting matrix
         Matrix c = new Matrix(size);
         // Get the matrix values from the tasks results
@@ -167,14 +167,14 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         DataProvider dataProvider = new MemoryMapDataProvider();
         dataProvider.setParameter(MatrixTask.DATA_KEY, b);
         JPPFJob job = new JPPFJob(dataProvider);
-        for (int i=0; i<size; i++) job.addTask(new MatrixTask(a.getRow(i)));
+        for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
         job.setBlocking(false);
         job.setResultListener(this);
         // submit the tasks for execution
-        jppfClient.submit(job);
+        jppfClient.submitJob(job);
         waitForResults();
-        List<JPPFTask> results = new ArrayList<>();
-        for (final Map.Entry<Integer, JPPFTask> entry : resultMap.entrySet()) results.add(entry.getValue());
+        List<Task> results = new ArrayList<>();
+        for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet()) results.add(entry.getValue());
         // initialize the resulting matrix
         Matrix c = new Matrix(size);
         // Get the matrix values from the tasks results
@@ -204,9 +204,9 @@ public class NonBlockingMatrixRunner implements TaskResultListener
   @Override
   public synchronized void resultsReceived(final TaskResultEvent event)
   {
-    List<JPPFTask> tasks = event.getTaskList();
+    List<Task<?>> tasks = event.getTasks();
     System.out.println("Received results for " + tasks.size() + " tasks ");
-    for (JPPFTask task: tasks) resultMap.put(task.getPosition(), task);
+    for (Task<?> task: tasks) resultMap.put(task.getPosition(), task);
     count += tasks.size();
     notify();
   }

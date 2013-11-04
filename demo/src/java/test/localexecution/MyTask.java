@@ -27,7 +27,7 @@ import org.jppf.utils.CollectionUtils;
  * Test task.
  * @author Laurent Cohen
  */
-public class Task extends JPPFTask
+public class MyTask extends JPPFTask
 {
   /**
    * Explicit serialVersionUID.

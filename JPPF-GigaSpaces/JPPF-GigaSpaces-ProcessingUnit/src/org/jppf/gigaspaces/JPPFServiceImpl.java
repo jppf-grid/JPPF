@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Implementation of the JPPF job submission service deployed as a GigaSpace.
@@ -51,13 +51,13 @@ public class JPPFServiceImpl implements JPPFService
   @Override
   public JPPFJob submitJob(final JPPFJob job)
   {
-    int n = job.getTasks().size();
+    int n = job.getJobTasks().size();
     System.out.println("received job with " + n + " task" + (n > 1 ? "s" : ""));
     try
     {
-      List<JPPFTask> results = getJPPFClient().submit(job);
-      job.getTasks().clear();
-      for (JPPFTask task: results) job.addTask(task);
+      List<Task<?>> results = getJPPFClient().submitJob(job);
+      job.getJobTasks().clear();
+      for (Task task: results) job.add(task);
     }
     catch(Exception e)
     {

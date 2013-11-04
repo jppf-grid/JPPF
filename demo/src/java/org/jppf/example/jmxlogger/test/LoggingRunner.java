@@ -26,7 +26,7 @@ import javax.management.*;
 import org.jppf.client.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
 /**
@@ -115,7 +115,7 @@ public class LoggingRunner implements NotificationListener
     for (int i=1; i<=nbTasks; i++)
     {
       // add a task to the job.
-      job.addTask(new LoggingTask("" + i));
+      job.add(new LoggingTask("" + i));
     }
 
     // there is no guarantee on the order of execution of the tasks,
@@ -137,15 +137,15 @@ public class LoggingRunner implements NotificationListener
     // Submit the job and wait until the results are returned.
     // The results are returned as a list of JPPFTask instances,
     // in the same order as the one in which the tasks where initially added the job.
-    List<JPPFTask> results = jppfClient.submit(job);
+    List<Task<?>> results = jppfClient.submitJob(job);
 
     // process the results
-    for (JPPFTask task: results)
+    for (Task task: results)
     {
       // if the task execution resulted in an exception
-      if (task.getException() != null)
+      if (task.getThrowable() != null)
       {
-        System.out.println("Task " + task.getId() + " in error: " + task.getException().getMessage());
+        System.out.println("Task " + task.getId() + " in error: " + task.getThrowable().getMessage());
       }
       else
       {

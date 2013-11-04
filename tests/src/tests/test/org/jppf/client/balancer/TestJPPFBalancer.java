@@ -18,17 +18,14 @@
 
 package test.org.jppf.client.balancer;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
-import org.jppf.client.JPPFResultCollector;
+import java.util.*;
+
+import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
-
-import java.util.Date;
-import java.util.UUID;
+import org.jppf.utils.*;
 
 /**
  * Tester for client balancer.
@@ -52,7 +49,7 @@ public class TestJPPFBalancer
       System.out.println("Connecting...DONE.");
 
       JPPFJob job = new JPPFJob();
-      job.addTask(new TestTask("Task BROADCAST", false));
+      job.add(new TestTask("Task BROADCAST", false));
       job.setBlocking(true);
       job.getSLA().setBroadcastJob(true);
 
@@ -72,8 +69,8 @@ public class TestJPPFBalancer
           System.out.println("jobEnded: " + event.getJob());
         }
       });
-      for(int index = 1; index <= 24; index++) {
-        job.addTask(new TestTask(String.format("Task %d", index), index == 9));
+      for (int index = 1; index <= 24; index++) {
+        job.add(new TestTask(String.format("Task %d", index), index == 9));
       }
 //      job.getSLA().setBroadcastJob(true);
       JPPFResultCollector collector = new JPPFResultCollector(job) {
@@ -85,12 +82,12 @@ public class TestJPPFBalancer
 
         @Override
         public synchronized void resultsReceived(final TaskResultEvent event) {
-          System.out.println("resultsReceived: " + event.getTaskList().size());
+          System.out.println("resultsReceived: " + event.getTasks().size());
           if(event.getThrowable() != null)
             event.getThrowable().printStackTrace(System.out);
           else {
-            for (JPPFTask task : event.getTaskList()) {
-              System.out.println("Ex: " + task.getException() + "\t result: " + task.getResult());
+            for (Task<?> task : event.getTasks()) {
+              System.out.println("Ex: " + task.getThrowable() + "\t result: " + task.getResult());
             }
           }
           super.resultsReceived(event);
@@ -107,7 +104,7 @@ public class TestJPPFBalancer
 
       System.out.println("Submitting job...");
       long dur = System.nanoTime();
-      client.submit(job);
+      client.submitJob(job);
       dur = System.nanoTime() - dur;
       System.out.println("Submitting job...DONE in " + (dur / 1000000.0));
 

@@ -26,9 +26,9 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
-import org.jppf.execute.JPPFFuture;
-import org.jppf.execute.JPPFFutureTask;
+import org.jppf.execute.*;
 import org.jppf.management.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
@@ -225,7 +225,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     @Override
     public void run() {
       Exception exception = null;
-      List<JPPFTask> tasks = this.clientBundle.getTasksL();
+      List<Task<?>> tasks = this.clientBundle.getTasksL();
       AbstractGenericClient client = connection.getClient();
       AbstractGenericClient.RegisteredClassLoader registeredClassLoader = null;
       try {
@@ -241,7 +241,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           connection.sendTasks(classLoader, bundle, newJob);
           while (count < tasks.size()) {
-            List<JPPFTask> results = connection.receiveResults(classLoader);
+            List<Task<?>> results = connection.receiveResults(classLoader);
             int n = results.size();
             count += n;
             if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
@@ -277,7 +277,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
      * @throws Exception if any error occurs.
      */
-    private JPPFJob createNewJob(final ClientTaskBundle job, final List<JPPFTask> tasks) throws Exception
+    private JPPFJob createNewJob(final ClientTaskBundle job, final List<Task<?>> tasks) throws Exception
     {
       JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
       newJob.setDataProvider(job.getJob().getDataProvider());
@@ -287,11 +287,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       newJob.setBlocking(job.getJob().isBlocking());
 //      newJob.setResultListener(job.getResultListener());
       newJob.setName(job.getName());
-      for (JPPFTask task : tasks)
+      for (Task<?> task : tasks)
       {
         // needed as JPPFJob.addTask() resets the position
         int pos = task.getPosition();
-        newJob.addTask(task);
+        newJob.add(task);
         task.setPosition(pos);
       }
       return newJob;
@@ -317,10 +317,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     private ClassLoader getClassLoader(final JPPFJob job)
     {
       if (job == null) throw new IllegalArgumentException("job is null");
-      if (job.getTasks().isEmpty()) return null;
+      if (job.getJobTasks().isEmpty()) return null;
       else
       {
-        Object task = job.getTasks().get(0);
+        Object task = job.getJobTasks().get(0);
         if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
         return task.getClass().getClassLoader();
       }

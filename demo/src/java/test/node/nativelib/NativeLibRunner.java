@@ -20,7 +20,7 @@ package test.node.nativelib;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * This is a template JPPF application runner.
@@ -92,7 +92,7 @@ public class NativeLibRunner
     // add a task to the job.
     NativeLibTask task = new NativeLibTask();
     //task.setTimeout(1000);
-    job.addTask(task);
+    job.add(task);
 
     // add more tasks here ...
 
@@ -115,17 +115,17 @@ public class NativeLibRunner
     // Submit the job and wait until the results are returned.
     // The results are returned as a list of JPPFTask instances,
     // in the same order as the one in which the tasks where initially added the job.
-    List<JPPFTask> results = jppfClient.submit(job);
+    List<Task<?>> results = jppfClient.submitJob(job);
 
     // process the results
-    for (JPPFTask task: results)
+    for (Task task: results)
     {
       // if the task execution resulted in an exception
-      if (task.getException() != null)
+      if (task.getThrowable() != null)
       {
         // process the exception here ...
         System.out.println("Caught exception:");
-        task.getException().printStackTrace();
+        task.getThrowable().printStackTrace();
       }
       else
       {
@@ -159,7 +159,7 @@ public class NativeLibRunner
     // Submit the job. This call returns immediately without waiting for the execution of
     // the job to complete. As a consequence, the object returned for a non-blocking job is
     // always null. Note that we are calling the exact same method as in the blocking case.
-    jppfClient.submit(job);
+    jppfClient.submitJob(job);
 
     // do something else here, while the job is being executed ...
 
@@ -167,13 +167,13 @@ public class NativeLibRunner
     // We use JPPFResultCollector.waitForResults() for this. This method returns immediately
     // with the results if the job has completed, otherwise it waits until the job execution
     // is complete.
-    List<JPPFTask> results = collector.waitForResults();
+    List<Task<?>> results = collector.awaitResults();
 
     // process the results
-    for (JPPFTask task: results)
+    for (Task task: results)
     {
       // if the task execution resulted in an exception
-      if (task.getException() != null)
+      if (task.getThrowable() != null)
       {
         // process the exception here ...
       }

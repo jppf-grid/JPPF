@@ -20,6 +20,7 @@ package sample.test.profiling;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -87,8 +88,8 @@ public class ProfilingRunner
       long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("profiling-" + iter);
-      for (int i=0; i<nbTask; i++) job.addTask(new EmptyTask(dataSize));
-      List<JPPFTask> results = jppfClient.submit(job);
+      for (int i=0; i<nbTask; i++) job.add(new EmptyTask(dataSize));
+      List<Task<?>> results = jppfClient.submitJob(job);
       long elapsed = System.nanoTime() - start;
       System.out.println("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed/1000000));
     }

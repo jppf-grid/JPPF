@@ -28,6 +28,7 @@ import org.jppf.client.balancer.utils.AbstractClientJob;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.*;
 import org.jppf.execute.ExecutorChannel;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
 
@@ -47,7 +48,7 @@ public class ClientJob extends AbstractClientJob
   /**
    * The list of the tasks.
    */
-  private final List<JPPFTask> tasks;
+  private final List<Task<?>> tasks;
   /**
    * The broadcast UUID.
    */
@@ -98,7 +99,7 @@ public class ClientJob extends AbstractClientJob
    * @param job   underlying task bundle.
    * @param tasks list of tasks to execute.
    */
-  public ClientJob(final JPPFJob job, final List<JPPFTask> tasks) {
+  public ClientJob(final JPPFJob job, final List<Task<?>> tasks) {
     this(job, tasks, null, null);
   }
 
@@ -109,7 +110,7 @@ public class ClientJob extends AbstractClientJob
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID.
    */
-  protected ClientJob(final JPPFJob job, final List<JPPFTask> tasks, final ClientJob parentJob, final String broadcastUUID) {
+  protected ClientJob(final JPPFJob job, final List<Task<?>> tasks, final ClientJob parentJob, final String broadcastUUID) {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
     this.parentJob = parentJob;
@@ -131,7 +132,7 @@ public class ClientJob extends AbstractClientJob
     else this.submissionStatus = SubmissionStatus.SUBMITTED;
     this.tasks = new ArrayList<>(tasks);
 
-    for (JPPFTask result : job.getResults().getAll()) {
+    for (Task<?> result : job.getResults().getAllResults()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
     }
   }
@@ -162,7 +163,7 @@ public class ClientJob extends AbstractClientJob
    * Get the list of of the tasks.
    * @return a list of <code>JPPFTask</code> instances.
    */
-  public List<JPPFTask> getTasks() {
+  public List<Task<?>> getTasks() {
     synchronized (tasks) {
       return Collections.unmodifiableList(new ArrayList<>(tasks));
     }
@@ -200,7 +201,7 @@ public class ClientJob extends AbstractClientJob
           this.tasks.clear();
         }
       } else {
-        List<JPPFTask> subList = this.tasks.subList(0, nbTasks);
+        List<Task<?>> subList = this.tasks.subList(0, nbTasks);
         try {
           return new ClientTaskBundle(this, subList);
         } finally {
@@ -216,7 +217,7 @@ public class ClientJob extends AbstractClientJob
    * @param after determines whether the tasks from other should be added first or last.
    * @return <code>true</code> when this client job needs to be requeued.
    */
-  protected boolean merge(final List<JPPFTask> taskList, final boolean after) {
+  protected boolean merge(final List<Task<?>> taskList, final boolean after) {
     synchronized (tasks) {
       boolean requeue = this.tasks.isEmpty() && !taskList.isEmpty();
       if (!after) this.tasks.addAll(0, taskList);
@@ -279,16 +280,16 @@ public class ClientJob extends AbstractClientJob
    * @param bundle  the executing job.
    * @param results the list of tasks whose results have been received from the server.
    */
-  public void resultsReceived(final ClientTaskBundle bundle, final List<JPPFTask> results) {
+  public void resultsReceived(final ClientTaskBundle bundle, final List<Task<?>> results) {
     if (debugEnabled) log.debug("received " + results.size() + " results for bundle " + bundle);
     if (results.isEmpty()) return;
 
     synchronized (tasks) {
       for (int i=0; i<results.size(); i++) {
-        JPPFTask task = results.get(i);
+        Task<?> task = results.get(i);
         taskStateMap.put(task.getPosition(), TaskState.RESULT);
         if (task instanceof JPPFExceptionResult) {
-          JPPFTask originalTask = job.getTasks().get(task.getPosition());
+          Task<?> originalTask = job.getJobTasks().get(task.getPosition());
           originalTask.setThrowable(task.getThrowable());
           results.set(i, originalTask);
         }
@@ -314,7 +315,7 @@ public class ClientJob extends AbstractClientJob
     boolean ioe = isIOException(throwable);
     Exception e = throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
     synchronized (tasks) {
-      for (JPPFTask task : bundle.getTasksL()) {
+      for (Task<?> task : bundle.getTasksL()) {
         TaskState oldState = taskStateMap.get(task.getPosition());
         if (!ioe && (oldState != TaskState.RESULT)) {
           taskStateMap.put(task.getPosition(), TaskState.EXCEPTION);
@@ -348,10 +349,10 @@ public class ClientJob extends AbstractClientJob
     //if (empty) clearChannels();
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {
-      List<JPPFTask> list = new ArrayList<>();
+      List<Task<?>> list = new ArrayList<>();
       synchronized (tasks) {
         if (bundle != null) {
-          for (JPPFTask task : bundle.getTasksL()) {
+          for (Task<?> task : bundle.getTasksL()) {
             if (taskStateMap.put(task.getPosition(), TaskState.RESULT) != TaskState.RESULT) list.add(task);
           }
         }
@@ -363,7 +364,7 @@ public class ClientJob extends AbstractClientJob
       resultsReceived(bundle, list);
     } else if (bundle == null) {
       if (isCancelled()) {
-        List<JPPFTask> list = new ArrayList<>();
+        List<Task<?>> list = new ArrayList<>();
         synchronized (tasks) {
           list.addAll(this.tasks);
           this.tasks.clear();
@@ -372,9 +373,9 @@ public class ClientJob extends AbstractClientJob
       }
     } else {
       if (bundle.isCancelled()) {
-        List<JPPFTask> list = new ArrayList<>();
+        List<Task<?>> list = new ArrayList<>();
         synchronized (tasks) {
-          for (JPPFTask task : bundle.getTasksL()) {
+          for (Task<?> task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
           }
           list.addAll(this.tasks);
@@ -383,9 +384,9 @@ public class ClientJob extends AbstractClientJob
         resultsReceived(bundle, list);
       }
       if (bundle.isRequeued()) {
-        List<JPPFTask> list = new ArrayList<>();
+        List<Task<?>> list = new ArrayList<>();
         synchronized (tasks) {
-          for (JPPFTask task : bundle.getTasksL()) {
+          for (Task<?> task : bundle.getTasksL()) {
             if (taskStateMap.get(task.getPosition()) != TaskState.RESULT) list.add(task);
           }
           requeue = merge(list, false);
@@ -417,7 +418,7 @@ public class ClientJob extends AbstractClientJob
    */
   protected boolean hasPending() {
     synchronized (tasks) {
-      if (tasks.isEmpty() && taskStateMap.size() >= job.getTasks().size()) {
+      if (tasks.isEmpty() && taskStateMap.size() >= job.getJobTasks().size()) {
         return taskStateMap.getStateCount(TaskState.EXCEPTION) > 0;
       } else return true;
     }

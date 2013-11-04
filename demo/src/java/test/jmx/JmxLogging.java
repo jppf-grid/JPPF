@@ -25,6 +25,7 @@ import javax.management.*;
 import org.jppf.client.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
@@ -57,8 +58,8 @@ public class JmxLogging {
       client = new JPPFClient();
       JPPFJob job = new JPPFJob();
       initJmxLogging();
-      for (int i=1; i<=10; i++) job.addTask(new MyTask()).setId(Integer.toString(i));
-      List<JPPFTask> results = client.submit(job);
+      for (int i=1; i<=10; i++) job.add(new MyTask()).setId(Integer.toString(i));
+      List<Task<?>> results = client.submitJob(job);
       System.out.println("received results: " + results);
     } catch (Exception e) {
       e.printStackTrace();

@@ -20,7 +20,7 @@ package test.serialization.overflow;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -87,16 +87,16 @@ public class SerializationOverflowRunner
   {
     JPPFJob job = new JPPFJob();
     job.setName(name);
-    for (int j=1; j<=nbTasks; j++) job.addTask(new SerializationOverflowTask(time, j));
+    for (int j=1; j<=nbTasks; j++) job.add(new SerializationOverflowTask(time, j));
     job.setBlocking(blocking);
     if (blocking)
     {
       output("* submitting job '" + job.getName() + "'");
-      List<JPPFTask> results = jppfClient.submit(job);
+      List<Task<?>> results = jppfClient.submitJob(job);
       output("+ got results for job " + job.getName());
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
-        Exception e = task.getException();
+        Throwable e = task.getThrowable();
         if (e != null)
         {
           output("task got exception: " + ExceptionUtils.getStackTrace(e));
@@ -111,7 +111,7 @@ public class SerializationOverflowRunner
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
       job.getSLA().setCancelUponClientDisconnect(true);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
       output("job '" + job.getName() + "' submitted");
     }
   }

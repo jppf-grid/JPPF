@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -189,7 +189,7 @@ public class LargeDataRunner
       }
       if (articleCount > 0)
       {
-        job.addTask(new LargeDataTask(list));
+        job.add(new LargeDataTask(list));
         totalJobArticles += articleCount;
         taskCount++;
       }
@@ -209,7 +209,7 @@ public class LargeDataRunner
   /**
    * 
    */
-  private static class SubmitTask implements Callable<List<JPPFTask>>
+  private static class SubmitTask implements Callable<List<Task<?>>>
   {
     /**
      * The job to submit.
@@ -226,9 +226,9 @@ public class LargeDataRunner
     }
 
     @Override
-    public List<JPPFTask> call() throws Exception
+    public List<Task<?>> call() throws Exception
     {
-      return jppfClient.submit(job);
+      return jppfClient.submitJob(job);
     }
   }
 
@@ -251,7 +251,7 @@ public class LargeDataRunner
     {
       super.resultsReceived(event);
       //System.out.println("received " + event.getTaskList().size() + " task results");
-      executor.submit(new MergerTask(event.getTaskList()));
+      executor.submit(new MergerTask(event.getTasks()));
     }
   }
 
@@ -263,13 +263,13 @@ public class LargeDataRunner
     /**
      * 
      */
-    private final List<JPPFTask> tasks;
+    private final List<Task<?>> tasks;
 
     /**
      * 
      * @param tasks the tasks to process.
      */
-    public MergerTask(final List<JPPFTask> tasks)
+    public MergerTask(final List<Task<?>> tasks)
     {
       this.tasks = tasks;
     }
@@ -277,7 +277,7 @@ public class LargeDataRunner
     @Override
     public void run()
     {
-      for (JPPFTask task: tasks)
+      for (Task task: tasks)
       {
         @SuppressWarnings("unchecked")
         Map<String, Long> map = (Map<String, Long>) task.getResult();

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -98,7 +98,7 @@ public class ManyJobsRunner
         jobs[n].getClientSLA().setMaxChannels(1);
         for (int i=0; i<nbTask; i++)
         {
-          jobs[n].addTask(new LongTask(length, false)).setId("job-" + (n+1) + ':' + (i+1));
+          jobs[n].add(new LongTask(length, false)).setId("job-" + (n+1) + ':' + (i+1));
         }
         /*
 				JPPFSchedule schedule = new JPPFSchedule(5000L);
@@ -108,13 +108,13 @@ public class ManyJobsRunner
         // submit the tasks for execution
         JPPFResultCollector collector = new JPPFResultCollector(jobs[n]);
         jobs[n].setResultListener(collector);
-        jppfClient.submit(jobs[n]);
+        jppfClient.submitJob(jobs[n]);
       }
       print("submitted " + nbJobs + " jobs");
       for (int n=0; n<nbJobs; n++)
       {
         JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
-        List<JPPFTask> results = collector.waitForResults();
+        List<Task<?>> results = collector.awaitResults();
       }
       print("got all " + nbJobs + " result lists");
     }

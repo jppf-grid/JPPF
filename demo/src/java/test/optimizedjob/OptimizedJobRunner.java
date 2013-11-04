@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -92,20 +92,20 @@ public class OptimizedJobRunner
         }
       });
       job.setName("demo job " + (i+1));
-      for (int j=0; j<nbTasks; j++) job.addTask(new OptimizedJobTask(time, (j+1)));
+      for (int j=0; j<nbTasks; j++) job.add(new OptimizedJobTask(time, (j+1)));
       JPPFResultCollector collector = new JPPFResultCollector(job);
       job.setResultListener(collector);
       job.setBlocking(false);
       jobs.add(job);
-      jppfClient.submit(job);
+      jppfClient.submitJob(job);
     }
     output("" + nbJobs + " job" + (nbJobs > 1 ? "s" : "") + " submitted");
     for (JPPFJob job: jobs)
     {
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<JPPFTask> results = collector.waitForResults();
+      List<Task<?>> results = collector.awaitResults();
       output("\n***** results for job " + job.getName() + " *****\n");
-      for (JPPFTask t: results) output((String) t.getResult());
+      for (Task t: results) output((String) t.getResult());
     }
     totalTime = System.currentTimeMillis() - totalTime;
     output("Computation time: " + StringUtils.toStringDuration(totalTime));

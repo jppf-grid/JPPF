@@ -20,7 +20,7 @@ package test.jobfromtask;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -57,19 +57,19 @@ public class JobFromTaskRunner
       long start = System.currentTimeMillis();
       JPPFJob job = new JPPFJob();
       job.setName("source job");
-      job.addTask(new SourceTask()).setId("source");
+      job.add(new SourceTask()).setId("source");
       job.getSLA().setMaxNodes(1);
-      List<JPPFTask> results = jppfClient.submit(job);
-      for (JPPFTask t: results)
+      List<Task<?>> results = jppfClient.submitJob(job);
+      for (Task t: results)
       {
-        Exception e = t.getException();
+        Throwable e = t.getThrowable();
         if (e != null) throw e;
         else print("task '" + t.getId() + "' result: " + t.getResult());
       }
       long elapsed = System.currentTimeMillis() - start;
       print("processing  performed in " + StringUtils.toStringDuration(elapsed));
     }
-    catch(Exception e)
+    catch(Throwable e)
     {
       e.printStackTrace();
     }
@@ -89,9 +89,9 @@ public class JobFromTaskRunner
   {
     JPPFJob job = new JPPFJob();
     job.setName("destination job");
-    job.addTask(new DestinationTask(input)).setId("destination task");
+    job.add(new DestinationTask(input)).setId("destination task");
     job.getSLA().setMaxNodes(1);
-    List<JPPFTask> result = jppfClient.submit(job);
+    List<Task<?>> result = jppfClient.submitJob(job);
     return (String) result.get(0).getResult();
   }
 

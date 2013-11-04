@@ -25,7 +25,6 @@ import java.util.List;
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -49,10 +48,10 @@ public class TestOfflineNode extends SetupOfflineNode1D2N1C
     int nbTasks = 5;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
     job.getSLA().getClassPath().setForceClassLoaderReset(true);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (JPPFTask task: results)
+    for (Task<?> task: results)
     {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();
@@ -72,10 +71,10 @@ public class TestOfflineNode extends SetupOfflineNode1D2N1C
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
     Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (JPPFTask task: results)
+    for (Task<?> task: results)
     {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();
@@ -97,10 +96,10 @@ public class TestOfflineNode extends SetupOfflineNode1D2N1C
     Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
     job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
-    List<JPPFTask> results = client.submit(job);
+    List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (JPPFTask task: results)
+    for (Task<?> task: results)
     {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();

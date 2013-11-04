@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.test.scenario.AbstractScenarioRunner;
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.common.*;
@@ -58,10 +58,10 @@ public class ResubmitRunner extends AbstractScenarioRunner
       JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
       job.addJobListener(new MyJobListener());
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      getSetup().getClient().submit(job);
+      getSetup().getClient().submitJob(job);
       while (!dispatched.get()) Thread.sleep(1000L);
       getSetup().getDriverManagementProxy().restartShutdown(1L, 1L);
-      List<JPPFTask> results = collector.waitForResults();
+      List<Task<?>> results = collector.awaitResults();
       long elapsed = System.nanoTime() - start;
       output("total time: " + StringUtils.toStringDuration(elapsed/1000000L));
     }

@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -61,17 +61,20 @@ public class JPPF_130_Runner extends AbstractScenarioRunner
           JPPFJob job = new JPPFJob("job_" + n);
           job.getClientSLA().setMaxChannels(10);
           job.setName("ruleset job_" + n);
-          for (int i=0; i<nbTasks; i++)
-          {
-            job.addTask(new JPPF_130_Task(nbLookups));
-          }
+          for (int i=0; i<nbTasks; i++) job.add(new JPPF_130_Task(nbLookups));
           job.setBlocking(false);
-          getSetup().getClient().submit(job);
+          getSetup().getClient().submitJob(job);
           JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-          List<JPPFTask> results = collector.waitForResults();
-          for (JPPFTask task: results)
+          List<Task<?>> results = collector.awaitResults();
+          for (Task<?> task: results)
           {
-            if (task.getException() != null) throw task.getException();
+            Throwable t = task.getThrowable();
+            if (t != null)
+            {
+              if (t instanceof Exception) throw (Exception) t;
+              else if (t instanceof Error) throw (Error) t;
+              throw new RuntimeException(t);
+            }
           }
         }
         finally
@@ -84,6 +87,7 @@ public class JPPF_130_Runner extends AbstractScenarioRunner
     catch (Exception e)
     {
       //e.printStackTrace();
+      if (e instanceof RuntimeException) throw (RuntimeException) e;
       throw new RuntimeException(e);
     }
     finally

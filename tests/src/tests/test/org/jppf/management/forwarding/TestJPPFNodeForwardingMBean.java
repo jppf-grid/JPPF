@@ -25,9 +25,11 @@ import java.util.*;
 import org.jppf.classloader.DelegationModel;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.management.NodeSelector.*;
+import org.jppf.management.NodeSelector.AllNodesSelector;
+import org.jppf.management.NodeSelector.ExecutionPolicySelector;
+import org.jppf.management.NodeSelector.UuidSelector;
 import org.jppf.node.policy.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -76,7 +78,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       }
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbNodes, LifeCycleTask.class, 2000L);
       job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
-      client.submit(job);
+      client.submitJob(job);
       Thread.sleep(750L);
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
@@ -86,7 +88,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
         assertEquals(0, state.getNbTasksExecuted());
         assertEquals(JPPFNodeState.ExecutionState.EXECUTING, state.getExecutionStatus());
       }
-      ((JPPFResultCollector) job.getResultListener()).waitForResults();
+      ((JPPFResultCollector) job.getResultListener()).awaitResults();
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
       for (Map.Entry<String, Object> entry: result.entrySet())
@@ -213,7 +215,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     }
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, true, false, nbTasks, LifeCycleTask.class, 1L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
-    client.submit(job);
+    client.submitJob(job);
     result = nodeForwarder.state(selector);
     checkNodes(result, JPPFNodeState.class, expectedNodes);
     for (Map.Entry<String, Object> entry: result.entrySet())
@@ -409,15 +411,15 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + " - " + selector, false, false, nbTasks, LifeCycleTask.class, 5000L);
     job.getSLA().setExecutionPolicy(new OneOf("jppf.node.uuid", false, expectedNodes));
     String uuid = job.getUuid();
-    client.submit(job);
+    client.submitJob(job);
     Thread.sleep(750L);
     Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
     checkNoException(result, expectedNodes);
-    List<JPPFTask> jobResult = ((JPPFResultCollector) job.getResultListener()).waitForResults();
+    List<Task<?>> jobResult = ((JPPFResultCollector) job.getResultListener()).awaitResults();
     assertNotNull(jobResult);
     assertEquals(nbTasks, jobResult.size());
     int count = 0;
-    for (JPPFTask t: jobResult)
+    for (Task<?> t: jobResult)
     {
       LifeCycleTask task = (LifeCycleTask) t;
       if (count == 0) assertTrue(task.isCancelled());

@@ -21,15 +21,20 @@ package org.jppf.example.webcrawler;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.*;
 
-import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.ui.options.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.client.JPPFClient;
+import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.Task;
+import org.jppf.ui.options.AbstractOption;
+import org.jppf.ui.options.Option;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -102,7 +107,7 @@ public class WebCrawlerRunner
    * @return a list of URLs to visit.
    * @throws Exception if the computation failed.
    */
-  public static List<JPPFTask> doPerform(final Collection<String> urls, final String query, final boolean doSearch) throws Exception
+  public static List<Task<?>> doPerform(final Collection<String> urls, final String query, final boolean doSearch) throws Exception
   {
     int n = 0;
     JPPFJob job = new JPPFJob();
@@ -110,7 +115,7 @@ public class WebCrawlerRunner
     {
       try
       {
-      job.addTask(new CrawlerTask(url, query, ++n, doSearch));
+      job.add(new CrawlerTask(url, query, ++n, doSearch));
       }
       catch(Throwable t)
       {
@@ -119,12 +124,12 @@ public class WebCrawlerRunner
         else if (t instanceof Error) throw (Error) t;
       }
     }
-    if (job.getTasks() == null) return new ArrayList<>();
+    if (job.getJobTasks() == null) return new ArrayList<>();
     CrawlerResultCollector collector = new CrawlerResultCollector(job);
     job.setResultListener(collector);
     job.setBlocking(false);
-    client.submit(job);
-    return collector.waitForResults();
+    client.submitJob(job);
+    return collector.awaitResults();
   }
 
   /**
@@ -257,15 +262,15 @@ public class WebCrawlerRunner
         for (int i=0; i<=depth; i++)
         {
           boolean doSearch = (i >= depth);
-          List<JPPFTask> tasks = doPerform(doSearch ? toSearch : temp, query, doSearch);
+          List<Task<?>> tasks = doPerform(doSearch ? toSearch : temp, query, doSearch);
           temp.clear();
-          for (JPPFTask t: tasks)
+          for (Task<?> t: tasks)
           {
             CrawlerTask task = (CrawlerTask) t;
-            if (task.getException() != null)
+            if (task.getThrowable() != null)
             {
               String msg = "Exception in task #"+task.getNumber()+ ", url: "+ task.getUrl();
-              log.info(msg, task.getException());
+              log.info(msg, task.getThrowable());
               continue;
             }
             Collection<LinkMatch> matchList = task.getMatchedLinks();

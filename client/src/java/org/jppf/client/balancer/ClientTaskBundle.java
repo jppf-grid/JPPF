@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.execute.ExecutorChannel;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 
@@ -51,7 +52,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
   /**
    * The tasks to be executed by the node.
    */
-  private transient List<JPPFTask> tasks = null;
+  private transient List<Task<?>> tasks = null;
   /**
    * The broadcast UUID.
    */
@@ -70,7 +71,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * @param job   the job to execute.
    * @param tasks the tasks to execute.
    */
-  public ClientTaskBundle(final ClientJob job, final List<JPPFTask> tasks)
+  public ClientTaskBundle(final ClientJob job, final List<Task<?>> tasks)
   {
     if (job == null) throw new IllegalArgumentException("job is null");
 
@@ -122,7 +123,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<JPPFTask> getTasksL()
+  public List<Task<?>> getTasksL()
   {
     return tasks;
   }
@@ -180,7 +181,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param results the list of tasks whose results have been received from the server.
    */
-  public void resultsReceived(final List<JPPFTask> results)
+  public void resultsReceived(final List<Task<?>> results)
   {
     job.resultsReceived(this, results);
   }

@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class TestConnectionPool extends Setup1D1N
       client = BaseSetup.createClient(null, false);
       int nbTasks = 100;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       testJobResults(nbTasks, results);
     }
     finally
@@ -77,7 +77,7 @@ public class TestConnectionPool extends Setup1D1N
       client = BaseSetup.createClient(null, false);
       int nbTasks = 100;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       testJobResults(nbTasks, results);
     }
     finally
@@ -102,7 +102,7 @@ public class TestConnectionPool extends Setup1D1N
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       // default max channels is 1 for backward compatibility with previous versions of the client.
       job.getClientSLA().setMaxChannels(10);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       testJobResults(nbTasks, results);
     }
     finally
@@ -148,17 +148,17 @@ public class TestConnectionPool extends Setup1D1N
    * @param results the results.
    * @throws Exception if any error occurs.
    */
-  private void testJobResults(final int nbTasks, final List<JPPFTask> results) throws Exception
+  private void testJobResults(final int nbTasks, final List<Task<?>> results) throws Exception
   {
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
     int count = 0;
-    for (JPPFTask t: results)
+    for (Task<?> task: results)
     {
       String prefix = "task " + count + " ";
-      Exception e = t.getException();
-      assertNull(prefix + "has an exception", t.getException());
-      assertNotNull(prefix + "result is null", t.getResult());
+      Throwable t = task.getThrowable();
+      assertNull(prefix + "has an exception", t);
+      assertNotNull(prefix + "result is null", task.getResult());
     }
   }
 }

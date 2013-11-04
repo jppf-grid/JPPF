@@ -27,6 +27,7 @@ import javax.management.Notification;
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.test.addons.mbeans.*;
@@ -70,10 +71,10 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(100L), new NotifyingTask(5000L));
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 2);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(NotifyingTask.SUCCESS, task.getResult());
       assertNull(task.getThrowable());
@@ -91,7 +92,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       assertTrue(notif.getUserData() instanceof UserObject);
       UserObject userObject = (UserObject) notif.getUserData();
       assertNotNull(userObject.nodeUuid);
-      task = (JPPFTask) job.getTasks().get(0);
+      task = (Task<?>) job.getJobTasks().get(0);
       assertEquals(NotifyingTask.END_PREFIX + task.getId(), userObject.taskId);
     } finally {
       if (listenerId != null) jmx.unregisterForwardingNotificationListener(listenerId);
@@ -113,10 +114,10 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(5000L, true, true));
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(1000L));
       job.getSLA().setMaxDispatchExpirations(2);
-      List<JPPFTask> results = client.submit(job);
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), 1);
-      JPPFTask task = results.get(0);
+      Task<?> task = results.get(0);
       assertNull(task.getResult());
       assertNull(task.getThrowable());
       Thread.sleep(1000L);
@@ -131,7 +132,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
         assertTrue(notif.getUserData() instanceof UserObject);
         UserObject userObject = (UserObject) notif.getUserData();
         assertNotNull(userObject.nodeUuid);
-        task = (JPPFTask) job.getTasks().get(0);
+        task = (JPPFTask) job.getJobTasks().get(0);
         assertEquals(NotifyingTask.START_PREFIX + task.getId(), userObject.taskId);
       }
     } finally {

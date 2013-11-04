@@ -20,7 +20,7 @@ package sample.clientdataprovider;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Runner class used for testing the framework.
@@ -31,8 +31,9 @@ public class DataProviderTestRunner
   /**
    * Entry point for this class, performs a matrix multiplication a number of times.
    * @param args not used.
+   * @throws Throwable if any erroor occurs.
    */
-  public static void main(final String...args)
+  public static void main(final String...args) throws Throwable
   {
     JPPFClient jppfClient = new JPPFClient();
     try
@@ -43,7 +44,7 @@ public class DataProviderTestRunner
       for (int i=0; i<nbJobs; i++)
       {
         jobs[i] = new JPPFJob();
-        for (int j=1; j<=nbTasks; j++) jobs[i].addTask(new DataProviderTestTask(i+1, j));
+        for (int j=1; j<=nbTasks; j++) jobs[i].add(new DataProviderTestTask(i+1, j));
         //jobs[i].setDataProvider(new ClientDataProvider());
         jobs[i].setName("job " + (i+1));
         jobs[i].setBlocking(false);
@@ -51,16 +52,16 @@ public class DataProviderTestRunner
       }
       for (int i=0; i<nbJobs; i++)
       {
-        jppfClient.submit(jobs[i]);
+        jppfClient.submitJob(jobs[i]);
       }
       for (int i=0; i<nbJobs; i++)
       {
         JPPFResultCollector collector = (JPPFResultCollector) jobs[i].getResultListener();
-        List<JPPFTask> results = collector.waitForResults();
-        for (JPPFTask task: results)
+        List<Task<?>> results = collector.awaitResults();
+        for (Task task: results)
         {
           DataProviderTestTask t = (DataProviderTestTask) task;
-          if (t.getException() != null) throw t.getException();
+          if (t.getThrowable() != null) throw t.getThrowable();
           else System.out.println("job #" + t.i +" task #" + t.j + " : result: " + t.getResult());
         }
       }

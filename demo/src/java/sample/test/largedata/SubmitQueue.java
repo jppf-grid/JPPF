@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 
 /**
@@ -39,7 +39,7 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
   /**
    * 
    */
-  private List<JPPFTask> results = null;
+  private List<Task<?>> results = null;
   /**
    * 
    */
@@ -70,7 +70,7 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
         JPPFJob job = queue.poll(1L, TimeUnit.MILLISECONDS);
         if (job != null)
         {
-          results = client.submit(job);
+          results = client.submitJob(job);
           resultCount.incrementAndGet();
         }
       }

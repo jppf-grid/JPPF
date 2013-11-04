@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
@@ -95,12 +96,12 @@ public class TestTaskRunner
     try
     {
       JPPFJob job = new JPPFJob();
-      job.addTask(new ExceptionTestTask());
-      List<JPPFTask> results = jppfClient.submit(job);
-      JPPFTask resultTask = results.get(0);
-      if (resultTask.getException() != null)
+      job.add(new ExceptionTestTask());
+      List<Task<?>> results = jppfClient.submitJob(job);
+      Task resultTask = results.get(0);
+      if (resultTask.getThrowable() != null)
       {
-        System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getException()));
+        System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getThrowable()));
       }
     }
     catch(Exception e)
@@ -124,12 +125,12 @@ public class TestTaskRunner
     try
     {
       JPPFJob job = new JPPFJob();
-      job.addTask(new FileDownloadTestTask("http://www.jppf.org/Options.xsd"));
-      List<JPPFTask> results = jppfClient.submit(job);
-      JPPFTask resultTask = results.get(0);
-      if (resultTask.getException() != null)
+      job.add(new FileDownloadTestTask("http://www.jppf.org/Options.xsd"));
+      List<Task<?>> results = jppfClient.submitJob(job);
+      Task resultTask = results.get(0);
+      if (resultTask.getThrowable() != null)
       {
-        System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getException()));
+        System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getThrowable()));
       }
       else
       {
@@ -157,9 +158,9 @@ public class TestTaskRunner
     try
     {
       JPPFJob job = new JPPFJob();
-      job.addTask(new SecurityTestTask());
-      List<JPPFTask> results = jppfClient.submit(job);
-      JPPFTask resultTask = results.get(0);
+      job.add(new SecurityTestTask());
+      List<Task<?>> results = jppfClient.submitJob(job);
+      Task resultTask = results.get(0);
       System.out.println("Result is:\n"+resultTask);
     }
     catch(Exception e)
@@ -182,7 +183,7 @@ public class TestTaskRunner
     System.out.println("Starting empty tasks list testing...");
     try
     {
-      jppfClient.submit(new JPPFJob());
+      jppfClient.submitJob(new JPPFJob());
     }
     catch(Exception e)
     {
@@ -206,8 +207,8 @@ public class TestTaskRunner
     {
       int n = 50;
       JPPFJob job = new JPPFJob();
-      for (int i=0; i<n; i++) job.addTask(new ConstantTask(i));
-      List<JPPFTask> results = jppfClient.submit(job);
+      for (int i=0; i<n; i++) job.add(new ConstantTask(i));
+      List<Task<?>> results = jppfClient.submitJob(job);
       for (int i=0; i<n; i++)
       {
         System.out.println("result for task #"+i+" is : "+results.get(i).getResult());
@@ -236,12 +237,12 @@ public class TestTaskRunner
     try
     {
       JPPFJob job = new JPPFJob();
-      job.addTask(new ClassNotFoundTestTask());
-      List<JPPFTask> results = jppfClient.submit(job);
-      JPPFTask resultTask = results.get(0);
-      if (resultTask.getException() != null)
+      job.add(new ClassNotFoundTestTask());
+      List<Task<?>> results = jppfClient.submitJob(job);
+      Task resultTask = results.get(0);
+      if (resultTask.getThrowable() != null)
       {
-        System.out.println("Exception was caught: "+ExceptionUtils.getStackTrace(resultTask.getException()));
+        System.out.println("Exception was caught: "+ExceptionUtils.getStackTrace(resultTask.getThrowable()));
       }
       else
       {
@@ -269,18 +270,18 @@ public class TestTaskRunner
     JPPFJob job = new JPPFJob();
     try
     {
-      for (int i=1; i<4;i++) job.addTask(h.new InnerTask(i));
+      for (int i=1; i<4;i++) job.add(h.new InnerTask(i));
       // execute tasks
-      List<JPPFTask> results = jppfClient.submit(job);
+      List<Task<?>> results = jppfClient.submitJob(job);
       // show results
       System.out.println("Got "+results.size()+" results: ");
       System.out.println("Result is:");
-      for (JPPFTask t: results)
+      for (Task t: results)
       {
         System.out.println(""+t.getResult());
-        if  (null != t.getException())
+        if  (null != t.getThrowable())
         {
-          t.getException().printStackTrace();
+          t.getThrowable().printStackTrace();
         }
       }
     }
@@ -380,14 +381,14 @@ public class TestTaskRunner
     try
     {
       JPPFJob job = new JPPFJob();
-      job.addTask(new TestAnnotatedTask(), 11, "test string");
-      job.addTask(TestAnnotatedStaticTask.class, 22, "test string (static method)");
-      List<JPPFTask> results = jppfClient.submit(job);
-      JPPFTask res = results.get(0);
-      if (res.getException() != null) throw res.getException();
+      job.add(new TestAnnotatedTask(), 11, "test string");
+      job.add(TestAnnotatedStaticTask.class, 22, "test string (static method)");
+      List<Task<?>> results = jppfClient.submitJob(job);
+      Task res = results.get(0);
+      if (res.getThrowable() != null) throw res.getThrowable();
       System.out.println("result is : " + res.getResult());
     }
-    catch(Exception e)
+    catch(Throwable e)
     {
       throw new JPPFException(e);
     }
@@ -432,13 +433,13 @@ public class TestTaskRunner
     try
     {
       JPPFJob job = new JPPFJob(dp);
-      for (Object task: tasks) job.addTask(task);
-      List<JPPFTask> results = jppfClient.submit(job);
-      JPPFTask res = results.get(0);
-      if (res.getException() != null) throw res.getException();
+      for (Object task: tasks) job.add(task);
+      List<Task<?>> results = jppfClient.submitJob(job);
+      Task res = results.get(0);
+      if (res.getThrowable() != null) throw res.getThrowable();
       System.out.println("result is : " + res.getResult());
     }
-    catch(Exception e)
+    catch(Throwable e)
     {
       throw new JPPFException(e);
     }

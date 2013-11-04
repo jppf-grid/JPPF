@@ -20,7 +20,7 @@ package sample.dist.commandline;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -72,17 +72,17 @@ public class CommandLineTaskRunner
   private static void performCommand() throws Exception
   {
     JPPFJob job = new JPPFJob();
-		job.addTask(new ListDirectoryTask("/usr/local"));
-		job.addTask(new ListDirectoryTask("C:\\Windows"));
+		job.add(new ListDirectoryTask("/usr/local"));
+		job.add(new ListDirectoryTask("C:\\Windows"));
     /*
     job.addTask(new TestTask("1"));
     for (JPPFTask t: job.getTasks()) t.setTimeoutSchedule(new JPPFSchedule(5000));
     */
 
-    List<JPPFTask> results = jppfClient.submit(job);
-    for (JPPFTask task: results)
+    List<Task<?>> results = jppfClient.submitJob(job);
+    for (Task task: results)
     {
-      if (task.getException() != null) task.getException().printStackTrace();
+      if (task.getThrowable() != null) task.getThrowable().printStackTrace();
       System.out.println("result: " + task.getResult());
     }
   }

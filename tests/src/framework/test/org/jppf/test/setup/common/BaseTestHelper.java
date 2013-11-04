@@ -99,7 +99,7 @@ public class BaseTestHelper
     {
       Object o = constructor.newInstance(params);
       if (o instanceof JPPFTask) ((JPPFTask) o).setId(job.getName() + " - task " + i);
-      job.addTask(o);
+      job.add(o);
     }
     job.setBlocking(blocking);
     job.getSLA().setBroadcastJob(broadcast);
@@ -122,7 +122,7 @@ public class BaseTestHelper
   {
     JPPFJob job = new JPPFJob();
     job.setName(name);
-    for (int i=1; i<=tasks.length; i++) job.addTask(tasks[i-1]).setId(job.getName() + " - task " + i);
+    for (int i=1; i<=tasks.length; i++) job.add(tasks[i-1]).setId(job.getName() + " - task " + i);
     job.setBlocking(blocking);
     job.getSLA().setBroadcastJob(broadcast);
     if (!blocking) job.setResultListener(new JPPFResultCollector(job));

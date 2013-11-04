@@ -20,7 +20,7 @@ package test.jmx.canceljob;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -63,8 +63,8 @@ public class CancelJobRunner
       job.setBlocking(false);
       job.getClientSLA().setMaxChannels(maxChannels);
       job.getSLA().setSuspended(true);
-      for (int i=1; i<=nbTasks; i++) job.addTask(new LifeCycleTask(duration)).setId(name + ":task-" + i);
-      jppfClient.submit(job);
+      for (int i=1; i<=nbTasks; i++) job.add(new LifeCycleTask(duration)).setId(name + ":task-" + i);
+      jppfClient.submitJob(job);
       Thread.sleep(900L);
       print("cancelling job");
       /*
@@ -76,11 +76,11 @@ public class CancelJobRunner
       //jppfClient.cancelJob(job.getUuid());
       print("job cancelled, waiting for results");
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<JPPFTask> results = collector.waitForResults();
+      List<Task<?>> results = collector.awaitResults();
       print("********** got results for job '" + job.getName() + "' **********");
-      for (JPPFTask task: results)
+      for (Task task: results)
       {
-        Exception e = task.getException();
+        Throwable e = task.getThrowable();
         if (e != null) print("task '" + task.getId() + "' raised an exception: " + ExceptionUtils.getStackTrace(e));
         else print("result for task '" + task.getId() + "' : " + task.getResult());
       }

@@ -26,6 +26,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -90,14 +91,30 @@ public class ClientWithFailover implements ClientListener, ClientConnectionStatu
    * Submit the specified job.
    * @param job the job to submit.
    * @return a list of jppf tasks or null if the job is non-blocking.
-   * @throws Exception if any error occurs.
+   * @throws Exception if any error occurs.*
+   * @deprecated use {@link #submitJob(JPPFJob)} instead.
    */
+  @Deprecated
   public List<JPPFTask> submit(final JPPFJob job) throws Exception {
     ExecutionPolicy policy = job.getClientSLA().getExecutionPolicy();
     // if an execution policy is already set, we join it with the failover policy instead of replacing it
     if (policy != null) job.getClientSLA().setExecutionPolicy(failoverPolicy.and(policy));
     else job.getClientSLA().setExecutionPolicy(failoverPolicy);
     return client.submit(job);
+  }
+
+  /**
+   * Submit the specified job.
+   * @param job the job to submit.
+   * @return a list of jppf tasks or null if the job is non-blocking.
+   * @throws Exception if any error occurs.
+   */
+  public List<Task<?>> submitJob(final JPPFJob job) throws Exception {
+    ExecutionPolicy policy = job.getClientSLA().getExecutionPolicy();
+    // if an execution policy is already set, we join it with the failover policy instead of replacing it
+    if (policy != null) job.getClientSLA().setExecutionPolicy(failoverPolicy.and(policy));
+    else job.getClientSLA().setExecutionPolicy(failoverPolicy);
+    return client.submitJob(job);
   }
 
   /**
