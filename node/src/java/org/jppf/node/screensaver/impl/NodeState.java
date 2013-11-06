@@ -23,7 +23,7 @@ import org.jppf.node.screensaver.*;
 /**
  * Instances of this class represent information about a node.
  */
-public class NodeState extends NodeLifeCycleListenerAdapter implements  JPPFScreenSaverHolder {
+public class NodeState extends NodeIntegrationAdapter implements  JPPFScreenSaverHolder {
   /**
    * The node panel to update.
    */

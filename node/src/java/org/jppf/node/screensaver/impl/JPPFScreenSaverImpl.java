@@ -18,13 +18,12 @@
 package org.jppf.node.screensaver.impl;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.util.Timer;
 
 import javax.swing.*;
 
-import org.jppf.node.screensaver.JPPFScreenSaver;
+import org.jppf.node.screensaver.*;
 import org.jppf.utils.*;
 
 /**
@@ -100,16 +99,6 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     int vmargin = (getHeight() - dim2.height) / 2;
     layout.putConstraint(SpringLayout.WEST, nodePanel, alignment * hmargin, SpringLayout.WEST, this);
     layout.putConstraint(SpringLayout.NORTH, nodePanel, vmargin, SpringLayout.NORTH, this);
-    //System.out.println("screensaver size = " + dim + ", nodePanel size = " + nodePanel.getSize() + ", pref = " + nodePanel.getPreferredSize());
-    if (fullscreen) {
-      addMouseListener(new MouseAdapter() {
-        @Override
-        public void mousePressed(final MouseEvent e) {
-          destroy();
-          System.exit(0);
-        }
-      });
-    }
     if (timer == null) {
       timer = new Timer("JPPFScreenSaverTimer");
       timer.schedule(new LogoUpdateTask(), 100L, 1000L / speed);
@@ -139,10 +128,10 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     String[] tokens = paths.split("\\|");
     java.util.List<ImageIcon> list = new ArrayList<>();
     for (String s: tokens) {
-      ImageIcon icon = NodePanel.loadImage(s.trim());
+      ImageIcon icon = ScreenSaverMain.loadImage(s.trim());
       if (icon != null) list.add(icon);
     }
-    if (list.isEmpty()) list.add(NodePanel.loadImage(defaultPath));
+    if (list.isEmpty()) list.add(ScreenSaverMain.loadImage(defaultPath));
     logos = list.toArray(new ImageIcon[list.size()]);
     String s = config.getString("jppf.screensaver.status.panel.alignment", "center").trim().toLowerCase();
     if (s.startsWith("l")) alignment = 0;
@@ -152,7 +141,10 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
 
   @Override
   public void destroy() {
-    timer.cancel();
+    if (timer != null) {
+      timer.cancel();
+      timer = null;
+    }
     if (nodePanel != null) nodePanel = null;
   }
 

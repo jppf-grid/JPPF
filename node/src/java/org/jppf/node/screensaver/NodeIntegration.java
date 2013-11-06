@@ -18,29 +18,12 @@
 
 package org.jppf.node.screensaver;
 
-import javax.swing.JComponent;
+import org.jppf.node.event.*;
 
 /**
- * This is the interface to implement for any custom implementation of a screen saver associated with a JPPF node. 
+ * This interface groups two other interfaces, from which the screen saver can receive notifications from the node.
  * @author Laurent Cohen
  */
-public interface JPPFScreenSaver
+public interface NodeIntegration extends NodeLifeCycleListener, TaskExecutionListener
 {
-  /**
-   * Get the swing component for this screen saver.
-   * @return a {@link JComponent}.
-   */
-  JComponent getComponent();
-
-  /**
-   * Initialize this screen saver, and in particular its UI components.
-   * @param fullscreen <code>true</code> if the screen saver is to be displayed in full screen mode,
-   * <code>false</code> if it is to run in windowed mode.
-   */
-  void init(boolean fullscreen);
-
-  /**
-   * Destroy this screen saver and release its resources.
-   */
-  void destroy();
 }

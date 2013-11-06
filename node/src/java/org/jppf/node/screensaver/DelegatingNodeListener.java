@@ -17,18 +17,21 @@
  */
 package org.jppf.node.screensaver;
 
+import org.jppf.node.NodeInternal;
 import org.jppf.node.event.*;
 import org.jppf.utils.TypedProperties;
 
 /**
- * Instances of this class represent information about the state of a node.
+ * This class registers as a NodeLifeCycleListener and instantiates an implementation of {@link NodeIntegration},
+ * if any is defined in the configuration. It also registers this implementation as a {@link TaskExecutionListener}
+ * with the node, so it can receive a notification for each individual task reaches completion. 
  */
 public class DelegatingNodeListener implements NodeLifeCycleListener
 {
   /**
    * The node life cycle listner to delegate events to.
    */
-  private NodeLifeCycleListener delegate;
+  private NodeIntegration delegate;
 
   /**
    * Initialize this listener and instantiate the delegate if one is configured.
@@ -45,7 +48,7 @@ public class DelegatingNodeListener implements NodeLifeCycleListener
         if (name != null)
         {
           Class<?> clazz = Class.forName(name, true, getClass().getClassLoader());
-          delegate = (NodeLifeCycleListener) clazz.newInstance();
+          delegate = (NodeIntegration) clazz.newInstance();
           if (delegate instanceof JPPFScreenSaverHolder)
           {
             ((JPPFScreenSaverHolder) delegate).setScreenSaver(ssm.getScreenSaver());
@@ -61,13 +64,27 @@ public class DelegatingNodeListener implements NodeLifeCycleListener
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event)
   {
-    if (delegate != null) delegate.nodeStarting(event);
+    if (delegate != null)
+    {
+      ((NodeInternal) event.getNode()).getExecutionManager().addTaskExecutionListener(delegate);
+      delegate.nodeStarting(event);
+    }
   }
 
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event)
   {
-    if (delegate != null) delegate.nodeEnding(event);
+    if (delegate != null)
+    {
+      try
+      {
+        delegate.nodeEnding(event);
+      }
+      finally
+      {
+        ((NodeInternal) event.getNode()).getExecutionManager().removeTaskExecutionListener(delegate);
+      }
+    }
   }
 
   @Override

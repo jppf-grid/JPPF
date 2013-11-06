@@ -22,13 +22,14 @@ import java.text.NumberFormat;
 
 import javax.swing.*;
 
+import org.jppf.node.screensaver.ScreenSaverMain;
 import org.jppf.utils.*;
 
 /**
  * This class displays the connection status, execution status and number of tasks for a node.
  * @author Laurent Cohen
  */
-class NodePanel extends JPanel {
+public class NodePanel extends JPanel {
   /**
    * Path to the images to display in the UI.
    */
@@ -36,11 +37,11 @@ class NodePanel extends JPanel {
   /**
    * Image displaying a bright green traffic light.
    */
-  static final ImageIcon BRIGHT_GREEN = loadImage(IMAGE_PATH + '/' + "active_greenlight.gif");
+  static final ImageIcon BRIGHT_GREEN = ScreenSaverMain.loadImage(IMAGE_PATH + '/' + "active_greenlight.gif");
   /**
    * Image displaying a dark red traffic light.
    */
-  static final ImageIcon DARK_RED = loadImage(IMAGE_PATH + '/' + "inactive_redlight.gif");
+  static final ImageIcon DARK_RED = ScreenSaverMain.loadImage(IMAGE_PATH + '/' + "inactive_redlight.gif");
   /**
    * Default path for the central image.
    */
@@ -91,8 +92,8 @@ class NodePanel extends JPanel {
     setBackground(Color.BLACK);
     //ImageIcon logo = loadImage(IMAGE_PATH + '/' + "jppf-at-home.gif");
     String path = JPPFConfiguration.getProperties().getString("jppf.screensaver.centerimage", DEFAULT_IMG);
-    ImageIcon logo = loadImage(path);
-    if (logo == null) logo = loadImage(DEFAULT_IMG);
+    ImageIcon logo = ScreenSaverMain.loadImage(path);
+    if (logo == null) logo = ScreenSaverMain.loadImage(DEFAULT_IMG);
     JLabel logoLabel = new JLabel(logo);
     addLayoutComp(this, g, c, logoLabel);
     addLayoutComp(this, g, c, Box.createVerticalStrut(10));
@@ -206,21 +207,6 @@ class NodePanel extends JPanel {
     panel.add(statusPanel);
     panel.setPreferredSize(new Dimension(78, 20));
     return panel;
-  }
-
-  /**
-   * Load an icon from the specified path.
-   * @param file the file to get the icon from.
-   * @return an <code>ImageIcon</code> instance.
-   */
-  public static ImageIcon loadImage(final String file) {
-    byte[] buf = null;
-    try {
-      buf = FileUtils.getPathAsByte(file);
-    } catch (Exception e) {
-      System.err.println("Could not load image '" + file + "' : " + ExceptionUtils.getStackTrace(e));
-    }
-    return (buf == null) ? null : new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
   }
 
   /**

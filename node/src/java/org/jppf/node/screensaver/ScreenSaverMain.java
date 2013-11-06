@@ -21,11 +21,12 @@ package org.jppf.node.screensaver;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
 import org.jppf.node.initialization.InitializationHook;
-import org.jppf.node.screensaver.impl.JPPFScreenSaverImpl;
+import org.jppf.node.screensaver.impl.*;
 import org.jppf.utils.*;
 
 /**
@@ -106,6 +107,9 @@ public class ScreenSaverMain implements InitializationHook
     if (fullscreenRequested && !fullscreenSupported) System.err.println("Full screen is not supported by the current graphics device");
     String title = config.getString("jppf.screensaver.title", "JPPF screensaver");
     JFrame frame = new JFrame(title);
+    ImageIcon icon = loadImage(config.getString("jppf.screensaver.icon", "org/jppf/node/jppf-icon.gif"));
+    if (icon == null) icon = loadImage("org/jppf/node/jppf-icon.gif");
+    frame.setIconImage(icon.getImage());
     if (fullscreenRequested && fullscreenSupported) {
       frame.setUndecorated(true);
       frame.setSize((int) result.getWidth(), (int) result.getHeight());
@@ -117,18 +121,28 @@ public class ScreenSaverMain implements InitializationHook
           System.exit(0);
         }
       });
+      frame.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mousePressed(final MouseEvent e) {
+          screensaver.destroy();
+          System.exit(0);
+        }
+      });
+      // hide the mouse cursor over the JFrame
+      BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB); // Transparent 16 x 16 pixel cursor image.
+      Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor"); // Create a new blank cursor.
+      frame.getContentPane().setCursor(blankCursor); // Set the blank cursor to the JFrame.
     } else {
-      frame.setVisible(true);
       Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-      int w = JPPFConfiguration.getProperties().getInt("jppf.screensaver.width", -1);
-      int h = JPPFConfiguration.getProperties().getInt("jppf.screensaver.height", -1);
-      if (w <= 0) w = d.width;
-      if (h <= 0) h = d.height;
+      int w = JPPFConfiguration.getProperties().getInt("jppf.screensaver.width", 1000);
+      int h = JPPFConfiguration.getProperties().getInt("jppf.screensaver.height", 800);
+      if ((w <= 0) || (w > d.width)) w = 1000;
+      if ((h <= 0) || (h > d.height)) h = 800;
       frame.setSize(w, h);
     }
     frame.setBackground(Color.BLACK);
     frame.getContentPane().setBackground(Color.BLACK);
-    final JPPFScreenSaver screensaver = createScreenSaver();
+    createScreenSaver();
     frame.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
@@ -136,9 +150,8 @@ public class ScreenSaverMain implements InitializationHook
         System.exit(0);
       }
     });
-    JComponent comp = screensaver.getComponent();
-    frame.add(comp);
-    comp.setSize(frame.getSize());
+    frame.add(screensaver.getComponent());
+    screensaver.getComponent().setSize(frame.getSize());
     screensaver.init(fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
   }
@@ -182,5 +195,20 @@ public class ScreenSaverMain implements InitializationHook
    */
   public TypedProperties getConfig() {
     return config;
+  }
+
+  /**
+   * Load an icon from the specified path.
+   * @param file the file to get the icon from.
+   * @return an <code>ImageIcon</code> instance.
+   */
+  public static ImageIcon loadImage(final String file) {
+    byte[] buf = null;
+    try {
+      buf = FileUtils.getPathAsByte(file);
+    } catch (Exception e) {
+      System.err.println("Could not load image '" + file + "' : " + ExceptionUtils.getStackTrace(e));
+    }
+    return (buf == null) ? null : new ImageIcon(Toolkit.getDefaultToolkit().createImage(buf));
   }
 }
