@@ -22,6 +22,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.net.ConnectException;
 
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
@@ -69,7 +70,7 @@ class SendingBundleState extends NodeServerState
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (context.getMessage() == null) {
       ServerTaskBundleNode nodeBundle = context.getBundle();
-      JPPFTaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
+      TaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
       if (bundle != null) {
         if (debugEnabled) log.debug("got bundle " + nodeBundle + " from the queue for " + channel);
         // to avoid cycles in peer-to-peer routing of jobs.

@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -50,7 +51,7 @@ public class ServerJob extends AbstractServerJobBase {
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
-  public ServerJob(final Lock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public ServerJob(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
     super(lock, notificationEmitter, job, dataProvider);
   }
 
@@ -60,7 +61,7 @@ public class ServerJob extends AbstractServerJobBase {
    * @return a new <code>ServerJob</code> instance.
    */
   public ServerTaskBundleNode copy(final int nbTasks) {
-    JPPFTaskBundle newTaskBundle;
+    TaskBundle newTaskBundle;
     lock.lock();
     try {
       int taskCount = (nbTasks > this.tasks.size()) ? this.tasks.size() : nbTasks;

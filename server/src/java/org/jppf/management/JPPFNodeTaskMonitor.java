@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 
 import javax.management.*;
 
-import org.jppf.server.node.*;
+import org.jppf.node.event.*;
 import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 

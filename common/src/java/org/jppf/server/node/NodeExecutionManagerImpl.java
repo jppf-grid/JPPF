@@ -26,8 +26,8 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.*;
 import org.jppf.node.ThreadManager.UsedClassLoader;
-import org.jppf.node.event.LifeCycleEventHandler;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.event.*;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -40,7 +40,7 @@ import org.slf4j.*;
  * @author Martin JANDA
  * @author Paul Woodward
  */
-public class NodeExecutionManagerImpl
+public class NodeExecutionManagerImpl implements NodeExecutionManager
 {
   /**
    * Logger for this class.
@@ -61,11 +61,11 @@ public class NodeExecutionManagerImpl
   /**
    * The bundle whose tasks are currently being executed.
    */
-  private JPPFTaskBundle bundle = null;
+  private TaskBundle bundle = null;
   /**
    * The list of tasks to execute.
    */
-  private List<? extends Task> taskList = null;
+  private List<Task<?>> taskList = null;
   /**
    * The uuid path of the current bundle.
    */
@@ -167,13 +167,8 @@ public class NodeExecutionManagerImpl
     return result;
   }
 
-  /**
-   * Execute the specified tasks of the specified tasks bundle.
-   * @param bundle the bundle to which the tasks are associated.
-   * @param taskList the list of tasks to execute.
-   * @throws Exception if the execution failed.
-   */
-  public void execute(final JPPFTaskBundle bundle, final List<? extends Task> taskList) throws Exception {
+  @Override
+  public void execute(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
     if ((taskList == null) || taskList.isEmpty()) return;
     if (debugEnabled) log.debug("executing " + taskList.size() + " tasks");
     try {
@@ -208,11 +203,7 @@ public class NodeExecutionManagerImpl
     }
   }
 
-  /**
-   * Cancel all executing or pending tasks.
-   * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
-   * @param requeue true if the job should be requeued on the server side, false otherwise.
-   */
+  @Override
   public void cancelAllTasks(final boolean callOnCancel, final boolean requeue) {
     if (debugEnabled) log.debug("cancelling all tasks with: callOnCancel=" + callOnCancel + ", requeue=" + requeue);
     if (requeue && (bundle != null)) {
@@ -242,9 +233,7 @@ public class NodeExecutionManagerImpl
     }
   }
 
-  /**
-   * Shutdown this execution manager.
-   */
+  @Override
   public void shutdown() {
     getExecutor().shutdownNow();
     timeoutHandler.clear(true);
@@ -256,7 +245,7 @@ public class NodeExecutionManagerImpl
    * @param taskList the list of tasks to execute.
    */
   @SuppressWarnings("unchecked")
-  private void setup(final JPPFTaskBundle bundle, final List<? extends Task> taskList) {
+  private void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
     this.bundle = bundle;
     this.taskList = taskList;
     this.taskWrapperList = new ArrayList<>(taskList.size());
@@ -274,7 +263,7 @@ public class NodeExecutionManagerImpl
     accumulatedElapsed.set(0L);
     LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
     if (handler != null) handler.fireJobStarting(bundle, taskClassLoader instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) taskClassLoader : null,
-      (List<Task>) taskList, dataProvider);
+      (List<Task<?>>) taskList, dataProvider);
   }
 
   /**
@@ -285,7 +274,7 @@ public class NodeExecutionManagerImpl
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     ClassLoader cl = usedClassLoader.getClassLoader();
     LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
-    if (handler != null) handler.fireJobEnding(bundle, cl instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) cl : null, (List<Task>) taskList, dataProvider);
+    if (handler != null) handler.fireJobEnding(bundle, cl instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) cl : null, taskList, dataProvider);
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;
@@ -312,66 +301,37 @@ public class NodeExecutionManagerImpl
     for (TaskExecutionListener listener : taskExecutionListeners) listener.taskExecuted(event);
   }
 
-  /**
-   * Get the id of the job currently being executed.
-   * @return the job id as a string, or null if no job is being executed.
-   */
+  @Override
   public String getCurrentJobId() {
     return (bundle != null) ? bundle.getUuid() : null;
   }
 
-  /**
-   * Add a task execution listener to the list of task execution listeners.
-   * @param listener the listener to add.
-   */
+  @Override
   public void addTaskExecutionListener(final TaskExecutionListener listener) {
     taskExecutionListeners.add(listener);
   }
 
-  /**
-   * Remove a task execution listener from the list of task execution listeners.
-   * @param listener the listener to remove.
-   */
+  @Override
   public void removeTaskExecutionListener(final TaskExecutionListener listener) {
     taskExecutionListeners.remove(listener);
   }
 
-  /**
-   * Get the executor used by this execution manager.
-   * @return an <code>ExecutorService</code> instance.
-   */
+  @Override
   public ExecutorService getExecutor() {
     return threadManager.getExecutorService();
   }
 
-  /**
-   * Determines whether the configuration has changed and resets the flag if it has.
-   * @return true if the config was changed, false otherwise.
-   */
+  @Override
   public boolean checkConfigChanged() {
     return configChanged.compareAndSet(true, false);
   }
 
-  /**
-   * Trigger the configuration changed flag.
-   */
+  @Override
   public void triggerConfigChanged() {
     configChanged.compareAndSet(false, true);
   }
 
-  /**
-   * Set the notification that the node must reconnect to the driver.
-   * @param reconnectionNotification a {@link JPPFNodeReconnectionNotification} instance.
-   * @exclude
-   */
-  public void setReconnectionNotification(final JPPFNodeReconnectionNotification reconnectionNotification) {
-    this.reconnectionNotification.compareAndSet(null, reconnectionNotification);
-  }
-
-  /**
-   * Set the size of the node's thread pool.
-   * @param size the size as an int.
-   */
+  @Override
   public void setThreadPoolSize(final int size) {
     if (size <= 0) {
       log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
@@ -387,67 +347,43 @@ public class NodeExecutionManagerImpl
     }
   }
 
-  /**
-   * Get the size of the node's thread pool.
-   * @return the size as an int.
-   */
+  @Override
   public int getThreadPoolSize() {
     return threadManager.getPoolSize();
   }
 
-  /**
-   * Get the priority assigned to the execution threads.
-   * @return the priority as an int value.
-   */
+  @Override
   public int getThreadsPriority() {
     return threadManager.getPriority();
   }
 
-  /**
-   * Update the priority of all execution threads.
-   * @param newPriority the new priority to set.
-   */
+  @Override
   public void updateThreadsPriority(final int newPriority) {
     threadManager.setPriority(newPriority);
   }
 
-  /**
-   * Get the thread manager for this node.
-   * @return a {@link ThreadManager} instance.
-   */
+  @Override
   public ThreadManager getThreadManager() {
     return threadManager;
   }
 
-  /**
-   * Determine whether the current job has been cancelled, including before starting its execution.
-   * @return <code>true</code> if the job has been cancelled, <code>false</code> otherwise.
-   */
+  @Override
   public boolean isJobCancelled() {
     return jobCancelled.get();
   }
 
-  /**
-   * Specify whether the current job has been cancelled, including before starting its execution.
-   * @param jobCancelled <code>true</code> if the job has been cancelled, <code>false</code> otherwise.
-   */
+  @Override
   public void setJobCancelled(final boolean jobCancelled) {
     this.jobCancelled.set(jobCancelled);
   }
 
-  /**
-   * Get the bundle whose tasks are currently being executed.
-   * @return a {@link JPPFTaskBundle} instance.
-   */
-  public JPPFTaskBundle getBundle() {
+  @Override
+  public TaskBundle getBundle() {
     return bundle;
   }
 
-  /**
-   * Set the bundle whose tasks are currently being executed.
-   * @param bundle a {@link JPPFTaskBundle} instance.
-   */
-  public void setBundle(final JPPFTaskBundle bundle) {
+  @Override
+  public void setBundle(final TaskBundle bundle) {
     this.bundle = bundle;
   }
 

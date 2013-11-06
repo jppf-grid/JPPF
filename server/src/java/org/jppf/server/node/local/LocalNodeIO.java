@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.io.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -137,7 +137,7 @@ public class LocalNodeIO extends AbstractNodeIO
   }
 
   @Override
-  public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception
+  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception
   {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();

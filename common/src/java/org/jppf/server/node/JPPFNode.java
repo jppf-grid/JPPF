@@ -27,10 +27,10 @@ import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
-import org.jppf.node.NodeRunner;
+import org.jppf.node.*;
 import org.jppf.node.event.LifeCycleEventHandler;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.*;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
@@ -52,10 +52,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * The task execution manager for this node.
+   * @exclude
    */
-  protected NodeExecutionManagerImpl executionManager = null;
+  protected NodeExecutionManager executionManager = null;
   /**
    * The object responsible for this node's I/O.
+   * @exclude
    */
   protected NodeIO nodeIO = null;
   /**
@@ -80,20 +82,24 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private JPPFMBeanProviderManager providerManager = null;
   /**
    * Handles the firing of node life cycle events and the listeners that subscribe to these events.
+   * @exclude
    */
   protected LifeCycleEventHandler lifeCycleEventHandler = null;
   /**
    * The connection checker for this node.
+   * @exclude
    */
   protected NodeConnectionChecker connectionChecker = null;
   /**
    * Determines whether the node connection checker should be used.
+   * @exclude
    */
   protected final boolean checkConnection = JPPFConfiguration.getProperties().getBoolean("jppf.node.check.connection", false);
   /**
-   * 
+   * The bundle currently processed in offline mode.
+   * @exclude
    */
-  protected Pair<JPPFTaskBundle, List<Task>> currentBundle  = null;
+  protected Pair<TaskBundle, List<Task<?>>> currentBundle  = null;
 
   /**
    * Default constructor.
@@ -107,7 +113,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Main processing loop of this node.
-   * @see java.lang.Runnable#run()
+   * @exclude
    */
   @Override
   public void run() {
@@ -149,6 +155,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Perform the main execution loop for this node. At each iteration, this method listens for a task to execute,
    * receives it, executes it and sends the results back.
    * @throws Exception if an error was raised from the underlying socket connection or the class loader.
+   * @exclude
    */
   public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
@@ -164,10 +171,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processNextJob() throws Exception {
-    Pair<JPPFTaskBundle, List<Task>> pair = nodeIO.readTask();
-    JPPFTaskBundle bundle = pair.first();
+    Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
+    TaskBundle bundle = pair.first();
     //if (bundle.isHandshake()) checkInitialBundle(bundle);
-    List<Task> taskList = pair.second();
+    List<Task<?>> taskList = pair.second();
     //boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
     if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
     if (!bundle.isHandshake()) {
@@ -202,7 +209,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param bundle the bundle to check.
    * @throws Exception if any error occurs.
    */
-  private void checkInitialBundle(final JPPFTaskBundle bundle) throws Exception {
+  private void checkInitialBundle(final TaskBundle bundle) throws Exception {
     if (debugEnabled) log.debug("setting initial bundle, offline=" + isOffline() + (currentBundle == null ? ", bundle=" + bundle : ", currentBundle=" + currentBundle.first()));
     bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
     if (isOffline()) {
@@ -222,7 +229,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param taskList the tasks results.
    * @throws Exception if any error occurs.
    */
-  private void processResults(final JPPFTaskBundle bundle, final List<Task> taskList) throws Exception {
+  private void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
     currentBundle = null;
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     //if (executionManager.checkConfigChanged() || (bundle.isHandshake() && (currentBundle == null))) {
@@ -297,6 +304,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @throws Exception if an error occurs while instantiating the class loader.
+   * @exclude
    */
   public void initHelper() throws Exception {
     if (debugEnabled) log.debug("Initializing serializer");
@@ -314,6 +322,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Get the administration and monitoring MBean for this node.
    * @return a <code>JPPFNodeAdminMBean</code> instance.
+   * @exclude
    */
   public synchronized JPPFNodeAdminMBean getNodeAdmin() {
     return nodeAdmin;
@@ -322,16 +331,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Set the administration and monitoring MBean for this node.
    * @param nodeAdmin a <code>JPPFNodeAdminMBean</code>m instance.
+   * @exclude
    */
   public synchronized void setNodeAdmin(final JPPFNodeAdminMBean nodeAdmin) {
     this.nodeAdmin = nodeAdmin;
   }
 
-  /**
-   * Get the task execution manager for this node.
-   * @return a <code>NodeExecutionManager</code> instance.
-   */
-  public NodeExecutionManagerImpl getExecutionManager() {
+  @Override
+  public NodeExecutionManager getExecutionManager() {
     return executionManager;
   }
 
@@ -345,6 +352,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Stop this node and release the resources it is using.
+   * @exclude
    */
   @Override
   public synchronized void stopNode() {
@@ -362,6 +370,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Shutdown and eventually restart the node.
    * @param restart determines whether this node should be restarted by the node launcher.
+   * @exclude
    */
   public void shutdown(final boolean restart) {
     NodeRunner.setShuttingDown(true);
@@ -400,6 +409,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Set the action executed when the node exits the main loop.
    * @param exitAction the action to execute.
+   * @exclude
    */
   public synchronized void setExitAction(final Runnable exitAction) {
     this.exitAction = exitAction;
@@ -420,6 +430,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Get the jmx server that handles administration and monitoring functions for this node.
    * @return a <code>JMXServerImpl</code> instance.
    * @throws Exception if any error occurs.
+   * @exclude
    */
   @Override
   public JMXServer getJmxServer() throws Exception {
@@ -434,6 +445,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     return jmxServer;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public LifeCycleEventHandler getLifeCycleEventHandler() {
     return lifeCycleEventHandler;
@@ -448,6 +463,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   /**
    * Trigger the configuration changed flag.
+   * @exclude
    */
   public void triggerConfigChanged() {
     updateSystemInformation();
@@ -456,7 +472,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   @Override
   public AbstractJPPFClassLoader resetTaskClassLoader() {
-    JPPFTaskBundle bundle = executionManager.getBundle();
+    TaskBundle bundle = executionManager.getBundle();
     if (bundle == null) return null;
     try {
       return classLoaderManager.resetClassLoader(bundle.getUuidPath().getList());

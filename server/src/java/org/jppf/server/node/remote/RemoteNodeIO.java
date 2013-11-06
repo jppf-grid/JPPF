@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.node.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -117,7 +117,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
    * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
    */
   @Override
-  public void writeResults(final JPPFTaskBundle bundle, final List<Task> tasks) throws Exception {
+  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizePerformanceData(bundle);

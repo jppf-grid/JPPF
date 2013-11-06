@@ -31,7 +31,7 @@ import org.jppf.utils.collections.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskBundle>, JPPFDistributedJob {
+public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskBundle>, TaskBundle {
   /**
    * Explicit serialVersionUID.
    */
@@ -102,60 +102,39 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     jobMetadata = new JPPFJobMetadata();
   }
 
-  /**
-   * Get the uuid path of the applications (driver or client) in whose classpath the class definition may be found.
-   * @return the uuid path as a list of string elements.
-   */
+  @Override
   public TraversalList<String> getUuidPath() {
     return uuidPath;
   }
 
-  /**
-   * Set the uuid path of the applications (driver or client) in whose classpath the class definition may be found.
-   * @param uuidPath the uuid path as a list of string elements.
-   */
+  @Override
   public void setUuidPath(final TraversalList<String> uuidPath) {
     this.uuidPath = uuidPath;
   }
 
-  /**
-   * Get the time it took a node to execute this task.
-   * @return the time in milliseconds as a long value.
-   */
+  @Override
   public long getNodeExecutionTime() {
     return nodeExecutionTime;
   }
 
-  /**
-   * Set the time it took a node to execute this task.
-   * @param nodeExecutionTime the time in milliseconds as a long value.
-   */
+  @Override
   public void setNodeExecutionTime(final long nodeExecutionTime) {
     this.nodeExecutionTime = nodeExecutionTime;
   }
 
-  /**
-   * Get the number of tasks in this bundle.
-   * @return the number of tasks as an int.
-   */
+  @Override
   public int getTaskCount() {
     return taskCount;
   }
 
-  /**
-   * Set the number of tasks in this bundle.
-   * @param taskCount the number of tasks as an int.
-   */
+  @Override
   public void setTaskCount(final int taskCount) {
     this.taskCount = taskCount;
     if (initialTaskCount <= 0) initialTaskCount = taskCount;
     if (currentTaskCount <= 0) currentTaskCount = taskCount;
   }
 
-  /**
-   * Set the initial number of tasks in this bundle.
-   * @param initialTaskCount the number of tasks as an int.
-   */
+  @Override
   public void setInitialTaskCount(final int initialTaskCount) {
     this.initialTaskCount = initialTaskCount;
   }
@@ -177,10 +156,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     return 0;
   }
 
-  /**
-   * Make a copy of this bundle.
-   * @return a new <code>JPPFTaskBundle</code> instance.
-   */
+  @Override
   public synchronized JPPFTaskBundle copy() {
     JPPFTaskBundle bundle = new JPPFTaskBundle();
     bundle.setUuidPath(uuidPath);
@@ -197,40 +173,17 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     return bundle;
   }
 
-  /**
-   * Make a copy of this bundle containing only the first nbTasks tasks it contains.
-   * @param nbTasks the number of tasks to include in the copy.
-   * @return a new <code>JPPFTaskBundle</code> instance.
-   */
-  public JPPFTaskBundle copy(final int nbTasks) {
-    JPPFTaskBundle bundle = copy();
-    synchronized(this) {
-      bundle.setTaskCount(nbTasks);
-      taskCount -= nbTasks;
-    }
-    return bundle;
-  }
-
-  /**
-   * Get the time at which the bundle is taken out of the queue for sending to a node.
-   * @return the time as a long value.
-   */
+  @Override
   public long getExecutionStartTime() {
     return executionStartTime;
   }
 
-  /**
-   * Set the time at which the bundle is taken out of the queue for sending to a node.
-   * @param executionStartTime the time as a long value.
-   */
+  @Override
   public void setExecutionStartTime(final long executionStartTime) {
     this.executionStartTime = executionStartTime;
   }
 
-  /**
-   * Get the initial task count of this bundle.
-   * @return the task count as an int.
-   */
+  @Override
   public int getInitialTaskCount() {
     return initialTaskCount;
   }
@@ -240,10 +193,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     return jobSLA;
   }
 
-  /**
-   * Get the service level agreement between the job and the server.
-   * @param jobSLA an instance of <code>JPPFJobSLA</code>.
-   */
+  @Override
   public void setSLA(final JobSLA jobSLA) {
     this.jobSLA = jobSLA;
   }
@@ -269,10 +219,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     return name;
   }
 
-  /**
-   * Set the user-defined display name for the job.
-   * @param name the display name as a string.
-   */
+  @Override
   public void setName(final String name) {
     this.name = name;
   }
@@ -282,10 +229,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     return jobMetadata;
   }
 
-  /**
-   * Set this bundle's metadata.
-   * @param jobMetadata a {@link JPPFJobMetadata} instance.
-   */
+  @Override
   public void setMetadata(final JobMetadata jobMetadata) {
     this.jobMetadata = jobMetadata;
   }
@@ -295,82 +239,52 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
     return uuid;
   }
 
-  /**
-   * Set the uuid of the initial job.
-   * @param jobUuid the uuid as a string.
-   */
+  @Override
   public void setUuid(final String jobUuid) {
     this.uuid = jobUuid;
   }
 
-  /**
-   * Get the current number of tasks in this bundle.
-   * @return the current number of tasks as an int.
-   */
+  @Override
   public int getCurrentTaskCount() {
     return currentTaskCount;
   }
 
-  /**
-   * Set the current number of tasks in this bundle.
-   * @param currentTaskCount the current number of tasks as an int.
-   */
+  @Override
   public void setCurrentTaskCount(final int currentTaskCount) {
     this.currentTaskCount = currentTaskCount;
   }
 
-  /**
-   * Get the job requeue flag.
-   * @return job requeue flag.
-   */
+  @Override
   public boolean isPending() {
     return getParameter(BundleParameter.JOB_PENDING, false);
   }
 
-  /**
-   * Get the job requeue flag.
-   * @return job requeue flag.
-   */
+  @Override
   public boolean isRequeue() {
     return getParameter(BundleParameter.JOB_REQUEUE, false);
   }
 
-  /**
-   * Set the job requeue flag.
-   * @param requeue job requeue flag.
-   */
+  @Override
   public void setRequeue(final boolean requeue) {
     setParameter(BundleParameter.JOB_REQUEUE, requeue);
   }
 
-  /**
-   * Get the number of tasks in this bundle at the time it is received by a driver.
-   * @return the number of tasks as an int.
-   */
+  @Override
   public int getDriverQueueTaskCount() {
     return driverQueueTaskCount;
   }
 
-  /**
-   * Set the number of tasks in this bundle at the time it is received by a driver.
-   * @param driverQueueTaskCount the number of tasks as an int.
-   */
+  @Override
   public void setDriverQueueTaskCount(final int driverQueueTaskCount) {
     this.driverQueueTaskCount = driverQueueTaskCount;
   }
 
-  /**
-   * Determine whether this object is used for handshake instead of execution.
-   * @return <code>true</code> if this bundle is a handshake bundle, <code>false</code> otherwise.
-   */
+  @Override
   public boolean isHandshake() {
     return handshake;
   }
 
-  /**
-   * Specify whether this object is used for handshake instead of execution.
-   * @param handshake <code>true</code> if this bundle is a handshake bundle, <code>false</code> otherwise.
-   */
+  @Override
   public void setHandshake(final boolean handshake) {
     this.handshake = handshake;
   }

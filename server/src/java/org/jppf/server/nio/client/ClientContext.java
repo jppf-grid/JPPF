@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.jppf.io.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.ClassContext;
@@ -119,7 +120,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public void serializeBundle() throws Exception
   {
     ClientMessage message = newMessage();
-    JPPFTaskBundle bundle = clientBundle.getJob();
+    TaskBundle bundle = clientBundle.getJob();
     bundle.setSLA(null);
     bundle.setMetadata(null);
     List<ServerTask> tasks = clientBundle.getTaskList();
@@ -141,7 +142,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public ServerTaskBundleClient deserializeBundle() throws Exception
   {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
-    JPPFTaskBundle bundle = ((ClientMessage) message).getBundle();
+    TaskBundle bundle = ((ClientMessage) message).getBundle();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
     return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
   }
@@ -262,7 +263,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     ServerTaskBundleClient bundle;
     if ((bundle = getInitialBundleWrapper()) != null)
     {
-      JPPFTaskBundle header = bundle.getJob();
+      TaskBundle header = bundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect = " + header.getSLA().isCancelUponClientDisconnect() + " for " + header);
       if (header.getSLA().isCancelUponClientDisconnect()) bundle.cancel();
       bundle.bundleEnded();

@@ -38,7 +38,7 @@ public class NodeLifeCycleEvent extends EventObject
   /**
    * The tasks currently being executed.
    */
-  private List<Task> tasks = null;
+  private List<Task<?>> tasks = null;
   /**
    * The data provider for the current job, if any.
    */
@@ -90,7 +90,7 @@ public class NodeLifeCycleEvent extends EventObject
    * @param tasks the tasks about to be or which have been executed.
    * @param dataProvider the data provider for the current job, if any.
    */
-  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider)
   {
     this(node, type);
     this.job = job;
@@ -128,7 +128,7 @@ public class NodeLifeCycleEvent extends EventObject
    * This method will return <code>null</code> in all other cases.
    * @return a list of {@link Task} instances, or null if the node is idle.
    */
-  public List<Task> getTasks()
+  public List<Task<?>> getTasks()
   {
     return tasks;
   }

@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 
@@ -134,17 +134,6 @@ public class ClientTaskBundle extends JPPFTaskBundle
    */
   @Override
   public ClientTaskBundle copy()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Make a copy of this bundle containing only the first nbTasks tasks it contains.
-   * @param nbTasks the number of tasks to include in the copy.
-   * @return a new <code>ClientTaskBundle</code> instance.
-   */
-  @Override
-  public ClientTaskBundle copy(final int nbTasks)
   {
     throw new UnsupportedOperationException();
   }

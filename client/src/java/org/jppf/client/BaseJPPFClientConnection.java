@@ -28,7 +28,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;

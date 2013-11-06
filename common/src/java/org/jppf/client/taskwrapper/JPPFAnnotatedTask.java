@@ -140,8 +140,8 @@ public class JPPFAnnotatedTask extends JPPFTask
   }
 
   /**
-   * Override of {@link Task#setDataProvider(DataProvider)} to enable setting the data provider
-   * onto tasks that are not subclasses of {@link Task} and which implement {@link DataProviderHolder}.
+   * Override of {@link org.jppf.node.protocol.Task#setDataProvider(DataProvider) Task.setDataProvider(DataProvider)} to enable setting the data provider
+   * onto tasks that are not subclasses of {@link org.jppf.node.protocol.Task Task} and which implement {@link DataProviderHolder}.
    * @param dataProvider the data provider to set onto the task.
    */
   @Override

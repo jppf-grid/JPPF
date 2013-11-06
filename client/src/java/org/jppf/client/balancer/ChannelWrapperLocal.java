@@ -53,7 +53,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * The task execution manager for this wrapper.
    */
-  private final NodeExecutionManagerImpl executionManager;
+  private final NodeExecutionManager executionManager;
   /**
    * Status of the connection.
    */
@@ -301,5 +301,11 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public boolean isOffline()
   {
     return false;
+  }
+
+  @Override
+  public NodeExecutionManager getExecutionManager()
+  {
+    return null;
   }
 }

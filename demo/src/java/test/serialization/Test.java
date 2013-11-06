@@ -22,6 +22,7 @@ import java.io.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.serialization.*;
 import org.jppf.server.protocol.*;
 
@@ -74,7 +75,7 @@ public class Test
    */
   public static void test2() throws Exception
   {
-    JPPFTaskBundle bundle = new JPPFTaskBundle();
+    TaskBundle bundle = new JPPFTaskBundle();
     bundle.setName("server handshake");
     bundle.setUuid("job uuid");
     bundle.setUuid("0");
@@ -83,7 +84,7 @@ public class Test
     bundle.setHandshake(true);;
     Test test = new Test();
     byte[] data = test.serialize(bundle);
-    JPPFTaskBundle bundle2 = (JPPFTaskBundle) test.deserialize(data);
+    TaskBundle bundle2 = (TaskBundle) test.deserialize(data);
     print("the end 2");
   }
 

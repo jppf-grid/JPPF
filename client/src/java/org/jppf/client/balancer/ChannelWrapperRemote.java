@@ -28,7 +28,7 @@ import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.*;
 import org.jppf.management.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;

@@ -32,29 +32,39 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 {
   /**
    * Utility for deserialization and serialization.
+   * @exclude
    */
   protected SerializationHelper helper = null;
   /**
    * Utility for deserialization and serialization.
+   * @exclude
    */
   protected ObjectSerializer serializer = null;
   /**
    * Total number of tasks executed.
+   * @exclude
    */
   private int taskCount = 0;
   /**
    * This node's universal identifier.
+   * @exclude
    */
   protected String uuid = null;
   /**
    * This node's system information.
+   * @exclude
    */
   protected JPPFSystemInformation systemInformation = null;
   /**
    * Get the connection used by this node.
+   * @exclude
    */
   protected NodeConnection<?> nodeConnection = null;
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public NodeConnection<?> getNodeConnection()
   {
@@ -73,6 +83,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   /**
    * Set the total number of tasks executed.
    * @param taskCount the number of tasks as an int.
+   * @exclude
    */
   public synchronized void setTaskCount(final int taskCount)
   {
@@ -82,6 +93,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   /**
    * Get the utility for deserialization and serialization.
    * @return a <code>SerializationHelper</code> instance.
+   * @exclude
    */
   public SerializationHelper getHelper()
   {
@@ -120,6 +132,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 
   /**
    * Update the current system information.
+   * @exclude
    */
   protected void updateSystemInformation()
   {
@@ -135,6 +148,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   /**
    * This implementation does nothing.
    * @return <code>null</code>.
+   * @exclude
    */
   @Override
   public AbstractJPPFClassLoader resetTaskClassLoader()

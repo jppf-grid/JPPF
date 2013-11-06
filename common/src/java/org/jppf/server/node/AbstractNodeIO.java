@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 import org.jppf.io.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -57,7 +57,7 @@ public abstract class AbstractNodeIO implements NodeIO {
   /**
    * The task bundle currently being processed.
    */
-  protected JPPFTaskBundle currentBundle = null;
+  protected TaskBundle currentBundle = null;
   /**
    * Used to serialize/deserialize tasks and data providers.
    */
@@ -79,10 +79,10 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @see org.jppf.server.node.NodeIO#readTask()
    */
   @Override
-  public Pair<JPPFTaskBundle, List<Task>> readTask() throws Exception {
+  public Pair<TaskBundle, List<Task<?>>> readTask() throws Exception {
     Object[] result = readObjects();
-    currentBundle = (JPPFTaskBundle) result[0];
-    List<Task> taskList = new LinkedList<>();
+    currentBundle = (TaskBundle) result[0];
+    List<Task<?>> taskList = new LinkedList<>();
     if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
       DataProvider dataProvider = (DataProvider) result[1];
       for (int i=0; i<currentBundle.getTaskCount(); i++) {
@@ -151,13 +151,13 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
    */
   @Override
-  public abstract void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
+  public abstract void writeResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
 
   /**
    * Prepare the task bundle's performance data that will be sent back to the server.
    * @param bundle the bundle to process.
    */
-  protected void initializePerformanceData(final JPPFTaskBundle bundle)
+  protected void initializePerformanceData(final TaskBundle bundle)
   {
     bundle.setNodeExecutionTime(System.nanoTime());
   }
@@ -166,7 +166,7 @@ public abstract class AbstractNodeIO implements NodeIO {
    * Compute the task bundle's performance data before it is sent back to the server.
    * @param bundle the bundle to process.
    */
-  protected void finalizePerformanceData(final JPPFTaskBundle bundle) {
+  protected void finalizePerformanceData(final TaskBundle bundle) {
     long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime());
     bundle.setNodeExecutionTime(elapsed);
   }

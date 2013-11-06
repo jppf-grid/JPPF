@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio;
 
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.node.protocol.TaskBundle;
 
 /**
  * Common abstract superclass representing a message sent or received by a node.
@@ -30,7 +30,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
   /**
    * The latest bundle that was sent or received.
    */
-  protected JPPFTaskBundle bundle = null;
+  protected TaskBundle bundle = null;
 
   /**
    * Initialize this nio message with the specified sll flag.
@@ -55,7 +55,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
    * Get the latest bundle that was sent or received.
    * @return a <code>JPPFTaskBundle</code> instance.
    */
-  public JPPFTaskBundle getBundle()
+  public TaskBundle getBundle()
   {
     return bundle;
   }
@@ -64,7 +64,7 @@ public abstract class AbstractTaskBundleMessage extends AbstractNioMessage
    * Set the latest bundle that was sent or received.
    * @param bundle a <code>JPPFTaskBundle</code> instance.
    */
-  public void setBundle(final JPPFTaskBundle bundle)
+  public void setBundle(final TaskBundle bundle)
   {
     this.bundle = bundle;
   }

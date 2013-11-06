@@ -220,7 +220,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   /**
    * Get the list of tasks to execute.
    * @return a list of objects.
-   * @deprectaed use {@link #getJobTasks()} instead.
+   * @deprecated use {@link #getJobTasks()} instead.
    */
   @Deprecated
   public List<JPPFTask> getTasks()

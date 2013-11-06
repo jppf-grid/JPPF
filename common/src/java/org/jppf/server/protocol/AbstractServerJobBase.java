@@ -24,6 +24,7 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.io.DataLocation;
 import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.protocol.utils.*;
 import org.jppf.server.submission.SubmissionStatus;
@@ -77,7 +78,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
-  public AbstractServerJobBase(final Lock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public AbstractServerJobBase(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
     super(lock, job);
     this.notificationEmitter = notificationEmitter;
     this.dataProvider = dataProvider;
@@ -237,7 +238,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
     int i = 0;
     for (ServerTaskBundleNode nodeBundle : entries) {
       JPPFManagementInfo nodeInfo = nodeBundle.getChannel().getManagementInfo();
-      JPPFTaskBundle bundle = nodeBundle.getJob();
+      TaskBundle bundle = nodeBundle.getJob();
       JobInformation jobInfo = new JobInformation(bundle);
       jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
       result[i++] = new NodeJobInformation(nodeInfo, jobInfo);

@@ -67,7 +67,7 @@ public class NodeListener implements NodeLifeCycleListener, NodeLifeCycleErrorHa
   @Override
   @SuppressWarnings("unchecked")
   public void jobEnding(final NodeLifeCycleEvent event) {
-    List<Task> tasks = event.getTasks();
+    List<Task<?>> tasks = event.getTasks();
     if ((tasks == null) || tasks.isEmpty()) return;
 
     Map<String, Long> reduced = null;

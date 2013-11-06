@@ -19,7 +19,7 @@ package org.jppf.node.protocol;
 
 /**
  * Common interface for client-side jobs (see {@link org.jppf.client.JPPFJob JPPFJob} and server-side jobs
- * (see {@link org.jppf.server.protocol.JPPFTaskBundle JPPFTaskBundle}).
+ * (see {@link org.jppf.node.protocol.TaskBundle TaskBundle}).
  * @author Laurent Cohen
  */
 public interface JPPFDistributedJob

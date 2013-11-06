@@ -20,8 +20,7 @@ package org.jppf.server.node;
 
 import java.util.List;
 
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.Pair;
 
 /**
@@ -36,7 +35,7 @@ public interface NodeIO
    * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
    * @throws Exception if an error is raised while reading the task data.
    */
-  Pair<JPPFTaskBundle, List<Task>> readTask() throws Exception;
+  Pair<TaskBundle, List<Task<?>>> readTask() throws Exception;
 
   /**
    * Write the execution results to the socket stream.
@@ -44,6 +43,6 @@ public interface NodeIO
    * @param tasks the list of tasks with their result field updated.
    * @throws Exception if an error occurs while writing to the socket stream.
    */
-  void writeResults(JPPFTaskBundle bundle, List<Task> tasks) throws Exception;
+  void writeResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
 
 }

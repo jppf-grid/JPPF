@@ -17,7 +17,7 @@
  */
 package org.jppf.application.template;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This class is a template for a standard JPPF task.
@@ -34,14 +34,12 @@ import org.jppf.server.protocol.JPPFTask;
  * </ol>
  * @author Laurent Cohen
  */
-public class TemplateJPPFTask extends JPPFTask
-{
+public class TemplateJPPFTask extends AbstractTask<String> {
   /**
    * Perform initializations on the client side,
    * before the task is executed by the node.
    */
-  public TemplateJPPFTask()
-  {
+  public TemplateJPPFTask() {
     // perform initializations here ...
   }
 
@@ -57,8 +55,7 @@ public class TemplateJPPFTask extends JPPFTask
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     // write your task code here.
     System.out.println("Hello, this is the node executing a template JPPF task");
 

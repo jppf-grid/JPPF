@@ -21,10 +21,11 @@ package org.jppf.server.node;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.classloader.*;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.JMXServer;
 import org.jppf.node.AbstractNode;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -44,19 +45,22 @@ public abstract class AbstractCommonNode extends AbstractNode
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Manages the class loaders and how they are used.
+   * @exclude
    */
   protected AbstractClassLoaderManager classLoaderManager = null;
   /**
    * Flag which determines whether a reset of the resource caches
    * should be performed at the next opportunity.
+   * @exclude
    */
   protected AtomicBoolean cacheResetFlag = new AtomicBoolean(false);
 
   /**
    * Add management parameters to the specified bundle, before sending it back to a server.
    * @param bundle the bundle to add parameters to.
+   * @exclude
    */
-  protected void setupManagementParameters(final JPPFTaskBundle bundle)
+  protected void setupManagementParameters(final TaskBundle bundle)
   {
     try
     {
@@ -83,6 +87,7 @@ public abstract class AbstractCommonNode extends AbstractNode
   /**
    * Set the main classloader for the node.
    * @param cl the class loader to set.
+   * @exclude
    */
   public void setClassLoader(final AbstractJPPFClassLoader cl)
   {
@@ -94,6 +99,7 @@ public abstract class AbstractCommonNode extends AbstractNode
    * @param uuidPath the uuid path containing the key to the container.
    * @return a <code>JPPFContainer</code> instance.
    * @throws Exception if an error occurs while getting the container.
+   * @exclude
    */
   public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
   {
@@ -102,6 +108,7 @@ public abstract class AbstractCommonNode extends AbstractNode
 
   /**
    * Clear the resource caches of all class loaders managed by this object.
+   * @exclude
    */
   protected void clearResourceCachesIfRequested()
   {

@@ -413,7 +413,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param taskBundle the job.
    * @param context the current node context.
    */
-  private void updateBundler(final Bundler bundler, final JPPFTaskBundle taskBundle, final C context)
+  private void updateBundler(final Bundler bundler, final TaskBundle taskBundle, final C context)
   {
     context.checkBundler(bundler, jppfContext);
     if (context.getBundler() instanceof JobAwareness)

@@ -21,7 +21,7 @@ package org.jppf.server.protocol.persistence;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.node.protocol.Location;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 
 /**
@@ -45,7 +45,7 @@ public class PersistentDispatchedJob implements Serializable
   /**
    * The job this submission is for
    */
-  private JPPFTaskBundle taskBundle;
+  private TaskBundle taskBundle;
   /**
    * Channel to which is this bundle dispatched.
    */

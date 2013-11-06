@@ -26,6 +26,7 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
 import org.jppf.management.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
@@ -72,7 +73,7 @@ class WaitInitialBundleState extends NodeServerState
     if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
       BundleResults received = context.deserializeBundle();
-      JPPFTaskBundle bundle = received.bundle();
+      TaskBundle bundle = received.bundle();
       boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
@@ -131,7 +132,7 @@ class WaitInitialBundleState extends NodeServerState
    * @throws Exception if any error occurs.
    */
   private NodeTransition processOfflineReopen(final BundleResults received, final AbstractNodeContext context) throws Exception {
-    JPPFTaskBundle bundle = received.bundle();
+    TaskBundle bundle = received.bundle();
     String jobUuid = bundle.getParameter(JOB_UUID);
     long id = bundle.getParameter(NODE_BUNDLE_ID);
     ServerTaskBundleNode nodeBundle = server.getOfflineNodeHandler().removeNodeBundle(jobUuid, id);

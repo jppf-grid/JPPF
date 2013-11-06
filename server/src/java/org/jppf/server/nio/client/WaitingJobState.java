@@ -20,6 +20,7 @@ package org.jppf.server.nio.client;
 
 import static org.jppf.server.nio.client.ClientTransition.*;
 
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
@@ -64,7 +65,7 @@ class WaitingJobState extends ClientServerState
     if (context.readMessage(channel))
     {
       ServerTaskBundleClient clientBundle = context.deserializeBundle();
-      JPPFTaskBundle header = clientBundle.getJob();
+      TaskBundle header = clientBundle.getJob();
       int count = header.getTaskCount();
       if (debugEnabled) log.debug("read bundle " + clientBundle + " from client " + channel + " done: received " + count + " tasks");
       if (clientBundle.getJobReceivedTime() == 0L) clientBundle.setJobReceivedTime(System.currentTimeMillis());

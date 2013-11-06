@@ -47,7 +47,7 @@ public class TaskResultEvent extends EventObject
 
   /**
    * Get the list of tasks whose results have been received from the server.
-   * To properly order the results, developers should use {@link org.jppf.server.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} for each task.
+   * To properly order the results, developers should use {@link Task#getPosition()} for each task.
    * @return a list of <code>JPPFTask</code> instances.
    * @deprecated as of v4.0, use {@link #getTasks()} instead.
    */
@@ -60,7 +60,7 @@ public class TaskResultEvent extends EventObject
 
   /**
    * Get the list of tasks whose results have been received from the server.
-   * To properly order the results, developers should use {@link org.jppf.node.protocol.JPPFTask#getPosition() JPPFTask.getPosition()} for each task.
+   * To properly order the results, developers should use {@link Task#getPosition()} for each task.
    * @return a list of <code>JPPFTask</code> instances.
    */
   @SuppressWarnings("unchecked")

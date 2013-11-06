@@ -21,9 +21,10 @@ package org.jppf.server.job.management;
 import javax.management.*;
 
 import org.jppf.job.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.slf4j.*;
 
@@ -161,7 +162,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   {
     ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
     if (bundleWrapper == null) return null;
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    TaskBundle bundle = bundleWrapper.getJob();
     JobInformation job = new JobInformation(bundle);
     job.setMaxNodes(bundle.getSLA().getMaxNodes());
     return job;

@@ -21,14 +21,14 @@ package org.jppf.server.nio.nodeserver;
 import java.util.List;
 
 import org.jppf.io.DataLocation;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.utils.Pair;
 
 /**
  * Convenience class to simplify and improve readability of the code.
  * @author Laurent Cohen
  */
-public class BundleResults extends Pair<JPPFTaskBundle, List<DataLocation>>
+public class BundleResults extends Pair<TaskBundle, List<DataLocation>>
 {
 
   /**
@@ -36,16 +36,16 @@ public class BundleResults extends Pair<JPPFTaskBundle, List<DataLocation>>
    * @param bundle the header received from the node.
    * @param data a list of {@link DataLocation} instances.
    */
-  public BundleResults(final JPPFTaskBundle bundle, final List<DataLocation> data)
+  public BundleResults(final TaskBundle bundle, final List<DataLocation> data)
   {
     super(bundle, data);
   }
 
   /**
    * Get the task bundle.
-   * @return a {@link JPPFTaskBundle} instance.
+   * @return a {@link TaskBundle} instance.
    */
-  public JPPFTaskBundle bundle()
+  public TaskBundle bundle()
   {
     return first();
   }

@@ -19,6 +19,7 @@ package org.jppf.server.peer;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -88,7 +89,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
-    JPPFTaskBundle bundle = clientBundle.getJob();
+    TaskBundle bundle = clientBundle.getJob();
     // i don't know why bundle.getTaskCount() = 0 at this point
     bundle.setTaskCount(clientBundle.getTaskCount());
     bundle.setSLA(null);

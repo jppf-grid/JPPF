@@ -183,7 +183,7 @@ public class LifeCycleEventHandler
    * @param tasks the tasks about to be or which have been executed.
    * @param dataProvider the data provider for the current job.
    */
-  public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
+  public void fireJobStarting(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider)
   {
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_STARTING, job, cl, tasks, dataProvider);
     synchronized (listeners)
@@ -209,7 +209,7 @@ public class LifeCycleEventHandler
    * @param tasks the tasks about to be or which have been executed.
    * @param dataProvider the data provider for the current job.
    */
-  public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task> tasks, final DataProvider dataProvider)
+  public void fireJobEnding(final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider)
   {
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, JOB_ENDING, job, cl, tasks, dataProvider);
     synchronized (listeners)

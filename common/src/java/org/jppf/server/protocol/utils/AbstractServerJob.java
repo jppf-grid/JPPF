@@ -17,17 +17,15 @@
  */
 package org.jppf.server.protocol.utils;
 
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.node.protocol.JobMetadata;
-import org.jppf.node.protocol.JobSLA;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.atomic.*;
-import java.util.concurrent.locks.Lock;
+import org.slf4j.*;
 
 /**
  * Abstract class that support job state management.
@@ -69,7 +67,7 @@ public abstract class AbstractServerJob {
   /**
    * The underlying task bundle.
    */
-  protected final JPPFTaskBundle job;
+  protected final TaskBundle job;
   /**
    * The universal unique id for this job.
    */
@@ -116,7 +114,7 @@ public abstract class AbstractServerJob {
    * @param lock used to synchronized access to job.
    * @param job  underlying task bundle.
    */
-  protected AbstractServerJob(final Lock lock, final JPPFTaskBundle job) {
+  protected AbstractServerJob(final Lock lock, final TaskBundle job) {
     if (lock == null) throw new IllegalArgumentException("lock is null");
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + id);
@@ -133,7 +131,7 @@ public abstract class AbstractServerJob {
    * Get the underlying task bundle.
    * @return a <code>ClientTaskBundle</code> instance.
    */
-  public JPPFTaskBundle getJob() {
+  public TaskBundle getJob() {
     return job;
   }
 

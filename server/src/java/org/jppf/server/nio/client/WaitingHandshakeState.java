@@ -22,6 +22,7 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 
 import java.util.List;
 
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
@@ -65,7 +66,7 @@ class WaitingHandshakeState extends ClientServerState
     if (context.readMessage(channel))
     {
       ServerTaskBundleClient bundleWrapper = context.deserializeBundle();
-      JPPFTaskBundle header = bundleWrapper.getJob();
+      TaskBundle header = bundleWrapper.getJob();
       if (debugEnabled) log.debug("read handshake bundle " + header + " from client " + channel);
       context.setConnectionUuid((String) header.getParameter("connection.uuid"));
       header.getUuidPath().incPosition();

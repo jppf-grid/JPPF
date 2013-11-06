@@ -22,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.io.DataLocation;
-import org.jppf.node.protocol.JobSLA;
+import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.results.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -54,7 +54,7 @@ public class ServerTaskBundleClient
   /**
    * The job to execute.
    */
-  private final JPPFTaskBundle job;
+  private final TaskBundle job;
   /**
    * The shared data provider for this task bundle.
    */
@@ -98,7 +98,7 @@ public class ServerTaskBundleClient
    * @param job   the job to execute.
    * @param dataProvider the shared data provider for this task bundle.
    */
-  public ServerTaskBundleClient(final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider) {
     this(job, dataProvider, Collections.<DataLocation>emptyList());
   }
 
@@ -108,7 +108,7 @@ public class ServerTaskBundleClient
    * @param dataProvider the shared data provider for this task bundle.
    * @param taskList the tasks to execute.
    */
-  public ServerTaskBundleClient(final JPPFTaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList) {
+  public ServerTaskBundleClient(final TaskBundle job, final DataLocation dataProvider, final List<DataLocation> taskList) {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
 
@@ -136,8 +136,8 @@ public class ServerTaskBundleClient
     //job = source.getJob().copy(size);
     this.job = source.getJob().copy();
     this.job.setTaskCount(size);
-    this.job.initialTaskCount = source.getJob().getInitialTaskCount();
-    this.job.currentTaskCount = size;
+    this.job.setInitialTaskCount(source.getJob().getInitialTaskCount());
+    this.job.setCurrentTaskCount(size);
     this.dataProvider = source.getDataProvider();
     this.taskList.addAll(taskList);
     this.pendingTasksCount.set(0);
@@ -150,7 +150,7 @@ public class ServerTaskBundleClient
    * Get the job this submission is for.
    * @return a {@link JPPFTaskBundle} instance.
    */
-  public JPPFTaskBundle getJob()
+  public TaskBundle getJob()
   {
     return job;
   }

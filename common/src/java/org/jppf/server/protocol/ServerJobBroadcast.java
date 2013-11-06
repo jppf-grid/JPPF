@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.protocol.utils.ServerJobStatus;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.collections.*;
@@ -68,7 +69,7 @@ public class ServerJobBroadcast extends ServerJob {
    * @param job   underlying task bundle.
    * @param dataProvider the data location of the data provider.
    */
-  public ServerJobBroadcast(final Lock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider) {
+  public ServerJobBroadcast(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider) {
     this(lock, notificationEmitter, job, dataProvider, null, null);
   }
 
@@ -81,7 +82,7 @@ public class ServerJobBroadcast extends ServerJob {
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID.
    */
-  protected ServerJobBroadcast(final Lock lock, final ServerJobChangeListener notificationEmitter, final JPPFTaskBundle job, final DataLocation dataProvider, final ServerJobBroadcast parentJob, final String broadcastUUID) {
+  protected ServerJobBroadcast(final Lock lock, final ServerJobChangeListener notificationEmitter, final TaskBundle job, final DataLocation dataProvider, final ServerJobBroadcast parentJob, final String broadcastUUID) {
     super(lock, notificationEmitter, job, dataProvider);
     if (!job.getSLA().isBroadcastJob()) throw new IllegalStateException("Not broadcast job");
 

@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.protocol.utils.AbstractServerJob;
@@ -108,7 +109,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   @Override
   public synchronized void jobDispatched(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
-    JPPFTaskBundle bundle = bundleNode.getJob();
+    TaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
@@ -124,7 +125,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   @Override
   public synchronized void jobReturned(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
-    JPPFTaskBundle bundle = bundleNode.getJob();
+    TaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
     List<ChannelJobPair> list = jobMap.get(jobUuid);
     if (list == null)
@@ -143,7 +144,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public synchronized void jobQueued(final ServerJob bundleWrapper)
   {
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    TaskBundle bundle = bundleWrapper.getJob();
     String jobUuid = bundle.getUuid();
     bundleMap.put(jobUuid, bundleWrapper);
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
@@ -164,7 +165,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
     if (bundleWrapper.getJob().isHandshake()) return; // skip notifications for handshake bundles
 
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    TaskBundle bundle = bundleWrapper.getJob();
     //long time = System.currentTimeMillis() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
     long time = System.currentTimeMillis() - bundleWrapper.getJobReceivedTime();
     String jobUuid = bundle.getUuid();
@@ -180,7 +181,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   @Override
   public synchronized void jobUpdated(final AbstractServerJob bundleWrapper)
   {
-    JPPFTaskBundle bundle = bundleWrapper.getJob();
+    TaskBundle bundle = bundleWrapper.getJob();
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' updated");
     submitEvent(JobEventType.JOB_UPDATED, bundle, null);
   }
@@ -197,7 +198,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param bundle the job data.
    * @param channel the id of the job source of the event.
    */
-  private void submitEvent(final JobEventType eventType, final JPPFTaskBundle bundle, final ExecutorChannel channel)
+  private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel)
   {
     executor.submit(new JobEventTask(this, eventType, bundle, channel));
   }

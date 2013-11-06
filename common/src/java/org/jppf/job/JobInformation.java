@@ -19,7 +19,7 @@ package org.jppf.job;
 
 import java.io.Serializable;
 
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.utils.ReflectionUtils;
 
 /**
@@ -79,7 +79,7 @@ public class JobInformation implements Serializable
    * Initialize this object with the specified parameters.
    * @param bundle the task bundle from which to get the job information.
    */
-  public JobInformation(final JPPFTaskBundle bundle)
+  public JobInformation(final TaskBundle bundle)
   {
     this(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(), bundle.getInitialTaskCount(),
         bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), bundle.isPending());

@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.management.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;
@@ -203,7 +204,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception {
     bundle.checkTaskCount();
-    JPPFTaskBundle taskBundle = bundle.getJob();
+    TaskBundle taskBundle = bundle.getJob();
     AbstractTaskBundleMessage message = newMessage();
     if (!taskBundle.isHandshake()) taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
     message.addLocation(IOHelper.serializeData(taskBundle, helper.getSerializer()));
@@ -220,7 +221,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public BundleResults deserializeBundle() throws Exception {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
-    JPPFTaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
+    TaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
     List<DataLocation> tasks = new ArrayList<>();
     if (locations.size() > 1) {
       for (int i=1; i<locations.size(); i++) tasks.add(locations.get(i));

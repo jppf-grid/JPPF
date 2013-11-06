@@ -23,6 +23,7 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.protocol.*;
@@ -78,7 +79,7 @@ class WaitingResultsState extends NodeServerState {
     server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle));
     boolean requeue = false;
     try {
-      JPPFTaskBundle newBundle = received.bundle();
+      TaskBundle newBundle = received.bundle();
       if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + context.getChannel());
       Pair<Boolean, Exception> res = processResults(context, received);
       requeue = res.first();
@@ -107,7 +108,7 @@ class WaitingResultsState extends NodeServerState {
    * @throws Exception if any error occurs.
    */
   private Pair<Boolean, Exception> processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
-    JPPFTaskBundle newBundle = received.bundle();
+    TaskBundle newBundle = received.bundle();
     ServerTaskBundleNode nodeBundle = context.getBundle();
     Exception exception = null;
     // if an exception prevented the node from executing the tasks or sending back the results

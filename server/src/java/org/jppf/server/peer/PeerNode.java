@@ -23,6 +23,8 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
+import org.jppf.node.NodeExecutionManager;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.*;
@@ -156,7 +158,7 @@ class PeerNode extends AbstractCommonNode
     while (!stopped)
     {
       ServerTaskBundleClient bundleWrapper = readBundle();
-      JPPFTaskBundle bundle = bundleWrapper.getJob();
+      TaskBundle bundle = bundleWrapper.getJob();
       if (bundle.isHandshake())
       {
         if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
@@ -282,5 +284,11 @@ class PeerNode extends AbstractCommonNode
   public boolean isOffline()
   {
     return false;
+  }
+
+  @Override
+  public NodeExecutionManager getExecutionManager()
+  {
+    return null;
   }
 }

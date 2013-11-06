@@ -20,8 +20,8 @@ package org.jppf.server.job;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.protocol.JobSLA;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.*;
+import org.jppf.server.protocol.BundleParameter;
 
 /**
  * Instances of this class are submitted into an event queue and generate actual
@@ -44,7 +44,7 @@ public class JobEventTask implements Runnable
   /**
    * The job data.
    */
-  private final JPPFTaskBundle bundle;
+  private final TaskBundle bundle;
   /**
    * Creation timestamp for this task.
    */
@@ -57,7 +57,7 @@ public class JobEventTask implements Runnable
    * @param bundle the job data.
    * @param channel the id of the job source of the event.
    */
-  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final JPPFTaskBundle bundle, final ExecutorChannel channel)
+  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel)
   {
     this.jobManager = jobManager;
     this.eventType = eventType;
