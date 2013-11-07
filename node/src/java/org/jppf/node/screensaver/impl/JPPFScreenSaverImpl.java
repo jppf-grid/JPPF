@@ -68,6 +68,10 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    * The horizontal alignment of the node status panel.
    */
   private int alignment = 1;
+  /**
+   * The JPPF configuration.
+   */
+  private TypedProperties config;
 
   /**
    * Default constructor.
@@ -82,7 +86,8 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   }
 
   @Override
-  public void init(final boolean fullscreen) {
+  public void init(final TypedProperties config, final boolean fullscreen) {
+    this.config = new TypedProperties(config);
     configure();
     data = new ImageData[nbLogos];
     for (int i=0; i<nbLogos; i++) data[i] = new ImageData(logos[i % logos.length]);
@@ -117,7 +122,6 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    * Initialize the parameters of the screensaver.
    */
   private void configure() {
-    TypedProperties config = JPPFConfiguration.getProperties();
     collisions = config.getBoolean("jppf.screensaver.handle.collisions", true);
     nbLogos = config.getInt("jppf.screensaver.logos", 10);
     speed = config.getInt("jppf.screensaver.speed", 10);

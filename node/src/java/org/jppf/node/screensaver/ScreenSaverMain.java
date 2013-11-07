@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 import org.jppf.node.initialization.InitializationHook;
-import org.jppf.node.screensaver.impl.*;
+import org.jppf.node.screensaver.impl.JPPFScreenSaverImpl;
 import org.jppf.utils.*;
 
 /**
@@ -76,7 +76,7 @@ public class ScreenSaverMain implements InitializationHook
    * @param config the configuration to use.
    * @throws Exception if any error occurs.
    */
-  public void startScreenSaver(final TypedProperties config) throws Exception {
+  private void startScreenSaver(final TypedProperties config) throws Exception {
     instance = this;
     this.config = config;
     createUI();
@@ -117,17 +117,25 @@ public class ScreenSaverMain implements InitializationHook
       frame.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(final KeyEvent e) {
-          screensaver.destroy();
-          System.exit(0);
+          doOnclose();
         }
       });
       frame.addMouseListener(new MouseAdapter() {
         @Override
         public void mousePressed(final MouseEvent e) {
-          screensaver.destroy();
-          System.exit(0);
+          doOnclose();
         }
       });
+      if (config.getBoolean("jppf.screensaver.mouse.motion.close", true)) {
+        final long mouseMotionDelay = config.getLong("jppf.screensaver.mouse.motion.delay", 500L);
+        final long start = System.currentTimeMillis();
+        frame.addMouseMotionListener(new MouseAdapter() {
+          @Override
+          public void mouseMoved(final MouseEvent e) {
+            if (System.currentTimeMillis() - start > mouseMotionDelay) doOnclose();
+          }
+        });
+      }
       // hide the mouse cursor over the JFrame
       BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB); // Transparent 16 x 16 pixel cursor image.
       Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor"); // Create a new blank cursor.
@@ -146,13 +154,12 @@ public class ScreenSaverMain implements InitializationHook
     frame.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
-        screensaver.destroy();
-        System.exit(0);
+        doOnclose();
       }
     });
     frame.add(screensaver.getComponent());
     screensaver.getComponent().setSize(frame.getSize());
-    screensaver.init(fullscreenRequested && fullscreenSupported);
+    screensaver.init(config, fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
   }
 
@@ -172,12 +179,11 @@ public class ScreenSaverMain implements InitializationHook
     return screensaver;
   }
 
-
   /**
    * Get the screensaver implementation.
    * @return a {@link JPPFScreenSaver} instance.
    */
-  public JPPFScreenSaver getScreenSaver() {
+  JPPFScreenSaver getScreenSaver() {
     return screensaver;
   }
 
@@ -185,7 +191,7 @@ public class ScreenSaverMain implements InitializationHook
    * Get the singleton instance of this class.
    * @return a {@link ScreenSaverMain} instance.
    */
-  public static ScreenSaverMain getInstance() {
+  static ScreenSaverMain getInstance() {
     return instance;
   }
 
@@ -193,8 +199,17 @@ public class ScreenSaverMain implements InitializationHook
    * Get the JPPF configuration.
    * @return a {@link TypedProperties} instance.
    */
-  public TypedProperties getConfig() {
+  TypedProperties getConfig() {
     return config;
+  }
+
+  /**
+   * Action performed when the frame is closed, or upon key pressed, mouse click
+   * or mouse motion events in full screen.
+   */
+  private void doOnclose() {
+    if (screensaver != null) screensaver.destroy();
+    System.exit(0);
   }
 
   /**

@@ -24,6 +24,10 @@ import org.jppf.node.event.*;
  * This interface groups two other interfaces, from which the screen saver can receive notifications from the node.
  * @author Laurent Cohen
  */
-public interface NodeIntegration extends NodeLifeCycleListener, TaskExecutionListener
-{
+public interface NodeIntegration extends NodeLifeCycleListener, TaskExecutionListener {
+  /**
+   * Provide a reference to the screen saver.
+   * @param screensaver a {@link JPPFScreenSaver} instance.
+   */
+  void setScreenSaver(JPPFScreenSaver screensaver);
 }

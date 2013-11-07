@@ -24,6 +24,7 @@ import java.util.Timer;
 import javax.swing.*;
 
 import org.jppf.node.screensaver.JPPFScreenSaver;
+import org.jppf.utils.TypedProperties;
 
 /**
  * A built-in simple screen saver implementation.
@@ -58,7 +59,7 @@ public class SimpleScreenSaver extends JPanel implements JPPFScreenSaver {
   }
 
   @Override
-  public void init(final boolean fullscreen) {
+  public void init(final TypedProperties config, final boolean fullscreen) {
     setBackground(Color.BLACK);
     timer = new Timer("JPPFScreenSaverTimer");
     // executes approximately every 40 ms

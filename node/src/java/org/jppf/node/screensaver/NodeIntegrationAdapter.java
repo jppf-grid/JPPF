@@ -23,13 +23,15 @@ import org.jppf.node.event.*;
 /**
  * An abstract adapter class for receiving node events. The methods in this class are empty.
  * This class exists as convenience, to be overriden for creating listener objects, instead of
- * implemnting the {@link NodeLifeCycleListener} and {@link TaskExecutionListener} interfaces.
+ * implementing the {@link NodeLifeCycleListener} and {@link TaskExecutionListener} interfaces.
  * @author Laurent Cohen
  */
-public abstract class NodeIntegrationAdapter extends NodeLifeCycleListenerAdapter implements NodeIntegration
-{
+public abstract class NodeIntegrationAdapter extends NodeLifeCycleListenerAdapter implements NodeIntegration {
   @Override
-  public void taskExecuted(final TaskExecutionEvent event)
-  {
+  public void taskExecuted(final TaskExecutionEvent event) {
+  }
+
+  @Override
+  public void setScreenSaver(final JPPFScreenSaver screensaver) {
   }
 }

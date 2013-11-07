@@ -20,6 +20,8 @@ package org.jppf.node.screensaver;
 
 import javax.swing.JComponent;
 
+import org.jppf.utils.TypedProperties;
+
 /**
  * This is the interface to implement for any custom implementation of a screen saver associated with a JPPF node. 
  * @author Laurent Cohen
@@ -27,17 +29,18 @@ import javax.swing.JComponent;
 public interface JPPFScreenSaver
 {
   /**
-   * Get the swing component for this screen saver.
+   * Get the Swing component for this screen saver.
    * @return a {@link JComponent}.
    */
   JComponent getComponent();
 
   /**
    * Initialize this screen saver, and in particular its UI components.
+   * @param config a copy of the JPPF configuration,
    * @param fullscreen <code>true</code> if the screen saver is to be displayed in full screen mode,
    * <code>false</code> if it is to run in windowed mode.
    */
-  void init(boolean fullscreen);
+  void init(TypedProperties config, boolean fullscreen);
 
   /**
    * Destroy this screen saver and release its resources.

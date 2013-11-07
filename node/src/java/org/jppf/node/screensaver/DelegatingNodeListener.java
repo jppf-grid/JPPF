@@ -25,9 +25,10 @@ import org.jppf.utils.TypedProperties;
  * This class registers as a NodeLifeCycleListener and instantiates an implementation of {@link NodeIntegration},
  * if any is defined in the configuration. It also registers this implementation as a {@link TaskExecutionListener}
  * with the node, so it can receive a notification for each individual task reaches completion. 
+ * @author Laurent Cohen
+ * @exclude
  */
-public class DelegatingNodeListener implements NodeLifeCycleListener
-{
+public class DelegatingNodeListener implements NodeLifeCycleListener {
   /**
    * The node life cycle listner to delegate events to.
    */
@@ -36,72 +37,53 @@ public class DelegatingNodeListener implements NodeLifeCycleListener
   /**
    * Initialize this listener and instantiate the delegate if one is configured.
    */
-  public DelegatingNodeListener()
-  {
-    try
-    {
+  public DelegatingNodeListener() {
+    try {
       ScreenSaverMain ssm = ScreenSaverMain.getInstance();
-      if (ssm != null)
-      {
+      if (ssm != null) {
         TypedProperties config = ssm.getConfig();
         String name = config.getString("jppf.screensaver.node.listener");
-        if (name != null)
-        {
+        if (name != null) {
           Class<?> clazz = Class.forName(name, true, getClass().getClassLoader());
           delegate = (NodeIntegration) clazz.newInstance();
-          if (delegate instanceof JPPFScreenSaverHolder)
-          {
-            ((JPPFScreenSaverHolder) delegate).setScreenSaver(ssm.getScreenSaver());
-          }
+          delegate.setScreenSaver(ssm.getScreenSaver());
         }
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
     }
   }
 
   @Override
-  public void nodeStarting(final NodeLifeCycleEvent event)
-  {
-    if (delegate != null)
-    {
+  public void nodeStarting(final NodeLifeCycleEvent event) {
+    if (delegate != null) {
       ((NodeInternal) event.getNode()).getExecutionManager().addTaskExecutionListener(delegate);
       delegate.nodeStarting(event);
     }
   }
 
   @Override
-  public void nodeEnding(final NodeLifeCycleEvent event)
-  {
-    if (delegate != null)
-    {
-      try
-      {
+  public void nodeEnding(final NodeLifeCycleEvent event) {
+    if (delegate != null) {
+      try {
         delegate.nodeEnding(event);
-      }
-      finally
-      {
+      } finally {
         ((NodeInternal) event.getNode()).getExecutionManager().removeTaskExecutionListener(delegate);
       }
     }
   }
 
   @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
-  {
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
     if (delegate != null) delegate.jobHeaderLoaded(event);
   }
 
   @Override
-  public void jobStarting(final NodeLifeCycleEvent event)
-  {
+  public void jobStarting(final NodeLifeCycleEvent event) {
     if (delegate != null) delegate.jobStarting(event);
   }
 
   @Override
-  public void jobEnding(final NodeLifeCycleEvent event)
-  {
+  public void jobEnding(final NodeLifeCycleEvent event) {
     if (delegate != null) delegate.jobEnding(event);
   }
 }
