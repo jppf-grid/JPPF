@@ -180,7 +180,47 @@ public enum Fields
   /**
    * Average number of tasks of a job in the server.
    */
-  JOBS_AVG_TASKS;
+  JOBS_AVG_TASKS,
+  /**
+   * Total number of class loading requests from the nodes.
+   */
+  NODE_TOTAL_CL_REQUEST_COUNT,
+  /**
+   * Average time of class loading requests from the nodes.
+   */
+  NODE_AVG_CL_REQUEST_TIME,
+  /**
+   * Minimum time of class loading requests from the nodes.
+   */
+  NODE_MIN_CL_REQUEST_TIME,
+  /**
+   * Maximum time of class loading requests from the nodes.
+   */
+  NODE_MAX_CL_REQUEST_TIME,
+  /**
+   * Latest time of class loading requests from the nodes.
+   */
+  NODE_LATEST_CL_REQUEST_TIME,
+  /**
+   * Total number of class loading requests to the clients.
+   */
+  CLIENT_TOTAL_CL_REQUEST_COUNT,
+  /**
+   * Average time of class loading requests to the clients.
+   */
+  CLIENT_AVG_CL_REQUEST_TIME,
+  /**
+   * Minimum time of class loading requests to the clients.
+   */
+  CLIENT_MIN_CL_REQUEST_TIME,
+  /**
+   * Maximum time of class loading requests to the clients.
+   */
+  CLIENT_MAX_CL_REQUEST_TIME,
+  /**
+   * Latest time of class loading requests to the clients.
+   */
+  CLIENT_LATEST_CL_REQUEST_TIME;
 
   /**
    * The localized name of this enum item.

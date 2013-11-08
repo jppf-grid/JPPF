@@ -29,7 +29,7 @@
 	<!-- ===================================================================== -->
 
 	<child name="Actions" type="page">
-		<property name="label" value="Actions"/>
+    <property name="label" value="Actions"/>
 		<property name="componentConstraints" value="growy 0"/>
 	
     <child name="RefreshBtn" type="Button">
@@ -75,28 +75,16 @@
 	<!--                      Tree table area                                  -->
 	<!-- ===================================================================== -->
 
-	<child name="TablesContainer" type="page">
-		<property name="label" value="Actions"/>
-		<property name="layoutConstraints" value="fill"/>
-		<property name="componentConstraints" value="grow"/>
-
-		<child name="Tables" type="Java">
-			<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
-      <!--
-      <property name="layoutConstraints" value="fill, flowy"/>
-      <property name="componentConstraints" value="grow"/>
-			-->
-      <property name="layoutConstraints" value=""/>
-      <property name="componentConstraints" value="grow, pushx"/>
-			<property name="value" value=""/>
-		</child>
-
+	<child name="Tables" type="Java">
+    <property name="scrollable" value="false"/>
+		<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
     <!--
-		<child name="filler" type="Page">
-			<property name="componentConstraints" value="growx, span 2"/>
-		</child>
+    <property name="layoutConstraints" value="fill, flowy"/>
+    <property name="componentConstraints" value="grow"/>
 		-->
-
+    <property name="layoutConstraints" value=""/>
+    <property name="componentConstraints" value="growx 0, growy, pushy"/>
+		<property name="value" value=""/>
 	</child>
 
 	<child name="filler" type="Page">

@@ -63,7 +63,6 @@ class WaitingNodeRequestState extends ClassServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
@@ -75,12 +74,7 @@ class WaitingNodeRequestState extends ClassServerState
       if (debugEnabled) log.debug(build("read resource request ", res, " from node: ", channel));
       boolean allDefinitionsFound = true;
       for (JPPFResourceWrapper resource: res.getResources()) allDefinitionsFound &= processResource(channel, resource);
-      if (allDefinitionsFound)
-      {
-        if (debugEnabled) log.debug(build("sending response ", res, " to node: ", channel));
-        context.serializeResource();
-        return TO_SENDING_NODE_RESPONSE;
-      }
+      if (allDefinitionsFound) return sendResponse(context);
       if (debugEnabled) log.debug(build("pending responses ", context.getNbPendingResponses(), " for node: ", channel));
       return TO_IDLE_NODE;
     }

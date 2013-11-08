@@ -25,6 +25,7 @@ import java.net.ConnectException;
 
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -56,7 +57,6 @@ class SendingNodeResponseState extends ClassServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
@@ -68,6 +68,8 @@ class SendingNodeResponseState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.writeMessage(channel))
     {
+      long elapsed = (System.nanoTime() - context.getRequestStartTime()) / 1_000_000L;
+      driver.getStatistics().addValues(JPPFStatisticsHelper.NODE_CLASS_REQUESTS_TIME, elapsed, context.getResource().getResources().length);
       if (debugEnabled) log.debug(build("node: ", channel, ", response [", context.getResource(), "] sent to the node"));
       context.setMessage(null);
       return TO_WAITING_NODE_REQUEST;

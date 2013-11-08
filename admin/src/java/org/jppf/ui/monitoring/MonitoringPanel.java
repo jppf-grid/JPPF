@@ -73,20 +73,13 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     addTablePanel(JOB_PROPS, "JobTable.label");
     addTablePanel(QUEUE_PROPS, "QueueTable.label");
     addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
+    addTablePanel(NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable.label");
+    addTablePanel(CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable.label");
     statsHandler.addStatsHandlerListener(this);
-    addComponentListener(new ComponentListener() {
-      @Override
-      public void componentShown(final ComponentEvent e){
-      }
+    addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(final ComponentEvent e) {
         MonitoringPanel.this.revalidate();
-      }
-      @Override
-      public void componentMoved(final ComponentEvent e) {
-      }
-      @Override
-      public void componentHidden(final ComponentEvent e) {
       }
     });
   }

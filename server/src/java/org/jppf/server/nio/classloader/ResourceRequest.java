@@ -19,7 +19,7 @@
 package org.jppf.server.nio.classloader;
 
 import org.jppf.classloader.JPPFResourceWrapper;
-import org.jppf.server.nio.*;
+import org.jppf.server.nio.ChannelWrapper;
 
 /**
  * Instances of this class represent a class loading request from a node to a client channel.
@@ -34,6 +34,10 @@ public class ResourceRequest
    * The resource to lookup in the client.
    */
   private JPPFResourceWrapper resource;
+  /**
+   * The time at which this request was submitted.
+   */
+  private long requestStartTime = 0L;
 
   /**
    * Initialize this request with the specified node channel and resource.
@@ -81,5 +85,23 @@ public class ResourceRequest
     sb.append(", resource=").append(resource);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the time at which this request was submitted.
+   * @return the time in nanoseconds.
+   */
+  public long getRequestStartTime()
+  {
+    return requestStartTime;
+  }
+
+  /**
+   * Set the time at which this request was submitted.
+   * @param requestStartTime the time in nanoseconds.
+   */
+  public void setRequestStartTime(final long requestStartTime)
+  {
+    this.requestStartTime = requestStartTime;
   }
 }

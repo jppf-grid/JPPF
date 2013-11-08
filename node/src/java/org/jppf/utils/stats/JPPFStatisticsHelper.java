@@ -81,6 +81,14 @@ public final class JPPFStatisticsHelper
    * Number of client connections.
    */
   public static final String CLIENTS = "clients";
+  /**
+   * Time for class loading requests from nodes to complete.
+   */
+  public static final String NODE_CLASS_REQUESTS_TIME = "node.class.requests.time";
+  /**
+   * Time for class loading requests from nodes to complete.
+   */
+  public static final String CLIENT_CLASS_REQUESTS_TIME = "client.class.requests.time";
 
   /**
    * Create a statistics object initialized with all the required server snapshots.
@@ -89,7 +97,8 @@ public final class JPPFStatisticsHelper
   public static JPPFStatistics createServerStatistics()
   {
     JPPFStatistics statistics = new JPPFStatistics();
-    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TOTAL, TASK_QUEUE_TIME, JOB_TOTAL, JOB_TIME, JOB_TASKS, TASK_DISPATCH);
+    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TOTAL, TASK_QUEUE_TIME, JOB_TOTAL, JOB_TIME, JOB_TASKS,
+      TASK_DISPATCH, NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);
     return statistics;
   }

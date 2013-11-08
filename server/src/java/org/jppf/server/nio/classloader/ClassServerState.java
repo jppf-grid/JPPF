@@ -18,6 +18,9 @@
 
 package org.jppf.server.nio.classloader;
 
+import static org.jppf.server.nio.classloader.ClassTransition.TO_SENDING_NODE_RESPONSE;
+import static org.jppf.utils.StringUtils.build;
+
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.NioState;
 import org.slf4j.*;
@@ -39,11 +42,11 @@ public abstract class ClassServerState extends NioState<ClassTransition>
   /**
    * The server that handles this state.
    */
-  protected ClassNioServer server = null;
+  protected final ClassNioServer server;
   /**
    * Reference to the driver.
    */
-  protected JPPFDriver driver = JPPFDriver.getInstance();
+  protected final JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this state.
@@ -52,5 +55,18 @@ public abstract class ClassServerState extends NioState<ClassTransition>
   public ClassServerState(final ClassNioServer server)
   {
     this.server = server;
+  }
+
+  /**
+   * Serialize the resource and send it back to the node.
+   * @param context the context which serializes the resource.
+   * @return a state transition as an <code>NioTransition</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  protected ClassTransition sendResponse(final ClassContext context) throws Exception
+  {
+    context.serializeResource();
+    if (debugEnabled) log.debug(build("sending response ", context.getResource(), " to node: ", context.getChannel()));
+    return TO_SENDING_NODE_RESPONSE;
   }
 }

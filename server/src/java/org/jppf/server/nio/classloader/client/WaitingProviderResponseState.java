@@ -23,6 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
@@ -74,6 +75,8 @@ class WaitingProviderResponseState extends ClassServerState
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 
       if (debugEnabled) log.debug(build("client ", channel, " sending response ", resource, " to node ", request.getChannel()));
+      double elapsed = (System.nanoTime() - request.getRequestStartTime()) / 1_000_000d;
+      driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENT_CLASS_REQUESTS_TIME, elapsed);
       context.sendNodeResponse(request, resource);
       context.setCurrentRequest(null);
       context.setMessage(null);

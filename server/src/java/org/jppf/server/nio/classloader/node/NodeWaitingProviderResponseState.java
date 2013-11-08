@@ -57,7 +57,6 @@ class NodeWaitingProviderResponseState extends ClassServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
@@ -85,18 +84,5 @@ class NodeWaitingProviderResponseState extends ClassServerState
     }
     context.removePendingResponses(toRemove);
     return context.hasPendingResponse() ? TO_IDLE_NODE : sendResponse(context);
-  }
-
-  /**
-   * Serialize the resource and send it back to the node.
-   * @param context the context which serializes the resource.
-   * @return a state transition as an <code>NioTransition</code> instance.
-   * @throws Exception if any error occurs.
-   */
-  protected ClassTransition sendResponse(final ClassContext context) throws Exception
-  {
-    if (debugEnabled) log.debug(build("preparing to send the response for channel ", context.getChannel()));
-    context.serializeResource();
-    return TO_SENDING_NODE_RESPONSE;
   }
 }

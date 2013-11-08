@@ -51,10 +51,10 @@ public class JavaOption extends AbstractOption
   {
     try
     {
-      UIComponent = (JComponent) Class.forName(getClassName()).newInstance();
-      if (UIComponent instanceof JPanel)
+      JComponent comp = (JComponent) Class.forName(getClassName()).newInstance();
+      if (comp instanceof JPanel)
       {
-        JPanel panel = (JPanel) UIComponent;
+        JPanel panel = (JPanel) comp;
         if (!(panel.getLayout() instanceof MigLayout) && (layoutConstraints != null) && !"".equals(layoutConstraints))
           panel.setLayout(new MigLayout(layoutConstraints));
       }
@@ -63,8 +63,9 @@ public class JavaOption extends AbstractOption
         JavaOptionMouseListener ml =
           (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
         ml.setOption(this);
-        UIComponent.addMouseListener(ml);
+        comp.addMouseListener(ml);
       }
+      UIComponent = scrollable ? new JScrollPane(comp) : comp;
     }
     catch(Exception e)
     {

@@ -138,6 +138,18 @@ public final class StatsFormatter implements StatsConstants
     map.put(JOBS_MIN_TASKS, formatInt(snapshot.getMin()));
     map.put(JOBS_MAX_TASKS, formatInt(snapshot.getMax()));
     map.put(JOBS_AVG_TASKS, formatDouble(snapshot.getAvg()));
+    snapshot = stats.getSnapshot(NODE_CLASS_REQUESTS_TIME);
+    map.put(NODE_TOTAL_CL_REQUEST_COUNT, formatInt(snapshot.getValueCount()));
+    map.put(NODE_AVG_CL_REQUEST_TIME, formatDouble(snapshot.getAvg()));
+    map.put(NODE_MIN_CL_REQUEST_TIME, formatDouble(snapshot.getMin()));
+    map.put(NODE_MAX_CL_REQUEST_TIME, formatDouble(snapshot.getMax()));
+    map.put(NODE_LATEST_CL_REQUEST_TIME, formatDouble(snapshot.getLatest()));
+    snapshot = stats.getSnapshot(CLIENT_CLASS_REQUESTS_TIME);
+    map.put(CLIENT_TOTAL_CL_REQUEST_COUNT, formatInt(snapshot.getValueCount()));
+    map.put(CLIENT_AVG_CL_REQUEST_TIME, formatDouble(snapshot.getAvg()));
+    map.put(CLIENT_MIN_CL_REQUEST_TIME, formatDouble(snapshot.getMin()));
+    map.put(CLIENT_MAX_CL_REQUEST_TIME, formatDouble(snapshot.getMax()));
+    map.put(CLIENT_LATEST_CL_REQUEST_TIME, formatDouble(snapshot.getLatest()));
     return map;
   }
 
@@ -198,6 +210,18 @@ public final class StatsFormatter implements StatsConstants
     map.put(JOBS_MIN_TASKS, snapshot.getMin());
     map.put(JOBS_MAX_TASKS, snapshot.getMax());
     map.put(JOBS_AVG_TASKS, snapshot.getAvg());
+    snapshot = stats.getSnapshot(NODE_CLASS_REQUESTS_TIME);
+    map.put(NODE_TOTAL_CL_REQUEST_COUNT, (double) snapshot.getValueCount());
+    map.put(NODE_AVG_CL_REQUEST_TIME, snapshot.getAvg());
+    map.put(NODE_MIN_CL_REQUEST_TIME, snapshot.getMin());
+    map.put(NODE_MAX_CL_REQUEST_TIME, snapshot.getMax());
+    map.put(NODE_LATEST_CL_REQUEST_TIME, snapshot.getLatest());
+    snapshot = stats.getSnapshot(CLIENT_CLASS_REQUESTS_TIME);
+    map.put(CLIENT_TOTAL_CL_REQUEST_COUNT, (double) snapshot.getValueCount());
+    map.put(CLIENT_AVG_CL_REQUEST_TIME, snapshot.getAvg());
+    map.put(CLIENT_MIN_CL_REQUEST_TIME, snapshot.getMin());
+    map.put(CLIENT_MAX_CL_REQUEST_TIME, snapshot.getMax());
+    map.put(CLIENT_LATEST_CL_REQUEST_TIME, snapshot.getLatest());
     return map;
   }
 

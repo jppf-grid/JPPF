@@ -23,6 +23,7 @@ import javax.swing.*;
 
 /**
  *  FlowLayout subclass that fully supports wrapping of components.
+ *  <p>Disclaimer: this class is based on the code provided at <a href="http://tips4java.wordpress.com/2008/11/06/wrap-layout/">http://tips4java.wordpress.com/2008/11/06/wrap-layout/</a>.
  */
 public class WrapLayout extends FlowLayout
 {

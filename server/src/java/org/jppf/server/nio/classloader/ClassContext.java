@@ -86,6 +86,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Reference to the driver.
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Time at which the current request was received.
+   */
+  private long requestStartTime = 0L;
 
   @Override
   public boolean setState(final ClassState state) {
@@ -109,6 +113,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public JPPFResourceWrapper deserializeResource() throws Exception
   {
+    requestStartTime = System.nanoTime();
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
     resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, serializer);
@@ -180,6 +185,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request) {
     if (!((ClientClassNioServer) driver.getClientClassServer()).addResourceRequest(uuid, request)) {
+      request.setRequestStartTime(System.nanoTime());
       pendingRequests.offer(request);
       processRequests();
     }
@@ -453,5 +459,13 @@ public class ClassContext extends SimpleNioContext<ClassState>
     sb.append(", secure=").append(isSecure());
     sb.append(", ssl=").append(ssl);
     return sb.toString();
+  }
+
+  /**
+   * Get the time at which the current request was received.
+   * @return the time in nanos.
+   */
+  public long getRequestStartTime() {
+    return requestStartTime;
   }
 }
