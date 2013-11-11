@@ -26,195 +26,67 @@ import org.jppf.utils.CollectionUtils;
  * Convenience class for collecting time or size statistics.
  * Instances of this class are thread-safe.
  */
-public class JPPFSnapshot implements Serializable
+public interface JPPFSnapshot extends Serializable
 {
-  /**
-   * Explicit serialVersionUID.
-   */
-  private static final long serialVersionUID = 1L;
-  /**
-   * Label for this snapshot, used in the {@link #toString()} method.
-   */
-  private final String label;
-  /**
-   * The total cumulated values.
-   */
-  private double total = 0d;
-  /**
-   * The most recent value.
-   */
-  private double latest = 0d;
-  /**
-   * The minimum value.
-   */
-  private double min = Double.POSITIVE_INFINITY;
-  /**
-   * The maximum value.
-   */
-  private double max = 0d;
-  /**
-   * The average value.
-   */
-  private double avg = 0d;
-  /**
-   * Count of values added to this snapshot.
-   */
-  private long valueCount = 0L;
-  /**
-   * Determines whether updates are accumulated instead of simply stored as latest value.
-   */
-  private final boolean cumulative;
-
-  /**
-   * Initialize this time snapshot with a specified title.
-   * @param label the title for this snapshot.
-   */
-  public JPPFSnapshot(final String label)
-  {
-    this(label, false);
-  }
-
-  /**
-   * Initialize this time snapshot with a specified title.
-   * @param label the title for this snapshot.
-   * @param cumulative determines whether updates are accumulated instead of simply stored as latest value.
-   * When true then <code>latest</code> is always equal to <code>total</code>.
-   */
-  public JPPFSnapshot(final String label, final boolean cumulative)
-  {
-    this.label = label;
-    this.cumulative = cumulative;
-  }
-
   /**
    * Add a set of aggregated values to this snapshot.
    * @param accumulatedValues the accumulated sum of the values to add.
    * @param count the number of values in the accumalated values.
    */
-  synchronized void addValues(final double accumulatedValues, final long count)
-  {
-    total += accumulatedValues;
-    if (count > 0L)
-    {
-      valueCount += count;
-      if (cumulative) latest += accumulatedValues;
-      else latest = (count == 1L) ? accumulatedValues : accumulatedValues / count;
-      if (latest > max) max = latest;
-      if (latest < min) min = latest;
-      if (valueCount != 0d) avg = total / valueCount;
-    }
-  }
+  void addValues(final double accumulatedValues, final long count);
 
   /**
    * Make a copy of this time snapshot object.
    * @return a <code>TimeSnapshot</code> instance.
    */
-  public synchronized JPPFSnapshot copy()
-  {
-    JPPFSnapshot ts = new JPPFSnapshot(label);
-    ts.total = total;
-    ts.latest = latest;
-    ts.min = min;
-    ts.max = max;
-    ts.avg = avg;
-    ts.valueCount = valueCount;
-    return ts;
-  }
+  JPPFSnapshot copy();
 
   /**
    * Reset all counters to their initial values.
    */
-  public synchronized void reset()
-  {
-    total = 0d;
-    latest = 0d;
-    min = Double.POSITIVE_INFINITY;
-    max = 0d;
-    avg = 0d;
-    valueCount = 0L;
-  }
-
-  /**
-   * Get a string representation of this stats object.
-   * @return a string display the various stats values.
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public synchronized String toString()
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append(label).append(": total=").append(total);
-    sb.append(", latest=").append(latest);
-    sb.append(", min=").append(min);
-    sb.append(", max=").append(max);
-    sb.append(", avg=").append(avg);
-    sb.append(", valueCount=").append(valueCount);
-    return sb.toString();
-  }
+  void reset();
 
   /**
    * Get the total cumulated time / size.
    * @return the total time as a long value.
    */
-  public synchronized double getTotal()
-  {
-    return total;
-  }
+  double getTotal();
 
   /**
    * Get the minimum time / size observed.
    * @return the minimum time as a long value.
    */
-  public synchronized double getLatest()
-  {
-    return latest;
-  }
+  double getLatest();
 
   /**
    * Get the smallest time / size observed.
    * @return the minimum time as a long value.
    */
-  public synchronized double getMin()
-  {
-    if (Double.compare(min, Double.POSITIVE_INFINITY) == 0) return latest;
-    else return min;
-  }
+  double getMin();
 
   /**
    * Get the peak time / size.
    * @return the maximum time as a long value.
    */
-  public synchronized double getMax()
-  {
-    return max;
-  }
+  double getMax();
 
   /**
    * Get the average time / size.
    * @return the average time as a double value.
    */
-  public synchronized double getAvg()
-  {
-    return avg;
-  }
+  double getAvg();
 
   /**
    * Get the label for this snapshot.
    * @return the label as a string.
    */
-  public synchronized String getLabel()
-  {
-    return label;
-  }
+  String getLabel();
 
   /**
    * Get the count of values added to this snapshot.
    * @return the count as a long value.
    */
-  public synchronized long getValueCount()
-  {
-    return valueCount;
-  }
+  long getValueCount();
 
   /**
    * A filter interface for snapshots.

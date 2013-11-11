@@ -20,9 +20,10 @@ package org.jppf.utils.configuration;
 
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.jppf.node.protocol.URLLocation;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -136,7 +137,8 @@ public class PropertiesLoader
           break;
         case URL_SRC:
           URL url = new URL(tokens[2]);
-          reader = new BufferedReader(new InputStreamReader(url.openStream()));
+          //reader = new BufferedReader(new InputStreamReader(url.openStream()));
+          reader = new BufferedReader(new InputStreamReader(new URLLocation(url).getInputStream()));
           break;
         case CLASS_SRC:
           reader = new BufferedReader(JPPFConfiguration.getConfigurationSourceReader(tokens[2]));

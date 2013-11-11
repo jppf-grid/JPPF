@@ -46,11 +46,11 @@ public final class JPPFStatisticsHelper
    */
   public static final String TASK_QUEUE_TOTAL = "task.queue.total";
   /**
-   * Tasks count.
+   * Queue tasks count.
    */
   public static final String TASK_QUEUE_COUNT = "task.queue.count";
   /**
-   * Tasks times.
+   * Queue tasks times.
    */
   public static final String TASK_QUEUE_TIME = "task.queue.time";
   /**
@@ -89,6 +89,38 @@ public final class JPPFStatisticsHelper
    * Time for class loading requests from nodes to complete.
    */
   public static final String CLIENT_CLASS_REQUESTS_TIME = "client.class.requests.time";
+  /**
+   * Bytes received from remote nodes.
+   */
+  public static final String NODE_IN_TRAFFIC = "node.traffic.in";
+  /**
+   * Bytes sent to remote nodes.
+   */
+  public static final String NODE_OUT_TRAFFIC = "node.traffic.out";
+  /**
+   * Bytes received from remote clients.
+   */
+  public static final String CLIENT_IN_TRAFFIC = "client.traffic.in";
+  /**
+   * Bytes sent to remote clients.
+   */
+  public static final String CLIENT_OUT_TRAFFIC = "client.traffic.out";
+  /**
+   * Bytes received from remote peer servers.
+   */
+  public static final String PEER_IN_TRAFFIC = "peer.traffic.in";
+  /**
+   * Bytes sent to remote peer servers.
+   */
+  public static final String PEER_OUT_TRAFFIC = "peer.traffic.out";
+  /**
+   * Bytes received from unidentified remote peers.
+   */
+  public static final String UNIDENTIFIED_IN_TRAFFIC = "unidentified.traffic.in";
+  /**
+   * Bytes sent to unidentified remote peers.
+   */
+  public static final String UNIDENTIFIED_OUT_TRAFFIC = "unidentified.traffic.out";
 
   /**
    * Create a statistics object initialized with all the required server snapshots.
@@ -97,9 +129,11 @@ public final class JPPFStatisticsHelper
   public static JPPFStatistics createServerStatistics()
   {
     JPPFStatistics statistics = new JPPFStatistics();
-    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TOTAL, TASK_QUEUE_TIME, JOB_TOTAL, JOB_TIME, JOB_TASKS,
-      TASK_DISPATCH, NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
+    statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, TASK_DISPATCH,
+      NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);
+    statistics.createSingleValueSnapshots(TASK_QUEUE_TOTAL, JOB_TOTAL, NODE_IN_TRAFFIC, NODE_OUT_TRAFFIC, CLIENT_IN_TRAFFIC, CLIENT_OUT_TRAFFIC,
+      PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, UNIDENTIFIED_IN_TRAFFIC, UNIDENTIFIED_OUT_TRAFFIC);
     return statistics;
   }
 }

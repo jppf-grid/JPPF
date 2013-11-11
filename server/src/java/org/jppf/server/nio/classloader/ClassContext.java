@@ -19,6 +19,7 @@
 package org.jppf.server.nio.classloader;
 
 import static org.jppf.utils.StringUtils.build;
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -57,7 +58,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * The list of pending resource requests for a resource provider.
    */
   private final Queue<ResourceRequest> pendingRequests = new ConcurrentLinkedQueue<>();
-  //private final List<ResourceRequest> pendingRequests = new ArrayList<ResourceRequest>();
   /**
    * The list of pending resource responses for a node.
    */
@@ -116,7 +116,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
     requestStartTime = System.nanoTime();
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
-    resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, serializer);
+    //resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, serializer);
+    resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl);
     return resource;
   }
 
@@ -141,14 +142,25 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * @throws Exception if any error occurs.
    */
   public boolean writeIdentifier(final ChannelWrapper<?> channel) throws Exception {
+    int id = JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL;
     if (nioObject == null) {
-      byte[] bytes = SerializationUtils.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
+      byte[] bytes = SerializationUtils.writeInt(id);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
+      /*
       if (sslHandler == null) nioObject = new PlainNioObject(channel, dl);
       else nioObject = new SSLNioObject(dl, sslHandler);
+       */
+      nioObject = new PlainNioObject(channel, dl);
     }
-    boolean b = nioObject.write();
-    if (b  && debugEnabled) log.debug(build("sent channel identifier ", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL), " to peer server"));
+    boolean b = false;
+    try {
+      b = nioObject.write();
+    } catch(Exception e) {
+      driver.getStatistics().addValue(PEER_OUT_TRAFFIC, nioObject.getChannelCount());
+      throw e;
+    }
+    if (b  && debugEnabled) log.debug("sent channel identifier {} to peer server", JPPFIdentifiers.asString(id));
+    if (b) driver.getStatistics().addValue(PEER_OUT_TRAFFIC, nioObject.getChannelCount());
     return b;
   }
 
@@ -184,7 +196,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request) {
-    if (!((ClientClassNioServer) driver.getClientClassServer()).addResourceRequest(uuid, request)) {
+    if (!driver.getClientClassServer().addResourceRequest(uuid, request)) {
       request.setRequestStartTime(System.nanoTime());
       pendingRequests.offer(request);
       processRequests();
@@ -290,7 +302,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
       if (!pendingList.isEmpty()) {
         if (debugEnabled) log.debug("provider: {} sending null response(s) for disconnected provider", getChannel());
-        ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
+        ClientClassNioServer clientClassServer = driver.getClientClassServer();
         ClassNioServer nodeClassServer = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
         for (ResourceRequest mainRequest : pendingList) {
@@ -333,7 +345,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public void sendNodeResponse(final ResourceRequest request, final JPPFResourceWrapper resource) throws Exception {
     String uuid = request.getResource().getUuidPath().getFirst();
-    ClientClassNioServer server = (ClientClassNioServer) driver.getClientClassServer();
+    ClientClassNioServer server = driver.getClientClassServer();
     Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, resource.getName());
     StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
     for (ResourceRequest req: allRequests) {
@@ -467,5 +479,52 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   public long getRequestStartTime() {
     return requestStartTime;
+  }
+
+  @Override
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
+    boolean b = false;
+    try {
+      b = super.readMessage(wrapper);
+    } catch(Exception e) {
+      updateInStats();
+      throw e;
+    }
+    if (b) updateOutStats();
+    return b;
+  }
+
+  @Override
+  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
+  {
+    boolean b = false;
+    try {
+      b = super.writeMessage(wrapper);
+    } catch(Exception e) {
+      updateOutStats();
+      throw e;
+    }
+    if (b) updateOutStats();
+    return b;
+  }
+
+  /**
+   * Update the inbound traffic statistics.
+   */
+  private void updateInStats() {
+    if (message != null) {
+      long n = message.getChannelCount();
+      if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : (provider ? CLIENT_IN_TRAFFIC : NODE_IN_TRAFFIC), n);
+    }
+  }
+
+  /**
+   * Update the outbound traffic statistics.
+   */
+  private void updateOutStats() {
+    if (message != null) {
+      long n = message.getChannelCount();
+      if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : (provider ? CLIENT_OUT_TRAFFIC : NODE_OUT_TRAFFIC), n);
+    }
   }
 }

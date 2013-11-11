@@ -55,4 +55,10 @@ public interface NioObject
    * @return the size as an int.
    */
   int getSize();
+
+  /**
+   * Get the actual bytes sent to or received from the underlying channel.
+   * @return the number of bytes as a long value.
+   */
+  long getChannelCount();
 }

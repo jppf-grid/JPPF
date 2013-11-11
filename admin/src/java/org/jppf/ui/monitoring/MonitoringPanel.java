@@ -67,14 +67,16 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
     wl.setAlignOnBaseline(true);
     setLayout(wl);
-    addTablePanel(EXECUTION_PROPS, "ExecutionTable.label");
-    addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable.label");
-    addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable.label");
-    addTablePanel(JOB_PROPS, "JobTable.label");
-    addTablePanel(QUEUE_PROPS, "QueueTable.label");
-    addTablePanel(CONNECTION_PROPS, "ConnectionsTable.label");
-    addTablePanel(NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable.label");
-    addTablePanel(CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable.label");
+    addTablePanel(EXECUTION_PROPS, "ExecutionTable");
+    addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable");
+    addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable");
+    addTablePanel(CONNECTION_PROPS, "ConnectionsTable");
+    addTablePanel(QUEUE_PROPS, "QueueTable");
+    addTablePanel(JOB_PROPS, "JobTable");
+    addTablePanel(NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable");
+    addTablePanel(CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable");
+    addTablePanel(INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable");
+    addTablePanel(OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable");
     statsHandler.addStatsHandlerListener(this);
     addComponentListener(new ComponentAdapter() {
       @Override
@@ -87,11 +89,12 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   /**
    * Add a table panel to this panel.
    * @param fields the fields displayed in the table.
-   * @param label the reference to the localized title of the table.
+   * @param title the reference to the localized title of the table.
    */
-  private void addTablePanel(final Fields[] fields, final String label)
+  private void addTablePanel(final Fields[] fields, final String title)
   {
-    JComponent comp = makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, label));
+    JComponent comp = makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, title + ".label"));
+    comp.setToolTipText(LocalizationUtils.getLocalized(BASE, title + ".tooltip"));
     add(comp);
   }
 

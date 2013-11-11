@@ -53,13 +53,18 @@ public class CsvStatsExporter implements StatsExporter
   {
     StringBuilder sb = new StringBuilder();
     sb.append("\"JPPF driver statistics\",\n\n");
-    Map<Fields, String> map = new HashMap<>(statsHandler.getLatestStringValues());
+    Map<Fields, Double> m = statsHandler.getLatestDoubleValues();
+    Map<Fields, Double> map = (m == null) ? new HashMap<Fields, Double>() : new HashMap<>(m);
     sb.append(format(map, EXECUTION_PROPS, "ExecutionTable.label"));
     sb.append(format(map, NODE_EXECUTION_PROPS, "NodeExecutionTable.label"));
     sb.append(format(map, TRANSPORT_PROPS, "NetworkOverheadTable.label"));
     sb.append(format(map, JOB_PROPS, "JobTable.label"));
     sb.append(format(map, QUEUE_PROPS, "QueueTable.label"));
     sb.append(format(map, CONNECTION_PROPS, "ConnectionsTable.label"));
+    sb.append(format(map, NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable.label"));
+    sb.append(format(map, CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable.label"));
+    sb.append(format(map, INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable.label"));
+    sb.append(format(map, OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable.label"));
     return sb.toString();
   }
 
@@ -70,14 +75,15 @@ public class CsvStatsExporter implements StatsExporter
    * @param label the title given to the set of values.
    * @return the values formatted as plain text.
    */
-  private String format(final Map<Fields, String> map, final Fields[] fields, final String label)
+  private String format(final Map<Fields, Double> map, final Fields[] fields, final String label)
   {
     StringBuilder sb = new StringBuilder();
     String title = LocalizationUtils.getLocalized(BASE, label);
     sb.append('\"').append(title).append("\",\n\n");
     for (Fields field: fields)
     {
-      String value = map.get(field);
+      Double value = map.get(field);
+      if (value == null) value = 0d;
       String name = field.toString();
       sb.append('\"').append(name).append("\", ").append(value).append('\n');
     }

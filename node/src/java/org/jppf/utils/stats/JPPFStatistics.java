@@ -60,25 +60,6 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   }
 
   /**
-   * Initialize and create the snapshots with the specified labels.
-   * @param labels the labels of the snapshots to create.
-   */
-  public JPPFStatistics(final String...labels)
-  {
-    createSnapshots(false, labels);
-  }
-
-  /**
-   * Initialize and create the snapshots with the specified labels.
-   * @param labels the labels of the snapshots to create.
-   * @param cumulative determines whether updates are accumulated instead of simply stored as latest value.
-   */
-  public JPPFStatistics(final boolean cumulative, final String...labels)
-  {
-    createSnapshots(cumulative, labels);
-  }
-
-  /**
    * Get a snapshot specified by its label.
    * @param label the label of the snapshot to look up.
    * @return a {@link JPPFSnapshot} instance, or <code>null</code> if none could be found with the specified label.
@@ -108,10 +89,25 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    */
   public JPPFSnapshot createSnapshot(final boolean cumulative, final String label)
   {
-    JPPFSnapshot newSnapshot = new JPPFSnapshot(label, cumulative);
+    JPPFSnapshot newSnapshot = cumulative ? new CumulativeSnapshot(label) : new NonCumulativeSnapshot(label);
     JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
     JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
     //fireSnapshotAdded(snapshot.copy());
+    return snapshot;
+  }
+
+  /**
+   * Create a single value snapshot with the specified label if it doesn't exist.
+   * If a snapshot with this label already exists, it is returned.
+   * @param label the label of the snapshot to create.
+   * @return a {@link JPPFSnapshot} instance representing the newly created snapshot or the exsting one.
+   */
+  public JPPFSnapshot createSingleValueSnapshot(final String label)
+  {
+    JPPFSnapshot newSnapshot = new SingleValueSnapshot(label);
+    JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
+    JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
+    //fireSnapshotAdded(snapshot);
     return snapshot;
   }
 
@@ -127,8 +123,8 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   }
 
   /**
-   * Create an array of snapshots with the specified labels, if it doesn't exist.
-   * If one of the snapshots already exists, it is returned.
+   * Create an array of snapshots with the specified labels, if they don't exist.
+   * If any of the snapshots already exists, it is returned.
    * @param labels the label of the snapshot to create.
    * @param cumulative determines whether updates are accumulated instead of simply stored as latest value.
    * @return an array of {@link JPPFSnapshot} instances representing the newly created or exsting snapshots, in the smaez order as the input labels.
@@ -137,6 +133,19 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   {
     JPPFSnapshot[] snapshots = new JPPFSnapshot[labels.length];
     for (int i=0; i<labels.length; i++) snapshots[i] = createSnapshot(cumulative, labels[i]);
+    return snapshots;
+  }
+
+  /**
+   * Create an array of single value snapshots with the specified labels, if they don't exist.
+   * If any of the snapshots already exists, it is returned.
+   * @param labels the label of the snapshot to create.
+   * @return an array of {@link JPPFSnapshot} instances representing the newly created or exsting snapshots, in the smaez order as the input labels.
+   */
+  public JPPFSnapshot[] createSingleValueSnapshots(final String...labels)
+  {
+    JPPFSnapshot[] snapshots = new JPPFSnapshot[labels.length];
+    for (int i=0; i<labels.length; i++) snapshots[i] = createSingleValueSnapshot(labels[i]);
     return snapshots;
   }
 

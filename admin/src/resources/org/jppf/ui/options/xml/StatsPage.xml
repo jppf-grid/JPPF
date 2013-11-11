@@ -83,7 +83,7 @@
     <property name="componentConstraints" value="grow"/>
 		-->
     <property name="layoutConstraints" value=""/>
-    <property name="componentConstraints" value="growx 0, growy, pushy"/>
+    <property name="componentConstraints" value="grow, push"/>
 		<property name="value" value=""/>
 	</child>
 

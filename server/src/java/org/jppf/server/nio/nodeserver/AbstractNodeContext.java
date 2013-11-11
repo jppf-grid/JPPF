@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,6 +48,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Reference to the driver.
+   */
+  protected static final JPPFDriver driver = JPPFDriver.getInstance();
   /**
    * Dummy runnable used for bundle execution.
    */
@@ -238,12 +244,28 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
     if (message == null) message = newMessage();
-    return message.read();
+    boolean b = false;
+    try {
+      b = message.read();
+    } catch (Exception e) {
+      updateInStats();
+      throw e;
+    }
+    if (b) updateInStats();
+    return b;
   }
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
-    return message.write();
+    boolean b = false;
+    try {
+      b = message.write();
+    } catch (Exception e) {
+      updateOutStats();
+      throw e;
+    }
+    if (b) updateOutStats();
+    return b;
   }
 
   @Override
@@ -451,6 +473,27 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public JPPFFuture<?> createFuture() {
     return new NodeContextFuture();
+  }
+
+
+  /**
+   * Update the inbound traffic statistics.
+   */
+  private void updateInStats() {
+    if (message != null) {
+      long n = message.getChannelCount();
+      if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : NODE_IN_TRAFFIC, n);
+    }
+  }
+
+  /**
+   * Update the outbound traffic statistics.
+   */
+  private void updateOutStats() {
+    if (message != null) {
+      long n = message.getChannelCount();
+      if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC, n);
+    }
   }
 
   /**

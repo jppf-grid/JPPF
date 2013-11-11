@@ -164,19 +164,13 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
     this.sslHandler = sslHandler;
   }
 
-  /**
-   * Determine whether the associated channel is connected to a peer server.
-   * @return <code>true</code> if the channel is connected to a peer server, <code>false</code> otherwise.
-   */
+  @Override
   public boolean isPeer()
   {
     return peer;
   }
 
-  /**
-   * Specify whether the associated channel is connected to a peer server.
-   * @param peer <code>true</code> if the channel is connected to a peer server, <code>false</code> otherwise.
-   */
+  @Override
   public void setPeer(final boolean peer)
   {
     this.peer = peer;
@@ -209,6 +203,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Determines whether the connection was opened on an SSL port.
    * @return <code>true</code> for an SSL connection, <code>false</code> otherwise.
    */
+  @Override
   public boolean isSsl()
   {
     return ssl;
@@ -218,6 +213,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Specifies whether the connection was opened on an SSL port.
    * @param ssl <code>true</code> for an SSL connection, <code>false</code> otherwise.
    */
+  @Override
   public void setSsl(final boolean ssl)
   {
     this.ssl = ssl;

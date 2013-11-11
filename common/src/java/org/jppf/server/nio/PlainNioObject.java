@@ -89,7 +89,11 @@ public class PlainNioObject extends AbstractNioObject
     do
     {
       n = location.transferFrom(source, false);
-      if (n > 0) count += n;
+      if (n > 0)
+      {
+        count += n;
+        channelCount = count;
+      }
       if (debugEnabled) log.debug("read {} bytes for {}", n, this);
     }
     while ((n > 0) && (count < size));
@@ -114,7 +118,11 @@ public class PlainNioObject extends AbstractNioObject
     do
     {
       n = location.transferTo(dest, false);
-      if (n > 0) count += n;
+      if (n > 0)
+      {
+        count += n;
+        channelCount = count;
+      }
       if (debugEnabled) log.debug("read {} bytes for {}", n, this);
     }
     while ((n > 0) && (count < size));

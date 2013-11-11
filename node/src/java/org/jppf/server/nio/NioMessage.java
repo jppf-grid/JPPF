@@ -44,4 +44,10 @@ public interface NioMessage
    * @return <code>true</code> is data is read from or written an SSL connection, <code>false</code> otherwise.
    */
   boolean isSSL();
+
+  /**
+   * Get the actual bytes sent to or received from the underlying channel.
+   * @return the number of bytes as a long value.
+   */
+  long getChannelCount();
 }

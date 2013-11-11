@@ -220,7 +220,47 @@ public enum Fields
   /**
    * Latest time of class loading requests to the clients.
    */
-  CLIENT_LATEST_CL_REQUEST_TIME;
+  CLIENT_LATEST_CL_REQUEST_TIME,
+  /**
+   * Inbound network traffic from clients.
+   */
+  CLIENT_INBOUND_MB,
+  /**
+   * Inbound network traffic to clients.
+   */
+  CLIENT_OUTBOUND_MB,
+  /**
+   * Outbound network traffic from nodes.
+   */
+  NODE_INBOUND_MB,
+  /**
+   * Inbound network traffic to nodes.
+   */
+  NODE_OUTBOUND_MB,
+  /**
+   * Inbound network traffic from peer servers.
+   */
+  PEER_INBOUND_MB,
+  /**
+   * Inbound network traffic to peer servers.
+   */
+  PEER_OUTBOUND_MB,
+  /**
+   * Unidentitified inbound network traffic.
+   */
+  UNIDENTIFIED_INBOUND_MB,
+  /**
+   * Unidentitified outbound network traffic.
+   */
+  UNIDENTIFIED_OUTBOUND_MB,
+  /**
+   * total inbound network traffic.
+   */
+  TOTAL_INBOUND_MB,
+  /**
+   * Total outbound network traffic.
+   */
+  TOTAL_OUTBOUND_MB;
 
   /**
    * The localized name of this enum item.

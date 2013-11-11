@@ -35,8 +35,7 @@ import org.slf4j.*;
  * Collection of utility methods to create and manipulate IO objects.
  * @author Laurent Cohen
  */
-public final class IOHelper
-{
+public final class IOHelper {
   /**
    * Logger for this class.
    */
@@ -61,21 +60,24 @@ public final class IOHelper
   /**
    * Lock used to check if there is sufficient free memory to read an object, AND reserve the memory, in a single atomic operation. 
    */
-  private static Lock lock = new ReentrantLock();
+  private static final Lock lock = new ReentrantLock();
   /**
    * This is used to reserve the memory for an object about to be read, so that we don't have to lock the JVM while reading the object. 
    */
-  private static AtomicLong footprint = new AtomicLong(0L);
+  private static final AtomicLong footprint = new AtomicLong(0L);
   /**
    * A number formatter for debugging and tracing purposes.
    */
-  private static NumberFormat nf = createNumberFormat();
+  private static final NumberFormat nf = createNumberFormat();
+  /**
+   * Default serilaizer to use when none is specified.
+   */
+  private static final ObjectSerializer defaultSerializer = createDefaultSerializer();
 
   /**
    * Instantiation of this class is not permitted.
    */
-  private IOHelper()
-  {
+  private IOHelper() {
   }
 
   /**
@@ -86,21 +88,14 @@ public final class IOHelper
    * or on another medium, depending on the available memory.
    * @throws Exception if an IO error occurs.
    */
-  public static DataLocation createDataLocationMemorySensitive(final int size) throws Exception
-  {
-    if (fitsInMemory(size))
-    {
-      try
-      {
+  public static DataLocation createDataLocationMemorySensitive(final int size) throws Exception {
+    if (fitsInMemory(size)) {
+      try {
         DataLocation dl = new MultipleBuffersLocation(size);
         return dl;
-      }
-      catch (OutOfMemoryError oome)
-      {
+      } catch (OutOfMemoryError oome) {
         if (debugEnabled) log.debug("OOM when allocating in-memory data location, attempting disk overflow", oome);
-      }
-      finally
-      {
+      } finally {
         footprint.addAndGet(-size);
       }
     }
@@ -115,8 +110,7 @@ public final class IOHelper
    * @return A data location containing the data provider or task data.
    * @throws Exception if an error occurs while reading the data.
    */
-  public static DataLocation readData(final InputSource source) throws Exception
-  {
+  public static DataLocation readData(final InputSource source) throws Exception {
     int n = source.readInt();
     if (traceEnabled) log.trace("read data size = " + nf.format(n));
     DataLocation dl = createDataLocationMemorySensitive(n);
@@ -130,8 +124,7 @@ public final class IOHelper
    * @param destination tyhe destination to write to.
    * @throws Exception if any error occurs.
    */
-  public static void writeData(final DataLocation data, final OutputDestination destination) throws Exception
-  {
+  public static void writeData(final DataLocation data, final OutputDestination destination) throws Exception {
     destination.writeInt(data.getSize());
     data.transferTo(destination, true);
   }
@@ -142,8 +135,7 @@ public final class IOHelper
    * @return the created <code>File</code>.
    * @throws Exception if an IO error occurs.
    */
-  public static File createTempFile(final int size) throws Exception
-  {
+  public static File createTempFile(final int size) throws Exception {
     File file = File.createTempFile("jppf", ".tmp");
     if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + nf.format(size));
     file.deleteOnExit();
@@ -155,19 +147,15 @@ public final class IOHelper
    * @param size the data size to check.
    * @return true if the data would fit in memory, false otherwise.
    */
-  public static boolean fitsInMemory(final int size)
-  {
+  public static boolean fitsInMemory(final int size) {
     lock.lock();
-    try
-    {
+    try {
       long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
       if (traceEnabled) log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
       boolean b = ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > LOW_MEMORY_THRESHOLD);
       if (b) footprint.addAndGet(size);
       return b;
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -179,8 +167,7 @@ public final class IOHelper
    * @return the transformed result as an object.
    * @throws Exception if an error occurs while preparing the data.
    */
-  public static Object unwrappedData(final SocketWrapper socketWrapper, final ObjectSerializer ser) throws Exception
-  {
+  public static Object unwrappedData(final SocketWrapper socketWrapper, final ObjectSerializer ser) throws Exception {
     //if (traceEnabled) log.trace("unwrapping from network connection");
     InputSource sis = new SocketWrapperInputSource(socketWrapper);
     DataLocation dl = IOHelper.readData(sis);
@@ -190,45 +177,42 @@ public final class IOHelper
   }
 
   /**
+   * Deserialize the specified data into an object, using a default serializer.
+   * @param dl the data, stored in a memory-aware location.
+   * @return the transformed result as an object.
+   * @throws Exception if an error occurs while preparing the data.
+   */
+  public static Object unwrappedData(final DataLocation dl) throws Exception {
+    return unwrappedData(dl, defaultSerializer);
+  }
+
+  /**
    * Deserialize the specified data into an object.
    * @param dl the data, stored in a memory-aware location.
    * @param ser the object serializer to use.
    * @return the transformed result as an object.
    * @throws Exception if an error occurs while preparing the data.
    */
-  public static Object unwrappedData(final DataLocation dl, final ObjectSerializer ser) throws Exception
-  {
+  public static Object unwrappedData(final DataLocation dl, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("unwrapping " + dl);
     JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
     InputStream is = null;
-    if (transform != null)
-    {
+    if (transform != null) {
       int size = dl.getSize();
-      if (fitsInMemory(size))
-      {
-        try
-        {
+      if (fitsInMemory(size)) {
+        try {
           is = unwrapData(transform, dl);
-        }
-        catch(OutOfMemoryError oome)
-        {
+        } catch(OutOfMemoryError oome) {
           if (debugEnabled) log.debug("OOM when allocating in-memory data location, attempting disk overflow", oome);
-        }
-        finally
-        {
+        } finally {
           footprint.addAndGet(-size);
         }
       }
       if (is == null) is = unwrapDataToFile(transform, dl);
-      //is = fitsInMemory(dl.getSize()) ? unwrapData(transform, dl) : unwrapDataToFile(transform, dl);
-    }
-    else is = dl.getInputStream();
-    try
-    {
+    } else is = dl.getInputStream();
+    try {
       return ser.deserialize(is);
-    }
-    finally
-    {
+    } finally {
       StreamUtils.close(is);
     }
   }
@@ -240,17 +224,13 @@ public final class IOHelper
    * @return the transformed data as an <code>InputStream</code>.
    * @throws Exception if an error occurs while preparing the data.
    */
-  public static InputStream unwrapData(final JPPFDataTransform transform, final DataLocation source) throws Exception
-  {
+  public static InputStream unwrapData(final JPPFDataTransform transform, final DataLocation source) throws Exception {
     if (traceEnabled) log.trace("unwrapping to memory " + source);
     MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
     InputStream is = source.getInputStream();
-    try
-    {
+    try {
       transform.unwrap(is, mbos);
-    }
-    finally
-    {
+    } finally {
       StreamUtils.close(is);
     }
     return new MultipleBuffersInputStream(mbos.toBufferList());
@@ -263,18 +243,14 @@ public final class IOHelper
    * @return the transformed data as a <code>File</code>.
    * @throws Exception if an error occurs while preparing the data.
    */
-  public static InputStream unwrapDataToFile(final JPPFDataTransform transform, final DataLocation source) throws Exception
-  {
+  public static InputStream unwrapDataToFile(final JPPFDataTransform transform, final DataLocation source) throws Exception {
     if (traceEnabled) log.trace("unwrapping to file " + source);
     File file = IOHelper.createTempFile(-1);
     OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
     InputStream is = source.getInputStream();
-    try
-    {
+    try {
       transform.unwrap(source.getInputStream(), os);
-    }
-    finally
-    {
+    } finally {
       StreamUtils.close(is);
     }
     return new BufferedInputStream(new FileInputStream(file));
@@ -287,8 +263,7 @@ public final class IOHelper
    * @param ser the object serializer.
    * @throws Exception if any error occurs.
    */
-  public static void sendData(final SocketWrapper socketWrapper, final Object o, final ObjectSerializer ser) throws Exception
-  {
+  public static void sendData(final SocketWrapper socketWrapper, final Object o, final ObjectSerializer ser) throws Exception {
     DataLocation dl = serializeData(o, ser);
     if (traceEnabled) log.trace("sending object with serialized size=" + dl.getSize() + " : " + o);
     socketWrapper.writeInt(dl.getSize());
@@ -303,16 +278,12 @@ public final class IOHelper
    * @return a {@link DataLocation} instance.
    * @throws Exception if any error occurs.
    */
-  public static DataLocation serializeData(final Object o, final ObjectSerializer ser) throws Exception
-  {
+  public static DataLocation serializeData(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object " + o);
     DataLocation dl = null;
-    try
-    {
+    try {
       dl = serializeDataToMemory(o, ser);
-    }
-    catch(OutOfMemoryError e)
-    {
+    } catch(OutOfMemoryError e) {
       dl = serializeDataToFile(o, ser);
     }
     return dl;
@@ -325,15 +296,13 @@ public final class IOHelper
    * @return an instance of {@link MultipleBuffersOutputStream}.
    * @throws Exception if any error occurs.
    */
-  public static DataLocation serializeDataToMemory(final Object o, final ObjectSerializer ser) throws Exception
-  {
+  public static DataLocation serializeDataToMemory(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object to memory " + o);
     JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
     MultipleBuffersOutputStream mbos = new MultipleBuffersOutputStream();
     NotifyingOutputStream nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
     ser.serialize(o, nos);
-    if (transform != null)
-    {
+    if (transform != null) {
       MultipleBuffersInputStream mbis = new MultipleBuffersInputStream(mbos.toBufferList());
       mbos = new MultipleBuffersOutputStream();
       nos = new NotifyingOutputStream(mbos, new OverflowDetectorCallback());
@@ -349,8 +318,7 @@ public final class IOHelper
    * @return an instance of {@link FileDataLocation}.
    * @throws Exception if any error occurs.
    */
-  public static DataLocation serializeDataToFile(final Object o, final ObjectSerializer ser) throws Exception
-  {
+  public static DataLocation serializeDataToFile(final Object o, final ObjectSerializer ser) throws Exception {
     if (traceEnabled) log.trace("serializing object to file " + o);
     File file = IOHelper.createTempFile(-1);
     OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
@@ -358,8 +326,7 @@ public final class IOHelper
     ser.serialize(o, nos);
     DataLocation dl = null;
     JPPFDataTransform transform = JPPFDataTransformFactory.getInstance();
-    if (transform != null)
-    {
+    if (transform != null) {
       InputStream is = new BufferedInputStream(new FileInputStream(file));
       File file2 = IOHelper.createTempFile(-1);
       os = new BufferedOutputStream(new FileOutputStream(file2));
@@ -375,10 +342,26 @@ public final class IOHelper
    * Create a number formatter for debugging purposes.
    * @return a {@link NumberFormat} instance.
    */
-  private static NumberFormat createNumberFormat()
-  {
+  private static NumberFormat createNumberFormat() {
     NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
     nf.setGroupingUsed(true);
     return nf;
+  }
+
+  /**
+   * Create a default serilaizer to use when none is specifed.
+   * @return an instance of ObjectSerializer, or null if none could be created.
+   */
+  private static ObjectSerializer createDefaultSerializer() {
+    String name = "org.jppf.utils.ObjectSerializerImpl";
+    try {
+      Class<?> c = Class.forName(name);
+      if (debugEnabled) log.debug("Loaded serializer class " + c);
+      Object o = c.newInstance();
+      return (ObjectSerializer) o;
+    } catch(Exception e) {
+      if (debugEnabled) log.debug("Could not load serializer class {}", name);
+      return null;
+    }
   }
 }

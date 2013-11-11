@@ -64,13 +64,17 @@ public class TextStatsExporter implements StatsExporter
     Map<Fields, String> map = new HashMap<>(statsHandler.getLatestStringValues());
     maxNameLength = 0;
     maxValueLength = 0;
-    updateMaxLengths(map, EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, JOB_PROPS, QUEUE_PROPS, CONNECTION_PROPS);
+    updateMaxLengths(map, StatsConstants.ALL_FIELDS);
     sb.append(format(map, EXECUTION_PROPS, "ExecutionTable.label"));
     sb.append(format(map, NODE_EXECUTION_PROPS, "NodeExecutionTable.label"));
     sb.append(format(map, TRANSPORT_PROPS, "NetworkOverheadTable.label"));
     sb.append(format(map, JOB_PROPS, "JobTable.label"));
     sb.append(format(map, QUEUE_PROPS, "QueueTable.label"));
     sb.append(format(map, CONNECTION_PROPS, "ConnectionsTable.label"));
+    sb.append(format(map, NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable.label"));
+    sb.append(format(map, CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable.label"));
+    sb.append(format(map, INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable.label"));
+    sb.append(format(map, OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable.label"));
     return sb.toString();
   }
 
@@ -115,7 +119,7 @@ public class TextStatsExporter implements StatsExporter
         String value = map.get(field);
         String name = field.toString();
         maxNameLength = Math.max(maxNameLength, name.length());
-        maxValueLength = Math.max(maxValueLength, value.length());
+        maxValueLength = Math.max(maxValueLength, value == null ? 0 : value.length());
       }
     }
   }

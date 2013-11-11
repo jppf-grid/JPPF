@@ -110,4 +110,16 @@ public interface NioContext<S extends Enum<S>>
    * @param ssl <code>true</code> for an SSL connection, <code>false</code> otherwise.
    */
   void setSsl(final boolean ssl);
+
+  /**
+   * Determine whether the associated channel is connected to a peer server.
+   * @return <code>true</code> if the channel is connected to a peer server, <code>false</code> otherwise.
+   */
+  boolean isPeer();
+
+  /**
+   * Specify whether the associated channel is connected to a peer server.
+   * @param peer <code>true</code> if the channel is connected to a peer server, <code>false</code> otherwise.
+   */
+  void setPeer(boolean peer);
 }

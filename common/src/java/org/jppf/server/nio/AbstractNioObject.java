@@ -41,13 +41,17 @@ public abstract class AbstractNioObject implements NioObject
    */
   protected final int size;
   /**
-   * What has currently been read from the message.
+   * What has currently been read from or written to the message.
    */
   protected int count = 0;
   /**
    * Location of the data to read or write.
    */
   protected final DataLocation location;
+  /**
+   * Actual bytes sent to or received from the underlying channel.
+   */
+  protected long channelCount = 0L;
 
   /**
    * Initialize this NioObject with the specified data location and size.
@@ -70,5 +74,11 @@ public abstract class AbstractNioObject implements NioObject
   public int getSize()
   {
     return size;
+  }
+
+  @Override
+  public long getChannelCount()
+  {
+    return channelCount;
   }
 }

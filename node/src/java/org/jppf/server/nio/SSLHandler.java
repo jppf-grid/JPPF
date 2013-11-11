@@ -74,6 +74,16 @@ public class SSLHandler
    * The data recevied yb the <code>SSLEngine</code>.
    */
   private ByteBuffer channelReceiveBuffer;
+  /**
+   * Count of bytes read from the channel, in the scope of a {@link #read()} invocation.
+   * This count includes all the SSL overhead: encrypted data, handshaking, renegotiation, etc.
+   */
+  private long channelReadCount = 0L;
+  /**
+   * Count of bytes written to the channel, in the scope of a {@link #write()} invocation.
+   * This count includes all the SSL overhead: encrypted data, handshaking, renegotiation, etc.
+   */
+  private long channelWriteCount = 0L;
 
   /**
    * Instantiate this SSLHandler with the specified channel and SSL engine.
@@ -95,18 +105,19 @@ public class SSLHandler
   /**
    * Read from the channel via the SSLEngine into the application receive buffer.
    * Called in blocking mode when input is expected, or in non-blocking mode when the channel is readable.
-   * @return the number of bytes read.
+   * @return the number of bytes read from the application receive buffer.
    * @throws Exception if any error occurs.
    */
   public int read() throws Exception
   {
+    channelReadCount = 0L;
     int sslCount = 0;
     int count = applicationReceiveBuffer.position();
     do
     {
       flush();
       if (sslEngine.isInboundDone()) return count > 0 ? count : -1;
-      int readCount = channel.read(channelReceiveBuffer);
+      int readCount = doRead();
       channelReceiveBuffer.flip();
       sslEngineResult = sslEngine.unwrap(channelReceiveBuffer, applicationReceiveBuffer);
       channelReceiveBuffer.compact();
@@ -114,7 +125,7 @@ public class SSLHandler
       {
         case BUFFER_UNDERFLOW:
           if (traceEnabled) log.trace("reading into netRecv=" + channelReceiveBuffer);
-          sslCount = channel.read(channelReceiveBuffer);
+          sslCount = doRead();
           if (traceEnabled) log.trace("sslCount=" + sslCount + ", channelReceiveBuffer=" + channelReceiveBuffer);
           if (sslCount == 0) return count;
           if (sslCount == -1)
@@ -151,6 +162,7 @@ public class SSLHandler
   public int write() throws Exception
   {
     if (traceEnabled) log.trace("position=" + applicationSendBuffer.position());
+    channelWriteCount = 0L;
     int remaining = applicationSendBuffer.position();
     int writeCount = 0;
     if ((remaining > 0) && (flush() > 0)) return 0;
@@ -197,7 +209,20 @@ public class SSLHandler
   {
     channelSendBuffer.flip();
     int n = channel.write(channelSendBuffer);
+    if (n > 0) channelWriteCount += n;
     channelSendBuffer.compact();
+    return n;
+  }
+
+  /**
+   * Read bytes from the underlying channel.
+   * @return the number of bytes read.
+   * @throws IOException if any error occurs.
+   */
+  private int doRead()  throws IOException
+  {
+    int n = channel.read(channelReceiveBuffer);
+    if (n > 0) channelReadCount += n;
     return n;
   }
 
@@ -271,7 +296,7 @@ public class SSLHandler
         if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW)
         {
           if (sslEngine.isInboundDone()) count = -1;
-          else count = channel.read(channelReceiveBuffer);
+          else count = doRead();
           if (traceEnabled) log.trace("readCount=" + count);
           return count > 0;
         }
@@ -318,7 +343,7 @@ public class SSLHandler
       case BUFFER_UNDERFLOW:
         if (traceEnabled) log.trace(printBuffers());
         flush();
-        count = channel.read(channelReceiveBuffer);
+        count = doRead();
         if (traceEnabled) log.trace("underflow: count=" + count + ", channelReceiveBuffer=" + channelReceiveBuffer);
         return count > 0;
 
@@ -383,7 +408,17 @@ public class SSLHandler
   {
     return channelSendBuffer;
   }
-  
+
+  /**
+   * Perform an <code>SSLEngine.wrap()</code> operation.
+   * @return the resulting {@link SSLEngineResult}.
+   * @throws Exception if any error occurs.
+   */
+  private SSLEngineResult doWrap() throws Exception
+  {
+    return sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
+  }
+
   /**
    * Print the state of all buffers to a string.
    * This method is intended for logging and debugging purposes.
@@ -410,5 +445,23 @@ public class SSLHandler
     sb.append("applicationSendBuffer=").append(applicationSendBuffer);
     sb.append(", channelSendBuffer=").append(channelSendBuffer);
     return sb.toString();
+  }
+
+  /**
+   * Get the count of bytes read from the channel.
+   * @return the byte count as a long value.
+   */
+  public long getChannelReadCount()
+  {
+    return channelReadCount;
+  }
+
+  /**
+   * Get the count of bytes written to the channel.
+   * @return the byte count as a long value.
+   */
+  public long getChannelWriteCount()
+  {
+    return channelWriteCount;
   }
 }

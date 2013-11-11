@@ -93,6 +93,10 @@ public abstract class AbstractNioMessage implements NioMessage
    * Temporary holder used as a local performance optimization for write operations.
    */
   private DataLocation currentDataLocation = null;
+  /**
+   * Actual bytes sent to or received from the underlying channel.
+   */
+  protected long channelCount = 0L;
 
   /**
    * Initialize this nio message with the specified sll flag.
@@ -164,30 +168,36 @@ public abstract class AbstractNioMessage implements NioMessage
    * @return true if the object has been completely read from the channel, false otherwise.
    * @throws Exception if an IO error occurs.
    */
-  protected boolean readNextObject() throws Exception
-  {
+  protected boolean readNextObject() throws Exception {
     if (currentLengthObject == null) currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4);
-    if (currentLength <= 0)
-    {
-      if (!currentLengthObject.read()) return false;
-      InputStream is = currentLengthObject.getData().getInputStream();
-      try
-      {
-        currentLength = SerializationUtils.readInt(is);
+    if (currentLength <= 0) {
+      try {
+        if (!currentLengthObject.read()) return false;
+      } catch(Exception e) {
+        channelCount += currentLengthObject.getChannelCount();
+        throw e;
       }
-      finally
-      {
+      channelCount += currentLengthObject.getChannelCount();
+      InputStream is = currentLengthObject.getData().getInputStream();
+      try {
+        currentLength = SerializationUtils.readInt(is);
+      } finally {
         StreamUtils.close(is);
       }
       count += 4;
     }
-    if (currentObject == null)
-    {
+    if (currentObject == null) {
       DataLocation location = IOHelper.createDataLocationMemorySensitive(currentLength);
       currentObject = ssl ? new SSLNioObject(location, sslHandler) : new PlainNioObject(channel, location);
     }
-    if (!currentObject.read()) return false;
+    try {
+      if (!currentObject.read()) return false;
+    } catch(Exception e) {
+      channelCount += currentObject.getChannelCount();
+      throw e;
+    }
     count += currentLength;
+    channelCount += currentObject.getChannelCount();
     locations.add(currentObject.getData());
     currentLengthObject = null;
     currentObject = null;
@@ -202,28 +212,36 @@ public abstract class AbstractNioMessage implements NioMessage
    * @return true if the object has been completely written the channel, false otherwise.
    * @throws Exception if an IO error occurs.
    */
-  protected boolean writeNextObject() throws Exception
-  {
-    if (currentLengthObject == null)
-    {
+  protected boolean writeNextObject() throws Exception {
+    if (currentLengthObject == null) {
       currentDataLocation = locations.get(position);
       byte[] bytes = SerializationUtils.writeInt(currentDataLocation.getSize());
       DataLocation dl = new MultipleBuffersLocation(bytes);
       currentLengthObject = ssl ? new SSLNioObject(dl, sslHandler) : new PlainNioObject(channel, dl);
     }
-    if (currentLength <= 0)
-    {
-      if (!currentLengthObject.write()) return false;
+    if (currentLength <= 0) {
+      try {
+        if (!currentLengthObject.write()) return false;
+      } catch(Exception e) {
+        channelCount += currentLengthObject.getChannelCount();
+        throw e;
+      }
       currentLength = currentDataLocation.getSize();
       count += 4;
+      channelCount += currentLengthObject.getChannelCount();
     }
-    if (currentObject == null)
-    {
+    if (currentObject == null) {
       DataLocation loc = currentDataLocation.copy();
       currentObject = ssl ? new SSLNioObject(loc, sslHandler) : new PlainNioObject(channel, loc);
     }
-    if (!currentObject.write()) return false;
+    try {
+      if (!currentObject.write()) return false;
+    } catch(Exception e) {
+      channelCount += currentObject.getChannelCount();
+      throw e;
+    }
     count += currentLength;
+    channelCount += currentObject.getChannelCount();
     if (debug) log.debug("channel id={} wrote object at position {}", channel.getId(), position);
     position++;
     currentLengthObject = null;
@@ -285,5 +303,11 @@ public abstract class AbstractNioMessage implements NioMessage
   public boolean isSSL()
   {
     return ssl;
+  }
+
+  @Override
+  public long getChannelCount()
+  {
+    return channelCount;
   }
 }

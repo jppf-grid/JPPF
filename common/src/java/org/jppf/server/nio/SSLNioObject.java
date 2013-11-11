@@ -96,6 +96,7 @@ public class SSLNioObject extends AbstractNioObject
         n = sslHandler.read();
         if (n == 0) return false;
         if (n < 0) throw new EOFException();
+        channelCount += sslHandler.getChannelReadCount();
       }
       buf.flip();
       if (traceEnabled) log.trace("n1=" + n + ", count=" + count + ", size=" + size + ", buf=" + buf);
@@ -159,6 +160,7 @@ public class SSLNioObject extends AbstractNioObject
       StreamUtils.close(is, log);
       is = null;
     }
+    channelCount += sslHandler.getChannelWriteCount();
     return b;
   }
 }

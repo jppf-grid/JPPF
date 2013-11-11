@@ -21,7 +21,6 @@ package org.jppf.server.nio.nodeserver;
 import org.jppf.io.IOHelper;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.utils.SerializationHelperImpl;
 
 /**
  * Node message implementation for an in-VM node.
@@ -41,7 +40,7 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
   @Override
   public boolean read() throws Exception
   {
-    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0), new SerializationHelperImpl().getSerializer());
+    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0));
     return true;
   }
 
@@ -54,7 +53,6 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
   @Override
   public boolean write() throws Exception
   {
-    //((LocalNodeWrapperHandler) wrapper).wakeUp();
     return true;
   }
 

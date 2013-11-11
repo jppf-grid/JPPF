@@ -23,7 +23,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import java.text.NumberFormat;
 import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -37,6 +37,10 @@ public final class StatsFormatter implements StatsConstants
    * Logger for this class.
    */
   static Logger log = LoggerFactory.getLogger(StatsFormatter.class);
+  /**
+   * Value of 1 megabyte.
+   */
+  private static final long MB = 1024L * 1024L;
   /**
    * Formatter for integer values.
    */
@@ -150,7 +154,37 @@ public final class StatsFormatter implements StatsConstants
     map.put(CLIENT_MIN_CL_REQUEST_TIME, formatDouble(snapshot.getMin()));
     map.put(CLIENT_MAX_CL_REQUEST_TIME, formatDouble(snapshot.getMax()));
     map.put(CLIENT_LATEST_CL_REQUEST_TIME, formatDouble(snapshot.getLatest()));
+    stringValues2(map, stats);
     return map;
+  }
+
+  /**
+   * Fill the map of values represented as strings for a specified data snapshot.
+   * @param map the map to fill.
+   * @param stats the data snapshot to map.
+   */
+  private static void stringValues2(final Map<Fields, String> map, final JPPFStatistics stats)
+  {
+    double d;
+    double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
+    map.put(CLIENT_INBOUND_MB, formatMB(d));
+    sum += (d = stats.getSnapshot(NODE_IN_TRAFFIC).getTotal());
+    map.put(NODE_INBOUND_MB, formatMB(d));
+    //sum += (d = stats.getSnapshot(PEER_IN_TRAFFIC).getTotal());
+    //map.put(PEER_INBOUND_MB, formatMB(d));
+    sum += (d = stats.getSnapshot(UNIDENTIFIED_IN_TRAFFIC).getTotal());
+    map.put(UNIDENTIFIED_INBOUND_MB, formatMB(d));
+    map.put(TOTAL_INBOUND_MB, formatMB(sum));
+
+    sum = (d = stats.getSnapshot(CLIENT_OUT_TRAFFIC).getTotal());
+    map.put(CLIENT_OUTBOUND_MB, formatMB(d));
+    sum += (d = stats.getSnapshot(NODE_OUT_TRAFFIC).getTotal());
+    map.put(NODE_OUTBOUND_MB, formatMB(d));
+    //sum += (d = stats.getSnapshot(PEER_OUT_TRAFFIC).getTotal());
+    //map.put(PEER_OUTBOUND_MB, formatMB(d));
+    sum += (d = stats.getSnapshot(UNIDENTIFIED_OUT_TRAFFIC).getTotal());
+    map.put(UNIDENTIFIED_OUTBOUND_MB, formatMB(d));
+    map.put(TOTAL_OUTBOUND_MB, formatMB(sum));
   }
 
   /**
@@ -222,7 +256,36 @@ public final class StatsFormatter implements StatsConstants
     map.put(CLIENT_MIN_CL_REQUEST_TIME, snapshot.getMin());
     map.put(CLIENT_MAX_CL_REQUEST_TIME, snapshot.getMax());
     map.put(CLIENT_LATEST_CL_REQUEST_TIME, snapshot.getLatest());
+    doubleValues2(map, stats);
     return map;
+  }
+
+  /**
+   * Fill the map of values represented as doubles for a specified data snapshot.
+   * @param map the map to fill.
+   * @param stats the data snapshot to map.
+   */
+  private static void doubleValues2(final Map<Fields, Double> map, final JPPFStatistics stats)
+  {
+    double d = 0d;
+    double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
+    map.put(CLIENT_INBOUND_MB, d);
+    sum += (d = stats.getSnapshot(NODE_IN_TRAFFIC).getTotal());
+    map.put(NODE_INBOUND_MB, d);
+    //sum += (d= stats.getSnapshot(PEER_IN_TRAFFIC).getTotal());
+    //map.put(PEER_INBOUND_MB, d);
+    sum += (d = stats.getSnapshot(UNIDENTIFIED_IN_TRAFFIC).getTotal());
+    map.put(UNIDENTIFIED_INBOUND_MB, d);
+    map.put(TOTAL_INBOUND_MB, sum);
+    sum = (d = stats.getSnapshot(CLIENT_OUT_TRAFFIC).getTotal());
+    map.put(CLIENT_OUTBOUND_MB, d);
+    sum += (d = stats.getSnapshot(NODE_OUT_TRAFFIC).getTotal());
+    map.put(NODE_OUTBOUND_MB, d);
+    //sum += (d = stats.getSnapshot(PEER_OUT_TRAFFIC).getTotal());
+    //map.put(PEER_OUTBOUND_MB, d);
+    sum += (d = stats.getSnapshot(UNIDENTIFIED_OUT_TRAFFIC).getTotal());
+    map.put(UNIDENTIFIED_OUTBOUND_MB, d);
+    map.put(TOTAL_OUTBOUND_MB, sum);
   }
 
   /**
@@ -243,6 +306,17 @@ public final class StatsFormatter implements StatsConstants
   private static String formatInt(final double value)
   {
     return (value == Long.MAX_VALUE) ? "" : integerFormatter.format(value);
+  }
+
+  /**
+   * Format a floating point value after conversion from bytes to megabytes.
+   * @param value the value to format.
+   * @return the formatted value as a string.
+   */
+  private static String formatMB(final double value)
+  {
+
+    return doubleFormatter.format(value/MB);
   }
 
   /**

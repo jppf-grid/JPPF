@@ -18,6 +18,8 @@
 
 package org.jppf.server.nio.client;
 
+import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -45,6 +47,10 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Reference to the driver.
+   */
+  protected static final JPPFDriver driver = JPPFDriver.getInstance();
   /**
    * The task bundle to send or receive.
    */
@@ -196,13 +202,35 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
   {
     if (message == null) message = newMessage();
-    return getClientMessage().read();
+    boolean b = false;
+    try
+    {
+      b = message.read();
+    }
+    catch (Exception e)
+    {
+      updateInStats();
+      throw e;
+    }
+    if (b) updateInStats();
+    return b;
   }
 
   @Override
   public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
   {
-    return getClientMessage().write();
+    boolean b = false;
+    try
+    {
+      b = message.write();
+    }
+    catch (Exception e)
+    {
+      updateOutStats();
+      throw e;
+    }
+    if (b) updateOutStats();
+    return b;
   }
 
   /**
@@ -312,5 +340,25 @@ public class ClientContext extends AbstractNioContext<ClientState>
   synchronized void setNbTasksToSend(final int nbTasksToSend)
   {
     this.nbTasksToSend = nbTasksToSend;
+  }
+
+  /**
+   * Update the inbound traffic statistics.
+   */
+  private void updateInStats() {
+    if (message != null) {
+      long n = message.getChannelCount();
+      if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : CLIENT_IN_TRAFFIC, n);
+    }
+  }
+
+  /**
+   * Update the outbound traffic statistics.
+   */
+  private void updateOutStats() {
+    if (message != null) {
+      long n = message.getChannelCount();
+      if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : CLIENT_OUT_TRAFFIC, n);
+    }
   }
 }

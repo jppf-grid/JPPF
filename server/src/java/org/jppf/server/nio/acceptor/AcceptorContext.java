@@ -21,14 +21,14 @@ package org.jppf.server.nio.acceptor;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
 /**
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
-public class AcceptorContext extends SimpleNioContext<AcceptorState>
-{
+public class AcceptorContext extends SimpleNioContext<AcceptorState> {
   /**
    * Logger for this class.
    */
@@ -58,21 +58,25 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
    * @see org.jppf.utils.JPPFIdentifiers
    */
   @Override
-  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
     if (nioObject == null) nioObject = new PlainNioObject(wrapper, 4);
-    if (nioObject.read())
-    {
-      id = SerializationUtils.readInt(nioObject.getData().getInputStream());
-      nioObject = null;
-      return true;
+    boolean b = false;
+    try {
+      b = nioObject.read();
+    } catch (Exception e) {
+      driver.getStatistics().addValue(JPPFStatisticsHelper.UNIDENTIFIED_IN_TRAFFIC, nioObject.getChannelCount());
+      throw e;
     }
-    return false;
+    if (b) {
+      id = SerializationUtils.readInt(nioObject.getData().getInputStream());
+      driver.getStatistics().addValue(JPPFStatisticsHelper.UNIDENTIFIED_IN_TRAFFIC, nioObject.getChannelCount());
+      nioObject = null;
+    }
+    return b;
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e)
-  {
+  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
     driver.getAcceptorServer().closeChannel(channel);
   }
 
@@ -80,8 +84,7 @@ public class AcceptorContext extends SimpleNioContext<AcceptorState>
    * get the identifier for the channel.
    * @return the identifier as an int value.
    */
-  public int getId()
-  {
+  public int getId() {
     return id;
   }
 }
