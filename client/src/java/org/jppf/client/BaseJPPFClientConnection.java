@@ -156,9 +156,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @return a JPPFTaskBundlesent by the server in response to the handshake job.
    * @throws Exception if an error occurs while sending the request.
    */
-  public JPPFTaskBundle sendHandshakeJob() throws Exception
-  {
-    JPPFTaskBundle header = new JPPFTaskBundle();
+  public JPPFTaskBundle sendHandshakeJob() throws Exception {
+    TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(client.getUuid());
@@ -170,9 +169,30 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     header.setParameter("connection.uuid", connectionUuid);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
-    IOHelper.sendData(socketClient, null, ser);
+    IOHelper.sendData(socketClient, null, ser); // null data provider
     socketClient.flush();
     return receiveBundleAndResults(AbstractJPPFClient.SERIALIZATION_HELPER_IMPL).first();
+  }
+
+  /**
+   * Send a close command job to the server.
+   * @throws Exception if an error occurs while sending the request.
+   */
+  public void sendCloseConnectionCommand() throws Exception {
+    TaskBundle header = new JPPFTaskBundle();
+    ObjectSerializer ser = new ObjectSerializerImpl();
+    TraversalList<String> uuidPath = new TraversalList<>();
+    uuidPath.add(client.getUuid());
+    header.setUuidPath(uuidPath);
+    if (debugEnabled) log.debug(this.toDebugString() + " sending close command job, uuidPath=" + uuidPath);
+    header.setName("close command job");
+    header.setUuid("close command job");
+    header.setParameter("connection.uuid", connectionUuid);
+    header.setParameter(BundleParameter.CLOSE_COMMAND, true);
+    SocketWrapper socketClient = taskServerConnection.getSocketClient();
+    IOHelper.sendData(socketClient, header, ser);
+    IOHelper.sendData(socketClient, null, ser); // null data provider
+    socketClient.flush();
   }
 
   /**

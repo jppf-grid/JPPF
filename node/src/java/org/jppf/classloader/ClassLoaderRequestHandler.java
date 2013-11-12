@@ -105,16 +105,19 @@ public class ClassLoaderRequestHandler
 
   /**
    * Close this request handler and release its resources.
+   * @return the {@link ResourceRequestRunner}.
    */
-  public void close()
+  public ResourceRequestRunner close()
   {
     if (debugEnabled) log.debug("closing request handler");
     periodicTask.setStopped(true);
     periodicThread.interrupt();
+    ResourceRequestRunner tmp = requestRunner;
     requestRunner = null;
     //nextRequest = null;
     periodicThread = null;
     periodicTask = null;
+    return tmp;
   }
 
   /**
@@ -184,5 +187,14 @@ public class ClassLoaderRequestHandler
         else log.warn(ExceptionUtils.getMessage(e));
       }
     }
+  }
+
+  /**
+   * Get the bject which sends the class loading requets to the driver and receives the response.
+   * @return a {@link ResourceRequestRunner} instance.
+   */
+  public ResourceRequestRunner getRequestRunner()
+  {
+    return requestRunner;
   }
 }

@@ -156,8 +156,9 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
     {
       if (requestHandler != null)
       {
-        requestHandler.close();
+        ResourceRequestRunner requestRunner = requestHandler.close();
         requestHandler = null;
+        sendCloseChannelCommand(requestRunner);
       }
       if (socketInitializer != null) socketInitializer.close();
       if (channel != null)

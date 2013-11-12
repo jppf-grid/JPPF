@@ -20,7 +20,8 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.NEW;
 
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.event.*;
@@ -80,7 +81,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * List of status listeners for this connection.
    */
-  protected final List<ClientConnectionStatusListener> listeners = new ArrayList<>();
+  protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Initialize this connection with the specified owner.
@@ -131,10 +132,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   @Override
   public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners)
-    {
-      listeners.add(listener);
-    }
+    listeners.add(listener);
   }
 
   /**
@@ -145,10 +143,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   @Override
   public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
   {
-    synchronized (listeners)
-    {
-      listeners.remove(listener);
-    }
+    listeners.remove(listener);
   }
 
   /**
@@ -164,12 +159,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
   {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
-    ClientConnectionStatusListener[] array;
-    synchronized (listeners)
-    {
-      array = listeners.toArray(new ClientConnectionStatusListener[listeners.size()]);
-    }
-    for (ClientConnectionStatusListener listener : array) listener.statusChanged(event);
+    for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
 
   /**
@@ -203,10 +193,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   public void close()
   {
     if (debugEnabled) log.debug("closing " + name);
-    synchronized (listeners)
-    {
-      listeners.clear();
-    }
+    listeners.clear();
     try
     {
       if (socketInitializer != null) socketInitializer.close();

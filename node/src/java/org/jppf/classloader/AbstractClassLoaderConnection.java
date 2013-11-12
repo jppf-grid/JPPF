@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
 
 import org.jppf.*;
 import org.jppf.node.*;
-import org.jppf.utils.TraversalList;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -84,6 +84,37 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     catch (Exception e)
     {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Send a command to close the channel to the server.
+   * @param requestRunner the object wrapping the driver connection and handling the class loading requests.
+   */
+  protected void sendCloseChannelCommand(final ResourceRequestRunner requestRunner)
+  {
+    try
+    {
+      if (debugEnabled) log.debug("sending node initiation message");
+      JPPFResourceWrapper request = new JPPFResourceWrapper();
+      request.setState(JPPFResourceWrapper.State.CLOSE_CHANNEL);
+      request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
+      requestRunner.setRequest(request);
+      requestRunner.run();
+      Throwable t = requestRunner.getThrowable();
+      if (t != null)
+      {
+        if (t instanceof Exception) throw (Exception) t;
+        else throw new RuntimeException(t);
+      }
+      if (debugEnabled) log.debug("received node initiation response");
+      requestRunner.reset();
+    }
+    catch (Exception e)
+    {
+      String format = "error sending close channel command : {}";
+      if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
+      else log.warn(format, ExceptionUtils.getMessage(e));
     }
   }
 

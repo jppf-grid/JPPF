@@ -66,6 +66,8 @@ class WaitingJobState extends ClientServerState
     {
       ServerTaskBundleClient clientBundle = context.deserializeBundle();
       TaskBundle header = clientBundle.getJob();
+      boolean closeCommand = header.getParameter(BundleParameter.CLOSE_COMMAND, false);
+      if (closeCommand) return closeChannel(context);
       int count = header.getTaskCount();
       if (debugEnabled) log.debug("read bundle " + clientBundle + " from client " + channel + " done: received " + count + " tasks");
       if (clientBundle.getJobReceivedTime() == 0L) clientBundle.setJobReceivedTime(System.currentTimeMillis());
@@ -85,5 +87,23 @@ class WaitingJobState extends ClientServerState
       return clientBundle.isDone() ? TO_SENDING_RESULTS : TO_IDLE;
     }
     return TO_WAITING_JOB;
+  }
+
+  /**
+   * Handle a close channel command.
+   * @param context the context associated witht th echannel.
+   * @return a <code>null</code> transition.
+   */
+  private ClientTransition closeChannel(final ClientContext context)
+  {
+    try
+    {
+      context.handleException(context.getChannel(), null);
+    }
+    catch (Exception e)
+    {
+      if (debugEnabled) log.debug("exception while trying to close the channel {}" + context.getChannel());
+    }
+    return null;
   }
 }

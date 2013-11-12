@@ -303,13 +303,19 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   {
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
-    synchronized(listeners)
-    {
-      listeners.clear();
-    }
+    listeners.clear();
     if (!closed)
     {
       closed = true;
+      try
+      {
+        sendCloseConnectionCommand();
+      }
+      catch (Exception e)
+      {
+        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
+        else log.error('[' + name + "] " + e.getMessage());
+      }
       try
       {
         if (debugEnabled) log.debug("closing task server connection " + this);

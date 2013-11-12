@@ -43,11 +43,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
+  static Logger log = LoggerFactory.getLogger(AbstractNodeContext.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Reference to the driver.
    */
@@ -172,7 +172,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
-    if (debugEnabled) log.debug("handling {} for {}", exception.getClass().getName(), channel);
+    if (debugEnabled) log.debug("handling {} for {}", exception == null ? "null" : exception.getClass().getName(), channel);
     ServerTaskBundleNode tmpBundle = bundle;
     NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
     try {
@@ -180,11 +180,19 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       cleanup(channel);
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
         tmpBundle.resubmit();
-        tmpBundle.getClientJob().taskCompleted(tmpBundle, new Exception(exception));
+        tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  /**
+   * Called when the node sends a close channel command.
+   */
+  public void closeChannel()
+  {
+    handleException(getChannel(), null);
   }
 
   /**
@@ -341,7 +349,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void close() throws Exception {
     getChannel().close();
-    if ((jmxConnection != null) && jmxConnection.isConnected()) jmxConnection.close();
+    if ((jmxConnection != null) && jmxConnection.isConnected()) {
+      try {
+        jmxConnection.close();
+      } catch (Exception ignore) {
+      }
+    }
   }
 
   @Override
@@ -472,7 +485,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a {@link JPFFFuture} instance. 
    */
   public JPPFFuture<?> createFuture() {
-    return new NodeContextFuture();
+    return new NodeContextFuture(this);
   }
 
 
@@ -493,35 +506,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (message != null) {
       long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC, n);
-    }
-  }
-
-  /**
-   * Fuiture associated with this context which handles the job cancellation.
-   */
-  public class NodeContextFuture extends JPPFFutureTask<Object> {
-    /**
-     * Initialize witht he specified runnable and result object.
-     */
-    public NodeContextFuture() {
-      super(NOOP_RUNNABLE, null);
-    }
-
-    @Override
-    public boolean cancel(final boolean mayInterruptIfRunning) {
-      if (debugEnabled) log.debug("cancelling " + AbstractNodeContext.this + ", isCancelled()=" + isCancelled());
-      if (isDone()) return false;
-      if (isCancelled()) return true;
-      if (bundle == null) return false;
-      try {
-        bundle.cancel();
-        cancelJob(bundle.getClientJob().getUuid(), false);
-      } catch (Exception e) {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.warn(ExceptionUtils.getMessage(e));
-      } finally {
-        return super.cancel(false);
-      }
     }
   }
 }

@@ -92,5 +92,9 @@ public enum  BundleParameter
   /**
    * An array of ints that holds the positions odf the tasks such as they are in the initial job submiited by the client.
    */
-  TASK_POSITIONS
+  TASK_POSITIONS,
+  /**
+   * An indicator from the remote peer that the channel should be closed.
+   */
+  CLOSE_COMMAND
 }

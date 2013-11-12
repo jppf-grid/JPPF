@@ -27,6 +27,7 @@ import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.TraversalList;
 import org.slf4j.*;
 
@@ -72,6 +73,14 @@ class WaitingNodeRequestState extends ClassServerState
     {
       JPPFResourceWrapper res = context.deserializeResource();
       if (debugEnabled) log.debug(build("read resource request ", res, " from node: ", channel));
+      if (res.getState() == JPPFResourceWrapper.State.CLOSE_CHANNEL)
+      {
+        NodeClassNioServer.closeConnection(channel);
+        String uuid = (String) res.getData(ResourceIdentifier.NODE_UUID);
+        AbstractNodeContext ctx = driver.getNodeNioServer().getConnection(uuid);
+        if (ctx != null) ctx.closeChannel();
+        return null;
+      }
       boolean allDefinitionsFound = true;
       for (JPPFResourceWrapper resource: res.getResources()) allDefinitionsFound &= processResource(channel, resource);
       if (allDefinitionsFound) return sendResponse(context);

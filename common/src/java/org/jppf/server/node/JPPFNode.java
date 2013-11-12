@@ -359,11 +359,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("stopping node");
     setStopped(true);
     executionManager.shutdown();
-    try {
-      this.closeDataChannel();
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-    }
     reset(true);
   }
 

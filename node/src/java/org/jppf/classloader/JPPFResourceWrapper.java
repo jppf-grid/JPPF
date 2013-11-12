@@ -83,7 +83,11 @@ public class JPPFResourceWrapper implements Serializable
     /**
      * State for the class server receiving a resource from a resource provider.
      */
-    PROVIDER_RESPONSE
+    PROVIDER_RESPONSE,
+    /**
+     * Used for sending a close channel command to the server
+     */
+    CLOSE_CHANNEL
   }
 
   /**
