@@ -56,7 +56,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * The current count of tasks executed.
    */
-  private int taskSucessfullCount = 0;
+  private int taskSuccessfulCount = 0;
   /**
    * The current count of tasks executed.
    */
@@ -90,20 +90,22 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     }
   }
 
-  /**
-   * Called to notify a listener that a task was executed.
-   * @param event the event encapsulating the task-related data.
-   */
   @Override
   public synchronized void taskExecuted(final TaskExecutionEvent event)
   {
     TaskInformation info = event.getTaskInformation();
     taskCount++;
     if (info.hasError()) taskInErrorCount++;
-    else taskSucessfullCount++;
+    else taskSuccessfulCount++;
     totalCpuTime += info.getCpuTime();
     totalElapsedTime += info.getElapsedTime();
-    executor.submit(new NotificationSender(info));
+    executor.submit(new NotificationSender(info, null));
+  }
+
+  @Override
+  public void taskNotification(final TaskExecutionEvent event)
+  {
+    executor.submit(new NotificationSender(event.getTaskInformation(), event.getUserObject()));
   }
 
   /**
@@ -153,7 +155,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   @Override
   public synchronized Integer getTotalTasksSucessfull()
   {
-    return taskSucessfullCount;
+    return taskSuccessfulCount;
   }
 
   @Override
@@ -161,7 +163,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   {
     this.taskCount = 0;
     this.taskInErrorCount = 0;
-    this.taskSucessfullCount = 0;
+    this.taskSuccessfulCount = 0;
     this.totalCpuTime = 0L;
     this.totalElapsedTime = 0L;
   }
@@ -172,23 +174,29 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   private class NotificationSender implements Runnable
   {
     /**
-     * 
+     * Information about the task for which this notification is created.
      */
     private final TaskInformation info;
+    /**
+     * User-defined object sent along with the notification.
+     */
+    private final Object userObject;
 
     /**
      * 
      * @param info the info to send.
+     * @param userObject a user-defined object sent along with the notification.
      */
-    public NotificationSender(final TaskInformation info)
+    public NotificationSender(final TaskInformation info, final Object userObject)
     {
       this.info = info;
+      this.userObject = userObject;
     }
 
     @Override
     public void run()
     {
-      sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info));
+      sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info, userObject));
     }
   }
 }

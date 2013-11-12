@@ -32,7 +32,7 @@ import org.jppf.utils.JPPFCallable;
  * <code>run</code> method the task calculations are performed, and the result of the calculations
  * is set with the {@link #setResult(Object)} method:
  * <pre>
- * class MyTask extends JPPFTask {
+ * class MyTask extends AbstractTask&lt;Object&gt; {
  *   public void run() {
  *     // do the calculation ...
  *     setResult(myResult);
@@ -41,6 +41,7 @@ import org.jppf.utils.JPPFCallable;
  * </pre>
  * @param <T> the type of results retrun by this task.
  * @author Laurent Cohen
+ * @since 4.0
  */
 public abstract class AbstractTask<T> implements Task<T>
 {
@@ -71,11 +72,15 @@ public abstract class AbstractTask<T> implements Task<T>
   /**
    * Determines whether this task is executing within a node, or locally on the client side.
    */
-  private boolean inNode = false;
+  private transient boolean inNode = false;
   /**
    * A user-assigned id for this task.
    */
   private String id = null;
+  /**
+   * Dispatches notifications from this task.
+   */
+  private transient TaskExecutionDispatcher executionDisptacher = null;
 
   @Override
   public T getResult()
@@ -228,5 +233,21 @@ public abstract class AbstractTask<T> implements Task<T>
     }
     else result = callable.call();
     return result;
+  }
+
+  @Override
+  public void fireNotification(final Object userObject, final boolean sendViaJmx)
+  {
+    if (executionDisptacher != null) executionDisptacher.fireTaskNotification(this, userObject, sendViaJmx);
+  }
+
+  /**
+   * Set the task notification dispatcher onto this task.
+   * @param executionDisptacher a {@link TaskExecutionDispatcher} instance.
+   * @exclude
+   */
+  public void setExecutionDispatcher(final TaskExecutionDispatcher executionDisptacher)
+  {
+    this.executionDisptacher = executionDisptacher;
   }
 }

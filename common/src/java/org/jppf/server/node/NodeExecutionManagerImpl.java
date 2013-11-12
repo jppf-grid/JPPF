@@ -75,9 +75,9 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
    */
   private List<NodeTaskWrapper> taskWrapperList = null;
   /**
-   * List of listeners to task execution events.
+   * Dispatches tasks notifications to registered listeners.
    */
-  private final List<TaskExecutionListener> taskExecutionListeners = new CopyOnWriteArrayList<>();
+  private final TaskExecutionDispatcher taskNotificationDispatcher;
   /**
    * Determines whether the number of threads or their priority has changed.
    */
@@ -123,6 +123,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
   public NodeExecutionManagerImpl(final NodeInternal node, final String nbThreadsProperty) {
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
+    taskNotificationDispatcher = new TaskExecutionDispatcher(getClass().getClassLoader());
     TypedProperties config = JPPFConfiguration.getProperties();
     int poolSize = config.getInt(nbThreadsProperty, Runtime.getRuntime().availableProcessors());
     if (poolSize <= 0) {
@@ -178,6 +179,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
         ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
         for (Task task : taskList) {
           if (!(task instanceof JPPFExceptionResult)) {
+            if (task instanceof AbstractTask) ((AbstractTask) task).setExecutionDispatcher(taskNotificationDispatcher);
             NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler);
             taskWrapperList.add(taskWrapper);
             Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
@@ -237,6 +239,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
   public void shutdown() {
     getExecutor().shutdownNow();
     timeoutHandler.clear(true);
+    taskNotificationDispatcher.close();
   }
 
   /**
@@ -246,7 +249,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
    */
   @SuppressWarnings("unchecked")
   private void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
-    this.bundle = bundle;
+    taskNotificationDispatcher.setBundle(this.bundle = bundle);
     this.taskList = taskList;
     this.taskWrapperList = new ArrayList<>(taskList.size());
     this.dataProvider = taskList.get(0).getDataProvider();
@@ -263,7 +266,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
     accumulatedElapsed.set(0L);
     LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
     if (handler != null) handler.fireJobStarting(bundle, taskClassLoader instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) taskClassLoader : null,
-      (List<Task<?>>) taskList, dataProvider);
+        taskList, dataProvider);
   }
 
   /**
@@ -278,7 +281,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;
-    this.bundle = null;
+    taskNotificationDispatcher.setBundle(this.bundle = null);
     this.taskList = null;
     this.uuidList = null;
     setJobCancelled(false);
@@ -297,23 +300,12 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
     NodeExecutionInfo info = taskWrapper.getExecutionInfo();
     long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
     Task task = taskWrapper.getTask();
-    TaskExecutionEvent event = new TaskExecutionEvent(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
-    for (TaskExecutionListener listener : taskExecutionListeners) listener.taskExecuted(event);
+    taskNotificationDispatcher.fireTaskEnded(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
   }
 
   @Override
   public String getCurrentJobId() {
     return (bundle != null) ? bundle.getUuid() : null;
-  }
-
-  @Override
-  public void addTaskExecutionListener(final TaskExecutionListener listener) {
-    taskExecutionListeners.add(listener);
-  }
-
-  @Override
-  public void removeTaskExecutionListener(final TaskExecutionListener listener) {
-    taskExecutionListeners.remove(listener);
   }
 
   @Override
@@ -395,5 +387,11 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
   private ClassLoader getTaskClassLoader(final Task<?> task) {
     Object o = task.getTaskObject();
     return (o == null) ? task.getClass().getClassLoader() : o.getClass().getClassLoader();
+  }
+
+  @Override
+  public TaskExecutionDispatcher getTaskNotificationDispatcher()
+  {
+    return taskNotificationDispatcher;
   }
 }

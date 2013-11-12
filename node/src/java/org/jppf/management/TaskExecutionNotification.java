@@ -40,11 +40,13 @@ public class TaskExecutionNotification extends Notification
    * @param source the emitter MBean's object name.
    * @param sequenceNumber the notification sequence number.
    * @param taskInformation information about the task that triggered this notification.
+   * @param userObject an user-defined object sent along with this notification.
    */
-  public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation)
+  public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation, final Object userObject)
   {
     super("task.monitor", source, sequenceNumber, taskInformation.getTimestamp());
     this.taskInformation = taskInformation;
+    setUserData(userObject);
   }
 
   /**

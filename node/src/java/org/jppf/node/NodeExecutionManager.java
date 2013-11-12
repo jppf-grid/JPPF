@@ -21,7 +21,6 @@ package org.jppf.node;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import org.jppf.node.event.TaskExecutionListener;
 import org.jppf.node.protocol.*;
 
 /**
@@ -55,18 +54,6 @@ public interface NodeExecutionManager
    * @return the job id as a string, or null if no job is being executed.
    */
   String getCurrentJobId();
-
-  /**
-   * Add a task execution listener to the list of task execution listeners.
-   * @param listener the listener to add.
-   */
-  void addTaskExecutionListener(TaskExecutionListener listener);
-
-  /**
-   * Remove a task execution listener from the list of task execution listeners.
-   * @param listener the listener to remove.
-   */
-  void removeTaskExecutionListener(TaskExecutionListener listener);
 
   /**
    * Get the executor used by this execution manager.
@@ -138,4 +125,10 @@ public interface NodeExecutionManager
    * @param bundle a {@link TaskBundle} instance.
    */
   void setBundle(TaskBundle bundle);
+
+  /**
+   * Get the object which dispatches tasks notifications to registered listeners.
+   * @return a {@link TaskExecutionDispatcher} instance.
+   */
+  TaskExecutionDispatcher getTaskNotificationDispatcher();
 }

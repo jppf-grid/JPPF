@@ -32,7 +32,19 @@ public class TaskExecutionEvent extends EventObject
   /**
    * Object encapsulating information about the task.
    */
-  private TaskInformation taskInformation = null;
+  private final TaskInformation taskInformation;
+  /**
+   * User-defined object to send as part of the notification.
+   */
+  private final Object userObject;
+  /**
+   * If <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
+   */
+  private final boolean sendViaJmx;
+  /**
+   * Whether this is a task completion or user-sent event.
+   */
+  private final boolean taskCompletion;
 
   /**
    * Initialize this event object with the specified task.
@@ -46,6 +58,26 @@ public class TaskExecutionEvent extends EventObject
   {
     super(task);
     this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
+    this.userObject = null;
+    this.sendViaJmx = true;
+    taskCompletion = true;
+  }
+
+  /**
+   * Initialize this event object with the specified task.
+   * @param task the JPPF task from which the event originates.
+   * @param jobId the id of the job this task belongs to.
+   * @param userObject a user-defined object to send as part of the notification.
+   * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
+   * @since 4.0
+   */
+  public TaskExecutionEvent(final Task<?> task, final String jobId, final Object userObject, final boolean sendViaJmx)
+  {
+    super(task);
+    this.taskInformation = new TaskInformation(task.getId(), jobId, -1, -1, false);
+    this.userObject = userObject;
+    this.sendViaJmx = sendViaJmx;
+    taskCompletion = false;
   }
 
   /**
@@ -64,5 +96,35 @@ public class TaskExecutionEvent extends EventObject
   public TaskInformation getTaskInformation()
   {
     return taskInformation;
+  }
+
+  /**
+   * Get the user-defined object to send as part of the notification.
+   * @return the object specified in the constructor or <code>null</code>.
+   * @since 4.0
+   */
+  public Object getUserObject()
+  {
+    return userObject;
+  }
+
+  /**
+   * If <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
+   * @return <code>true</code> if this notification should be sent via JMX, <code>false</code> otherwise.
+   * @since 4.0
+   */
+  public boolean isSendViaJmx()
+  {
+    return sendViaJmx;
+  }
+
+  /**
+   * Determine whether this is a task completion or user-sent event.
+   * @return <code>true</code> if this is a task completion event, <code>false</code> otherwise.
+   * @exclude
+   */
+  public boolean isTaskCompletion()
+  {
+    return taskCompletion;
   }
 }

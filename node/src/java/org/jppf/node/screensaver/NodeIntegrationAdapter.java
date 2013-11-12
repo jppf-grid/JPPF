@@ -32,6 +32,10 @@ public abstract class NodeIntegrationAdapter extends NodeLifeCycleListenerAdapte
   }
 
   @Override
+  public void taskNotification(final TaskExecutionEvent event) {
+  }
+
+  @Override
   public void setScreenSaver(final JPPFScreenSaver screensaver) {
   }
 }

@@ -28,7 +28,14 @@ public interface TaskExecutionListener extends EventListener
 {
   /**
    * Called to notify a listener that a task was executed.
-   * @param event - the event encapsulating the task-related data.
+   * @param event the event encapsulating the task-related data.
    */
   void taskExecuted(TaskExecutionEvent event);
+
+  /**
+   * Called when a task sends a notification.
+   * @param event the event encapsulating the task-related data.
+   * @since 4.0
+   */
+  void taskNotification(TaskExecutionEvent event);
 }

@@ -60,7 +60,7 @@ public class HookFactory
   }
 
   /**
-   * Register a hook defined via SPI, for which all looked u^p instances are discovered and invoked.
+   * Register a hook defined via SPI, for which all looked up instances are discovered and invoked.
    * @param <T> the type of the hook interface.
    * @param infClass the class of the hook's interface.
    * @param defaultImpl the default implementation, which may be null.

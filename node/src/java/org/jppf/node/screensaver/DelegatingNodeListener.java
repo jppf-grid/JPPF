@@ -56,7 +56,7 @@ public class DelegatingNodeListener implements NodeLifeCycleListener {
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {
     if (delegate != null) {
-      ((NodeInternal) event.getNode()).getExecutionManager().addTaskExecutionListener(delegate);
+      ((NodeInternal) event.getNode()).getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(delegate);
       delegate.nodeStarting(event);
     }
   }
@@ -67,7 +67,7 @@ public class DelegatingNodeListener implements NodeLifeCycleListener {
       try {
         delegate.nodeEnding(event);
       } finally {
-        ((NodeInternal) event.getNode()).getExecutionManager().removeTaskExecutionListener(delegate);
+        ((NodeInternal) event.getNode()).getExecutionManager().getTaskNotificationDispatcher().removeTaskExecutionListener(delegate);
       }
     }
   }

@@ -130,13 +130,20 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     String defaultPath = NodePanel.IMAGE_PATH + '/' + "jppf_group_small.gif";
     String paths = config.getString("jppf.screensaver.logo.path", defaultPath);
     String[] tokens = paths.split("\\|");
-    java.util.List<ImageIcon> list = new ArrayList<>();
+    java.util.List<ImageIcon> list = new LinkedList<>();
     for (String s: tokens) {
       ImageIcon icon = ScreenSaverMain.loadImage(s.trim());
       if (icon != null) list.add(icon);
     }
     if (list.isEmpty()) list.add(ScreenSaverMain.loadImage(defaultPath));
-    logos = list.toArray(new ImageIcon[list.size()]);
+    logos = new ImageIcon[list.size()];
+    Random rnd = new Random(System.nanoTime());
+    int count = 0;
+    while (!list.isEmpty()) {
+      int n = rnd.nextInt(list.size());
+      logos[count++] = list.remove(n);
+    }
+    //logos = list.toArray(new ImageIcon[list.size()]);
     String s = config.getString("jppf.screensaver.status.panel.alignment", "center").trim().toLowerCase();
     if (s.startsWith("l")) alignment = 0;
     else if (s.startsWith("r")) alignment = 2;

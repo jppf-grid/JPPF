@@ -168,4 +168,17 @@ public interface Task<T> extends Runnable, Serializable
    * @see org.jppf.utils.JPPFCallable
    */
   <V> V compute(JPPFCallable<V> callable) throws Exception;
+
+  /**
+   * Causes the task to send a notification to all listeners.
+   * This method can be called at any time during the execution of the task,
+   * i.e. while in the execution scope of the {@link #run()}, {@link #onTimeout()} or {@link #onCancel()} method.
+   * <p>If the parameter <code>sendViaJmx</code> is true, then a notfication will also be sent
+   * by the {@link org.jppf.management.JPPFNodeTaskMonitorMBean JPPFNodeTaskMonitorMBean} mbean, otherwise only local listeners will be notified.
+   * @param userObject a user-defined object to send as part of the notification.
+   * @param sendViaJmx if <code>true</code> then also send the notification via the JMX MBean, otherwise only send to local listeners.
+   * If the task is executing within a client local executor, this parameter has no effect. 
+   * @since 4.0
+   */
+  void fireNotification(Object userObject, boolean sendViaJmx);
 }
