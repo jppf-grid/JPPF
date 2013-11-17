@@ -22,7 +22,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.TO_NODE_WAITING_PR
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
@@ -128,23 +128,21 @@ public class ClassContext extends SimpleNioContext<ClassState>
   }
 
   /**
-   * Write the peer initiation message when first connecting to a remote server.
-   * The message is made of the JPPF identifier {@link JPPFIdentifiers#NODE_CLASSLOADER_CHANNEL} plus
-   * an initial resource wrapper (preceded by its serialized length).
+   * Write the peer channel identifier when first connecting to a remote server.
+   * The message is made of the JPPF identifier {@link JPPFIdentifiers#NODE_CLASSLOADER_CHANNEL}.
    * @param channel the channel to which to write the message.
    * @return <code>true</code> if the message was fully written, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
   public boolean writeIdentifier(final ChannelWrapper<?> channel) throws Exception {
+    int id = JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL;
     if (nioObject == null) {
-      int identifier = JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL;
-      byte[] bytes = SerializationUtils.writeInt(identifier);
+      byte[] bytes = SerializationUtils.writeInt(id);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
-      if (sslHandler == null) nioObject = new PlainNioObject(channel, dl, false);
-      else nioObject = new SSLNioObject(dl, sslHandler);
+      nioObject = new PlainNioObject(channel, dl, false);
     }
     boolean b = nioObject.write();
-    if (b  && debugEnabled) log.debug("sent channel identifier {} to peer server", JPPFIdentifiers.asString(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL));
+    if (b  && debugEnabled) log.debug("sent channel identifier {} to peer server", JPPFIdentifiers.asString(id));
     return b;
   }
 
@@ -181,7 +179,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
   @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request)
   {
-    if (!((ClientClassNioServer) driver.getClientClassServer()).addResourceRequest(uuid, request))
+    if (!((ClientClassNioServer) driver.getClientClassServer()).addResourceRequest(request.getResource().getUuidPath().getFirst(), request))
     {
       pendingRequests.offer(request);
       processRequests();
@@ -337,7 +335,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
       synchronized(nodeChannel) {
         while (ClassState.IDLE_NODE != nodeContext.getState()) nodeChannel.wait(0L, 10000);
-        ResourceRequest pendingResponse = nodeContext.getPendingResponse(resource);
+        ResourceRequest pendingResponse = nodeContext.getPendingResponse(req.getResource());
         pendingResponse.setResource(resource);
         tm.transitionChannel(nodeChannel, TO_NODE_WAITING_PROVIDER_RESPONSE, true);
       }
@@ -431,8 +429,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+    sb.append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    sb.append(", uuid=").append(uuid);
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource == null ? "null" : resource.getName());
     if (provider) {
@@ -451,7 +451,19 @@ public class ClassContext extends SimpleNioContext<ClassState>
       sb.append(", type=node");
     }
     sb.append(", peer=").append(peer);
-    sb.append(", uuid=").append(uuid);
+    sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Determine whether the specified resource is a request for a single resource definition.
+   * @param resource the resource to check.
+   * @return <code>true</code> if the specified resource is a request for a single resource definition, <code>false</code> otherwise.
+   */
+  public static boolean isSingleResource(final JPPFResourceWrapper resource) {
+    for (String s: new String[] {"multiple", "multiple.resources.names", "callable"}) {
+      if (resource.getData(s) != null) return false;
+    }
+    return true;
   }
 }

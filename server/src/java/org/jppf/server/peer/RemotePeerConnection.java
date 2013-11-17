@@ -63,6 +63,10 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
    * 
    */
   final SerializationHelper helper = new SerializationHelperImpl();
+  /**
+   * 
+   */
+  private boolean closed = false;
 
   /**
    * Initialize this connection with the specified serializer.
@@ -78,32 +82,27 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
   }
 
   @Override
-  public void init() throws Exception
-  {
+  public void init() throws Exception {
     if (debugEnabled) log.debug(name + " initializing socket client");
     lock.lock();
-    try
-    {
+    if (closed) closed = false;
+    try {
       boolean mustInit = false;
-      if (channel == null)
-      {
+      if (channel == null) {
         mustInit = true;
-        initchannel();
+        initChannel();
       }
-      if (mustInit)
-      {
-        if (debugEnabled) log.debug(name + "initializing socket");
+      if (mustInit) {
+        if (debugEnabled) log.debug(name + " initializing socket");
         System.out.println("Connecting to  " + name);
         socketInitializer.initializeSocket(channel);
         if (!socketInitializer.isSuccessful()) throw new JPPFException("Unable to reconnect to " + name);
-        if (debugEnabled) log.debug("sending channel identifier");
+        if (debugEnabled) log.debug("sending channel identifier to " + name);
         channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
         if (secure) channel = SSLHelper.createSSLClientConnection(channel);
         System.out.println("Reconnected to " + name);
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -112,9 +111,8 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public void initchannel() throws Exception
+  public void initChannel() throws Exception
   {
-    if (debugEnabled) log.debug(name + "initializing socket client");
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
     int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
@@ -123,18 +121,21 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
     channel.setPort(port);
     channel.setSerializer(helper.getSerializer());
     name += '@' + host + ':' + port;
+    if (debugEnabled) log.debug(name + " initialized socket client [host=" + host + ", port=" + port + ", secure=" + secure + "]");
   }
 
   @Override
   public void close() throws Exception
   {
-    lock.lock();
-    try
-    {
-    }
-    finally
-    {
-      lock.unlock();
-    }
+    closed = true;
+  }
+
+  /**
+   * Determine whether this connection is closed.
+   * @return <code>true</code> if this connection is closed, <code>false</code> otherwise.
+   */
+  public boolean isClosed()
+  {
+    return closed;
   }
 }

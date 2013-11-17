@@ -70,7 +70,18 @@ public class ResourceRequest
    */
   public void setResource(final JPPFResourceWrapper resource)
   {
-    this.resource = resource;
+    Object o = null;
+    for (String id: new String[] { "definition", "resource_list", "resource_map" }) {
+      if ((o = resource.getData(id)) != null) {
+        this.resource.setData(id, o);
+      }
+    }
+    Long callableId = (Long) resource.getData("callable.id");
+    if (callableId == null) callableId = -1L;
+    Long thisCallableId = (Long) this.resource.getData("callable.id");
+    if (thisCallableId == null) thisCallableId = -1L;
+    if (callableId.equals(thisCallableId) && (callableId >= 0) && ((o = resource.getCallable()) != null)) this.resource.setCallable((byte[]) o);
+    this.resource.setState(resource.getState());
   }
 
   @Override

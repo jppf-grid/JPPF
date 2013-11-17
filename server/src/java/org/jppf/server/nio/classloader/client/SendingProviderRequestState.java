@@ -69,7 +69,7 @@ class SendingProviderRequestState extends ClassServerState
       if (request != null) {
         context.setMessage(null);
         JPPFResourceWrapper resource = request.getResource();
-        if ((resource.getCallable() == null) && (resource.getData("multiple") == null) && !(resource.getData("multiple.resources.names") == null)) {
+        if (ClassContext.isSingleResource(resource)) {
           byte[] content = server.getClassCache().getCacheContent(resource.getUuidPath().getFirst(), resource.getName());
           if (content != null) {
             resource.setDefinition(content);
@@ -87,7 +87,6 @@ class SendingProviderRequestState extends ClassServerState
     }
     if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug(build("request sent to provider ", channel, " from node ", request, ", resource: ", context.getResource().getName()));
-      //context.setMessage(new BaseNioMessage(context.getSSLHandler() != null));
       context.setMessage(null);
       return TO_WAITING_PROVIDER_RESPONSE;
     }

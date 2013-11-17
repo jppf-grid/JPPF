@@ -70,7 +70,8 @@ class WaitingProviderResponseState extends ClassServerState
       ResourceRequest request = context.getCurrentRequest();
       JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", request.getChannel(), ", resource: ", resource.getName()));
-      if ((resource.getDefinition() != null) && (resource.getCallable() == null)) classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
+      if ((resource.getDefinition() != null) && ClassContext.isSingleResource(resource))
+        classCache.setCacheContent(resource.getUuidPath().getFirst(), resource.getName(), resource.getDefinition());
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 
       if (debugEnabled) log.debug(build("client ", channel, " sending response ", resource, " to node ", request.getChannel()));
