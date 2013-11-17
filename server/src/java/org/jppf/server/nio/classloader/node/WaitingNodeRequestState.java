@@ -169,12 +169,15 @@ class WaitingNodeRequestState extends ClassServerState
     String name = resource.getName();
     TraversalList<String> uuidPath = resource.getUuidPath();
     ClassContext context = (ClassContext) channel.getContext();
-    if (resource.getCallable() == null) b = classCache.getCacheContent(uuidPath.getFirst(), name);
-    if ((b != null) && (resource.getData(ResourceIdentifier.MULTIPLE) == null) && !(resource.getData(ResourceIdentifier.MULTIPLE_NAMES) == null))
+    if (resource.isSingleResource())
     {
-      resource.setDefinition(b);
-      resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-      return true;
+      b = classCache.getCacheContent(uuidPath.getFirst(), name);
+      if (b != null)
+      {
+        resource.setDefinition(b);
+        resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
+        return true;
+      }
     }
     uuidPath.decPosition();
     String uuid = resource.getUuidPath().getCurrentElement();

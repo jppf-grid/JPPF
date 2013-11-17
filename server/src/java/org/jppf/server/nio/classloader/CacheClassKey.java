@@ -40,6 +40,6 @@ public class CacheClassKey extends Pair<String, String>
   @Override
   public String toString()
   {
-    return getClass().getSimpleName() + "[uuid=" + first + ", res=" + second + ']';
+    return new StringBuilder(getClass().getSimpleName()).append("[uuid=").append(first).append(", res=").append(second).append(']').toString();
   }
 }

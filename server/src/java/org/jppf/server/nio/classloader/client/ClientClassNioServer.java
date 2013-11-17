@@ -193,6 +193,7 @@ public class ClientClassNioServer extends ClassNioServer
   public boolean addResourceRequest(final String uuid, final ResourceRequest request)
   {
     CacheClassKey key = new CacheClassKey(uuid, request.getResource().getName());
+    if (debugEnabled) log.debug("adding resource request for {}", key);
     lockRequests.lock();
     try
     {
@@ -215,10 +216,13 @@ public class ClientClassNioServer extends ClassNioServer
   public Collection<ResourceRequest> removeResourceRequest(final String uuid, final String name)
   {
     CacheClassKey key = new CacheClassKey(uuid, name);
+    if (debugEnabled) log.debug("removing resource request for {}", key);
     lockRequests.lock();
     try
     {
-      return requestMap.removeKey(key);
+      Collection<ResourceRequest> c = requestMap.removeKey(key);
+      if (debugEnabled) log.debug("removing resource request for {} : {} requests", key, c == null ? "null" : c.size());
+      return c;
     }
     finally
     {

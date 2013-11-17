@@ -20,7 +20,7 @@ package org.jppf.server.nio.classloader.client;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.classloader.*;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
@@ -71,7 +71,11 @@ class WaitingProviderResponseState extends ClassServerState
       ResourceRequest request = context.getCurrentRequest();
       JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", request.getChannel(), ", resource: ", resource.getName()));
-      if ((resource.getDefinition() != null) && (resource.getCallable() == null)) classCache.setCacheContent(context.getUuid(), resource.getName(), resource.getDefinition());
+      if ("org/jppf/utils/ObjectSerializerImpl.class".equals(resource.getName())) {
+        boolean breakpoint = true;
+      }
+      if ((resource.getDefinition() != null) && resource.isSingleResource())
+        classCache.setCacheContent(resource.getUuidPath().getFirst(), resource.getName(), resource.getDefinition());
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
 
       if (debugEnabled) log.debug(build("client ", channel, " sending response ", resource, " to node ", request.getChannel()));

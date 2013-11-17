@@ -116,7 +116,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
     requestStartTime = System.nanoTime();
     ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
-    //resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, serializer);
     resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl);
     return resource;
   }
@@ -196,6 +195,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    */
   @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request) {
+    String uuid = request.getResource().getUuidPath().getFirst();
     if (!driver.getClientClassServer().addResourceRequest(uuid, request)) {
       request.setRequestStartTime(System.nanoTime());
       pendingRequests.offer(request);
@@ -353,7 +353,11 @@ public class ClassContext extends SimpleNioContext<ClassState>
       ClassContext nodeContext = (ClassContext) nodeChannel.getContext();
       synchronized(nodeChannel) {
         while (ClassState.IDLE_NODE != nodeContext.getState()) nodeChannel.wait(0L, 10000);
-        ResourceRequest pendingResponse = nodeContext.getPendingResponse(resource);
+        ResourceRequest pendingResponse = nodeContext.getPendingResponse(req.getResource());
+        if (pendingResponse == null) {
+          if (debugEnabled) log.debug("node {} has {} pending responses, but none for {}, pendingResponses={}",
+            new Object[] {nodeChannel.getId(), nodeContext.getNbPendingResponses(), resource, nodeContext.getPendingResponses()});
+        }
         pendingResponse.setResource(resource);
         tm.transitionChannel(nodeChannel, ClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE, true);
       }

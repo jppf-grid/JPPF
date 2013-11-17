@@ -18,7 +18,9 @@
 
 package org.jppf.server.nio.classloader;
 
-import org.jppf.classloader.JPPFResourceWrapper;
+import static org.jppf.classloader.ResourceIdentifier.*;
+
+import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
 
 /**
@@ -74,7 +76,15 @@ public class ResourceRequest
    */
   public void setResource(final JPPFResourceWrapper resource)
   {
-    this.resource = resource;
+    Object o = null;
+    for (ResourceIdentifier id: new ResourceIdentifier[] { DEFINITION, RESOURCE_LIST, RESOURCE_MAP }) {
+      if ((o = resource.getData(id)) != null) {
+        this.resource.setData(id, o);
+      }
+    }
+    long callableId = resource.getCallableID();
+    if ((callableId == this.resource.getCallableID()) && (callableId >= 0) && ((o = resource.getCallable()) != null)) this.resource.setCallable((byte[]) o);
+    this.resource.setState(resource.getState());
   }
 
   @Override

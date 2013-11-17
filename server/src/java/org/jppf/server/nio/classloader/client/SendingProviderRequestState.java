@@ -69,9 +69,11 @@ class SendingProviderRequestState extends ClassServerState
       if (request != null) {
         context.setMessage(null);
         JPPFResourceWrapper resource = request.getResource();
-        if ((resource.getCallable() == null) && (resource.getData(ResourceIdentifier.MULTIPLE) == null) && !(resource.getData(ResourceIdentifier.MULTIPLE_NAMES) == null)) {
-          byte[] content = server.getClassCache().getCacheContent(resource.getUuidPath().getFirst(), resource.getName());
+        if (resource.isSingleResource()) {
+          String uuid = resource.getUuidPath().getFirst();
+          byte[] content = server.getClassCache().getCacheContent(uuid, resource.getName());
           if (content != null) {
+            if (debugEnabled) log.debug("resource [uuid={}, res={}] found in the cache, request will not be sent to the client", uuid, resource.getName());
             resource.setDefinition(content);
             resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
             context.sendNodeResponse(request, resource);
