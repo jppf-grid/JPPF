@@ -16,27 +16,29 @@
  * limitations under the License.
  */
 
-package test.org.jppf.ssl;
+package test.org.jppf.server.peer;
 
+import org.jppf.node.policy.Equal;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
 
 /**
- * SSL Unit Tests with 1-way authentication.
+ * Test a multi-server topology with 2 servers, 1 node attached to each server and 1 client,
+ * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
-public class TestSSL3 extends AbstractNonStandardSetup
+public class TestMultiServerWithSSL extends AbstractNonStandardSetup
 {
   /**
-   * Launches a driver and 1 node and start the client,
-   * all setup with 1-way SSL authentication.
+   * Launches a 2 drivers with 1 node attached to each and start the client,
+   * all setup with 2-way SSL authentication.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
   public static void setup() throws Exception
   {
-    client = BaseSetup.setup(1, 1, true, createConfig("ssl3"));
+    client = BaseSetup.setup(2, 2, true, createConfig("ssl2_p2p"));
   }
 
   /**
@@ -46,7 +48,7 @@ public class TestSSL3 extends AbstractNonStandardSetup
   @Test(timeout=10000)
   public void testSimpleJob() throws Exception
   {
-    super.testSimpleJob(null);
+    super.testSimpleJob(new Equal("jppf.ssl.server.port", 12101));
   }
 
   @Override
@@ -68,12 +70,5 @@ public class TestSSL3 extends AbstractNonStandardSetup
   public void testNotSerializableExceptionFromNode() throws Exception
   {
     super.testNotSerializableExceptionFromNode();
-  }
-
-  @Override
-  @Test(timeout=8000)
-  public void testForwardingMBean() throws Exception
-  {
-    super.testForwardingMBean();
   }
 }

@@ -16,26 +16,20 @@
  * limitations under the License.
  */
 
-package test.org.jppf.test.setup;
+package test;
 
-import org.junit.BeforeClass;
 
-import test.org.jppf.test.setup.BaseSetup.Configuration;
+
+
+
 
 /**
- * Tests with a driver and 2 offline nodes.
+ * A suite of JUnit tests.
  * @author Laurent Cohen
  */
-public class SetupOfflineNode1D2N1C extends AbstractSetupOfflineNode
+//@RunWith(Suite.class)
+//@Suite.SuiteClasses({ TestSSL.class, TestFileDataLocation.class, TestMultiServerWithSSL.class })
+//@Suite.SuiteClasses({ TestSSL.class, TestMultiServer.class, TestFileDataLocation.class, TestSSL2.class })
+public class JPPFSuite
 {
-  /**
-   * Launches a driver and 2 nodes and start the client.
-   * @throws Exception if a process could not be started.
-   */
-  @BeforeClass
-  public static void setup() throws Exception
-  {
-    Configuration testConfig = createConfig();
-    client = BaseSetup.setup(1, 2, true, testConfig);
-  }
 }

@@ -77,7 +77,7 @@ class PeerNode extends AbstractCommonNode
   public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure)
   {
     if(peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerNameBase is blank");
-    if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+    if(connectionInfo == null) throw new IllegalArgumentException(peerNameBase +" connectionInfo is null");
 
     this.peerNameBase = peerNameBase;
     this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
@@ -144,7 +144,7 @@ class PeerNode extends AbstractCommonNode
         }
       }
     }
-    if (debugEnabled) log.debug(getName() + "End of peer node main loop");
+    if (debugEnabled) log.debug(getName() + " end of peer node main loop");
   }
 
   /**
@@ -154,7 +154,7 @@ class PeerNode extends AbstractCommonNode
    */
   public void perform() throws Exception
   {
-    if (debugEnabled) log.debug(getName() + "Start of peer node secondary loop");
+    if (debugEnabled) log.debug(getName() + " start of peer node secondary loop");
     while (!stopped)
     {
       ServerTaskBundleClient bundleWrapper = readBundle();
@@ -178,7 +178,7 @@ class PeerNode extends AbstractCommonNode
         resultSender.waitForExecution();
         resultSender.sendResults(bundleWrapper);
         setTaskCount(getTaskCount() + bundleWrapper.getTaskCount());
-        if (debugEnabled) log.debug(getName() + "tasks executed: " + getTaskCount());
+        if (debugEnabled) log.debug(getName() + " tasks executed: " + getTaskCount());
       }
       else
       {
@@ -190,7 +190,7 @@ class PeerNode extends AbstractCommonNode
         bundleWrapper.bundleEnded();
       }
     }
-    if (debugEnabled) log.debug(getName() + " End of peer node secondary loop");
+    if (debugEnabled) log.debug(getName() + " end of peer node secondary loop");
   }
 
   /**
@@ -214,17 +214,17 @@ class PeerNode extends AbstractCommonNode
     if (debugEnabled) log.debug("waiting for next request");
     JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ((RemotePeerConnection) nodeConnection).helper.getSerializer());
     int count = header.getTaskCount();
-    if (debugEnabled) log.debug("received header from peer driver: " + header + " with " + count + " tasks");
+    if (debugEnabled) log.debug(getName() + " received header from peer driver: " + header + " with " + count + " tasks");
 
     DataLocation dataProvider = IOHelper.readData(is);
-    if (traceEnabled) log.trace("received data provider from peer driver, data length = " + dataProvider.getSize());
+    if (traceEnabled) log.trace(getName() + " received data provider from peer driver, data length = " + dataProvider.getSize());
 
     List<DataLocation> tasks = new ArrayList<>(count);
     for (int i=1; i<count+1; i++)
     {
       DataLocation dl = IOHelper.readData(is);
       tasks.add(dl);
-      if (traceEnabled) log.trace("received task #"+ i + " from peer driver, data length = " + dl.getSize());
+      if (traceEnabled) log.trace(getName() + " received task #"+ i + " from peer driver, data length = " + dl.getSize());
     }
     return new ServerTaskBundleClient(header, dataProvider, tasks);
   }
@@ -245,11 +245,11 @@ class PeerNode extends AbstractCommonNode
   @Override
   public void stopNode()
   {
-    if (debugEnabled) log.debug(getName() + "closing node");
+    if (debugEnabled) log.debug(getName() + " closing node");
     stopped = true;
     try
     {
-      if (debugEnabled) log.debug(getName() + "closing socket: " + nodeConnection.getChannel());
+      if (debugEnabled) log.debug(getName() + " closing socket: " + nodeConnection.getChannel());
       nodeConnection.close();
     }
     catch(Exception ex)

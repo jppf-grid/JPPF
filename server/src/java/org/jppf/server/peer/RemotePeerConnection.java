@@ -92,11 +92,11 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
       }
       if (mustInit)
       {
-        if (debugEnabled) log.debug(name + "initializing socket");
+        if (debugEnabled) log.debug(name + " initializing socket");
         System.out.println("Connecting to  " + name);
         socketInitializer.initializeSocket(channel);
         if (!socketInitializer.isSuccessful()) throw new JPPFException("Unable to reconnect to " + name);
-        if (debugEnabled) log.debug("sending channel identifier");
+        if (debugEnabled) log.debug(name + " sending channel identifier");
         channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
         System.out.println("Reconnected to " + name);
         if (secure) channel = SSLHelper.createSSLClientConnection(channel);
@@ -114,7 +114,7 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
    */
   public void initchannel() throws Exception
   {
-    if (debugEnabled) log.debug(name + "initializing socket client");
+    if (debugEnabled) log.debug(name + " initializing socket client");
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
     int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];

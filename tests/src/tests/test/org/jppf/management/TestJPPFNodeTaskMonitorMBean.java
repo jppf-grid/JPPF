@@ -188,7 +188,7 @@ public class TestJPPFNodeTaskMonitorMBean
         Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);
         assertEquals(job.getUuid(), ti.getJobId());
-        assertEquals(task.getId(), ti.getId());
+        assertEquals(task.getId(), ti.getId()); //
         Long n = ti.getElapsedTime();
         if (i < nbTasks - 1) assertFalse(ti.hasError());
         else {
@@ -211,14 +211,14 @@ public class TestJPPFNodeTaskMonitorMBean
   /** */
   public class NodeNotificationListener implements NotificationListener {
     /**  The task information received as notifications from the node. */
-    public List<TaskInformation> notifs = new ArrayList<>();
+    public List<TaskInformation> notifs = new Vector<>();
     /** A user-defined object. */
-    public List<Object> userObjects = new ArrayList<>();
+    public List<Object> userObjects = new Vector<>();
     /** */
     public Exception exception = null;
 
     @Override
-    public void handleNotification(final Notification notification, final Object handback) {
+    public synchronized void handleNotification(final Notification notification, final Object handback) {
       try {
         TaskExecutionNotification notif = (TaskExecutionNotification) notification;
         notifs.add(notif.getTaskInformation());

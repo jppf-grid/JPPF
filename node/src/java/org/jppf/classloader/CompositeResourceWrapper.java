@@ -51,9 +51,9 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
   public JPPFResourceWrapper[] getResources()
   {
     synchronized (getMonitor()) {
-      Set<JPPFResourceWrapper> resources = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
-      if(resources == null || resources.isEmpty()) return EMPTY_RESOURCE_WRAPPER_ARRAY;
-      else return resources.toArray(new JPPFResourceWrapper[resources.size()]);
+      Set<JPPFResourceWrapper> set = (Set<JPPFResourceWrapper>) getData(ResourceIdentifier.RESOURCES_KEY);
+      if ((set == null) || set.isEmpty()) return EMPTY_RESOURCE_WRAPPER_ARRAY;
+      else return set.toArray(new JPPFResourceWrapper[set.size()]);
     }
   }
 

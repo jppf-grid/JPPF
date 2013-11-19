@@ -51,4 +51,10 @@ public interface ClientConnectionHandler extends ClientConnectionStatusHandler
    * Close and cleanup this connection handler.
    */
   void close();
+
+  /**
+   * Determine whether this connection handler is closed.
+   * @return <code>true</code> if this connection handler is closed, <code>false</code> otherwise.
+   */
+  boolean isClosed();
 }

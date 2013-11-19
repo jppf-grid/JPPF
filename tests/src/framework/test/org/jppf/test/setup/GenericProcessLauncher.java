@@ -157,12 +157,7 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "jmxremote/jmxremote_optional-1.0_01-ea.jar");
-    TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
-    String s = config.getString("jppf.jvm.options", null);
-    if (s != null) {
-      String[] options = s.split("\\s");
-      for (String opt: options) addJvmOption(opt);
-    }
+    updateJvmOptionsFromConfig();
   }
 
   /**
@@ -181,6 +176,19 @@ public class GenericProcessLauncher implements Runnable {
     log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
     for (String elt: classpath) addClasspathElement(elt);
     for (String option: jvmOptions) addJvmOption(option);
+    updateJvmOptionsFromConfig();
+  }
+
+  /**
+   * 
+   */
+  private void updateJvmOptionsFromConfig() {
+    TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
+    String s = config.getString("jppf.jvm.options", null);
+    if (s != null) {
+      String[] options = s.split("\\s");
+      for (String opt: options) addJvmOption(opt);
+    }
   }
 
   /**

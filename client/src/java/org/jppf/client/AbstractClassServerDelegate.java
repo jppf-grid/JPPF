@@ -46,10 +46,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected boolean stop = false;
   /**
-   * Indicates whether this socket handler is closed, which means it can't handle requests anymore.
-   */
-  protected boolean closed = false;
-  /**
    * Reads resource files from the classpath.
    */
   protected ResourceProvider resourceProvider = new ResourceProvider();
@@ -78,17 +74,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   {
     super(owner, owner.getName() + " - ClassServer");
     formattedName = "[" + name + ']';
-  }
-
-  /**
-   * Determine whether the socket connection is closed
-   * @return true if the socket connection is closed, false otherwise
-   * @see org.jppf.client.ClassServerDelegate#isClosed()
-   */
-  @Override
-  public boolean isClosed()
-  {
-    return closed;
   }
 
   /**
@@ -231,14 +216,11 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   @Override
   public void close()
   {
-    if (!closed)
-    {
-      if (debugEnabled) log.debug("closing " + getName());
-      closed = true;
-      stop = true;
-      super.close();
-      if (debugEnabled) log.debug(getName() + " closed");
-    }
+    if (debugEnabled) log.debug("closing " + getName());
+    closed = true;
+    stop = true;
+    super.close();
+    if (debugEnabled) log.debug(getName() + " closed");
   }
 
   @Override

@@ -305,6 +305,7 @@ public final class SSLHelper
       else
       {
         source = config.getString("jppf.ssl.configuration.file", null);
+        if (source == null) throw new SSLConfigurationException("no SSL configuration source is configured");
         is = FileUtils.getFileInputStream(source);
       }
       if (is == null) throw new SSLConfigurationException("could not load the SSL configuration '" + source + "'");

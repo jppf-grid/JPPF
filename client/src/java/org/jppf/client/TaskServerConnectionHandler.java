@@ -124,10 +124,4 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
     socketClient.setHost(host);
     socketClient.setPort(port);
   }
-
-  @Override
-  public void close()
-  {
-    super.close();
-  }
 }

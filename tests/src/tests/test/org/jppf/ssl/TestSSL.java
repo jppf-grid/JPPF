@@ -26,7 +26,7 @@ import test.org.jppf.test.setup.*;
  * SSL Unit Tests with 1-way authentication.
  * @author Laurent Cohen
  */
-public class TestSSL extends AbstractSSLSetup
+public class TestSSL extends AbstractNonStandardSetup
 {
   /**
    * Launches a driver and 1 node and start the client,
@@ -39,15 +39,18 @@ public class TestSSL extends AbstractSSLSetup
     client = BaseSetup.setup(1, 1, true, createConfig("ssl"));
   }
 
-  @Override
-  @Test(timeout=5000)
+  /**
+   * Test a simple job.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
   public void testSimpleJob() throws Exception
   {
-    super.testSimpleJob();
+    super.testSimpleJob(null);
   }
 
   @Override
-  @Test(timeout=10000)
+  @Test(timeout=15000)
   public void testMultipleJobs() throws Exception
   {
     super.testMultipleJobs();

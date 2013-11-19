@@ -95,6 +95,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
       while (!isStopped())
       {
         JPPFConnectionInformation info = receiver.receive();
+        if (isStopped()) break;
         synchronized(this)
         {
           if ((info != null) && !hasConnectionInformation(info))
@@ -112,7 +113,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
     }
     finally
     {
-      if(receiver != null) receiver.setStopped(true);
+      if (receiver != null) receiver.setStopped(true);
     }
   }
 

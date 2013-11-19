@@ -82,6 +82,10 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
    * List of status listeners for this connection.
    */
   protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
+  /**
+   * Indicates whether this connection handler is closed, which means it can't handle requests anymore.
+   */
+  protected boolean closed = false;
 
   /**
    * Initialize this connection with the specified owner.
@@ -197,11 +201,29 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     try
     {
       if (socketInitializer != null) socketInitializer.close();
+      socketInitializer = null;
       if (socketClient != null) socketClient.close();
+      socketClient = null;
     }
     catch (Exception e)
     {
       log.error('[' + name + "] " + e.getMessage(), e);
     }
+    if (debugEnabled) log.debug(name  + "closed");
+  }
+
+  @Override
+  public boolean isClosed()
+  {
+    return closed || owner.isClosed();
+  }
+
+  /**
+   * Set the closed state of this connection handler.
+   * @param closed <code>true</code> to set the state to closed, <code>false</code> otherwise.
+   */
+  public void setClosed(final boolean closed)
+  {
+    this.closed = closed;
   }
 }

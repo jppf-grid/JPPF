@@ -18,6 +18,7 @@
 
 package test.org.jppf.test.setup;
 
+import java.io.*;
 import java.util.*;
 
 import javax.management.remote.JMXServiceURL;
@@ -25,7 +26,7 @@ import javax.management.remote.JMXServiceURL;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 
 /**
@@ -34,6 +35,10 @@ import org.jppf.utils.JPPFConfiguration;
  */
 public class BaseSetup
 {
+  /**
+   * The default configuratin used when none is specified.
+   */
+  private static final Configuration DEFAULT_CONFIG = createDefaultConfiguration();
   /**
    * The jppf client to use.
    */
@@ -97,7 +102,7 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbNodes) throws Exception
   {
-    return setup(1, nbNodes, true, null);
+    return setup(1, nbNodes, true, DEFAULT_CONFIG);
   }
 
   /**
@@ -109,7 +114,7 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbNodes, final boolean initClient) throws Exception
   {
-    return setup(1, nbNodes, initClient, null);
+    return setup(1, nbNodes, initClient, DEFAULT_CONFIG);
   }
 
   /**
@@ -122,7 +127,7 @@ public class BaseSetup
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception
   {
-    return setup(nbDrivers, nbNodes, initClient, null);
+    return setup(nbDrivers, nbNodes, initClient, DEFAULT_CONFIG);
   }
 
   /**
@@ -154,7 +159,7 @@ public class BaseSetup
     }
     if (initClient)
     {
-      client = createClient(null);
+      client = createClient(null, true, config);
       checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     }
     return client;
@@ -168,7 +173,7 @@ public class BaseSetup
    */
   public static JPPFClient createClient(final String uuid) throws Exception
   {
-    return createClient(uuid, true);
+    return createClient(uuid, true, DEFAULT_CONFIG);
   }
 
   /**
@@ -180,11 +185,24 @@ public class BaseSetup
    */
   public static JPPFClient createClient(final String uuid, final boolean reset) throws Exception
   {
+    return createClient(uuid, reset, DEFAULT_CONFIG);
+  }
+
+  /**
+   * Create a client with the specified uuid.
+   * @param uuid if null, let the client generate its uuid.
+   * @param reset if <code>true</code>, the JPPF configuration is reloaded.
+   * @param config the configuration to use.
+   * @return a <code>JPPFClient</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public static JPPFClient createClient(final String uuid, final boolean reset, final Configuration config) throws Exception
+  {
+    ConfigSource.setClientConfig(config.clientConfig);
     if (reset) JPPFConfiguration.reset();
-    JPPFClient jppfClient = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
-    //System.out.println("waiting for available client connection");
-    while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
-    return jppfClient;
+    client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
+    while (!client.hasAvailableConnection()) Thread.sleep(10L);
+    return client;
   }
 
   /**
@@ -330,6 +348,38 @@ public class BaseSetup
   }
 
   /**
+   * Create the default configuratin used when none is specified.
+   * @return a {@link Configuration} instance.
+   */
+  private static Configuration createDefaultConfiguration()
+  {
+    Configuration config = new Configuration();
+    List<String> commonCP = new ArrayList<>();
+    commonCP.add("classes/addons");
+    commonCP.add("classes/tests/config");
+    commonCP.add("../node/classes");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.6.1.jar");
+    commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
+    commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
+    commonCP.add("../JPPF/lib/jmxremote/jmxremote_optional-1.0_01-ea.jar");
+    List<String> driverCP = new ArrayList<>(commonCP);
+    driverCP.add("../common/classes");
+    driverCP.add("../server/classes");
+    String dir = "classes/tests/config";
+    config.driverJppf = dir + "/driver.template.properties";
+    config.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
+    config.driverClasspath = driverCP;
+    config.driverJvmOptions.add("-Xmx128m");
+    config.driverJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-driver.properties");
+    config.nodeJppf = dir + "/node.template.properties";
+    config.nodeLog4j = "classes/tests/config/log4j-node.template.properties";
+    config.nodeClasspath = commonCP;
+    config.nodeJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-node1.properties");
+    config.clientConfig = dir + "/client.properties";
+    return config;
+  }
+
+  /**
    * 
    */
   public static class Configuration
@@ -366,5 +416,64 @@ public class BaseSetup
      * Node JVM options.
      */
     public List<String> nodeJvmOptions = new ArrayList<>();
+    /**
+     * 
+     */
+    public String clientConfig = "classes/tests/config/client.properties";
+
+    /**
+     * Copy this configuration to a new instance.
+     * @return a {@link Configuration} instance.
+     */
+    public Configuration copy()
+    {
+      Configuration copy = new Configuration();
+      copy.driverJppf = driverJppf;
+      copy.driverLog4j = driverLog4j;
+      copy.driverClasspath = new ArrayList<>(driverClasspath);
+      copy.driverJvmOptions = new ArrayList<>(driverJvmOptions);
+      copy.nodeJppf = nodeJppf;
+      copy.nodeLog4j = nodeLog4j;
+      copy.nodeClasspath = new ArrayList<>(nodeClasspath);
+      copy.nodeJvmOptions = new ArrayList<>(nodeJvmOptions);
+      copy.clientConfig = clientConfig;
+      return copy;
+    }
+  }
+
+  /**
+   * 
+   */
+  public static class ConfigSource implements JPPFConfiguration.ConfigurationSourceReader
+  {
+    /**
+     * Path to the client configuration file.
+     */
+    private static String clientConfig = null;
+
+    @Override
+    public Reader getPropertyReader() throws IOException
+    {
+      if (clientConfig == null) return null;
+      return FileUtils.getFileReader(clientConfig);
+    }
+
+    /**
+     * Get the path to the client configuration file.
+     * @return the path as a string.
+     */
+    public static String getClientConfig()
+    {
+      return clientConfig;
+    }
+
+    /**
+     * Set the path to the client configuration file.
+     * @param clientConfig the path as a string.
+     */
+    public static void setClientConfig(final String clientConfig)
+    {
+      ConfigSource.clientConfig = clientConfig;
+    }
   }
 }

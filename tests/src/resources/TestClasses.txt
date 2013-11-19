@@ -16,6 +16,8 @@ test.org.jppf.management.TestJPPFNodeAdminMBean
 test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
 test.org.jppf.node.TestOfflineNode
 test.org.jppf.server.job.management.TestDriverJobManagementMBean
+test.org.jppf.server.peer.TestMultiServer
+test.org.jppf.server.peer.TestMultiServerWithSSL
 test.org.jppf.server.protocol.TestJPPFJobClientSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA2

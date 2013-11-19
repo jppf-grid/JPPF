@@ -299,37 +299,28 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @see org.jppf.client.JPPFClientConnection#close()
    */
   @Override
-  public List<JPPFJob> close()
-  {
+  public List<JPPFJob> close() {
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();
-    if (!closed)
-    {
-      closed = true;
-      try
-      {
-        sendCloseConnectionCommand();
-      }
-      catch (Exception e)
-      {
-        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
-        else log.error('[' + name + "] " + e.getMessage());
-      }
-      try
-      {
-        if (debugEnabled) log.debug("closing task server connection " + this);
-        if (taskServerConnection != null) taskServerConnection.close();
-        if (debugEnabled) log.debug("closing class server connection " + this);
-        if (delegate != null) delegate.close();
-        if (debugEnabled) log.debug("closing jmx connection " + this);
-        if (jmxConnection != null) jmxConnection.close();
-      }
-      catch (Exception e)
-      {
-        if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
-        else log.error('[' + name + "] " + e.getMessage());
-      }
+    closed = true;
+    ((AbstractClassServerDelegate) delegate).setClosed(true);
+    try {
+      sendCloseConnectionCommand();
+    } catch (Exception e) {
+      if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
+      else log.error('[' + name + "] " + e.getMessage());
+    }
+    try {
+      if (debugEnabled) log.debug("closing task server connection " + this);
+      if (taskServerConnection != null) taskServerConnection.close();
+      if (debugEnabled) log.debug("closing class server connection " + this);
+      if (delegate != null) delegate.close();
+      if (debugEnabled) log.debug("closing jmx connection " + this);
+      if (jmxConnection != null) jmxConnection.close();
+    } catch (Exception e) {
+      if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
+      else log.error('[' + name + "] " + e.getMessage());
     }
     if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + toDebugString() + " closed");
@@ -339,6 +330,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public boolean isClosed()
   {
-    return closed;
+    return closed || client.isClosed();
   }
 }

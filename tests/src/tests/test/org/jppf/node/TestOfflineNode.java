@@ -26,17 +26,29 @@ import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
 
-import test.org.jppf.test.setup.SetupOfflineNode1D2N1C;
+import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit test for nodes in offline mode.
  * @author Laurent Cohen
  */
-public class TestOfflineNode extends SetupOfflineNode1D2N1C
+public class TestOfflineNode extends AbstractSetupOfflineNode
 {
+  /**
+   * Launches a driver and 2 nodes and start the client.
+   * @throws Exception if a process could not be started.
+   */
+  @BeforeClass
+  public static void setup() throws Exception
+  {
+    Configuration testConfig = createConfig();
+    client = BaseSetup.setup(1, 2, true, testConfig);
+  }
+
   /**
    * Test that a simple job triggers a deserialization error in the node (because the task class is not found in the classpath),
    * and that this error is handled properly.

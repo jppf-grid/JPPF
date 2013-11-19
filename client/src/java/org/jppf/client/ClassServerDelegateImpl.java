@@ -107,7 +107,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
     try
     {
       Thread.currentThread().setUncaughtExceptionHandler(this);
-      while (!stop)
+      while (!stop && !isClosed())
       {
         try
         {
@@ -116,7 +116,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
         }
         catch(Exception e)
         {
-          if (!closed)
+          if (!isClosed())
           {
             if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
             else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");

@@ -26,34 +26,41 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
- * Base test setup for testing offline nodes.
+ * Base test setup for a grid with multiple servers in p2p.
  * @author Laurent Cohen
  */
-public class AbstractSSLSetup
+public class AbstractNonStandardSetup
 {
   /**
    * The jppf client to use.
    */
   protected static JPPFClient client = null;
+  /**
+   * 
+   */
+  protected static Configuration testConfig = null;
 
   /**
    * Create the drivers and nodes configuration.
-   * @param sslPrefix prefix to use to locate the configuration files
+   * @param prefix prefix to use to locate the configuration files
    * @return a {@link Configuration} instance.
    * @throws Exception if a process could not be started.
    */
-  protected static Configuration createConfig(final String sslPrefix) throws Exception
+  protected static Configuration createConfig(final String prefix) throws Exception
   {
-    Configuration testConfig = new Configuration();
+    SSLHelper.resetConfig();
+    testConfig = new Configuration();
     List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
     commonCP.add("classes/tests/config");
@@ -65,7 +72,7 @@ public class AbstractSSLSetup
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../common/classes");
     driverCP.add("../server/classes");
-    String dir = "classes/tests/config/" + sslPrefix;
+    String dir = "classes/tests/config/" + prefix;
     testConfig.driverJppf = dir + "/driver.properties";
     testConfig.driverLog4j = "classes/tests/config/log4j-driver.template.properties";
     testConfig.driverClasspath = driverCP;
@@ -74,7 +81,7 @@ public class AbstractSSLSetup
     testConfig.nodeLog4j = "classes/tests/config/log4j-node.template.properties";
     testConfig.nodeClasspath = commonCP;
     testConfig.nodeJvmOptions.add("-Djava.util.logging.testConfig.file=classes/tests/config/logging-node1.properties");
-    System.setProperty("jppf.config", dir + "/client.properties");
+    testConfig.clientConfig = dir + "/client.properties";
     return testConfig;
   }
 
@@ -85,32 +92,48 @@ public class AbstractSSLSetup
   @AfterClass
   public static void cleanup() throws Exception
   {
-    SSLHelper.resetConfig();
-    BaseSetup.cleanup();
+    try
+    {
+      BaseSetup.cleanup();
+    }
+    finally
+    {
+      //JPPFConfiguration.reset();
+    }
   }
 
   /**
    * Test that a simple job is normally executed.
+   * @param policy the client execution policy to set onto the job, may be null.
    * @throws Exception if any error occurs
    */
-  protected void testSimpleJob() throws Exception
-  {
-    int nbTasks = 5;
+  protected void testSimpleJob(final ExecutionPolicy policy) throws Exception {
+    int tasksPerNode = 5;
+    int nbNodes = BaseSetup.nbNodes();
+    int nbTasks = tasksPerNode * nbNodes;
     String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
-    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 10L);
+    JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 100L);
+    job.getClientSLA().setExecutionPolicy(policy);
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results)
-    {
-      assertTrue("task = " + task, task instanceof LifeCycleTask);
-      Throwable t = task.getThrowable();
-      assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
-      assertNotNull(task.getResult());
-      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
+    CollectionMap<String, Task<?>> map = new ArrayListHashMap<>();
+    for (Task<?> t: results) {
+      assertTrue("task = " + t, t instanceof LifeCycleTask);
+      LifeCycleTask task = (LifeCycleTask) t;
+      map.putValue(task.getNodeUuid(), task);
+      Throwable throwable = t.getThrowable();
+      assertNull("throwable for task '" + t.getId() + "' : " + ExceptionUtils.getStackTrace(throwable), throwable);
+      assertNotNull(t.getResult());
+      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
+    }
+    assertEquals(nbNodes, map.keySet().size());
+    for (int i=0; i<nbNodes; i++) {
+      String key = "n" + (i+1);
+      assertTrue(map.containsKey(key));
+      assertEquals(tasksPerNode, map.getValues(key).size());
     }
   }
-
 
   /**
    * Test multiple non-blocking jobs can be sent asynchronously.
@@ -118,7 +141,9 @@ public class AbstractSSLSetup
    */
   protected void testMultipleJobs() throws Exception
   {
-    int nbTasks = 5;
+    int tasksPerNode = 5;
+    int nbNodes = BaseSetup.nbNodes();
+    int nbTasks = tasksPerNode * nbNodes;
     int nbJobs = 3;
     try
     {
@@ -148,7 +173,7 @@ public class AbstractSSLSetup
     finally
     {
       if (client != null) client.close();
-      client = BaseSetup.createClient(null, true);
+      client = BaseSetup.createClient(null, true, testConfig);
     }
   }
 
@@ -158,7 +183,9 @@ public class AbstractSSLSetup
    */
   protected void testCancelJob() throws Exception
   {
-    int nbTasks = 10;
+    int tasksPerNode = 5;
+    int nbNodes = BaseSetup.nbNodes();
+    int nbTasks = tasksPerNode * nbNodes;
     JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
     JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submitJob(job);
@@ -183,7 +210,9 @@ public class AbstractSSLSetup
    */
   protected void testNotSerializableExceptionFromNode() throws Exception
   {
-    int nbTasks = 2;
+    int tasksPerNode = 5;
+    int nbNodes = BaseSetup.nbNodes();
+    int nbTasks = tasksPerNode * nbNodes;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);

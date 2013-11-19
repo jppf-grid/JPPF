@@ -77,6 +77,10 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Handles include and exclude IP filters.
    */
   private IPFilter ipFilter = null;
+  /**
+   * 
+   */
+  private Receiver[] receivers = null; 
 
   /**
    * Default constructor.
@@ -137,7 +141,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
           for (InetAddress addr: addresses) sb.append(' ').append(addr.getHostAddress());
           log.debug(sb.toString());
         }
-        Receiver[] receivers = new Receiver[len];
+        receivers = new Receiver[len];
         for (int i=0; i<len; i++) receivers[i] = new Receiver(addresses.get(i), port);
         for (Receiver r: receivers) r.start();
       }
@@ -250,6 +254,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
             try
             {
               socket.receive(packet);
+              if (isStopped()) break;
               ByteBuffer buffer = ByteBuffer.wrap(buf);
               int len = buffer.getInt();
               byte[] bytes = new byte[len];
@@ -262,7 +267,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
             }
             catch(SocketTimeoutException e)
             {
-              if (debugEnabled) log.debug(e.getMessage(), e);
+              //if (debugEnabled) log.debug(e.getMessage(), e);
             }
             if (System.currentTimeMillis() - start < t) Thread.sleep(50L);
           }
@@ -271,7 +276,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
       }
       catch(Exception e)
       {
-        log.error(e.getMessage(), e);
+        if (!(e instanceof InterruptedException)) log.error(e.getMessage(), e);
       }
       if (socket != null) socket.close();
     }
@@ -302,5 +307,15 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
   private synchronized void setGroupInetAddress(final InetAddress groupInetAddress)
   {
     this.groupInetAddress = groupInetAddress;
+  }
+
+  @Override
+  public synchronized void setStopped(final boolean stopped)
+  {
+    if (stopped && (receivers != null))
+    {
+      for (Receiver r: receivers) r.interrupt();
+    }
+    super.setStopped(stopped);
   }
 }

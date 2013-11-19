@@ -57,6 +57,12 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    */
   public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
   {
+    if (client.isClosed())
+    {
+      if (debugEnabled) log.debug("error: initializing connection {} while client is closed", name);
+      return;
+    }
+    if (ssl && (info.sslServerPorts == null)) throw new IllegalStateException("ssl is enabled but no ssl port is provided");
     this.client = client;
     this.sslEnabled = ssl;
     this.connectionUuid = client.getUuid() + '_' + connectionCount.incrementAndGet();

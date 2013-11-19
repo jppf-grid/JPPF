@@ -117,7 +117,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Performance optimization.
    */
-  private transient JPPFResourceWrapper[] resources = null;
+  protected transient JPPFResourceWrapper[] resources = null;
 
   /**
    * Add a uuid to the uuid path of this resource wrapper.
@@ -282,7 +282,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the ID of an eventual remote-computed callable.
    * @return the id as a long.
    */
-  protected long getCallableID()
+  public long getCallableID()
   {
     Long id = (Long) getData(CALLABLE_ID);
     return id == null ? NO_CALLABLE_ID : id;
@@ -293,8 +293,7 @@ public class JPPFResourceWrapper implements Serializable
    * @param key the string identifying the metadata.
    * @return an object value or null if the metadata could not be found.
    */
-  public Object getData(final ResourceIdentifier key)
-  {
+  public Object getData(final ResourceIdentifier key) {
     synchronized (dataMap) {
       return dataMap.get(key);
     }
@@ -306,8 +305,7 @@ public class JPPFResourceWrapper implements Serializable
    * @param def a default value to return if the key is not found.
    * @return an object value or the specified default if the metadata could not be found.
    */
-  public Object getData(final String key, final Object def)
-  {
+  public Object getData(final String key, final Object def) {
     synchronized (dataMap) {
       Object o = dataMap.get(key);
       return o == null ? def : o;
@@ -319,8 +317,7 @@ public class JPPFResourceWrapper implements Serializable
    * @param key the string identifying the metadata.
    * @param value the value of the metadata.
    */
-  public void setData(final ResourceIdentifier key, final Object value)
-  {
+  public void setData(final ResourceIdentifier key, final Object value) {
     synchronized (dataMap) {
       dataMap.put(key, value);
     }
@@ -351,6 +348,8 @@ public class JPPFResourceWrapper implements Serializable
     sb.append("dynamic=").append(dynamic);
     sb.append(", name=").append(getName());
     sb.append(", state=").append(state);
+    sb.append(", uuidPath=").append(uuidPath);
+    sb.append(", callableID=").append(getCallableID());
     sb.append(']');
     return sb.toString();
   }
@@ -376,5 +375,29 @@ public class JPPFResourceWrapper implements Serializable
   {
     long id = getCallableID();
     return 31 + (dynamic ? 1 : 0) + uuidPath.hashCode() + (int) id + getName().hashCode();
+  }
+
+  /**
+   * Determine whether this resource has any of the specified data.
+   * @param ids the ids of the data to check.
+   * @return <code>true</code> if this resource has any of the specified data, <code>false</code> otherwise.
+   */
+  public boolean hasAny(final ResourceIdentifier...ids) {
+    if (ids != null) {
+      synchronized(dataMap) {
+        for (ResourceIdentifier id: ids) {
+          if (dataMap.get(id) != null) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Determine whether this is a request for a single resource definition.
+   * @return <code>true</code> if this is a request for a single resource definition, <code>false</code> otherwise.
+   */
+  public boolean isSingleResource() {
+    return !hasAny(MULTIPLE, MULTIPLE_NAMES, CALLABLE);
   }
 }

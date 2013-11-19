@@ -69,7 +69,7 @@ public enum ResourceIdentifier
    */
   PEER,
   /**
-   * Unique id of a client conncetion.
+   * Unique id of a client connection.
    */
   CONNECTION_UUID,
 }

@@ -29,6 +29,7 @@ import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 import org.junit.Test;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -40,6 +41,10 @@ import test.org.jppf.test.setup.common.*;
 public class TestFileDataLocation extends Setup1D1N1C
 {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TestFileDataLocation.class);
+  /**
    * 
    */
   private LoadBalancingInformation oldLbi = null;
@@ -48,9 +53,11 @@ public class TestFileDataLocation extends Setup1D1N1C
    * Test the execution of a job with a very large footprint, and multiple dispatches from the load-balancer.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=20000)
+  @Test()
+  //@Test(timeout=20000)
   public void testSubmitLargeDataProvider() throws Exception
   {
+    System.out.println("******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************");
     int size = 128 * 1024 * 1024;
     int nbTasks = 3;
     try
