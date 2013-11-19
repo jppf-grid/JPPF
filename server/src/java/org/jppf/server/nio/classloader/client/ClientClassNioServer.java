@@ -183,7 +183,8 @@ public class ClientClassNioServer extends ClassNioServer
    */
   public boolean addResourceRequest(final String uuid, final ResourceRequest request)
   {
-    CacheClassKey key = new CacheClassKey(uuid, request.getResource().getName());
+    //CacheClassKey key = new CacheClassKey(uuid, request.getResource().getName());
+    CacheClassKey key = new CacheClassKey(uuid, ClassContext.getResourceName(request.getResource()));
     lockRequests.lock();
     try
     {

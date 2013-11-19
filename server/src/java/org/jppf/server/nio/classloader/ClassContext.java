@@ -23,7 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.*;
@@ -281,14 +281,14 @@ public class ClassContext extends SimpleNioContext<ClassState>
         }
         pendingRequests.clear();
       }
-
       if (!pendingList.isEmpty()) {
         if (debugEnabled) log.debug("provider: {} sending null response(s) for disconnected provider", getChannel());
         ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
         ClassNioServer nodeClassServer = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<ChannelWrapper<?>>();
         for (ResourceRequest mainRequest : pendingList) {
-          Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, mainRequest.getResource().getName());
+          //Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, mainRequest.getResource().getName());
+          Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, getResourceName(mainRequest.getResource()));
           if (coll == null) continue;
           for (ResourceRequest request: coll) {
             ChannelWrapper<?> nodeChannel = request.getChannel();
@@ -328,7 +328,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public void sendNodeResponse(final ResourceRequest request, final JPPFResourceWrapper resource) throws Exception {
     String uuid = request.getResource().getUuidPath().getFirst();
     ClientClassNioServer server = (ClientClassNioServer) driver.getClientClassServer();
-    Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, resource.getName());
+    //Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, resource.getName());
+    Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, getResourceName(resource));
     StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
     for (ResourceRequest req: allRequests) {
       ChannelWrapper<?> nodeChannel = req.getChannel();
@@ -466,4 +467,26 @@ public class ClassContext extends SimpleNioContext<ClassState>
     }
     return true;
   }
+
+  /**
+   * Determine whether the specified resource is a request for a single resource definition.
+   * @param resource the resource to check.
+   * @return <code>true</code> if the specified resource is a request for a single resource definition, <code>false</code> otherwise.
+   */
+  public static String getResourceName(final JPPFResourceWrapper resource) {
+    StringBuilder sb = new StringBuilder();
+    if (resource.getData("multiple") != null) sb.append("multiple.").append(resource.getName());
+    else if (resource.getData("multiple.resources.names") != null) {
+      sb.append("multiple.resources.names[").append(resource.getName());
+      String[] names = (String[]) resource.getData("multiple.resources.names");
+      for (int i=0; i<names.length; i++) {
+        if (i > 0) sb.append(",");
+        sb.append(names[i]);
+      }
+      sb.append(']');
+    } else if (resource.getData("callable") != null) sb.append(resource.getData("driver.callable.id"));
+    else sb.append(resource.getName());
+    return sb.toString();
+  }
 }
+ 
