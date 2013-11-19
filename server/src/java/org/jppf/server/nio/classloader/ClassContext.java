@@ -232,8 +232,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Get the number of pending resource requests for a resource provider.
    * @return a the number of requests as an int.
    */
-  public int getNbPendingRequests()
-  {
+  public int getNbPendingRequests() {
     return pendingRequests.size();
   }
 
@@ -241,8 +240,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Determine whether this context has at least one pending request.
    * @return <code>true</code> if there is at least obne pending request, <code>false</code> otherwise.
    */
-  public boolean hasPendingRequest()
-  {
+  public boolean hasPendingRequest() {
     return !pendingRequests.isEmpty();
   }
 
@@ -250,8 +248,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Get the request currently processed.
    * @return a <code>SelectionKey</code> instance.
    */
-  public ResourceRequest getCurrentRequest()
-  {
+  public ResourceRequest getCurrentRequest() {
     return currentRequest.get();
   }
 
@@ -259,8 +256,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Set the request currently processed.
    * @param currentRequest a <code>SelectionKey</code> instance.
    */
-  public void setCurrentRequest(final ResourceRequest currentRequest)
-  {
+  public void setCurrentRequest(final ResourceRequest currentRequest) {
     this.currentRequest.set(currentRequest);
   }
 
@@ -268,8 +264,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Determine whether this context relates to a provider or node connection.
    * @return true if this is a provider context, false otherwise.
    */
-  public boolean isProvider()
-  {
+  public boolean isProvider() {
     return provider;
   }
 
@@ -277,8 +272,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
    * Specify whether this context relates to a provider or node connection.
    * @param provider true if this is a provider context, false otherwise.
    */
-  public void setProvider(final boolean provider)
-  {
+  public void setProvider(final boolean provider) {
     this.provider = provider;
   }
 
@@ -299,14 +293,14 @@ public class ClassContext extends SimpleNioContext<ClassState>
         }
         pendingRequests.clear();
       }
-
       if (!pendingList.isEmpty()) {
         if (debugEnabled) log.debug("provider: {} sending null response(s) for disconnected provider", getChannel());
         ClientClassNioServer clientClassServer = driver.getClientClassServer();
         ClassNioServer nodeClassServer = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
         for (ResourceRequest mainRequest : pendingList) {
-          Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, mainRequest.getResource().getName());
+          //Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, mainRequest.getResource().getName());
+          Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, getResourceName(mainRequest.getResource()));
           if (coll == null) continue;
           for (ResourceRequest request: coll) {
             ChannelWrapper<?> nodeChannel = request.getChannel();
@@ -346,7 +340,8 @@ public class ClassContext extends SimpleNioContext<ClassState>
   public void sendNodeResponse(final ResourceRequest request, final JPPFResourceWrapper resource) throws Exception {
     String uuid = request.getResource().getUuidPath().getFirst();
     ClientClassNioServer server = driver.getClientClassServer();
-    Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, resource.getName());
+    //Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, resource.getName());
+    Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, getResourceName(resource));
     StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
     for (ResourceRequest req: allRequests) {
       ChannelWrapper<?> nodeChannel = req.getChannel();
@@ -530,5 +525,26 @@ public class ClassContext extends SimpleNioContext<ClassState>
       long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : (provider ? CLIENT_OUT_TRAFFIC : NODE_OUT_TRAFFIC), n);
     }
+  }
+
+  /**
+   * Determine whether the specified resource is a request for a single resource definition.
+   * @param resource the resource to check.
+   * @return <code>true</code> if the specified resource is a request for a single resource definition, <code>false</code> otherwise.
+   */
+  public static String getResourceName(final JPPFResourceWrapper resource) {
+    StringBuilder sb = new StringBuilder();
+    if (resource.getData(ResourceIdentifier.MULTIPLE) != null) sb.append(ResourceIdentifier.MULTIPLE).append('.').append(resource.getName());
+    else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
+      sb.append(ResourceIdentifier.MULTIPLE_NAMES).append('[').append(resource.getName());
+      String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
+      for (int i=0; i<names.length; i++) {
+        if (i > 0) sb.append(',');
+        sb.append(names[i]);
+      }
+      sb.append(']');
+    } else if (resource.getData(ResourceIdentifier.CALLABLE) != null) sb.append(resource.getData(ResourceIdentifier.DRIVER_CALLABLE_ID));
+    else sb.append(resource.getName());
+    return sb.toString();
   }
 }

@@ -22,6 +22,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.classloader.*;
 import org.jppf.server.nio.ChannelWrapper;
@@ -45,6 +46,10 @@ class WaitingNodeRequestState extends ClassServerState
    * Determines whether DEBUG logging level is enabled.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * 
+   */
+  private static AtomicLong callableSeq = new AtomicLong(0L);
   /**
    * The class cache.
    */
@@ -178,6 +183,10 @@ class WaitingNodeRequestState extends ClassServerState
         resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
         return true;
       }
+    }
+    else if (resource.getCallable() != null)
+    {
+      resource.setData(ResourceIdentifier.DRIVER_CALLABLE_ID, callableSeq.incrementAndGet());
     }
     uuidPath.decPosition();
     String uuid = resource.getUuidPath().getCurrentElement();

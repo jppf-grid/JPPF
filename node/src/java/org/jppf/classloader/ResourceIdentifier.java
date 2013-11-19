@@ -49,6 +49,10 @@ public enum ResourceIdentifier
    */
   CALLABLE_ID,
   /**
+   * The identifier of a callable within a driver instance.
+   */
+  DRIVER_CALLABLE_ID,
+  /**
    * The resources held by a {@link CompositeResourceWrapper}.
    */
   RESOURCES_KEY,
