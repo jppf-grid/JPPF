@@ -62,6 +62,7 @@ public interface Task<T> extends Runnable, Serializable
   /**
    * Get the Throwable that was raised by this task's execution.
    * @return a <code>Exception</code> instance, or null if no exception was raised.
+   * @since 4.0
    */
   Throwable getThrowable();
 
@@ -69,6 +70,7 @@ public interface Task<T> extends Runnable, Serializable
    * Sets the Throwable that was raised by this task's execution in the <code>run</code> method.
    * The Throwable is normally set by the JPPF framework.
    * @param throwable a <code>Throwable</code> instance.
+   * @since 4.0
    */
   void setThrowable(Throwable throwable);
 

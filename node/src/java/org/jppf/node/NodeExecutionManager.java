@@ -26,6 +26,7 @@ import org.jppf.node.protocol.*;
 /**
  * Instances of this interface manage the execution of JPPF tasks by a node.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface NodeExecutionManager
 {

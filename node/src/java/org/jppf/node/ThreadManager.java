@@ -92,6 +92,7 @@ public interface ThreadManager
 
   /**
    * Helper class for managing used class loaders.
+   * @exclude
    */
   public static abstract class UsedClassLoader
   {

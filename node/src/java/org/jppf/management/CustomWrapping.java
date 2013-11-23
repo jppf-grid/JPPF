@@ -29,6 +29,8 @@ import org.jppf.utils.streams.StreamUtils;
 
 /**
  * This implementation uses the configured JPPF serialization scheme.
+ * @author Laurent Cohen
+ * @exclude
  */
 public class CustomWrapping implements ObjectWrapping
 {

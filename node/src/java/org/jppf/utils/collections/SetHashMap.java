@@ -16,8 +16,35 @@
  * limitations under the License.
  */
 
+package org.jppf.utils.collections;
+
+import java.util.*;
+
 /**
- * Internal classes to obtain debug information on a node via JMX.
- * @exclude
+ * A  hash map whose values are sets of a specified component type.
+ * @param <K> the type of the keys in this map.
+ * @param <V> the type of values in each Set mapped to a key.
+ * @author Laurent Cohen
  */
-package org.jppf.node.debug;
+public class SetHashMap<K, V> extends AbstractCollectionMap<K, V>
+{
+  /**
+   * Default constructor.
+   */
+  public SetHashMap()
+  {
+    map = createMap();
+  }
+
+  @Override
+  protected Map<K, Collection<V>> createMap()
+  {
+    return new HashMap<>();
+  }
+
+  @Override
+  protected Collection<V> newCollection()
+  {
+    return new HashSet<>();
+  }
+}

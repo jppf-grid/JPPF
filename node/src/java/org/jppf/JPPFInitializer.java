@@ -21,6 +21,7 @@ package org.jppf;
 /**
  * Performs static initializations that must be done before anything elsse.
  * @author Laurent Cohen
+ * @exclude
  */
 public final class JPPFInitializer
 {

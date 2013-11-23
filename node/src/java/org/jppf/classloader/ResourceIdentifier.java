@@ -21,6 +21,7 @@ package org.jppf.classloader;
 /**
  * An enumeration of the possible keys in a {@link JPPFResourceWrapper} data map.
  * @author Laurent Cohen
+ * @exclude
  */
 public enum ResourceIdentifier
 {
