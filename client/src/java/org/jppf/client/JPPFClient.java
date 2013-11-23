@@ -78,12 +78,7 @@ public class JPPFClient extends AbstractGenericClient
   }
 
   /**
-   * Create a new driver connection based on the specified parameters.
-   * @param uuid the uuid of the remote driver.
-   * @param name the name of the connection.
-   * @param info the driver connection information.
-   * @param ssl determines whether this is an SSL connection.
-   * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
+   * {@inheritDoc}
    * @exclude
    */
   @Override
@@ -93,11 +88,7 @@ public class JPPFClient extends AbstractGenericClient
   }
 
   /**
-   * Submit a job execution request.
-   * @param job the job to execute.
-   * @return the list of executed tasks with their results for a blocking job, or <code>null</code> for a non-blocking job.
-   * @throws IllegalArgumentException if the job is null or empty.
-   * @throws Exception if an error occurs while sending the request.
+   * {@inheritDoc}
    * @deprecated use {@link #submitJob(JPPFJob)} instead.
    */
   @Override
@@ -117,13 +108,6 @@ public class JPPFClient extends AbstractGenericClient
     return null;
   }
 
-  /**
-   * Submit a job execution request.
-   * @param job the job to execute.
-   * @return the list of executed tasks with their results for a blocking job, or <code>null</code> for a non-blocking job.
-   * @throws IllegalArgumentException if the job is null or empty.
-   * @throws Exception if an error occurs while sending the request.
-   */
   @Override
   public List<Task<?>> submitJob(final JPPFJob job) throws Exception
   {

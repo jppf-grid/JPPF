@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.queue.*;
-import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.management.*;
@@ -55,10 +54,6 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * A reference to the tasks queue.
    */
   private final JPPFPriorityQueue queue;
-  /**
-   * The statistics manager.
-   */
-  private final JPPFClientStatsManager statsManager = new JPPFClientStatsManager();
   /**
    * The bundler factory.
    */
@@ -118,7 +113,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.queue = new JPPFPriorityQueue(this);
 
-    taskQueueChecker = new TaskQueueChecker(queue, statsManager);
+    taskQueueChecker = new TaskQueueChecker(queue);
     taskQueueChecker.setBundler(bundler);
 
     this.queue.addQueueListener(new QueueListener<ClientJob, ClientJob, ClientTaskBundle>() {

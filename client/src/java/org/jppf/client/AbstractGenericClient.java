@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.*;
@@ -26,6 +26,7 @@ import org.jppf.comm.discovery.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -37,8 +38,7 @@ import org.slf4j.*;
  * the uuid has changed or not.
  * @author Laurent Cohen
  */
-public abstract class AbstractGenericClient extends AbstractJPPFClient
-{
+public abstract class AbstractGenericClient extends AbstractJPPFClient {
   /**
    * Logger for this class.
    */
@@ -70,17 +70,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   protected JPPFMulticastReceiverThread receiverThread = null;
   /**
-   * Mapping of class loader to requests uuids.
-   */
-  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<>();
-  /**
    * Mapping of registered class loaders.
    */
-  private final Map<String, Set<RegisteredClassLoader>> classLoaderRegistrations = new HashMap<>();
-  /**
-   * Mapping class loader to uuid.
-   */
-  private final Map<ClassLoader, String>  classLoaderUUIDs = new WeakHashMap<>();
+  private final CollectionMap<String, RegisteredClassLoader> classLoaderRegistrations = new SetHashMap<>();
   /**
    * Determines whether SSL communication is on or off.
    */
@@ -120,8 +112,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Get JPPF configuration properties. These properties are unmodifiable.
    * @return <code>TypedProperties</code> instance. With JPPF configuration.
    */
-  public TypedProperties getConfig()
-  {
+  public TypedProperties getConfig() {
     return config;
   }
 
@@ -131,8 +122,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @return <code>TypedProperties</code> instance holding JPPF configuration. Never be <code>null</code>.
    * @exclude
    */
-  protected TypedProperties initConfig(final Object configuration)
-  {
+  protected TypedProperties initConfig(final Object configuration) {
     if (configuration instanceof TypedProperties) return (TypedProperties) configuration;
     return JPPFConfiguration.getProperties();
   }
@@ -143,8 +133,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected void initPools(final TypedProperties config)
-  {
+  protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
     executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
@@ -215,10 +204,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param ssl determines whether this is an SSL connection.
    * @exclude
    */
-  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl)
-  {
-    for (int i=1; i<=poolSize; i++)
-    {
+  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl) {
+    for (int i=1; i<=poolSize; i++) {
       if (isClosed()) return;
       AbstractJPPFClientConnection c = createConnection(info.uuid, (poolSize > 1) ? name + '-' + i : name, info, ssl);
       c.setPriority(priority);
@@ -238,16 +225,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl);
 
   /**
-   * Invoked when a new connection is created.
-   * @param c the connection that failed.
+   * {@inheritDoc}
    * @exclude
    */
   @Override
-  public void newConnection(final JPPFClientConnection c)
-  {
+  public void newConnection(final JPPFClientConnection c) {
     if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
-    //addClientConnection(c);
     c.addClientConnectionStatusListener(this);
     c.setStatus(JPPFClientConnectionStatus.NEW);
     executor.submit(new ConnectionInitializer(c));
@@ -261,17 +245,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @exclude
    */
   @Override
-  protected void connectionFailed(final JPPFClientConnection connection)
-  {
+  protected void connectionFailed(final JPPFClientConnection connection) {
     log.info("Connection [" + connection.getName() + "] failed");
     if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
-    try
-    {
+    try {
       JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
       if (jmx != null) jmx.close();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug("could not close JMX connection for " + connection, e);
       else log.warn("could not close JMX connection for " + connection + " : " + ExceptionUtils.getMessage(e));
     }
@@ -280,12 +260,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
     fireConnectionFailed(connection);
   }
 
-  /**
-   * Close this client and release all the resources it is using.
-   */
   @Override
-  public void close()
-  {
+  public void close() {
     if (debugEnabled) log.debug("closing JPPF client");
     closed.set(true);
     if (debugEnabled) log.debug("closing submission manager");
@@ -302,8 +278,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Determine whether local execution is enabled on this client.
    * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
    */
-  public boolean isLocalExecutionEnabled()
-  {
+  public boolean isLocalExecutionEnabled() {
     SubmissionManager submissionManager = getSubmissionManager();
     return (submissionManager != null) && submissionManager.isLocalExecutionEnabled();
   }
@@ -312,8 +287,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Specify whether local execution is enabled on this client.
    * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
    */
-  public void setLocalExecutionEnabled(final boolean localExecutionEnabled)
-  {
+  public void setLocalExecutionEnabled(final boolean localExecutionEnabled) {
     SubmissionManager submissionManager = getSubmissionManager();
     if (submissionManager != null) submissionManager.setLocalExecutionEnabled(localExecutionEnabled);
   }
@@ -322,8 +296,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * Determine whether there is a client connection available for execution.
    * @return true if at least one connection is available, false otherwise.
    */
-  public boolean hasAvailableConnection()
-  {
+  public boolean hasAvailableConnection() {
     SubmissionManager submissionManager = getSubmissionManager();
     return (submissionManager != null) && submissionManager.hasAvailableConnection();
   }
@@ -333,19 +306,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @exclude
    */
   @Override
-  public void statusChanged(final ClientConnectionStatusEvent event)
-  {
+  public void statusChanged(final ClientConnectionStatusEvent event) {
     super.statusChanged(event);
     SubmissionManager submissionManager = getSubmissionManager();
-    if(submissionManager != null)
-    {
+    if(submissionManager != null) {
       ClientConnectionStatusListener listener = submissionManager.getClientConnectionStatusListener();
       if(listener != null) listener.statusChanged(event);
-
-      if (submissionManager instanceof ThreadSynchronization)
-      {
-        ((ThreadSynchronization) submissionManager).wakeUp();
-      }
+      if (submissionManager instanceof ThreadSynchronization) ((ThreadSynchronization) submissionManager).wakeUp();
     }
   }
 
@@ -354,50 +321,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @return a {@link ThreadPoolExecutor} instance.
    * @exclude
    */
-  public ThreadPoolExecutor getExecutor()
-  {
+  public ThreadPoolExecutor getExecutor() {
     return executor;
-  }
-
-  /**
-   * Add a request uuid to class loader mapping to this submission manager.
-   * @param uuid the uuid of the request.
-   * @param cl the class loader for the request.
-   * @exclude
-   */
-  public void addRequestClassLoader(final String uuid, final ClassLoader cl)
-  {
-    synchronized(classLoaderMap)
-    {
-      classLoaderMap.put(uuid, cl);
-    }
-  }
-
-  /**
-   * Add a request uuid to class loader mapping to this submission manager.
-   * @param uuid the uuid of the request.
-   * @exclude
-   */
-  public void removeRequestClassLoader(final String uuid)
-  {
-    synchronized(classLoaderMap)
-    {
-      classLoaderMap.remove(uuid);
-    }
-  }
-
-  /**
-   * Get a class loader from its request uuid.
-   * @param uuid the uuid of the request.
-   * @return a <code>ClassLoader</code> instance, or null if none exists for the key.
-   * @exclude
-   */
-  public ClassLoader getRequestClassLoader(final String uuid)
-  {
-    synchronized(classLoaderMap)
-    {
-      return classLoaderMap.get(uuid);
-    }
   }
 
   /**
@@ -405,10 +330,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @return a <code>JPPFSubmissionManager</code> instance.
    * @exclude
    */
-  public SubmissionManager getSubmissionManager()
-  {
-    synchronized(this)
-    {
+  public SubmissionManager getSubmissionManager() {
+    synchronized(this) {
       if (submissionManager == null) submissionManager = createSubmissionManager();
     }
     return submissionManager;
@@ -419,10 +342,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
    * @exclude
    */
-  protected void setSubmissionManager(final SubmissionManager submissionManager)
-  {
-    synchronized (this)
-    {
+  protected void setSubmissionManager(final SubmissionManager submissionManager) {
+    synchronized (this) {
       this.submissionManager = submissionManager;
     }
   }
@@ -447,6 +368,22 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
   }
 
   /**
+   * Get a class loader associated with a job.
+   * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
+   * @return a <code>RegisteredClassLoader</code> instance.
+   * @exclude
+   */
+  public RegisteredClassLoader getRegisteredClassLoader(final String uuid) {
+    if (uuid == null) throw new IllegalArgumentException("uuid is null");
+    RegisteredClassLoader registeredClassLoader = null;
+    synchronized (classLoaderRegistrations) {
+      Collection<RegisteredClassLoader> c = classLoaderRegistrations.getValues(uuid);
+      if ((c == null) || c.isEmpty()) throw new IllegalStateException("");
+      return c.iterator().next();
+    }
+  }
+
+  /**
    * Register class loader with this submission manager.
    * @param cl a <code>ClassLoader</code> instance.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
@@ -454,19 +391,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @exclude
    */
   public RegisteredClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
-    if(cl == null) throw new IllegalArgumentException("cl is null");
-    if(uuid == null) throw new IllegalArgumentException("uuid is null");
-
+    if (cl == null) throw new IllegalArgumentException("cl is null");
+    if (uuid == null) throw new IllegalArgumentException("uuid is null");
     RegisteredClassLoader registeredClassLoader;
     synchronized (classLoaderRegistrations) {
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
-      Set<RegisteredClassLoader> list = classLoaderRegistrations.get(uuid);
-      if(list == null) {
-        list = new HashSet<>();
-        classLoaderRegistrations.put(uuid, list);
-        addRequestClassLoader(uuid, cl);
-      }
-      list.add(registeredClassLoader);
+      classLoaderRegistrations.putValue(uuid, registeredClassLoader);
     }
     return registeredClassLoader;
   }
@@ -477,19 +407,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient
    * @exclude
    */
   protected void unregister(final RegisteredClassLoader registeredClassLoader) {
-    if(registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
-
+    if (registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
     synchronized (classLoaderRegistrations) {
-      Set<RegisteredClassLoader> list = classLoaderRegistrations.get(registeredClassLoader.getUuid());
-      if(list == null) throw new IllegalStateException("ClassLoader already unregistered");
-
-      if(list.remove(registeredClassLoader)) {
-        if(list.isEmpty()) {
-          classLoaderRegistrations.remove(registeredClassLoader.getUuid());
-          removeRequestClassLoader(registeredClassLoader.getUuid());
-        }
-      } else
-        throw new IllegalStateException("ClassLoader already unregistered");
+      classLoaderRegistrations.removeValue(registeredClassLoader.getUuid(), registeredClassLoader);
     }
   }
 

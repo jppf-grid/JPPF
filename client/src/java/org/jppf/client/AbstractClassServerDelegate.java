@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.classloader.*;
+import org.jppf.client.AbstractGenericClient.RegisteredClassLoader;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.IOHelper;
 import org.jppf.utils.JPPFIdentifiers;
@@ -48,15 +49,11 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Reads resource files from the classpath.
    */
-  protected ResourceProvider resourceProvider = new ResourceProvider();
+  protected final ResourceProvider resourceProvider = new ResourceProvider();
   /**
    * Unique identifier for this class server delegate, obtained from the local JPPF client.
    */
   protected String clientUuid = null;
-  /**
-   * Mapping of class loader to requests uuids.
-   */
-  private final Map<String, ClassLoader> classLoaderMap = new Hashtable<>();
   /**
    * Determines if the handshake with the server has been performed.
    */
@@ -206,7 +203,9 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   protected ClassLoader getClassLoader(final String uuid)
   {
-    return ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(uuid);
+    //return ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(uuid);
+    RegisteredClassLoader rcl = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoader(uuid);
+    return rcl.getClassLoader();
   }
 
   /**
@@ -217,7 +216,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   public void close()
   {
     if (debugEnabled) log.debug("closing " + getName());
-    closed = true;
     stop = true;
     super.close();
     if (debugEnabled) log.debug(getName() + " closed");

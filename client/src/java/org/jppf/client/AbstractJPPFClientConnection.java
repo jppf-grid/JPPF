@@ -26,8 +26,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.management.*;
-import org.jppf.server.protocol.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.protocol.BundleParameter;
 import org.slf4j.*;
 
 /**
@@ -58,10 +58,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
   /**
-   * Determines whether this connection has been shut down;
-   */
-  protected boolean closed = false;
-  /**
    * The name displayed for this connection.
    */
   protected String displayName;
@@ -81,10 +77,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    *
    */
   protected int jmxPort = -1;
-  /**
-   * Contains the configuration properties for this client connection.
-   */
-  protected TypedProperties props = null;
 
   /**
    * Configure this client connection with the specified parameters.
@@ -270,9 +262,9 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   @Override
-  public JPPFTaskBundle sendHandshakeJob() throws Exception
+  public TaskBundle sendHandshakeJob() throws Exception
   {
-    JPPFTaskBundle bundle = super.sendHandshakeJob();
+    TaskBundle bundle = super.sendHandshakeJob();
     this.systemInfo = bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
     this.driverUuid = bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
     return bundle;
@@ -303,8 +295,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();
-    closed = true;
-    ((AbstractClassServerDelegate) delegate).setClosed(true);
     try {
       sendCloseConnectionCommand();
     } catch (Exception e) {
@@ -330,6 +320,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public boolean isClosed()
   {
-    return closed || client.isClosed();
+    return client.isClosed();
   }
 }

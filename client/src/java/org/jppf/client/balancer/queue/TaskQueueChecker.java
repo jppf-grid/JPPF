@@ -23,7 +23,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.*;
-import org.jppf.client.balancer.stats.JPPFClientStatsManager;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.server.scheduler.bundle.*;
@@ -58,10 +57,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   private final JPPFPriorityQueue queue;
   /**
-   * Reference to the statistics manager.
-   */
-  private final JPPFClientStatsManager statsManager;
-  /**
    * Lock on the job queue.
    */
   private final Lock queueLock;
@@ -82,13 +77,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   /**
    * Initialize this task queue checker with the specified node server.
    * @param queue        the reference queue to use.
-   * @param statsManager the reference to statistics manager.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFClientStatsManager statsManager)
+  public TaskQueueChecker(final JPPFPriorityQueue queue)
   {
     this.queue = queue;
     this.jppfContext = new JPPFContextClient(queue);
-    this.statsManager = statsManager;
     this.queueLock = queue.getLock();
     this.bundler = createDefault();
   }
@@ -166,7 +159,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       count = idleChannels.size();
     }
     wakeUp();
-    statsManager.idleNodes(count);
   }
 
   /**
@@ -195,7 +187,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       idleChannels.removeValue(channel.getPriority(), channel);
       count = idleChannels.size();
     }
-    statsManager.idleNodes(count);
     return channel;
   }
 
