@@ -82,7 +82,7 @@ public class TaskExecutionEvent extends EventObject
 
   /**
    * Get the JPPF task from which the event originates.
-   * @return a <code>JPPFTask</code> instance.
+   * @return a <code>Task</code> instance.
    */
   public Task<?> getTask()
   {

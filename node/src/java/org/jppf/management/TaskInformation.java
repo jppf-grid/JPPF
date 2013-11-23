@@ -125,4 +125,17 @@ public class TaskInformation implements Serializable
   {
     return timestamp;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+    sb.append('[');
+    sb.append("taskId=").append(id);
+    sb.append(", jobId=").append(jobId);
+    sb.append(", cpuTime=").append(cpuTime);
+    sb.append(", elapsedTime=").append(elapsedTime);
+    sb.append(", error=").append(error);
+    return sb.toString();
+  }
 }
