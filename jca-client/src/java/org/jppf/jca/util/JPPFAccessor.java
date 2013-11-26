@@ -35,13 +35,13 @@ public interface JPPFAccessor
    * Get the JPPF client used to submit tasks.
    * @return an <code>AbstractGenericClient</code> instance.
    */
-  AbstractGenericClient getJppfClient();
+  AbstractGenericClient retrieveJppfClient();
 
   /**
    * Set the JPPF client used to submit tasks.
    * @param jppfClient an <code>AbstractGenericClient</code> instance.
    */
-  void setJppfClient(AbstractGenericClient jppfClient);
+  void assignJppfClient(AbstractGenericClient jppfClient);
 
   /**
    * Get the log writer for this object.

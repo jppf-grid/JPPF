@@ -85,6 +85,27 @@ public class HookFactory
   }
 
   /**
+   * Register a hook defined via SPI, of which a single instance is discovered and invoked.
+   * @param <T> the type of the hook interface.
+   * @param infClass the class of the hook's interface.
+   */
+  public static <T> void unregister(final Class<T> infClass)
+  {
+    unregister(hookMap.get(infClass.getName()));
+  }
+
+  /**
+   * Unregister the specified hook.
+   * @param <T> the type of the hook interface.
+   * @param hook the hhook to unregister.
+   */
+  private static <T> void unregister(final Hook<T> hook)
+  {
+    hookMap.remove(hook.getInterfaceName());
+    hook.dispose();
+  }
+
+  /**
    * Invoke all instances of the hook with the specified interface name, with the specified parameters.
    * @param inf the hook's interface name.
    * @param methodName the name of the implementation method to invoke.

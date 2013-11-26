@@ -24,9 +24,13 @@ import javax.resource.ResourceException;
 import javax.resource.spi.*;
 import javax.security.auth.Subject;
 
-import org.jppf.client.AbstractGenericClient;
-import org.jppf.jca.cci.JPPFConnectionFactory;
+import org.jppf.client.*;
+import org.jppf.client.submission.SubmissionManager;
+import org.jppf.jca.cci.*;
 import org.jppf.jca.util.JPPFAccessorImpl;
+import org.jppf.jca.work.JcaSubmissionManager;
+import org.jppf.utils.TypedProperties;
+import org.slf4j.*;
 
 
 /**
@@ -40,73 +44,61 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    */
   private static final long serialVersionUID = 1L;
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFManagedConnectionFactory.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * Handle to the resource adapter.
    */
   private transient ResourceAdapter resourceAdapter = null;
+  /**
+   * Defines how the configuration is to be located.<br>
+   * This property is defined in the format "<i>type</i>|<i>path</i>", where <i>type</i> can be one of:<br>
+   * <ul>
+   * <li>"classpath": in this case <i>path</i> is a path to a properties file in one of the jars of the .rar file, for instance "resources/config/jppf.properties"</li>
+   * <li>"url": <i>path</i> is a url that points to a properties file, for instance "file:///home/me/jppf/jppf.properties" (could be a http:// or ftp:// url as well)</li>
+   * <li>"file": <i>path</i> is considered a path on the file system, for instance "/home/me/jppf/config/jppf.properties"</li>
+   * </ul>
+   */
+  private String configurationSource = "";
 
   /**
    * Default constructor.
    */
   public JPPFManagedConnectionFactory()
   {
-    //System.out.println("creating managed connection factory, call stack:");
-    //System.out.println(StringUtils.getStackTrace(new Exception()));
+    if (debugEnabled) log.debug("instatiating JPPFManagedConnectionFactory");
   }
 
-  /**
-   * Create a jca connection factory. This method is called by the application server.
-   * @return a JPPFConnectionFactory instance.
-   * @throws ResourceException if the connection factory could not be created.
-   * @see javax.resource.spi.ManagedConnectionFactory#createConnectionFactory()
-   */
   @Override
   public Object createConnectionFactory() throws ResourceException
   {
-    JPPFConnectionFactory jcf = new JPPFConnectionFactory();
-    if (jcf.getJppfClient() == null) jcf.setJppfClient(getJppfClient());
-    return jcf;
+    if (debugEnabled) log.debug("creating connection factory with default connection manager");
+    return createConnectionFactory(new JPPFConnectionManager());
   }
 
-  /**
-   * Create a jca connection factory using a specified connection manager.
-   * @param manager the connection manager to use.
-   * @return a JPPFConnectionFactory instance.
-   * @throws ResourceException if the connection factory could not be created.
-   * @see javax.resource.spi.ManagedConnectionFactory#createConnectionFactory(javax.resource.spi.ConnectionManager)
-   */
   @Override
   public Object createConnectionFactory(final ConnectionManager manager) throws ResourceException
   {
+    if (debugEnabled) log.debug("creating connection factory with connection manager");
     JPPFConnectionFactory jcf = new JPPFConnectionFactory(this, manager);
-    if (jcf.getJppfClient() == null) jcf.setJppfClient(getJppfClient());
+    if (jcf.retrieveJppfClient() == null) jcf.assignJppfClient(jppfClient);
     return jcf;
   }
 
-  /**
-   * Create a managed connection.
-   * @param subject not used.
-   * @param cri not used.
-   * @return a <code>JPPFManagedConnection</code> instance.
-   * @throws ResourceException if the managed connection could not be created.
-   * @see javax.resource.spi.ManagedConnectionFactory#createManagedConnection(javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
-   */
   @Override
   public ManagedConnection createManagedConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
   {
-    JPPFManagedConnection conn = new JPPFManagedConnection();
-    if (conn.getJppfClient() == null) conn.setJppfClient(getJppfClient());
+    if (debugEnabled) log.debug("creating managed connection");
+    JPPFManagedConnection conn = new JPPFManagedConnection(this);
+    if (conn.retrieveJppfClient() == null) conn.assignJppfClient(jppfClient);
     return conn;
   }
 
-  /**
-   * Returns a matched connection from the candidate set of connections.
-   * @param set not used
-   * @param subject not used
-   * @param cri not used
-   * @return a <code>JPPFManagedConnection</code> instance, or null if none is available.
-   * @throws ResourceException always.
-   * @see javax.resource.spi.ManagedConnectionFactory#matchManagedConnections(java.util.Set, javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
-   */
   @Override
   public ManagedConnection matchManagedConnections(final Set set, final Subject subject, final ConnectionRequestInfo cri)
   throws ResourceException
@@ -115,64 +107,82 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
     return null;
   }
 
-  /**
-   * Get the handle to the resource adapter.
-   * @return a <code>ResourceAdapter</code>.
-   * @see javax.resource.spi.ResourceAdapterAssociation#getResourceAdapter()
-   */
   @Override
   public ResourceAdapter getResourceAdapter()
   {
     return resourceAdapter;
   }
 
-  /**
-   * Set the handle to the resource adapter.
-   * @param resourceAdapter a <code>ResourceAdapter</code>.
-   * @throws ResourceException if the resource adapter could not be set.
-   * @see javax.resource.spi.ResourceAdapterAssociation#setResourceAdapter(javax.resource.spi.ResourceAdapter)
-   */
   @Override
   public void setResourceAdapter(final ResourceAdapter resourceAdapter) throws ResourceException
   {
     this.resourceAdapter = resourceAdapter;
-    setJppfClient(((JPPFResourceAdapter) resourceAdapter).getJppfClient());
   }
 
-  /**
-   * Determine whether 2 objects are equal.
-   * @param obj the other object to compare to.
-   * @return true if the objects are equal, false otherwise.
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(final Object obj)
   {
     return super.equals(obj);
   }
 
-  /**
-   * Get this managed connection factory's hashcode.
-   * @return the hashcode as an int.
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode()
   {
     return super.hashCode();
   }
 
-  /**
-   * Get the JPPF client used to submit tasks.
-   * @return an <code>AbstractGenericClient</code> instance.
-   */
   @Override
-  public AbstractGenericClient getJppfClient()
+  public AbstractGenericClient retrieveJppfClient()
   {
-    if (jppfClient == null)
-    {
-      if (resourceAdapter != null) jppfClient = ((JPPFResourceAdapter) resourceAdapter).getJppfClient();
-    }
     return jppfClient;
+  }
+
+  /**
+   * Get the property which defines how the configuration is to be located.
+   * @return the property as a string.
+   */
+  public String getConfigurationSource()
+  {
+    return configurationSource;
+  }
+
+  /**
+   * Set the property which defines how the configuration is to be located.
+   * @param configurationSource the property as a string.
+   */
+  public void setConfigurationSource(final String configurationSource)
+  {
+    this.configurationSource = configurationSource;
+    log.info("Starting JPPF managed connection factory");
+    TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
+    jppfClient = new JPPFClient(null, config) {
+      @Override
+      protected SubmissionManager createSubmissionManager() {
+        SubmissionManager submissionManager = null;
+        try {
+          submissionManager = new JcaSubmissionManager(this);
+        } catch (Exception e) {
+          log.error("Can't initialize Submission Manager", e);
+        }
+        return submissionManager;
+      }
+
+      @Override
+      protected String getSerializationHelperClassName(){
+        return AbstractJPPFClient.JCA_SERIALIZATION_HELPER;
+      }
+    };
+    if (log.isDebugEnabled()) log.debug("Starting JPPF resource adapter: jppf client=" + jppfClient);
+    log.info("JPPF connection factory started");
+  }
+
+  /**
+   * Reset the JPPF client.
+   */
+  void resetClient()
+  {
+    if (jppfClient == null) return;
+    TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
+    ((JPPFClient) jppfClient).reset(config);
   }
 }

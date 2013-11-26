@@ -40,7 +40,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * Submit a job to the JPPF client.<br>
    * This method exits immediately after adding the request to the requests queue.<br>
    * The returned id is used to later retrieve the results and status of the execution.
-   * @param job - the job to execute.
+   * @param job the job to execute.
    * @return the id of the submission, to use for later retrieval of the results and status of the submission.
    * @throws Exception if an error occurs while submitting the request.
    */
@@ -152,13 +152,6 @@ public interface JPPFConnection extends Connection, JPPFAccessor
   void setAvailable();
 
   /**
-   * Get the associated managed connection.
-   * @return a <code>JPPFManagedConnection</code> instance.
-   * @exclude
-   */
-  JPPFManagedConnection getManagedConnection();
-
-  /**
    * Set the associated managed connection.
    * @param conn a <code>JPPFManagedConnection</code> instance.
    * @exclude
@@ -166,9 +159,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
   void setManagedConnection(JPPFManagedConnection conn);
 
   /**
-   * Close this connection.
-   * @see javax.resource.cci.Connection#close()
+   * Reset the client and reload its configuration.
    */
-  @Override
-  void close();
+  void resetClient();
 }

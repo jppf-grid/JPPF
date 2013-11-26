@@ -38,19 +38,23 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
   /**
    * This managed connection's associated connection handle.
    */
-  private JPPFConnectionImpl connection = null;
+  private JPPFConnection connection = null;
   /**
    * List of connection event listeners for this managed connection.
    */
   private List<ConnectionEventListener> listeners = new ArrayList<>();
+  /**
+   * The managed connection factory which creates this managed connection.
+   */
+  private final JPPFManagedConnectionFactory factory;
 
   /**
    * Default constructor.
+   * @param factory the managed connection factory which creates this managed connection.
    */
-  public JPPFManagedConnection()
+  public JPPFManagedConnection(final JPPFManagedConnectionFactory factory)
   {
-    //System.out.println("creating managed connection, call stack:");
-    //System.out.println(StringUtils.getStackTrace(new Exception()));
+    this.factory = factory;
   }
 
   /**
@@ -119,50 +123,31 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
    * with a ManagedConnection instance.
    * @param conn the new connection to associate.
    * @throws ResourceException if the association raised an error.
-   * @see javax.resource.spi.ManagedConnection#associateConnection(java.lang.Object)
    */
   @Override
   public void associateConnection(final Object conn) throws ResourceException
   {
-    connection = (JPPFConnectionImpl) conn;
+    connection = (JPPFConnection) conn;
     connection.setManagedConnection(this);
   }
 
-  /**
-   * This method does nothing.
-   * @throws ResourceException .
-   * @see javax.resource.spi.ManagedConnection#cleanup()
-   */
   @Override
   public void cleanup() throws ResourceException
   {
   }
 
-  /**
-   * This method does nothing.
-   * @throws ResourceException .
-   * @see javax.resource.spi.ManagedConnection#destroy()
-   */
   @Override
   public void destroy() throws ResourceException
   {
   }
 
-  /**
-   * Get a connection.
-   * @param subject not used.
-   * @param cri not used.
-   * @return a <code>JPPFConnection</code> instance.
-   * @throws ResourceException if the connection could not be obtained.
-   * @see javax.resource.spi.ManagedConnection#getConnection(javax.security.auth.Subject, javax.resource.spi.ConnectionRequestInfo)
-   */
   @Override
   public Object getConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
   {
     if (connection == null)
     {
       connection = new JPPFConnectionImpl(this);
-      if (connection.getJppfClient() == null) connection.setJppfClient(getJppfClient());
+      if (connection.retrieveJppfClient() == null) connection.assignJppfClient(retrieveJppfClient());
     }
     if (connection.isClosed()) connection.setAvailable();
     return connection;
@@ -180,12 +165,6 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
     throw new NotSupportedException("Method not supported");
   }
 
-  /**
-   * Get this managed connection's metadata.
-   * @return a <code>JPPFManagedConnectionMetaData</code> instance.
-   * @throws ResourceException if the metadata could not be obtained.
-   * @see javax.resource.spi.ManagedConnection#getMetaData()
-   */
   @Override
   public ManagedConnectionMetaData getMetaData() throws ResourceException
   {
@@ -205,14 +184,10 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
   }
 
   /**
-   * Determine whether this managed connection is available and can be reused by the application server.
-   * @return true if this managed connection is available, false otherwise.
+   * Reset the JPPF client.
    */
-  public boolean isAvailable()
+  public void resetClient()
   {
-    synchronized(this)
-    {
-      return (connection != null) && connection.isClosed();
-    }
+    factory.resetClient();
   }
 }

@@ -88,6 +88,11 @@ public interface SubmissionManager
   void close();
 
   /**
+   * Reset this submission manager.
+   */
+  void reset();
+
+  /**
    * Cancel the job with the specified id.
    * @param jobId the id of the job to cancel.
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.

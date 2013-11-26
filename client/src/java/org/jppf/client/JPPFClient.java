@@ -144,4 +144,23 @@ public class JPPFClient extends AbstractGenericClient
     }
     return submissionManager;
   }
+
+  /**
+   * Reset this client, that is, close it if necessary, then open it again, using the current configuration.
+   */
+  public void reset()
+  {
+    reset(JPPFConfiguration.getProperties());
+  }
+
+  /**
+   * Reset this client, that is, close it if necessary, then open it again, using the specified confguration.
+   * @param configuration the configuration to initialize this client with.
+   */
+  public void reset(final TypedProperties configuration)
+  {
+    if (isClosed()) throw new IllegalStateException("This client has already been closed and cannot be reset - a new instance must be created");
+    close(true);
+    init(configuration);
+  }
 }

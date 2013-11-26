@@ -41,33 +41,18 @@ public class JPPFConnectionMetaData implements ConnectionMetaData
     this.userName = userName;
   }
 
-  /**
-   * name.Get the product name.
-   * @return the name as a string.
-   * @see javax.resource.cci.ConnectionMetaData#getEISProductName()
-   */
   @Override
   public String getEISProductName()
   {
     return "JPPF";
   }
 
-  /**
-   * Get the product version.
-   * @return the version as a string.
-   * @see javax.resource.cci.ConnectionMetaData#getEISProductVersion()
-   */
   @Override
   public String getEISProductVersion()
   {
-    return "3.1";
+    return "4.0";
   }
 
-  /**
-   * Get the user name.
-   * @return the name as a string.
-   * @see javax.resource.cci.ConnectionMetaData#getUserName()
-   */
   @Override
   public String getUserName()
   {

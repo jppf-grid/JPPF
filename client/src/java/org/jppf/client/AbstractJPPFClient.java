@@ -305,18 +305,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Close this client and release all the resources it is using.
    */
-  public void close()
-  {
+  public void close() {
     List<JPPFClientConnection> list = getAllConnections();
     if (debugEnabled) log.debug("closing all connections: " + list);
-    for (JPPFClientConnection c : list)
-    {
-      try
-      {
+    for (JPPFClientConnection c : list) {
+      try {
         c.close();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }

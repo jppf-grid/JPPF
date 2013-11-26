@@ -41,48 +41,24 @@ public class JPPFManagedConnectionMetaData implements ManagedConnectionMetaData
     this.userName = userName;
   }
 
-  /**
-   * Get the name of the product.
-   * @return the product name as a string.
-   * @throws ResourceException if the product name could not be obtained.
-   * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductName()
-   */
   @Override
   public String getEISProductName() throws ResourceException
   {
     return "JPPF";
   }
 
-  /**
-   * Get the version of the product.
-   * @return the version as a string.
-   * @throws ResourceException if the version could not be obtained.
-   * @see javax.resource.spi.ManagedConnectionMetaData#getEISProductVersion()
-   */
   @Override
   public String getEISProductVersion() throws ResourceException
   {
-    return "JPPF 3.1";
+    return "JPPF 4.0";
   }
 
-  /**
-   * Get the maximum number of connections.
-   * @return the number of connections as an int.
-   * @throws ResourceException if the number of connections could not be obtained.
-   * @see javax.resource.spi.ManagedConnectionMetaData#getMaxConnections()
-   */
   @Override
   public int getMaxConnections() throws ResourceException
   {
     return 10;
   }
 
-  /**
-   * Get the name of the user of the connection.
-   * @return the name as a string.
-   * @throws ResourceException if the name could not be obtained.
-   * @see javax.resource.spi.ManagedConnectionMetaData#getUserName()
-   */
   @Override
   public String getUserName() throws ResourceException
   {

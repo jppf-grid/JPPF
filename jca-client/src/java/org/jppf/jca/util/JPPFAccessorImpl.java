@@ -51,7 +51,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
    * @return an <code>AbstractGenericClient</code> instance.
    */
   @Override
-  public AbstractGenericClient getJppfClient()
+  public AbstractGenericClient retrieveJppfClient()
   {
     return jppfClient;
   }
@@ -61,7 +61,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
    * @param jppfClient an <code>AbstractGenericClient</code> instance.
    */
   @Override
-  public void setJppfClient(final AbstractGenericClient jppfClient)
+  public void assignJppfClient(final AbstractGenericClient jppfClient)
   {
     this.jppfClient = jppfClient;
   }

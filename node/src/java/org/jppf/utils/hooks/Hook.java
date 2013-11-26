@@ -180,4 +180,13 @@ public class Hook<E> {
   {
     return instances;
   }
+
+  /**
+   * Cleanup this hook and release its resources.
+   */
+  public void dispose()
+  {
+    for (HookInstance<E> instance: instances) instance.dispose();
+    instances.clear();
+  }
 }

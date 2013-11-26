@@ -88,6 +88,14 @@ public class HookInstance<E>
     return null;
   }
 
+  /**
+   * Cleanup this hook instance and release its resources.
+   */
+  public void dispose()
+  {
+    methodCache.clear();
+  }
+
   @Override
   public String toString()
   {

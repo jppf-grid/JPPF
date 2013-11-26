@@ -67,10 +67,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     this.managedConnection = conn;
   }
 
-  /**
-   * Close this connection and notify the associated managed connection.
-   * @see javax.resource.cci.Connection#close()
-   */
   @Override
   public void close()
   {
@@ -78,11 +74,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (managedConnection != null) managedConnection.fireConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED, null);
   }
 
-  /**
-   * Create an interaction.
-   * @return an <code>Interaction</code> instance.
-   * @see javax.resource.cci.Connection#createInteraction()
-   */
   @Override
   public Interaction createInteraction()
   {
@@ -93,7 +84,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    * Transaction management is not supported in this version.
    * @return nothing.
    * @throws ResourceException this method always throws a NotSupportedException.
-   * @see javax.resource.cci.Connection#getLocalTransaction()
    */
   @Override
   public LocalTransaction getLocalTransaction() throws ResourceException
@@ -101,11 +91,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     throw new NotSupportedException("Method not supported");
   }
 
-  /**
-   * Get the connection metadata.
-   * @return a <code>JPPFConnectionMetaData</code> instance.
-   * @see javax.resource.cci.Connection#getMetaData()
-   */
   @Override
   public ConnectionMetaData getMetaData()
   {
@@ -116,7 +101,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    * This method is not supported in this version.
    * @return nothing.
    * @throws ResourceException this method always throws a NotSupportedException.
-   * @see javax.resource.cci.Connection#getResultSetInfo()
    */
   @Override
   public ResultSetInfo getResultSetInfo() throws ResourceException
@@ -136,14 +120,9 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     job.setBlocking(false);
-    return getJppfClient().getSubmissionManager().submitJob(job, listener);
+    return retrieveJppfClient().getSubmissionManager().submitJob(job, listener);
   }
 
-  /**
-   * Add a listener to the submission with the specified id.
-   * @param submissionId the id of the submission.
-   * @param listener the listener to add.
-   */
   @Override
   public void addSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
@@ -151,11 +130,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (res != null) res.addSubmissionStatusListener(listener);
   }
 
-  /**
-   * Remove a listener from the submission with the specified id.
-   * @param submissionId the id of the submission.
-   * @param listener the listener to remove.
-   */
   @Override
   public void removeSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
@@ -163,12 +137,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (res != null) res.removeSubmissionStatusListener(listener);
   }
 
-  /**
-   * Get the execution status of a tasks submission.
-   * @param submissionId the id of the submission for which to get the status.
-   * @return the submission status.
-   * @throws Exception if an error occurs while submitting the request.
-   */
   @Override
   public SubmissionStatus getSubmissionStatus(final String submissionId) throws Exception
   {
@@ -192,7 +160,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public List<JPPFTask> getSubmissionResults(final String submissionId) throws Exception
   {
-    JcaSubmissionManager mgr = (JcaSubmissionManager) getJppfClient().getSubmissionManager();
+    JcaSubmissionManager mgr = (JcaSubmissionManager) retrieveJppfClient().getSubmissionManager();
     JPPFResultCollector res = mgr.peekSubmission(submissionId);
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
@@ -212,7 +180,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   @Override
   public List<Task<?>> getResults(final String submissionId) throws Exception
   {
-    JcaSubmissionManager mgr = (JcaSubmissionManager) getJppfClient().getSubmissionManager();
+    JcaSubmissionManager mgr = (JcaSubmissionManager) retrieveJppfClient().getSubmissionManager();
     JPPFResultCollector res = mgr.peekSubmission(submissionId);
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
@@ -226,23 +194,19 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
    */
   private JPPFResultCollector getResultCollector(final String submissionId)
   {
-    return ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).peekSubmission(submissionId);
+    return ((JcaSubmissionManager) retrieveJppfClient().getSubmissionManager()).peekSubmission(submissionId);
   }
 
-  /**
-   * Get the ids of all currently available submissions.
-   * @return a collection of ids as strings.
-   */
   @Override
   public Collection<String> getAllSubmissionIds()
   {
-    return ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).getAllSubmissionIds();
+    return ((JcaSubmissionManager) retrieveJppfClient().getSubmissionManager()).getAllSubmissionIds();
   }
 
   @Override
   public boolean cancelJob(final String submissionId) throws Exception
   {
-    return getJppfClient().cancelJob(submissionId);
+    return retrieveJppfClient().cancelJob(submissionId);
   }
 
   @Override
@@ -255,16 +219,6 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
   public void setAvailable()
   {
     this.closed = false;
-  }
-
-  /**
-   * Get the associated managed connection.
-   * @return a <code>JPPFManagedConnection</code> instance.
-   */
-  @Override
-  public JPPFManagedConnection getManagedConnection()
-  {
-    return managedConnection;
   }
 
   /**
@@ -290,7 +244,7 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (result == null) return null;
     result.waitForResults();
     List<JPPFTask> tasks = result.getResults();
-    ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).pollSubmission(submissionId);
+    ((JcaSubmissionManager) retrieveJppfClient().getSubmissionManager()).pollSubmission(submissionId);
     return tasks;
   }
 
@@ -302,7 +256,13 @@ public class JPPFConnectionImpl extends JPPFAccessorImpl implements JPPFConnecti
     if (result == null) return null;
     result.awaitResults();
     List<Task<?>> tasks = result.getAllResults();
-    ((JcaSubmissionManager) getJppfClient().getSubmissionManager()).pollSubmission(submissionId);
+    ((JcaSubmissionManager) retrieveJppfClient().getSubmissionManager()).pollSubmission(submissionId);
     return tasks;
+  }
+
+  @Override
+  public void resetClient()
+  {
+    if (managedConnection != null) managedConnection.resetClient();
   }
 }

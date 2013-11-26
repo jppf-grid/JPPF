@@ -392,6 +392,17 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
+  public void reset()
+  {
+    synchronized(this)
+    {
+      for (ChannelWrapper channel: allConnections) channel.close();
+      allConnections.clear();
+      if (taskQueueChecker != null) taskQueueChecker.clearChannels();
+    }
+  }
+
+  @Override
   public void close()
   {
     closed.set(true);

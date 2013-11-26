@@ -63,7 +63,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   /**
    * The JPPF configuration properties.
    */
-  private final TypedProperties config;
+  private TypedProperties config;
   /**
    * Performs server discovery.
    * @exclude
@@ -88,9 +88,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @param configuration the object holding the JPPF configuration.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public AbstractGenericClient(final String uuid, final Object configuration, final ClientListener... listeners) {
+  public AbstractGenericClient(final String uuid, final TypedProperties configuration, final ClientListener... listeners) {
     super(uuid);
     for (ClientListener listener : listeners) addClientListener(listener);
+    init(configuration);
+  }
+
+  /**
+   * Initialize this client with the specified configuration.
+   * @param configuration the configuration to use with this client.
+   */
+  protected void init(final TypedProperties configuration) {
+    closed.set(false);
     this.config = initConfig(configuration);
     sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
@@ -137,8 +146,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
     if (debugEnabled) log.debug("initializing connections");
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
     executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
-    if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
     if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
+    if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
   }
 
   /**
@@ -262,15 +271,39 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
 
   @Override
   public void close() {
+    close(false);
+  }
+
+  /**
+   * Close this client.
+   * @param reset if <code>true</code>, then this client is left in a state where it can be reopened.
+   */
+  protected void close(final boolean reset) {
     if (debugEnabled) log.debug("closing JPPF client");
     closed.set(true);
+    if (debugEnabled) log.debug("unregistering startup classes");
+    HookFactory.unregister(JPPFClientStartupSPI.class);
     if (debugEnabled) log.debug("closing submission manager");
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager != null) submissionManager.close();
+    if (submissionManager != null) {
+      if (reset) {
+        submissionManager.reset();
+      } else {
+        submissionManager.close();
+        submissionManager = null;
+      }
+    }
     if (debugEnabled) log.debug("closing broadcast receiver");
-    if (receiverThread != null) receiverThread.close();
+    if (receiverThread != null) {
+      receiverThread.close();
+      receiverThread = null;
+    }
     if (debugEnabled) log.debug("closing executor");
-    if (executor != null) executor.shutdownNow();
+    if (executor != null) {
+      executor.shutdownNow();
+      executor = null;
+    }
+    if (debugEnabled) log.debug("clearing registered class loaders");
+    classLoaderRegistrations.clear();
     super.close();
   }
 

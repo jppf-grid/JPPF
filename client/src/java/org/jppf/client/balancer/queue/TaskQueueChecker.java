@@ -358,4 +358,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
       ((JobAwareness) context.getBundler()).setJobMetadata(metadata);
     }
   }
+
+  /**
+   * Clear all channels from this task queue checker.
+   */
+  public void clearChannels()
+  {
+    synchronized (idleChannels)
+    {
+      idleChannels.clear();
+    }
+  }
 }

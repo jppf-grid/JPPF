@@ -140,7 +140,7 @@ public final class JPPFConfiguration
 
   /**
    * Get an inputStream for a properties file located by the specified configuration source.
-   * @param configurationSourceName fully qualified name of a class implementating {@link JPPFConfiguration.ConfigurationSource}
+   * @param configurationSourceName fully qualified name of a class implementing {@link JPPFConfiguration.ConfigurationSource}
    * or {@link JPPFConfiguration.ConfigurationSourceReader}.
    * @return an input stream that can be used to load the properties.
    * @throws Exception if any error occurs while trying to obtain the stream.

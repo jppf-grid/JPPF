@@ -207,8 +207,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
   protected Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
     List<Task<?>> taskList = new LinkedList<>();
     TaskBundle bundle = null;
+    ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
     try {
       ClassLoader loader = cl == null ? getClass().getClassLoader() : cl;
+      Thread.currentThread().setContextClassLoader(loader);
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
       ObjectSerializer ser = makeHelper(loader, helperClassName).getSerializer();
       bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, ser);
@@ -237,14 +239,18 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
       }
       return new Pair(bundle, taskList);
     } catch (AsynchronousCloseException e) {
-      log.debug(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
     } catch (Exception e) {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.error(ExceptionUtils.getMessage(e));
       throw e;
     } catch (Error e) {
-      log.error(e.getMessage(), e);
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.error(ExceptionUtils.getMessage(e));
       throw e;
+    } finally {
+      Thread.currentThread().setContextClassLoader(ctxCl);
     }
   }
 

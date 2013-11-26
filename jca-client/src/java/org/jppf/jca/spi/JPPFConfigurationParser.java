@@ -41,16 +41,14 @@ class JPPFConfigurationParser
    */
   private static Logger log = LoggerFactory.getLogger(JPPFConfigurationParser.class);
   /**
-   * A string holding the client configuration, specified as a property in the ra.xml descriptor.
-   */
-  private final String clientConfiguration;
-  /**
    * Defines how the configuration is to be located.<br>
    * This property is defined in the format "<i>type</i>|<i>path</i>", where <i>type</i> can be one of:<br>
    * <ul>
    * <li>"classpath": in this case <i>path</i> is a path to a properties file in one of the jars of the .rar file, for instance "resources/config/jppf.properties"</li>
    * <li>"url": <i>path</i> is a url that points to a properties file, for instance "file:///home/me/jppf/jppf.properties" (could be a http:// or ftp:// url as well)</li>
    * <li>"file": <i>path</i> is considered a path on the file system, for instance "/home/me/jppf/config/jppf.properties"</li>
+   * <li>"plugin": <i>path</i> represents the fully qualified name of an implemnetation of either {@link JPPFConfiguration.ConfigurationSource}
+   * or {@link JPPFConfiguration.ConfigurationSourceReader}, for instance "com.example.MyConfigSourceReader"</li>
    * </ul>
    */
   private final String configurationSource;
@@ -58,12 +56,10 @@ class JPPFConfigurationParser
   /**
    * Initialize this ocnfiguration parser.
    * @param configurationSource a string holding the client configuration.
-   * @param clientConfiguration defines how the configuration is to be located.
    */
-  public JPPFConfigurationParser(final String configurationSource, final String clientConfiguration)
+  public JPPFConfigurationParser(final String configurationSource)
   {
     this.configurationSource = configurationSource;
-    this.clientConfiguration = clientConfiguration;
   }
 
   /**
@@ -74,11 +70,7 @@ class JPPFConfigurationParser
   {
     String src = configurationSource;
     if (src != null) src = src.trim();
-    if ((src == null) || src.isEmpty())
-    {
-      if ((clientConfiguration == null) || clientConfiguration.trim().isEmpty()) src = DEFAULT_CONFIG_SOURCE;
-      else return parseFromConfig();
-    }
+    if ((src == null) || src.isEmpty()) src = DEFAULT_CONFIG_SOURCE;
     return parseFromSource(src);
   }
 
@@ -89,20 +81,23 @@ class JPPFConfigurationParser
    */
   private TypedProperties parseFromSource(final String src)
   {
-    TypedProperties config = JPPFConfiguration.getProperties();
+    TypedProperties config = new TypedProperties();
     int idx = src.indexOf('|');
     if (idx <= 0) return config;
     String type = src.substring(0, idx).trim();
     String path = src.substring(idx+1).trim();
     InputStream is = null;
+    Reader reader = null;
     try
     {
       if ("classpath".equalsIgnoreCase(type)) is = getClass().getClassLoader().getResourceAsStream(path);
       else if ("url".equalsIgnoreCase(type)) is = new URL(path).openStream();
       else if ("file".equalsIgnoreCase(type)) is = new BufferedInputStream(new FileInputStream(path));
+      else if ("plugin".equalsIgnoreCase(type)) reader = JPPFConfiguration.getConfigurationSourceReader(path);
       else throw new IllegalArgumentException("wrong type '"  + type + "' for confguration source, should be one of ['classpath', 'url', 'file']");
-      if (is == null) throw new IllegalArgumentException("configuration source '" + src + "' does not point to a valid JPPF configuration");
-      config.load(is);
+      if ((is == null) && (reader == null)) throw new IllegalArgumentException("configuration source '" + src + "' does not point to a valid JPPF configuration");
+      if (is != null) config.load(is);
+      else if (reader != null) config.load(reader);
     }
     catch (Exception e)
     {
@@ -112,33 +107,6 @@ class JPPFConfigurationParser
     {
       if (is != null) StreamUtils.closeSilent(is);
     }
-    return config;
-  }
-
-  /**
-   * Parse form the configuration specified as a string.
-   * @return the config as a {@link TypedProperties} object.
-   */
-  private TypedProperties parseFromConfig()
-  {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    try
-    {
-      StringReader reader = new StringReader(clientConfiguration);
-      try
-      {
-        config.load(reader);
-      }
-      finally
-      {
-        StreamUtils.closeSilent(reader);
-      }
-    }
-    catch(Exception e)
-    {
-      log.error("Error while initializing the JPPF client configuration", e);
-    }
-    if (log.isDebugEnabled()) log.debug("config properties: " + config);
     return config;
   }
 }

@@ -42,19 +42,11 @@ public class JPPFInteraction implements Interaction
     this.conn = conn;
   }
 
-  /**
-   * 
-   * @see javax.resource.cci.Interaction#clearWarnings()
-   */
   @Override
   public void clearWarnings()
   {
   }
 
-  /**
-   * 
-   * @see javax.resource.cci.Interaction#close()
-   */
   @Override
   public void close()
   {
@@ -64,9 +56,8 @@ public class JPPFInteraction implements Interaction
    * This method does nothing.
    * @param ispec not used.
    * @param input not used.
-   * @return null.
+   * @return <code>null</code>.
    * @throws ResourceException .
-   * @see javax.resource.cci.Interaction#execute(javax.resource.cci.InteractionSpec, javax.resource.cci.Record)
    */
   @Override
   public Record execute(final InteractionSpec ispec, final Record input) throws ResourceException
@@ -79,9 +70,8 @@ public class JPPFInteraction implements Interaction
    * @param ispec not used.
    * @param input not used.
    * @param output not used.
-   * @return false.
+   * @return <code>false</code>.
    * @throws ResourceException .
-   * @see javax.resource.cci.Interaction#execute(javax.resource.cci.InteractionSpec, javax.resource.cci.Record, javax.resource.cci.Record)
    */
   @Override
   public boolean execute(final InteractionSpec ispec, final Record input, final Record output) throws ResourceException
@@ -89,11 +79,6 @@ public class JPPFInteraction implements Interaction
     return false;
   }
 
-  /**
-   * Get the connection.
-   * @return a <code>Connection</code> instance.
-   * @see javax.resource.cci.Interaction#getConnection()
-   */
   @Override
   public Connection getConnection()
   {
@@ -102,8 +87,7 @@ public class JPPFInteraction implements Interaction
 
   /**
    * This method does nothing.
-   * @return null;
-   * @see javax.resource.cci.Interaction#getWarnings()
+   * @return <code>null</code>;
    */
   @Override
   public ResourceWarning getWarnings()
