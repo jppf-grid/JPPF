@@ -134,7 +134,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    */
   protected void runAction(final Runnable r)
   {
-    new Thread(r, getClass().getSimpleName()).start();
+    GuiUtils.runAction(r, getClass().getSimpleName());
   }
 
   /**

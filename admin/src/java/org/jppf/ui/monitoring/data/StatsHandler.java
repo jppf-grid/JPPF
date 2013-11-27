@@ -30,6 +30,7 @@ import org.jppf.client.event.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.OptionElement;
+import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
@@ -468,5 +469,34 @@ public final class StatsHandler implements StatsConstants, ClientListener {
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  /**
+   * Close all connections to the driver(s).
+   */
+  public void close() {
+    if (jppfClient != null) jppfClient.close();
+  }
+
+  /**
+   * Reset the statistics of the currently selected driver, if any.
+   */
+  public void resetCurrentStats() {
+    Runnable r = new Runnable() {
+      public void run() {
+        JPPFClientConnection c = getCurrentConnection();
+        if (c == null) return;
+        JMXDriverConnectionWrapper jmx = ((JPPFClientConnectionImpl) c).getJmxConnection();
+        if ((jmx != null) && jmx.isConnected()) {
+          try {
+            jmx.resetStatistics();
+          } catch (Exception e) {
+            if (debugEnabled) log.debug("couldn't reset statistics on {} : {}", c, ExceptionUtils.getStackTrace(e));
+            else log.error("couldn't reset statistics on {} : {}", c, ExceptionUtils.getMessage(e));
+          }
+        }
+      }
+    };
+    GuiUtils.runAction(r, "Reset server stats");
   }
 }

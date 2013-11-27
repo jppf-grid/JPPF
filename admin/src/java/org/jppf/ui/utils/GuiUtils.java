@@ -186,4 +186,15 @@ public final class GuiUtils
     map.put("of", "");
     return map;
   }
+
+  /**
+   * Execute the specified runnable in a new thread.
+   * @param r the <code>Runnable</code> to execute.
+   * @param name the thread name.
+   */
+  public static void runAction(final Runnable r, final String name)
+  {
+    new Thread(r, name).start();
+  }
+
 }

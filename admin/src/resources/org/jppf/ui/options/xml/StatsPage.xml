@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatsPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatsPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
@@ -34,6 +37,7 @@
 	
     <child name="RefreshBtn" type="Button">
       <property name="componentConstraints" value="growx 0"/>
+      <property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
       <listener type="script">
         <script language="groovy">StatsHandler.getInstance().requestUpdate()</script>
       </listener>
@@ -43,11 +47,23 @@
       <property name="componentConstraints" value="growx, span 2"/>
     </child>
 
+    <child name="ResetStatsBtn" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/server_reset_stats.gif"/>
+      <property name="componentConstraints" value="growx 0"/>
+      <listener type="script">
+        <script language="groovy">StatsHandler.getInstance().resetCurrentStats()</script>
+      </listener>
+    </child>
+
+    <child name="fillerb1" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
     <child name="CopyAsLabel" type="Label">
       <property name="componentConstraints" value="growx 0"/>
     </child>
 
-    <child name="fillerb1" type="Page">
+    <child name="fillerb2" type="Page">
       <property name="componentConstraints" value="growx, span 2"/>
     </child>
 
@@ -58,7 +74,7 @@
       </listener>
     </child>
 
-    <child name="fillerb2" type="Page">
+    <child name="fillerb3" type="Page">
       <property name="componentConstraints" value="growx, span 2"/>
     </child>
 

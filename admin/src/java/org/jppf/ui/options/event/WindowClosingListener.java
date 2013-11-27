@@ -22,6 +22,7 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.prefs.*;
 
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
@@ -40,6 +41,7 @@ public class WindowClosingListener extends WindowAdapter
   @Override
   public void windowClosing(final WindowEvent event)
   {
+    StatsHandler.getInstance().close();
     Preferences pref = OptionsHandler.getPreferences();
     List<OptionElement> list = OptionsHandler.getPageList();
     if (!list.isEmpty())
