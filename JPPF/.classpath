@@ -8,7 +8,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/MigLayout/miglayout-3.7-swing.jar"/>
-	<classpathentry kind="lib" path="lib/J2EE/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/J2EE/geronimo-j2ee-connector_1.5_spec-2.0.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://docs.oracle.com/javaee/5/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/JFreeChart/jcommon-1.0.15.jar"/>
 	<classpathentry kind="lib" path="lib/JFreeChart/jfreechart-1.0.12.jar"/>
 	<classpathentry kind="lib" path="lib/Hazelcast/hazelcast.jar"/>

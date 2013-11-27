@@ -25,6 +25,7 @@ import org.jppf.node.NodeExecutionInfo;
 /**
  * 
  * @author Laurent Cohen
+ * @exclude
  */
 public class CpuTimeCollector
 {

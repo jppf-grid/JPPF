@@ -42,17 +42,20 @@ public interface SendResultsStrategy
    * @param bundle the client bundle for which results were recived from a node.
    * @param tasks the task whose results are to be returned.
    * @return <code>true</code> if the results should be sent immediately, <code>false</code> otherwise.
+   * @exclude
    */
   boolean sendResults(final ServerTaskBundleClient bundle, final Collection<ServerTask> tasks);
 
   /**
    * Get the name of this strategy.
    * @return the name as a string.
+   * @exclude
    */
   String getName();
 
   /**
    * Strategy that sends the results everytime time they are received from a node.
+   * @exclude
    */
   public static class SendNodeResultsStrategy implements SendResultsStrategy
   {
@@ -71,6 +74,7 @@ public interface SendResultsStrategy
 
   /**
    * Strategy that sends the results when they have all been received for the client bundle.
+   * @exclude
    */
   public static class SendAllResultsStrategy implements SendResultsStrategy
   {

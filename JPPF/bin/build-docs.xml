@@ -109,7 +109,7 @@
 			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
 			<link href="http://docs.oracle.com/javase/7/docs/api/"/>
 			<link href="http://docs.oracle.com/javaee/6/api/"/>
-			<link href="http://kentbeck.github.com/junit/javadoc/latest"/>
+			<link href="http://junit.sourceforge.net/javadoc"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
 			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
 			<header>
@@ -127,7 +127,7 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2013 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2013 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>

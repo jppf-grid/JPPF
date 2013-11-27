@@ -30,6 +30,7 @@ import org.slf4j.*;
 /**
  * Instances of this class group tasks for the same node channel together.
  * @author Martin JANDA
+ * @exclude
  */
 public class ServerTaskBundleNode {
   /**

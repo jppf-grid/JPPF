@@ -16,31 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
-
 /**
- * State for task indicating whether result or exception was received.
- * @exclude
+ * Classes used to reproduce the problem reported in forums thread
+ * <a href="http://www.jppf.org/forums/index.php/topic,1179.0.html">http://www.jppf.org/forums/index.php/topic,1179.0.html</a>.
  */
-public enum TaskState {
-  /**
-   * Task was just received - no result or exception.
-   */
-  PENDING,
-  /**
-   * Task is to be resubmitted following a dispatch expiration.
-   */
-  RESUBMIT,
-  /**
-   * Exception was received for task.
-   */
-  EXCEPTION,
-  /**
-   * Result was received for task.
-   */
-  RESULT,
-  /**
-   * Task is cancelled.
-   */
-  CANCELLED
-}
+package test.client;
