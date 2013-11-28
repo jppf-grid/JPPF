@@ -1,0 +1,1572 @@
+2013-09-03 19:12:47,188 [driver-1] driver process id: 2484
+2013-09-03 19:12:47,388 [  node-1] node process id: 5400
+2013-09-03 19:12:47,410 [  node-8] node process id: 3492
+2013-09-03 19:12:47,415 [  node-3] node process id: 5356
+2013-09-03 19:12:47,425 [  node-2] node process id: 2820
+2013-09-03 19:12:47,453 [  node-4] node process id: 3512
+2013-09-03 19:12:47,461 [  node-6] node process id: 4340
+2013-09-03 19:12:47,474 [  node-5] node process id: 5980
+2013-09-03 19:12:47,493 [  node-10] node process id: 3060
+2013-09-03 19:12:47,514 [  node-9] node process id: 5404
+2013-09-03 19:12:47,549 [  node-7] node process id: 4064
+2013-09-03 19:12:48,409 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:12:48,600 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:12:48,634 [driver-1] ClientClassServer initialized
+2013-09-03 19:12:48,638 [driver-1] NodeClassServer initialized
+2013-09-03 19:12:48,642 [driver-1] ClientJobServer initialized
+2013-09-03 19:12:48,658 [driver-1] NodeJobServer initialized
+2013-09-03 19:12:48,662 [driver-1] Acceptor initialized
+2013-09-03 19:12:48,662 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:12:48,662 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:12:48,662 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:12:49,296 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,304 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,315 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,318 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,323 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,343 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,349 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,355 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,357 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,359 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:49,410 [  node-6] Reconnected to the class server
+2013-09-03 19:12:49,410 [  node-2] Reconnected to the class server
+2013-09-03 19:12:49,411 [  node-4] Reconnected to the class server
+2013-09-03 19:12:49,411 [  node-3] Reconnected to the class server
+2013-09-03 19:12:49,411 [  node-1] Reconnected to the class server
+2013-09-03 19:12:49,413 [  node-9] Reconnected to the class server
+2013-09-03 19:12:49,419 [  node-5] Reconnected to the class server
+2013-09-03 19:12:49,420 [  node-8] Reconnected to the class server
+2013-09-03 19:12:49,426 [  node-10] Reconnected to the class server
+2013-09-03 19:12:49,429 [  node-7] Reconnected to the class server
+2013-09-03 19:12:50,552 [  node-9] JPPF Node management initialized
+2013-09-03 19:12:50,627 [  node-2] JPPF Node management initialized
+2013-09-03 19:12:50,673 [  node-1] JPPF Node management initialized
+2013-09-03 19:12:50,690 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:50,691 [  node-9] Reconnected to the node server
+2013-09-03 19:12:50,701 [  node-6] JPPF Node management initialized
+2013-09-03 19:12:50,737 [  node-9] Node successfully initialized
+2013-09-03 19:12:50,758 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:50,759 [  node-2] Reconnected to the node server
+2013-09-03 19:12:50,816 [  node-2] Node successfully initialized
+2013-09-03 19:12:50,823 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:50,824 [  node-1] Reconnected to the node server
+2013-09-03 19:12:50,842 [  node-3] JPPF Node management initialized
+2013-09-03 19:12:50,876 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:50,877 [  node-6] Reconnected to the node server
+2013-09-03 19:12:50,881 [  node-1] Node successfully initialized
+2013-09-03 19:12:50,941 [  node-6] Node successfully initialized
+2013-09-03 19:12:51,043 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:51,043 [  node-3] Reconnected to the node server
+2013-09-03 19:12:51,095 [  node-3] Node successfully initialized
+2013-09-03 19:12:51,191 [  node-5] JPPF Node management initialized
+2013-09-03 19:12:51,191 [  node-4] JPPF Node management initialized
+2013-09-03 19:12:51,228 [  node-10] JPPF Node management initialized
+2013-09-03 19:12:51,228 [  node-7] JPPF Node management initialized
+2013-09-03 19:12:51,230 [  node-8] JPPF Node management initialized
+2013-09-03 19:12:51,347 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:51,347 [  node-4] Reconnected to the node server
+2013-09-03 19:12:51,354 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:51,354 [  node-5] Reconnected to the node server
+2013-09-03 19:12:51,377 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:51,378 [  node-10] Reconnected to the node server
+2013-09-03 19:12:51,382 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:51,382 [  node-8] Reconnected to the node server
+2013-09-03 19:12:51,383 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:12:51,383 [  node-7] Reconnected to the node server
+2013-09-03 19:12:51,393 [  node-4] Node successfully initialized
+2013-09-03 19:12:51,406 [  node-5] Node successfully initialized
+2013-09-03 19:12:51,421 [  node-10] Node successfully initialized
+2013-09-03 19:12:51,423 [  node-7] Node successfully initialized
+2013-09-03 19:12:51,426 [  node-8] Node successfully initialized
+2013-09-03 19:12:58,168 [driver-1] driver process id: 4544
+2013-09-03 19:12:58,842 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:12:59,047 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:12:59,081 [driver-1] ClientClassServer initialized
+2013-09-03 19:12:59,085 [driver-1] NodeClassServer initialized
+2013-09-03 19:12:59,089 [driver-1] ClientJobServer initialized
+2013-09-03 19:12:59,105 [driver-1] NodeJobServer initialized
+2013-09-03 19:12:59,109 [driver-1] Acceptor initialized
+2013-09-03 19:12:59,109 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:12:59,109 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:12:59,109 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:12:59,770 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,770 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,771 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,771 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:12:59,785 [  node-4] Reconnected to the class server
+2013-09-03 19:12:59,785 [  node-10] Reconnected to the class server
+2013-09-03 19:12:59,785 [  node-5] Reconnected to the class server
+2013-09-03 19:12:59,788 [  node-3] Reconnected to the class server
+2013-09-03 19:12:59,788 [  node-8] Reconnected to the class server
+2013-09-03 19:12:59,788 [  node-7] Reconnected to the class server
+2013-09-03 19:12:59,788 [  node-2] Reconnected to the class server
+2013-09-03 19:12:59,789 [  node-9] Reconnected to the class server
+2013-09-03 19:12:59,789 [  node-1] Reconnected to the class server
+2013-09-03 19:12:59,790 [  node-6] Reconnected to the class server
+2013-09-03 19:13:00,256 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:00,348 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:00,367 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,367 [  node-10] Reconnected to the node server
+2013-09-03 19:13:00,375 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:00,404 [  node-10] Node successfully initialized
+2013-09-03 19:13:00,429 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:00,460 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,461 [  node-3] Reconnected to the node server
+2013-09-03 19:13:00,463 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:00,490 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,491 [  node-7] Reconnected to the node server
+2013-09-03 19:13:00,498 [  node-3] Node successfully initialized
+2013-09-03 19:13:00,518 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:00,533 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:00,538 [  node-7] Node successfully initialized
+2013-09-03 19:13:00,576 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,577 [  node-2] Reconnected to the node server
+2013-09-03 19:13:00,587 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:00,588 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:00,591 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:00,638 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,639 [  node-8] Reconnected to the node server
+2013-09-03 19:13:00,648 [  node-2] Node successfully initialized
+2013-09-03 19:13:00,694 [  node-8] Node successfully initialized
+2013-09-03 19:13:00,725 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,725 [  node-5] Reconnected to the node server
+2013-09-03 19:13:00,728 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,728 [  node-1] Reconnected to the node server
+2013-09-03 19:13:00,769 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,771 [  node-4] Reconnected to the node server
+2013-09-03 19:13:00,778 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,779 [  node-9] Reconnected to the node server
+2013-09-03 19:13:00,788 [  node-5] Node successfully initialized
+2013-09-03 19:13:00,794 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:00,795 [  node-6] Reconnected to the node server
+2013-09-03 19:13:00,802 [  node-1] Node successfully initialized
+2013-09-03 19:13:00,835 [  node-4] Node successfully initialized
+2013-09-03 19:13:00,847 [  node-9] Node successfully initialized
+2013-09-03 19:13:00,860 [  node-6] Node successfully initialized
+2013-09-03 19:13:05,213 [driver-1] driver process id: 4284
+2013-09-03 19:13:05,862 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:06,056 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:06,090 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:06,094 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:06,098 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:06,114 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:06,118 [driver-1] Acceptor initialized
+2013-09-03 19:13:06,118 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:06,118 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:06,119 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:06,768 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,768 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,769 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:06,779 [  node-8] Reconnected to the class server
+2013-09-03 19:13:06,781 [  node-6] Reconnected to the class server
+2013-09-03 19:13:06,782 [  node-9] Reconnected to the class server
+2013-09-03 19:13:06,783 [  node-5] Reconnected to the class server
+2013-09-03 19:13:06,783 [  node-3] Reconnected to the class server
+2013-09-03 19:13:06,784 [  node-7] Reconnected to the class server
+2013-09-03 19:13:06,785 [  node-10] Reconnected to the class server
+2013-09-03 19:13:06,785 [  node-4] Reconnected to the class server
+2013-09-03 19:13:06,786 [  node-2] Reconnected to the class server
+2013-09-03 19:13:06,788 [  node-1] Reconnected to the class server
+2013-09-03 19:13:07,292 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:07,312 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:07,354 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:07,393 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,393 [  node-7] Reconnected to the node server
+2013-09-03 19:13:07,406 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,407 [  node-1] Reconnected to the node server
+2013-09-03 19:13:07,418 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:07,436 [  node-7] Node successfully initialized
+2013-09-03 19:13:07,444 [  node-1] Node successfully initialized
+2013-09-03 19:13:07,455 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,456 [  node-10] Reconnected to the node server
+2013-09-03 19:13:07,460 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:07,471 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:07,493 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:07,498 [  node-10] Node successfully initialized
+2013-09-03 19:13:07,531 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:07,532 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:07,536 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:07,551 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,551 [  node-5] Reconnected to the node server
+2013-09-03 19:13:07,602 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,603 [  node-8] Reconnected to the node server
+2013-09-03 19:13:07,614 [  node-5] Node successfully initialized
+2013-09-03 19:13:07,617 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,617 [  node-9] Reconnected to the node server
+2013-09-03 19:13:07,653 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,653 [  node-6] Reconnected to the node server
+2013-09-03 19:13:07,664 [  node-8] Node successfully initialized
+2013-09-03 19:13:07,683 [  node-9] Node successfully initialized
+2013-09-03 19:13:07,715 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,716 [  node-2] Reconnected to the node server
+2013-09-03 19:13:07,721 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,722 [  node-3] Reconnected to the node server
+2013-09-03 19:13:07,726 [  node-6] Node successfully initialized
+2013-09-03 19:13:07,738 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:07,738 [  node-4] Reconnected to the node server
+2013-09-03 19:13:07,775 [  node-2] Node successfully initialized
+2013-09-03 19:13:07,782 [  node-3] Node successfully initialized
+2013-09-03 19:13:07,796 [  node-4] Node successfully initialized
+2013-09-03 19:13:12,347 [driver-1] driver process id: 3768
+2013-09-03 19:13:13,067 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:13,261 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:13,294 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:13,298 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:13,302 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:13,318 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:13,322 [driver-1] Acceptor initialized
+2013-09-03 19:13:13,322 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:13,322 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:13,322 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:13,929 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,929 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,929 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,929 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,929 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,929 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,929 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,930 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,930 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,930 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:13,943 [  node-1] Reconnected to the class server
+2013-09-03 19:13:13,944 [  node-5] Reconnected to the class server
+2013-09-03 19:13:13,950 [  node-9] Reconnected to the class server
+2013-09-03 19:13:13,950 [  node-3] Reconnected to the class server
+2013-09-03 19:13:13,951 [  node-8] Reconnected to the class server
+2013-09-03 19:13:13,951 [  node-6] Reconnected to the class server
+2013-09-03 19:13:13,951 [  node-2] Reconnected to the class server
+2013-09-03 19:13:13,951 [  node-10] Reconnected to the class server
+2013-09-03 19:13:13,951 [  node-7] Reconnected to the class server
+2013-09-03 19:13:13,954 [  node-4] Reconnected to the class server
+2013-09-03 19:13:14,446 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:14,503 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:14,520 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:14,542 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,543 [  node-7] Reconnected to the node server
+2013-09-03 19:13:14,569 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:14,577 [  node-7] Node successfully initialized
+2013-09-03 19:13:14,598 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,599 [  node-6] Reconnected to the node server
+2013-09-03 19:13:14,610 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:14,624 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,624 [  node-10] Reconnected to the node server
+2013-09-03 19:13:14,641 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:14,643 [  node-6] Node successfully initialized
+2013-09-03 19:13:14,670 [  node-10] Node successfully initialized
+2013-09-03 19:13:14,673 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:14,674 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:14,682 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:14,685 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:14,700 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,700 [  node-9] Reconnected to the node server
+2013-09-03 19:13:14,756 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,756 [  node-3] Reconnected to the node server
+2013-09-03 19:13:14,758 [  node-9] Node successfully initialized
+2013-09-03 19:13:14,800 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,800 [  node-2] Reconnected to the node server
+2013-09-03 19:13:14,821 [  node-3] Node successfully initialized
+2013-09-03 19:13:14,846 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,847 [  node-1] Reconnected to the node server
+2013-09-03 19:13:14,863 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,864 [  node-5] Reconnected to the node server
+2013-09-03 19:13:14,865 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,865 [  node-8] Reconnected to the node server
+2013-09-03 19:13:14,874 [  node-2] Node successfully initialized
+2013-09-03 19:13:14,882 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:14,883 [  node-4] Reconnected to the node server
+2013-09-03 19:13:14,907 [  node-1] Node successfully initialized
+2013-09-03 19:13:14,925 [  node-5] Node successfully initialized
+2013-09-03 19:13:14,932 [  node-8] Node successfully initialized
+2013-09-03 19:13:14,958 [  node-4] Node successfully initialized
+2013-09-03 19:13:19,230 [driver-1] driver process id: 5440
+2013-09-03 19:13:19,881 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:20,078 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:20,112 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:20,116 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:20,120 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:20,136 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:20,140 [driver-1] Acceptor initialized
+2013-09-03 19:13:20,140 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:20,140 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:20,141 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:20,758 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,759 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,759 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,759 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,759 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,760 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,760 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,760 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,760 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,761 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:20,776 [  node-7] Reconnected to the class server
+2013-09-03 19:13:20,777 [  node-2] Reconnected to the class server
+2013-09-03 19:13:20,778 [  node-3] Reconnected to the class server
+2013-09-03 19:13:20,780 [  node-5] Reconnected to the class server
+2013-09-03 19:13:20,780 [  node-6] Reconnected to the class server
+2013-09-03 19:13:20,780 [  node-9] Reconnected to the class server
+2013-09-03 19:13:20,780 [  node-10] Reconnected to the class server
+2013-09-03 19:13:20,780 [  node-1] Reconnected to the class server
+2013-09-03 19:13:20,780 [  node-4] Reconnected to the class server
+2013-09-03 19:13:20,782 [  node-8] Reconnected to the class server
+2013-09-03 19:13:21,182 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:21,236 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:21,288 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,288 [  node-8] Reconnected to the node server
+2013-09-03 19:13:21,321 [  node-8] Node successfully initialized
+2013-09-03 19:13:21,332 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:21,339 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,339 [  node-6] Reconnected to the node server
+2013-09-03 19:13:21,373 [  node-6] Node successfully initialized
+2013-09-03 19:13:21,376 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:21,413 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:21,447 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,448 [  node-7] Reconnected to the node server
+2013-09-03 19:13:21,490 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:21,501 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,502 [  node-1] Reconnected to the node server
+2013-09-03 19:13:21,502 [  node-7] Node successfully initialized
+2013-09-03 19:13:21,512 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:21,545 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:21,547 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:21,557 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:21,571 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,571 [  node-9] Reconnected to the node server
+2013-09-03 19:13:21,577 [  node-1] Node successfully initialized
+2013-09-03 19:13:21,655 [  node-9] Node successfully initialized
+2013-09-03 19:13:21,696 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,697 [  node-4] Reconnected to the node server
+2013-09-03 19:13:21,736 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,736 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,736 [  node-3] Reconnected to the node server
+2013-09-03 19:13:21,737 [  node-2] Reconnected to the node server
+2013-09-03 19:13:21,741 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,741 [  node-5] Reconnected to the node server
+2013-09-03 19:13:21,756 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:21,757 [  node-10] Reconnected to the node server
+2013-09-03 19:13:21,768 [  node-4] Node successfully initialized
+2013-09-03 19:13:21,795 [  node-3] Node successfully initialized
+2013-09-03 19:13:21,804 [  node-2] Node successfully initialized
+2013-09-03 19:13:21,817 [  node-5] Node successfully initialized
+2013-09-03 19:13:21,821 [  node-10] Node successfully initialized
+2013-09-03 19:13:26,231 [driver-1] driver process id: 5184
+2013-09-03 19:13:26,875 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:27,071 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:27,105 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:27,108 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:27,112 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:27,128 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:27,132 [driver-1] Acceptor initialized
+2013-09-03 19:13:27,132 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:27,132 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:27,133 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:27,752 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,752 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,752 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,753 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,753 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,753 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,753 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,754 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,754 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,754 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:27,766 [  node-10] Reconnected to the class server
+2013-09-03 19:13:27,767 [  node-1] Reconnected to the class server
+2013-09-03 19:13:27,767 [  node-8] Reconnected to the class server
+2013-09-03 19:13:27,772 [  node-3] Reconnected to the class server
+2013-09-03 19:13:27,772 [  node-4] Reconnected to the class server
+2013-09-03 19:13:27,773 [  node-5] Reconnected to the class server
+2013-09-03 19:13:27,773 [  node-7] Reconnected to the class server
+2013-09-03 19:13:27,775 [  node-6] Reconnected to the class server
+2013-09-03 19:13:27,775 [  node-9] Reconnected to the class server
+2013-09-03 19:13:27,776 [  node-2] Reconnected to the class server
+2013-09-03 19:13:28,323 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:28,356 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:28,371 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:28,397 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:28,418 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,419 [  node-4] Reconnected to the node server
+2013-09-03 19:13:28,436 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:28,458 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,458 [  node-10] Reconnected to the node server
+2013-09-03 19:13:28,466 [  node-4] Node successfully initialized
+2013-09-03 19:13:28,474 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:28,485 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:28,487 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,488 [  node-6] Reconnected to the node server
+2013-09-03 19:13:28,490 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:28,510 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:28,517 [  node-10] Node successfully initialized
+2013-09-03 19:13:28,517 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:28,532 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,532 [  node-3] Reconnected to the node server
+2013-09-03 19:13:28,548 [  node-6] Node successfully initialized
+2013-09-03 19:13:28,586 [  node-3] Node successfully initialized
+2013-09-03 19:13:28,592 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,592 [  node-8] Reconnected to the node server
+2013-09-03 19:13:28,642 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,642 [  node-9] Reconnected to the node server
+2013-09-03 19:13:28,652 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,652 [  node-2] Reconnected to the node server
+2013-09-03 19:13:28,658 [  node-8] Node successfully initialized
+2013-09-03 19:13:28,672 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,673 [  node-7] Reconnected to the node server
+2013-09-03 19:13:28,688 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,689 [  node-1] Reconnected to the node server
+2013-09-03 19:13:28,710 [  node-9] Node successfully initialized
+2013-09-03 19:13:28,712 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:28,712 [  node-5] Reconnected to the node server
+2013-09-03 19:13:28,723 [  node-2] Node successfully initialized
+2013-09-03 19:13:28,752 [  node-7] Node successfully initialized
+2013-09-03 19:13:28,760 [  node-1] Node successfully initialized
+2013-09-03 19:13:28,790 [  node-5] Node successfully initialized
+2013-09-03 19:13:33,260 [driver-1] driver process id: 5108
+2013-09-03 19:13:33,935 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:34,143 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:34,177 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:34,181 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:34,185 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:34,201 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:34,205 [driver-1] Acceptor initialized
+2013-09-03 19:13:34,205 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:34,205 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:34,206 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:34,821 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,821 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,821 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,821 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,821 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,821 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,822 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,822 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,822 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,823 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:34,835 [  node-8] Reconnected to the class server
+2013-09-03 19:13:34,836 [  node-4] Reconnected to the class server
+2013-09-03 19:13:34,836 [  node-6] Reconnected to the class server
+2013-09-03 19:13:34,838 [  node-9] Reconnected to the class server
+2013-09-03 19:13:34,838 [  node-10] Reconnected to the class server
+2013-09-03 19:13:34,838 [  node-7] Reconnected to the class server
+2013-09-03 19:13:34,838 [  node-1] Reconnected to the class server
+2013-09-03 19:13:34,839 [  node-2] Reconnected to the class server
+2013-09-03 19:13:34,840 [  node-3] Reconnected to the class server
+2013-09-03 19:13:34,840 [  node-5] Reconnected to the class server
+2013-09-03 19:13:35,344 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:35,364 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:35,426 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:35,442 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,442 [  node-6] Reconnected to the node server
+2013-09-03 19:13:35,454 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,455 [  node-7] Reconnected to the node server
+2013-09-03 19:13:35,469 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:35,479 [  node-6] Node successfully initialized
+2013-09-03 19:13:35,496 [  node-7] Node successfully initialized
+2013-09-03 19:13:35,499 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:35,543 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,544 [  node-4] Reconnected to the node server
+2013-09-03 19:13:35,546 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:35,582 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:35,597 [  node-4] Node successfully initialized
+2013-09-03 19:13:35,618 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:35,622 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,622 [  node-8] Reconnected to the node server
+2013-09-03 19:13:35,625 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:35,627 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:35,639 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,640 [  node-1] Reconnected to the node server
+2013-09-03 19:13:35,703 [  node-8] Node successfully initialized
+2013-09-03 19:13:35,704 [  node-1] Node successfully initialized
+2013-09-03 19:13:35,789 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,790 [  node-2] Reconnected to the node server
+2013-09-03 19:13:35,814 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,815 [  node-3] Reconnected to the node server
+2013-09-03 19:13:35,850 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,850 [  node-9] Reconnected to the node server
+2013-09-03 19:13:35,868 [  node-2] Node successfully initialized
+2013-09-03 19:13:35,871 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,873 [  node-10] Reconnected to the node server
+2013-09-03 19:13:35,882 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:35,883 [  node-5] Reconnected to the node server
+2013-09-03 19:13:35,896 [  node-3] Node successfully initialized
+2013-09-03 19:13:35,922 [  node-9] Node successfully initialized
+2013-09-03 19:13:35,935 [  node-10] Node successfully initialized
+2013-09-03 19:13:35,945 [  node-5] Node successfully initialized
+2013-09-03 19:13:40,297 [driver-1] driver process id: 1272
+2013-09-03 19:13:40,968 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:41,175 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:41,208 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:41,212 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:41,216 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:41,232 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:41,236 [driver-1] Acceptor initialized
+2013-09-03 19:13:41,236 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:41,236 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:41,236 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:41,826 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,826 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,827 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,827 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:41,868 [  node-1] Reconnected to the class server
+2013-09-03 19:13:41,868 [  node-10] Reconnected to the class server
+2013-09-03 19:13:41,869 [  node-5] Reconnected to the class server
+2013-09-03 19:13:41,869 [  node-7] Reconnected to the class server
+2013-09-03 19:13:41,870 [  node-2] Reconnected to the class server
+2013-09-03 19:13:41,870 [  node-6] Reconnected to the class server
+2013-09-03 19:13:41,871 [  node-4] Reconnected to the class server
+2013-09-03 19:13:41,871 [  node-8] Reconnected to the class server
+2013-09-03 19:13:41,872 [  node-3] Reconnected to the class server
+2013-09-03 19:13:41,874 [  node-9] Reconnected to the class server
+2013-09-03 19:13:42,406 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:42,460 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:42,487 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:42,499 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,499 [  node-7] Reconnected to the node server
+2013-09-03 19:13:42,507 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:42,535 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:42,537 [  node-7] Node successfully initialized
+2013-09-03 19:13:42,557 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,558 [  node-4] Reconnected to the node server
+2013-09-03 19:13:42,566 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:42,607 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,607 [  node-6] Reconnected to the node server
+2013-09-03 19:13:42,609 [  node-4] Node successfully initialized
+2013-09-03 19:13:42,610 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:42,619 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:42,625 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:42,629 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:42,640 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,640 [  node-10] Reconnected to the node server
+2013-09-03 19:13:42,677 [  node-6] Node successfully initialized
+2013-09-03 19:13:42,683 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,683 [  node-5] Reconnected to the node server
+2013-09-03 19:13:42,698 [  node-10] Node successfully initialized
+2013-09-03 19:13:42,731 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,732 [  node-2] Reconnected to the node server
+2013-09-03 19:13:42,750 [  node-5] Node successfully initialized
+2013-09-03 19:13:42,791 [  node-2] Node successfully initialized
+2013-09-03 19:13:42,795 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,795 [  node-8] Reconnected to the node server
+2013-09-03 19:13:42,805 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,806 [  node-9] Reconnected to the node server
+2013-09-03 19:13:42,814 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,815 [  node-1] Reconnected to the node server
+2013-09-03 19:13:42,840 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:42,841 [  node-3] Reconnected to the node server
+2013-09-03 19:13:42,864 [  node-8] Node successfully initialized
+2013-09-03 19:13:42,878 [  node-9] Node successfully initialized
+2013-09-03 19:13:42,881 [  node-1] Node successfully initialized
+2013-09-03 19:13:42,892 [  node-3] Node successfully initialized
+2013-09-03 19:13:47,308 [driver-1] driver process id: 1496
+2013-09-03 19:13:47,985 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:48,181 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:48,216 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:48,220 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:48,224 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:48,240 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:48,244 [driver-1] Acceptor initialized
+2013-09-03 19:13:48,244 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:48,244 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:48,244 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:48,882 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,882 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,882 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,882 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,882 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,882 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,882 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,883 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,883 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,883 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:48,893 [  node-2] Reconnected to the class server
+2013-09-03 19:13:48,895 [  node-5] Reconnected to the class server
+2013-09-03 19:13:48,897 [  node-9] Reconnected to the class server
+2013-09-03 19:13:48,898 [  node-3] Reconnected to the class server
+2013-09-03 19:13:48,898 [  node-4] Reconnected to the class server
+2013-09-03 19:13:48,899 [  node-10] Reconnected to the class server
+2013-09-03 19:13:48,899 [  node-7] Reconnected to the class server
+2013-09-03 19:13:48,901 [  node-8] Reconnected to the class server
+2013-09-03 19:13:48,901 [  node-1] Reconnected to the class server
+2013-09-03 19:13:48,903 [  node-6] Reconnected to the class server
+2013-09-03 19:13:49,351 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:49,388 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:49,454 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,455 [  node-2] Reconnected to the node server
+2013-09-03 19:13:49,463 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:49,483 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,483 [  node-4] Reconnected to the node server
+2013-09-03 19:13:49,489 [  node-2] Node successfully initialized
+2013-09-03 19:13:49,498 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:49,517 [  node-4] Node successfully initialized
+2013-09-03 19:13:49,548 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:49,560 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,561 [  node-9] Reconnected to the node server
+2013-09-03 19:13:49,581 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:49,606 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:49,612 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,612 [  node-10] Reconnected to the node server
+2013-09-03 19:13:49,613 [  node-9] Node successfully initialized
+2013-09-03 19:13:49,624 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:49,625 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:49,635 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:49,682 [  node-10] Node successfully initialized
+2013-09-03 19:13:49,726 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,727 [  node-5] Reconnected to the node server
+2013-09-03 19:13:49,748 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,748 [  node-1] Reconnected to the node server
+2013-09-03 19:13:49,795 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,796 [  node-3] Reconnected to the node server
+2013-09-03 19:13:49,796 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,797 [  node-6] Reconnected to the node server
+2013-09-03 19:13:49,798 [  node-5] Node successfully initialized
+2013-09-03 19:13:49,804 [  node-1] Node successfully initialized
+2013-09-03 19:13:49,806 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,807 [  node-8] Reconnected to the node server
+2013-09-03 19:13:49,822 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:49,822 [  node-7] Reconnected to the node server
+2013-09-03 19:13:49,858 [  node-3] Node successfully initialized
+2013-09-03 19:13:49,864 [  node-6] Node successfully initialized
+2013-09-03 19:13:49,874 [  node-8] Node successfully initialized
+2013-09-03 19:13:49,876 [  node-7] Node successfully initialized
+2013-09-03 19:13:54,336 [driver-1] driver process id: 4900
+2013-09-03 19:13:55,008 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:13:55,214 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:13:55,248 [driver-1] ClientClassServer initialized
+2013-09-03 19:13:55,251 [driver-1] NodeClassServer initialized
+2013-09-03 19:13:55,255 [driver-1] ClientJobServer initialized
+2013-09-03 19:13:55,271 [driver-1] NodeJobServer initialized
+2013-09-03 19:13:55,275 [driver-1] Acceptor initialized
+2013-09-03 19:13:55,275 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:13:55,275 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:13:55,275 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:13:55,915 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,915 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,915 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,915 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,915 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,915 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,915 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,916 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,916 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,916 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:13:55,929 [  node-6] Reconnected to the class server
+2013-09-03 19:13:55,930 [  node-1] Reconnected to the class server
+2013-09-03 19:13:55,930 [  node-9] Reconnected to the class server
+2013-09-03 19:13:55,932 [  node-4] Reconnected to the class server
+2013-09-03 19:13:55,932 [  node-2] Reconnected to the class server
+2013-09-03 19:13:55,932 [  node-10] Reconnected to the class server
+2013-09-03 19:13:55,933 [  node-3] Reconnected to the class server
+2013-09-03 19:13:55,933 [  node-5] Reconnected to the class server
+2013-09-03 19:13:55,933 [  node-7] Reconnected to the class server
+2013-09-03 19:13:55,935 [  node-8] Reconnected to the class server
+2013-09-03 19:13:56,420 [  node-4] JPPF Node management initialized
+2013-09-03 19:13:56,425 [  node-9] JPPF Node management initialized
+2013-09-03 19:13:56,520 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,520 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,520 [  node-4] Reconnected to the node server
+2013-09-03 19:13:56,520 [  node-9] Reconnected to the node server
+2013-09-03 19:13:56,541 [  node-2] JPPF Node management initialized
+2013-09-03 19:13:56,551 [  node-6] JPPF Node management initialized
+2013-09-03 19:13:56,554 [  node-9] Node successfully initialized
+2013-09-03 19:13:56,555 [  node-4] Node successfully initialized
+2013-09-03 19:13:56,595 [  node-1] JPPF Node management initialized
+2013-09-03 19:13:56,611 [  node-10] JPPF Node management initialized
+2013-09-03 19:13:56,654 [  node-3] JPPF Node management initialized
+2013-09-03 19:13:56,655 [  node-8] JPPF Node management initialized
+2013-09-03 19:13:56,658 [  node-5] JPPF Node management initialized
+2013-09-03 19:13:56,665 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,665 [  node-2] Reconnected to the node server
+2013-09-03 19:13:56,675 [  node-7] JPPF Node management initialized
+2013-09-03 19:13:56,687 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,688 [  node-6] Reconnected to the node server
+2013-09-03 19:13:56,744 [  node-2] Node successfully initialized
+2013-09-03 19:13:56,764 [  node-6] Node successfully initialized
+2013-09-03 19:13:56,765 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,765 [  node-1] Reconnected to the node server
+2013-09-03 19:13:56,779 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,779 [  node-10] Reconnected to the node server
+2013-09-03 19:13:56,825 [  node-10] Node successfully initialized
+2013-09-03 19:13:56,825 [  node-1] Node successfully initialized
+2013-09-03 19:13:56,843 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,844 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,844 [  node-5] Reconnected to the node server
+2013-09-03 19:13:56,844 [  node-3] Reconnected to the node server
+2013-09-03 19:13:56,847 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,847 [  node-8] Reconnected to the node server
+2013-09-03 19:13:56,879 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:13:56,879 [  node-7] Reconnected to the node server
+2013-09-03 19:13:56,900 [  node-8] Node successfully initialized
+2013-09-03 19:13:56,908 [  node-5] Node successfully initialized
+2013-09-03 19:13:56,908 [  node-3] Node successfully initialized
+2013-09-03 19:13:56,936 [  node-7] Node successfully initialized
+2013-09-03 19:14:01,353 [driver-1] driver process id: 2620
+2013-09-03 19:14:02,038 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:02,251 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:02,286 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:02,289 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:02,293 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:02,309 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:02,313 [driver-1] Acceptor initialized
+2013-09-03 19:14:02,313 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:02,313 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:02,314 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:02,932 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,932 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,932 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,932 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,932 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,932 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,932 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,933 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,933 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,933 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:02,942 [  node-4] Reconnected to the class server
+2013-09-03 19:14:02,942 [  node-10] Reconnected to the class server
+2013-09-03 19:14:02,949 [  node-5] Reconnected to the class server
+2013-09-03 19:14:02,949 [  node-6] Reconnected to the class server
+2013-09-03 19:14:02,949 [  node-8] Reconnected to the class server
+2013-09-03 19:14:02,950 [  node-7] Reconnected to the class server
+2013-09-03 19:14:02,950 [  node-9] Reconnected to the class server
+2013-09-03 19:14:02,951 [  node-3] Reconnected to the class server
+2013-09-03 19:14:02,952 [  node-2] Reconnected to the class server
+2013-09-03 19:14:02,954 [  node-1] Reconnected to the class server
+2013-09-03 19:14:03,376 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:03,441 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:03,470 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,471 [  node-9] Reconnected to the node server
+2013-09-03 19:14:03,482 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:03,503 [  node-9] Node successfully initialized
+2013-09-03 19:14:03,528 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,528 [  node-4] Reconnected to the node server
+2013-09-03 19:14:03,562 [  node-4] Node successfully initialized
+2013-09-03 19:14:03,564 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:03,571 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,571 [  node-3] Reconnected to the node server
+2013-09-03 19:14:03,594 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:03,607 [  node-3] Node successfully initialized
+2013-09-03 19:14:03,620 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:03,663 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:03,670 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:03,676 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:03,680 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:03,696 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,697 [  node-7] Reconnected to the node server
+2013-09-03 19:14:03,750 [  node-7] Node successfully initialized
+2013-09-03 19:14:03,752 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,752 [  node-5] Reconnected to the node server
+2013-09-03 19:14:03,778 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,779 [  node-8] Reconnected to the node server
+2013-09-03 19:14:03,807 [  node-5] Node successfully initialized
+2013-09-03 19:14:03,822 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,822 [  node-10] Reconnected to the node server
+2013-09-03 19:14:03,832 [  node-8] Node successfully initialized
+2013-09-03 19:14:03,833 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,834 [  node-2] Reconnected to the node server
+2013-09-03 19:14:03,834 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,834 [  node-6] Reconnected to the node server
+2013-09-03 19:14:03,845 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:03,846 [  node-1] Reconnected to the node server
+2013-09-03 19:14:03,881 [  node-10] Node successfully initialized
+2013-09-03 19:14:03,888 [  node-2] Node successfully initialized
+2013-09-03 19:14:03,890 [  node-6] Node successfully initialized
+2013-09-03 19:14:03,898 [  node-1] Node successfully initialized
+2013-09-03 19:14:08,365 [driver-1] driver process id: 5584
+2013-09-03 19:14:09,060 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:09,251 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:09,285 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:09,288 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:09,293 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:09,309 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:09,313 [driver-1] Acceptor initialized
+2013-09-03 19:14:09,313 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:09,313 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:09,313 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:09,944 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,944 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,944 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,945 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,945 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,945 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,945 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,945 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,946 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,946 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:09,958 [  node-10] Reconnected to the class server
+2013-09-03 19:14:09,958 [  node-9] Reconnected to the class server
+2013-09-03 19:14:09,959 [  node-1] Reconnected to the class server
+2013-09-03 19:14:09,959 [  node-3] Reconnected to the class server
+2013-09-03 19:14:09,961 [  node-4] Reconnected to the class server
+2013-09-03 19:14:09,961 [  node-5] Reconnected to the class server
+2013-09-03 19:14:09,964 [  node-6] Reconnected to the class server
+2013-09-03 19:14:09,964 [  node-7] Reconnected to the class server
+2013-09-03 19:14:09,964 [  node-8] Reconnected to the class server
+2013-09-03 19:14:09,966 [  node-2] Reconnected to the class server
+2013-09-03 19:14:10,448 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:10,453 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:10,511 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:10,544 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,544 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,544 [  node-1] Reconnected to the node server
+2013-09-03 19:14:10,545 [  node-8] Reconnected to the node server
+2013-09-03 19:14:10,563 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:10,579 [  node-8] Node successfully initialized
+2013-09-03 19:14:10,580 [  node-1] Node successfully initialized
+2013-09-03 19:14:10,600 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,600 [  node-7] Reconnected to the node server
+2013-09-03 19:14:10,604 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:10,639 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:10,647 [  node-7] Node successfully initialized
+2013-09-03 19:14:10,657 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:10,661 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:10,664 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:10,664 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:10,677 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,677 [  node-5] Reconnected to the node server
+2013-09-03 19:14:10,755 [  node-5] Node successfully initialized
+2013-09-03 19:14:10,776 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,776 [  node-10] Reconnected to the node server
+2013-09-03 19:14:10,815 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,815 [  node-3] Reconnected to the node server
+2013-09-03 19:14:10,843 [  node-10] Node successfully initialized
+2013-09-03 19:14:10,860 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,861 [  node-6] Reconnected to the node server
+2013-09-03 19:14:10,861 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,862 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,862 [  node-2] Reconnected to the node server
+2013-09-03 19:14:10,862 [  node-4] Reconnected to the node server
+2013-09-03 19:14:10,879 [  node-3] Node successfully initialized
+2013-09-03 19:14:10,880 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:10,880 [  node-9] Reconnected to the node server
+2013-09-03 19:14:10,916 [  node-6] Node successfully initialized
+2013-09-03 19:14:10,922 [  node-2] Node successfully initialized
+2013-09-03 19:14:10,922 [  node-4] Node successfully initialized
+2013-09-03 19:14:10,930 [  node-9] Node successfully initialized
+2013-09-03 19:14:15,388 [driver-1] driver process id: 4812
+2013-09-03 19:14:16,065 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:16,276 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:16,310 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:16,314 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:16,318 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:16,334 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:16,338 [driver-1] Acceptor initialized
+2013-09-03 19:14:16,338 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:16,338 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:16,338 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:16,959 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,959 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,960 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,960 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:16,971 [  node-9] Reconnected to the class server
+2013-09-03 19:14:16,971 [  node-3] Reconnected to the class server
+2013-09-03 19:14:16,971 [  node-8] Reconnected to the class server
+2013-09-03 19:14:16,974 [  node-5] Reconnected to the class server
+2013-09-03 19:14:16,974 [  node-7] Reconnected to the class server
+2013-09-03 19:14:16,976 [  node-6] Reconnected to the class server
+2013-09-03 19:14:16,977 [  node-2] Reconnected to the class server
+2013-09-03 19:14:16,977 [  node-1] Reconnected to the class server
+2013-09-03 19:14:16,979 [  node-4] Reconnected to the class server
+2013-09-03 19:14:16,979 [  node-10] Reconnected to the class server
+2013-09-03 19:14:17,409 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:17,481 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:17,497 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,497 [  node-3] Reconnected to the node server
+2013-09-03 19:14:17,525 [  node-3] Node successfully initialized
+2013-09-03 19:14:17,547 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:17,558 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,559 [  node-9] Reconnected to the node server
+2013-09-03 19:14:17,563 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:17,591 [  node-9] Node successfully initialized
+2013-09-03 19:14:17,607 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:17,624 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:17,636 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:17,655 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,655 [  node-1] Reconnected to the node server
+2013-09-03 19:14:17,668 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:17,673 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:17,682 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:17,690 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,690 [  node-8] Reconnected to the node server
+2013-09-03 19:14:17,733 [  node-1] Node successfully initialized
+2013-09-03 19:14:17,753 [  node-8] Node successfully initialized
+2013-09-03 19:14:17,774 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,774 [  node-7] Reconnected to the node server
+2013-09-03 19:14:17,791 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,792 [  node-2] Reconnected to the node server
+2013-09-03 19:14:17,809 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,809 [  node-5] Reconnected to the node server
+2013-09-03 19:14:17,830 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,830 [  node-6] Reconnected to the node server
+2013-09-03 19:14:17,840 [  node-2] Node successfully initialized
+2013-09-03 19:14:17,841 [  node-7] Node successfully initialized
+2013-09-03 19:14:17,850 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,851 [  node-10] Reconnected to the node server
+2013-09-03 19:14:17,860 [  node-5] Node successfully initialized
+2013-09-03 19:14:17,867 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:17,868 [  node-4] Reconnected to the node server
+2013-09-03 19:14:17,887 [  node-6] Node successfully initialized
+2013-09-03 19:14:17,909 [  node-10] Node successfully initialized
+2013-09-03 19:14:17,919 [  node-4] Node successfully initialized
+2013-09-03 19:14:22,759 [driver-1] driver process id: 5824
+2013-09-03 19:14:23,408 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:23,601 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:23,635 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:23,638 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:23,643 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:23,658 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:23,662 [driver-1] Acceptor initialized
+2013-09-03 19:14:23,662 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:23,662 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:23,663 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:24,292 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,292 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,292 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,292 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,292 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,292 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,293 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,293 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,293 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,293 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:24,311 [  node-6] Reconnected to the class server
+2013-09-03 19:14:24,312 [  node-1] Reconnected to the class server
+2013-09-03 19:14:24,313 [  node-9] Reconnected to the class server
+2013-09-03 19:14:24,313 [  node-2] Reconnected to the class server
+2013-09-03 19:14:24,314 [  node-10] Reconnected to the class server
+2013-09-03 19:14:24,315 [  node-7] Reconnected to the class server
+2013-09-03 19:14:24,315 [  node-4] Reconnected to the class server
+2013-09-03 19:14:24,315 [  node-3] Reconnected to the class server
+2013-09-03 19:14:24,316 [  node-8] Reconnected to the class server
+2013-09-03 19:14:24,316 [  node-5] Reconnected to the class server
+2013-09-03 19:14:24,741 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:24,819 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:24,835 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:24,835 [  node-10] Reconnected to the node server
+2013-09-03 19:14:24,864 [  node-10] Node successfully initialized
+2013-09-03 19:14:24,881 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:24,902 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:24,902 [  node-9] Reconnected to the node server
+2013-09-03 19:14:24,922 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:24,935 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:24,937 [  node-9] Node successfully initialized
+2013-09-03 19:14:24,984 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:24,985 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:24,990 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:24,990 [  node-6] Reconnected to the node server
+2013-09-03 19:14:25,026 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:25,041 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:25,046 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:25,053 [  node-6] Node successfully initialized
+2013-09-03 19:14:25,086 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,087 [  node-2] Reconnected to the node server
+2013-09-03 19:14:25,099 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,100 [  node-8] Reconnected to the node server
+2013-09-03 19:14:25,149 [  node-2] Node successfully initialized
+2013-09-03 19:14:25,153 [  node-8] Node successfully initialized
+2013-09-03 19:14:25,154 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,154 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,155 [  node-4] Reconnected to the node server
+2013-09-03 19:14:25,155 [  node-3] Reconnected to the node server
+2013-09-03 19:14:25,209 [  node-3] Node successfully initialized
+2013-09-03 19:14:25,211 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,212 [  node-5] Reconnected to the node server
+2013-09-03 19:14:25,229 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,230 [  node-7] Reconnected to the node server
+2013-09-03 19:14:25,233 [  node-4] Node successfully initialized
+2013-09-03 19:14:25,248 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:25,248 [  node-1] Reconnected to the node server
+2013-09-03 19:14:25,285 [  node-7] Node successfully initialized
+2013-09-03 19:14:25,285 [  node-5] Node successfully initialized
+2013-09-03 19:14:25,301 [  node-1] Node successfully initialized
+2013-09-03 19:14:29,718 [driver-1] driver process id: 4892
+2013-09-03 19:14:30,371 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:30,563 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:30,598 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:30,601 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:30,606 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:30,622 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:30,626 [driver-1] Acceptor initialized
+2013-09-03 19:14:30,626 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:30,626 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:30,626 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:31,262 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,262 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,263 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,263 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:31,276 [  node-3] Reconnected to the class server
+2013-09-03 19:14:31,276 [  node-9] Reconnected to the class server
+2013-09-03 19:14:31,278 [  node-8] Reconnected to the class server
+2013-09-03 19:14:31,278 [  node-10] Reconnected to the class server
+2013-09-03 19:14:31,279 [  node-1] Reconnected to the class server
+2013-09-03 19:14:31,279 [  node-4] Reconnected to the class server
+2013-09-03 19:14:31,279 [  node-6] Reconnected to the class server
+2013-09-03 19:14:31,280 [  node-2] Reconnected to the class server
+2013-09-03 19:14:31,281 [  node-7] Reconnected to the class server
+2013-09-03 19:14:31,281 [  node-5] Reconnected to the class server
+2013-09-03 19:14:31,693 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:31,786 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:31,787 [  node-3] Reconnected to the node server
+2013-09-03 19:14:31,795 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:31,818 [  node-3] Node successfully initialized
+2013-09-03 19:14:31,825 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:31,869 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:31,876 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:31,877 [  node-7] Reconnected to the node server
+2013-09-03 19:14:31,892 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:31,914 [  node-7] Node successfully initialized
+2013-09-03 19:14:31,925 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:31,927 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:31,928 [  node-9] Reconnected to the node server
+2013-09-03 19:14:31,946 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:31,975 [  node-9] Node successfully initialized
+2013-09-03 19:14:31,984 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:31,987 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:31,992 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:31,993 [  node-1] Reconnected to the node server
+2013-09-03 19:14:31,996 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:32,040 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:32,040 [  node-10] Reconnected to the node server
+2013-09-03 19:14:32,052 [  node-1] Node successfully initialized
+2013-09-03 19:14:32,098 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:32,099 [  node-6] Reconnected to the node server
+2013-09-03 19:14:32,103 [  node-10] Node successfully initialized
+2013-09-03 19:14:32,115 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:32,115 [  node-8] Reconnected to the node server
+2013-09-03 19:14:32,148 [  node-6] Node successfully initialized
+2013-09-03 19:14:32,155 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:32,155 [  node-4] Reconnected to the node server
+2013-09-03 19:14:32,159 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:32,160 [  node-5] Reconnected to the node server
+2013-09-03 19:14:32,167 [  node-8] Node successfully initialized
+2013-09-03 19:14:32,170 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:32,170 [  node-2] Reconnected to the node server
+2013-09-03 19:14:32,202 [  node-4] Node successfully initialized
+2013-09-03 19:14:32,216 [  node-5] Node successfully initialized
+2013-09-03 19:14:32,225 [  node-2] Node successfully initialized
+2013-09-03 19:14:36,739 [driver-1] driver process id: 1048
+2013-09-03 19:14:37,421 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:37,623 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:37,656 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:37,660 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:37,664 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:37,680 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:37,684 [driver-1] Acceptor initialized
+2013-09-03 19:14:37,684 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:37,684 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:37,684 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:38,263 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,263 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,264 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,265 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:38,306 [  node-9] Reconnected to the class server
+2013-09-03 19:14:38,306 [  node-3] Reconnected to the class server
+2013-09-03 19:14:38,307 [  node-6] Reconnected to the class server
+2013-09-03 19:14:38,307 [  node-5] Reconnected to the class server
+2013-09-03 19:14:38,307 [  node-10] Reconnected to the class server
+2013-09-03 19:14:38,307 [  node-7] Reconnected to the class server
+2013-09-03 19:14:38,308 [  node-4] Reconnected to the class server
+2013-09-03 19:14:38,309 [  node-8] Reconnected to the class server
+2013-09-03 19:14:38,311 [  node-2] Reconnected to the class server
+2013-09-03 19:14:38,312 [  node-1] Reconnected to the class server
+2013-09-03 19:14:38,815 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:38,831 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:38,870 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:38,916 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:38,917 [  node-4] Reconnected to the node server
+2013-09-03 19:14:38,920 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:38,921 [  node-8] Reconnected to the node server
+2013-09-03 19:14:38,944 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:38,949 [  node-4] Node successfully initialized
+2013-09-03 19:14:38,952 [  node-8] Node successfully initialized
+2013-09-03 19:14:38,960 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:38,961 [  node-7] Reconnected to the node server
+2013-09-03 19:14:38,962 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:38,992 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:39,004 [  node-7] Node successfully initialized
+2013-09-03 19:14:39,018 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:39,041 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:39,044 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:39,059 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:39,077 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,078 [  node-10] Reconnected to the node server
+2013-09-03 19:14:39,123 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,123 [  node-9] Reconnected to the node server
+2013-09-03 19:14:39,141 [  node-10] Node successfully initialized
+2013-09-03 19:14:39,178 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,178 [  node-2] Reconnected to the node server
+2013-09-03 19:14:39,184 [  node-9] Node successfully initialized
+2013-09-03 19:14:39,189 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,190 [  node-6] Reconnected to the node server
+2013-09-03 19:14:39,225 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,226 [  node-3] Reconnected to the node server
+2013-09-03 19:14:39,229 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,229 [  node-1] Reconnected to the node server
+2013-09-03 19:14:39,241 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:39,241 [  node-5] Reconnected to the node server
+2013-09-03 19:14:39,249 [  node-2] Node successfully initialized
+2013-09-03 19:14:39,254 [  node-6] Node successfully initialized
+2013-09-03 19:14:39,276 [  node-3] Node successfully initialized
+2013-09-03 19:14:39,284 [  node-1] Node successfully initialized
+2013-09-03 19:14:39,294 [  node-5] Node successfully initialized
+2013-09-03 19:14:43,766 [driver-1] driver process id: 4968
+2013-09-03 19:14:44,448 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:44,657 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:44,691 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:44,695 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:44,699 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:44,715 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:44,719 [driver-1] Acceptor initialized
+2013-09-03 19:14:44,719 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:44,719 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:44,719 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:45,351 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,351 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,351 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,351 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,351 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,351 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,351 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,352 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,352 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,352 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:45,362 [  node-2] Reconnected to the class server
+2013-09-03 19:14:45,363 [  node-4] Reconnected to the class server
+2013-09-03 19:14:45,363 [  node-10] Reconnected to the class server
+2013-09-03 19:14:45,364 [  node-7] Reconnected to the class server
+2013-09-03 19:14:45,366 [  node-1] Reconnected to the class server
+2013-09-03 19:14:45,370 [  node-8] Reconnected to the class server
+2013-09-03 19:14:45,370 [  node-3] Reconnected to the class server
+2013-09-03 19:14:45,370 [  node-6] Reconnected to the class server
+2013-09-03 19:14:45,370 [  node-9] Reconnected to the class server
+2013-09-03 19:14:45,372 [  node-5] Reconnected to the class server
+2013-09-03 19:14:45,801 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:45,869 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:45,889 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:45,890 [  node-6] Reconnected to the node server
+2013-09-03 19:14:45,915 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:45,923 [  node-6] Node successfully initialized
+2013-09-03 19:14:45,952 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:45,953 [  node-10] Reconnected to the node server
+2013-09-03 19:14:45,959 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:45,983 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:45,983 [  node-10] Node successfully initialized
+2013-09-03 19:14:46,002 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,003 [  node-9] Reconnected to the node server
+2013-09-03 19:14:46,020 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:46,040 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:46,048 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:46,054 [  node-9] Node successfully initialized
+2013-09-03 19:14:46,070 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:46,070 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:46,076 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,077 [  node-2] Reconnected to the node server
+2013-09-03 19:14:46,132 [  node-2] Node successfully initialized
+2013-09-03 19:14:46,133 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,134 [  node-1] Reconnected to the node server
+2013-09-03 19:14:46,194 [  node-1] Node successfully initialized
+2013-09-03 19:14:46,195 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,196 [  node-8] Reconnected to the node server
+2013-09-03 19:14:46,208 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,209 [  node-3] Reconnected to the node server
+2013-09-03 19:14:46,236 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,236 [  node-4] Reconnected to the node server
+2013-09-03 19:14:46,248 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,248 [  node-7] Reconnected to the node server
+2013-09-03 19:14:46,256 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:46,256 [  node-5] Reconnected to the node server
+2013-09-03 19:14:46,263 [  node-8] Node successfully initialized
+2013-09-03 19:14:46,273 [  node-3] Node successfully initialized
+2013-09-03 19:14:46,291 [  node-4] Node successfully initialized
+2013-09-03 19:14:46,301 [  node-7] Node successfully initialized
+2013-09-03 19:14:46,304 [  node-5] Node successfully initialized
+2013-09-03 19:14:50,939 [driver-1] driver process id: 616
+2013-09-03 19:14:51,716 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:14:51,907 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:14:51,942 [driver-1] ClientClassServer initialized
+2013-09-03 19:14:51,945 [driver-1] NodeClassServer initialized
+2013-09-03 19:14:51,950 [driver-1] ClientJobServer initialized
+2013-09-03 19:14:51,965 [driver-1] NodeJobServer initialized
+2013-09-03 19:14:51,969 [driver-1] Acceptor initialized
+2013-09-03 19:14:51,969 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:14:51,969 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:14:51,970 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:14:52,608 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,608 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,609 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,609 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:14:52,620 [  node-4] Reconnected to the class server
+2013-09-03 19:14:52,623 [  node-3] Reconnected to the class server
+2013-09-03 19:14:52,623 [  node-7] Reconnected to the class server
+2013-09-03 19:14:52,625 [  node-10] Reconnected to the class server
+2013-09-03 19:14:52,625 [  node-9] Reconnected to the class server
+2013-09-03 19:14:52,627 [  node-2] Reconnected to the class server
+2013-09-03 19:14:52,627 [  node-1] Reconnected to the class server
+2013-09-03 19:14:52,628 [  node-6] Reconnected to the class server
+2013-09-03 19:14:52,628 [  node-5] Reconnected to the class server
+2013-09-03 19:14:52,628 [  node-8] Reconnected to the class server
+2013-09-03 19:14:53,068 [  node-2] JPPF Node management initialized
+2013-09-03 19:14:53,127 [  node-6] JPPF Node management initialized
+2013-09-03 19:14:53,163 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,164 [  node-2] Reconnected to the node server
+2013-09-03 19:14:53,193 [  node-2] Node successfully initialized
+2013-09-03 19:14:53,196 [  node-3] JPPF Node management initialized
+2013-09-03 19:14:53,209 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,209 [  node-6] Reconnected to the node server
+2013-09-03 19:14:53,230 [  node-10] JPPF Node management initialized
+2013-09-03 19:14:53,240 [  node-6] Node successfully initialized
+2013-09-03 19:14:53,253 [  node-8] JPPF Node management initialized
+2013-09-03 19:14:53,285 [  node-1] JPPF Node management initialized
+2013-09-03 19:14:53,302 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,303 [  node-3] Reconnected to the node server
+2013-09-03 19:14:53,305 [  node-5] JPPF Node management initialized
+2013-09-03 19:14:53,326 [  node-4] JPPF Node management initialized
+2013-09-03 19:14:53,335 [  node-7] JPPF Node management initialized
+2013-09-03 19:14:53,342 [  node-9] JPPF Node management initialized
+2013-09-03 19:14:53,365 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,366 [  node-10] Reconnected to the node server
+2013-09-03 19:14:53,373 [  node-3] Node successfully initialized
+2013-09-03 19:14:53,419 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,420 [  node-8] Reconnected to the node server
+2013-09-03 19:14:53,429 [  node-10] Node successfully initialized
+2013-09-03 19:14:53,469 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,470 [  node-1] Reconnected to the node server
+2013-09-03 19:14:53,482 [  node-8] Node successfully initialized
+2013-09-03 19:14:53,484 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,485 [  node-5] Reconnected to the node server
+2013-09-03 19:14:53,504 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,504 [  node-4] Reconnected to the node server
+2013-09-03 19:14:53,515 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,515 [  node-7] Reconnected to the node server
+2013-09-03 19:14:53,529 [  node-1] Node successfully initialized
+2013-09-03 19:14:53,533 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:14:53,534 [  node-9] Reconnected to the node server
+2013-09-03 19:14:53,539 [  node-5] Node successfully initialized
+2013-09-03 19:14:53,553 [  node-4] Node successfully initialized
+2013-09-03 19:14:53,565 [  node-7] Node successfully initialized
+2013-09-03 19:14:53,586 [  node-9] Node successfully initialized
+2013-09-03 19:15:00,804 [driver-1] driver process id: 3096
+2013-09-03 19:15:01,457 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:15:01,656 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:15:01,690 [driver-1] ClientClassServer initialized
+2013-09-03 19:15:01,693 [driver-1] NodeClassServer initialized
+2013-09-03 19:15:01,697 [driver-1] ClientJobServer initialized
+2013-09-03 19:15:01,713 [driver-1] NodeJobServer initialized
+2013-09-03 19:15:01,717 [driver-1] Acceptor initialized
+2013-09-03 19:15:01,717 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:15:01,717 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:15:01,718 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:15:02,343 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,343 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,344 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,344 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:02,358 [  node-6] Reconnected to the class server
+2013-09-03 19:15:02,360 [  node-8] Reconnected to the class server
+2013-09-03 19:15:02,360 [  node-3] Reconnected to the class server
+2013-09-03 19:15:02,361 [  node-10] Reconnected to the class server
+2013-09-03 19:15:02,361 [  node-2] Reconnected to the class server
+2013-09-03 19:15:02,361 [  node-7] Reconnected to the class server
+2013-09-03 19:15:02,361 [  node-4] Reconnected to the class server
+2013-09-03 19:15:02,362 [  node-5] Reconnected to the class server
+2013-09-03 19:15:02,363 [  node-1] Reconnected to the class server
+2013-09-03 19:15:02,364 [  node-9] Reconnected to the class server
+2013-09-03 19:15:02,836 [  node-2] JPPF Node management initialized
+2013-09-03 19:15:02,839 [  node-8] JPPF Node management initialized
+2013-09-03 19:15:02,919 [  node-3] JPPF Node management initialized
+2013-09-03 19:15:02,931 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:02,931 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:02,931 [  node-2] Reconnected to the node server
+2013-09-03 19:15:02,932 [  node-8] Reconnected to the node server
+2013-09-03 19:15:02,964 [  node-8] Node successfully initialized
+2013-09-03 19:15:02,965 [  node-2] Node successfully initialized
+2013-09-03 19:15:02,971 [  node-5] JPPF Node management initialized
+2013-09-03 19:15:02,998 [  node-10] JPPF Node management initialized
+2013-09-03 19:15:03,017 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,017 [  node-3] Reconnected to the node server
+2013-09-03 19:15:03,026 [  node-1] JPPF Node management initialized
+2013-09-03 19:15:03,042 [  node-4] JPPF Node management initialized
+2013-09-03 19:15:03,071 [  node-9] JPPF Node management initialized
+2013-09-03 19:15:03,071 [  node-6] JPPF Node management initialized
+2013-09-03 19:15:03,072 [  node-3] Node successfully initialized
+2013-09-03 19:15:03,076 [  node-7] JPPF Node management initialized
+2013-09-03 19:15:03,085 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,086 [  node-5] Reconnected to the node server
+2013-09-03 19:15:03,143 [  node-5] Node successfully initialized
+2013-09-03 19:15:03,148 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,148 [  node-10] Reconnected to the node server
+2013-09-03 19:15:03,192 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,193 [  node-1] Reconnected to the node server
+2013-09-03 19:15:03,202 [  node-10] Node successfully initialized
+2013-09-03 19:15:03,206 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,206 [  node-4] Reconnected to the node server
+2013-09-03 19:15:03,250 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,251 [  node-9] Reconnected to the node server
+2013-09-03 19:15:03,251 [  node-1] Node successfully initialized
+2013-09-03 19:15:03,255 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,256 [  node-6] Reconnected to the node server
+2013-09-03 19:15:03,264 [  node-4] Node successfully initialized
+2013-09-03 19:15:03,268 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:03,268 [  node-7] Reconnected to the node server
+2013-09-03 19:15:03,308 [  node-6] Node successfully initialized
+2013-09-03 19:15:03,313 [  node-9] Node successfully initialized
+2013-09-03 19:15:03,320 [  node-7] Node successfully initialized
+2013-09-03 19:15:07,826 [driver-1] driver process id: 3768
+2013-09-03 19:15:08,496 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:15:08,701 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:15:08,735 [driver-1] ClientClassServer initialized
+2013-09-03 19:15:08,738 [driver-1] NodeClassServer initialized
+2013-09-03 19:15:08,743 [driver-1] ClientJobServer initialized
+2013-09-03 19:15:08,759 [driver-1] NodeJobServer initialized
+2013-09-03 19:15:08,763 [driver-1] Acceptor initialized
+2013-09-03 19:15:08,763 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:15:08,763 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:15:08,763 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:15:09,382 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,382 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,383 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:09,400 [  node-1] Reconnected to the class server
+2013-09-03 19:15:09,402 [  node-10] Reconnected to the class server
+2013-09-03 19:15:09,402 [  node-7] Reconnected to the class server
+2013-09-03 19:15:09,404 [  node-6] Reconnected to the class server
+2013-09-03 19:15:09,404 [  node-4] Reconnected to the class server
+2013-09-03 19:15:09,404 [  node-3] Reconnected to the class server
+2013-09-03 19:15:09,404 [  node-8] Reconnected to the class server
+2013-09-03 19:15:09,405 [  node-2] Reconnected to the class server
+2013-09-03 19:15:09,405 [  node-5] Reconnected to the class server
+2013-09-03 19:15:09,405 [  node-9] Reconnected to the class server
+2013-09-03 19:15:09,884 [  node-3] JPPF Node management initialized
+2013-09-03 19:15:09,916 [  node-6] JPPF Node management initialized
+2013-09-03 19:15:09,934 [  node-7] JPPF Node management initialized
+2013-09-03 19:15:09,977 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:09,977 [  node-3] Reconnected to the node server
+2013-09-03 19:15:09,996 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:09,997 [  node-6] Reconnected to the node server
+2013-09-03 19:15:10,008 [  node-8] JPPF Node management initialized
+2013-09-03 19:15:10,009 [  node-3] Node successfully initialized
+2013-09-03 19:15:10,019 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,020 [  node-7] Reconnected to the node server
+2013-09-03 19:15:10,030 [  node-1] JPPF Node management initialized
+2013-09-03 19:15:10,033 [  node-6] Node successfully initialized
+2013-09-03 19:15:10,052 [  node-2] JPPF Node management initialized
+2013-09-03 19:15:10,065 [  node-7] Node successfully initialized
+2013-09-03 19:15:10,088 [  node-4] JPPF Node management initialized
+2013-09-03 19:15:10,097 [  node-5] JPPF Node management initialized
+2013-09-03 19:15:10,102 [  node-9] JPPF Node management initialized
+2013-09-03 19:15:10,110 [  node-10] JPPF Node management initialized
+2013-09-03 19:15:10,133 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,134 [  node-8] Reconnected to the node server
+2013-09-03 19:15:10,164 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,164 [  node-1] Reconnected to the node server
+2013-09-03 19:15:10,197 [  node-8] Node successfully initialized
+2013-09-03 19:15:10,209 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,210 [  node-2] Reconnected to the node server
+2013-09-03 19:15:10,221 [  node-1] Node successfully initialized
+2013-09-03 19:15:10,272 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,272 [  node-4] Reconnected to the node server
+2013-09-03 19:15:10,279 [  node-2] Node successfully initialized
+2013-09-03 19:15:10,294 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,294 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,295 [  node-9] Reconnected to the node server
+2013-09-03 19:15:10,295 [  node-5] Reconnected to the node server
+2013-09-03 19:15:10,299 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:10,300 [  node-10] Reconnected to the node server
+2013-09-03 19:15:10,326 [  node-4] Node successfully initialized
+2013-09-03 19:15:10,345 [  node-9] Node successfully initialized
+2013-09-03 19:15:10,347 [  node-5] Node successfully initialized
+2013-09-03 19:15:10,352 [  node-10] Node successfully initialized
+2013-09-03 19:15:14,843 [driver-1] driver process id: 5460
+2013-09-03 19:15:15,518 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:15:15,728 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:15:15,762 [driver-1] ClientClassServer initialized
+2013-09-03 19:15:15,766 [driver-1] NodeClassServer initialized
+2013-09-03 19:15:15,770 [driver-1] ClientJobServer initialized
+2013-09-03 19:15:15,786 [driver-1] NodeJobServer initialized
+2013-09-03 19:15:15,790 [driver-1] Acceptor initialized
+2013-09-03 19:15:15,790 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:15:15,790 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:15:15,790 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:15:16,345 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,345 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,346 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,346 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:16,371 [  node-10] Reconnected to the class server
+2013-09-03 19:15:16,373 [  node-3] Reconnected to the class server
+2013-09-03 19:15:16,373 [  node-4] Reconnected to the class server
+2013-09-03 19:15:16,374 [  node-2] Reconnected to the class server
+2013-09-03 19:15:16,374 [  node-7] Reconnected to the class server
+2013-09-03 19:15:16,374 [  node-5] Reconnected to the class server
+2013-09-03 19:15:16,377 [  node-8] Reconnected to the class server
+2013-09-03 19:15:16,377 [  node-6] Reconnected to the class server
+2013-09-03 19:15:16,381 [  node-9] Reconnected to the class server
+2013-09-03 19:15:16,385 [  node-1] Reconnected to the class server
+2013-09-03 19:15:16,806 [  node-10] JPPF Node management initialized
+2013-09-03 19:15:16,891 [  node-2] JPPF Node management initialized
+2013-09-03 19:15:16,893 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:16,894 [  node-10] Reconnected to the node server
+2013-09-03 19:15:16,923 [  node-10] Node successfully initialized
+2013-09-03 19:15:16,940 [  node-4] JPPF Node management initialized
+2013-09-03 19:15:16,969 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:16,970 [  node-2] Reconnected to the node server
+2013-09-03 19:15:16,977 [  node-9] JPPF Node management initialized
+2013-09-03 19:15:17,002 [  node-3] JPPF Node management initialized
+2013-09-03 19:15:17,007 [  node-2] Node successfully initialized
+2013-09-03 19:15:17,035 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,036 [  node-7] JPPF Node management initialized
+2013-09-03 19:15:17,036 [  node-4] Reconnected to the node server
+2013-09-03 19:15:17,069 [  node-8] JPPF Node management initialized
+2013-09-03 19:15:17,083 [  node-6] JPPF Node management initialized
+2013-09-03 19:15:17,086 [  node-5] JPPF Node management initialized
+2013-09-03 19:15:17,090 [  node-1] JPPF Node management initialized
+2013-09-03 19:15:17,091 [  node-4] Node successfully initialized
+2013-09-03 19:15:17,106 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,107 [  node-9] Reconnected to the node server
+2013-09-03 19:15:17,140 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,141 [  node-3] Reconnected to the node server
+2013-09-03 19:15:17,163 [  node-9] Node successfully initialized
+2013-09-03 19:15:17,198 [  node-3] Node successfully initialized
+2013-09-03 19:15:17,200 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,200 [  node-7] Reconnected to the node server
+2013-09-03 19:15:17,233 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,233 [  node-8] Reconnected to the node server
+2013-09-03 19:15:17,254 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,255 [  node-1] Reconnected to the node server
+2013-09-03 19:15:17,257 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,257 [  node-5] Reconnected to the node server
+2013-09-03 19:15:17,259 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:17,259 [  node-6] Reconnected to the node server
+2013-09-03 19:15:17,260 [  node-7] Node successfully initialized
+2013-09-03 19:15:17,285 [  node-8] Node successfully initialized
+2013-09-03 19:15:17,306 [  node-1] Node successfully initialized
+2013-09-03 19:15:17,307 [  node-6] Node successfully initialized
+2013-09-03 19:15:17,312 [  node-5] Node successfully initialized
+2013-09-03 19:15:21,866 [driver-1] driver process id: 3424
+2013-09-03 19:15:22,511 [driver-1] management initialized and listening on port 11201
+2013-09-03 19:15:22,705 [driver-1] secure management initialized and listening on port 12201
+2013-09-03 19:15:22,740 [driver-1] ClientClassServer initialized
+2013-09-03 19:15:22,743 [driver-1] NodeClassServer initialized
+2013-09-03 19:15:22,748 [driver-1] ClientJobServer initialized
+2013-09-03 19:15:22,763 [driver-1] NodeJobServer initialized
+2013-09-03 19:15:22,767 [driver-1] Acceptor initialized
+2013-09-03 19:15:22,767 [driver-1] -  accepting plain connections on port 11101
+2013-09-03 19:15:22,767 [driver-1] - accepting secure connections on port 12001
+2013-09-03 19:15:22,768 [driver-1] JPPF Driver initialization complete
+2013-09-03 19:15:23,366 [  node-4] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-3] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-7] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-10] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-2] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-8] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-9] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,366 [  node-1] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,367 [  node-5] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,367 [  node-6] Attempting connection to the class server at 192.168.1.14:11101
+2013-09-03 19:15:23,388 [  node-3] Reconnected to the class server
+2013-09-03 19:15:23,389 [  node-8] Reconnected to the class server
+2013-09-03 19:15:23,391 [  node-9] Reconnected to the class server
+2013-09-03 19:15:23,391 [  node-1] Reconnected to the class server
+2013-09-03 19:15:23,391 [  node-6] Reconnected to the class server
+2013-09-03 19:15:23,393 [  node-4] Reconnected to the class server
+2013-09-03 19:15:23,393 [  node-10] Reconnected to the class server
+2013-09-03 19:15:23,393 [  node-7] Reconnected to the class server
+2013-09-03 19:15:23,394 [  node-5] Reconnected to the class server
+2013-09-03 19:15:23,396 [  node-2] Reconnected to the class server
+2013-09-03 19:15:23,893 [  node-4] JPPF Node management initialized
+2013-09-03 19:15:23,925 [  node-9] JPPF Node management initialized
+2013-09-03 19:15:23,982 [  node-4] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:23,983 [  node-4] Reconnected to the node server
+2013-09-03 19:15:24,000 [  node-1] JPPF Node management initialized
+2013-09-03 19:15:24,001 [  node-9] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,002 [  node-9] Reconnected to the node server
+2013-09-03 19:15:24,009 [  node-6] JPPF Node management initialized
+2013-09-03 19:15:24,016 [  node-4] Node successfully initialized
+2013-09-03 19:15:24,033 [  node-5] JPPF Node management initialized
+2013-09-03 19:15:24,037 [  node-9] Node successfully initialized
+2013-09-03 19:15:24,067 [  node-7] JPPF Node management initialized
+2013-09-03 19:15:24,088 [  node-10] JPPF Node management initialized
+2013-09-03 19:15:24,114 [  node-1] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,114 [  node-1] Reconnected to the node server
+2013-09-03 19:15:24,121 [  node-2] JPPF Node management initialized
+2013-09-03 19:15:24,123 [  node-8] JPPF Node management initialized
+2013-09-03 19:15:24,128 [  node-3] JPPF Node management initialized
+2013-09-03 19:15:24,129 [  node-6] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,129 [  node-6] Reconnected to the node server
+2013-09-03 19:15:24,170 [  node-1] Node successfully initialized
+2013-09-03 19:15:24,180 [  node-5] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,180 [  node-5] Reconnected to the node server
+2013-09-03 19:15:24,185 [  node-6] Node successfully initialized
+2013-09-03 19:15:24,219 [  node-7] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,220 [  node-7] Reconnected to the node server
+2013-09-03 19:15:24,248 [  node-5] Node successfully initialized
+2013-09-03 19:15:24,281 [  node-10] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,281 [  node-10] Reconnected to the node server
+2013-09-03 19:15:24,286 [  node-7] Node successfully initialized
+2013-09-03 19:15:24,303 [  node-3] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,304 [  node-3] Reconnected to the node server
+2013-09-03 19:15:24,307 [  node-2] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,308 [  node-2] Reconnected to the node server
+2013-09-03 19:15:24,317 [  node-8] Attempting connection to the node server at 192.168.1.14:11101
+2013-09-03 19:15:24,317 [  node-8] Reconnected to the node server
+2013-09-03 19:15:24,338 [  node-10] Node successfully initialized
+2013-09-03 19:15:24,353 [  node-3] Node successfully initialized
+2013-09-03 19:15:24,357 [  node-2] Node successfully initialized
+2013-09-03 19:15:24,368 [  node-8] Node successfully initialized

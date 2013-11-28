@@ -1,0 +1,14 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.2.2
+
+This maintenance release brings important bug fixes, including a critical issue preventing secure connections to the server.
+
+Bugs fixes:
+
+[JPPF-110 Proportional algorithm results in uneven load with small number of long-lived tasks](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-110)
+[JPPF-116 NPE in AbstractJPPFClassLoader.findResources()](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-1116)
+[JPPF-117 Task timeout is not working as expected](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-117)
+*critical* [JPPF-120 (Regression) Impossible to make an SSL connection to the server](http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-120)
+
+JPPF Links: [Web Site](http://www.jppf.org) - [Downloads](http://www.jppf.org/downloads.php) - [Documentation](http://www.jppf.org/wiki) - [User forums](http://www.jppf.org/forums) - [Issue tracker](http://www.jppf.org/tracker/tbg/jppf) - [SF.net project page](http://sourceforge.net/projects/jppf-project/)
