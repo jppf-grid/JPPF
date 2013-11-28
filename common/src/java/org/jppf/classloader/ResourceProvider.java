@@ -141,7 +141,6 @@ public class ResourceProvider
    */
   public byte[] computeCallable(final byte[] serializedCallable)
   {
-    if (debugEnabled) log.debug("before deserialization");
     JPPFCallable callable = null;
     ObjectSerializer ser = new ObjectSerializerImpl();
     Object result = null;
@@ -154,6 +153,7 @@ public class ResourceProvider
     {
       result = (t instanceof Exception) ? t : new JPPFException(t);
     }
+    if (debugEnabled) log.debug("callable result: " + result);
     byte[] bytes = null;
     try
     {
