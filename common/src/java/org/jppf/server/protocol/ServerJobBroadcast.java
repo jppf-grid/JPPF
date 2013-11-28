@@ -22,7 +22,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.protocol.utils.ServerJobStatus;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;

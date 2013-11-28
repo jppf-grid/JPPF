@@ -26,7 +26,6 @@ import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.job.management.NodeJobInformation;
-import org.jppf.server.protocol.utils.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.*;
 

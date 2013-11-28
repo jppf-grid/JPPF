@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.protocol.utils;
+package org.jppf.server.protocol;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,7 +23,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.slf4j.*;
 

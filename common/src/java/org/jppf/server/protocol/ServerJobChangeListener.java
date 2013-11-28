@@ -19,7 +19,6 @@
 package org.jppf.server.protocol;
 
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.server.protocol.utils.AbstractServerJob;
 import org.jppf.server.submission.SubmissionStatus;
 
 /**

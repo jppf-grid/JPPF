@@ -16,8 +16,28 @@
  * limitations under the License.
  */
 
+package org.jppf.server.protocol;
+
 /**
- * Support for the new load-balancing of local versus remote execution on the server side.
- * @exclude
+ * An enumeration of the possible statuses of a job on the server side.
+ * @author Laurent Cohen
  */
-package org.jppf.server.protocol.utils;
+public enum ServerJobStatus
+{
+  /**
+   * Job status is new (just submitted).
+   */
+  NEW,
+  /**
+   * Job status is executing.
+   */
+  EXECUTING,
+  /**
+   * Job status is done/complete.
+   */
+  DONE,
+  /**
+   * Job status is cancelled.
+   */
+  CANCELLED
+}
