@@ -19,19 +19,18 @@
 package org.jppf.jca.cci;
 
 import javax.naming.*;
-import javax.resource.*;
+import javax.resource.ResourceException;
 import javax.resource.cci.*;
 import javax.resource.spi.ConnectionManager;
 
 import org.jppf.jca.spi.*;
-import org.jppf.jca.util.JPPFAccessorImpl;
 
 /**
  * Implementation of the {@link javax.resource.cci.ConnectionFactory ConnectionFactory} interface for
  * the JPPF resource adapter.
  * @author Laurent Cohen
  */
-public class JPPFConnectionFactory extends JPPFAccessorImpl implements ConnectionFactory
+public class JPPFConnectionFactory implements ConnectionFactory
 {
   /**
    * The default managed factory.
@@ -63,7 +62,6 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
   public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager)
   {
     this.factory = factory;
-    if (factory.retrieveJppfClient() == null) assignJppfClient(factory.retrieveJppfClient());
     this.manager = manager;
   }
 
@@ -72,8 +70,6 @@ public class JPPFConnectionFactory extends JPPFAccessorImpl implements Connectio
   {
     JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
     if (conn == null) return null;
-    if (conn.retrieveJppfClient() == null) conn.assignJppfClient(retrieveJppfClient());
-    if (conn.isClosed()) conn.setAvailable();
     return conn;
   }
 

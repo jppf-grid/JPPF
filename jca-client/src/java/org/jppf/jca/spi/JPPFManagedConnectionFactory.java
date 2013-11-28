@@ -37,7 +37,7 @@ import org.slf4j.*;
  * Implementation of the ManagedConnectionFactory interface.
  * @author Laurent Cohen
  */
-public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements ManagedConnectionFactory, ResourceAdapterAssociation
+public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements ManagedConnectionFactory
 {
   /**
    * Explicit serialVersionUID.
@@ -51,10 +51,6 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Handle to the resource adapter.
-   */
-  private transient ResourceAdapter resourceAdapter = null;
   /**
    * Defines how the configuration is to be located.<br>
    * This property is defined in the format "<i>type</i>|<i>path</i>", where <i>type</i> can be one of:<br>
@@ -86,7 +82,6 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   {
     if (debugEnabled) log.debug("creating connection factory with connection manager");
     JPPFConnectionFactory jcf = new JPPFConnectionFactory(this, manager);
-    if (jcf.retrieveJppfClient() == null) jcf.assignJppfClient(jppfClient);
     return jcf;
   }
 
@@ -100,23 +95,10 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   }
 
   @Override
-  public ManagedConnection matchManagedConnections(final Set set, final Subject subject, final ConnectionRequestInfo cri)
-  throws ResourceException
+  public ManagedConnection matchManagedConnections(final Set set, final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
   {
     if (!set.isEmpty()) return (ManagedConnection) set.iterator().next();
     return null;
-  }
-
-  @Override
-  public ResourceAdapter getResourceAdapter()
-  {
-    return resourceAdapter;
-  }
-
-  @Override
-  public void setResourceAdapter(final ResourceAdapter resourceAdapter) throws ResourceException
-  {
-    this.resourceAdapter = resourceAdapter;
   }
 
   @Override
@@ -129,12 +111,6 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   public int hashCode()
   {
     return super.hashCode();
-  }
-
-  @Override
-  public AbstractGenericClient retrieveJppfClient()
-  {
-    return jppfClient;
   }
 
   /**

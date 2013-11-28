@@ -147,6 +147,7 @@ public class JPPFClient extends AbstractGenericClient
 
   /**
    * Reset this client, that is, close it if necessary, reload its configuration, then open it again.
+   * @see #reset(TypedProperties)
    * @since 4.0
    */
   public void reset()
@@ -160,6 +161,7 @@ public class JPPFClient extends AbstractGenericClient
   /**
    * Reset this client, that is, close it if necessary, then open it again, using the specified confguration.
    * @param configuration the configuration to initialize this client with.
+   * @see #reset()
    * @since 4.0
    */
   public void reset(final TypedProperties configuration)

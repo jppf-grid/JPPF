@@ -128,7 +128,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
   public void associateConnection(final Object conn) throws ResourceException
   {
     connection = (JPPFConnection) conn;
-    connection.setManagedConnection(this);
+    ((JPPFConnectionImpl) connection).setManagedConnection(this);
   }
 
   @Override
@@ -144,12 +144,7 @@ public class JPPFManagedConnection extends JPPFAccessorImpl implements ManagedCo
   @Override
   public Object getConnection(final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
   {
-    if (connection == null)
-    {
-      connection = new JPPFConnectionImpl(this);
-      if (connection.retrieveJppfClient() == null) connection.assignJppfClient(retrieveJppfClient());
-    }
-    if (connection.isClosed()) connection.setAvailable();
+    if (connection == null) connection = new JPPFConnectionImpl(this);
     return connection;
   }
 

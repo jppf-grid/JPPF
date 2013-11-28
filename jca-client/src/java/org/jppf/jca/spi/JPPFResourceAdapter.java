@@ -52,6 +52,7 @@ public class JPPFResourceAdapter implements ResourceAdapter, Serializable
   @Override
   public void stop()
   {
+    log.info("Stopping JPPF resource adapter");
   }
 
   /**

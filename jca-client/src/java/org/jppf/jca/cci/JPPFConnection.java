@@ -25,8 +25,6 @@ import javax.resource.cci.Connection;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.SubmissionStatusListener;
 import org.jppf.client.submission.SubmissionStatus;
-import org.jppf.jca.spi.JPPFManagedConnection;
-import org.jppf.jca.util.JPPFAccessor;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
 
@@ -34,7 +32,7 @@ import org.jppf.server.protocol.JPPFTask;
  * Interface for JPPF JCA connections. This interface provides an API to send jobs to a JPPF driver.
  * @author Laurent Cohen
  */
-public interface JPPFConnection extends Connection, JPPFAccessor
+public interface JPPFConnection extends Connection
 {
   /**
    * Submit a job to the JPPF client.<br>
@@ -72,6 +70,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @param submissionId the id of the job submission.
    * @return the results as a list of {@link Task} instances.
    * @throws Exception if any error occurs.
+   * @since 4.0
    */
   List<Task<?>> awaitResults(final String submissionId) throws Exception;
 
@@ -129,6 +128,7 @@ public interface JPPFConnection extends Connection, JPPFAccessor
    * @param submissionId the id of the submission for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
+   * @since 4.0
    */
   List<Task<?>> getResults(final String submissionId) throws Exception;
 
@@ -139,27 +139,9 @@ public interface JPPFConnection extends Connection, JPPFAccessor
   Collection<String> getAllSubmissionIds();
 
   /**
-   * Determine whether this connection has been closed.
-   * @return true if the connection was closed, false otherwise.
-   * @exclude
-   */
-  boolean isClosed();
-
-  /**
-   * Set the closed  state of this connection.
-   * @exclude
-   */
-  void setAvailable();
-
-  /**
-   * Set the associated managed connection.
-   * @param conn a <code>JPPFManagedConnection</code> instance.
-   * @exclude
-   */
-  void setManagedConnection(JPPFManagedConnection conn);
-
-  /**
    * Reset the client and reload its configuration.
+   * @see org.jppf.client.JPPFClient#reset()
+   * @since 4.0
    */
   void resetClient();
 }
