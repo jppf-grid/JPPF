@@ -351,6 +351,9 @@ public class JPPFResourceWrapper implements Serializable
     sb.append("dynamic=").append(dynamic);
     sb.append(", name=").append(getName());
     sb.append(", state=").append(state);
+    sb.append(", multiple=").append(getData("multiple", false));
+    sb.append(", callableID=").append(getCallableID());
+    if (getData("multiple.resources.names") != null) sb.append(", multiple.resources.names=").append(getData("multiple.resources.names"));
     sb.append(']');
     return sb.toString();
   }
