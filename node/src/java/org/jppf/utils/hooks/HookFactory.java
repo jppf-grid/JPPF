@@ -101,8 +101,11 @@ public class HookFactory
    */
   private static <T> void unregister(final Hook<T> hook)
   {
-    hookMap.remove(hook.getInterfaceName());
-    hook.dispose();
+    if (hook != null)
+    {
+      hookMap.remove(hook.getInterfaceName());
+      hook.dispose();
+    }
   }
 
   /**
