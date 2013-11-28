@@ -491,4 +491,19 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public boolean isServerClassLoader() {
     return !dynamic;
   }
+
+  @Override
+  public URL getResource(final String name) {
+    List<URL> urls = resourceCache.getResourcesURLs(name);
+    if (urls == null) return super.getResource(name);
+    else if (urls.isEmpty()) return null;
+    return urls.get(0);
+  }
+
+  @Override
+  public Enumeration<URL> getResources(final String name) throws IOException {
+    List<URL> urls = resourceCache.getResourcesURLs(name);
+    if (urls == null) return super.getResources(name);
+    return new IteratorEnumeration<>(urls.iterator());
+  }
 }
