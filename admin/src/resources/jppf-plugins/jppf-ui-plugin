@@ -1,0 +1,7 @@
+#org/jppf/ui/options/xml/NodeDataPage.xml
+org/jppf/ui/options/xml/TabbedNodeDataPage.xml
+org/jppf/ui/options/xml/JobDataPage.xml
+org/jppf/ui/options/xml/StatsPage.xml
+org/jppf/ui/options/xml/ServerChartsPage.xml
+org/jppf/ui/options/xml/ChartsConfigPage.xml
+org/jppf/ui/options/xml/BundleSizeTuningPage.xml

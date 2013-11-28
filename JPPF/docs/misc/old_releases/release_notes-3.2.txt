@@ -1,0 +1,134 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.2
+
+
+Load balancing in the client:
+
+As for the server with the nodes, the client can now distribute jobs over multiple server channels and the local execution channel.
+This opens up a broad variety of distribution capabilities, including:
+- distribution through connections to multiple servers
+- distribution through multiple connections to the same server
+- distribution to the client-local execution channel
+- any combination of the above
+
+Load-balancing / scheduling is applied in exactly the same way as within the server, with the same APIs and configuration properties and the ability to implement custom class loaders.
+
+
+Client-side SLA:
+
+All jobs now have a distinct <a href="/doc/v3/index.php?title=Job_Service_Level_Agreement">service level agreement</a> for the client-side dispatching of their tasks. This  provides the ability for each job to specifiy:
+- a start and expiration schedule on the client side
+- an execution policy to determine through which channels a job can be dispatched (channel filtering)
+- the maximum number of channels to dispatch to
+- as a result, the ability to specifiy local vs. remote execution on a per job basis
+
+
+Executor services enhancements:
+
+- a data provider</a> can now be sent along with the jobs
+- ability to register a listener to receive notfications of each job's execution status
+- a <a href="/doc/v3/index.php?title=JPPF_Executor_Services#JPPFCompletionService">JPPF-specific CompletionListener</a> is now available
+
+
+Class loading improvements:
+
+- Parallel class loading requests from the same node are now batched and sent together to the server, providing a sigificant speed-up of the nodes performance
+- Nodes maintain a cache of classes and resources not found in the remote classpath, avoiding costly network requests and improving class loading performance overall
+- Local cache of resources found in remote classpaths can now be switched from file system to memory storage with automatic fallback strategy.
+	This addresses environments where disk space available to the node is minimal or inexistant.
+
+
+New JPPF task APIs:
+
+Two very useful methods were added to JPPFTask:
+- isInNode() determines whether the task is executing within a node or in the client's local executor
+- compute(JPPFCallable) enables the execution of a callback in the client. This replaces the ClientDataProvider API which is now deprecated.
+
+
+IPv6 ready:
+
+All areas of JPPF networking have been updated to handle IPv6 addresses properly and transparently:
+- discovery information broadcast by the server
+- connectivity from the nodes and clients
+- JMX-based connections for management and monitoring of the Grid
+
+
+Automated testing:
+
+A major effort has taken place to provide automated testing of the JPPF features, to ensure that the quality of each release meets the expectations.
+This results in a large and growing set of tests based on JUnit and integrated into our development process.<br/>
+An additional module was created to perform stress testing of JPPF grids and improve its stability and resilience under high-throughput and highly unstable networking conditions.
+
+
+List of enhancements in JPPF 3.2
+
+JPPF-50 Add data provider to the JPPFExecutor service job configuration
+JPPF-55 Extensions to NodeLifeCycleListener
+JPPF-45 Class loader enhancements
+JPPF-66 Additional notifications needed for JobListener
+JPPF-63 Add a separate job SLA for processing on the client side
+JPPF-53 Enhancements to JPPFExecutorService
+JPPF-76 Make sure JPPF is IPv6-ready
+JPPF-79 Stability, stress and load testing for v3.2
+JPPF-80 Improve exception handling
+
+Feature Requests 
+
+JPPF-3 API to provide information of client connections
+JPPF-46 Missing public API to determine which and how many nodes are idle
+JPPF-47 Add a management API to determine how many nodes are attached to a driver
+JPPF-40 Provide ClientDataProvider functionality in the tasks
+JPPF-36 Toggle Local execution per Job
+JPPF-44 Restrict server broadcast to specific interfaces for discovery
+JPPF-34 Inefficient load balancing with peer servers
+JPPF-35 Job submission through multiple channels
+JPPF-84 Add isLocal() to JPPFManagementInfo
+JPPF-83 Add systemInformation() to JPPFClient, JPPFNode, JPPFDriver
+JPPF-77 Extend Client, JPPFManagementInfo with identifiaction for local, remove node and peer driver
+JPPF-101 Ability to provide dynamic binding for the driver
+JPPF-30 Broadcast job: execute on ALL nodes (currently only ACTIVE)
+
+Bug Fixes 
+
+JPPF-5 NoSuchFieldException: target for ForkJoinWorkerThread
+JPPF-43 MemLeak: ResourceCache (minor)
+JPPF-60 NPE: AbstractJPPFClassLoader.findResources(284)
+JPPF-67 NPE: periodic task
+JPPF-71 Regression: administration console is broken
+JPPF-54 LocalNode: long init when network is broken
+JPPF-74 Reg: Failing test on slow single core machine
+JPPF-73 Peer nodes - infinite reconnection
+JPPF-75 NPE: display information about peer node in admin
+JPPF-72 Server deadlock in TaskQueueChecker / NodeNioServer
+JPPF-78 Generic serializer throws a ClassFormatError
+JPPF-81 FAIL: TestExecutorServiceConfiguration.testSubmitWithClientExecutionPolicy
+JPPF-82 FAIL: TestJobPersistence.testJobRecovery
+JPPF-41 BarChart: queue size sometimes negative
+JPPF-42 ServerStats/Latest number of jobs show negative value
+JPPF-70 IllegalStateException: Job xxx already enqueued when job is submitted via multiple channels
+JPPF-64 Deadlock: state transition in NodeClass and ClientClass
+JPPF-85 P2P connection failure: IllegalArgumentException: bundle is null
+JPPF-87 Memory leak in the driver: ServerJob instances fill the heap
+JPPF-88 Nodes and drivers running as services cannot be restarted via JMX
+JPPF-94 JPPF source distribution is missing 'jdk7-addons' and 'application-template' modules
+JPPF-95 ConcurrentModificationException in DriverJobManagement.getAllJobIds()
+JPPF-91 NPE: in class loaders when AbstractJPPFClassLoaderLifeCycle:loadRemoteData return NULL
+JPPF-96 Deadlock in the client: RemoteChannelWrapper / TaskQUeueChecker
+JPPF-90 Job never ends after reconnection 
+JPPF-89 ConnectException during performTransition
+JPPF-98 Server discovery threads are duplicated int he client
+JPPF-92 Regression: results returned by the driver should depend on the driver load-balancer
+JPPF-100 Missing deployment instructions for custom execution policies
+JPPF-103 Node local resources cache may lead to grid hang in some environments
+
+To browse an issue, use the URL http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-<issue_number>
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+Issue tracker: http://www.jppf.org/tracker/tbg/jppf
+SF.net project page: http://sourceforge.net/projects/jppf-project/

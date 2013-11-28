@@ -1,0 +1,29 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.1.4
+
+This maintenance release brings important bug fixes.
+
+Bugs fixes:
+
+JPPF-58 JPPFResultCollector.setStatus(COMPLETE) is called twice for each job
+JPPF-59 Cannot submit multiple jobs concurrently with JCA adaptor
+JPPF-62 Jobs with timeout expire in the client instead of the server
+JPPF-65 Some threads are still alive when the client is closed
+JPPF-78 Generic serializer throws a ClassFormatError 
+JPPF-88 Nodes and drivers running as services cannot be restarted via JMX
+JPPF-94 JPPF source distribution is missing "jdk7-addons" and "application-template" modules
+JPPF-95 ConcurrentModificationException in DriverJobManagement.getAllJobIds() 
+JPPF-96 Deadlock in the client: RemoteChannelWrapper / TaskQueueChecker
+JPPF-97 OutOfMemoryError in the driver when using multiple client connections
+
+To browse an issue, use the URL http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-<issue_number>
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+Issue tracker: http://www.jppf.org/tracker/tbg/jppf
+SF.net project page: http://sourceforge.net/projects/jppf-project/

@@ -1,0 +1,34 @@
+<p>JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+<p>JPPF 3.1 brings new security features, load-balancing in the client, fork/join tasks execution and more.
+
+<br/>
+<h2>What's new in JPPF 3.1</h2>
+<br/>
+<h3>Security</h3>
+
+<p align="justify">JPPF 3.1 brings a new security layer by performing all <a href="http://www.jppf.org/doc/v3/index.php?title=Configuring_SSL/TLS_communications">network communications through SSL/TLS</a>, providing data encryption, data integrity and certificate-based authentication.
+Switching from plain to secure connections is as easy as toggling a single configuration flag. In this new context, a JPPF driver can serve both plain and secure connections, whereas clients and nodes attach via either.
+Secure communication has been implemented on top of all connections used by JPPF: client to server, node to server, server to server and JMX remote connectors.
+
+<h3>Management and monitoring</h3>
+
+<p>A new <a href="http://www.jppf.org/screenshots.php?screenshot=Topology-GraphView.gif">graph view</a> of the grid topology has been added to the administration console<br/>
+A new management API was added to <a href="http://www.jppf.org/doc/v3/index.php?title=Server_management#Testing_an_execution_policy">test execution policies</a> against the current grid state<br/>
+Jobs can now be cancelled directly from a standalone JPPF client or from the J2EE connector<br/>
+
+<h3>Executor services</h3>
+
+<p>Job SLAs and metadata, along with task timeout and cancel handlers, can now be <a href="http://www.jppf.org/doc/v3/index.php?title=JPPF_Executor_Services#Configuring_jobs_and_tasks">dynamically configured</a> for tasks and jobs submitted from a JPPFExecutorService
+
+<h3>Clients</h3>
+
+<p>The load balancing between local and remote execution is now <a href="http://www.jppf.org/doc/v3/index.php?title=Client_and_administration_console_configuration#Load-balancing_in_the_client">fully configurable in the client</a>. The same algorithms and configuration parameters as for the server are available.
+
+<h3>Nodes</h3>
+
+<p>A new node extension enables switching the node execution model to a <a href="http://www.jppf.org/doc/v3/index.php?title=Fork/Join_thread_pool_in_the_nodes">local fork/join model</a>, using the JDK 7 APIs.
+
+<h3>JPPF Links:</h3>
+
+<p><a href="http://www.jppf.org">Web Site</a> - <a href="http://www.jppf.org/downloads.php">Downloads</a> - <a href="http://www.jppf.org/doc/v3">Documentation</a> - <a href="http://www.jppf.org/forums">User forums</a>

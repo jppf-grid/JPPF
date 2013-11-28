@@ -1,0 +1,56 @@
+JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid
+
+What's new in JPPF 3.2-beta-3
+
+Bug fixes
+
+JPPF-5  NoSuchFieldException: target for ForkJoinWorkerThread
+JPPF-43 MemLeak: ResourceCache (minor)
+JPPF-60 NPE: AbstractJPPFClassLoader.findResources(284)
+JPPF-67 NPE: periodic task
+JPPF-71 Regression: administration console is broken
+JPPF-54 LocalNode: long init when network is broken
+JPPF-74 Reg: Failing test on slow single core machine
+JPPF-73 Peer nodes - infinite reconnection
+JPPF-75 NPE: display information about peer node in admin
+JPPF-72 Server deadlock in TaskQueueChecker / NodeNioServer
+JPPF-78 Generic serializer throws a ClassFormatError
+JPPF-81 FAIL: TestExecutorServiceConfiguration.testSubmitWithClientExecutionPolicy
+JPPF-82 FAIL: TestJobPersistence.testJobRecovery
+JPPF-41 BarChart: queue size sometimes negative
+JPPF-42 ServerStats/Latest number of jobs show negative value
+JPPF-70 IllegalStateException: Job xxx already enqueued when job is submitted via multiple channels
+JPPF-64 Deadlock: state transition in NodeClass and ClientClass
+
+Enhancements
+
+JPPF-50 Add data provider to the JPPFExecutor service job configuration
+JPPF-55 Extensions to NodeLifeCycleListener
+JPPF-45 Class loader enhancements
+JPPF-66 Additional notifications needed for JobListener
+JPPF-63 Add a separate job SLA for processing on the client side
+JPPF-53 Enhancements to JPPFExecutorService
+JPPF-76 Make sure JPPF is IPv6-ready
+
+Feature requests
+
+JPPF-3 API to provide information of client connections
+JPPF-46 Missing public API to determine which and how many nodes are idle
+JPPF-47 Add a management API to determine how many nodes are attached to a driver
+JPPF-40 Provide ClientDataProvider functionality in the tasks
+JPPF-36 Toggle Local execution per Job
+JPPF-44 Restrict server broadcast to specific interfaces for discovery
+JPPF-34 Inefficient load balancing with peer servers
+JPPF-35 Job submission through multiple channels
+JPPF-84 Add isLocal() to JPPFManagementInfo
+
+To browse an issue, use the URL http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-<issue_number>
+
+JPPF Links:
+
+Web Site: http://www.jppf.org
+Downloads: http://www.jppf.org/downloads.php
+Documentation: http://www.jppf.org/wiki
+User forums: http://www.jppf.org/forums
+Issue tracker: http://www.jppf.org/tracker/tbg/jppf
+SF.net project page: http://sourceforge.net/projects/jppf-project/
