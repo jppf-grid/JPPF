@@ -91,6 +91,7 @@ public class JPPFClient extends AbstractGenericClient
    * {@inheritDoc}
    * @deprecated use {@link #submitJob(JPPFJob)} instead.
    */
+  @Deprecated
   @Override
   public List<JPPFTask> submit(final JPPFJob job) throws Exception
   {
@@ -128,7 +129,6 @@ public class JPPFClient extends AbstractGenericClient
   /**
    * {@inheritDoc}
    * @exclude
-   * 
    */
   @Override
   protected SubmissionManager createSubmissionManager()
@@ -147,6 +147,7 @@ public class JPPFClient extends AbstractGenericClient
 
   /**
    * Reset this client, that is, close it if necessary, then open it again, using the current configuration.
+   * @since 4.0
    */
   public void reset()
   {
@@ -156,6 +157,7 @@ public class JPPFClient extends AbstractGenericClient
   /**
    * Reset this client, that is, close it if necessary, then open it again, using the specified confguration.
    * @param configuration the configuration to initialize this client with.
+   * @since 4.0
    */
   public void reset(final TypedProperties configuration)
   {

@@ -277,6 +277,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   /**
    * Close this client.
    * @param reset if <code>true</code>, then this client is left in a state where it can be reopened.
+   * @exclude
    */
   protected void close(final boolean reset) {
     if (debugEnabled) log.debug("closing JPPF client");
@@ -461,7 +462,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
     private final ClassLoader classLoader;
 
     /**
-     *
+     * Initialize this registered class laoder.
      * @param uuid unique id assigned to classLoader
      * @param classLoader a <code>ClassLoader</code> instance.
      */

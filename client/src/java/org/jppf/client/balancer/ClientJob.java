@@ -24,7 +24,6 @@ import java.util.concurrent.Future;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
-import org.jppf.client.balancer.utils.AbstractClientJob;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.*;
 import org.jppf.execute.ExecutorChannel;

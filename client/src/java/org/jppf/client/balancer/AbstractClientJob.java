@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.client.balancer.utils;
+package org.jppf.client.balancer;
 
 import static org.jppf.utils.StringUtils.build;
 
