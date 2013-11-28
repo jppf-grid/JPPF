@@ -255,11 +255,15 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   @Override
   public InputStream getResourceAsStream(final String name) {
     InputStream is = null;
+    URL url = null;
     try {
-      URL url = getResource(name);
+      url = getResource(name);
       if (url != null) is = url.openStream();
       if (debugEnabled) log.debug(build("lookup for '", name, "' = ", url, " for ", this));
     } catch(IOException e) {
+      String msg = "could not open stream for resource=={}, url={} : {}";
+      if (debugEnabled) log.debug(msg, new Object[] {name, url, ExceptionUtils.getStackTrace(e)});
+      else log.warn(msg, new Object[] {name, url, ExceptionUtils.getMessage(e)});
     }
     return is;
   }
@@ -508,5 +512,24 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   public boolean isServerClassLoader() {
     return !dynamic;
+  }
+
+  @Override
+  void reset() {
+  }
+
+  @Override
+  public URL getResource(final String name) {
+    List<URL> urls = cache.getResourcesURLs(name);
+    if (urls == null) return super.getResource(name);
+    else if (urls.isEmpty()) return null;
+    return urls.get(0);
+  }
+
+  @Override
+  public Enumeration<URL> getResources(final String name) throws IOException {
+    List<URL> urls = cache.getResourcesURLs(name);
+    if (urls == null) return super.getResources(name);
+    return new IteratorEnumeration<URL>(urls.iterator());
   }
 }

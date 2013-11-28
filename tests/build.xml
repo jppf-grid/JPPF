@@ -108,6 +108,7 @@
     </javac>
     <copy todir="${tests.classes}">
       <fileset dir="${resources.src}"/>
+      <fileset dir="${tests.src}" excludes="**/*.java"/>
     </copy>
   </target>
 

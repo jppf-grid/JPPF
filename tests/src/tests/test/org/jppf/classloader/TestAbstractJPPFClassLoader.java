@@ -57,6 +57,39 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   }
 
   /**
+   * Test that multiple lookups of the same resource do not generate duplicate entries in the node's resource cache.<br/>
+   * See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-203">JPPF-203 Class loader resource cache generates duplicate resources</a>
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=5000)
+  public void testGetResourcesNoDuplicate() throws Exception
+  {
+    int nbLookups = 3;
+    String name = ReflectionUtils.getCurrentMethodName();
+    String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
+    List<JPPFTask> results = client.submit(BaseTestHelper.createJob(name, true, false, 1, ResourceLoadingTask.class, nbLookups));
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    JPPFTask task = results.get(0);
+    assertNotNull(task);
+    Exception e = task.getException();
+    assertNull(e == null ? "" : "got exception: " + ExceptionUtils.getStackTrace(e), e);
+    Object o = task.getResult();
+    assertNotNull(o);
+    @SuppressWarnings("unchecked")
+    List<List<URL>> list = (List<List<URL>>) o;
+    assertEquals(nbLookups, list.size());
+    URL firstURL = null;
+    for (int i=0; i<nbLookups; i++) {
+      List<URL> sublist = list.get(i);
+      assertNotNull(sublist);
+      assertEquals(1, sublist.size());
+      if (i == 0) firstURL = sublist.get(0);
+      else assertEquals(firstURL, sublist.get(0));
+    }
+  }
+
+  /**
    * Test that at task startup in the node, the thread context class loader and the task class loader re the same. 
    * <br/>See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution)</a>
    * @throws Exception if any error occurs
