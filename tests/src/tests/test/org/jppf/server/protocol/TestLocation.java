@@ -60,7 +60,7 @@ public class TestLocation {
    * @param size the size of the source.
    * @throws Exception if any error occurs.
    */
-  private void checkCopy(final Location source, final int size) throws Exception {
+  private void checkCopy(final Location<?> source, final int size) throws Exception {
     assertEquals(size, source.size());
     checkCopiedLocation(source, new MemoryLocation((int) source.size()));
     File file = new File("tmpCopy.loc");
@@ -83,7 +83,7 @@ public class TestLocation {
    * @param dest the location which is the destination of the copy.
    * @throws Exception if any error occurs.
    */
-  private void checkCopiedLocation(final Location source, final Location dest) throws Exception {
+  private void checkCopiedLocation(final Location<?> source, final Location<?> dest) throws Exception {
     source.copyTo(dest);
     assertEquals(source.size(), dest.size());
     byte[] buf1 = source.toByteArray();

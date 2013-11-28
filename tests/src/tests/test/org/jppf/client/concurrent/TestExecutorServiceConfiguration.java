@@ -224,7 +224,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   /**
    * A callback used in lieu of JPPFTask.onCancel() and JPPFTask.onTimeout().
    */
-  private static class MyTaskCallback extends JPPFTaskCallback
+  private static class MyTaskCallback extends JPPFTaskCallback<String>
   {
     /**
      * A message that will be set as the task's result.
