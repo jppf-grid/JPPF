@@ -58,7 +58,7 @@ public class MyCustomPolicy extends CustomPolicy
   public boolean accepts(final PropertiesCollection info)
   {
     // get the number of processing threads in the node
-    long nbThreads = info.getProperties("jppf").getLong("processing.threads");
+    long nbThreads = info.getProperties("jppf").getLong("jppf.processing.threads");
     // get the node's max heap size
     long maxHeap = info.getProperties("runtime").getLong("maxMemory");
     // we assume that 10 MB is taken by JPPF code and data

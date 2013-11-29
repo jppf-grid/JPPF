@@ -135,10 +135,10 @@ public class TestJPPFBalancer
     properties.setProperty("driver1.jppf.pool.size", poolSize);
     properties.setProperty("driver1.class.server.port", "11111");
     properties.setProperty("driver1.app.server.port", "11112");
-    properties.setProperty("driver1.priority" , "10");
+    properties.setProperty("driver1.jppf.priority" , "10");
     properties.setProperty("driver2.jppf.server.host", "hs2.crcdata.cz");
     properties.setProperty("driver2.jppf.pool.size", poolSize);
-    properties.setProperty("driver2.priority" , "10");
+    properties.setProperty("driver2.jppf.priority" , "10");
     properties.setProperty("driver2.app.server.port", "11112");
     properties.setProperty("driver2.class.server.port", "11111");
     properties.setProperty("jppf.remote.execution.enabled", "false");

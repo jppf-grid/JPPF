@@ -98,7 +98,7 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
     else
     {
       // get the number of processing threads in the node
-      int nbThreads = getNodeConfiguration().getJppf().getInt("processing.threads", -1);
+      int nbThreads = getNodeConfiguration().getJppf().getInt("jppf.processing.threads", -1);
       // if number of threads is not defined, we assume it is the number of available processors
       if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
       if (nbThreads <= 0) nbThreads = 1;

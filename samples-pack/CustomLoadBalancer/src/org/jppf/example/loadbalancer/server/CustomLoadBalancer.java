@@ -169,7 +169,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
     // if allowed time is not defined we assume no time limit
     if (allowedTime <= 0) allowedTime = Long.MAX_VALUE;
     // get the number of processing threads in the node
-    int nbThreads = getNodeConfiguration().getJppf().getInt("processing.threads", -1);
+    int nbThreads = getNodeConfiguration().getJppf().getInt("jppf.processing.threads", -1);
     // if number of threads is not defined, we assume it is the number of available processors
     if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
     // max node heap size of the node in bytes

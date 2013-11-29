@@ -68,7 +68,7 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration)
   {
     this.nodeConfiguration = nodeConfiguration;
-    nbThreads = nodeConfiguration.getJppf().getInt("processing.threads", 1);
+    nbThreads = nodeConfiguration.getJppf().getInt("jppf.processing.threads", 1);
   }
 
   @Override

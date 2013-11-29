@@ -321,7 +321,7 @@ public class TestJPPFClient extends Setup1D1N
       Thread.currentThread().setName("JPPF-test");
       int poolSize = 2;
       int maxReconnect = 3;
-      config.setProperty("reconnect.max.time", Integer.toString(maxReconnect));
+      config.setProperty("jppf.reconnect.max.time", Integer.toString(maxReconnect));
       config.setProperty("jppf.discovery.enabled", "false");
       config.setProperty("jppf.pool.size", Integer.toString(poolSize));
       config.setProperty("jppf.drivers", "driver1");

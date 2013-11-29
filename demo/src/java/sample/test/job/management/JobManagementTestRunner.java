@@ -101,7 +101,7 @@ public class JobManagementTestRunner
       Thread.sleep(500L);
       client.submitJob(createJob("broadcast1"));
       Thread.sleep(500L);
-      ExecutionPolicy policy = new AtLeast("processing.threads", 4);
+      ExecutionPolicy policy = new AtLeast("jppf.processing.threads", 4);
       int n = driver.matchingNodes(policy);
       System.out.println("found " + n + " nodes, expected = 2");
       nodes[1].updateThreadPoolSize(2);

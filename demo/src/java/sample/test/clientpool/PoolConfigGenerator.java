@@ -50,7 +50,7 @@ public class PoolConfigGenerator
         String name = "d" + i;
         sb.append(name).append(".jppf.server.host = ").append(driverHost).append('\n');
         sb.append(name).append(".jppf.server.port = ").append(port).append('\n');
-        sb.append(name).append(".priority = ").append(priority).append('\n');
+        sb.append(name).append("jppf..priority = ").append(priority).append('\n');
         sb.append(name).append(".jppf.management.host = ").append(jmxHost).append('\n');
         sb.append(name).append(".jppf.management.port = ").append(jmxPort).append('\n');
         sb.append('\n');

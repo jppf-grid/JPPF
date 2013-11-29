@@ -223,7 +223,7 @@ public class TestJPPFNodeAdminMBean
     assertNotNull(info.getEnv());
     assertFalse(info.getEnv().isEmpty());
     assertNotNull(info.getJppf());
-    assertEquals(1, info.getJppf().getInt("processing.threads"));
+    assertEquals(1, info.getJppf().getInt("jppf.processing.threads"));
     assertEquals("n1", info.getJppf().getString("jppf.node.uuid"));
     assertFalse(info.getJppf().isEmpty());
     assertNotNull(info.getNetwork());
@@ -250,10 +250,10 @@ public class TestJPPFNodeAdminMBean
     TypedProperties config = info.getJppf();
     assertNotNull(config);
     assertFalse(config.isEmpty());
-    assertEquals(1, config.getInt("processing.threads"));
+    assertEquals(1, config.getInt("jppf.processing.threads"));
     assertEquals("n1", config.getString("jppf.node.uuid"));
     TypedProperties newConfig = new TypedProperties(config);
-    newConfig.setProperty("processing.threads", "8");
+    newConfig.setProperty("jppf.processing.threads", "8");
     newConfig.setProperty("custom.property", "custom.value");
     nodeJmx.updateConfiguration(newConfig, false);
     info = nodeJmx.systemInformation();
@@ -261,7 +261,7 @@ public class TestJPPFNodeAdminMBean
     newConfig = info.getJppf();
     assertNotNull(newConfig);
     assertFalse(newConfig.isEmpty());
-    assertEquals(8, newConfig.getInt("processing.threads"));
+    assertEquals(8, newConfig.getInt("jppf.processing.threads"));
     assertEquals("n1", newConfig.getString("jppf.node.uuid"));
     assertEquals("custom.value", newConfig.getString("custom.property"));
     nodeJmx.updateConfiguration(config, false);

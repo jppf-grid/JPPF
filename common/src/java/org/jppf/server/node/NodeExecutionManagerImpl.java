@@ -26,12 +26,13 @@ import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.*;
 import org.jppf.node.ThreadManager.UsedClassLoader;
-import org.jppf.node.event.*;
+import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -113,20 +114,22 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
    * @param node the node that uses this execution manager.
    */
   public NodeExecutionManagerImpl(final AbstractNode node) {
-    this(node, "processing.threads");
+    this(node, "jppf.processing.threads", "processing.threads");
   }
 
   /**
    * Initialize this execution manager with the specified node.
    * @param node the node that uses this execution manager.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
+   * @param legacyNbThreadsProperty the legacy name of the property which configures the number of threads.
    */
-  public NodeExecutionManagerImpl(final NodeInternal node, final String nbThreadsProperty) {
+  public NodeExecutionManagerImpl(final NodeInternal node, final String nbThreadsProperty, final String legacyNbThreadsProperty) {
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
     taskNotificationDispatcher = new TaskExecutionDispatcher(getClass().getClassLoader());
     TypedProperties config = JPPFConfiguration.getProperties();
-    int poolSize = config.getInt(nbThreadsProperty, Runtime.getRuntime().availableProcessors());
+    ConfigurationHelper helper = new ConfigurationHelper(config);
+    int poolSize = helper.getInt(nbThreadsProperty, legacyNbThreadsProperty, Runtime.getRuntime().availableProcessors());
     if (poolSize <= 0) {
       poolSize = Runtime.getRuntime().availableProcessors();
       config.setInt(nbThreadsProperty, poolSize);
@@ -335,7 +338,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
     int newSize = getThreadPoolSize();
     if (oldSize != newSize) {
       log.info("Node thread pool size changed from " + oldSize + " to " + size);
-      JPPFConfiguration.getProperties().setProperty("processing.threads", Integer.toString(size));
+      JPPFConfiguration.getProperties().setProperty("jppf.processing.threads", Integer.toString(size));
       triggerConfigChanged();
     }
   }

@@ -310,7 +310,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       assertNotNull(info.getEnv());
       assertFalse(info.getEnv().isEmpty());
       assertNotNull(info.getJppf());
-      assertEquals(1, info.getJppf().getInt("processing.threads"));
+      assertEquals(1, info.getJppf().getInt("jppf.processing.threads"));
       assertEquals(entry.getKey(), info.getJppf().getString("jppf.node.uuid"));
       assertFalse(info.getJppf().isEmpty());
       assertNotNull(info.getNetwork());
@@ -357,13 +357,13 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       TypedProperties config = info.getJppf();
       assertNotNull(config);
       assertFalse(config.isEmpty());
-      assertEquals(1, config.getInt("processing.threads"));
+      assertEquals(1, config.getInt("jppf.processing.threads"));
       assertEquals(uuid, config.getString("jppf.node.uuid"));
       if (oldConfig == null) oldConfig = new TypedProperties(config);
       if (newConfig == null)
       {
         newConfig = new TypedProperties(config);
-        newConfig.setProperty("processing.threads", "8");
+        newConfig.setProperty("jppf.processing.threads", "8");
         newConfig.setProperty("custom.property", "custom.value");
       }
     }
@@ -379,7 +379,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       newConfig = info.getJppf();
       assertNotNull(newConfig);
       assertFalse(newConfig.isEmpty());
-      assertEquals(8, newConfig.getInt("processing.threads"));
+      assertEquals(8, newConfig.getInt("jppf.processing.threads"));
       assertEquals(uuid, newConfig.getString("jppf.node.uuid"));
       assertEquals("custom.value", newConfig.getString("custom.property"));
     }

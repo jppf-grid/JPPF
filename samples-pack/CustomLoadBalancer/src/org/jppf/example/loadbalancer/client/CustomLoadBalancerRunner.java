@@ -82,7 +82,7 @@ public class CustomLoadBalancerRunner
 
       // Create a "light" job
       // We want at least 2 light tasks executing concurrently in a node, to mitigate the network overhead.
-      ExecutionPolicy lightPolicy = new AtLeast("processing.threads", 2);
+      ExecutionPolicy lightPolicy = new AtLeast("jppf.processing.threads", 2);
       // Tasks in the job will have 10 KB data size, will last at most 80 milliseconds,
       // and the maximum execution time for a set of tasks will be no more than 3 seconds.
       // Here the allowed time will be the limiting factor for the number of tasks that can be sent to a node,

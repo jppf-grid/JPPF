@@ -38,8 +38,8 @@ public class NioConstants
    * It is defined as the value of the configuration property
    * &quot;jppf.transition.thread.pool.size&quot;, with a default value of 1.
    */
-  public static final int THREAD_POOL_SIZE =
-    ConfigurationHelper.getInt("jppf.transition.thread.pool.size", "transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32 * 1024);
+  public static final int THREAD_POOL_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt(
+    "jppf.transition.thread.pool.size", "transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32 * 1024);
   /**
    * Name of the class server.
    */

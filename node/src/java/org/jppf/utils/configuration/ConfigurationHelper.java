@@ -24,18 +24,20 @@ import org.jppf.utils.*;
  * Utility methods to help access and manipulate the JPPF configuration
  * @author Laurent Cohen
  */
-public final class ConfigurationHelper
+public class ConfigurationHelper
 {
   /**
-   * The JPPF configuration.
+   * The configuration to use.
    */
-  private static TypedProperties config = JPPFConfiguration.getProperties();
+  private final TypedProperties config;
 
   /**
-   * Instantiation is not permitted.
+   * Initialize this helper witht he specified ocnfiguration.
+   * @param config the configuration to use.
    */
-  private ConfigurationHelper()
+  public ConfigurationHelper(final TypedProperties config)
   {
+    this.config = config;
   }
 
   /**
@@ -47,11 +49,32 @@ public final class ConfigurationHelper
    * @param max the maximum acceptable value.
    * @return the value of the property as an int.
    */
-  public static int getInt(final String name, final int def, final int min, final int max)
+  public int getInt(final String name, final int def, final int min, final int max)
   {
     if (!config.containsKey(name)) return def;
     int val = config.getInt(name);
     if ((val < min) || (val > max)) val = def;
+    return val;
+  }
+
+  /**
+   * Get the integer value of the specified configuration property.
+   * If the property with the specified name does not exist, it is looked up using a legacy name.<br> 
+   * If the property is not defined, the default value is returned.
+   * @param name the name of the property whose value is to be retrieved.
+   * @param oldName the legacy name of the property to retrieve.
+   * @param def the default value to use.
+   * @return the value of the property as an int.
+   */
+  public int getInt(final String name, final String oldName, final int def)
+  {
+    int val = def;
+    if (!config.containsKey(name))
+    {
+      if (!config.containsKey(oldName)) return def;
+      else val = config.getInt(oldName);
+    }
+    else val = config.getInt(name);
     return val;
   }
 
@@ -66,7 +89,7 @@ public final class ConfigurationHelper
    * @param max the maximum acceptable value.
    * @return the value of the property as an int.
    */
-  public static int getInt(final String name, final String oldName, final int def, final int min, final int max)
+  public int getInt(final String name, final String oldName, final int def, final int min, final int max)
   {
     int val = def;
     if (!config.containsKey(name))
@@ -88,11 +111,32 @@ public final class ConfigurationHelper
    * @param max the maximum acceptable value.
    * @return the value of the property as a long.
    */
-  public static long getLong(final String name, final long def, final long min, final long max)
+  public long getLong(final String name, final long def, final long min, final long max)
   {
     if (!config.containsKey(name)) return def;
     long val = config.getInt(name);
     if ((val < min) || (val > max)) val = def;
+    return val;
+  }
+
+  /**
+   * Get the long value of the specified configuration property.
+   * If the property with the specified name does not exist, it is looked up using a legacy name.<br> 
+   * If the property is not defined, the default value is returned.
+   * @param name the name of the property whose value is to be retrieved.
+   * @param oldName the legacy name of the property to retrieve.
+   * @param def the default value to use.
+   * @return the value of the property as a long.
+   */
+  public long getLong(final String name, final String oldName, final long def)
+  {
+    long val = def;
+    if (!config.containsKey(name))
+    {
+      if (!config.containsKey(oldName)) return def;
+      else val = config.getInt(oldName);
+    }
+    else val = config.getInt(name);
     return val;
   }
 }

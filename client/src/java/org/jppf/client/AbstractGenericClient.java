@@ -27,6 +27,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -193,7 +194,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
             else info.sslServerPorts = new int[] { port };
             if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
-            int priority = props.getInt(String.format("%s.priority", name), 0);
+            int priority = new ConfigurationHelper(props).getInt(String.format("%s.jppf.priority", name), String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
             newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
           }

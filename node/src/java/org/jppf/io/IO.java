@@ -32,7 +32,7 @@ public interface IO extends Closeable
   /**
    * Size of send and receive buffer for socket connections. Defaults to 32768.
    */
-  int SOCKET_BUFFER_SIZE = ConfigurationHelper.getInt("jppf.socket.buffer.size", 32*1024, 1024, 64 * 1024);
+  int SOCKET_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.socket.buffer.size", 32*1024, 1024, 64 * 1024);
   /**
    * Disable Nagle's algorithm to improve performance. Defaults to true.
    */
@@ -44,7 +44,7 @@ public interface IO extends Closeable
   /**
    * Size of temporary buffers (including direct buffers) used in I/O transfers. Defaults to 32768.
    */
-  int TEMP_BUFFER_SIZE = ConfigurationHelper.getInt("jppf.temp.buffer.size", 32*1024, 1024, 65536);
+  int TEMP_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.temp.buffer.size", 32*1024, 1024, 65536);
   /**
    * A definition of an empty byte array.
    */
