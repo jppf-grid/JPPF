@@ -41,7 +41,6 @@
 	<property name="was"           value="Websphere"/>
 	<property name="jboss"         value="JBoss"/>
 	<property name="jboss7"        value="JBoss-7"/>
-	<property name="oracle"        value="Oracle"/>
 	<property name="sunas"         value="Glassfish"/>
 	<property name="weblogic"      value="Weblogic"/>
 	<property name="geronimo"      value="Geronimo"/>
@@ -187,10 +186,6 @@
 			<param name="include.client.classes" value="false"/>
 		</antcall>
 		<antcall target="ear">
-			<param name="appserver" value="${oracle}"/>
-			<param name="include.client.classes" value="false"/>
-		</antcall>
-		<antcall target="ear">
 			<param name="appserver" value="${sunas}"/>
 			<param name="include.client.classes" value="false"/>
 		</antcall>
@@ -317,7 +312,6 @@
 		<antcall target="rar"><param name="appserver" value="${sunas}"/><param name="logging" value="jdk14"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${was}"/><param name="logging" value="jdk14"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${weblogic}"/><param name="logging" value="jdk14"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${oracle}"/><param name="logging" value="jdk14"/></antcall>
 		<antcall target="rar"><param name="appserver" value="${geronimo}"/><param name="logging" value="log4j12"/></antcall>
   	<!-- *****                      add RAR generation for other application servers here                     ***** -->
   	<!-- *****                      end of add other                                                          ***** -->
