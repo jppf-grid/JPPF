@@ -29,7 +29,6 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.test.addons.mbeans.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
@@ -132,7 +131,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
         assertTrue(notif.getUserData() instanceof UserObject);
         UserObject userObject = (UserObject) notif.getUserData();
         assertNotNull(userObject.nodeUuid);
-        task = (JPPFTask) job.getJobTasks().get(0);
+        task = (Task<?>) job.getJobTasks().get(0);
         assertEquals(NotifyingTask.START_PREFIX + task.getId(), userObject.taskId);
       }
     } finally {

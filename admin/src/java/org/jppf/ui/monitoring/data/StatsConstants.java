@@ -19,7 +19,7 @@ package org.jppf.ui.monitoring.data;
 
 import static org.jppf.ui.monitoring.data.Fields.*;
 
-import org.jppf.utils.CollectionUtils;
+import org.jppf.utils.collections.CollectionUtils;
 
 /**
  * Constants for the JPPF statistics collected form the server.

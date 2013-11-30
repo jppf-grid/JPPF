@@ -28,9 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.client.*;
 import org.jppf.client.event.TaskResultEvent;
 import org.jppf.node.policy.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.server.protocol.results.SendResultsStrategy;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
@@ -421,7 +420,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   /**
    * A task that creates a file.
    */
-  public static class FileTask extends JPPFTask {
+  public static class FileTask extends AbstractTask<String> {
     /** */
     private final String filePath;
     /** */

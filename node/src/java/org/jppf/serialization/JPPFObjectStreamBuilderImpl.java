@@ -26,6 +26,7 @@ import java.io.*;
  * and {@link java.io.ObjectOutputStream ObjectOutputStream}
  * @author Laurent Cohen
  * @deprecated in favor of using {@link JPPFSerialization}.
+ * @exclude
  */
 @Deprecated
 public class JPPFObjectStreamBuilderImpl implements JPPFObjectStreamBuilder

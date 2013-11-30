@@ -19,7 +19,7 @@
 package org.jppf.server.job;
 
 import org.jppf.execute.ExecutorChannel;
-import org.jppf.server.protocol.utils.AbstractServerJob;
+import org.jppf.server.protocol.AbstractServerJob;
 import org.jppf.utils.Pair;
 
 /**

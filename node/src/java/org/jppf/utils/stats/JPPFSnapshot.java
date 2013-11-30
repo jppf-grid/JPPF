@@ -20,7 +20,7 @@ package org.jppf.utils.stats;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.utils.CollectionUtils;
+import org.jppf.utils.collections.CollectionUtils;
 
 /**
  * Convenience class for collecting time or size statistics.

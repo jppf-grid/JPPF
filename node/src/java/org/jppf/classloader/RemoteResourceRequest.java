@@ -20,7 +20,7 @@ package org.jppf.classloader;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.IOHelper;
-import org.jppf.utils.ObjectSerializer;
+import org.jppf.serialization.ObjectSerializer;
 
 /**
  * Encapsulates a remote resource request submitted asynchronously

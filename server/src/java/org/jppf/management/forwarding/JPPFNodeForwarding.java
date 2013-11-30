@@ -18,7 +18,7 @@
 
 package org.jppf.management.forwarding;
 
-import static org.jppf.utils.CollectionUtils.array;
+import static org.jppf.utils.collections.CollectionUtils.array;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

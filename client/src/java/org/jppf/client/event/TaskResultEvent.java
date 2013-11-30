@@ -61,7 +61,7 @@ public class TaskResultEvent extends EventObject
   /**
    * Get the list of tasks whose results have been received from the server.
    * To properly order the results, developers should use {@link Task#getPosition()} for each task.
-   * @return a list of <code>JPPFTask</code> instances.
+   * @return a list of <code>Task</code> instances.
    */
   @SuppressWarnings("unchecked")
   public List<Task<?>> getTasks()

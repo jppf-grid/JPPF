@@ -30,6 +30,7 @@ import org.jppf.management.spi.*;
 import org.jppf.node.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
+import org.jppf.serialization.*;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;

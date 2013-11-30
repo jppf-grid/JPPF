@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.io.*;
-import org.jppf.utils.SerializationUtils;
+import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 

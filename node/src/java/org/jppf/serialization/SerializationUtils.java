@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.utils;
+package org.jppf.serialization;
 
 import java.io.*;
 import java.nio.ByteBuffer;

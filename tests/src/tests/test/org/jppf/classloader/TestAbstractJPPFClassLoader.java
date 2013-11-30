@@ -23,8 +23,7 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.*;
 
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -116,7 +115,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   /**
    * 
    */
-  public static class MyTask extends JPPFTask {
+  public static class MyTask extends AbstractTask<String> {
     /**
      * Name of a resource to lookup.
      */

@@ -20,6 +20,7 @@ package org.jppf.server.peer;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;

@@ -19,7 +19,7 @@
 package test.org.jppf.test.setup.common;
 
 import org.jppf.node.NodeRunner;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.test.addons.mbeans.UserObject;
 import org.jppf.test.addons.startups.TaskNotifier;
 import org.jppf.utils.ExceptionUtils;
@@ -28,7 +28,7 @@ import org.jppf.utils.ExceptionUtils;
  * 
  * @author Laurent Cohen
  */
-public class NotifyingTask extends JPPFTask
+public class NotifyingTask extends AbstractTask<String>
 {
   /**
    * Prefix of the string sent as notification at the start of a task.

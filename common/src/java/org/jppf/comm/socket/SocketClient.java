@@ -20,6 +20,7 @@ package org.jppf.comm.socket;
 import java.net.Socket;
 
 import org.jppf.JPPFException;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -151,7 +152,7 @@ public class SocketClient extends AbstractSocketWrapper
   /**
    * Set the object serializer / deserializer to convert an object to or from an array of bytes.
    * @param serializer an <code>ObjectSerializer</code> instance.
-   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
+   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.serialization.ObjectSerializer)
    */
   @Override
   public void setSerializer(final ObjectSerializer serializer)

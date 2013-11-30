@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -86,7 +87,7 @@ public abstract class AbstractNodeIO implements NodeIO {
     if (!currentBundle.isHandshake() && (currentBundle.getParameter(NODE_EXCEPTION_PARAM) == null)) {
       DataProvider dataProvider = (DataProvider) result[1];
       for (int i=0; i<currentBundle.getTaskCount(); i++) {
-        JPPFTask task = (JPPFTask) result[2 + i];
+        Task<?> task = (Task<?>) result[2 + i];
         task.setDataProvider(dataProvider);
         task.setInNode(true);
         taskList.add(task);

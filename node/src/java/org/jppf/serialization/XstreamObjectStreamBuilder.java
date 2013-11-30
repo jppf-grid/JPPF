@@ -32,6 +32,7 @@ import org.slf4j.*;
  * as this class relies entirely on reflection to instantiate the required objects.
  * @author Laurent Cohen
  * @deprecated in favor of using {@link JPPFSerialization}.
+ * @exclude
  */
 @Deprecated
 public class XstreamObjectStreamBuilder implements JPPFObjectStreamBuilder

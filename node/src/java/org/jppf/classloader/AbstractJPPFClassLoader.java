@@ -23,7 +23,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.IteratorEnumeration;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 

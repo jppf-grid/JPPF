@@ -69,7 +69,10 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
   {
     try
     {
-      if (owner.isClosed()) throw new IllegalStateException("this task server connection is closed");
+      if (owner.isClosed()) {
+        log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
+        return;
+      }
       handshakeDone = false;
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();

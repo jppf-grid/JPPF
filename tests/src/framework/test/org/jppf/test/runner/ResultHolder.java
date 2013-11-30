@@ -21,7 +21,7 @@ package test.org.jppf.test.runner;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.utils.CollectionUtils;
+import org.jppf.utils.collections.CollectionUtils;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 

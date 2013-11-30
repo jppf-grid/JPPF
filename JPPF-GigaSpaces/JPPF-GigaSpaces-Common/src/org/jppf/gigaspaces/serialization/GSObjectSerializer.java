@@ -41,7 +41,7 @@ public class GSObjectSerializer extends ObjectSerializerImpl
    * @param is the input stream to deserialize from.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.utils.ObjectSerializer#deserialize(java.io.InputStream)
+   * @see org.jppf.serialization.ObjectSerializer#deserialize(java.io.InputStream)
    */
   @Override
   public Object deserialize(final InputStream is) throws Exception

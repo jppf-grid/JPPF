@@ -18,14 +18,14 @@
 
 package test.org.jppf.test.setup.common;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.slf4j.*;
 
 /**
  * A simple JPPF task for unit-testing.
  * @author Laurent Cohen
  */
-public class SimpleTask extends JPPFTask
+public class SimpleTask extends AbstractTask<String>
 {
   /**
    * Logger for this class.

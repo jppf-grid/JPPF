@@ -18,6 +18,7 @@
 
 package org.jppf.server.nio.acceptor;
 
+import org.jppf.serialization.SerializationUtils;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.utils.*;

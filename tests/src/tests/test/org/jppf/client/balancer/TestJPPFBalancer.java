@@ -23,8 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionStatus;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 
 /**
@@ -158,7 +157,7 @@ public class TestJPPFBalancer
    * A simple JPPF task for testing.
    * @author Martin JANDA
    */
-  public static class TestTask extends JPPFTask
+  public static class TestTask extends AbstractTask<String>
   {
     /**
      * Explicit serialVersionUID.

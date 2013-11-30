@@ -23,6 +23,7 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
+import org.jppf.serialization.SerializationHelper;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;

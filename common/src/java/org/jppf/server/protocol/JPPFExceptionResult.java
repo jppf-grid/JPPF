@@ -18,6 +18,7 @@
 
 package org.jppf.server.protocol;
 
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.ExceptionUtils;
 
 /**
@@ -28,7 +29,7 @@ import org.jppf.utils.ExceptionUtils;
  * <p>When such an error occurs, an instance of this class will be sent instead of the initial JPPF task.
  * @author Laurent Cohen
  */
-public final class JPPFExceptionResult extends JPPFTask
+public final class JPPFExceptionResult extends AbstractTask<Object>
 {
   /**
    * Explicit serialVersionUID.

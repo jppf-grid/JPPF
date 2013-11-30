@@ -20,13 +20,13 @@ package org.jppf.jca.demo;
 
 import java.text.DecimalFormat;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Demonstration task to test the resource adaptor.
  * @author Laurent Cohen
  */
-public class DemoTask extends JPPFTask
+public class DemoTask extends AbstractTask<String>
 {
   /**
    * Explicit serialVersionUID.

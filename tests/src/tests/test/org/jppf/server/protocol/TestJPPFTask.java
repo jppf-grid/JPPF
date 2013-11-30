@@ -25,9 +25,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -35,7 +34,7 @@ import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
- * Unit tests for {@link JPPFTask}.
+ * Unit tests for {@link Task}.
  * In this class, we test that the behavior is the expected one, from the client point of view,
  * as specified in the job SLA.
  * @author Laurent Cohen
@@ -133,7 +132,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code>.
+   * Test the execution of a JPPFCallable via <code>Task.compute()</code>.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -152,7 +151,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the exception handling of a JPPFCallable which calls its <code>JPPFTask.compute()</code> method.
+   * Test the exception handling of a JPPFCallable which calls its <code>Task.compute()</code> method.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -172,7 +171,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the execution of a JPPFCallable via <code>JPPFTask.compute()</code> in the client.
+   * Test the execution of a JPPFCallable via <code>Task.compute()</code> in the client.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -200,7 +199,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the value of <code>JPPFTask.isInNode()</code> for a task executing in a node.
+   * Test the value of <code>Task.isInNode()</code> for a task executing in a node.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -217,7 +216,7 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * Test the value of <code>JPPFTask.isInNode()</code> for a task executing locally in the client.
+   * Test the value of <code>Task.isInNode()</code> for a task executing locally in the client.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
@@ -242,9 +241,9 @@ public class TestJPPFTask extends Setup1D1N1C
   }
 
   /**
-   * A simple JPPFTask which calls its <code>compute()</code> method.
+   * A simple Task which calls its <code>compute()</code> method.
    */
-  public static class MyComputeCallableTask extends JPPFTask
+  public static class MyComputeCallableTask extends AbstractTask<Object>
   {
     /**
      * The class name for the callable to invoke.

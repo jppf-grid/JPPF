@@ -21,7 +21,7 @@ package org.jppf.io;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import org.jppf.utils.SerializationUtils;
+import org.jppf.serialization.SerializationUtils;
 
 
 /**

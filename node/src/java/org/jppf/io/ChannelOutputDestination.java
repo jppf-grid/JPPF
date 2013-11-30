@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 
-import org.jppf.utils.SerializationUtils;
+import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.pooling.DirectBufferPool;
 
 /**

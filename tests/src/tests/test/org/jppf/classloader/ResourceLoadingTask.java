@@ -20,13 +20,13 @@ package test.org.jppf.classloader;
 import java.net.URL;
 import java.util.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This class is a template for a standard JPPF task.
  * @author Laurent Cohen
  */
-public class ResourceLoadingTask extends JPPFTask {
+public class ResourceLoadingTask extends AbstractTask<List<List<URL>>> {
   /**
    * 
    */

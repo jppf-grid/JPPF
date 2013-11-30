@@ -34,6 +34,7 @@ import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.Equal;
 import org.jppf.test.addons.mbeans.*;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.CollectionUtils;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.common.*;

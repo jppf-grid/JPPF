@@ -18,12 +18,12 @@
 
 package test.org.jppf.test.setup.common;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * A task which holds a non-serializable object.
  */
-public class NotSerializableTask extends JPPFTask
+public class NotSerializableTask extends AbstractTask<String>
 {
   /**
    * A non-serializable object.

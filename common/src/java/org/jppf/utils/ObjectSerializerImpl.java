@@ -48,7 +48,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param o the object to Serialize.
    * @return a <code>JPPFBuffer</code> instance holding the serialized object.
    * @throws Exception if the object can't be serialized.
-   * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
+   * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object)
    */
   @Override
   public JPPFBuffer serialize(final Object o) throws Exception
@@ -62,7 +62,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param noCopy avoid copying intermediate buffers.
    * @return a <code>JPPFBuffer</code> instance holding the serialized object.
    * @throws Exception if the object can't be serialized.
-   * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object)
+   * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object)
    */
   @Override
   public JPPFBuffer serialize(final Object o, final boolean noCopy) throws Exception
@@ -78,7 +78,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param o the object to Serialize.
    * @param os the output stream to serialize to.
    * @throws Exception if the object can't be serialized.
-   * @see org.jppf.utils.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
+   * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
    */
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception
@@ -98,7 +98,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param buf buffer holding the array of bytes to deserialize from.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.utils.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
+   * @see org.jppf.serialization.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
    */
   @Override
   public Object deserialize(final JPPFBuffer buf) throws Exception
@@ -111,7 +111,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param bytes buffer holding the array of bytes to deserialize from.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.utils.ObjectSerializer#deserialize(byte[])
+   * @see org.jppf.serialization.ObjectSerializer#deserialize(byte[])
    */
   @Override
   public Object deserialize(final byte[] bytes) throws Exception
@@ -126,7 +126,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param length the number of bytes to read.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.utils.ObjectSerializer#deserialize(byte[], int, int)
+   * @see org.jppf.serialization.ObjectSerializer#deserialize(byte[], int, int)
    */
   @Override
   public Object deserialize(final byte[] bytes, final int offset, final int length) throws Exception

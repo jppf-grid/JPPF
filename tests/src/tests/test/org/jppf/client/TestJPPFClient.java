@@ -28,9 +28,8 @@ import java.util.regex.Pattern;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
 import org.jppf.management.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.node.AbstractThreadManager;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -297,8 +296,9 @@ public class TestJPPFClient extends Setup1D1N
       assertEquals(1, results.size());
       Task<?> task = results.get(0);
       assertTrue(task instanceof NotSerializableTask);
-      assertNotNull(task.getThrowable());
-      assertTrue(task.getThrowable() instanceof NotSerializableException);
+      Throwable t = task.getThrowable();
+      assertNotNull(t);
+      assertTrue("wrong exception: " + ExceptionUtils.getStackTrace(t), t instanceof NotSerializableException);
     }
     finally
     {
@@ -428,7 +428,7 @@ public class TestJPPFClient extends Setup1D1N
   /**
    * A task that checks the current thread context class loader during its execution.
    */
-  public static class ThreadContextClassLoaderTask extends JPPFTask
+  public static class ThreadContextClassLoaderTask extends AbstractTask<String>
   {
     @Override
     public void run()

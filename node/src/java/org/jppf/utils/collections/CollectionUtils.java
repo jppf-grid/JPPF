@@ -15,13 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.utils;
+package org.jppf.utils.collections;
 
 
 import java.lang.reflect.Array;
 import java.util.*;
-
-import org.jppf.utils.collections.AbstractCollectionMap;
 
 /**
  * This class provides a set of utility methods for manipulating and converting

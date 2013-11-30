@@ -28,6 +28,7 @@ import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.protocol.*;

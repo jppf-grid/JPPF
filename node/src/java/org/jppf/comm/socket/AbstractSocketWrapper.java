@@ -22,6 +22,7 @@ import java.net.*;
 
 import org.jppf.JPPFException;
 import org.jppf.io.IO;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -351,7 +352,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   /**
    * This implementation does nothing.
    * @param serializer not used.
-   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
+   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.serialization.ObjectSerializer)
    */
   @Override
   public void setSerializer(final ObjectSerializer serializer)

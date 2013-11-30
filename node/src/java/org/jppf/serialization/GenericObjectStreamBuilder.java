@@ -26,6 +26,7 @@ import java.io.*;
  * the serialization and deserialization of objects whose class does not implement <code>java.io.Serializable</code>.
  * @author Laurent Cohen
  * @deprecated in favor of using {@link JPPFSerialization}.
+ * @exclude
  */
 @Deprecated
 public class GenericObjectStreamBuilder implements JPPFObjectStreamBuilder

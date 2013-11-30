@@ -18,7 +18,7 @@
 
 package org.jppf.client.balancer.queue;
 
-import static org.jppf.utils.CollectionUtils.*;
+import static org.jppf.utils.collections.CollectionUtils.*;
 
 import java.text.ParseException;
 import java.util.*;

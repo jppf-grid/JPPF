@@ -83,6 +83,11 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   protected final AtomicBoolean closed = new AtomicBoolean(false);
   /**
+   * Determines whether this JPPF client is resetting.
+   * @exclude
+   */
+  protected final AtomicBoolean resetting = new AtomicBoolean(false);
+  /**
    * Fully qualified name of the serilaization helper class to use.
    * @exclude
    */

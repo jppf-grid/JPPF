@@ -21,7 +21,7 @@ package test.org.jppf.test.setup.common;
 import java.lang.reflect.Constructor;
 
 import org.jppf.client.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.Task;
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
@@ -72,7 +72,7 @@ public class BaseTestHelper
     int nbArgs = (params == null) ? 0 : params.length;
     Constructor constructor = findConstructor(taskClass, nbArgs);
     Object o = constructor.newInstance(params);
-    if (o instanceof JPPFTask) ((JPPFTask) o).setId(id);
+    if (o instanceof Task) ((Task) o).setId(id);
     return o;
   }
 
@@ -98,7 +98,7 @@ public class BaseTestHelper
     for (int i=1; i<=nbTasks; i++)
     {
       Object o = constructor.newInstance(params);
-      if (o instanceof JPPFTask) ((JPPFTask) o).setId(job.getName() + " - task " + i);
+      if (o instanceof Task) ((Task) o).setId(job.getName() + " - task " + i);
       job.add(o);
     }
     job.setBlocking(blocking);

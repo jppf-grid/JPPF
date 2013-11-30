@@ -24,7 +24,7 @@ import javax.management.remote.generic.ObjectWrapping;
 
 import org.jppf.comm.socket.BootstrapObjectSerializer;
 import org.jppf.io.*;
-import org.jppf.utils.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.streams.StreamUtils;
 
 /**

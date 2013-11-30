@@ -18,6 +18,7 @@
 
 package org.jppf.jca.serialization;
 
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 
 /**
@@ -42,7 +43,7 @@ public class JcaSerializationHelperImpl extends SerializationHelperImpl
    * Get the object serializer for this helper.
    * @return an <code>ObjectSerializer</code> instance.
    * @throws Exception if the object serializer could not be instantiated.
-   * @see org.jppf.utils.SerializationHelper#getSerializer()
+   * @see org.jppf.serialization.SerializationHelper#getSerializer()
    */
   @Override
   public ObjectSerializer getSerializer() throws Exception

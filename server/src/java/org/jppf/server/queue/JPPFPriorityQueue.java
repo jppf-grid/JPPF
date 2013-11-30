@@ -18,7 +18,7 @@
 
 package org.jppf.server.queue;
 
-import static org.jppf.utils.CollectionUtils.*;
+import static org.jppf.utils.collections.CollectionUtils.*;
 
 import java.util.*;
 import java.util.concurrent.*;

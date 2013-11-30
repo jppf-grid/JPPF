@@ -21,8 +21,7 @@ package org.jppf.test.scenario.classloading;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 import org.jppf.task.storage.*;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
@@ -77,7 +76,7 @@ public class Runner extends AbstractScenarioRunner
   /**
    * 
    */
-  public static class MyTask extends JPPFTask
+  public static class MyTask extends AbstractTask<String>
   {
     @Override
     public void run()

@@ -20,6 +20,7 @@ package org.jppf.comm.socket;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 
 /**

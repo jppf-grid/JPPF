@@ -101,6 +101,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   protected void init(final TypedProperties configuration) {
     closed.set(false);
+    resetting.set(false);
     this.config = initConfig(configuration);
     sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
     log.info("JPPF client starting with sslEnabled = " + sslEnabled);
@@ -281,6 +282,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @exclude
    */
   protected void close(final boolean reset) {
+    if (closed.get()) return;
     if (debugEnabled) log.debug("closing JPPF client");
     closed.set(true);
     if (debugEnabled) log.debug("unregistering startup classes");

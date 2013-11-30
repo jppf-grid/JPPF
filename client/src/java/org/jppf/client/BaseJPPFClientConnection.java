@@ -29,6 +29,7 @@ import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
 import org.jppf.io.IOHelper;
 import org.jppf.node.protocol.*;
+import org.jppf.serialization.*;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;

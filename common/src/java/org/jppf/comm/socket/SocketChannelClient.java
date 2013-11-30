@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.jppf.io.IO;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -343,7 +344,7 @@ public class SocketChannelClient implements SocketWrapper
   /**
    * Set the object serializer / deserializer to convert an object to or from an array of bytes.
    * @param serializer an <code>ObjectSerializer</code> instance.
-   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.utils.ObjectSerializer)
+   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.serialization.ObjectSerializer)
    */
   @Override
   public void setSerializer(final ObjectSerializer serializer)

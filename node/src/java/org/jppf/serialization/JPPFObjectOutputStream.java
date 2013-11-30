@@ -21,8 +21,6 @@ package org.jppf.serialization;
 import java.io.*;
 import java.util.Map;
 
-import org.jppf.utils.SerializationUtils;
-
 /**
  * Implementation of {@link ObjectOutputStream} that writes objects without regards to whether
  * they implement {@link Serializable} or not. This allows using non-serializable classes in

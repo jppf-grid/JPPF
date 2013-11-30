@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.serialization.SerializationUtils;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -216,7 +216,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
         count = 0;
         int size = SerializationUtils.readInt(bytes, 0);
         List<Task<?>> tasks = new ArrayList<>(size);
-        for (int i=0; i<size; i++) tasks.add((JPPFTask) serializer.deserialize(is, false));
+        for (int i=0; i<size; i++) tasks.add((Task<?>) serializer.deserialize(is, false));
         job.getResults().addResults(tasks);
       }
       if (debugEnabled) log.debug("loaded job " + job);

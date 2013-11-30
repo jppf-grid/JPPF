@@ -23,7 +23,6 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.jppf.utils.SerializationUtils;
 import org.slf4j.*;
 
 /**

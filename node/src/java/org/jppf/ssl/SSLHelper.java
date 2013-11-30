@@ -28,6 +28,7 @@ import java.util.concurrent.Callable;
 import javax.net.ssl.*;
 
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;

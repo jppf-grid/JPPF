@@ -18,6 +18,7 @@
 package org.jppf.utils;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.serialization.*;
 
 /**
  * Collection of utility methods for serializing and deserializing to and from bytes buffers.
@@ -44,7 +45,7 @@ public class SerializationHelperImpl implements SerializationHelper {
    * Get the object serializer for this helper.
    * @return an <code>ObjectSerializer</code> instance.
    * @throws Exception if the object serializer could not be instantiated.
-   * @see org.jppf.utils.SerializationHelper#getSerializer()
+   * @see org.jppf.serialization.SerializationHelper#getSerializer()
    */
   @Override
   public ObjectSerializer getSerializer() throws Exception {

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.*;
 
 import org.jppf.JPPFException;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 
 /**

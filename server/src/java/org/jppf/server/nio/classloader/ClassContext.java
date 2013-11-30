@@ -29,6 +29,7 @@ import java.util.concurrent.locks.*;
 import org.jppf.classloader.*;
 import org.jppf.classloader.JPPFResourceWrapper.State;
 import org.jppf.io.*;
+import org.jppf.serialization.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;

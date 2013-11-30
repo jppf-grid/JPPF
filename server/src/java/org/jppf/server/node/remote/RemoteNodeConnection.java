@@ -21,6 +21,7 @@ package org.jppf.server.node.remote;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.node.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;

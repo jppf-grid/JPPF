@@ -28,6 +28,7 @@ import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.queue.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
+import org.jppf.serialization.*;
 import org.jppf.server.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.*;

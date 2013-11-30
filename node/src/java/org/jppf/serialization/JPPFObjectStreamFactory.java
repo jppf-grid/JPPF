@@ -28,6 +28,7 @@ import org.slf4j.*;
  * This class builds object streams based on JPPF configuration properties.
  * @author Laurent Cohen
  * @deprecated in favor of using {@link JPPFSerialization}.
+ * @exclude
  */
 @Deprecated
 public class JPPFObjectStreamFactory

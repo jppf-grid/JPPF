@@ -24,6 +24,7 @@ import org.jppf.JPPFException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.node.AbstractNodeConnection;
+import org.jppf.serialization.SerializationHelper;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;

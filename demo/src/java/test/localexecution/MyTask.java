@@ -21,7 +21,7 @@ import java.net.URL;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.CollectionUtils;
+import org.jppf.utils.collections.CollectionUtils;
 
 /**
  * Test task.

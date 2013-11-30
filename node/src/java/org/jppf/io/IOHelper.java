@@ -26,6 +26,7 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.data.transform.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.*;
 import org.slf4j.*;

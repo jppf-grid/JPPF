@@ -75,7 +75,10 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
   {
     try
     {
-      if (owner.isClosed()) throw new IllegalStateException("this task server connection is closed");
+      if (isClosed()) {
+        log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
+        return;
+      }
       boolean done = false;
       while (!done)
       {

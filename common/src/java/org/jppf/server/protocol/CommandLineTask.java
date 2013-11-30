@@ -24,7 +24,7 @@ import java.util.*;
 import org.jppf.node.protocol.AbstractTask;
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
-import org.jppf.utils.CollectionUtils;
+import org.jppf.utils.collections.CollectionUtils;
 
 /**
  * Instances of this class encapsulate the execution of an external process, program or shell script.<br>

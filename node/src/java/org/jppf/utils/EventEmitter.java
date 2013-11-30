@@ -24,6 +24,7 @@ import java.util.*;
  * Generic abstract super class for class that wish to emit events.
  * @param <S> the type of event listeners handled by this event emitter.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class EventEmitter<S extends EventListener>
 {

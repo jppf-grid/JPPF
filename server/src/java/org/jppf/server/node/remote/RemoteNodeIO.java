@@ -26,9 +26,9 @@ import java.util.concurrent.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**

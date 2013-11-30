@@ -20,13 +20,13 @@ package org.jppf.test.scenario.jppf_130;
 
 import java.net.URL;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Task for reproducing bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-130">JPPF-130</a>.
  * @author Laurent Cohen
  */
-public class JPPF_130_Task extends JPPFTask
+public class JPPF_130_Task extends AbstractTask<String>
 {
   /**
    * Number of class loader lookups to perform.

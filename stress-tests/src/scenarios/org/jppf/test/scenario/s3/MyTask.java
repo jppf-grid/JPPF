@@ -20,13 +20,13 @@ package org.jppf.test.scenario.s3;
 
 import java.util.Random;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * These tasks count from 0 up to a large integer.
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask
+public class MyTask extends AbstractTask<String>
 {
   /**
    * The time it takes to perform the count.

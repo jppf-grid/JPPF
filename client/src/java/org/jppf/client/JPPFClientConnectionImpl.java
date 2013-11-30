@@ -76,7 +76,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   {
     try
     {
-      if (isClosed()) throw new IllegalStateException("this client connection is closed");
+      if (isClosed()) {
+        log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
+        return;
+      }
       try
       {
         host = InetAddress.getByName(host).getHostName();

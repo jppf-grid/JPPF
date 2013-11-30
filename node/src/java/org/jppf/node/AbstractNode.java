@@ -22,6 +22,7 @@ import org.jppf.JPPFUnsupportedOperationException;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
+import org.jppf.serialization.*;
 import org.jppf.utils.*;
 
 /**

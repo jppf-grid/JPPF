@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;

@@ -207,15 +207,6 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   }
 
   /**
-   * Get the object used to synchronize threads when reading/writing the keyOps or readyOps.
-   * @return a {@link SimpleObjectLock} instance.
-   */
-  public SimpleObjectLock getOpsLock()
-  {
-    return opsLock;
-  }
-
-  /**
    * @return <code>true</code>.
    */
   @Override

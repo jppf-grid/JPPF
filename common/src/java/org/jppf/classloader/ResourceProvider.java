@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.jppf.JPPFException;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
