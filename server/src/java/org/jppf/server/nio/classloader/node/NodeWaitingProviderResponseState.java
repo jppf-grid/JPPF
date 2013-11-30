@@ -18,13 +18,13 @@
 
 package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.ClassTransition.TO_IDLE_NODE;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 
 import org.jppf.classloader.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 

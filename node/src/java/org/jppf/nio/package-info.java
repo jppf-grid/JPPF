@@ -16,21 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
-
-
 /**
- * State associated with a socket channel.
- * @param <T> the type of transitions for this state.
- * @author Laurent Cohen
+ * Support for asynchronous communication between JPPF components.
+ * Classes in this package build a transport-independant layer, to provide a unified interface
+ * for all tyes of I/O (network socket or channel-based, file or in-memory I/O).
+ * They also abstract the notion of secure vs. non-secure communications.
+ * @exclude
  */
-public abstract class NioState<T extends Enum<T>>
-{
-  /**
-   * Execute the action associated with this channel state.
-   * @param channel the selection key corresponding to the channel and selector for this state.
-   * @return a state transition as an <code>NioTransition</code> instance.
-   * @throws Exception if an error occurs while transitioning to another state.
-   */
-  public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
-}
+package org.jppf.nio;

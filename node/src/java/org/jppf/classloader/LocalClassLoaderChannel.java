@@ -18,7 +18,7 @@
 
 package org.jppf.classloader;
 
-import org.jppf.server.nio.*;
+import org.jppf.nio.*;
 
 /**
  * Channel wrapper and I/O implementation for the class loader of an in-VM node.

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

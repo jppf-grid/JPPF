@@ -18,7 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.server.nio.*;
+import org.jppf.nio.*;
+import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.slf4j.*;
 
 

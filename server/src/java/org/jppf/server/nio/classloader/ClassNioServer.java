@@ -19,8 +19,8 @@
 package org.jppf.server.nio.classloader;
 
 import org.jppf.classloader.ResourceProvider;
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.slf4j.*;
 
 /**

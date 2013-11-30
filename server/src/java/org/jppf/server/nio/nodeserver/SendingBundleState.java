@@ -22,10 +22,10 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.net.ConnectException;
 
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.nio.ChannelWrapper;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.slf4j.*;
 
 /**
@@ -60,7 +60,7 @@ class SendingBundleState extends NodeServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {

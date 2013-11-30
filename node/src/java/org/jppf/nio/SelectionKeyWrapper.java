@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 import java.nio.channels.*;
 
@@ -88,7 +88,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   /**
    * Get the operations enabled for this channel.
    * @return the operations as an int value.
-   * @see org.jppf.server.nio.AbstractChannelWrapper#getInterestOps()
+   * @see org.jppf.nio.AbstractChannelWrapper#getInterestOps()
    */
   @Override
   public int getInterestOps()
@@ -99,7 +99,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   /**
    * Get the operations enabled for this channel.
    * @param keyOps the operations as an int value.
-   * @see org.jppf.server.nio.AbstractChannelWrapper#setInterestOps(int)
+   * @see org.jppf.nio.AbstractChannelWrapper#setInterestOps(int)
    */
   @Override
   public void setInterestOps(final int keyOps)
@@ -110,7 +110,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   /**
    * Get the operations available for this channel.
    * @return the operations as an int value.
-   * @see org.jppf.server.nio.AbstractChannelWrapper#getReadyOps()
+   * @see org.jppf.nio.AbstractChannelWrapper#getReadyOps()
    */
   @Override
   public int getReadyOps()

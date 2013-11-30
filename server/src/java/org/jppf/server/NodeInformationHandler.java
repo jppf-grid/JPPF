@@ -21,7 +21,7 @@ package org.jppf.server;
 import java.util.*;
 
 import org.jppf.management.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**

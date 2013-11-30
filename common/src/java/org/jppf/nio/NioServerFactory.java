@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 import java.nio.channels.SelectionKey;
 import java.util.Map;

@@ -19,7 +19,8 @@
 package org.jppf.server.nio.client;
 
 import org.jppf.io.IOHelper;
-import org.jppf.server.nio.*;
+import org.jppf.nio.ChannelWrapper;
+import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**

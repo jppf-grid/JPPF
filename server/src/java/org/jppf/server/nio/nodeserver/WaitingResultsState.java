@@ -23,10 +23,10 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.ChannelWrapper;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.Pair;
 import org.jppf.utils.stats.*;

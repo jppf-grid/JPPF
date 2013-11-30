@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 /**
  * Instances of this class define the transition of one NIO state to another.

@@ -22,8 +22,8 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 
 import java.util.List;
 
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;

@@ -22,8 +22,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jppf.comm.recovery.*;
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -187,7 +187,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
 
   /**
    * Close and remove all connections accepted by this server.
-   * @see org.jppf.server.nio.NioServer#removeAllConnections()
+   * @see org.jppf.nio.NioServer#removeAllConnections()
    */
   @Override
   public synchronized void removeAllConnections()

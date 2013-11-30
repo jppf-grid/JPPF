@@ -20,8 +20,8 @@ package org.jppf.server.debug;
 
 import java.util.*;
 
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;

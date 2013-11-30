@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 import static java.nio.channels.SelectionKey.*;
 
@@ -154,7 +154,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
   /**
    * Default implementation of this method returns null.
    * @return by default this method returns null.
-   * @see org.jppf.server.nio.ChannelWrapper#getSelector()
+   * @see org.jppf.nio.ChannelWrapper#getSelector()
    */
   @Override
   public ChannelSelector getSelector()
@@ -166,7 +166,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * By default, this method does nothing.
    * Subclasses should override it ot implement their own selection mechanism.
    * @param selector the selector associated with this mechanism.
-   * @see org.jppf.server.nio.ChannelWrapper#setSelector(org.jppf.server.nio.ChannelSelector)
+   * @see org.jppf.nio.ChannelWrapper#setSelector(org.jppf.nio.ChannelSelector)
    */
   @Override
   public void setSelector(final ChannelSelector selector)

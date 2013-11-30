@@ -18,10 +18,10 @@
 
 package org.jppf.server.nio.acceptor;
 
+import org.jppf.nio.*;
 import org.jppf.serialization.SerializationUtils;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFIdentifiers;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 

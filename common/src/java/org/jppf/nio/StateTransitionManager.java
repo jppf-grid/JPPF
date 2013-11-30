@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
-import static java.nio.channels.SelectionKey.*;
+import static java.nio.channels.SelectionKey.OP_WRITE;
 
 import java.io.IOException;
 import java.nio.channels.*;

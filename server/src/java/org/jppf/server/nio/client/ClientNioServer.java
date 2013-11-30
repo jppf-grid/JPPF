@@ -20,8 +20,8 @@ package org.jppf.server.nio.client;
 
 import java.util.*;
 
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;

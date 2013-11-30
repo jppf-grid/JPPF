@@ -21,8 +21,8 @@ package org.jppf.server.nio.classloader;
 import static org.jppf.server.nio.classloader.ClassTransition.TO_SENDING_NODE_RESPONSE;
 import static org.jppf.utils.StringUtils.build;
 
+import org.jppf.nio.NioState;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.NioState;
 import org.slf4j.*;
 
 /**

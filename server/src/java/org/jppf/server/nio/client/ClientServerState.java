@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.client;
 
-import org.jppf.server.*;
-import org.jppf.server.nio.NioState;
+import org.jppf.nio.NioState;
+import org.jppf.server.JPPFDriver;
 import org.jppf.utils.JPPFConfiguration;
 
 /**

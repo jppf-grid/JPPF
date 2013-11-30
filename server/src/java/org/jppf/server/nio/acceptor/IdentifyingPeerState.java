@@ -21,8 +21,8 @@ package org.jppf.server.nio.acceptor;
 import java.nio.channels.*;
 
 import org.jppf.JPPFException;
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.utils.JPPFIdentifiers;
 import org.slf4j.*;
 

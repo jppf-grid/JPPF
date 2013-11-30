@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
-import java.io.*;
+import java.io.InputStream;
 import java.util.*;
 
 import org.jppf.io.*;

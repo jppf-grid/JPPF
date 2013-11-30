@@ -19,7 +19,7 @@
 package org.jppf.server.nio.classloader;
 
 import org.jppf.classloader.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.nio.ChannelWrapper;
 import org.slf4j.*;
 
 /**

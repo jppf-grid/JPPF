@@ -18,11 +18,11 @@
 
 package org.jppf.server.nio.client;
 
-import org.jppf.server.nio.*;
+import java.util.List;
+
+import org.jppf.nio.*;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;
-
-import java.util.List;
 
 /**
  * Completion listener that is used to notify that results were received from a node,

@@ -20,8 +20,8 @@ package org.jppf.server.nio.classloader.client;
 import static org.jppf.server.nio.classloader.ClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
-import org.jppf.classloader.*;
-import org.jppf.server.nio.*;
+import org.jppf.classloader.JPPFResourceWrapper;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
@@ -59,7 +59,7 @@ class WaitingProviderResponseState extends ClassServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
+   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   @SuppressWarnings("unchecked")

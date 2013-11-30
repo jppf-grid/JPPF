@@ -23,7 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
 
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;

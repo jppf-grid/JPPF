@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.server.nio.AbstractLocalChannelWrapper;
+import org.jppf.nio.AbstractLocalChannelWrapper;
 
 /**
  * Wrapper implementation for a local node's communication channel.

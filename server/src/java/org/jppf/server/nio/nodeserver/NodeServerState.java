@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.server.nio.NioState;
+import org.jppf.nio.NioState;
 
 /**
  * Common abstract superclass for all states of a node that executes tasks.

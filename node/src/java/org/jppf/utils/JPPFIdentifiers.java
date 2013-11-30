@@ -20,7 +20,7 @@ package org.jppf.utils;
 
 import java.util.*;
 
-import org.jppf.server.nio.NioConstants;
+import org.jppf.nio.NioConstants;
 
 /**
  * Channel identifiers sent over the network as part of the handshaking with a JPPF server.

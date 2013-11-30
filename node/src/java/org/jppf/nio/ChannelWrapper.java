@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 /**
  * Interface for a set of abstractions wrapping different communication channels into a common semantic.

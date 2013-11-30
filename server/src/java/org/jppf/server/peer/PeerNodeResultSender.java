@@ -17,15 +17,15 @@
  */
 package org.jppf.server.peer;
 
+import java.util.List;
+
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.SerializationHelperImpl;
 import org.slf4j.*;
-
-import java.util.List;
 
 /**
  * Result sender for a peer driver.<br>

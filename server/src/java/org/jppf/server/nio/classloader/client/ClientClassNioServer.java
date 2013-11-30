@@ -21,8 +21,8 @@ package org.jppf.server.nio.classloader.client;
 import java.util.*;
 import java.util.concurrent.locks.*;
 
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
@@ -168,7 +168,7 @@ public class ClientClassNioServer extends ClassNioServer
 
   /**
    * Close and remove all connections accepted by this server.
-   * @see org.jppf.server.nio.NioServer#removeAllConnections()
+   * @see org.jppf.nio.NioServer#removeAllConnections()
    */
   @Override
   public synchronized void removeAllConnections()

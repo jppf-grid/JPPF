@@ -24,8 +24,8 @@ import javax.net.ssl.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.ssl.SSLHelper;
 import org.slf4j.*;

@@ -23,7 +23,7 @@ import static org.jppf.server.nio.classloader.ClassTransition.*;
 
 import java.util.*;
 
-import org.jppf.server.nio.*;
+import org.jppf.nio.*;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.collections.*;
 
@@ -46,7 +46,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   /**
    * Create the map of all possible states.
    * @return a mapping of the states enumeration to the corresponding NioStateInstances.
-   * @see org.jppf.server.nio.NioServerFactory#createStateMap()
+   * @see org.jppf.nio.NioServerFactory#createStateMap()
    */
   @Override
   public Map<ClassState, NioState<ClassTransition>> createStateMap()
@@ -66,7 +66,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClassState, ClassT
   /**
    * Create the map of all possible states.
    * @return a mapping of the states enumeration to the corresponding NioStateInstances.
-   * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
+   * @see org.jppf.nio.NioServerFactory#createTransitionMap()
    */
   @Override
   public Map<ClassTransition, NioTransition<ClassState>> createTransitionMap()

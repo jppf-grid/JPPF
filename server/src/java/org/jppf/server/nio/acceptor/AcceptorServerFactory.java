@@ -23,7 +23,7 @@ import static org.jppf.server.nio.acceptor.AcceptorTransition.TO_IDENTIFYING_PEE
 
 import java.util.*;
 
-import org.jppf.server.nio.*;
+import org.jppf.nio.*;
 
 /**
  * Utility class used to specify the possible states of a node server connection, as well as the possible
@@ -44,7 +44,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
   /**
    * Create the map of all possible states.
    * @return a mapping of the states enumeration to the corresponding NioState instances.
-   * @see org.jppf.server.nio.NioServerFactory#createStateMap()
+   * @see org.jppf.nio.NioServerFactory#createStateMap()
    */
   @Override
   public Map<AcceptorState, NioState<AcceptorTransition>> createStateMap()
@@ -58,7 +58,7 @@ final class AcceptorServerFactory extends NioServerFactory<AcceptorState, Accept
   /**
    * Create the map of all possible transitions.
    * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
-   * @see org.jppf.server.nio.NioServerFactory#createTransitionMap()
+   * @see org.jppf.nio.NioServerFactory#createTransitionMap()
    */
   @Override
   public Map<AcceptorTransition, NioTransition<AcceptorState>> createTransitionMap()

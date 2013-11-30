@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.classloader.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;

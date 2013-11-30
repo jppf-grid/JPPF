@@ -21,7 +21,7 @@ package org.jppf.server.nio.classloader;
 import static org.jppf.classloader.ResourceIdentifier.*;
 
 import org.jppf.classloader.*;
-import org.jppf.server.nio.ChannelWrapper;
+import org.jppf.nio.ChannelWrapper;
 
 /**
  * Instances of this class represent a class loading request from a node to a client channel.

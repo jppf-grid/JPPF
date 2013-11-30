@@ -16,7 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
+
 
 
 /**

@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.acceptor;
 
-import org.jppf.server.nio.NioState;
+import org.jppf.nio.NioState;
 
 /**
  * Common abstract superclass for all states of a client that sends and receives jobs.

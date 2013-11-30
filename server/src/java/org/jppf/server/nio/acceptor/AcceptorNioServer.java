@@ -20,8 +20,8 @@ package org.jppf.server.nio.acceptor;
 
 import javax.net.ssl.SSLEngine;
 
+import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

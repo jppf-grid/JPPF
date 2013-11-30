@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio;
+package org.jppf.nio;
 
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
