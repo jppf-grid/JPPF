@@ -60,19 +60,23 @@ public final class ExceptionUtils
 
   /**
    * Converts a generic Throwable into an Exception.
+   * If <code>throwable</code> is already an instance of {@link Exception}, it is returned as is.
    * @param throwable the Throwable to convert.
-   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   * @return an (possibly new) {@link Exception} wrapping the {@link Throwable} as its cause.
+   * @since 4.0
    */
   public static Exception toException(final Throwable throwable)
   {
+    if (throwable instanceof Exception) return (Exception) throwable;
     return new Exception(throwable);
   }
 
   /**
-   * Converts a generic Throwable into an Exception.
+   * Converts a generic Throwable into an {@link Exception}.
    * @param throwable the Throwable to convert.
    * @param message the message of the created exception.
    * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   * @since 4.0
    */
   public static Exception toException(final String message, final Throwable throwable)
   {
@@ -80,54 +84,68 @@ public final class ExceptionUtils
   }
 
   /**
-   * Converts a generic Throwable into an RuntimeException.
+   * Converts a generic Throwable into a {@link RuntimeException}.
+   * If <code>throwable</code> is already an instance of {@link RuntimeException}, it is returned as is.
+   * @param throwable the Throwable to convert.
+   * @return a (possibly new) {@link RuntimeException} wrapping the {@link Throwable} as its cause.
+   * @since 4.0
+   */
+  public static RuntimeException toRuntimeException(final Throwable throwable)
+  {
+    if (throwable instanceof RuntimeException) return (RuntimeException) throwable;
+    return new RuntimeException(throwable);
+  }
+
+  /**
+   * Converts a generic Throwable into a {@link RuntimeException}.
    * @param throwable the Throwable to convert.
    * @param message the message of the xcreated exception.
    * @return a new {@link RuntimeException} wrapping the {@link Throwable} as its cause.
+   * @since 4.0
    */
   public static RuntimeException toRuntimeException(final String message, final Throwable throwable)
   {
-    return message == null ? new RuntimeException(throwable) : new RuntimeException(message, throwable);
+    return new RuntimeException(message, throwable);
   }
 
   /**
-   * Converts a generic Throwable into an Exception of the specified class.
+   * Converts a generic {@link Throwable} into an Exception of the specified class.
+   * If <code>throwable</code> is already an instance of the specified exception class, it is returned as is.
    * @param <E> the type of exception to return.
    * @param throwable the Throwable to convert.
-   * @param clazz the class of the exception to convert.
-   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   * @param clazz the class of the exception to convert to.
+   * @return a (possibly new) exception of the specified class wrapping the {@link Throwable} as its cause,
+   * or <code>null</code> if an exception of this class cannot be constructed. 
+   * @since 4.0
    */
-  public static <E extends Exception> Exception toException(final Throwable throwable, final Class<E> clazz)
-  {
-    try
-    {
+  public static <E extends Exception> E toException(final Throwable throwable, final Class<E> clazz) {
+    if (clazz == null) return null;
+    try {
+      if ((throwable != null) && clazz.isAssignableFrom(throwable.getClass())) return (E) throwable;
       Constructor<E> constructor = clazz.getConstructor(Throwable.class);
       return constructor.newInstance(throwable);
+    } catch (Exception e) {
     }
-    catch (Exception e)
-    {
-    }
-    return new Exception(throwable);
+    return null;
   }
 
   /**
-   * Converts a generic Throwable into an Exception of the specified class.
+   * Converts a generic {@link Throwable} into an Exception of the specified class.
    * @param <E> the type of exception to return.
-   * @param throwable the Throwable to convert.
-   * @param clazz the class of the exception to convert.
    * @param message the message of the xcreated exception.
-   * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
+   * @param throwable the Throwable to convert.
+   * @param clazz the class of the exception to convert to.
+   * @return a new exception of the specified class wrapping the {@link Throwable} as its cause,
+   * or <code>null</code> if an exception of this class cannot be constructed. 
+   * @since 4.0
    */
-  public static <E extends Exception> Exception toException(final String message, final Throwable throwable, final Class<E> clazz)
-  {
-    try
-    {
+  public static <E extends Exception> E toException(final String message, final Throwable throwable, final Class<E> clazz) {
+    if (clazz == null) return null;
+    try {
       Constructor<E> constructor = clazz.getConstructor(String.class, Throwable.class);
       return constructor.newInstance(message, throwable);
+    } catch (Exception e) {
     }
-    catch (Exception e)
-    {
-    }
-    return new Exception(message, throwable);
+    return null;
   }
 }
