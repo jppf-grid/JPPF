@@ -79,6 +79,7 @@ public class Runner extends AbstractScenarioRunner
   public static class MyTask extends AbstractTask<String>
   {
     @Override
+    @SuppressWarnings("unchecked")
     public void run()
     {
       int nbSuccess = 0;
