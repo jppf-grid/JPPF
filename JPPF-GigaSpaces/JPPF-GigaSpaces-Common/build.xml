@@ -22,9 +22,10 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
-	<property name="classes.dir"     value="${basedir}/classes"/>	
-	<property name="src.dir"         value="${basedir}/src"/>
-	<property name="build.dir"       value="${basedir}/build"/>
+	<property name="classes.dir"        value="${basedir}/classes"/>	
+	<property name="src.dir"            value="${basedir}/src"/>
+	<property name="build.dir"          value="${basedir}/build"/>
+  <property name="build.sysclasspath" value="last"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->

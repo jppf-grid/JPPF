@@ -22,16 +22,17 @@
   <!--                          Property definitions                             -->
   <!-- ========================================================================= -->
 
-  <property name="classes.dir"   value="${basedir}/classes" />
-  <property name="src.dir"       value="${basedir}/src" />
-  <property name="config.dir"    value="${basedir}/config" />
-  <property name="build.dir"     value="${basedir}/build" />
-  <property name="lib.dir"       value="${basedir}/../lib" />
-  <property name="war.prefix"    value="JPPF_J2EE_Tests" />
+  <property name="build.sysclasspath" value="last"/>
+  <property name="classes.dir"        value="${basedir}/classes" />
+  <property name="src.dir"            value="${basedir}/src" />
+  <property name="config.dir"         value="${basedir}/config" />
+  <property name="build.dir"          value="${basedir}/build" />
+  <property name="lib.dir"            value="${basedir}/../lib" />
+  <property name="war.prefix"         value="JPPF_J2EE_Tests" />
   <property file="${basedir}/../build.number" />
-  <property name="geronimo.name" value="geronimo-tomcat7-javaee6-3.0.0"/>
-  <property name="geronimo.dir"  value="${user.home}/geronimo"/>
-  <property name="j2e.dir"       value="${basedir}/../build" />
+  <property name="geronimo.name"      value="geronimo-tomcat7-javaee6-3.0.0"/>
+  <property name="geronimo.dir"       value="${user.home}/geronimo"/>
+  <property name="j2e.dir"            value="${basedir}/../build" />
 
   <!-- ========================================================================= -->
   <!--                           Classpath definitions                           -->

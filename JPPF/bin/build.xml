@@ -64,6 +64,7 @@
 	<property name="runtime.node"          value="${build}/runtime/node"/>
 	<property name="runtime.gui"           value="${build}/runtime/gui"/>
 	<property name="app.ver"               value="${ant.project.name}-${version.number}"/>
+  <property name="build.sysclasspath"    value="last"/>
 
 	<!-- ========================================================================= -->
 	<!--                           Classpath definitions                           -->

@@ -23,7 +23,8 @@
 	<!-- ========================================================================= -->
 
   <property file="${basedir}/build.properties"/>
-	<property name="deployable"  value="${basedir}/deployable"/>
+	<property name="deployable"         value="${basedir}/deployable"/>
+  <property name="build.sysclasspath" value="last"/>
 
 	<!-- ========================================================================= -->
 	<!--                                    Clean                                  -->

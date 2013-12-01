@@ -22,6 +22,7 @@
 	<!--                          Property definitions                             -->
 	<!-- ========================================================================= -->
 
+  <property name="build.sysclasspath"    value="last"/>
 	<property name="build.properties.file" value="${basedir}/build.properties"/>
 	<property file="${build.properties.file}"/>
 	<property name="config.dir"            value="${basedir}/config"/>

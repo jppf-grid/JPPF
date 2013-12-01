@@ -22,23 +22,24 @@
   <!--                          Property definitions                             -->
   <!-- ========================================================================= -->
 
-  <property name="jppf"              value="${basedir}/../JPPF"/>
-  <property name="lib"               value="${jppf}/lib"/>
-  <property name="src"               value="${basedir}/src"/>
-  <property name="framework.src"     value="${src}/framework"/>
-  <property name="tests.src"         value="${src}/tests"/>
+  <property name="build.sysclasspath" value="last"/>
+  <property name="jppf"               value="${basedir}/../JPPF"/>
+  <property name="lib"                value="${jppf}/lib"/>
+  <property name="src"                value="${basedir}/src"/>
+  <property name="framework.src"      value="${src}/framework"/>
+  <property name="tests.src"          value="${src}/tests"/>
   <property name="addons.src"         value="${src}/addons"/>
-  <property name="resources.src"     value="${src}/resources"/>
-  <property name="classes"           value="${basedir}/classes"/>
-  <property name="framework.classes" value="${classes}/framework"/>
-  <property name="tests.classes"     value="${classes}/tests"/>
+  <property name="resources.src"      value="${src}/resources"/>
+  <property name="classes"            value="${basedir}/classes"/>
+  <property name="framework.classes"  value="${classes}/framework"/>
+  <property name="tests.classes"      value="${classes}/tests"/>
   <property name="addons.classes"     value="${classes}/addons"/>
-  <property name="build"             value="${basedir}/build"/>
+  <property name="build"              value="${basedir}/build"/>
 
   <!-- JPPF modules -->
-  <property name="client"            value="${basedir}/../client"/>
-  <property name="common"            value="${basedir}/../common"/>
-  <property name="node"              value="${basedir}/../node"/>
+  <property name="client"             value="${basedir}/../client"/>
+  <property name="common"             value="${basedir}/../common"/>
+  <property name="node"               value="${basedir}/../node"/>
 
   <property file="${jppf}/bin/build.properties"/>
   <property file="${jppf}/bin/build.number"/>
