@@ -147,6 +147,7 @@
 			<property name="label" value="Configuration"/>
 			<property name="scrollable" value="false"/>
 			<property name="layoutConstraints" value="fill, flowy"/>
+      <property name="componentConstraints" value="aligny top"/>
 			<property name="bordered" value="true"/>
 
 			<child name="TabName" type="ComboBox">
@@ -198,12 +199,13 @@
 			<listener type="script">
 				<script language="groovy">changePreview(getPopulatedConfiguration())</script>
 			</listener>
+      <property name="componentConstraints" value="aligny top"/>
 		</child>
 
 		<child name="ChartActionsPanel" type="page">
 			<property name="label" value="Actions"/>
 			<property name="layoutConstraints" value="fill, flowy"/>
-			<property name="componentConstraints" value="growx 0"/>
+			<property name="componentConstraints" value="growx 0, aligny top"/>
 			<property name="bordered" value="true"/>
 
 			<child name="SaveNewChart" type="Button">

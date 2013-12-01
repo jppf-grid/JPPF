@@ -7,6 +7,7 @@ import java.awt.event.*
 import javax.swing.*
 import org.jppf.client.*
 import org.jppf.utils.*
+import org.jppf.utils.collections.*
 import org.jppf.server.protocol.*
 import org.jppf.ui.monitoring.*
 import org.jppf.ui.monitoring.event.*
