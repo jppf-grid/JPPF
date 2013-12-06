@@ -19,6 +19,7 @@ package org.jppf.utils;
 
 import java.io.Serializable;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Instances of this class serve as unique identifiers for messages sent to and from
@@ -37,6 +38,10 @@ public class JPPFUuid implements Serializable
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Sequence number added to the seed of the Random object definition to ensure unicity within the JVM.
+   */
+  private static final AtomicLong SEED_SEQUENCE = new AtomicLong(0L);
   /**
    * Set of characters used to compose a uuid, including more than alphanumeric characters.
    */
@@ -206,7 +211,7 @@ public class JPPFUuid implements Serializable
     r.setSeed(System.nanoTime());
     return r;
     */
-    return new Random(System.nanoTime());
+    return new Random(System.nanoTime() + SEED_SEQUENCE.incrementAndGet());
   }
 
   /**
