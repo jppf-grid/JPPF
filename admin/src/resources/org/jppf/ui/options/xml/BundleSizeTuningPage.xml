@@ -21,7 +21,6 @@
 	<property name="label" value="Bundle Size Tuning"/>
 	<property name="scrollable" value="true"/>
 	<property name="layoutConstraints" value="fill, flowy"/>
-	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
 	<script language="groovy" source="org/jppf/ui/options/xml/bundleSize.groovy"/>
 	<initializer type="script">
 		<script language="groovy">refresh()</script>
