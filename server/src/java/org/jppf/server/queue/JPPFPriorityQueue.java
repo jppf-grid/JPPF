@@ -245,7 +245,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (debugEnabled) log.debug("removing bundle from queue, jobId= " + serverJob.getName() + ", removeFromJobMap=" + removeFromJobMap);
       priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob);
 
-      for (ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) addBundle(clientBundle);
+      for (ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) {
+        if (debugEnabled) log.debug("adding completion bundle for jobId={} : {}", serverJob.getName(), clientBundle);
+        addBundle(clientBundle);
+      }
     } finally {
       lock.unlock();
     }

@@ -169,46 +169,6 @@ public class ServerJob extends AbstractServerJobBase {
   }
 
   /**
-   * Utility method - extract DataLocation from list of server tasks filtered by their state (exclusive) and add them to list.
-   * @param dst destination list of <code>DataLocation</code>.
-   * @param src source list of <code>ServerTask</code> objects.
-   * @param state the first state of the server tasks to exclude.
-   * @param otherStates the other states of the server tasks to exclude.
-   */
-  private static void addExcluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state, final TaskState...otherStates) {
-    EnumSet<TaskState> stateSet = EnumSet.of(state, otherStates);
-    for (ServerTask item : src) {
-      if (!stateSet.contains(item.getState())) dst.add(item.getDataLocation());
-    }
-  }
-
-  /**
-   * Utility method - extract DataLocation from list of server tasks filtered by their state (exclusive) and add them to list.
-   * @param dst destination list of <code>DataLocation</code>.
-   * @param src source list of <code>ServerTask</code> objects.
-   * @param state the state of the server tasks to add.
-   */
-  private static void addIncluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state) {
-    for (ServerTask item : src) {
-      if (item.getState() == state) dst.add(item.getDataLocation());
-    }
-  }
-
-  /**
-   * Utility method - extract DataLocation from list of server tasks filtered by their state (inclusive) and add them to list.
-   * @param dst destination list of <code>DataLocation</code>.
-   * @param src source list of <code>ServerTask</code> objects.
-   * @param state the first state of the server tasks to include.
-   * @param otherStates the other states of the server tasks to include.
-   */
-  private static void addIncluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state, final TaskState...otherStates) {
-    EnumSet<TaskState> stateSet = EnumSet.of(state, otherStates);
-    for (ServerTask item : src) {
-      if (stateSet.contains(item.getState())) dst.add(item.getDataLocation());
-    }
-  }
-
-  /**
    * Called to notify that the execution of a task has completed.
    * @param bundle    the completed task.
    * @param throwable the {@link Exception} thrown during job execution or <code>null</code>.

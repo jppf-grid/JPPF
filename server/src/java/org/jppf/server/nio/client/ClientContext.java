@@ -49,6 +49,10 @@ public class ClientContext extends AbstractNioContext<ClientState>
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether TRACE logging level is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Reference to the driver.
    */
   protected static final JPPFDriver driver = JPPFDriver.getInstance();
@@ -73,10 +77,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * The number of tasks remaining to send.
    */
   private int nbTasksToSend = 0;
-  /**
-   * Unique ID for the client.
-   */
-  private String clientUuid = null;
 
   /**
    * Get the task bundle to send or receive.
@@ -100,18 +100,22 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public void handleException(final ChannelWrapper<?> channel, final Exception e)
   {
     ClientNioServer.closeClient(channel);
-    if (clientUuid != null)
-    {
+    if (uuid != null) {
       ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
-      List<ChannelWrapper<?>> list = classServer.getProviderConnections(clientUuid);
-      if ((list != null) && !list.isEmpty())
-      {
-        for (ChannelWrapper<?> classChannel: list)
-        {
+      List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
+      String s = getClass().getSimpleName() + '[' + "channelId=" + channel.getId() + ']'; 
+      if (debugEnabled) log.debug("{} found {} provider connections for clientUuid={}", new Object[] {s, list == null ? 0 : list.size(), uuid});
+      if ((list != null) && !list.isEmpty()) {
+        for (ChannelWrapper<?> classChannel: list) {
           ClassContext ctx = (ClassContext) classChannel.getContext();
-          if (ctx.getConnectionUuid().equals(connectionUuid))
-          {
-            ClientClassNioServer.closeConnection(channel);
+          if (ctx.getConnectionUuid().equals(connectionUuid)) {
+            if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
+            try {
+              ClientClassNioServer.closeConnection(classChannel, false);
+            }
+            catch (Exception e2) {
+              log.error(e2.getMessage(), e2);
+            }
             break;
           }
         }
@@ -133,7 +137,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     List<ServerTask> tasks = clientBundle.getTaskList();
     int[] positions = new int[tasks.size()];
     for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getJobPosition();
-    if (debugEnabled) log.debug("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
+    if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
     bundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
     message.addLocation(IOHelper.serializeData(bundle, helper.getSerializer()));
     for (ServerTask task: tasks) message.addLocation(task.getResult());
@@ -179,24 +183,6 @@ public class ClientContext extends AbstractNioContext<ClientState>
   public void setClientMessage(final ClientMessage message)
   {
     this.message = message;
-  }
-
-  /**
-   * Get the uuid of the corresponding node.
-   * @return the uuid as a string.
-   */
-  public String getClientUuid()
-  {
-    return clientUuid;
-  }
-
-  /**
-   * Set the uuid of the corresponding node.
-   * @param nodeUuid the uuid as a string.
-   */
-  public void setClientUuid(final String nodeUuid)
-  {
-    this.clientUuid = nodeUuid;
   }
 
   @Override
@@ -279,6 +265,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     ServerTaskBundleClient bundle;
     if ((bundle = getInitialBundleWrapper()) != null)
     {
+      if (debugEnabled) log.debug("cancelUponClientDisconnect bundle={}", bundle);
       bundle.bundleEnded();
       setInitialBundleWrapper(null);
     }
@@ -298,6 +285,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
       bundle.bundleEnded();
       setInitialBundleWrapper(null);
     }
+    else if (debugEnabled) log.debug("getInitialBundleWrapper() is null for {}", this);
   }
 
   /**

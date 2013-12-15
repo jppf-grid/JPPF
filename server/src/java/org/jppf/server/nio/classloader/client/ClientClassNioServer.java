@@ -103,8 +103,16 @@ public class ClientClassNioServer extends ClassNioServer
    */
   public static void closeConnection(final ChannelWrapper<?> channel)
   {
-    if (channel == null)
-    {
+    closeConnection(channel, true);
+  }
+
+  /**
+   * Close the specified connection.
+   * @param channel the channel representing the connection.
+   * @param removeJobConnection <code>true</code> to remove the corresponding job connection as well, <code>false</code> otherwise.
+   */
+  public static void closeConnection(final ChannelWrapper<?> channel, final boolean removeJobConnection) {
+    if (channel == null) {
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
@@ -112,17 +120,17 @@ public class ClientClassNioServer extends ClassNioServer
     ClassContext context = (ClassContext) channel.getContext();
     String uuid = context.getUuid();
     if (uuid != null) server.removeProviderConnection(uuid, channel);
-    try
-    {
+    else if (debugEnabled) log.debug("null uuid for {}", context);
+    try {
       channel.close();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
-    String connectionUuid = context.getConnectionUuid();
-    JPPFDriver.getInstance().getClientNioServer().closeClientConnection(connectionUuid);
+    if (removeJobConnection) {
+      String connectionUuid = context.getConnectionUuid();
+      JPPFDriver.getInstance().getClientNioServer().closeClientConnection(connectionUuid);
+    }
   }
 
   /**

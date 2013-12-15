@@ -93,8 +93,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   }
 
   @Override
-  public NioContext createNioContext()
-  {
+  public NioContext createNioContext() {
     return new ClientContext();
   }
 
@@ -102,8 +101,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * Remove the specified channel.
    * @param channel the channel to remove.
    */
-  public void removeChannel(final ChannelWrapper<?> channel)
-  {
+  public void removeChannel(final ChannelWrapper<?> channel) {
     channels.remove(channel);
   }
 
@@ -111,17 +109,13 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * Attempts to close the connection witht he specified uuid.
    * @param connectionUuid the connection uuid to correlate.
    */
-  public void closeClientConnection(final String connectionUuid)
-  {
+  public void closeClientConnection(final String connectionUuid) {
     ChannelWrapper<?> channel = null;
     if (debugEnabled) log.debug("closing client channel with connectionUuid=" + connectionUuid);
-    synchronized(channels)
-    {
-      for (ChannelWrapper<?> ch: channels)
-      {
+    synchronized(channels) {
+      for (ChannelWrapper<?> ch: channels) {
         ClientContext context = (ClientContext) ch.getContext();
-        if (context.getConnectionUuid().equals(connectionUuid))
-        {
+        if (context.getConnectionUuid().equals(connectionUuid)) {
           channel = ch;
           break;
         }
@@ -134,37 +128,28 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    * Close a connection to a node.
    * @param channel a <code>SocketChannel</code> that encapsulates the connection.
    */
-  public static void closeClient(final ChannelWrapper<?> channel)
-  {
+  public static void closeClient(final ChannelWrapper<?> channel) {
     if (debugEnabled) log.debug("closing client channel " + channel);
-    try
-    {
+    try {
       driver.getClientNioServer().removeChannel(channel);
       channel.close();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
-    try
-    {
+    try {
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
 
   @Override
-  public boolean isIdle(final ChannelWrapper<?> channel)
-  {
+  public boolean isIdle(final ChannelWrapper<?> channel) {
     return ClientState.IDLE == channel.getContext().getState();
   }
 
   @Override
-  public List<ChannelWrapper<?>> getAllConnections()
-  {
+  public List<ChannelWrapper<?>> getAllConnections() {
     return channels;
   }
 }

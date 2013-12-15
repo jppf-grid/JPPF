@@ -65,9 +65,10 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
     if (bundle == null) throw new IllegalStateException("bundlerWrapper is null");
     if (!isChannelValid()) {
+      if (debugEnabled) log.debug("channel is invalid: {}", channel);
       ClientContext context = (ClientContext) channel.getContext();
-      if (context.getInitialBundleWrapper() != null) context.getInitialBundleWrapper().removeCompletionListener(this);
-      context.cancelJobOnClose();
+      //if (context.getInitialBundleWrapper() != null) context.getInitialBundleWrapper().removeCompletionListener(this);
+      // context.cancelJobOnClose(); 
       return;
     }
     if (results.isEmpty()) {
@@ -95,6 +96,13 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
 
   @Override
   public void bundleEnded(final ServerTaskBundleClient bundle) {
+    if (debugEnabled) log.debug("bundle ended: {}", bundle);
+    /*
+    String uuid = bundle.getUuid();
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
+    ServerJob job = queue.getBundleForJob(uuid);
+    if (job != null) queue.removeBundle(job);
+    */
   }
 
   /**
