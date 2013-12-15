@@ -126,6 +126,7 @@ public class JobEvent extends EventObject
    * Get the tasks that were dispatched or returned.
    * <p>This method returns a non <code>null</code> value only for <code>jobDispatched()</code> and <code>jobReturned()</code> events.
    * @return a list of {@link JPPFTask} instances.
+   * @since 4.0
    */
   public List<Task<?>> getJobTasks()
   {

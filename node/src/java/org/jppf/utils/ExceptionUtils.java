@@ -48,6 +48,22 @@ public final class ExceptionUtils
   }
 
   /**
+   * Get a throwable's stack trace.
+   * @return the stack trace as a string.
+   */
+  public static String getCallStack()
+  {
+    Throwable t = new Throwable();
+    StringBuilder sb = new StringBuilder();
+    StackTraceElement[] st = t.getStackTrace();
+    for (int i=1; i<st.length; i++) {
+      if (i > 1) sb.append("\n");
+      sb.append("  at ").append(st[i]);
+    }
+    return sb.toString();
+  }
+
+  /**
    * Get the message of the specified <code>Throwable</code> along with its class name.
    * @param t the <code>Throwable</code> object from which to get the message.
    * @return a formatted message from the <code>Throwable</code>.

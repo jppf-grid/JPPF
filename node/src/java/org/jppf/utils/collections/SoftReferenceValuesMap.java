@@ -58,9 +58,6 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
     map = new HashMap<>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int size()
   {
@@ -68,9 +65,6 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
     return map.size();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isEmpty()
   {
@@ -78,9 +72,6 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
     return map.isEmpty();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public V get(final Object key)
   {
@@ -89,9 +80,6 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
     return ref == null ? null : ref.get();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @SuppressWarnings("unchecked")
   public V put(final K key, final V value)
@@ -101,9 +89,6 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
     return ref == null ? null : ref.get();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public V remove(final Object key)
   {
@@ -112,13 +97,17 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
     return ref == null ? null : ref.get();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Set<Map.Entry<K, V>> entrySet()
   {
     throw new UnsupportedOperationException("This operation is not implemented");
+  }
+
+  @Override
+  public void clear()
+  {
+    cleanup();
+    map.clear();
   }
 
   /**

@@ -94,7 +94,7 @@ public class IdleDetectionTask extends TimerTask
     }
     catch(JPPFError e)
     {
-      System.out.println(ExceptionUtils.getMessage(e) + " - idle mode is disbled");
+      System.out.println(ExceptionUtils.getMessage(e) + " - idle mode is disabled");
       detector = null;
       cancel();
     }

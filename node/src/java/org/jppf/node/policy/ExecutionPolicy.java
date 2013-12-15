@@ -24,10 +24,10 @@ import org.jppf.utils.*;
 
 /**
  * Interface for all execution policy implementations.
+ * This API defines a DSL for predicate-oriented expressions.
  * @author Laurent Cohen
  */
-public abstract class ExecutionPolicy implements Serializable
-{
+public abstract class ExecutionPolicy implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -54,9 +54,18 @@ public abstract class ExecutionPolicy implements Serializable
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the operand in an "AND" operation.
    */
-  public ExecutionPolicy and(final ExecutionPolicy...rules)
-  {
+  public ExecutionPolicy and(final ExecutionPolicy...rules) {
     return new AndRule(makeRuleArray(this, rules));
+  }
+
+  /**
+   * Create an execution policy that is a logical "AND" combination of this policy
+   * and the engations those specified as argument.
+   * @param rules rules to combine this one with.
+   * @return an execution policy that combines the this policy with the operand in an "AND" operation.
+   */
+  public ExecutionPolicy andNot(final ExecutionPolicy...rules) {
+    return new AndRule(makeNotRuleArray(this, rules));
   }
 
   /**
@@ -64,9 +73,18 @@ public abstract class ExecutionPolicy implements Serializable
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the operand in an "OR" operation.
    */
-  public ExecutionPolicy or(final ExecutionPolicy...rules)
-  {
+  public ExecutionPolicy or(final ExecutionPolicy...rules) {
     return new OrRule(makeRuleArray(this, rules));
+  }
+
+  /**
+   * Create an execution policy that is a logical "OR" combination of this policy
+   * and the engations those specified as argument.
+   * @param rules rules to combine this one with.
+   * @return an execution policy that combines the this policy with the negated operand in an "OR NOT" operation.
+   */
+  public ExecutionPolicy orNot(final ExecutionPolicy...rules) {
+    return new OrRule(makeNotRuleArray(this, rules));
   }
 
   /**
@@ -74,8 +92,7 @@ public abstract class ExecutionPolicy implements Serializable
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the operand in an "XOR" operation.
    */
-  public ExecutionPolicy xor(final ExecutionPolicy...rules)
-  {
+  public ExecutionPolicy xor(final ExecutionPolicy...rules) {
     return new XorRule(makeRuleArray(this, rules));
   }
 
@@ -83,8 +100,7 @@ public abstract class ExecutionPolicy implements Serializable
    * Create an execution policy that is a negation of this policy.
    * @return an execution policy that negates this policy.
    */
-  public ExecutionPolicy not()
-  {
+  public ExecutionPolicy not() {
     return new NotRule(this);
   }
 
@@ -94,12 +110,26 @@ public abstract class ExecutionPolicy implements Serializable
    * @param ruleArray the array of other rules.
    * @return an array of <code>ExecutionPolicy</code> instances.
    */
-  private static ExecutionPolicy[] makeRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray)
-  {
+  private static ExecutionPolicy[] makeRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray) {
     ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
     int count = 0;
     result[count++] = rule;
     for (ExecutionPolicy r: ruleArray) result[count++] = r;
+    return result;
+  }
+
+  /**
+   * Generate  new array with size +1 and the specified rule as first element,
+   * while the other rules are negated before being added to the new array.
+   * @param rule the rule to set as first element.
+   * @param ruleArray the array of other rules.
+   * @return an array of <code>ExecutionPolicy</code> instances.
+   */
+  private static ExecutionPolicy[] makeNotRuleArray(final ExecutionPolicy rule, final ExecutionPolicy[] ruleArray) {
+    ExecutionPolicy[] result = new ExecutionPolicy[ruleArray.length + 1];
+    int count = 0;
+    result[count++] = rule;
+    for (ExecutionPolicy r: ruleArray) result[count++] = r.not();
     return result;
   }
 
@@ -109,10 +139,8 @@ public abstract class ExecutionPolicy implements Serializable
    * @param name the name of the property to look for.
    * @return the value of the property, or null if it could not be found.
    */
-  public String getProperty(final PropertiesCollection info, final String name)
-  {
-    for (TypedProperties props: info.getPropertiesArray())
-    {
+  public String getProperty(final PropertiesCollection info, final String name) {
+    for (TypedProperties props: info.getPropertiesArray()) {
       String value = props.getString(name);
       if (value != null) return value;
     }
@@ -124,8 +152,7 @@ public abstract class ExecutionPolicy implements Serializable
    * @return an indented string depending on the value of <code>toStringIndent</code>.
    * @exclude
    */
-  protected static String indent()
-  {
+  protected static String indent() {
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<toStringIndent; i++) sb.append("  ");
     return sb.toString();
@@ -134,8 +161,7 @@ public abstract class ExecutionPolicy implements Serializable
   /**
    * An execution policy that realizes a binary logical combination of the policies specified as operands.
    */
-  public abstract static class LogicalRule extends ExecutionPolicy
-  {
+  public abstract static class LogicalRule extends ExecutionPolicy {
     /**
      * First operand.
      * @exclude
@@ -146,8 +172,7 @@ public abstract class ExecutionPolicy implements Serializable
      * Initialize this binary logical operator with the specified operands.
      * @param rules the first operand.
      */
-    public LogicalRule(final ExecutionPolicy...rules)
-    {
+    public LogicalRule(final ExecutionPolicy...rules) {
       this.rules = rules;
     }
 
@@ -158,13 +183,11 @@ public abstract class ExecutionPolicy implements Serializable
     @Override
     public String toString()
     {
-      synchronized(ExecutionPolicy.class)
-      {
+      synchronized(ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         toStringIndent++;
         if (rules == null) sb.append(indent()).append("null\n");
-        else
-        {
+        else {
           for (ExecutionPolicy ep: rules) sb.append(ep.toString());
         }
         toStringIndent--;
@@ -176,14 +199,12 @@ public abstract class ExecutionPolicy implements Serializable
   /**
    * An execution policy that realizes a logical "AND" combination of multiple policies specified as operands.
    */
-  public static class AndRule extends LogicalRule
-  {
+  public static class AndRule extends LogicalRule {
     /**
      * Initialize this AND operator with the specified operands.
      * @param rules the rules to combine.
      */
-    public AndRule(final ExecutionPolicy...rules)
-    {
+    public AndRule(final ExecutionPolicy...rules) {
       super(rules);
     }
 
@@ -195,8 +216,7 @@ public abstract class ExecutionPolicy implements Serializable
     @Override
     public boolean accepts(final PropertiesCollection info)
     {
-      if ((rules == null) || (rules.length <= 0)) return true;
-      boolean b = true;
+      if ((rules == null) || (rules.length <= 0)) return true; boolean b = true;
       for (ExecutionPolicy ep: rules) b = b && ep.accepts(info);
       return b;
     }
@@ -207,12 +227,9 @@ public abstract class ExecutionPolicy implements Serializable
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString()
-    {
-      if (computedToString == null)
-      {
-        synchronized(ExecutionPolicy.class)
-        {
+    public String toString() {
+      if (computedToString == null) {
+        synchronized(ExecutionPolicy.class) {
           computedToString = new StringBuilder().append(indent()).append("<AND>\n").append(super.toString()).append(indent()).append("</AND>\n").toString();
         }
       }
@@ -223,14 +240,12 @@ public abstract class ExecutionPolicy implements Serializable
   /**
    * An execution policy that realizes a logical "OR" combination of multiple policies specified as operands.
    */
-  public static class OrRule extends LogicalRule
-  {
+  public static class OrRule extends LogicalRule {
     /**
      * Initialize this OR operator with the specified operands.
      * @param rules the rules to combine.
      */
-    public OrRule(final ExecutionPolicy...rules)
-    {
+    public OrRule(final ExecutionPolicy...rules) {
       super(rules);
     }
 
@@ -240,8 +255,7 @@ public abstract class ExecutionPolicy implements Serializable
      * @return true if at least one of the operands' accepts() method returns true.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info)
-    {
+    public boolean accepts(final PropertiesCollection info) {
       if ((rules == null) || (rules.length <= 0)) return true;
       boolean b = false;
       for (ExecutionPolicy ep: rules) b = b || ep.accepts(info);
@@ -253,12 +267,9 @@ public abstract class ExecutionPolicy implements Serializable
      * @return an XML string representation of this object
      */
     @Override
-    public String toString()
-    {
-      if (computedToString == null)
-      {
-        synchronized(ExecutionPolicy.class)
-        {
+    public String toString() {
+      if (computedToString == null) {
+        synchronized(ExecutionPolicy.class) {
           computedToString = new StringBuilder().append(indent()).append("<OR>\n").append(super.toString()).append(indent()).append("</OR>\n").toString();
         }
       }
@@ -269,8 +280,7 @@ public abstract class ExecutionPolicy implements Serializable
   /**
    * An execution policy that realizes a logical "XOR" combination of multiple policies specified as operands.
    */
-  public static class XorRule extends LogicalRule
-  {
+  public static class XorRule extends LogicalRule {
     /**
      * Initialize this OR operator with the specified operands.
      * @param rules the rules to combine.
@@ -286,8 +296,7 @@ public abstract class ExecutionPolicy implements Serializable
      * @return true if and only if the operands' accepts() method return different values.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info)
-    {
+    public boolean accepts(final PropertiesCollection info) {
       if ((rules == null) || (rules.length <= 0)) return true;
       boolean b = rules[0].accepts(info);
       if (rules.length >= 1) for (int i=1; i<rules.length; i++) b = (b != rules[i].accepts(info));
@@ -299,12 +308,9 @@ public abstract class ExecutionPolicy implements Serializable
      * @return an XML string representation of this object
      */
     @Override
-    public String toString()
-    {
-      if (computedToString == null)
-      {
-        synchronized(ExecutionPolicy.class)
-        {
+    public String toString() {
+      if (computedToString == null) {
+        synchronized(ExecutionPolicy.class) {
           computedToString = new StringBuilder().append(indent()).append("<XOR>\n").append(super.toString()).append(indent()).append("</XOR>\n").toString();
         }
       }
@@ -315,8 +321,7 @@ public abstract class ExecutionPolicy implements Serializable
   /**
    * An execution policy that realizes the negation of a policy specified as operand.
    */
-  public static class NotRule extends ExecutionPolicy
-  {
+  public static class NotRule extends ExecutionPolicy {
     /**
      * The operand.
      */
@@ -326,8 +331,7 @@ public abstract class ExecutionPolicy implements Serializable
      * Initialize this binary logical operator with the specified operands.
      * @param rule the operand.
      */
-    public NotRule(final ExecutionPolicy rule)
-    {
+    public NotRule(final ExecutionPolicy rule) {
       this.rule = rule;
     }
 
@@ -337,22 +341,18 @@ public abstract class ExecutionPolicy implements Serializable
      * @return true if and only if the 2 operands' accepts() method return true.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info)
-    {
+    public boolean accepts(final PropertiesCollection info) {
       return !rule.accepts(info);
     }
 
     /**
      * Print this object to a string.
-     * @return an XML string representation of this object
+     * @return an XML string representation of this object.
      */
     @Override
-    public String toString()
-    {
-      if (computedToString == null)
-      {
-        synchronized(ExecutionPolicy.class)
-        {
+    public String toString() {
+      if (computedToString == null) {
+        synchronized(ExecutionPolicy.class) {
           StringBuilder sb = new StringBuilder();
           sb.append(indent()).append("<NOT>\n");
           toStringIndent++;
@@ -365,5 +365,14 @@ public abstract class ExecutionPolicy implements Serializable
       }
       return computedToString;
     }
+  }
+
+  /**
+   * A convenience method to provide a way to negate a policy that is consistent with the execution policy DSL.
+   * @param policy the policy to negate.
+   * @return An execution policy which negates the specified policy, or <code>null</code> if the specified policy was <code>null</code>.
+   */
+  public static ExecutionPolicy Not(final ExecutionPolicy policy) {
+    return policy == null ? null : new NotRule(policy);
   }
 }
