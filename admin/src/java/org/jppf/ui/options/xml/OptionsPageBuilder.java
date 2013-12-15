@@ -226,6 +226,7 @@ public class OptionsPageBuilder
     elt.setBordered(desc.getBoolean("bordered", false));
     elt.setLayoutConstraints(desc.getString("layoutConstraints", "fill, gapy 2!, insets 0 0 0 0"));
     elt.setComponentConstraints(desc.getString("componentConstraints", "growx"));
+    elt.setDetachable(desc.getBoolean("detachable", true));
     for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
     if (desc.initializer != null) elt.setInitializer(createListener(desc.initializer));
     if (desc.finalizer != null) elt.setFinalizer(createListener(desc.finalizer));

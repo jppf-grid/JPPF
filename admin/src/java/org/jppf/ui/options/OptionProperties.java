@@ -124,4 +124,9 @@ public interface OptionProperties extends Serializable
    * @param componentConstraints the constraints as a string.
    */
   void setComponentConstraints(String componentConstraints);
+  /**
+   * Determines whether this component can be detached to a different view.
+   * @return true if this component can be detached, false otherwise.
+   */
+  boolean isDetachable();
 }

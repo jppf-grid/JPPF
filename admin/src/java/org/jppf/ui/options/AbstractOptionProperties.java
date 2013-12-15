@@ -83,6 +83,10 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Mig layout constraints for a component.
    */
   protected String componentConstraints = null;
+  /**
+   * Determines whether this component can be detached to a different view.
+   */
+  protected boolean detachable = true;
 
   /**
    * Constructor provided as a convenience to facilitate the creation of
@@ -363,5 +367,20 @@ public abstract class AbstractOptionProperties implements OptionProperties
   @Override
   public void setEditable(final boolean editable)
   {
+  }
+
+  @Override
+  public boolean isDetachable()
+  {
+    return detachable;
+  }
+
+  /**
+   * Specify whether this component can be detached to a different view.
+   * @param detachable <code>true</code> if this component can be detached, <code>false</code> otherwise.
+   */
+  public void setDetachable(final boolean detachable)
+  {
+    this.detachable = detachable;
   }
 }
