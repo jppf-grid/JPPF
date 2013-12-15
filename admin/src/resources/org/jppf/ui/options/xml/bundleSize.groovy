@@ -36,7 +36,7 @@ void apply()
     return;
   }
   def params = new TypedProperties();
-  params.loadString(option.findFirstWithName("/LoadBalancingParameters").getValue());
+  params.load(new StringReader(option.findFirstWithName("/LoadBalancingParameters").getValue()));
   def msg = connection.changeLoadBalancerSettings(algorithm, params);
   if (msg != null) option.findFirstWithName("/LoadBalancingMessages").setValue(msg);
 }
