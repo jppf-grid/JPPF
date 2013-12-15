@@ -31,6 +31,7 @@ import org.jppf.utils.TypedProperties;
  * It draws 500 discs at random locations with a random color 25 times / second.
  * Every 5 seconds, the screen is emptied (repainted in black).
  * @author Laurent Cohen
+ * @since 4.0
  */
 public class SimpleScreenSaver extends JPanel implements JPPFScreenSaver {
   /**

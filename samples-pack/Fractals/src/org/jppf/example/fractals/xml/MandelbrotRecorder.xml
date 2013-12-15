@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2013 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="MandelbrotRecorder" type="page">
+	<property name="layoutConstraints" value="flowy, fill"/>
+  <property name="bordered" value="true"/>
+
+  <child name="mandelbrot.record.top" type="page">
+    <child name="record.mandelbrot" type="Button">
+      <property name="icon" value="/icons/record.gif"/>
+      <property name="toggle" value="true"/>
+      <property name="tooltip" value="Start/stop recording for later retrieval and replay"/>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          def recording = RunnerFactory.getRunner("mandelbrot").isRecording();
+          RunnerFactory.getRunner("mandelbrot").setRecording(!recording);
+        ]]></script>
+      </listener>
+    </child>
+  
+    <child name="replay.mandelbrot" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/start.gif"/>
+      <property name="tooltip" value="Replay the currently recorded configurations"/>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          RunnerFactory.getRunner("mandelbrot").replay();
+        ]]></script>
+      </listener>
+    </child>
+
+    <child name="mandelbrot.clear" type="Button">
+      <property name="icon" value="/icons/trash.gif"/>
+      <property name="tooltip" value="Clear all records"/>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          RunnerFactory.getRunner("mandelbrot").clearRecords();
+        ]]></script>
+      </listener>
+    </child>
+
+  </child>
+
+  <child name="mandelbrot.record.bottom" type="page">
+    <child name="mandelbrot.open" type="FileChooser">
+      <property name="icon" value="/icons/open.gif"/>
+      <property name="tooltip" value="Open a record file for playback"/>
+      <property name="type" value="1"/>
+      <property name="extensions" value="csv;CSV files (*.csv)"/>
+      <property name="value" value="./mandelbrot.csv"/>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          RunnerFactory.getRunner("mandelbrot").loadRecords(option.getValue());
+        ]]></script>
+      </listener>
+    </child>
+  
+    <child name="mandelbrot.save" type="FileChooser">
+      <property name="icon" value="/icons/save.gif"/>
+      <property name="tooltip" value="Save all current records to a file"/>
+      <property name="type" value="2"/>
+      <property name="extensions" value="csv;CSV files (*.csv)|"/>
+      <property name="value" value="./mandelbrot.csv"/>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          RunnerFactory.getRunner("mandelbrot").saveRecords(option.getValue());
+        ]]></script>
+      </listener>
+    </child>
+  
+    <child name="filler" type="page">
+      <property name="layoutConstraints" value="fill"/>
+      <property name="componentConstraints" value="growx, pushx"/>
+    </child>
+
+  </child>
+
+</opt:main>

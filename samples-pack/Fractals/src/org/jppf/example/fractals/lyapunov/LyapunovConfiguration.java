@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.example.fractals;
+package org.jppf.example.fractals.lyapunov;
 
-import java.io.Serializable;
+import org.jppf.example.fractals.AbstractFractalConfiguration;
 
 /**
  * Instances of this class represent the set of parameters for either
@@ -28,7 +28,7 @@ import java.io.Serializable;
  * <a href="http://en.wikipedia.org/wiki/Image:Lyapunov-fractal.png"> on the Wikipedia web site</a>.
  * @author Laurent Cohen
  */
-public class FractalConfiguration implements Serializable
+public class LyapunovConfiguration extends AbstractFractalConfiguration
 {
   /**
    * Explicit serialVersionUID.
@@ -36,37 +36,22 @@ public class FractalConfiguration implements Serializable
   private static final long serialVersionUID = 1L;
   /**
    * Lyapunov: lower bound for &quot;a&quot;.<br>
-   * Mandelbrot: lower bound for real part of &quot;c&quot;.
    */
   public double amin = 3.4;
   /**
    * Lyapunov: upper bound for &quot;a&quot;.<br>
-   * Mandelbrot: upper bound for real part of &quot;c&quot;.
    */
   public double amax = 4;
   /**
    * Lyapunov: lower bound for &quot;b&quot;.<br>
-   * Mandelbrot: lower bound for imaginary part of &quot;c&quot;.
    */
   public double bmin = 2.5;
   /**
    * Lyapunov: upper bound for &quot;b&quot;.<br>
-   * Mandelbrot: upper bound for imaginary part of &quot;c&quot;.
    */
   public double bmax = 3.4;
   /**
-   * Lyapunov: image height.<br>
-   * Mandelbrot: image width.
-   */
-  public int asize = 768;
-  /**
-   * Lyapunov: image width.<br>
-   * Mandelbrot: image height.
-   */
-  public int bsize = 1024;
-  /**
-   * Lyapunov: image width.<br>
-   * Mandelbrot: image height.
+   * Lyapunov: ???.<br>
    */
   public int nmax = 1000;
   /**
@@ -77,7 +62,7 @@ public class FractalConfiguration implements Serializable
   /**
    * Initialize this configuration with default parameters.
    */
-  public FractalConfiguration()
+  public LyapunovConfiguration()
   {
   }
 
@@ -93,39 +78,17 @@ public class FractalConfiguration implements Serializable
    * @param nmax definition (also called N).
    * @param seq sequence of As and Bs, used only for Lyapunov algorithm.
    */
-  public FractalConfiguration(final double amin, final double amax, final double bmin, final double bmax,
+  public LyapunovConfiguration(final double amin, final double amax, final double bmin, final double bmax,
       final int asize, final int bsize, final int nmax, final String seq)
   {
     this.amin = amin;
     this.amax = amax;
     this.bmin = bmin;
     this.bmax = bmax;
-    this.asize = asize;
-    this.bsize = bsize;
+    this.height = asize;
+    this.width = bsize;
     this.nmax = nmax;
     this.sequence = transformSequence(seq);
-  }
-
-  /**
-   * Initialize this configuration with the specified parameters.
-   * This constructor is used for Mandelbrot fractals.
-   * @param xcenter image center x coordinate.
-   * @param ycenter image center y coordinate.
-   * @param diameter image diameter.
-   * @param asize image width.
-   * @param bsize image height
-   * @param nmax number of iterations.
-   */
-  public FractalConfiguration(final double xcenter, final double ycenter, final double diameter, final int asize, final int bsize, final int nmax)
-  {
-    double r = diameter/2;
-    this.amin = xcenter - r;
-    this.amax = xcenter + r;
-    this.bmin = ycenter - r;
-    this.bmax = ycenter + r;
-    this.asize = asize;
-    this.bsize = bsize;
-    this.nmax = nmax;
   }
 
   /**
@@ -145,5 +108,17 @@ public class FractalConfiguration implements Serializable
       }
     }
     return booleanSequence;
+  }
+
+  @Override
+  public String toCSV()
+  {
+    return null;
+  }
+
+  @Override
+  public LyapunovConfiguration fromCSV(final String csv)
+  {
+    return this;
   }
 }

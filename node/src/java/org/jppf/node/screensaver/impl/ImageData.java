@@ -27,7 +27,7 @@ import javax.swing.ImageIcon;
 /**
  * Data structure holding the position and direction of a moving logo.
  */
-public class ImageData {
+class ImageData {
   /**
    * The previous position on the x axis.
    */

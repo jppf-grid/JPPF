@@ -80,7 +80,7 @@ public class HookInstance<E>
     }
     catch (Exception e)
     {
-      String format = "failed to invoke '{}()' with params={} on {} with exception=";
+      String format = "failed to invoke '{}()' with params={} on {} with exception={}";
       Object[] params = new Object[] {methodName, nbArgs == 0 ? "{}" : Arrays.asList(parameters), this, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e)};
       if (debugEnabled) log.debug(format, params);
       else log.warn(format, params);

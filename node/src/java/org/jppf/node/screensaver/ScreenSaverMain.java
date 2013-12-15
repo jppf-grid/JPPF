@@ -32,6 +32,7 @@ import org.jppf.utils.*;
 /**
  * Main entry point for starting the screen saver.
  * @author Laurent Cohen
+ * @since 4.0
  */
 public class ScreenSaverMain implements InitializationHook
 {
@@ -159,6 +160,9 @@ public class ScreenSaverMain implements InitializationHook
     });
     frame.add(screensaver.getComponent());
     screensaver.getComponent().setSize(frame.getSize());
+    int screenX = config.getInt("jppf.screensaver.screen.location.x", 0);
+    int screenY = config.getInt("jppf.screensaver.screen.location.Y", 0);
+    frame.setLocation(screenX, screenY);
     screensaver.init(config, fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
   }

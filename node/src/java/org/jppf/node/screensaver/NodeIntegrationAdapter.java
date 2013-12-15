@@ -25,6 +25,7 @@ import org.jppf.node.event.*;
  * This class exists as convenience, to be overriden for creating listener objects, instead of
  * implementing the {@link NodeLifeCycleListener} and {@link TaskExecutionListener} interfaces.
  * @author Laurent Cohen
+ * @since 4.0
  */
 public abstract class NodeIntegrationAdapter extends NodeLifeCycleListenerAdapter implements NodeIntegration {
   @Override

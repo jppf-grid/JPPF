@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.example.fractals;
+package org.jppf.example.fractals.lyapunov;
 
 import org.jppf.server.protocol.JPPFTask;
 
@@ -31,6 +31,10 @@ public class LyapunovTask extends JPPFTask
    * The line number, for which to compute the lambda exponent for each point in the line.
    */
   private int b = -1;
+  /**
+   * The computed colors for each computed point.
+   */
+  protected int[] colors = null;
 
   /**
    * Initialize this task with the specified line number.
@@ -51,13 +55,13 @@ public class LyapunovTask extends JPPFTask
     try
     {
       // retrieve the configuration from the data provider
-      FractalConfiguration config = getDataProvider().getParameter("config");
-      double[] lambda = new double[config.asize];
+      LyapunovConfiguration config = getDataProvider().getParameter("config");
+      double[] lambda = new double[config.height];
       double bval = config.bmin +
-      b * (config.bmax - config.bmin) / config.bsize;
-      double astep = (config.amax - config.amin) / config.asize;
+      b * (config.bmax - config.bmin) / config.width;
+      double astep = (config.amax - config.amin) / config.height;
       double aval = config.amin;
-      for (int i=0; i<config.asize; i++)
+      for (int i=0; i<config.height; i++)
       {
         double x = 0.5d;
         int len = config.sequence.length;
@@ -80,5 +84,14 @@ public class LyapunovTask extends JPPFTask
     {
       setThrowable(e);
     }
+  }
+
+  /**
+   * Get the computed colors for each computed point.
+   * @return an array of int values.
+   */
+  public int[] getColors()
+  {
+    return colors;
   }
 }

@@ -58,11 +58,11 @@ public class NodePanel extends JPanel {
   /**
    * Labels used to display the number of tasks executed by each node.
    */
-  private JLabel countLabel = null;
+  private JLabel countLabel;
   /**
    * Label used to display how long the node has been active.
    */
-  private JLabel timeLabel = null;
+  private JLabel timeLabel;
   /**
    * The time this panel was started.
    */
@@ -90,15 +90,21 @@ public class NodePanel extends JPanel {
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     setBackground(Color.BLACK);
-    //ImageIcon logo = loadImage(IMAGE_PATH + '/' + "jppf-at-home.gif");
-    String path = JPPFConfiguration.getProperties().getString("jppf.screensaver.centerimage", DEFAULT_IMG);
-    ImageIcon logo = ScreenSaverMain.loadImage(path);
-    if (logo == null) logo = ScreenSaverMain.loadImage(DEFAULT_IMG);
-    JLabel logoLabel = new JLabel(logo);
-    addLayoutComp(this, g, c, logoLabel);
+    addLayoutComp(this, g, c, createTopPanel());
     addLayoutComp(this, g, c, Box.createVerticalStrut(10));
     addLayoutComp(this, g, c, createNodePanel());
     addLayoutComp(this, g, c, Box.createVerticalStrut(5));
+  }
+
+  /**
+   * Create the panel on top of the node monitoring panel.
+   * @return the panel as a {@link JComponent}.
+   */
+  protected JComponent createTopPanel() {
+    String path = JPPFConfiguration.getProperties().getString("jppf.screensaver.centerimage", DEFAULT_IMG);
+    ImageIcon logo = ScreenSaverMain.loadImage(path);
+    if (logo == null) logo = ScreenSaverMain.loadImage(DEFAULT_IMG);
+    return new JLabel(logo);
   }
 
   /**
@@ -124,7 +130,7 @@ public class NodePanel extends JPanel {
     countLabel.setBackground(Color.BLACK);
     countLabel.setForeground(Color.WHITE);
 
-    timeLabel = new JLabel("Active for: "+NodePanel.toStringDuration(0));
+    timeLabel = new JLabel("Active for: " + toStringDuration(0L));
     timeLabel.setBackground(Color.BLACK);
     timeLabel.setForeground(Color.WHITE);
   }
@@ -171,7 +177,7 @@ public class NodePanel extends JPanel {
    * @param c the constraints to apply to the component.
    * @param comp the component to add.
    */
-  private void addLayoutComp(final JPanel panel, final GridBagLayout g, final GridBagConstraints c, final Component comp) {
+  protected void addLayoutComp(final JPanel panel, final GridBagLayout g, final GridBagConstraints c, final Component comp) {
     g.setConstraints(comp, c);
     panel.add(comp);
   }

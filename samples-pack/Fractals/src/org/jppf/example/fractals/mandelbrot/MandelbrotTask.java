@@ -16,60 +16,55 @@
  * limitations under the License.
  */
 
-package org.jppf.example.fractals;
+package org.jppf.example.fractals.mandelbrot;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.example.fractals.FractalPoint;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Instances of this task compute the Mandelbrot algorithm (number of iterations to escape the
  * Mandelbrot set) for each point of a line in the resulting image.
  * @author Laurent Cohen
  */
-public class MandelbrotTask extends JPPFTask
-{
+public class MandelbrotTask extends AbstractTask<int[]> {
+  /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * The line number, for which to compute the escape value for each point in the line.
    */
-  private int b = -1;
+  private int lineToCompute = -1;
   /**
    * The computed colors for each computed point.
    */
-  private int[] colors = null;
+  protected int[] colors = null;
 
   /**
    * Initialize this task with the specified line number.
-   * @param b the line number as an int value.
+   * @param line the line number as an int value.
    */
-  public MandelbrotTask(final int b)
-  {
-    this.b = b;
+  public MandelbrotTask(final int line) {
+    this.lineToCompute = line;
   }
 
-  /**
-   * Execute the task.
-   * @see java.lang.Runnable#run()
-   */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       // retrieve the configuration from the data provider
-      FractalConfiguration config = getDataProvider().getParameter("config");
-      int[] iter = new int[config.asize];
-      colors = new int[config.asize];
-      double bval = config.bmin +
-      b * (config.bmax - config.bmin) / config.bsize;
-      double astep = (config.amax - config.amin) / config.asize;
-      double aval = config.amin;
-      for (int i=0; i<config.asize; i++)
+      MandelbrotConfiguration config = getDataProvider().getParameter("config");
+      int[] iter = new int[config.width];
+      colors = new int[config.width];
+      double bval = config.i_lower + lineToCompute * (config.i_upper - config.i_lower) / config.height;
+      double astep = (config.r_upper - config.r_lower) / config.width;
+      double aval = config.r_lower;
+      for (int i=0; i<config.width; i++)
       {
         double x = aval;
         double y = bval;
         int iteration = 0;
         boolean escaped = false;
-        while (!escaped && (iteration < config.nmax))
-        {
+        while (!escaped && (iteration < config.maxIterations)) {
           double x1 = x*x - y*y + aval;
           y = 2*x*y + bval;
           x = x1;
@@ -77,14 +72,12 @@ public class MandelbrotTask extends JPPFTask
           iteration++;
         }
         iter[i] = iteration;
-        colors[i] = computeRGB(iteration, config.nmax);
+        colors[i] = computeRGB(iteration, config.maxIterations);
+        fireNotification(new FractalPoint(i, lineToCompute, colors[i]), false);
         aval += astep;
       }
-      // set the results
       setResult(iter);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       setThrowable(e);
     }
   }
@@ -92,11 +85,10 @@ public class MandelbrotTask extends JPPFTask
   /**
    * Compute a RGB value for a specific point.
    * @param value the escape time value for the point.
-   * @param max the max escapte time value.
+   * @param max the max escape time value.
    * @return an int value representing the rgb components for the point.
    */
-  private int computeRGB(final int value, final int max)
-  {
+  private int computeRGB(final int value, final int max) {
     if (value >= max) return 0;
     double x, y, z, t;
     t = 2 * Math.PI * value / max;
@@ -123,30 +115,7 @@ public class MandelbrotTask extends JPPFTask
    * Get the computed colors for each computed point.
    * @return an array of int values.
    */
-  public int[] getColors()
-  {
+  public int[] getColors() {
     return colors;
   }
-
-  /*
-	private static synchronized void redefineOutput()
-	{
-		try
-		{
-			// check if output has already been redefined
-			Boolean redefined = (Boolean) NodeRunner.getPersistentData("output.redefined");
-			if (redefined == null)
-			{
-				System.setOut(new PrintStream("myapp.out"));
-				System.setErr(new PrintStream("myapp.err"));
-				// to ensure other tasks won't redefine it again
-				NodeRunner.setPersistentData("output.redefined", true);
-			}
-		}
-		catch(Exception e)
-		{
-			// ...
-		}
-	}
-   */
 }

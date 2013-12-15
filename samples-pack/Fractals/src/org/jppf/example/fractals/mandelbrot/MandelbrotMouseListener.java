@@ -16,44 +16,48 @@
  * limitations under the License.
  */
 
-package org.jppf.example.fractals;
+package org.jppf.example.fractals.mandelbrot;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 
+import org.jppf.example.fractals.ImagePanel;
+import org.jppf.example.fractals.RunnerFactory;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.JavaOption.JavaOptionMouseListener;
+import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Mouse listener used in the Mandelbrot panel to perform the mouse-driven
  * zooming functionality.
  * @author Laurent Cohen
  */
-public class MandelbrotMouseListener extends JavaOptionMouseListener
-{
+public class MandelbrotMouseListener extends JavaOptionMouseListener {
   /**
    * Processes left-click and right-click events to zoom-in or zoom-out the image.
    * @param event the mouse event to process
    * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
    */
   @Override
-  public void mousePressed(final MouseEvent event)
-  {
+  public void mousePressed(final MouseEvent event) {
     Component comp = event.getComponent();
     if (!(comp instanceof ImagePanel)) return;
 
     int button = event.getButton();
-    if ((button == MouseEvent.BUTTON1) || (button == MouseEvent.BUTTON3))
-    {
+    if ((button == MouseEvent.BUTTON1) || (button == MouseEvent.BUTTON3)) {
       int mouseX = event.getX();
       int mouseY = event.getY();
       double centerX = getDoubleValue("/centerX");
       double centerY = getDoubleValue("/centerY");
       double d = getDoubleValue("/diameter");
+      TypedProperties jppfConfig = JPPFConfiguration.getProperties();
+      int width = jppfConfig.getInt("image.width", 800);
+      int height = jppfConfig.getInt("image.height", 600);
       double minX = centerX - d/2;
-      double x = mouseX * d/800d + minX;
+      double x = mouseX * d /(double) width + minX;
       double minY = centerY - d/2;
-      double y = (600 - mouseY - 1) * d/600d + minY;
+      double y = (height - mouseY - 1) * d / (double) height + minY;
       int f = getIntValue("/mandelbrotZoomFactor");
 
       d = (button == MouseEvent.BUTTON1) ? d/f : d * f;
@@ -61,12 +65,9 @@ public class MandelbrotMouseListener extends JavaOptionMouseListener
       setDoubleValue("/centerY", y);
       setDoubleValue("/diameter", d);
       int iter = getIntValue("/iterations");
-      try
-      {
-        FractalRunner.perform(true, new FractalConfiguration(x, y, d, 800, 600, iter), getOption());
-      }
-      catch(Exception e)
-      {
+      try {
+        RunnerFactory.getRunner("mandelbrot").submitExecution(new MandelbrotConfiguration(x, y, d, iter));
+      } catch(Exception e) {
         e.printStackTrace();
       }
     }

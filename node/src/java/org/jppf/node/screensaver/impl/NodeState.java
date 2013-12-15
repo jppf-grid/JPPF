@@ -22,12 +22,13 @@ import org.jppf.node.screensaver.*;
 
 /**
  * Instances of this class represent information about a node.
+ * @since 4.0
  */
 public class NodeState extends NodeIntegrationAdapter {
   /**
    * The node panel to update.
    */
-  NodePanel nodePanel = null;
+  protected NodePanel nodePanel = null;
 
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {

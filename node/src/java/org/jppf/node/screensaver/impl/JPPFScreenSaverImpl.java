@@ -24,12 +24,13 @@ import java.util.Timer;
 import javax.swing.*;
 
 import org.jppf.node.screensaver.*;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 
 /**
  * A built-in screen saver implementation.
  * @author Laurent Cohen
  * @author nissalia
+ * @since 4.0
  */
 public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   /**
@@ -94,7 +95,7 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     Dimension dim = this.getSize();
     for (ImageData d: data) d.init(dim);
 
-    if (nodePanel == null) nodePanel = new NodePanel();
+    if (nodePanel == null) nodePanel = createNodePanel();
     SpringLayout layout = new SpringLayout();
     setLayout(layout);
     this.add(nodePanel);
@@ -107,7 +108,7 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     if (timer == null) {
       timer = new Timer("JPPFScreenSaverTimer");
       timer.schedule(new LogoUpdateTask(), 100L, 1000L / speed);
-      timer.schedule(new LogoPaintTask(), 100L, 25L);
+      timer.schedule(new LogoPaintTask(), 100L, 20L);
       TimerTask task = new TimerTask() {
         @Override
         public void run() {
@@ -205,6 +206,12 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     try {
       for (ImageData d: data) {
         synchronized(d) {
+          /*
+          g.setClip(d.prevx, d.prevy, d.imgw, d.imgh);
+          g.setColor(Color.BLACK);
+          g.fillRect(d.prevx, d.prevy, d.imgw, d.imgh);
+          */
+
           g.setClip(d.x, d.y, d.imgw, d.imgh);
           g.drawImage(d.img, d.x, d.y, null);
           d.prevx = d.x;
@@ -219,18 +226,12 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   }
 
   /**
-   * Performs the repainting of the flying logo images, as well as that of the areas they were
-   * occupying within the underlying components.
+   * Create the node panel. This methods is provided so subclasses can override it
+   * and eventually create as subclass of {@link NodePanel}.
+   * @return an instance of {@link NodePanel} or one of its subclasses.
    */
-  private void paintLogos() {
-    Graphics g = getGraphics();
-    try {
-      paintLogos(g);
-    } catch(Throwable t) {
-      t.printStackTrace();
-    } finally {
-      g.dispose();
-    }
+  protected NodePanel createNodePanel() {
+    return new NodePanel();
   }
 
   /**
@@ -245,5 +246,13 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
   public void paint(final Graphics g) {
     super.paint(g);
     paintLogos(g);
+  }
+
+  /**
+   * Get the Timer used to update GUI.
+   * @return a Timer instance.
+   */
+  public Timer getTimer() {
+    return timer;
   }
 }
