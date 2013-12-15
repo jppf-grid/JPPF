@@ -64,8 +64,9 @@
 	</xs:complexType>
 
 	<xs:complexType name="Import">
+    <xs:element name="script" type="opt:Script" minOccurs="0"/>
 		<xs:attribute name="source" type="opt:ImportSource"/>
-		<xs:attribute name="location"/>
+		<xs:attribute name="location" use="optional"/>
     <xs:attribute name="debug" use="optional" default="false"/>
 	</xs:complexType>
 
@@ -82,7 +83,8 @@
 	  <xs:restriction base="xs:string">
 	    <xs:enumeration value="file"/>
 	    <xs:enumeration value="url"/>
-	    <xs:enumeration value="plugin"/>
+        <xs:enumeration value="plugin"/>
+        <xs:enumeration value="script"/>
 	  </xs:restriction>
 	</xs:simpleType>
 

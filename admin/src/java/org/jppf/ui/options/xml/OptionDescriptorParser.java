@@ -70,14 +70,10 @@ public class OptionDescriptorParser
   public OptionDescriptor parse(final String docPath) throws Exception
   {
     InputStream is = FileUtils.getFileInputStream(docPath);
-    //if (is == null) is = this.getClass().getClassLoader().getResourceAsStream(docPath);
     if (is == null)
     {
       URL url = this.getClass().getClassLoader().getResource(docPath);
-      if (docPath.contains("NodeDataPage"))
-      {
-        log.info("loading doc form url = " + url);
-      }
+      if (docPath.contains("NodeDataPage")) log.info("loading doc form url = " + url);
       is = url.openStream();
     }
     if (is == null) return null;
@@ -219,10 +215,7 @@ public class OptionDescriptorParser
     for (int j=0; j<children.getLength(); j++)
     {
       Node tmpNode = children.item(j);
-      if (tmpNode.getNodeType() == Node.TEXT_NODE)
-      {
-        return tmpNode.getNodeValue();
-      }
+      if (tmpNode.getNodeType() == Node.TEXT_NODE) return tmpNode.getNodeValue();
     }
     return null;
   }
@@ -232,52 +225,35 @@ public class OptionDescriptorParser
    * @param node the node to generate the listener from.
    * @return a <code>ScriptDescriptor</code> instance.
    */
-  public ScriptDescriptor createScriptDescriptor(final Node node)
-  {
+  public ScriptDescriptor createScriptDescriptor(final Node node) {
     ScriptDescriptor desc = new ScriptDescriptor();
-    NodeList children = node.getChildNodes();
     NamedNodeMap attrs = node.getAttributes();
     desc.language = attrs.getNamedItem("language").getNodeValue();
     Node source = attrs.getNamedItem("source");
-    if (source != null)
-    {
-      desc.source = source.getNodeValue();
-    }
-    if ((desc.source == null) || "inline".equalsIgnoreCase(desc.source))
-    {
-      for (int j=0; j<children.getLength(); j++)
-      {
+    if (source != null) desc.source = source.getNodeValue();
+    if ((desc.source == null) || "inline".equalsIgnoreCase(desc.source)) {
+      NodeList children = node.getChildNodes();
+      for (int j=0; j<children.getLength(); j++) {
         Node tmpNode = children.item(j);
-        if ((tmpNode.getNodeType() == Node.CDATA_SECTION_NODE) || (tmpNode.getNodeType() == Node.TEXT_NODE))
-        {
+        if ((tmpNode.getNodeType() == Node.CDATA_SECTION_NODE) || (tmpNode.getNodeType() == Node.TEXT_NODE)) {
           desc.content = tmpNode.getNodeValue();
           break;
         }
       }
-    }
-    else
-    {
+    } else {
       InputStream is = null;
-      try
-      {
-        try
-        {
+      try {
+        try {
           is = new URL(desc.source).openStream();
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           if (debugEnabled) log.debug(e.getMessage());
         }
-        try
-        {
+        try {
           if (is == null) is = FileUtils.getFileInputStream(desc.source);
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
-        if (is != null)
-        {
+        if (is != null) {
           InputStreamReader reader = new InputStreamReader(is);
           try {
             desc.content = FileUtils.readTextFile(reader);
@@ -285,9 +261,7 @@ public class OptionDescriptorParser
             reader.close();
           }
         }
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
       }
     }
     return desc;
@@ -317,9 +291,17 @@ public class OptionDescriptorParser
     OptionDescriptor desc = new OptionDescriptor();
     desc.type = "import";
     desc.setProperty("source", attrMap.getNamedItem("source").getNodeValue());
-    desc.setProperty("location", attrMap.getNamedItem("location").getNodeValue());
+    if (attrMap.getNamedItem("location") != null)  desc.setProperty("location", attrMap.getNamedItem("location").getNodeValue());
     Node debugNode = attrMap.getNamedItem("debug");
     if (debugNode != null) desc.setProperty("debug", debugNode.getNodeValue());
+    NodeList children = node.getChildNodes();
+    for (int j=0; j<children.getLength(); j++) {
+      Node child = children.item(j);
+      if ("script".equals(child.getNodeName())) {
+        desc.scripts.add(createScriptDescriptor(child));
+        break;
+      }
+    }
     return desc;
   }
 }

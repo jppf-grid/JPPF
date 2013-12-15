@@ -21,16 +21,16 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.jppf.scripting.*;
 import org.jppf.ui.options.*;
-import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.*;
 
 /**
  * Factory class used to build UI elements from XML descriptors.
  * @author Laurent Cohen
  */
-public class OptionElementFactory
-{
+public class OptionElementFactory {
   /**
    * The builder using this factory.
    */
@@ -40,8 +40,7 @@ public class OptionElementFactory
    * Initialize this factory.
    * @param builder the builder using this factory.
    */
-  public OptionElementFactory(final OptionsPageBuilder builder)
-  {
+  public OptionElementFactory(final OptionsPageBuilder builder) {
     this.builder = builder;
   }
 
@@ -50,8 +49,7 @@ public class OptionElementFactory
    * @param i18n the path for localized resource bundles.
    * @return an {@link OptionsPageBuilder} instance.
    */
-  private OptionsPageBuilder getOrCreateBuilder(final String i18n)
-  {
+  private OptionsPageBuilder getOrCreateBuilder(final String i18n) {
     if ((i18n == null) || "".equals(i18n.trim()) || i18n.equals(builder.getBaseName())) return this.builder;
     OptionsPageBuilder newBuilder = new OptionsPageBuilder(builder.isEventEnabled());
     newBuilder.setBaseName(i18n);
@@ -64,15 +62,13 @@ public class OptionElementFactory
    * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
    * @throws Exception if an error was raised while building the page.
    */
-  public OptionElement buildPage(final OptionDescriptor desc) throws Exception
-  {
+  public OptionElement buildPage(final OptionDescriptor desc) throws Exception {
     OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
     OptionPanel page = new OptionPanel();
     page.setEventsEnabled(false);
     tmpBuilder.initCommonAttributes(page, desc);
     page.createUI();
-    for (OptionDescriptor child: desc.children)
-    {
+    for (OptionDescriptor child: desc.children) {
       for (OptionElement elt: tmpBuilder.build(child)) page.add(elt);
     }
     page.setEventsEnabled(true);
@@ -85,8 +81,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public OptionElement buildSplitPane(final OptionDescriptor desc) throws Exception
-  {
+  public OptionElement buildSplitPane(final OptionDescriptor desc) throws Exception {
     OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
     SplitPaneOption option = new SplitPaneOption();
     tmpBuilder.initCommonAttributes(option, desc);
@@ -95,8 +90,7 @@ public class OptionElementFactory
     String s = desc.getString("orientation", "horizontal");
     option.setOrientation("horizontal".equalsIgnoreCase(s) ? SplitPaneOption.HORIZONTAL : SplitPaneOption.VERTICAL);
     option.createUI();
-    for (OptionDescriptor child: desc.children)
-    {
+    for (OptionDescriptor child: desc.children) {
       for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
     }
     return option;
@@ -115,8 +109,7 @@ public class OptionElementFactory
     option.setEventsEnabled(false);
     tmpBuilder.initCommonAttributes(option, desc);
     option.createUI();
-    for (OptionDescriptor child: desc.children)
-    {
+    for (OptionDescriptor child: desc.children) {
       for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
     }
     option.setEventsEnabled(true);
@@ -136,8 +129,7 @@ public class OptionElementFactory
     option.setEventsEnabled(false);
     tmpBuilder.initCommonAttributes(option, desc);
     option.createUI();
-    for (OptionDescriptor child: desc.children)
-    {
+    for (OptionDescriptor child: desc.children) {
       for (OptionElement elt: tmpBuilder.build(child)) option.add(elt);
     }
     option.setEventsEnabled(true);
@@ -150,8 +142,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildButton(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildButton(final OptionDescriptor desc) throws Exception {
     ButtonOption option = new ButtonOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -168,8 +159,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildLabel(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildLabel(final OptionDescriptor desc) throws Exception {
     LabelOption option = new LabelOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -186,8 +176,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildTextArea(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildTextArea(final OptionDescriptor desc) throws Exception {
     TextAreaOption option = new TextAreaOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -204,8 +193,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildPassword(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildPassword(final OptionDescriptor desc) throws Exception {
     PasswordOption option = new PasswordOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -221,8 +209,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildPlainText(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildPlainText(final OptionDescriptor desc) throws Exception {
     PlainTextOption option = new PlainTextOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -239,8 +226,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildFormattedNumber(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildFormattedNumber(final OptionDescriptor desc) throws Exception {
     FormattedNumberOption option = new FormattedNumberOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -258,8 +244,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildSpinnerNumber(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildSpinnerNumber(final OptionDescriptor desc) throws Exception {
     SpinnerNumberOption option = new SpinnerNumberOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -279,8 +264,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildBoolean(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildBoolean(final OptionDescriptor desc) throws Exception {
     BooleanOption option = new BooleanOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -296,8 +280,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildRadio(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildRadio(final OptionDescriptor desc) throws Exception {
     RadioButtonOption option = new RadioButtonOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -313,8 +296,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildComboBox(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildComboBox(final OptionDescriptor desc) throws Exception {
     ComboBoxOption option = new ComboBoxOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -333,8 +315,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildList(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildList(final OptionDescriptor desc) throws Exception {
     ListOption option = new ListOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
@@ -356,8 +337,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildFiller(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildFiller(final OptionDescriptor desc) throws Exception {
     int width = desc.getInt("width", 1);
     int height = desc.getInt("height", 1);
     return new FillerOption(width, height);
@@ -369,8 +349,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildToolbarSeparator(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildToolbarSeparator(final OptionDescriptor desc) throws Exception {
     int width = desc.getInt("width", 1);
     int height = desc.getInt("height", 1);
     String text = desc.getString("text", " ");
@@ -383,8 +362,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildFileChooser(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildFileChooser(final OptionDescriptor desc) throws Exception   {
     FileChooserOption option = new FileChooserOption();
     builder.initCommonOptionAttributes(option, desc);
     int dlgType = "open".equals(desc.getProperty("type")) ? FileChooserOption.OPEN : FileChooserOption.SAVE;
@@ -402,30 +380,32 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public List<OptionElement> loadImport(final OptionDescriptor desc) throws Exception
-  {
+  public List<OptionElement> loadImport(final OptionDescriptor desc) throws Exception {
     OptionsPageBuilder builder = new OptionsPageBuilder(true);
     List<OptionElement> list = new ArrayList<>();
     String source = desc.getProperty("source");
     String location = desc.getProperty("location");
     if ("url".equalsIgnoreCase(source)) list.add(builder.buildPageFromURL(location, builder.getBaseName()));
     else if ("file".equalsIgnoreCase(source)) list.add(builder.buildPage(location, null));
-    else if ("plugin".equalsIgnoreCase(source))
-    {
+    else if ("plugin".equalsIgnoreCase(source)) {
       List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
       Set<String> names = new HashSet<>();
-      for (String def: pathList)
-      {
+      for (String def: pathList) {
         OptionElement elt = builder.buildPage(def, null);
-        if (!names.contains(elt.getName()))
-        {
+        if (!names.contains(elt.getName())) {
           names.add(elt.getName());
           list.add(elt);
         }
       }
+    } else if ("script".equalsIgnoreCase(source)) {
+      if (!desc.scripts.isEmpty()) {
+        ScriptDescriptor scriptDesc = desc.scripts.get(0);
+        ScriptRunner runner = ScriptRunnerFactory.makeScriptRunner(scriptDesc.language);
+        String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
+        if (path != null) list.add(builder.buildPage(path, null));
+      }
     }
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false))
-    {
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) {
       for (OptionElement elt: list) addDebugComp(elt, source, location);
     }
     return list;
@@ -437,13 +417,10 @@ public class OptionElementFactory
    * @param source - determines whether the XML is loaded from a url or file location.
    * @param location - where to load the xml descriptor from.
    */
-  public void addDebugComp(final OptionElement elt, final String source, final String location)
-  {
-    JLabel label = new JLabel("X")
-    {
+  public void addDebugComp(final OptionElement elt, final String source, final String location) {
+    JLabel label = new JLabel("X") {
       @Override
-      public java.awt.Color getBackground()
-      {
+      public java.awt.Color getBackground() {
         return java.awt.Color.red;
       }
     };
@@ -461,8 +438,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildJavaOption(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildJavaOption(final OptionDescriptor desc) throws Exception {
     JavaOption option = new JavaOption();
     builder.initCommonOptionAttributes(option, desc);
     option.setClassName(desc.getProperty("class"));
@@ -477,8 +453,7 @@ public class OptionElementFactory
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public Option buildCustomOption(final OptionDescriptor desc) throws Exception
-  {
+  public Option buildCustomOption(final OptionDescriptor desc) throws Exception {
     String className = desc.getString("impl.class");
     Class clazz = Class.forName(className);
     AbstractOption option = (AbstractOption) clazz.newInstance();
