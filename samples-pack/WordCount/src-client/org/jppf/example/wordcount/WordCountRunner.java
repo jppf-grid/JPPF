@@ -48,7 +48,7 @@ public class WordCountRunner {
       Parameters params = new Parameters();
       nf.setGroupingUsed(true);
       JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(params.nbChannels));
-      (queue = new SubmitQueue(params.jobCapacity)).start();
+      queue = new SubmitQueue(params.jobCapacity);
       System.out.println("Processing '" + params.dataFile + "' with " + nf.format(params.nbArticles) +
           " articles per task, " + nf.format(params.nbTasks) + " tasks per job, nb channels = " + params.nbChannels);
       jobProvider = new JobProvider(params);
@@ -99,6 +99,7 @@ public class WordCountRunner {
         return o2.compareTo(o1);
       }
     };
+    // using a multimap (JPPF implementation) makes code a lot simpler
     CollectionMap<Long, String> result = new SortedSetSortedMap<>(comp);
     for (Map.Entry<String, Long> entry: mergedResults.entrySet()) result.putValue(entry.getValue(), entry.getKey());
     long elapsed = (System.nanoTime() - start) / 1000000L;
@@ -116,11 +117,9 @@ public class WordCountRunner {
   private static void writeResults(final CollectionMap<Long, String> results, final String destFile) throws Exception {
     String filename = "WordCountResults.txt";
     System.out.println("writing results to '" + filename + "' ...");
-    BufferedWriter writer = null;
     long start = System.nanoTime();
     NumberFormat nf = createFormatter();
-    try {
-      writer = new BufferedWriter(new FileWriter(filename));
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
       for (Map.Entry<Long, Collection<String>> entry: results.entrySet()) {
         long n = entry.getKey();
         for (String word: entry.getValue()) {
@@ -131,8 +130,6 @@ public class WordCountRunner {
         }
       }
       writer.flush();
-    } finally {
-      if (writer != null) writer.close();
     }
     long elapsed = (System.nanoTime() - start) / 1000000L;
     System.out.println("results written in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms)");

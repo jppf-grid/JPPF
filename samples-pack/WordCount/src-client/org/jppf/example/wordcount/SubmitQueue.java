@@ -19,10 +19,10 @@
 package org.jppf.example.wordcount;
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.ThreadSynchronization;
 
 /**
  * This class provides a bounded queue for submitting JPPF jobs and process their results.
@@ -37,25 +37,17 @@ import org.jppf.utils.*;
 public class SubmitQueue extends ThreadSynchronization
 {
   /**
-   * The JPPF client ot which jobs are submitted.
+   * The JPPF client to which jobs are submitted.
    */
   private final JPPFClient client;
   /**
-   * Total number of submitted jobs.
-   */
-  private final AtomicInteger resultCount = new AtomicInteger(0);
-  /**
    * Executes the jobs and waits for their results.
    */
-  private ExecutorService executor;
+  private final ThreadPoolExecutor executor;
   /**
-   * Maximum number of concurrent jobs.
+   * Counting semaphore used to ensure that no more than {@code capacity} jobs are submitted at any time.
    */
-  private int capacity = 1;
-  /**
-   * The current number of jobs being executed.
-   */
-  private int currentJobCount = 0;
+  private final Semaphore semaphore;
 
   /**
    * Initiialize this submit queue with the specified JPPF client.
@@ -63,7 +55,19 @@ public class SubmitQueue extends ThreadSynchronization
    */
   public SubmitQueue(final int capacity) {
     this.client = new JPPFClient();
-    this.capacity = capacity;
+    this.semaphore = new Semaphore(capacity);
+    BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    executor = new ThreadPoolExecutor(capacity, capacity, 0L, TimeUnit.MINUTES, queue, new JPPFThreadFactory("SubmitQueue")) {
+      @Override
+      protected void afterExecute(final Runnable r, final Throwable t) {
+        try {
+          super.afterExecute(r, t);
+        } finally {
+          semaphore.release(); // make sure a slot is released after each task execution
+        }
+      }
+    };
+    executor.prestartAllCoreThreads();
   }
 
   /**
@@ -72,45 +76,24 @@ public class SubmitQueue extends ThreadSynchronization
    * @param job the job to submit.
    */
   public void submit(final JPPFJob job) {
-    // submitting thread waits until a slot is free for submitting a job
-    synchronized(SubmitQueue.this) {
-      while (currentJobCount >= capacity) goToSleep();
-      currentJobCount++;
-    }
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          client.submitJob(job);
-          JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-          collector.awaitResults();
-          resultCount.incrementAndGet();
-          // notify submitting threads that a slot is free for submitting a job
-          synchronized(SubmitQueue.this) {
-            currentJobCount--;
-            wakeUp();
+    try {
+      // calling thread waits until a slot is free for submitting a job
+      semaphore.acquire();
+      executor.submit(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            client.submitJob(job);
+            JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+            collector.awaitResults();
+          } catch (Exception e) {
+            e.printStackTrace();
           }
-        } catch (Exception e) {
-          e.printStackTrace();
         }
-      }
-    });
-  }
-
-  /**
-   * Get the count of job results received.
-   * @return the count as an int.
-   */
-  public int getResultCount() {
-    return resultCount.get();
-  }
-
-  /**
-   * Start this submit queue.
-   */
-  public void start() {
-    BlockingQueue<Runnable> queue = new ArrayBlockingQueue(capacity);
-    executor = new ThreadPoolExecutor(capacity, capacity, 1L, TimeUnit.MINUTES, queue, new JPPFThreadFactory("SubmitQueue"));
+      });
+    } catch(Exception e) {
+      e.printStackTrace();;
+    }
   }
 
   /**
