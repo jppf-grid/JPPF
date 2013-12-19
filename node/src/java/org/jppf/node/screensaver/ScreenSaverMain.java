@@ -107,7 +107,7 @@ public class ScreenSaverMain implements InitializationHook
 
     if (fullscreenRequested && !fullscreenSupported) System.err.println("Full screen is not supported by the current graphics device");
     String title = config.getString("jppf.screensaver.title", "JPPF screensaver");
-    JFrame frame = new JFrame(title);
+    final JFrame frame = new FocusedJFrame(title);
     ImageIcon icon = loadImage(config.getString("jppf.screensaver.icon", "org/jppf/node/jppf-icon.gif"));
     if (icon == null) icon = loadImage("org/jppf/node/jppf-icon.gif");
     frame.setIconImage(icon.getImage());
@@ -115,28 +115,6 @@ public class ScreenSaverMain implements InitializationHook
       frame.setUndecorated(true);
       frame.setSize((int) result.getWidth(), (int) result.getHeight());
       frame.setResizable(false);
-      frame.addKeyListener(new KeyAdapter() {
-        @Override
-        public void keyPressed(final KeyEvent e) {
-          doOnclose();
-        }
-      });
-      frame.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mousePressed(final MouseEvent e) {
-          doOnclose();
-        }
-      });
-      if (config.getBoolean("jppf.screensaver.mouse.motion.close", true)) {
-        final long mouseMotionDelay = config.getLong("jppf.screensaver.mouse.motion.delay", 500L);
-        final long start = System.currentTimeMillis();
-        frame.addMouseMotionListener(new MouseAdapter() {
-          @Override
-          public void mouseMoved(final MouseEvent e) {
-            if (System.currentTimeMillis() - start > mouseMotionDelay) doOnclose();
-          }
-        });
-      }
       // hide the mouse cursor over the JFrame
       BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB); // Transparent 16 x 16 pixel cursor image.
       Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor"); // Create a new blank cursor.
@@ -149,15 +127,10 @@ public class ScreenSaverMain implements InitializationHook
       if ((h <= 0) || (h > d.height)) h = 800;
       frame.setSize(w, h);
     }
+    configureFrameListeners(frame, fullscreenRequested && !fullscreenSupported);
     frame.setBackground(Color.BLACK);
     frame.getContentPane().setBackground(Color.BLACK);
     createScreenSaver();
-    frame.addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(final WindowEvent e) {
-        doOnclose();
-      }
-    });
     frame.add(screensaver.getComponent());
     screensaver.getComponent().setSize(frame.getSize());
     int screenX = config.getInt("jppf.screensaver.screen.location.x", 0);
@@ -165,6 +138,12 @@ public class ScreenSaverMain implements InitializationHook
     frame.setLocation(screenX, screenY);
     screensaver.init(config, fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      @Override public void run() {
+        frame.toFront();
+        frame.repaint();
+      }
+    });
   }
 
   /**
@@ -181,6 +160,41 @@ public class ScreenSaverMain implements InitializationHook
       screensaver = new JPPFScreenSaverImpl();
     }
     return screensaver;
+  }
+
+  /**
+   * Configure the mouse and keyboard listener for the frame.
+   * @param frame the frame to configure.
+   * @param fullscreen whether the frame is displayed in full screen mode.
+   */
+  private void configureFrameListeners(final JFrame frame, final boolean fullscreen) {
+    if (fullscreen) {
+      frame.addKeyListener(new KeyAdapter() {
+        @Override public void keyPressed(final KeyEvent e) {
+          doOnclose();
+        }
+      });
+      frame.addMouseListener(new MouseAdapter() {
+        @Override public void mousePressed(final MouseEvent e) {
+          doOnclose();
+        }
+      });
+      if (config.getBoolean("jppf.screensaver.mouse.motion.close", true)) {
+        final long mouseMotionDelay = config.getLong("jppf.screensaver.mouse.motion.delay", 500L);
+        final long start = System.currentTimeMillis();
+        frame.addMouseMotionListener(new MouseAdapter() {
+          @Override
+          public void mouseMoved(final MouseEvent e) {
+            if (System.currentTimeMillis() - start > mouseMotionDelay) doOnclose();
+          }
+        });
+      }
+    }
+    frame.addWindowListener(new WindowAdapter() {
+      @Override public void windowClosing(final WindowEvent e) {
+        doOnclose();
+      }
+    });
   }
 
   /**
