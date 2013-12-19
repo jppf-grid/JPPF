@@ -17,7 +17,6 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
   <li><a href="DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
   <li><a href="NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
   <li><a href="CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
-  <li><a href="TaskNotifications/Readme.php">A customization that allows tasks to send notifications while executing</a></li>
   <li><a href="IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
   <li><a href="NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
   <li><a href="Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a  magnetic field</a></li>
@@ -30,6 +29,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
   <li><a href="KryoSerializer/Readme.php">A JPPF serialization scheme using Kryo</a></li>
   <li><a href="ForkJoinNodeExecutor/Readme.php">A Fibonacci computation demo using fork/join thread pools in the nodes</a></li>
   <li><a href="WordCount/Readme.php">A word count demo on the Wikipedia database</a></li>
+  <li><a href="FractalMovieGenerator/Readme.php">Generating AVI movies</a> from images produced by the <a href="Fractals/Readme.php">Mandelbrot fractals sample</a></li>
 </ul>
 <br>
 

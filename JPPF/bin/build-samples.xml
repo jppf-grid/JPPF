@@ -47,7 +47,6 @@
 		<antcall target="include.code"><param name="sample" value="JobRecovery"/></antcall>
 		<antcall target="include.code"><param name="sample" value="KryoSerializer"/></antcall>
 		<antcall target="include.code"><param name="sample" value="NodeLifeCycle"/></antcall>
-		<antcall target="include.code"><param name="sample" value="TaskNotifications"/></antcall>
 		<!-- Generate the samples pack zip file -->
 		<property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
 		<property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
@@ -85,6 +84,8 @@
 				<include name="NodeTray/images/*.gif"/>
 				<include name="Nbody/images/*.gif"/>
 				<include name="GPU/**/*.c"/>
+        <include name="Fractals/src/icons/*.gif"/>
+        <include name="Fractals/src/icons/*.png"/>
 			</fileset>
 		</copy>
 		<!-- remove HTML-converted files after the zip is created -->
