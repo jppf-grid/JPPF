@@ -118,6 +118,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
     idx2 = text.indexOf(END_CONTENT_TAG);
     if (idx2 < 0) throw new JPPFException("could not find end of content for " + file);
     String content = text.substring(idx + START_CONTENT_TAG.length(), idx2);
+    content = content.replace("Readme.html", "Readme.php");
     String result = template.replace("${TITLE}", title);
     result = result.replace("${SAMPLE_README}", content);
     int len = sourceDir.getCanonicalPath().length();
