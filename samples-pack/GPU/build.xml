@@ -106,8 +106,8 @@
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${src.dir}"/>
-      <link href="http://download.oracle.com/javase/6/docs/api/"/>
-			<link href="http://www.jppf.org/api-3"/>
+      <link href="http://docs.oracle.com/javase/7/docs/api"/>
+      <link href="http://www.jppf.org/api"/>
 			<doctitle><![CDATA[JPPF - GPU Sample]]></doctitle>
 			<header>
 				<![CDATA[

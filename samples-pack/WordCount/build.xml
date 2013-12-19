@@ -131,7 +131,7 @@
 			<packageset dir="${src.dir}"/>
 			<link href="http://docs.oracle.com/javase/7/docs/api/"/>
 			<link href="http://www.jppf.org/api"/>
-			<doctitle><![CDATA[JPPF - Startup Classes Sample]]></doctitle>
+			<doctitle><![CDATA[JPPF - Wikipedia Word Count Sample]]></doctitle>
 			<header>
 				<![CDATA[
 					<table><tr><td valign="center">

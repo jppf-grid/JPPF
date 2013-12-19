@@ -108,7 +108,7 @@ public class MovieGenerator {
       protected List<Task<?>> submitJob(final JPPFJob job, final AbstractFractalConfiguration cfg) throws Exception {
         // override SLA settings to ensure a job won't get stuck if a node fails
         TypedProperties config = JPPFConfiguration.getProperties();
-        int maxExpirations = config.getInt("jppf.fractals.dispatch.max.expirations", 1);
+        int maxExpirations = config.getInt("jppf.fractals.dispatch.max.timeouts", 1);
         long timeout = config.getLong("jppf.fractals.dispatch.timeout", 15000L);
         job.getSLA().setMaxDispatchExpirations(maxExpirations);
         job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(timeout));

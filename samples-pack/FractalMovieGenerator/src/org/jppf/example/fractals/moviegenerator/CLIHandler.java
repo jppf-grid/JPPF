@@ -103,7 +103,7 @@ public class CLIHandler {
     System.out.println("  input_file: a csv record file produced by the mandelbrot fractal sample");
     System.out.println("  output_file: path to the generated movie file");
     System.out.println("    the .avi extension is added if needed");
-    System.out.println("  frame_rate: numer of frames per second");
+    System.out.println("  frame_rate: number of frames per second");
     System.out.println("  trans_time: the duration (in seconds) of a transition");
     System.out.println("    between 2 records in the input file");
     System.out.println("note: the total number of frames in the generated movie is equal to");

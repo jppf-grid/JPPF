@@ -150,9 +150,9 @@
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${src.dir}"/>
-			<link href="http://download.oracle.com/javase/6/docs/api/"/>
-			<link href="http://www.jppf.org/api-2.0"/>
-			<doctitle><![CDATA[JPPF - ${ant.project.name}]]></doctitle>
+      <link href="http://docs.oracle.com/javase/7/docs/api"/>
+      <link href="http://www.jppf.org/api"/>
+			<doctitle><![CDATA[JPPF - ${ant.project.name} Sample]]></doctitle>
 			<header>
 				<![CDATA[
 					<table><tr><td valign="center">

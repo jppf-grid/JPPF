@@ -66,7 +66,7 @@ where:
   input_file: a csv record file produced by the mandelbrot fractal sample
   output_file: path to the generated movie file
     the .avi extension is added if needed
-  frame_rate: numer of frames per second
+  frame_rate: number of frames per second
   trans_time: the duration (in seconds) of a transition
     between 2 records in the input file
 note: the total number of frames in the generated movie is equal to
@@ -81,8 +81,16 @@ jppf.fractals.concurrent.jobs = 4</pre>
 <pre Class="samples">jppf.fractals.concurrent.jobs = <b>4</b>
 jppf.pool.size = <b>4</b></pre>
 
+          <p>Lastly, you can also configure a job <a href="http://www.jppf.org/doc/v4/index.php?title=Job_Service_Level_Agreement#Expiration_of_job_dispatches">dispatch timeout and maximum allowed timeouts</a> in the client configuration.
+          These 2 properties are used to prevent jobs from getting stuck forever, in case a node never completes the execution of a job. This is done as follows:
+<pre Class="samples"><font color="green"># maximum allowed time for a job to execute in a node, before it is resubmitted</font>
+<font color="green"># or cancelled; defaults to 15000 ms</font>
+jppf.fractals.dispatch.timeout = 15000
+<font color="green"># maximum number of allowed timeouts before a job is cancelled; defaults to 1</font>
+jppf.fractals.dispatch.max.timeouts = 1</pre>
+
           <h3>Example generated video</h3>
-          The following was generated as an image size of 640x360 (360p definition), using a frame rate of 30 fps, and based on the input file "FractalMovieGenerator/data/mandelbrot.csv".
+          The following was generated as an image size of 640x360 (360p definition), using a frame rate of 30 fps, and based on the input file "<b>FractalMovieGenerator/data/mandelbrot.csv</b>".
           Note that uploading it to Youtube required an additonal encoding step using the H.264 codec to generate a .mp4 video file.
           <p><iframe width="640" height="360" src="http://www.youtube.com/embed/JDVBQHkEsMM?feature=player_detailpage" frameborder="0" allowfullscreen></iframe>
 
