@@ -132,22 +132,15 @@ public class OptionDescriptorParser
       if (childNode.getNodeType() == Node.ELEMENT_NODE)
       {
         String name = childNode.getNodeName();
-        if ("child".equals(name))
-          desc.children.add(generateTree(childNode));
-        else if ("script".equals(name))
-          desc.scripts.add(createScriptDescriptor(childNode));
-        else if ("initializer".equals(name))
-          desc.initializer = createListenerDescriptor(childNode);
-        else if ("finalizer".equals(name))
-          desc.finalizer = createListenerDescriptor(childNode);
-        else if ("property".equals(name))
-          addProperty(desc, childNode);
-        else if ("item".equals(name))
-          desc.items.add(createItemDescriptor(childNode));
-        else if ("listener".equals(name))
-          desc.listeners.add(createListenerDescriptor(childNode));
-        else if ("import".equals(name))
-          desc.children.add(loadImport(childNode));
+        if ("child".equals(name)) desc.children.add(generateTree(childNode));
+        else if ("script".equals(name)) desc.scripts.add(createScriptDescriptor(childNode));
+        else if ("initializer".equals(name)) desc.initializer = createListenerDescriptor(childNode);
+        else if ("finalizer".equals(name)) desc.finalizer = createListenerDescriptor(childNode);
+        else if ("property".equals(name)) addProperty(desc, childNode);
+        else if ("item".equals(name)) desc.items.add(createItemDescriptor(childNode));
+        else if ("listener".equals(name)) desc.listeners.add(createListenerDescriptor(childNode));
+        else if ("import".equals(name)) desc.children.add(loadImport(childNode));
+        else if ("mouselistener".equals(name)) desc.mouseListener = createListenerDescriptor(childNode);
       }
     }
     return desc;

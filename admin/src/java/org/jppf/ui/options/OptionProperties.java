@@ -17,6 +17,7 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.event.MouseListener;
 import java.io.Serializable;
 import java.util.List;
 
@@ -129,4 +130,15 @@ public interface OptionProperties extends Serializable
    * @return true if this component can be detached, false otherwise.
    */
   boolean isDetachable();
+  /**
+   * Get the Java or scripted mouse click listener.
+   * @return a {@link MouseListener} instance.
+   */
+  MouseListener getMouseListener();
+
+  /**
+   * Set the Java or scripted mouse click listener.
+   * @param mouseListener a {@link MouseListener} instance.
+   */
+  void setMouseListener(final MouseListener mouseListener);
 }

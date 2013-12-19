@@ -17,7 +17,7 @@
  */
 package org.jppf.ui.options;
 
-import java.awt.Dimension;
+import java.awt.*;
 
 import javax.swing.*;
 
@@ -57,6 +57,7 @@ public class ToolbarSeparatorOption extends AbstractOption
   {
     //UIComponent = new JToolBar.Separator();
     UIComponent = new JLabel(labelText);
+    ((JLabel) UIComponent).setForeground(Color.GRAY.darker());
     ((JLabel) UIComponent).setHorizontalAlignment(SwingConstants.CENTER);
     ((JLabel) UIComponent).setVerticalAlignment(SwingConstants.CENTER);
     UIComponent.setForeground(UIComponent.getForeground().brighter());

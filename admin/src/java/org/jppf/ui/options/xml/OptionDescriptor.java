@@ -80,6 +80,10 @@ public class OptionDescriptor extends TypedProperties
    * Finalizer.
    */
   public ListenerDescriptor finalizer = null;
+  /**
+   * Mouse listener.
+   */
+  public ListenerDescriptor mouseListener = null;
 
   /**
    * Descriptor for listeners set on option elements.

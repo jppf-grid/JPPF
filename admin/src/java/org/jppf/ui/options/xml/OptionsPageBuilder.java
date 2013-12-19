@@ -17,10 +17,13 @@
  */
 package org.jppf.ui.options.xml;
 
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
+
+import javax.swing.JComponent;
 
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
@@ -157,8 +160,7 @@ public class OptionsPageBuilder
    * This ensures the consistence of the UI's initial state.
    * @param elt the root element of the options on which to trigger the events.
    */
-  public void triggerInitialEvents(final OptionElement elt)
-  {
+  public void triggerInitialEvents(final OptionElement elt) {
     triggerLifeCycleEvents(elt, true);
   }
 
@@ -178,34 +180,32 @@ public class OptionsPageBuilder
    * @param elt the root element of the options on which to trigger the events.
    * @param initial true to trigger the initializers, false to trigger the finalizers.
    */
-  private static void triggerLifeCycleEvents(final OptionElement elt, final boolean initial)
-  {
+  private static void triggerLifeCycleEvents(final OptionElement elt, final boolean initial) {
     if (elt == null) return;
+    if ((elt instanceof OptionProperties) && initial) {
+      OptionProperties op = (OptionProperties) elt;
+      JComponent comp = op.getUIComponent();
+      if (comp != null) {
+        MouseListener listener = op.getMouseListener();
+        if (listener != null) comp.addMouseListener(listener);
+      }
+    }
     final ValueChangeListener listener = initial ? elt.getInitializer() : elt.getFinalizer();
-    if (listener != null)
-    {
-      Runnable r = new Runnable()
-      {
+    if (listener != null) {
+      Runnable r = new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           listener.valueChanged(new ValueChangeEvent(elt));
         }
       };
-      //eventExecutor.submit(r);
       Future<?> future = eventExecutor.submit(r);
-      try
-      {
+      try {
         future.get();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
       }
     }
-    if (elt instanceof OptionContainer)
-    {
-      for (OptionElement child: ((OptionContainer) elt).getChildren())
-      {
+    if (elt instanceof OptionContainer) {
+      for (OptionElement child: ((OptionContainer) elt).getChildren()) {
         triggerLifeCycleEvents(child, initial);
       }
     }
@@ -241,6 +241,11 @@ public class OptionsPageBuilder
   public void initCommonOptionAttributes(final AbstractOption option, final OptionDescriptor desc) throws Exception
   {
     initCommonAttributes(option, desc);
+    if (desc.mouseListener != null)
+    {
+      MouseListener listener = createMouseListener(option, desc.mouseListener);
+      option.setMouseListener(listener);
+    }
     //option.setEditable(desc.getBoolean("editable", false));
     option.setPersistent(desc.getBoolean("persistent", false));
     for (ListenerDescriptor listenerDesc: desc.listeners)
@@ -270,6 +275,32 @@ public class OptionsPageBuilder
       {
         ScriptDescriptor script = listenerDesc.script;
         listener = new ScriptedValueChangeListener(script.language, script.content);
+      }
+    }
+    return listener;
+  }
+
+  /**
+   * Create a value change listener from a listener descriptor.
+   * @param option the option whose attributes are to be initialized.
+   * @param listenerDesc the listener descriptor to get the listener properties from.
+   * @return a ValueChangeListener instance.
+   * @throws Exception if an error was raised while building the page.
+   */
+  public MouseListener createMouseListener(final AbstractOption option, final ListenerDescriptor listenerDesc) throws Exception
+  {
+    MouseListener listener = null;
+    if (listenerDesc != null)
+    {
+      if ("java".equals(listenerDesc.type))
+      {
+        Class clazz = Class.forName(listenerDesc.className);
+        listener = (MouseListener) clazz.newInstance();
+      }
+      else
+      {
+        ScriptDescriptor script = listenerDesc.script;
+        listener = new ScriptedMouseListener(option, script.language, script.content);
       }
     }
     return listener;

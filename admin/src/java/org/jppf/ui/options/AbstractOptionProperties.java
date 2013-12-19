@@ -17,6 +17,7 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.event.MouseListener;
 import java.util.*;
 
 import javax.swing.JComponent;
@@ -71,6 +72,10 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * The action to fire immediately when the page is disposed.
    */
   protected ValueChangeListener finalizer = null;
+  /**
+   * A Java or scripted mouse click listener.
+   */
+  protected MouseListener mouseListener = null;
   /**
    * Determines whether firing events is enabled or not.
    */
@@ -382,5 +387,17 @@ public abstract class AbstractOptionProperties implements OptionProperties
   public void setDetachable(final boolean detachable)
   {
     this.detachable = detachable;
+  }
+
+  @Override
+  public MouseListener getMouseListener()
+  {
+    return mouseListener;
+  }
+
+  @Override
+  public void setMouseListener(final MouseListener mouseListener)
+  {
+    this.mouseListener = mouseListener;
   }
 }
