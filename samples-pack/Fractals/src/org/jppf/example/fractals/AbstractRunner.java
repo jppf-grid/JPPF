@@ -20,7 +20,7 @@ package org.jppf.example.fractals;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,15 +28,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.task.storage.DataProvider;
-import org.jppf.task.storage.MemoryMapDataProvider;
-import org.jppf.ui.options.OptionElement;
+import org.jppf.task.storage.*;
 import org.jppf.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Abstract runner class for the fractals sample application.
@@ -62,7 +58,7 @@ public abstract class AbstractRunner {
   /**
    * The option holding the image in the UI.
    */
-  protected OptionElement option;
+  protected boolean uiMode;
   /**
    * The name associated to this runner, corresponds to the type of fractals.
    */
@@ -89,7 +85,7 @@ public abstract class AbstractRunner {
    * @param name the name associated to this runner, corresponds to the type of fractals.
    */
   public AbstractRunner(final String name) {
-    this(name, 1, null);
+    this(name, 1, false);
   }
 
   /**
@@ -98,25 +94,25 @@ public abstract class AbstractRunner {
    * @param jobCapacity the maximum number of JPPF jobs that can be submitted at any given time.
    */
   public AbstractRunner(final String name, final int jobCapacity) {
-    this(name, jobCapacity, null);
+    this(name, jobCapacity, false);
   }
 
   /**
    * Initialize this runner.
    * @param name the name associated to this runner, corresponds to the type of fractals.
-   * @param option the option holding the image in the UI.
+   * @param uiMode the option holding the image in the UI.
    */
-  public AbstractRunner(final String name, final OptionElement option) {
-    this(name, 1, option);
+  public AbstractRunner(final String name, final boolean uiMode) {
+    this(name, 1, uiMode);
   }
 
   /**
    * Initialize this runner.
    * @param name the name associated to this runner, corresponds to the type of fractals.
    * @param jobCapacity the maximum number of JPPF jobs that can be submitted at any given time.
-   * @param option the option holding the image in the UI.
+   * @param uiMode the option holding the image in the UI.
    */
-  public AbstractRunner(final String name, final int jobCapacity, final OptionElement option) {
+  public AbstractRunner(final String name, final int jobCapacity, final boolean uiMode) {
     this.name = name;
     semaphore = new Semaphore(jobCapacity);
     executor = new ThreadPoolExecutor(jobCapacity, jobCapacity, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory(name + "-runner")) {
@@ -128,7 +124,7 @@ public abstract class AbstractRunner {
     };
     //executor = Executors.newFixedThreadPool(jobCapacity, new JPPFThreadFactory(name + "-runner"));
     if (jppfClient == null) jppfClient = new JPPFClient();
-    this.option = option;
+    this.uiMode = uiMode;
   }
 
   /**
@@ -164,7 +160,7 @@ public abstract class AbstractRunner {
    */
   public Future<GeneratedImage> submitExecution(final int id, final AbstractFractalConfiguration config, final long wait) throws Exception {
     semaphore.acquire();
-    if (option != null) createOrDisplayWaitWindow();
+    if (uiMode) createOrDisplayWaitWindow();
     if (recording) addRecord(config);
     FractalExecution exec = new FractalExecution(id, config, wait);
     return executor.submit(exec);
@@ -190,19 +186,21 @@ public abstract class AbstractRunner {
     if (log.isDebugEnabled()) log.debug("Computation performed in " + StringUtils.toStringDuration(elapsed));
 
     final BufferedImage image = generateImage(results, cfg);
-    if (option != null) {
+    if (uiMode) {
+      /*
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
-          ImagePanel panel = (ImagePanel) option.getUIComponent();
+          ImagePanel panel = (ImagePanel) uiMode.getUIComponent();
           panel.setImage(image);
           panel.setVisible(false);
           panel.setVisible(true);
         }
       });
+      */
     }
     if (JPPFConfiguration.getProperties().getBoolean("jppf.fractals.autosave.enabled", true)) saveImage(image, "png", "data/" + name + ".png");
-    if (option != null) hideWaitWindow();
+    if (uiMode) hideWaitWindow();
     return image;
   }
 

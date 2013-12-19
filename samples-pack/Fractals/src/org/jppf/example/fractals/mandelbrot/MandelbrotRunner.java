@@ -22,13 +22,10 @@ import java.io.FileReader;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.example.fractals.AbstractFractalConfiguration;
-import org.jppf.example.fractals.AbstractRunner;
+import org.jppf.example.fractals.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.ui.options.OptionElement;
 import org.jppf.utils.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Runner class for the Mandelbrot fractals sample application.
@@ -52,7 +49,7 @@ public class MandelbrotRunner extends AbstractRunner
    * Initialize this runner.
    * @param option the option holding the image in the UI.
    */
-  public MandelbrotRunner(final OptionElement option) {
+  public MandelbrotRunner(final boolean option) {
     super("mandelbrot", option);
   }
 

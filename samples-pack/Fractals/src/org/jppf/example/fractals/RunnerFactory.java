@@ -18,12 +18,10 @@
 
 package org.jppf.example.fractals;
 
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import org.jppf.example.fractals.lyapunov.LyapunovRunner;
 import org.jppf.example.fractals.mandelbrot.MandelbrotRunner;
-import org.jppf.ui.options.OptionElement;
 
 /**
  * 
@@ -50,7 +48,7 @@ public class RunnerFactory
    * @param option the GUI component that uses the runner.
    * @return an {@link AbstractRunner} instance.
    */
-  public static synchronized AbstractRunner createRunner(final String name, final OptionElement option) {
+  public static synchronized AbstractRunner createRunner(final String name, final boolean option) {
     AbstractRunner runner = runners.get(name);
     if (runner == null) {
       switch(name) {

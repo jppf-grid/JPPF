@@ -1,5 +1,6 @@
 import java.lang.*
 import java.util.*
+import java.util.concurrent.*
 import org.jppf.example.fractals.*
 import org.jppf.example.fractals.mandelbrot.*
 import org.jppf.example.fractals.lyapunov.*
@@ -9,6 +10,7 @@ import org.jppf.ui.monitoring.data.*
 import org.jppf.ui.options.*
 import org.jppf.ui.options.factory.*
 import org.jppf.ui.options.event.*
+import org.jppf.ui.utils.*
 import org.jppf.utils.*
 import java.awt.*
 import java.awt.event.*

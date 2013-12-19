@@ -23,6 +23,7 @@
 	<initializer type="script">
 		<script language="groovy"><![CDATA[
 			def frame = new JFrame(option.getLabel());
+      frame.setIconImage(GuiUtils.loadIcon("/icons/mandelbrot-icon.png").getImage());
 			frame.addWindowListener(new WindowClosingListener());
 			def comp = option.findFirstWithName("/Tabs").getUIComponent();
 			comp.setSelectedIndex(0);

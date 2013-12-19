@@ -7,6 +7,7 @@
 	<classpathentry kind="src" output="ExtendedClassLoading/classes" path="ExtendedClassLoading/src"/>
 	<classpathentry kind="src" output="ExtendedClassLoading/classes2" path="ExtendedClassLoading/src2"/>
 	<classpathentry kind="src" output="ForkJoinNodeExecutor/classes" path="ForkJoinNodeExecutor/src"/>
+	<classpathentry kind="src" output="FractalMovieGenerator/classes" path="FractalMovieGenerator/src"/>
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
 	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
@@ -70,5 +71,6 @@
 	<classpathentry kind="lib" path="KryoSerializer/lib/objenesis-1.2.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/reflectasm-1.07.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.22.jar"/>
+	<classpathentry kind="lib" path="FractalMovieGenerator/lib/monte-cc.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>

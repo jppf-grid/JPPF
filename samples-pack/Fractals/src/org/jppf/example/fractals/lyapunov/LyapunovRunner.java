@@ -24,12 +24,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.example.fractals.AbstractFractalConfiguration;
-import org.jppf.example.fractals.AbstractRunner;
+import org.jppf.example.fractals.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.ui.options.OptionElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Runner class for the Lyapunov and Mandelbrot fractals sample application.
@@ -53,7 +50,7 @@ public class LyapunovRunner extends AbstractRunner
    * Initialize this runner.
    * @param option the option holding the image in the UI.
    */
-  public LyapunovRunner(final OptionElement option) {
+  public LyapunovRunner(final boolean option) {
     super("lyapunov", option);
   }
 

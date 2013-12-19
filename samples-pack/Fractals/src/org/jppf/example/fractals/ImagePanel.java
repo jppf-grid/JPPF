@@ -19,10 +19,12 @@
 package org.jppf.example.fractals;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 
 /**
  * This class is an extension of JPanel whose goal is to draw an image in its component area.
@@ -33,13 +35,19 @@ public class ImagePanel extends JPanel
   /**
    * The image to draw in this panel.
    */
-  private transient Image image = null;
+  private transient BufferedImage image = null;
 
   /**
-   * Paints this panel. Overridden to allow for a color gradient in the background and
-   * rounded corners.
-   * @param g the graphic context to draw in
-   * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+   * Default constructor.
+   */
+  public ImagePanel()
+  {
+    setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+  }
+
+  /**
+   * Paints this panel with a background image.<br/>
+   * {@inheritDoc}
    */
   @Override
   protected void paintComponent(final Graphics g)
@@ -60,11 +68,12 @@ public class ImagePanel extends JPanel
 
   /**
    * Set the image to draw in this panel.
-   * @param image an <code>Image</code> instance.
+   * @param image an {@code BufferedImage} instance.
    */
-  public void setImage(final Image image)
+  public void setImage(final BufferedImage image)
   {
     this.image = image;
+    updateSize();
   }
 
   /**
@@ -75,5 +84,19 @@ public class ImagePanel extends JPanel
   public void setImage(final String imagePath) throws Exception
   {
     this.image = ImageIO.read(new File(imagePath));
+    updateSize();
+  }
+  
+  /**
+   * 
+   */
+  private void updateSize()
+  {
+    Insets ins = getBorder().getBorderInsets(this);
+    Dimension d = new Dimension(image.getWidth() + ins.left + ins.right, image.getHeight() + ins.bottom + ins.top);
+    setSize(d);
+    setPreferredSize(d);
+    setMaximumSize(d);
+    repaint();
   }
 }
