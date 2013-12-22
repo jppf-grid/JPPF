@@ -38,7 +38,7 @@ public class PolicyParser
    * List of possible rule names.
    */
   private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
-      "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule");
+      "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script");
   /**
    * The DOM parser used to build the descriptor tree.
    */
@@ -109,6 +109,7 @@ public class PolicyParser
   {
     PolicyDescriptor desc = new PolicyDescriptor();
     desc.type = node.getNodeName();
+    if ("Script".equals(desc.type)) desc.script = getTextNodeValue(node);
     NamedNodeMap attrMap = node.getAttributes();
     Node attrNode = attrMap.getNamedItem("valueType");
     if (attrNode != null) desc.valueType = attrNode.getNodeValue();
@@ -116,6 +117,8 @@ public class PolicyParser
     if (attrNode != null) desc.ignoreCase = attrNode.getNodeValue();
     attrNode = attrMap.getNamedItem("class");
     if (attrNode != null) desc.className = attrNode.getNodeValue();
+    attrNode = attrMap.getNamedItem("language");
+    if (attrNode != null) desc.language = attrNode.getNodeValue();
     NodeList list = node.getChildNodes();
     for (int i=0; i<list.getLength(); i++)
     {
@@ -123,11 +126,10 @@ public class PolicyParser
       if (childNode.getNodeType() == Node.ELEMENT_NODE)
       {
         String name = childNode.getNodeName();
-        if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
-        else if ("Property".equals(name) || "Value".equals(name))
-          desc.operands.add(getTextNodeValue(childNode));
-        else if ("Arg".equals(name))
-          desc.arguments.add(getTextNodeValue(childNode));
+        /*if ("Script".equals(name)) desc.script = getTextNodeValue(childNode);
+        else*/ if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
+        else if ("Property".equals(name) || "Value".equals(name)) desc.operands.add(getTextNodeValue(childNode));
+        else if ("Arg".equals(name)) desc.arguments.add(getTextNodeValue(childNode));
       }
     }
     return desc;
@@ -145,10 +147,7 @@ public class PolicyParser
     {
       Node childNode = children.item(j);
       int type = childNode.getNodeType();
-      if ((type == Node.TEXT_NODE) || (type == Node.CDATA_SECTION_NODE))
-      {
-        return childNode.getNodeValue();
-      }
+      if ((type == Node.TEXT_NODE) || (type == Node.CDATA_SECTION_NODE)) return childNode.getNodeValue();
     }
     return null;
   }
@@ -250,7 +249,9 @@ public class PolicyParser
    */
   public static void validatePolicy(final String policyContent) throws JPPFException, Exception
   {
-    validatePolicy(FileUtils.getFileReader(policyContent));
+    try (Reader reader = new StringReader(policyContent)) {
+      validatePolicy(reader);
+    }
   }
 
   /**

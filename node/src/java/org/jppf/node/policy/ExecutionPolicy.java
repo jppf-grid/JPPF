@@ -41,6 +41,11 @@ public abstract class ExecutionPolicy implements Serializable {
    * Used to avoid doing it more than once.
    */
   String computedToString = null;
+  /**
+   * The children of this rule.
+   * @exclude
+   */
+  protected ExecutionPolicy[] children = null;
 
   /**
    * Determines whether this policy accepts the specified node.
@@ -104,6 +109,16 @@ public abstract class ExecutionPolicy implements Serializable {
     return new NotRule(this);
   }
 
+
+  /**
+   * Get the children of this rule.
+   * @return an array of {@link ExecutionPolicy} instances, or {@code null} for leaf rules.
+   * @exclude
+   */
+  public ExecutionPolicy[] getChildren() {
+    return children;
+  }
+
   /**
    * Generate  new array with size +1 and the specified rule as first element.
    * @param rule the rule to set as first element.
@@ -163,17 +178,11 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   public abstract static class LogicalRule extends ExecutionPolicy {
     /**
-     * First operand.
-     * @exclude
-     */
-    protected ExecutionPolicy[] rules = null;
-
-    /**
      * Initialize this binary logical operator with the specified operands.
      * @param rules the first operand.
      */
     public LogicalRule(final ExecutionPolicy...rules) {
-      this.rules = rules;
+      this.children = rules;
     }
 
     /**
@@ -186,9 +195,9 @@ public abstract class ExecutionPolicy implements Serializable {
       synchronized(ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         toStringIndent++;
-        if (rules == null) sb.append(indent()).append("null\n");
+        if (children == null) sb.append(indent()).append("null\n");
         else {
-          for (ExecutionPolicy ep: rules) sb.append(ep.toString());
+          for (ExecutionPolicy ep: children) sb.append(ep.toString());
         }
         toStringIndent--;
         return sb.toString();
@@ -216,8 +225,8 @@ public abstract class ExecutionPolicy implements Serializable {
     @Override
     public boolean accepts(final PropertiesCollection info)
     {
-      if ((rules == null) || (rules.length <= 0)) return true; boolean b = true;
-      for (ExecutionPolicy ep: rules) b = b && ep.accepts(info);
+      if ((children == null) || (children.length <= 0)) return true; boolean b = true;
+      for (ExecutionPolicy ep: children) b = b && ep.accepts(info);
       return b;
     }
 
@@ -256,9 +265,9 @@ public abstract class ExecutionPolicy implements Serializable {
      */
     @Override
     public boolean accepts(final PropertiesCollection info) {
-      if ((rules == null) || (rules.length <= 0)) return true;
+      if ((children == null) || (children.length <= 0)) return true;
       boolean b = false;
-      for (ExecutionPolicy ep: rules) b = b || ep.accepts(info);
+      for (ExecutionPolicy ep: children) b = b || ep.accepts(info);
       return b;
     }
 
@@ -297,9 +306,9 @@ public abstract class ExecutionPolicy implements Serializable {
      */
     @Override
     public boolean accepts(final PropertiesCollection info) {
-      if ((rules == null) || (rules.length <= 0)) return true;
-      boolean b = rules[0].accepts(info);
-      if (rules.length >= 1) for (int i=1; i<rules.length; i++) b = (b != rules[i].accepts(info));
+      if ((children == null) || (children.length <= 0)) return true;
+      boolean b = children[0].accepts(info);
+      if (children.length >= 1) for (int i=1; i<children.length; i++) b = (b != children[i].accepts(info));
       return b;
     }
 

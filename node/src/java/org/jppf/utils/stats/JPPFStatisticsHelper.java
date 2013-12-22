@@ -123,17 +123,45 @@ public final class JPPFStatisticsHelper
   public static final String UNIDENTIFIED_OUT_TRAFFIC = "unidentified.traffic.out";
 
   /**
+   * Determine wether the specified snapshot is a single value snapshot.
+   * @param snapshot the snapshot to evaluate.
+   * @return {@code true} if the snapshot is a single value snapshot, {@code false} otherwise.
+   */
+  public static boolean isSingleValue(final JPPFSnapshot snapshot) {
+    return snapshot instanceof SingleValueSnapshot;
+  }
+
+  /**
+   * Determine wether the specified snapshot is a cumulative snapshot.
+   * @param snapshot the snapshot to evaluate.
+   * @return {@code true} if the snapshot is a cumulative snapshot, {@code false} otherwise.
+   */
+  public static boolean isCumulative(final JPPFSnapshot snapshot) {
+    return snapshot instanceof CumulativeSnapshot;
+  }
+
+  /**
+   * Determine wether the specified snapshot is a non-cumulative snapshot.
+   * @param snapshot the snapshot to evaluate.
+   * @return {@code true} if the snapshot is a non-cumulative snapshot, {@code false} otherwise.
+   */
+  public static boolean isNonCumulative(final JPPFSnapshot snapshot) {
+    return snapshot instanceof NonCumulativeSnapshot;
+  }
+
+  /**
    * Create a statistics object initialized with all the required server snapshots.
    * @return a {@link JPPFStatistics} instance.
+   * @exclude
    */
   public static JPPFStatistics createServerStatistics()
   {
     JPPFStatistics statistics = new JPPFStatistics();
     statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, TASK_DISPATCH,
-      NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
+        NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);
     statistics.createSingleValueSnapshots(TASK_QUEUE_TOTAL, JOB_TOTAL, NODE_IN_TRAFFIC, NODE_OUT_TRAFFIC, CLIENT_IN_TRAFFIC, CLIENT_OUT_TRAFFIC,
-      PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, UNIDENTIFIED_IN_TRAFFIC, UNIDENTIFIED_OUT_TRAFFIC);
+        PEER_IN_TRAFFIC, PEER_OUT_TRAFFIC, UNIDENTIFIED_IN_TRAFFIC, UNIDENTIFIED_OUT_TRAFFIC);
     return statistics;
   }
 }

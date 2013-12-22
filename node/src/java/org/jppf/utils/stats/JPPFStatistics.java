@@ -250,7 +250,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    */
   public Collection<JPPFSnapshot> getSnapshots()
   {
-    return snapshots.values();
+    return new ArrayList<>(snapshots.values());
   }
 
   /**

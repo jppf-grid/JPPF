@@ -51,6 +51,7 @@ public class PolicyBuilder
     else if ("OneOf".equals(type)) return buildOneOfPolicy(desc);
     else if ("RegExp".equals(type)) return buildRegExpPolicy(desc);
     else if ("CustomRule".equals(type)) return buildCustomPolicy(desc);
+    else if ("Script".equals(type)) return buildScriptedPolicy(desc);
     return null;
   }
 
@@ -372,5 +373,15 @@ public class PolicyBuilder
     policy.setArgs(desc.arguments.toArray(new String[desc.arguments.size()]));
     policy.initialize();
     return policy;
+  }
+
+  /**
+   * Build a scripted policy from a descriptor.
+   * @param desc the descriptor to use.
+   * @return an <code>ExecutionPolicy</code> instance.
+   */
+  private static ExecutionPolicy buildScriptedPolicy(final PolicyDescriptor desc)
+  {
+    return new ScriptedPolicy(desc.language, desc.script);
   }
 }

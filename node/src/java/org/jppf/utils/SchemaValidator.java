@@ -100,8 +100,7 @@ public class SchemaValidator
    */
   public SchemaValidator(final JPPFErrorReporter reporter)
   {
-    if (reporter == null) this.reporter = new JPPFErrorReporter("Error Reporter");
-    else this.reporter = reporter;
+    this.reporter = (reporter == null)  ? new JPPFErrorReporter("Error Reporter") : reporter;
   }
 
   /**
@@ -244,8 +243,7 @@ public class SchemaValidator
      */
     public ValidatorErrorHandler(final JPPFErrorReporter reporter)
     {
-      if (reporter == null) this.reporter = new JPPFErrorReporter("Error Reporter");
-      else this.reporter = reporter;
+      this.reporter = (reporter == null) ? new JPPFErrorReporter("Error Reporter") : reporter;
     }
 
     /**

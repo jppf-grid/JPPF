@@ -53,7 +53,11 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
   /**
    * Mapping of all properties containers.
    */
-  private Map<String, TypedProperties> map = new LinkedHashMap<>();
+  private final Map<String, TypedProperties> map = new LinkedHashMap<>();
+  /**
+   * Holds the latests set of properties maps.
+   */
+  private TypedProperties[] propertiesArray = new TypedProperties[0];
   /**
    * <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
    */
@@ -173,6 +177,54 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
   }
 
   /**
+   * Get the properties object holding the JPPF uuid and evrsion information.
+   * The following properties are provided:
+   * <ul>
+   * <li>"jppf.uuid" : the uuid of the node or driver</li>
+   * <li>"jppf.version.number" : the current JPPF version number</li>
+   * <li>"jppf.build.number" : the current build number</li>
+   * <li>"jppf.build.date" : the build date, including the time zone, in the format "yyyy-MM-dd hh:mm z" </li>
+   * </ul>
+   * @return a <code>TypedProperties</code> wrapper for the uuid and version information of the corresponding JPPF component.
+   */
+  public TypedProperties getUuid()
+  {
+    return getProperties("uuid");
+  }
+
+  /**
+   * Get all the properties as an array.
+   * @return an array of all the sets of properties.
+   */
+  @Override
+  public TypedProperties[] getPropertiesArray()
+  {
+    synchronized(map)
+    {
+      return propertiesArray;
+    }
+  }
+
+  @Override
+  public void addProperties(final String key, final TypedProperties properties)
+  {
+    synchronized(map)
+    {
+      map.put(key, properties);
+      propertiesArray = map.values().toArray(new TypedProperties[map.size()]);
+    }
+  }
+
+  @Override
+  public TypedProperties getProperties(final String key)
+  {
+    synchronized(map)
+    {
+      return map.get(key);
+    }
+  }
+
+  /**
    * Populate this system information object.
    * @return this <code>JPPFSystemInformation</code> object.
    */
@@ -276,53 +328,6 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
     public String ipAddress()
     {
       return second();
-    }
-  }
-
-  /**
-   * Get the properties object holding the JPPF uuid and evrsion information.
-   * The following properties are provided:
-   * <ul>
-   * <li>"jppf.uuid" : the uuid of the node or driver</li>
-   * <li>"jppf.version.number" : the current JPPF version number</li>
-   * <li>"jppf.build.number" : the current build number</li>
-   * <li>"jppf.build.date" : the build date, including the time zone, in the format "yyyy-MM-dd hh:mm z" </li>
-   * </ul>
-   * @return a <code>TypedProperties</code> wrapper for the uuid and version information of the corresponding JPPF component.
-   */
-  public TypedProperties getUuid()
-  {
-    return getProperties("uuid");
-  }
-
-  /**
-   * Get all the properties as an array.
-   * @return an array of all the sets of properties.
-   */
-  @Override
-  public TypedProperties[] getPropertiesArray()
-  {
-    synchronized(map)
-    {
-      return map.values().toArray(new TypedProperties[map.size()]);
-    }
-  }
-
-  @Override
-  public void addProperties(final String key, final TypedProperties properties)
-  {
-    synchronized(map)
-    {
-      map.put(key, properties);
-    }
-  }
-
-  @Override
-  public TypedProperties getProperties(final String key)
-  {
-    synchronized(map)
-    {
-      return map.get(key);
     }
   }
 }

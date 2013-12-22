@@ -30,30 +30,38 @@ public class PolicyDescriptor
   /**
    * The type of rule, eg AND, NOT, OneOf, Equal, etc.
    */
-  public String type = null;
+  String type = null;
   /**
    * Type of value used for some rules (currently Equal and OneOf).
    */
-  public String valueType = null;
+  String valueType = null;
   /**
    * Determines whether case should be ignored in string comparisons.
    */
-  public String ignoreCase = null;
+  String ignoreCase = null;
   /**
    * The fully qualified class name of a custom policy class.
    */
-  public String className = null;
+  String className = null;
   /**
    * The operands for this element, applies to non-logical rules (ie not AND, OR, XOR, NOT).
    * The first operand is always a property name.
    */
-  public List<String> operands = new ArrayList<>();
+  List<String> operands = new ArrayList<>();
   /**
    * List of arguments used in a custom (user-defined policy).
    */
-  public List<String> arguments = new ArrayList<>();
+  List<String> arguments = new ArrayList<>();
   /**
    * The children of this element, if any.
    */
-  public List<PolicyDescriptor> children = new ArrayList<>();
+  List<PolicyDescriptor> children = new ArrayList<>();
+  /**
+   * The script language to use for ScriptedRule elements.
+   */
+  String language = null;
+  /**
+   * The actual script to use for ScriptedRule elements.
+   */
+  String script = null;
 }

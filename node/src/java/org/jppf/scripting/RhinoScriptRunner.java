@@ -19,6 +19,7 @@ package org.jppf.scripting;
 
 import java.util.*;
 
+import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.mozilla.javascript.*;
 import org.slf4j.*;
 
@@ -52,7 +53,8 @@ public class RhinoScriptRunner implements ScriptRunner
   /**
    * Mapping of Rhino scripts to their uuid.
    */
-  private static Map<String, Script> scriptMap = new HashMap<>();
+  private static Map<String, Script> scriptMap = new SoftReferenceValuesMap<>();
+  //private static Map<String, Script> scriptMap = new HashMap<>();
 
   /**
    * Initialize the Rhino environment.
@@ -77,10 +79,10 @@ public class RhinoScriptRunner implements ScriptRunner
 
   /**
    * Evaluate the script specified as input and get the evaluation result.
-   * @param scriptId - a unique identifier for the script, to be used if the engine generates compiled code
+   * @param scriptId a unique identifier for the script, to be used if the engine generates compiled code
    * which can be later retrieved through this id.
-   * @param script - a string containing the script to evaluate.
-   * @param variables - a mapping of objects to variable names, added within the scope of the script.
+   * @param script a string containing the script to evaluate.
+   * @param variables a mapping of objects to variable names, added within the scope of the script.
    * @return the result of the evaluation as an object. The actual type of the result
    * depends on the scripting engine that is used.
    * @throws JPPFScriptingException if an error occurs while evaluating the script.
@@ -236,5 +238,11 @@ public class RhinoScriptRunner implements ScriptRunner
       sb.append("Source = ").append(lineSource);
       return sb.toString();
     }
+  }
+
+  @Override
+  public String getLanguage()
+  {
+    return "javascript";
   }
 }

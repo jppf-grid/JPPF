@@ -32,17 +32,20 @@ public interface JPPFSnapshot extends Serializable
    * Add a set of aggregated values to this snapshot.
    * @param accumulatedValues the accumulated sum of the values to add.
    * @param count the number of values in the accumalated values.
+   * @exclude
    */
   void addValues(final double accumulatedValues, final long count);
 
   /**
    * Make a copy of this time snapshot object.
    * @return a <code>TimeSnapshot</code> instance.
+   * @exclude
    */
   JPPFSnapshot copy();
 
   /**
    * Reset all counters to their initial values.
+   * @exclude
    */
   void reset();
 

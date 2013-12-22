@@ -20,7 +20,9 @@ package org.jppf.scripting;
 
 import groovy.lang.*;
 
-import java.util.*;
+import java.util.Map;
+
+import org.jppf.utils.collections.SoftReferenceValuesMap;
 
 /**
  * Script runner wrapper around a Groovy script engine.
@@ -31,7 +33,8 @@ public class GroovyScriptRunner implements ScriptRunner
   /**
    * Mapping of Groovy scripts to their uuid.
    */
-  private static Map<String, Script> scriptMap = new HashMap<>();
+  private Map<String, Script> scriptMap = new SoftReferenceValuesMap<>();
+  //private static Map<String, Script> scriptMap = new HashMap<>();
 
   /**
    * Evaluate the script specified as input and get the evaluation result.
@@ -39,7 +42,6 @@ public class GroovyScriptRunner implements ScriptRunner
    * @param variables a mapping of objects to add the scope of the script.
    * @return the result of the evaluation as an object.
    * @throws JPPFScriptingException if an error occurs while evaluating the script.
-   * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.util.Map)
    */
   @Override
   public Object evaluate(final String script, final Map<String, Object> variables) throws JPPFScriptingException
@@ -56,14 +58,12 @@ public class GroovyScriptRunner implements ScriptRunner
    * @return the result of the evaluation as an object. The actual type of the result
    * depends on the scripting engine that is used.
    * @throws JPPFScriptingException if an error occurs while evaluating the script.
-   * @see org.jppf.scripting.ScriptRunner#evaluate(java.lang.String, java.lang.String, java.util.Map)
    */
   @Override
   public Object evaluate(final String scriptId, final String script, final Map<String, Object> variables) throws JPPFScriptingException
   {
     try
     {
-      //GroovyShell shell = new GroovyShell(binding);
       GroovyShell shell = new GroovyShell();
       Script groovyScript = scriptId == null ? null : scriptMap.get(scriptId);
       if (groovyScript == null)
@@ -82,21 +82,19 @@ public class GroovyScriptRunner implements ScriptRunner
     }
   }
 
-  /**
-   * Initialize the execution environment.
-   * @see org.jppf.scripting.ScriptRunner#init()
-   */
   @Override
   public void init()
   {
   }
 
-  /**
-   * Perform cleanup after we're done using this script runner.
-   * @see org.jppf.scripting.ScriptRunner#cleanup()
-   */
   @Override
   public void cleanup()
   {
+  }
+
+  @Override
+  public String getLanguage()
+  {
+    return "groovy";
   }
 }
