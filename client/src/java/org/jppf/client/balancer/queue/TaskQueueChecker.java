@@ -27,7 +27,7 @@ import org.jppf.execute.ExecutorStatus;
 import org.jppf.node.protocol.JobMetadata;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.fixedsize.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -120,14 +120,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    */
   public void setBundler(final Bundler bundler)
   {
-    if (bundler == null)
-    {
-      this.bundler = createDefault();
-    }
-    else
-    {
-      this.bundler = bundler;
-    }
+    this.bundler = (bundler == null) ? createDefault() : bundler;
   }
 
   /**
@@ -278,40 +271,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
   }
 
   /**
-   * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
-   * @param channel        the node channel to dispatch the job to.
-   * @param selectedBundle the job to dispatch.
-   */
-  @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)
-  {
-    if (debugEnabled)
-    {
-      log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to channel " + channel +
-              ", connectionUuid=" + channel.getConnectionUuid());
-    }
-    synchronized (channel.getMonitor())
-    {
-      int size = 1;
-      try
-      {
-        updateBundler(getBundler(), selectedBundle.getJob(), channel);
-        size = channel.getBundler().getBundleSize();
-      }
-      catch (Exception e)
-      {
-        log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
-        FixedSizeProfile profile = new FixedSizeProfile();
-        profile.setSize(1);
-        setBundler(new FixedSizeBundler(profile));
-      }
-      ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
-      selectedBundle.addChannel(channel);
-      channel.submit(bundleWrapper);
-    }
-  }
-
-  /**
    * Find a channel that can send the specified task bundle for execution.
    * @param bundle the bundle to execute.
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
@@ -336,11 +295,37 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     }
     int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
-    if (size > 0)
+    return (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
+  }
+
+  /**
+   * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
+   * @param channel        the node channel to dispatch the job to.
+   * @param selectedBundle the job to dispatch.
+   */
+  @SuppressWarnings("unchecked")
+  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)
+  {
+    if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()});
+    synchronized (channel.getMonitor())
     {
-      return acceptableChannels.get(size > 1 ? random.nextInt(size) : 0);
+      int size = 1;
+      try
+      {
+        updateBundler(getBundler(), selectedBundle.getJob(), channel);
+        size = channel.getBundler().getBundleSize();
+      }
+      catch (Exception e)
+      {
+        log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
+        FixedSizeProfile profile = new FixedSizeProfile();
+        profile.setSize(1);
+        setBundler(new FixedSizeBundler(profile));
+      }
+      ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
+      selectedBundle.addChannel(channel);
+      channel.submit(bundleWrapper);
     }
-    return null;
   }
 
   /**

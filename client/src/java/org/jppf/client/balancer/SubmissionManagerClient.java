@@ -352,19 +352,16 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       wrapperLocal.addClientConnectionStatusListener(statusListener);
       addConnection(wrapperLocal);
     }
-    else
+    else if (wrapperLocal != null)
     {
-      if (wrapperLocal != null)
+      try
       {
-        try
-        {
-          wrapperLocal.close();
-        }
-        finally
-        {
-          removeConnection(wrapperLocal);
-          wrapperLocal = null;
-        }
+        wrapperLocal.close();
+      }
+      finally
+      {
+        removeConnection(wrapperLocal);
+        wrapperLocal = null;
       }
     }
   }

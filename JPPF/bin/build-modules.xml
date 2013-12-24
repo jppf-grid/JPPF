@@ -115,7 +115,6 @@
 					<include name="jppf-admin-src.jar"/>
 				</zipfileset>
 				<zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
-				<zipfileset dir="${lib}/Rhino" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="*.jar"/>
 				<zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="*.jar"/>

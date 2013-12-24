@@ -23,6 +23,7 @@ import java.util.EventListener;
 /**
  * Listener interface for JPPF statistics.
  * @author Laurent Cohen
+ * @exclude
  */
 public interface JPPFStatisticsListener extends EventListener
 {

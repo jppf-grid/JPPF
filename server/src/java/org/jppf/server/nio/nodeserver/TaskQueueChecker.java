@@ -23,14 +23,14 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.*;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.server.scheduler.bundle.fixedsize.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ThreadSynchronization;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -38,8 +38,7 @@ import org.slf4j.*;
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  * @param <C> type of the <code>ExecutorChannel</code>.
  */
-public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchronization implements Runnable
-{
+public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -86,8 +85,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param queue the reference queue to use.
    * @param stats reference to the statistics.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats)
-  {
+  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats) {
     this.queue = queue;
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
@@ -107,8 +105,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * Create new instance of default bundler.
    * @return a new {@link Bundler} instance.
    */
-  protected Bundler createDefault()
-  {
+  protected Bundler createDefault() {
     FixedSizeProfile profile = new FixedSizeProfile();
     profile.setSize(1);
     return new FixedSizeBundler(profile);
@@ -118,8 +115,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * Get the bundler used to schedule tasks for the corresponding node.
    * @return a {@link Bundler} instance.
    */
-  public Bundler getBundler()
-  {
+  public Bundler getBundler() {
     return bundler;
   }
 
@@ -127,26 +123,16 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * Set the bundler used to schedule tasks for the corresponding node.
    * @param bundler a {@link Bundler} instance.
    */
-  public void setBundler(final Bundler bundler)
-  {
-    if (bundler == null)
-    {
-      this.bundler = createDefault();
-    }
-    else
-    {
-      this.bundler = bundler;
-    }
+  public void setBundler(final Bundler bundler) {
+    this.bundler = (bundler == null) ? createDefault() : bundler;
   }
 
   /**
    * Get the number of idle channels.
    * @return the size of the underlying list of idle channels.
    */
-  public int getNbIdleChannels()
-  {
-    synchronized (idleChannels)
-    {
+  public int getNbIdleChannels() {
+    synchronized (idleChannels) {
       return idleChannels.size();
     }
   }
@@ -155,14 +141,11 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final C channel)
-  {
+  public void addIdleChannel(final C channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
-
     if (traceEnabled) log.trace("Adding idle channel " + channel);
-    synchronized(idleChannels)
-    {
+    synchronized(idleChannels) {
       idleChannels.add(channel);
     }
     wakeUp();
@@ -173,10 +156,8 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<C> getIdleChannels()
-  {
-    synchronized (idleChannels)
-    {
+  public List<C> getIdleChannels() {
+    synchronized (idleChannels) {
       return new ArrayList<>(idleChannels);
     }
   }
@@ -186,12 +167,10 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  public C removeIdleChannel(final C channel)
-  {
+  public C removeIdleChannel(final C channel) {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     boolean removed;
-    synchronized(idleChannels)
-    {
+    synchronized(idleChannels) {
       removed = idleChannels.remove(channel);
     }
     if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
@@ -202,10 +181,8 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * Return whether any idle channel is available.
    * @return <code>true</code> when there are no idle channels.
    */
-  public boolean hasIdleChannel()
-  {
-    synchronized (idleChannels)
-    {
+  public boolean hasIdleChannel() {
+    synchronized (idleChannels) {
       return !idleChannels.isEmpty();
     }
   }
@@ -215,10 +192,8 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param channel the channel to check.
    * @return <code>true</code> if the channel is in the set of idle channels, <code>false</code> otherwise.
    */
-  public boolean hasIdleChannel(final C channel)
-  {
-    synchronized (idleChannels)
-    {
+  public boolean hasIdleChannel(final C channel) {
+    synchronized (idleChannels) {
       return idleChannels.contains(channel);
     }
   }
@@ -228,11 +203,9 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @see Runnable#run()
    */
   @Override
-  public void run()
-  {
-    while (!isStopped())
-    {
-      if (!dispatch()) goToSleep(100L);
+  public void run() {
+    while (!isStopped()) {
+      if (!dispatch()) goToSleep(1L);
     }
   }
 
@@ -284,13 +257,8 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @return a channel for a node on which to execute the job.
    * @throws Exception if any error occurs.
    */
-  private C retrieveChannel(final ServerJob bundleWrapper) throws Exception
-  {
-    if (checkJobState(bundleWrapper))
-    {
-      return findIdleChannelIndex(bundleWrapper);
-    }
-    return null;
+  private C retrieveChannel(final ServerJob bundleWrapper) throws Exception {
+    return checkJobState(bundleWrapper) ? findIdleChannelIndex(bundleWrapper) : null;
   }
 
   /**
@@ -299,17 +267,13 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param selectedBundle the job to dispatch.
    * @return the task bundle to dispatch to the specified node.
    */
-  private ServerTaskBundleNode prepareJobDispatch(final C channel, final ServerJob selectedBundle)
-  {
+  private ServerTaskBundleNode prepareJobDispatch(final C channel, final ServerJob selectedBundle) {
     if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
-    try
-    {
+    try {
       updateBundler(getBundler(), selectedBundle.getJob(), channel);
       size = channel.getBundler().getBundleSize();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
       FixedSizeProfile profile = new FixedSizeProfile();
       profile.setSize(1);
@@ -337,12 +301,12 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @return the index of an available and acceptable channel, or -1 if no channel could be found.
    */
   private C findIdleChannelIndex(final ServerJob bundle) {
-    int idleChannelsSize = idleChannels.size();
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
-    List<C> acceptableChannels = new ArrayList<>(idleChannelsSize);
+    List<C> acceptableChannels = new ArrayList<>(idleChannels.size());
     List<String> uuidPath = bundle.getJob().getUuidPath().getList();
     Iterator<C> iterator = idleChannels.iterator();
+    int nbJobChannels = bundle.getNbChannels();
     while (iterator.hasNext()) {
       C ch = iterator.next();
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
@@ -361,6 +325,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
         JPPFSystemInformation info = ch.getSystemInformation();
         boolean b = false;
         try {
+          preparePolicy(policy, bundle, stats, nbJobChannels);
           b = policy.accepts(info);
         } catch(Exception ex) {
           log.error("An error occurred while running the execution policy to determine node participation.", ex);
@@ -374,8 +339,22 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
     }
     int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
-    if (size > 0) return acceptableChannels.get(size > 1 ? random.nextInt(size) : 0);
-    return null;
+    return (size > 0) ? acceptableChannels.get(size > 1 ? random.nextInt(size) : 0) : null;
+  }
+
+  /**
+   * Set the parameters needed as bounded variables fro scripted execution policies.
+   * @param policy the root policy to explore.
+   * @param job the job containing the sla and metadata.
+   * @param stats the server statistics.
+   * @param nbJobNodes the number of nodes the job is already dispatched to.
+   */
+  public static void preparePolicy(final ExecutionPolicy policy, final ServerJob job, final JPPFStatistics stats, final int nbJobNodes) {
+    if (policy instanceof ScriptedPolicy) {
+      ((ScriptedPolicy) policy).setVariables(job == null ? null : job.getSLA(), null, job == null ? null : job.getMetadata(), nbJobNodes, stats);
+    } else if (policy.getChildren() != null) {
+      for (ExecutionPolicy child: policy.getChildren()) preparePolicy(child, job, stats, nbJobNodes);
+    }
   }
 
   /**
@@ -385,26 +364,13 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param bundle the bundle from which to get the job information.
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
-  private static boolean checkJobState(final ServerJob bundle)
-  {
+  private static boolean checkJobState(final ServerJob bundle) {
     if (bundle.isCancelled()) return false;
     JobSLA sla = bundle.getJob().getSLA();
-    if (debugEnabled)
-    {
-      String s = StringUtils.build("job '", bundle.getName(), "' : ",
-        "suspended=", sla.isSuspended(), ", pending=", bundle.isPending(),
-        ", expired=", bundle.isJobExpired());
-      log.debug(s);
-    }
-    if (sla.isSuspended()) return false;
-    boolean b = bundle.isPending();
-    if (b) return false;
-    b = bundle.isJobExpired();
-    if (b) return false;
-    int maxNodes = sla.getMaxNodes();
-    int n = bundle.getNbChannels();
-    if (debugEnabled) log.debug("current nodes = " + n + ", maxNodes = " + maxNodes);
-    return n < maxNodes;
+    if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {bundle.getName(), sla.isSuspended(), bundle.isPending(), bundle.isJobExpired()});
+    if (sla.isSuspended() || bundle.isPending() || bundle.isJobExpired()) return false;
+    if (debugEnabled) log.debug("current nodes = " + bundle.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
+    return bundle.getNbChannels() < sla.getMaxNodes();
   }
 
   /**
@@ -413,13 +379,9 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param taskBundle the job.
    * @param context the current node context.
    */
-  private void updateBundler(final Bundler bundler, final TaskBundle taskBundle, final C context)
-  {
+  private void updateBundler(final Bundler bundler, final TaskBundle taskBundle, final C context) {
     context.checkBundler(bundler, jppfContext);
-    if (context.getBundler() instanceof JobAwareness)
-    {
-      JobMetadata metadata = taskBundle.getMetadata();
-      ((JobAwareness) context.getBundler()).setJobMetadata(metadata);
-    }
+    Bundler ctxBundler = context.getBundler();
+    if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJobMetadata(taskBundle.getMetadata());
   }
 }

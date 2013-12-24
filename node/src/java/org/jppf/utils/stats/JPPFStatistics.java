@@ -44,6 +44,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
 
   /**
    * Default constructor.
+   * @exclude
    */
   public JPPFStatistics()
   {
@@ -52,6 +53,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Copy constructor.
    * @param map the statistics map to copy.
+   * @exclude
    */
   private JPPFStatistics(final Map<String, JPPFSnapshot> map)
   {
@@ -74,6 +76,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * If a snapshot with this label already exists, it is returned.
    * @param label the label of the snapshot to create.
    * @return a {@link JPPFSnapshot} instance representing the newly created snapshot or the exsting one.
+   * @exclude
    */
   public JPPFSnapshot createSnapshot(final String label)
   {
@@ -86,6 +89,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * @param label the label of the snapshot to create.
    * @param cumulative determines whether updates are accumulated instead of simply stored as latest value.
    * @return a {@link JPPFSnapshot} instance representing the newly created snapshot or the exsting one.
+   * @exclude
    */
   public JPPFSnapshot createSnapshot(final boolean cumulative, final String label)
   {
@@ -101,6 +105,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * If a snapshot with this label already exists, it is returned.
    * @param label the label of the snapshot to create.
    * @return a {@link JPPFSnapshot} instance representing the newly created snapshot or the exsting one.
+   * @exclude
    */
   public JPPFSnapshot createSingleValueSnapshot(final String label)
   {
@@ -116,6 +121,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * If one of the snapshots already exists, it is returned.
    * @param labels the label of the snapshot to create.
    * @return an array of {@link JPPFSnapshot} instances representing the newly created or exsting snapshots, in the smaez order as the input labels.
+   * @exclude
    */
   public JPPFSnapshot[] createSnapshots(final String...labels)
   {
@@ -128,6 +134,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * @param labels the label of the snapshot to create.
    * @param cumulative determines whether updates are accumulated instead of simply stored as latest value.
    * @return an array of {@link JPPFSnapshot} instances representing the newly created or exsting snapshots, in the smaez order as the input labels.
+   * @exclude
    */
   public JPPFSnapshot[] createSnapshots(final boolean cumulative, final String...labels)
   {
@@ -141,6 +148,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * If any of the snapshots already exists, it is returned.
    * @param labels the label of the snapshot to create.
    * @return an array of {@link JPPFSnapshot} instances representing the newly created or exsting snapshots, in the smaez order as the input labels.
+   * @exclude
    */
   public JPPFSnapshot[] createSingleValueSnapshots(final String...labels)
   {
@@ -154,6 +162,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * If a snapshot with this label already exists, it is returned.
    * @param label the label of the snapshot to create.
    * @return a {@link JPPFSnapshot} instance representing the removed snapshot or <code>null</code> if the label is not in the map.
+   * @exclude
    */
   public JPPFSnapshot removeSnapshot(final String label)
   {
@@ -168,6 +177,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * @param value the accumulated sum of the values to add.
    * @return a reference to the updated {@link JPPFSnapshot} object.
    * @throws IllegalStateException if the snapshot does not exist.
+   * @exclude
    */
   public JPPFSnapshot addValue(final String label, final double value)
   {
@@ -181,6 +191,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * @param count the number of values in the accumalated values.
    * @return a reference to the updated {@link JPPFSnapshot} object.
    * @throws IllegalStateException if the snapshot does not exist.
+   * @exclude
    */
   public JPPFSnapshot addValues(final String label, final double accumulatedValues, final long count)
   {
@@ -195,17 +206,13 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * Build a copy of this stats object.
    * @return a new <code>JPPFStats</code> instance, populated with the current values
    * of the fields in this stats object.
+   * @exclude
    */
   public JPPFStatistics copy()
   {
     return new JPPFStatistics(snapshots);
   }
 
-  /**
-   * Get a string representation of this stats object.
-   * @return a string display the various stats values.
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString()
   {
@@ -217,6 +224,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
 
   /**
    * Reset all contained snapshots to their initial values.
+   * @exclude
    */
   public void reset()
   {
@@ -226,6 +234,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Reset all contained snapshots to their initial values.
    * @param filter determines which snapshots will be reset.
+   * @exclude
    */
   public void reset(final JPPFSnapshot.Filter filter)
   {
@@ -238,6 +247,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
 
   /**
    * Remove all snapshots from this object.
+   * @exclude
    */
   public void clear()
   {
@@ -272,6 +282,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Add a listener to the list of listeners.
    * @param listener the listener to add.
+   * @exclude
    */
   public void addListener(final JPPFStatisticsListener listener)
   {
@@ -281,6 +292,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Remove a listener to the list of listeners.
    * @param listener the listener to remove.
+   * @exclude
    */
   public void removeListener(final JPPFStatisticsListener listener)
   {
@@ -290,6 +302,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Notify all listeners that a snapshot was created.
    * @param snapshot a copy of the created snapshot.
+   * @exclude
    */
   private void fireSnapshotAdded(final JPPFSnapshot snapshot)
   {
@@ -300,6 +313,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Notify all listeners that a snapshot was updated.
    * @param snapshot a copy of the updated snapshot.
+   * @exclude
    */
   private void fireSnapshotUpdated(final JPPFSnapshot snapshot)
   {
@@ -310,6 +324,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   /**
    * Notify all listeners that a snapshot was removed.
    * @param snapshot a copy of the removed snapshot.
+   * @exclude
    */
   private void fireSnapshotRemoved(final JPPFSnapshot snapshot)
   {

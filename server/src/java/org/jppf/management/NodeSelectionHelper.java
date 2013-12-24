@@ -51,8 +51,11 @@ public class NodeSelectionHelper implements NodeSelectionProvider
     if (node.isPeer()) return false;
     else if (selector instanceof NodeSelector.UuidSelector)
       return ((NodeSelector.UuidSelector) selector).getUuids().contains(node.getUuid());
-    else if (selector instanceof NodeSelector.ExecutionPolicySelector)
-      return ((NodeSelector.ExecutionPolicySelector) selector).getPolicy().accepts(node.getSystemInformation());
+    else if (selector instanceof NodeSelector.ExecutionPolicySelector) {
+      ExecutionPolicy policy = ((NodeSelector.ExecutionPolicySelector) selector).getPolicy();
+      TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
+      return policy.accepts(node.getSystemInformation());
+    }
     throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
   }
 
@@ -117,6 +120,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   {
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+    TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context: allChannels)
     {
       if (!hasWorkingJmxConnection(context)) continue;

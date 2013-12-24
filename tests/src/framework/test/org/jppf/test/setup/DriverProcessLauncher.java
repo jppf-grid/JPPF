@@ -61,6 +61,7 @@ public class DriverProcessLauncher extends GenericProcessLauncher
     addClasspathElement("classes/tests/config");
     addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");
+    addClasspathElement("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");
     //addJvmOption("-Xrunjdwp:transport=dt_socket,address=localhost:800" + n +",server=y,suspend=y");
   }

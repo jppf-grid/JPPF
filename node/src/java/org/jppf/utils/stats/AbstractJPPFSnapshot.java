@@ -30,36 +30,44 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
   private static final long serialVersionUID = 1L;
   /**
    * Label for this snapshot, used in the {@link #toString()} method.
+   * @exclude
    */
   protected final String label;
   /**
    * The total cumulated values.
+   * @exclude
    */
   protected double total = 0d;
   /**
    * The most recent value.
+   * @exclude
    */
   protected double latest = 0d;
   /**
    * The minimum value.
+   * @exclude
    */
   protected double min = Double.POSITIVE_INFINITY;
   /**
    * The maximum value.
+   * @exclude
    */
   protected double max = 0d;
   /**
    * The average value.
+   * @exclude
    */
   protected double avg = 0d;
   /**
    * Count of values added to this snapshot.
+   * @exclude
    */
   protected long valueCount = 0L;
 
   /**
    * Initialize this time snapshot with a specified title.
    * @param label the title for this snapshot.
+   * @exclude
    */
   public AbstractJPPFSnapshot(final String label)
   {
@@ -70,6 +78,7 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
    * Make a copy of this time snapshot object.
    * @param ts a new snapshot into which values will be copied
    * @return a <code>TimeSnapshot</code> instance.
+   * @exclude
    */
   public synchronized AbstractJPPFSnapshot copy(final AbstractJPPFSnapshot ts)
   {
@@ -82,6 +91,10 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
     return ts;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public synchronized void reset()
   {
@@ -93,6 +106,10 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
     valueCount = 0L;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public synchronized String toString()
   {

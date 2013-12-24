@@ -69,7 +69,7 @@ public class ServiceFinder
         if (single) break;
         alreadyLoaded.add(s);
       }
-      catch(Exception e)
+      catch(Exception|NoClassDefFoundError e)
       {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));

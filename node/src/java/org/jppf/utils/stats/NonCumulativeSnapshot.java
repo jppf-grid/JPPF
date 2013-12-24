@@ -32,6 +32,7 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
   /**
    * Initialize this snapshot with a specified title.
    * @param label the title for this snapshot.
+   * @exclude
    */
   public NonCumulativeSnapshot(final String label)
   {
@@ -39,9 +40,8 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
   }
 
   /**
-   * Add a set of aggregated values to this snapshot.
-   * @param accumulatedValues the accumulated sum of the values to add.
-   * @param count the number of values in the accumalated values.
+   * {@inheritDoc}
+   * @exclude
    */
   @Override
   public synchronized void addValues(final double accumulatedValues, final long count)
@@ -57,6 +57,10 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public JPPFSnapshot copy()
   {

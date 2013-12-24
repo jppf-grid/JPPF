@@ -19,16 +19,13 @@ package org.jppf.scripting;
 
 import java.util.*;
 
-import org.jppf.utils.*;
-import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
  * Factory used to instantiate script runners.
  * @author Laurent Cohen
  */
-public final class ScriptRunnerFactory
-{
+public final class ScriptRunnerFactory {
   /**
    * Logger for this class.
    */
@@ -40,13 +37,12 @@ public final class ScriptRunnerFactory
   /**
    * An association of script languages with the corresponding discovered runners.
    */
-  private static final CollectionMap<String, ScriptRunner> runners = loadRunners();
+  private static final Map<String, ScriptRunner> runners = new HashMap<>();
 
   /**
    * Instantiation of this class is not allowed.
    */
-  private ScriptRunnerFactory()
-  {
+  private ScriptRunnerFactory() {
   }
 
   /**
@@ -57,8 +53,7 @@ public final class ScriptRunnerFactory
    * @deprecated this method is not actually creating a script runner, but providing a cached instance.
    * {@link #getScriptRunner(String)} should be used instead for semantic consistency. 
    */
-  public static ScriptRunner makeScriptRunner(final String language)
-  {
+  public static ScriptRunner makeScriptRunner(final String language) {
     return getScriptRunner(language);
   }
 
@@ -68,30 +63,12 @@ public final class ScriptRunnerFactory
    * @return A <code>ScriptRunner</code> instance, or null if no known script runner
    * exists for the specified language.
    */
-  public static ScriptRunner getScriptRunner(final String language)
-  {
-    Collection<ScriptRunner> c = runners.getValues(language);
-    if (c == null) return null;
-    return c.iterator().next();
-  }
-
-  /**
-   * Load all configured script runner via SPI.
-   * @return a mapping of language names to script runners.
-   */
-  private static CollectionMap<String, ScriptRunner> loadRunners()
-  {
-    CollectionMap<String, ScriptRunner> map = new SetHashMap<>();
-    try
-    {
-      ServiceFinder sf = new ServiceFinder();
-      List<ScriptRunner> list = sf.findProviders(ScriptRunner.class);
-      for (ScriptRunner r: list) map.putValue(r.getLanguage(), r);
+  public static ScriptRunner getScriptRunner(final String language) {
+    ScriptRunner runner = runners.get(language);
+    if (runner == null) {
+      runner = new ScriptRunnerImpl(language);
+      runners.put(language, runner);
     }
-    catch (Exception e)
-    {
-      log.error("error loading script runners via SPI: {}", ExceptionUtils.getStackTrace(e));
-    }
-    return map;
+    return runner;
   }
 }

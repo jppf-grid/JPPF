@@ -224,6 +224,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean
     if (policy == null) return allChannels.size();
 
     int count = 0;
+    TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
       JPPFManagementInfo mgtInfo = context.getManagementInfo();
       boolean match = false;

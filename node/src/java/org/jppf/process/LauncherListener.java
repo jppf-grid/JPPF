@@ -28,6 +28,7 @@ import org.slf4j.*;
  * Instances of this class listen to a socket connection setup in the ProcessLauncher, to handle the situation when the Launcher dies unexpectedly.<br>
  * In that situation, the connection is broken and this process knows that it must exit.
  * @author Laurent Cohen
+ * @exclude
  */
 public class LauncherListener extends Thread
 {

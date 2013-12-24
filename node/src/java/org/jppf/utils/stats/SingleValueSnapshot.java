@@ -33,28 +33,39 @@ public class SingleValueSnapshot implements JPPFSnapshot
   private static final long serialVersionUID = 1L;
   /**
    * Label for this snapshot, used in the {@link #toString()} method.
+   * @exclude
    */
   protected final String label;
   /**
    * The total cumulated values.
+   * @exclude
    */
   protected double total = 0d;
 
   /**
    * Initialize this time snapshot with a specified title.
    * @param label the title for this snapshot.
+   * @exclude
    */
   public SingleValueSnapshot(final String label)
   {
     this.label = label;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public synchronized void addValues(final double accumulatedValues, final long count)
   {
     total += accumulatedValues;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public synchronized JPPFSnapshot copy()
   {
@@ -63,6 +74,10 @@ public class SingleValueSnapshot implements JPPFSnapshot
     return svs;
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public synchronized void reset()
   {

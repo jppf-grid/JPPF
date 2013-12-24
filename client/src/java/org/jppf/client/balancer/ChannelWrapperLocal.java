@@ -136,6 +136,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   @SuppressWarnings("unchecked")
   public JPPFFuture<?> submit(final ClientTaskBundle bundle) {
+    if (debugEnabled) log.debug("locally submitting {}", bundle);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(getBundler(), bundle), null) {
       @Override
@@ -306,6 +307,6 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public NodeExecutionManager getExecutionManager()
   {
-    return null;
+    return executionManager;
   }
 }

@@ -23,6 +23,7 @@ import java.util.EventObject;
 /**
  * A statistics event.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFStatisticsEvent extends EventObject
 {

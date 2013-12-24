@@ -62,17 +62,9 @@ public class ScriptedPolicy extends ExecutionPolicy {
    */
   protected transient JPPFStatistics stats;
   /**
-   * The additional variables to bind to the script engine.
-   */
-  protected transient Map<String, Object> bindings;
-  /**
    * The script language to use.
    */
   protected final String language;
-  /**
-   * A list of Java package names, from which import statements are generated in the chosen script language.
-   */
-  //protected Collection<String> imports;
   /**
    * A unique id given to this script, to allow caching its compiled version.
    */
@@ -81,6 +73,11 @@ public class ScriptedPolicy extends ExecutionPolicy {
    * The script to execute.
    */
   protected String script;
+  /**
+   * Flag set if an error is raised while executing the script,
+   * to avoid evaluating the script again.
+   */
+  protected boolean evaluationError = false;
 
   /**
    * Initialize this policy with a script language.
@@ -130,20 +127,21 @@ public class ScriptedPolicy extends ExecutionPolicy {
 
   @Override
   public boolean accepts(final PropertiesCollection info) {
-    if (script == null) return false;
+    if ((script == null) || evaluationError) return false;
     Map<String, Object> variables = new HashMap<>();
-    if (info != null) variables.put("jppfSystemInfo", info);
-    if (sla != null) variables.put("jppfSla", sla);
-    if (clientSla != null) variables.put("jppfClientSla", clientSla);
-    if (metadata != null) variables.put("jppfMetadata", metadata);
+    variables.put("jppfSystemInfo", info);
+    variables.put("jppfSla", sla);
+    variables.put("jppfClientSla", clientSla);
+    variables.put("jppfMetadata", metadata);
     variables.put("jppfDispatches", jobDispatches);
-    if (stats != null) variables.put("jppfStats", stats);
+    variables.put("jppfStats", stats);
     try {
       ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
       Object result = runner.evaluate(id, script, variables);
       if (!(result instanceof Boolean)) throw new JPPFException("result of scripted policy should be a boolean but instead is " + result);
       return (Boolean) result;
-    } catch (Exception e) {
+    } catch (Exception|NoClassDefFoundError e) {
+      evaluationError = true;
       log.error("exception occurred evaluting scripted policy: {}\npolicy is\n{}", ExceptionUtils.getStackTrace(e), this);
     }
     return false;
@@ -183,14 +181,5 @@ public class ScriptedPolicy extends ExecutionPolicy {
     this.metadata = metadata;
     this.jobDispatches = jobDispatches;
     this.stats = stats;
-  }
-
-  /**
-   * Set the parameters used as bound variables in the script.
-   * @param bindings the additional variables to bind to the script engine.
-   * @exclude
-   */
-  public void setBindings(final Map<String, Object> bindings) {
-    this.bindings = bindings;
   }
 }

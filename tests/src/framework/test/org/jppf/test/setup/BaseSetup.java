@@ -365,6 +365,7 @@ public class BaseSetup
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../common/classes");
     driverCP.add("../server/classes");
+    driverCP.add("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
     String dir = "classes/tests/config";
     config.driverJppf = dir + "/driver.template.properties";
     config.driverLog4j = "classes/tests/config/log4j-driver.template.properties";

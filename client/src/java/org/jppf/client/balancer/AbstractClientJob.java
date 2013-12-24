@@ -27,7 +27,7 @@ import org.jppf.client.JPPFJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.slf4j.*;
 
@@ -130,9 +130,7 @@ public abstract class AbstractClientJob
   {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (debugEnabled) log.debug("creating ClientJob #" + INSTANCE_COUNT.incrementAndGet());
-
     this.job = job;
-
     this.uuid = this.job.getUuid();
     this.name = this.job.getName();
     this.sla = this.job.getSLA();
@@ -332,10 +330,7 @@ public abstract class AbstractClientJob
     {
       runnables = onDoneList.toArray(new Runnable[onDoneList.size()]);
     }
-    for (Runnable runnable : runnables)
-    {
-      runnable.run();
-    }
+    for (Runnable runnable : runnables) runnable.run();
   }
 
   /**
@@ -345,7 +340,6 @@ public abstract class AbstractClientJob
   public void addOnDone(final Runnable runnable)
   {
     if(runnable == null) throw new IllegalArgumentException("runnable is null");
-
     synchronized (onDoneList)
     {
       onDoneList.add(runnable);
@@ -359,7 +353,6 @@ public abstract class AbstractClientJob
   public void removeOnDone(final Runnable runnable)
   {
     if (runnable == null) throw new IllegalArgumentException("runnable is null");
-
     synchronized (onDoneList)
     {
       onDoneList.remove(runnable);
@@ -430,18 +423,29 @@ public abstract class AbstractClientJob
   public boolean acceptsChannel(final ExecutorChannel channel)
   {
     if (traceEnabled) log.trace(build("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired()));
-    if (isPending()) return false;
-    if (isJobExpired()) return false;
-    if (channelsCount.get() >= clientSla.getMaxChannels()) return false;
+    if (isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
     ExecutionPolicy policy = clientSla.getExecutionPolicy();
     boolean b = true;
     if (policy != null)
     {
       JPPFSystemInformation info = channel.getSystemInformation();
+      preparePolicy(policy);
       b = policy.accepts(info);
       if (traceEnabled) log.trace("policy result = " + b);
     }
     return b;
+  }
+
+  /**
+   * Set the parameters needed as bounded variables fro scripted execution policies. 
+   * @param policy the root policy to explore.
+   */
+  private void preparePolicy(final ExecutionPolicy policy) {
+    if (policy instanceof ScriptedPolicy) {
+      ((ScriptedPolicy) policy).setVariables(sla, clientSla, metadata, channelsCount.get(), null);
+    } else if (policy.getChildren() != null) {
+      for (ExecutionPolicy child: policy.getChildren()) preparePolicy(child);
+    }
   }
 
   /**
