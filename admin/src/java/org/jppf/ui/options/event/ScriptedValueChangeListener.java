@@ -50,10 +50,6 @@ public class ScriptedValueChangeListener implements ValueChangeListener
    */
   private String script = null;
   /**
-   * A wrapper around the scripting engine.
-   */
-  private ScriptRunner runner = null;
-  /**
    * The unique id of this scripted listener.
    */
   private String uuid = new JPPFUuid().toString();
@@ -71,7 +67,6 @@ public class ScriptedValueChangeListener implements ValueChangeListener
   {
     this.language = language;
     this.script = content;
-    runner = ScriptRunnerFactory.makeScriptRunner(this.language);
   }
 
   /**
@@ -82,20 +77,16 @@ public class ScriptedValueChangeListener implements ValueChangeListener
    * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
    */
   @Override
-  public void valueChanged(final ValueChangeEvent event)
-  {
+  public void valueChanged(final ValueChangeEvent event) {
     OptionElement option = event.getOption();
-    if (scriptText == null)
-    {
+    if (scriptText == null) {
       TreePath path = option.getPath();
       StringBuilder sb = new StringBuilder();
       // add the scripts defined in the option and all its ancestors to the one in the listener.
       // only scripts written in the same scripting language are added.
-      for (Object o: path.getPath())
-      {
+      for (Object o: path.getPath()) {
         OptionElement elt = (OptionElement) o;
-        for (ScriptDescriptor desc: elt.getScripts())
-        {
+        for (ScriptDescriptor desc: elt.getScripts()) {
           if (language.equals(desc.language)) sb.append(desc.content).append('\n');
         }
       }
@@ -105,19 +96,20 @@ public class ScriptedValueChangeListener implements ValueChangeListener
     Map<String, Object> variables = new HashMap<>();
     variables.put("root", option.getRoot());
     variables.put("option", option);
-    try
-    {
+    ScriptRunner runner = null;
+    try {
+      runner = ScriptRunnerFactory.getScriptRunner(this.language);
       long start = System.currentTimeMillis();
       runner.evaluate(uuid, scriptText, variables);
       long elapsed = System.currentTimeMillis() - start;
       StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
       if (debugEnabled) log.debug(sb.toString());
       //System.out.println(sb.toString());
-    }
-    catch(JPPFScriptingException e)
-    {
+    } catch(JPPFScriptingException e) {
       //e.printStackTrace();
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
+    } finally {
+      ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
 }

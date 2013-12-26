@@ -51,10 +51,6 @@ public class ScriptedMouseListener implements MouseListener
    */
   private final String script;
   /**
-   * A wrapper around the scripting engine.
-   */
-  private final ScriptRunner runner;
-  /**
    * The unique id of this scripted listener.
    */
   private final String uuid = new JPPFUuid().toString();
@@ -78,7 +74,6 @@ public class ScriptedMouseListener implements MouseListener
     this.language = language;
     this.script = content;
     this.option = option;
-    runner = ScriptRunnerFactory.makeScriptRunner(this.language);
   }
 
   /**
@@ -110,8 +105,10 @@ public class ScriptedMouseListener implements MouseListener
     variables.put("option", option);
     variables.put("event", event);
     variables.put("eventType", eventType);
+    ScriptRunner runner = null;
     try
     {
+      runner = ScriptRunnerFactory.getScriptRunner(this.language);
       long start = System.currentTimeMillis();
       runner.evaluate(uuid, scriptText, variables);
       long elapsed = System.currentTimeMillis() - start;
@@ -121,6 +118,10 @@ public class ScriptedMouseListener implements MouseListener
     catch(JPPFScriptingException e)
     {
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
+    }
+    finally
+    {
+      ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
 

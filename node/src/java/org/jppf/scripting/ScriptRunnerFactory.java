@@ -35,9 +35,9 @@ public final class ScriptRunnerFactory {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * An association of script languages with the corresponding discovered runners.
+   * Mapping of languages to associated pool of engines.
    */
-  private static final Map<String, ScriptRunner> runners = new HashMap<>();
+  private static final Map<String, ScriptRunnerPool> runnerMap = new HashMap<>();
 
   /**
    * Instantiation of this class is not allowed.
@@ -50,25 +50,42 @@ public final class ScriptRunnerFactory {
    * @param language the name of the script language to use.
    * @return A <code>ScriptRunner</code> instance, or null if no known script runner
    * exists for the specified language.
-   * @deprecated this method is not actually creating a script runner, but providing a cached instance.
-   * {@link #getScriptRunner(String)} should be used instead for semantic consistency. 
+   * @deprecated {@link #getScriptRunner(String)} should be used instead for semantic consistency.
    */
   public static ScriptRunner makeScriptRunner(final String language) {
     return getScriptRunner(language);
   }
 
   /**
-   * Get a script runner based on the specified script language.
+   * Get a new script runner instance based on the specified script language.
    * @param language the name of the script language to use.
-   * @return A <code>ScriptRunner</code> instance, or null if no known script runner
+   * @return A <code>ScriptRunner</code> instance, or null if no known script engine
    * exists for the specified language.
    */
   public static ScriptRunner getScriptRunner(final String language) {
-    ScriptRunner runner = runners.get(language);
-    if (runner == null) {
-      runner = new ScriptRunnerImpl(language);
-      runners.put(language, runner);
+    if (language == null) return null;
+    ScriptRunnerPool pool = null;
+    synchronized(runnerMap) {
+      pool = runnerMap.get(language);
+      if (pool == null) {
+        pool = new ScriptRunnerPool(language);
+        runnerMap.put(language, pool);
+      }
+      return pool == null ? null : pool.get();
     }
-    return runner;
+  }
+
+  /**
+   * Release the specified runner back into its pool when no longer used.
+   * @param runner the script runner to release.
+   */
+  public static void releaseScriptRunner(final ScriptRunner runner) {
+    if (runner != null) {
+      ScriptRunnerPool pool = null;
+      synchronized(runnerMap) {
+        pool = runnerMap.get(runner.getLanguage());
+      }
+      if (pool != null) pool.put(runner);
+    }
   }
 }

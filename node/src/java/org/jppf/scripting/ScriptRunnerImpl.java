@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.script.*;
 
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
@@ -30,7 +31,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class ScriptRunnerImpl implements ScriptRunner {
-
   /**
    * Logger for this class.
    */
@@ -67,7 +67,7 @@ public class ScriptRunnerImpl implements ScriptRunner {
 
   /**
    * Get the script engine according tot he given name.
-   * The engine is lazily instantiated upon the first invocation fo this method.
+   * The engine is lazily instantiated upon the first invocation of this method.
    * @return a {@link ScriptEngine} instance.
    */
   private ScriptEngine createEngine() {
@@ -91,20 +91,22 @@ public class ScriptRunnerImpl implements ScriptRunner {
     bindings.putAll(variables);
     CompiledScript cs = null;
     if ((scriptId != null) && (engine instanceof Compilable)) {
-      cs = map.get(scriptId);
+      String key = new StringBuilder().append(language).append(':').append(scriptId).toString();
+      cs = map.get(key);
       if (cs == null) {
         try {
           cs = ((Compilable) engine).compile(script);
-          if (cs != null) map.put(scriptId, cs);
+          if (cs != null) map.put(key, cs);
         } catch (Exception e) {
-          throw new JPPFScriptingException(e);
+          throw buildScriptingException(e);
         }
       }
     }
     try {
-      return cs != null ? cs.eval(bindings) : engine.eval(script, bindings);
+      Object res = (cs != null) ? cs.eval(bindings) : engine.eval(script, bindings);
+      return res;
     } catch(Exception e) {
-      throw new JPPFScriptingException(e);
+      throw buildScriptingException(e);
     }
   }
 
@@ -120,5 +122,18 @@ public class ScriptRunnerImpl implements ScriptRunner {
   @Override
   public String getLanguage() {
     return language;
+  }
+
+  /**
+   * Build an exception from a throwable raised by the script engine.<br>
+   * I noticed that the Rhino engine throws {@code EcmaError}s which are not serializable.
+   * This causes problems if the EcmaError is set as a JPPF task's throwable via {@code Task.setThrowable(Throwable)}.
+   * @param t the exception from the script engine.
+   * @return a {@link JPPFScriptingException} instance.
+   */
+  private JPPFScriptingException buildScriptingException(final Throwable t) {
+    JPPFScriptingException jfe = new JPPFScriptingException(ExceptionUtils.getMessage(t));
+    jfe.setStackTrace(t.getStackTrace());
+    return jfe;
   }
 }

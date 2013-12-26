@@ -23,7 +23,8 @@ import javax.swing.*;
 
 import org.jppf.scripting.*;
 import org.jppf.ui.options.*;
-import org.jppf.ui.options.xml.OptionDescriptor.*;
+import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 import org.jppf.utils.*;
 
 /**
@@ -400,9 +401,14 @@ public class OptionElementFactory {
     } else if ("script".equalsIgnoreCase(source)) {
       if (!desc.scripts.isEmpty()) {
         ScriptDescriptor scriptDesc = desc.scripts.get(0);
-        ScriptRunner runner = ScriptRunnerFactory.makeScriptRunner(scriptDesc.language);
+        ScriptRunner runner = null;
+        try {
+        runner = ScriptRunnerFactory.getScriptRunner(scriptDesc.language);
         String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
         if (path != null) list.add(builder.buildPage(path, null));
+        } finally {
+          ScriptRunnerFactory.releaseScriptRunner(runner);
+        }
       }
     }
     if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) {

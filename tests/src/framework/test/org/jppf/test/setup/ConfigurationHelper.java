@@ -142,9 +142,17 @@ public class ConfigurationHelper
     if (value.startsWith("expr:"))
     {
       String expr = value.substring("expr:".length()).trim();
-      ScriptRunner runner = ScriptRunnerFactory.getScriptRunner("groovy");
-      Object o = runner.evaluate(key, expr, variables);
-      if (o != null) value = o.toString();
+      ScriptRunner runner = null;
+      try
+      {
+        runner = ScriptRunnerFactory.getScriptRunner("groovy");
+        Object o = runner.evaluate(key, expr, variables);
+        if (o != null) value = o.toString();
+      }
+      finally
+      {
+        ScriptRunnerFactory.releaseScriptRunner(runner);
+      }
     }
     return value;
   }
