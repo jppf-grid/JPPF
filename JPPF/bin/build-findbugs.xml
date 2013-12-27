@@ -64,26 +64,11 @@
 			<param name="fsrc" value="${jca-client}/src/j2eeclient"/>
 			<param name="fclass" value="${jca-client}/classes/j2eeclient"/>
 		</antcall>
-		<antcall target="findbugs.generic">
-			<param name="foutput" value="gigaspaces-common"/>
-			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
-			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-Common/classes"/>
-		</antcall>
-		<antcall target="findbugs.generic">
-			<param name="foutput" value="gigaspaces-client"/>
-			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
-			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-Client/classes"/>
-		</antcall>
-		<antcall target="findbugs.generic">
-			<param name="foutput" value="gigaspaces-pu"/>
-			<param name="fsrc" value="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
-			<param name="fclass" value="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/classes"/>
-		</antcall>
 	</target>
 
 	<target name="findbugs.module">
     <findbugs home="${findbugs.home}" output="${output.type}" outputFile="${build}/findbugs/${path}-findbugs.${output.type}" jvmargs="${findbug.jvm.flags}"
-    excludeFilter="${bin}/findbugs-filter.xml">
+      excludeFilter="${bin}/findbugs-filter.xml">
       <auxClasspath>
       	<fileset dir="${lib}" includes="**/*.jar"/>
       	<fileset dir="${build}" includes="*.jar"/>
@@ -96,10 +81,6 @@
   <path id="findbugs.generic.classpath">
 		<pathelement location="${jca-client}/classes/j2eeclient"/>
 		<pathelement location="${jca-client}/classes/jca"/>
-		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Common/classes"/>
-		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Common/lib/spring.jar"/>
-		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-Client/classes"/>
-		<pathelement location="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/classes"/>
   	<fileset dir="${lib}" includes="**/*.jar"/>
   	<fileset dir="${build}" includes="*.jar"/>
   </path>

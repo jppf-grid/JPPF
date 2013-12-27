@@ -132,12 +132,6 @@
       	<include name="**/*.*"/>
       </fileset>
     </pack>
-    <pack name="GigaSpaces_Connector" required="no" preselected="no">
-      <description></description>
-      <fileset dir="./build/@{app.ver}/@{app.ver}-GigaSpaces" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-GigaSpaces">
-      	<include name="**/*.*"/>
-      </fileset>
-    </pack>
 
   </packs>
 

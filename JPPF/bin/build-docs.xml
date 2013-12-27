@@ -86,7 +86,6 @@
 	<!-- ========================================================================= -->
 
 	<target name="javadoc" depends="compile.doclet" description="Generate all java doc">
-		<echo message="gs.home = ${gs.home}"/>
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
     <exec executable="java">
@@ -104,9 +103,6 @@
 			<packageset dir="${admin}/src/java"/>
 			<packageset dir="${jca-client}/src/java"/>
 			<packageset dir="${jca-client}/src/j2eeclient"/>
-			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Common/src"/>
-			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-Client/src"/>
-			<packageset dir="${gigaspaces}/JPPF-GigaSpaces-ProcessingUnit/src"/>
 			<link href="http://docs.oracle.com/javase/7/docs/api/"/>
 			<link href="http://docs.oracle.com/javaee/6/api/"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>

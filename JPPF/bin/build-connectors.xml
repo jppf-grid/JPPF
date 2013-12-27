@@ -19,32 +19,6 @@
 <project name="JPPF-connectors" basedir="..">
 
 	<!-- ========================================================================= -->
-	<!--                 Generate the JPPF-GigaSpaces integration                  -->
-	<!-- ========================================================================= -->
-
-	<target name="jppf.gigaspaces" description="Generate the JPPF-GigaSpaces integration package" depends="init, build">
-		<copy todir="${gigaspaces}/JPPF-GigaSpaces-Common/lib">
-			<fileset dir="${build}">
-				<include name="jppf-client.jar"/>
-				<include name="jppf-common.jar"/>
-				<include name="jppf-common-node*.jar"/>
-			</fileset>
-		</copy>
-		<ant antfile="${gigaspaces}/build.xml" target="build" inheritall="false"/>
-		<property name="gigaspaces.prefix" value="${app.ver}-GigaSpaces"/>
-		<property name="gigaspaces.file" value="${build}/${gigaspaces.prefix}.zip"/>
-		<delete file="gigaspaces.file" quiet="true"/>
-		<zip destfile="${gigaspaces.file}">
-			<zipfileset dir="${gigaspaces}" prefix="${gigaspaces.prefix}">
-				<exclude name="**/CVS/**"/>
-				<exclude name="**/*.log"/>
-				<exclude name="**/*.classpath"/>
-				<exclude name="**/*.project"/>
-			</zipfileset>
-		</zip>
-  </target>
-
-	<!-- ========================================================================= -->
 	<!--             Package the j2ee connector for deployment                     -->
 	<!-- ========================================================================= -->
 

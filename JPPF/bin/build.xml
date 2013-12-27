@@ -30,14 +30,12 @@
 	<property name="server"                value="${basedir}/../server"/>
 	<property name="demo"                  value="${basedir}/../demo"/>
 	<property name="jca-client"            value="${basedir}/../jca-client"/>
-	<property name="gigaspaces"            value="${basedir}/../JPPF-GigaSpaces"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="tests"                 value="${basedir}/../tests"/>
   <property name="stress-tests"          value="${basedir}/../stress-tests"/>
 
 	<property name="build.properties.file" value="${basedir}/bin/build.properties"/>
-  <property file="${gigaspaces}/build.properties"/>
   <property file="${build.properties.file}"/>
 	<property name="build.number.file"     value="${basedir}/bin/build.number"/>
 	<property name="bin"                   value="${basedir}/bin"/>	
@@ -155,13 +153,13 @@
   <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector"/>
 	<target name="rebuild" depends="clean.all, build"/>
 	<target name="deploy"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc, javadoc, installer"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc, installer"/>
 	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc, javadoc           "/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc           "/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc,          installer"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc,          installer"/>
 	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, jppf.gigaspaces, j2ee.connector, tests.build, user.guide, doc                    "/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc                    "/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -203,12 +201,6 @@
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
-      <zipfileset dir="${gigaspaces}" prefix="${zip.prefix}/JPPF-GigaSpaces">
-        <exclude name="deployable/*.jar"/>
-        <exclude name="deployable/*.war"/>
-        <exclude name="**/build/*.*"/>
-		    <exclude name="**/pu/*.*"/>
-      </zipfileset>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
       <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
         <exclude name="**/*.log"/>
