@@ -23,7 +23,7 @@ import java.net.*;
 import org.jppf.JPPFException;
 import org.jppf.io.IO;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -92,13 +92,13 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @throws IOException if there is an issue with the socket streams.
    */
   public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer)
-  throws ConnectException, IOException
-  {
+      throws ConnectException, IOException
+      {
     this.host = host;
     this.port = port;
     this.serializer = serializer;
     open();
-  }
+      }
 
   /**
    * Initialize this socket client with an already opened and connected socket.
@@ -461,5 +461,13 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    */
   protected void updateSocketTimestamp() {
     socketTimestamp = System.currentTimeMillis();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("socket=").append(socket);
+    sb.append(']');
+    return sb.toString();
   }
 }

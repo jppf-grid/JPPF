@@ -85,6 +85,7 @@ public class ServerConnection extends AbstractRecoveryConnection
       return;
     }
     uuid = response.substring(idx + 1);
+    if (debugEnabled) log.debug("got uuid=" + uuid);
   }
 
   /**

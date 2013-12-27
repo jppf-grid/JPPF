@@ -72,6 +72,10 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * Connection to the recovery server.
    */
   private ClientConnection recoveryConnection = null;
+  /**
+   * 
+   */
+  private JPPFConnectionInformation connectionInfo = null;
 
   /**
    * Initialize this peer node with the specified configuration name.
@@ -88,6 +92,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
     this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     this.uuid = driver.getUuid();
     this.systemInformation = driver.getSystemInformation();
+    this.connectionInfo = connectionInfo;
   }
 
   /**
@@ -211,7 +216,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
       if (recoveryConnection == null)
       {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid);
+        recoveryConnection = new ClientConnection(uuid, connectionInfo);
         recoveryConnection.addClientConnectionListener(this);
         new Thread(recoveryConnection, getName() + "reaper client connection").start();
       }

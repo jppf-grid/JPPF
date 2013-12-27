@@ -20,6 +20,7 @@ package org.jppf.comm.recovery;
 
 import java.util.*;
 
+import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -50,6 +51,10 @@ public class ClientConnection extends AbstractRecoveryConnection
    * The list of listeners to this object's events.
    */
   private final List<ClientConnectionListener> listeners = new ArrayList<>();
+  /**
+   * 
+   */
+  private JPPFConnectionInformation connectionInfo = null;
 
   /**
    * Initialize this client connection with the specified uuid.
@@ -58,6 +63,17 @@ public class ClientConnection extends AbstractRecoveryConnection
   public ClientConnection(final String uuid)
   {
     this.uuid = uuid;
+  }
+
+  /**
+   * Initialize this client connection with the specified uuid.
+   * @param uuid the JPPF node or client uuid.
+   * @param connectionInfo information on connecting to the remote peer.
+   */
+  public ClientConnection(final String uuid, final JPPFConnectionInformation connectionInfo)
+  {
+    this.uuid = uuid;
+    this.connectionInfo = connectionInfo;
   }
 
   @Override
@@ -100,8 +116,15 @@ public class ClientConnection extends AbstractRecoveryConnection
   {
     if (debugEnabled) log.debug("configuring connection");
     TypedProperties config = JPPFConfiguration.getProperties();
-    String host = config.getString("jppf.server.host", "localhost");
-    int port = config.getInt("jppf.recovery.server.port", 22222);
+    String host = null;
+    int port = -1;
+    if (connectionInfo == null) {
+      host = config.getString("jppf.server.host", "localhost");
+      port = config.getInt("jppf.recovery.server.port", 22222);
+    } else {
+      host = connectionInfo.host;
+      port = connectionInfo.recoveryPort;
+    }
     maxRetries = config.getInt("jppf.recovery.max.retries", 2);
     socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 60000);
     socketWrapper = new BootstrapSocketClient();

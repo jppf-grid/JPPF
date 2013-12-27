@@ -443,7 +443,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         context.handleException(context.getChannel(), null);
       } else {
         log.warn("found null context - a job may be stuck!");
-        closeNode(context);
+        //closeNode(context);
       }
     }
   }

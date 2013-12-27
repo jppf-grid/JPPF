@@ -113,7 +113,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
       catch (SocketTimeoutException e)
       {
         retries++;
-        if (debugEnabled) log.debug(this + " retry #" + retries + " failed!");
+        if (debugEnabled) log.debug(" retry #{} failed for {}", retries, this);
       }
     }
     if (!success) throw new JPPFException("could not get a message from the remote peer");
@@ -180,5 +180,19 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
   public synchronized void setInitialized(final boolean initialized)
   {
     this.initialized = initialized;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("socketWrapper=").append(socketWrapper);
+    sb.append(", maxRetries=").append(maxRetries);
+    sb.append(", socketReadTimeout=").append(socketReadTimeout);
+    sb.append(", uuid=").append(uuid);
+    sb.append(", ok=").append(ok);
+    sb.append(", initialized=").append(initialized);
+    sb.append(']');
+    return sb.toString();
   }
 }
