@@ -20,6 +20,7 @@ package org.jppf.server.peer;
 import java.util.*;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.recovery.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
@@ -37,7 +38,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Martin JANDA
  */
-class PeerNode extends AbstractCommonNode
+class PeerNode extends AbstractCommonNode implements ClientConnectionListener
 {
   /**
    * Logger for this class.
@@ -67,6 +68,10 @@ class PeerNode extends AbstractCommonNode
    * Reference to the driver.
    */
   private JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Connection to the recovery server.
+   */
+  private ClientConnection recoveryConnection = null;
 
   /**
    * Initialize this peer node with the specified configuration name.
@@ -201,6 +206,16 @@ class PeerNode extends AbstractCommonNode
   {
     nodeConnection.init();
     is = new SocketWrapperInputSource(getSocketWrapper());
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false))
+    {
+      if (recoveryConnection == null)
+      {
+        if (debugEnabled) log.debug("Initializing recovery");
+        recoveryConnection = new ClientConnection(uuid);
+        recoveryConnection.addClientConnectionListener(this);
+        new Thread(recoveryConnection, getName() + "reaper client connection").start();
+      }
+    }
   }
 
   /**
@@ -257,6 +272,15 @@ class PeerNode extends AbstractCommonNode
       log.error(ex.getMessage(), ex);
     }
     nodeConnection = null;
+    if (recoveryConnection != null)
+    {
+      ClientConnection tmp = recoveryConnection;
+      if (tmp != null)
+      {
+        recoveryConnection = null;
+        tmp.close();
+      }
+    }
   }
 
   /**
@@ -290,5 +314,12 @@ class PeerNode extends AbstractCommonNode
   public NodeExecutionManager getExecutionManager()
   {
     return null;
+  }
+
+  @Override
+  public void clientConnectionFailed(final ClientConnectionEvent event)
+  {
+   if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
+   stopNode();
   }
 }
