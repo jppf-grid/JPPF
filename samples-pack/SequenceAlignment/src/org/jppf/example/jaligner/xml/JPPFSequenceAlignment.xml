@@ -37,18 +37,10 @@
 
 			var comp = option.getUIComponent();
 			var frame = new JFrame(option.getLabel());
-			wa = 
-			{
-				windowClosing: function(event)
-				{
-					OptionsHandler.savePreferences();
-					System.exit(0);
-				}
-			};
-			frame.addWindowListener(new WindowAdapter(wa));
+			frame.addWindowListener(new org.jppf.example.jaligner.WindowClosingListener());
 			var BASE = "org.jppf.samples.i18n.SequenceAlignment";
 			frame.getContentPane().add(option.getUIComponent());
-			frame.setSize(760, 700);
+			frame.setSize(820, 700);
 			frame.setVisible(true);
 		]]></script>
 	</initializer>
