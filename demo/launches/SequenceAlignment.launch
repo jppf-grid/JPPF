@@ -14,7 +14,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.ui.monitoring.UILauncher"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="org/jppf/examples/jaligner/xml/JPPFSequenceAlignment.xml file"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="org/jppf/example/jaligner/xml/JPPFSequenceAlignment.xml file"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="samples-pack"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -Duser.language=en -Duser.country=US"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:samples-pack/SequenceAlignment}"/>
