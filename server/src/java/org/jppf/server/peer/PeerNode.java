@@ -113,16 +113,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
       catch(Exception e)
       {
         if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
-        setStopped(true);
-        try
-        {
-          if (nodeConnection != null) nodeConnection.close();
-        }
-        catch (Exception e2)
-        {
-          log.error(e.getMessage(), e);
-        }
-        driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(((RemotePeerConnection) nodeConnection).connectionInfo);
+        stopNode();
       }
       if (!isStopped())
       {
@@ -135,16 +126,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
         {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
-          try
-          {
-            if (nodeConnection != null) nodeConnection.close();
-            nodeConnection = null;
-          }
-          catch(Exception ex)
-          {
-            if (debugEnabled) log.debug(e.getMessage(), ex);
-            else log.warn(ExceptionUtils.getMessage(ex));
-          }
+          close();
         }
         catch(Error e)
         {
@@ -265,8 +247,19 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
   @Override
   public void stopNode()
   {
+    if (debugEnabled) log.debug(getName() + " stopping node");
+    this.setStopped(true);
+    close();
+    driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
+  }
+
+  /**
+   * Stop this node and release the resources it is using.
+   * @see org.jppf.node.Node#stopNode()
+   */
+  public void close()
+  {
     if (debugEnabled) log.debug(getName() + " closing node");
-    stopped = true;
     try
     {
       if (debugEnabled) log.debug(getName() + " closing socket: " + nodeConnection.getChannel());
@@ -325,7 +318,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
   @Override
   public void clientConnectionFailed(final ClientConnectionEvent event)
   {
-   if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
-   stopNode();
+    if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
+    close();
   }
 }
