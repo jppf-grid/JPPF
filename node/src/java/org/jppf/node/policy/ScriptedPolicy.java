@@ -135,14 +135,19 @@ public class ScriptedPolicy extends ExecutionPolicy {
     variables.put("jppfMetadata", metadata);
     variables.put("jppfDispatches", jobDispatches);
     variables.put("jppfStats", stats);
+    ScriptRunner runner = null;
     try {
-      ScriptRunner runner = ScriptRunnerFactory.getScriptRunner(language);
-      Object result = runner.evaluate(id, script, variables);
-      if (!(result instanceof Boolean)) throw new JPPFException("result of scripted policy should be a boolean but instead is " + result);
-      return (Boolean) result;
+      runner = ScriptRunnerFactory.getScriptRunner(language);
+      if (runner != null) {
+        Object result = runner.evaluate(id, script, variables);
+        if (!(result instanceof Boolean)) throw new JPPFException("result of scripted policy should be a boolean but instead is " + result);
+        return (Boolean) result;
+      }
     } catch (Exception|NoClassDefFoundError e) {
       evaluationError = true;
       log.error("exception occurred evaluting scripted policy: {}\npolicy is\n{}", ExceptionUtils.getStackTrace(e), this);
+    } finally {
+      if (runner != null) ScriptRunnerFactory.releaseScriptRunner(runner);
     }
     return false;
   }

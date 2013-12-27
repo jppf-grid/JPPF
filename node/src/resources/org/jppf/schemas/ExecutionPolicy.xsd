@@ -2,7 +2,7 @@
 
 <!--
   JPPF.
-   Copyright (C) 2005-2013 JPPF Team. 
+  Copyright (C) 2005-2014 JPPF Team. 
   http://www.jppf.org
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
   xmlns:jppf="http://www.jppf.org/schemas/ExecutionPolicy.xsd"
   targetNamespace="http://www.jppf.org/schemas/ExecutionPolicy.xsd"
-  elementFormDefault="unqualified"
-  attributeFormDefault="unqualified"
+  elementFormDefault="unqualified" attributeFormDefault="unqualified"
 >
 
   <element name="ExecutionPolicy" type="jppf:OneRuleType"/>
@@ -50,12 +49,14 @@
     </choice>
   </group>
 
+  <!-- unary predicates : NOT -->
   <complexType name="OneRuleType">
     <sequence>
       <group ref="jppf:Rule"/>
     </sequence>
   </complexType>
 
+  <!-- binary predicates : AND, OR, XOR -->
   <complexType name="TwoOrMoreRulesType">
     <sequence minOccurs="2" maxOccurs="unbounded">
       <group ref="jppf:Rule"/>
@@ -105,7 +106,7 @@
     <attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
   </complexType>
 
-  <!-- test of type "property_value is one of { value1, ... , valueN } " -->
+  <!-- test of type "property_value is one of {value1, ... , valueN}" -->
   <complexType name="OneOfType">
     <sequence>
       <element name="Property" type="string"/>
@@ -122,7 +123,7 @@
     <attribute name="ignoreCase" type="jppf:TrueFalse" use="optional" default="false"/>
   </complexType>
 
-  <!-- test of type "property_value matches regular_expression " -->
+  <!-- test of type "property_value matches regular_expression" -->
   <complexType name="RegExpType">
     <sequence>
       <element name="Property" type="string"/>
@@ -137,6 +138,7 @@
     </restriction>
   </simpleType>
 
+  <!-- custom execution policy -->
   <complexType name="CustomRuleType">
     <sequence>
       <element name="Arg" type="string" minOccurs="0" maxOccurs="unbounded"/>
@@ -144,6 +146,7 @@
     <attribute name="class" type="string"/>
   </complexType>
 
+  <!-- scripted execution policy -->
   <complexType name="ScriptedRuleType">
     <simpleContent>
       <extension base="string">
