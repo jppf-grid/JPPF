@@ -294,7 +294,8 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    */
   private String getName()
   {
-    return ((RemotePeerConnection) nodeConnection).name;
+    //return ((RemotePeerConnection) nodeConnection).name;
+    return peerNameBase;
   }
 
   @Override

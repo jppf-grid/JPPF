@@ -18,7 +18,8 @@
 
 package org.jppf.comm.recovery;
 
-import java.util.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
@@ -50,7 +51,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * The list of listeners to this object's events.
    */
-  private final List<ClientConnectionListener> listeners = new ArrayList<>();
+  private final List<ClientConnectionListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * 
    */
@@ -148,10 +149,7 @@ public class ClientConnection extends AbstractRecoveryConnection
       if (tmp != null) tmp.close();
       if (socketInitializer != null) socketInitializer.close();
       socketInitializer = null;
-      synchronized(listeners)
-      {
-        listeners.clear();
-      }
+      listeners.clear();
     }
     catch (Exception e)
     {
@@ -166,10 +164,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   public void addClientConnectionListener(final ClientConnectionListener listener)
   {
     if (listener == null) return;
-    synchronized (listeners)
-    {
-      listeners.add(listener);
-    }
+    listeners.add(listener);
   }
 
   /**
@@ -179,10 +174,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   public void removeClientConnectionListener(final ClientConnectionListener listener)
   {
     if (listener == null) return;
-    synchronized (listeners)
-    {
-      listeners.remove(listener);
-    }
+    listeners.remove(listener);
   }
 
   /**
@@ -191,11 +183,6 @@ public class ClientConnection extends AbstractRecoveryConnection
   private void fireClientConnectionEvent()
   {
     ClientConnectionEvent event = new ClientConnectionEvent(this);
-    ClientConnectionListener[] tmp;
-    synchronized (listeners)
-    {
-      tmp = listeners.toArray(new ClientConnectionListener[listeners.size()]);
-    }
-    for (ClientConnectionListener listener : tmp) listener.clientConnectionFailed(event);
+    for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
   }
 }
