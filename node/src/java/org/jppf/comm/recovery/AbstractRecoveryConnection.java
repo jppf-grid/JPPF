@@ -108,12 +108,12 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
         buffer = socketWrapper.receiveBytes(socketReadTimeout);
         success = true;
         message = buffer.asString();
-        if (traceEnabled) log.trace(this + " received '" + message + '\'');
+        if (traceEnabled) log.trace("received '{}' for {}", message, this);
       }
       catch (SocketTimeoutException e)
       {
         retries++;
-        if (debugEnabled) log.debug(" retry #{} failed for {}", retries, this);
+        if (debugEnabled) log.debug("retry #{} failed for {}", retries, this);
       }
     }
     if (!success) throw new JPPFException("could not get a message from the remote peer");
@@ -129,7 +129,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
   {
     JPPFBuffer buffer = new JPPFBuffer(message);
     socketWrapper.sendBytes(buffer);
-    if (traceEnabled) log.trace(this + " sent '" + message + '\'');
+    if (traceEnabled) log.trace("sent '{}' from {}", message, this);
   }
 
   /**
