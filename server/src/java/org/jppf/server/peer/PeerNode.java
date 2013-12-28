@@ -38,8 +38,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Martin JANDA
  */
-class PeerNode extends AbstractCommonNode implements ClientConnectionListener
-{
+class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   /**
    * Logger for this class.
    */
@@ -73,9 +72,13 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    */
   private ClientConnection recoveryConnection = null;
   /**
-   * 
+   * The peer connection information.
    */
   private JPPFConnectionInformation connectionInfo = null;
+  /**
+   * Specifies whether the connection should be established over SSL/TLS.
+   */
+  private final boolean secure;
 
   /**
    * Initialize this peer node with the specified configuration name.
@@ -83,13 +86,12 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * @param connectionInfo peer connection information.
    * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure)
-  {
+  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure) {
     if(peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerNameBase is blank");
     if(connectionInfo == null) throw new IllegalArgumentException(peerNameBase +" connectionInfo is null");
 
+    this.secure = secure;
     this.peerNameBase = peerNameBase;
-    this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     this.uuid = driver.getUuid();
     this.systemInformation = driver.getSystemInformation();
     this.connectionInfo = connectionInfo;
@@ -100,36 +102,25 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     stopped = false;
     if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
-    while (!isStopped())
-    {
-      try
-      {
+    while (!isStopped()) {
+      try {
         init();
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
         stopNode();
       }
-      if (!isStopped())
-      {
-        try
-        {
+      if (!isStopped()) {
+        try {
           resultSender = new PeerNodeResultSender(getSocketWrapper());
           perform();
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
           close();
-        }
-        catch(Error e)
-        {
+        } catch(Error e) {
           log.error(e.getMessage(), e);
           e.printStackTrace();
           throw e;
@@ -144,45 +135,38 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * receives it, executes it and sends the results back.
    * @throws Exception if an error was raised from the underlying socket connection or the class loader.
    */
-  public void perform() throws Exception
-  {
+  public void perform() throws Exception {
     if (debugEnabled) log.debug(getName() + " start of peer node secondary loop");
-    while (!stopped)
-    {
-      ServerTaskBundleClient bundleWrapper = readBundle();
-      TaskBundle bundle = bundleWrapper.getJob();
-      if (bundle.isHandshake())
-      {
-        if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
-        bundle.setUuid(uuid);
-        bundle.setParameter(BundleParameter.IS_PEER, true);
-        bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
-        bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
+    try {
+      while (!stopped) {
+        ServerTaskBundleClient bundleWrapper = readBundle();
+        TaskBundle bundle = bundleWrapper.getJob();
+        if (bundle.isHandshake()) {
+          if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
+          bundle.setUuid(uuid);
+          bundle.setParameter(BundleParameter.IS_PEER, true);
+          bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+          bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
+        }
+        if (bundleWrapper.getTaskCount() > 0) {
+          bundle.getUuidPath().add(driver.getUuid());
+          if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
+          bundleWrapper.addCompletionListener(resultSender);
+          resultSender.bundle = bundleWrapper;
+          JPPFDriver.getQueue().addBundle(bundleWrapper);
+          resultSender.waitForExecution();
+          resultSender.sendResults(bundleWrapper);
+          setTaskCount(getTaskCount() + bundleWrapper.getTaskCount());
+          if (debugEnabled) log.debug(getName() + " tasks executed: " + getTaskCount());
+        } else {
+          resultSender.bundle = bundleWrapper;
+          resultSender.sendResults(bundleWrapper);
+        }
+        if (!bundle.isHandshake()) bundleWrapper.bundleEnded();
       }
-      if (bundleWrapper.getTaskCount() > 0)
-      {
-        //bundle.setTaskCount(bundleWrapper.getTaskCount());
-        bundle.getUuidPath().add(driver.getUuid());
-        if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
-        bundleWrapper.addCompletionListener(resultSender);
-        resultSender.bundle = bundleWrapper;
-        JPPFDriver.getQueue().addBundle(bundleWrapper);
-        resultSender.waitForExecution();
-        resultSender.sendResults(bundleWrapper);
-        setTaskCount(getTaskCount() + bundleWrapper.getTaskCount());
-        if (debugEnabled) log.debug(getName() + " tasks executed: " + getTaskCount());
-      }
-      else
-      {
-        resultSender.bundle = bundleWrapper;
-        resultSender.sendResults(bundleWrapper);
-      }
-      if (!bundle.isHandshake())
-      {
-        bundleWrapper.bundleEnded();
-      }
+    } finally {
+      if (debugEnabled) log.debug(getName() + " end of peer node secondary loop");
     }
-    if (debugEnabled) log.debug(getName() + " end of peer node secondary loop");
   }
 
   /**
@@ -191,12 +175,11 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    */
   public synchronized void init() throws Exception
   {
+    this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     nodeConnection.init();
     is = new SocketWrapperInputSource(getSocketWrapper());
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false))
-    {
-      if (recoveryConnection == null)
-      {
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false)) {
+      if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
         recoveryConnection = new ClientConnection(uuid, connectionInfo);
         recoveryConnection.addClientConnectionListener(this);
@@ -210,8 +193,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * @return an array of deserialized objects.
    * @throws Exception if an error occurs while deserializing.
    */
-  private ServerTaskBundleClient readBundle() throws Exception
-  {
+  private ServerTaskBundleClient readBundle() throws Exception {
     // Read the request header - with task count information
     if (debugEnabled) log.debug("waiting for next request");
     JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ((RemotePeerConnection) nodeConnection).helper.getSerializer());
@@ -222,8 +204,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
     if (traceEnabled) log.trace(getName() + " received data provider from peer driver, data length = " + dataProvider.getSize());
 
     List<DataLocation> tasks = new ArrayList<>(count);
-    for (int i=1; i<count+1; i++)
-    {
+    for (int i=1; i<count+1; i++) {
       DataLocation dl = IOHelper.readData(is);
       tasks.add(dl);
       if (traceEnabled) log.trace(getName() + " received task #"+ i + " from peer driver, data length = " + dl.getSize());
@@ -235,8 +216,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * Get the underlying socket connection wrapper.
    * @return a {@link SocketWrapper} instance.
    */
-  private SocketWrapper getSocketWrapper()
-  {
+  private SocketWrapper getSocketWrapper() {
     return ((RemotePeerConnection) nodeConnection).getChannel();
   }
 
@@ -245,8 +225,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * @see org.jppf.node.Node#stopNode()
    */
   @Override
-  public void stopNode()
-  {
+  public void stopNode() {
     if (debugEnabled) log.debug(getName() + " stopping node");
     this.setStopped(true);
     close();
@@ -257,24 +236,18 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * Stop this node and release the resources it is using.
    * @see org.jppf.node.Node#stopNode()
    */
-  public void close()
-  {
+  public void close() {
     if (debugEnabled) log.debug(getName() + " closing node");
-    try
-    {
+    try {
       if (debugEnabled) log.debug(getName() + " closing socket: " + nodeConnection.getChannel());
       nodeConnection.close();
-    }
-    catch(Exception ex)
-    {
+    } catch(Exception ex) {
       log.error(ex.getMessage(), ex);
     }
     nodeConnection = null;
-    if (recoveryConnection != null)
-    {
+    if (recoveryConnection != null) {
       ClientConnection tmp = recoveryConnection;
-      if (tmp != null)
-      {
+      if (tmp != null) {
         recoveryConnection = null;
         tmp.close();
       }
@@ -285,39 +258,32 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener
    * Get a string representation of this peer node's name.
    * @return the name as a string.
    */
-  private String getName()
-  {
-    //return ((RemotePeerConnection) nodeConnection).name;
+  private String getName() {
     return peerNameBase;
   }
 
   @Override
-  public JMXServer getJmxServer() throws Exception
-  {
+  public JMXServer getJmxServer() throws Exception {
     return driver.getInitializer().getJmxServer(((RemotePeerConnection) nodeConnection).secure);
   }
 
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return false;
   }
 
   @Override
-  public boolean isOffline()
-  {
+  public boolean isOffline() {
     return false;
   }
 
   @Override
-  public NodeExecutionManager getExecutionManager()
-  {
+  public NodeExecutionManager getExecutionManager() {
     return null;
   }
 
   @Override
-  public void clientConnectionFailed(final ClientConnectionEvent event)
-  {
+  public void clientConnectionFailed(final ClientConnectionEvent event) {
     if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
     close();
   }

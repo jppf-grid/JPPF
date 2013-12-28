@@ -63,6 +63,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
    */
   @Override
   public void initializeSocket(final SocketWrapper socketWrapper) {
+    if (closed) return;
     if ("".equals(name)) name = getClass().getSimpleName() + '[' + socketWrapper.getHost() + ':' + socketWrapper.getPort() + ']';
     try {
       if (debugEnabled) log.debug("{} about to close socket wrapper", name);

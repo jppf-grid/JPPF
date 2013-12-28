@@ -132,6 +132,12 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
     lock.lock();
     try
     {
+      if (channel != null)
+      {
+        SocketWrapper tmp = channel;
+        channel = null;
+        tmp.close();
+      }
     }
     finally
     {
