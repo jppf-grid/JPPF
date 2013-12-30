@@ -11,6 +11,8 @@
     </dep:moduleId>
     <dep:export-package>org.jppf.jca.cci</dep:export-package>
     <dep:export-package>org.jppf.utils</dep:export-package>
+    <dep:export-package>org.jppf.utils.collections</dep:export-package>
+    <dep:export-package>org.jppf.utils.streams</dep:export-package>
     <dep:export-package>org.jppf.client</dep:export-package>
     <dep:export-package>org.jppf.client.event</dep:export-package>
     <dep:export-package>org.jppf.server.protocol</dep:export-package>
