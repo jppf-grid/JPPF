@@ -301,7 +301,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     String suffix = "node-";
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
-    List<Task<?>> results = client.submitJob(job);
+    client.submitJob(job);
     for (int i=1; i<=2; i++) {
       File file = new File("node-n" + i + ".tmp");
       assertTrue("file '" + file + "' does not exist", file.exists());
@@ -442,6 +442,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
         String name = filePath;
         if (appendNodeSuffix) name = name + JPPFConfiguration.getProperties().getString("jppf.node.uuid");
         name = name + ".tmp";
+        System.out.println("creating file '" + name + "'");
         File f = new File(name);
         Thread.sleep(2000L);
         Writer writer = new FileWriter(f);

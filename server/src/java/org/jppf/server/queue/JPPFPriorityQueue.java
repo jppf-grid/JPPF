@@ -291,6 +291,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       scheduleManager.close();
+      synchronized (queueListeners) {
+        queueListeners.clear();
+      }
+      priorityMap.clear();
+      sizeMap.clear();
     } finally {
       lock.unlock();
     }

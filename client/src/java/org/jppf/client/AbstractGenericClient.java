@@ -23,7 +23,6 @@ import java.util.concurrent.*;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
@@ -147,7 +146,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     LinkedBlockingQueue queue = new LinkedBlockingQueue();
-    executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
+    int coreThreads = Runtime.getRuntime().availableProcessors();
+    executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
+    executor.allowCoreThreadTimeOut(true);
     if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
     if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
   }
@@ -259,6 +260,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   protected void connectionFailed(final JPPFClientConnection connection) {
     log.info("Connection [" + connection.getName() + "] failed");
     if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
+    /*
     try {
       JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
       if (jmx != null) jmx.close();
@@ -266,6 +268,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
       if (debugEnabled) log.debug("could not close JMX connection for " + connection, e);
       else log.warn("could not close JMX connection for " + connection + " : " + ExceptionUtils.getMessage(e));
     }
+    */
     connection.close();
     removeClientConnection(connection);
     fireConnectionFailed(connection);

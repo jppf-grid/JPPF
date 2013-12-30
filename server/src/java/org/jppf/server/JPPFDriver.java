@@ -289,11 +289,11 @@ public class JPPFDriver {
     log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
     shuttingDown = true;
 
+    if (acceptorServer != null) acceptorServer.shutdown();
     if (clientClassServer != null) clientClassServer.shutdown();
     if (nodeClassServer != null) nodeClassServer.shutdown();
     if (nodeNioServer != null) nodeNioServer.shutdown();
     if (clientNioServer != null) clientNioServer.shutdown();
-    if (acceptorServer != null) acceptorServer.shutdown();
 
     Timer timer = new Timer();
     ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay, this);
@@ -308,6 +308,7 @@ public class JPPFDriver {
     log.info("Shutting down");
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
+    /*
     if (acceptorServer != null) {
       acceptorServer.end();
       acceptorServer = null;
@@ -328,6 +329,7 @@ public class JPPFDriver {
       clientNioServer.end();
       clientNioServer = null;
     }
+    */
     initializer.stopJmxServer();
     jobManager.close();
     initializer.stopRecoveryServer();

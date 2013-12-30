@@ -197,7 +197,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     try
     {
       if (socketInitializer != null) socketInitializer.close();
-      socketInitializer = null;
+      //socketInitializer = null;
       if (socketClient != null) socketClient.close();
       socketClient = null;
     }

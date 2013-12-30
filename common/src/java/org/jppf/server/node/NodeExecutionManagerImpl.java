@@ -192,13 +192,16 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
         }
         for (int i=0; i<count; i++) {
           try {
-            NodeTaskWrapper taskWrapper = ecs.take().get();
-            JPPFNodeReconnectionNotification notif = taskWrapper.getReconnectionNotification();
-            if (notif != null) {
-              cancelAllTasks(true, false);
-              throw notif;
+            Future<NodeTaskWrapper> future = ecs.take();
+            if (!future.isCancelled()) {
+              NodeTaskWrapper taskWrapper = future.get();
+              JPPFNodeReconnectionNotification notif = taskWrapper.getReconnectionNotification();
+              if (notif != null) {
+                cancelAllTasks(true, false);
+                throw notif;
+              }
+              taskEnded(taskWrapper);
             }
-            taskEnded(taskWrapper);
           } catch (final Exception e) {
             log.debug("Exception when executing task", e);
           }
@@ -236,6 +239,7 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
       if (taskWrapper != null) taskWrapper.cancel(callOnCancel);
       future.cancel(true);
       taskWrapper.cancelTimeoutAction();
+      taskEnded(taskWrapper);
     }
   }
 

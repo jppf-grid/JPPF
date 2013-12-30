@@ -441,10 +441,13 @@ public abstract class AbstractClientJob
    * @param policy the root policy to explore.
    */
   private void preparePolicy(final ExecutionPolicy policy) {
+    if (policy == null) return;
     if (policy instanceof ScriptedPolicy) {
       ((ScriptedPolicy) policy).setVariables(sla, clientSla, metadata, channelsCount.get(), null);
     } else if (policy.getChildren() != null) {
-      for (ExecutionPolicy child: policy.getChildren()) preparePolicy(child);
+      for (ExecutionPolicy child: policy.getChildren()) {
+        if (child != null) preparePolicy(child);
+      }
     }
   }
 

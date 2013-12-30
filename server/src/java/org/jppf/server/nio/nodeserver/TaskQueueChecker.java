@@ -199,6 +199,15 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
   }
 
   /**
+   * Clear the list of idle channels.
+   */
+  public void clearIdleChannels() {
+    synchronized (idleChannels) {
+      idleChannels.clear();
+    }
+  }
+
+  /**
    * Perform the assignment of tasks.
    * @see Runnable#run()
    */
@@ -350,10 +359,13 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    * @param nbJobNodes the number of nodes the job is already dispatched to.
    */
   public static void preparePolicy(final ExecutionPolicy policy, final ServerJob job, final JPPFStatistics stats, final int nbJobNodes) {
+    if (policy == null) return;
     if (policy instanceof ScriptedPolicy) {
       ((ScriptedPolicy) policy).setVariables(job == null ? null : job.getSLA(), null, job == null ? null : job.getMetadata(), nbJobNodes, stats);
     } else if (policy.getChildren() != null) {
-      for (ExecutionPolicy child: policy.getChildren()) preparePolicy(child, job, stats, nbJobNodes);
+      for (ExecutionPolicy child: policy.getChildren()) {
+        if (child != null) preparePolicy(child, job, stats, nbJobNodes);
+      }
     }
   }
 

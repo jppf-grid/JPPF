@@ -193,8 +193,16 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   public synchronized void removeAllConnections()
   {
     if (!isStopped()) return;
+    List<ChannelWrapper<?>> list  = new ArrayList<>(nodeConnections.values());
     nodeConnections.clear();
     super.removeAllConnections();
+    for (ChannelWrapper<?> channel: list) {
+      try {
+        closeConnection(channel);
+      } catch (Exception e) {
+        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+      }
+    }
   }
 
   @Override

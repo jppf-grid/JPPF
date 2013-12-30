@@ -164,7 +164,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     try {
       if (nodeContext == null) throw new IllegalArgumentException("nodeContext is null");
       if (nodeContext.getChannel() == null) throw new IllegalArgumentException("channel is null");
-      if (debugEnabled) log.debug("adding connection {}", nodeContext.getChannel()); 
+      if (debugEnabled) log.debug("adding connection {}", nodeContext.getChannel());
       allConnections.put(nodeContext.getUuid(), nodeContext);
       nodeContext.addExecutionStatusListener(statusListener);
       updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
@@ -186,7 +186,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     } catch(Exception e) {
       if (debugEnabled) log.debug("error removing connection {} : {}", nodeContext, e);
     } finally {
-      try {        
+      try {
         String uuid = nodeContext.getUuid();
         if (uuid != null) allConnections.remove(uuid);
         nodeContext.removeExecutionStatusListener(statusListener);
@@ -453,18 +453,17 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     return NodeState.IDLE == channel.getContext().getState();
   }
 
-  /**
-   * Close this server and interrupt the thread that runs it.
-   */
-  public void close() {
-    setStopped(true);
-    if (taskQueueChecker != null) {
-      taskQueueChecker.setStopped(true);
-      taskQueueChecker.wakeUp();
-    }
-    queue.close();
+  @Override
+  public void removeAllConnections() {
     lock.lock();
     try {
+      selector.wakeup();
+      if (taskQueueChecker != null) {
+        taskQueueChecker.setStopped(true);
+        taskQueueChecker.wakeUp();
+        taskQueueChecker.clearIdleChannels();
+      }
+      queue.close();
       for (AbstractNodeContext channel: allConnections.values()) {
         try {
           channel.close();
@@ -473,9 +472,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         }
       }
       allConnections.clear();
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
     } finally {
       lock.unlock();
     }
+    super.removeAllConnections();
   }
 
   /**

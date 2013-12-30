@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import static org.jppf.client.JPPFClientConnectionStatus.CREATED;
 
+import java.io.NotSerializableException;
 import java.nio.channels.AsynchronousCloseException;
 import java.util.*;
 import java.util.concurrent.atomic.*;
@@ -43,8 +44,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class BaseJPPFClientConnection implements JPPFClientConnection
-{
+public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Logger for this class.
    */
@@ -116,8 +116,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @param job the job to execute remotely.
    * @throws Exception if an error occurs while sending the request.
    */
-  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception
-  {
+  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, client.getSerializationHelperClassName()).getSerializer();
     int count = job.getJobTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<>();
@@ -132,11 +131,9 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     int[] positions = new int[count];
     Task<?>[] tasks = new Task<?>[count];
     int i = 0;
-    for (Task task : job.getJobTasks())
-    {
+    for (Task task : job.getJobTasks()) {
       int pos = task.getPosition();
-      if (!job.getResults().hasResult(pos))
-      {
+      if (!job.getResults().hasResult(pos)) {
         tasks[i] = task;
         positions[i] = pos;
         i++;
@@ -146,10 +143,28 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     if (debugEnabled) log.debug(this.toDebugString() + " sending job " + header + ", positions=" + StringUtils.buildString(positions));
 
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
+    boolean hasNotSerializableException = false;
     IOHelper.sendData(socketClient, header, ser);
-    IOHelper.sendData(socketClient, job.getDataProvider(), ser);
-    for (Task<?> task : tasks) IOHelper.sendData(socketClient, task, ser);
+    try {
+      IOHelper.sendData(socketClient, job.getDataProvider(), ser);
+    } catch(NotSerializableException e) {
+      hasNotSerializableException = true;
+      log.error("error serializing data provider for {} : {}\nthe job will be cancelled", job, ExceptionUtils.getStackTrace(e));
+      IOHelper.sendData(socketClient, null, ser);
+    }
+    for (Task<?> task : tasks) {
+      try {
+        IOHelper.sendData(socketClient, task, ser);
+      } catch(NotSerializableException e) {
+        hasNotSerializableException = true;
+        log.error("error serializing task {} for {} : {}\nthe job will be cancelled", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
+        Task<?> t = new JPPFExceptionResult(e, task);
+        t.setPosition(task.getPosition());
+        IOHelper.sendData(socketClient, t, ser);
+      }
+    }
     socketClient.flush();
+    if (hasNotSerializableException) client.cancelJob(job.getUuid());
   }
 
   /**
@@ -191,9 +206,11 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
     header.setParameter("connection.uuid", connectionUuid);
     header.setParameter(BundleParameter.CLOSE_COMMAND, true);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
-    IOHelper.sendData(socketClient, header, ser);
-    IOHelper.sendData(socketClient, null, ser); // null data provider
-    socketClient.flush();
+    if (socketClient != null) {
+      IOHelper.sendData(socketClient, header, ser);
+      IOHelper.sendData(socketClient, null, ser); // null data provider
+      socketClient.flush();
+    }
   }
 
   /**
@@ -262,8 +279,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
-  public List<Task<?>> receiveResults(final ClassLoader cl) throws Exception
-  {
+  public List<Task<?>> receiveResults(final ClassLoader cl) throws Exception {
     return receiveBundleAndResults(cl, client.getSerializationHelperClassName()).second();
   }
 
@@ -273,8 +289,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
    */
-  protected SerializationHelper makeHelper(final String helperClassName) throws Exception
-  {
+  protected SerializationHelper makeHelper(final String helperClassName) throws Exception {
     return makeHelper(null, helperClassName);
   }
 
@@ -314,8 +329,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @see org.jppf.client.JPPFClientConnection#getName()
    */
   @Override
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -329,8 +343,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Get the handler for the connection to the task server.
    * @return a <code>TaskServerConnectionHandler</code> instance.
    */
-  public TaskServerConnectionHandler getTaskServerConnection()
-  {
+  public TaskServerConnectionHandler getTaskServerConnection() {
     return taskServerConnection;
   }
 
@@ -338,8 +351,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Get the class server delegate that loads local classes onto remote nodes
    * @return a {@link ClassServerDelegate} instance.
    */
-  public ClassServerDelegate getDelegate()
-  {
+  public ClassServerDelegate getDelegate() {
     return delegate;
   }
 
@@ -347,8 +359,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Get the JPPF client that owns this connection.
    * @return an <code>AbstractGenericClient</code> instance.
    */
-  public AbstractGenericClient getClient()
-  {
+  public AbstractGenericClient getClient() {
     return client;
   }
 
@@ -357,20 +368,17 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @return the uuid as a string.
    * @deprecated use {@link #getDriverUuid()} instead.
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return driverUuid;
   }
 
   @Override
-  public String getDriverUuid()
-  {
+  public String getDriverUuid() {
     return driverUuid;
   }
 
   @Override
-  public String getConnectionUuid()
-  {
+  public String getConnectionUuid() {
     return connectionUuid;
   }
 
@@ -379,8 +387,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @return the host as a string.
    */
   @Override
-  public String getHost()
-  {
+  public String getHost() {
     return host;
   }
 
@@ -389,8 +396,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * @return the port as an int value.
    */
   @Override
-  public int getPort()
-  {
+  public int getPort() {
     return port;
   }
 
@@ -398,8 +404,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection
    * Get a string representing this connection for debugging purposes.
    * @return a string representing this connection.
    */
-  protected String toDebugString()
-  {
+  protected String toDebugString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("connectionUuid=").append(connectionUuid);

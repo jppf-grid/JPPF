@@ -72,11 +72,12 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     catch(Exception e) {
     }
     ConfigurationHelper helper = new ConfigurationHelper(JPPFConfiguration.getProperties());
-    long delay = 1000L * helper.getLong("jppf.reconnect.initial.delay", "reconnect.initial.delay", 0L);
-    if (delay <= 0L) delay = rand.nextInt(10);
+    long delay = 1000L * helper.getLong("jppf.reconnect.initial.delay", "reconnect.initial.delay", 1L);
+    if (delay <= 0L) delay = 1L + rand.nextInt(10);
     long maxTime = helper.getLong("jppf.reconnect.max.time", "reconnect.max.time", 60L);
     long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
     long period = 1000L * helper.getLong("jppf.reconnect.interval", "reconnect.interval", 1L);
+    goToSleep(delay);
     successful = false;
     long elapsed = 0L;
     long start = System.currentTimeMillis();

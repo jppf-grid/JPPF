@@ -105,6 +105,10 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * The channel identifier for channels handled by this server.
    */
   protected final int identifier;
+  /**
+   * List of opened server socket channels.
+   */
+  private List<ServerSocketChannel> servers = new Vector<>();
 
   /**
    * Initialize this server with a specified port number and name.
@@ -169,6 +173,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
       server.configureBlocking(false);
       server.register(selector, SelectionKey.OP_ACCEPT, ssl);
+      servers.add(server);
     }
   }
 
@@ -208,7 +213,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
           lock.unlock();
         }
         int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        if (!isStopped() && (n > 0)) go(selector.selectedKeys());
+        if (!isStopped() && !externalStopCondition() && (n > 0)) go(selector.selectedKeys());
       }
     } catch (Throwable t) {
       log.error("error in selector loop for {} : {}", getClass().getSimpleName(), t);
@@ -234,6 +239,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   public void shutdown()
   {
     requestShutdown.set(true);
+    try {
+      lock.lock();
+      selector.wakeup();
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
@@ -299,7 +310,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   @SuppressWarnings("unchecked")
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
-    if (debugEnabled) log.debug("performing accept() of channel {}, ssl={}", channel, ssl);
+    if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
     NioContext context = createNioContext();
     SelectionKeyWrapper wrapper = null;
     lock.lock();
@@ -343,6 +354,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public void end() {
     if (!isStopped()) {
+      if (debugEnabled) log.debug("closing server {}", this);
       setStopped(true);
       removeAllConnections();
     }
@@ -353,22 +365,21 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    */
   public void removeAllConnections() {
     if (!isStopped()) return;
+    lock.lock();
     try {
-      lock.lock();
-      selector.wakeup();
-      Set<SelectionKey> keySet = selector.keys();
-      List<SelectableChannel> channels = new ArrayList<>();
-      for (SelectionKey key: keySet) channels.add(key.channel());
-      selector.close();
-      for (SelectableChannel channel: channels) {
+      try {
+        selector.wakeup();
+        selector.close();
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
+      }
+      for (ServerSocketChannel server: servers) {
         try {
-          channel.close();
-        } catch(Exception e) {
+          server.close();
+        } catch (Exception e) {
           log.error(e.getMessage(), e);
         }
       }
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
     } finally {
       lock.unlock();
     }
@@ -521,8 +532,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Get the channel identifier for channels handled by this server.
    * @return an int whose value is one of the constants defined in {@link org.jppf.utils.JPPFIdentifiers}.
    */
-  public int getIdentifier()
-  {
+  public int getIdentifier() {
     return identifier;
   }
 }

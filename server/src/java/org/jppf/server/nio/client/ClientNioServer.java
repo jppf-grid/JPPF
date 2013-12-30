@@ -152,4 +152,19 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   public List<ChannelWrapper<?>> getAllConnections() {
     return channels;
   }
+
+  @Override
+  public synchronized void removeAllConnections() {
+    if (!isStopped()) return;
+    List<ChannelWrapper<?>> list  = new ArrayList<>(channels);
+    channels.clear();
+    for (ChannelWrapper<?> channel: list) {
+      try {
+        closeClient(channel);
+      } catch (Exception e) {
+        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    super.removeAllConnections();
+  }
 }

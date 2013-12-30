@@ -271,6 +271,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public void addClientConnection(final JPPFClientConnection connection)
   {
     if (connection == null) throw new IllegalArgumentException("connection is null");
+    if (debugEnabled) log.debug("adding connection {}", connection);
     int priority = connection.getPriority();
     synchronized (pools)
     {
@@ -293,7 +294,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   protected void removeClientConnection(final JPPFClientConnection connection)
   {
     if (connection == null) throw new IllegalArgumentException("connection is null");
-
+    if (debugEnabled) log.debug("removing connection {}", connection);
     connection.removeClientConnectionStatusListener(this);
     int priority = connection.getPriority();
     synchronized (pools)

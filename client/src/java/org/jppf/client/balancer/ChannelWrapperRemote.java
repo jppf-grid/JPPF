@@ -170,6 +170,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    */
   public void reconnect()
   {
+    TaskServerConnectionHandler handler = channel.getTaskServerConnection();
+    if (handler.isClosed()) return;
     Runnable r = new Runnable() {
       public void run() {
         setStatus(JPPFClientConnectionStatus.DISCONNECTED);
@@ -188,8 +190,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   {
     final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
-    sb.append("[channel=").append(channel);
-    sb.append(']');
+    sb.append("[channel=").append(channel).append(']');
     return sb.toString();
   }
 

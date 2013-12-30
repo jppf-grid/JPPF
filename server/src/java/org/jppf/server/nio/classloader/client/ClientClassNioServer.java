@@ -182,8 +182,16 @@ public class ClientClassNioServer extends ClassNioServer
   public synchronized void removeAllConnections()
   {
     if (!isStopped()) return;
+    List<ChannelWrapper<?>> list = providerConnections.allValues();
     providerConnections.clear();
     super.removeAllConnections();
+    for (ChannelWrapper<?> channel: list) {
+      try {
+        closeConnection(channel);
+      } catch (Exception e) {
+        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+      }
+    }
   }
 
   @Override

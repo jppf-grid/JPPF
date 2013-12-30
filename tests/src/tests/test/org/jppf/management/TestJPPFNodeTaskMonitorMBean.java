@@ -184,6 +184,12 @@ public class TestJPPFNodeTaskMonitorMBean
       assertNull(listener.exception);
       assertEquals(nbTasks + 1, listener.notifs.size());
       assertEquals(1, listener.userObjects.size());
+      Collections.sort(listener.notifs, new Comparator<TaskInformation>() {
+        @Override
+        public int compare(final TaskInformation o1, final TaskInformation o2) {
+          return o1.getId().compareTo(o2.getId());
+        }
+      });
       for (int i=0; i < nbTasks; i++) {
         Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);
@@ -222,7 +228,10 @@ public class TestJPPFNodeTaskMonitorMBean
       try {
         TaskExecutionNotification notif = (TaskExecutionNotification) notification;
         notifs.add(notif.getTaskInformation());
-        if (notif.getUserData() != null) userObjects.add(notif.getUserData());
+        System.out.println("got task notification for task " + notif.getTaskInformation().getId());
+        if (notif.getUserData() != null) {
+          userObjects.add(notif.getUserData());
+        }
       } catch (Exception e) {
         if (exception == null) exception = e;
       }
