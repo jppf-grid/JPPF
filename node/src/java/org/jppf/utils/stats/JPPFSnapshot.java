@@ -50,32 +50,32 @@ public interface JPPFSnapshot extends Serializable
   void reset();
 
   /**
-   * Get the total cumulated time / size.
-   * @return the total time as a long value.
+   * Get the total cumulated sum of the values.
+   * @return the cumulated values as a double.
    */
   double getTotal();
 
   /**
-   * Get the minimum time / size observed.
-   * @return the minimum time as a long value.
+   * Get the latest observed value.
+   * @return the latest value as a double.
    */
   double getLatest();
 
   /**
-   * Get the smallest time / size observed.
-   * @return the minimum time as a long value.
+   * Get the smallest observed value.
+   * @return the minimum value as a double.
    */
   double getMin();
 
   /**
-   * Get the peak time / size.
-   * @return the maximum time as a long value.
+   * Get the peak observed value.
+   * @return the peak value double.
    */
   double getMax();
 
   /**
-   * Get the average time / size.
-   * @return the average time as a double value.
+   * Get the average value.
+   * @return the average value as a double.
    */
   double getAvg();
 
@@ -87,27 +87,14 @@ public interface JPPFSnapshot extends Serializable
 
   /**
    * Get the count of values added to this snapshot.
-   * @return the count as a long value.
+   * @return the count of values as a long.
    */
   long getValueCount();
 
   /**
-   * A filter interface for snapshots.
-   */
-  public interface Filter
-  {
-    /**
-     * Determines whether the specified snapshot is accepted by this filter.
-     * @param snapshot the snapshot to check.
-     * @return <code>true</code> if the snapshot is accepted, <code>false</code> otherwise.
-     */
-    boolean accept(JPPFSnapshot snapshot);
-  }
-
-  /**
    * Base class for filters including or excluding snpashots based on a provided set of labels.
    */
-  public abstract static class LabelBasedFilter implements Filter
+  public abstract static class LabelBasedFilter implements JPPFStatistics.Filter
   {
     /**
      * The set of labels to exclude.

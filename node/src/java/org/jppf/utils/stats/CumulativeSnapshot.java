@@ -19,7 +19,8 @@
 package org.jppf.utils.stats;
 
 /**
- * 
+ * In this implementation, {@code getLatest()} is computed as the cumulated sum of all values added to the snapshot.
+ * If values are only added, and not removed, then it will always return the same value as getTotal().
  * @author Laurent Cohen
  */
 public class CumulativeSnapshot extends AbstractJPPFSnapshot

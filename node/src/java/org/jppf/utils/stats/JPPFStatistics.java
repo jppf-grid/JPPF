@@ -96,7 +96,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
     JPPFSnapshot newSnapshot = cumulative ? new CumulativeSnapshot(label) : new NonCumulativeSnapshot(label);
     JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
     JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
-    //fireSnapshotAdded(snapshot.copy());
+    if (!listeners.isEmpty()) fireSnapshotAdded(snapshot.copy());
     return snapshot;
   }
 
@@ -112,7 +112,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
     JPPFSnapshot newSnapshot = new SingleValueSnapshot(label);
     JPPFSnapshot oldSnapshot = snapshots.putIfAbsent(label, newSnapshot);
     JPPFSnapshot snapshot = oldSnapshot == null ? newSnapshot : oldSnapshot;
-    //fireSnapshotAdded(snapshot);
+    if (!listeners.isEmpty()) fireSnapshotAdded(snapshot);
     return snapshot;
   }
 
@@ -167,7 +167,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   public JPPFSnapshot removeSnapshot(final String label)
   {
     JPPFSnapshot snapshot = snapshots.remove(label);
-    //fireSnapshotRemoved(snapshot.copy());
+    if (!listeners.isEmpty()) fireSnapshotRemoved(snapshot.copy());
     return snapshot;
   }
 
@@ -198,7 +198,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
     JPPFSnapshot snapshot = snapshots.get(label);
     if (snapshot == null) throw new IllegalStateException("snapshot '" + label + "' was either not created or removed!");
     snapshot.addValues(accumulatedValues, count);
-    //fireSnapshotUpdated(snapshot.copy());
+    if (!listeners.isEmpty()) fireSnapshotUpdated(snapshot.copy());
     return snapshot;
   }
 
@@ -236,7 +236,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * @param filter determines which snapshots will be reset.
    * @exclude
    */
-  public void reset(final JPPFSnapshot.Filter filter)
+  public void reset(final JPPFStatistics.Filter filter)
   {
     for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet())
     {
@@ -268,7 +268,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
    * @param filter determines which snapshots will be part of the returned collection.
    * @return a collection of {@link JPPFSnapshot} instances, possibly empty but never null.
    */
-  public Collection<JPPFSnapshot> getSnapshots(final JPPFSnapshot.Filter filter)
+  public Collection<JPPFSnapshot> getSnapshots(final Filter filter)
   {
     List<JPPFSnapshot> list = new ArrayList<>(snapshots.size());
     for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet())
@@ -336,5 +336,18 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   public Iterator<JPPFSnapshot> iterator()
   {
     return snapshots.values().iterator();
+  }
+
+  /**
+   * A filter interface for snapshots.
+   */
+  public interface Filter
+  {
+    /**
+     * Determines whether the specified snapshot is accepted by this filter.
+     * @param snapshot the snapshot to check.
+     * @return <code>true</code> if the snapshot is accepted, <code>false</code> otherwise.
+     */
+    boolean accept(JPPFSnapshot snapshot);
   }
 }

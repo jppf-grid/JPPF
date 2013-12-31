@@ -18,19 +18,27 @@
 
 package org.jppf.utils.stats;
 
+import java.util.Locale;
+
+import org.jppf.utils.LocalizationUtils;
+
 
 /**
- * 
+ * This helper class holds the constants definitions for the labels
+ * of the statistics snapshots used in JPPF, along with utility methods.
  * @author Laurent Cohen
  */
-public final class JPPFStatisticsHelper
-{
+public final class JPPFStatisticsHelper {
+  /**
+   * Count of tasks dispatched to nodes.
+   */
+  private  static final String I18N_BASE = "org.jppf.utils.stats.i18n.StatsLabels.properties";
   /**
    * Count of tasks dispatched to nodes.
    */
   public static final String TASK_DISPATCH = "task.dispatch";
   /**
-   * Execution times including server/nodes trnasport overhead.
+   * Execution times including server/nodes transport overhead.
    */
   public static final String EXECUTION = "execution";
   /**
@@ -150,12 +158,31 @@ public final class JPPFStatisticsHelper
   }
 
   /**
+   * Get the localized translation of the label of the specified snapshot in the current locale.
+   * @param snapshot the snapshot whose label to translate.
+   * @return a translation of the label, or the label itself if no translation could be found.
+   */
+  public static String getLocalizedLabel(final JPPFSnapshot snapshot) {
+    return getLocalizedLabel(snapshot, Locale.getDefault());
+  }
+
+  /**
+   * Get the localized translation of the label of the specified snapshot in the specified locale.
+   * @param snapshot the snapshot whose label to translate.
+   * @param locale the locale in which to translate.
+   * @return a translation of the label, or the label itself if no translation could be found.
+   */
+  public static String getLocalizedLabel(final JPPFSnapshot snapshot, final Locale locale) {
+    String label = snapshot.getLabel();
+    return LocalizationUtils.getLocalized(I18N_BASE, label, label, locale);
+  }
+
+  /**
    * Create a statistics object initialized with all the required server snapshots.
    * @return a {@link JPPFStatistics} instance.
    * @exclude
    */
-  public static JPPFStatistics createServerStatistics()
-  {
+  public static JPPFStatistics createServerStatistics() {
     JPPFStatistics statistics = new JPPFStatistics();
     statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, TASK_DISPATCH,
         NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);

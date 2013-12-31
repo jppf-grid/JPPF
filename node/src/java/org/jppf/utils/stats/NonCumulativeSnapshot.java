@@ -19,7 +19,7 @@
 package org.jppf.utils.stats;
 
 /**
- * 
+ * In this implementation, {@code getLatest()} is computed as the average of the latest set of values that were added, or the latest value if only one was added.
  * @author Laurent Cohen
  */
 public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
