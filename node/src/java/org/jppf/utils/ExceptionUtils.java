@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2013 JPPF Team.
+ * Copyright (C) 2005-2014 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,8 +48,8 @@ public final class ExceptionUtils
   }
 
   /**
-   * Get a throwable's stack trace.
-   * @return the stack trace as a string.
+   * Get the call stack for the current thread.
+   * @return the call stack as a string.
    */
   public static String getCallStack()
   {
