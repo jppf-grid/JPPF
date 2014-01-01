@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2013 JPPF Team.
+ * Copyright (C) 2005-2014 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,8 +28,8 @@ import com.sun.tools.javadoc.Main;
  * A doclet that processes an <code>@exclude</code> tag at the package, class or member level.
  * All elements marked with the <code>@exclude</code> tag in their documentation are
  * excluded from the javadoc output.
- * This code is based on the public domain code published by Chris Nokleberg's
- * at <a href="http://www.sixlegs.com/blog/java/exclude-javadoc-tag.html">http://www.sixlegs.com/blog/java/exclude-javadoc-tag.html</a>.
+ * This code is based on the public domain code published by Chris Nokleberg at
+ * <a href="http://www.sixlegs.com/blog/java/exclude-javadoc-tag.html">http://www.sixlegs.com/blog/java/exclude-javadoc-tag.html</a>.
  * @author Laurent Cohen
  */
 public class ExcludeDoclet
@@ -166,9 +166,6 @@ public class ExcludeDoclet
       this.target = target;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
     {

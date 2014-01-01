@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
   <?php
-    $jppfVersion = "3.3.6";
+    $jppfVersion = "4.0";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
   ?>
   <a name="2.0"></a>
@@ -24,8 +24,10 @@ $template{name="about-page-header" title="Downloads"}$
 
   <h3>Connectors and add-ons</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+  <!--
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-jdk7-addons.zip/download'; ?>">JDK 7+ add-ons</a><br>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-GigaSpaces.zip/download'; ?>">GigaSpaces XAP connector</a><br>
+  -->
 
   <h3>Samples and tutorials</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
@@ -39,7 +41,7 @@ $template{name="about-page-header" title="Downloads"}$
   <hr>
 
   <h3>Feeling curious or adventurous about JPPF's latest advances?</h3>
-  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 10/19/2013 JPPF 4.0 alpha2</b></a>.
+  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 12/3/2013 JPPF 4.0 beta</b></a>.
   <p><span style="color: #FF7F00">Warning: this is not recommended for production environments</span>
 
 $template{name="about-page-footer"}$
