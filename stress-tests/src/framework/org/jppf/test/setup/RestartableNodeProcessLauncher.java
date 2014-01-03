@@ -36,7 +36,7 @@ public class RestartableNodeProcessLauncher extends RestartableProcessLauncher
   public RestartableNodeProcessLauncher(final int n, final ScenarioConfiguration scenarioConfig)
   {
     super(n, "  node", scenarioConfig);
-    setJppfConfig(doConfigOverride("node.template.properties", "driver-" + n + ".properties"));
+    setJppfConfig(doConfigOverride("node.template.properties", "node-" + n + ".properties"));
     setJVMOptions();
     String s = doConfigOverride("log4j-node.template.properties", "log4j-node-" + n + ".properties");
     try
@@ -57,7 +57,6 @@ public class RestartableNodeProcessLauncher extends RestartableProcessLauncher
   private void setupCommon()
   {
     setMainClass("org.jppf.node.NodeRunner");
-    addClasspathElement("classes/tests/config");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-node" + n + ".properties");
   }
 }

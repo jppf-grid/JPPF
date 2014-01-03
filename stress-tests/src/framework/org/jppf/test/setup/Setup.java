@@ -119,7 +119,8 @@ public class Setup
     if (config.isStartClient())
     {
       client = createClient("c" + clientCount.incrementAndGet(), true);
-      jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+      if (config.getProperties().getBoolean("jppf.scenario.jmx.checks.enabled", true))
+        jmxHandler.checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     }
     return client;
   }
