@@ -129,6 +129,6 @@ public class SingleValueSnapshot implements JPPFSnapshot
   @Override
   public synchronized String toString()
   {
-    return new StringBuilder(label).append(": total=").append(total).toString();
+    return new StringBuilder(JPPFStatisticsHelper.getLocalizedLabel(this)).append(": type=").append(getClass().getSimpleName()).append(", total=").append(total).toString();
   }
 }

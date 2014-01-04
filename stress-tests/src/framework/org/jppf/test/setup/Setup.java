@@ -88,8 +88,9 @@ public class Setup
    */
   public JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
   {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
+    JMXDriverConnectionWrapper driver = null;
+    while ((driver = client.getClientConnection().getJmxConnection()) == null) Thread.sleep(10L);
+    while (!driver.isConnected()) Thread.sleep(10L);
     return driver;
   }
 
@@ -108,7 +109,7 @@ public class Setup
     for (int i=0; i<nbDrivers; i++)
     {
       drivers[i] = new RestartableDriverProcessLauncher(i+1, config);
-      new Thread(drivers[i], drivers[i].getName() + "process launcher").start(); 
+      new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
     }
     nodes = new RestartableNodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++)

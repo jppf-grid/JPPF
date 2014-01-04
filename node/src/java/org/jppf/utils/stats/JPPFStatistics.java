@@ -217,8 +217,8 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot>
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("JPPF statistics:\n");
-    for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) sb.append(entry.getValue()).append('\n');
+    sb.append("JPPF statistics:");
+    for (Map.Entry<String, JPPFSnapshot> entry: snapshots.entrySet()) sb.append('\n').append(entry.getValue());
     return sb.toString();
   }
 

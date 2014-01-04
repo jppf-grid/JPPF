@@ -120,8 +120,13 @@ public class NodeMixRunner extends AbstractScenarioRunner {
         JPPFJob job = future.get();
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
         List<Task<?>> result = collector.awaitResults();
-        System.out.println("got results for " + job.getName());
+        output("got results for " + job.getName());
+        for (Task<?> task: result) {
+          Throwable t = task.getThrowable();
+          if (t != null) output(task.getId() + " has an error: " + ExceptionUtils.getStackTrace(t));
+        }
       }
+      output(getSetup().getDriverManagementProxy().statistics().toString());
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

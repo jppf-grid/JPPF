@@ -105,7 +105,6 @@ class WaitInitialBundleState extends NodeServerState
         }
       }
       server.nodeConnected(context);
-      // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(received, context);
       return finalizeTransition(context);
     }

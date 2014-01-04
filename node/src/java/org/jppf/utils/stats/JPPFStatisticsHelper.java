@@ -32,7 +32,7 @@ public final class JPPFStatisticsHelper {
   /**
    * Count of tasks dispatched to nodes.
    */
-  private  static final String I18N_BASE = "org.jppf.utils.stats.i18n.StatsLabels.properties";
+  private  static final String I18N_BASE = "org.jppf.utils.stats.i18n.StatsLabels";
   /**
    * Count of tasks dispatched to nodes.
    */

@@ -114,7 +114,8 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
   public synchronized String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append(label).append(": total=").append(total);
+    sb.append(JPPFStatisticsHelper.getLocalizedLabel(this)).append(": type=").append(getClass().getSimpleName());
+    sb.append(": total=").append(total);
     sb.append(", latest=").append(latest);
     sb.append(", min=").append(min);
     sb.append(", max=").append(max);
