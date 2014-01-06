@@ -43,6 +43,10 @@ public class ServerJob extends AbstractServerJobBase {
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
 
   /**
    * Initialized client job with task bundle and list of tasks to execute.
@@ -106,7 +110,7 @@ public class ServerJob extends AbstractServerJobBase {
         for (int index = 0; index < bundleTasks.size(); index++) {
           ServerTask task = bundleTasks.get(index);
           if (task.getState() == TaskState.RESUBMIT) {
-            if (debugEnabled) log.debug("task to resubmit: {}", task);
+            if (traceEnabled) log.trace("task to resubmit: {}", task);
             task.setState(TaskState.PENDING);
           } else {
             if (results != null) {

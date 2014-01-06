@@ -18,10 +18,14 @@
 
 package org.jppf.test.scenario.nodesmix;
 
+import java.io.*;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
 
 import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.test.scenario.AbstractScenarioRunner;
@@ -38,31 +42,31 @@ public class NodeMixRunner extends AbstractScenarioRunner {
    */
   static Logger log = LoggerFactory.getLogger(NodeMixRunner.class);
   /**
-   * 
+   * Numbher of jobs to submit.
    */
   private int nbJobs;
   /**
-   * 
+   * Number of tasks per job.
    */
   private int nbTasks;
   /**
-   * 
+   * Duration of each task in ms.
    */
   private long duration;
   /**
-   * 
+   * Not used.
    */
   private int nbChannels;
   /**
-   * 
+   * Max number of expirations for each job dispatch.
    */
   private int maxDispatches;
   /**
-   * 
+   * Expiration timeout for each job dispatch.
    */
   private long dispatchTimeout;
   /**
-   * 
+   * Max number of jobs that can be concurrently submitted via the executor.
    */
   private int concurrentJobs;
   /**
@@ -74,13 +78,25 @@ public class NodeMixRunner extends AbstractScenarioRunner {
    */
   private ExecutorService executor;
   /**
-   * 
+   * Executes job submissions in parallel by the same client.
    */
   private CompletionService<JPPFJob> completionService;
   /**
-   * 
+   * The JPPF client.
    */
   private JPPFClient client;
+  /**
+   * Used to format task numbers.
+   */
+  private DecimalFormat nf;
+  /**
+   * Used to format job numbers.
+   */
+  private DecimalFormat nfJob;
+  /**
+   * Max number of digits in a task number.
+   */
+  private int digits;
 
   @Override
   public void run() {
@@ -94,6 +110,11 @@ public class NodeMixRunner extends AbstractScenarioRunner {
       maxDispatches = config.getInt("max.dispatches", 0);
       dispatchTimeout = config.getLong("dispatch.expiration", 10000L);
       concurrentJobs = config.getInt("max.concurrent.jobs", 1);
+      digits = (int) Math.floor(Math.log10(nbTasks)) + 1;
+      nf = new DecimalFormat(StringUtils.padRight("", '0', digits));
+      int digitsJob = (int) Math.floor(Math.log10(nbJobs)) + 1;
+      nfJob = new DecimalFormat(StringUtils.padRight("", '0', digitsJob));
+
       semaphore = new Semaphore(concurrentJobs);
       executor = new ThreadPoolExecutor(concurrentJobs, concurrentJobs, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("NodeMixRunner")) {
         @Override
@@ -114,19 +135,33 @@ public class NodeMixRunner extends AbstractScenarioRunner {
         }
       };
       completionService = new ExecutorCompletionService<>(executor);
+
       new Thread(new JobSubmitter(), "JobSubmitter").start();
       for (int i=1; i<=nbJobs; i++) {
         Future<JPPFJob> future = completionService.take();
         JPPFJob job = future.get();
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
         List<Task<?>> result = collector.awaitResults();
-        output("got results for " + job.getName());
+        int nbNoExec = 0;
+        int nbErrors = 0;
+        int nbOk = 0;
         for (Task<?> task: result) {
           Throwable t = task.getThrowable();
-          if (t != null) output(task.getId() + " has an error: " + ExceptionUtils.getStackTrace(t));
+          if (t != null) {
+            output(task.getId() + " has an error: " + ExceptionUtils.getStackTrace(t));
+            nbErrors++;
+          } else if (task.getResult() == null) nbNoExec++;
+          else nbOk++;
         }
+        output("got results for " + job.getName() + ": tasks in error = " + StringUtils.padLeft("" + nbErrors, ' ', digits) +
+            ", not executed = " + StringUtils.padLeft("" + nbNoExec, ' ', digits) + ", good = " + StringUtils.padLeft("" + nbOk, ' ', digits));
       }
-      output(getSetup().getDriverManagementProxy().statistics().toString());
+      JMXDriverConnectionWrapper jmx = getSetup().getDriverManagementProxy();
+      String debug = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
+      output("debug info:\n" + debug);
+      output(jmx.statistics().toString());
+      File file = new File(getConfiguration().getConfigDir().getPath() + "/logs/driver-1.log");
+      searchTextInFile(file, "expiring");
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -135,7 +170,7 @@ public class NodeMixRunner extends AbstractScenarioRunner {
   }
 
   /**
-   * 
+   * Creates a submits a job to the JPPF client.
    */
   private class JobSubmitter implements Runnable {
 
@@ -171,8 +206,8 @@ public class NodeMixRunner extends AbstractScenarioRunner {
     @Override
     public JPPFJob call() throws Exception {
       job = new JPPFJob();
-      job.setName("job-" + index);
-      for (int i=1; i<=nbTasks;i++) job.add(new NodeMixTask(duration)).setId("task-" + i);
+      job.setName("job-" + nfJob.format(index));
+      for (int i=1; i<=nbTasks;i++) job.add(new NodeMixTask(duration)).setId("task-" + nf.format(i));
       job.getSLA().setMaxDispatchExpirations(maxDispatches);
       job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(dispatchTimeout));
       job.getClientSLA().setMaxChannels(nbChannels);
@@ -185,8 +220,31 @@ public class NodeMixRunner extends AbstractScenarioRunner {
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message) {
+  private void output(final String message) {
     System.out.println(message);
     log.info(message);
+  }
+
+  /**
+   * Search for an occurrence of the given text in the specified file.
+   * @param file the file to search.
+   * @param text the text to search for.
+   * @return the line of the file that contains the text, along with the line number, or <code>null</code> if the text couldn't be found.
+   * @throws Exception if any error occurs.
+   */
+  private Pair<Integer, String> searchTextInFile(final File file, final String text) throws Exception {
+    Pair<Integer, String> result = null;
+    Pattern pattern = Pattern.compile(".*" + text + ".*");
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+      String s;
+      int count = 0;
+      while (((s = reader.readLine()) != null) && (result == null)) {
+        count++;
+        if (pattern.matcher(s).matches()) result = new Pair<>(count, s);
+      }
+    }
+    if (result != null) output("'" + text + "' found in '" + file + "'" + result.first() + " :\n" + result.second());
+    else output("'" + text + "' was not found in '" + file +  "'");
+    return result;
   }
 }

@@ -52,7 +52,7 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   private List<Long> threadIDs = null;
   /**
-   * 
+   * Whether created threads are daemon threads.
    */
   private long[] threadIDsArray = new long[0];
   /**
@@ -71,6 +71,10 @@ public class JPPFThreadFactory implements ThreadFactory
    * Indicates whether new thread should be created in PrivilegedAction.
    */
   private final boolean doPrivileged;
+  /**
+   * Indicates whether new thread should be created in PrivilegedAction.
+   */
+  private final boolean daemon;
 
   /**
    * Initialize this thread factory with the specified name.
@@ -121,12 +125,26 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority, final boolean doPrivileged)
   {
+    this(name, monitoringEnabled, priority, doPrivileged, false);
+  }
+
+  /**
+   * Initialize this thread factory with the specified name.
+   * @param name the name used as prefix for the constructed threads name.
+   * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
+   * @param priority priority assigned to the threads created by this factory.
+   * @param doPrivileged indicates whether thread should be created in PrivilegedAction.
+   * @param daemon whether created threads are daemon threads.
+   */
+  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority, final boolean doPrivileged, final boolean daemon)
+  {
     this.name = name == null ? "JPPFThreadFactory" : name;
     threadGroup = new ThreadGroup(this.name + " thread group");
     threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
     this.monitoringEnabled = monitoringEnabled;
     this.priority = priority;
     this.doPrivileged = doPrivileged;
+    this.daemon = daemon;
     if (monitoringEnabled) threadIDs = new ArrayList<>();
   }
 
@@ -159,7 +177,7 @@ public class JPPFThreadFactory implements ThreadFactory
     }
     thread.setPriority(priority);
     thread.setUncaughtExceptionHandler(defaultExceptionHandler);
-    //thread.setDaemon(false);
+    thread.setDaemon(daemon);
     return thread;
   }
 
@@ -169,14 +187,7 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public synchronized long[] getThreadIDs()
   {
-    //if (!monitoringEnabled || (threadIDs == null) || threadIDs.isEmpty()) return new long[0];
     return threadIDsArray;
-    /*
-    long[] ids = new long[threadIDs.size()];
-    int i = 0;
-    for (long id: threadIDs) ids[i++] = id;
-    return ids;
-    */
   }
 
   /**

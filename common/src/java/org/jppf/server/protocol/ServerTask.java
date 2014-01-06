@@ -36,6 +36,10 @@ public class ServerTask {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Client bundle that owns this task.
    */
   private final ServerTaskBundleClient bundle;
@@ -145,7 +149,7 @@ public class ServerTask {
    * Mark this task as cancelled.
    */
   public void cancel() {
-    if (debugEnabled) log.debug("cancelling {}", this);
+    if (traceEnabled) log.trace("cancelling {}", this);
     result = dataLocation;
     state = TaskState.CANCELLED;
   }
@@ -154,7 +158,7 @@ public class ServerTask {
    * Mark this task as to be resubmitted followxing expiration of a node dispatch.
    */
   public void resubmit() {
-    if (debugEnabled) log.debug("expiring {}", this);
+    if (traceEnabled) log.trace("expiring {}", this);
     result = null;
     state = TaskState.RESUBMIT;
   }
