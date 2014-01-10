@@ -77,7 +77,6 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
   public synchronized void waitForExecution() throws Exception
   {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-
     while (bundle.getPendingTasksCount() > 0) wait();
   }
 
@@ -93,8 +92,8 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
     TaskBundle bundle = clientBundle.getJob();
     // i don't know why bundle.getTaskCount() = 0 at this point
     bundle.setTaskCount(clientBundle.getTaskCount());
-    bundle.setSLA(null);
-    bundle.setMetadata(null);
+    //bundle.setSLA(null);
+    //bundle.setMetadata(null);
     if (debugEnabled) log.debug("Sending bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
     IOHelper.sendData(socketClient, bundle, helper.getSerializer());
     for (ServerTask task : clientBundle.getTaskList()) IOHelper.writeData(task.getResult(), destination);
@@ -127,5 +126,6 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
 
   @Override
   public void bundleEnded(final ServerTaskBundleClient bundle) {
+    this.bundle = null;
   }
 }
