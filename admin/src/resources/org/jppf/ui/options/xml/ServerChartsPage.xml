@@ -20,6 +20,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ChartsPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Charts"/>
+  <property name="icon" value="/org/jppf/ui/resources/chart-curve-go.png"/>
 	<script language="groovy">BASE = "org.jppf.ui.i18n.ChartsPage"</script>
 
 	<child name="ChartsBuilder" type="Java">

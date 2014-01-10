@@ -147,7 +147,6 @@ public class OptionElementFactory {
     ButtonOption option = new ButtonOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
-    option.setIconPath(desc.getProperty("icon"));
     option.setToggle(desc.getBoolean("toggle", false));
     option.createUI();
     option.setEventsEnabled(true);
@@ -165,7 +164,6 @@ public class OptionElementFactory {
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setValue(desc.getProperty("value"));
-    option.setIconPath(desc.getProperty("icon"));
     option.createUI();
     option.setEventsEnabled(true);
     return option;
@@ -370,7 +368,6 @@ public class OptionElementFactory {
     option.setDialogType(dlgType);
     option.setExtensions(desc.getProperty("extensions"));
     option.setValue(desc.getProperty("value"));
-    option.setIconPath(desc.getProperty("icon"));
     option.createUI();
     return option;
   }

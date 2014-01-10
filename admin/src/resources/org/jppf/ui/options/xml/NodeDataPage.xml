@@ -21,6 +21,7 @@
 	<!-- test comment for save -->
 	<!--<property name="label" value="Topology"/>-->
 	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="icon" value="/org/jppf/ui/resources/view-list-tree-4.png"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->

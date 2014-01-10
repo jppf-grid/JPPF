@@ -20,7 +20,8 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="health.page" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<!-- test comment for save -->
 	<!--<property name="label" value="Graph View"/>-->
-	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="icon" value="/org/jppf/ui/resources/utilities-system-monitor-3.png"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Toolbar                                        -->

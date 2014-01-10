@@ -21,9 +21,8 @@
 	<property name="componentConstraints" value="push, grow"/>
 	<property name="layoutConstraints" value="fill"/>
 	<property name="bordered" value="false"/>
+  <property name="icon" value="/org/jppf/ui/resources/retroshare1.png"/>
 	<import source="file" location="org/jppf/ui/options/xml/NodeDataPage2.xml"/>
   <import source="file" location="org/jppf/ui/options/xml/NodeDataGraphPage.xml"/>
-  <!--
-  -->
   <import source="file" location="org/jppf/ui/options/xml/JVMHealthPage.xml"/>
 </opt:main>

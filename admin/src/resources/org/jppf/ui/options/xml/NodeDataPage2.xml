@@ -18,7 +18,9 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
-	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="icon" value="/org/jppf/ui/resources/view-list-tree-4.png"/>
+
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->

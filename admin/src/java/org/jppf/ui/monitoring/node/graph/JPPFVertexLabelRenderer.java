@@ -112,14 +112,14 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
   }
 
   /**
-   * Compute ther tooltipe for a node vertex.
+   * Compute the tooltipe for a node vertex.
    * @param node contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
   private String computeNodeText(final TopologyData node)
   {
     StringBuilder sb = new StringBuilder();
-    sb.append(node.getId()).append("<br>");
+    sb.append("uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
     return sb.toString();

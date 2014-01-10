@@ -20,6 +20,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobDataPage" type="page">
 	<!-- test comment for save -->
 	<property name="label" value="Job Data"/>
+  <property name="icon" value="/org/jppf/ui/resources/preferences-contact-list.png"/>
 	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
 
 	<!-- ===================================================================== -->

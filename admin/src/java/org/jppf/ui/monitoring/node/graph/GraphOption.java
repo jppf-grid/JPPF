@@ -268,7 +268,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
   private String computeNodeTooltip(final TopologyData node)
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("<html>").append(node.getId()).append("<br>");
+    sb.append("<html>uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
     sb.append("</html>");

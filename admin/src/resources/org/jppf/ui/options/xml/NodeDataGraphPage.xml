@@ -21,6 +21,7 @@
 	<!-- test comment for save -->
 	<!--<property name="label" value="Graph View"/>-->
 	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="icon" value="/org/jppf/ui/resources/code-class.png"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->

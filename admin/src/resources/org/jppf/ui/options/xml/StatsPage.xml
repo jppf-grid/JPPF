@@ -24,6 +24,7 @@
 	<!-- test comment for save -->
 	<property name="label" value="Node Data"/>
 	<property name="scrollable" value="false"/>
+  <property name="icon" value="/org/jppf/ui/resources/kspread.png"/>
 	<property name="layoutConstraints" value="flowy, fill"/>
 	<property name="componentConstraints" value="grow"/>
 

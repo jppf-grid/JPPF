@@ -47,23 +47,23 @@ public class TabbedPaneOption extends AbstractOptionContainer
     JTabbedPane pane = (JTabbedPane) UIComponent;
     ImageIcon icon = null;
     if (element.getIconPath() != null) icon = GuiUtils.loadIcon(element.getIconPath());
-      DockingManager dmgr = DockingManager.getInstance();
-      try
+    DockingManager dmgr = DockingManager.getInstance();
+    try
+    {
+      pane.addTab("", null, element.getUIComponent(), element.getToolTipText());
+      JLabel l = new JLabel(element.getLabel(), icon, SwingConstants.CENTER);
+      pane.setTabComponentAt(idx, l);
+      if (element.isDetachable())
       {
-        pane.addTab("", icon, element.getUIComponent(), element.getToolTipText());
-        JLabel l = new JLabel(element.getLabel());
-        pane.setTabComponentAt(idx, l);
-        if (element.isDetachable())
-        {
-          l.addMouseListener(dmgr.getMouseAdapter());
-          if (!dmgr.isRegistered(element)) dmgr.register(element, l);
-          else dmgr.update(element, l);
-        }
+        l.addMouseListener(dmgr.getMouseAdapter());
+        if (!dmgr.isRegistered(element)) dmgr.register(element, l);
+        else dmgr.update(element, l);
       }
-      catch(Throwable t)
-      {
-        t.printStackTrace();
-      }
+    }
+    catch(Throwable t)
+    {
+      t.printStackTrace();
+    }
   }
 
   @Override

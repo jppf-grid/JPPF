@@ -227,6 +227,7 @@ public class OptionsPageBuilder
     elt.setLayoutConstraints(desc.getString("layoutConstraints", "fill, gapy 2!, insets 0 0 0 0"));
     elt.setComponentConstraints(desc.getString("componentConstraints", "growx"));
     elt.setDetachable(desc.getBoolean("detachable", true));
+    elt.setIconPath(desc.getString("icon"));
     for (ScriptDescriptor script: desc.scripts) elt.getScripts().add(script);
     if (desc.initializer != null) elt.setInitializer(createListener(desc.initializer));
     if (desc.finalizer != null) elt.setFinalizer(createListener(desc.finalizer));
