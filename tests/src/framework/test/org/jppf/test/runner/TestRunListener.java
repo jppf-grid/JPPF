@@ -57,7 +57,7 @@ public class TestRunListener extends RunListener
   /**
    * EXIT, WAIT, or NONE
    */
-  private final String actionOnError = "EXIT";
+  private final String actionOnError = "NONE";
 
   /**
    * Initialize this listener with the specified result holder.

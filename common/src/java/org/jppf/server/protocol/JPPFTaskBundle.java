@@ -21,7 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
-import org.jppf.utils.collections.*;
+import org.jppf.utils.collections.MetadataImpl;
+import org.slf4j.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -40,6 +41,10 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
    * Flag indicating whether collection of debug information is available via JMX.
    */
   private static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
+  /**
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(JPPFTaskBundle.class);
   /**
    * The unique identifier for the request (the job) this task bundle is a part of.
    */
@@ -195,6 +200,7 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
 
   @Override
   public void setSLA(final JobSLA jobSLA) {
+    //if (jobSLA == null) log.info("setting null SLA for {}:\n{}", this, ExceptionUtils.getCallStack());
     this.jobSLA = jobSLA;
   }
 

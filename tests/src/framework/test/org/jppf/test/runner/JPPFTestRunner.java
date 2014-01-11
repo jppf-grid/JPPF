@@ -165,7 +165,7 @@ public class JPPFTestRunner
       }
       else if ("-u".equals(type))
       {
-        System.out.println("Running tests at " + args[0]);
+        System.out.println("Running tests at " + args[1]);
         URL url = new URL(args[1]);
         if ((args.length > 2) && (args[2] != null)) outputFile = args[2];
         result = new JPPFTestRunner().sendTestRequest(url);
