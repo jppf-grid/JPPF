@@ -1,0 +1,85 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-installer" basedir="..">
+
+	<!-- ========================================================================= -->
+	<!--                    Generate the IzPack installer jar                      -->
+	<!-- ========================================================================= -->
+	<!-- This requires the property  ${izpack.home} defined in build.properties    -->
+	<!-- It must point to the root installation directory of IzPack                -->
+	<!-- ========================================================================= -->
+
+	<target name="installer">
+		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
+		<antcall target="installer.package"><param name="url" value="http://www.jppf.org/"/></antcall>
+	</target>
+
+	<target name="installer.local">
+		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
+		<antcall target="installer.package"><param name="url" value="http://localhost:8880/"/></antcall>
+	</target>
+
+	<target name="installer.package" description="package the jar installer" if="izpack.present">
+		<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
+		<property name="install.prefix" value="${build}/${app.ver}"/>
+		<property name="install.file" value="${install.prefix}-Installer"/>
+		<property name="installer.url" value="${url}"/>
+		<delete file="${install.file}.jar" quiet="true"/>
+		<mkdir dir="${install.prefix}"/>
+		<echo message="unzipping all files"/>
+		<!-- Unzip all packages for use by the web installer generator -->
+		<unzip dest="${install.prefix}"><fileset dir="${build}" includes="${app.ver}-*.zip"/></unzip>
+
+		<!-- Generate offline installer -->
+		<!--
+		<izpack input="${installer}/install.xml" output="${install.file}.jar" installerType="standard" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+    -->
+
+		<!-- Generate web installer -->
+		<property name="web.installer.dir" value="${home}/download/${version.number}"/>
+		<delete dir="${web.installer.dir}" quiet="true"/>
+		<mkdir dir="${web.installer.dir}"/>
+		<copy file="${installer}/jppf_ws.jnlp" todir="${home}/download"/>
+		<replace file="${home}/download/jppf_ws.jnlp" token="@version@" value="${version.number}"/>
+		<replace file="${home}/download/jppf_ws.jnlp" token="@url@" value="${installer.url}"/>
+		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
+		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+
+		<!-- Sign the web installer jars for use with JNLP -->
+		<echo message="java.home = ${java.home}"/>
+		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">
+			<contains string="${java.home}" substring="jre" casesensitive="false"/>
+		</condition>
+		<echo message="jdk.bin = ${jdk.bin}"/>
+		<exec executable="${jdk.bin}/jarsigner">
+			<arg value="-keystore"/>
+			<arg value="${bin}\security\jppf.keystore"/>
+			<arg value="-storepass"/>
+			<arg value="Faz600er"/>
+			<arg value="-keypass"/>
+			<arg value="Faz600er"/>
+			<arg value="${web.installer.file}"/>
+			<arg value="jppf"/>
+		</exec>
+
+		<!-- Delete all unzipped file (can take a long time) -->
+		<delete dir="${install.prefix}" quiet="true"/>
+	</target>
+
+</project> 
