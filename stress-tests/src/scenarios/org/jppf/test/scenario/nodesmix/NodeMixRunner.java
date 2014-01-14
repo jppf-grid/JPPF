@@ -25,11 +25,11 @@ import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 import org.jppf.client.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -103,6 +103,7 @@ public class NodeMixRunner extends AbstractScenarioRunner {
     client = getSetup().getClient();
     TypedProperties config = getConfiguration().getProperties();
     try {
+      StreamUtils.waitKeyPressed("Start the admin console and press [Enter] ...");
       nbJobs = config.getInt("nbJobs", 1);
       nbTasks = config.getInt("nbTasks", 1);
       duration = config.getLong("task.duration", 1L);
@@ -156,12 +157,17 @@ public class NodeMixRunner extends AbstractScenarioRunner {
         output("got results for " + job.getName() + ": tasks in error = " + StringUtils.padLeft("" + nbErrors, ' ', digits) +
             ", not executed = " + StringUtils.padLeft("" + nbNoExec, ' ', digits) + ", good = " + StringUtils.padLeft("" + nbOk, ' ', digits));
       }
+      /*
       JMXDriverConnectionWrapper jmx = getSetup().getDriverManagementProxy();
       String debug = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
       output("debug info:\n" + debug);
       output(jmx.statistics().toString());
-      File file = new File(getConfiguration().getConfigDir().getPath() + "/logs/driver-1.log");
-      searchTextInFile(file, "expiring");
+      */
+      for (int i=1; i<=getConfiguration().getNbDrivers(); i++) {
+        File file = new File(String.format("%s/logs/driver-%d.log", getConfiguration().getConfigDir().getPath(), i));
+        searchTextInFile(file, "expiring");
+      }
+      StreamUtils.waitKeyPressed();
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

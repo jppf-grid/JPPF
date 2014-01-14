@@ -41,8 +41,7 @@ import edu.uci.ics.jung.graph.Graph;
  * </ul>
  * @author Laurent Cohen
  */
-public class RadialLayout extends AbstractLayout<TopologyData, Number>
-{
+public class RadialLayout extends AbstractLayout<TopologyData, Number> {
   /**
    * The default radius factor to use when none is specified.
    */
@@ -59,8 +58,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
    * Initialize this layout with the specified graph.
    * @param graph the graph to layout.
    */
-  public RadialLayout(final Graph<TopologyData, Number> graph)
-  {
+  public RadialLayout(final Graph<TopologyData, Number> graph) {
     super(graph);
   }
 
@@ -69,22 +67,15 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
    * @param graph the graph to layout.
    * @param radiusFactor radius factor to use.
    */
-  public RadialLayout(final Graph<TopologyData, Number> graph, final double radiusFactor)
-  {
+  public RadialLayout(final Graph<TopologyData, Number> graph, final double radiusFactor) {
     super(graph);
     this.radiusFactor = radiusFactor;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void initialize()
-  {
+  public void initialize() {
     Dimension d = getSize();
-
-    if (d != null)
-    {
+    if (d != null) {
       Collection<TopologyData> drivers = getDrivers();
       int dSize = drivers.size();
       double height = d.getHeight();
@@ -93,8 +84,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
       radius *= (dSize > 1) ? 1d : 2d;
 
       int i = 0;
-      for (TopologyData driver : drivers)
-      {
+      for (TopologyData driver : drivers) {
         Point2D coord = transform(driver);
         double angle = dSize > 1 ? (2d * Math.PI * i) / dSize : 0d;
         if (dSize == 1) coord.setLocation(width / 2d, height / 2d);
@@ -103,8 +93,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
         double firstAngle = dSize > 1 ? angle - Math.PI/2d : 0d;
         int j = 0;
         double factor = dSize > 1 ? 1d : 2d;
-        for (TopologyData node : nodes)
-        {
+        for (TopologyData node : nodes) {
           Point2D nodeCoord = transform(node);
           double nodeAngle = firstAngle + factor * Math.PI * j / nodes.size();
           nodeCoord.setLocation(Math.cos(nodeAngle) * radius + coord.getX(), Math.sin(nodeAngle) * radius + coord.getY());
@@ -116,8 +105,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
   }
 
   @Override
-  public void reset()
-  {
+  public void reset() {
     initialize();
   }
 
@@ -125,15 +113,17 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
    * Get all the vertices that represent a driver.
    * @return a cloolection of <code>TopologyData</code> objects.
    */
-  private Collection<TopologyData> getDrivers()
-  {
-    Set<TopologyData> drivers = new HashSet<>();
-    Collection<TopologyData> coll = graph.getVertices();
-    if (coll != null)
-    {
-      for (TopologyData data: coll) if (!data.isNode()) drivers.add(data);
+  private Collection<TopologyData> getDrivers() {
+    try {
+      Set<TopologyData> drivers = new HashSet<>();
+      Collection<TopologyData> coll = graph.getVertices();
+      if (coll != null) {
+        for (TopologyData data: coll) if (!data.isNode()) drivers.add(data);
+      }
+      return drivers;
+    } catch(Exception e) {
+      return Collections.<TopologyData>emptyList();
     }
-    return drivers;
   }
 
   /**
@@ -141,14 +131,16 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number>
    * @param driver the driver for which to retrieve the nodes.
    * @return a cloolection of <code>TopologyData</code> objects.
    */
-  private Collection<TopologyData> getNodes(final TopologyData driver)
-  {
-    Set<TopologyData> nodes = new HashSet<>();
-    Collection<TopologyData> coll = graph.getNeighbors(driver);
-    if (coll != null)
-    {
-      for (TopologyData data: coll) if (data.isNode()) nodes.add(data);
+  private Collection<TopologyData> getNodes(final TopologyData driver) {
+    try {
+      Set<TopologyData> nodes = new HashSet<>();
+      Collection<TopologyData> coll = graph.getNeighbors(driver);
+      if (coll != null) {
+        for (TopologyData data: coll) if (data.isNode()) nodes.add(data);
+      }
+      return nodes;
+    } catch(Exception e) {
+      return Collections.<TopologyData>emptyList();
     }
-    return nodes;
   }
 }

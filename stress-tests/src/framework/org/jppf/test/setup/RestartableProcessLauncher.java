@@ -71,6 +71,8 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
     variables.put("$n", n);
     variables.put("$scenario_dir", config.getConfigDir().getPath());
     variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
+    variables.put("$nbDrivers", config.getNbDrivers());
+    variables.put("$nbNodes", config.getNbNodes());
     if (streamsConfigured.compareAndSet(false, true))
     {
       stdout = configureOutput(config.getStdoutFilename());

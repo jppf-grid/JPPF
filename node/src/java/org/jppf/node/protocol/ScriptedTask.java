@@ -76,7 +76,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
   }
 
   /**
-   * Initialize this task with the specified script language, script provided as a string,
+   * Initialize this task with the specified script language, script provided from a {@link Reader},
    * and a set of variable bindings to be used in the scripts.
    * @param language the JSR 223 script language to use.
    * @param scriptReader a reader form which to read the script source.
@@ -91,7 +91,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
   }
 
   /**
-   * Initialize this task with the specified script language, script provided as a string,
+   * Initialize this task with the specified script language, script provided as a file,
    * and a set of variable bindings to be used in the scripts.
    * @param language the JSR 223 script language to use.
    * @param scriptFile a file from which to read the script source.

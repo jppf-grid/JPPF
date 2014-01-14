@@ -5,11 +5,13 @@ $template{name="about-page-header" title="Downloads"}$
     $jppfVersion = "4.0";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $jppfVersion . "/";
   ?>
-  <a name="2.0"></a>
+  <a name="4.0"></a>
   <h1>JPPF <?php echo $jppfVersion ?></h1>
 
+  <!--
   <h3>Installer</h3>
   <a href="/download/jppf_ws.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+  -->
 
   <h3>Deployable module binaries</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
@@ -31,7 +33,7 @@ $template{name="about-page-header" title="Downloads"}$
 
   <h3>Samples and tutorials</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-  Make sure to get started with our <a href="/wiki/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
+  Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
 
   <hr>
 
@@ -41,7 +43,7 @@ $template{name="about-page-header" title="Downloads"}$
   <hr>
 
   <h3>Feeling curious or adventurous about JPPF's latest advances?</h3>
-  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 12/3/2013 JPPF 4.0 beta</b></a>.
+  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 1/2/2014 JPPF 4.0 RC1</b></a>.
   <p><span style="color: #FF7F00">Warning: this is not recommended for production environments</span>
 
 $template{name="about-page-footer"}$

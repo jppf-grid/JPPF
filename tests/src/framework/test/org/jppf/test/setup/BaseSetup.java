@@ -310,19 +310,13 @@ public class BaseSetup
   /**
    * Create the shutdown hook.
    */
-  protected static void createShutdownHook()
-  {
-    shutdownHook = new Thread()
-    {
+  protected static void createShutdownHook() {
+    shutdownHook = new Thread() {
       @Override
-      public void run()
-      {
-        try
-        {
+      public void run() {
+        try {
           close();
-        }
-        catch(Exception ignore)
-        {
+        } catch(Exception ignore) {
         }
       }
     };

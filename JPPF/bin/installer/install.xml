@@ -12,6 +12,7 @@
 		<url>@{installer.url}</url>
 		<javaversion>1.5</javaversion>
 		<webdir>@{installer.url}download/@{version.number}</webdir>
+    <run-privileged condition="izpack.windowsinstall"/>
   </info>
 
 	<guiprefs width="600" height="400" resizable="yes">

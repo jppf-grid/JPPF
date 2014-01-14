@@ -28,12 +28,11 @@
 		<antcall target="doc.gen">
 			<param name="source" value="${home}/doc-source/home"/>
 			<param name="dest" value="${home}/"/>
-			<param name="templates" value="${home}/templates/"/>
+			<param name="templates" value="${home}/doc-source/templates/"/>
 		</antcall>
-  	<copy toDir="${home}/doc/v2/includes" file="${home}/jppf_header.php"/>
-  	<copy toDir="${home}/doc/v2/includes" file="${home}/jppf_menu.php"/>
-  	<copy toDir="${home}/doc/v3/includes" file="${home}/jppf_header.php"/>
-  	<copy toDir="${home}/doc/v3/includes" file="${home}/jppf_menu.php"/>
+    <copy toDir="${home}/doc/v2/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
+    <copy toDir="${home}/doc/v3/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
+    <copy toDir="${home}/doc/v4/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
 	</target>
 
 	<target name="doc.gen" description="generates the project web site pages">
@@ -55,7 +54,7 @@
 			<arg value="${home}/screenshots"/>
 			<arg value="72"/>
 			<arg value="72"/>
-			<arg value="${home}/templates"/>
+			<arg value="${home}/doc-source/templates"/>
 			<arg value="9"/>
 		</java>
 	</target>
@@ -65,7 +64,7 @@
 			<jvmarg value="-Xmx128m" />
 			<arg value="${samples-pack}"/>
 			<arg value="${home}/doc-source/home/samples-pack"/>
-			<arg value="${home}/templates/sample-readme.html"/>
+			<arg value="${home}/doc-source/templates/sample-readme.html"/>
 		</java>
 	</target>
 

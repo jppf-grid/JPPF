@@ -35,6 +35,7 @@ public class ConfigurationHelper
    * Cache of the created temp files, so they can be deleted upon cleanup.
    */
   private static List<File> tempFiles = new Vector<>();
+
   /**
    * Create a temporary file containing the specified configuration.
    * @param config the configuration to store on file.
@@ -222,7 +223,7 @@ public class ConfigurationHelper
   /**
    * Cleanup the created temporary files.
    */
-  static void cleanup()
+  public static void cleanup()
   {
     while (!tempFiles.isEmpty()) tempFiles.remove(0).delete();
   }

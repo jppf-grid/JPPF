@@ -26,6 +26,8 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.JPPFConfiguration;
 
+import test.org.jppf.test.setup.ConfigurationHelper;
+
 /**
  * Helper object for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
@@ -158,6 +160,7 @@ public class Setup
     }
     System.gc();
     stopProcesses();
+    ConfigurationHelper.cleanup();
     if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
   }
 
@@ -187,12 +190,11 @@ public class Setup
    */
   protected void createShutdownHook()
   {
-    shutdownHook = new Thread()
-    {
+    shutdownHook = new Thread() {
       @Override
-      public void run()
-      {
+      public void run() {
         stopProcesses();
+        ConfigurationHelper.cleanup();
       }
     };
     Runtime.getRuntime().addShutdownHook(shutdownHook);
