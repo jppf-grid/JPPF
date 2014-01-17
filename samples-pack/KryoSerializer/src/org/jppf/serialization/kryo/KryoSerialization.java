@@ -47,8 +47,7 @@ public class KryoSerialization implements JPPFSerialization {
   };
   /**
    * A fast dynamic pool of {@link Kryo} instances.
-   * Using this provides a huge performance improvement vs creating a new Kryo instance
-   * each time we serialize or deserialize an object.
+   * Using this provides a huge performance improvement vs creating a new Kryo instance each time we serialize or deserialize an object.
    * @see org.jppf.utils.pooling.AbstractObjectPoolQueue
    */
   private static ObjectPool<Kryo> pool = new AbstractObjectPoolQueue<Kryo>() {
@@ -94,7 +93,7 @@ public class KryoSerialization implements JPPFSerialization {
     private final Class c;
 
     /**
-     * Initializate this instantiator witht he specified class.
+     * Initialize this instantiator with the specified class.
      * @param c the class to instantiate.
      */
     public JPPFInstantiator(final Class c) {
