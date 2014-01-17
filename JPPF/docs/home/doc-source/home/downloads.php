@@ -8,10 +8,8 @@ $template{name="about-page-header" title="Downloads"}$
   <a name="4.0"></a>
   <h1>JPPF <?php echo $jppfVersion ?></h1>
 
-  <!--
   <h3>Installer</h3>
   <a href="/download/jppf_ws.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
-  -->
 
   <h3>Deployable module binaries</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>

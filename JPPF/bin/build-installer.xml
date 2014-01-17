@@ -61,6 +61,25 @@
 		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
 		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
 
+    <!-- Add needed attributes to the manifest of the web installer jar -->
+    <mkdir dir="${web.installer.dir}/jar_dir"/>
+		<unjar src="${web.installer.file}" dest="${web.installer.dir}/jar_dir"/>
+    <delete file="${web.installer.file}" quiet="true"/>
+    <delete file="${web.installer.dir}/jar_dir/META-INF/MANIFEST.MF" quiet="true"/>
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+    <jar jarfile="${web.installer.file}" index="true">
+      <fileset dir="${web.installer.dir}/jar_dir"/>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+        <attribute name="Permissions" value="all-permissions"/>
+      </manifest>
+    </jar>
+    <delete dir="${web.installer.dir}/jar_dir" quiet="true"/>
+
 		<!-- Sign the web installer jars for use with JNLP -->
 		<echo message="java.home = ${java.home}"/>
 		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">

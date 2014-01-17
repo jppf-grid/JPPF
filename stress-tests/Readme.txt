@@ -26,13 +26,18 @@ The expression can make use of predefined variables:
 - $n is the number of the driver or node, it defaults to 1 for the client
 - $templates_dir is the path to the directory where the default templates are located (see below)
 - $scenario_dir is the path to the scenario directory (see below)
+- $nbDrivers is the number of drivers started by the test scenario, as specified with jppf.scenario.nbDrivers in scenario.properties
+- $nbNodes is the number of nodes started by the test scenario, as specified with jppf.scenario.nbNodes in scenario.properties
 
 Examples:
-- log4j.appender.JPPF.File= expr: $templates_dir + '/driver-' + $n + '.log' ==> log4j.appender.JPPF.File=scenarios/templates/driver-1.log (for driver-1)
-- log4j.appender.JPPF.File= expr: $scenario_dir  + '/driver-' + $n + '.log' ==> log4j.appender.JPPF.File=scenarios/s1/driver-1.log (for driver-1, scenario dir in scenarios/s1)
+- log4j.appender.JPPF.File= expr: $templates_dir + '/driver-' + $n + '.log'
+   ==> log4j.appender.JPPF.File=scenarios/templates/driver-1.log (for driver-1)
+- log4j.appender.JPPF.File= expr: $scenario_dir  + '/driver-' + $n + '.log'
+  ==> log4j.appender.JPPF.File=scenarios/s1/driver-1.log (for driver-1, scenario dir in scenarios/s1)
 - jppf.server.port = expr: 11100 + $n ==> jppf.server.port = 11102 (for driver-2: 11000 + 2)
-- jppf.server.port = expr: 11100 + ($n % 2 == 0 ? 1 : 2) ==> jppf.server.port = 11101 for all nodes with an even number
-                                                         ==> jppf.server.port = 11102 for all nodes with an odd number
+- jppf.server.port = expr: 11100 + ($n % 2 == 0 ? 1 : 2)
+  ==> jppf.server.port = 11101 for all nodes with an even number
+  ==> jppf.server.port = 11102 for all nodes with an odd number
 
 Default templates:
 -----------------
@@ -99,6 +104,11 @@ The predefined properties are the following:
 - jppf.scenario.diagnostics.file = the output file where the diagnostics for all nodes and drivers are written.
   value can be "none", "out", "err" or any valid file path. Default is "out" (printed to the console as with System.out)
   "none" means that diagnostics are not fetched or printed
+- jppf.scenario.process.stdout.file = the output file where the stdout of the started processes (drivers and nodes) is to be redirected.
+  value can be "out", "err" or any valid file path. Default is "out" (printed to the console as with System.out)
+- jppf.scenario.process.stderr.file = the output file where the stderr of the started processes (drivers and nodes) is to be redirected.
+  value can be "out", "err" or any valid file path. Default is "err" (printed to the console as with System.out)
+
 
 The values for these properties can be defined as Groovy expressions, which can use the variable $scenario_dir
 
