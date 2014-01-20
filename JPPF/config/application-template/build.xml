@@ -1,0 +1,91 @@
+<!--
+	JPPF.
+	 Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name='JPPF Application' basedir="." default="run">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="build.properties.file" value="${basedir}/build.properties"/>
+  <property file="${build.properties.file}"/>
+	<property name="lib.dir"    value="${basedir}/lib"/>
+	<property name="config.dir"  value="${basedir}/config"/>
+	<property name="classes.dir" value="${basedir}/classes"/>	
+	<property name="src.dir"     value="${basedir}/src"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${classes.dir}"/>
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	</path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${classes.dir}" quiet="true"/>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" description="Initialize ressources">
+ 		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                                  Compile                                  -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" depends="clean, init">
+		<javac srcdir="" destdir="${classes.dir}"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${src.dir}"/>
+		</javac>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                                    Build                                  -->
+	<!-- ========================================================================= -->
+
+	<target name="build" description="build the application" depends="clean, init, compile">
+ 		<mkdir dir="${classes.dir}"/>
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                     Run the application                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="run" description="run the application" depends="build">
+		<java fork="yes" classname="${main.class}" classpathref="project.classpath">
+			<jvmarg value="-Djppf.config=jppf.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+			<jvmarg value="-Xmx64m"/>
+		</java>
+	</target>
+
+</project> 
