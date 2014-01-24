@@ -33,7 +33,7 @@ public class BootstrapObjectSerializer implements ObjectSerializer
   /**
    * 
    */
-  private static JPPFSerialization serialization = JPPFSerialization.Factory.getSerialization();
+  private JPPFSerialization serialization = JPPFSerialization.Factory.getSerialization();
 
   /**
    * The default constructor must be public to allow for instantiation through Java reflection.

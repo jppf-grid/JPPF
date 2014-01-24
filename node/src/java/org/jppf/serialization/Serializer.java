@@ -190,7 +190,16 @@ class Serializer
         Method m = SerializationReflectionHelper.getWriteObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
-        m.invoke(obj, out);
+        try
+        {
+          tmpDesc = currentClassDescriptor;
+          currentClassDescriptor = desc;
+          m.invoke(obj, out);
+        }
+        finally
+        {
+          currentClassDescriptor = tmpDesc;
+        }
       }
       else if (desc.externalizable) ((Externalizable) obj).writeExternal(out);
       else writeDeclaredFields(obj, desc);

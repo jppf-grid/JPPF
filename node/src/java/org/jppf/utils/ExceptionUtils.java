@@ -18,7 +18,9 @@
 
 package org.jppf.utils;
 
+import java.io.*;
 import java.lang.reflect.Constructor;
+import java.util.*;
 
 
 /**
@@ -42,8 +44,34 @@ public final class ExceptionUtils
   public static String getStackTrace(final Throwable t)
   {
     if (t == null) return "null";
-    StringBuilder sb = new StringBuilder(getMessage(t));
-    for (StackTraceElement elt: t.getStackTrace()) sb.append("\n  at ").append(elt);
+    String result = null;
+    try (StringWriter writer = new StringWriter(); PrintWriter pw = new PrintWriter(writer)) {
+      t.printStackTrace(pw);
+      result = writer.toString();
+    } catch(Exception e) {
+      result = getStackTrace2(t);
+    }
+    return result;
+  }
+
+  /**
+   * Get a throwable's stack trace.
+   * @param t the throwable to get the stack trace from.
+   * @return the stack trace as a string.
+   */
+  private static String getStackTrace2(final Throwable t)
+  {
+    Throwable ct = t;
+    Set<Throwable> set = new HashSet<>();
+    StringBuilder sb = new StringBuilder();
+    while (ct != null) {
+      set.add(ct);
+      sb.append(getMessage(ct));
+      for (StackTraceElement elt: ct.getStackTrace()) sb.append("\n  at ").append(elt);
+      ct = ct.getCause();
+      if (set.contains(ct)) break;
+      if (ct != null) sb.append("\nCaused by: ");
+    }
     return sb.toString();
   }
 

@@ -116,6 +116,15 @@ public interface JPPFSerialization
     {
       return serialization;
     }
+
+    /**
+     * Reset the configured serialization.
+     * @exclude
+     */
+    public static void reset()
+    {
+      serialization = init();
+    }
   }
 
   /**

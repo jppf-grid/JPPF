@@ -49,5 +49,6 @@ public class NotSerializableTask extends AbstractTask<String>
   public void run()
   {
     if (!instantiateInClient) nso = new NotSerializableObject();
+    setResult("success");
   }
 }

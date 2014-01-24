@@ -130,6 +130,8 @@ public class KryoSerialization implements JPPFSerialization {
     kryo.register(InvocationHandler.class, new JdkProxySerializer());
     UnmodifiableCollectionsSerializer.registerSerializers(kryo);
     SynchronizedCollectionsSerializer.registerSerializers(kryo);
+    kryo.register(EnumMap.class, new EnumMapSerializer());
+    kryo.register(EnumSet.class, new EnumSetSerializer());
     return kryo;
- }
+  }
 }

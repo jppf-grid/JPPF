@@ -37,7 +37,7 @@ public class CustomWrapping implements ObjectWrapping
   /**
    * 
    */
-  private static ObjectSerializer serializer = new BootstrapObjectSerializer();
+  private ObjectSerializer serializer = new BootstrapObjectSerializer();
 
   @Override
   public Object unwrap(final Object wrapped, final ClassLoader cl) throws IOException, ClassNotFoundException

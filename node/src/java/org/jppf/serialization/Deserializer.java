@@ -172,7 +172,16 @@ class Deserializer
         Method m = SerializationReflectionHelper.getReadObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking readObject() for class=" + desc + " on object " + obj); } catch(Exception e) {}
-        m.invoke(obj, in);
+        try
+        {
+          tmpDesc = currentClassDescriptor;
+          currentClassDescriptor = desc;
+          m.invoke(obj, in);
+        }
+        finally
+        {
+          currentClassDescriptor = tmpDesc;
+        }
       }
       else if (desc.externalizable) ((Externalizable) obj).readExternal(in);
       else readDeclaredFields(desc, obj);

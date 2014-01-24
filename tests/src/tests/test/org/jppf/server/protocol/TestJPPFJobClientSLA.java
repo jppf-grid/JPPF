@@ -298,7 +298,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * Test that a job is executed on both local and remote channels.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout=15000)
   public void testJobMaxChannels2Client() throws Exception
   {
     try

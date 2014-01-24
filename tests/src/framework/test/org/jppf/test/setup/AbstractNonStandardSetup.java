@@ -227,6 +227,26 @@ public class AbstractNonStandardSetup
   }
 
   /**
+   * Test that a task that is not Serializable still works with a custom serialization scheme (DefaultJPPFSerialization or KryoSerialization).
+   * @throws Exception if any error occurs
+   */
+  protected void testNotSerializableWorkingInNode() throws Exception {
+    int tasksPerNode = 5;
+    int nbNodes = BaseSetup.nbNodes();
+    int nbTasks = tasksPerNode * nbNodes;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(nbTasks, results.size());
+    for (Task<?> task: results) {
+      assertTrue(task instanceof NotSerializableTask);
+      assertNotNull(task.getResult());
+      assertEquals("success", task.getResult());
+      assertNull(task.getThrowable());
+    }
+  }
+
+  /**
    * Test that we can obtain the state of a node via the node forwarder mbean.
    * @throws Exception if nay error occurs.
    */
