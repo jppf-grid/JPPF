@@ -16,26 +16,7 @@
  * limitations under the License.
  */
 
-package test;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-import test.org.jppf.serialization.*;
-
-
-
-
-
-
 /**
- * A suite of JUnit tests.
- * @author Laurent Cohen
+ * Unit tests for JPPF grids with SSL enabled.
  */
-@RunWith(Suite.class)
-//@Suite.SuiteClasses({ TestSSL.class, TestFileDataLocation.class, TestMultiServerWithSSL.class })
-//@Suite.SuiteClasses({ TestSSL.class, TestMultiServer.class, TestFileDataLocation.class, TestSSL2.class })
-@Suite.SuiteClasses({ TestKryo.class, TestJPPFSerialization.class })
-public class JPPFSuite
-{
-}
+package test.org.jppf.serialization;

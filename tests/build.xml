@@ -62,6 +62,9 @@
     <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
     <pathelement location="${lib}/JUnit/junit-4.10.jar"/>
     <pathelement location="${lib}/jmxremote/jmxremote_optional-1.0_01-ea.jar"/>
+    <pathelement location="${basedir}/../samples-pack/KryoSerializer/classes"/>
+    <pathelement location="${basedir}/../samples-pack/KryoSerializer/lib/kryo-2.22-all.jar"/>
+    <pathelement location="${basedir}/../samples-pack/KryoSerializer/lib/kryo-serializers-0.26.jar"/>
   </path>
 
   <!-- ========================================================================= -->

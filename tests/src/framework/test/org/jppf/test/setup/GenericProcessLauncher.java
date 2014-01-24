@@ -20,6 +20,7 @@ package test.org.jppf.test.setup;
 
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -122,6 +123,10 @@ public class GenericProcessLauncher implements Runnable {
    * 
    */
   protected SocketWrapper socketClient = null;
+  /**
+   * Used to format timestamps in the std and err outputs.
+   */
+  protected final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss.SSS");
 
   /**
    * Default constructor.
@@ -130,7 +135,7 @@ public class GenericProcessLauncher implements Runnable {
    */
   public GenericProcessLauncher(final int n, final String processType) {
     this.n = n;
-    this.name = "[" + processType + '-' + n + "] ";
+    this.name = "[" + processType + '-' + n + "]";
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
@@ -148,7 +153,7 @@ public class GenericProcessLauncher implements Runnable {
    */
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
     this.n = n;
-    this.name = "[" + processType + '-' + n + "] ";
+    this.name = "[" + processType + '-' + n + "]";
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
@@ -171,7 +176,7 @@ public class GenericProcessLauncher implements Runnable {
    */
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate, final List<String> classpath, final List<String> jvmOptions) {
     this.n = n;
-    this.name = "[" + processType + '-' + n + "] ";
+    this.name = "[" + processType + '-' + n + "]";
     jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
     log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
     for (String elt: classpath) addClasspathElement(elt);
@@ -339,11 +344,11 @@ public class GenericProcessLauncher implements Runnable {
     wrapper.addListener(new ProcessWrapperEventListener() {
       @Override
       public void outputStreamAltered(final ProcessWrapperEvent event) {
-        if (stdout != null) stdout.print(name + event.getContent());
+        if (stdout != null) stdout.print(formatPrologue() + event.getContent());
       }
       @Override
       public void errorStreamAltered(final ProcessWrapperEvent event) {
-        if (stderr != null) stderr.print(name + event.getContent());
+        if (stderr != null) stderr.print(formatPrologue() + event.getContent());
       }
     });
     wrapper.setProcess(builder.start());
@@ -458,5 +463,16 @@ public class GenericProcessLauncher implements Runnable {
    */
   public String getName() {
     return name;
+  }
+
+  /**
+   * Return a formatted time stamp.
+   * @return the current timestamp formatted as a string.
+   */
+  protected String formatPrologue() {
+    StringBuilder sb = new StringBuilder(name).append('[');
+    synchronized(sdf) {
+      return sb.append(sdf.format(new Date())).append("] ").toString();
+    }
   }
 }

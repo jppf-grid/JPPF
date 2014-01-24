@@ -63,12 +63,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry kind="lib" path="GPU/lib/aparapi.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/asm-4.0.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-2.21.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/minlog-none-1.2.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/objenesis-1.2.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/reflectasm-1.07.jar"/>
-	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.22.jar"/>
 	<classpathentry kind="lib" path="FractalMovieGenerator/lib/monte-cc.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-2.22-all.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.26.jar"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>

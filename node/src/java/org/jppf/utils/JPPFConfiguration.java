@@ -19,6 +19,7 @@ package org.jppf.utils;
 
 import java.io.*;
 
+import org.jppf.serialization.JPPFSerialization;
 import org.jppf.ssl.SSLHelper;
 import org.slf4j.*;
 
@@ -86,6 +87,7 @@ public final class JPPFConfiguration
   {
     SSLHelper.resetConfig();
     loadProperties();
+    JPPFSerialization.Factory.reset();
   }
 
   /**

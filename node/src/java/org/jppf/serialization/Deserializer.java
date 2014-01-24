@@ -21,9 +21,8 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingDeque;
 
-import org.jppf.utils.*;
+import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -159,12 +158,14 @@ class Deserializer
   void readFields(final ClassDescriptor cd, final Object obj) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
-    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
+    LinkedList<ClassDescriptor> stack = new LinkedList<>();
     while (tmpDesc != null)
     {
       stack.addFirst(tmpDesc);
       tmpDesc = caches.getDescriptor(tmpDesc.superClassHandle);
     }
+    int size = stack.size();
+    int count = 0;
     for (ClassDescriptor desc: stack)
     {
       if (desc.hasWriteObject)
@@ -172,10 +173,17 @@ class Deserializer
         Method m = SerializationReflectionHelper.getReadObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking readObject() for class=" + desc + " on object " + obj); } catch(Exception e) {}
-        m.invoke(obj, in);
+        try {
+          tmpDesc = currentClassDescriptor;
+          currentClassDescriptor = desc;
+          m.invoke(obj, in);
+        } finally {
+          currentClassDescriptor = tmpDesc;
+        }
       }
       else if (desc.externalizable) ((Externalizable) obj).readExternal(in);
       else readDeclaredFields(desc, obj);
+      count++;
     }
   }
 

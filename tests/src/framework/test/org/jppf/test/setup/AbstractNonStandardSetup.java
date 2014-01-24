@@ -40,8 +40,7 @@ import test.org.jppf.test.setup.common.*;
  * Base test setup for a grid with multiple servers in p2p.
  * @author Laurent Cohen
  */
-public class AbstractNonStandardSetup
-{
+public class AbstractNonStandardSetup {
   /**
    * The jppf client to use.
    */
@@ -57,8 +56,7 @@ public class AbstractNonStandardSetup
    * @return a {@link Configuration} instance.
    * @throws Exception if a process could not be started.
    */
-  protected static Configuration createConfig(final String prefix) throws Exception
-  {
+  protected static Configuration createConfig(final String prefix) throws Exception {
     SSLHelper.resetConfig();
     testConfig = new Configuration();
     List<String> commonCP = new ArrayList<>();
@@ -90,14 +88,10 @@ public class AbstractNonStandardSetup
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass
-  public static void cleanup() throws Exception
-  {
-    try
-    {
+  public static void cleanup() throws Exception {
+    try {
       BaseSetup.cleanup();
-    }
-    finally
-    {
+    } finally {
       //JPPFConfiguration.reset();
     }
   }
@@ -139,29 +133,25 @@ public class AbstractNonStandardSetup
    * Test multiple non-blocking jobs can be sent asynchronously.
    * @throws Exception if any error occurs
    */
-  protected void testMultipleJobs() throws Exception
-  {
+  protected void testMultipleJobs() throws Exception {
     int tasksPerNode = 5;
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     int nbJobs = 3;
-    try
-    {
+    try {
       if (client != null) client.close();
       JPPFConfiguration.getProperties().setInt("jppf.pool.size", 2);
-      client = BaseSetup.createClient(null, false);
+      client = BaseSetup.createClient(null, false, testConfig);
       String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       List<JPPFJob> jobs = new ArrayList<>(nbJobs);
       for (int i=1; i<=nbJobs; i++) jobs.add(BaseTestHelper.createJob(name + '-' + i, false, false, nbTasks, LifeCycleTask.class, 10L));
       for (JPPFJob job: jobs) client.submitJob(job);
-      for (JPPFJob job: jobs)
-      {
+      for (JPPFJob job: jobs) {
         JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
         List<Task<?>> results = collector.awaitResults();
         assertNotNull(results);
         assertEquals(nbTasks, results.size());
-        for (Task<?> task: results)
-        {
+        for (Task<?> task: results) {
           assertTrue("task = " + task, task instanceof LifeCycleTask);
           Throwable t = task.getThrowable();
           assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
@@ -169,9 +159,7 @@ public class AbstractNonStandardSetup
           assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
         }
       }
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
       client = BaseSetup.createClient(null, true, testConfig);
     }
@@ -181,8 +169,7 @@ public class AbstractNonStandardSetup
    * Test the cancellation of a job.
    * @throws Exception if any error occurs
    */
-  protected void testCancelJob() throws Exception
-  {
+  protected void testCancelJob() throws Exception {
     int tasksPerNode = 5;
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
@@ -195,8 +182,7 @@ public class AbstractNonStandardSetup
     assertNotNull(results);
     assertEquals("results size should be " + nbTasks + " but is " + results.size(), nbTasks, results.size());
     int count = 0;
-    for (Task<?> task: results)
-    {
+    for (Task<?> task: results) {
       Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
       if (task.getResult() == null) count++;
@@ -208,8 +194,7 @@ public class AbstractNonStandardSetup
    * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
    * @throws Exception if any error occurs
    */
-  protected void testNotSerializableExceptionFromNode() throws Exception
-  {
+  protected void testNotSerializableExceptionFromNode() throws Exception {
     int tasksPerNode = 5;
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
@@ -217,8 +202,7 @@ public class AbstractNonStandardSetup
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results)
-    {
+    for (Task<?> task: results) {
       assertTrue(task instanceof NotSerializableTask);
       assertNull(task.getResult());
       assertNotNull(task.getThrowable());
@@ -227,30 +211,45 @@ public class AbstractNonStandardSetup
   }
 
   /**
+   * Test that a task that is not Serializable still works with a custom serialization scheme (DefaultJPPFSerialization or KryoSerialization).
+   * @throws Exception if any error occurs
+   */
+  protected void testNotSerializableWorkingInNode() throws Exception {
+    int tasksPerNode = 5;
+    int nbNodes = BaseSetup.nbNodes();
+    int nbTasks = tasksPerNode * nbNodes;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotSerializableTask.class, false);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(nbTasks, results.size());
+    for (Task<?> task: results) {
+      assertTrue(task instanceof NotSerializableTask);
+      assertNotNull(task.getResult());
+      assertEquals("success", task.getResult());
+      assertNull(task.getThrowable());
+    }
+  }
+
+  /**
    * Test that we can obtain the state of a node via the node forwarder mbean.
    * @throws Exception if nay error occurs.
    */
-  protected void testForwardingMBean() throws Exception
-  {
+  protected void testForwardingMBean() throws Exception {
     JMXDriverConnectionWrapper driverJmx = BaseSetup.getDriverManagementProxy(client);
     JPPFNodeForwardingMBean nodeForwarder = driverJmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
     boolean ready = false;
     long elapsed = 0L;
     long start = System.currentTimeMillis();
-    while (!ready)
-    {
+    while (!ready) {
       elapsed = System.currentTimeMillis() - start;
       assertTrue((elapsed < 20_000L));
-      try
-      {
+      try {
         Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
         assertNotNull(result);
         assertEquals(BaseSetup.nbNodes(), result.size());
         for (Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
         ready = true;
-      }
-      catch (Exception|AssertionError e)
-      {
+      } catch (Exception|AssertionError e) {
         Thread.sleep(100L);
       }
     }

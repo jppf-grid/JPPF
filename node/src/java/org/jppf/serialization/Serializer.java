@@ -21,7 +21,6 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import org.slf4j.*;
 
@@ -177,7 +176,7 @@ class Serializer
   void writeFields(final Object obj, final ClassDescriptor cd) throws Exception
   {
     ClassDescriptor tmpDesc = cd;
-    Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
+    LinkedList<ClassDescriptor> stack = new LinkedList<>();
     while (tmpDesc != null)
     {
       stack.addFirst(tmpDesc);
@@ -190,7 +189,13 @@ class Serializer
         Method m = SerializationReflectionHelper.getWriteObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
-        m.invoke(obj, out);
+        try {
+          tmpDesc = currentClassDescriptor;
+          currentClassDescriptor = desc;
+          m.invoke(obj, out);
+        } finally {
+          currentClassDescriptor = tmpDesc;
+        }
       }
       else if (desc.externalizable) ((Externalizable) obj).writeExternal(out);
       else writeDeclaredFields(obj, desc);
