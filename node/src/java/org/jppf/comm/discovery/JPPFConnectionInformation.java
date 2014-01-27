@@ -20,6 +20,7 @@ package org.jppf.comm.discovery;
 
 import java.io.*;
 
+import org.jppf.node.connection.*;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -195,5 +196,17 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
       oos.close();
     }
     return baos.toByteArray();
+  }
+
+  /**
+   * Convert this object into a {@link DriverConnectionInfo}.
+   * @param ssl whether ssl is enabled or not.
+   * @param recovery whether discovery is enabled or not.
+   * @return a {@link DriverConnectionInfo} instance.
+   */
+  public DriverConnectionInfo toDriverConnectionInfo(final boolean ssl, final boolean recovery) {
+    int port = ssl ? sslServerPorts[0] : serverPorts[0];
+    boolean recoveryEnabled = recovery && (recoveryPort >= 0);
+    return new JPPFDriverConnectionInfo(ssl, host, port, recoveryEnabled ? recoveryPort: -1);
   }
 }

@@ -24,18 +24,18 @@ import java.io.IOException;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
+import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ * Concrete implementation of {@link ClassLoaderConnection} for connecting to a remote driver.
  * @author Laurent Cohen
  * @exclude
  */
-public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<SocketWrapper>
-{
+public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<SocketWrapper> {
   /**
    * Logger for this class.
    */
@@ -56,37 +56,40 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
    * The object used to serialize and deserialize resources.
    */
   private ObjectSerializer serializer = null;
+  /**
+   * The server conenction information.
+   */
+  private final DriverConnectionInfo connectionInfo;
+
+  /**
+   * Initialize with the required information to connect to the server.
+   * @param connectionInfo he server conenction information.
+   */
+  public RemoteClassLoaderConnection(final DriverConnectionInfo connectionInfo) {
+    this.connectionInfo = connectionInfo;
+  }
 
   @Override
-  public void init() throws Exception
-  {
+  public void init() throws Exception {
     lock.lock();
-    try
-    {
-      if (initializing.compareAndSet(false, true))
-      {
-        try
-        {
+    try {
+      if (initializing.compareAndSet(false, true)) {
+        try {
           if (debugEnabled) log.debug("initializing connection");
           initChannel();
           System.out.println("Attempting connection to the class server at " + channel.getHost() + ':' + channel.getPort());
           socketInitializer.initializeSocket(channel);
-          if (!socketInitializer.isSuccessful())
-          {
+          if (!socketInitializer.isSuccessful()) {
             channel = null;
             throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
           }
           performHandshake();
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
-        }
-        finally
-        {
+        } finally {
           initializing.set(false);
         }
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -94,14 +97,10 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   /**
    * Create the ssl connection over an established plain connection.
    */
-  private void createSSLConnection()
-  {
-    try
-    {
+  private void createSSLConnection() {
+    try {
       channel = SSLHelper.createSSLClientConnection(channel);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -113,23 +112,17 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
    * <li>calling {@link #performCommonHandshake(ResourceRequestRunner) performCommonHandshake()} on the superclass</li>
    * </ol>
    */
-  private void performHandshake()
-  {
-    try
-    {
+  private void performHandshake() {
+    try {
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL);
       channel.flush();
       if (sslEnabled) createSSLConnection();
       ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
       performCommonHandshake(rr);
-    }
-    catch (IOException e)
-    {
+    } catch (IOException e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -137,46 +130,33 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
   /**
    * Initialize the underlying socket connection.
    */
-  private void initChannel()
-  {
+  private void initChannel() {
     if (debugEnabled) log.debug("initializing socket connection");
-    TypedProperties props = JPPFConfiguration.getProperties();
-    sslEnabled = props.getBoolean("jppf.ssl.enabled", false);
-    String host = props.getString("jppf.server.host", "localhost");
-    int port = props.getInt("jppf.server.port", sslEnabled ? 11443 : 11111);
+    sslEnabled = connectionInfo.isSecure();
     channel = new BootstrapSocketClient();
-    channel.setHost(host);
-    channel.setPort(port);
+    channel.setHost(connectionInfo.getHost());
+    channel.setPort(connectionInfo.getPort());
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     lock.lock();
-    try
-    {
-      if (requestHandler != null)
-      {
+    try {
+      if (requestHandler != null) {
         ResourceRequestRunner requestRunner = requestHandler.close();
         requestHandler = null;
         sendCloseChannelCommand(requestRunner);
       }
       if (socketInitializer != null) socketInitializer.close();
-      if (channel != null)
-      {
-        try
-        {
+      if (channel != null) {
+        try {
           channel.close();
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
         channel = null;
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -187,8 +167,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
    * @throws Exception if any error occurs.
    * @exclude
    */
-  private ObjectSerializer getSerializer() throws Exception
-  {
+  private ObjectSerializer getSerializer() throws Exception {
     if (serializer == null) serializer = new BootstrapObjectSerializer();
     return serializer;
   }

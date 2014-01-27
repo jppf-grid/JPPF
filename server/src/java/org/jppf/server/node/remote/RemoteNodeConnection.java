@@ -21,6 +21,7 @@ package org.jppf.server.node.remote;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
 import org.jppf.node.*;
+import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -46,20 +47,22 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
    */
   private SocketInitializer socketInitializer = new SocketInitializerImpl();
   /**
-   * Determines whether SSL is enabled for this connection.
-   */
-  private boolean sslEnabled = false;
-  /**
    * 
    */
   private final ObjectSerializer serializer;
+  /**
+   * Server connection information.
+   */
+  private final DriverConnectionInfo connectionInfo;
 
   /**
    * Initialize this connection with the specified serializer.
+   * @param connectionInfo the server connection information.
    * @param serializer the serializer to use.
    */
-  public RemoteNodeConnection(final ObjectSerializer serializer)
+  public RemoteNodeConnection(final DriverConnectionInfo connectionInfo, final ObjectSerializer serializer)
   {
+    this.connectionInfo = connectionInfo;
     this.serializer = serializer;
   }
 
@@ -71,15 +74,12 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
     {
       if (debugEnabled) log.debug("Initializing socket");
       TypedProperties config = JPPFConfiguration.getProperties();
-      sslEnabled = config.getBoolean("jppf.ssl.enabled", false);
-      String host = config.getString("jppf.server.host", "localhost");
-      int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
       channel = new SocketClient();
-      channel.setHost(host);
-      channel.setPort(port);
+      channel.setHost(connectionInfo.getHost());
+      channel.setPort(connectionInfo.getPort());
       channel.setSerializer(serializer);
       if (debugEnabled) log.debug("end socket client initialization");
-      if (!NodeRunner.isOffline()) System.out.println("Attempting connection to the node server at " + host + ':' + port);
+      if (!NodeRunner.isOffline()) System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
       socketInitializer.initializeSocket(channel);
       if (!socketInitializer.isSuccessful())
       {
@@ -89,7 +89,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
       if (!NodeRunner.isOffline()) System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
-      if (sslEnabled) channel = SSLHelper.createSSLClientConnection(channel);
+      if (connectionInfo.isSecure()) channel = SSLHelper.createSSLClientConnection(channel);
       if (debugEnabled) log.debug("end socket initializer");
     }
     finally

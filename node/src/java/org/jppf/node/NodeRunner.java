@@ -17,16 +17,17 @@
  */
 package org.jppf.node;
 
+import java.lang.reflect.Constructor;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.*;
 import org.jppf.classloader.*;
-import org.jppf.comm.discovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JMXServer;
-import org.jppf.node.initialization.*;
+import org.jppf.node.connection.*;
+import org.jppf.node.initialization.InitializationHook;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
@@ -37,8 +38,7 @@ import org.slf4j.*;
  * Bootstrap class for launching a JPPF node. The node class is dynamically loaded from a remote server.
  * @author Laurent Cohen
  */
-public class NodeRunner
-{
+public class NodeRunner {
   // this static block must be the first thing executed when this class is loaded
   static {
     JPPFInitializer.init();
@@ -92,6 +92,10 @@ public class NodeRunner
    * Determines whether this node is currently shutting down.
    */
   private static boolean shuttingDown = false;
+  /**
+   * The current server connection information.
+   */
+  private static DriverConnectionInfo currentConnectionInfo = null;
 
   /**
    * Run a node as a standalone application.
@@ -100,13 +104,12 @@ public class NodeRunner
   public static void main(final String...args) {
     node = null;
     try {
-      // initialize the jmx logger
-      new JmxMessageNotifier();
+      new JmxMessageNotifier(); // initialize the jmx logger
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       VersionUtils.logVersionInformation("node", uuid);
-      initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
       if (debugEnabled) log.debug("launching the JPPF node");
       HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
+      HookFactory.registerConfigSingleHook("jppf.server.connection.strategy", DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(), null);
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
@@ -120,6 +123,8 @@ public class NodeRunner
     try {
       while (true) {
         try {
+          if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
+          else restoreInitialConfig();
           node = createNode();
           node.run();
         } catch(JPPFNodeReconnectionNotification e) {
@@ -161,47 +166,22 @@ public class NodeRunner
    * @throws Exception if the node failed to run or couldn't connect to the server.
    * @exclude
    */
-  public static NodeInternal createNode() throws Exception
-  {
+  public static NodeInternal createNode() throws Exception {
     HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true)) discoverDriver();
+    currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo)[0];
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";
-    Class clazz = getJPPFClassLoader().loadClass(className);
-    NodeInternal node = (NodeInternal) clazz.newInstance();
+    Class<?> clazz = getJPPFClassLoader().loadClass(className);
+    Constructor c = clazz.getConstructor(DriverConnectionInfo.class);
+    NodeInternal node = (NodeInternal) c.newInstance(currentConnectionInfo);
     if (debugEnabled) log.debug("Created new node instance: " + node);
     return node;
   }
 
   /**
-   * Automatically discover the server connection information using a datagram multicast.
-   * Upon receiving the connection information, the JPPF configuration is modified to take into
-   * account the discovered information. If no information could be received, the node relies on
-   * the static information in the configuration file.
-   */
-  private static void discoverDriver() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    JPPFMulticastReceiver receiver = new JPPFMulticastReceiver(new IPFilter(config));
-    JPPFConnectionInformation info = receiver.receive();
-    receiver.setStopped(true);
-    if (info == null) {
-      if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
-      restoreInitialConfig();
-      return;
-    }
-    if (debugEnabled) log.debug("Discovered driver: " + info);
-    boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
-    config.setProperty("jppf.server.host", info.host);
-    config.setProperty("jppf.server.port", String.valueOf(ssl ? info.sslServerPorts[0] : info.serverPorts[0]));
-    if (info.managementHost != null) config.setProperty("jppf.management.host", info.managementHost);
-    if (info.recoveryPort >= 0) config.setProperty("jppf.recovery.server.port", "" + info.recoveryPort);
-    else config.setProperty("jppf.recovery.enabled", "false");
-  }
-
-  /**
    * Restore the configuration from the sna^shot taken at startup time.
    */
-  private static void restoreInitialConfig() {
+  public static void restoreInitialConfig() {
     TypedProperties config = JPPFConfiguration.getProperties();
     for (Map.Entry<Object, Object> entry: initialConfig.entrySet()) {
       if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
@@ -259,7 +239,7 @@ public class NodeRunner
         PrivilegedAction<JPPFClassLoader> pa = new PrivilegedAction<JPPFClassLoader>() {
           @Override
           public JPPFClassLoader run() {
-            return new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(), NodeRunner.class.getClassLoader());
+            return new JPPFClassLoader(offline ? null : new RemoteClassLoaderConnection(currentConnectionInfo), NodeRunner.class.getClassLoader());
           }
         };
         classLoader = AccessController.doPrivileged(pa);
@@ -369,10 +349,6 @@ public class NodeRunner
       this.node = node;
     }
 
-    /**
-     * Execute this task.
-     * @see java.lang.Runnable#run()
-     */
     @Override
     public void run() {
       AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -420,8 +396,7 @@ public class NodeRunner
    * Get the offline node flag.
    * @return <code>true</code> if the node is offline, <code>false</code> otherwise.
    */
-  public static boolean isOffline()
-  {
+  public static boolean isOffline() {
     return offline;
   }
 }

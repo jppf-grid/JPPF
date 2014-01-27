@@ -181,7 +181,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
     if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid, connectionInfo);
+        recoveryConnection = new ClientConnection(uuid, connectionInfo.toDriverConnectionInfo(secure, true));
         recoveryConnection.addClientConnectionListener(this);
         new Thread(recoveryConnection, getName() + "reaper client connection").start();
       }

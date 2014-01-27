@@ -21,8 +21,8 @@ package org.jppf.comm.recovery;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
+import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -55,7 +55,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * 
    */
-  private JPPFConnectionInformation connectionInfo = null;
+  private DriverConnectionInfo connectionInfo = null;
 
   /**
    * Initialize this client connection with the specified uuid.
@@ -71,7 +71,7 @@ public class ClientConnection extends AbstractRecoveryConnection
    * @param uuid the JPPF node or client uuid.
    * @param connectionInfo information on connecting to the remote peer.
    */
-  public ClientConnection(final String uuid, final JPPFConnectionInformation connectionInfo)
+  public ClientConnection(final String uuid, final DriverConnectionInfo connectionInfo)
   {
     this.uuid = uuid;
     this.connectionInfo = connectionInfo;
@@ -123,8 +123,8 @@ public class ClientConnection extends AbstractRecoveryConnection
       host = config.getString("jppf.server.host", "localhost");
       port = config.getInt("jppf.recovery.server.port", 22222);
     } else {
-      host = connectionInfo.host;
-      port = connectionInfo.recoveryPort;
+      host = connectionInfo.getHost();
+      port = connectionInfo.getRecoveryPort();
     }
     maxRetries = config.getInt("jppf.recovery.max.retries", 2);
     socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 60000);

@@ -29,8 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractNodeConnection<C> implements NodeConnection<C>
-{
+public abstract class AbstractNodeConnection<C> implements NodeConnection<C> {
   /**
    * Logger for this class.
    */
@@ -53,14 +52,12 @@ public abstract class AbstractNodeConnection<C> implements NodeConnection<C>
   protected final AtomicBoolean initializing = new AtomicBoolean(false);
 
   @Override
-  public C getChannel()
-  {
+  public C getChannel() {
     return channel;
   }
 
   @Override
-  public void reset() throws Exception
-  {
+  public void reset() throws Exception {
     close();
     init();
   }

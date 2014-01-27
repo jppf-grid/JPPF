@@ -31,8 +31,7 @@ import org.slf4j.*;
  * to get the driver connection host and ports.
  * @author Laurent Cohen
  */
-public class JPPFMulticastReceiver extends ThreadSynchronization
-{
+public class JPPFMulticastReceiver extends ThreadSynchronization {
   /**
    * Logger for this class.
    */
@@ -85,8 +84,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
   /**
    * Default constructor.
    */
-  public JPPFMulticastReceiver()
-  {
+  public JPPFMulticastReceiver() {
     this(null);
   }
 
@@ -94,8 +92,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Default constructor.
    * @param ipFilter handles include and exclude IP filters.
    */
-  public JPPFMulticastReceiver(final IPFilter ipFilter)
-  {
+  public JPPFMulticastReceiver(final IPFilter ipFilter) {
     group = config.getString("jppf.discovery.group", "230.0.0.1");
     port = config.getInt("jppf.discovery.port", 11111);
     timeout = config.getInt("jppf.discovery.timeout", 5000);
@@ -108,8 +105,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * @param port the multicast port to listen to.
    * @param timeout the timeout for UDP socket read operations.
    */
-  public JPPFMulticastReceiver(final String group, final int port, final int timeout)
-  {
+  public JPPFMulticastReceiver(final String group, final int port, final int timeout) {
     this.group = group;
     this.port = port;
     this.timeout = timeout;
@@ -120,20 +116,16 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * @return a <code>DriverConnectionInformation</code> instance, or null
    * if no broadcast information could be retrieved.
    */
-  public synchronized JPPFConnectionInformation receive()
-  {
+  public synchronized JPPFConnectionInformation receive() {
     JPPFConnectionInformation info = null;
-    try
-    {
-      if (groupInetAddress == null)
-      {
+    try {
+      if (groupInetAddress == null) {
         groupInetAddress = InetAddress.getByName(group);
         //List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
         List<InetAddress> addresses = NetworkUtils.getNonLocalIPAddresses();
         if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
         int len = addresses.size();
-        if (debugEnabled)
-        {
+        if (debugEnabled) {
           StringBuilder sb = new StringBuilder();
           sb.append("Found ").append(len).append(" address");
           if (len > 1) sb.append("es");
@@ -148,9 +140,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
       if (!hasConnectionInfo()) wait(timeout);
       else wait(50);
       info = getMostRecent();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (!(e instanceof InterruptedException)) log.error(e.getMessage(), e);
     }
     if (traceEnabled) log.trace("Auto-discovery of the driver connection information: " + info);
@@ -162,14 +152,10 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * If the connection information already exists, nothing is added.
    * @param info the connection information to add.
    */
-  private synchronized void addConnectionInfo(final JPPFConnectionInformation info)
-  {
-    try
-    {
+  private synchronized void addConnectionInfo(final JPPFConnectionInformation info) {
+    try {
       if ((ipFilter != null) && !ipFilter.isAddressAccepted(InetAddress.getByName(info.host))) return;
-    }
-    catch (UnknownHostException e)
-    {
+    } catch (UnknownHostException e) {
       return;
     }
     infoList.remove(info);
@@ -182,8 +168,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Get the most recently received connection information.
    * @return a <code>JPPFConnectionInformation</code> instance, or null if none was received.
    */
-  private synchronized JPPFConnectionInformation getMostRecent()
-  {
+  private synchronized JPPFConnectionInformation getMostRecent() {
     if (infoList.isEmpty()) return null;
     return infoList.getFirst();
   }
@@ -192,8 +177,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Determine whether at least one connection information object has been retrieved.
    * @return true if at least one connection information object has been retrieved, false otherwise.
    */
-  private synchronized boolean hasConnectionInfo()
-  {
+  private synchronized boolean hasConnectionInfo() {
     return !infoList.isEmpty();
   }
 
@@ -201,8 +185,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Instances of this class attempt to receive broadcast connection information
    * from a multicast socket bound to a specified address.
    */
-  public class Receiver extends Thread
-  {
+  public class Receiver extends Thread {
     /**
      * Address the multicast socket is bound to.
      */
@@ -221,38 +204,27 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
      * @param addr address the multicast socket is bound to.
      * @param port port the multicast socket listens to.
      */
-    public Receiver(final InetAddress addr, final int port)
-    {
+    public Receiver(final InetAddress addr, final int port) {
       super("Receiver@" + addr.getHostAddress() + ':' + port);
       this.addr = addr;
       this.port = port;
     }
 
-    /**
-     * 
-     * @see java.lang.Runnable#run()
-     */
     @Override
-    public void run()
-    {
+    public void run() {
       MulticastSocket socket = null;
-      try
-      {
+      try {
         int t = 1000;
-        //socket = new MulticastSocket(new InetSocketAddress(addr, port));
         socket = new MulticastSocket(port);
         socket.setInterface(addr);
         socket.joinGroup(getGroupInetAddress());
         socket.setSoTimeout(timeout);
         byte[] buf = new byte[512];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
-        while (!isStopped())
-        {
+        while (!isStopped()) {
           long start = System.currentTimeMillis();
-          while (System.currentTimeMillis() - start < t)
-          {
-            try
-            {
+          while (System.currentTimeMillis() - start < t) {
+            try {
               socket.receive(packet);
               if (isStopped()) break;
               ByteBuffer buffer = ByteBuffer.wrap(buf);
@@ -264,18 +236,14 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
               if (host == null) host = addr.getHostAddress();
               info.managementHost = host;
               addConnectionInfo(info);
-            }
-            catch(SocketTimeoutException e)
-            {
-              //if (debugEnabled) log.debug(e.getMessage(), e);
+            } catch(SocketTimeoutException e) {
+              if (traceEnabled) log.trace(e.getMessage(), e);
             }
             if (System.currentTimeMillis() - start < t) Thread.sleep(50L);
           }
         }
         socket.leaveGroup(getGroupInetAddress());
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         if (!(e instanceof InterruptedException)) log.error(e.getMessage(), e);
       }
       if (socket != null) socket.close();
@@ -285,8 +253,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
      * Get the connection information retrieved by the multicast socket.
      * @return a <code>JPPFConnectionInformation</code> instance or null if no information could be retrieved.
      */
-    public JPPFConnectionInformation getInfo()
-    {
+    public JPPFConnectionInformation getInfo() {
       return info;
     }
   }
@@ -295,8 +262,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Get the multicast group to join.
    * @return an {@link InetAddress} instance.
    */
-  private synchronized InetAddress getGroupInetAddress()
-  {
+  private synchronized InetAddress getGroupInetAddress() {
     return groupInetAddress;
   }
 
@@ -304,16 +270,13 @@ public class JPPFMulticastReceiver extends ThreadSynchronization
    * Set the multicast group to join.
    * @param groupInetAddress an {@link InetAddress} instance.
    */
-  private synchronized void setGroupInetAddress(final InetAddress groupInetAddress)
-  {
+  private synchronized void setGroupInetAddress(final InetAddress groupInetAddress) {
     this.groupInetAddress = groupInetAddress;
   }
 
   @Override
-  public synchronized void setStopped(final boolean stopped)
-  {
-    if (stopped && (receivers != null))
-    {
+  public synchronized void setStopped(final boolean stopped) {
+    if (stopped && (receivers != null)) {
       for (Receiver r: receivers) r.interrupt();
     }
     super.setStopped(stopped);

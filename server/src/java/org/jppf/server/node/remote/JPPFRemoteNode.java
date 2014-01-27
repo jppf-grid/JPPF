@@ -18,6 +18,7 @@
 package org.jppf.server.node.remote;
 
 import org.jppf.comm.recovery.*;
+import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.server.node.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -44,44 +45,40 @@ public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
    * Determines whether SSL is enabled.
    */
   private boolean sslEnabled = false;
+  /**
+   * Server connection information.
+   */
+  private final DriverConnectionInfo connectionInfo;
 
   /**
    * Default constructor.
+   * @param connectionInfo the server connection information.
    */
-  public JPPFRemoteNode()
+  public JPPFRemoteNode(final DriverConnectionInfo connectionInfo)
   {
     super();
+    this.connectionInfo = connectionInfo;
     classLoaderManager = new RemoteClassLoaderManager(this);
   }
 
-  /**
-   * Initialize this node's resources.
-   * @throws Exception if an error is raised during initialization.
-   * @see org.jppf.server.node.JPPFNode#initDataChannel()
-   */
   @Override
   public void initDataChannel() throws Exception
   {
     TypedProperties config = JPPFConfiguration.getProperties();
-    (nodeConnection = new RemoteNodeConnection(serializer)).init();
+    (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
     if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
     if (config.getBoolean("jppf.recovery.enabled", false))
     {
       if (recoveryConnection == null)
       {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid);
+        recoveryConnection = new ClientConnection(uuid, connectionInfo);
         recoveryConnection.addClientConnectionListener(this);
         new Thread(recoveryConnection, "reaper client connection").start();
       }
     }
   }
 
-  /**
-   * Initialize this node's data channel.
-   * @throws Exception if an error is raised during initialization.
-   * @see org.jppf.server.node.JPPFNode#closeDataChannel()
-   */
   @Override
   public void closeDataChannel() throws Exception
   {

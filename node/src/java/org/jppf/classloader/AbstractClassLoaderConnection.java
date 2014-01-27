@@ -28,13 +28,12 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Abstract impelementation of {@link ClassLoaderConnection}.
+ * Abstract implementation of {@link ClassLoaderConnection}.
  * @param <C> the type of communication channel used by this connection.
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConnection<C> implements ClassLoaderConnection<C>
-{
+public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConnection<C> implements ClassLoaderConnection<C> {
   /**
    * Logger for this class.
    */
@@ -56,10 +55,8 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
    * </ol>
    * @param requestRunner the object wrapping the driver connection and handling the class loading requests.
    */
-  protected void performCommonHandshake(final ResourceRequestRunner requestRunner)
-  {
-    try
-    {
+  protected void performCommonHandshake(final ResourceRequestRunner requestRunner) {
+    try {
       if (debugEnabled) log.debug("sending node initiation message");
       JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.NODE_INITIATION);
@@ -67,22 +64,17 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       requestRunner.setRequest(request);
       requestRunner.run();
       Throwable t = requestRunner.getThrowable();
-      if (t != null)
-      {
+      if (t != null) {
         if (t instanceof Exception) throw (Exception) t;
         else throw new RuntimeException(t);
       }
       if (debugEnabled) log.debug("received node initiation response");
       requestRunner.reset();
       requestHandler = new ClassLoaderRequestHandler(requestRunner);
-    }
-    catch (IOException e)
-    {
+    } catch (IOException e) {
       log.debug(e.getMessage(), e);
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
@@ -91,10 +83,8 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
    * Send a command to close the channel to the server.
    * @param requestRunner the object wrapping the driver connection and handling the class loading requests.
    */
-  protected void sendCloseChannelCommand(final ResourceRequestRunner requestRunner)
-  {
-    try
-    {
+  protected void sendCloseChannelCommand(final ResourceRequestRunner requestRunner) {
+    try {
       if (debugEnabled) log.debug("sending node initiation message");
       JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.CLOSE_CHANNEL);
@@ -102,16 +92,13 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       requestRunner.setRequest(request);
       requestRunner.run();
       Throwable t = requestRunner.getThrowable();
-      if (t != null)
-      {
+      if (t != null) {
         if (t instanceof Exception) throw (Exception) t;
         else throw new RuntimeException(t);
       }
       if (debugEnabled) log.debug("received node initiation response");
       requestRunner.reset();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       String format = "error sending close channel command : {}";
       if (debugEnabled) log.debug(format, ExceptionUtils.getStackTrace(e));
       else log.warn(format, ExceptionUtils.getMessage(e));
@@ -119,8 +106,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
   }
 
   @Override
-  public JPPFResourceWrapper loadResource(final Map<ResourceIdentifier, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception
-  {
+  public JPPFResourceWrapper loadResource(final Map<ResourceIdentifier, Object> map, final boolean dynamic, final String requestUuid, final List<String> uuidPath) throws Exception {
     JPPFResourceWrapper resource = new JPPFResourceWrapper();
     resource.setState(JPPFResourceWrapper.State.NODE_REQUEST);
     resource.setDynamic(dynamic);
@@ -133,8 +119,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     Future<JPPFResourceWrapper> f = requestHandler.addRequest(resource);
     resource = f.get();
     Throwable t = ((ResourceFuture) f).getThrowable();
-    if (t != null)
-    {
+    if (t != null) {
       if (t instanceof Exception) throw (Exception) t;
       else if (t instanceof Error) throw (Error) t;
       else throw new JPPFException(t);
@@ -146,25 +131,18 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
    * Get the object which sends the class laoding requests and receives the responses.
    * @return a {@link ClassLoaderRequestHandler} instance.
    */
-  public ClassLoaderRequestHandler getRequestHandler()
-  {
+  public ClassLoaderRequestHandler getRequestHandler() {
     return requestHandler;
   }
 
   @Override
-  public void reset() throws Exception
-  {
+  public void reset() throws Exception {
     lock.lock();
-    try
-    {
+    try {
       init();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
