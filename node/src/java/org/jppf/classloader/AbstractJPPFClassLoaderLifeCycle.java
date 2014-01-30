@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.caching.*;
 import org.jppf.classloader.resource.ResourceCache;
+import org.jppf.node.connection.ConnectionReason;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
@@ -116,7 +117,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       try {
         connection.init();
       } catch (Exception e) {
-        throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
+        throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
       }
     } else {
       System.out.println("This node is 'offline', no class loader connection is established");
@@ -146,7 +147,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
         if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
       } catch(IOException e) {
         if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
-        throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);
+        throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e, ConnectionReason.CLASSLOADER_PROCESSING_ERROR);
       } catch(ClassNotFoundException e) {
         throw e;
       } catch(Exception e) {

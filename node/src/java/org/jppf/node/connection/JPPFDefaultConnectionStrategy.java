@@ -32,13 +32,9 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFDefaultConnectionStrategy.class);
-  /**
-   * Determines whether debug-level logging is enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
 
   @Override
-  public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo previousConnectionInfo) {
+  public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
     return JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true) ? discoverDriver() : connectionFromManualConfiguration();
   }
 
@@ -55,10 +51,10 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
     JPPFConnectionInformation info = receiver.receive();
     receiver.setStopped(true);
     if (info == null) {
-      if (debugEnabled) log.debug("Could not auto-discover the driver connection information");
+      if (log.isDebugEnabled()) log.debug("Could not auto-discover the driver connection information");
       return connectionFromManualConfiguration();
     }
-    if (debugEnabled) log.debug("Discovered driver: " + info);
+    if (log.isDebugEnabled()) log.debug("Discovered driver: " + info);
     boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     boolean recovery = config.getBoolean("jppf.recovery.enabled", false) && (info.recoveryPort >= 0);
     return info.toDriverConnectionInfo(ssl, recovery);

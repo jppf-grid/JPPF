@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 import org.jppf.*;
 import org.jppf.node.*;
+import org.jppf.node.connection.ConnectionReason;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -73,7 +74,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
       requestHandler = new ClassLoaderRequestHandler(requestRunner);
     } catch (IOException e) {
       log.debug(e.getMessage(), e);
-      throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
+      throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -141,7 +142,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
     try {
       init();
     } catch (Exception e) {
-      throw new JPPFNodeReconnectionNotification("Could not reconnect to the server", e);
+      throw new JPPFNodeReconnectionNotification("Could not reconnect to the server after connection reset", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } finally {
       lock.unlock();
     }

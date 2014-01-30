@@ -19,7 +19,7 @@
 package org.jppf.node.connection;
 
 /**
- * This interface defines which parmeters should be used to connect to the driver.
+ * This interface defines which parameters should be used to connect to the driver.
  * <p>It gives the ability to create new sets of parameters whenever a connection attempt was unsuccessful,
  * therefore providing the nodes with a failover strategy when the connection to a driver cannot be established.
  * @author Laurent Cohen
@@ -27,9 +27,10 @@ package org.jppf.node.connection;
 public interface DriverConnectionStrategy {
   /**
    * Get a new connection information, eventually based on the one that was previously used.
-   * @param previousConnectionInfo the {@link DriverConnectionInfo} that was previously used to connecto the driver,
+   * @param currentInfo the {@link DriverConnectionInfo} that was previously used to connecto the driver,
    * or {@code null} if the node is connecting for the first time. 
+   * @param context provides information on why a new connection is requested, so as to help deciding which connection information to provide.
    * @return a new {@link DriverConnectionInfo} object that the node will use to connect to the driver.
    */
-  DriverConnectionInfo nextConnectionInfo(DriverConnectionInfo previousConnectionInfo);
+  DriverConnectionInfo nextConnectionInfo(DriverConnectionInfo currentInfo, ConnectionContext context);
 }

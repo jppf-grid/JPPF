@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.comm.socket.*;
-import org.jppf.node.connection.DriverConnectionInfo;
+import org.jppf.node.connection.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -81,7 +81,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
           socketInitializer.initializeSocket(channel);
           if (!socketInitializer.isSuccessful()) {
             channel = null;
-            throw new JPPFNodeReconnectionNotification("Could not reconnect to the server");
+            throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           }
           performHandshake();
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
@@ -121,7 +121,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
       ResourceRequestRunner rr = new RemoteResourceRequest(getSerializer(), channel);
       performCommonHandshake(rr);
     } catch (IOException e) {
-      throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e);
+      throw new JPPFNodeReconnectionNotification("Could not reconnect to the driver", e, ConnectionReason.CLASSLOADER_INIT_ERROR);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

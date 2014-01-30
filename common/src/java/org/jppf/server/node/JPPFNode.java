@@ -28,6 +28,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
+import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.*;
@@ -136,8 +137,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       } catch(IOException e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
-        reset(true);
-        throw new JPPFNodeReconnectionNotification(e);
+        if (!isStopped()) {
+          reset(true);
+          throw new JPPFNodeReconnectionNotification("I/O exception occurred during node processing", e, ConnectionReason.JOB_CHANNEL_PROCESSING_ERROR);
+        }
       } catch(Exception e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();

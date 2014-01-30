@@ -121,14 +121,16 @@ public class NodeRunner {
       System.exit(1);
     }
     try {
+      ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
       while (true) {
         try {
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
-          node = createNode();
+          node = createNode(context);
           node.run();
         } catch(JPPFNodeReconnectionNotification e) {
           if (debugEnabled) log.debug("received reconnection notification : {}", ExceptionUtils.getStackTrace(e));
+          context = new ConnectionContext(e.getMessage(), e.getCause(), e.getReason());
           if (classLoader != null) classLoader.close();
           classLoader = null;
           if (node != null) node.stopNode();
@@ -162,13 +164,14 @@ public class NodeRunner {
 
   /**
    * Start the node.
+   * @param connectionContext provides context information on the new connection request to the driver.
    * @return the node that was started, as a <code>MonitoredNode</code> instance.
    * @throws Exception if the node failed to run or couldn't connect to the server.
    * @exclude
    */
-  public static NodeInternal createNode() throws Exception {
+  public static NodeInternal createNode(final ConnectionContext connectionContext) throws Exception {
     HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
-    currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo)[0];
+    currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     Class<?> clazz = getJPPFClassLoader().loadClass(className);
@@ -200,9 +203,6 @@ public class NodeRunner {
       String s = props.getString("jppf.policy.file");
       if (s != null) {
         if (debugEnabled) log.debug("setting security");
-        //java.rmi.server.hostname
-        String rmiHostName = props.getString("jppf.management.host", "localhost");
-        System.setProperty("java.rmi.server.hostname", rmiHostName);
         Policy.setPolicy(new JPPFPolicy(getJPPFClassLoader()));
         System.setSecurityManager(new SecurityManager());
         securityManagerSet = true;
@@ -211,7 +211,7 @@ public class NodeRunner {
   }
 
   /**
-   * Set the security manager with the permission granted in the policy file.
+   * Set the security manager with the permissions granted in the policy file.
    */
   private static void unsetSecurity() {
     if (securityManagerSet) {

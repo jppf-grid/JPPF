@@ -17,38 +17,35 @@
  */
 package org.jppf;
 
+import org.jppf.node.connection.ConnectionReason;
+
 /**
  * This error is thrown to notify a node that its code is obsolete and it should dynamically reload itself.
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFNodeReconnectionNotification extends JPPFError
-{
+public class JPPFNodeReconnectionNotification extends JPPFError {
   /**
-   * Initialize this notification with a specified message.
-   * @param message a text message indicating the reason for this notification.
+   * An enum value indicating the reson for the reconnection.
    */
-  public JPPFNodeReconnectionNotification(final String message)
-  {
-    super(message);
-  }
+  private final ConnectionReason reason;
 
   /**
    * Initialize this error with a specified message and cause exception.
    * @param message the message for this error.
    * @param cause the cause exception.
+   * @param reason an enum value indicating the reson for the reconnection.
    */
-  public JPPFNodeReconnectionNotification(final String message, final Throwable cause)
-  {
+  public JPPFNodeReconnectionNotification(final String message, final Throwable cause, final ConnectionReason reason) {
     super(message, cause);
+    this.reason = reason;
   }
 
   /**
-   * Initialize this error with a specified cause exception.
-   * @param cause the cause exception.
+   * Get the reason for the reconnection.
+   * @return an enum value indicating the reson for the reconnection.
    */
-  public JPPFNodeReconnectionNotification(final Throwable cause)
-  {
-    super(cause);
+  public ConnectionReason getReason() {
+    return reason;
   }
 }

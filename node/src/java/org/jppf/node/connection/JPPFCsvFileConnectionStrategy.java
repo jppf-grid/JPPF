@@ -45,15 +45,11 @@ import org.slf4j.*;
  * with the driver selection mechanism rotating one tick each time {@code nextConnectionInfo()} is invoked.
  *  * @author Laurent Cohen
  */
-public class JPPFFileConnectionStrategy implements DriverConnectionStrategy {
+public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFFileConnectionStrategy.class);
-  /**
-   * Determines whether debug-level logging is enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static Logger log = LoggerFactory.getLogger(JPPFCsvFileConnectionStrategy.class);
   /**
    * The queue in which {@code DriverConnectionInfo} objects are stored.
    */
@@ -66,7 +62,36 @@ public class JPPFFileConnectionStrategy implements DriverConnectionStrategy {
   /**
    * Find and read the CSV file.
    */
-  public JPPFFileConnectionStrategy() {
+  public JPPFCsvFileConnectionStrategy() {
+    readCsvFile();
+    fallbackStrategy = queue.isEmpty() ? new JPPFDefaultConnectionStrategy() : null;
+    if (log.isDebugEnabled()) {
+      if (queue.isEmpty()) log.debug("no valid driver definition found, falling back to default strategy");
+      else {
+        StringBuilder sb = new StringBuilder("driver definitions:");
+        for (DriverConnectionInfo info: queue) sb.append('\n').append(info);
+        log.debug(sb.toString());
+      }
+    }
+  }
+
+  @Override
+  public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
+    if (fallbackStrategy != null) return fallbackStrategy.nextConnectionInfo(currentInfo, context);
+    if (log.isDebugEnabled()) log.debug("new connection request with prevInfo={} and context={}", currentInfo, context);
+    if ((currentInfo != null) && (context.getReason() == ConnectionReason.MANAGEMENT_REQUEST)) {
+      return currentInfo;
+    }
+    DriverConnectionInfo info = queue.poll();
+    queue.offer(info);
+    return info;
+  }
+
+  /**
+   * Parse the CSV file specified in the configuration and convert each line
+   * into a {@link DriverConnectionInfo} which is then added to the queue.
+   */
+  private void readCsvFile() {
     try {
       String path = JPPFConfiguration.getProperties().getString("jppf.server.connection.strategy.file");
       if ((path != null) && !(path = path.trim()).isEmpty()) {
@@ -82,27 +107,10 @@ public class JPPFFileConnectionStrategy implements DriverConnectionStrategy {
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
-    fallbackStrategy = queue.isEmpty() ? new JPPFDefaultConnectionStrategy() : null;
-    if (debugEnabled) {
-      if (queue.isEmpty()) log.debug("no valid driver definition found, falling back to default strategy");
-      else {
-        StringBuilder sb = new StringBuilder("driver definitions:");
-        for (DriverConnectionInfo info: queue) sb.append('\n').append(info);
-        log.debug(sb.toString());
-      }
-    }
-  }
-
-  @Override
-  public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo previousConnectionInfo) {
-    if (fallbackStrategy != null) return fallbackStrategy.nextConnectionInfo(previousConnectionInfo);
-    DriverConnectionInfo info = queue.poll();
-    queue.offer(info);
-    return info;
   }
 
   /**
-   * Parse a CSV line tyo generate a driver connection info.
+   * Parse a CSV line to generate a driver connection info.
    * @param csv the csv line to parse.
    * @return a {@link DriverConnectionInfo} instance, or {@code null} if the CSV is not valid or a comment.
    */

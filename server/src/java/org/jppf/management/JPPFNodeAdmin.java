@@ -23,6 +23,7 @@ import java.util.Map;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
 import org.jppf.node.*;
+import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -201,24 +202,14 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Trigger a disconnection/reconnection of this node.
    * @throws Exception if any error occurs.
    */
-  private void triggerReconnect() throws Exception
-  {
+  private void triggerReconnect() throws Exception {
     node.setExitAction(new Runnable() {
       @Override
       public void run() {
-        throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes");
+        throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes", null, ConnectionReason.MANAGEMENT_REQUEST);
       }
     });
-    try
-    {
-      // we close the socket connection in case the node is waiting for data from the server.
-      node.getNodeConnection().close();
-    }
-    catch(Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-    node.setStopped(true);
+    node.stopNode();
   }
 
   /**
