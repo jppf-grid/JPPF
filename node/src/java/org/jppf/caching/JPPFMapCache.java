@@ -34,6 +34,13 @@ public interface JPPFMapCache<K, V>
   void put(K key, V value);
 
   /**
+   * Determine whether an entry with the specified key is in the cache.
+   * @param key the key to look up.
+   * @return {@code true} if the key is in the cache, {@code false} otherwise.
+   */
+  boolean has(K key);
+
+  /**
    * Get an element in the cache.
    * @param key the element's key.
    * @return the value of the element, or <code>null</code> if the element is not in the cache.

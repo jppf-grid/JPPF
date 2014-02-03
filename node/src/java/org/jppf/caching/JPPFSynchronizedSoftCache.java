@@ -28,46 +28,44 @@ import org.jppf.utils.collections.SoftReferenceValuesMap;
  * @param <V> the type of values.
  * @author Laurent Cohen
  */
-public class JPPFSynchronizedSoftCache<K, V> implements JPPFMapCache<K, V>
-{
+public class JPPFSynchronizedSoftCache<K, V> implements JPPFMapCache<K, V> {
   /**
    * The backing map for this cache.
    */
   private final Map<K, V> map = new SoftReferenceValuesMap<>();
 
   @Override
-  public void put(final K key, final V value)
-  {
-    synchronized(map)
-    {
+  public void put(final K key, final V value) {
+    synchronized(map) {
       map.put(key, value);
     }
   }
 
   @Override
-  public V get(final K key)
-  {
-    synchronized(map)
-    {
+  public V get(final K key) {
+    synchronized(map) {
       return map.get(key);
     }
   }
 
   @Override
-  public V remove(final K key)
-  {
-    synchronized(map)
-    {
+  public V remove(final K key) {
+    synchronized(map) {
       return map.remove(key);
     }
   }
 
   @Override
-  public void clear()
-  {
-    synchronized(map)
-    {
+  public void clear() {
+    synchronized(map) {
       map.clear();
+    }
+  }
+
+  @Override
+  public boolean has(final K key) {
+    synchronized(map) {
+      return map.containsKey(key);
     }
   }
 }

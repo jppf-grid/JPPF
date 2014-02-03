@@ -25,6 +25,7 @@ import java.util.*;
 
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -32,8 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ResourceCache
-{
+public class ResourceCache {
   /**
    * Logger for this class.
    */
@@ -57,7 +57,7 @@ public class ResourceCache
   /**
    * Map of resource names to temporary file names to which their content is stored.
    */
-  private Map<String, List<Location>> cache = new Hashtable<>();
+  private CollectionMap<String, Location> cache = new VectorHashtable<>();
   /**
    * List of temp folders used by this cache.
    */
@@ -70,18 +70,25 @@ public class ResourceCache
    * Reference ot the shutdown hook created by this cache.
    */
   private ShutdownHook shutdownHook = null;
+  /**
+   * Whether this cache is enabled.
+   */
+  private final boolean enabled;
 
   /**
    * Default initializations.
+   * @param enabled whether this cache is enabled.
    */
-  public ResourceCache()
-  {
-    shutdownHook = new ShutdownHook(tempFolders, uuid);
-    // to avoid class loader leak !!!
-    shutdownHook.setContextClassLoader(null);
-    Runtime.getRuntime().addShutdownHook(shutdownHook);
+  public ResourceCache(final boolean enabled) {
+    this.enabled = enabled;
+    if (this.enabled) {
+      shutdownHook = new ShutdownHook(tempFolders, uuid);
+      // to avoid class loader leak !!!
+      shutdownHook.setContextClassLoader(null);
+      Runtime.getRuntime().addShutdownHook(shutdownHook);
+      initTempFolders();
+    }
     cacheMap.put(uuid, this);
-    initTempFolders();
   }
 
   /**
@@ -89,9 +96,9 @@ public class ResourceCache
    * @param name the name of the resource to lookup.
    * @return a list of file paths, or null if the resource is not found in the cache.
    */
-  public synchronized List<Location> getResourcesLocations(final String name)
-  {
-    return cache.get(name);
+  @SuppressWarnings("unchecked")
+  public synchronized List<Location> getResourcesLocations(final String name) {
+    return enabled ? (List<Location>) cache.getValues(name) : null;
   }
 
   /**
@@ -99,11 +106,10 @@ public class ResourceCache
    * @param name the name of the resource to lookup.
    * @return a file path, or null if the resource is not found in the cache.
    */
-  private synchronized Location getResourceLocation(final String name)
-  {
-    List<Location> locations = cache.get(name);
+  private synchronized Location getResourceLocation(final String name) {
+    Collection<Location> locations = cache.getValues(name);
     if ((locations == null) || locations.isEmpty()) return null;
-    return locations.get(0);
+    return locations.iterator().next();
   }
 
   /**
@@ -111,9 +117,8 @@ public class ResourceCache
    * @param name the name of the resource to lookup.
    * @param locations a list of file paths.
    */
-  private synchronized void setResourcesLocations(final String name, final List<Location> locations)
-  {
-    cache.put(name, locations);
+  private synchronized void setResourcesLocations(final String name, final List<Location> locations) {
+    cache.addValues(name, locations);
   }
 
   /**
@@ -121,14 +126,13 @@ public class ResourceCache
    * @param name the name of the resource to lookup.
    * @return a list of {@link URL}s, or null if the resource is not found in the cache.
    */
-  public synchronized List<URL> getResourcesURLs(final String name)
-  {
-    List<Location> resources = getResourcesLocations(name);
+  public synchronized List<URL> getResourcesURLs(final String name) {
+    if (!enabled) return null;
+    Collection<Location> resources = getResourcesLocations(name);
     if (resources == null) return null;
     List<URL> urls = new ArrayList<>(resources.size());
     int count = 0;
-    for (Location res: resources)
-    {
+    for (Location res : resources) {
       URL url = getResourceURL(name, res, count++);
       if (url != null) urls.add(url);
     }
@@ -140,9 +144,8 @@ public class ResourceCache
    * @param name the name of the resource to find.
    * @return resource location expressed as a URL.
    */
-  public URL getResourceURL(final String name)
-  {
-    return getResourceURL(name,  getResourceLocation(name), 0);
+  public URL getResourceURL(final String name) {
+    return enabled ? getResourceURL(name, getResourceLocation(name), 0) : null;
   }
 
   /**
@@ -152,27 +155,19 @@ public class ResourceCache
    * @param id the position of the url to fetch.
    * @return resource location expressed as a URL.
    */
-  private synchronized URL getResourceURL(final String name, final Location res, final int id)
-  {
-    if (res instanceof FileLocation)
-    {
+  private synchronized URL getResourceURL(final String name, final Location res, final int id) {
+    if (res instanceof FileLocation) {
       String path = ((FileLocation) res).getPath();
       if (path == null) return null;
       return FileUtils.getURLFromFilePath(path);
-    }
-    else if (res instanceof MemoryLocation)
-    {
+    } else if (res instanceof MemoryLocation) {
       String s = "jppfres://" + uuid + '/' + name + "?id=" + id;
-      try
-      {
+      try {
         return new URL(s);
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         return null;
       }
-    }
-    else if (res instanceof URLLocation) return ((URLLocation) res).getPath();
+    } else if (res instanceof URLLocation) return ((URLLocation) res).getPath();
     return null;
   }
 
@@ -181,18 +176,14 @@ public class ResourceCache
    * @param name the name of the resource to register.
    * @param definitions a list of byte array definitions.
    */
-  public synchronized void registerResources(final String name, final List<byte[]> definitions)
-  {
+  public synchronized void registerResources(final String name, final List<byte[]> definitions) {
+    if (!enabled) return;
     if (isAbsolutePath(name)) return;
     List<Location> locations = new LinkedList<>();
-    for (byte[] def: definitions)
-    {
-      try
-      {
+    for (byte[] def : definitions) {
+      try {
         locations.add(saveToTempFile(name, def));
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         String s = "Exception caught while saving resource named '" + name + "' : ";
         if (debugEnabled) log.debug(s, e);
         else log.warn(s + ExceptionUtils.getMessage(e));
@@ -206,15 +197,8 @@ public class ResourceCache
    * @param name the name of the resource to register.
    * @param location a Location object holding or pointing to the resource defintion.
    */
-  public synchronized void registerResource(final String name, final Location location)
-  {
-    List<Location> currentLocations = cache.get(name);
-    if (currentLocations == null)
-    {
-      currentLocations = new LinkedList<>();
-      cache.put(name, currentLocations);
-    }
-    currentLocations.add(location);
+  public synchronized void registerResource(final String name, final Location location) {
+    if (enabled) cache.putValue(name, location);
   }
 
   /**
@@ -224,8 +208,7 @@ public class ResourceCache
    * @return the path to the created file.
    * @throws Exception if any I/O error occurs.
    */
-  private Location saveToTempFile(final String name, final byte[] definition) throws Exception
-  {
+  private Location saveToTempFile(final String name, final byte[] definition) throws Exception {
     SaveResourceAction action = new SaveResourceAction(tempFolders, name, definition);
     Location file = AccessController.doPrivileged(action);
     if (action.getException() != null) throw action.getException();
@@ -236,18 +219,14 @@ public class ResourceCache
   /**
    * Initializations of the temps folders.
    */
-  private void initTempFolders()
-  {
-    try
-    {
+  private void initTempFolders() {
+    try {
       String base = JPPFConfiguration.getProperties().getString("jppf.resource.cache.dir", null);
-      if (base == null)
-      {
+      if (base == null) {
         base = System.getProperty("java.io.tmpdir");
         if (base == null) base = System.getProperty("user.home");
         if (base == null) base = System.getProperty("user.dir");
-        if (base != null)
-        {
+        if (base != null) {
           if (!base.endsWith(File.separator)) base += File.separator;
           base += ROOT_NAME;
         }
@@ -259,9 +238,7 @@ public class ResourceCache
       FileUtils.mkdirs(baseDir);
       tempFolders.add(s);
       if (traceEnabled) log.trace("added temp folder " + s);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -271,25 +248,23 @@ public class ResourceCache
    * @param path the path to verify.
    * @return true if the path is absolute, false otherwise
    */
-  private boolean isAbsolutePath(final String path)
-  {
+  private boolean isAbsolutePath(final String path) {
     if (path.startsWith("/") || path.startsWith("\\")) return true;
     if (path.length() < 3) return false;
     char c = path.charAt(0);
-    if ((((c >= 'A') && (c <='Z')) || ((c >= 'a') && (c <= 'z'))) && (path.charAt(1) == ':')) return true;
+    if ((((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))) && (path.charAt(1) == ':')) return true;
     return false;
   }
 
   /**
-   * A runnable invoked whenever this resource cache is garbage collected or the JVM shuts down,
-   * so as to cleanup all cached resources on the file system.
+   * A runnable invoked whenever this resource cache is garbage collected or the JVM shuts down, so as to cleanup all cached resources on the file system.
    */
-  private final static class ShutdownHook extends Thread
-  {
+  private final static class ShutdownHook extends Thread {
     /**
      * The list of folders to delete.
      */
     private final List<String> tempResourceFolders;
+
     /**
      * The uuid of the cache to clear.
      */
@@ -300,22 +275,17 @@ public class ResourceCache
      * @param tempFolders the list of folders to delete.
      * @param uuid the unique id of the cahce to remove.
      */
-    private ShutdownHook(final List<String> tempFolders, final String uuid)
-    {
+    private ShutdownHook(final List<String> tempFolders, final String uuid) {
       this.tempResourceFolders = tempFolders;
       this.uuid = uuid;
     }
 
     @Override
-    public void run()
-    {
-      //System.out.println("cleaning up resource cache [uuid=" + uuid + "]");
+    public void run() {
       ResourceCache rc = cacheMap.remove(uuid);
       // deletion of the temp folders may take a while, so we make the resource cache garbage-collectible asap
-      if (rc != null)
-      {
+      if (rc != null) {
         rc.cache.clear();
-        //rc.tempFolders = null;
         rc = null;
       }
       while (!tempResourceFolders.isEmpty()) FileUtils.deletePath(new File(tempResourceFolders.remove(0)));
@@ -325,23 +295,19 @@ public class ResourceCache
   /**
    * Close this resource cache and clean all resources it uses.
    */
-  public synchronized void close()
-  {
-    //cacheMap.remove(uuid);
-    try
-    {
-      if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
+  public synchronized void close() {
+    if (enabled) {
+      try {
+        if (shutdownHook != null) Runtime.getRuntime().removeShutdownHook(shutdownHook);
+      } catch (Exception e) {
+        if (debugEnabled) log.debug("could not deregister shutdown hook", e);
+      }
+      new ShutdownHook(tempFolders, uuid).run();
     }
-    catch(Exception e)
-    {
-      if (debugEnabled) log.debug("could not deregister shutdown hook", e);
-    }
-    new ShutdownHook(tempFolders, uuid).run();
   }
 
   @Override
-  protected void finalize() throws Throwable
-  {
+  protected void finalize() throws Throwable {
     close();
     super.finalize();
   }
@@ -350,8 +316,7 @@ public class ResourceCache
    * Get the unique identifier for this resource cache.
    * @return the uuid as a string.
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
@@ -360,8 +325,15 @@ public class ResourceCache
    * @param uuid the uuid of the cache to find.
    * @return a <code>ResourceCache</code> instance.
    */
-  public static ResourceCache getCacheInstance(final String uuid)
-  {
+  public static ResourceCache getCacheInstance(final String uuid) {
     return cacheMap.get(uuid);
+  }
+
+  /**
+   * Determine whether this cache is enabled.
+   * @return {@code true} if this cache is enabled, {@code false} otherwise.
+   */
+  public boolean isEnabled() {
+    return enabled;
   }
 }

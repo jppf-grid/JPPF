@@ -71,7 +71,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * The cache handling resources temporarily stored to file.
    * @exclude
    */
-  protected ResourceCache resourceCache = new ResourceCache();
+  protected ResourceCache resourceCache = createResourceCache();
   /**
    * The cache handling resources that were not found by this class loader.
    * @exclude
@@ -206,8 +206,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    * @exclude
    */
   @SuppressWarnings("unchecked")
-  protected URL[] findMultipleResources(final String...names)
-  {
+  protected URL[] findMultipleResources(final String...names) {
     if ((names == null) || (names.length <= 0)) return StringUtils.ZERO_URL;
     URL[] results = new URL[names.length];
     boolean[] alreadyNotFound = new boolean[names.length];
@@ -220,7 +219,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
       for (int i=0; i<names.length; i++) {
         if (alreadyNotFound[i]) continue;
         String name = names[i];
-        List<URL> locationsList = resourceCache.getResourcesURLs(name);
+        List<URL> locationsList = resourceCache.isEnabled() ? resourceCache.getResourcesURLs(name) : null;
         if ((locationsList != null) && !locationsList.isEmpty()) {
           results[i] = locationsList.get(0);
           if (debugEnabled) log.debug(build(this, " resource ", name, " found in local cache as ", results[i]));
@@ -335,7 +334,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   public void resetResourceCache() {
     if (resourceCache != null) {
       resourceCache.close();
-      resourceCache = new ResourceCache();
+      resourceCache = createResourceCache();
     }
   }
 
@@ -365,5 +364,14 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   public ResourceCache getResourceCache() {
     return resourceCache;
+  }
+
+  /**
+   * Create a new resource cache instance.
+   * @return a {@code ResourceCache} object.
+   */
+  private ResourceCache createResourceCache() {
+    boolean enabled = JPPFConfiguration.getProperties().getBoolean("jppf.resource.cache.enabled", true);
+    return new ResourceCache(enabled);
   }
 }

@@ -50,6 +50,13 @@ public interface CollectionMap<K, V> extends Iterable<V>, Serializable
    * @param key the key to which to add the values.
    * @param values the values to add to the key.
    */
+  void addValues(final K key, final Collection<V> values);
+
+  /**
+   * Add the specified values to the specified key. This is a bulk operation.
+   * @param key the key to which to add the values.
+   * @param values the values to add to the key.
+   */
   void addValues(final K key, final V... values);
 
   /**

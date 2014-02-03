@@ -221,8 +221,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   public URL findResource(final String name) {
     URL url = null;
     if (notFoundCache.has(name)) return null;
-    url = resourceCache.getResourceURL(name);
-    if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
+    if (resourceCache.isEnabled()) {
+      url = resourceCache.getResourceURL(name);
+      if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
+    }
     if (url == null) {
       url = super.findResource(name);
       if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
@@ -275,7 +277,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (!notFoundCache.has(name)) {
       if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
       try {
-        urlList = resourceCache.getResourcesURLs(name);
+        if (resourceCache.isEnabled()) urlList = resourceCache.getResourcesURLs(name);
         if (urlList == null) urlList = new ArrayList<>();
         if (!isOffline()) {
           List<URL> tempList = findRemoteResources(name);
@@ -315,7 +317,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       if (resource != null) dataList = (List<byte[]>) resource.getData(ResourceIdentifier.RESOURCE_LIST);
       boolean found = (dataList != null) && !dataList.isEmpty();
       if (debugEnabled) log.debug(build(this, "resource [", name, "] ", found ? "" : "not ", "found remotely"));
-      if (found) {
+      if (found && resourceCache.isEnabled()) {
         resourceCache.registerResources(name, dataList);
         urlList = resourceCache.getResourcesURLs(name);
       }
@@ -496,7 +498,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   @Override
   public URL getResource(final String name) {
-    List<URL> urls = resourceCache.getResourcesURLs(name);
+    List<URL> urls = resourceCache.isEnabled() ? resourceCache.getResourcesURLs(name) : null;
     if (urls == null) return super.getResource(name);
     else if (urls.isEmpty()) return null;
     return urls.get(0);
@@ -504,7 +506,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   @Override
   public Enumeration<URL> getResources(final String name) throws IOException {
-    List<URL> urls = resourceCache.getResourcesURLs(name);
+    List<URL> urls = resourceCache.isEnabled() ? resourceCache.getResourcesURLs(name) : null;
     if (urls == null) return super.getResources(name);
     return new IteratorEnumeration<>(urls.iterator());
   }

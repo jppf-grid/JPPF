@@ -63,6 +63,13 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   }
 
   @Override
+  public void addValues(final K key, final Collection<V> values)
+  {
+    Collection<V> coll = createOrGetCollection(key);
+    coll.addAll(values);
+  }
+
+  @Override
   public void addValues(final K key, final V...values)
   {
     Collection<V> coll = createOrGetCollection(key);
