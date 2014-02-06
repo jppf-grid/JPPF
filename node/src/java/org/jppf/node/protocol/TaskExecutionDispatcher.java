@@ -55,6 +55,7 @@ public class TaskExecutionDispatcher {
    */
   public TaskExecutionDispatcher(final ClassLoader loader) {
     this.loader = loader;
+    loadListeners();
   }
 
   /**
@@ -142,8 +143,7 @@ public class TaskExecutionDispatcher {
   /**
    * Register all listeners discovered via SPI.
    */
-  private void loadListeners()
-  {
+  private void loadListeners() {
     Iterator<TaskExecutionListener> it = ServiceFinder.lookupProviders(TaskExecutionListener.class, loader);
     while (it.hasNext()) addTaskExecutionListener(it.next());
   }

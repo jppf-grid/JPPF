@@ -199,7 +199,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * Test that a job is only sent to the server according to its execution policy.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout=15000)
   public void testJobInNodeExecutionPolicyClient() throws Exception
   {
     try
@@ -230,7 +230,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * Test that a job is only executed locally in the client according to its execution policy.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout=15000)
   public void testJobLocalExecutionPolicyClient() throws Exception
   {
     try

@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
@@ -39,8 +40,7 @@ import test.org.jppf.test.setup.common.*;
  * as specified in the job SLA.
  * @author Laurent Cohen
  */
-public class TestJPPFTask extends Setup1D1N1C
-{
+public class TestJPPFTask extends Setup1D1N1C {
   /**
    * Count of the number of jobs created.
    */
@@ -71,8 +71,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testTaskTimeout() throws Exception
-  {
+  public void testTaskTimeout() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     List<Task<?>> tasks = job.getJobTasks();
@@ -91,8 +90,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  public void testTaskTimeoutStart() throws Exception
-  {
+  public void testTaskTimeoutStart() throws Exception {
     int nbTasks = 2;
     long timeout = 200L;
     JPPFJob job = new JPPFJob(ReflectionUtils.getCurrentMethodName());
@@ -114,8 +112,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testTaskExpirationDate() throws Exception
-  {
+  public void testTaskExpirationDate() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, TIME_LONG);
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
@@ -136,8 +133,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testComputeCallable() throws Exception
-  {
+  public void testComputeCallable() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
         MyComputeCallableTask.class, MyComputeCallable.class.getName());
@@ -155,8 +151,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testComputeCallableThrowingException() throws Exception
-  {
+  public void testComputeCallableThrowingException() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
         MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
@@ -175,10 +170,8 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testComputeCallableInClient() throws Exception
-  {
-    try
-    {
+  public void testComputeCallableInClient() throws Exception {
+    try {
       configure();
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
@@ -191,9 +184,7 @@ public class TestJPPFTask extends Setup1D1N1C
       if (task.getThrowable() != null) throw new Exception(task.getThrowable());
       assertNotNull(task.getResult());
       assertEquals("test successful", task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -203,8 +194,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testIsInNodeTrue() throws Exception
-  {
+  public void testIsInNodeTrue() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
     List<Task<?>> results = client.submitJob(job);
@@ -220,10 +210,8 @@ public class TestJPPFTask extends Setup1D1N1C
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testIsInNodeFalse() throws Exception
-  {
-    try
-    {
+  public void testIsInNodeFalse() throws Exception {
+    try {
       configure();
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class);
@@ -233,18 +221,33 @@ public class TestJPPFTask extends Setup1D1N1C
       MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
       assertNotNull(task.getResult());
       assertFalse((Boolean) task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
 
   /**
+   * Test that notifications sent by a task are received by a locally registered listener.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskLocalNotifications() throws Exception {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask.class);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    NotifyingTask task = (NotifyingTask) results.get(0);
+    assertTrue(task.getResult() instanceof List);
+    List list = (List) task.getResult();
+    assertEquals(3, list.size());
+    for (int i=0; i<3; i++) assertEquals("task notification " + (i+1), list.get(i));
+  }
+
+  /**
    * A simple Task which calls its <code>compute()</code> method.
    */
-  public static class MyComputeCallableTask extends AbstractTask<Object>
-  {
+  public static class MyComputeCallableTask extends AbstractTask<Object> {
     /**
      * The class name for the callable to invoke.
      */
@@ -253,8 +256,7 @@ public class TestJPPFTask extends Setup1D1N1C
     /**
      * Iitialize this task.
      */
-    public MyComputeCallableTask()
-    {
+    public MyComputeCallableTask() {
       this.callableClassName = null;
     }
 
@@ -262,36 +264,27 @@ public class TestJPPFTask extends Setup1D1N1C
      * Iitialize this task.
      * @param callableClassName the class name for the callable to invoke.
      */
-    public MyComputeCallableTask(final String callableClassName)
-    {
+    public MyComputeCallableTask(final String callableClassName) {
       this.callableClassName = callableClassName;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void run()
-    {
-      try
-      {
-
+    public void run() {
+      try {
         System.out.println("this task's class loader = " + getClass().getClassLoader());
-        if (callableClassName != null)
-        {
+        if (callableClassName != null) {
           Class<?> clazz = Class.forName(callableClassName);
           JPPFCallable<String> callable = (JPPFCallable<String>) clazz.newInstance();
           String s = compute(callable);
           System.out.println("result of MyCallable.call() = " + s);
           setResult(s);
-        }
-        else
-        {
+        } else {
           boolean b = isInNode();
           System.out.println("isInNode() = " + b);
           setResult(b);
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         setThrowable(e);
       }
     }
@@ -300,11 +293,9 @@ public class TestJPPFTask extends Setup1D1N1C
   /**
    * A simple <code>JPPFCallable</code>.
    */
-  public static class MyComputeCallable implements JPPFCallable<String>
-  {
+  public static class MyComputeCallable implements JPPFCallable<String> {
     @Override
-    public String call() throws Exception
-    {
+    public String call() throws Exception {
       System.out.println("result of MyCallable.call() = " + callableResult);
       return callableResult;
     }
@@ -313,11 +304,9 @@ public class TestJPPFTask extends Setup1D1N1C
   /**
    * A <code>JPPFCallable</code> whixh throws an exception in its <code>call()</code> method..
    */
-  public static class MyExceptionalCallable implements JPPFCallable<String>
-  {
+  public static class MyExceptionalCallable implements JPPFCallable<String> {
     @Override
-    public String call() throws Exception
-    {
+    public String call() throws Exception {
       throw new UnsupportedOperationException("this exception is thrown intentionally");
     }
   }
@@ -326,8 +315,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * Configure the client for a local execution.
    * @throws Exception if any error occurs.
    */
-  private void configure() throws Exception
-  {
+  private void configure() throws Exception {
     client.close();
     // enable only local execution
     TypedProperties config = JPPFConfiguration.getProperties();
@@ -340,8 +328,7 @@ public class TestJPPFTask extends Setup1D1N1C
    * Reset the confiugration.
    * @throws Exception if any error occurs.
    */
-  private void reset() throws Exception
-  {
+  private void reset() throws Exception {
     // reset the client and config
     client.close();
     client = BaseSetup.createClient(null, true);
@@ -350,22 +337,38 @@ public class TestJPPFTask extends Setup1D1N1C
   /**
    * An extension of LifeCycleTask which sets the result before calling {@link super.run()}.
    */
-  public static class MyTask extends LifeCycleTask
-  {
+  public static class MyTask extends LifeCycleTask {
     /**
      * Initialize this task.
      * @param duration the  task duration.
      */
-    public MyTask(final long duration)
-    {
+    public MyTask(final long duration) {
       super(duration);
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
       setResult("result is set");
       super.run();
+    }
+  }
+
+  /**
+   * 
+   */
+  public static class NotifyingTask extends AbstractTask<Object> {
+    @Override
+    public void run() {
+      for (int i=1; i<=3; i++) {
+        final int n = i;
+        Callable<Object> callable = new Callable<Object>() {
+          @Override
+          public Object call() throws Exception {
+            return "task notification " + n;
+          }
+        };
+        fireNotification(callable, false);
+      }
     }
   }
 }
