@@ -55,6 +55,7 @@ public class TaskExecutionDispatcher {
    */
   public TaskExecutionDispatcher(final ClassLoader loader) {
     this.loader = loader;
+    loadListeners();
   }
 
   /**
@@ -114,7 +115,7 @@ public class TaskExecutionDispatcher {
     private final TaskExecutionEvent event;
 
     /**
-     * Initiailize this task with the specified event.
+     * Initialize this task with the specified event.
      * @param event the event to dispatch.
      */
     public NotificationTask(final TaskExecutionEvent event) {
