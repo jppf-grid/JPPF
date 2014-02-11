@@ -30,6 +30,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
   <li><a href="ForkJoinNodeExecutor/Readme.php">A Fibonacci computation demo using fork/join thread pools in the nodes</a></li>
   <li><a href="WordCount/Readme.php">A word count demo on the Wikipedia database</a></li>
   <li><a href="FractalMovieGenerator/Readme.php">Generating AVI movies</a> from images produced by the <a href="Fractals/Readme.php">Mandelbrot fractals sample</a></li>
+  <li><a href="NodeProvisioning/Readme.php">A cloud-like JPPF node provisioning facility</a></li>
 </ul>
 <br>
 

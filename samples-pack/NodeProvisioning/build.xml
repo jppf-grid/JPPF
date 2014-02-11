@@ -1,0 +1,148 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2014 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name='JPPF Node Provisioning' basedir="." default="build">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <property name="shared"     value="${basedir}/../shared"/>
+  <property name="shared.lib" value="${shared}/lib"/>
+  <property name="src"        value="${basedir}/src"/>
+  <property name="classes"    value="${basedir}/classes"/>
+  <property name="node.dist"  value="${basedir}/node-dist"/>
+  <property name="build.sysclasspath" value="last"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="project.classpath">
+    <pathelement location="${config}"/>
+    <pathelement location="${classes}/master"/>
+    <pathelement location="${classes}/slave"/>
+    <pathelement location="${classes}/client"/>
+    <fileset dir="${shared.lib}" includes="*.jar"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                                    Clean                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="clean" description="cleanup">
+    <delete quiet="true" includeemptydirs="true">
+      <fileset dir="${basedir}"              includes="*.zip"/>
+      <fileset dir="${classes}/master"       includes="**/*/**"/>
+      <fileset dir="${classes}/slave"        includes="**/*/**"/>
+      <fileset dir="${classes}/client"       includes="**/*/**"/>
+      <fileset dir="${node.dist}/lib"        includes="*.*"/>
+      <fileset dir="${node.dist}/lib-master" includes="*.*"/>
+      <fileset dir="${node.dist}/lib-slave"  includes="*.*"/>
+    </delete>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                                  Build                                    -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="zip" description="build a redistributable node in zip format"/>
+
+  <!-- ========================================================================= -->
+  <!--                                  Compile                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="compile" depends="clean">
+    <compile.module module="master"/>
+    <compile.module module="slave"/>
+    <compile.module module="client"/>
+  </target>
+
+  <macrodef name="compile.module">
+    <attribute name="module"/>
+    <sequential>
+      <javac srcdir="" destdir="${classes}/@{module}" source="1.7" target="1.7"
+        debug="on" deprecation="off" optimize="on" includes="**/*.java">
+        <classpath refid="project.classpath"/>
+        <compilerarg line="-Xlint:unchecked"/>
+        <src path="${src}/@{module}"/>
+      </javac>
+      <copy todir="${classes}/@{module}">
+        <fileset dir="${src}/@{module}" includes="META-INF/**/*.*"/>
+        <fileset dir="${src}/@{module}" includes="**/*.properties"/>
+      </copy>
+    </sequential>
+  </macrodef>
+
+  <!-- ========================================================================= -->
+  <!--                                  Jar                                      -->
+  <!-- ========================================================================= -->
+
+  <target name="jar" depends="compile">
+    <jar.module module="master"/>
+    <jar.module module="slave"/>
+  </target>
+
+  <macrodef name="jar.module">
+    <attribute name="module"/>
+    <sequential>
+      <jar jarfile="${node.dist}/lib-@{module}/@{module}.jar" index="true">
+        <fileset dir="${classes}/@{module}"/>
+      </jar>
+      <echo message="*** The file ${node.dist}/lib-@{module}/@{module}.jar is now ready to be deployed ***"/>
+    </sequential>
+  </macrodef>
+
+  <!-- ========================================================================= -->
+  <!--                     Build the deployment archive file                     -->
+  <!-- ========================================================================= -->
+
+  <target name="zip" depends="jar">
+    <copy todir="${basedir}/node-dist/lib">
+      <fileset dir="${shared.lib}">
+        <include name="jppf-common-node.jar"/>
+        <include name="jmxremote_optional-1.0_01-ea.jar"/>
+        <include name="log4j-1.2.15.jar"/>
+        <include name="slf4j-api-1.6.1.jar"/>
+        <include name="slf4j-log4j12-1.6.1.jar"/>
+      </fileset>
+    </copy>
+    <property name="zip.file" value="${basedir}/node-dist.zip"/>
+    <delete file="${zip.file}" quiet="true"/>
+    <zip destfile="${zip.file}">
+      <zipfileset dir="${node.dist}" includes="**/*.*" prefix="node-dist"/>
+    </zip>
+    <echo/>
+    <echo message="*** The file ${zip.file} is now ready to be deployed ***"/>
+    <echo/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                     Run the sample application                            -->
+  <!-- ========================================================================= -->
+
+  <target name="run">
+    <echo message="Running the node provisioning demo"/>
+    <java fork="yes" classname="org.jppf.example.provisioning.client.Runner" classpathref="project.classpath">
+      <jvmarg value="-Xmx256m"/>
+      <jvmarg value="-Djppf.config=jppf.properties"/>
+      <jvmarg value="-Dlog4j.configuration=log4j.properties"/>
+    </java>       
+  </target>
+
+</project> 
