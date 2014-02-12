@@ -77,10 +77,9 @@ public class JPPFBundlerFactory
       try
       {
         String s = (config instanceof String) ? (String) config : config.toString();
-        this.config = new TypedProperties();
         try (Reader reader = new StringReader(s))
         {
-          this.config.loadWithIncludes(reader);
+          this.config = TypedProperties.loadAndResolve(reader);
         }
       }
       catch (Exception e)

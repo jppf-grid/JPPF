@@ -110,9 +110,9 @@ public class SlaveNodeLauncher implements Runnable {
    */
   private Process startProcess() throws Exception {
     File configFile = new File(slaveDir, "jppf-node.properties");
-    TypedProperties config = new TypedProperties();
+    TypedProperties config = null;
     try (Reader reader = new BufferedReader(new FileReader(configFile))) {
-      config.loadWithIncludes(reader);
+      config = TypedProperties.loadAndResolve(reader);
     }
     String pathSeparator = System.getProperty("path.separator");
     List<String> jvmOptions = new ArrayList<>();

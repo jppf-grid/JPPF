@@ -167,9 +167,9 @@ public class SlaveNodeManager implements SlaveNodeLauncherListener {
     copyConfigFile(slaveDir, "logging-node.properties");
     // load the JPPF config, apply the overrides, then save it to the slave's folder
     File jppfConfigPath = new File(masterDir, "config/jppf-node.properties");
-    TypedProperties props = new TypedProperties();
+    TypedProperties props = null;
     try (Reader reader = new BufferedReader(new FileReader(jppfConfigPath))) {
-      props.loadWithIncludes(reader);
+      props = TypedProperties.loadAndResolve(reader);
     }
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.remove(MASTER_PROPERTY);

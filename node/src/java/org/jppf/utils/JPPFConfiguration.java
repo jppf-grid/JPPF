@@ -95,10 +95,9 @@ public final class JPPFConfiguration
    */
   private static void loadProperties()
   {
-    props = new TypedProperties();
     try (Reader reader = getReader())
     {
-      if (reader != null) props.loadWithIncludes(reader);
+      props = TypedProperties.loadAndResolve(reader);
     }
     catch(Exception e)
     {

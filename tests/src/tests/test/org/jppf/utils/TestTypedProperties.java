@@ -29,23 +29,19 @@ import org.junit.Test;
  * Unit test for the <code>TypedProperties</code> class.
  * @author Laurent Cohen
  */
-public class TestTypedProperties
-{
+public class TestTypedProperties {
   /**
    * Test including a file within a properties file.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000L)
-  public void testIncludeFile() throws Exception
-  {
+  public void testIncludeFile() throws Exception {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString()))
-    {
-      TypedProperties props = new TypedProperties();
-      props.loadWithIncludes(r);
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "file.include.prop.1", "file.include.prop.1.value");
@@ -58,17 +54,14 @@ public class TestTypedProperties
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000L)
-  public void testIncludeURL() throws Exception
-  {
+  public void testIncludeURL() throws Exception {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
     sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString()))
-    {
-      TypedProperties props = new TypedProperties();
-      props.loadWithIncludes(r);
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "url.include.prop.1", "url.include.prop.1.value");
@@ -81,16 +74,13 @@ public class TestTypedProperties
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000L)
-  public void testIncludeConfigSource() throws Exception
-  {
+  public void testIncludeConfigSource() throws Exception {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include class ").append(TestConfigurationSourceReader.class.getName()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString()))
-    {
-      TypedProperties props = new TypedProperties();
-      props.loadWithIncludes(r);
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -112,10 +102,8 @@ public class TestTypedProperties
     File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
     sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
-    try (Reader r = new StringReader(sb.toString()))
-    {
-      TypedProperties props = new TypedProperties();
-      props.loadWithIncludes(r);
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -133,17 +121,14 @@ public class TestTypedProperties
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000L)
-  public void testNestedIncludes() throws Exception
-  {
+  public void testNestedIncludes() throws Exception {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("prop.2 = prop.2.value\n");
     File file = new File("classes/tests/test/org/jppf/utils/NestedURLInclude.properties");
     sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
-    try (Reader r = new StringReader(sb.toString()))
-    {
-      TypedProperties props = new TypedProperties();
-      props.loadWithIncludes(r);
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -160,19 +145,54 @@ public class TestTypedProperties
    * @throws Exception if any error occurs.
    */
   @Test(timeout=15000L)
-  public void testIncludeCycle() throws Exception
-  {
+  public void testIncludeCycle() throws Exception {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     sb.append("#!include file test/org/jppf/utils/CyclicFileInclude1.properties\n");
     sb.append("prop.2 = prop.2.value\n");
-    try (Reader r = new StringReader(sb.toString()))
-    {
-      TypedProperties props = new TypedProperties();
-      props.loadWithIncludes(r);
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
       String s = props.getProperty("jppf.configuration.error");
       assertNotNull(s);
       assertTrue(s.indexOf(StackOverflowError.class.getName()) >= 0);
+    }
+  }
+
+  /**
+   * Test that property substitutions are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testSubstitutions() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${prop.2}/${prop.3}/${prop.4}\n");
+    sb.append("prop.2 = 2-${prop.3}-${prop.4}\n");
+    sb.append("prop.3 = 3.${prop.4}\n");
+    sb.append("prop.4 = 4\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
+      System.out.println("resolved properties: " + props);
+      checkProperty(props, "prop.4", "4");
+      checkProperty(props, "prop.3", "3.4");
+      checkProperty(props, "prop.2", "2-3.4-4");
+      checkProperty(props, "prop.1", "1/2-3.4-4/3.4/4");
+    }
+  }
+
+  /**
+   * Test that property substitutions whith an unresolvable cycle are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testSubstitutionsWithCycle() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${prop.2}\n");
+    sb.append("prop.2 = 2-${prop.1}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
+      System.out.println("resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/${prop.2}");
+      checkProperty(props, "prop.2", "2-${prop.1}");
     }
   }
 
@@ -183,8 +203,7 @@ public class TestTypedProperties
    * @param value the value of the property to check.
    * @throws Exception if any error occurs.
    */
-  private void checkProperty(final TypedProperties props, final String key, final String value) throws Exception
-  {
+  private void checkProperty(final TypedProperties props, final String key, final String value) throws Exception {
     assertTrue("properties do not contain key=" + key, props.containsKey(key));
     assertEquals(value, props.getProperty(key));
   }
@@ -192,11 +211,9 @@ public class TestTypedProperties
   /**
    * Test implementation of alternate configuration source.
    */
-  public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader
-  {
+  public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader {
     @Override
-    public Reader getPropertyReader() throws IOException
-    {
+    public Reader getPropertyReader() throws IOException {
       StringBuilder sb = new StringBuilder();
       sb.append("reader.include.prop.1 = reader.include.prop.1.value\n");
       sb.append("reader.include.prop.2 = reader.include.prop.2.value\n");
