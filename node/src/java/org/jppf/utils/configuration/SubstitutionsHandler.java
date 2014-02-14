@@ -39,6 +39,10 @@ public class SubstitutionsHandler {
    */
   private static final String SUBST_STOP = "}";
   /**
+   * Prefix for references to environment variables.
+   */
+  private static final String ENV_PREFIX ="env.";
+  /**
    * The properties object in which to resolve substitutions.
    */
   private final TypedProperties props;
@@ -51,7 +55,7 @@ public class SubstitutionsHandler {
    */
   private final CollectionMap<String, String> dependenciesMap = new SetHashMap<>();
   /**
-   * 
+   * Stores the properties whose values are fully resolved.
    */
   private TypedProperties resolved = new TypedProperties();
 
@@ -82,7 +86,12 @@ public class SubstitutionsHandler {
         int idx2 = value.indexOf(SUBST_STOP, pos);
         if (idx2 < 0) break;
         String name = value.substring(pos, idx2);
-        dependenciesMap.putValue(key, name);
+        if (name.startsWith(ENV_PREFIX)) {
+          String envVar = name.substring(ENV_PREFIX.length());
+          String resolvedValue = System.getenv(envVar);
+          if (resolvedValue == null) resolvedValue = "";
+          value = value.replace(SUBST_START + name + SUBST_STOP, resolvedValue);
+        } else dependenciesMap.putValue(key, name);
         pos = idx2 + SUBST_STOP.length() + 1;
       }
       if (dependenciesMap.containsKey(key)) {
