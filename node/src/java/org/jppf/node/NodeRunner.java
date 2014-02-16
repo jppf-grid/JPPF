@@ -106,8 +106,8 @@ public class NodeRunner {
     try {
       new JmxMessageNotifier(); // initialize the jmx logger
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-      VersionUtils.logVersionInformation("node", uuid);
       if (debugEnabled) log.debug("launching the JPPF node");
+      VersionUtils.logVersionInformation("node", uuid);
       HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
       HookFactory.registerConfigSingleHook("jppf.server.connection.strategy", DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(), null);
       if ((args == null) || (args.length <= 0))
@@ -171,6 +171,7 @@ public class NodeRunner {
    */
   public static NodeInternal createNode(final ConnectionContext connectionContext) throws Exception {
     HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
+    SystemUtils.printPidAndUuid("node", uuid);
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     setSecurity();
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";

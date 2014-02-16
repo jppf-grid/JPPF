@@ -394,4 +394,18 @@ public final class SystemUtils
     Thread hook = shutdownHooks.remove(key);
     if (hook != null) Runtime.getRuntime().removeShutdownHook(hook);
   }
+
+  /**
+   * Prints the JPPF process id and uuid to {@code System.out}.
+   * @param component the JPPF component type: driver, node or client.
+   * @param uuid the component uuid.
+   */
+  public static void printPidAndUuid(final String component, final String uuid)
+  {
+    StringBuilder sb = new StringBuilder(component == null ? "<unknown component type>" : component);
+    int pid = getPID();
+    if (pid >= 0) sb = sb.append(" process id: ").append(pid).append(',');
+    sb.append(" uuid: ").append(uuid);
+    System.out.println(sb.toString());
+  }
 }

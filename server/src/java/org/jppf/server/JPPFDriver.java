@@ -28,6 +28,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.NioServer;
+import org.jppf.node.initialization.InitializationHook;
 import org.jppf.process.LauncherListener;
 import org.jppf.queue.JPPFQueue;
 import org.jppf.server.job.JPPFJobManager;
@@ -140,11 +141,14 @@ public class JPPFDriver {
   protected JPPFDriver() {
     instance = this;
     config = JPPFConfiguration.getProperties();
-    uuid = config.getString("jppf.driver.uuid", JPPFUuid.normalUUID());
-    // initialize the jmx logger
-    new JmxMessageNotifier();
+    String s;
+    this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
+    new JmxMessageNotifier(); // initialize the jmx logger
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
+    HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
+    HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(config));
     VersionUtils.logVersionInformation("driver", uuid);
+    SystemUtils.printPidAndUuid("driver", uuid);
     systemInformation = new JPPFSystemInformation(uuid, false, true);
     jobManager = new JPPFJobManager();
     taskQueue = new JPPFPriorityQueue(this, jobManager);
@@ -308,28 +312,6 @@ public class JPPFDriver {
     log.info("Shutting down");
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
-    /*
-    if (acceptorServer != null) {
-      acceptorServer.end();
-      acceptorServer = null;
-    }
-    if (clientClassServer != null) {
-      clientClassServer.end();
-      clientClassServer = null;
-    }
-    if (nodeClassServer != null) {
-      nodeClassServer.end();
-      nodeClassServer = null;
-    }
-    if (nodeNioServer != null) {
-      nodeNioServer.end();
-      nodeNioServer = null;
-    }
-    if (clientNioServer != null) {
-      clientNioServer.end();
-      clientNioServer = null;
-    }
-    */
     initializer.stopJmxServer();
     jobManager.close();
     initializer.stopRecoveryServer();
@@ -349,8 +331,7 @@ public class JPPFDriver {
    * @return a <code>DriverInitializer</code> instance.
    * @exclude
    */
-  public DriverInitializer getInitializer()
-  {
+  public DriverInitializer getInitializer() {
     return initializer;
   }
 
@@ -359,8 +340,7 @@ public class JPPFDriver {
    * @param args not used.
    */
   public static void main(final String...args) {
-    try
-    {
+    try {
       if (debugEnabled) log.debug("starting the JPPF driver");
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The driver should be run with an argument representing a valid TCP port or 'noLauncher'");

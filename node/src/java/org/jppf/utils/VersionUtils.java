@@ -77,13 +77,12 @@ public final class VersionUtils
   /**
    * Log the JPPF version information and process id.
    * @param component the JPPF component type: driver, node or client.
-   * @param uuid the ocmponent uuuid.
+   * @param uuid the component uuid.
    */
   public static void logVersionInformation(final String component, final String uuid)
   {
     String comp = component == null ? "<unknown component type>" : component;
     int pid = SystemUtils.getPID();
-    if (pid > 0) System.out.println(comp + " process id: " + pid);
     String hrule = StringUtils.padRight("", '-', 80);
     log.info(hrule);
     log.info(VersionUtils.VERSION.toString());

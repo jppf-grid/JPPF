@@ -297,6 +297,35 @@ public class TypedProperties extends Properties {
   }
 
   /**
+   * Get the value of the specified property as a {@link File}.
+   * @param key the name of the property to look up.
+   * @return an abstract file path based on the value of the property, or null if the property is not defined.
+   */
+  public File getFile(final String key) {
+    return getFile(key, null);
+  }
+
+  /**
+   * Get the value of the specified property as a {@link File}.
+   * @param key the name of the property to look up.
+   * @param defValue the value to return if the property is not found.
+   * @return an abstract file path based on the value of the property, or the default value if the property is not defined.
+   */
+  public File getFile(final String key, final File defValue) {
+    String s = getProperty(key);
+    return (s == null) || s.trim().isEmpty() ? defValue : new File(s);
+  }
+
+  /**
+   * Set the value of the specified property as a {@link File}.
+   * @param key the name of the property to look up.
+   * @param value the file whose path to set as the property value.
+   */
+  public void setFile(final String key, final File value) {
+    if (value != null) setProperty(key, value.getPath());
+  }
+
+  /**
    * Get the value of a property with the specified name as a set of a properties.
    * @param key the name of the property to look for.
    * Its value is the path to another properties file. Relative paths are evaluated against the current application directory.
