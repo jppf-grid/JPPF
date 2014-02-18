@@ -19,6 +19,7 @@
 package org.jppf.node.initialization;
 
 import java.io.*;
+import java.util.Date;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -56,7 +57,10 @@ public class OutputRedirectHook implements InitializationHook {
       boolean append = config.getBoolean(propBase + ".append", false);
       OutputStream os = new FileOutputStream(outFile, append);
       if (os != null) {
-        System.setOut(new PrintStream(os));
+        PrintStream pos = new PrintStream(os);
+        pos.println("********** " + new Date() + " **********");
+        if (isOut) System.setOut(pos);
+        else System.setErr(pos);
       }
     } catch (Exception e) {
       String message = "error occurred while trying to redirect System." + (isOut ? "out" :  "err") + " : {}";
