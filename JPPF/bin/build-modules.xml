@@ -22,7 +22,7 @@
 	<!--                 Package the runtime components for deployment             -->
 	<!-- ========================================================================= -->
 
-	<target name="runtime" description="" depends="rebuild">
+	<target name="runtime" depends="rebuild">
 		<antcall target="runtime.driver"/>
 		<antcall target="runtime.node"/>
 		<antcall target="runtime.gui"/>

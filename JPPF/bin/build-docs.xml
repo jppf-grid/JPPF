@@ -22,9 +22,9 @@
 	<!--                     Build the web site content                            -->
 	<!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home"/>
+  <target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home" description=""/>
 
-  <target name="doc.home" description="generates the project web site pages">
+  <target name="doc.home">
 		<antcall target="doc.gen">
 			<param name="source" value="${home}/doc-source/home"/>
 			<param name="dest" value="${home}/"/>
@@ -35,7 +35,7 @@
     <copy toDir="${home}/doc/v4/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
 	</target>
 
-	<target name="doc.gen" description="generates the project web site pages">
+	<target name="doc.gen">
 		<java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m"/>
 			<arg value="-s"/>
@@ -48,7 +48,7 @@
 		</java>
 	</target>
 
-	<target name="doc.screenshots" description="generates the project web site pages">
+	<target name="doc.screenshots" >
 		<java fork="yes" classname="org.jppf.utils.ThumbnailGenerator" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
 			<arg value="${home}/screenshots"/>
@@ -59,7 +59,7 @@
 		</java>
 	</target>
 
-	<target name="doc.samples.pack" description="generates the Readme.php for each sample">
+	<target name="doc.samples.pack">
 		<java fork="yes" classname="org.jppf.doc.SamplesPHPReadmeProcessor" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
 			<arg value="${samples-pack}"/>
@@ -72,7 +72,7 @@
 	<!--                 Generate the User Guide redistributable                   -->
 	<!-- ========================================================================= -->
 
-	<target name="user.guide" description="Generate the user guide zip file">
+	<target name="user.guide">
 		<property name="user.guide.file" value="${build}/JPPF-${version.number}-User-Guide.zip"/>
 		<delete file="${user.guide.file}" quiet="true"/>
 		<zip destfile="${user.guide.file}">
@@ -150,7 +150,7 @@
 		<pathelement location="${java.home}/lib/tools.jar"/>
 	</path>
 
-	<target name="compile.doclet" description="compile the @exclude doclet">
+	<target name="compile.doclet">
 		<delete><fileset dir="${basedir}/classes" includes="**/*.*"/></delete>
 		<javac srcdir="" destdir="${basedir}/classes" source="1.7" target="1.7"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">

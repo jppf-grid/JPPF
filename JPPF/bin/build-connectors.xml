@@ -22,7 +22,7 @@
 	<!--             Package the j2ee connector for deployment                     -->
 	<!-- ========================================================================= -->
 
-	<target name="j2ee.connector" description="" depends="j2ee.connector.build">
+	<target name="j2ee.connector" depends="j2ee.connector.build">
     <ant antfile="${basedir}/../jca-client/build.xml" target="build" inheritall="false"/>
 		<property name="j2ee.prefix" value="${app.ver}-j2ee-connector"/>
 		<property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>
@@ -37,7 +37,7 @@
 		</zip>
 	</target>
 
-  <target name="j2ee.connector.build" description="">
+  <target name="j2ee.connector.build">
     <copy todir="${jca-client}" file="${basedir}/CheckStyle_JPPF_config.xml"/>
     <copy todir="${jca-client}/lib">
       <fileset dir="${build}">

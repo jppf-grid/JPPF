@@ -22,7 +22,7 @@
 	<!--                     Build and run the JUnit tests                         -->
 	<!-- ========================================================================= -->
 
-  <target name="tests.build" description="build and run the junit tests">
+  <target name="tests.build">
     <!-- build the standalone unit tests -->
     <ant antfile="${tests}/build.xml" target="build" inheritall="false"/>
     <!-- build the standalone stress tests -->
@@ -32,7 +32,7 @@
     <ant antfile="${jca-client}/test/build.xml" target="build" inheritall="false"/>
   </target>
 
-  <target name="tests.run" description="build and run the junit tests">
+  <target name="tests.run">
     <!-- run the standalone unit tests -->
     <ant antfile="${tests}/build.xml" target="run" inheritall="false"/>
   </target>

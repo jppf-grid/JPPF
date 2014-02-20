@@ -83,11 +83,6 @@
   <path id="javadoc.classpath">
 		<pathelement location="${bin}"/>
     <path refid="project.classpath"/>	
-		<pathelement location="${gs.home}/lib/jini/jsk-lib.jar"/>
-		<pathelement location="${gs.home}/lib/jini/jsk-platform.jar"/>
-		<pathelement location="${gs.home}/lib/openspaces/openspaces.jar"/>
-		<pathelement location="${gs.home}/lib/spring/spring.jar"/>
-		<pathelement location="${gs.home}/lib/JSpaces.jar"/>
   </path>
 
   <path id="run.classpath">
@@ -99,11 +94,11 @@
 	<!--                                    Clean                                  -->
 	<!-- ========================================================================= -->
 
-  <target name="clean" description="">
+  <target name="clean">
 		<delete><fileset dir="${build}" includes="**/*.*"/></delete>
   </target>
 
-  <target name="clean.all" depends="clean.deploy" description="">
+  <target name="clean.all" depends="clean.deploy">
     <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
@@ -113,7 +108,7 @@
     <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
   </target>               
 
-  <target name="clean.deploy" description="clean the deploy folder">
+  <target name="clean.deploy">
     <delete dir="${deploy}" quiet="true"/>
 	  <delete dir="${runtime}" quiet="true"/>
   </target>               
@@ -122,7 +117,7 @@
 	<!--                                    Init                                   -->
 	<!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
+	<target name="init">
  		<mkdir dir="${build}"/>
 		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
 		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
@@ -149,21 +144,17 @@
   <!--
   <target name="build" depends="init, compile, jar, jar.src, j2ee.connector.build, tests.build"/>
   -->
-  <target name="build" depends="init, compile, jar, jar.src"/>
-  <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector"/>
-	<target name="rebuild" depends="clean.all, build"/>
+  <target name="build" depends="init, compile, jar, jar.src" description=""/>
+  <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector" description=""/>
+	<target name="rebuild" depends="clean.all, build" description=""/>
 	<target name="deploy"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc, installer"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc, installer" description=""/>
 	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc           "/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc           " description=""/>
 	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc,          installer"/>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc,          installer" description=""/>
 	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc                    "/>
-  <target name="deploy.splash">
-  	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
-  	<antcall target="deploy"/>
-  </target>
+		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc                    " description=""/>
 
 	<import file="build-compile-jar.xml"/>
 	<import file="build-modules.xml"/>
@@ -179,7 +170,7 @@
 	<!--                 Package the application for deployment                    -->
 	<!-- ========================================================================= -->
 
-	<target name="package" description="package the application into a release zip file" depends="rebuild">
+	<target name="package" depends="rebuild">
 		<property name="zip.prefix" value="${app.ver}-full-src"/>
 		<property name="release.file" value="${build}/${zip.prefix}.zip"/>
 		<delete file="${release.file}" quiet="true"/>
@@ -213,7 +204,7 @@
 	<!--                        Zip the whole workspace                            -->
 	<!-- ========================================================================= -->
 
-	<target name="zip.workspace" description="Zip the whole workspace">
+	<target name="zip.workspace">
     <delete file="${basedir}/../../JPPF.zip" quiet="true"/>
 		<zip destfile="${basedir}/../../JPPF.zip">
 			<zipfileset dir="${basedir}/.." prefix="JPPF">

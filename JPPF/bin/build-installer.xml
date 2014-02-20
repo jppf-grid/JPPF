@@ -25,7 +25,7 @@
 	<!-- It must point to the root installation directory of IzPack                -->
 	<!-- ========================================================================= -->
 
-	<target name="installer">
+	<target name="installer" description="">
 		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
 		<antcall target="installer.package"><param name="url" value="http://www.jppf.org/"/></antcall>
 	</target>
@@ -35,7 +35,7 @@
 		<antcall target="installer.package"><param name="url" value="http://localhost:8880/"/></antcall>
 	</target>
 
-	<target name="installer.package" description="package the jar installer" if="izpack.present">
+	<target name="installer.package" if="izpack.present">
 		<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
 		<property name="install.prefix" value="${build}/${app.ver}"/>
 		<property name="install.file" value="${install.prefix}-Installer"/>
