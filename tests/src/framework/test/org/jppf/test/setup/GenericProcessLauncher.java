@@ -28,6 +28,7 @@ import org.jppf.comm.socket.*;
 import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -402,12 +403,7 @@ public class GenericProcessLauncher implements Runnable {
             if (n == -1) throw new EOFException();
           } catch(Exception ioe) {
             if (debugEnabled) log.debug(name, ioe);
-            if (socketClient != null) {
-              try {
-                socketClient.close();
-              } catch (Exception ignore) {
-              }
-            }
+            if (socketClient != null) StreamUtils.closeSilent(socketClient);
           }
         }
       };
@@ -415,13 +411,8 @@ public class GenericProcessLauncher implements Runnable {
       thread.setDaemon(true);
       thread.start();
     } catch(Exception e) {
-      try {
-        processServer.close();
-      } catch(IOException ioe) {
-        if (debugEnabled) log.debug(ioe.getMessage(), ioe);
-      } finally {
-        processServer = null;
-      }
+      if (processServer != null) StreamUtils.closeSilent(processServer);
+      processServer = null;
     }
     return processPort;
   }

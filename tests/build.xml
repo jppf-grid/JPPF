@@ -80,7 +80,7 @@
 
   <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
 
-  <target name="compile" description="compile the junit tests classes">
+  <target name="compile">
     <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml">
       <fileset dir="${framework.src}" includes="**/*.java"/>
       <fileset dir="${addons.src}" includes="**/*.java"/>
@@ -157,10 +157,10 @@
   <!--                           Run the JUnit tests                             -->
   <!-- ========================================================================= -->
 
-  <target name="run"            depends="compile, generate.tests.list, runtests"/>
-  <target name="run.nogenerate" depends="compile,                      runtests"/>
+  <target name="run"            depends="compile, generate.tests.list, runtests" description=""/>
+  <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
 
-  <target name="runtests" description="run the junit tests">
+  <target name="runtests">
     <echo message="Running the tests"/>
     <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
       <jvmarg value="-server"/>

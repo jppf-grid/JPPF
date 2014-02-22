@@ -173,8 +173,8 @@ public class NodeDataPanelManager {
   void nodeAdded(final DefaultMutableTreeNode driverNode, final JPPFManagementInfo nodeInfo) {
     if (findNode(driverNode, nodeInfo.getUuid()) != null) return;
     String nodeUuid = nodeInfo.getUuid();
-    if (debugEnabled) log.debug("attempting to add node=" + nodeUuid + " to driver=" + driverNode);
-    int index = nodeInsertIndex(driverNode, nodeUuid);
+    if (debugEnabled) log.debug("attempting to add node={} to driver={}", nodeInfo, driverNode);
+    int index = nodeInsertIndex(driverNode, nodeUuid, nodeInfo.toDisplayString());
     if (index < 0) return;
     if (debugEnabled) log.debug("adding node: " + nodeUuid + " at index " + index);
     TopologyData data = null;
@@ -319,17 +319,20 @@ public class NodeDataPanelManager {
   /**
    * Find the position at which to insert a node, using the sorted lexical order of node names.
    * @param driverNode name the parent of the node to insert.
+   * @param nodeUuid the uuid of the node to insert.
    * @param nodeName the name of the node to insert.
    * @return the index at which to insert the node, or -1 if the node is already in the tree.
    */
-  int nodeInsertIndex(final DefaultMutableTreeNode driverNode, final String nodeName) {
+  int nodeInsertIndex(final DefaultMutableTreeNode driverNode, final String nodeUuid, final String nodeName) {
     int n = driverNode.getChildCount();
     for (int i=0; i<n; i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       TopologyData nodeData = (TopologyData) node.getUserObject();
-      String name = nodeData.getUuid();
-      if (nodeName.equals(name)) return -1;
-      else if (nodeName.compareTo(name) < 0) return i;
+      if (nodeUuid.equals(nodeData.getUuid())) return -1;
+      else {
+        String name = nodeData.getNodeInformation().toDisplayString();
+        if (nodeName.compareTo(name) < 0) return i;
+      }
     }
     return n;
   }
@@ -392,6 +395,7 @@ public class NodeDataPanelManager {
    * @param driverData the driver that was added.
    */
   void fireDriverAdded(final TopologyData driverData) {
+    if (debugEnabled) log.debug("adding driver {}", driverData);
     TopologyChangeEvent event = new TopologyChangeEvent(panel, driverData, null, null);
     for (TopologyChangeListener listener: listeners) listener.driverAdded(event);
   }
@@ -401,6 +405,7 @@ public class NodeDataPanelManager {
    * @param driverData the driver that was removed.
    */
   void fireDriverRemoved(final TopologyData driverData) {
+    if (debugEnabled) log.debug("removing driver {}", driverData);
     TopologyChangeEvent event = new TopologyChangeEvent(panel, driverData, null, null);
     for (TopologyChangeListener listener: listeners) listener.driverRemoved(event);
   }
@@ -412,6 +417,7 @@ public class NodeDataPanelManager {
    * @param peerData the peer driver that was added, if the node is a peer, <code>null</code> otherwise.
    */
   void fireNodeAdded(final TopologyData driverData, final TopologyData nodeData, final TopologyData peerData) {
+    if (debugEnabled) log.debug("adding node {} to driver {}", nodeData, driverData);
     TopologyChangeEvent event = new TopologyChangeEvent(panel, driverData, nodeData, peerData);
     for (TopologyChangeListener listener: listeners) listener.nodeAdded(event);
   }
@@ -422,6 +428,7 @@ public class NodeDataPanelManager {
    * @param nodeData the node that was removed.
    */
   void fireNodeRemoved(final TopologyData driverData, final TopologyData nodeData) {
+    if (debugEnabled) log.debug("removing node {} from driver {}", nodeData, driverData);
     TopologyChangeEvent event = new TopologyChangeEvent(panel, driverData, nodeData, null);
     for (TopologyChangeListener listener: listeners) listener.nodeRemoved(event);
   }

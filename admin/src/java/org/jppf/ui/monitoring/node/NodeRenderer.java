@@ -88,7 +88,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer
             break;
 
           case NODE:
-            path = NODE_ICON;
+            path = data.getNodeInformation().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
             if (!TopologyDataStatus.UP.equals(data.getStatus())) {
               background = INACTIVE_COLOR;
               backgroundSelected = INACTIVE_SELECTION_COLOR;

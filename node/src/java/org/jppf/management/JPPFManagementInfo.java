@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.io.Serializable;
+import java.util.*;
 
 
 /**
@@ -47,14 +48,33 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @exclude
    */
   public static final byte PEER = 2;
+  /*
+   * Extended attributes must have their 0-3 bits set to 0.
+   */
+  /**
+   * Information that the node is a master node for the provisioning feature.
+   */
+  public static final byte MASTER = 0x10;
+  /**
+   * Information that the node is a slave node for the provisioning feature.
+   */
+  public static final byte SLAVE = 0x20;
   /**
    * Information that node is local on DRIVER or CLIENT. Value of this constant can be changed in future!
    */
-  public static final byte LOCAL = 64;
+  public static final byte LOCAL = 0x40;
   /**
    * Mask for elimination extended type attributes.
    */
-  protected static final byte TYPE_MASK = 15;
+  protected static final byte TYPE_MASK = 0x0F;
+  /**
+   * Maps type values to readable strings.
+   */
+  private static final Map<Byte, String> typeMap = new HashMap<Byte, String>() {{
+    put(DRIVER, "driver");
+    put(NODE, "node");
+    put(PEER, "peer");
+  }};
   /**
    * The host on which the node is running.
    */
@@ -146,25 +166,30 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     // we want ascending alphabetical order
     int n = -1 * host.compareTo(o.getHost());
     if (n != 0) return n;
-
-    /*
-    if (port > o.getPort()) return +1;
-    if (port < o.getPort()) return -1;
-    return 0;
-    */
     return port - o.getPort();
   }
 
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append(host).append(':').append(port);
-    sb.append(", type=").append(type & TYPE_MASK);
+    sb.append(", type=").append(typeToString());
+    sb.append(", local=").append(isLocal());
+    sb.append(", secure=").append(secure);
     sb.append(", uuid=").append(uuid);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get a string displayed in the console.
+   * @return .
+   * @exclude
+   */
+  public String toDisplayString()
+  {
+    return host + ':' + port;
   }
 
   /**
@@ -244,6 +269,22 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   }
 
   /**
+   * Determine whether this information represents a master node for provisioning.
+   * @return <code>true</code> if the node is a master node.
+   */
+  public boolean isMasterNode() {
+    return (type & MASTER) == MASTER;
+  }
+
+  /**
+   * Determine whether this information represents a slave node for provisioning.
+   * @return <code>true</code> if the node is a master node.
+   */
+  public boolean isSlaveNode() {
+    return (type & SLAVE) == SLAVE;
+  }
+
+  /**
    * Determine whether this information represents a local node on client or driver.
    * @return <code>true</code>
    */
@@ -268,5 +309,20 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   public void setActive(final boolean active)
   {
     this.active = active;
+  }
+
+  /**
+   * Get a string representation of the type.
+   * @return a string representing the type.
+   */
+  private String typeToString() {
+    byte b = (byte) (type & TYPE_MASK);
+    StringBuilder sb = new StringBuilder();
+    String s = typeMap.get(b);
+    sb.append(s == null ? "?" : s);
+    if (isMasterNode()) sb.append("|MASTER");
+    if (isSlaveNode()) sb.append("|SLAVE");
+    if (isLocal()) sb.append("|LOCAL");
+    return sb.toString();
   }
 }

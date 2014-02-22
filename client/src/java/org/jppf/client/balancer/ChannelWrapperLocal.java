@@ -309,4 +309,14 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   {
     return executionManager;
   }
+
+  @Override
+  public boolean isMasterNode() {
+    return false;
+  }
+
+  @Override
+  public boolean isSlaveNode() {
+    return false;
+  }
 }

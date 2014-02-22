@@ -84,7 +84,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
     }
     else
     {
-      path = AbstractTreeCellRenderer.NODE_ICON;
+      path = data.getNodeInformation().isMasterNode() ? AbstractTreeCellRenderer.NODE_MASTER_ICON : AbstractTreeCellRenderer.NODE_ICON;
       if (!TopologyDataStatus.UP.equals(data.getStatus()))
       {
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;

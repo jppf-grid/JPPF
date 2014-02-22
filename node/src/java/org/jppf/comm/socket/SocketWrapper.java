@@ -17,7 +17,7 @@
  */
 package org.jppf.comm.socket;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 import org.jppf.serialization.ObjectSerializer;
@@ -30,7 +30,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @author Jeff Rosen
  */
-public interface SocketWrapper
+public interface SocketWrapper extends Closeable
 {
   /**
    * Send an object over a TCP socket connection.
@@ -132,7 +132,7 @@ public interface SocketWrapper
    * Close the underlying socket connection.
    * @throws Exception if the underlying input and output streams raise an error.
    */
-  void close() throws Exception;
+  //void close() throws Exception;
 
   /**
    * Determine whether this socket client is opened or not.

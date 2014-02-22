@@ -47,15 +47,17 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener
     Component comp = event.getComponent();
     Point p = comp.getLocationOnScreen();
     JPopupMenu menu = new JPopupMenu();
+    addItem(menu, "show.information", p);
+    menu.addSeparator();
     addItem(menu, "shutdown.restart.driver", p);
     addItem(menu, "driver.reset.statistics", p);
     menu.addSeparator();
-    addItem(menu, "show.information", p);
     addItem(menu, "update.configuration", p);
     addItem(menu, "update.threads", p);
+    addItem(menu, "reset.counter", p);
     addItem(menu, "restart.node", p);
     addItem(menu, "shutdown.node", p);
-    addItem(menu, "reset.counter", p);
+    addItem(menu, "node.provisioning", p);
     return menu;
   }
 }

@@ -115,8 +115,10 @@ public class ReflectionUtils
     {
       if (!Boolean.class.equals(type) && !Boolean.TYPE.equals(type)) return false;
     }
+    int mod = meth.getModifiers();
+    if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
     Class[] paramTypes = meth.getParameterTypes();
-    return !((paramTypes != null) && (paramTypes.length > 0));
+    return ((paramTypes == null) || (paramTypes.length <= 0));
   }
 
   /**
@@ -129,8 +131,10 @@ public class ReflectionUtils
     Class type = meth.getReturnType();
     if (!Void.TYPE.equals(type)) return false;
     if (!meth.getName().startsWith("set")) return false;
+    int mod = meth.getModifiers();
+    if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
     Class[] paramTypes = meth.getParameterTypes();
-    return !((paramTypes == null) || (paramTypes.length != 1));
+    return ((paramTypes != null) && (paramTypes.length == 1));
   }
 
   /**

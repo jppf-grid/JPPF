@@ -214,6 +214,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
       actionHandler.putAction("graph.restart.node", new RestartNodeAction());
       actionHandler.putAction("graph.shutdown.node", new ShutdownNodeAction());
       actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction(treeTableOption));
+      actionHandler.putAction("graph.node.provisioning", new ProvisioningAction());
       actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
       actionHandler.putAction("graph.select.nodes", new SelectGraphNodesAction(this));
       actionHandler.putAction("graph.button.collapse", new ExpandOrCollapseGraphAction(this, true));
@@ -271,6 +272,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
     sb.append("<html>uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
+    if (node.getNodeInformation().isMasterNode()) sb.append(" | Slaves: ").append(node.getNbSlaveNodes());
     sb.append("</html>");
     return sb.toString();
   }

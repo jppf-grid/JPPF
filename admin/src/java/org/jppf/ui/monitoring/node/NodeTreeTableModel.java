@@ -51,6 +51,10 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    */
   static final int NB_TASKS = 4;
   /**
+   * Column number for the node's number of provisioned slaves.
+   */
+  static final int NB_SLAVES = 5;
+  /**
    * 
    */
   static NumberFormat nf = createNumberFormat();
@@ -73,7 +77,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
   @Override
   public int getColumnCount()
   {
-    return 5;
+    return 6;
   }
 
   /**
@@ -84,28 +88,23 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
    */
   @Override
-  public Object getValueAt(final Object node, final int column)
-  {
+  public Object getValueAt(final Object node, final int column) {
     Object res = "";
-    if (node instanceof DefaultMutableTreeNode)
-    {
+    if (node instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      if (defNode.getUserObject() instanceof TopologyData)
-      {
+      if (defNode.getUserObject() instanceof TopologyData) {
         TopologyData info = (TopologyData) defNode.getUserObject();
         JPPFManagementInfo mgtInfo = info.getNodeInformation();
         boolean isNode = (mgtInfo != null) && mgtInfo.isNode();
         if (TopologyDataType.DRIVER.equals(info.getType()) && (column > 0)) return res;
         JPPFNodeState state = info.getNodeState();
         if (state == null) return res;
-        switch (column)
-        {
+        switch (column) {
           case NODE_URL:
             res = info.toString() + (isNode ? "" : "(peer driver)");
             break;
           case NODE_THREADS:
-            if (isNode)
-            {
+            if (isNode) {
               int n = state.getThreadPoolSize();
               int p = state.getThreadPriority();
               res = "" + (n <= 0 ? "?" : n) + " / " + (p <= 0 ? "?" : p);
@@ -118,14 +117,19 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
             if (isNode) res = state.getExecutionStatus();
             break;
           case NB_TASKS:
-            //if (isNode) res = Integer.toString(state.getNbTasksExecuted());
             if (isNode) res = nf.format(state.getNbTasksExecuted());
             break;
+          case NB_SLAVES:
+            if (isNode) {
+              if ((mgtInfo != null) && mgtInfo.isMasterNode()) {
+                int n = info.getNbSlaveNodes();
+                res = n >= 0 ? nf.format(n) : "";
+              } else res = "";
+            }
+            break;
         }
-      }
-      else
-      {
-        if (column == 0) res = defNode.getUserObject().toString();
+      } else {
+        if (column == 0)res = defNode.getUserObject().toString();
       }
     }
     return res;
@@ -157,6 +161,9 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
         break;
       case NB_TASKS:
         res = localize("column.nb.tasks");
+        break;
+      case NB_SLAVES:
+        res = localize("column.nb.slaves");
         break;
     }
     return res;

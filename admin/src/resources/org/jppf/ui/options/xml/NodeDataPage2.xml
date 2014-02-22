@@ -41,6 +41,7 @@
 		<child name="restart.node" type="Button"/>
     <child name="shutdown.node" type="Button"/>
     <child name="toggle.active" type="Button"/>
+    <child name="node.provisioning" type="Button"/>
 
 		<child name="sep2" type="ToolbarSeparator"/>
 		<child name="Auto" type="Boolean">

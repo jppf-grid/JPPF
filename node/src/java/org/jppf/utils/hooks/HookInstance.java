@@ -101,4 +101,12 @@ public class HookInstance<E>
   {
     return new StringBuilder(getClass().getSimpleName()).append('[').append("instance=").append(instance).append(']').toString();
   }
+
+  /**
+   * Get the concrete instance.
+   * @return an instance of a hook interface implementation.
+   */
+  public E getInstance() {
+    return instance;
+  }
 }

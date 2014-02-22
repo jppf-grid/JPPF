@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClientConnection;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
@@ -30,8 +30,7 @@ import org.slf4j.*;
  * Instances of this class represent the state of a node in the Topology panel tree.
  * @author Laurent Cohen
  */
-public class TopologyData
-{
+public class TopologyData {
   /**
    * Logger for this class.
    */
@@ -92,13 +91,16 @@ public class TopologyData
    * 
    */
   private AtomicBoolean initializing = new AtomicBoolean(false);
+  /**
+   * The number of slaves for a master node.
+   */
+  private int nbSlaveNodes = -1;
 
   /**
    * Initialize this topology data as a driver related object.
    * @param clientConnection a reference to the driver connection.
    */
-  public TopologyData(final JPPFClientConnection clientConnection)
-  {
+  public TopologyData(final JPPFClientConnection clientConnection) {
     this.type = TopologyDataType.DRIVER;
     this.clientConnection = clientConnection;
     this.jmxWrapper = clientConnection.getJmxConnection();
@@ -110,8 +112,7 @@ public class TopologyData
    * Initialize this topology data as holding information about a node.
    * @param nodeInformation information on the JPPF node.
    */
-  public TopologyData(final JPPFManagementInfo nodeInformation)
-  {
+  public TopologyData(final JPPFManagementInfo nodeInformation) {
     this.type = TopologyDataType.NODE;
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
@@ -123,8 +124,7 @@ public class TopologyData
    * @param nodeInformation information on the JPPF peer node.
    * @param peerJmx the JMX wrapper associated with the driver information this peer node represents.
    */
-  public TopologyData(final JPPFManagementInfo nodeInformation, final JMXDriverConnectionWrapper peerJmx)
-  {
+  public TopologyData(final JPPFManagementInfo nodeInformation, final JMXDriverConnectionWrapper peerJmx) {
     this.type = TopologyDataType.PEER;
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
@@ -136,8 +136,7 @@ public class TopologyData
    * Get the type of this job data object.
    * @return a <code>TopologyDataType</code> enum value.
    */
-  public TopologyDataType getType()
-  {
+  public TopologyDataType getType() {
     return type;
   }
 
@@ -145,8 +144,7 @@ public class TopologyData
    * Get the wrapper holding the connection to the JMX server on a driver or node.
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
-  public JMXDriverConnectionWrapper getJmxWrapper()
-  {
+  public JMXDriverConnectionWrapper getJmxWrapper() {
     return jmxWrapper;
   }
 
@@ -154,8 +152,7 @@ public class TopologyData
    * Set the wrapper holding the connection to the JMX server on a driver or node.
    * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
    */
-  public void setJmxWrapper(final JMXDriverConnectionWrapper jmxWrapper)
-  {
+  public void setJmxWrapper(final JMXDriverConnectionWrapper jmxWrapper) {
     this.jmxWrapper = jmxWrapper;
   }
 
@@ -163,8 +160,7 @@ public class TopologyData
    * Get the information on a JPPF node.
    * @return a <code>NodeManagementInfo</code> instance.
    */
-  public JPPFManagementInfo getNodeInformation()
-  {
+  public JPPFManagementInfo getNodeInformation() {
     return nodeInformation;
   }
 
@@ -174,8 +170,7 @@ public class TopologyData
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return (type == TopologyDataType.NODE) ? nodeInformation.getHost() + ':' + nodeInformation.getPort() : jmxWrapper.getDisplayName();
   }
 
@@ -183,8 +178,7 @@ public class TopologyData
    * Get the object describing the current state of a node.
    * @return a <code>JPPFNodeState</code> instance.
    */
-  public JPPFNodeState getNodeState()
-  {
+  public JPPFNodeState getNodeState() {
     return nodeState;
   }
 
@@ -192,8 +186,7 @@ public class TopologyData
    * Refresh the state of the node represented by this topology data.
    * @param newState the new node state fetched from the grid.
    */
-  public void refreshNodeState(final JPPFNodeState newState)
-  {
+  public void refreshNodeState(final JPPFNodeState newState) {
     if (!TopologyDataType.NODE.equals(type)) return;
     this.nodeState = newState;
     setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
@@ -204,8 +197,7 @@ public class TopologyData
    * Get the object describing the health of a node or driver.
    * @return a <code>HealthSnapshot</code> instance.
    */
-  public HealthSnapshot getHealthSnapshot()
-  {
+  public HealthSnapshot getHealthSnapshot() {
     return healthSnapshot;
   }
 
@@ -213,8 +205,7 @@ public class TopologyData
    * Refresh the health snapshot state of the driver or node represented by this topology data.
    * @param newSnapshot the new health snapshot fetched from the grid.
    */
-  public void refreshHealthSnapshot(final HealthSnapshot newSnapshot)
-  {
+  public void refreshHealthSnapshot(final HealthSnapshot newSnapshot) {
     if (type == TopologyDataType.PEER) return;
     this.healthSnapshot = newSnapshot;
   }
@@ -223,8 +214,7 @@ public class TopologyData
    * Get the driver connection.
    * @return a <code>JPPFClientConnection</code> instance.
    */
-  public JPPFClientConnection getClientConnection()
-  {
+  public JPPFClientConnection getClientConnection() {
     return clientConnection;
   }
 
@@ -232,8 +222,7 @@ public class TopologyData
    * Set the driver connection.
    * @param clientConnection a <code>JPPFClientConnection</code> instance.
    */
-  public void setClientConnection(final JPPFClientConnection clientConnection)
-  {
+  public void setClientConnection(final JPPFClientConnection clientConnection) {
     this.clientConnection = clientConnection;
   }
 
@@ -241,8 +230,7 @@ public class TopologyData
    * Get the status of the node.
    * @return the node status.
    */
-  public TopologyDataStatus getStatus()
-  {
+  public TopologyDataStatus getStatus() {
     return status;
   }
 
@@ -250,8 +238,7 @@ public class TopologyData
    * Set the status of the node.
    * @param status the node status.
    */
-  public void setStatus(final TopologyDataStatus status)
-  {
+  public void setStatus(final TopologyDataStatus status) {
     if (status == TopologyDataStatus.DOWN)
     {
       boolean breakpoint = true;
@@ -263,8 +250,7 @@ public class TopologyData
    * Get the id of this topology element.
    * @return the id as a string.
    */
-  public String getId()
-  {
+  public String getId() {
     return (jmxWrapper == null) ? null : jmxWrapper.getId();
   }
 
@@ -272,14 +258,12 @@ public class TopologyData
    * Determine whether this object represents an node.
    * @return <code>true</code> if this object represets a node, <code>false</code> otherwise.
    */
-  public boolean isNode()
-  {
+  public boolean isNode() {
     return (type == TopologyDataType.NODE);
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
@@ -287,14 +271,12 @@ public class TopologyData
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     TopologyData other = (TopologyData) obj;
-    if (uuid == null)
-    {
+    if (uuid == null) {
       if (other.uuid != null) return false;
     }
     return uuid.equals(other.uuid);
@@ -304,8 +286,7 @@ public class TopologyData
    * Determine whether the corresponding driver is collapsed in the visualization panel.
    * @return <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
    */
-  public boolean isCollapsed()
-  {
+  public boolean isCollapsed() {
     return collapsed;
   }
 
@@ -313,8 +294,7 @@ public class TopologyData
    * Specify whether the corresponding driver is collapsed in the visualization panel.
    * @param collapsed <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
    */
-  public void setCollapsed(final boolean collapsed)
-  {
+  public void setCollapsed(final boolean collapsed) {
     this.collapsed = collapsed;
   }
 
@@ -322,8 +302,7 @@ public class TopologyData
    * Get the UUID of the driver or node reprsented by this object.
    * @return the uuid as a string.
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
@@ -331,8 +310,7 @@ public class TopologyData
    * Set the connection uuuid.
    * @param uuid the uuid as a string.
    */
-  public void setUuid(final String uuid)
-  {
+  public void setUuid(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -340,8 +318,7 @@ public class TopologyData
    * Get the proxy to the driver MBean that forwards node management requests.
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    */
-  public JPPFNodeForwardingMBean getNodeForwarder()
-  {
+  public JPPFNodeForwardingMBean getNodeForwarder() {
     return nodeForwarder;
   }
 
@@ -349,8 +326,7 @@ public class TopologyData
    * Get the driver diagnostics MBean proxy.
    * @return an instance of {@link DiagnosticsMBean}.
    */
-  public DiagnosticsMBean getDiagnostics()
-  {
+  public DiagnosticsMBean getDiagnostics() {
     return diagnostics;
   }
 
@@ -358,8 +334,7 @@ public class TopologyData
    * Get the parent driver data.
    * @return a <code>TopologyData</code> instance, or null if no parent was set.
    */
-  public TopologyData getParent()
-  {
+  public TopologyData getParent() {
     return parent;
   }
 
@@ -367,8 +342,7 @@ public class TopologyData
    * Set the parent driver data.
    * @param parent a <code>TopologyData</code> instance, or null to remove the parent.
    */
-  public void setParent(final TopologyData parent)
-  {
+  public void setParent(final TopologyData parent) {
     this.parent = parent;
   }
 
@@ -376,10 +350,8 @@ public class TopologyData
    * Reset the forwarder and diagnostics mbeans. This method should be called when an I/O error occurs
    * when invoking a method of the driver jmx connection wwrapper.
    */
-  public void initializeProxies()
-  {
-    if (initializing.compareAndSet(false, true))
-    {
+  public void initializeProxies() {
+    if (initializing.compareAndSet(false, true)) {
       nodeForwarder = null;
       diagnostics = null;
       new Thread(new ProxySettingTask()).start();
@@ -413,5 +385,21 @@ public class TopologyData
         initializing.set(false);
       }
     }
+  }
+
+  /**
+   * Get the number of slaves for a master node.
+   * @return the number of slaves as an int.
+   */
+  public int getNbSlaveNodes() {
+    return nbSlaveNodes;
+  }
+
+  /**
+   * Set the number of slaves for a master node.
+   * @param nbSlaveNodes the number of slaves as an int.
+   */
+  public void setNbSlaveNodes(final int nbSlaveNodes) {
+    this.nbSlaveNodes = nbSlaveNodes;
   }
 }

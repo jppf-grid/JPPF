@@ -55,4 +55,16 @@ public interface Node extends Runnable
    * @return <code>true</code> if this node is offline, <code>false</code> otherwise.
    */
   boolean isOffline();
+
+  /**
+   * Determine whether this node is a 'master' node for the provisioning features.
+   * @return <code>true</code> if this node is a master, <code>false</code> otherwise.
+   */
+  boolean isMasterNode();
+
+  /**
+   * Determine whether this node is a 'slave' node for the provisioning features.
+   * @return <code>true</code> if this node is a slave, <code>false</code> otherwise.
+   */
+  boolean isSlaveNode();
 }

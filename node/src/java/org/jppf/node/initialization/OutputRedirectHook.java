@@ -55,9 +55,9 @@ public class OutputRedirectHook implements InitializationHook {
       File outFile = config.getFile(propBase);
       if (outFile == null) return;
       boolean append = config.getBoolean(propBase + ".append", false);
-      OutputStream os = new FileOutputStream(outFile, append);
+      OutputStream os = new BufferedOutputStream(new FileOutputStream(outFile, append));
       if (os != null) {
-        PrintStream pos = new PrintStream(os);
+        PrintStream pos = new PrintStream(os, true);
         pos.println("********** " + new Date() + " **********");
         if (isOut) System.setOut(pos);
         else System.setErr(pos);

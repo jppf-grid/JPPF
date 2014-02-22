@@ -171,11 +171,26 @@ public class TestTypedProperties {
     sb.append("prop.4 = 4\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = TypedProperties.loadAndResolve(r);
-      System.out.println("resolved properties: " + props);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.4", "4");
       checkProperty(props, "prop.3", "3.4");
       checkProperty(props, "prop.2", "2-3.4-4");
       checkProperty(props, "prop.1", "1/2-3.4-4/3.4/4");
+    }
+  }
+
+  /**
+   * Test that property substitutions are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testUnresolvedSubstitutions() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${prop.2}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/${prop.2}");
     }
   }
 
@@ -190,15 +205,50 @@ public class TestTypedProperties {
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = TypedProperties.loadAndResolve(r);
-      System.out.println("resolved properties: " + props);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.1", "1/${prop.2}");
       checkProperty(props, "prop.2", "2-${prop.1}");
     }
   }
 
   /**
-   * Test that the proertuy with the specified key exists in the TypeProperties container and has the specified value.
-   * @param props the typed properties containing the property to check.
+   * Test that substitutions of environment variables references are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testEnvironmentVariableSubstitution() throws Exception {
+    String path = System.getenv("PATH");
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${env.PATH}\n");
+    sb.append("prop.2 = 2-${prop.1}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/" + path);
+      checkProperty(props, "prop.2", "2-1/" + path);
+    }
+  }
+
+  /**
+   * Test that substitutions of undefined environment variables references are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testUnresolvedEnvironmentVariableSubstitution() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${env.This_is_my_undefined_environment_variable}\n");
+    sb.append("prop.2 = 2-${prop.1}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/");
+      checkProperty(props, "prop.2", "2-1/");
+    }
+  }
+
+  /**
+   * Test that the property with the specified key exists in the {@code TypedProperties} container and has the specified value.
+   * @param props the {@link TypedProperties} containing the property to check.
    * @param key the name of the property to check.
    * @param value the value of the property to check.
    * @throws Exception if any error occurs.

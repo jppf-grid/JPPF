@@ -58,6 +58,7 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
       int alignment = SwingConstants.LEFT;
       switch(column) {
         case NodeTreeTableModel.NB_TASKS:
+        case NodeTreeTableModel.NB_SLAVES:
           alignment = SwingConstants.RIGHT;
           break;
 

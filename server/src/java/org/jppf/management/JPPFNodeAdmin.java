@@ -62,7 +62,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    */
   public JPPFNodeAdmin(final JPPFNode node)
   {
-    if (debugEnabled) log.debug("instantiating JPPNodeAdmin");
+    if (debugEnabled) log.debug("instantiating JPPFNodeAdmin");
     this.node = node;
     node.setNodeAdmin(this);
     //node.addNodeListener(this);

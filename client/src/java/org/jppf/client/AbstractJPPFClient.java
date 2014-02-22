@@ -102,6 +102,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     this.uuid = (uuid == null) ? new JPPFUuid().toString() : uuid;
     if (debugEnabled) log.debug("Instantiating JPPF client with uuid=" + this.uuid);
     VersionUtils.logVersionInformation("client", this.uuid);
+    SystemUtils.printPidAndUuid("client", this.uuid);
   }
 
   /**

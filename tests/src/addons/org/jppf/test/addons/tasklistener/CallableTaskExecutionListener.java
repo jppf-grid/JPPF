@@ -46,9 +46,11 @@ public class CallableTaskExecutionListener implements TaskExecutionListener {
    * Process the event.
    * @param event the event to process.
    */
+  @SuppressWarnings("unchecked")
   private void process(final TaskExecutionEvent event) {
     if (event.getUserObject() instanceof Callable) {
       Task task = (Task) event.getTask();
+      System.out.println("Id of notifying task: " + task.getId());
       Object o = task.getResult();
       if ((o != null) && !(o instanceof List)) return;
       List<Object> list = null;

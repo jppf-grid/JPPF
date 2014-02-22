@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.jppf.management.RegistrationCondition;
 import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.hooks.*;
 import org.slf4j.*;
@@ -31,8 +32,7 @@ import org.slf4j.*;
  * @param <S> the SPI interface for the mbean provider.
  * @author Laurent Cohen
  */
-public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
-{
+public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   /**
    * Logger for this class.
    */
@@ -58,23 +58,32 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
    * @param server the MBean server on which to register.
    * @throws Exception if the registration failed.
    */
-  public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final MBeanServer server, final Object...createParams) throws Exception
-  {
+  public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final MBeanServer server, final Object...createParams) throws Exception {
     this.server = server;
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     ClassLoader loader = cl == null ? tmp : cl;
     if (loader == null) loader = getClass().getClassLoader();
     Hook<S> hook = HookFactory.registerSPIMultipleHook(clazz, null, loader);
-    Object[] mbeans = hook.invoke("createMBean", createParams);
-    Object[] infNames = hook.invoke("getMBeanInterfaceName");
-    Object[] mbeanNames = hook.invoke("getMBeanName");
     try {
       Thread.currentThread().setContextClassLoader(cl);
-      for (int i=0; i<mbeans.length; i++) {
-        Class inf = Class.forName((String) infNames[i], true, loader);
-        boolean b = registerProviderMBean(mbeans[i], inf, (String) mbeanNames[i]);
-        if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanNames[i] + ']');
-        if (b) registeredMBeanNames.add((String) mbeanNames[i]);
+      for (HookInstance<S> hookInstance: hook.getInstances()) {
+        S concrete = hookInstance.getInstance();
+        boolean register = (concrete instanceof RegistrationCondition) ? ((RegistrationCondition) concrete).mustRegister(createParams) : true;
+        if (register) {
+          try {
+            String infName = (String) hookInstance.invoke("getMBeanInterfaceName");
+            Class inf = Class.forName((String) infName, true, loader);
+            Object mbean = hookInstance.invoke("createMBean", createParams);
+            String mbeanName = (String) hookInstance.invoke("getMBeanName");
+            boolean b = registerProviderMBean(mbean, inf, mbeanName);
+            if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanName + ']');
+            if (b) registeredMBeanNames.add((String) mbeanName);
+          } catch (Exception e) {
+            String message = "error processing MBean provider {} : {}";
+            if (debugEnabled) log.debug(message, concrete, ExceptionUtils.getStackTrace(e));
+            else log.warn(message, concrete, ExceptionUtils.getMessage(e));
+          }
+        }
       }
     } finally {
       Thread.currentThread().setContextClassLoader(tmp);
@@ -89,21 +98,15 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
    * @param name the MBean name.
    * @return true if the registration succeeded, false otherwise.
    */
-  private <T> boolean registerProviderMBean(final T impl, final Class<T> intf, final String name)
-  {
-    try
-    {
+  private <T> boolean registerProviderMBean(final T impl, final Class<T> intf, final String name) {
+    try {
       if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+ ']');
       ObjectName objectName = new ObjectName(name);
-      if (!server.isRegistered(objectName))
-      {
+      if (!server.isRegistered(objectName)) {
         server.registerMBean(impl, objectName);
         return true;
-      }
-      else log.warn("an instance of MBean [" + name + "] already exists, registration was skipped");
-    }
-    catch(Exception e)
-    {
+      } else log.warn("an instance of MBean [" + name + "] already exists, registration was skipped");
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return false;
@@ -112,19 +115,14 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider>
   /**
    * Un-register all registered mbeans.
    */
-  public void unregisterProviderMBeans()
-  {
+  public void unregisterProviderMBeans() {
     if (debugEnabled) log.debug("list of registered MBeans {}", registeredMBeanNames);
-    while (!registeredMBeanNames.isEmpty())
-    {
+    while (!registeredMBeanNames.isEmpty()) {
       String s = registeredMBeanNames.remove(0);
-      try
-      {
+      try {
         server.unregisterMBean(new ObjectName(s));
         if (debugEnabled) log.debug("MBean un-registration succeeded for [{}]", s);
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         String format = "MBean un-registration failed for [{}] : {}";
         if (debugEnabled) log.debug(format, s, ExceptionUtils.getStackTrace(e));
         else log.warn(format, s, ExceptionUtils.getMessage(e));

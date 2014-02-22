@@ -49,7 +49,7 @@
 
 	</child>
 
-	<child name="threadButtons" type="page">
+	<child name="configButtons" type="page">
 		<property name="layoutConstraints" value="fill"/>
 		<property name="componentConstraints" value="growx 0"/>
 		<property name="tooltip" value="Validate or cancel the updates"/>

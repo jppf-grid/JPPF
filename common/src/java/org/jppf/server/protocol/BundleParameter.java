@@ -86,6 +86,14 @@ public enum  BundleParameter
    */
   JOB_UUID,
   /**
+   * Marker to indicate whether a node is a master node for the provisioning features.
+   */
+  NODE_PROVISIONING_MASTER,
+  /**
+   * Marker to indicate whether a node is a slave node for the provisioning features.
+   */
+  NODE_PROVISIONING_SLAVE,
+  /**
    * An array of boolean flags indicating whther the task raised an error during serilaization or deserialization.
    */
   ERROR_MARKERS,

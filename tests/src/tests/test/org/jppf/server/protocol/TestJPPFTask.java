@@ -234,6 +234,8 @@ public class TestJPPFTask extends Setup1D1N1C {
   public void testTaskLocalNotifications() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask.class);
+    int count = 0;
+    for (Task<?> task: job) task.setId("NotifyingTask " + ++count);
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);

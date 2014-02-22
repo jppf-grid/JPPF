@@ -39,8 +39,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class DriverInitializer
-{
+public class DriverInitializer {
   /**
    * Logger for this class.
    */
@@ -103,8 +102,7 @@ public class DriverInitializer
    * @param driver the driver to initialize.
    * @param config the driver's configuration.
    */
-  public DriverInitializer(final JPPFDriver driver, final TypedProperties config)
-  {
+  public DriverInitializer(final JPPFDriver driver, final TypedProperties config) {
     this.driver = driver;
     this.config = config;
   }
@@ -112,19 +110,14 @@ public class DriverInitializer
   /**
    * Register the MBean that collects debug/troubleshooting information.
    */
-  void registerDebugMBean()
-  {
-    if (JPPFDriver.JPPF_DEBUG)
-    {
-      try
-      {
+  void registerDebugMBean() {
+    if (JPPFDriver.JPPF_DEBUG) {
+      try {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         serverDebug = new ServerDebug();
         StandardMBean mbean = new StandardMBean(serverDebug, ServerDebugMBean.class);
         server.registerMBean(mbean, new ObjectName(ServerDebugMBean.MBEAN_NAME));
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -135,8 +128,7 @@ public class DriverInitializer
    * @throws Exception if the registration failed.
    */
   @SuppressWarnings("unchecked")
-  void registerProviderMBeans() throws Exception
-  {
+  void registerProviderMBeans() throws Exception {
     MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
   }
@@ -145,10 +137,8 @@ public class DriverInitializer
    * Read configuration for the host name and ports used to connect to this driver.
    * @return a <code>DriverConnectionInformation</code> instance.
    */
-  public JPPFConnectionInformation getConnectionInformation()
-  {
-    if (connectionInfo == null)
-    {
+  public JPPFConnectionInformation getConnectionInformation() {
+    if (connectionInfo == null) {
       connectionInfo = new JPPFConnectionInformation();
       connectionInfo.uuid = driver.getUuid();
       String s = config.getString("jppf.server.port", "11111");
@@ -169,10 +159,8 @@ public class DriverInitializer
   /**
    * Initialize and start the discovery service.
    */
-  void initBroadcaster()
-  {
-    if (config.getBoolean("jppf.discovery.enabled", true))
-    {
+  void initBroadcaster() {
+    if (config.getBoolean("jppf.discovery.enabled", true)) {
       broadcaster = new JPPFBroadcaster(getConnectionInformation());
       new Thread(broadcaster, "JPPF Broadcaster").start();
     }
@@ -181,10 +169,8 @@ public class DriverInitializer
   /**
    * Stop the discovery service if it is running.
    */
-  void stopBroadcaster()
-  {
-    if (broadcaster != null)
-    {
+  void stopBroadcaster() {
+    if (broadcaster != null) {
       broadcaster.setStopped(true);
       broadcaster = null;
     }
@@ -194,13 +180,11 @@ public class DriverInitializer
    * Initialize this driver's peers.
    * @param classServer JPPF class server
    */
-  void initPeers(final ClassNioServer classServer)
-  {
+  void initPeers(final ClassNioServer classServer) {
     boolean initPeers;
     TypedProperties props = JPPFConfiguration.getProperties();
     final boolean ssl = props.getBoolean("jppf.peer.ssl.enabled", false);
-    if (props.getBoolean("jppf.peer.discovery.enabled", false))
-    {
+    if (props.getBoolean("jppf.peer.discovery.enabled", false)) {
       if (debugEnabled) log.debug("starting peers discovery");
       peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
         @Override
@@ -209,28 +193,20 @@ public class DriverInitializer
         }
       }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
-    }
-    else
-    {
+    } else {
       peerDiscoveryThread = null;
       initPeers = true;
     }
 
     String discoveryNames = props.getString("jppf.peers");
-    if ((discoveryNames != null) && !discoveryNames.trim().isEmpty())
-    {
+    if ((discoveryNames != null) && !discoveryNames.trim().isEmpty()) {
       if (debugEnabled) log.debug("found peers in the configuration");
       String[] names = discoveryNames.split("\\s");
-      for (String name : names) {
-        initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
-      }
+      for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
-      if(initPeers)
-      {
-        for (String name : names)
-        {
-          if (!VALUE_JPPF_DISCOVERY.equals(name))
-          {
+      if(initPeers) {
+        for (String name : names) {
+          if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
             // to keep backward compatibility with v2.x configurations
@@ -244,28 +220,22 @@ public class DriverInitializer
       }
     }
 
-    if(peerDiscoveryThread != null)
-    {
-      new Thread(peerDiscoveryThread, "PeerDiscovery").start();
-    }
+    if (peerDiscoveryThread != null) new Thread(peerDiscoveryThread, "PeerDiscovery").start();
   }
 
   /**
    * Get the thread that performs the peer servers discovery.
    * @return a <code>PeerDiscoveryThread</code> instance.
    */
-  public PeerDiscoveryThread getPeerDiscoveryThread()
-  {
+  public PeerDiscoveryThread getPeerDiscoveryThread() {
     return peerDiscoveryThread;
   }
 
   /**
    * Stop the peer discovery thread if it is running.
    */
-  void stopPeerDiscoveryThread()
-  {
-    if (peerDiscoveryThread != null)
-    {
+  void stopPeerDiscoveryThread() {
+    if (peerDiscoveryThread != null) {
       peerDiscoveryThread.setStopped(true);
       peerDiscoveryThread = null;
     }
@@ -276,16 +246,14 @@ public class DriverInitializer
    * @param ssl specifies whether to get the ssl-based connector server. 
    * @return a <code>JMXServerImpl</code> instance.
    */
-  public synchronized JMXServer getJmxServer(final boolean ssl)
-  {
+  public synchronized JMXServer getJmxServer(final boolean ssl) {
     return ssl ? sslJmxServer : jmxServer;
   }
 
   /**
    * Initialize the JMX server.
    */
-  void initJmxServer()
-  {
+  void initJmxServer() {
     jmxServer = createJMXServer(false);
     sslJmxServer = createJMXServer(true);
   }
@@ -295,26 +263,21 @@ public class DriverInitializer
    * @param ssl specifies whether JMX communication should be done via SSL/TLS.
    * @return a new {@link JMXServer} instance, or null if the server could not be created.
    */
-  private JMXServer createJMXServer(final boolean ssl)
-  {
+  private JMXServer createJMXServer(final boolean ssl) {
     JMXServer server = null;
     JPPFConnectionInformation info = getConnectionInformation();
     String prop = ssl ? "jppf.management.ssl.enabled" : "jppf.management.enabled";
     String tmp = ssl ? "secure " : "";
-    try
-    {
+    try {
       // default is false for ssl, true for plain connection
-      if (config.getBoolean(prop, !ssl))
-      {
+      if (config.getBoolean(prop, !ssl)) {
         server = JMXServerFactory.createServer(driver.getUuid(), ssl);
         server.start(getClass().getClassLoader());
         if (!ssl) info.managementPort = server.getManagementPort();
         else info.sslManagementPort = server.getManagementPort();
         System.out.println(tmp + "management initialized and listening on port " + server.getManagementPort());
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       config.setProperty(prop, "false");
       String s = e.getMessage();
@@ -328,14 +291,10 @@ public class DriverInitializer
   /**
    * Stop the JMX server.
    */
-  void stopJmxServer()
-  {
-    try
-    {
+  void stopJmxServer() {
+    try {
       if (jmxServer != null) jmxServer.stop();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -344,18 +303,15 @@ public class DriverInitializer
    * The server used to detect that individual connections are broken due to hardware failures.
    * @return a {@link RecoveryServer} instance.
    */
-  public RecoveryServer getRecoveryServer()
-  {
+  public RecoveryServer getRecoveryServer() {
     return recoveryServer;
   }
 
   /**
    * Initialize the recovery server.
    */
-  void initRecoveryServer()
-  {
-    if (config.getBoolean("jppf.recovery.enabled", false))
-    {
+  void initRecoveryServer() {
+    if (config.getBoolean("jppf.recovery.enabled", false)) {
       recoveryServer = new RecoveryServer();
       new Thread(recoveryServer, "RecoveryServer thread").start();
     }
@@ -364,8 +320,7 @@ public class DriverInitializer
   /**
    * Stop the recovery server.
    */
-  void stopRecoveryServer()
-  {
+  void stopRecoveryServer() {
     if (recoveryServer != null) recoveryServer.close();
   }
 
@@ -373,8 +328,7 @@ public class DriverInitializer
    * Get the object that collects debug information.
    * @return a {@link ServerDebug} instance.
    */
-  public ServerDebug getServerDebug()
-  {
+  public ServerDebug getServerDebug() {
     return serverDebug;
   }
 
@@ -382,8 +336,7 @@ public class DriverInitializer
    * Get the object that handles listeners to node connection events.
    * @return a {@link NodeConnectionEventHandler} instance.
    */
-  public NodeConnectionEventHandler getNodeConnectionEventHandler()
-  {
+  public NodeConnectionEventHandler getNodeConnectionEventHandler() {
     return nodeConnectionEventHandler;
   }
 
@@ -391,8 +344,7 @@ public class DriverInitializer
    * Get the soft cache of classes downloaded form the clients r from this driver's classpath.
    * @return an instance of {@link ClassCache}.
    */
-  public ClassCache getClassCache()
-  {
+  public ClassCache getClassCache() {
     return classCache;
   }
 
@@ -402,19 +354,14 @@ public class DriverInitializer
    * @param def the default port number to use if none is specified or valid.
    * @return an array of int port numbers.
    */
-  private static int[] parsePorts(final String s, final int def)
-  {
+  private static int[] parsePorts(final String s, final int def) {
     String[] strPorts = s.split("\\s");
     List<Integer> portsList = new ArrayList<>(strPorts.length);
-    for (int i=0; i<strPorts.length; i++)
-    {
-      try
-      {
+    for (int i=0; i<strPorts.length; i++) {
+      try {
         int n = Integer.valueOf(strPorts[i].trim());
         portsList.add(n);
-      }
-      catch(NumberFormatException e)
-      {
+      } catch(NumberFormatException e) {
         if (debugEnabled) log.debug("invalid port number value '" + strPorts[i] + "'");
       }
     }

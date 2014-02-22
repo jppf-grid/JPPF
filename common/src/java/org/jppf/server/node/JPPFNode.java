@@ -490,4 +490,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public boolean isOffline() {
     return getClassLoader().isOffline();
   }
+
+  @Override
+  public boolean isMasterNode() {
+    return systemInformation == null ? false : !isSlaveNode() && systemInformation.getJppf().getBoolean("jppf.node.provisioning.master", true);
+  }
+
+  @Override
+  public boolean isSlaveNode() {
+    return systemInformation == null ? false : systemInformation.getJppf().getBoolean("jppf.node.provisioning.slave", false);
+  }
 }

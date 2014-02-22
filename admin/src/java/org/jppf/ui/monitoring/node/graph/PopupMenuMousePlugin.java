@@ -87,21 +87,18 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin
    */
   private JPopupMenu createMenu(final V vertex, final VisualizationViewer viewer, final Point point)
   {
-    //viewer.l
     JPopupMenu menu = new JPopupMenu();
+    menu.add(createMenuItem(actionHandler.getAction("graph.show.information"), point));
+    menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.restart.driver"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.driver.reset.statistics"), point));
     menu.addSeparator();
-    menu.add(createMenuItem(actionHandler.getAction("graph.show.information"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.update.configuration"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.update.threads"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.reset.counter"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.restart.node"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node"), point));
-    menu.add(createMenuItem(actionHandler.getAction("graph.reset.counter"), point));
-    /*
-    menu.addSeparator();
-    menu.add(createMenuItem(actionHandler.getAction("graph.toggle.mode"), point));
-    */
+    menu.add(createMenuItem(actionHandler.getAction("graph.node.provisioning"), point));
     return menu;
   }
 

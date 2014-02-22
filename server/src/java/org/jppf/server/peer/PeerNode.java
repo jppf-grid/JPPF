@@ -287,4 +287,14 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
     if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
     close();
   }
+
+  @Override
+  public boolean isMasterNode() {
+    return false;
+  }
+
+  @Override
+  public boolean isSlaveNode() {
+    return false;
+  }
 }

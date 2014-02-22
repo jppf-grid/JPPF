@@ -52,6 +52,10 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
   //public static final String NODE_ICON = RESOURCES + "buggi_server.gif";
   public static final String NODE_ICON = RESOURCES + "computer-server.png";
   /**
+   * Path to the icon used for a master node.
+   */
+  public static final String NODE_MASTER_ICON = RESOURCES + "computer-server_database.png";
+  /**
    * Path to the icon used for a job.
    */
   public static final String JOB_ICON = RESOURCES + "rack.gif";
