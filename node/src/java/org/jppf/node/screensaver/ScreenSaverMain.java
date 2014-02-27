@@ -127,7 +127,7 @@ public class ScreenSaverMain implements InitializationHook
       if ((h <= 0) || (h > d.height)) h = 800;
       frame.setSize(w, h);
     }
-    configureFrameListeners(frame, fullscreenRequested && !fullscreenSupported);
+    configureFrameListeners(frame, fullscreenRequested && fullscreenSupported);
     frame.setBackground(Color.BLACK);
     frame.getContentPane().setBackground(Color.BLACK);
     createScreenSaver();
@@ -141,7 +141,6 @@ public class ScreenSaverMain implements InitializationHook
     java.awt.EventQueue.invokeLater(new Runnable() {
       @Override public void run() {
         frame.toFront();
-        frame.repaint();
       }
     });
   }
