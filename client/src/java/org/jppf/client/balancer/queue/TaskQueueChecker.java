@@ -19,6 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.client.*;
@@ -64,7 +65,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
    * The list of idle node channels.
    */
   private final CollectionMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new AbstractJPPFClient.DescendingIntegerComparator());
-  //private final Set<ChannelWrapper> idleChannels = new LinkedHashSet<>();
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
@@ -280,18 +280,23 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
     int idleChannelsSize = idleChannels.size();
     List<ChannelWrapper> acceptableChannels = new ArrayList<>(idleChannelsSize);
     Iterator<ChannelWrapper> iterator = idleChannels.iterator();
+    Queue<ChannelWrapper> channelsToRemove = new LinkedBlockingQueue<>();
     while (iterator.hasNext())
     {
       ChannelWrapper ch = iterator.next();
       if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE)
       {
         if (debugEnabled) log.debug("channel is not opened: " + ch);
-        iterator.remove();
+        channelsToRemove.offer(ch);
         continue;
       }
       if (!bundle.acceptsChannel(ch)) continue;
       if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
       acceptableChannels.add(ch);
+    }
+    if (!channelsToRemove.isEmpty()) {
+      ChannelWrapper ch = null;
+      while ((ch = channelsToRemove.poll()) != null) idleChannels.removeValue(ch.getPriority(), ch);
     }
     int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");
@@ -300,7 +305,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable
 
   /**
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
-   * @param channel        the node channel to dispatch the job to.
+   * @param channel        the channel to dispatch the job to.
    * @param selectedBundle the job to dispatch.
    */
   @SuppressWarnings("unchecked")
