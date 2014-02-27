@@ -127,7 +127,7 @@ public class ScreenSaverMain implements InitializationHook
       if ((h <= 0) || (h > d.height)) h = 800;
       frame.setSize(w, h);
     }
-    configureFrameListeners(frame, fullscreenRequested && !fullscreenSupported);
+    configureFrameListeners(frame, fullscreenRequested && fullscreenSupported);
     frame.setBackground(Color.BLACK);
     frame.getContentPane().setBackground(Color.BLACK);
     createScreenSaver();
@@ -137,11 +137,11 @@ public class ScreenSaverMain implements InitializationHook
     int screenY = config.getInt("jppf.screensaver.screen.location.Y", 0);
     frame.setLocation(screenX, screenY);
     screensaver.init(config, fullscreenRequested && fullscreenSupported);
+    System.out.println("fullscreenRequested && fullscreenSupported = "  + (fullscreenRequested && fullscreenSupported));
     frame.setVisible(true);
     java.awt.EventQueue.invokeLater(new Runnable() {
       @Override public void run() {
         frame.toFront();
-        frame.repaint();
       }
     });
   }
@@ -169,12 +169,14 @@ public class ScreenSaverMain implements InitializationHook
    */
   private void configureFrameListeners(final JFrame frame, final boolean fullscreen) {
     if (fullscreen) {
-      frame.addKeyListener(new KeyAdapter() {
+      Component comp = frame;
+      //Component comp = frame.getContentPane();
+      comp.addKeyListener(new KeyAdapter() {
         @Override public void keyPressed(final KeyEvent e) {
           doOnclose();
         }
       });
-      frame.addMouseListener(new MouseAdapter() {
+      comp.addMouseListener(new MouseAdapter() {
         @Override public void mousePressed(final MouseEvent e) {
           doOnclose();
         }
@@ -182,7 +184,7 @@ public class ScreenSaverMain implements InitializationHook
       if (config.getBoolean("jppf.screensaver.mouse.motion.close", true)) {
         final long mouseMotionDelay = config.getLong("jppf.screensaver.mouse.motion.delay", 500L);
         final long start = System.currentTimeMillis();
-        frame.addMouseMotionListener(new MouseAdapter() {
+        comp.addMouseMotionListener(new MouseAdapter() {
           @Override
           public void mouseMoved(final MouseEvent e) {
             if (System.currentTimeMillis() - start > mouseMotionDelay) doOnclose();

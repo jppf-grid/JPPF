@@ -23,11 +23,16 @@ import java.awt.*;
 import javax.swing.JFrame;
 
 /**
- * This extension of JFrale ensures that the frame is brought to the fore,
+ * This extension of JFrame ensures that the frame is brought to the fore,
  * on top of any other window, when {@code toFront()} is called.
  * @author Laurent Cohen
  */
 public class FocusedJFrame extends JFrame {
+  /**
+   * Use to avoid inifinite recursion in {@code toFront()}.
+   */
+  private boolean alreadyCalled = false;
+
   /**
    * Default initialization for this frame.
    * @throws HeadlessException if {@code GraphicsEnvironment.isHeadless()} returns {@code true}.
@@ -69,13 +74,19 @@ public class FocusedJFrame extends JFrame {
 
   @Override
   public void toFront() {
-    super.setVisible(true);
-    int state = super.getExtendedState();
-    state &= ~Frame.ICONIFIED;
-    super.setExtendedState(state);
-    super.setAlwaysOnTop(true);
-    super.toFront();
-    super.requestFocus();
-    super.setAlwaysOnTop(false);
+    if (alreadyCalled) return;
+    try {
+      alreadyCalled = true;
+      super.setVisible(true);
+      int state = super.getExtendedState();
+      state &= ~Frame.ICONIFIED;
+      super.setExtendedState(state);
+      super.setAlwaysOnTop(true);
+      super.toFront();
+      super.requestFocus();
+      super.setAlwaysOnTop(false);
+    } finally {
+      alreadyCalled = false;
+    }
   }
 }
