@@ -46,6 +46,7 @@ public class CallableTaskExecutionListener implements TaskExecutionListener {
    * Process the event.
    * @param event the event to process.
    */
+  @SuppressWarnings("unchecked")
   private void process(final TaskExecutionEvent event) {
     if (event.getUserObject() instanceof Callable) {
       Task task = (Task) event.getTask();

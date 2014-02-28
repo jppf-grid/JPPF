@@ -125,7 +125,7 @@
 	<target name="init" description="Initialize ressources">
  		<mkdir dir="${build}"/>
 		<available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
-		<!-- Format the build number to a 4 figures integer with leading zeroes if required -->
+		<!-- Format the build number to a 4 digits integer with leading zeroes if required -->
 		<!-- The build number is also incremented by 1                                      -->
 		<propertyfile file="${build.number.file}">
 			<entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
@@ -146,20 +146,13 @@
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->
 
-  <!--
-  <target name="build" depends="init, compile, jar, jar.src, j2ee.connector.build, tests.build"/>
-  -->
   <target name="build" depends="init, compile, jar, jar.src"/>
   <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector"/>
 	<target name="rebuild" depends="clean.all, build"/>
-	<target name="deploy"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc, installer"/>
-	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc           "/>
-	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc,          installer"/>
-	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc                    "/>
+	<target name="deploy"             depends="deploy.nojavadoc.noinstaller, javadoc, installer" description=""/>
+	<target name="deploy.noinstaller" depends="deploy.nojavadoc.noinstaller, javadoc"            description=""/>
+	<target name="deploy.nojavadoc"   depends="deploy.nojavadoc.noinstaller, installer"          description=""/>
+	<target name="deploy.nojavadoc.noinstaller" depends="clean, clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc" description=""/>
   <target name="deploy.splash">
   	<splash showduration="500" imageurl="http://www.jppf.org/images/logo1.gif"/>
   	<antcall target="deploy"/>
@@ -175,30 +168,41 @@
   <import file="build-tests.xml"/>
   <import file="build-maven.xml"/>
 	
-	<!-- ========================================================================= -->
-	<!--                 Package the application for deployment                    -->
-	<!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!--              Package the all-in-one zip distribution                      -->
+  <!-- ========================================================================= -->
 
-	<target name="package" description="package the application into a release zip file" depends="rebuild">
-		<property name="zip.prefix" value="${app.ver}-full-src"/>
-		<property name="release.file" value="${build}/${zip.prefix}.zip"/>
-		<delete file="${release.file}" quiet="true"/>
-		<zip destfile="${release.file}">
-			<zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
-				<include name="build/jppf*.jar"/>
-				<include name="bin/**/*.*"/>
-				<include name="config/**/*.*"/>
-				<!--<include name="docs/api/**/*.*"/>-->
-				<include name="lib/**/*.*"/>
-				<include name="${license.file}"/>
-				<include name="JPPF-3rd-party.html"/>
-			</zipfileset>
-			<zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
-			<zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
-			<zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
-			<zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
-			<zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
-			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
+  <target name="all.zips" depends="" description="">
+    <property name="all.zip.prefix" value="${app.ver}-all"/>
+    <property name="all.zip.file" value="${build}/${all.zip.prefix}.zip"/>
+    <delete file="${all.zip.file}" quiet="true"/>
+    <zip destfile="${all.zip.file}" basedir="${build}" includes="${app.ver}-*.zip"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                 Package the source distribution                           -->
+  <!-- ========================================================================= -->
+
+  <target name="package" description="package the application into a release zip file" depends="rebuild">
+    <property name="zip.prefix" value="${app.ver}-full-src"/>
+    <property name="release.file" value="${build}/${zip.prefix}.zip"/>
+    <delete file="${release.file}" quiet="true"/>
+    <zip destfile="${release.file}">
+      <zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
+        <include name="build/jppf*.jar"/>
+        <include name="bin/**/*.*"/>
+        <include name="config/**/*.*"/>
+        <!--<include name="docs/api/**/*.*"/>-->
+        <include name="lib/**/*.*"/>
+        <include name="${license.file}"/>
+        <include name="JPPF-3rd-party.html"/>
+      </zipfileset>
+      <zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
+      <zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
+      <zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
+      <zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
+      <zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
+      <zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
@@ -206,8 +210,8 @@
         <exclude name="**/*.log"/>
         <exclude name="**/diagnostics.txt"/>
       </zipfileset>
-		</zip>
-	</target>
+    </zip>
+  </target>
 
 	<!-- ========================================================================= -->
 	<!--                        Zip the whole workspace                            -->
