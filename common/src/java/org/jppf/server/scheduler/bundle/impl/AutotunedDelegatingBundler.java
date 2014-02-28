@@ -1,0 +1,132 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2014 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.server.scheduler.bundle.impl;
+
+import org.jppf.server.scheduler.bundle.AbstractBundler;
+import org.jppf.server.scheduler.bundle.Bundler;
+import org.jppf.server.scheduler.bundle.autotuned.AnnealingTuneProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * Instances of this bundler delegate their operations to a singleton instance of a
+ * {@link org.jppf.server.scheduler.bundle.impl.AbstractAutoTunedBundler AutoTunedBundler}.
+ * @author Laurent Cohen
+ */
+public class AutotunedDelegatingBundler extends AbstractBundler
+{
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AutotunedDelegatingBundler.class);
+  /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * The global bundler to which bundle size calculations are delegated.
+   */
+  private static AutoTunedBundler simpleBundler = null;
+  /**
+   * Used to synchronize multiple threads when creating the simple bundler.
+   */
+  private static ReentrantLock lock = new ReentrantLock();
+  /**
+   * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
+   */
+  protected AnnealingTuneProfile profile;
+
+  /**
+   * Creates a new instance with the initial size of bundle as the start size.
+   * @param profile the parameters of the auto-tuning algorithm grouped as a performance analysis profile.
+   */
+  public AutotunedDelegatingBundler(final AnnealingTuneProfile profile)
+  {
+    super(profile);
+    log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
+    //log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
+    lock.lock();
+    try
+    {
+      synchronized(AutotunedDelegatingBundler.class)
+      {
+        if (simpleBundler == null)
+        {
+          simpleBundler = new AutoTunedBundler(profile);
+        }
+      }
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Make a copy of this bundler
+   * @return a <code>Bundler</code> instance.
+   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+   */
+  @Override
+  public Bundler copy()
+  {
+    return new AutotunedDelegatingBundler(profile);
+  }
+
+  /**
+   * Get the current size of bundle.
+   * @return  the bundle size as an int value.
+   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
+   */
+  @Override
+  public int getBundleSize()
+  {
+    return simpleBundler.getBundleSize();
+  }
+
+  /**
+   * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
+   * @param bundleSize the number of tasks executed.
+   * @param totalTime the time in nanoseconds it took to execute the tasks.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#feedback(int, double)
+   */
+  @Override
+  public void feedback(final int bundleSize, final double totalTime)
+  {
+    simpleBundler.feedback(bundleSize, totalTime);
+  }
+
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+   */
+  @Override
+  protected int maxSize()
+  {
+    int max = 0;
+    synchronized(simpleBundler)
+    {
+      max = simpleBundler.maxSize();
+    }
+    return max;
+  }
+}

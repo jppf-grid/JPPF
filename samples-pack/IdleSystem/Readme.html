@@ -1,0 +1,102 @@
+<html>
+
+	<head>
+		<title>JPPF Samples Pack</title>
+		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+		<link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+	</head>
+
+	<body>
+		<div align="center">
+			<div class="gwrapper" align="center">
+
+				<!-- start header -->
+				<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+				<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+					<tr style="height: 80px">
+						<td width="20"></td>
+						<td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+						<td valign="center"><h1>Idle Mode for JPPF Nodes</h1></td>
+						<td width="20"></td>
+					</tr>
+				</table>
+				<!-- end header -->
+
+				<!-- start content -->
+				<div align="left" style="margin: 10px">
+					<h3>What does the sample do?</h3>
+					<!-- ${SAMPLE_START_CONTENT} -->
+					<p>This sample is an implementation of a JPPF API that allows a node to start when the machine on which it is running is idle, and to stop when the machine is busy again.
+					By idle we mean that no keyboard or mouse input has occurred for a specified time.
+
+					<h3>How does it work?</h3>
+					<p>This implementation uses the <a href="https://jna.dev.java.net/">JNA library</a>, which provides Java wrappers around native calls to the operating system.
+					This allows us to query the system for how long it has been idle, and make decisions to start or stop the node based on that.
+
+					<h3>Related source files</h3>
+					<ul class="samplesList">
+						<li><a href="src/org/jppf/example/idlesystem/IdleTimeDetectorFactoryImpl.java.html">IdleTimeDetectorFactoryImpl.java</a> : this is the factory class that instantiates the platform-specific object detecting that the system is idle</li>
+						<li><a href="src/org/jppf/example/idlesystem/X11IdleTimeDetector.java.html">X11IdleTimeDetector.java</a> : detects when an X11 (Linux, Unix, etc...) system is idle</li>
+						<li><a href="src/org/jppf/example/idlesystem/WindowsIdleTimeDetector.java.html">WindowsIdleTimeDetector.java</a> : detects when a Windows-based system is idle</li>
+						<li><a href="src/org/jppf/example/idlesystem/MacIdleTimeDetector.java.html">MacIdleTimeDetector.java</a> : detects when an Apple Mac system is idle (untested)</li>
+					</ul>
+
+					<h3>How do I use it?</h3>
+					First you need to build the sample jar file. To do this, perform the following steps:
+
+					<ol class="samplesList">
+						<li>open a command prompt or shell console in <b>JPPF-x.y.z-samples-pack/IdleSystem</b></li>
+						<li>run the build script: "<b>ant jar</b>", or simply "<b>ant</b>". This will download 2 jar files "<b>jna.jar</b>" and "<b>platform.jar</b>" and create a third one "<b>IdleSystem.jar</b>", into the <b>IdleSystem/lib</b> directory.</li>
+						<li>when this is done, copy the 3 jar files in <b>IdleSystem/lib</b> into your node's library directory "<b>JPPF-x.y.z-node/lib</b>"</li>
+						<li>to configure the node to run in idle mode, open the file "<b>JPPF-x.y.z-node/config/jppf-node.properties</b>" in a text editor and create or edit the following properties:
+							<ul class="samplesNestedList">
+								<li><b>jppf.idle.mode.enabled = true</b> to enable the idle mode</li>
+								<li><b>jppf.idle.timeout = 6000</b> to configure the time of keyboard and mouse inactivity to consider the node idle, expressed in milliseconds</li>
+								<li><b>jppf.idle.poll.interval = 1000</b> to configure how often the node will check for inactivity, in milliseconds</li>
+								<li><b>jppf.idle.detector.factory = org.jppf.example.idlesystem.IdleTimeDetectorFactoryImpl</b> please do not change this!</li>
+							</ul>
+						</li>
+						<li>when this is all done, you can start the node and it will only run when the system has been idle for the configured time, and will stop as soon as any keyboard or mouse input occurs</li>
+					</ol>
+
+					<h3>What features of JPPF are demonstrated?</h3>
+					Ability to <a href="http://www.jppf.org/doc/v4/index.php?title=Deployment_and_run_modes#JPPF_Node_in_.E2.80.9CIdle_Host.E2.80.9D_mode">run a node when the host is idle</a>.
+
+					<h3>I have additional questions and comments, where can I go?</h3>
+					<p>There are 2 privileged places you can go to:
+					<ul class="smaplesList">
+						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+					</ul>
+					<!-- ${SAMPLE_END_CONTENT} -->
+				</div>
+				<!-- end content -->
+
+				<!-- start footer -->
+				<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+					<tr>
+						<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+						<td align="right">
+							<a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+							<a href="http://sourceforge.net/projects/jppf-project">
+								<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+									alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+							</a>
+						</td>
+						<td style="width: 10px"></td>
+					</tr>
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+				</table>
+				<div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+				<!-- end footer -->
+
+			</div>
+		</div>
+
+	</body>
+
+</html>
