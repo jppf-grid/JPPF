@@ -18,6 +18,8 @@
 
 package org.jppf.node.provisioning;
 
+import static org.jppf.node.provisioning.NodeProvisioningConstants.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -36,13 +38,15 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    */
   private static Logger log = LoggerFactory.getLogger(SlaveNodeManager.class);
   /**
-   * Name of the property which defines a node as master.
+   * Path prefix used for the root directory of each slave node.
+   * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
    */
-  static final String MASTER_PROPERTY = "jppf.node.provisioning.master";
+  private static final String SLAVE_PATH_PREFIX = JPPFConfiguration.getProperties().getString(SLAVE_PATH_PREFIX_PROPERTY, "slave_nodes/node_");
   /**
-   * Name of the property which defines a node as a slave.
+   * Directory where configuration files, other than the jppf configuration, are located.
+   * The files in this folder will be copied into each slave node's 'config' directory.
    */
-  static final String SLAVE_PROPERTY = "jppf.node.provisioning.slave";
+  private static final String SLAVE_CONFIG_PATH = JPPFConfiguration.getProperties().getString(SLAVE_CONFIG_PATH_PROPERTY, "config");
   /**
    * The directpry where the slave's config files are located, relative to its root folder.
    */
@@ -51,20 +55,6 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    * The name of the slave's JPPF config file.
    */
   static final String SLAVE_LOCAL_CONFIG_FILE = "jppf-node.properties";
-  /**
-   * The location of the slave's JPPF config file, relative to its root folder.
-   */
-  static final String SLAVE_LOCAL_CONFIG_PATH = SLAVE_LOCAL_CONFIG_DIR + "/" + SLAVE_LOCAL_CONFIG_FILE;
-  /**
-   * Prefix path used for the name of the root directory of each slave node.
-   * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
-   */
-  private static final String SLAVE_PATH_PREFIX = JPPFConfiguration.getProperties().getString("jppf.node.provisioning.slave.path.prefix", "slave_nodes/node_");
-  /**
-   * Directory where configuration files, other than the jppf configuration, are located.
-   * The files in this folder will be copied into each slave node's 'config' directory.
-   */
-  private static final String SLAVE_CONFIG_PATH = JPPFConfiguration.getProperties().getString("jppf.node.provisioning.slave.config.path", "config");
   /**
    * Singleton instance of this class.
    */
@@ -93,6 +83,8 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     masterDir = new File(System.getProperty("user.dir"));
     log.debug("masterDir = {}", masterDir);
     computeSlaveClasspath();
+    int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
+    if (n > 0) shrinkOrGrowSlaves(n, null);
   }
 
   /**
@@ -164,11 +156,11 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     File slaveConfigSrc = new File(SLAVE_CONFIG_PATH);
     File slaveConfigDest = new File(slaveDir, SLAVE_LOCAL_CONFIG_DIR);
     if (!slaveConfigDest.exists()) slaveConfigDest.mkdirs();
-    FileUtils.copyDirectory(slaveConfigSrc, slaveConfigDest);
+    if (slaveConfigSrc.exists()) FileUtils.copyDirectory(slaveConfigSrc, slaveConfigDest);
     // get the JPPF config, apply the overrides, then save it to the slave's folder
     TypedProperties props = new TypedProperties(JPPFConfiguration.getProperties());
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
-    props.remove(MASTER_PROPERTY);
+    props.setBoolean(MASTER_PROPERTY, false);
     props.setBoolean(SLAVE_PROPERTY, true);
     props.setProperty("jppf.redirect.out", "system_out.log");
     props.setProperty("jppf.redirect.err", "system_err.log");

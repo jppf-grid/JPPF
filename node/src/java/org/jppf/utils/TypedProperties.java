@@ -418,6 +418,7 @@ public class TypedProperties extends Properties {
    * This load operation will recursively process all <code>!#include</code> statements before parsing the properties.
    * @param reader the reader to load from.
    * @throws IOException if any I/O error occurs.
+   * @exclude
    */
   public synchronized void loadWithIncludes(final Reader reader) throws IOException {
     new PropertiesLoader().load(this, reader);
@@ -430,6 +431,7 @@ public class TypedProperties extends Properties {
    * @param reader the reader to load from.
    * @return a {@link TypedProperties} object with all includes loaded and substitutions performed.
    * @throws IOException if any I/O error occurs.
+   * @exclude
    */
   public static TypedProperties loadAndResolve(final Reader reader) throws IOException {
     TypedProperties props = new TypedProperties();

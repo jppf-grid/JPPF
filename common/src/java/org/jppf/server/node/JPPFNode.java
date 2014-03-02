@@ -31,6 +31,7 @@ import org.jppf.node.*;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
+import org.jppf.node.provisioning.NodeProvisioningConstants;
 import org.jppf.serialization.*;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.startup.JPPFNodeStartupSPI;
@@ -177,9 +178,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private void processNextJob() throws Exception {
     Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
     TaskBundle bundle = pair.first();
-    //if (bundle.isHandshake()) checkInitialBundle(bundle);
     List<Task<?>> taskList = pair.second();
-    //boolean notEmpty = (taskList != null) && (!taskList.isEmpty());
     if (debugEnabled) log.debug(!bundle.isHandshake() ? "received a bundle with " + taskList.size()  + " tasks" : "received a handshake bundle");
     if (!bundle.isHandshake()) {
       try {
@@ -493,11 +492,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   @Override
   public boolean isMasterNode() {
-    return systemInformation == null ? false : !isSlaveNode() && systemInformation.getJppf().getBoolean("jppf.node.provisioning.master", true);
+    return !isOffline() && (systemInformation != null) && systemInformation.getJppf().getBoolean(NodeProvisioningConstants.MASTER_PROPERTY, true);
   }
 
   @Override
   public boolean isSlaveNode() {
-    return systemInformation == null ? false : systemInformation.getJppf().getBoolean("jppf.node.provisioning.slave", false);
+    return (systemInformation != null) && systemInformation.getJppf().getBoolean(NodeProvisioningConstants.SLAVE_PROPERTY, false);
   }
 }

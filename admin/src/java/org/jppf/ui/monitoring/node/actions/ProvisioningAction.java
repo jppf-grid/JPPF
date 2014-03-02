@@ -103,11 +103,10 @@ public class ProvisioningAction extends AbstractTopologyAction
     OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
     OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
     TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
-    //textArea.setValue(overrides);
 
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
-    final JFrame frame = new JFrame("Update the JPPF configuration");
+    final JFrame frame = new JFrame(localize("provisioning.frame.caption"));
     frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {

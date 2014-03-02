@@ -18,10 +18,12 @@
 
 package org.jppf.node.provisioning;
 
+import static org.jppf.node.provisioning.NodeProvisioningConstants.*;
+
 import org.jppf.management.RegistrationCondition;
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
 import org.jppf.node.Node;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 
 /**
  * NodeProvisioningMBean provider implementation, discovered by JPPF via the service provider API.
@@ -29,6 +31,12 @@ import org.jppf.utils.JPPFConfiguration;
  * @exclude
  */
 public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider, RegistrationCondition {
+  /**
+   * Iniitialize this MBean provider.
+   */
+  public JPPFNodeProvisioningMBeanProvider() {
+  }
+
   @Override
   public String getMBeanInterfaceName() {
     return JPPFNodeProvisioningMBean.class.getName();
@@ -46,6 +54,12 @@ public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider,
 
   @Override
   public boolean mustRegister(final Object...params) {
-    return !JPPFConfiguration.getProperties().getBoolean(SlaveNodeManager.SLAVE_PROPERTY, false);
+    Node node = (Node) params[0];
+    TypedProperties config = JPPFConfiguration.getProperties();
+    boolean slave = !node.isOffline() && config.getBoolean(SLAVE_PROPERTY, false);
+    boolean master = !node.isOffline() && config.getBoolean(MASTER_PROPERTY, true);
+    config.setBoolean(MASTER_PROPERTY, master);
+    config.setBoolean(SLAVE_PROPERTY, slave);
+    return master;
   }
 }

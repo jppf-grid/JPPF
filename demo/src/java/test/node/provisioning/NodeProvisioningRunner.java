@@ -42,7 +42,7 @@ public class NodeProvisioningRunner {
     JPPFClient client = null;
     try {
       client = new JPPFClient();
-      // wait until a JMX connection tot he driver is properly established
+      // wait until a JMX connection to the driver is properly established
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       JMXDriverConnectionWrapper jmxDriver = null;
       while ((jmxDriver = client.getClientConnection().getJmxConnection()) == null) Thread.sleep(10L);

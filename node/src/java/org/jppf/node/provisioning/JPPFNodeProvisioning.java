@@ -18,8 +18,6 @@
 
 package org.jppf.node.provisioning;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -32,10 +30,6 @@ public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
    * The slave node manager, to which all operations are delegated.
    */
   private final SlaveNodeManager slaveManager;
-  /**
-   * Wehether provisioning is enabled for the node.
-   */
-  private final AtomicBoolean enabled = new AtomicBoolean(false);
 
   /**
    * Initialize this MBean.
@@ -57,15 +51,5 @@ public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
   @Override
   public void provisionSlaveNodes(final int nbNodes, final TypedProperties configOverrides) {
     slaveManager.shrinkOrGrowSlaves(nbNodes, configOverrides);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return enabled.get();
-  }
-
-  @Override
-  public void setEnabled(final boolean enabled) {
-    this.enabled.set(enabled);
   }
 }

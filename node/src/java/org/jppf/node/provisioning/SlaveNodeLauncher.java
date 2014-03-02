@@ -42,6 +42,10 @@ public class SlaveNodeLauncher implements Runnable {
    */
   private static Logger log = LoggerFactory.getLogger(SlaveNodeLauncher.class);
   /**
+   * The location of the slave's JPPF config file, relative to its root folder.
+   */
+  static final String SLAVE_LOCAL_CONFIG_PATH = SlaveNodeManager.SLAVE_LOCAL_CONFIG_DIR + "/" + SlaveNodeManager.SLAVE_LOCAL_CONFIG_FILE;
+  /**
    * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
    */
   private Process process = null;
@@ -110,7 +114,7 @@ public class SlaveNodeLauncher implements Runnable {
    * @throws Exception if the process failed to start.
    */
   private Process startProcess() throws Exception {
-    File configFile = new File(slaveDir, SlaveNodeManager.SLAVE_LOCAL_CONFIG_PATH);
+    File configFile = new File(slaveDir, SLAVE_LOCAL_CONFIG_PATH);
     TypedProperties config = null;
     try (Reader reader = new BufferedReader(new FileReader(configFile))) {
       config = TypedProperties.loadAndResolve(reader);
@@ -119,7 +123,7 @@ public class SlaveNodeLauncher implements Runnable {
     List<String> jvmOptions = new ArrayList<>();
     String s = config.getString("jppf.jvm.options");
     jvmOptions.addAll(parseJvmOptions(s));
-    s = config.getString("jppf.node.provisioning.slave.jvm.options");
+    s = config.getString(NodeProvisioningConstants.SLAVE_JVM_OPTIONS_PROPERTY);
     jvmOptions.addAll(parseJvmOptions(s));
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
     List<String> command = new ArrayList<>();
@@ -133,7 +137,7 @@ public class SlaveNodeLauncher implements Runnable {
     }
     command.add(sb.toString());
     for (String opt: jvmOptions) command.add(opt);
-    command.add("-Djppf.config=" + SlaveNodeManager.SLAVE_LOCAL_CONFIG_PATH);
+    command.add("-Djppf.config=" + SLAVE_LOCAL_CONFIG_PATH);
     command.add(MAIN_CLASS);
     command.add("" + processPort);
     if (log.isDebugEnabled()) log.debug("process command for {}:\n{}", name, command);

@@ -28,7 +28,7 @@ public interface JPPFNodeProvisioningMBean {
   /**
    * The object name of this MBean.
    */
-  String MBEAN_NAME = "org.jppf:name=Provisioning,type=node";
+  String MBEAN_NAME = "org.jppf:name=provisioning,type=node";
 
   /**
    * Get the number of slave nodes started by this MBean.
@@ -52,16 +52,4 @@ public interface JPPFNodeProvisioningMBean {
    * @param configOverrides the configuration overriddes to apply.
    */
   void provisionSlaveNodes(int nbNodes, TypedProperties configOverrides);
-
-  /**
-   * Determine whether provisioning is enabled for this node.  
-   * @return {@code true} if provisioning is enabled, {@code false} otherwise.
-   */
-  boolean isEnabled();
-
-  /**
-   * Specify whether to enable or disable provisioning for this node.  
-   * @param enabled {@code true} to enable provisioning, {@code false} to disable it.
-   */
-  void setEnabled(boolean enabled);
 }

@@ -17,20 +17,17 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="nodeProvisioningPanel" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="nodeProvisioningPanel" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<property name="label" value="Node provisioning"/>
 	<property name="layoutConstraints" value="flowy, fill"/>
 	<property name="componentConstraints" value=""/>
 
-	<!-- ===================================================================== -->
-	<!--                          Text area                                    -->
-	<!-- ===================================================================== -->
-
 	<child name="mainArea" type="page">
 		<property name="layoutConstraints" value="fill, flowy"/>
 		<property name="componentConstraints" value="grow, push"/>
-		<property name="bordered" value="true"/>
+		<property name="bordered" value="false"/>
 
+    <!-- Numbr of slaves spinner -->
     <child name="nbSlaves" type="SpinnerNumber">
       <property name="label" value="Number of slave nodes"/>
       <property name="tooltip" value="Number of slave nodes to provision. Slaves will be started or terminated as needed"/>
@@ -40,10 +37,10 @@
       <property name="persistent" value="true"/>
     </child>
 
+    <!-- Use config overrides checkbox -->
 		<child name="useOverrides" type="Boolean">
 			<property name="label" value="Use configuration overrides"/>
 			<property name="tooltip" value="Whether to specify configuration override for the slaves"/>
-			<!--<property name="value" value="false"/>-->
 			<property name="persistent" value="true"/>
       <script language="groovy">
         void updateTextArea() {
@@ -60,18 +57,28 @@
       </listener>
 		</child>
 
-		<child name="configOverrides" type="TextArea">
-			<property name="scrollable" value="true"/>
-			<property name="editable" value="true"/>
-			<property name="label" value="Configuration overrides"/>
-			<property name="tooltip" value="Configuration properties that will override the default slaves configuration"/>
-			<property name="value" value=""/>
-			<property name="componentConstraints" value="gaptop unrel, grow, push, w 400, h 300"/>
-      <property name="persistent" value="true"/>
-		</child>
+    <child name="configOverridesContainer" type="page">
+      <property name="label" value="Configuration overrides"/>
+      <property name="bordered" value="true"/>
+      <property name="layoutConstraints" value="fill"/>
+      <property name="componentConstraints" value="grow, push"/>
 
-	</child>
+      <!-- Text area -->
+  		<child name="configOverrides" type="TextArea">
+  			<property name="scrollable" value="true"/>
+  			<property name="editable" value="true"/>
+  			<property name="label" value="Configuration overrides"/>
+  			<property name="tooltip" value="Configuration properties that will override the default slaves configuration"/>
+  			<property name="value" value=""/>
+  			<property name="componentConstraints" value="grow, push, w 400, h 300"/>
+        <property name="persistent" value="true"/>
+      </child>
 
+    </child>
+
+  </child>
+
+  <!-- OK and Cancel buttons -->
 	<child name="provisioningButtons" type="page">
 		<property name="layoutConstraints" value="fill"/>
 		<property name="componentConstraints" value="growx 0"/>
