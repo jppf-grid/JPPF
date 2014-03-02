@@ -19,9 +19,6 @@
 	<classpathentry kind="src" output="Nbody/classes" path="Nbody/src"/>
 	<classpathentry kind="src" path="NodeConnectionEvents/src"/>
 	<classpathentry kind="src" output="NodeLifeCycle/classes" path="NodeLifeCycle/src"/>
-	<classpathentry kind="src" output="NodeProvisioning/classes/client" path="NodeProvisioning/src/client"/>
-	<classpathentry kind="src" output="NodeProvisioning/classes/master" path="NodeProvisioning/src/master"/>
-	<classpathentry kind="src" output="NodeProvisioning/classes/slave" path="NodeProvisioning/src/slave"/>
 	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
