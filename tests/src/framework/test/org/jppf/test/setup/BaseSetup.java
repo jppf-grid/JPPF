@@ -33,8 +33,7 @@ import org.jppf.utils.*;
  * Helper methods for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
  */
-public class BaseSetup
-{
+public class BaseSetup {
   /**
    * The default configuratin used when none is specified.
    */
@@ -62,8 +61,7 @@ public class BaseSetup
    * @return an instance of <code>DriverJobManagementMBean</code>.
    * @throws Exception if the proxy could not be obtained.
    */
-  public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception
-  {
+  public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception {
     JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
@@ -75,8 +73,7 @@ public class BaseSetup
    * @return an instance of <code>DriverJobManagementMBean</code>.
    * @throws Exception if the proxy could not be obtained.
    */
-  public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception
-  {
+  public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception {
     JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver;
@@ -87,8 +84,7 @@ public class BaseSetup
    * @return an instance of <code>DriverJobManagementMBean</code>.
    * @throws Exception if the proxy could not be obtained.
    */
-  public static JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
-  {
+  public static JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception {
     JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver;
@@ -100,8 +96,7 @@ public class BaseSetup
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbNodes) throws Exception
-  {
+  public static JPPFClient setup(final int nbNodes) throws Exception {
     return setup(1, nbNodes, true, DEFAULT_CONFIG);
   }
 
@@ -112,8 +107,7 @@ public class BaseSetup
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbNodes, final boolean initClient) throws Exception
-  {
+  public static JPPFClient setup(final int nbNodes, final boolean initClient) throws Exception {
     return setup(1, nbNodes, initClient, DEFAULT_CONFIG);
   }
 
@@ -125,8 +119,7 @@ public class BaseSetup
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception
-  {
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception {
     return setup(nbDrivers, nbNodes, initClient, DEFAULT_CONFIG);
   }
 
@@ -139,26 +132,22 @@ public class BaseSetup
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient, final Configuration config) throws Exception
-  {
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient, final Configuration config) throws Exception {
     System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (initClient ? " and 1 client" : ""));
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
-    for (int i=0; i<nbDrivers; i++)
-    {
+    for (int i=0; i<nbDrivers; i++) {
       if (config == null) drivers[i] = new DriverProcessLauncher(i+1);
       else drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions);
       new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
     }
     nodes = new NodeProcessLauncher[nbNodes];
-    for (int i=0; i<nbNodes; i++)
-    {
+    for (int i=0; i<nbNodes; i++) {
       if (config == null) nodes[i] = new NodeProcessLauncher(i+1);
       else nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
-    if (initClient)
-    {
+    if (initClient) {
       client = createClient(null, true, config);
       checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     }
@@ -171,8 +160,7 @@ public class BaseSetup
    * @return a <code>JPPFClient</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFClient createClient(final String uuid) throws Exception
-  {
+  public static JPPFClient createClient(final String uuid) throws Exception {
     return createClient(uuid, true, DEFAULT_CONFIG);
   }
 
@@ -183,8 +171,7 @@ public class BaseSetup
    * @return a <code>JPPFClient</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFClient createClient(final String uuid, final boolean reset) throws Exception
-  {
+  public static JPPFClient createClient(final String uuid, final boolean reset) throws Exception {
     return createClient(uuid, reset, DEFAULT_CONFIG);
   }
 
@@ -196,8 +183,7 @@ public class BaseSetup
    * @return a <code>JPPFClient</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFClient createClient(final String uuid, final boolean reset, final Configuration config) throws Exception
-  {
+  public static JPPFClient createClient(final String uuid, final boolean reset, final Configuration config) throws Exception {
     ConfigSource.setClientConfig(config.clientConfig);
     if (reset) JPPFConfiguration.reset();
     client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
@@ -206,11 +192,19 @@ public class BaseSetup
   }
 
   /**
+   * Reset the client configuration to the defaults.
+   * @throws Exception if any error occurs.
+   */
+  public static void resetClientConfig() throws Exception {
+    ConfigSource.setClientConfig(DEFAULT_CONFIG.clientConfig);
+    JPPFConfiguration.reset();
+  }
+
+  /**
    * Stops the driver and node and close the client.
    * @throws Exception if a process could not be stopped.
    */
-  public static void cleanup() throws Exception
-  {
+  public static void cleanup() throws Exception {
     close();
     Runtime.getRuntime().removeShutdownHook(shutdownHook);
   }
@@ -219,10 +213,8 @@ public class BaseSetup
    * Stops the driver and node and close the client.
    * @throws Exception if a process could not be stopped.
    */
-  private static void close() throws Exception
-  {
-    if (client != null)
-    {
+  private static void close() throws Exception {
+    if (client != null) {
       client.close();
       client = null;
       Thread.sleep(500L);
@@ -238,8 +230,7 @@ public class BaseSetup
    * @param nbNodes the number of nodes that were started.
    * @throws Exception if any error occurs.
    */
-  public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception
-  {
+  public static void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception {
     checkDriverAndNodesInitialized(client, nbDrivers, nbNodes);
   }
 
@@ -250,18 +241,14 @@ public class BaseSetup
    * @param nbNodes the number of nodes that were started.
    * @throws Exception if any error occurs.
    */
-  public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes) throws Exception
-  {
+  public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
     Map<Integer, JPPFClientConnection> connectionMap = new HashMap<>();
     boolean allConnected = false;
-    while (!allConnected)
-    {
+    while (!allConnected) {
       List<JPPFClientConnection> list = client.getAllConnections();
-      if (list != null)
-      {
-        for (JPPFClientConnection c: list)
-        {
+      if (list != null) {
+        for (JPPFClientConnection c: list) {
           if (!connectionMap.containsKey(c.getPort())) connectionMap.put(c.getPort(), c);
         }
       }
@@ -269,21 +256,17 @@ public class BaseSetup
       else allConnected = true;
     }
     Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
-    for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet())
-    {
+    for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet()) {
       JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
-      if (!wrapperMap.containsKey(wrapper.getURL()))
-      {
+      if (!wrapperMap.containsKey(wrapper.getURL())) {
         while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
         wrapperMap.put(wrapper.getURL(), wrapper);
       }
     }
     int sum = 0;
-    while (sum < nbNodes)
-    {
+    while (sum < nbNodes) {
       sum = 0;
-      for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet())
-      {
+      for (Map.Entry<JMXServiceURL, JMXDriverConnectionWrapper> entry: wrapperMap.entrySet()) {
         Integer n = entry.getValue().nbNodes();
         if (n != null) sum += n;
         else break;
@@ -294,15 +277,11 @@ public class BaseSetup
   /**
    * Stop driver and node processes.
    */
-  protected static void stopProcesses()
-  {
-    try
-    {
+  protected static void stopProcesses() {
+    try {
       if (nodes != null)  for (NodeProcessLauncher n: nodes) n.stopProcess();
       if (drivers != null) for (DriverProcessLauncher d: drivers) d.stopProcess();
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       t.printStackTrace();
     }
   }
@@ -327,8 +306,7 @@ public class BaseSetup
    * Get the number of drivers in the test setup.
    * @return the number of drivers as an int.
    */
-  public static int nbDrivers()
-  {
+  public static int nbDrivers() {
     return drivers == null ? 0 : drivers.length;
   }
 
@@ -336,8 +314,7 @@ public class BaseSetup
    * Get the number of nodes in the test setup.
    * @return the number of nodes as an int.
    */
-  public static int nbNodes()
-  {
+  public static int nbNodes() {
     return nodes == null ? 0 : nodes.length;
   }
 
@@ -345,8 +322,7 @@ public class BaseSetup
    * Create the default configuratin used when none is specified.
    * @return a {@link Configuration} instance.
    */
-  private static Configuration createDefaultConfiguration()
-  {
+  private static Configuration createDefaultConfiguration() {
     Configuration config = new Configuration();
     List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");
@@ -377,8 +353,7 @@ public class BaseSetup
   /**
    * 
    */
-  public static class Configuration
-  {
+  public static class Configuration {
     /**
      * Path to the driver JPPF config
      */
@@ -420,8 +395,7 @@ public class BaseSetup
      * Copy this configuration to a new instance.
      * @return a {@link Configuration} instance.
      */
-    public Configuration copy()
-    {
+    public Configuration copy() {
       Configuration copy = new Configuration();
       copy.driverJppf = driverJppf;
       copy.driverLog4j = driverLog4j;
@@ -439,16 +413,14 @@ public class BaseSetup
   /**
    * 
    */
-  public static class ConfigSource implements JPPFConfiguration.ConfigurationSourceReader
-  {
+  public static class ConfigSource implements JPPFConfiguration.ConfigurationSourceReader {
     /**
      * Path to the client configuration file.
      */
     private static String clientConfig = null;
 
     @Override
-    public Reader getPropertyReader() throws IOException
-    {
+    public Reader getPropertyReader() throws IOException {
       if (clientConfig == null) return null;
       return FileUtils.getFileReader(clientConfig);
     }
@@ -457,8 +429,7 @@ public class BaseSetup
      * Get the path to the client configuration file.
      * @return the path as a string.
      */
-    public static String getClientConfig()
-    {
+    public static String getClientConfig() {
       return clientConfig;
     }
 
@@ -466,8 +437,7 @@ public class BaseSetup
      * Set the path to the client configuration file.
      * @param clientConfig the path as a string.
      */
-    public static void setClientConfig(final String clientConfig)
-    {
+    public static void setClientConfig(final String clientConfig) {
       ConfigSource.clientConfig = clientConfig;
     }
   }

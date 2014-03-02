@@ -39,8 +39,7 @@ import test.org.jppf.test.setup.common.*;
  * as specified in the job SLA.
  * @author Laurent Cohen
  */
-public class TestJPPFJobClientSLA extends Setup1D1N
-{
+public class TestJPPFJobClientSLA extends Setup1D1N {
   /**
    * A "short" duration for this test.
    */
@@ -63,10 +62,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAtDateClient() throws Exception
-  {
-    try
-    {
+  public void testJobExpirationAtDateClient() throws Exception {
+    try {
       configure(false, true, 1);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
       SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
@@ -77,9 +74,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       assertEquals(results.size(), 1);
       Task<?> task = results.get(0);
       assertNull(task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -89,10 +84,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAtDateTooLateClient() throws Exception
-  {
-    try
-    {
+  public void testJobExpirationAtDateTooLateClient() throws Exception {
+    try {
       configure(false, true, 1);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
       SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
@@ -104,9 +97,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       Task<?> task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -116,10 +107,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAfterDelayClient() throws Exception
-  {
-    try
-    {
+  public void testJobExpirationAfterDelayClient() throws Exception {
+    try {
       configure(false, true, 1);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_LONG);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_SHORT));
@@ -128,9 +117,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       assertEquals(results.size(), 1);
       Task<?> task = results.get(0);
       assertNull(task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -140,10 +127,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
-  public void testJobExpirationAfterDelayTooLateClient() throws Exception
-  {
-    try
-    {
+  public void testJobExpirationAfterDelayTooLateClient() throws Exception {
+    try {
       configure(false, true, 1);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, SimpleTask.class, TIME_SHORT);
       job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
@@ -153,9 +138,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       Task<?> task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -165,10 +148,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=10000)
-  public void testMultipleJobsExpirationClient() throws Exception
-  {
-    try
-    {
+  public void testMultipleJobsExpirationClient() throws Exception {
+    try {
       configure(false, true, 1);
       String methodName = ReflectionUtils.getCurrentMethodName();
       JPPFJob job1 = BaseTestHelper.createJob(methodName + "-1", false, false, 1, SimpleTask.class, TIME_LONG);
@@ -188,9 +169,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       task = results.get(0);
       assertNotNull(task.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -200,10 +179,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=15000)
-  public void testJobInNodeExecutionPolicyClient() throws Exception
-  {
-    try
-    {
+  public void testJobInNodeExecutionPolicyClient() throws Exception {
+    try {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
       int nbTasks = 10;
@@ -212,16 +189,13 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      for (Task<?> t: results)
-      {
+      for (Task<?> t: results) {
         LifeCycleTask task = (LifeCycleTask) t;
         assertTrue(task.isExecutedInNode());
         assertNotNull(task.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       }
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -231,10 +205,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   @Test(timeout=15000)
-  public void testJobLocalExecutionPolicyClient() throws Exception
-  {
-    try
-    {
+  public void testJobLocalExecutionPolicyClient() throws Exception {
+    try {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
       int nbTasks = 10;
@@ -243,16 +215,13 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
-      for (Task<?> t: results)
-      {
+      for (Task<?> t: results) {
         LifeCycleTask task = (LifeCycleTask) t;
         assertFalse(task.isExecutedInNode());
         assertNotNull(task.getResult());
         assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       }
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -262,10 +231,8 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   //@Test(timeout=8000)
-  public void testJobMaxChannelsClient() throws Exception
-  {
-    try
-    {
+  public void testJobMaxChannelsClient() throws Exception {
+    try {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
       int nbTasks = 10;
@@ -275,21 +242,17 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       assertNotNull(results);
       assertEquals(results.size(), nbTasks);
       // check that no 2 tasks were executing at the same time on different channels
-      for (int i=0; i<results.size()-1; i++)
-      {
+      for (int i=0; i<results.size()-1; i++) {
         LifeCycleTask t1 = (LifeCycleTask) results.get(i);
         Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
-        for (int j=i+1; j<results.size(); j++)
-        {
+        for (int j=i+1; j<results.size(); j++) {
           LifeCycleTask t2 = (LifeCycleTask) results.get(j);
           Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
           assertFalse("r1=" + r1 + ", r2=" + r2 + ", uuid1=" + t1.getNodeUuid() + ", uuid2=" + t2.getNodeUuid(), 
             r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
         }
       }
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -298,11 +261,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * Test that a job is executed on both local and remote channels.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=20000)
-  public void testJobMaxChannels2Client() throws Exception
-  {
-    try
-    {
+  @Test(timeout=15000)
+  public void testJobMaxChannels2Client() throws Exception {
+    try {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
       int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
@@ -313,16 +274,13 @@ public class TestJPPFJobClientSLA extends Setup1D1N
       assertEquals(results.size(), nbTasks);
       boolean found = false;
       // check that no 2 tasks were executing at the same time on different channels
-      for (int i=0; i<results.size()-1; i++)
-      {
+      for (int i=0; i<results.size()-1; i++) {
         LifeCycleTask t1 = (LifeCycleTask) results.get(i);
         Range<Double> r1 = new Range<>(t1.getStart(), t1.getStart() + t1.getElapsed());
-        for (int j=i+1; j<results.size(); j++)
-        {
+        for (int j=i+1; j<results.size(); j++) {
           LifeCycleTask t2 = (LifeCycleTask) results.get(j);
           Range<Double> r2 = new Range<>(t2.getStart(), t2.getStart() + t2.getElapsed());
-          if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid()))
-          {
+          if (r1.intersects(r2) && !t1.getNodeUuid().equals(t2.getNodeUuid())) {
             found = true;
             break;
           }
@@ -330,9 +288,10 @@ public class TestJPPFJobClientSLA extends Setup1D1N
         if (found) break;
       }
       assertTrue(found);
-    }
-    finally
-    {
+    } catch(Exception e) {
+      e.printStackTrace();
+      throw e;
+    } finally {
       reset();
     }
   }
@@ -344,26 +303,25 @@ public class TestJPPFJobClientSLA extends Setup1D1N
    * @param poolSize the size of the connection pool.
    * @throws Exception if any error occurs.
    */
-  private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) throws Exception
-  {
+  private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) throws Exception {
+    BaseSetup.resetClientConfig();
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.remote.execution.enabled", String.valueOf(remoteEnabled));
-    config.setProperty("jppf.local.execution.enabled", String.valueOf(localEnabled));
-    config.setProperty("jppf.local.execution.threads", String.valueOf(Runtime.getRuntime().availableProcessors()));
+    //config.setBoolean("jppf.ssl.enabled", false);
+    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
+    config.setBoolean("jppf.local.execution.enabled", localEnabled);
+    config.setInt("jppf.local.execution.threads", Runtime.getRuntime().availableProcessors());
     config.setProperty("jppf.load.balancing.algorithm", "manual");
     config.setProperty("jppf.load.balancing.profile", "manual");
-    config.setProperty("jppf.load.balancing.profile.manual.size", "5");
-    config.setProperty("jppf.pool.size", String.valueOf(poolSize));
+    config.setInt("jppf.load.balancing.profile.manual.size", 5);
+    config.setInt("jppf.pool.size", poolSize);
     client = BaseSetup.createClient(null, false);
   }
 
   /**
    * Close the client and reset the configuration.
    */
-  private void reset()
-  {
-    if (client != null)
-    {
+  private void reset() {
+    if (client != null) {
       client.close();
       client = null;
     }
