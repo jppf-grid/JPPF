@@ -53,8 +53,7 @@ public class TestFileDataLocation extends Setup1D1N1C
    * Test the execution of a job with a very large footprint, and multiple dispatches from the load-balancer.
    * @throws Exception if any error occurs
    */
-  @Test()
-  //@Test(timeout=20000)
+  @Test(timeout=20000)
   public void testSubmitLargeDataProvider() throws Exception
   {
     System.out.println("******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************");

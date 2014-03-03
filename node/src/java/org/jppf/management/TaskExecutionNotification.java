@@ -24,8 +24,7 @@ import javax.management.*;
  * Notification sent to provide information about a task that was executed in a node.
  * @author Laurent Cohen
  */
-public class TaskExecutionNotification extends Notification
-{
+public class TaskExecutionNotification extends Notification {
   /**
    * Explicit serialVersionUID.
    */
@@ -33,7 +32,11 @@ public class TaskExecutionNotification extends Notification
   /**
    * Information about the task that triggered this notification.
    */
-  private TaskInformation taskInformation = null;
+  private final TaskInformation taskInformation;
+  /**
+   * Determines whether this is a user-defined notification sent from a task.
+   */
+  private final boolean userNotification;
 
   /**
    * Initialize this notification with the specified parameters.
@@ -41,11 +44,12 @@ public class TaskExecutionNotification extends Notification
    * @param sequenceNumber the notification sequence number.
    * @param taskInformation information about the task that triggered this notification.
    * @param userObject an user-defined object sent along with this notification.
+   * @param userNotification determines whether this is a user-defined notification sent from a task.
    */
-  public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation, final Object userObject)
-  {
+  public TaskExecutionNotification(final ObjectName source, final long sequenceNumber, final TaskInformation taskInformation, final Object userObject, final boolean userNotification) {
     super("task.monitor", source, sequenceNumber, taskInformation.getTimestamp());
     this.taskInformation = taskInformation;
+    this.userNotification = userNotification;
     setUserData(userObject);
   }
 
@@ -53,8 +57,16 @@ public class TaskExecutionNotification extends Notification
    * Get the object encapsulating information about the task.
    * @return a <code>TaskInformation</code> instance.
    */
-  public TaskInformation getTaskInformation()
-  {
+  public TaskInformation getTaskInformation() {
     return taskInformation;
+  }
+
+  /**
+   * Determine whether this is a user-defined notification sent from a task.
+   * @return {@code true} if this is a user notification, {@code false} otherwise.
+   * @since 4.1
+   */
+  public boolean isUserNotification() {
+    return userNotification;
   }
 }

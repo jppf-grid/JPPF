@@ -26,6 +26,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
@@ -247,6 +248,34 @@ public class TestJPPFTask extends Setup1D1N1C {
   }
 
   /**
+   * Test that JMX notifications sent by a task are received by a fowarding JMX notification listener.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskJMXNotifications() throws Exception {
+    NodeSelector selector = NodeSelector.ALL_NODES;
+    int nbTasks = 20;
+    NotifyingTaskListener listener = new NotifyingTaskListener();
+    String listenerID = null;
+    JMXDriverConnectionWrapper driverJmx = BaseSetup.getDriverManagementProxy();
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask2.class);
+    try {
+      listenerID = driverJmx.registerForwardingNotificationListener(selector, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+      client.submitJob(job);
+      Thread.sleep(1500L);
+    } finally {
+      driverJmx.unregisterForwardingNotificationListener(listenerID);
+    }
+    assertEquals(2*nbTasks, listener.taskExecutionUserNotificationCount);
+    assertEquals(nbTasks, listener.taskExecutionJppfNotificationCount);
+    for (Task<?> task: job) {
+      assertTrue(listener.userObjects.contains(task.getId()  + "#1"));
+      assertFalse(listener.userObjects.contains(task.getId() + "#2"));
+      assertTrue(listener.userObjects.contains(task.getId()  + "#3"));
+    }
+  }
+  
+  /**
    * A simple Task which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends AbstractTask<Object> {
@@ -371,6 +400,18 @@ public class TestJPPFTask extends Setup1D1N1C {
         };
         fireNotification(callable, false);
       }
+    }
+  }
+
+  /**
+   * 
+   */
+  public static class NotifyingTask2 extends AbstractTask<Object> {
+    @Override
+    public void run() {
+      fireNotification(getId() + "#1", true);
+      fireNotification(getId() + "#2", false);
+      fireNotification(getId() + "#3", true);
     }
   }
 }

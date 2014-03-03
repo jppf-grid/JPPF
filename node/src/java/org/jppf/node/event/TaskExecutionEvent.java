@@ -48,6 +48,7 @@ public class TaskExecutionEvent extends EventObject
 
   /**
    * Initialize this event object with the specified task.
+   * This constructor is used by the JPPF node when sending task completion notifications.
    * @param task the JPPF task from which the event originates.
    * @param jobId the id of the job this task belongs to.
    * @param cpuTime the cpu time taken by the task.
@@ -65,6 +66,7 @@ public class TaskExecutionEvent extends EventObject
 
   /**
    * Initialize this event object with the specified task.
+   * This constructor is used when sending user-ddefined notifications from the tasks.
    * @param task the JPPF task from which the event originates.
    * @param jobId the id of the job this task belongs to.
    * @param userObject a user-defined object to send as part of the notification.
@@ -121,10 +123,21 @@ public class TaskExecutionEvent extends EventObject
   /**
    * Determine whether this is a task completion or user-sent event.
    * @return <code>true</code> if this is a task completion event, <code>false</code> otherwise.
+   * @since 4.0
    * @exclude
    */
   public boolean isTaskCompletion()
   {
     return taskCompletion;
+  }
+
+  /**
+   * Determine whether this is a user-sent event.
+   * @return <code>true</code> if this is a task completion event, <code>false</code> otherwise.
+   * @since 4.1
+   */
+  public boolean isUserNotification()
+  {
+    return !taskCompletion;
   }
 }

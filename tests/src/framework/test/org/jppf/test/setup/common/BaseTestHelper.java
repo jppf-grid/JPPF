@@ -98,8 +98,7 @@ public class BaseTestHelper
     for (int i=1; i<=nbTasks; i++)
     {
       Object o = constructor.newInstance(params);
-      if (o instanceof Task) ((Task) o).setId(job.getName() + " - task " + i);
-      job.add(o);
+      job.add(o).setId(job.getName() + " - task " + i);
     }
     job.setBlocking(blocking);
     job.getSLA().setBroadcastJob(broadcast);

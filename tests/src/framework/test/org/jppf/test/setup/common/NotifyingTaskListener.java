@@ -22,12 +22,14 @@ import java.util.*;
 
 import javax.management.*;
 
+import org.jppf.management.TaskExecutionNotification;
+import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
+
 /**
-   * A JMX {@link NotificationListener} which simply accumulates the notifications it receives.
+ * A JMX {@link NotificationListener} which simply accumulates the notifications it receives.
  * @author Laurent Cohen
  */
-public class NotifyingTaskListener implements NotificationListener
-{
+public class NotifyingTaskListener implements NotificationListener {
   /**
    * The task information received as notifications from the node.
    */
@@ -36,16 +38,34 @@ public class NotifyingTaskListener implements NotificationListener
    * 
    */
   public Exception exception = null;
+  /**
+   * 
+   */
+  public int taskExecutionUserNotificationCount = 0;
+  /**
+   * 
+   */
+  public int taskExecutionJppfNotificationCount = 0;
+  /**
+   * List of received user objects.
+   */
+  public List<Object> userObjects = new Vector<>();
 
   @Override
-  public void handleNotification(final Notification notification, final Object handback)
-  {
-    try
-    {
+  public void handleNotification(final Notification notification, final Object handback) {
+    try {
       notifs.add(notification);
-    }
-    catch (Exception e)
-    {
+      if (notification instanceof JPPFNodeForwardingNotification) {
+        Notification realNotif = ((JPPFNodeForwardingNotification) notification).getNotification();
+        if (realNotif instanceof TaskExecutionNotification) {
+          TaskExecutionNotification notif = (TaskExecutionNotification) realNotif;
+          if (notif.isUserNotification()) taskExecutionUserNotificationCount++;
+          else taskExecutionJppfNotificationCount++;
+          Object o = notif.getUserData();
+          if (o != null) userObjects.add(o);
+        }
+      }
+    } catch (Exception e) {
       if (exception == null) exception = e;
     }
   }
