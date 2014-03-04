@@ -171,7 +171,7 @@ public class TopologyData {
    */
   @Override
   public String toString() {
-    return (type == TopologyDataType.NODE) ? nodeInformation.getHost() + ':' + nodeInformation.getPort() : jmxWrapper.getDisplayName();
+    return (type == TopologyDataType.NODE) ? nodeInformation.getHost() + ':' + nodeInformation.getPort() : (jmxWrapper != null ? jmxWrapper.getDisplayName(): "?");
   }
 
   /**

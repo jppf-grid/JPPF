@@ -68,7 +68,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
     this.connectionUuid = client.getUuid() + '_' + connectionCount.incrementAndGet();
     configure(uuid, name, info.host, ssl ? info.sslServerPorts[0] : info.serverPorts[0], 0, ssl);
     jmxPort = ssl ? info.sslManagementPort : info.managementPort;
-    initializeJmxConnection();
+    //if (jmxPort >= 0) initializeJmxConnection();
   }
 
   @Override
@@ -84,7 +84,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       {
         host = InetAddress.getByName(host).getHostName();
         displayName = name + '[' + host + ':' + port + ']';
-        getJmxConnection().setHost(host);
       }
       catch (UnknownHostException e)
       {
@@ -140,6 +139,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
     {
       new Thread(delegate, delegate.getName()).start();
       taskServerConnection.init();
+      initializeJmxConnection();
     }
   }
 

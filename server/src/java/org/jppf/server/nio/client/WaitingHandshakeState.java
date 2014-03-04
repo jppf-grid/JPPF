@@ -22,6 +22,7 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 
 import java.util.List;
 
+import org.jppf.management.JMXServer;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
@@ -90,6 +91,10 @@ class WaitingHandshakeState extends ClientServerState
       // send system info (and more) back to the client
       header.setParameter(BundleParameter.SYSTEM_INFO_PARAM, driver.getSystemInformation());
       header.setParameter(BundleParameter.DRIVER_UUID_PARAM, driverUUID);
+      JMXServer jmxServer = driver.getInitializer().getJmxServer(false);
+      header.setParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, jmxServer != null ? jmxServer.getManagementPort(): -1);
+      jmxServer = driver.getInitializer().getJmxServer(true);
+      header.setParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, jmxServer != null ? jmxServer.getManagementPort(): -1);
       return TO_SENDING_HANDSHAKE_RESULTS;
     }
     return TO_WAITING_HANDSHAKE;

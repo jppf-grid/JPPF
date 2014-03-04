@@ -92,7 +92,7 @@ public class NodeDataPanelManager {
    */
   void driverAdded(final JPPFClientConnection connection) {
     if (findDriver(connection.getDriverUuid()) != null) return;
-    JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
+    JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
     String driverName = connection.getDriverUuid();
     int index = driverInsertIndex(driverName);
     if (index < 0) return;
@@ -102,25 +102,27 @@ public class NodeDataPanelManager {
     if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
     panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
     fireDriverAdded(driverData);
-    if (panel.getListenerMap().get(wrapper.getId()) == null) {
-      ConnectionStatusListener listener = new ConnectionStatusListener(panel, driverData.getUuid());
-      connection.addClientConnectionStatusListener(listener);
-      panel.getListenerMap().put(wrapper.getId(), listener);
+    panel.updateStatusBar("/StatusNbServers", 1);
+    if (jmx != null) {
+      if ((jmx != null) && (panel.getListenerMap().get(jmx.getId()) == null)) {
+        ConnectionStatusListener listener = new ConnectionStatusListener(panel, driverData.getUuid());
+        connection.addClientConnectionStatusListener(listener);
+        panel.getListenerMap().put(jmx.getId(), listener);
+      }
+      Collection<JPPFManagementInfo> nodes = null;
+      try {
+        nodes = jmx.nodesInformation();
+      } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        return;
+      }
+      if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
     }
-    Collection<JPPFManagementInfo> nodes = null;
-    try {
-      nodes = wrapper.nodesInformation();
-    } catch(Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      return;
-    }
-    if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
     JPPFTreeTable treeTable = panel.getTreeTable();
     if (treeTable != null) {
       treeTable.expand(panel.getTreeTableRoot());
       treeTable.expand(driverNode);
     }
-    panel.updateStatusBar("/StatusNbServers", 1);
     repaintTreeTable();
   }
 

@@ -66,6 +66,14 @@ public enum  BundleParameter
    */
   DRIVER_UUID_PARAM,
   /**
+   * Parameter for the non-secure JMX server port.
+   */
+  DRIVER_MANAGEMENT_PORT,
+  /**
+   * Parameter for the secure JMX server port.
+   */
+  DRIVER_MANAGEMENT_PORT_SSL,
+  /**
    * Parameter the total accumulated task execution elapsed time in a bundle.
    */
   NODE_BUNDLE_ELAPSED_PARAM,

@@ -99,13 +99,13 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
     else taskSuccessfulCount++;
     totalCpuTime += info.getCpuTime();
     totalElapsedTime += info.getElapsedTime();
-    executor.submit(new NotificationSender(info, null));
+    executor.submit(new NotificationSender(info, null, false));
   }
 
   @Override
   public void taskNotification(final TaskExecutionEvent event)
   {
-    executor.submit(new NotificationSender(event.getTaskInformation(), event.getUserObject()));
+    if (event.isSendViaJmx()) executor.submit(new NotificationSender(event.getTaskInformation(), event.getUserObject(), true));
   }
 
   /**
@@ -181,22 +181,28 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
      * User-defined object sent along with the notification.
      */
     private final Object userObject;
+    /**
+     * Determines whether this is a user-defined notification sent from a task.
+     */
+    private final boolean userNotification;
 
     /**
      * 
      * @param info the info to send.
      * @param userObject a user-defined object sent along with the notification.
+     * @param userNotification determines whether this is a user-defined notification sent from a task.
      */
-    public NotificationSender(final TaskInformation info, final Object userObject)
+    public NotificationSender(final TaskInformation info, final Object userObject, final boolean userNotification)
     {
       this.info = info;
       this.userObject = userObject;
+      this.userNotification = userNotification;
     }
 
     @Override
     public void run()
     {
-      sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info, userObject));
+      sendNotification(new TaskExecutionNotification(OBJECT_NAME, ++sequence, info, userObject, userNotification));
     }
   }
 }

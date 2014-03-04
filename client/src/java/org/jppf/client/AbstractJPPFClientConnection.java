@@ -275,6 +275,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   public void initializeJmxConnection()
   {
+    if (debugEnabled) log.debug("{} initializing jmx with host={}, jmxPort={}, ssl={}", new Object[] {this, host, jmxPort, sslEnabled});
     jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, sslEnabled);
     jmxConnection.connect();
   }

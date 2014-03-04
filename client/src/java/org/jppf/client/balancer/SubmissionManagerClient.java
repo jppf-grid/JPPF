@@ -184,7 +184,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         JMXDriverConnectionWrapper jmx = cnn.getJmxConnection();
         JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(jmx.getHost(), jmx.getPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
+        JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), jmx == null ? -1 : jmx.getPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       } catch (Throwable e) {
@@ -243,7 +243,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
         JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
 
         wrapper.setSystemInformation(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(jmx.getHost(), jmx.getPort(), jmx.getId(), JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+        JPPFManagementInfo info = new JPPFManagementInfo(connection.getHost(), jmx != null ? jmx.getPort() : -1,
+          jmx != null ? jmx.getId() : (connection.getDriverUuid() != null ? connection.getDriverUuid() : "?"),
+          JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }

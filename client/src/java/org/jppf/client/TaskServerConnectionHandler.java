@@ -23,6 +23,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -95,6 +96,9 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
           socketClient.writeInt(JPPFIdentifiers.CLIENT_JOB_DATA_CHANNEL);
           if (owner.isSSLEnabled()) createSSLConnection();
           TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
+          int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
+          int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
+          ((AbstractJPPFClientConnection) owner).jmxPort = owner.isSSLEnabled() ? sslJmxPort : plainJmxPort;
           msg = "[client: " + name + "] Reconnected to the JPPF task server";
           System.out.println(msg);
           if (debugEnabled) log.debug(msg);

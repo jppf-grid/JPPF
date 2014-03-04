@@ -30,8 +30,7 @@ import org.slf4j.*;
 /**
  * Task executed when a new driver connection is created.
  */
-class NewConnectionTask extends ThreadSynchronization implements Runnable
-{
+class NewConnectionTask extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -54,8 +53,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
    * @param statsHandler the {@link StatsHandler}.
    * @param c the new connection that was created.
    */
-  public NewConnectionTask(final StatsHandler statsHandler, final JPPFClientConnection c)
-  {
+  public NewConnectionTask(final StatsHandler statsHandler, final JPPFClientConnection c) {
     this.statsHandler = statsHandler;
     this.c = c;
   }
@@ -66,58 +64,46 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable
    */
   @Override
   @SuppressWarnings("unchecked")
-  public void run()
-  {
-    synchronized(statsHandler)
-    {
-      if (statsHandler.dataHolderMap.get(c.getName()) == null)
-      {
+  public void run() {
+    synchronized(statsHandler) {
+      if (statsHandler.dataHolderMap.get(c.getName()) == null) {
         statsHandler.dataHolderMap.put(c.getName(), new ConnectionDataHolder());
       }
-      if (statsHandler.timer != null)
-      {
+      if (statsHandler.timer != null) {
         TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }
     JComboBox box = null;
     while (statsHandler.getServerListOption() == null) goToSleep(50L);
-    synchronized(statsHandler)
-    {
+    synchronized(statsHandler) {
       if (debugEnabled) log.debug("adding client connection " + c.getName());
       box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
       int count = box.getItemCount();
       boolean found = false;
-      for (int i=0; i<count; i++)
-      {
+      for (int i=0; i<count; i++) {
         Object o = box.getItemAt(i);
-        if (c.equals(o))
-        {
+        if (c.equals(o)) {
           found = true;
           break;
         }
       }
-      if (!found)
-      {
+      if (!found) {
         box.addItem(c);
         int maxLen = 0;
         Object proto = null;
-        for (int i=0; i<box.getItemCount(); i++)
-        {
+        for (int i=0; i<box.getItemCount(); i++) {
           Object o = box.getItemAt(i);
           int n = o.toString().length();
-          if (n > maxLen)
-          {
+          if (n > maxLen) {
             maxLen = n;
             proto = o;
           }
         }
         if (proto != null) box.setPrototypeDisplayValue(proto);
       }
-      if (statsHandler.currentConnection == null)
-      {
-        //statsHandler.currentConnection = (JPPFClientConnectionImpl) c;
-        statsHandler.setCurrentConnection((JPPFClientConnectionImpl) c);
+      if (statsHandler.currentConnection == null) {
+        statsHandler.setCurrentConnection(c);
         box.setSelectedItem(c);
       }
     }

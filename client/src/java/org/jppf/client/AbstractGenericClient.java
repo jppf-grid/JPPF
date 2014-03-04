@@ -194,8 +194,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
             int port = props.getInt(String.format("%s.jppf.server.port", name), sslEnabled ? 11443 : 11111);
             if (!sslEnabled) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
+            /*
             if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
             else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
+            */
+            if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), -1);
+            else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), -1);
             int priority = new ConfigurationHelper(props).getInt(String.format("%s.jppf.priority", name), String.format("%s.priority", name), 0);
             if(receiverThread != null) receiverThread.addConnectionInformation(info);
             newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
@@ -260,15 +264,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   protected void connectionFailed(final JPPFClientConnection connection) {
     log.info("Connection [" + connection.getName() + "] failed");
     if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
-    /*
-    try {
-      JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
-      if (jmx != null) jmx.close();
-    } catch(Exception e) {
-      if (debugEnabled) log.debug("could not close JMX connection for " + connection, e);
-      else log.warn("could not close JMX connection for " + connection + " : " + ExceptionUtils.getMessage(e));
-    }
-    */
     connection.close();
     removeClientConnection(connection);
     fireConnectionFailed(connection);

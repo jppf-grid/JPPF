@@ -70,7 +70,7 @@ public class NodeRefreshHandler
 
   /**
    * Initialize this node handler.
-   * @param nodeDataPanel - the panel to refresh.
+   * @param nodeDataPanel the panel to refresh.
    */
   public NodeRefreshHandler(final NodeDataPanel nodeDataPanel)
   {
@@ -107,13 +107,11 @@ public class NodeRefreshHandler
   /**
    * Refresh the tree structure.
    */
-  private synchronized void refresh0()
-  {
+  private synchronized void refresh0() {
     Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
     Set<String> uuidSet = new HashSet<>();
     Map<String, JPPFClientConnection> map = new HashMap<>();
-    for (JPPFClientConnection c: connectionList)
-    {
+    for (JPPFClientConnection c: connectionList) {
       String driverUuid = c.getDriverUuid();
       if (uuidSet.contains(driverUuid)) continue;
       uuidSet.add(driverUuid);
@@ -123,27 +121,23 @@ public class NodeRefreshHandler
 
     // handle drivers that were removed
     List<String> driversToProcess = new ArrayList<>();
-    for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
-    {
+    for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet()) {
       String uuid = entry.getValue().getDriverUuid();
       if (!map.containsKey(uuid)) driversToProcess.add(uuid);
       else refreshNodes(uuid);
     }
-    for (String uuid: driversToProcess)
-    {
+    for (String uuid: driversToProcess) {
       if (debugEnabled) log.debug("removing driver " + uuid);
       nodeDataPanel.driverRemoved(uuid, false);
     }
 
     // handle drivers that were added
     driversToProcess = new ArrayList<>();
-    for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
-    {
+    for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet()) {
       String uuid = entry.getKey();
       if (!connectionMap.containsKey(uuid)) driversToProcess.add(uuid);
     }
-    for (String uuid: driversToProcess)
-    {
+    for (String uuid: driversToProcess) {
       if (debugEnabled) log.debug("adding driver " + uuid);
       nodeDataPanel.driverAdded(map.get(uuid));
     }
@@ -157,17 +151,18 @@ public class NodeRefreshHandler
    */
   private void refreshNodes(final String driverUuid) {
     DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverUuid);
-    //if (debugEnabled) log.debug("driverNode = " + driverNode);
+    if (debugEnabled) log.debug("driverNode = " + driverNode);
     if (driverNode == null) return;
+    TopologyData driverData = (TopologyData) driverNode.getUserObject();
+    refreshJmxConnection(driverData);
     Set<String> panelUuids = new HashSet<>();
     for (int i=0; i<driverNode.getChildCount(); i++) {
       DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-      TopologyData data = (TopologyData) nodeNode.getUserObject();
-      panelUuids.add(data.getUuid());
+      TopologyData nodeData = (TopologyData) nodeNode.getUserObject();
+      panelUuids.add(nodeData.getUuid());
     }
-    TopologyData data = (TopologyData) driverNode.getUserObject();
-    JMXDriverConnectionWrapper wrapper = (JMXDriverConnectionWrapper) data.getJmxWrapper();
-    if (!wrapper.isConnected()) return;
+    JMXDriverConnectionWrapper wrapper = driverData.getJmxWrapper();
+    if ((wrapper == null) || !wrapper.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
     try {
       nodesInfo = wrapper.nodesInformation();
@@ -207,12 +202,24 @@ public class NodeRefreshHandler
   }
 
   /**
+   * Refresh the JMX connection of the specified driver, in case it connected after the driver was added.
+   * @param driver the driver data to check and refresh.
+   */
+  private void refreshJmxConnection(final TopologyData driver) {
+    if (driver.getJmxWrapper() == null) {
+      JMXDriverConnectionWrapper jmx = driver.getClientConnection().getJmxConnection();
+      if (jmx != null) {
+        driver.setJmxWrapper(jmx);
+        driver.initializeProxies();
+      }
+    }
+  }
+
+  /**
    * Stop the automatic refresh of the nodes state through a timer.
    */
-  public void stopRefreshTimer()
-  {
-    if (refreshTimer != null)
-    {
+  public void stopRefreshTimer() {
+    if (refreshTimer != null) {
       refreshTimer.cancel();
       refreshTimer = null;
     }
@@ -221,16 +228,13 @@ public class NodeRefreshHandler
   /**
    * Start the automatic refresh of the nodes state through a timer.
    */
-  public void startRefreshTimer()
-  {
+  public void startRefreshTimer() {
     if (refreshTimer != null) return;
     if (refreshInterval <= 0L) return;
     refreshTimer = new Timer("JPPF Topology Update Timer");
-    TimerTask task = new TimerTask()
-    {
+    TimerTask task = new TimerTask() {
       @Override
-      public void run()
-      {
+      public void run() {
         refresh();
       }
     };
