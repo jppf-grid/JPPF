@@ -36,25 +36,21 @@ class ConnectionInitializer implements Runnable
   /**
    * The client connection to initialize.
    */
-  private JPPFClientConnection c = null;
+  private JPPFClientConnection connection = null;
 
   /**
    * Instantiate this connection initializer with the specified client connection.
-   * @param c the client connection to initialize.
+   * @param connection the client connection to initialize.
    */
-  public ConnectionInitializer(final JPPFClientConnection c)
+  public ConnectionInitializer(final JPPFClientConnection connection)
   {
-    this.c = c;
+    this.connection = connection;
   }
 
-  /**
-   * Perform the initialization of a client connection.
-   * @see java.lang.Runnable#run()
-   */
   @Override
   public void run()
   {
-    if (debugEnabled) log.debug("initializing driver connection '" + c+ '\'');
-    c.init();
+    if (debugEnabled) log.debug("initializing driver connection '" + connection + '\'');
+    connection.init();
   }
 }

@@ -62,7 +62,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   private static final boolean SEQUENTIAL_DESERIALIZATION = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
   /**
-   * 
+   * A sequence number used as suffix for the {@code connectionUuid}.
    */
   protected static AtomicInteger connectionCount = new AtomicInteger(0);
   /**

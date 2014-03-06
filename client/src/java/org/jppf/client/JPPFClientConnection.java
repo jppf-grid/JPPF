@@ -31,6 +31,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
 {
   /**
    * Initialize this client connection.
+   * @exclude
    */
   void init();
 
@@ -89,7 +90,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
   JMXDriverConnectionWrapper getJmxConnection();
 
   /**
-   * Get the system information.
+   * Get the system information for the remote driver this connection refers to.
    * @return a {@link JPPFSystemInformation} instance.
    */
   JPPFSystemInformation getSystemInfo();
@@ -99,4 +100,11 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
    * @return the id as a string.
    */
   String getConnectionUuid();
+
+  /**
+   * Get the id of thez pool this connection belongs to.
+   * @return the pool id as an int value.
+   * @exclude
+   */
+  int getPoolId();
 }

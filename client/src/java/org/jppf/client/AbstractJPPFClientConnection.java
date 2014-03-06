@@ -38,8 +38,7 @@ import org.slf4j.*;
  * depending on whether the uuid has changed or not.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection
-{
+public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   /**
    * Logger for this class.
    */
@@ -53,6 +52,10 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * priority. If multiple drivers have the same priority, they will be used as a pool and tasks will be evenly distributed among them.
    */
   protected int priority = 0;
+  /**
+   * The id of the connection pool this connection belongs to.
+   */
+  protected final int poolId;
   /**
    * List of status listeners for this connection.
    */
@@ -74,9 +77,17 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected JMXDriverConnectionWrapper jmxConnection = null;
   /**
-   *
+   * Port number the rmeote JMX server is listening to.
    */
   protected int jmxPort = -1;
+
+  /**
+   * Intiialize this connection with a pool id.
+   * @param poolId id of the connection pool this connection belongs to.
+   */
+  protected AbstractJPPFClientConnection(final int poolId) {
+    this.poolId = poolId;
+  }
 
   /**
    * Configure this client connection with the specified parameters.
@@ -87,8 +98,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @param priority the assigned to this client connection.
    * @param sslEnabled determines whether the communication via the server is done via SSL.
    */
-  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean sslEnabled)
-  {
+  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean sslEnabled) {
     this.driverUuid = uuid;
     this.host = host;
     this.port = driverPort;
@@ -112,8 +122,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @see org.jppf.client.JPPFClientConnection#getPriority()
    */
   @Override
-  public int getPriority()
-  {
+  public int getPriority() {
     return priority;
   }
 
@@ -121,23 +130,19 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Set the priority assigned to this connection.
    * @param priority a priority as an int value.
    */
-  public void setPriority(final int priority)
-  {
+  public void setPriority(final int priority) {
     this.priority = priority;
   }
 
   @Override
-  public JPPFClientConnectionStatus getStatus()
-  {
+  public JPPFClientConnectionStatus getStatus() {
     return status.get();
   }
 
   @Override
-  public void setStatus(final JPPFClientConnectionStatus status)
-  {
+  public void setStatus(final JPPFClientConnectionStatus status) {
     JPPFClientConnectionStatus oldStatus = getStatus();
-    if (status != oldStatus)
-    {
+    if (status != oldStatus) {
       if (debugEnabled) log.debug("connection '" + name + "' status changing from " + oldStatus + " to " + status);
       this.status.set(status);
       fireStatusChanged(oldStatus);
@@ -145,14 +150,12 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   @Override
-  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.add(listener);
   }
 
   @Override
-  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.remove(listener);
   }
 
@@ -160,8 +163,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Notify all listeners that the status of this connection has changed.
    * @param oldStatus the connection status before the change.
    */
-  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus)
-  {
+  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus) {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
   }
@@ -171,8 +173,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @return a string representing this connection.
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return displayName + " : " + status;
   }
 
@@ -183,14 +184,11 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Cancel the job with the specified id.
    * @param jobId the id of the job to cancel.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
-  public boolean cancelJob(final String jobId) throws Exception
-  {
+  public boolean cancelJob(final String jobId) throws Exception {
     JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
-    if ( jmxConnection != null && jmxConnection.isConnected())
-    {
+    if ( jmxConnection != null && jmxConnection.isConnected()) {
       if (debugEnabled) log.debug("requesting cancel of jobUuid=" + jobId);
       jmxConnection.cancelJob(jobId);
       return true;
@@ -202,10 +200,8 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Invoked to notify of a status change event on a client connection.
    * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
    */
-  public void delegateStatusChanged(final ClientConnectionStatusEvent event)
-  {
+  public void delegateStatusChanged(final ClientConnectionStatusEvent event) {
     JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
     JPPFClientConnectionStatus s2 = taskServerConnection.getStatus();
     processStatusChanged(s1, s2);
@@ -214,10 +210,8 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Invoked to notify of a status change event on a client connection.
    * @param event the event to notify of.
-   * @see org.jppf.client.event.ClientConnectionStatusListener#statusChanged(org.jppf.client.event.ClientConnectionStatusEvent)
    */
-  public void taskServerConnectionStatusChanged(final ClientConnectionStatusEvent event)
-  {
+  public void taskServerConnectionStatusChanged(final ClientConnectionStatusEvent event) {
     JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
     JPPFClientConnectionStatus s2 = delegate.getStatus();
     processStatusChanged(s2, s1);
@@ -229,19 +223,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @param delegateStatus status of the class server delegate connection.
    * @param taskConnectionStatus status of the task server connection.
    */
-  protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus)
-  {
+  protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus) {
     if (delegateStatus == FAILED) setStatus(FAILED);
-    else if (delegateStatus == ACTIVE)
-    {
+    else if (delegateStatus == ACTIVE) {
       if ((taskConnectionStatus == ACTIVE) && (this.getStatus() != ACTIVE)) setStatus(ACTIVE);
       else if (taskConnectionStatus != this.getStatus()) setStatus(taskConnectionStatus);
-    }
-    else
-    {
+    } else {
       if (taskConnectionStatus == ACTIVE) setStatus(delegateStatus);
-      else
-      {
+      else {
         int n = delegateStatus.compareTo(taskConnectionStatus);
         if ((n < 0) && (delegateStatus != this.getStatus())) setStatus(delegateStatus);
         else if (taskConnectionStatus != this.getStatus()) setStatus(taskConnectionStatus);
@@ -250,20 +239,17 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   @Override
-  public boolean isSSLEnabled()
-  {
+  public boolean isSSLEnabled() {
     return sslEnabled;
   }
 
   @Override
-  public JPPFSystemInformation getSystemInfo()
-  {
+  public JPPFSystemInformation getSystemInfo() {
     return systemInfo;
   }
 
   @Override
-  public TaskBundle sendHandshakeJob() throws Exception
-  {
+  public TaskBundle sendHandshakeJob() throws Exception {
     TaskBundle bundle = super.sendHandshakeJob();
     this.systemInfo = bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
     this.driverUuid = bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
@@ -273,16 +259,14 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Initialize the jmx connection using the specified jmx server information.
    */
-  public void initializeJmxConnection()
-  {
+  void initializeJmxConnection() {
     if (debugEnabled) log.debug("{} initializing jmx with host={}, jmxPort={}, ssl={}", new Object[] {this, host, jmxPort, sslEnabled});
     jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, sslEnabled);
     jmxConnection.connect();
   }
 
   @Override
-  public JMXDriverConnectionWrapper getJmxConnection()
-  {
+  public JMXDriverConnectionWrapper getJmxConnection() {
     return jmxConnection;
   }
 
@@ -319,8 +303,12 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   }
 
   @Override
-  public boolean isClosed()
-  {
+  public boolean isClosed() {
     return client.isClosed();
+  }
+
+  @Override
+  public int getPoolId() {
+    return poolId;
   }
 }

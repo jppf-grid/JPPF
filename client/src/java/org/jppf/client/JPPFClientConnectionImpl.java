@@ -54,13 +54,13 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    * @param name configuration name for this local client.
    * @param info the connection properties for this connection.
    * @param ssl determines whether this is an SSL connection.
+   * @param poolId id of the connection pool this connection belongs to.
    */
-  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
-  {
-    if (client.isClosed())
-    {
+  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl, final int poolId) {
+    super(poolId);
+    if (client.isClosed()) {
       if (debugEnabled) log.debug("error: initializing connection {} while client is closed", name);
-      return;
+      throw new IllegalStateException("error: initializing connection " + name + " while client is closed");
     }
     if (ssl && (info.sslServerPorts == null)) throw new IllegalStateException("ssl is enabled but no ssl port is provided");
     this.client = client;
@@ -72,37 +72,28 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   }
 
   @Override
-  public void init()
-  {
-    try
-    {
+  public void init() {
+    try {
       if (isClosed()) {
         log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
         return;
       }
-      try
-      {
+      try {
         host = InetAddress.getByName(host).getHostName();
         displayName = name + '[' + host + ':' + port + ']';
-      }
-      catch (UnknownHostException e)
-      {
+      } catch (UnknownHostException e) {
         displayName = name;
       }
       delegate = new ClassServerDelegateImpl(this, client.getUuid(), host, port);
-      delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener()
-      {
+      delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
         @Override
-        public void statusChanged(final ClientConnectionStatusEvent event)
-        {
+        public void statusChanged(final ClientConnectionStatusEvent event) {
           delegateStatusChanged(event);
         }
       });
-      taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener()
-      {
+      taskServerConnection.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
         @Override
-        public void statusChanged(final ClientConnectionStatusEvent event)
-        {
+        public void statusChanged(final ClientConnectionStatusEvent event) {
           taskServerConnectionStatusChanged(event);
         }
       });
@@ -110,19 +101,14 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
       JPPFClientConnectionStatus status = getStatus();
       if (debugEnabled) log.debug("connection [" + name + "] status=" + status);
       if (client.isClosed()) close();
-      else if ((status == ACTIVE) || (status == EXECUTING))
-      {
+      else if ((status == ACTIVE) || (status == EXECUTING)) {
         client.addClientConnection(this);
         if (debugEnabled) log.debug("connection [" + name + "] added to the client pool");
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       setStatus(FAILED);
-    }
-    catch (JPPFError e)
-    {
+    } catch (JPPFError e) {
       setStatus(FAILED);
       throw e;
     }
@@ -132,11 +118,9 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    * Connect to the driver.
    * @throws Exception if connection failed.
    */
-  protected void connect() throws Exception
-  {
+  protected void connect() throws Exception {
     delegate.init();
-    if (!delegate.isClosed())
-    {
+    if (!delegate.isClosed()) {
       new Thread(delegate, delegate.getName()).start();
       taskServerConnection.init();
       initializeJmxConnection();
@@ -144,8 +128,7 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
   }
 
   @Override
-  protected SocketInitializer createSocketInitializer()
-  {
+  protected SocketInitializer createSocketInitializer() {
     return new SocketInitializerImpl();
   }
 }

@@ -82,9 +82,9 @@ public class JPPFClient extends AbstractGenericClient
    * @exclude
    */
   @Override
-  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl)
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl, final int poolId)
   {
-    return new JPPFClientConnectionImpl(this, uuid, name, info, ssl);
+    return new JPPFClientConnectionImpl(this, uuid, name, info, ssl, poolId);
   }
 
   /**

@@ -23,8 +23,7 @@ import java.util.*;
 /**
  * Instances of this class manage a list of client connections with the same priority and remote driver.
  */
-public class ClientPool
-{
+public class ClientConnectionPool implements Comparable<ClientConnectionPool> {
   /**
    * The priority associated with this pool.
    */
@@ -37,13 +36,17 @@ public class ClientPool
    * List of <code>JPPFClientConnection</code> instances with the same priority.
    */
   private final List<JPPFClientConnection> clientList = new ArrayList<>();
+  /**
+   * The id of this pool.
+   */
+  private final int id;
 
   /**
    * Initialize this pool with the specified connection.
    * @param connection the first connection added to this pool.
    */
-  public ClientPool(final JPPFClientConnection connection)
-  {
+  ClientConnectionPool(final JPPFClientConnection connection) {
+    this.id = connection.getPoolId();
     this.priority = connection.getPriority();
     clientList.add(connection);
   }
@@ -52,8 +55,7 @@ public class ClientPool
    * Get the next client connection.
    * @return a <code>JPPFClientConnection</code> instances.
    */
-  public JPPFClientConnection nextClient()
-  {
+  synchronized JPPFClientConnection nextClient() {
     if (clientList.isEmpty()) return null;
     lastUsedIndex = ++lastUsedIndex % clientList.size();
     return clientList.get(getLastUsedIndex());
@@ -63,8 +65,7 @@ public class ClientPool
    * Determine whether this pool is empty.
    * @return <code>true</code> if this pool is empty, <code>false</code> otherwise.
    */
-  public boolean isEmpty()
-  {
+  public synchronized boolean isEmpty() {
     return clientList.isEmpty();
   }
 
@@ -72,8 +73,7 @@ public class ClientPool
    * Get the current size of this pool.
    * @return the size as an int.
    */
-  public int size()
-  {
+  public synchronized int size() {
     return clientList.size();
   }
 
@@ -82,8 +82,7 @@ public class ClientPool
    * @param client the connection too add.
    * @return true if the underlying list of connections changed as a result of calling this method.
    */
-  public boolean add(final JPPFClientConnection client)
-  {
+  synchronized boolean add(final JPPFClientConnection client) {
     return clientList.add(client);
   }
 
@@ -92,10 +91,8 @@ public class ClientPool
    * @param client the connection too remove.
    * @return true if the underlying list of connections changed as a result of calling this method.
    */
-  public boolean remove(final JPPFClientConnection client)
-  {
-    if (clientList.remove(client))
-    {
+  synchronized boolean remove(final JPPFClientConnection client) {
+    if (clientList.remove(client)) {
       if (lastUsedIndex >= clientList.size() && lastUsedIndex > 0) lastUsedIndex--;
       return true;
     }
@@ -106,8 +103,7 @@ public class ClientPool
    * Get the priority associated with this pool.
    * @return the priority as an int.
    */
-  public int getPriority()
-  {
+  public synchronized int getPriority() {
     return priority;
   }
 
@@ -115,8 +111,29 @@ public class ClientPool
    * Get the index of the last used connection in this pool.
    * @return the last used index as an int.
    */
-  public int getLastUsedIndex()
-  {
+  private int getLastUsedIndex() {
     return lastUsedIndex;
+  }
+
+  /**
+   * Get the uuid of the driver to which connections in this pool are connected.
+   * @return the driver uuid as a string.
+   */
+  public synchronized String getDriverUuid() {
+    return !clientList.isEmpty() ? clientList.get(0).getDriverUuid() : null;
+  }
+
+  @Override
+  public int compareTo(final ClientConnectionPool o) {
+    if (o == null) return -1;
+    return priority > o.priority ? -1 : (priority < o.priority ? 1 : 0);
+  }
+
+  /**
+   * Get the id of this pool.
+   * @return the id as an int value.
+   */
+  public int getId() {
+    return id;
   }
 }

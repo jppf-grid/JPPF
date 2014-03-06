@@ -145,7 +145,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   @SuppressWarnings("unchecked")
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
-    LinkedBlockingQueue queue = new LinkedBlockingQueue();
+    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     int coreThreads = Runtime.getRuntime().availableProcessors();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
@@ -194,10 +194,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
             int port = props.getInt(String.format("%s.jppf.server.port", name), sslEnabled ? 11443 : 11111);
             if (!sslEnabled) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
-            /*
-            if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
-            else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), 11198);
-            */
             if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), -1);
             else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), -1);
             int priority = new ConfigurationHelper(props).getInt(String.format("%s.jppf.priority", name), String.format("%s.priority", name), 0);
@@ -221,9 +217,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @exclude
    */
   protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl) {
+    int poolId = poolSequence.incrementAndGet();
     for (int i=1; i<=poolSize; i++) {
       if (isClosed()) return;
-      AbstractJPPFClientConnection c = createConnection(info.uuid, (poolSize > 1) ? name + '-' + i : name, info, ssl);
+      AbstractJPPFClientConnection c = createConnection(info.uuid, (poolSize > 1) ? name + '-' + i : name, info, ssl, poolId);
       c.setPriority(priority);
       newConnection(c);
     }
@@ -235,10 +232,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @param name the name of the connection.
    * @param info the driver connection information.
    * @param ssl determines whether this is an SSL connection.
+   * @param poolId id of the connection pool the connection belongs to.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
    * @exclude
    */
-  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl);
+  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl, final int poolId);
 
   /**
    * {@inheritDoc}
