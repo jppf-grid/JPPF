@@ -140,8 +140,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
       frame.pack();
       frame.setLocationRelativeTo(null);
       frame.setLocation(location);
-      setKeyAction(panel, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
-      setKeyAction(panel, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
+      setOkCancelKeys(panel, okAction, cancelAction);
       frame.setVisible(true);
     }
     catch(Exception e)

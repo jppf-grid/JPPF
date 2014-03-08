@@ -138,7 +138,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
   }
 
   /**
-   * Associate a keybord virtual key with an action.
+   * Associate a keyboard virtual key with an action.
    * @param option contains the {@link JComponent} whose {@link InputMap} and {@link ActionMap} this method modifies.
    * @param vkey the virtual key code to associate with the action, built from
    * one of the values in {@link KeyEvent}, for instance: <code>KeyEvent.VK_ENTER</code>.
@@ -152,5 +152,17 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
     inputMap.put(vkey, actionKey);
     ActionMap map = comp.getActionMap();
     map.put(actionKey, action);
+  }
+
+  /**
+   * Associate 'ok' and 'cancel' actions with 'Enter' and 'Esc' keys, repsectively.
+   * @param option contains the {@link JComponent} whose {@link InputMap} and {@link ActionMap} this method modifies.
+   * @param okAction the action to execute upon pressing 'Enter'.
+   * @param cancelAction the action to execute upon pressing 'Esc'.
+   */
+  protected void setOkCancelKeys(final OptionElement option, final Action okAction, final Action cancelAction)
+  {
+    setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
+    setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
   }
 }

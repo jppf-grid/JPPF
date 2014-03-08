@@ -76,7 +76,7 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer
             break;
 
           case NODE:
-            path = NODE_ICON;
+            path = data.getNodeInformation().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
             break;
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
