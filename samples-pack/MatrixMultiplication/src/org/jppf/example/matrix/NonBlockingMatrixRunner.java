@@ -133,7 +133,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
-      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection(true)).getJmxConnection().statistics();
+      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection(true, false)).getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)
@@ -190,7 +190,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
-      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection(true)).getJmxConnection().statistics();
+      JPPFStatistics stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection(true, false)).getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)
