@@ -67,7 +67,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Contains all the connections pools in ascending priority order.
    */
-  //private final Map<Integer, ClientConnectionPool> pools = new TreeMap<>(new DescendingIntegerComparator());
   private final CollectionMap<Integer, ClientConnectionPool> pools = new LinkedListSortedMap<>(new DescendingIntegerComparator());
   /**
    * Unique universal identifier for this JPPF client.
@@ -417,27 +416,39 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
-   * Get a set of existing connection pools witht he specified priority.
+   * Get a set of existing connection pools with the specified priority.
    * @param priority the priority of the pool, helps speedup the search.
-   * @return a set of {@link ClientConnectionPool} instances, possibly empty but never {@code null}².
+   * @return a list of {@link ClientConnectionPool} instances, possibly empty but never {@code null}.
    */
-  public Set<ClientConnectionPool> getConnectionPools(final int priority) {
-    Set<ClientConnectionPool> poolSet = new HashSet<>();
+  public List<ClientConnectionPool> getConnectionPools(final int priority) {
     Collection<ClientConnectionPool> coll;
     synchronized(pools) {
-      coll = pools.getValues(priority);
-      if (coll != null) poolSet.addAll(coll);
+      if ((coll = pools.getValues(priority)) != null) {
+        List<ClientConnectionPool> list = new ArrayList<>(coll.size());
+        list.addAll(coll);
+        return list;
+      }
     }
-    return poolSet;
+    return Collections.<ClientConnectionPool>emptyList();
   }
 
   /**
-   * Get a set of existing connection pools, sorted in descending order of their priority.
-   * @return a set of {@link ClientConnectionPool} instances.
+   * Get a list of all priorities for the currently existing pools, ordered by descending priority.
+   * @return a list of integers represent the priorities.
    */
-  public SortedSet<ClientConnectionPool> getConnectionPools() {
+  public List<Integer> getPoolPriorities() {
     synchronized(pools) {
-      return new TreeSet<>(pools.allValues());
+      return new ArrayList<>(pools.keySet());
+    }
+  }
+
+  /**
+   * Get a list of existing connection pools, ordered by descending priority.
+   * @return a list of {@link ClientConnectionPool} instances.
+   */
+  public List<ClientConnectionPool> getConnectionPools() {
+    synchronized(pools) {
+      return new ArrayList<>(pools.allValues());
     }
   }
 

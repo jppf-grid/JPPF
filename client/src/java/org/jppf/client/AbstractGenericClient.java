@@ -162,12 +162,13 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
     try {
       boolean initPeers;
       if (props.getBoolean("jppf.discovery.enabled", true)) {
-        if (debugEnabled) log.debug("initializing connections from discovery");
+        final int priority = props.getInt("jppf.discovery.priority", 0);
         boolean acceptMultipleInterfaces = props.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
+        if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            newConnection(name, info, 0, props.getInt("jppf.pool.size", 1), sslEnabled);
+            newConnection(name, info, priority, props.getInt("jppf.pool.size", 1), sslEnabled);
           }
         }, new IPFilter(props), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
@@ -218,9 +219,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl) {
     int poolId = poolSequence.incrementAndGet();
-    for (int i=1; i<=poolSize; i++) {
+    int size = poolSize > 0 ? poolSize : 1;
+    for (int i=1; i<=size; i++) {
       if (isClosed()) return;
-      AbstractJPPFClientConnection c = createConnection(info.uuid, (poolSize > 1) ? name + '-' + i : name, info, ssl, poolId);
+      AbstractJPPFClientConnection c = createConnection(info.uuid, (size > 1) ? name + '-' + i : name, info, ssl, poolId);
       c.setPriority(priority);
       newConnection(c);
     }
