@@ -147,14 +147,10 @@
   <target name="build" depends="init, compile, jar, jar.src" description=""/>
   <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector" description=""/>
 	<target name="rebuild" depends="clean.all, build" description=""/>
-	<target name="deploy"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc, installer" description=""/>
-	<target name="deploy.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc, javadoc           " description=""/>
-	<target name="deploy.nojavadoc"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc,          installer" description=""/>
-	<target name="deploy.nojavadoc.noinstaller"
-		depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc                    " description=""/>
+  <target name="deploy"             depends="deploy.nojavadoc.noinstaller, javadoc, installer" description=""/>
+  <target name="deploy.noinstaller" depends="deploy.nojavadoc.noinstaller, javadoc"            description=""/>
+  <target name="deploy.nojavadoc"   depends="deploy.nojavadoc.noinstaller, installer"          description=""/>
+	<target name="deploy.nojavadoc.noinstaller" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc" description=""/>
 
 	<import file="build-compile-jar.xml"/>
 	<import file="build-modules.xml"/>
@@ -166,8 +162,18 @@
   <import file="build-tests.xml"/>
   <import file="build-maven.xml"/>
 	
+  <!-- ========================================================================= -->
+  <!--              Package the all-in-one zip distribution                      -->
+  <!-- ========================================================================= -->
+
+  <target name="all.zips" depends="" description="">
+    <property name="all.zip.file" value="${build}/${app.ver}-all.zip"/>
+    <delete file="${all.zip.file}" quiet="true"/>
+    <zip destfile="${all.zip.file}" basedir="${build}" includes="${app.ver}-*.zip"/>
+  </target>
+
 	<!-- ========================================================================= -->
-	<!--                 Package the application for deployment                    -->
+	<!--                 Package the source distribution                           -->
 	<!-- ========================================================================= -->
 
 	<target name="package" depends="rebuild">
@@ -201,7 +207,7 @@
 	</target>
 
 	<!-- ========================================================================= -->
-	<!--                        Zip the whole workspace                            -->
+	<!--                        Zip the whole Eclipse workspace                    -->
 	<!-- ========================================================================= -->
 
 	<target name="zip.workspace">

@@ -56,7 +56,6 @@
     <include.code sample="JobRecovery"/>
     <include.code sample="KryoSerializer"/>
     <include.code sample="NodeLifeCycle"/>
-    <include.code sample="NodeProvisioning"/>
     <!-- Generate the samples pack zip file -->
     <property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
     <property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>

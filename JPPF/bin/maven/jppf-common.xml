@@ -7,6 +7,5 @@
       <artifactId>jppf-common-node</artifactId>
       <version>@version@</version>
     </dependency>
-@common-dep@
   </dependencies>
 </project>
