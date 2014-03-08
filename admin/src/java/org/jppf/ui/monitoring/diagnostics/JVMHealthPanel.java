@@ -239,7 +239,9 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
     DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
     if (driver != null) return;
     driver = new DefaultMutableTreeNode(driverData);
-    model.insertNodeInto(driver, treeTableRoot, treeTableRoot.getChildCount());
+    int n = treeTableRoot.getChildCount();
+    model.insertNodeInto(driver, treeTableRoot, n);
+    if (n == 0) treeTable.expand(treeTableRoot);
   }
 
   @Override
@@ -260,7 +262,9 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
     DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
     if (node != null) return;
     node = new DefaultMutableTreeNode(event.getNodeData());
-    model.insertNodeInto(node, driver, driver.getChildCount());
+    int n = driver.getChildCount();
+    model.insertNodeInto(node, driver, n);
+    if (n == 0) treeTable.expand(driver);
   }
 
   @Override
