@@ -28,8 +28,7 @@ import java.util.concurrent.locks.Lock;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
-{
+public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V> {
   /**
    * The underlying map to which operations are delegated.
    */
@@ -38,23 +37,19 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   /**
    * Default constructor.
    */
-  public AbstractCollectionMap()
-  {
+  public AbstractCollectionMap() {
   }
 
   @Override
-  public void putValue(final K key, final V value)
-  {
+  public void putValue(final K key, final V value) {
     Collection<V> coll = createOrGetCollection(key);
     coll.add(value);
   }
 
   @Override
-  public boolean removeValue(final K key, final V value)
-  {
+  public boolean removeValue(final K key, final V value) {
     Collection<V> coll = map.get(key);
-    if (coll != null)
-    {
+    if (coll != null) {
       boolean b = coll.remove(value);
       if (coll.isEmpty()) map.remove(key);
       return b;
@@ -63,28 +58,23 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   }
 
   @Override
-  public void addValues(final K key, final Collection<V> values)
-  {
+  public void addValues(final K key, final Collection<V> values) {
     Collection<V> coll = createOrGetCollection(key);
     coll.addAll(values);
   }
 
   @Override
-  public void addValues(final K key, final V...values)
-  {
+  public void addValues(final K key, final V...values) {
     Collection<V> coll = createOrGetCollection(key);
     for (V value: values) coll.add(value);
   }
 
   @Override
-  public int removeValues(final K key, final V...values)
-  {
+  public int removeValues(final K key, final V...values) {
     Collection<V> coll = map.get(key);
-    if (coll != null)
-    {
+    if (coll != null) {
       int count = 0;
-      for (V value: values)
-      {
+      for (V value: values) {
         if (coll.remove(value)) count++;
       }
       if (coll.isEmpty()) map.remove(key);
@@ -94,70 +84,59 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   }
 
   @Override
-  public Collection<V> removeKey(final K key)
-  {
+  public Collection<V> removeKey(final K key) {
     return map.remove(key);
   }
 
   @Override
-  public Collection<V> getValues(final K key)
-  {
+  public Collection<V> getValues(final K key) {
     return map.get(key);
   }
 
   @Override
-  public int size()
-  {
+  public int size() {
     int result = 0;
     for (Map.Entry<K, Collection<V>> entry: map.entrySet()) result += entry.getValue().size();
     return result;
   }
 
   @Override
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     return map.isEmpty();
   }
 
   @Override
-  public boolean containsKey(final K key)
-  {
+  public boolean containsKey(final K key) {
     return map.containsKey(key);
   }
 
   @Override
-  public boolean containsValue(final K key, final V value)
-  {
+  public boolean containsValue(final K key, final V value) {
     Collection<V> coll = map.get(key);
     if (coll == null) return false;
     return coll.contains(value);
   }
 
   @Override
-  public boolean containsValue(final V value)
-  {
-    for (Map.Entry<K, Collection<V>> entry: map.entrySet())
-    {
+  public boolean containsValue(final V value) {
+    for (Map.Entry<K, Collection<V>> entry: map.entrySet()) {
       if (entry.getValue().contains(value)) return true;
     }
     return false;
   }
 
   @Override
-  public Iterator<V> iterator()
-  {
+  public Iterator<V> iterator() {
     return new CollectionMapIterator();
   }
 
   @Override
-  public Iterator<V> iterator(final Lock lock)
-  {
+  public Iterator<V> iterator(final Lock lock) {
     return new CollectionMapIterator(lock);
   }
 
   @Override
-  public void clear()
-  {
+  public void clear() {
     map.clear();
   }
 
@@ -174,16 +153,14 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   protected abstract Collection<V> newCollection();
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return map.toString();
   }
 
   /**
-   * An itrator on the values in the mapped collections of this map.
+   * An iterator on the values in the mapped collections of this map.
    */
-  private class CollectionMapIterator implements Iterator<V>
-  {
+  private class CollectionMapIterator implements Iterator<V> {
     /**
      * Iterator over the entries in the priority map.
      */
@@ -200,8 +177,7 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
     /**
      * Initialize this iterator.
      */
-    public CollectionMapIterator()
-    {
+    public CollectionMapIterator() {
       this(null);
     }
 
@@ -209,17 +185,13 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
      * Initialize this iterator.
      * @param lock used to synchronize with the queue.
      */
-    public CollectionMapIterator(final Lock lock)
-    {
+    public CollectionMapIterator(final Lock lock) {
       this.lock = lock;
       lock();
-      try
-      {
+      try {
         entryIterator = map.entrySet().iterator();
         if (entryIterator.hasNext()) listIterator = entryIterator.next().getValue().iterator();
-      }
-      finally
-      {
+      } finally {
         unlock();
       }
     }
@@ -227,18 +199,13 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
     /**
      * Determines whether an element remains to visit.
      * @return true if there is at least one element that hasn't been visited, false otherwise.
-     * @see java.util.Iterator#hasNext()
      */
     @Override
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
       lock();
-      try
-      {
+      try {
         return entryIterator.hasNext() || ((listIterator != null) && listIterator.hasNext());
-      }
-      finally
-      {
+      } finally {
         unlock();
       }
     }
@@ -246,27 +213,20 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
     /**
      * Get the next element for this iterator.
      * @return the next element as a <code>JPPFTaskBundle</code> instance.
-     * @see java.util.Iterator#next()
      */
     @Override
-    public V next()
-    {
+    public V next() {
       lock();
-      try
-      {
-        if (listIterator != null)
-        {
+      try {
+        if (listIterator != null) {
           if (listIterator.hasNext()) return listIterator.next();
-          if (entryIterator.hasNext())
-          {
+          if (entryIterator.hasNext()) {
             listIterator = entryIterator.next().getValue().iterator();
             if (listIterator.hasNext()) return listIterator.next();
           }
         }
         throw new NoSuchElementException("no more element for this iterator");
-      }
-      finally
-      {
+      } finally {
         unlock();
       }
     }
@@ -274,49 +234,41 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
     /**
      * This operation is not supported and throws an <code>UnsupportedOperationException</code>.
      * @throws UnsupportedOperationException as this operation is not supported.
-     * @see java.util.Iterator#remove()
      */
     @Override
-    public void remove() throws UnsupportedOperationException
-    {
+    public void remove() throws UnsupportedOperationException {
       throw new UnsupportedOperationException("remove() is not supported on a CollectionMapIterator");
     }
 
     /**
      * Perform a lock if a lock is present.
      */
-    private void lock()
-    {
+    private void lock() {
       if (lock != null) lock.lock();
     }
 
     /**
      * Perform an unlock if a lock is present.
      */
-    private void unlock()
-    {
+    private void unlock() {
       if (lock != null) lock.unlock();
     }
   }
 
   @Override
-  public Set<K> keySet()
-  {
+  public Set<K> keySet() {
     return map == null ? null : map.keySet();
   }
 
   @Override
-  public Set<Entry<K, Collection<V>>> entrySet()
-  {
+  public Set<Entry<K, Collection<V>>> entrySet() {
     return map == null ? null : map.entrySet();
   }
 
   @Override
-  public List<V> allValues()
-  {
+  public List<V> allValues() {
     List<V> list = new ArrayList<>();
-    for (Map.Entry<K, Collection<V>> entry: map.entrySet())
-    {
+    for (Map.Entry<K, Collection<V>> entry: map.entrySet()) {
       if (!entry.getValue().isEmpty()) list.addAll(entry.getValue());
     }
     return list;
@@ -327,14 +279,11 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
    * @param key the key for which to get a collection of values.
    * @return a collection of value for the specified keys, may be empty if newly created.
    */
-  protected Collection<V> createOrGetCollectionSynchronized(final K key)
-  {
+  protected Collection<V> createOrGetCollectionSynchronized(final K key) {
     Collection<V> coll;
-    synchronized(map)
-    {
+    synchronized(map) {
       coll = map.get(key);
-      if (coll == null)
-      {
+      if (coll == null) {
         coll = newCollection();
         map.put(key, coll);
       }
@@ -347,14 +296,11 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
    * @param key the key for which to get a collection of values.
    * @return a collection of value for the specified keys, may be empty if newly created.
    */
-  protected Collection<V> createOrGetCollection(final K key)
-  {
+  protected Collection<V> createOrGetCollection(final K key) {
     Collection<V> coll;
-    synchronized(map)
-    {
+    synchronized(map) {
       coll = map.get(key);
-      if (coll == null)
-      {
+      if (coll == null) {
         coll = newCollection();
         map.put(key, coll);
       }

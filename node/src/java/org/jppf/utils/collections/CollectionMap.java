@@ -83,7 +83,8 @@ public interface CollectionMap<K, V> extends Iterable<V>, Serializable
 
   /**
    * Get the total number of elements in this collection map.
-   * @return the number of elemets as an int value.
+   * Note that the cost of the {@code size()} operation will be in O(n).
+   * @return the number of elements as an int value.
    */
   int size();
 
