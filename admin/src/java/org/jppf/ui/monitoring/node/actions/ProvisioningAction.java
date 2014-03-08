@@ -29,7 +29,8 @@ import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -125,8 +126,7 @@ public class ProvisioningAction extends AbstractTopologyAction
     };
     okBtn.addActionListener(okAction);
     cancelBtn.addActionListener(cancelAction);
-    setKeyAction(thisPanel, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
-    setKeyAction(thisPanel, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
+    setOkCancelKeys(thisPanel, okAction, cancelAction);
     frame.getContentPane().add(thisPanel.getUIComponent());
     frame.pack();
     frame.setLocationRelativeTo(null);
@@ -146,21 +146,30 @@ public class ProvisioningAction extends AbstractTopologyAction
     overrides = (String) textArea.getValue();
     final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesAsMap(overrides) : null;
     nbSlaves = ((Number) ((SpinnerNumberOption) thisPanel.findFirstWithName("nbSlaves")).getValue()).intValue();
+    final CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
+    for (TopologyData data: dataArray) {
+      if (data.getParent() == null) continue;
+      map.putValue(data.getParent(), data.getUuid());
+    }
+    final Object[] params = {nbSlaves, props};
+    final String[] signature = {int.class.getName(), TypedProperties.class.getName()};
     Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        TopologyData parent = dataArray[0].getParent();
-        if (parent == null) return;
-        try {
-          String[] uuids = new String[dataArray.length];
-          for (int i=0; i<dataArray.length; i++) uuids[i] = dataArray[i].getUuid();
-          parent.getNodeForwarder().forwardInvoke(new NodeSelector.UuidSelector(uuids), JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes",
-            new Object[] {nbSlaves, props}, new String[] {int.class.getName(), TypedProperties.class.getName()});
-        } catch(IOException e) {
-          parent.initializeProxies();
-          log.error(e.getMessage(), e);
-        } catch(Exception e) {
-          log.error(e.getMessage(), e);
+      @Override public void run() {
+        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
+          TopologyData parent = entry.getKey();
+          try {
+            Map<String, Object> result = parent.getNodeForwarder().forwardInvoke(new NodeSelector.UuidSelector(entry.getValue()),
+              JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
+            for (Map.Entry<String, Object> entry2: result.entrySet()) {
+              if (debugEnabled && (entry2.getValue() instanceof Throwable)) if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}",
+                entry2.getKey(), ExceptionUtils.getStackTrace((Throwable) entry2.getValue()));
+            }
+          } catch(IOException e) {
+            parent.initializeProxies();
+            log.error(e.getMessage(), e);
+          } catch(Exception e) {
+            log.error(e.getMessage(), e);
+          }
         }
       }
     };
