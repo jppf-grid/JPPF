@@ -40,6 +40,10 @@ public class ScriptRunnerPool extends AbstractObjectPoolQueue<ScriptRunner> {
 
   @Override
   protected ScriptRunner create() {
+    try {
     return new ScriptRunnerImpl(language);
+    } catch(JPPFScriptingException e) {
+      return null;
+    }
   }
 }

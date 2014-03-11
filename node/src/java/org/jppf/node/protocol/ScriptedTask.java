@@ -47,7 +47,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
    */
   protected String reusableId;
   /**
-   * The bindings provide varibles available to the script engien during execution of the script.
+   * The bindings provide variables available to the script engine during execution of the script.
    */
   protected Map<String, Object> bindings = new HashMap<>();
 

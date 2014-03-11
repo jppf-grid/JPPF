@@ -247,6 +247,35 @@ public class TestTypedProperties {
   }
 
   /**
+   * Test scripted property values are evaluated properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testScriptedValues() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("jppf.script.default.language = $script::file{ test/org/jppf/utils/test.js }$\n");
+    sb.append("prop.0 = hello miscreant world\n");
+    sb.append("prop.1 = hello $script:javascript{ 2 + 3 }$ world\n");
+    sb.append("prop.2 = hello $script:glouglou:{ 2 + 3 }$ world\n");
+    sb.append("prop.3 = hello $script{ return 2 + 3 }$ world\n");
+    sb.append("prop.4 = hello $script:groovy{ return 2 + 3 }$ dear $script:javascript{'' + (2 + 5)}$ world\n");
+    sb.append("prop.5 = hello $script{ return '${prop.0} ' + (2 + 3) }$ world\n");
+    sb.append("prop.6 = hello $script{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = TypedProperties.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "jppf.script.default.language", "groovy");
+      checkProperty(props, "prop.0", "hello miscreant world");
+      checkProperty(props, "prop.1", "hello 5.0 world");
+      checkProperty(props, "prop.2", "hello $script:glouglou:{ 2 + 3 }$ world");
+      checkProperty(props, "prop.3", "hello 5 world");
+      checkProperty(props, "prop.4", "hello 5 dear 7 world");
+      checkProperty(props, "prop.5", "hello hello miscreant world 5 world");
+      checkProperty(props, "prop.6", "hello hello miscreant world5 universe");
+    }
+  }
+
+  /**
    * Test that the property with the specified key exists in the {@code TypedProperties} container and has the specified value.
    * @param props the {@link TypedProperties} containing the property to check.
    * @param key the name of the property to check.

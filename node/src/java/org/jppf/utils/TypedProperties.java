@@ -436,7 +436,9 @@ public class TypedProperties extends Properties {
   public static TypedProperties loadAndResolve(final Reader reader) throws IOException {
     TypedProperties props = new TypedProperties();
     new PropertiesLoader().load(props, reader);
-    return new SubstitutionsHandler(props).resolve();
+    props = new SubstitutionsHandler(props).resolve();
+    new ScriptHandler().process(props);
+    return props;
   }
 
   /**

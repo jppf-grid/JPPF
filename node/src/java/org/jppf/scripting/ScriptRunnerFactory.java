@@ -46,17 +46,6 @@ public final class ScriptRunnerFactory {
   }
 
   /**
-   * Instantiate a script runner based on the specified script language.
-   * @param language the name of the script language to use.
-   * @return A <code>ScriptRunner</code> instance, or null if no known script runner
-   * exists for the specified language.
-   * @deprecated {@link #getScriptRunner(String)} should be used instead for semantic consistency.
-   */
-  public static ScriptRunner makeScriptRunner(final String language) {
-    return getScriptRunner(language);
-  }
-
-  /**
    * Get a new script runner instance based on the specified script language.
    * @param language the name of the script language to use.
    * @return A <code>ScriptRunner</code> instance, or null if no known script engine

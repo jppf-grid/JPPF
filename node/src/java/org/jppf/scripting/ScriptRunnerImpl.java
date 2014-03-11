@@ -59,8 +59,9 @@ public class ScriptRunnerImpl implements ScriptRunner {
   /**
    * Create a script runner witht he specified language.
    * @param language the language supported by this script engine.
+   * @throws JPPFScriptingException if the engine oculd not be created.
    */
-  public ScriptRunnerImpl(final String language) {
+  public ScriptRunnerImpl(final String language) throws JPPFScriptingException {
     this.language = language;
     this.engine = createEngine();
   }
@@ -69,12 +70,13 @@ public class ScriptRunnerImpl implements ScriptRunner {
    * Get the script engine according tot he given name.
    * The engine is lazily instantiated upon the first invocation of this method.
    * @return a {@link ScriptEngine} instance.
+   * @throws JPPFScriptingException if the engine oculd not be created.
    */
-  private ScriptEngine createEngine() {
+  private ScriptEngine createEngine () throws JPPFScriptingException {
     ScriptEngine engine = new ScriptEngineManager().getEngineByName(language);
     if (engine == null) {
       engineNotFound = true;
-      log.error("the script engine [name={}] could not be instantiated", getLanguage());
+      throw new JPPFScriptingException("an engine could not be instanciated for script language '" + language + "'");
     }
     return engine;
   }
