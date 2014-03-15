@@ -74,6 +74,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   private final List<JPPFClientConnection> allConnections = new CopyOnWriteArrayList<>();
   /**
+   * A list of all the connections not yet active.
+   */
+  final List<JPPFClientConnection> pendingConnections = new CopyOnWriteArrayList<>();
+  /**
    * List of listeners to this JPPF client.
    */
   private final List<ClientListener> listeners = new CopyOnWriteArrayList<>();
@@ -284,6 +288,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
       else pool.add(connection);
     }
     allConnections.add(connection);
+    pendingConnections.remove(connection);
   }
 
   /**
@@ -315,9 +320,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Close this client and release all the resources it is using.
    */
   public void close() {
-    List<JPPFClientConnection> list = getAllConnections();
-    if (debugEnabled) log.debug("closing all connections: " + list);
-    for (JPPFClientConnection c : list) {
+    Set<JPPFClientConnection> connectionSet = new HashSet<>(getAllConnections());
+    connectionSet.addAll(pendingConnections);
+    if (debugEnabled) log.debug("closing all connections: " + connectionSet);
+    for (JPPFClientConnection c : connectionSet) {
       try {
         c.close();
       } catch (Exception e) {

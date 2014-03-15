@@ -246,6 +246,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);
     c.setStatus(JPPFClientConnectionStatus.NEW);
+    pendingConnections.add(c);
     executor.submit(new ConnectionInitializer(c));
     fireNewConnection(c);
     if (debugEnabled) log.debug("end of connection [" + c.getName() + "] created");
@@ -372,7 +373,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   public SubmissionManager getSubmissionManager() {
     synchronized(this) {
-      if (submissionManager == null) submissionManager = createSubmissionManager();
+      if ((submissionManager == null) && !isClosed()) submissionManager = createSubmissionManager();
     }
     return submissionManager;
   }

@@ -402,6 +402,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   @Override
   public void close()
   {
+    if (debugEnabled) log.debug("closing {}", this);
     closed.set(true);
     setStopped(true);
     wakeUp();
