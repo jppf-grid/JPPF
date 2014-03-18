@@ -70,6 +70,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * The number of times a dispatched task can expire before it is finally cancelled.
    */
   protected int maxDispatchExpirations = 0;
+  /**
+   * Maximum number of times a task can rsubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
+   */
+  protected int maxTaskResubmits = 1;
 
   /**
    * Default constructor.
@@ -238,5 +242,15 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   public void setMaxDispatchExpirations(final int maxDispatchExpirations)
   {
     this.maxDispatchExpirations = maxDispatchExpirations;
+  }
+
+  @Override
+  public int getMaxTaskResubmits() {
+    return maxTaskResubmits;
+  }
+
+  @Override
+  public void setMaxTaskResubmits(final int maxResubmits) {
+    this.maxTaskResubmits = maxResubmits;
   }
 }

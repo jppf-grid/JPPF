@@ -44,10 +44,6 @@ public class ServerTask {
    */
   private final ServerTaskBundleClient bundle;
   /**
-   * The position of this task within received bundle.
-   */
-  private final int position;
-  /**
    * The position of this task within the job submitted by the client.
    */
   private final int jobPosition;
@@ -71,30 +67,24 @@ public class ServerTask {
    * Number of times a dispatch of this task has expired.
    */
   private int expirationCount = 0;
+  /**
+   * Number of times a task resubmitted itself.
+   */
+  private int resubmitCount = 0;
 
   /**
    *
    * @param bundle client bundle that own this task.
-   * @param position identification of this task within bundle.
    * @param dataLocation shared data provider for this task.
    * @param jobPosition the position of this task within the job submitted by the client.
    */
-  public ServerTask(final ServerTaskBundleClient bundle, final int position, final DataLocation dataLocation, final int jobPosition) {
+  public ServerTask(final ServerTaskBundleClient bundle, final DataLocation dataLocation, final int jobPosition) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (dataLocation == null) throw new IllegalArgumentException("dataLocation is null");
 
-    this.position = position;
     this.bundle = bundle;
     this.dataLocation = dataLocation;
     this.jobPosition = jobPosition;
-  }
-
-  /**
-   * Returns the position of this task in the bundle in which it was received.
-   * @return the position of this task as an <code>int</code>.
-   */
-  public int getPosition() {
-    return position;
   }
 
   /**
@@ -158,7 +148,7 @@ public class ServerTask {
    * Mark this task as to be resubmitted followxing expiration of a node dispatch.
    */
   public void resubmit() {
-    if (traceEnabled) log.trace("expiring {}", this);
+    if (traceEnabled) log.trace("resubmitting {}", this);
     result = null;
     state = TaskState.RESUBMIT;
   }
@@ -198,7 +188,6 @@ public class ServerTask {
     StringBuilder sb = new StringBuilder();
     sb.append("ServerTask[");
     sb.append("state=").append(getState());
-    sb.append(", position=").append(position);
     sb.append(", jobPosition=").append(jobPosition);
     sb.append(", expirationCount=").append(expirationCount);
     sb.append(", dataLocation=").append(dataLocation);
@@ -217,14 +206,6 @@ public class ServerTask {
   }
 
   /**
-   * Get the number of times a dispatch of this task has expired.
-   * @return the number of expirations as an int.
-   */
-  public int getExpirationCount() {
-    return expirationCount;
-  }
-
-  /**
    * Increment and get the number of times a dispatch of this task has expired.
    * @return the new number of expirations as an int.
    */
@@ -239,5 +220,21 @@ public class ServerTask {
    */
   public boolean isDone() {
     return state.ordinal() >= TaskState.EXCEPTION.ordinal();
+  }
+
+  /**
+   * Get the number of times a task resubmitted itself.
+   * @return the number of resubmits as an int.
+   */
+  public int getTaskResubmitCount() {
+    return resubmitCount;
+  }
+
+  /**
+   * Increment and get the number of times a task resubmitted itself.
+   * @return the new number of resubmits as an int.
+   */
+  public int incResubmitCount() {
+    return ++resubmitCount;
   }
 }

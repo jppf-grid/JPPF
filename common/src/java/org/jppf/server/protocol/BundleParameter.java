@@ -106,9 +106,13 @@ public enum  BundleParameter
    */
   ERROR_MARKERS,
   /**
-   * An array of ints that holds the positions odf the tasks such as they are in the initial job submiited by the client.
+   * An array of ints that holds the positions of the tasks such as they are in the initial job submiited by the client.
    */
   TASK_POSITIONS,
+  /**
+   * An array of ints that holds the positions of the tasks that are marked as having to be resubmitted.
+   */
+  RESUBMIT_TASK_POSITIONS,
   /**
    * An indicator from the remote peer that the channel should be closed.
    */

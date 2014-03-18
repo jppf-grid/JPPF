@@ -118,7 +118,7 @@ public class ServerTaskBundleClient
     for (int index = 0; index < taskList.size(); index++) {
       DataLocation dataLocation = taskList.get(index);
       int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
-      this.taskList.add(new ServerTask(this, index, dataLocation, pos));
+      this.taskList.add(new ServerTask(this, dataLocation, pos));
     }
     this.pendingTasksCount.set(this.taskList.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
@@ -148,7 +148,7 @@ public class ServerTaskBundleClient
 
   /**
    * Get the job this submission is for.
-   * @return a {@link JPPFTaskBundle} instance.
+   * @return a {@link TaskBundle} instance.
    */
   public TaskBundle getJob()
   {

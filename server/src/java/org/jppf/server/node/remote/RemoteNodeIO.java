@@ -28,7 +28,6 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -61,7 +60,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
   protected Object[] deserializeObjects() throws Exception {
     ObjectSerializer ser = node.getHelper().getSerializer();
     if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
-    JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(getSocketWrapper(), node.getHelper().getSerializer());
+    TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
     Object[] result = deserializeObjects(bundle);
@@ -71,12 +70,12 @@ public class RemoteNodeIO extends AbstractNodeIO {
   }
 
   @Override
-  protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception {
+  protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
     int count = bundle.getTaskCount();
     List<Object> list = new ArrayList<>(count + 2);
     list.add(bundle);
     try {
-      initializePerformanceData(bundle);
+      initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
       if (!bundle.isHandshake()) {
         JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
@@ -114,13 +113,12 @@ public class RemoteNodeIO extends AbstractNodeIO {
    * @param bundle the task wrapper to send along.
    * @param tasks the list of tasks with their result field updated.
    * @throws Exception if an error occurs while writing to the socket stream.
-   * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
    */
   @Override
   public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
-    finalizePerformanceData(bundle);
+    finalizeBundleData(bundle, tasks);
     bundle.setSLA(null);
     bundle.setMetadata(null);
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);

@@ -123,7 +123,7 @@ public class ServerTaskBundleNode {
 
   /**
    * Get the job this submission is for.
-   * @return a {@link JPPFTaskBundle} instance.
+   * @return a {@link TaskBundle} instance.
    */
   public TaskBundle getJob() {
     return taskBundle;

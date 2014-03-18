@@ -81,6 +81,11 @@ public abstract class AbstractTask<T> implements Task<T>
    * Dispatches notifications from this task.
    */
   private transient TaskExecutionDispatcher executionDisptacher = null;
+  /**
+   * Whether this task should be resubmitted by the server.
+   * @since 4.1
+   */
+  private transient boolean resubmit = false;
 
   @Override
   public T getResult()
@@ -249,5 +254,23 @@ public abstract class AbstractTask<T> implements Task<T>
   public void setExecutionDispatcher(final TaskExecutionDispatcher executionDisptacher)
   {
     this.executionDisptacher = executionDisptacher;
+  }
+
+  /**
+   * Determine whether this task should be resubmitted by the server.
+   * @return {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * @since 4.1
+   */
+  public boolean isResubmit() {
+    return resubmit;
+  }
+
+  /**
+   * Specify whether this task should be resubmitted by the server.
+   * @param resubmit {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * @since 4.1
+   */
+  public void setResubmit(final boolean resubmit) {
+    this.resubmit = resubmit;
   }
 }

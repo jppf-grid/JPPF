@@ -137,4 +137,17 @@ public interface JobSLA extends JobCommonSLA
    * @param max the number of expirations as an int.
    */
   void setMaxDispatchExpirations(int max);
+
+  /**
+   * Get the naximum number of times a task can resubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
+   * The default value is 1, meaning that a task can resubmit itself at most once.
+   * @return the maximum number of resubmits; a value of 0 or less means tasks in the job cannot be resubmitted.
+   */
+  int getMaxTaskResubmits();
+
+  /**
+   * Set the naximum number of times a task can resubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
+   * @param maxResubmits the maximum number of resubmits; a value of 0 or less means tasks in the job cannot be resubmitted.
+   */
+  void setMaxTaskResubmits(int maxResubmits);
 }

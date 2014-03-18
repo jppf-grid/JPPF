@@ -21,12 +21,14 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.server.protocol.BundleParameter.*;
 
+import java.util.*;
+
 import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.protocol.ServerTaskBundleNode;
+import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.Pair;
 import org.jppf.utils.stats.*;
@@ -120,6 +122,22 @@ class WaitingResultsState extends NodeServerState {
       nodeBundle.resultsReceived(t);
     } else {
       if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
+      Set<Integer> resubmitSet = null;
+      int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
+      if (debugEnabled) log.debug("*** resubmitPositions = {} for {}", resubmitPositions, newBundle);
+      if (resubmitPositions != null) {
+        resubmitSet = new HashSet<>();
+        for (int n: resubmitPositions) resubmitSet.add(n);
+        if (debugEnabled) log.debug("*** resubmitSet = {} for {}", resubmitSet, newBundle);
+      }
+      boolean anyResubmit = resubmitSet != null;
+      for (ServerTask task: nodeBundle.getTaskList()) {
+        if (anyResubmit && resubmitSet.contains(task.getJobPosition())) {
+          int max = nodeBundle.getJob().getSLA().getMaxTaskResubmits();
+          if (task.incResubmitCount() <= max) task.resubmit();
+        }
+      }
+      
       nodeBundle.resultsReceived(received.data());
       long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
       updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
@@ -144,7 +162,6 @@ class WaitingResultsState extends NodeServerState {
    * @param elapsedInNode time spent in the node.
    */
   private void updateStats(final int nbTasks, final long elapsed, final long elapsedInNode) {
-    //server.getStatsManager().taskExecuted(newBundle.getTaskCount(), elapsed / 1000000L, newBundle.getNodeExecutionTime() / 1000000L);
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.TASK_DISPATCH, nbTasks);
     stats.addValues(JPPFStatisticsHelper.EXECUTION, elapsed, nbTasks);

@@ -142,7 +142,7 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @return an array of objects deserialized from the socket stream.
    * @throws Exception if an error occurs while deserializing.
    */
-  protected abstract Object[] deserializeObjects(JPPFTaskBundle bundle) throws Exception;
+  protected abstract Object[] deserializeObjects(TaskBundle bundle) throws Exception;
 
   /**
    * Write the execution results to the socket stream.
@@ -155,21 +155,33 @@ public abstract class AbstractNodeIO implements NodeIO {
   public abstract void writeResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
 
   /**
-   * Prepare the task bundle's performance data that will be sent back to the server.
+   * Prepare the task bundle's data that will be sent back to the server.
    * @param bundle the bundle to process.
    */
-  protected void initializePerformanceData(final TaskBundle bundle)
+  protected void initializeBundleData(final TaskBundle bundle)
   {
     bundle.setNodeExecutionTime(System.nanoTime());
   }
 
   /**
-   * Compute the task bundle's performance data before it is sent back to the server.
+   * Compute the task bundle's data before it is sent back to the server.
    * @param bundle the bundle to process.
+   * @param tasks the list of tasks after they have been executed.
    */
-  protected void finalizePerformanceData(final TaskBundle bundle) {
+  protected void finalizeBundleData(final TaskBundle bundle, final List<Task<?>> tasks) {
     long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime());
     bundle.setNodeExecutionTime(elapsed);
+    Set<Integer> resubmitSet = new HashSet<>();
+    for (Task<?> task: tasks) {
+      if ((task instanceof AbstractTask) && ((AbstractTask) task).isResubmit()) resubmitSet.add(task.getPosition());
+    }
+    if (!resubmitSet.isEmpty()) {
+      if (debugEnabled) log.debug("positions of task resubmit requests: {}", resubmitSet);
+      int[] resubmitPos = new int[resubmitSet.size()];
+      int count = 0;
+      for (int n: resubmitSet) resubmitPos[count++] = n;
+      bundle.setParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, resubmitPos);
+    }
   }
 
   /**

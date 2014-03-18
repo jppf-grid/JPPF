@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
+import org.jppf.node.NodeRunner;
+import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
@@ -276,6 +278,53 @@ public class TestJPPFTask extends Setup1D1N1C {
   }
   
   /**
+   * Test that the {@link AbstractTask#setResubmit(boolean)} method works properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskResubmit() throws Exception {
+    int nbTasks = 1;
+    int nbRuns = 5;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+    // ensure the job is only executed in a single specific node
+    JMXDriverConnectionWrapper jmx = BaseSetup.getDriverManagementProxy(client);
+    Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+    String nodeUuid = coll.iterator().next().getUuid();
+    job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
+    job.getSLA().setMaxTaskResubmits(Integer.MAX_VALUE);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    ResubmittingTask task = (ResubmittingTask) results.get(0);
+    assertTrue(task.getResult() instanceof Integer);
+    assertEquals(Integer.valueOf(nbRuns), task.getResult());
+  }
+
+  /**
+   * Test that the max number of task resubmits set in the job SLA works properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testMaxTaskResubmits() throws Exception {
+    int nbTasks = 1;
+    int maxResubmits = 2;
+    int nbRuns = 5;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+    // ensure the job is only executed in a single specific node
+    JMXDriverConnectionWrapper jmx = BaseSetup.getDriverManagementProxy(client);
+    Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+    String nodeUuid = coll.iterator().next().getUuid();
+    job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
+    job.getSLA().setMaxTaskResubmits(maxResubmits);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    ResubmittingTask task = (ResubmittingTask) results.get(0);
+    assertTrue(task.getResult() instanceof Integer);
+    assertEquals(Integer.valueOf(maxResubmits + 1), task.getResult());
+  }
+
+  /**
    * A simple Task which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends AbstractTask<Object> {
@@ -412,6 +461,39 @@ public class TestJPPFTask extends Setup1D1N1C {
       fireNotification(getId() + "#1", true);
       fireNotification(getId() + "#2", false);
       fireNotification(getId() + "#3", true);
+    }
+  }
+
+  /**
+   * This task maintains a counter in the node and resubmits itself
+   * until the counter has reached a specified value.
+   */
+  public static class ResubmittingTask extends AbstractTask<Integer> {
+    /**
+     * Maximum number of runs for this task = max resubmit + 1.
+     */
+    private final int nbRuns;
+
+    /**
+     * Initialie this task.
+     * @param nbRuns the maximum number of runs for this task.
+     */
+    public ResubmittingTask(final int nbRuns) {
+      this.nbRuns = nbRuns;
+    }
+
+    @Override
+    public void run() {
+      String key = getId() + "counter";
+      AtomicInteger counter = (AtomicInteger) NodeRunner.getPersistentData(key);
+      if (counter == null) {
+        counter = new AtomicInteger(0);
+        NodeRunner.setPersistentData(key, counter);
+      }
+      int n = counter.incrementAndGet();
+      if (n < nbRuns) setResubmit(true);
+      else NodeRunner.removePersistentData(key);
+      setResult(n);
     }
   }
 }

@@ -107,14 +107,14 @@ public class ServerJob extends AbstractServerJobBase {
       if (isJobExpired() || isCancelled()) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
       } else {
-        for (int index = 0; index < bundleTasks.size(); index++) {
-          ServerTask task = bundleTasks.get(index);
+        for (int i=0; i<bundleTasks.size(); i++) {
+          ServerTask task = bundleTasks.get(i);
           if (task.getState() == TaskState.RESUBMIT) {
             if (traceEnabled) log.trace("task to resubmit: {}", task);
             task.setState(TaskState.PENDING);
           } else {
             if (results != null) {
-              DataLocation location = results.get(index);
+              DataLocation location = results.get(i);
               task.resultReceived(location);
             }
             map.putValue(task.getBundle(), task);
