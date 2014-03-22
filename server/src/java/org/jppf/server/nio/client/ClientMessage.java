@@ -20,8 +20,8 @@ package org.jppf.server.nio.client;
 
 import org.jppf.io.IOHelper;
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * Representation of a message sent or received by a remote node.
@@ -45,7 +45,7 @@ public class ClientMessage extends AbstractTaskBundleMessage
   @Override
   protected void afterFirstRead() throws Exception
   {
-    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0));
+    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0));
     nbObjects = bundle.getTaskCount() + 2;
   }
 

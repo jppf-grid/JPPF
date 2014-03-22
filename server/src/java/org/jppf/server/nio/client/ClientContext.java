@@ -89,7 +89,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
 
   /**
    * Set the task bundle to send or receive.
-   * @param bundle a {@link JPPFTaskBundle} instance.
+   * @param bundle a {@link ServerTaskBundleClient} instance.
    */
   public void setBundle(final ServerTaskBundleClient bundle)
   {

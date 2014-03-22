@@ -20,8 +20,8 @@ package org.jppf.server.nio.nodeserver;
 
 import org.jppf.io.IOHelper;
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
-import org.jppf.server.protocol.JPPFTaskBundle;
 
 /**
  * Node message implementation for an in-VM node.
@@ -41,7 +41,7 @@ public class LocalNodeMessage extends AbstractTaskBundleMessage
   @Override
   public boolean read() throws Exception
   {
-    bundle = (JPPFTaskBundle) IOHelper.unwrappedData(locations.get(0));
+    bundle = (TaskBundle) IOHelper.unwrappedData(locations.get(0));
     return true;
   }
 

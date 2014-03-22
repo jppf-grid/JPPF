@@ -27,6 +27,7 @@ import org.jppf.execute.*;
 import org.jppf.io.MultipleBuffersLocation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.nio.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.queue.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.serialization.*;
@@ -318,7 +319,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       byte[] bytes = new byte[4 + len];
       SerializationUtils.writeInt(len, bytes, 0);
       System.arraycopy(buf.getBuffer(), 0, bytes, 4, len);
-      JPPFTaskBundle bundle = new JPPFTaskBundle();
+      TaskBundle bundle = new JPPFTaskBundle();
       bundle.setName("server handshake");
       bundle.setUuid(INITIAL_BUNDLE_UUID);
       bundle.getUuidPath().add(driver.getUuid());

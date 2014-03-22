@@ -28,7 +28,6 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
-import org.jppf.server.protocol.JPPFTaskBundle;
 import org.slf4j.*;
 
 /**
@@ -91,7 +90,7 @@ public class LocalNodeIO extends AbstractNodeIO
       channel.setNodeResource(null);
     }
     DataLocation location = currentMessage.getLocations().get(0);
-    JPPFTaskBundle bundle = (JPPFTaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
+    TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(location, node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     node.getExecutionManager().setBundle(bundle);
     result = deserializeObjects(bundle);
@@ -100,14 +99,14 @@ public class LocalNodeIO extends AbstractNodeIO
   }
 
   @Override
-  protected Object[] deserializeObjects(final JPPFTaskBundle bundle) throws Exception
+  protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception
   {
     int count = bundle.getTaskCount();
     List<Object> list = new ArrayList<>(count + 1);
     list.add(bundle);
     try
     {
-      initializePerformanceData(bundle);
+      initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", hanshake = " + bundle.isHandshake());
       if (!bundle.isHandshake())
       {
@@ -141,7 +140,7 @@ public class LocalNodeIO extends AbstractNodeIO
   {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
-    finalizePerformanceData(bundle);
+    finalizeBundleData(bundle, tasks);
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));

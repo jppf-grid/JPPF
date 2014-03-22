@@ -125,7 +125,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   /**
    * Set the task bundle to send or receive.
-   * @param bundle a {@link JPPFTaskBundle} instance.
+   * @param bundle a {@link ServerTaskBundleNode} instance.
    */
   public void setBundle(final ServerTaskBundleNode bundle) {
     this.bundle = bundle;
