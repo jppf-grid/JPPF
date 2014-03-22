@@ -56,6 +56,10 @@ public final class StringUtils
    */
   public static final URL[] ZERO_URL = new URL[0];
   /**
+   * Constant for an empty array of ints.
+   */
+  public static final int[] ZERO_INT = new int[0];
+  /**
    * An array of char containing the hex digits in ascending order.
    */
   private static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };

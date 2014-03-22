@@ -22,7 +22,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.utils.configuration.*;
 import org.jppf.utils.streams.StreamUtils;
 
 /**
@@ -411,34 +410,6 @@ public class TypedProperties extends Properties {
       }
     }
     return result;
-  }
-
-  /**
-   * Load this properties objects from the specified reader.
-   * This load operation will recursively process all <code>!#include</code> statements before parsing the properties.
-   * @param reader the reader to load from.
-   * @throws IOException if any I/O error occurs.
-   * @exclude
-   */
-  public synchronized void loadWithIncludes(final Reader reader) throws IOException {
-    new PropertiesLoader().load(this, reader);
-  }
-
-  /**
-   * Load this properties objects from the specified reader.
-   * This load operation will recursively process all <code>!#include</code> statements before parsing the properties,
-   * then perform the properties substitutions.
-   * @param reader the reader to load from.
-   * @return a {@link TypedProperties} object with all includes loaded and substitutions performed.
-   * @throws IOException if any I/O error occurs.
-   * @exclude
-   */
-  public static TypedProperties loadAndResolve(final Reader reader) throws IOException {
-    TypedProperties props = new TypedProperties();
-    new PropertiesLoader().load(props, reader);
-    props = new SubstitutionsHandler(props).resolve();
-    new ScriptHandler().process(props);
-    return props;
   }
 
   /**

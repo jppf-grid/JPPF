@@ -21,6 +21,7 @@ import java.io.*;
 
 import org.jppf.serialization.JPPFSerialization;
 import org.jppf.ssl.SSLHelper;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -97,7 +98,8 @@ public final class JPPFConfiguration
   {
     try (Reader reader = getReader())
     {
-      props = TypedProperties.loadAndResolve(reader);
+      if (reader != null) props = ConfigurationHelper.loadAndResolve(reader);
+      else props = new TypedProperties();
     }
     catch(Exception e)
     {
