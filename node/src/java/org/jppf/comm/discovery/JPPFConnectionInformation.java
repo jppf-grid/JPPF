@@ -32,6 +32,10 @@ import org.slf4j.*;
 public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>, Cloneable
 {
   /**
+   * Explicit serialVersionUID.
+   */
+  private static final long serialVersionUID = 1L;
+  /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFConnectionInformation.class);
@@ -39,10 +43,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Explicit serialVersionUID.
-   */
-  private static final long serialVersionUID = 1L;
   /**
    * The host name.
    */
@@ -68,17 +68,9 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    */
   public int recoveryPort = -1;
   /**
-   * Host address used for JMX management and monitoring.
-   */
-  public transient String managementHost = null;
-  /**
    * Identifier for this object.
    */
   public String uuid = null;
-  /**
-   * The length of the subnet mask for the host address.
-   */
-  public int subnetMaskLength = 0;
 
   /**
    * Default constructor.
@@ -189,7 +181,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     try
     {
       oos.writeObject(info);
-      oos.close();
     }
     finally
     {

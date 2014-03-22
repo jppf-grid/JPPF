@@ -234,7 +234,6 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
               info = JPPFConnectionInformation.fromBytes(bytes);
               String host = config.getString("jppf.management.host", null);
               if (host == null) host = addr.getHostAddress();
-              info.managementHost = host;
               addConnectionInfo(info);
             } catch(SocketTimeoutException e) {
               if (traceEnabled) log.trace(e.getMessage(), e);

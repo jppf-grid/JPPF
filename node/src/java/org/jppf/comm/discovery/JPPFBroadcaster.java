@@ -100,7 +100,6 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
       {
         JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
         ci.host = addr.getHostAddress();
-        ci.subnetMaskLength = NetworkUtils.getSubnetMaskLength(addr);
         byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
         ByteBuffer buffer = ByteBuffer.wrap(new byte[512]);
         buffer.putInt(infoBytes.length);
