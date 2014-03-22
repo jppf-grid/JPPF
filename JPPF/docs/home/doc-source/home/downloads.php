@@ -19,8 +19,8 @@ $template{name="about-page-header" title="Downloads"}$
 
   <h3>Source code and documentation</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
-  User Guide: <a href="/doc/v3">view online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
-  API documentation: <a href="/api-3">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
+  User Guide: <a href="/doc/v4">view online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
+  API documentation: <a href="/api">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-api.zip/download'; ?>">download</a><p>
 
   <h3>Connectors and add-ons</h3>
   <a href="<?php echo $base . 'JPPF-' . $jppfVersion . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>

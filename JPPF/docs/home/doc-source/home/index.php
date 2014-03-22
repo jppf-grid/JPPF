@@ -52,7 +52,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
     </ul>
 
     <h3>Contribute</h3>
-    <b>Browse our <a href="./wiki" target=_top>documentation</a></b><br>
+    <b>Browse our <a href="/doc" target=_top>documentation</a></b><br>
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
