@@ -24,6 +24,7 @@ import java.util.EventListener;
  * Listener interface that must be implemented by all classes wishing
  * to receive notifications of when a node is started or stopped.
  * @author Laurent Cohen
+ * @since 4.1
  * @exclude
  */
 public interface SlaveNodeLauncherListener extends EventListener {

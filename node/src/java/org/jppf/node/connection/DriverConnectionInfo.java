@@ -21,6 +21,7 @@ package org.jppf.node.connection;
 /**
  * This interface provides the required information for connecting to a remote JPPF driver.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public interface DriverConnectionInfo {
   /**

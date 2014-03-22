@@ -23,6 +23,7 @@ package org.jppf.node.connection;
  * <p>It gives the ability to create new sets of parameters whenever a connection attempt was unsuccessful,
  * therefore providing the nodes with a failover strategy when the connection to a driver cannot be established.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public interface DriverConnectionStrategy {
   /**

@@ -23,6 +23,7 @@ import java.util.EventObject;
 /**
  * Instances of this class represent notifications that a slave process was started or terminated.
  * @author Laurent Cohen
+ * @since 4.1
  * @exclude
  */
 public class SlaveNodeLauncherEvent extends EventObject {

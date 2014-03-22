@@ -23,6 +23,7 @@ import org.jppf.utils.TypedProperties;
 /**
  * Provides an interface for "master" nodes, giving them the ability to start, stop and monitor "slave" nodes on the same machine.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public interface JPPFNodeProvisioningMBean {
   /**

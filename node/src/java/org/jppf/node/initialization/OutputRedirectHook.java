@@ -27,6 +27,7 @@ import org.slf4j.*;
 /**
  * This initialization redirects the dirver's or node's stdout and stderr to specified files.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public class OutputRedirectHook implements InitializationHook {
   /**

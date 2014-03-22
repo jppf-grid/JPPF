@@ -21,6 +21,7 @@ package org.jppf.node.connection;
 /**
  * A default implementation for the {@link DriverConnectionInfo} interface.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
   /**

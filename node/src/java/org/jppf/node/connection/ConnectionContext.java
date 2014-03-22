@@ -21,6 +21,7 @@ package org.jppf.node.connection;
 /**
  * Instances of this class define the context for a node (re)connection request.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public class ConnectionContext {
   /**

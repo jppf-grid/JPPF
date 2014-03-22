@@ -26,6 +26,7 @@ import org.slf4j.*;
  * This implementation of {@link DriverConnectionStrategy} is the JPPF default
  * and produces DriverConnectionInfo instances based solely on the JPPF configuration.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
   /**

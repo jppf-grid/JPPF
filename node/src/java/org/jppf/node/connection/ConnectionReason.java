@@ -21,6 +21,7 @@ package org.jppf.node.connection;
 /**
  * This enum lists the possible high-level reasons for a node reconnection request.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public enum ConnectionReason
 {

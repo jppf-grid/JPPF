@@ -24,12 +24,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.socket.*;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
  * This class wraps a single slave node process and provides an API to start, stop and monitor it.
  * @author Laurent Cohen
+ * @since 4.1
  * @exclude
  */
 public class SlaveNodeLauncher implements Runnable {
@@ -117,7 +119,7 @@ public class SlaveNodeLauncher implements Runnable {
     File configFile = new File(slaveDir, SLAVE_LOCAL_CONFIG_PATH);
     TypedProperties config = null;
     try (Reader reader = new BufferedReader(new FileReader(configFile))) {
-      config = TypedProperties.loadAndResolve(reader);
+      config = ConfigurationHelper.loadAndResolve(reader);
     }
     if (log.isDebugEnabled()) log.debug("{} read config {} : {}", new Object[] {name, configFile, config});
     List<String> jvmOptions = new ArrayList<>();

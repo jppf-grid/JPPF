@@ -28,6 +28,7 @@ import org.jppf.utils.*;
 /**
  * NodeProvisioningMBean provider implementation, discovered by JPPF via the service provider API.
  * @author Laurent Cohen
+ * @since 4.1
  * @exclude
  */
 public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider, RegistrationCondition {

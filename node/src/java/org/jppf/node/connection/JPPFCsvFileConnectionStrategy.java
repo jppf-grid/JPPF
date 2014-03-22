@@ -38,12 +38,13 @@ import org.slf4j.*;
  * <li><i>recovery_port</i> is a valid port number for the recovery heartbeat mechanism, or a negative value to disable recovery for the node</li>
  * </ul>
  * <p>Additionally, any line starting with a '#' (after trimming) will be considered as a comment and ignored.
- * <p>The file location is read from the configuration property 'jppf.node.connection.strategy.file'.
+ * <p>The file location is read from the configuration property {@code 'jppf.node.connection.strategy.file'}.
  * It will  first be looked up in the file system, then in the classpath if it is not found in the file system.
  * If no file is found at all, the node will fall back to the {@link JPPFDefaultConnectionStrategy JPPF default strategy} and use the configuration to find the driver connection information.
  * <p>The listed drivers will be used as if they were arrayed in a "circle",
  * with the driver selection mechanism rotating one tick each time {@code nextConnectionInfo()} is invoked.
- *  * @author Laurent Cohen
+ * @author Laurent Cohen
+ * @since 4.1
  */
 public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
   /**

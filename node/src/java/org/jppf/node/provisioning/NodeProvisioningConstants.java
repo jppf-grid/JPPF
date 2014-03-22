@@ -21,6 +21,7 @@ package org.jppf.node.provisioning;
 /**
  * This class contains constant definitions for the names of the properties used for node provisioning.
  * @author Laurent Cohen
+ * @since 4.1
  */
 public final class NodeProvisioningConstants {
   /**

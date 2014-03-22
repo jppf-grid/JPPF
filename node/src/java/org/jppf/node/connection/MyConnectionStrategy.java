@@ -39,7 +39,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * If no file is found at all, the node will fall back to the {@link JPPFDefaultConnectionStrategy JPPF default strategy} and use the configuration to find the driver connection information.
  * <p>The listed drivers will be used as if they were arrayed in a "circle",
  * with the driver selection mechanism rotating one tick each time {@code nextConnectionInfo()} is invoked.
- *  * @author Laurent Cohen
+ * @author Laurent Cohen
+ * @since 4.1
  */
 public class MyConnectionStrategy implements DriverConnectionStrategy {
   /**
