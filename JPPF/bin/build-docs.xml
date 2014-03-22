@@ -30,9 +30,6 @@
 			<param name="dest" value="${home}/"/>
 			<param name="templates" value="${home}/doc-source/templates/"/>
 		</antcall>
-    <copy toDir="${home}/doc/v2/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
-    <copy toDir="${home}/doc/v3/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
-    <copy toDir="${home}/doc/v4/includes"><fileset dir="${home}" includes="jppf_header.php,jppf_menu.php"/></copy>
 	</target>
 
 	<target name="doc.gen">

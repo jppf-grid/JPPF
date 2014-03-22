@@ -161,6 +161,7 @@
   <import file="build-docs.xml"/>
   <import file="build-tests.xml"/>
   <import file="build-maven.xml"/>
+  <import file="build-utils.xml"/>
 	
   <!-- ========================================================================= -->
   <!--              Package the all-in-one zip distribution                      -->
