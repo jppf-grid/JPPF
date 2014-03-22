@@ -24,6 +24,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -45,8 +46,7 @@ public class JPPFBundlerFactory
   /**
    * This enum defines the available default load balancing configurations.
    */
-  public enum Defaults
-  {
+  public enum Defaults {
     /**
      * Default load-balancing configuration for JPPF servers.
      */
@@ -72,18 +72,13 @@ public class JPPFBundlerFactory
      * Initialize with the specified configuration as a string.
      * @param config the configuration as a string.
      */
-    Defaults(final CharSequence config)
-    {
-      try
-      {
+    Defaults(final CharSequence config) {
+      try {
         String s = (config instanceof String) ? (String) config : config.toString();
-        try (Reader reader = new StringReader(s))
-        {
-          this.config = TypedProperties.loadAndResolve(reader);
+        try (Reader reader = new StringReader(s)) {
+          this.config = ConfigurationHelper.loadAndResolve(reader);
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         if (debugEnabled) log.debug("could not load default configuration", e);
       }
     }
@@ -92,14 +87,12 @@ public class JPPFBundlerFactory
      * Get the value of this configuration default.
      * @return the value as a {@link TypedProperties} object.
      */
-    public TypedProperties config()
-    {
+    public TypedProperties config() {
       return config;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
       return name() + (config == null ? ":null" : config);
     }
   }
@@ -115,8 +108,7 @@ public class JPPFBundlerFactory
   /**
    * Default constructor.
    */
-  public JPPFBundlerFactory()
-  {
+  public JPPFBundlerFactory() {
     this(Defaults.SERVER);
   }
 
@@ -124,8 +116,7 @@ public class JPPFBundlerFactory
    * Default constructor.
    * @param def the default values to use if nothing is specified in the JPPF configuration.
    */
-  public JPPFBundlerFactory(final Defaults def)
-  {
+  public JPPFBundlerFactory(final Defaults def) {
     defaultConfig = def;
     if (debugEnabled) log.debug("using default properties: " + defaultConfig);
   }
@@ -137,8 +128,7 @@ public class JPPFBundlerFactory
    * @return a new <code>Bundler</code> instance.
    * @throws Exception if the bundler could not be created.
    */
-  public Bundler createBundler(final String name, final TypedProperties configuration) throws Exception
-  {
+  public Bundler createBundler(final String name, final TypedProperties configuration) throws Exception {
     JPPFBundlerProvider provider = getBundlerProvider(name);
     if (provider == null) throw new JPPFException("Provider '" + name + "' could not be found");
     LoadBalancingProfile profile = provider.createProfile(configuration);
@@ -150,22 +140,18 @@ public class JPPFBundlerFactory
    * @return a new <code>Bundler</code> instance.
    * @throws Exception if the bundler could not be created.
    */
-  public Bundler createBundlerFromJPPFConfiguration() throws Exception
-  {
+  public Bundler createBundlerFromJPPFConfiguration() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
     String algorithm = config.getString("jppf.load.balancing.algorithm", null);
     if (algorithm == null) algorithm = defaultConfig.config().getString("jppf.load.balancing.algorithm");
     String profileName = config.getString("jppf.load.balancing.strategy", null);
     if (profileName == null) profileName = config.getString("jppf.load.balancing.profile", null);
-    if (profileName == null)
-    {
+    if (profileName == null) {
       String prefix = "jppf.load.balancing.profile";
       profileName = defaultConfig.config().getString(prefix, "jppf");
       String prefixDot = prefix + '.';
-      for (Map.Entry<Object, Object> entry: defaultConfig.config().entrySet())
-      {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-        {
+      for (Map.Entry<Object, Object> entry: defaultConfig.config().entrySet()) {
+        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
           String key = (String) entry.getKey();
           if (!config.containsKey(key) && key.startsWith(prefixDot)) config.put(key, entry.getValue());
         }
@@ -183,8 +169,7 @@ public class JPPFBundlerFactory
    * @return a <code>JPPFBundlerProvider</code> instance or null if the provider could not be found.
    * @throws Exception if any error occurs while loading the providers.
    */
-  public JPPFBundlerProvider getBundlerProvider(final String name) throws Exception
-  {
+  public JPPFBundlerProvider getBundlerProvider(final String name) throws Exception {
     if (providerMap == null) loadProviders();
     return providerMap.get(name);
   }
@@ -194,8 +179,7 @@ public class JPPFBundlerFactory
    * @return a list of provider names.
    * @throws Exception if any error occurs while loading the providers.
    */
-  public List<String> getBundlerProviderNames() throws Exception
-  {
+  public List<String> getBundlerProviderNames() throws Exception {
     if (providerMap == null) loadProviders();
     return new ArrayList<>(providerMap.keySet());
   }
@@ -204,28 +188,23 @@ public class JPPFBundlerFactory
    * Retrieve all the bundler providers configured through the service provider interface (SPI).
    * @throws Exception if any error occurs while loading the providers.
    */
-  private void loadProviders() throws Exception
-  {
+  private void loadProviders() throws Exception {
     Map<String, JPPFBundlerProvider> map = new Hashtable<>();
     ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
     ClassLoader currentCL = getClass().getClassLoader();
     if (debugEnabled) log.debug("oldCL=" + oldCL + ", currentCL=" + currentCL);
     final boolean isDiff = (oldCL != currentCL);
-    try
-    {
+    try {
       if (isDiff) Thread.currentThread().setContextClassLoader(currentCL);
       Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
-      while (it.hasNext())
-      {
+      while (it.hasNext()) {
         JPPFBundlerProvider provider = it.next();
         map.put(provider.getAlgorithmName(), provider);
         if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
       }
       if (debugEnabled) log.debug("found " + map.size() + " load-balancing algorithms in the classpath");
       providerMap = map;
-    }
-    finally
-    {
+    } finally {
       if (isDiff) Thread.currentThread().setContextClassLoader(oldCL);
     }
   }
@@ -237,13 +216,11 @@ public class JPPFBundlerFactory
    * @param configuration the JPPF configuration to extract from.
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
-  public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration)
-  {
+  public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration) {
     TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
     String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties result = new TypedProperties();
-    for (Map.Entry<Object, Object> entry: profile.entrySet())
-    {
+    for (Map.Entry<Object, Object> entry: profile.entrySet()) {
       String key = (String) entry.getKey();
       String s = key.substring(prefix.length());
       result.setProperty(s, (String) entry.getValue());
@@ -258,18 +235,14 @@ public class JPPFBundlerFactory
    * @param configuration the JPPF configuration to extract from.
    * @return a <code>TypedProperties</code> instance containing only the profile-specific parameters.
    */
-  private TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration)
-  {
+  private TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration) {
     TypedProperties profile = new TypedProperties();
     String prefix = "strategy." + profileName + '.';
     String prefix2 = "jppf.load.balancing.profile." + profileName + '.';
-    for (Map.Entry<Object, Object> entry: configuration.entrySet())
-    {
-      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-      {
+    for (Map.Entry<Object, Object> entry: configuration.entrySet()) {
+      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         String key = (String) entry.getKey();
-        if (key.startsWith(prefix))
-        {
+        if (key.startsWith(prefix)) {
           String propName = key.substring(prefix.length());
           profile.setProperty(prefix2 + propName, (String) entry.getValue());
         }
