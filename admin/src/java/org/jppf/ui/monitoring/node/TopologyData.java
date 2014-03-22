@@ -364,6 +364,7 @@ public class TopologyData {
   private class ProxySettingTask implements Runnable {
     @Override
     public void run() {
+      if (jmxWrapper == null) return;
       try {
         boolean hasNullProxy = true;
         while (hasNullProxy) {
