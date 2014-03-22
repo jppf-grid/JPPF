@@ -93,7 +93,8 @@
 	<!-- ===================================================================== -->
 
 	<child name="Tables" type="Java">
-    <property name="scrollable" value="false"/>
+    <property name="scrollable" value="true"/>
+    <property name="horizontalScrollbar" value="false"/>
 		<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
     <!--
     <property name="layoutConstraints" value="fill, flowy"/>

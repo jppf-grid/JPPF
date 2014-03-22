@@ -47,28 +47,27 @@ public class JavaOption extends AbstractOption
   }
 
   @Override
-  public void createUI()
-  {
-    try
-    {
+  public void createUI() {
+    try {
       JComponent comp = (JComponent) Class.forName(getClassName()).newInstance();
-      if (comp instanceof JPanel)
-      {
+      JScrollPane scrollPane = scrollable ? createScrollPane(comp) : null;
+      if (comp instanceof JPanel) {
         JPanel panel = (JPanel) comp;
         if (!(panel.getLayout() instanceof MigLayout) && (layoutConstraints != null) && !"".equals(layoutConstraints))
           panel.setLayout(new MigLayout(layoutConstraints));
       }
-      if (mouseListenerClassName != null)
-      {
+      if (mouseListenerClassName != null) {
         JavaOptionMouseListener ml =
           (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
         ml.setOption(this);
         comp.addMouseListener(ml);
       }
-      UIComponent = scrollable ? new JScrollPane(comp) : comp;
-    }
-    catch(Exception e)
-    {
+      if (scrollPane != null) {
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        UIComponent = scrollPane;
+      }
+      else UIComponent = comp;
+    } catch(Exception e) {
       e.printStackTrace();
     }
   }

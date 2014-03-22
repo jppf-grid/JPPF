@@ -223,6 +223,8 @@ public class OptionsPageBuilder
     elt.setLabel(LocalizationUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
     elt.setToolTipText(LocalizationUtils.getLocalized(baseName, desc.name+".tooltip", desc.getProperty("tooltip")));
     elt.setScrollable(desc.getBoolean("scrollable", false));
+    elt.setHorizontalScrollbar(desc.getBoolean("horizontalScrollbar", true));
+    elt.setVerticalScrollbar(desc.getBoolean("verticalScrollbar", true));
     elt.setBordered(desc.getBoolean("bordered", false));
     elt.setLayoutConstraints(desc.getString("layoutConstraints", "fill, gapy 2!, insets 0 0 0 0"));
     elt.setComponentConstraints(desc.getString("componentConstraints", "growx"));

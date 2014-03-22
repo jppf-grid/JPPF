@@ -20,7 +20,7 @@ package org.jppf.ui.options;
 import java.awt.event.MouseListener;
 import java.util.*;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 
 import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
@@ -29,8 +29,7 @@ import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
  * Default abstract implementation of the <code>OptionElement</code> interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractOptionProperties implements OptionProperties
-{
+public abstract class AbstractOptionProperties implements OptionProperties {
   /**
    * The label or title displayed with the UI component.
    */
@@ -55,6 +54,14 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Determines whether this page should be enclosed within a scroll pane.
    */
   protected boolean scrollable = false;
+  /**
+   * Whether the scroll pane can have a horizontal scrollbar (if {@code scrollable} is {@code true}).
+   */
+  protected boolean horizontalScrollbar = true;
+  /**
+   * Whether the scroll pane can have a vertical scrollbar (if {@code scrollable} is {@code true}).
+   */
+  protected boolean verticalScrollbar = true;
   /**
    * Determines whether this option has a border around it.
    */
@@ -97,8 +104,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  protected AbstractOptionProperties()
-  {
+  protected AbstractOptionProperties() {
   }
 
   /**
@@ -109,11 +115,9 @@ public abstract class AbstractOptionProperties implements OptionProperties
   /**
    * Get the label displayed with the UI component.
    * @return the label as a string.
-   * @see org.jppf.ui.options.Option#getLabel()
    */
   @Override
-  public String getLabel()
-  {
+  public String getLabel() {
     return label;
   }
 
@@ -121,19 +125,16 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the label displayed with the UI component.
    * @param label the label as a string.
    */
-  public void setLabel(final String label)
-  {
+  public void setLabel(final String label) {
     this.label = label;
   }
 
   /**
    * Get the name of this option.
    * @return the name as a string.
-   * @see org.jppf.ui.options.Option#getName()
    */
   @Override
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -141,19 +142,16 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the name of this option.
    * @param name the name as a string.
    */
-  public void setName(final String name)
-  {
+  public void setName(final String name) {
     this.name = name;
   }
 
   /**
    * Get the UI component for this option.
    * @return a <code>JComponent</code> instance.
-   * @see org.jppf.ui.options.Option#getUIComponent()
    */
   @Override
-  public JComponent getUIComponent()
-  {
+  public JComponent getUIComponent() {
     return UIComponent;
   }
 
@@ -161,19 +159,16 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the UI component for this option.
    * @param component a <code>JComponent</code> instance.
    */
-  public void setUIComponent(final JComponent component)
-  {
+  public void setUIComponent(final JComponent component) {
     UIComponent = component;
   }
 
   /**
    * Get the tooltip text displayed with the UI component.
    * @return the tooltip as a string.
-   * @see org.jppf.ui.options.OptionElement#getToolTipText()
    */
   @Override
-  public String getToolTipText()
-  {
+  public String getToolTipText() {
     return toolTipText;
   }
 
@@ -181,23 +176,19 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the tooltip text displayed with the UI component.
    * @param tooltip the tooltip as a string.
    */
-  public void setToolTipText(final String tooltip)
-  {
+  public void setToolTipText(final String tooltip) {
     String html = tooltip;
     if (((tooltip == null) || "".equals(tooltip.trim()))) html = null;
-    else if (tooltip.contains("\\n"))
-      html = "<html>"+tooltip.replace("\\n", "<br>")+"</html>";
+    else if (tooltip.contains("\\n")) html = "<html>"+tooltip.replace("\\n", "<br>")+"</html>";
     this.toolTipText = html;
   }
 
   /**
    * Determine whether this page should be enclosed within a scroll pane.
    * @return true if the page is to be enclosed in a scroll page, false otherwise.
-   * @see org.jppf.ui.options.OptionElement#isScrollable()
    */
   @Override
-  public boolean isScrollable()
-  {
+  public boolean isScrollable() {
     return scrollable;
   }
 
@@ -205,8 +196,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Determine whether this page should be enclosed within a scroll pane.
    * @param scrollable true if the page is to be enclosed in a scroll pane, false otherwise.
    */
-  public void setScrollable(final boolean scrollable)
-  {
+  public void setScrollable(final boolean scrollable) {
     this.scrollable = scrollable;
   }
 
@@ -216,8 +206,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * @see org.jppf.ui.options.OptionElement#isBordered()
    */
   @Override
-  public boolean isBordered()
-  {
+  public boolean isBordered() {
     return bordered;
   }
 
@@ -225,30 +214,25 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Determine whether this page has a border around it.
    * @param bordered true if the page has a border, false otherwise.
    */
-  public void setBordered(final boolean bordered)
-  {
+  public void setBordered(final boolean bordered) {
     this.bordered = bordered;
   }
 
   /**
    * Get the scripts used by this option or its children.
    * @return a list of <code>ScriptDescriptor</code> instances.
-   * @see org.jppf.ui.options.OptionElement#getScripts()
    */
   @Override
-  public List<ScriptDescriptor> getScripts()
-  {
+  public List<ScriptDescriptor> getScripts() {
     return scripts;
   }
 
   /**
    * Get the initializer for this option.
    * @return a <code>ValueChangeListener</code> instance.
-   * @see org.jppf.ui.options.OptionElement#getInitializer()
    */
   @Override
-  public ValueChangeListener getInitializer()
-  {
+  public ValueChangeListener getInitializer() {
     return initializer;
   }
 
@@ -256,19 +240,16 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the initializer for this option.
    * @param initializer a <code>ValueChangeListener</code> instance.
    */
-  public void setInitializer(final ValueChangeListener initializer)
-  {
+  public void setInitializer(final ValueChangeListener initializer) {
     this.initializer = initializer;
   }
 
   /**
    * Get the finalizer for this option.
    * @return a <code>ValueChangeListener</code> instance.
-   * @see org.jppf.ui.options.OptionElement#getFinalizer()
    */
   @Override
-  public ValueChangeListener getFinalizer()
-  {
+  public ValueChangeListener getFinalizer() {
     return finalizer;
   }
 
@@ -276,8 +257,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the finalizer for this option.
    * @param finalizer a <code>ValueChangeListener</code> instance.
    */
-  public void setFinalizer(final ValueChangeListener finalizer)
-  {
+  public void setFinalizer(final ValueChangeListener finalizer) {
     this.finalizer = finalizer;
   }
 
@@ -286,8 +266,7 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * @return the path as a string.
    */
   @Override
-  public String getIconPath()
-  {
+  public String getIconPath() {
     return iconPath;
   }
 
@@ -295,88 +274,70 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Set the path to an eventual icon displayed in the button.
    * @param iconPath the path as a string.
    */
-  public void setIconPath(final String iconPath)
-  {
+  public void setIconPath(final String iconPath) {
     this.iconPath = iconPath;
   }
 
   /**
    * Determine whether the events firing in this option and/or its children are enabled.
    * @return enabled true if the events are enabled, false otherwise.
-   * @see org.jppf.ui.options.OptionElement#isEventsEnabled()
    */
   @Override
-  public boolean isEventsEnabled()
-  {
+  public boolean isEventsEnabled() {
     return eventsEnabled;
   }
 
   /**
    * Enable or disable the events firing in this option and/or its children.
    * @param enabled true to enable the events, false to disable them.
-   * @see org.jppf.ui.options.OptionElement#setEventsEnabled(boolean)
    */
   @Override
-  public void setEventsEnabled(final boolean enabled)
-  {
+  public void setEventsEnabled(final boolean enabled) {
     eventsEnabled = enabled;
   }
 
   /**
    * Get the Mig layout constraints for the entire layout.
    * @return the constraints as a string.
-   * @see org.jppf.ui.options.OptionProperties#getLayoutConstraints()
    */
   @Override
-  public String getLayoutConstraints()
-  {
+  public String getLayoutConstraints() {
     return layoutConstraints;
   }
 
   /**
    * Set the Mig layout constraints for the entire layout.
    * @param layoutConstraints - the constraints as a string.
-   * @see org.jppf.ui.options.OptionProperties#setLayoutConstraints(java.lang.String)
    */
   @Override
-  public void setLayoutConstraints(final String layoutConstraints)
-  {
+  public void setLayoutConstraints(final String layoutConstraints) {
     this.layoutConstraints = layoutConstraints;
   }
 
   /**
    * Get the Mig layout constraints for a component.
    * @return the constraints as a string.
-   * @see org.jppf.ui.options.OptionProperties#getComponentConstraints()
    */
   @Override
-  public String getComponentConstraints()
-  {
+  public String getComponentConstraints() {
     return componentConstraints;
   }
 
   /**
    * Set the Mig layout constraints for a component.
    * @param componentConstraints - the constraints as a string.
-   * @see org.jppf.ui.options.OptionProperties#setComponentConstraints(java.lang.String)
    */
   @Override
-  public void setComponentConstraints(final String componentConstraints)
-  {
+  public void setComponentConstraints(final String componentConstraints) {
     this.componentConstraints = componentConstraints;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void setEditable(final boolean editable)
-  {
+  public void setEditable(final boolean editable) {
   }
 
   @Override
-  public boolean isDetachable()
-  {
+  public boolean isDetachable() {
     return detachable;
   }
 
@@ -384,20 +345,61 @@ public abstract class AbstractOptionProperties implements OptionProperties
    * Specify whether this component can be detached to a different view.
    * @param detachable <code>true</code> if this component can be detached, <code>false</code> otherwise.
    */
-  public void setDetachable(final boolean detachable)
-  {
+  public void setDetachable(final boolean detachable) {
     this.detachable = detachable;
   }
 
   @Override
-  public MouseListener getMouseListener()
-  {
+  public MouseListener getMouseListener() {
     return mouseListener;
   }
 
   @Override
-  public void setMouseListener(final MouseListener mouseListener)
-  {
+  public void setMouseListener(final MouseListener mouseListener) {
     this.mouseListener = mouseListener;
+  }
+
+  /**
+   * Determine whether the scroll pane can have a horizontal scrollbar (if {@code scrollable} is {@code true}).
+   * @return {@code true} if the scroll pane can have a horizontal scroll bar, {@code false} otherwise.
+   */
+  public boolean isHorizontalScrollbar() {
+    return horizontalScrollbar;
+  }
+
+  /**
+   * Specify whether the scroll pane can have a horizontal scrollbar (if {@code scrollable} is {@code true}).
+   * @param horizontalScrollbar {@code true} if the scroll pane can have a horizontal scroll bar, {@code false} otherwise.
+   */
+  public void setHorizontalScrollbar(final boolean horizontalScrollbar) {
+    this.horizontalScrollbar = horizontalScrollbar;
+  }
+
+  /**
+   * Determine whether the scroll pane can have a vertical scrollbar (if {@code scrollable} is {@code true}).
+   * @return {@code true} if the scroll pane can have a vertical scroll bar, {@code false} otherwise.
+   */
+  public boolean isVerticalScrollbar() {
+    return verticalScrollbar;
+  }
+
+  /**
+   * Specify whether the scroll pane can have a vertical scrollbar (if {@code scrollable} is {@code true}).
+   * @param verticalScrollbar {@code true} if the scroll pane can have a vertical scroll bar, {@code false} otherwise.
+   */
+  public void setVerticalScrollbar(final boolean verticalScrollbar) {
+    this.verticalScrollbar = verticalScrollbar;
+  }
+
+  /**
+   * Create a JScrollPane for the specified view, based on the scroll pane policies.
+   * @param comp the view for which to create the scroll pane.
+   * @return {@link JScrollPane} instance.
+   */
+  protected JScrollPane createScrollPane(final JComponent comp) {
+    JScrollPane jsc = new JScrollPane(comp);
+    jsc.setHorizontalScrollBarPolicy(isHorizontalScrollbar() ? ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED : ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    jsc.setVerticalScrollBarPolicy(isVerticalScrollbar() ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    return jsc;
   }
 }
