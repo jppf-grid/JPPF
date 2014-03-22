@@ -81,12 +81,14 @@ public class PriorityTestRunner
   public static void perform() throws Exception
   {
     JPPFJob job = new JPPFJob();
-    job.add(new PrioritizedTask(0));
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
+    job.setName("my job");
+    job.add(new PrioritizedTask(0)).setId(job.getName() + ":1");
+    job.add(new ResubmittingTask(3)).setId(job.getName() + ":2");
     job.setBlocking(false);
     client.submitJob(job);
+    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     List<Task<?>> results = collector.awaitResults();
+    for (Task<?> task : results) System.out.println("result of task '" + task.getId() + "' : " + task.getResult());
   }
 
   /**

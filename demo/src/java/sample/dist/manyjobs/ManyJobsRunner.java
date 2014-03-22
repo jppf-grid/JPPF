@@ -19,7 +19,6 @@ package sample.dist.manyjobs;
 
 import java.util.List;
 
-import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
@@ -51,17 +50,16 @@ public class ManyJobsRunner
     try
     {
       TypedProperties config = JPPFConfiguration.getProperties();
-      int nbConnections = config.getInt("manyjobs.pool.size", 1);
+      int poolSize = config.getInt("manyjobs.pool.size", 1);
       long length = config.getLong("manyjobs.task.duration", 1L);
       int nbTask = config.getInt("manyjobs.nbtasks", 1);
       int nbJobs = config.getInt("manyjobs.nbjobs", 1);
-      config.setProperty("jppf.discovery.enabled", "true");
-      config.setProperty("jppf.pool.size", String.valueOf(nbConnections));
+      config.setBoolean("jppf.discovery.enabled", true);
+      config.setInt("jppf.pool.size", poolSize);
       jppfClient = new JPPFClient();
       while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
-      print("Running " + nbJobs+ " jobs with " + nbTask + " tasks of length = " + length + " ms");
+      print("Running " + nbJobs+ " jobs with " + nbTask + " tasks of length = " + length + " ms, pools size = " + poolSize);
       perform(nbTask, length, nbJobs);
-      //performLong(size, iterations);
     }
     catch(Exception e)
     {
@@ -82,40 +80,32 @@ public class ManyJobsRunner
    */
   private static void perform(final int nbTask, final long length, final int nbJobs) throws Exception
   {
-    try
+    JPPFJob[] jobs = new JPPFJob[nbJobs];
+    long start = System.nanoTime();
+    for (int n=0; n<nbJobs; n++)
     {
-      JPPFJob[] jobs = new JPPFJob[nbJobs];
-      long start = System.nanoTime();
-      for (int n=0; n<nbJobs; n++)
-      {
-        jobs[n] = new JPPFJob();
-        String s = StringUtils.padLeft(""+(n+1), '0', 4);
-        jobs[n].setName("JPPF Job " + s);
-        jobs[n].setBlocking(false);
-        jobs[n].getSLA().setPriority((nbJobs - n) / 10);
-        //job.getJobSLA().setMaxNodes(1);
-        jobs[n].getClientSLA().setMaxChannels(1);
-        for (int i=0; i<nbTask; i++)
-        {
-          jobs[n].add(new LongTask(length, false)).setId("job-" + (n+1) + ':' + (i+1));
-        }
-        JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
-        jobs[n].setResultListener(collector);
-        jppfClient.submitJob(jobs[n]);
-      }
-      print("submitted " + nbJobs + " jobs");
-      for (int n=0; n<nbJobs; n++)
-      {
-        JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
-        List<Task<?>> results = collector.awaitResults();
-      }
-      long elapsed = (System.nanoTime() - start) / 1_000_000L ;
-      print("got all " + nbJobs + " result lists in " + StringUtils.toStringDuration(elapsed));
+      jobs[n] = new JPPFJob();
+      String s = StringUtils.padLeft(""+(n+1), '0', 4);
+      jobs[n].setName("JPPF Job " + s);
+      jobs[n].setBlocking(false);
+      jobs[n].getSLA().setPriority((nbJobs - n) / 10);
+      //job.getJobSLA().setMaxNodes(1);
+      jobs[n].getClientSLA().setMaxChannels(1);
+      for (int i=0; i<nbTask; i++) jobs[n].add(new LongTask(length, false)).setId("job-" + (n+1) + ':' + (i+1));
+      /*
+      JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
+      jobs[n].setResultListener(collector);
+      */
+      jppfClient.submitJob(jobs[n]);
     }
-    catch(Exception e)
+    print("submitted " + nbJobs + " jobs");
+    for (int n=0; n<nbJobs; n++)
     {
-      throw new JPPFException(e.getMessage(), e);
+      JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
+      List<Task<?>> results = collector.awaitResults();
     }
+    long elapsed = (System.nanoTime() - start) / 1_000_000L;
+    print("got all " + nbJobs + " result lists in " + StringUtils.toStringDuration(elapsed));
   }
 
   /**

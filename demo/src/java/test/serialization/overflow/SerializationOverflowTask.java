@@ -19,14 +19,14 @@ package test.serialization.overflow;
 
 import java.util.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 
 /**
  * .
  * @author Laurent Cohen
  */
-public class SerializationOverflowTask extends JPPFTask
+public class SerializationOverflowTask extends AbstractTask<String>
 {
   /**
    * The time this task will sleep.
@@ -54,8 +54,8 @@ public class SerializationOverflowTask extends JPPFTask
   }
 
   /**
-   * Perform the multiplication of a matrix row by another matrix.
-   * @see sample.BaseDemoTask#doWork()
+   * Initialize a list of byte arrays whose serialized size is greater than 2 GB.
+   * The node should have at least 6 GB of heap.
    */
   @Override
   public void run()

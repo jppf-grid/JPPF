@@ -48,5 +48,6 @@ public class PrioritizedTask extends JPPFTask
   public void run()
   {
     System.out.println("executing task with priority " + priority);
+    setResult("task completed");
   }
 }

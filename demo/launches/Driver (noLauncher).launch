@@ -31,7 +31,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.server.JPPFDriver"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="noLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="server"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=log4j-driver.properties -Djppf.config=jppf-driver.properties -server -Xmx512m -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=config/logging-driver.properties -javaagent:C:\ftp\dev\JInspired\sentris-1.1.2\bundle\sentris-javaagent.jar -noverify"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=log4j-driver.properties -Djppf.config=jppf-driver.properties -server -Xmx512m -XX:+HeapDumpOnOutOfMemoryError -Djava.util.logging.config.file=config/logging-driver.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 <stringAttribute key="yk-options" value="&#13;&#10;additional-options=&#13;&#10;snapshots-dir=&#13;&#10;startup=0&#13;&#10;"/>
 </launchConfiguration>

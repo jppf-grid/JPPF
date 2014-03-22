@@ -31,8 +31,7 @@ import org.slf4j.*;
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class JPPFCallableRunner
-{
+public class JPPFCallableRunner {
   /**
    * Logger for this class.
    */
@@ -55,23 +54,16 @@ public class JPPFCallableRunner
    * @param args not used.
    * @throws Exception if an error is raised during the execution.
    */
-  public static void main(final String...args) throws Exception
-  {
+  public static void main(final String...args) throws Exception {
     int nbRuns = 1;
     //loggingHandler = new MyLoggingHandler();
-    for (int i=1; i<=nbRuns; i++)
-    {
+    for (int i=1; i<=nbRuns; i++) {
       print("*---------- run "  + StringUtils.padLeft(String.valueOf(i), '0', 3) + " ----------*");
-      try
-      {
+      try {
         perform();
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         e.printStackTrace();
-      }
-      finally
-      {
+      } finally {
         //restartDriver(1L, i < nbRuns ? 2000L : -1L);
         if (jppfClient != null) jppfClient.close();
         if (i < nbRuns) Thread.sleep(3000L);
@@ -83,8 +75,7 @@ public class JPPFCallableRunner
    * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform() throws Exception
-  {
+  private static void perform() throws Exception {
     int nbTasks = 400;
     int nbJobs = 1;
     int maxChannels = 1;
@@ -94,25 +85,21 @@ public class JPPFCallableRunner
     jppfClient = new JPPFClient();
     while (!jppfClient.hasAvailableConnection()) Thread.sleep(20L);
     JmxLogger jmxLogger = null;
-    if (loggingHandler != null)
-    {
+    if (loggingHandler != null) {
       jmxLogger = getJmxLogger();
       loggingHandler.register(jmxLogger);
     }
     print("submitting " + nbJobs + " jobs with " + nbTasks + " tasks");
     List<JPPFJob> jobList = new ArrayList<>();
-    for (int n=1; n<=nbJobs; n++)
-    {
+    for (int n=1; n<=nbJobs; n++) {
       String name = "job-" + StringUtils.padLeft(String.valueOf(n), '0', 4);
       JPPFJob job = new JPPFJob(name);
       job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
-      job.setResultListener(new JPPFResultCollector(job)
-      {
+      job.setResultListener(new JPPFResultCollector(job) {
         @Override
-        public synchronized void resultsReceived(final TaskResultEvent event)
-        {
+        public synchronized void resultsReceived(final TaskResultEvent event) {
           super.resultsReceived(event);
           if (event.getTasks() != null) print("received " + jobResults.size() + " results");
         }
@@ -122,8 +109,7 @@ public class JPPFCallableRunner
     }
     callableResult = "from MyCallable";
     for (JPPFJob job: jobList) jppfClient.submitJob(job);
-    for (JPPFJob job: jobList)
-    {
+    for (JPPFJob job: jobList) {
       JPPFResultCollector coll = (JPPFResultCollector) job.getResultListener();
       List<Task<?>> results = coll.awaitResults();
       print("got results for job '" + job.getName() + "'");
@@ -134,16 +120,14 @@ public class JPPFCallableRunner
   /**
    * Perform optional configuration before creating the JPPF client.
    */
-  public static void configure()
-  {
+  public static void configure() {
   }
 
   /**
    * Print a message tot he log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     log.info(msg);
     System.out.println(msg);
   }
@@ -154,21 +138,14 @@ public class JPPFCallableRunner
    * @param restartDelay .
    * @throws Exception if any error occurs.
    */
-  private static void restartDriver(final long shutdownDelay, final long restartDelay) throws Exception
-  {
+  private static void restartDriver(final long shutdownDelay, final long restartDelay) throws Exception {
     JMXDriverConnectionWrapper jmx = getDriverJmx();
-    try
-    {
+    try {
       jmx.restartShutdown(shutdownDelay, restartDelay);
-    }
-    finally
-    {
-      try
-      {
+    } finally {
+      try {
         jmx.close();
-      }
-      catch (Exception ignore)
-      {
+      } catch (Exception ignore) {
       }
     }
   }
@@ -178,8 +155,7 @@ public class JPPFCallableRunner
    * @return a {@link JMXDriverConnectionWrapper} instance.
    * @throws Exception if any error occurs.
    */
-  private static JMXDriverConnectionWrapper getDriverJmx() throws Exception
-  {
+  private static JMXDriverConnectionWrapper getDriverJmx() throws Exception {
     JPPFClientConnectionImpl c;
     while ((c = (JPPFClientConnectionImpl) jppfClient.getClientConnection()) == null) Thread.sleep(10L);
     JMXDriverConnectionWrapper jmx;
@@ -193,49 +169,42 @@ public class JPPFCallableRunner
    * @return a {@link JmxLogger} instance.
    * @throws Exception if any error occurs.
    */
-  private static JmxLogger getJmxLogger() throws Exception
-  {
+  private static JmxLogger getJmxLogger() throws Exception {
     return getDriverJmx().getProxy(JmxLogger.DEFAULT_MBEAN_NAME, JmxLogger.class);
   }
 
   /**
    * 
    */
-  public static class MyJobListener extends JobListenerAdapter
-  {
+  public static class MyJobListener extends JobListenerAdapter {
     /**
      * 
      */
     private int lastCount = 0;
 
     @Override
-    public void jobReturned(final JobEvent event)
-    {
+    public void jobReturned(final JobEvent event) {
       System.out.println("job '" + event.getJob().getName() + "' returned");
       JPPFJob job = event.getJob();
       int size = job.getResults().size();
-      if (size - lastCount > 100)
-      {
+      if (size - lastCount > 100) {
         System.out.println("received " + size + " tasks for job '" + job.getName() + "'");
         lastCount = size;
       }
     }
 
     @Override
-    public void jobStarted(final JobEvent event)
-    {
+    public void jobStarted(final JobEvent event) {
       System.out.println("job '" + event.getJob().getName() + "' started");
     }
 
     @Override
-    public void jobEnded(final JobEvent event)
-    {
+    public void jobEnded(final JobEvent event) {
       System.out.println("job '" + event.getJob().getName() + "' ended");
     }
 
     @Override
-    public void jobDispatched(final JobEvent event)
-    {
+    public void jobDispatched(final JobEvent event) {
       System.out.println("job '" + event.getJob().getName() + "' dispatched");
     }
   }

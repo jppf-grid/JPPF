@@ -20,6 +20,7 @@ package test.client;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -91,5 +92,34 @@ public class ClientReset
   {
     log.info(msg);
     System.out.println(msg);
+  }
+
+  /**
+   * @throws Exception .
+   */
+  private static void temp() throws Exception {
+    JPPFClient jppfClient = new JPPFClient();
+    JPPFJob job = new JPPFJob();
+    JPPFResultCollector collector = new JPPFResultCollector(job) {
+      @Override public synchronized void resultsReceived(final TaskResultEvent event) {
+        super.resultsReceived(event);
+        // Get the partial results from a single node
+        List<Task<?>> myResults = event.getTasks();
+        // ... work with the results
+      }
+    };
+    job.setResultListener(collector);
+    jppfClient.submitJob(job);
+
+    JobListener jobListener = new JobListenerAdapter() {
+      @Override public void jobReturned(final JobEvent event) {
+        synchronized(event.getJob()) {
+          // get the partial results
+          List<Task<?>> myResults = event.getJobTasks();
+          // ... work with the results
+        }
+      }
+    };
+    job.addJobListener(jobListener);
   }
 }

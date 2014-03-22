@@ -32,20 +32,22 @@ import sample.dist.tasklength.LongTask;
  * 
  * @author Laurent Cohen
  */
-public class Test
-{
+public class Test {
   /**
    * Main entry point.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
-      test2();
-    }
-    catch (Exception e)
-    {
+  public static void main(final String[] args) {
+    try {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      Hello hello = new Hello();
+      try {
+        oos.writeObject(hello);
+      } finally {
+        oos.close();
+      }
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -89,6 +91,25 @@ public class Test
   }
 
   /**
+   * Perform a test.
+   * @throws Exception if any error occurs.
+   */
+  public static void test3() throws Exception
+  {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(baos);
+    Hello hello = new Hello();
+    try
+    {
+      oos.writeObject(hello);
+    }
+    finally
+    {
+      oos.close();
+    }
+  }
+
+  /**
    * Print a string.
    * @param s the string to print.
    */
@@ -122,5 +143,23 @@ public class Test
     ByteArrayInputStream bais = new ByteArrayInputStream(data);
     JPPFObjectInputStream jois = new JPPFObjectInputStream(bais);
     return jois.readObject();
+  }
+
+  /**
+   * 
+   */
+  public static class Hello implements Serializable {
+    /**
+     * Explicit serialVersionUID.
+     */
+    //private static final long serialVersionUID = 12345678L;
+    /**
+     * 
+     */
+    public String fname = "Lolo";
+    /**
+     * 
+     */
+    public String lname = "Coco";
   }
 }

@@ -43,9 +43,11 @@ public class NodeProvisioningRunner {
     try {
       client = new JPPFClient();
       // wait until a JMX connection to the driver is properly established
-      while (!client.hasAvailableConnection()) Thread.sleep(10L);
+      JPPFClientConnection connection = null;
+      while ((connection = client.getClientConnection()) == null) Thread.sleep(10L);
+      //while (!client.hasAvailableConnection()) Thread.sleep(10L);
       JMXDriverConnectionWrapper jmxDriver = null;
-      while ((jmxDriver = client.getClientConnection().getJmxConnection()) == null) Thread.sleep(10L);
+      while ((jmxDriver = connection.getJmxConnection()) == null) Thread.sleep(10L);
       while (!jmxDriver.isConnected()) Thread.sleep(10L);
       // get a proxy to the mbean that forwards management requests to the nodes
       JPPFNodeForwardingMBean forwarder = jmxDriver.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);

@@ -18,7 +18,10 @@
 
 package sample.test;
 
+import java.io.*;
 import java.util.UUID;
+
+import javax.swing.text.html.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.event.*;
@@ -69,5 +72,18 @@ public class ClientTest
     {
       if (client != null) client.close();
     }
+  }
+
+  /**
+   * 
+   * @throws Exception .
+   */
+  public static void testHTML() throws Exception {
+    HTMLDocument doc = new HTMLDocument();
+    try ( Reader reader = new FileReader("C:/temp/MyFile.html")) {
+      HTMLEditorKit kit = new HTMLEditorKit();
+      kit.read(reader, doc, 0);
+    }
+    //doc.
   }
 }
