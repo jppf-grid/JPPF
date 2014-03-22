@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.junit.Test;
 
 /**
@@ -41,7 +42,7 @@ public class TestTypedProperties {
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
     sb.append("prop.2 = prop.2.value\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "file.include.prop.1", "file.include.prop.1.value");
@@ -61,7 +62,7 @@ public class TestTypedProperties {
     sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "url.include.prop.1", "url.include.prop.1.value");
@@ -80,7 +81,7 @@ public class TestTypedProperties {
     sb.append("#!include class ").append(TestConfigurationSourceReader.class.getName()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -103,7 +104,7 @@ public class TestTypedProperties {
     sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -128,7 +129,7 @@ public class TestTypedProperties {
     File file = new File("classes/tests/test/org/jppf/utils/NestedURLInclude.properties");
     sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");
       checkProperty(props, "prop.2", "prop.2.value");
       checkProperty(props, "reader.include.prop.1", "reader.include.prop.1.value");
@@ -151,7 +152,7 @@ public class TestTypedProperties {
     sb.append("#!include file test/org/jppf/utils/CyclicFileInclude1.properties\n");
     sb.append("prop.2 = prop.2.value\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       String s = props.getProperty("jppf.configuration.error");
       assertNotNull(s);
       assertTrue(s.indexOf(StackOverflowError.class.getName()) >= 0);
@@ -170,7 +171,7 @@ public class TestTypedProperties {
     sb.append("prop.3 = 3.${prop.4}\n");
     sb.append("prop.4 = 4\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.4", "4");
       checkProperty(props, "prop.3", "3.4");
@@ -188,7 +189,7 @@ public class TestTypedProperties {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${prop.2}\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.1", "1/${prop.2}");
     }
@@ -204,7 +205,7 @@ public class TestTypedProperties {
     sb.append("prop.1 = 1/${prop.2}\n");
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.1", "1/${prop.2}");
       checkProperty(props, "prop.2", "2-${prop.1}");
@@ -222,7 +223,7 @@ public class TestTypedProperties {
     sb.append("prop.1 = 1/${env.PATH}\n");
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.1", "1/" + path);
       checkProperty(props, "prop.2", "2-1/" + path);
@@ -239,7 +240,7 @@ public class TestTypedProperties {
     sb.append("prop.1 = 1/${env.This_is_my_undefined_environment_variable}\n");
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "prop.1", "1/");
       checkProperty(props, "prop.2", "2-1/");
@@ -262,7 +263,7 @@ public class TestTypedProperties {
     sb.append("prop.5 = hello $script{ return '${prop.0} ' + (2 + 3) }$ world\n");
     sb.append("prop.6 = hello $script{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe\n");
     try (Reader r = new StringReader(sb.toString())) {
-      TypedProperties props = TypedProperties.loadAndResolve(r);
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
       checkProperty(props, "jppf.script.default.language", "groovy");
       checkProperty(props, "prop.0", "hello miscreant world");
