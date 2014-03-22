@@ -54,21 +54,18 @@ public class JPPFTestServlet extends HttpServlet
   {
     JPPFTestRunner runner = new JPPFTestRunner();
     ResultHolder result = runner.runTests("TestClasses.txt", null);
-    try
-    {
+    try {
+      String server = request.getParameter("server");
+      if ("jboss".equalsIgnoreCase(server)) JPPFHelper.setJndiName(JPPFHelper.JNDI_NAME_JBOSS);
+      if ("geronimo".equalsIgnoreCase(server)) JPPFHelper.setJndiName(JPPFHelper.JNDI_NAME_GERONIMO);
       String remoteClient = request.getParameter("remoteClient");
-      if (remoteClient != null)
-      {
+      if (remoteClient != null) {
         // send the results to the remote java client
         runner.sendResults(result, response.getOutputStream());
-      }
-      else
-      {
+      } else {
         // render the results in a web page.
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e);
     }
   }

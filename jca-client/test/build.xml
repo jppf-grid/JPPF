@@ -18,25 +18,25 @@
 
 <project name="J2EE Connector Tests" default="build" basedir=".">
 
-  <!-- ========================================================================= -->
-  <!--                          Property definitions                             -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Property definitions                                                 -->
+  <!-- ==================================================================== -->
 
   <property name="build.sysclasspath" value="last"/>
-  <property name="classes.dir"        value="${basedir}/classes" />
-  <property name="src.dir"            value="${basedir}/src" />
-  <property name="config.dir"         value="${basedir}/config" />
-  <property name="build.dir"          value="${basedir}/build" />
-  <property name="lib.dir"            value="${basedir}/../lib" />
-  <property name="war.prefix"         value="JPPF_J2EE_Tests" />
+  <property name="classes.dir"        value="${basedir}/classes"/>
+  <property name="src.dir"            value="${basedir}/src"/>
+  <property name="config.dir"         value="${basedir}/config"/>
+  <property name="build.dir"          value="${basedir}/build"/>
+  <property name="lib.dir"            value="${basedir}/../lib"/>
+  <property name="war.prefix"         value="JPPF_J2EE_Tests"/>
   <property file="${basedir}/../build.number" />
-  <property name="geronimo.name"      value="geronimo-tomcat7-javaee6-3.0.0"/>
-  <property name="geronimo.dir"       value="${user.home}/geronimo"/>
   <property name="j2e.dir"            value="${basedir}/../build" />
+  <!-- name of the app server to test on -->
+  <property name="server"             value="jboss"/>
 
-  <!-- ========================================================================= -->
-  <!--                           Classpath definitions                           -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Classpath definitions                                                -->
+  <!-- ==================================================================== -->
 
   <path id="project.classpath">
     <pathelement location="${classes.dir}" />
@@ -53,9 +53,9 @@
     <fileset dir="${lib.dir}" includes="**/*.jar" excludes="**/slf4j-jdk*.jar"/>
   </path>
 
-  <!-- ========================================================================= -->
-  <!--                                    Clean                                  -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Clean                                                                -->
+  <!-- ==================================================================== -->
 
   <target name="clean">
     <delete quiet="true">
@@ -66,24 +66,32 @@
     </delete>
   </target>
 
-  <!-- ========================================================================= -->
-  <!--                                    Init                                   -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Init                                                                 -->
+  <!-- ==================================================================== -->
 
   <target name="init" depends="clean" description="Initialize ressources">
     <mkdir dir="${build.dir}" />
   </target>
 
-  <!-- ========================================================================= -->
-  <!--                         Build everything                                  -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Build everything                                                     -->
+  <!-- ==================================================================== -->
 
   <target name="build" depends="war"/>
-  <target name="build.run" depends="build, geronimo.install, geronimo.start, geronimo.deploy.connector, geronimo.deploy.testwar, run.tests, geronimo.stop"/>
+  <target name="build.run" depends="" description="build, run.geronimo, run.jboss"/>
+  <target name="run.geronimo" depends="build, geronimo.install, geronimo.start, geronimo.deploy.connector, geronimo.deploy.testwar" description="">
+    <run.tests appserver="geronimo" port="8080" contextroot="JPPF_J2EE_Tests"/>
+    <antcall target="geronimo.stop"/>
+  </target>
+  <target name="run.jboss" depends="build, jboss.install, jboss.deploy, jboss.start" description="">
+    <run.tests appserver="jboss" port="8080" contextroot="JPPF_J2EE_Tests"/>
+    <antcall target="jboss.stop"/>
+  </target>
 
-  <!-- ========================================================================= -->
-  <!--                     Generates the list of test classes                    -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Generates the list of test classes                                   -->
+  <!-- ==================================================================== -->
 
   <target name="generate.tests.list">
     <echo message="basedir=${basedir}, src.dir=${src.dir}"/>
@@ -97,9 +105,9 @@
     <copy todir="${src.dir}/resources" file="${classes.dir}/TestClasses.txt" overwrite="true"/>
   </target>
 
-  <!-- ========================================================================= -->
-  <!--                         Compile the application                           -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Compile the test code                                                -->
+  <!-- ==================================================================== -->
 
   <target name="compile" depends="init">
     <echo message="compiling the project..." />
@@ -114,9 +122,9 @@
     <antcall target="generate.tests.list"/>
   </target>
 
-  <!-- ========================================================================= -->
-  <!--                     Generate the WAR file                                 -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Generate the test WAR file                                           -->
+  <!-- ==================================================================== -->
 
   <target name="war" depends="compile">
     <echo message="creating the WAR ..." />
@@ -137,126 +145,31 @@
     </war>
   </target>
 
-  <!-- ========================================================================= -->
-  <!--                          Run the tests                                    -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Run the tests                                                        -->
+  <!-- ==================================================================== -->
 
-  <target name="run.tests">
-    <echo message="Running the tests"/>
-    <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="project.classpath" resultproperty="test.result">
-      <jvmarg value="-server"/>
-      <jvmarg value="-Xmx256m"/>
-      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
-      <arg value="-u"/>
-      <arg value="http://localhost:8080/jppfunittests/performTests?remoteClient=true"/>
-    </java>
-  </target>
+  <macrodef name="run.tests">
+    <attribute name="appserver" default="jboss"/>
+    <attribute name="port" default="8080"/>  
+    <attribute name="contextroot" default="JPPF_J2EE_Tests"/>
+    <sequential>
+      <echo message="Running the tests"/>
+      <java fork="yes" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="project.classpath" resultproperty="test.result">
+        <jvmarg value="-server"/>
+        <jvmarg value="-Xmx256m"/>
+        <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+        <arg value="-u"/>
+        <arg value="http://localhost:@{port}/@{contextroot}/performTests?remoteClient=true&amp;server=@{appserver}"/>
+      </java>
+    </sequential>
+  </macrodef>
 
-  <!-- ========================================================================= -->
-  <!--                       Download and install Geronimo                       -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!-- Import app server specific targets                                   -->
+  <!-- ==================================================================== -->
 
-  <target name="geronimo.install" depends="">
-    <echo message="downloading geronimo 3.0.0 ..." />
-    <mkdir dir="${geronimo.dir}"/>
-    <get dest="${geronimo.dir}/${geronimo.name}.tar.gz" verbose="true" skipexisting="true">
-      <first>
-        <restrict>
-          <resourcelist>
-            <file file="${basedir}/bin/geronimo-mirrors.txt"/>
-          </resourcelist>
-          <exists/>
-        </restrict>
-      </first>
-    </get>
-    <delete dir="${geronimo.dir}/${geronimo.name}" quiet="false"/>
-    <untar src="${geronimo.dir}/${geronimo.name}.tar.gz" dest="${user.home}/geronimo" compression="gzip"/>
-    <copy tofile="${geronimo.dir}/${geronimo.name}/var/log/server-log4j.properties" file="${basedir}/bin/server-log4j.properties" overwrite="true"/>
-    <!--
-    <antcall target="start.geronimo"/>
-    -->
-  </target>
-
-  <!-- ========================================================================= -->
-  <!--                       Start and stop Geronimo                             -->
-  <!-- ========================================================================= -->
-
-  <target name="geronimo.start" depends="">
-    <echo message="starting geronimo 3.0.0 ..." />
-    <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
-      <arg value="/c"/>
-      <arg value="startup.bat"/>
-      <arg value="jpda"/>
-    </exec>    
-    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1000">
-      <http url="http://localhost:8080/"/>
-    </waitfor>
-  </target>
-
-  <target name="geronimo.stop" depends="">
-    <echo message="stopping geronimo 3.0.0 ..." />
-    <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
-      <arg value="/c"/>
-      <arg value="geronimo"/>
-      <arg value="stop"/>
-      <arg value="--user"/>
-      <arg value="system"/>
-      <arg value="--password"/>
-      <arg value="manager"/>
-    </exec>    
-    <waitfor maxwait="1" maxwaitunit="minute" checkevery="1000">
-      <not>
-        <http url="http://localhost:8080/"/>
-      </not>
-    </waitfor>
-  </target>
-
-  <!-- ========================================================================= -->
-  <!--                       Deploy/undeploy modules                             -->
-  <!-- ========================================================================= -->
-
-  <target name="geronimo.deploy.connector" depends="">
-    <antcall target="geronimo.deploy"><param name="resource" value="${j2e.dir}/jppf_ra_Geronimo.rar"/></antcall>
-  </target>
-
-  <target name="geronimo.deploy.testwar" depends="">
-    <antcall target="geronimo.deploy"><param name="resource" value="${build.dir}/${war.prefix}.war"/></antcall>
-  </target>
-
-  <target name="geronimo.undeploy.connector" depends="">
-    <antcall target="geronimo.undeploy"><param name="mid" value="JPPF/jca-client/2.0/rar"/></antcall>
-  </target>
-
-  <target name="geronimo.undeploy.testwar" depends="">
-    <antcall target="geronimo.undeploy"><param name="mid" value="JPPF/unit.tests/2.0/war"/></antcall>
-  </target>
-
-  <target name="geronimo.deploy" depends="">
-    <echo message="deploying ${resource} ..." />
-    <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
-      <arg value="/c"/>
-      <arg value="deploy.bat"/>
-      <arg value="--user"/>
-      <arg value="system"/>
-      <arg value="--password"/>
-      <arg value="manager"/>
-      <arg value="deploy"/>
-      <arg value="${resource}"/>
-    </exec>    
-  </target>
-
-  <target name="geronimo.undeploy" depends="">
-    <echo message="un-deploying ${mid} ..." />
-    <exec dir="${geronimo.dir}/${geronimo.name}/bin" executable="cmd">
-      <arg value="/c"/>
-      <arg value="deploy.bat"/>
-      <arg value="--user"/>
-      <arg value="system"/>
-      <arg value="--password"/>
-      <arg value="manager"/>
-      <arg value="undeploy"/>
-      <arg value="${mid}"/>
-    </exec>    
-  </target>
+  <import file="build-jboss.xml"/>
+  <import file="build-geronimo.xml"/>
 
 </project>

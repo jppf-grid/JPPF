@@ -33,7 +33,7 @@
     <dep:non-overridable-classes/>
   </dep:environment>
 
-  <context-root>/jppfunittests</context-root>
+  <context-root>/JPPF_J2EE_Tests</context-root>
 
   <!-- Optional JNDI references -->
   <!--

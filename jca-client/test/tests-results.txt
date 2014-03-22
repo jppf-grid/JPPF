@@ -1,14 +1,14 @@
 
 Total tests: 7, successful: 7, failed: 0, ignored: 0
-Start time: Mon Dec 30 18:16:58 CET 2013, total elapsed: 00:00:17.547
+Start time: Wed Mar 12 07:48:22 CET 2014, total elapsed: 00:00:19.595
 
 Tests results:
 
 class test.org.jppf.jca.cci.TestJPPFConnection
-  testStatusListenerFromSubmit() : OK
+  testSubmit() : OK
+  testCancelJob() : OK
   testSubmitAndRetrieve() : OK
   testGetAllSubmissionIds() : OK
   testSubmissionResults() : OK
+  testStatusListenerFromSubmit() : OK
   testCancelJobAfterCompletion() : OK
-  testSubmit() : OK
-  testCancelJob() : OK

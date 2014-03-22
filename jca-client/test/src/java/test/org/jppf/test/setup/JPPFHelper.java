@@ -31,14 +31,26 @@ import org.jppf.jca.cci.*;
 public class JPPFHelper
 {
   /**
+   * JNDI name of the connection factory for JBoss app server.
+   */
+  public static final String JNDI_NAME_JBOSS = "java:eis/JPPFConnectionFactory";
+  /**
+   * JNDI name of the connection factory for Geronimo app server.
+   */
+  public static final String JNDI_NAME_GERONIMO = "jca:/JPPF/jca-client/JCAConnectionManager/eis/JPPFConnectionFactory";
+  /**
+   * JNDI name of the JCA connection factory to use.
+   */
+  private static String jndiName = JNDI_NAME_JBOSS;
+
+  /**
    * Obtain a JPPF connection from the resource adapter's connection pool.
    * The obtained connection must be closed by the caller of this method, once it is done using it.
-   * @param jndiName the jNDI name of the JPPF connection factory (application server-dependent).
    * @return a <code>JPPFConnection</code> instance.
    * @throws NamingException if the connection factory lookup failed.
    * @throws ResourceException if a connection could not be obtained.
    */
-  public static JPPFConnection getConnection(final String jndiName) throws NamingException, ResourceException
+  public static JPPFConnection getConnection() throws NamingException, ResourceException
   {
     InitialContext context = new InitialContext();
     Object objref = context.lookup(jndiName);
@@ -56,5 +68,21 @@ public class JPPFHelper
   public static void closeConnection(final JPPFConnection connection) throws ResourceException
   {
     connection.close();
+  }
+
+  /**
+   * Get the JNDI name of the JCA connection factory to use.
+   * @return the JNDI name as a string.
+   */
+  public static String getJndiName() {
+    return jndiName;
+  }
+
+  /**
+   * Set the JNDI name of the JCA connection factory to use.
+   * @param jndiName the JNDI name as a string.
+   */
+  public static void setJndiName(final String jndiName) {
+    JPPFHelper.jndiName = jndiName;
   }
 }
