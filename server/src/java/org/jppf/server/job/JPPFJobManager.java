@@ -28,6 +28,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -65,6 +66,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Reference to the driver.
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Caches the uuids of jobs that were queue so they can be counted properly.
+   */
+  private final Map<String, Boolean> jobUuids = new SoftReferenceValuesMap<>();
 
   /**
    * Default constructor.
@@ -150,8 +155,13 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
     submitEvent(JobEventType.JOB_QUEUED, bundle, null);
     //driver.getStatsUpdater().jobQueued(bundle.getTaskCount());
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
+    synchronized(jobUuids) {
+      if (jobUuids.get(jobUuid) == null) {
+        jobUuids.put(jobUuid, true);
+        driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
+        driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
+      }
+    }
     driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
   }
 
