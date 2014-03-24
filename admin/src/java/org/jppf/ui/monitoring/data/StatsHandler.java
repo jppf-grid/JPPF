@@ -112,7 +112,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    */
   private StatsHandler() {
     if (debugEnabled) log.debug("initializing StatsHandler");
-    refreshInterval = JPPFConfiguration.getProperties().getLong("default.refresh.interval", 1000L);
+    refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.stats", 1000L);
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
     getJppfClient(null);
     update(null, stats);
