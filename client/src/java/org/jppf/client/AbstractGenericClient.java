@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.*;
@@ -269,7 +269,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
       if (debugEnabled) log.debug("could not close JMX connection for " + connection, e);
       else log.warn("could not close JMX connection for " + connection + " : " + ExceptionUtils.getMessage(e));
     }
-    */
+     */
     connection.close();
     removeClientConnection(connection);
     fireConnectionFailed(connection);
@@ -416,10 +416,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   public RegisteredClassLoader getRegisteredClassLoader(final String uuid) {
     if (uuid == null) throw new IllegalArgumentException("uuid is null");
-    RegisteredClassLoader registeredClassLoader = null;
     synchronized (classLoaderRegistrations) {
       Collection<RegisteredClassLoader> c = classLoaderRegistrations.getValues(uuid);
-      if ((c == null) || c.isEmpty()) throw new IllegalStateException("");
+      if ((c == null) || c.isEmpty()) {
+        //throw new IllegalStateException("no class loader found for requestUuid=" + uuid);
+        // workaround for bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-237
+        if (debugEnabled) log.debug("job '{}' may have been submitted by a different client instance, looking for an alternate class loader", uuid);
+        Iterator<RegisteredClassLoader> it = classLoaderRegistrations.iterator();
+        if (it.hasNext()) return it.next();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) cl = getClass().getClassLoader();
+        return new RegisteredClassLoader(uuid, cl);
+      }
       return c.iterator().next();
     }
   }
@@ -439,6 +447,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       classLoaderRegistrations.putValue(uuid, registeredClassLoader);
     }
+    if (debugEnabled) log.debug("registered {}", registeredClassLoader);
     return registeredClassLoader;
   }
 
@@ -449,6 +458,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   protected void unregister(final RegisteredClassLoader registeredClassLoader) {
     if (registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
+    if (debugEnabled) log.debug("unregistering {}", registeredClassLoader);
     synchronized (classLoaderRegistrations) {
       classLoaderRegistrations.removeValue(registeredClassLoader.getUuid(), registeredClassLoader);
     }
@@ -499,6 +509,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
      */
     public void dispose() {
       unregister(this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+      sb.append("classLoader=").append(classLoader);
+      sb.append(", uuid=").append(uuid);
+      sb.append(']');
+      return sb.toString();
     }
   }
 }
