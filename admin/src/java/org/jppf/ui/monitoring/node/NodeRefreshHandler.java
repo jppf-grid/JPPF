@@ -26,6 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -54,7 +55,7 @@ public class NodeRefreshHandler
   /**
    * Interval, in milliseconds, between refreshes from the server.
    */
-  private long refreshInterval = 1000L;
+  private long refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.topology", 1000L);
   /**
    * The panel to refresh.
    */

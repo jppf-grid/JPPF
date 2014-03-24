@@ -21,6 +21,7 @@ package org.jppf.ui.monitoring.diagnostics;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -45,7 +46,7 @@ public class RefreshHandler
   /**
    * Interval, in milliseconds, between refreshes from the server.
    */
-  private long refreshInterval = 3000L;
+  private long refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.health", 3000L);
   /**
    * The panel to refresh.
    */
