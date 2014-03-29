@@ -208,10 +208,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     return rcl.getClassLoader();
   }
 
-  /**
-   * Close the socket connection.
-   * @see org.jppf.client.ClassServerDelegate#close()
-   */
   @Override
   public void close()
   {

@@ -235,7 +235,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   @Override
   public synchronized void setStatus(final SubmissionStatus newStatus) {
     if (newStatus == this.status) return;
-    if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
+    if (debugEnabled) log.debug("job [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
     this.status = newStatus;
     try {
       if (newStatus == SubmissionStatus.COMPLETE) {
@@ -271,7 +271,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     synchronized(listeners)
     {
-      if (debugEnabled) log.debug("submission [" + getId() + "] adding status listener " + listener);
+      if (debugEnabled) log.debug("job [" + getId() + "] adding status listener " + listener);
       if (listener != null) listeners.add(listener);
     }
   }
@@ -284,7 +284,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     synchronized(listeners)
     {
-      if (debugEnabled) log.debug("submission [" + getId() + "] removing status listener " + listener);
+      if (debugEnabled) log.debug("job [" + getId() + "] removing status listener " + listener);
       if (listener != null) listeners.remove(listener);
     }
   }
@@ -298,7 +298,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   {
     synchronized(listeners)
     {
-      if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
+      if (debugEnabled) log.debug("job [" + getId() + "] fire status changed event for '" + newStatus + "'");
       if (!listeners.isEmpty())
       {
         SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
