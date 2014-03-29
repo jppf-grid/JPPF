@@ -75,12 +75,8 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
   {
     try
     {
-      if (isClosed()) {
-        log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
-        return;
-      }
       boolean done = false;
-      while (!done)
+      while (!done && !isClosed())
       {
         setStatus(CONNECTING);
         if (socketClient == null) initSocketClient();
