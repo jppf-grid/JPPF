@@ -110,16 +110,11 @@ public abstract class AbstractCommonNode extends AbstractNode
    * Clear the resource caches of all class loaders managed by this object.
    * @exclude
    */
-  protected void clearResourceCachesIfRequested()
-  {
-    if (cacheResetFlag.get())
-    {
-      try
-      {
+  protected void clearResourceCachesIfRequested() {
+    if (cacheResetFlag.get()) {
+      try {
         classLoaderManager.clearResourceCaches();
-      }
-      finally
-      {
+      } finally {
         cacheResetFlag.set(false);
       }
     }
@@ -130,8 +125,16 @@ public abstract class AbstractCommonNode extends AbstractNode
    * This method merely sets a floag, the actual reset will
    * be performed at the next opportunity, when it is safe to do so. 
    */
-  public void requestResourceCacheReset()
-  {
+  public void requestResourceCacheReset() {
     cacheResetFlag.compareAndSet(false, true);
+  }
+
+  /**
+   * Get the object that manages the class loaders and how they are used.
+   * @return an {@link AbstractClassLoaderManager} instance.
+   * @exclude
+   */
+  public AbstractClassLoaderManager getClassLoaderManager() {
+    return classLoaderManager;
   }
 }

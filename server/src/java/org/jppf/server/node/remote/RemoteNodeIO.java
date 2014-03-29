@@ -65,7 +65,6 @@ public class RemoteNodeIO extends AbstractNodeIO {
     if (debugEnabled) log.debug("got bundle " + bundle);
     if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
     Object[] result = deserializeObjects(bundle);
-    //if (node.isOffline() && !bundle.isHandshake()) sendOfflineCloseRequest(bundle);
     if (node.isOffline() && !bundle.isHandshake()) waitChannelClosed(getSocketWrapper());
     return result;
   }
@@ -82,6 +81,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
         JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.setNodeConnection((RemoteNodeConnection) node.getNodeConnection());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
+        if (debugEnabled) log.debug("using container {}", cont);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
       } else {

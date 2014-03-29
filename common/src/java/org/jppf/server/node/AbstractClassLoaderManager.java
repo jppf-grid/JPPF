@@ -131,9 +131,10 @@ public abstract class AbstractClassLoaderManager
     JPPFContainer container = containerMap.get(uuid);
     if (container == null)
     {
-      if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
+      //if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
       AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath);
       container = newJPPFContainer(uuidPath, cl);
+      if (debugEnabled) log.debug("Created new container {}", container);
       if (containerList.size() >= maxContainers)
       {
         JPPFContainer toRemove = containerList.removeFirst();
@@ -250,5 +251,14 @@ public abstract class AbstractClassLoaderManager
     cont.setClassLoader(newCL);
     oldCL.close();
     return newCL;
+  }
+
+  /**
+   * Get the list retaining the containers in chronological order of their creation.
+   * @return a list of {@link JPPFContainer} instances.
+   */
+  public List<JPPFContainer> getContainerList()
+  {
+    return new ArrayList<>(containerList);
   }
 }

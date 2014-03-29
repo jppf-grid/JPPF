@@ -18,20 +18,27 @@
 
 package org.jppf.node.debug;
 
-import java.io.Serializable;
+import org.jppf.management.spi.JPPFNodeMBeanProvider;
+import org.jppf.node.Node;
+import org.jppf.server.node.JPPFNode;
 
 /**
- * 
+ * Provider for the default JPPF node management and monitoring features.
  * @author Laurent Cohen
  */
-public interface NodeDebugMBean extends Serializable {
-  /**
-   * Name of the node's admin MBean.
-   */
-  String MBEAN_NAME = "org.jppf:name=debug,type=node";
-  /**
-   * Get the content of the class loader cache.
-   * @return a string listing the classloaders cached by the node.
-   */
-  String[] getClassloaderCache();
+public class NodeDebugMBeanProvider implements JPPFNodeMBeanProvider {
+  @Override
+  public String getMBeanInterfaceName() {
+    return NodeDebugMBean.class.getName();
+  }
+
+  @Override
+  public Object createMBean(final Node node) {
+    return new NodeDebug((JPPFNode) node);
+  }
+
+  @Override
+  public String getMBeanName() {
+    return NodeDebug.MBEAN_NAME;
+  }
 }

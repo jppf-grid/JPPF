@@ -20,25 +20,41 @@ package org.jppf.serialization;
 
 import java.io.*;
 
+import org.jppf.utils.ExceptionUtils;
+import org.slf4j.*;
+
 /**
  * This implementation uses the default Java serialization.
  */
-public class DefaultJavaSerialization implements JPPFSerialization
-{
+public class DefaultJavaSerialization implements JPPFSerialization {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(DefaultJavaSerialization.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+
   @Override
-  public void serialize(final Object o, final OutputStream os) throws Exception
-  {
+  public void serialize(final Object o, final OutputStream os) throws Exception {
     new ObjectOutputStream(os).writeObject(o);
   }
 
   @Override
-  public Object deserialize(final InputStream is) throws Exception
-  {
+  public Object deserialize(final InputStream is) throws Exception {
     ObjectInputStream ois = new ObjectInputStream(is) {
       @Override
       protected Class<?> resolveClass(final ObjectStreamClass desc) throws IOException, ClassNotFoundException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null)  return super.resolveClass(desc);
+        if (cl == null) {
+          if (traceEnabled) log.trace("{} thread context class loader is null, current call stack: {}", getClass().getSimpleName(), ExceptionUtils.getCallStack());
+          return super.resolveClass(desc);
+        }
         return Class.forName(desc.getName(), false, cl);
       }
     };

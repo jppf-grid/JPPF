@@ -141,9 +141,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
     JPPFResourceWrapper resource = null;
     if (!isOffline()) {
       try {
-        if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
+        if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get(ResourceIdentifier.NAME), "]"));
         resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
-        if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
+        if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get(ResourceIdentifier.NAME) + "] ", resource.getDefinition()==null ? "not " : "", "found"));
       } catch(IOException e) {
         if (debugEnabled) log.debug(this.toString() + " connection with class server ended, re-initializing, exception is:", e);
         throw new JPPFNodeReconnectionNotification("connection with class server ended, re-initializing, exception is:", e);

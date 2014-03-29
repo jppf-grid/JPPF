@@ -200,14 +200,14 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @exclude
    */
   public byte[] computeRemoteData(final byte[] callable) throws Exception {
-    if (debugEnabled) log.debug(build(this, " requesting remote computation, requestUuid = ", requestUuid));
+    if (debugEnabled) log.debug("{} requesting remote computation, requestUuid = {}", this, requestUuid);
     Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
     map.put(ResourceIdentifier.NAME, "callable");
     map.put(ResourceIdentifier.CALLABLE, callable);
     JPPFResourceWrapper resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
     byte[] b = null;
     if ((resource != null) && (resource.getState() == JPPFResourceWrapper.State.NODE_RESPONSE)) b = resource.getCallable();
-    if (debugEnabled) log.debug(build(this, " remote definition for callable resource ", b==null ? "not " : "", "found"));
+    if (debugEnabled) log.debug("{} remote definition for callable resource {} found", this, b==null ? "not " : "");
     return b;
   }
 
@@ -222,12 +222,12 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     URL url = null;
     if (notFoundCache.has(name)) return null;
     url = resourceCache.getResourceURL(name);
-    if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in local cache"));
+    if (debugEnabled) log.debug("{} resource [{}]", "] {} found in local cache", new Object[] {this, name, url == null ? "not " : ""});
     if (url == null) {
       url = super.findResource(name);
-      if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
+      if (debugEnabled) log.debug("{} resource [{}]", "] {} found in URL classpath", new Object[] {this, name, url == null ? "not " : ""});
       if (!isOffline() && (url == null)) {
-        if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
+        if (debugEnabled) log.debug("{} resource [{}] not found locally, attempting remote lookup", this, name);
         try {
           List<URL> urlList = findRemoteResources(name);
           if ((urlList != null) && !urlList.isEmpty()) url = urlList.get(0);
@@ -235,7 +235,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }
-        if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found remotely"));
+        if (debugEnabled) log.debug("{} resource [{}]", "] {} found remotely", new Object[] {this, name, url == null ? "not " : ""});
       }
     }
     if (url == null) notFoundCache.add(name);

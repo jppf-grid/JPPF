@@ -85,7 +85,7 @@ public class JPPFRemoteContainer extends JPPFContainer
       for (int i=0; i<count; i++)
       {
         DataLocation dl = IOHelper.readData(is);
-        if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
+        if (traceEnabled) log.trace("i = {}, read data size = {}, ctxClassLoader = {}", new Object[] { i, dl.getSize(), classLoader});
         futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
       }
       Throwable t = null;

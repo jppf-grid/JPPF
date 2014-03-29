@@ -16,22 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.node.debug;
-
-import java.io.Serializable;
-
 /**
- * 
- * @author Laurent Cohen
+ * Internal classes to obtain debug information on a node via JMX.
+ * @exclude
  */
-public interface NodeDebugMBean extends Serializable {
-  /**
-   * Name of the node's admin MBean.
-   */
-  String MBEAN_NAME = "org.jppf:name=debug,type=node";
-  /**
-   * Get the content of the class loader cache.
-   * @return a string listing the classloaders cached by the node.
-   */
-  String[] getClassloaderCache();
-}
+package org.jppf.node.debug;

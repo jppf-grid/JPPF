@@ -145,8 +145,7 @@ public abstract class JPPFContainer
    * Get the unique identifier for the submitting application.
    * @return the application uuid as a string.
    */
-  public String getAppUuid()
-  {
+  public String getAppUuid() {
     return uuidPath.isEmpty() ? null : uuidPath.get(0);
   }
 
@@ -154,17 +153,25 @@ public abstract class JPPFContainer
    * Set the unique identifier for the submitting application.
    * @param uuidPath the application uuid as a string.
    */
-  public void setUuidPath(final List<String> uuidPath)
-  {
+  public void setUuidPath(final List<String> uuidPath) {
     this.uuidPath = uuidPath;
+  }
+
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("uuidPath=").append(uuidPath);
+    sb.append(", classLoader=").append(classLoader);
+    sb.append(']');
+    return sb.toString();
   }
 
   /**
    * Instances of this class are used to deserialize objects from an
    * incoming message in parallel.
    */
-  protected class ObjectDeserializationTask implements Callable<Object>
-  {
+  protected class ObjectDeserializationTask implements Callable<Object> {
     /**
      * The data received over the network connection.
      */
@@ -179,8 +186,7 @@ public abstract class JPPFContainer
      * @param dl the data read from the network connection, stored in a memory-sensitive location.
      * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
      */
-    public ObjectDeserializationTask(final DataLocation dl, final int index)
-    {
+    public ObjectDeserializationTask(final DataLocation dl, final int index) {
       this.dl = dl;
       this.index = index;
     }
@@ -190,38 +196,25 @@ public abstract class JPPFContainer
      * @return a deserialized object.
      */
     @Override
-    public Object call()
-    {
+    public Object call() {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      try
-      {
-        Thread.currentThread().setContextClassLoader(getClassLoader());
-        if (traceEnabled) log.debug("deserializing object index = " + index);
+      try {
+        Thread.currentThread().setContextClassLoader(classLoader);
+        if (traceEnabled) log.debug("deserializing object index={} with ctxClassLoader={}", index, classLoader);
         if (sequentialDeserialization) lock.lock();
-        try
-        {
+        try {
           return IOHelper.unwrappedData(dl, helper.getSerializer());
-        }
-        finally
-        {
+        } finally {
           if (sequentialDeserialization) lock.unlock();
         }
-      }
-      catch(Throwable t)
-      {
-        /*
-        log.error(t.getMessage() + " [object index: " + index + ']', t);
-        return t;
-        */
+      } catch(Throwable t) {
         String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
         if (debugEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
         else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
         Object result = null;
         if (index > 0) result = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
         return result;
-      }
-      finally
-      {
+      } finally {
         Thread.currentThread().setContextClassLoader(cl);
       }
     }
