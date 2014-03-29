@@ -18,60 +18,113 @@
 
 package sample.test.jppfcallable;
 
+import java.net.*;
+import java.util.Stack;
+
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 
 /**
  * 
  */
-public class MyTask extends JPPFTask
-{
+public class MyTask extends JPPFTask {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(MyTask.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-  /**
    * Duration of the callable.
    */
   private final long time;
   /**
-   * Size of the data to create.
+   * Uuid of the client that submitted this task.
    */
-  private final int size;
+  private  final String clientUuid;
 
   /**
-   * Intiialize this task with the specified callable duration.
+   * Initialize this task with the specified callable duration.
    * @param time the duration of the callable.
-   * @param size the size of the data to create.
+   * @param clientUuid the uuid of the client that submitted this task.
    */
-  public MyTask(final long time, final int size)
-  {
+  public MyTask(final long time, final String clientUuid) {
     this.time = time;
-    this.size = size;
+    this.clientUuid = clientUuid;
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
-      MyCallable mc = new MyCallable(getId(), time, size);
+  public void run() {
+    try {
+      print("-----------------------------------------------------------------------------------------------------------------------------");
+      print("starting task '" + getId() + "' from client uuid = " + clientUuid);
+      MyCallable mc = new MyCallable(getId(), time);
+      print("context class loader  = " + toString(Thread.currentThread().getContextClassLoader()));
+      print("task class loader     = " + toString(getClass().getClassLoader()));
+      print("callable class loader = " + toString(mc.getClass().getClassLoader()));
       String s = compute(mc);
-      //System.out.println("[node] result of MyCallable[id=" + getId() + "].call() = " + s);
       setResult(s);
-      if (debugEnabled) log.debug(s);
-    }
-    catch (Throwable t)
-    {
-      //t.printStackTrace();
+      print("result of MyCallable[id=" + getId() + "].call() = " + s);
+    } catch (Throwable t) {
       setThrowable(t);
-      log.error(getId() + " : " + ExceptionUtils.getMessage(t), t);
+      log.error("error in task " + getId(), t);
     }
+  }
+
+  /**
+   * Print a top-down representation of a class loader hierarchy into a string.
+   * @param leafClassLoader the class loader at the bottom of the hierarchy.
+   * @return a string representation of the class loader hierarchy.
+   */
+  private String printCLHierarchy(final ClassLoader leafClassLoader) {
+    StringBuilder sb = new StringBuilder();
+    ClassLoader cl = leafClassLoader;
+    Stack<String> stack = new Stack<>();
+    while (cl != null) {
+      if (cl instanceof AbstractJPPFClassLoader) stack.push(cl.toString());
+      else if (cl instanceof URLClassLoader) stack.push(toString((URLClassLoader) cl));
+      else  stack.push(cl.toString());
+      cl = cl.getParent();
+    }
+    int count = 0;
+    while (!stack.isEmpty()) {
+      for (int i=0; i<2*count; i++) sb.append(' ');
+      sb.append(stack.pop());
+      if (!stack.isEmpty()) sb.append('\n');
+      count++;
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Print a representation of a <code>URLClassLoader</code> into a string.
+   * The resulting string includes the class loader's classpath.
+   * @param cl  the classloader to print.
+   * @return a string representation of the input class loader.
+   */
+  private String toString(final ClassLoader cl) {
+    StringBuilder sb = new StringBuilder();
+    if (cl instanceof AbstractJPPFClassLoader) sb.append(cl.toString());
+    else if (cl instanceof URLClassLoader) {
+      sb.append(cl.getClass().getSimpleName()).append("[classpath=");
+      URL[] urls = ((URLClassLoader) cl).getURLs();
+      if ((urls != null) && (urls.length > 0)) {
+        for (int i=0; i<urls.length; i++) {
+          if (i > 0) sb.append(System.getProperty("path.separator"));
+          sb.append(urls[i]);
+        }
+      }
+      sb.append(']');
+    } else  sb.append(cl.toString());    
+    return sb.toString();
+  }
+
+  /**
+   * Print a message to both the console and the log.
+   * @param message the message to print.
+   */
+  private void print(final String message) {
+    System.out.println(message);
+    log.info(message);
   }
 }
