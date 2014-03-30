@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.client.event.*;
@@ -209,23 +209,38 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
   }
 
   /**
-   * Called when a new connection is read from the configuration (as opposed to discovered from the network).
-   * @param name the name assigned to the connection.
+   * Called when a new connection pool is read from the configuration (as opposed to discovered from the network).
+   * @param name the name assigned to the connection pool.
    * @param info the information required for the connection to connect to the driver.
    * @param priority the priority assigned to the connection.
-   * @param poolSize the size of the associated connection pool.
-   * @param ssl determines whether this is an SSL connection.
+   * @param poolSize the size of the connection pool.
+   * @param ssl determines whether the pool is for SSL connections.
    * @exclude
    */
   protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl) {
-    int poolId = poolSequence.incrementAndGet();
     int size = poolSize > 0 ? poolSize : 1;
+    JPPFConnectionPool pool = new JPPFConnectionPool(this, poolSequence.incrementAndGet(), name, priority, poolSize, ssl);
+    synchronized(pools) {
+      pools.putValue(priority, pool);
+      pendingPools.add(pool);
+    }
     for (int i=1; i<=size; i++) {
       if (isClosed()) return;
-      AbstractJPPFClientConnection c = createConnection(info.uuid, (size > 1) ? name + '-' + i : name, info, ssl, poolId);
-      c.setPriority(priority);
-      newConnection(c);
+      submitNewConnection(info, pool, ssl);
     }
+  }
+
+  /**
+   * Called to submit the initialization of a new connection.
+   * @param info the information required for the connection to connect to the driver.
+   * @param pool thez connection pool to which the connection belongs.
+   * @param ssl determines whether the connection is an SSL connection.
+   * @exclude
+   */
+  protected void submitNewConnection(final JPPFConnectionInformation info, final JPPFConnectionPool pool, final boolean ssl) {
+    AbstractJPPFClientConnection c = createConnection(info.uuid, pool.getName() + "-" + pool.nextSequence(), info, ssl, pool);
+    c.setPriority(pool.getPriority());
+    newConnection(c);
   }
 
   /**
@@ -234,11 +249,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @param name the name of the connection.
    * @param info the driver connection information.
    * @param ssl determines whether this is an SSL connection.
-   * @param poolId id of the connection pool the connection belongs to.
+   * @param pool id of the connection pool the connection belongs to.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
    * @exclude
    */
-  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl, final int poolId);
+  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl, final JPPFConnectionPool pool);
 
   /**
    * {@inheritDoc}
@@ -411,10 +426,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   public RegisteredClassLoader getRegisteredClassLoader(final String uuid) {
     if (uuid == null) throw new IllegalArgumentException("uuid is null");
-    RegisteredClassLoader registeredClassLoader = null;
     synchronized (classLoaderRegistrations) {
       Collection<RegisteredClassLoader> c = classLoaderRegistrations.getValues(uuid);
-      if ((c == null) || c.isEmpty()) throw new IllegalStateException("");
+      if ((c == null) || c.isEmpty()) {
+        //throw new IllegalStateException("no class loader found for requestUuid=" + uuid);
+        // workaround for bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-237
+        if (debugEnabled) log.debug("job '{}' may have been submitted by a different client instance, looking for an alternate class loader", uuid);
+        Iterator<RegisteredClassLoader> it = classLoaderRegistrations.iterator();
+        if (it.hasNext()) return it.next();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) cl = getClass().getClassLoader();
+        return new RegisteredClassLoader(uuid, cl);
+      }
       return c.iterator().next();
     }
   }
@@ -434,6 +457,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
       registeredClassLoader = new RegisteredClassLoader(uuid, cl);
       classLoaderRegistrations.putValue(uuid, registeredClassLoader);
     }
+    if (debugEnabled) log.debug("registered {}", registeredClassLoader);
     return registeredClassLoader;
   }
 
@@ -444,6 +468,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   protected void unregister(final RegisteredClassLoader registeredClassLoader) {
     if (registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
+    if (debugEnabled) log.debug("unregistering {}", registeredClassLoader);
     synchronized (classLoaderRegistrations) {
       classLoaderRegistrations.removeValue(registeredClassLoader.getUuid(), registeredClassLoader);
     }
@@ -494,6 +519,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
      */
     public void dispose() {
       unregister(this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+      sb.append("classLoader=").append(classLoader);
+      sb.append(", uuid=").append(uuid);
+      sb.append(']');
+      return sb.toString();
     }
   }
 }

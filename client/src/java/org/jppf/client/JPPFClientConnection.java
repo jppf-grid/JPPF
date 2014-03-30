@@ -102,9 +102,9 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
   String getConnectionUuid();
 
   /**
-   * Get the id of thez pool this connection belongs to.
-   * @return the pool id as an int value.
+   * Get the pool this connection belongs to.
+   * @return a {@link JPPFConnectionPool} instance.
    * @exclude
    */
-  int getPoolId();
+  JPPFConnectionPool getConnectionPool();
 }

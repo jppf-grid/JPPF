@@ -116,7 +116,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param job the job to execute remotely.
    * @throws Exception if an error occurs while sending the request.
    */
-  public void sendTasks(final ClassLoader cl, final JPPFTaskBundle header, final JPPFJob job) throws Exception {
+  public void sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, client.getSerializationHelperClassName()).getSerializer();
     int count = job.getJobTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<>();

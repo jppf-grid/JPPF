@@ -54,10 +54,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection
    * @param name configuration name for this local client.
    * @param info the connection properties for this connection.
    * @param ssl determines whether this is an SSL connection.
-   * @param poolId id of the connection pool this connection belongs to.
+   * @param pool the connection pool this connection belongs to.
    */
-  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl, final int poolId) {
-    super(poolId);
+  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl, final JPPFConnectionPool pool) {
+    super(pool);
     if (client.isClosed()) {
       if (debugEnabled) log.debug("error: initializing connection {} while client is closed", name);
       throw new IllegalStateException("error: initializing connection " + name + " while client is closed");

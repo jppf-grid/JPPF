@@ -116,9 +116,9 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     taskQueueChecker = new TaskQueueChecker(queue);
     taskQueueChecker.setBundler(bundler);
 
-    this.queue.addQueueListener(new QueueListener<ClientJob, ClientJob, ClientTaskBundle>() {
+    this.queue.addQueueListener(new QueueListenerAdapter<ClientJob, ClientJob, ClientTaskBundle>() {
       @Override
-      public void newBundle(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
+      public void bundleAdded(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
         taskQueueChecker.wakeUp();
       }
     });

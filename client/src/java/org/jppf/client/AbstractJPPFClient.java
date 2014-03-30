@@ -67,7 +67,11 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Contains all the connections pools in ascending priority order.
    */
-  private final CollectionMap<Integer, ClientConnectionPool> pools = new LinkedListSortedMap<>(new DescendingIntegerComparator());
+  protected final CollectionMap<Integer, JPPFConnectionPool> pools = new LinkedListSortedMap<>(new DescendingIntegerComparator());
+  /**
+   * Keeps inactive connection ppols, that is the pools who do not yet have an active connection.
+   */
+  protected final Set<JPPFConnectionPool> pendingPools = new HashSet<>();
   /**
    * Unique universal identifier for this JPPF client.
    */
@@ -131,7 +135,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Get count of all client connections handled by this JPPFClient.
    * @return count of <code>JPPFClientConnection</code> instances.
    */
-  protected int getAllConnectionsCount()
+  public int getAllConnectionsCount()
   {
     return allConnections.size();
   }
@@ -196,12 +200,12 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   public JPPFClientConnection getClientConnection(final int priority, final boolean oneAttempt, final boolean anyState) {
     synchronized(pools) {
       JPPFClientConnection connection = null;
-      Collection<ClientConnectionPool> priorityPools = pools.getValues(priority);
+      Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
       if (priorityPools == null) return null;
-      for (ClientConnectionPool pool: priorityPools) {
+      for (JPPFConnectionPool pool: priorityPools) {
         int count = 0;
-        while ((connection == null) && (count < pool.size())) {
-          JPPFClientConnection c = pool.nextClient();
+        while ((connection == null) && (count < pool.connectionCount())) {
+          JPPFClientConnection c = pool.nextConnection();
           if (c == null) break;
           switch (c.getStatus()) {
             case ACTIVE:
@@ -268,11 +272,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     if (connection == null) throw new IllegalArgumentException("connection is null");
     if (debugEnabled) log.debug("adding connection {}", connection);
     int priority = connection.getPriority();
-    int poolId = connection.getPoolId();
+    JPPFConnectionPool pool = connection.getConnectionPool();
     synchronized (pools) {
-      ClientConnectionPool pool = findConnectionPool(priority, poolId);
-      if (pool == null) pool = new ClientConnectionPool(connection);
-      pools.putValue(priority, pool);
+      //pool.add(connection);
+      if (pendingPools.remove(pool)) pools.putValue(priority, pool);
     }
     allConnections.add(connection);
     pendingConnections.remove(connection);
@@ -288,9 +291,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     if (debugEnabled) log.debug("removing connection {}", connection);
     connection.removeClientConnectionStatusListener(this);
     int priority = connection.getPriority();
-    int poolId = connection.getPoolId();
+    JPPFConnectionPool pool = connection.getConnectionPool();
     synchronized (pools) {
-      ClientConnectionPool pool = findConnectionPool(priority, poolId);
       if (pool != null) {
         pool.remove(connection);
         if (pool.isEmpty()) pools.removeValue(priority, pool);
@@ -389,14 +391,15 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Find the connection pool with the specified priority and id.
    * @param priority the priority of the pool, helps speedup the search.
    * @param poolId the id of the pool to find.
-   * @return a {@link ClientConnectionPool} instance, or {@code null} if no pool witht he specified id could be found.
+   * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool witht he specified id could be found.
+   * @since 4.1
    */
-  public ClientConnectionPool findConnectionPool(final int priority, final int poolId) {
-    ClientConnectionPool pool = null;
+  public JPPFConnectionPool findConnectionPool(final int priority, final int poolId) {
+    JPPFConnectionPool pool = null;
     synchronized (pools) {
-      Collection<ClientConnectionPool> priorityPools = pools.getValues(priority);
+      Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
       if (priorityPools != null) {
-        for (ClientConnectionPool p: priorityPools) {
+        for (JPPFConnectionPool p: priorityPools) {
           if (p.getId() == poolId) {
             pool = p;
             break;
@@ -410,12 +413,28 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Find the connection pool with the specified id.
    * @param poolId the id of the pool to find.
-   * @return a {@link ClientConnectionPool} instance, or {@code null} if no pool witht he specified id could be found.
+   * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool with the specified id could be found.
+   * @since 4.1
    */
-  public ClientConnectionPool findConnectionPool(final int poolId) {
+  public JPPFConnectionPool findConnectionPool(final int poolId) {
     synchronized (pools) {
-      for (ClientConnectionPool pool: pools) {
+      for (JPPFConnectionPool pool: pools) {
         if (pool.getId() == poolId) return pool;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Find the connection pool with the specified id.
+   * @param name the name of the pool to find.
+   * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool with the specified name could be found.
+   * @since 4.1
+   */
+  public JPPFConnectionPool findConnectionPool(final String name) {
+    synchronized (pools) {
+      for (JPPFConnectionPool pool: pools) {
+        if (pool.getName().equals(name)) return pool;
       }
     }
     return null;
@@ -424,23 +443,25 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Get a set of existing connection pools with the specified priority.
    * @param priority the priority of the pool, helps speedup the search.
-   * @return a list of {@link ClientConnectionPool} instances, possibly empty but never {@code null}.
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never {@code null}.
+   * @since 4.1
    */
-  public List<ClientConnectionPool> getConnectionPools(final int priority) {
-    Collection<ClientConnectionPool> coll;
+  public List<JPPFConnectionPool> getConnectionPools(final int priority) {
+    Collection<JPPFConnectionPool> coll;
     synchronized(pools) {
       if ((coll = pools.getValues(priority)) != null) {
-        List<ClientConnectionPool> list = new ArrayList<>(coll.size());
+        List<JPPFConnectionPool> list = new ArrayList<>(coll.size());
         list.addAll(coll);
         return list;
       }
     }
-    return Collections.<ClientConnectionPool>emptyList();
+    return Collections.<JPPFConnectionPool>emptyList();
   }
 
   /**
    * Get a list of all priorities for the currently existing pools, ordered by descending priority.
    * @return a list of integers represent the priorities.
+   * @since 4.1
    */
   public List<Integer> getPoolPriorities() {
     synchronized(pools) {
@@ -450,9 +471,10 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * Get a list of existing connection pools, ordered by descending priority.
-   * @return a list of {@link ClientConnectionPool} instances.
+   * @return a list of {@link JPPFConnectionPool} instances.
+   * @since 4.1
    */
-  public List<ClientConnectionPool> getConnectionPools() {
+  public List<JPPFConnectionPool> getConnectionPools() {
     synchronized(pools) {
       return new ArrayList<>(pools.allValues());
     }

@@ -22,6 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.SocketInitializer;
@@ -53,9 +54,9 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   protected int priority = 0;
   /**
-   * The id of the connection pool this connection belongs to.
+   * The connection pool this connection belongs to.
    */
-  protected final int poolId;
+  protected final JPPFConnectionPool pool;
   /**
    * List of status listeners for this connection.
    */
@@ -80,13 +81,18 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * Port number the rmeote JMX server is listening to.
    */
   protected int jmxPort = -1;
+  /**
+   * Whether this connection is closed.
+   */
+  private AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
-   * Intiialize this connection with a pool id.
-   * @param poolId id of the connection pool this connection belongs to.
+   * Initialize this connection with a parent pool.
+   * @param pool the connection pool this connection belongs to.
    */
-  protected AbstractJPPFClientConnection(final int poolId) {
-    this.poolId = poolId;
+  protected AbstractJPPFClientConnection(final JPPFConnectionPool pool) {
+    this.pool = pool;
+    this.pool.add(this);
   }
 
   /**
@@ -277,6 +283,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   @Override
   public List<JPPFJob> close() {
+    if (!closed.compareAndSet(false, true)) return null;
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();
@@ -304,11 +311,11 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
 
   @Override
   public boolean isClosed() {
-    return client.isClosed();
+    return client.isClosed() || closed.get();
   }
 
   @Override
-  public int getPoolId() {
-    return poolId;
+  public JPPFConnectionPool getConnectionPool() {
+    return pool;
   }
 }
