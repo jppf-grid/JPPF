@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF
+	Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="Sequence Alignment" type="page">
+	<property name="label" value="JPPF Sequence Alignment"/>
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<property name="componentConstraints" value="grow"/>
+	<script language="javascript"><![CDATA[
+		function populateTargetSequence()
+		{
+			var file = option.findFirstWithName("/loadSequenceBtn").getValue();
+			if ((file != null) && !"".equals(file.trim()))
+			{
+				var s = FileUtils.readTextFile(file);
+				option.findFirstWithName("/sequenceText").setValue(s);
+			}
+		}
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!--         Mandelbrot algorithm configuration parameters                 -->
+	<!-- ===================================================================== -->
+
+	<child name="inputConfig" type="page">
+		<property name="layoutConstraints" value="fill, insets 0 0 0 0"/>
+		<property name="componentConstraints" value="growx"/>
+
+		<child name="ButtonPanel" type="page">
+			<property name="label" value="Actions"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0, aligny top"/>
+			<property name="bordered" value="true"/>
+
+			<child name="compute" type="Button">
+				<property name="label" value="Compute"/>
+				<property name="tooltip" value="Find the sequence in the database whose alignment score with the target sequence is the highest"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						var seq = option.findFirstWithName("/sequenceText").getValue();
+						var matrix = option.findFirstWithName("/matrix").getValue();
+						var db = option.findFirstWithName("/databaseFile").getValue();
+						SequenceAlignmentRunner.perform(seq, matrix, db, option);
+					]]></script>
+				</listener>
+			</child>
+
+			<child name="reset" type="Button">
+				<property name="label" value="Reset Defaults"/>
+				<property name="tooltip" value="Reset to the default values"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						var b = option.getRoot().isEventsEnabled();
+						option.getRoot().setEventsEnabled(false);
+						option.findFirstWithName("/matrix").setValue("PAM120");
+						option.findFirstWithName("/databaseFile").setValue("data/ecoli.aa");
+						populateTargetSequence();
+						option.getRoot().setEventsEnabled(b);
+					]]></script>
+				</listener>
+			</child>
+
+		</child>
+
+		<child name="inputPanel" type="page">
+			<property name="label" value="Target Sequence"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="pushx, grow, gapright 0!"/>
+			<property name="bordered" value="true"/>
+
+			<child name="matrixPanel" type="page">
+
+				<child name="matrix" type="ComboBox">
+					<property name="label" value="Substitution matrix"/>
+					<property name="tooltip" value="Select the substitution matrix to use"/>
+					<property name="value" value="PAM120"/>
+					<property name="orientation" value="horizontal"/>
+					<property name="persistent" value="true"/>
+					<item name="BLOSUM100" selected="false"/>
+					<item name="BLOSUM30" selected="false"/>
+					<item name="BLOSUM35" selected="false"/>
+					<item name="BLOSUM40" selected="false"/>
+					<item name="BLOSUM45" selected="false"/>
+					<item name="BLOSUM50" selected="false"/>
+					<item name="BLOSUM55" selected="false"/>
+					<item name="BLOSUM60" selected="false"/>
+					<item name="BLOSUM62" selected="false"/>
+					<item name="BLOSUM65" selected="false"/>
+					<item name="BLOSUM70" selected="false"/>
+					<item name="BLOSUM75" selected="false"/>
+					<item name="BLOSUM80" selected="false"/>
+					<item name="BLOSUM85" selected="false"/>
+					<item name="BLOSUM90" selected="false"/>
+					<item name="BLOSUMN" selected="false"/>
+					<item name="DAYHOFF" selected="false"/>
+					<item name="EDNAFULL" selected="false"/>
+					<item name="GONNET" selected="false"/>
+					<item name="IDENTITY" selected="false"/>
+					<item name="MATCH" selected="false"/>
+					<item name="PAM10" selected="false"/>
+					<item name="PAM100" selected="false"/>
+					<item name="PAM110" selected="false"/>
+					<item name="PAM120" selected="false"/>
+					<item name="PAM130" selected="false"/>
+					<item name="PAM140" selected="false"/>
+					<item name="PAM150" selected="false"/>
+					<item name="PAM160" selected="false"/>
+					<item name="PAM170" selected="false"/>
+					<item name="PAM180" selected="false"/>
+					<item name="PAM190" selected="false"/>
+					<item name="PAM20" selected="false"/>
+					<item name="PAM200" selected="false"/>
+					<item name="PAM210" selected="false"/>
+					<item name="PAM220" selected="false"/>
+					<item name="PAM230" selected="false"/>
+					<item name="PAM240" selected="false"/>
+					<item name="PAM250" selected="false"/>
+					<item name="PAM260" selected="false"/>
+					<item name="PAM270" selected="false"/>
+					<item name="PAM280" selected="false"/>
+					<item name="PAM290" selected="false"/>
+					<item name="PAM30" selected="false"/>
+					<item name="PAM300" selected="false"/>
+					<item name="PAM310" selected="false"/>
+					<item name="PAM320" selected="false"/>
+					<item name="PAM330" selected="false"/>
+					<item name="PAM340" selected="false"/>
+					<item name="PAM350" selected="false"/>
+					<item name="PAM360" selected="false"/>
+					<item name="PAM370" selected="false"/>
+					<item name="PAM380" selected="false"/>
+					<item name="PAM390" selected="false"/>
+					<item name="PAM40" selected="false"/>
+					<item name="PAM400" selected="false"/>
+					<item name="PAM410" selected="false"/>
+					<item name="PAM420" selected="false"/>
+					<item name="PAM430" selected="false"/>
+					<item name="PAM440" selected="false"/>
+					<item name="PAM450" selected="false"/>
+					<item name="PAM460" selected="false"/>
+					<item name="PAM470" selected="false"/>
+					<item name="PAM480" selected="false"/>
+					<item name="PAM490" selected="false"/>
+					<item name="PAM50" selected="false"/>
+					<item name="PAM500" selected="false"/>
+					<item name="PAM60" selected="false"/>
+					<item name="PAM70" selected="false"/>
+					<item name="PAM80" selected="false"/>
+					<item name="PAM90" selected="false"/>
+				</child>
+	
+				<child name="loadDatabaseBtn" type="FileChooser">
+					<property name="componentConstraints" value="gapleft 20"/>
+					<property name="icon" value="/org/jppf/ui/resources/open.gif"/>
+					<property name="tooltip" value="Specify the database file"/>
+					<property name="value" value="data/ecoli.aa"/>
+					<property name="extensions" value="*; All Files (*.*)"/>
+					<property name="orientation" value="vertical"/>
+					<property name="type" value="open"/>
+					<property name="persistent" value="true"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+							var file = option.getValue();
+							if ((file != null) && !"".equals(file.trim()))
+							{
+								option.findFirstWithName("/databaseFile").setValue(file);
+							}
+						]]></script>
+					</listener>
+				</child>
+	
+				<child name="databaseFile" type="PlainText">
+					<property name="label" value="Database file"/>
+					<property name="tooltip" value="The location of the database file"/>
+					<property name="value" value="data/ecoli.aa"/>
+					<property name="orientation" value="horizontal"/>
+					<property name="persistent" value="true"/>
+					<property name="width" value="300"/>
+				</child>
+		
+				<child name="filler" type="page">
+					<property name="componentConstraints" value="growx, pushx 0"/>
+				</child>
+	
+			</child>
+
+			<child name="inputSequencePanel" type="page">
+				<property name="label" value="Target Sequence"/>
+
+				<child name="inputSequenceButtonPanel" type="page">
+					<property name="componentConstraints" value="growx 0, aligny top, gaptop 10"/>
+
+					<child name="loadSequenceBtn" type="FileChooser">
+						<property name="icon" value="/org/jppf/ui/resources/open.gif"/>
+						<property name="tooltip" value="Load the sequence from a file"/>
+						<property name="value" value="data/TargetSequence.txt"/>
+						<property name="extensions" value="*; All Files (*.*)"/>
+						<property name="type" value="open"/>
+						<property name="persistent" value="true"/>
+						<listener type="script">
+							<script language="javascript"><![CDATA[populateTargetSequence()]]></script>
+						</listener>
+					</child>
+
+				</child>
+	
+				<child name="sequenceTextPanel" type="page">
+					<property name="layoutConstraints" value="fill, flowy"/>
+					<property name="componentConstraints" value="grow, pushx"/>
+
+					<child name="sequenceText" type="TextArea">
+						<property name="tooltip" value="DNA or protein sequence to compare with those in the database"/>
+						<property name="persistent" value="true"/>
+						<property name="editable" value="true"/>
+						<property name="scrollable" value="true"/>
+						<initializer type="script">
+							<script language="javascript"><![CDATA[
+								var value = option.getValue();
+								if ((value == null) || "".equals(value.trim())) populateTargetSequence();
+							]]></script>
+						</initializer>
+					</child>
+
+				</child>
+
+			</child>
+
+		</child>
+
+	</child>
+
+	<child name="resultPanel" type="page">
+		<property name="label" value="Results"/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value="push, grow"/>
+		<property name="bordered" value="true"/>
+
+		<child name="scorePanel" type="page">
+			<property name="componentConstraints" value="growx 0"/>
+
+			<child name="score" type="FormattedNumber">
+				<property name="label" value="Score"/>
+				<property name="tooltip" value="Score resulting from the alignment of this sequence with the target sequence"/>
+				<property name="value" value="0"/>
+				<property name="pattern" value="###,###,##0.###"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="enabled" value="false"/>
+			</child>
+	
+		</child>
+
+		<child name="resultSequenceText" type="TextArea">
+			<property name="componentConstraints" value="push, grow"/>
+			<property name="label" value=""/>
+			<property name="tooltip" value="DNA or protein sequence whose alignment with the target sequence resulted in the highest score"/>
+			<property name="value" value=""/>
+			<property name="editable" value="true"/>
+			<property name="scrollable" value="true"/>
+		</child>
+
+	</child>
+
+</opt:main>

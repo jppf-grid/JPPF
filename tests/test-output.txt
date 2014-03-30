@@ -1,0 +1,1380 @@
+performing setup with 1 drivers, 1 nodes and 1 client
+[driver-1][11:35:43.979] Listening for transport dt_socket at address: 8001
+client process id: 9440
+[driver-1][11:35:44.171] driver process id: 792
+[  node-1][11:35:44.200] node process id: 7476
+[driver-1][11:35:45.020] management initialized and listening on port 11201
+[driver-1][11:35:45.252] secure management initialized and listening on port 12201
+[driver-1][11:35:45.302] ClientClassServer initialized
+[driver-1][11:35:45.309] NodeClassServer initialized
+[driver-1][11:35:45.316] ClientJobServer initialized
+[driver-1][11:35:45.348] NodeJobServer initialized
+[driver-1][11:35:45.351] Acceptor initialized
+[driver-1][11:35:45.351] -  accepting plain connections on port 11101
+[driver-1][11:35:45.351] - accepting secure connections on port 12101
+[driver-1][11:35:45.356] JPPF Driver initialization complete
+[  node-1][11:35:46.178] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:35:47.246] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:35:47.793] initialized NodeTest
+[  node-1][11:35:48.038] JPPF Node management initialized
+[  node-1][11:35:48.054] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:35:49.055] Reconnected to the node server
+[  node-1][11:35:49.079] Node successfully initialized
+
+---------- end of output for class test.org.jppf.classloader.TestAbstractJPPFClassLoader ----------
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:35:50.321] Listening for transport dt_socket at address: 8001
+[  node-1][11:35:50.502] node process id: 11376
+[driver-1][11:35:50.530] driver process id: 4876
+[driver-1][11:35:51.352] management initialized and listening on port 11201
+[driver-1][11:35:51.583] secure management initialized and listening on port 12201
+[driver-1][11:35:51.633] ClientClassServer initialized
+[driver-1][11:35:51.641] NodeClassServer initialized
+[driver-1][11:35:51.648] ClientJobServer initialized
+[driver-1][11:35:51.680] NodeJobServer initialized
+[driver-1][11:35:51.683] Acceptor initialized
+[driver-1][11:35:51.683] -  accepting plain connections on port 11101
+[driver-1][11:35:51.683] - accepting secure connections on port 12101
+[driver-1][11:35:51.688] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:35:52.440] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:35:53.467] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:35:54.007] initialized NodeTest
+[  node-1][11:35:54.254] JPPF Node management initialized
+[  node-1][11:35:54.270] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:35:55.271] Reconnected to the node server
+[  node-1][11:35:55.298] Node successfully initialized
+
+---------- end of output for class test.org.jppf.client.concurrent.TestExecutorServiceConfiguration ----------
+
+[  node-1][11:35:56.061] task executed
+[  node-1][11:35:57.613] this task has timed out
+[  node-1][11:35:59.155] this task has been cancelled
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:36:00.309] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:00.481] node process id: 7656
+[driver-1][11:36:00.504] driver process id: 16896
+[driver-1][11:36:01.311] management initialized and listening on port 11201
+[driver-1][11:36:01.535] secure management initialized and listening on port 12201
+[driver-1][11:36:01.585] ClientClassServer initialized
+[driver-1][11:36:01.592] NodeClassServer initialized
+[driver-1][11:36:01.599] ClientJobServer initialized
+[driver-1][11:36:01.631] NodeJobServer initialized
+[driver-1][11:36:01.635] Acceptor initialized
+[driver-1][11:36:01.635] -  accepting plain connections on port 11101
+[driver-1][11:36:01.635] - accepting secure connections on port 12101
+[driver-1][11:36:01.639] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:02.424] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:36:03.459] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:36:04.193] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:36:04.551] JPPF Node management initialized
+[  node-1][11:36:04.576] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:36:05.577] Reconnected to the node server
+[  node-1][11:36:05.601] Node successfully initialized
+
+---------- end of output for class test.org.jppf.client.concurrent.TestJPPFCompletionService ----------
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:36:10.517] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:10.694] node process id: 18416
+[driver-1][11:36:10.724] driver process id: 2260
+[driver-1][11:36:11.520] management initialized and listening on port 11201
+[driver-1][11:36:11.744] secure management initialized and listening on port 12201
+[driver-1][11:36:11.793] ClientClassServer initialized
+[driver-1][11:36:11.801] NodeClassServer initialized
+[driver-1][11:36:11.808] ClientJobServer initialized
+[driver-1][11:36:11.840] NodeJobServer initialized
+[driver-1][11:36:11.843] Acceptor initialized
+[driver-1][11:36:11.843] -  accepting plain connections on port 11101
+[driver-1][11:36:11.843] - accepting secure connections on port 12101
+[driver-1][11:36:11.848] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:12.596] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:36:13.653] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:36:14.363] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:36:14.702] JPPF Node management initialized
+[  node-1][11:36:14.725] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:36:15.726] Reconnected to the node server
+[  node-1][11:36:15.754] Node successfully initialized
+
+---------- end of output for class test.org.jppf.client.concurrent.TestJPPFExecutorService ----------
+
+performing setup with 1 drivers, 1 nodes
+
+---------- end of output for class test.org.jppf.client.event.TestJobListener ----------
+
+client process id: 9440
+[driver-1][11:36:21.801] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:21.960] node process id: 14068
+client process id: 9440
+[driver-1][11:36:21.991] driver process id: 18152
+[driver-1][11:36:22.798] management initialized and listening on port 11201
+[driver-1][11:36:23.022] secure management initialized and listening on port 12201
+[driver-1][11:36:23.071] ClientClassServer initialized
+[driver-1][11:36:23.079] NodeClassServer initialized
+[driver-1][11:36:23.086] ClientJobServer initialized
+[driver-1][11:36:23.118] NodeJobServer initialized
+[driver-1][11:36:23.122] Acceptor initialized
+[driver-1][11:36:23.122] -  accepting plain connections on port 11101
+[driver-1][11:36:23.122] - accepting secure connections on port 12101
+[driver-1][11:36:23.127] JPPF Driver initialization complete
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:23.886] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:36:24.944] RemoteClassLoaderConnection: Reconnected to the class server
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:36:26.170] initialized NodeTest
+[  node-1][11:36:26.763] JPPF Node management initialized
+[  node-1][11:36:26.799] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:36:27.800] Reconnected to the node server
+[  node-1][11:36:27.847] Node successfully initialized
+performing setup with 1 drivers, 1 nodes
+
+---------- end of output for class test.org.jppf.client.persistence.TestJobPersistence ----------
+
+client process id: 9440
+[driver-1][11:36:29.490] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:29.671] node process id: 18332
+[driver-1][11:36:29.703] driver process id: 8204
+[driver-1][11:36:30.474] management initialized and listening on port 11201
+[driver-1][11:36:30.696] secure management initialized and listening on port 12201
+[driver-1][11:36:30.746] ClientClassServer initialized
+[driver-1][11:36:30.754] NodeClassServer initialized
+[driver-1][11:36:30.761] ClientJobServer initialized
+[driver-1][11:36:30.794] NodeJobServer initialized
+[driver-1][11:36:30.797] Acceptor initialized
+[driver-1][11:36:30.797] -  accepting plain connections on port 11101
+[driver-1][11:36:30.797] - accepting secure connections on port 12101
+[driver-1][11:36:30.802] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:31.503] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:36:32.560] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:36:33.342] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:36:33.637] JPPF Node management initialized
+[  node-1][11:36:33.654] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:36:34.655] Reconnected to the node server
+[  node-1][11:36:34.704] Node successfully initialized
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes
+
+---------- end of output for class test.org.jppf.client.TestConnectionPool ----------
+
+client process id: 9440
+[driver-1][11:36:42.039] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:42.219] node process id: 7964
+[driver-1][11:36:42.244] driver process id: 13044
+[driver-1][11:36:43.040] management initialized and listening on port 11201
+[driver-1][11:36:43.261] secure management initialized and listening on port 12201
+[driver-1][11:36:43.311] ClientClassServer initialized
+[driver-1][11:36:43.319] NodeClassServer initialized
+[driver-1][11:36:43.326] ClientJobServer initialized
+[driver-1][11:36:43.358] NodeJobServer initialized
+[driver-1][11:36:43.362] Acceptor initialized
+[driver-1][11:36:43.362] -  accepting plain connections on port 11101
+[driver-1][11:36:43.362] - accepting secure connections on port 12101
+[driver-1][11:36:43.367] JPPF Driver initialization complete
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:44.125] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:36:45.182] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:36:46.004] initialized NodeTest
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:36:46.355] JPPF Node management initialized
+[  node-1][11:36:46.378] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:36:47.379] Reconnected to the node server
+[  node-1][11:36:47.428] Node successfully initialized
+client process id: 9440
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes
+
+---------- end of output for class test.org.jppf.client.TestJPPFClient ----------
+
+client process id: 9440
+[driver-1][11:36:52.543] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:52.733] node process id: 10172
+[driver-1][11:36:52.758] driver process id: 17728
+[driver-1][11:36:53.555] management initialized and listening on port 11201
+[driver-1][11:36:53.781] secure management initialized and listening on port 12201
+[driver-1][11:36:53.830] ClientClassServer initialized
+[driver-1][11:36:53.838] NodeClassServer initialized
+[driver-1][11:36:53.845] ClientJobServer initialized
+[driver-1][11:36:53.877] NodeJobServer initialized
+[driver-1][11:36:53.880] Acceptor initialized
+[driver-1][11:36:53.880] -  accepting plain connections on port 11101
+[driver-1][11:36:53.880] - accepting secure connections on port 12101
+[driver-1][11:36:53.885] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:54.566] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:36:55.623] RemoteClassLoaderConnection: Reconnected to the class server
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:36:56.823] initialized NodeTest
+
+---------- end of output for class test.org.jppf.client.TestJPPFJob ----------
+
+client process id: 9440
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:36:57.363] Listening for transport dt_socket at address: 8001
+[  node-1][11:36:57.570] node process id: 3176
+[driver-1][11:36:57.599] driver process id: 2908
+[driver-1][11:36:58.454] management initialized and listening on port 11201
+[driver-1][11:36:58.691] secure management initialized and listening on port 12201
+[driver-1][11:36:58.743] ClientClassServer initialized
+[driver-1][11:36:58.750] NodeClassServer initialized
+[driver-1][11:36:58.757] ClientJobServer initialized
+[driver-1][11:36:58.789] NodeJobServer initialized
+[driver-1][11:36:58.793] Acceptor initialized
+[driver-1][11:36:58.793] -  accepting plain connections on port 11101
+[driver-1][11:36:58.793] - accepting secure connections on port 12101
+[driver-1][11:36:58.798] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:36:59.629] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:37:00.686] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:37:01.324] initialized NodeTest
+[  node-1][11:37:01.558] JPPF Node management initialized
+[  node-1][11:37:01.575] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:37:02.576] Reconnected to the node server
+[  node-1][11:37:02.602] Node successfully initialized
+
+---------- end of output for class test.org.jppf.io.TestFileDataLocation ----------
+
+******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************
+runtime driver info: {totalMemory=128974848, availableProcessors=8, freeMemory=122744920, maxMemory=128974848}
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:37:07.238] Listening for transport dt_socket at address: 8001
+[  node-1][11:37:07.437] node process id: 6492
+[  node-2][11:37:07.442] node process id: 20172
+[driver-1][11:37:07.473] driver process id: 6292
+[driver-1][11:37:08.300] management initialized and listening on port 11201
+[driver-1][11:37:08.537] secure management initialized and listening on port 12201
+[driver-1][11:37:08.588] ClientClassServer initialized
+[driver-1][11:37:08.596] NodeClassServer initialized
+[driver-1][11:37:08.604] ClientJobServer initialized
+[driver-1][11:37:08.636] NodeJobServer initialized
+[driver-1][11:37:08.640] Acceptor initialized
+[driver-1][11:37:08.640] -  accepting plain connections on port 11101
+[driver-1][11:37:08.640] - accepting secure connections on port 12101
+[driver-1][11:37:08.644] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:37:09.454] Attempting connection to the class server at 192.168.1.15:11101
+[  node-2][11:37:09.457] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:37:10.513] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-2][11:37:10.516] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:37:11.004] initialized NodeTest
+[  node-2][11:37:11.004] initialized NodeTest
+[  node-1][11:37:11.231] JPPF Node management initialized
+[  node-2][11:37:11.232] JPPF Node management initialized
+[  node-1][11:37:11.248] Attempting connection to the node server at 192.168.1.15:11101
+[  node-2][11:37:11.248] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:37:12.249] Reconnected to the node server
+[  node-2][11:37:12.249] Reconnected to the node server
+[  node-1][11:37:12.280] Node successfully initialized
+[  node-2][11:37:12.280] Node successfully initialized
+
+---------- end of output for class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean ----------
+
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:37:22.463] Listening for transport dt_socket at address: 8001
+[  node-2][11:37:22.649] node process id: 5628
+[  node-1][11:37:22.657] node process id: 10920
+[driver-1][11:37:22.695] driver process id: 7080
+[driver-1][11:37:23.447] management initialized and listening on port 11201
+[driver-1][11:37:23.688] secure management initialized and listening on port 12201
+[driver-1][11:37:23.738] ClientClassServer initialized
+[driver-1][11:37:23.746] NodeClassServer initialized
+[driver-1][11:37:23.753] ClientJobServer initialized
+[driver-1][11:37:23.785] NodeJobServer initialized
+[driver-1][11:37:23.789] Acceptor initialized
+[driver-1][11:37:23.789] -  accepting plain connections on port 11101
+[driver-1][11:37:23.789] - accepting secure connections on port 12101
+[driver-1][11:37:23.793] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:37:24.552] Attempting connection to the class server at 192.168.1.15:11101
+[  node-2][11:37:24.552] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-2][11:37:25.611] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:37:25.611] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:37:26.262] initialized NodeTest
+[  node-2][11:37:26.267] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:37:26.580] JPPF Node management initialized
+[  node-2][11:37:26.584] JPPF Node management initialized
+[  node-1][11:37:26.603] Attempting connection to the node server at 192.168.1.15:11101
+[  node-2][11:37:26.605] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:37:27.604] Reconnected to the node server
+[  node-2][11:37:27.606] Reconnected to the node server
+[  node-1][11:37:27.632] Node successfully initialized
+[  node-2][11:37:27.632] Node successfully initialized
+
+---------- end of output for class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean2 ----------
+
+[  node-1][11:37:28.110] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:28.110] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:28.110] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:UuidSelector - task 1]
+[  node-1][11:37:28.110] task testNotifications:UuidSelector - task 1 successful
+[  node-2][11:37:28.111] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:UuidSelector - task 2]
+[  node-2][11:37:28.112] task testNotifications:UuidSelector - task 2 successful
+[  node-2][11:37:28.230] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:28.231] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:UuidSelector - task 3]
+[  node-2][11:37:28.231] task testNotifications:UuidSelector - task 3 successful
+[  node-1][11:37:28.231] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:28.231] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:UuidSelector - task 4]
+[  node-1][11:37:28.231] task testNotifications:UuidSelector - task 4 successful
+[  node-2][11:37:28.341] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:28.341] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:UuidSelector - task 5]
+[  node-2][11:37:28.341] task testNotifications:UuidSelector - task 5 successful
+[  node-1][11:37:28.342] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:28.342] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:UuidSelector - task 6]
+[  node-1][11:37:28.342] task testNotifications:UuidSelector - task 6 successful
+[  node-2][11:37:28.451] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:28.451] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:UuidSelector - task 7]
+[  node-2][11:37:28.451] task testNotifications:UuidSelector - task 7 successful
+[  node-1][11:37:28.452] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:28.453] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:UuidSelector - task 8]
+[  node-1][11:37:28.453] task testNotifications:UuidSelector - task 8 successful
+[  node-2][11:37:28.561] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:28.561] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:UuidSelector - task 9]
+[  node-2][11:37:28.562] task testNotifications:UuidSelector - task 9 successful
+[  node-1][11:37:28.564] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:28.564] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:UuidSelector - task 10]
+[  node-1][11:37:28.564] task testNotifications:UuidSelector - task 10 successful
+[  node-2][11:37:30.226] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:30.227] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:AllNodesSelector - task 1]
+[  node-2][11:37:30.227] task testNotifications:AllNodesSelector - task 1 successful
+[  node-1][11:37:30.227] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:30.229] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:AllNodesSelector - task 2]
+[  node-1][11:37:30.229] task testNotifications:AllNodesSelector - task 2 successful
+[  node-2][11:37:30.338] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:30.338] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:AllNodesSelector - task 3]
+[  node-2][11:37:30.338] task testNotifications:AllNodesSelector - task 3 successful
+[  node-1][11:37:30.340] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:30.340] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:AllNodesSelector - task 4]
+[  node-1][11:37:30.340] task testNotifications:AllNodesSelector - task 4 successful
+[  node-2][11:37:30.448] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:30.449] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:AllNodesSelector - task 5]
+[  node-2][11:37:30.449] task testNotifications:AllNodesSelector - task 5 successful
+[  node-1][11:37:30.450] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:30.450] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:AllNodesSelector - task 6]
+[  node-1][11:37:30.450] task testNotifications:AllNodesSelector - task 6 successful
+[  node-2][11:37:30.560] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:30.561] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:AllNodesSelector - task 7]
+[  node-2][11:37:30.561] task testNotifications:AllNodesSelector - task 7 successful
+[  node-1][11:37:30.562] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:30.562] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:AllNodesSelector - task 8]
+[  node-1][11:37:30.562] task testNotifications:AllNodesSelector - task 8 successful
+[  node-2][11:37:30.670] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:30.670] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:AllNodesSelector - task 9]
+[  node-2][11:37:30.670] task testNotifications:AllNodesSelector - task 9 successful
+[  node-1][11:37:30.671] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:30.671] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:AllNodesSelector - task 10]
+[  node-1][11:37:30.671] task testNotifications:AllNodesSelector - task 10 successful
+[  node-2][11:37:32.319] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:32.319] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:32.319] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:ExecutionPolicySelector - task 1]
+[  node-1][11:37:32.319] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:ExecutionPolicySelector - task 2]
+[  node-2][11:37:32.319] task testNoNotifcationReceived:ExecutionPolicySelector - task 1 successful
+[  node-1][11:37:32.319] task testNoNotifcationReceived:ExecutionPolicySelector - task 2 successful
+[  node-2][11:37:32.434] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:32.434] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:ExecutionPolicySelector - task 3]
+[  node-2][11:37:32.434] task testNoNotifcationReceived:ExecutionPolicySelector - task 3 successful
+[  node-1][11:37:32.437] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:32.437] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:ExecutionPolicySelector - task 4]
+[  node-1][11:37:32.437] task testNoNotifcationReceived:ExecutionPolicySelector - task 4 successful
+[  node-2][11:37:32.544] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:32.545] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:ExecutionPolicySelector - task 5]
+[  node-2][11:37:32.545] task testNoNotifcationReceived:ExecutionPolicySelector - task 5 successful
+[  node-2][11:37:32.677] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:32.678] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:UuidSelector - task 1]
+[  node-2][11:37:32.678] task testNoNotifcationReceived:UuidSelector - task 1 successful
+[  node-1][11:37:32.678] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:32.678] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:UuidSelector - task 2]
+[  node-1][11:37:32.678] task testNoNotifcationReceived:UuidSelector - task 2 successful
+[  node-1][11:37:32.788] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:32.788] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:UuidSelector - task 4]
+[  node-1][11:37:32.788] task testNoNotifcationReceived:UuidSelector - task 4 successful
+[  node-2][11:37:32.789] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:32.790] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:UuidSelector - task 3]
+[  node-2][11:37:32.790] task testNoNotifcationReceived:UuidSelector - task 3 successful
+[  node-1][11:37:32.898] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:32.898] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:UuidSelector - task 5]
+[  node-1][11:37:32.898] task testNoNotifcationReceived:UuidSelector - task 5 successful
+[  node-1][11:37:33.032] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.032] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.032] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 1]
+[  node-2][11:37:33.032] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 2]
+[  node-1][11:37:33.032] task testNoNotifcationReceived:AllNodesSelector - task 1 successful
+[  node-2][11:37:33.032] task testNoNotifcationReceived:AllNodesSelector - task 2 successful
+[  node-2][11:37:33.143] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.143] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 3]
+[  node-2][11:37:33.143] task testNoNotifcationReceived:AllNodesSelector - task 3 successful
+[  node-1][11:37:33.144] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.144] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 4]
+[  node-1][11:37:33.144] task testNoNotifcationReceived:AllNodesSelector - task 4 successful
+[  node-2][11:37:33.252] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.252] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 5]
+[  node-2][11:37:33.252] task testNoNotifcationReceived:AllNodesSelector - task 5 successful
+[  node-1][11:37:33.253] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.253] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 6]
+[  node-1][11:37:33.253] task testNoNotifcationReceived:AllNodesSelector - task 6 successful
+[  node-2][11:37:33.361] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.361] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 7]
+[  node-2][11:37:33.361] task testNoNotifcationReceived:AllNodesSelector - task 7 successful
+[  node-1][11:37:33.362] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.362] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 8]
+[  node-1][11:37:33.362] task testNoNotifcationReceived:AllNodesSelector - task 8 successful
+[  node-2][11:37:33.469] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.470] sent object: UserObject[nodeUuid=n2, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 9]
+[  node-2][11:37:33.470] task testNoNotifcationReceived:AllNodesSelector - task 9 successful
+[  node-1][11:37:33.470] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.470] sent object: UserObject[nodeUuid=n1, taskId=end: testNoNotifcationReceived:AllNodesSelector - task 10]
+[  node-1][11:37:33.471] task testNoNotifcationReceived:AllNodesSelector - task 10 successful
+[  node-1][11:37:33.597] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.598] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:ExecutionPolicySelector - task 1]
+[  node-1][11:37:33.598] task testNotifications:ExecutionPolicySelector - task 1 successful
+[  node-2][11:37:33.599] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.600] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:ExecutionPolicySelector - task 2]
+[  node-2][11:37:33.600] task testNotifications:ExecutionPolicySelector - task 2 successful
+[  node-1][11:37:33.708] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.708] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:ExecutionPolicySelector - task 3]
+[  node-1][11:37:33.708] task testNotifications:ExecutionPolicySelector - task 3 successful
+[  node-2][11:37:33.709] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.709] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:ExecutionPolicySelector - task 4]
+[  node-2][11:37:33.709] task testNotifications:ExecutionPolicySelector - task 4 successful
+[  node-1][11:37:33.818] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.818] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:ExecutionPolicySelector - task 5]
+[  node-1][11:37:33.818] task testNotifications:ExecutionPolicySelector - task 5 successful
+[  node-2][11:37:33.818] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.818] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:ExecutionPolicySelector - task 6]
+[  node-2][11:37:33.819] task testNotifications:ExecutionPolicySelector - task 6 successful
+[  node-1][11:37:33.926] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:33.926] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:ExecutionPolicySelector - task 7]
+[  node-1][11:37:33.927] task testNotifications:ExecutionPolicySelector - task 7 successful
+[  node-2][11:37:33.927] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:33.927] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:ExecutionPolicySelector - task 8]
+[  node-2][11:37:33.927] task testNotifications:ExecutionPolicySelector - task 8 successful
+[  node-1][11:37:34.035] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:37:34.036] sent object: UserObject[nodeUuid=n1, taskId=end: testNotifications:ExecutionPolicySelector - task 9]
+[  node-1][11:37:34.036] task testNotifications:ExecutionPolicySelector - task 9 successful
+[  node-2][11:37:34.036] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:37:34.036] sent object: UserObject[nodeUuid=n2, taskId=end: testNotifications:ExecutionPolicySelector - task 10]
+[  node-2][11:37:34.036] task testNotifications:ExecutionPolicySelector - task 10 successful
+
+---------- end of output for class test.org.jppf.management.TestJMXConnectionWrapper ----------
+
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:37:38.082] Listening for transport dt_socket at address: 8001
+[  node-2][11:37:38.274] node process id: 7188
+[  node-1][11:37:38.281] node process id: 8792
+[driver-1][11:37:38.315] driver process id: 19832
+[driver-1][11:37:39.101] management initialized and listening on port 11201
+[driver-1][11:37:39.332] secure management initialized and listening on port 12201
+[driver-1][11:37:39.383] ClientClassServer initialized
+[driver-1][11:37:39.390] NodeClassServer initialized
+[driver-1][11:37:39.397] ClientJobServer initialized
+[driver-1][11:37:39.430] NodeJobServer initialized
+[driver-1][11:37:39.433] Acceptor initialized
+[driver-1][11:37:39.433] -  accepting plain connections on port 11101
+[driver-1][11:37:39.433] - accepting secure connections on port 12101
+[driver-1][11:37:39.438] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-2][11:37:40.199] Attempting connection to the class server at 192.168.1.15:11101
+[  node-1][11:37:40.199] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-2][11:37:41.257] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:37:41.259] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-2][11:37:41.843] initialized NodeTest
+[  node-1][11:37:41.858] initialized NodeTest
+[  node-2][11:37:42.100] JPPF Node management initialized
+[  node-1][11:37:42.116] JPPF Node management initialized
+[  node-2][11:37:42.119] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:37:42.132] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-2][11:37:43.119] Reconnected to the node server
+[  node-1][11:37:43.133] Reconnected to the node server
+[  node-2][11:37:43.145] Node successfully initialized
+[  node-1][11:37:43.156] Node successfully initialized
+
+---------- end of output for class test.org.jppf.management.TestJPPFDriverAdminMBean ----------
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:37:51.104] Listening for transport dt_socket at address: 8001
+[  node-1][11:37:51.302] node process id: 7716
+[driver-1][11:37:51.327] driver process id: 16444
+[driver-1][11:37:52.126] management initialized and listening on port 11201
+[driver-1][11:37:52.352] secure management initialized and listening on port 12201
+[driver-1][11:37:52.401] ClientClassServer initialized
+[driver-1][11:37:52.409] NodeClassServer initialized
+[driver-1][11:37:52.416] ClientJobServer initialized
+[driver-1][11:37:52.448] NodeJobServer initialized
+[driver-1][11:37:52.451] Acceptor initialized
+[driver-1][11:37:52.451] -  accepting plain connections on port 11101
+[driver-1][11:37:52.451] - accepting secure connections on port 12101
+[driver-1][11:37:52.456] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:37:53.170] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:37:54.228] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:37:54.777] initialized NodeTest
+[  node-1][11:37:55.014] JPPF Node management initialized
+[  node-1][11:37:55.030] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:37:56.031] Reconnected to the node server
+[  node-1][11:37:56.057] Node successfully initialized
+
+---------- end of output for class test.org.jppf.management.TestJPPFNodeAdminMBean ----------
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:38:00.237] Listening for transport dt_socket at address: 8001
+[  node-1][11:38:00.400] node process id: 15640
+[driver-1][11:38:00.429] driver process id: 16316
+[driver-1][11:38:01.275] management initialized and listening on port 11201
+[driver-1][11:38:01.529] secure management initialized and listening on port 12201
+[driver-1][11:38:01.580] ClientClassServer initialized
+[driver-1][11:38:01.587] NodeClassServer initialized
+[driver-1][11:38:01.594] ClientJobServer initialized
+[driver-1][11:38:01.626] NodeJobServer initialized
+[driver-1][11:38:01.629] Acceptor initialized
+[driver-1][11:38:01.629] -  accepting plain connections on port 11101
+[driver-1][11:38:01.630] - accepting secure connections on port 12101
+[driver-1][11:38:01.634] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:38:02.458] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:38:03.515] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:38:04.050] initialized NodeTest
+[  node-1][11:38:04.286] JPPF Node management initialized
+[  node-1][11:38:04.303] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:38:05.304] Reconnected to the node server
+[  node-1][11:38:05.336] Node successfully initialized
+
+---------- end of output for class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean ----------
+
+got task notification for task testNotifications - task 1
+got task notification for task testNotifications - task 2
+got task notification for task testNotifications - task 3
+got task notification for task testNotifications - task 5
+got task notification for task testNotifications - task 4
+got task notification for task testNotifications - task 5
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:38:07.561] Listening for transport dt_socket at address: 8001
+[  node-1][11:38:07.738] node process id: 13596
+[  node-2][11:38:07.755] node process id: 7920
+[driver-1][11:38:07.799] driver process id: 8060
+[driver-1][11:38:08.550] management initialized and listening on port 11201
+[driver-1][11:38:08.782] secure management initialized and listening on port 12201
+[driver-1][11:38:08.832] ClientClassServer initialized
+[driver-1][11:38:08.839] NodeClassServer initialized
+[driver-1][11:38:08.846] ClientJobServer initialized
+[driver-1][11:38:08.879] NodeJobServer initialized
+[driver-1][11:38:08.882] Acceptor initialized
+[driver-1][11:38:08.882] -  accepting plain connections on port 11101
+[driver-1][11:38:08.882] - accepting secure connections on port 12101
+[driver-1][11:38:08.887] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-2][11:38:09.646] Attempting connection to the class server at 192.168.1.15:11101
+[  node-1][11:38:09.646] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:38:10.706] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-2][11:38:10.706] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:38:11.273] initialized NodeTest
+[  node-2][11:38:11.280] initialized NodeTest
+[  node-1][11:38:11.521] JPPF Node management initialized
+[  node-2][11:38:11.528] JPPF Node management initialized
+[  node-1][11:38:11.539] Attempting connection to the node server at 192.168.1.15:11101
+[  node-2][11:38:11.544] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:38:12.539] Reconnected to the node server
+[  node-2][11:38:12.544] Reconnected to the node server
+[  node-1][11:38:12.563] Node successfully initialized
+[  node-2][11:38:12.566] Node successfully initialized
+
+---------- end of output for class test.org.jppf.node.policy.TestScriptedPolicy ----------
+
+the policy is: <Script language="groovy"><![CDATA[
+// total nodes in the grid from the server statistics
+def totalNodes = jppfStats.getSnapshot("nodes").getLatest()
+def prio = jppfSla.getPriority()
+// determine max allowed nodes for the job, as % of total nodes
+def maxPct = (prio <= 1) ? 0.1 : (prio >= 9 ? 0.9 : prio / 10.0)
+// return true if current nodes for the job is less than max %
+return jppfDispatches < (int) (totalNodes * maxPct)
+
+]]></Script>
+
+the policy is: <Script language="javascript"><![CDATA[
+function accepts() {
+  // total nodes in the grid from the server statistics
+  var totalNodes = jppfStats.getSnapshot("nodes").getLatest();
+  var prio = jppfSla.getPriority();
+  // determine max allowed nodes for the job, as % of total nodes
+  var maxPct = (prio <= 1) ? 0.1 : (prio >= 9 ? 0.9 : prio / 10.0);
+  // return true if current nodes for the job is less than max %
+  return jppfDispatches < totalNodes * maxPct;
+}
+accepts();
+
+]]></Script>
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:38:14.802] Listening for transport dt_socket at address: 8001
+[  node-1][11:38:14.998] node process id: 4440
+[driver-1][11:38:15.023] driver process id: 17948
+[driver-1][11:38:15.851] management initialized and listening on port 11201
+[driver-1][11:38:16.081] secure management initialized and listening on port 12201
+[driver-1][11:38:16.131] ClientClassServer initialized
+[driver-1][11:38:16.138] NodeClassServer initialized
+[driver-1][11:38:16.145] ClientJobServer initialized
+[driver-1][11:38:16.177] NodeJobServer initialized
+[driver-1][11:38:16.180] Acceptor initialized
+[driver-1][11:38:16.180] -  accepting plain connections on port 11101
+[driver-1][11:38:16.180] - accepting secure connections on port 12101
+[driver-1][11:38:16.185] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:38:16.906] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:38:17.964] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:38:18.706] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:38:19.037] JPPF Node management initialized
+[  node-1][11:38:19.058] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:38:20.059] Reconnected to the node server
+[  node-1][11:38:20.080] Node successfully initialized
+
+---------- end of output for class test.org.jppf.node.protocol.TestScriptedTask ----------
+
+[  node-1][11:38:22.628] language=groovy, result=Hello JPPF (1), class=java.lang.String
+[  node-1][11:38:22.629] language=groovy, result=Hello JPPF (2), class=java.lang.String
+[  node-1][11:38:22.630] language=groovy, result=Hello JPPF (3), class=java.lang.String
+[  node-1][11:38:22.630] language=groovy, result=Hello JPPF (4), class=java.lang.String
+[  node-1][11:38:22.631] language=groovy, result=Hello JPPF (5), class=java.lang.String
+[  node-1][11:38:22.640] language=groovy, result=Hello JPPF (6), class=java.lang.String
+[  node-1][11:38:22.640] language=groovy, result=Hello JPPF (7), class=java.lang.String
+[  node-1][11:38:22.641] language=groovy, result=Hello JPPF (8), class=java.lang.String
+[  node-1][11:38:22.641] language=groovy, result=Hello JPPF (9), class=java.lang.String
+[  node-1][11:38:22.642] language=groovy, result=Hello JPPF (10), class=java.lang.String
+[  node-1][11:38:22.671] language=javascript, result=Hello JPPF (1), class=java.lang.String
+[  node-1][11:38:22.672] language=javascript, result=Hello JPPF (2), class=java.lang.String
+[  node-1][11:38:22.673] language=javascript, result=Hello JPPF (3), class=java.lang.String
+[  node-1][11:38:22.675] language=javascript, result=Hello JPPF (4), class=java.lang.String
+[  node-1][11:38:22.676] language=javascript, result=Hello JPPF (5), class=java.lang.String
+[  node-1][11:38:22.681] language=javascript, result=Hello JPPF (6), class=java.lang.String
+[  node-1][11:38:22.682] language=javascript, result=Hello JPPF (7), class=java.lang.String
+[  node-1][11:38:22.683] language=javascript, result=Hello JPPF (8), class=java.lang.String
+[  node-1][11:38:22.685] language=javascript, result=Hello JPPF (9), class=java.lang.String
+[  node-1][11:38:22.686] language=javascript, result=Hello JPPF (10), class=java.lang.String
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:38:23.767] Listening for transport dt_socket at address: 8001
+[  node-1][11:38:23.971] node process id: 8012
+[  node-2][11:38:23.975] node process id: 10484
+[driver-1][11:38:23.993] driver process id: 18252
+[driver-1][11:38:24.795] management initialized and listening on port 11201
+[driver-1][11:38:25.018] secure management initialized and listening on port 12201
+[driver-1][11:38:25.066] ClientClassServer initialized
+[driver-1][11:38:25.073] NodeClassServer initialized
+[driver-1][11:38:25.080] ClientJobServer initialized
+[driver-1][11:38:25.111] NodeJobServer initialized
+[driver-1][11:38:25.115] Acceptor initialized
+[driver-1][11:38:25.115] -  accepting plain connections on port 11101
+[driver-1][11:38:25.115] - accepting secure connections on port 12101
+[driver-1][11:38:25.119] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:38:25.871] This node is 'offline', no class loader connection is established
+[  node-2][11:38:25.871] This node is 'offline', no class loader connection is established
+[  node-1][11:38:26.281] initialized NodeTest
+[  node-2][11:38:26.286] initialized NodeTest
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:38:27.325] Node successfully initialized
+[  node-2][11:38:27.333] Node successfully initialized
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+
+---------- end of output for class test.org.jppf.node.TestOfflineNode ----------
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:38:33.335] Listening for transport dt_socket at address: 8001
+[  node-1][11:38:33.522] node process id: 19844
+[driver-1][11:38:33.537] driver process id: 7840
+[  node-1][11:38:33.548] Attempting connection to the class server at localhost:11101
+[driver-1][11:38:34.373] management initialized and listening on port 11201
+[driver-1][11:38:34.427] ClientClassServer initialized
+[driver-1][11:38:34.432] NodeClassServer initialized
+[driver-1][11:38:34.438] ClientJobServer initialized
+[driver-1][11:38:34.475] NodeJobServer initialized
+[driver-1][11:38:34.479] Acceptor initialized
+[driver-1][11:38:34.479] -  accepting plain connections on port 11101
+[driver-1][11:38:34.484] JPPF Driver initialization complete
+[  node-1][11:38:34.606] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:38:35.188] initialized NodeTest
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:38:35.445] JPPF Node management initialized
+[  node-1][11:38:35.466] Attempting connection to the node server at localhost:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:38:36.467] Reconnected to the node server
+[  node-1][11:38:36.501] Node successfully initialized
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+
+---------- end of output for class test.org.jppf.serialization.TestJPPFSerialization ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:38:47.329] Listening for transport dt_socket at address: 8001
+[  node-1][11:38:47.512] node process id: 9072
+[driver-1][11:38:47.539] driver process id: 18720
+[  node-1][11:38:47.543] Attempting connection to the class server at localhost:11101
+[driver-1][11:38:48.299] management initialized and listening on port 11201
+[driver-1][11:38:48.349] ClientClassServer initialized
+[driver-1][11:38:48.353] NodeClassServer initialized
+[driver-1][11:38:48.359] ClientJobServer initialized
+[driver-1][11:38:48.430] NodeJobServer initialized
+[driver-1][11:38:48.434] Acceptor initialized
+[driver-1][11:38:48.434] -  accepting plain connections on port 11101
+[driver-1][11:38:48.438] JPPF Driver initialization complete
+[  node-1][11:38:48.693] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:38:49.235] initialized NodeTest
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:38:49.473] JPPF Node management initialized
+[  node-1][11:38:49.492] Attempting connection to the node server at localhost:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:38:50.493] Reconnected to the node server
+[  node-1][11:38:50.548] Node successfully initialized
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+
+---------- end of output for class test.org.jppf.serialization.TestKryo ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:39:01.284] Listening for transport dt_socket at address: 8001
+[  node-1][11:39:01.468] node process id: 13524
+[driver-1][11:39:01.499] driver process id: 10200
+[driver-1][11:39:02.318] management initialized and listening on port 11201
+[driver-1][11:39:02.544] secure management initialized and listening on port 12201
+[driver-1][11:39:02.595] ClientClassServer initialized
+[driver-1][11:39:02.602] NodeClassServer initialized
+[driver-1][11:39:02.609] ClientJobServer initialized
+[driver-1][11:39:02.641] NodeJobServer initialized
+[driver-1][11:39:02.644] Acceptor initialized
+[driver-1][11:39:02.644] -  accepting plain connections on port 11101
+[driver-1][11:39:02.644] - accepting secure connections on port 12101
+[driver-1][11:39:02.649] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:39:03.396] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:39:04.453] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:39:04.987] initialized NodeTest
+[  node-1][11:39:05.213] JPPF Node management initialized
+[  node-1][11:39:05.230] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:39:06.230] Reconnected to the node server
+[  node-1][11:39:06.257] Node successfully initialized
+
+---------- end of output for class test.org.jppf.server.job.management.TestDriverJobManagementMBean ----------
+
+performing setup with 2 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-2][11:39:12.475] Listening for transport dt_socket at address: 8002
+[driver-1][11:39:12.476] Listening for transport dt_socket at address: 8001
+[  node-1][11:39:12.694] node process id: 6060
+[  node-2][11:39:12.711] node process id: 4796
+[  node-1][11:39:12.729] Attempting connection to the class server at localhost:11101
+[driver-1][11:39:12.735] driver process id: 12108
+[driver-2][11:39:12.736] driver process id: 5388
+[  node-2][11:39:12.745] Attempting connection to the class server at localhost:11102
+[driver-1][11:39:13.474] management initialized and listening on port 11201
+[driver-2][11:39:13.491] management initialized and listening on port 11202
+[driver-1][11:39:13.527] ClientClassServer initialized
+[driver-1][11:39:13.531] NodeClassServer initialized
+[driver-1][11:39:13.537] ClientJobServer initialized
+[driver-2][11:39:13.542] ClientClassServer initialized
+[driver-2][11:39:13.546] NodeClassServer initialized
+[driver-2][11:39:13.552] ClientJobServer initialized
+[driver-1][11:39:13.569] NodeJobServer initialized
+[driver-1][11:39:13.573] Acceptor initialized
+[driver-1][11:39:13.573] -  accepting plain connections on port 11101
+[driver-1][11:39:13.578] JPPF Driver initialization complete
+[driver-2][11:39:13.584] NodeJobServer initialized
+[driver-2][11:39:13.588] Acceptor initialized
+[driver-2][11:39:13.588] -  accepting plain connections on port 11102
+[driver-2][11:39:13.593] JPPF Driver initialization complete
+[  node-1][11:39:13.803] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-2][11:39:13.814] RemoteClassLoaderConnection: Reconnected to the class server
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11102
+[  node-1][11:39:14.409] initialized NodeTest
+[  node-2][11:39:14.415] initialized NodeTest
+[  node-2][11:39:14.654] JPPF Node management initialized
+[  node-1][11:39:14.658] JPPF Node management initialized
+[  node-2][11:39:14.671] Attempting connection to the node server at localhost:11102
+[  node-1][11:39:14.675] Attempting connection to the node server at localhost:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[driver-2][11:39:15.395] Connecting to  Peer-1@lolo-i2600.home:11101
+[client: driver-2 - ClassServer] Reconnected to the class server
+[client: driver-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11102
+[driver-1][11:39:15.454] Connecting to  Peer-1@lolo-i2600.home:11102
+[  node-2][11:39:15.671] Reconnected to the node server
+[  node-1][11:39:15.675] Reconnected to the node server
+[  node-2][11:39:15.719] Node successfully initialized
+[  node-1][11:39:15.726] Node successfully initialized
+[driver-2][11:39:16.396] Reconnected to Peer-1@lolo-i2600.home:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-2 - TasksServer] Reconnected to the JPPF task server
+[driver-1][11:39:16.455] Reconnected to Peer-1@lolo-i2600.home:11102
+
+---------- end of output for class test.org.jppf.server.peer.TestMultiServer ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-2-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11102
+[client: driver-2-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11102
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-2-1 - ClassServer] Reconnected to the class server
+[client: driver-2-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11102
+[client: driver-2-2 - ClassServer] Reconnected to the class server
+[client: driver-2-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11102
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+[client: driver-2-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-2-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11102
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-2 - ClassServer] Reconnected to the class server
+[client: driver-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11102
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-2 - TasksServer] Reconnected to the JPPF task server
+performing setup with 2 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-2][11:39:30.624] Listening for transport dt_socket at address: 8002
+[driver-1][11:39:30.625] Listening for transport dt_socket at address: 8001
+[  node-1][11:39:30.861] node process id: 4108
+[  node-2][11:39:30.880] node process id: 7724
+[driver-2][11:39:30.884] driver process id: 9456
+[driver-1][11:39:30.890] driver process id: 16884
+[  node-1][11:39:30.901] Attempting connection to the class server at localhost:12101
+[  node-2][11:39:30.911] Attempting connection to the class server at localhost:12102
+[driver-1][11:39:31.666] management initialized and listening on port 11201
+[driver-2][11:39:31.666] management initialized and listening on port 11202
+[driver-2][11:39:31.925] secure management initialized and listening on port 12202
+[driver-1][11:39:31.927] secure management initialized and listening on port 12201
+[driver-2][11:39:31.977] ClientClassServer initialized
+[driver-1][11:39:31.978] ClientClassServer initialized
+[driver-2][11:39:31.986] NodeClassServer initialized
+[driver-1][11:39:31.986] NodeClassServer initialized
+[driver-2][11:39:31.993] ClientJobServer initialized
+[driver-1][11:39:31.994] ClientJobServer initialized
+[driver-1][11:39:32.027] NodeJobServer initialized
+[driver-2][11:39:32.028] NodeJobServer initialized
+[driver-1][11:39:32.030] Acceptor initialized
+[driver-1][11:39:32.030] - accepting secure connections on port 12101
+[driver-2][11:39:32.032] Acceptor initialized
+[driver-2][11:39:32.032] - accepting secure connections on port 12102
+[driver-1][11:39:32.037] JPPF Driver initialization complete
+[driver-2][11:39:32.037] JPPF Driver initialization complete
+[  node-1][11:39:32.935] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-2][11:39:32.937] RemoteClassLoaderConnection: Reconnected to the class server
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[  node-2][11:39:33.539] initialized NodeTest
+[  node-1][11:39:33.552] initialized NodeTest
+[  node-2][11:39:33.804] JPPF Node management initialized
+[  node-1][11:39:33.817] JPPF Node management initialized
+[  node-2][11:39:33.824] Attempting connection to the node server at localhost:12102
+[  node-1][11:39:33.836] Attempting connection to the node server at localhost:12101
+[client: driver-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12102
+[driver-1][11:39:34.031] Connecting to  Peer-1@lolo-i2600.home:12102
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[driver-2][11:39:34.110] Connecting to  Peer-1@lolo-i2600.home:12101
+[  node-2][11:39:34.825] Reconnected to the node server
+[  node-1][11:39:34.837] Reconnected to the node server
+[  node-2][11:39:34.907] Node successfully initialized
+[  node-1][11:39:34.919] Node successfully initialized
+[client: driver-2 - ClassServer] Reconnected to the class server
+[client: driver-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12102
+[driver-1][11:39:35.031] Reconnected to Peer-1@lolo-i2600.home:12102
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[driver-2][11:39:35.111] Reconnected to Peer-1@lolo-i2600.home:12101
+[client: driver-2 - TasksServer] Reconnected to the JPPF task server
+
+---------- end of output for class test.org.jppf.server.peer.TestMultiServerWithSSL ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12102
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12102
+[client: driver-2-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-2-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12102
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12102
+[client: driver-2-1 - ClassServer] Reconnected to the class server
+[client: driver-2-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-2-2 - ClassServer] Reconnected to the class server
+[client: driver-2-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+[client: driver-2-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-2-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12102
+[client: driver-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12102
+[client: driver-2 - ClassServer] Reconnected to the class server
+[client: driver-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes
+
+---------- end of output for class test.org.jppf.server.protocol.TestJPPFJobClientSLA ----------
+
+client process id: 9440
+[driver-1][11:39:59.489] Listening for transport dt_socket at address: 8001
+[  node-1][11:39:59.654] node process id: 11044
+[driver-1][11:39:59.677] driver process id: 16216
+client process id: 9440
+[driver-1][11:40:00.462] management initialized and listening on port 11201
+[driver-1][11:40:00.699] secure management initialized and listening on port 12201
+[driver-1][11:40:00.753] ClientClassServer initialized
+[driver-1][11:40:00.761] NodeClassServer initialized
+[driver-1][11:40:00.768] ClientJobServer initialized
+[driver-1][11:40:00.802] NodeJobServer initialized
+[driver-1][11:40:00.806] Acceptor initialized
+[driver-1][11:40:00.806] -  accepting plain connections on port 11101
+[driver-1][11:40:00.806] - accepting secure connections on port 12101
+[driver-1][11:40:00.811] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:40:01.598] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:40:02.655] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:40:03.291] initialized NodeTest
+[  node-1][11:40:03.531] JPPF Node management initialized
+[  node-1][11:40:03.547] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:40:04.548] Reconnected to the node server
+[  node-1][11:40:04.570] Node successfully initialized
+client process id: 9440
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+client process id: 9440
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:40:19.201] Listening for transport dt_socket at address: 8001
+[  node-1][11:40:19.375] node process id: 4944
+[  node-2][11:40:19.395] node process id: 13276
+[driver-1][11:40:19.412] driver process id: 4488
+[driver-1][11:40:20.237] management initialized and listening on port 11201
+[driver-1][11:40:20.477] secure management initialized and listening on port 12201
+[driver-1][11:40:20.527] ClientClassServer initialized
+[driver-1][11:40:20.535] NodeClassServer initialized
+[driver-1][11:40:20.542] ClientJobServer initialized
+[driver-1][11:40:20.573] NodeJobServer initialized
+[driver-1][11:40:20.577] Acceptor initialized
+[driver-1][11:40:20.577] -  accepting plain connections on port 11101
+[driver-1][11:40:20.577] - accepting secure connections on port 12101
+[driver-1][11:40:20.582] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-2][11:40:21.381] Attempting connection to the class server at 192.168.1.15:11101
+[  node-1][11:40:21.385] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-2][11:40:22.439] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:40:22.443] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:40:22.993] initialized NodeTest
+[  node-2][11:40:22.994] initialized NodeTest
+[  node-1][11:40:23.225] JPPF Node management initialized
+[  node-2][11:40:23.237] JPPF Node management initialized
+[  node-1][11:40:23.243] Attempting connection to the node server at 192.168.1.15:11101
+[  node-2][11:40:23.253] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:40:24.243] Reconnected to the node server
+[  node-2][11:40:24.253] Reconnected to the node server
+[  node-1][11:40:24.269] Node successfully initialized
+[  node-2][11:40:24.276] Node successfully initialized
+
+---------- end of output for class test.org.jppf.server.protocol.TestJPPFJobSLA ----------
+
+[  node-2][11:40:24.393] creating file 'testCancelJobUponClientDisconnect.tmp'
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:40:40.310] creating file 'node-n1.tmp'
+[  node-2][11:40:40.310] creating file 'node-n2.tmp'
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+[  node-2][11:40:50.455] creating file 'broadcast-node-n2.tmp'
+[  node-1][11:40:50.455] creating file 'broadcast-node-n1.tmp'
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 2 nodes and 1 client
+client process id: 9440
+[driver-1][11:41:00.716] Listening for transport dt_socket at address: 8001
+[  node-1][11:41:00.900] node process id: 8068
+[  node-2][11:41:00.926] node process id: 18384
+[driver-1][11:41:00.949] driver process id: 7140
+[driver-1][11:41:01.730] management initialized and listening on port 11201
+[driver-1][11:41:01.962] secure management initialized and listening on port 12201
+[driver-1][11:41:02.013] ClientClassServer initialized
+[driver-1][11:41:02.020] NodeClassServer initialized
+[driver-1][11:41:02.028] ClientJobServer initialized
+[driver-1][11:41:02.060] NodeJobServer initialized
+[driver-1][11:41:02.064] Acceptor initialized
+[driver-1][11:41:02.064] -  accepting plain connections on port 11101
+[driver-1][11:41:02.064] - accepting secure connections on port 12101
+[driver-1][11:41:02.068] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-2][11:41:02.816] Attempting connection to the class server at 192.168.1.15:11101
+[  node-1][11:41:02.816] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-2][11:41:03.875] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:41:03.875] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-2][11:41:04.438] initialized NodeTest
+[  node-1][11:41:04.439] initialized NodeTest
+[  node-2][11:41:04.695] JPPF Node management initialized
+[  node-1][11:41:04.697] JPPF Node management initialized
+[  node-2][11:41:04.712] Attempting connection to the node server at 192.168.1.15:11101
+[  node-1][11:41:04.713] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-2][11:41:05.713] Reconnected to the node server
+[  node-1][11:41:05.713] Reconnected to the node server
+[  node-2][11:41:05.739] Node successfully initialized
+[  node-1][11:41:05.739] Node successfully initialized
+
+---------- end of output for class test.org.jppf.server.protocol.TestJPPFJobSLA2 ----------
+
+[  node-2][11:41:06.257] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:41:06.258] sent object: UserObject[nodeUuid=n2, taskId=end: testDispatchExpirationSchedule - task 1]
+[  node-2][11:41:06.258] task testDispatchExpirationSchedule - task 1 successful
+[  node-2][11:41:08.074] Error on task testDispatchExpirationSchedule - task 2 : java.lang.InterruptedException: sleep interrupted
+[  node-2][11:41:09.120] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:41:09.120] sent object: UserObject[nodeUuid=n2, taskId=start: testMaxDispatchExpirations - task 1]
+[  node-2][11:41:10.119] Error on task testMaxDispatchExpirations - task 1 : java.lang.InterruptedException: sleep interrupted
+[  node-1][11:41:10.199] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-1][11:41:10.200] sent object: UserObject[nodeUuid=n1, taskId=start: testMaxDispatchExpirations - task 1]
+[  node-1][11:41:11.131] Error on task testMaxDispatchExpirations - task 1 : java.lang.InterruptedException: sleep interrupted
+[  node-2][11:41:11.142] sending notification : javax.management.Notification[source=org.jppf:name=test,type=node][type=NodeTest][message=]
+[  node-2][11:41:11.143] sent object: UserObject[nodeUuid=n2, taskId=start: testMaxDispatchExpirations - task 1]
+[  node-2][11:41:12.142] Error on task testMaxDispatchExpirations - task 1 : java.lang.InterruptedException: sleep interrupted
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:41:14.245] Listening for transport dt_socket at address: 8001
+[  node-1][11:41:14.418] node process id: 19292
+[driver-1][11:41:14.445] driver process id: 11380
+[driver-1][11:41:15.202] management initialized and listening on port 11201
+[driver-1][11:41:15.424] secure management initialized and listening on port 12201
+[driver-1][11:41:15.474] ClientClassServer initialized
+[driver-1][11:41:15.482] NodeClassServer initialized
+[driver-1][11:41:15.489] ClientJobServer initialized
+[driver-1][11:41:15.521] NodeJobServer initialized
+[driver-1][11:41:15.524] Acceptor initialized
+[driver-1][11:41:15.524] -  accepting plain connections on port 11101
+[driver-1][11:41:15.524] - accepting secure connections on port 12101
+[driver-1][11:41:15.529] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[  node-1][11:41:16.285] Attempting connection to the class server at 192.168.1.15:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[  node-1][11:41:17.342] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:41:17.980] initialized NodeTest
+[  node-1][11:41:18.216] JPPF Node management initialized
+[  node-1][11:41:18.232] Attempting connection to the node server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:41:19.233] Reconnected to the node server
+[  node-1][11:41:19.255] Node successfully initialized
+
+---------- end of output for class test.org.jppf.server.protocol.TestJPPFTask ----------
+
+[  node-1][11:41:19.370] this task's class loader = JPPFClassLoader[id=2, type=client, uuidPath=[4E2332BD-5A48-0806-5E3B-7427D1EB66AF, d1], offline=false, classpath=]
+client process id: 9440
+this task's class loader = sun.misc.Launcher$AppClassLoader@779c86c5
+result of MyCallable.call() = test successful
+result of MyCallable.call() = test successful
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+this task's class loader = sun.misc.Launcher$AppClassLoader@779c86c5
+isInNode() = false
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:11101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:11101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:41:26.420] this task's class loader = JPPFClassLoader[id=3, type=client, uuidPath=[98A23A70-B62B-CCB8-ED0D-C68B118DC4C7, d1], offline=false, classpath=]
+[  node-1][11:41:26.420] isInNode() = true
+[  node-1][11:41:26.438] this task's class loader = JPPFClassLoader[id=3, type=client, uuidPath=[98A23A70-B62B-CCB8-ED0D-C68B118DC4C7, d1], offline=false, classpath=]
+result of MyCallable.call() = test successful
+[  node-1][11:41:26.462] result of MyCallable.call() = test successful
+
+---------- end of output for class test.org.jppf.server.protocol.TestLocation ----------
+
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:41:29.179] Listening for transport dt_socket at address: 8001
+[  node-1][11:41:29.376] node process id: 17692
+[driver-1][11:41:29.410] driver process id: 4904
+[driver-1][11:41:30.272] management initialized and listening on port 11201
+[driver-1][11:41:30.516] secure management initialized and listening on port 12201
+[driver-1][11:41:30.566] ClientClassServer initialized
+[driver-1][11:41:30.574] NodeClassServer initialized
+[driver-1][11:41:30.581] ClientJobServer initialized
+[driver-1][11:41:30.613] NodeJobServer initialized
+[driver-1][11:41:30.616] Acceptor initialized
+[driver-1][11:41:30.616] -  accepting plain connections on port 11101
+[driver-1][11:41:30.616] - accepting secure connections on port 12101
+[driver-1][11:41:30.621] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[  node-1][11:41:31.419] Attempting connection to the class server at 192.168.1.15:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[  node-1][11:41:32.731] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:41:33.248] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:41:33.507] JPPF Node management initialized
+[  node-1][11:41:33.526] Attempting connection to the node server at 192.168.1.15:12101
+[  node-1][11:41:34.527] Reconnected to the node server
+[  node-1][11:41:34.560] Node successfully initialized
+
+---------- end of output for class test.org.jppf.ssl.TestSSL ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:41:49.453] Listening for transport dt_socket at address: 8001
+[  node-1][11:41:49.613] node process id: 19944
+[driver-1][11:41:49.653] driver process id: 18024
+[driver-1][11:41:50.405] management initialized and listening on port 11201
+[driver-1][11:41:50.634] secure management initialized and listening on port 12201
+[driver-1][11:41:50.684] ClientClassServer initialized
+[driver-1][11:41:50.692] NodeClassServer initialized
+[driver-1][11:41:50.699] ClientJobServer initialized
+[driver-1][11:41:50.731] NodeJobServer initialized
+[driver-1][11:41:50.735] Acceptor initialized
+[driver-1][11:41:50.735] -  accepting plain connections on port 11101
+[driver-1][11:41:50.735] - accepting secure connections on port 12101
+[driver-1][11:41:50.740] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[  node-1][11:41:51.493] Attempting connection to the class server at 192.168.1.15:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[  node-1][11:41:52.836] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:41:53.356] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:41:53.607] JPPF Node management initialized
+[  node-1][11:41:53.627] Attempting connection to the node server at 192.168.1.15:12101
+[  node-1][11:41:54.628] Reconnected to the node server
+[  node-1][11:41:54.659] Node successfully initialized
+
+---------- end of output for class test.org.jppf.ssl.TestSSL2 ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+performing setup with 1 drivers, 1 nodes and 1 client
+client process id: 9440
+[driver-1][11:42:09.496] Listening for transport dt_socket at address: 8001
+[  node-1][11:42:09.657] node process id: 17468
+[driver-1][11:42:09.690] driver process id: 2116
+[driver-1][11:42:10.553] management initialized and listening on port 11201
+[driver-1][11:42:10.800] secure management initialized and listening on port 12201
+[driver-1][11:42:10.851] ClientClassServer initialized
+[driver-1][11:42:10.859] NodeClassServer initialized
+[driver-1][11:42:10.866] ClientJobServer initialized
+[driver-1][11:42:10.899] NodeJobServer initialized
+[driver-1][11:42:10.902] Acceptor initialized
+[driver-1][11:42:10.902] -  accepting plain connections on port 11101
+[driver-1][11:42:10.902] - accepting secure connections on port 12101
+[driver-1][11:42:10.907] JPPF Driver initialization complete
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[  node-1][11:42:11.697] Attempting connection to the class server at 192.168.1.15:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[  node-1][11:42:13.005] RemoteClassLoaderConnection: Reconnected to the class server
+[  node-1][11:42:13.523] initialized NodeTest
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+[  node-1][11:42:13.774] JPPF Node management initialized
+[  node-1][11:42:13.794] Attempting connection to the node server at 192.168.1.15:12101
+[  node-1][11:42:14.794] Reconnected to the node server
+[  node-1][11:42:14.827] Node successfully initialized
+
+---------- end of output for class test.org.jppf.ssl.TestSSL3 ----------
+
+client process id: 9440
+[client: driver-1-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-2 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1-1 - ClassServer] Reconnected to the class server
+[client: driver-1-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-2 - ClassServer] Reconnected to the class server
+[client: driver-1-2 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1-1 - TasksServer] Reconnected to the JPPF task server
+[client: driver-1-2 - TasksServer] Reconnected to the JPPF task server
+client process id: 9440
+[client: driver-1 - ClassServer] Attempting connection to the class server at lolo-i2600.home:12101
+[client: driver-1 - ClassServer] Reconnected to the class server
+[client: driver-1 - TasksServer] Attempting connection to the JPPF task server at 192.168.1.15:12101
+[client: driver-1 - TasksServer] Reconnected to the JPPF task server
+
+---------- end of output for class test.org.jppf.utils.TestJPPFConfiguration ----------
+
+
+---------- end of output for class test.org.jppf.utils.TestJPPFUuid ----------
+
+
+---------- end of output for class test.org.jppf.utils.TestRange ----------
+
+
+---------- end of output for class test.org.jppf.utils.TestTypedProperties ----------
+
+There is a problem in the configuration: it has cyclic include statements leading to java.lang.StackOverflowError: null

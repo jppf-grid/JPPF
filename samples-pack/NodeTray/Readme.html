@@ -1,0 +1,100 @@
+<html>
+
+	<head>
+		<title>JPPF Samples Pack</title>
+		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+		<link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+	</head>
+
+	<body>
+		<div align="center">
+			<div class="gwrapper" align="center">
+
+				<!-- start header -->
+				<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+				<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+					<tr style="height: 80px">
+						<td width="20"></td>
+						<td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+						<td valign="center"><h1>Node Tray sample</h1></td>
+						<td width="20"></td>
+					</tr>
+				</table>
+				<!-- end header -->
+
+				<!-- start content -->
+				<div align="left" style="margin: 10px">
+					<!-- ${SAMPLE_START_CONTENT} -->
+					<h3>What does the sample do?</h3>
+					This sample provides a node health monitor that sits in the system tray.<br>
+					It displays the following information:
+					<ul>
+						<li>A "computer" icon in the system tray, which turns green when the node is connected to a server, and red when it is disconnected</li>
+						<li>System tray notifications when the node status changes</li>
+						<li>Information about the node's performance and connection to a JPPF server, when the mouse is hovering over the icon</li>
+					</ul>
+					<p>Here are some screenshots:
+					<p align="center">
+					<table border="0" cellspacing="10" cellpadding="0">
+						<tr><td align="center"><img src="images/NodeTrayAddon-01.gif" border="0"/></td><td align="center"><img src="images/NodeTrayAddon-03.gif" border="0"/></td></tr>
+						<tr><td align="center" colspan="2"><img src="images/NodeTrayAddon-02.gif" border="0"/></td></tr>
+					</table>
+
+					<h3>How do I run it?</h3>
+					Before running this sample application, you need to install a JPPF server and at least one node.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+					Once you have installed a server and node, perform the following steps:
+					<ol>
+						<li>open a command prompt in JPPF-x.y-samples-pack/NodeTray</li>
+						<li><b>important</b>: to build this sample you need a <b>JDK 1.6 or later</b>, as the system tray APIs are not available in prior Java versions</li>
+						<li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create a file named <b>NodeTray.jar</b></li>
+						<li>copy NodeTray.jar in the "lib" folder of the JPPF node installation, to add it to the node's classpath. This is enough to deploy the add-on.</li>
+						<li>start the server and node</li>
+						<li>you should see the new system tray icon</li>
+					</ol>
+
+					<h3>What features of JPPF are demonstrated?</h3>
+					<ul>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">JPPF node life cycle notifications</a></li>
+						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Node_management#Subscribing_to_MBean_notifications">Subscribing to task-level JMX notifications</a></li>
+					</ul>
+
+					<h3>I have additional questions and comments, where can I go?</h3>
+					<p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.
+					<p>In addition, There are 2 privileged places you can go to:
+					<ul>
+						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+						<li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
+					</ul>
+					<!-- ${SAMPLE_END_CONTENT} -->
+				</div>
+				<!-- end content -->
+
+				<!-- start footer -->
+				<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+					<tr>
+						<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+						<td align="right">
+							<a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+							<a href="http://sourceforge.net/projects/jppf-project">
+								<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+									alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+							</a>
+						</td>
+						<td style="width: 10px"></td>
+					</tr>
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+				</table>
+				<div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+				<!-- end footer -->
+
+			</div>
+		</div>
+
+	</body>
+
+</html>
