@@ -22,9 +22,9 @@ import java.io.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.serialization.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 
 import sample.dist.tasklength.LongTask;
 
@@ -60,7 +60,7 @@ public class Test {
   {
     JPPFJob job = new JPPFJob();
     job.setName("my job id");
-    JPPFTask task = new LongTask(1000);
+    Task<String> task = new LongTask(1000);
     task.setId("someID");
     task.setResult("result");
     task.setThrowable(new JPPFException("exception"));

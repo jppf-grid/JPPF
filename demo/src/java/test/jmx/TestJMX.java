@@ -29,7 +29,6 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
@@ -130,7 +129,7 @@ public class TestJMX
       job.setName("job" + (i+1));
       for (int j=0; j<nbTasks; j++)
       {
-        JPPFTask task = new LongTask(100L);
+        Task<String> task = new LongTask(100L);
         task.setTimeoutSchedule(new JPPFSchedule(50L));
         job.add(task).setId(String.valueOf(j+1));
       }

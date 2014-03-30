@@ -25,17 +25,15 @@ import java.util.*;
  * 
  * @author Laurent Cohen
  */
-public class TestCounters
-{
+public class TestCounters {
   /**
    * 
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     try {
       // do some warmup.
-      int warmupIterations = 10_000;
+      int warmupIterations = 100_000;
       System.out.println("starting warmup");
       test(new LongCounterSynchronized(), 1, warmupIterations);
       test(new LongCounterLock(), 1, warmupIterations);
@@ -46,12 +44,11 @@ public class TestCounters
       Map<String, List<TimeAndCpu>> results = new LinkedHashMap<>();
       int length = "LongCounter".length();
       for (int i=0; i<threadCounts.length; i++) {
-        LongCounter[] counters = { new LongCounterSynchronized(), new LongCounterLock(), new LongCounterAtomic() };
+        LongCounter[] counters = { new LongCounterAtomic(), new LongCounterSynchronized(), new LongCounterLock() };
         int nbThreads = threadCounts[i];
         int iterations = max_iterations / nbThreads;
         System.out.printf("Testing  with %,d threads and %,d iterations per thread\n", nbThreads, iterations);
-        for (LongCounter counter: counters)
-        {
+        for (LongCounter counter: counters) {
           String name = counter.getClass().getSimpleName().substring(length);
           TimeAndCpu res = test(counter, nbThreads, iterations);
           System.out.printf("  %-12s done in %,d ms, avg cpu load = %.3f %%\n", name, res.time, 100d * res.cpuLoad);
@@ -74,7 +71,7 @@ public class TestCounters
    * @param counter the counter to test.
    * @param nbThreads the number of threads to use.
    * @param iterations the number of iterations to run for each thread.
-   * @return the test eklapsed time in nanoseconds.
+   * @return the test elapsed time in nanoseconds.
    * @throws Exception if any error occurs.
    */
   private static TimeAndCpu test(final LongCounter counter, final int nbThreads, final int iterations) throws Exception {
@@ -121,7 +118,7 @@ public class TestCounters
    */
   private static class TimeAndCpu {
     /**
-     * Elapsed time.
+     * Elapsed time in nanoseconds.
      */
     public final long time;
     /**

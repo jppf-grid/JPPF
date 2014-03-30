@@ -57,12 +57,7 @@ public class JobManagementTestRunner
     JPPFJob job = new JPPFJob(jobName);
     job.setName(jobName);
     job.setBlocking(false);
-    for (int i=0; i<nbTasks; i++)
-    {
-      JPPFTask task = new LongTask(duration);
-      task.setId(jobName + " - task " + i);
-      job.add(task);
-    }
+    for (int i=0; i<nbTasks; i++) job.add(new LongTask(duration)).setId(jobName + " - task " + i);
     JPPFResultCollector collector = new JPPFResultCollector(job);
     job.setResultListener(collector);
     client.submitJob(job);

@@ -22,8 +22,7 @@ package test.counters;
  * 
  * @author Laurent Cohen
  */
-public interface LongCounter
-{
+public interface LongCounter {
   /**
    * Increment this counter and get the new value.
    * @return the old value + 1.

@@ -24,7 +24,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.concurrent.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
@@ -97,12 +97,7 @@ public class LongTaskRunner
         long start = System.currentTimeMillis();
         JPPFJob job = new JPPFJob();
         job.setName("Long task iteration " + iter);
-        for (int i=0; i<nbTasks; i++)
-        {
-          LongTask task = new LongTask(length, false);
-          task.setId("" + iter + ':' + (i+1));
-          job.add(task);
-        }
+        for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
         // submit the tasks for execution
         List<Task<?>> results = jppfClient.submitJob(job);
         for (Task task: results)
@@ -256,18 +251,18 @@ public class LongTaskRunner
   /**
    * A <code>Callable</code> wrapper around a <code>JPPFTask</code>.
    */
-  public static class JPPFTaskCallable extends JPPFTask implements JPPFCallable<Object>
+  public static class JPPFTaskCallable extends AbstractTask<Object> implements JPPFCallable<Object>
   {
     /**
      * The task to run.
      */
-    private JPPFTask task = null;
+    private AbstractTask task = null;
 
     /**
      * Initialize this callable with the specified jppf task.
      * @param task a <code>JPPFTask</code> instance.
      */
-    public JPPFTaskCallable(final JPPFTask task)
+    public JPPFTaskCallable(final AbstractTask task)
     {
       this.task = task;
     }

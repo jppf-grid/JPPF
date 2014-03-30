@@ -24,7 +24,6 @@ import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -144,12 +143,7 @@ public class LocalExecutionRunner
         JPPFJob job = new JPPFJob();
         job.setName("job " + i);
         job.setBlocking(false);
-        for (int j=0; j<nbTasks; j++)
-        {
-          JPPFTask task = new LongTask(length, false);
-          task.setId("task " + i + ':' + j);
-          job.add(task);
-        }
+        for (int j=0; j<nbTasks; j++) job.add(new LongTask(length)).setId("task " + i + ':' + j);
         job.setResultListener(new JPPFResultCollector(job));
         jobs.add(job);
       }

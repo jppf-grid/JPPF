@@ -17,15 +17,14 @@
  */
 package sample.dist.tasklength;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.slf4j.*;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
-public class LongTask extends JPPFTask
-{
+public class LongTask extends AbstractTask<String> {
   /**
    * Logger.
    */
@@ -33,86 +32,68 @@ public class LongTask extends JPPFTask
   /**
    * Determines how long this task will run.
    */
-  private long taskLength = 0L;
-  /**
-   * Timestamp marking the time when the task execution starts.
-   */
-  private long taskStart = 0L;
+  private final long taskLength;
   /**
    * Determines this task's behavior: false if it should just sleep during its allocated time, or true if it should
    * do some make-do work that uses the cpu.
    */
-  private boolean useCPU = false;
+  private final boolean useCPU;
+  /**
+   * Whether this task was cancelled.
+   */
+  private boolean cancelled = false;
+  /**
+   * Whether this task timeout.
+   */
+  private boolean timeout = false;
 
   /**
    * Default constructor.
    */
-  public LongTask()
-  {
-  }
-
-  /**
-   * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
-   * @param taskLength - determines how long this task will run.
-   * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
-   */
-  public LongTask(final long taskLength, final boolean useCPU)
-  {
-    this.taskLength = taskLength;
-    this.useCPU = useCPU;
+  public LongTask() {
+    this(0L, false);
   }
 
   /**
    * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
    * @param taskLength determines how long this task will run.
    */
-  public LongTask(final long taskLength)
-  {
+  public LongTask(final long taskLength) {
     this(taskLength, false);
   }
 
   /**
-   * Perform the execution of this task.
-   * @see sample.BaseDemoTask#doWork()
+   * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
+   * @param taskLength determines how long this task will run.
+   * @param useCPU determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
    */
+  public LongTask(final long taskLength, final boolean useCPU) {
+    this.taskLength = taskLength;
+    this.useCPU = useCPU;
+  }
+
   @Override
-  public void run()
-  {
-    //System.out.println("Starting task " + getId());
-    taskStart = System.currentTimeMillis();
+  public void run() {
+    long taskStart = System.currentTimeMillis();
     long elapsed = 0L;
-    try
-    {
-      if (useCPU)
-      {
-        for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
-        {
+    try {
+      if (useCPU) {
+        for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart) {
           String s = "";
           for (int i=0; i<10; i++) s += "A10";
         }
-      }
-      else
-      {
+      } else {
         if (taskLength > 0) Thread.sleep(taskLength);
         elapsed = System.currentTimeMillis() - taskStart;
       }
       setResult("task has run for " + elapsed + " ms");
-      //System.out.println("Task " + getId() + " complete");
-    }
-    catch(InterruptedException e)
-    {
-      //setException(e);
+    } catch(InterruptedException e) {
       setResult(e.getClass().getName() + " : " + e.getMessage());
     }
   }
 
-  /**
-   * Called when this task is cancelled.
-   * @see org.jppf.server.protocol.JPPFTask#onCancel()
-   */
   @Override
-  public void onCancel()
-  {
+  public void onCancel() {
     String s = "task " + getId() + " has been cancelled";
     setResult(s);
     System.out.println(s);
