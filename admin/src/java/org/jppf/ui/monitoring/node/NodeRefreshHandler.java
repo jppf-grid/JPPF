@@ -171,7 +171,10 @@ public class NodeRefreshHandler
       if (debugEnabled) log.debug(e.getMessage(), e);
       return;
     }
-    if (nodesInfo == null) return;
+    if (nodesInfo == null) {
+      nodeDataPanel.driverRemoved(driverUuid, true);
+      return;
+    }
     Map<String, JPPFManagementInfo> actualMap = new HashMap<>();
     for (JPPFManagementInfo info: nodesInfo) {
       if (info.getPort() >= 0) actualMap.put(info.getUuid(), info);
