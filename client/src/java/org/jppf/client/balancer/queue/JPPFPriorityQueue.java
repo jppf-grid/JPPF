@@ -425,7 +425,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
 
   /**
    * Get all the {@link JPPFJob}s currently in the queue.
-   * @return a list of {@link JPPFJob} instances ordered by their priority.Q8mebrid
+   * <p>This method should be used with caution, as its cost is in O(n), with n being the number of jobs in the queue.
+   * @return a list of {@link JPPFJob} instances ordered by their priority.
+   * @since 4.1
    */
   public List<JPPFJob> getJPPFJobs() {
     lock.lock();

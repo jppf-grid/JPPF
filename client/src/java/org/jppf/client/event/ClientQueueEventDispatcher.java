@@ -28,6 +28,7 @@ import org.jppf.queue.*;
 public class ClientQueueEventDispatcher implements QueueListener<ClientJob, ClientJob, ClientTaskBundle> {
   @Override
   public void bundleAdded(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
+
   }
 
   @Override

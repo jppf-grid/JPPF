@@ -40,8 +40,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class SubmissionManagerClient extends ThreadSynchronization implements SubmissionManager
-{
+public class SubmissionManagerClient extends ThreadSynchronization implements SubmissionManager {
   /**
    * Logger for this class.
    */
@@ -105,8 +104,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param client JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
-  public SubmissionManagerClient(final AbstractGenericClient client) throws Exception
-  {
+  public SubmissionManagerClient(final AbstractGenericClient client) throws Exception {
     if (client == null) throw new IllegalArgumentException("client is null");
 
     this.localEnabled = client.getConfig().getBoolean("jppf.local.execution.enabled", false);
@@ -123,6 +121,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       }
     });
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
+    this.queue.addQueueListener(client);
 
     client.addClientListener(new ClientListener() {
       @Override
@@ -144,8 +143,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param wrapper the connection wrapper to add.
    */
-  protected synchronized void addConnection(final ChannelWrapper wrapper)
-  {
+  protected synchronized void addConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
 
@@ -203,8 +201,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param connection the client connection to remove.
    * @return wrapper for the removed client connection or null.
    */
-  protected synchronized ChannelWrapper removeConnection(final JPPFClientConnection connection)
-  {
+  protected synchronized ChannelWrapper removeConnection(final JPPFClientConnection connection) {
     ChannelWrapper wrapper = wrapperMap.remove(connection);
     if (wrapper != null) removeConnection(wrapper);
     return wrapper;
@@ -214,8 +211,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Get all the client connections handled by this manager.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
-  public synchronized List<ChannelWrapper> getAllConnections()
-  {
+  public synchronized List<ChannelWrapper> getAllConnections() {
     return new ArrayList<>(allConnections);
   }
 
@@ -223,8 +219,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Dtermine whether there is at east one connection, idle or not.
    * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
    */
-  public synchronized boolean hasWorkingConnection()
-  {
+  public synchronized boolean hasWorkingConnection() {
     return nbWorkingConnections.get() > 0;
   }
 
@@ -232,13 +227,10 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param connection       the client connection.
    * @param oldStatus the connection status before the change.
    */
-  private void updateConnectionStatus(final JPPFClientConnection connection, final JPPFClientConnectionStatus oldStatus)
-  {
+  private void updateConnectionStatus(final JPPFClientConnection connection, final JPPFClientConnectionStatus oldStatus) {
     ChannelWrapper wrapper = wrapperMap.get(connection);
-    if (wrapper != null)
-    {
-      if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE)
-      {
+    if (wrapper != null) {
+      if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
 
@@ -257,8 +249,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param wrapper   the connection wrapper.
    * @param oldStatus the connection status before the change.
    */
-  private void updateConnectionStatus(final ChannelWrapper wrapper, final JPPFClientConnectionStatus oldStatus)
-  {
+  private void updateConnectionStatus(final ChannelWrapper wrapper, final JPPFClientConnectionStatus oldStatus) {
     if (wrapper == null) return;
     updateConnectionStatus(wrapper, oldStatus, wrapper.getStatus());
   }
@@ -268,15 +259,13 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
    */
-  private void updateConnectionStatus(final ChannelWrapper wrapper, final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus)
-  {
+  private void updateConnectionStatus(final ChannelWrapper wrapper, final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (wrapper == null || oldStatus == newStatus) return;
 
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) taskQueueChecker.addIdleChannel(wrapper);
-    else
-    {
+    else {
       taskQueueChecker.removeIdleChannel(wrapper);
       if(newStatus == JPPFClientConnectionStatus.FAILED || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
@@ -287,18 +276,15 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
-  public String submitJob(final JPPFJob job)
-  {
+  public String submitJob(final JPPFJob job) {
     return submitJob(job, null);
   }
 
   @Override
-  public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
-  {
+  public String submitJob(final JPPFJob job, final SubmissionStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     List<Task<?>> pendingTasks = new ArrayList<>();
-    if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector))
-    {
+    if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector)) {
       ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
     }
     List<Task<?>> tasks = job.getJobTasks();
@@ -308,34 +294,29 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
-  public String resubmitJob(final JPPFJob job)
-  {
+  public String resubmitJob(final JPPFJob job) {
     return submitJob(job);
   }
 
   @Override
-  public boolean cancelJob(final String jobId) throws Exception
-  {
+  public boolean cancelJob(final String jobId) throws Exception {
     if (debugEnabled) log.debug("requesting cancel of jobId=" + jobId);
     queue.cancelJob(jobId);
     return true;
   }
 
   @Override
-  public synchronized boolean hasAvailableConnection()
-  {
+  public synchronized boolean hasAvailableConnection() {
     return taskQueueChecker.hasIdleChannel() || wrapperLocal != null && wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE;
   }
 
   @Override
-  public synchronized boolean isLocalExecutionEnabled()
-  {
+  public synchronized boolean isLocalExecutionEnabled() {
     return localEnabled;
   }
 
   @Override
-  public synchronized void setLocalExecutionEnabled(final boolean localExecutionEnabled)
-  {
+  public synchronized void setLocalExecutionEnabled(final boolean localExecutionEnabled) {
     if (this.localEnabled == localExecutionEnabled) return;
     this.localEnabled = localExecutionEnabled;
     updateLocalExecution(this.localEnabled);
@@ -345,23 +326,16 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
    * Starts or stops local execution node according to specified parameter.
    * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
    */
-  protected synchronized void updateLocalExecution(final boolean localExecutionEnabled)
-  {
+  protected synchronized void updateLocalExecution(final boolean localExecutionEnabled) {
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
-    if (localExecutionEnabled)
-    {
+    if (localExecutionEnabled) {
       wrapperLocal = new ChannelWrapperLocal();
       wrapperLocal.addClientConnectionStatusListener(statusListener);
       addConnection(wrapperLocal);
-    }
-    else if (wrapperLocal != null)
-    {
-      try
-      {
+    } else if (wrapperLocal != null) {
+      try {
         wrapperLocal.close();
-      }
-      finally
-      {
+      } finally {
         removeConnection(wrapperLocal);
         wrapperLocal = null;
       }
@@ -369,14 +343,11 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
-  public Vector<JPPFClientConnection> getAvailableConnections()
-  {
+  public Vector<JPPFClientConnection> getAvailableConnections() {
     List<ChannelWrapper> idleChannels = taskQueueChecker.getIdleChannels();
     Vector<JPPFClientConnection> availableConnections = new Vector<>(idleChannels.size());
-    for (ChannelWrapper idleChannel : idleChannels)
-    {
-      if (idleChannel instanceof ChannelWrapperRemote)
-      {
+    for (ChannelWrapper idleChannel : idleChannels) {
+      if (idleChannel instanceof ChannelWrapperRemote) {
         ChannelWrapperRemote wrapperRemote = (ChannelWrapperRemote) idleChannel;
         availableConnections.add(wrapperRemote.getChannel());
       }
@@ -385,16 +356,13 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
-  public ClientConnectionStatusListener getClientConnectionStatusListener()
-  {
+  public ClientConnectionStatusListener getClientConnectionStatusListener() {
     return this.statusListener;
   }
 
   @Override
-  public void reset()
-  {
-    synchronized(this)
-    {
+  public void reset() {
+    synchronized(this) {
       for (ChannelWrapper channel: allConnections) channel.close();
       allConnections.clear();
       if (taskQueueChecker != null) taskQueueChecker.clearChannels();
@@ -402,20 +370,17 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     if (debugEnabled) log.debug("closing {}", this);
     closed.set(true);
     setStopped(true);
     wakeUp();
-    if (taskQueueChecker != null)
-    {
+    if (taskQueueChecker != null) {
       taskQueueChecker.setStopped(true);
       taskQueueChecker.wakeUp();
     }
     queue.close();
-    synchronized(this)
-    {
+    synchronized(this) {
       for (ChannelWrapper channel: allConnections) channel.close();
       allConnections.clear();
     }

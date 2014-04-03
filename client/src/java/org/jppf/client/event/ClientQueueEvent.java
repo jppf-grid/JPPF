@@ -18,7 +18,7 @@
 
 package org.jppf.client.event;
 
-import java.util.EventObject;
+import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.queue.JPPFPriorityQueue;
@@ -33,6 +33,10 @@ public class ClientQueueEvent extends EventObject {
    * The job this event is for.
    */
   private final JPPFJob job;
+  /**
+   * The job queue from which this event originates.
+   */
+  private final JPPFPriorityQueue queue;
 
   /**
    * Initialize this event with the specified source JPPF client and Job.
@@ -40,9 +44,10 @@ public class ClientQueueEvent extends EventObject {
    * @param job the job this event is for.
    * @param queue the job queue which emitted this event.
    */
-  public ClientQueueEvent(final JPPFClient client, final JPPFJob job, final JPPFPriorityQueue queue) {
+  public ClientQueueEvent(final AbstractGenericClient client, final JPPFJob job, final JPPFPriorityQueue queue) {
     super(client);
     this.job = job;
+    this.queue = queue;
   }
 
   /**
@@ -54,10 +59,28 @@ public class ClientQueueEvent extends EventObject {
   }
 
   /**
-   * Get the job this event is for.
+   * Get the job that was added or removed.
    * @return a {@link JPPFJob} instance.
    */
   public JPPFJob getJob() {
     return job;
+  }
+
+  /**
+   * Get all the {@link JPPFJob}s currently in the queue.
+   * <p>This method should be used with caution, as its cost is in O(n), with n being the number of jobs in the queue.
+   * @return a list of {@link JPPFJob} instances ordered by their priority.
+   */
+  public List<JPPFJob> getQueuedJobs() {
+    return queue.getJPPFJobs();
+  }
+
+  /**
+   * Get the size of this job queue.
+   * <p>This method should be used with caution, as its cost is in O(n), with n being the number of jobs in the queue.
+   * @return the number of jobs currently in the queue.
+   */
+  public int getQueueSize() {
+    return queue.getQueueSize();
   }
 }

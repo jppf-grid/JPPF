@@ -278,12 +278,10 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
 
   /**
    * Shutdown this client and retrieve all pending executions for resubmission.
-   * @return a list of <code>JPPFJob</code> instances to resubmit; this list may be empty, but never null.
-   * @see org.jppf.client.JPPFClientConnection#close()
    */
   @Override
-  public List<JPPFJob> close() {
-    if (!closed.compareAndSet(false, true)) return null;
+  public void close() {
+    if (!closed.compareAndSet(false, true)) return;
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();
@@ -306,7 +304,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     }
     if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + toDebugString() + " closed");
-    return list;
   }
 
   @Override

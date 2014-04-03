@@ -316,14 +316,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   }
 
   /**
-   * Shutdown this client and retrieve all pending executions for resubmission.
-   * @return a list of <code>JPPFJob</code> instances to resubmit.
-   * @see org.jppf.client.JPPFClientConnection#close()
-   */
-  @Override
-  public abstract List<JPPFJob> close();
-
-  /**
    * Get the name assigned to this client connection.
    * @return the name as a string.
    * @see org.jppf.client.JPPFClientConnection#getName()

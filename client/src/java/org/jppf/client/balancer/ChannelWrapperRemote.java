@@ -24,12 +24,13 @@ import java.util.concurrent.Executors;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -228,7 +229,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       Exception exception = null;
       List<Task<?>> tasks = this.clientBundle.getTasksL();
       AbstractGenericClient client = connection.getClient();
-      AbstractGenericClient.RegisteredClassLoader registeredClassLoader = null;
+      RegisteredClassLoader registeredClassLoader = null;
       try {
         long start = System.nanoTime();
         int count = 0;

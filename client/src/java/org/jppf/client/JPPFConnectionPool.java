@@ -88,6 +88,7 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
    * @param priority the priority of the connectios in this pool.
    * @param coreSize the core size of this pool.
    * @param sslEnabled determines whether the pool is for SSL connections.
+   * @exclude
    */
   JPPFConnectionPool(final AbstractGenericClient client, final int id, final String name, final int priority, final int coreSize, final boolean sslEnabled) {
     this.client = client;
@@ -102,6 +103,7 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
   /**
    * Get the next client connection.
    * @return a <code>JPPFClientConnection</code> instances.
+   * @exclude
    */
   synchronized JPPFClientConnection nextConnection() {
     if (connections.isEmpty()) return null;
@@ -144,6 +146,7 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
    * Add a driver connection to this pool.
    * @param client the connection too add.
    * @return true if the underlying list of connections changed as a result of calling this method.
+   * @exclude
    */
   synchronized boolean add(final JPPFClientConnection client) {
     return connections.add(client);
@@ -153,6 +156,7 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
    * Remove a driver connection from this pool.
    * @param client the connection too remove.
    * @return true if the underlying list of connections changed as a result of calling this method.
+   * @exclude
    */
   synchronized boolean remove(final JPPFClientConnection client) {
     if (connections.remove(client)) {
@@ -160,6 +164,23 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
       return true;
     }
     return false;
+  }
+
+  /**
+   * Get the index of the last used connection in this pool.
+   * @return the last used index as an int.
+   * @exclude
+   */
+  private int getLastUsedIndex() {
+    return lastUsedIndex;
+  }
+
+  /**
+   * Get the id of this pool.
+   * @return the id as an int value.
+   */
+  public int getId() {
+    return id;
   }
 
   /**
@@ -171,11 +192,19 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
   }
 
   /**
-   * Get the index of the last used connection in this pool.
-   * @return the last used index as an int.
+   * Check whether this pool is for SSL connections.
+   * @return {@code true} if SSL is enabled, false otherwise.
    */
-  private int getLastUsedIndex() {
-    return lastUsedIndex;
+  public boolean isSslEnabled() {
+    return sslEnabled;
+  }
+
+  /**
+   * Get the name of this pool.
+   * @return this connection pool's name.
+   */
+  public String getName() {
+    return name;
   }
 
   /**
@@ -186,18 +215,17 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
     return !connections.isEmpty() ? connections.get(0).getDriverUuid() : null;
   }
 
-  @Override
-  public int compareTo(final JPPFConnectionPool o) {
-    if (o == null) return 1;
-    return priority > o.priority ? -1 : (priority < o.priority ? 1 : 0);
-  }
-
   /**
-   * Get the id of this pool.
-   * @return the id as an int value.
+   * Compares this connection pool with another, based on their respective priorities.
+   * <p>This comparison defines an ordering of connection pools by their <b><i>descending</i></b> priority.
+   * @param other the other connection pool to compare with.
+   * @return -1 if this pool's priority is greater than the other pool's, 0 if the priorities are equal,
+   * +1 if this pool's priority is less than the other pool's.
    */
-  public int getId() {
-    return id;
+  @Override
+  public int compareTo(final JPPFConnectionPool other) {
+    if (other == null) return 1;
+    return priority > other.priority ? -1 : (priority < other.priority ? 1 : 0);
   }
 
   @Override
@@ -211,6 +239,14 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     return id == ((JPPFConnectionPool) obj).id;
+  }
+
+  /**
+   * Get the core size of this connection pool.
+   * @return the core size as an int value.
+   */
+  public int getCoreSize() {
+    return coreSize;
   }
 
   /**
@@ -261,14 +297,6 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
   }
 
   /**
-   * Get the core size of this connection pool.
-   * @return the core size as an int value.
-   */
-  public int getCoreSize() {
-    return coreSize;
-  }
-
-  /**
    * Get a list of connections held by this pool. The returned list is independent from this pool,
    * thus changing, adding or removing elements has not effect on the pool.
    * @return a list of {@link JPPFClientConnection} instances.
@@ -289,19 +317,6 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
       if (connectionMatchesStatus(c, statuses)) list.add(c);
     }
     return list;
-  }
-
-  /**
-   * Get the number of connections held by this pool whose status is one of the specified statuses.
-   * @param statuses an array of {@link JPPFClientConnectionStatus} values to check against.
-   * @return the number of matching connections.
-   */
-  public synchronized int getNbConnections(final JPPFClientConnectionStatus...statuses) {
-    int count = 0;
-    for (JPPFClientConnection c: connections) {
-      if (connectionMatchesStatus(c, statuses)) count++;
-    }
-    return count;
   }
 
   @Override
@@ -337,22 +352,6 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
       if (status == s) return false;
     }
     return true;
-  }
-
-  /**
-   * Check whether this pool is for SSL connections.
-   * @return {@code true} if SSL is enabled, false otherwise.
-   */
-  public boolean isSslEnabled() {
-    return sslEnabled;
-  }
-
-  /**
-   * Get the name of this pool.
-   * @return this connection pool's name.
-   */
-  public String getName() {
-    return name;
   }
 
   @Override

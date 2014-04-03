@@ -21,7 +21,7 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.classloader.*;
-import org.jppf.client.AbstractGenericClient.RegisteredClassLoader;
+import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.IOHelper;
 import org.jppf.utils.JPPFIdentifiers;

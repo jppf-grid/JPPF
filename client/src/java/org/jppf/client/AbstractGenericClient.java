@@ -17,15 +17,18 @@
  */
 package org.jppf.client;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.*;
 
+import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
+import org.jppf.client.balancer.*;
+import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
+import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
-import org.jppf.utils.collections.*;
 import org.jppf.utils.configuration.ConfigurationHelper;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
@@ -38,7 +41,7 @@ import org.slf4j.*;
  * the uuid has changed or not.
  * @author Laurent Cohen
  */
-public abstract class AbstractGenericClient extends AbstractJPPFClient {
+public abstract class AbstractGenericClient extends AbstractJPPFClient implements QueueListener<ClientJob, ClientJob, ClientTaskBundle> {
   /**
    * Logger for this class.
    */
@@ -70,10 +73,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   protected JPPFMulticastReceiverThread receiverThread = null;
   /**
-   * Mapping of registered class loaders.
-   */
-  private final CollectionMap<String, RegisteredClassLoader> classLoaderRegistrations = new SetHashMap<>();
-  /**
    * Determines whether SSL communication is on or off.
    */
   protected boolean sslEnabled = false;
@@ -81,6 +80,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * The submission manager.
    */
   private SubmissionManager submissionManager;
+  /**
+   * Handles the class loaders used for inbound class loading requests from the servers.
+   */
+  private final ClassLoaderRegistrationHandler classLoaderRegistrationHandler;
+  /**
+   * The list of listeners on the queue associated with this client.
+   */
+  private final List<ClientQueueListener> queueListeners = new CopyOnWriteArrayList<>();
 
   /**
    * Initialize this client with a specified application UUID.
@@ -90,6 +97,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    */
   public AbstractGenericClient(final String uuid, final TypedProperties configuration, final ClientListener... listeners) {
     super(uuid);
+    this.classLoaderRegistrationHandler = new ClassLoaderRegistrationHandler();
     for (ClientListener listener : listeners) addClientListener(listener);
     init(configuration);
   }
@@ -321,7 +329,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
       executor = null;
     }
     if (debugEnabled) log.debug("clearing registered class loaders");
-    classLoaderRegistrations.clear();
+    classLoaderRegistrationHandler.close();
     super.close();
   }
 
@@ -425,21 +433,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @exclude
    */
   public RegisteredClassLoader getRegisteredClassLoader(final String uuid) {
-    if (uuid == null) throw new IllegalArgumentException("uuid is null");
-    synchronized (classLoaderRegistrations) {
-      Collection<RegisteredClassLoader> c = classLoaderRegistrations.getValues(uuid);
-      if ((c == null) || c.isEmpty()) {
-        //throw new IllegalStateException("no class loader found for requestUuid=" + uuid);
-        // workaround for bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-237
-        if (debugEnabled) log.debug("job '{}' may have been submitted by a different client instance, looking for an alternate class loader", uuid);
-        Iterator<RegisteredClassLoader> it = classLoaderRegistrations.iterator();
-        if (it.hasNext()) return it.next();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null) cl = getClass().getClassLoader();
-        return new RegisteredClassLoader(uuid, cl);
-      }
-      return c.iterator().next();
-    }
+    return classLoaderRegistrationHandler.getRegisteredClassLoader(uuid);
   }
 
   /**
@@ -450,15 +444,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @exclude
    */
   public RegisteredClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
-    if (cl == null) throw new IllegalArgumentException("cl is null");
-    if (uuid == null) throw new IllegalArgumentException("uuid is null");
-    RegisteredClassLoader registeredClassLoader;
-    synchronized (classLoaderRegistrations) {
-      registeredClassLoader = new RegisteredClassLoader(uuid, cl);
-      classLoaderRegistrations.putValue(uuid, registeredClassLoader);
-    }
-    if (debugEnabled) log.debug("registered {}", registeredClassLoader);
-    return registeredClassLoader;
+    return classLoaderRegistrationHandler.registerClassLoader(cl, uuid);
   }
 
   /**
@@ -466,68 +452,61 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient {
    * @param registeredClassLoader a <code>RegisteredClassLoader</code> instance.
    * @exclude
    */
-  protected void unregister(final RegisteredClassLoader registeredClassLoader) {
-    if (registeredClassLoader == null) throw new IllegalArgumentException("registeredClassLoader is null");
-    if (debugEnabled) log.debug("unregistering {}", registeredClassLoader);
-    synchronized (classLoaderRegistrations) {
-      classLoaderRegistrations.removeValue(registeredClassLoader.getUuid(), registeredClassLoader);
+  protected void unregisterClassLoader(final RegisteredClassLoader registeredClassLoader) {
+    classLoaderRegistrationHandler.unregister(registeredClassLoader);
+  }
+
+  /**
+   * Register the specified listener to receive client queue event notifications.
+   * @param listener the listener to register.
+   * @since 4.1
+   */
+  public void addClientQueueListener(final ClientQueueListener listener) {
+    queueListeners.add(listener);
+  }
+
+  /**
+   * Unregister the specified listener.
+   * @param listener the listener to unregister.
+   * @since 4.1
+   */
+  public void removeClientQueueListener(final ClientQueueListener listener) {
+    queueListeners.remove(listener);
+  }
+
+  /**
+   * Notify all client queue listeners that a queue event has occurred.
+   * @param qEvent the actual event which occurred in the queue.
+   * @param jobAdded {@code true} for a job added event, {@code false} for a job removed event.
+   * @exclude
+   * @since 4.1
+   */
+  protected void fireQueueEvent(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> qEvent, final boolean jobAdded) {
+    ClientQueueEvent event = new ClientQueueEvent(this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
+    if (jobAdded) {
+      for (ClientQueueListener listener: queueListeners) listener.jobAdded(event);
+    } else {
+      for (ClientQueueListener listener: queueListeners) listener.jobRemoved(event);
     }
   }
 
   /**
-   * Helper class for managing registered class loaders.
+   * {@inheritDoc}
    * @exclude
+   * @since 4.1
    */
-  public class RegisteredClassLoader {
-    /**
-     * Unique id assigned to class loader.
-     */
-    private final String      uuid;
-    /**
-     * A <code>ClassLoader</code> instance.
-     */
-    private final ClassLoader classLoader;
+  @Override
+  public void bundleAdded(final QueueEvent event) {
+    fireQueueEvent(event, true);
+  }
 
-    /**
-     * Initialize this registered class laoder.
-     * @param uuid unique id assigned to classLoader
-     * @param classLoader a <code>ClassLoader</code> instance.
-     */
-    protected RegisteredClassLoader(final String uuid, final ClassLoader classLoader) {
-      this.uuid = uuid;
-      this.classLoader = classLoader;
-    }
-
-    /**
-     * Get unique id assigned to class loader.
-     * @return an id assigned to <code>ClassLoader</code>
-     */
-    public String getUuid() {
-      return uuid;
-    }
-
-    /**
-     * Get a class loader instance.
-     * @return a <code>ClassLoader</code> instance.
-     */
-    public ClassLoader getClassLoader() {
-      return classLoader;
-    }
-
-    /**
-     * Disposes this registration for classLoader.
-     */
-    public void dispose() {
-      unregister(this);
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-      sb.append("classLoader=").append(classLoader);
-      sb.append(", uuid=").append(uuid);
-      sb.append(']');
-      return sb.toString();
-    }
+  /**
+   * {@inheritDoc}
+   * @exclude
+   * @since 4.1
+   */
+  @Override
+  public void bundleRemoved(final QueueEvent event) {
+    fireQueueEvent(event, false);
   }
 }

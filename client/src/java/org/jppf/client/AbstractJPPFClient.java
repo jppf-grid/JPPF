@@ -36,7 +36,7 @@ import org.slf4j.*;
  * the uuid has changed or not.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFClient implements ClientConnectionStatusListener {
+public abstract class AbstractJPPFClient implements ClientConnectionStatusListener, AutoCloseable {
   /**
    * Logger for this class.
    */

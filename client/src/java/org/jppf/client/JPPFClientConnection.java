@@ -18,8 +18,6 @@
 
 package org.jppf.client;
 
-import java.util.List;
-
 import org.jppf.client.event.ClientConnectionStatusHandler;
 import org.jppf.management.*;
 
@@ -27,7 +25,7 @@ import org.jppf.management.*;
  * Interface for a client connection to a JPPF driver.
  * @author Laurent Cohen
  */
-public interface JPPFClientConnection extends ClientConnectionStatusHandler
+public interface JPPFClientConnection extends ClientConnectionStatusHandler, AutoCloseable
 {
   /**
    * Initialize this client connection.
@@ -42,10 +40,10 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
   int getPriority();
 
   /**
-   * Shutdown this client and retrieve all pending executions for resubmission.
-   * @return a list of <code>JPPFJob</code> instances to resubmit.
+   * Shutdown this connection and release all the resources it is using.
    */
-  List<JPPFJob> close();
+  @Override
+  void close();
 
   /**
    * Determine whether this connection was closed.
@@ -64,7 +62,7 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler
    * @return <code>true</code> if this is an SSL connection, <code>false</code> otherwise.
    */
   boolean isSSLEnabled();
-  
+
   /**
    * Get the driver's host name or ip address.
    * @return the host as a stirng.

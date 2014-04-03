@@ -102,7 +102,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
           {
             if (debugEnabled) log.debug("Found connection information: " + info);
             addConnectionInformation(info);
-            onNewConnection("driver-" + count.incrementAndGet(), info);
+            onNewConnection(AbstractGenericClient.VALUE_JPPF_DISCOVERY + '-' + count.incrementAndGet(), info);
           }
         }
       }
