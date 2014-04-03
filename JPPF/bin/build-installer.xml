@@ -25,80 +25,83 @@
 	<!-- It must point to the root installation directory of IzPack                -->
 	<!-- ========================================================================= -->
 
-	<target name="installer" description="">
-		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
-		<antcall target="installer.package"><param name="url" value="http://www.jppf.org/"/></antcall>
+	<target name="installer" depends="installer.check.izpack.present" if="izpack.present" description="">
+    <installer.package url="http://www.jppf.org/"/>
 	</target>
 
-	<target name="installer.local">
-		<available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
-		<antcall target="installer.package"><param name="url" value="http://localhost:8880/"/></antcall>
-	</target>
+  <target name="installer.local" depends="installer.check.izpack.present" if="izpack.present">
+    <installer.package url="http://localhost:8880/"/>
+  </target>
 
-	<target name="installer.package" if="izpack.present">
-		<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
-		<property name="install.prefix" value="${build}/${app.ver}"/>
-		<property name="install.file" value="${install.prefix}-Installer"/>
-		<property name="installer.url" value="${url}"/>
-		<delete file="${install.file}.jar" quiet="true"/>
-		<mkdir dir="${install.prefix}"/>
-		<echo message="unzipping all files"/>
-		<!-- Unzip all packages for use by the web installer generator -->
-		<unzip dest="${install.prefix}"><fileset dir="${build}" includes="${app.ver}-*.zip"/></unzip>
+  <target name="installer.check.izpack.present">
+    <available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present"/>
+  </target>
 
-		<!-- Generate offline installer -->
-		<!--
-		<izpack input="${installer}/install.xml" output="${install.file}.jar" installerType="standard" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
-    -->
-
-		<!-- Generate web installer -->
-		<property name="web.installer.dir" value="${home}/download/${version.number}"/>
-		<delete dir="${web.installer.dir}" quiet="true"/>
-		<mkdir dir="${web.installer.dir}"/>
-		<copy file="${installer}/jppf_ws.jnlp" todir="${home}/download"/>
-		<replace file="${home}/download/jppf_ws.jnlp" token="@version@" value="${version.number}"/>
-		<replace file="${home}/download/jppf_ws.jnlp" token="@url@" value="${installer.url}"/>
-		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
-		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
-
-    <!-- Add needed attributes to the manifest of the web installer jar -->
-    <mkdir dir="${web.installer.dir}/jar_dir"/>
-		<unjar src="${web.installer.file}" dest="${web.installer.dir}/jar_dir"/>
-    <delete file="${web.installer.file}" quiet="true"/>
-    <delete file="${web.installer.dir}/jar_dir/META-INF/MANIFEST.MF" quiet="true"/>
-    <tstamp>
-      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
-    </tstamp>
-    <jar jarfile="${web.installer.file}" index="true">
-      <fileset dir="${web.installer.dir}/jar_dir"/>
-      <manifest>
-        <attribute name="JPPF-Version" value="${version.number}"/>
-        <attribute name="JPPF-Build" value="${build.number}"/>
-        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
-        <attribute name="Permissions" value="all-permissions"/>
-      </manifest>
-    </jar>
-    <delete dir="${web.installer.dir}/jar_dir" quiet="true"/>
-
-		<!-- Sign the web installer jars for use with JNLP -->
-		<echo message="java.home = ${java.home}"/>
-		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">
-			<contains string="${java.home}" substring="jre" casesensitive="false"/>
-		</condition>
-		<echo message="jdk.bin = ${jdk.bin}"/>
-		<exec executable="${jdk.bin}/jarsigner">
-			<arg value="-keystore"/>
-			<arg value="${bin}\security\jppf.keystore"/>
-			<arg value="-storepass"/>
-			<arg value="Faz600er"/>
-			<arg value="-keypass"/>
-			<arg value="Faz600er"/>
-			<arg value="${web.installer.file}"/>
-			<arg value="jppf"/>
-		</exec>
-
-		<!-- Delete all unzipped file (can take a long time) -->
-		<delete dir="${install.prefix}" quiet="true"/>
-	</target>
+	<macrodef name="installer.package">
+    <attribute name="url"/>
+    <sequential>
+  		<taskdef onerror="ignore" name="izpack" classpath="${izpack.home}/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask"/>
+  		<property name="install.prefix" value="${build}/${app.ver}"/>
+  		<property name="install.file" value="${install.prefix}-Installer"/>
+  		<delete file="${install.file}.jar" quiet="true"/>
+  		<mkdir dir="${install.prefix}"/>
+  		<echo message="unzipping all files"/>
+  		<!-- Unzip all packages for use by the web installer generator -->
+  		<unzip dest="${install.prefix}"><fileset dir="${build}" includes="${app.ver}-*.zip"/></unzip>
+  
+  		<!-- Generate offline installer -->
+  		<!--
+  		<izpack input="${installer}/install.xml" output="${install.file}.jar" installerType="standard" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+      -->
+  
+  		<!-- Generate web installer -->
+      <property name="web.installer.dir" value="${home}/download/${version.number}"/>
+      <property name="installer.url" value="@{url}"/>
+  		<delete dir="${web.installer.dir}" quiet="true"/>
+  		<mkdir dir="${web.installer.dir}"/>
+  		<copy file="${installer}/jppf_ws.jnlp" todir="${home}/download" overwrite="true"/>
+  		<replace file="${home}/download/jppf_ws.jnlp" token="@version@" value="${version.number}"/>
+  		<replace file="${home}/download/jppf_ws.jnlp" token="@url@" value="@{url}"/>
+  		<property name="web.installer.file" value="${web.installer.dir}/${app.ver}-Web-Installer.jar"/>
+  		<izpack input="${installer}/install.xml" output="${web.installer.file}" installerType="web" inheritAll="true" basedir="${basedir}" compression="deflate" compressionlevel="9"/>
+  
+      <!-- Add needed attributes to the manifest of the web installer jar -->
+      <mkdir dir="${web.installer.dir}/jar_dir"/>
+  		<unjar src="${web.installer.file}" dest="${web.installer.dir}/jar_dir"/>
+      <delete file="${web.installer.file}" quiet="true"/>
+      <delete file="${web.installer.dir}/jar_dir/META-INF/MANIFEST.MF" quiet="true"/>
+      <tstamp><format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/></tstamp>
+      <jar jarfile="${web.installer.file}" index="true">
+        <fileset dir="${web.installer.dir}/jar_dir"/>
+        <manifest>
+          <attribute name="JPPF-Version" value="${version.number}"/>
+          <attribute name="JPPF-Build" value="${build.number}"/>
+          <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+          <attribute name="Permissions" value="all-permissions"/>
+        </manifest>
+      </jar>
+      <delete dir="${web.installer.dir}/jar_dir" quiet="true"/>
+  
+  		<!-- Sign the web installer jars for use with JNLP -->
+  		<echo message="java.home = ${java.home}"/>
+  		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">
+  			<contains string="${java.home}" substring="jre" casesensitive="false"/>
+  		</condition>
+  		<echo message="jdk.bin = ${jdk.bin}"/>
+  		<exec executable="${jdk.bin}/jarsigner">
+  			<arg value="-keystore"/>
+  			<arg value="${bin}\security\jppf.keystore"/>
+  			<arg value="-storepass"/>
+  			<arg value="Faz600er"/>
+  			<arg value="-keypass"/>
+  			<arg value="Faz600er"/>
+  			<arg value="${web.installer.file}"/>
+  			<arg value="jppf"/>
+  		</exec>
+  
+  		<!-- Delete all unzipped file (can take a long time) -->
+  		<delete dir="${install.prefix}" quiet="true"/>
+    </sequential>
+	</macrodef>
 
 </project> 

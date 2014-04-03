@@ -11,7 +11,7 @@
     <all-permissions/>
   </security>
   <resources>
-    <j2se version="1.5.0+"/>
+    <j2se version="1.7+"/>
     <jar href="download/@version@/JPPF-@version@-Web-Installer.jar"/>
   </resources>
   <application-desc main-class="com.izforge.izpack.installer.Installer"/>

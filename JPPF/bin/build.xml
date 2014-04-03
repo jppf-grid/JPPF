@@ -86,8 +86,8 @@
   </path>
 
   <path id="run.classpath">
-		<pathelement location="${config}"/>
-    <path refid="project.classpath"/>	
+    <pathelement location="${config}"/>
+    <path refid="project.classpath"/>
   </path>
 
 	<!-- ========================================================================= -->

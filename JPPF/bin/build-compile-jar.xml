@@ -18,9 +18,9 @@ limitations under the License.
 
 <project name="JPPF-compile-jar" basedir="..">
 
-  <!-- ========================================================================= -->
-  <!--                         Compile the application                           -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!--                         Compile the application                      -->
+  <!-- ==================================================================== -->
 
   <target name="compile" depends="init, i18n" unless="compile.done">
     <compile.module path="${node}"/>
@@ -34,6 +34,11 @@ limitations under the License.
 
   <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
 
+  <!--
+    Compile a project/module.
+    Attributes:
+    - path: the root path of the project or module
+  -->
   <macrodef name="compile.module">
     <attribute name="path"/>
     <sequential>
@@ -55,29 +60,36 @@ limitations under the License.
     </sequential>
   </macrodef>
 
-  <!-- ========================================================================= -->
-  <!--              Convert native translations to ascii                         -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!--              Convert native translations to ascii                    -->
+  <!-- ==================================================================== -->
 
   <target name="i18n" depends="init">
     <property name="i18n.dir" value="${admin}/src/resources/org/jppf/ui/i18n"/>
     <native2ascii encoding="windows-1251" src="${i18n.dir}/native/ru" dest="${i18n.dir}" includes="**/*.properties"/>
   </target>
 
-  <!-- ========================================================================= -->
-  <!--                     Build the jar files                                   -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!--                     Build the jar files                              -->
+  <!-- ==================================================================== -->
 
   <target name="jar" depends="compile" unless="jar.done">
-    <jar.module module="common"/>
     <jar.module module="node" jar="common-node"/>
-    <jar.module module="admin"/>
+    <jar.module module="common"/>
     <jar.module module="client"/>
+    <jar.module module="admin"/>
     <jar.module module="server"/>
     <jar.module module="demo"/>
     <property name="jar.done" value="true"/>
   </target>
 
+  <!--
+    Jar a project/module.
+    Attributes:
+    - module: the root path of the project or module
+    - jar: the suffix of the generated jar file name jppf-@{jar}.jar
+           defaults to the value of the "module" attribute
+  -->
   <macrodef name="jar.module">
     <attribute name="module"/>
     <attribute name="jar" default="@{module}"/>
@@ -94,9 +106,9 @@ limitations under the License.
     </sequential>
   </macrodef>
 
-  <!-- ========================================================================= -->
-  <!--                     Build the source jar files                            -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!--                     Build the source jar files                       -->
+  <!-- ==================================================================== -->
 
   <target name="jar.src" depends="compile"  unless="jar.src.done">
     <jar.src.module module="common"/>
@@ -108,6 +120,13 @@ limitations under the License.
     <property name="jar.src.done" value="true"/>
   </target>
 
+  <!--
+    Build the source jar of a project/module.
+    Attributes:
+    - module: the root path of the project or module
+    - jar: the suffix of the generated jar file name jppf-@{jar}.jar
+           defaults to the value of the "module" attribute
+  -->
   <macrodef name="jar.src.module">
     <attribute name="module"/>
     <attribute name="jar" default="@{module}"/>
@@ -125,9 +144,9 @@ limitations under the License.
     </sequential>
   </macrodef>
 
-  <!-- ========================================================================= -->
-  <!--               Build the logging formatter jar                             -->
-  <!-- ========================================================================= -->
+  <!-- ==================================================================== -->
+  <!--               Build the logging formatter jar                        -->
+  <!-- ==================================================================== -->
 
   <target name="jar.logging" depends="compile">
     <jar jarfile="${build}/jppf-logging-formatter.jar" index="true">

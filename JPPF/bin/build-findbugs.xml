@@ -25,9 +25,10 @@
   <!-- It must point to the root installation directory of findbugs              -->
   <!-- ========================================================================= -->
 
-  <target name="findbugs">
+  <target name="findbugs" depends="check.findbugs.present, findbugs.package"/>
+
+  <target name="check.findbugs.present">
     <available file="${findbugs.home}/lib/findbugs-ant.jar" property="findbugs.present"/>
-    <antcall target="findbugs.package"/>
   </target>
 
   <property name="findbug.jvm.flags" value="-server -Xmx512m -Duser.language=en -Duser.country=US"/>

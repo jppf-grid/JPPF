@@ -22,12 +22,7 @@
 	<!--                 Package the runtime components for deployment             -->
 	<!-- ========================================================================= -->
 
-	<target name="runtime" depends="rebuild">
-		<antcall target="runtime.driver"/>
-		<antcall target="runtime.node"/>
-		<antcall target="runtime.gui"/>
-		<antcall target="application.template"/>
-	</target>
+	<target name="runtime" depends="rebuild, runtime.driver, runtime.node, runtime.gui, application.template"/>
 
 	<macrodef name="package-module">
 		<attribute name="module"/>

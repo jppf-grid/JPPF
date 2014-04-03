@@ -25,26 +25,37 @@
   <target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home" description=""/>
 
   <target name="doc.home">
-		<antcall target="doc.gen">
-			<param name="source" value="${home}/doc-source/home"/>
-			<param name="dest" value="${home}/"/>
-			<param name="templates" value="${home}/doc-source/templates/"/>
-		</antcall>
+    <doc.gen source="${home}/doc-source/home" dest="${home}/" templates="${home}/doc-source/templates/"/>
 	</target>
 
-	<target name="doc.gen">
-		<java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
-			<jvmarg value="-Xmx128m"/>
-			<arg value="-s"/>
-			<arg value="${source}"/>
-			<arg value="-d"/>
-			<arg value="${dest}"/>
-			<arg value="-t"/>
-			<arg value="${templates}"/>
-			<arg value="-r"/>
-		</java>
-	</target>
+  <!--
+    Generate web site pages based on templates.
+    Attributes:
+    - source: the folder where the source documents to convert are located
+    - dest: the destination folder where the generated php and html files are written
+    - templates: the folder where the templates are located
+  -->
+  <macrodef name="doc.gen">
+    <attribute name="source"/>
+    <attribute name="dest"/>
+    <attribute name="templates"/>
+    <sequential>
+      <java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
+        <jvmarg value="-Xmx128m"/>
+        <arg value="-s"/>
+        <arg value="@{source}"/>
+        <arg value="-d"/>
+        <arg value="@{dest}"/>
+        <arg value="-t"/>
+        <arg value="@{templates}"/>
+        <arg value="-r"/>
+      </java>
+    </sequential>
+  </macrodef>
 
+  <!--
+    Generate the screenshots thumbnails.
+  -->
 	<target name="doc.screenshots" >
 		<java fork="yes" classname="org.jppf.utils.ThumbnailGenerator" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
@@ -56,6 +67,9 @@
 		</java>
 	</target>
 
+  <!--
+    samples Generate readme.php files based on the correspondng Readme.html in the samples sources.
+  -->
 	<target name="doc.samples.pack">
 		<java fork="yes" classname="org.jppf.doc.SamplesPHPReadmeProcessor" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
