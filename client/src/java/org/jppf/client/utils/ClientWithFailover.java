@@ -34,6 +34,10 @@ import org.slf4j.*;
 /**
  * A wrapper for a JPPF client which provides connections failover based on their priority.
  * @author Laurent Cohen
+ * @deprecated as of JPPF 4.1, the functionality provided by this class is now an integral
+ * part of the implementation of {@link JPPFClient} and its accompanying classes. Hence this class
+ * is no longer necessary. If it is used in your ocde, it will still work as intended, however
+ * you should prepare for the fact that this this class will vbe removed in a future version. 
  */
 public class ClientWithFailover implements ClientListener, ClientConnectionStatusListener {
   /**
