@@ -81,6 +81,8 @@ public class JMXMPServer extends AbstractJMXServer
       Map<String, Object> env = new HashMap<>();
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
+      env.put("jmx.remote.x.server.max.threads", 1);
+      env.put("jmx.remote.x.client.connection.check.period", 0);
       if (ssl) SSLHelper.configureJMXProperties(env);
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
       boolean found = false;

@@ -37,8 +37,7 @@ import org.slf4j.*;
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
  * @author Laurent Cohen
  */
-public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean
-{
+public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean {
   /**
    * Logger for this class.
    */
@@ -136,6 +135,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
+      env.put("jmx.remote.x.server.max.threads", 1);
+      env.put("jmx.remote.x.client.connection.check.period", 0);
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -188,7 +189,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   void performConnection() throws Exception {
     setConnectedStatus(false);
     synchronized(connectionLock) {
-      jmxc = JMXConnectorFactory.connect(url, env);
+      if (jmxc == null) jmxc = JMXConnectorFactory.newJMXConnector(url, env);
+      jmxc.connect();
+      connectionThread.get().close();
+      connectionThread.set(null);
     }
     synchronized(this) {
       mbeanConnection.set(jmxc.getMBeanServerConnection());
@@ -207,7 +211,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void close() throws Exception {
     if (connectionThread.get() != null) connectionThread.get().close();
-    if (jmxc != null) jmxc.close();
+    connectionThread.set(null);
+    if ((jmxc != null) && isConnected()) jmxc.close();
   }
 
   /**
