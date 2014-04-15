@@ -45,7 +45,7 @@ public class Setup1D1N
   public static void cleanup() throws Exception
   {
     try {
-    BaseSetup.cleanup();
+      BaseSetup.cleanup();
     } catch(Exception e) {
       e.printStackTrace();
       throw e;

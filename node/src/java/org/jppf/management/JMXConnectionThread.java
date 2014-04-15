@@ -26,8 +26,7 @@ import org.slf4j.*;
  * the management server.
  * @exclude
  */
-public class JMXConnectionThread extends ThreadSynchronization implements Runnable
-{
+public class JMXConnectionThread extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -53,8 +52,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * Initialize this thread with the specified connection.
    * @param connectionWrapper the connection that holds this thread.
    */
-  public JMXConnectionThread(final JMXConnectionWrapper connectionWrapper)
-  {
+  public JMXConnectionThread(final JMXConnectionWrapper connectionWrapper) {
     this.connectionWrapper = connectionWrapper;
   }
 
@@ -63,40 +61,28 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    while (!isStopped())
-    {
-      if (isSuspended())
-      {
+  public void run() {
+    while (!isStopped()) {
+      if (isSuspended()) {
         if (debugEnabled) log.debug(connectionWrapper.getId() + " about to go to sleep");
         goToSleep();
         continue;
       }
-      if (isConnecting())
-      {
-        try
-        {
+      if (isConnecting()) {
+        try {
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
           connectionWrapper.performConnection();
           if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
           suspend();
           connectionWrapper.wakeUp();
-        }
-        catch(Exception ignored)
-        {
+        } catch(Exception ignored) {
           if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
-          try
-          {
+          try {
             Thread.sleep(100);
-          }
-          catch(InterruptedException e)
-          {
+          } catch(InterruptedException e) {
             log.error(e.getMessage(), e);
           }
-        }
-        finally
-        {
+        } finally {
           connectionWrapper.wakeUp();
         }
       }
@@ -106,8 +92,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
   /**
    * Suspend the current thread.
    */
-  public synchronized void suspend()
-  {
+  public synchronized void suspend() {
     if (debugEnabled) log.debug(connectionWrapper.getId() + " suspending connection attempts");
     setConnecting(false);
     setSuspended(true);
@@ -117,8 +102,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
   /**
    * Resume the current thread's execution.
    */
-  public synchronized void resume()
-  {
+  public synchronized void resume() {
     if (debugEnabled) log.debug(connectionWrapper.getId() + " resuming connection attempts");
     setConnecting(true);
     setSuspended(false);
@@ -128,8 +112,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
   /**
    * Stop this thread.
    */
-  public synchronized void close()
-  {
+  public synchronized void close() {
     setConnecting(false);
     setStopped(true);
     wakeUp();
@@ -139,8 +122,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * Get the connecting state of this connection thread.
    * @return true if the connection is established, false otherwise.
    */
-  public synchronized boolean isConnecting()
-  {
+  public synchronized boolean isConnecting() {
     return connecting;
   }
 
@@ -148,8 +130,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * Get the connecting state of this connection thread.
    * @param connecting true if the connection is established, false otherwise.
    */
-  public synchronized void setConnecting(final boolean connecting)
-  {
+  public synchronized void setConnecting(final boolean connecting) {
     this.connecting = connecting;
   }
 
@@ -157,8 +138,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * Determines the suspended state of this connection thread.
    * @return true if the thread is suspended, false otherwise.
    */
-  public synchronized boolean isSuspended()
-  {
+  public synchronized boolean isSuspended() {
     return suspended;
   }
 
@@ -166,8 +146,7 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * Set the suspended state of this connection thread.
    * @param suspended true if the connection is suspended, false otherwise.
    */
-  public synchronized void setSuspended(final boolean suspended)
-  {
+  public synchronized void setSuspended(final boolean suspended) {
     this.suspended = suspended;
   }
 }

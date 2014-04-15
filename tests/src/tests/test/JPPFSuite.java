@@ -21,11 +21,8 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.serialization.*;
-
-
-
-
+import test.org.jppf.server.peer.*;
+import test.org.jppf.server.protocol.TestJPPFJobClientSLA;
 
 
 /**
@@ -35,7 +32,8 @@ import test.org.jppf.serialization.*;
 @RunWith(Suite.class)
 //@Suite.SuiteClasses({ TestSSL.class, TestFileDataLocation.class, TestMultiServerWithSSL.class })
 //@Suite.SuiteClasses({ TestSSL.class, TestMultiServer.class, TestFileDataLocation.class, TestSSL2.class })
-@Suite.SuiteClasses({ TestKryo.class, TestJPPFSerialization.class })
+//@Suite.SuiteClasses({ TestKryo.class, TestJPPFSerialization.class })
+@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestJPPFJobClientSLA.class })
 public class JPPFSuite
 {
 }

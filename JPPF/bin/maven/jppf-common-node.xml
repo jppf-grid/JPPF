@@ -34,24 +34,10 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.jvnet.opendmk</groupId>
-      <artifactId>jmxremote_optional</artifactId>
-      <version>1.0_01-ea</version>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-jmxremote_optional</artifactId>
+      <version>1.0</version>
       <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>jms</artifactId>
-          <groupId>javax.jms</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jmxtools</artifactId>
-          <groupId>com.sun.jdmk</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jmxri</artifactId>
-          <groupId>com.sun.jmx</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 </project>

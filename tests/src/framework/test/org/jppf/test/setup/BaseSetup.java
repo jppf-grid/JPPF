@@ -26,6 +26,7 @@ import javax.management.remote.JMXServiceURL;
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 
 
@@ -200,6 +201,7 @@ public class BaseSetup
   {
     ConfigSource.setClientConfig(config.clientConfig);
     if (reset) JPPFConfiguration.reset();
+    else SSLHelper.resetConfig();
     client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
     return client;
@@ -355,7 +357,7 @@ public class BaseSetup
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.6.1.jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
-    commonCP.add("../JPPF/lib/jmxremote/jmxremote_optional-1.0_01-ea.jar");
+    commonCP.add("../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.0.jar");
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../common/classes");
     driverCP.add("../server/classes");

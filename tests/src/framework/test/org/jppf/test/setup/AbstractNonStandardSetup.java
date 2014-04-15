@@ -66,7 +66,7 @@ public class AbstractNonStandardSetup {
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.6.1.jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
-    commonCP.add("../JPPF/lib/jmxremote/jmxremote_optional-1.0_01-ea.jar");
+    commonCP.add("../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.0.jar");
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../common/classes");
     driverCP.add("../server/classes");

@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 import javax.management.remote.*;
-import javax.management.remote.generic.*;
+import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.JPPFException;
 import org.jppf.ssl.SSLHelper;
@@ -37,8 +37,7 @@ import org.slf4j.*;
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
  * @author Laurent Cohen
  */
-public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean
-{
+public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean {
   /**
    * Logger for this class.
    */
@@ -104,7 +103,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected boolean sslEnabled = false;
   /**
-   * 
+   *
    */
   private final Object connectionLock = new Object();
 
@@ -136,6 +135,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_PACKAGES, "com.sun.jmx.remote.protocol");
       env.put(JMXConnectorFactory.PROTOCOL_PROVIDER_CLASS_LOADER, getClass().getClassLoader());
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
+      env.put("jmx.remote.x.server.max.threads", 1);
+      env.put("jmx.remote.x.client.connection.check.period", 0);
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
@@ -188,7 +189,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   void performConnection() throws Exception {
     setConnectedStatus(false);
     synchronized(connectionLock) {
-      jmxc = JMXConnectorFactory.connect(url, env);
+      if (jmxc == null) jmxc = JMXConnectorFactory.newJMXConnector(url, env);
+      jmxc.connect();
+      connectionThread.get().close();
+      connectionThread.set(null);
     }
     synchronized(this) {
       mbeanConnection.set(jmxc.getMBeanServerConnection());
@@ -207,7 +211,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void close() throws Exception {
     if (connectionThread.get() != null) connectionThread.get().close();
-    if (jmxc != null) jmxc.close();
+    connectionThread.set(null);
+    if ((jmxc != null) && isConnected()) jmxc.close();
   }
 
   /**
@@ -220,7 +225,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
-    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
+    if (!checkConnected()) return null;
     synchronized(this) {
       Object result = null;
       try {
@@ -234,7 +239,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
-        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+        //if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
       }
       return result;
     }
@@ -243,7 +248,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * Invoke a method on the specified MBean.
    * This is a convenience method to be used when invoking a remote MBean method with no parameters.<br/>
-   * This is equivalent to calling <code>invoke(name, methodName, (Object[]) null, (String[]) null)</code>. 
+   * This is equivalent to calling <code>invoke(name, methodName, (Object[]) null, (String[]) null)</code>.
    * @param name the name of the MBean.
    * @param methodName the name of the method to invoke.
    * @return an object or null.
@@ -261,7 +266,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public Object getAttribute(final String name, final String attribute) throws Exception {
-    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
+    if (!checkConnected()) return null;
     synchronized(this) {
       Object result = null;
       try {
@@ -274,7 +279,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
-        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+        //if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
         if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
         throw e;
       }
@@ -290,7 +295,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public void setAttribute(final String name, final String attribute, final Object value) throws Exception {
-    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return;
+    if (!checkConnected()) return;
     synchronized(this) {
       try {
         ObjectName mbeanName = new ObjectName(name);
@@ -302,7 +307,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
-        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+        //if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
         if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
         throw e;
       }
@@ -468,6 +473,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public boolean isSecure() {
     return sslEnabled;
+  }
+
+  /**
+   * Check whether this connection wrapper is effectively connected.
+   * @return {@code true} if this wrapper is connected, {@code false} otherwise.
+   */
+  private boolean checkConnected() {
+    return isConnected() && ((connectionThread.get() == null) || !connectionThread.get().isConnecting());
   }
 
   @Override

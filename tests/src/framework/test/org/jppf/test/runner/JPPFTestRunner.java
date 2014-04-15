@@ -115,7 +115,7 @@ public class JPPFTestRunner
       commonCP.add("../lib/slf4j-api-1.6.1.jar");
       commonCP.add("../lib/slf4j-log4j12-1.6.1.jar");
       commonCP.add("../lib/log4j-1.2.15.jar");
-      commonCP.add("../lib/jmxremote_optional-1.0_01-ea.jar");
+      commonCP.add("../lib/jppf-jmxremote_optional-1.0.jar");
       config.driverJppf = "config/driver.template.properties";
       config.driverLog4j = "config/log4j-driver.template.properties";
       config.driverClasspath.addAll(commonCP);
