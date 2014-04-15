@@ -275,6 +275,13 @@ public class ClientJob extends AbstractClientJob
   }
 
   /**
+   * Notify that this job was requeued.
+   */
+  public void jobRequeued() {
+    updateStatus(EXECUTING, NEW);
+  }
+
+  /**
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param bundle  the executing job.
    * @param results the list of tasks whose results have been received from the server.
@@ -398,7 +405,10 @@ public class ClientJob extends AbstractClientJob
         setSubmissionStatus(exception instanceof NotSerializableException ? SubmissionStatus.COMPLETE : SubmissionStatus.FAILED);
       }
       if (empty) setExecuting(false);
-      if (requeue && onRequeue != null) onRequeue.run();
+      if (requeue && onRequeue != null) {
+        onRequeue.run();
+        updateStatus(NEW, EXECUTING);
+      }
     } else {
       boolean callDone = updateStatus(isCancelled() ? CANCELLED : EXECUTING, DONE);
       if (empty) setExecuting(false);
