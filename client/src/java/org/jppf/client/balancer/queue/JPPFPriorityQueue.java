@@ -79,50 +79,48 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
 
   /**
    * Add an object to the queue, and notify all listeners about it.
-   * @param bundleWrapper the object to add to the queue.
+   * @param clientJob the object to add to the queue.
    */
   @Override
-  public void addBundle(final ClientJob bundleWrapper)
+  public void addBundle(final ClientJob clientJob)
   {
-    JobSLA sla = bundleWrapper.getSLA();
-    final String jobUuid = bundleWrapper.getUuid();
-    if (sla.isBroadcastJob() && (bundleWrapper.getBroadcastUUID() == null))
+    JobSLA sla = clientJob.getSLA();
+    final String jobUuid = clientJob.getUuid();
+    if (sla.isBroadcastJob() && (clientJob.getBroadcastUUID() == null))
     {
-      if (debugEnabled) log.debug("before processing broadcast job " + bundleWrapper.getJob());
-      processBroadcastJob(bundleWrapper);
+      if (debugEnabled) log.debug("before processing broadcast job " + clientJob.getJob());
+      processBroadcastJob(clientJob);
     } else {
       lock.lock();
       try {
         ClientJob other = jobMap.get(jobUuid);
         if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
-        bundleWrapper.addOnDone(new Runnable()
-        {
+        clientJob.addOnDone(new Runnable() {
           @Override
-          public void run()
-          {
+          public void run() {
             lock.lock();
             try {
               jobMap.remove(jobUuid);
-              removeBundle(bundleWrapper);
+              removeBundle(clientJob);
             } finally {
               lock.unlock();
             }
           }
         });
-        bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
-        bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
-        bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
+        clientJob.setSubmissionStatus(SubmissionStatus.PENDING);
+        clientJob.setQueueEntryTime(System.currentTimeMillis());
+        clientJob.setJobReceivedTime(clientJob.getQueueEntryTime());
 
-        if (!sla.isBroadcastJob() || bundleWrapper.getBroadcastUUID() != null) {
-          priorityMap.putValue(sla.getPriority(), bundleWrapper);
-          sizeMap.putValue(getSize(bundleWrapper), bundleWrapper);
-          if (debugEnabled) log.debug("adding bundle with " + bundleWrapper);
-          handleStartJobSchedule(bundleWrapper);
-          handleExpirationJobSchedule(bundleWrapper);
+        if (!sla.isBroadcastJob() || clientJob.getBroadcastUUID() != null) {
+          priorityMap.putValue(sla.getPriority(), clientJob);
+          sizeMap.putValue(getSize(clientJob), clientJob);
+          if (debugEnabled) log.debug("adding bundle with " + clientJob);
+          handleStartJobSchedule(clientJob);
+          handleExpirationJobSchedule(clientJob);
         }
-        jobMap.put(jobUuid, bundleWrapper);
+        jobMap.put(jobUuid, clientJob);
         updateLatestMaxSize();
-        fireQueueEvent(new QueueEvent<>(this, bundleWrapper, false));
+        fireQueueEvent(new QueueEvent<>(this, clientJob, false));
         if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
       } finally {
         lock.unlock();
@@ -138,10 +136,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     lock.lock();
     try {
       if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
-
+      if (debugEnabled) log.debug("requeueing {}", job);
       priorityMap.putValue(job.getSLA().getPriority(), job);
       sizeMap.putValue(getSize(job), job);
       fireQueueEvent(new QueueEvent<>(this, job, true));
+      job.jobRequeued();
     } finally {
       lock.unlock();
     }

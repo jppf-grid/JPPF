@@ -35,8 +35,7 @@ import test.org.jppf.test.setup.common.*;
  * (connection pool size > 1).
  * @author Laurent Cohen
  */
-public class TestJobListener extends Setup1D1N
-{
+public class TestJobListener extends Setup1D1N {
   /**
    * The JPPF client.
    */
@@ -47,10 +46,8 @@ public class TestJobListener extends Setup1D1N
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testJobListenerSingleLocalConnection() throws Exception
-  {
-    try
-    {
+  public void testJobListenerSingleLocalConnection() throws Exception {
+    try {
       configure(false, true, 1);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
@@ -59,9 +56,7 @@ public class TestJobListener extends Setup1D1N
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
       assertEquals(4, listener.returnedCount.get());
-    }
-    finally
-    {
+    } finally {
       reset();
     }
   }
@@ -71,10 +66,8 @@ public class TestJobListener extends Setup1D1N
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testJobListenerMultipleRemoteConnections() throws Exception
-  {
-    try
-    {
+  public void testJobListenerMultipleRemoteConnections() throws Exception {
+    try {
       configure(true, false, 2);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
@@ -83,9 +76,37 @@ public class TestJobListener extends Setup1D1N
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
       assertEquals(4, listener.returnedCount.get());
+    } finally {
+      reset();
     }
-    finally
-    {
+  }
+
+  /**
+   * Test that the <code>JobListener</code> receives a jobStarted() notification when a job is requeued.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout=20000)
+  public void testJobListenerNotificationsUponRequeue() throws Exception {
+    try {
+      configure(true, false, 1);
+      client = BaseSetup.createClient(null, false);
+      CountingJobListener listener = new CountingJobListener();
+      int nbTasks = 1;
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+      job.addJobListener(listener);
+      client.submitJob(job);
+      Thread.sleep(2000L);
+      client.reset();
+      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
+      List<Task<?>> results = collector.awaitResults();
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, results.get(0).getResult());
+      assertEquals(2, listener.startedCount.get());
+      assertEquals(1, listener.endedCount.get());
+      assertEquals(2, listener.dispatchedCount.get());
+      assertEquals(1, listener.returnedCount.get());
+    } finally {
       reset();
     }
   }
@@ -98,8 +119,7 @@ public class TestJobListener extends Setup1D1N
    * @return the execution results.
    * @throws Exception if any error occurs
    */
-  public List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception
-  {
+  public List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
     client = BaseSetup.createClient(null, false);
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
@@ -116,25 +136,22 @@ public class TestJobListener extends Setup1D1N
    * @param localEnabled specifies whether local execution is enabled.
    * @param poolSize the size of the connection pool.
    */
-  private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize)
-  {
+  private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.remote.execution.enabled", String.valueOf(remoteEnabled));
-    config.setProperty("jppf.local.execution.enabled", String.valueOf(localEnabled));
-    config.setProperty("jppf.local.execution.threads", "4");
+    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
+    config.setBoolean("jppf.local.execution.enabled", localEnabled);
+    config.setInt("jppf.local.execution.threads", 4);
     config.setProperty("jppf.load.balancing.algorithm", "manual");
     config.setProperty("jppf.load.balancing.profile", "manual");
-    config.setProperty("jppf.load.balancing.profile.manual.size", "5");
-    config.setProperty("jppf.pool.size", String.valueOf(poolSize));
+    config.setInt("jppf.load.balancing.profile.manual.size", 5);
+    config.setInt("jppf.pool.size", poolSize);
   }
 
   /**
    * Reset the confiugration.
    */
-  private void reset()
-  {
-    if (client != null)
-    {
+  private void reset() {
+    if (client != null) {
       client.close();
       client = null;
     }
