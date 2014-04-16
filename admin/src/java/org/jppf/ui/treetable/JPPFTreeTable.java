@@ -20,12 +20,19 @@ package org.jppf.ui.treetable;
 
 import javax.swing.tree.*;
 
+import org.slf4j.*;
+
 /**
  * Common super class for all tree tables in the admin console.
  * @author Laurent Cohen
  */
 public class JPPFTreeTable extends JTreeTable
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFTreeTable.class);
+
   /**
    * Initialize this tree table with the specified model.
    * @param treeTableModel - a tree table model.
@@ -43,7 +50,12 @@ public class JPPFTreeTable extends JTreeTable
   public TreePath getPathForRow(final int n)
   {
     if (getTree().getRowCount() <= n) return null;
-    return getTree().getPathForRow(n);
+    try {
+      return getTree().getPathForRow(n);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return null;
   }
 
   /**
