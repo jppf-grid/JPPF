@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.diagnostics;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.prefs.Preferences;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -61,6 +62,10 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    * The threshold values.
    */
   protected Thresholds thresholds = new Thresholds();
+  /**
+   * 
+   */
+  protected ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JVMHealthPanelExecutor"));
 
   /**
    * Initialize this panel with the specified information.
@@ -145,6 +150,18 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    * Refresh the JVM health status of all displayed drivers and nodes.
    */
   public synchronized void refreshSnapshots() {
+    Runnable r = new Runnable() {
+      @Override public void run() {
+        refreshSnapshots0();
+      }
+    };
+    executor.execute(r);
+  }
+
+  /**
+   * Refresh the JVM health status of all displayed drivers and nodes.
+   */
+  private void refreshSnapshots0() {
     for (int i=0; i<treeTableRoot.getChildCount(); i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
       TopologyData driverData = (TopologyData) driverNode.getUserObject();
@@ -232,59 +249,74 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   }
 
   @Override
-  public synchronized void driverAdded(final TopologyChangeEvent event)
-  {
-    if (debugEnabled) log.debug("adding driver " + event.getDriverData());
-    TopologyData driverData = event.getDriverData();
-    DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
-    if (driver != null) return;
-    driver = new DefaultMutableTreeNode(driverData);
-    int n = treeTableRoot.getChildCount();
-    model.insertNodeInto(driver, treeTableRoot, n);
-    if (n == 0) treeTable.expand(treeTableRoot);
+  public void driverAdded(final TopologyChangeEvent event) {
+    Runnable r = new Runnable() {
+      @Override public void run() {
+        if (debugEnabled) log.debug("adding driver " + event.getDriverData());
+        TopologyData driverData = event.getDriverData();
+        DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
+        if (driver != null) return;
+        driver = new DefaultMutableTreeNode(driverData);
+        int n = treeTableRoot.getChildCount();
+        model.insertNodeInto(driver, treeTableRoot, n);
+        if (n == 0) treeTable.expand(treeTableRoot);
+      }
+    };
+    executor.execute(r);
   }
 
   @Override
-  public synchronized void driverRemoved(final TopologyChangeEvent event)
-  {
-    if (debugEnabled) log.debug("removing driver " + event.getDriverData());
-    DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
-    if (driver != null) model.removeNodeFromParent(driver);
+  public void driverRemoved(final TopologyChangeEvent event) {
+    Runnable r = new Runnable() {
+      @Override public void run() {
+        if (debugEnabled) log.debug("removing driver " + event.getDriverData());
+        DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
+        if (driver != null) model.removeNodeFromParent(driver);
+      }
+    };
+    executor.execute(r);
   }
 
   @Override
-  public synchronized void nodeAdded(final TopologyChangeEvent event)
-  {
-    if (debugEnabled) log.debug("adding node " + event.getNodeData() + " to driver " + event.getDriverData());
-    if ((event.getPeerData() != null) || (event.getNodeData().getType() == TopologyDataType.PEER)) return;
-    DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
-    if (driver == null) return;
-    DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
-    if (node != null) return;
-    node = new DefaultMutableTreeNode(event.getNodeData());
-    int n = driver.getChildCount();
-    model.insertNodeInto(node, driver, n);
-    if (n == 0) treeTable.expand(driver);
+  public void nodeAdded(final TopologyChangeEvent event) {
+    Runnable r = new Runnable() {
+      @Override public void run() {
+        if (debugEnabled) log.debug("adding node " + event.getNodeData() + " to driver " + event.getDriverData());
+        if ((event.getPeerData() != null) || (event.getNodeData().getType() == TopologyDataType.PEER)) return;
+        DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
+        if (driver == null) return;
+        DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
+        if (node != null) return;
+        node = new DefaultMutableTreeNode(event.getNodeData());
+        int n = driver.getChildCount();
+        model.insertNodeInto(node, driver, n);
+        if (n == 0) treeTable.expand(driver);
+      }
+    };
+    executor.execute(r);
   }
 
   @Override
-  public synchronized void nodeRemoved(final TopologyChangeEvent event)
-  {
-    if (debugEnabled) log.debug("removing node " + event.getNodeData() + " from driver " + event.getDriverData());
-    if (event.getNodeData().getType() == TopologyDataType.PEER) return;
-    DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
-    if (driver == null) return;
-    DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
-    if (node != null)
-    {
-      model.removeNodeFromParent(node);
-      repaintTreeTable();
-    }
+  public void nodeRemoved(final TopologyChangeEvent event) {
+    Runnable r = new Runnable() {
+      @Override public void run() {
+        if (debugEnabled) log.debug("removing node " + event.getNodeData() + " from driver " + event.getDriverData());
+        if (event.getNodeData().getType() == TopologyDataType.PEER) return;
+        DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
+        if (driver == null) return;
+        DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
+        if (node != null)
+        {
+          model.removeNodeFromParent(node);
+          repaintTreeTable();
+        }
+      }
+    };
+    executor.execute(r);
   }
 
   @Override
-  public synchronized void dataUpdated(final TopologyChangeEvent event)
-  {
+  public void dataUpdated(final TopologyChangeEvent event) {
   }
 
   /**

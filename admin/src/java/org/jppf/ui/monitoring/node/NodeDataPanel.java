@@ -36,15 +36,14 @@ import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.monitoring.node.graph.GraphOption;
 import org.jppf.ui.options.FormattedNumberOption;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class NodeDataPanel extends AbstractTreeTableOption implements ClientListener
-{
+public class NodeDataPanel extends AbstractTreeTableOption implements ClientListener {
   /**
    * Logger for this class.
    */
@@ -76,7 +75,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Separate thread used to sequentialize events that impact the tree table.
    */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("NodeDataPanel"));
   /**
    * The graph view of the topology.
    */
@@ -89,8 +88,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Initialize this panel with the specified information.
    */
-  public NodeDataPanel()
-  {
+  public NodeDataPanel() {
     BASE = "org.jppf.ui.i18n.NodeDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
     manager = new NodeDataPanelManager(this);
@@ -101,8 +99,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
-  private void createTreeTableModel()
-  {
+  private void createTreeTableModel() {
     treeTableRoot = new DefaultMutableTreeNode(localize("tree.root.name"));
     model = new NodeTreeTableModel(treeTableRoot);
   }
@@ -121,8 +118,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Create, initialize and layout the GUI components displayed in this panel.
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     treeTable = new JPPFTreeTable(model);
     treeTable.getTree().setLargeModel(true);
     treeTable.getTree().setRootVisible(false);
@@ -144,13 +140,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * @param driverName the name of the driver to which the node is attached.
    * @param nodeName the name of the node to update.
    */
-  public void nodeDataUpdated(final String driverName, final String nodeName)
-  {
-    Runnable r = new Runnable()
-    {
+  public void nodeDataUpdated(final String driverName, final String nodeName) {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         manager.nodeDataUpdated(driverName, nodeName);
       }
     };
@@ -161,13 +154,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Called to notify that a driver was added.
    * @param connection a reference to the driver connection.
    */
-  public void driverAdded(final JPPFClientConnection connection)
-  {
-    Runnable r = new Runnable()
-    {
+  public void driverAdded(final JPPFClientConnection connection) {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         manager.driverAdded(connection);
       }
     };
@@ -181,16 +171,13 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    */
   public void driverRemoved(final String driverName, final boolean removeNodesOnly)
   {
-    Runnable r = new Runnable()
-    {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         manager.driverRemoved(driverName, removeNodesOnly);
       }
     };
     executor.submit(r);
-    if (debugEnabled) log.debug("submitted driverRemoved task for " + driverName);
   }
 
   /**
@@ -200,11 +187,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    */
   public void nodeAdded(final String driverUuid, final JPPFManagementInfo nodeInfo)
   {
-    Runnable r = new Runnable()
-    {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         final DefaultMutableTreeNode driverNode = manager.findDriver(driverUuid);
         if (driverNode == null) return;
         manager.nodeAdded(driverNode, nodeInfo);
@@ -218,13 +203,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * @param driverName the name of the driver from which the node is removed.
    * @param nodeName the name of the node to remove.
    */
-  public void nodeRemoved(final String driverName, final String nodeName)
-  {
-    Runnable r = new Runnable()
-    {
+  public void nodeRemoved(final String driverName, final String nodeName) {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         manager.nodeRemoved(driverName, nodeName);
       }
     };
@@ -234,13 +216,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Repaint the tree table area.
    */
-  void repaintTreeTable()
-  {
-    executor.submit(new Runnable()
-    {
+  void repaintTreeTable() {
+    executor.submit(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         manager.repaintTreeTable();
       }
     });
@@ -259,11 +238,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Get a mapping of driver names to their corresponding connection.
    * @return a map of string to <code>JPPFClientConnection</code> instances.
    */
-  public synchronized Map<String, JPPFClientConnection> getAllDriverNames()
-  {
+  public synchronized Map<String, JPPFClientConnection> getAllDriverNames() {
     Map<String, JPPFClientConnection> map = new HashMap<>();
-    for (int i=0; i<treeTableRoot.getChildCount(); i++)
-    {
+    for (int i=0; i<treeTableRoot.getChildCount(); i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
       TopologyData data = (TopologyData) driverNode.getUserObject();
       //map.put(data.getJmxWrapper().getId(), data.getClientConnection());
@@ -275,42 +252,32 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Refresh the states of all displayed nodes.
    */
-  public synchronized void refreshNodeStates()
-  {
-    for (int i=0; i<treeTableRoot.getChildCount(); i++)
-    {
+  public synchronized void refreshNodeStates() {
+    for (int i=0; i<treeTableRoot.getChildCount(); i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
       TopologyData driverData = (TopologyData) driverNode.getUserObject();
       if (driverNode.getChildCount() <= 0) continue;
       if (driverData.getNodeForwarder() == null) continue;
       Map<String, TopologyData> uuidMap = new HashMap<>();
-      for (int j=0; j<driverNode.getChildCount(); j++)
-      {
+      for (int j=0; j<driverNode.getChildCount(); j++) {
         DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
         TopologyData data = (TopologyData) nodeNode.getUserObject();
         uuidMap.put(data.getUuid(), data);
       }
       Map<String, Object> result = null;
-      try
-      {
+      try {
         result = driverData.getNodeForwarder().state(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
-      }
-      catch(IOException e)
-      {
+      } catch(IOException e) {
         log.error("error getting node states for driver " + driverData.getUuid() + ", reinitializing the connection", e);
         driverData.initializeProxies();
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         log.error("error getting node states for driver " + driverData.getUuid(), e);
       }
       if (result == null) continue;
-      for (Map.Entry<String, Object> entry: result.entrySet())
-      {
+      for (Map.Entry<String, Object> entry: result.entrySet()) {
         TopologyData data = uuidMap.get(entry.getKey());
         if (data == null) continue;
-        if (entry.getValue() instanceof Exception)
-        {
+        if (entry.getValue() instanceof Exception) {
           data.setStatus(TopologyDataStatus.DOWN);
           log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
         }
@@ -322,8 +289,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Initialize all actions used in the panel.
    */
-  public void setupActions()
-  {
+  public void setupActions() {
     actionHandler = new JTreeTableActionHandler(treeTable);
     actionHandler.putAction("shutdown.restart.driver", new ServerShutdownRestartAction());
     actionHandler.putAction("driver.reset.statistics", new ServerStatisticsResetAction());
@@ -348,18 +314,13 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
    */
   @Override
-  public synchronized void newConnection(final ClientEvent event)
-  {
+  public synchronized void newConnection(final ClientEvent event) {
     final JPPFClientConnection c = (JPPFClientConnection) event.getConnection();
-    if (c.getDriverUuid() == null)
-    {
-      c.addClientConnectionStatusListener(new ClientConnectionStatusListener()
-      {
+    if (c.getDriverUuid() == null) {
+      c.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
         @Override
-        public void statusChanged(final ClientConnectionStatusEvent event)
-        {
-          if (c.getStatus() == JPPFClientConnectionStatus.ACTIVE)
-          {
+        public void statusChanged(final ClientConnectionStatusEvent event) {
+          if (c.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
             c.removeClientConnectionStatusListener(this);
             driverAdded(c);
           }
@@ -370,8 +331,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   }
 
   @Override
-  public void connectionFailed(final ClientEvent event)
-  {
+  public void connectionFailed(final ClientEvent event) {
     JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) event.getConnection();
     driverRemoved(c.getDriverUuid(), false);
   }
@@ -381,18 +341,14 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * @param name the name of the field to update.
    * @param n the number of servers to add or subtract.
    */
-  void updateStatusBar(final String name, final int n)
-  {
-    try
-    {
+  void updateStatusBar(final String name, final int n) {
+    try {
       AtomicInteger nb = "/StatusNbServers".equals(name) ? nbServers : nbNodes;
       int newNb = nb.addAndGet(n);
       if (debugEnabled) log.debug("updating '" + name + "' with value = " + n + ", result = " + newNb);
       FormattedNumberOption option = (FormattedNumberOption) findFirstWithName(name);
       if (option != null) option.setValue(Double.valueOf(newNb));
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       log.error(t.getMessage(), t);
     }
   }
@@ -400,8 +356,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   /**
    * Refresh the number of active servers and nodes in the status bar.
    */
-  public void refreshStatusBar()
-  {
+  public void refreshStatusBar() {
     FormattedNumberOption option = (FormattedNumberOption) findFirstWithName("/StatusNbServers");
     if (option != null) option.setValue(Double.valueOf(nbServers.get()));
     option = (FormattedNumberOption) findFirstWithName("/StatusNbNodes");
@@ -412,8 +367,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Get the mapping of connection names to status listener.
    * @return a map of string keys to <code>ConnectionStatusListener</code> values.
    */
-  Map<String, ConnectionStatusListener> getListenerMap()
-  {
+  Map<String, ConnectionStatusListener> getListenerMap() {
     return listenerMap;
   }
 
@@ -421,8 +375,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Get the tree table updates manager.
    * @return a {@link NodeDataPanelManager} instance.
    */
-  public NodeDataPanelManager getManager()
-  {
+  public NodeDataPanelManager getManager() {
     return manager;
   }
 
@@ -430,8 +383,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Get the graph view of the topology.
    * @return a {@link GraphOption} instance.
    */
-  public GraphOption getGraphOption()
-  {
+  public GraphOption getGraphOption() {
     return graphOption;
   }
 
@@ -439,11 +391,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Set the graph view of the topology.
    * @param graphOption a {@link GraphOption} instance.
    */
-  public void setGraphOption(final GraphOption graphOption)
-  {
+  public void setGraphOption(final GraphOption graphOption) {
     if (debugEnabled) log.debug("start");
-    if (this.graphOption == null)
-    {
+    if (this.graphOption == null) {
       if (graphOption != null) graphOption.setTreeTableOption(this);
       populateTreeTableModel();
       refreshNodeStates();
@@ -459,8 +409,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Get the JVM health view of the topology.
    * @return a {@link JVMHealthPanel} instance.
    */
-  public JVMHealthPanel getJVMHealthPanel()
-  {
+  public JVMHealthPanel getJVMHealthPanel() {
     return jvmHealthPanel;
   }
 
@@ -468,13 +417,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Set the JVM health view of the topology.
    * @param jvmHealthPanel a {@link JVMHealthPanel} instance.
    */
-  public void setJVMHealthPanel(final JVMHealthPanel jvmHealthPanel)
-  {
+  public void setJVMHealthPanel(final JVMHealthPanel jvmHealthPanel) {
     if (debugEnabled) log.debug("start");
-    if (this.jvmHealthPanel == null)
-    {
-      if (jvmHealthPanel != null)
-      {
+    if (this.jvmHealthPanel == null) {
+      if (jvmHealthPanel != null) {
         jvmHealthPanel.setNodePanel(this);
         jvmHealthPanel.populate();
         this.jvmHealthPanel = jvmHealthPanel;

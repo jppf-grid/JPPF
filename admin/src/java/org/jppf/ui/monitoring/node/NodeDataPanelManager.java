@@ -77,6 +77,7 @@ public class NodeDataPanelManager {
    * @param nodeName the name of the node to update.
    */
   void nodeDataUpdated(final String driverName, final String nodeName) {
+    if (debugEnabled) log.debug("updating node {} with driver {}", driverName, nodeName);
     final DefaultMutableTreeNode driverNode = findDriver(driverName);
     if (driverNode == null) return;
     final DefaultMutableTreeNode node = findNode(driverNode, nodeName);
@@ -91,37 +92,48 @@ public class NodeDataPanelManager {
    * @param connection a reference to the driver connection.
    */
   void driverAdded(final JPPFClientConnection connection) {
-    if (findDriver(connection.getDriverUuid()) != null) return;
-    JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
-    String driverName = connection.getDriverUuid();
-    int index = driverInsertIndex(driverName);
-    if (index < 0) return;
-    TopologyData driverData = new TopologyData(connection);
-    driverMap.put(driverData.getUuid(), driverData);
-    DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
-    if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
-    panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
-    fireDriverAdded(driverData);
-    if (panel.getListenerMap().get(wrapper.getId()) == null) {
-      ConnectionStatusListener listener = new ConnectionStatusListener(panel, driverData.getUuid());
-      connection.addClientConnectionStatusListener(listener);
-      panel.getListenerMap().put(wrapper.getId(), listener);
-    }
-    Collection<JPPFManagementInfo> nodes = null;
     try {
-      nodes = wrapper.nodesInformation();
-    } catch(Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      return;
+      if (debugEnabled) log.debug("before adding driver {}", connection);
+      String driverName = connection.getDriverUuid();
+      DefaultMutableTreeNode tmp = findDriver(driverName);
+      if (tmp != null) {
+        if (debugEnabled) log.debug("driver {} already exists", driverName);
+        return;
+      }
+      JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
+      int index = driverInsertIndex(driverName);
+      if (debugEnabled) log.debug("before adding driver {} at index {}", driverName, index);
+      if (index < 0) return;
+      TopologyData driverData = new TopologyData(connection);
+      driverMap.put(driverData.getUuid(), driverData);
+      DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
+      if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
+      panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
+      fireDriverAdded(driverData);
+      if (panel.getListenerMap().get(wrapper.getId()) == null) {
+        ConnectionStatusListener listener = new ConnectionStatusListener(panel, driverData.getUuid());
+        connection.addClientConnectionStatusListener(listener);
+        panel.getListenerMap().put(wrapper.getId(), listener);
+      }
+      Collection<JPPFManagementInfo> nodes = null;
+      try {
+        nodes = wrapper.nodesInformation();
+      } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        return;
+      }
+      if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
+      JPPFTreeTable treeTable = panel.getTreeTable();
+      if (treeTable != null) {
+        treeTable.expand(panel.getTreeTableRoot());
+        treeTable.expand(driverNode);
+      }
+      panel.updateStatusBar("/StatusNbServers", 1);
+      repaintTreeTable();
+    } catch(RuntimeException | Error e) {
+      e.printStackTrace();
+      throw e;
     }
-    if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
-    JPPFTreeTable treeTable = panel.getTreeTable();
-    if (treeTable != null) {
-      treeTable.expand(panel.getTreeTableRoot());
-      treeTable.expand(driverNode);
-    }
-    panel.updateStatusBar("/StatusNbServers", 1);
-    repaintTreeTable();
   }
 
   /**
@@ -129,15 +141,17 @@ public class NodeDataPanelManager {
    * @param driverUuid the name of the driver to remove.
    * @param removeNodesOnly true if only the nodes attached to the driver are to be removed.
    */
-  void driverRemoved(final String driverUuid, final boolean removeNodesOnly)
-  {
+  void driverRemoved(final String driverUuid, final boolean removeNodesOnly) {
     if (debugEnabled) log.debug("removing driver: " + driverUuid);
     final DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
     TopologyData driverData = (TopologyData) driverNode.getUserObject();
-    driverMap.remove(driverData.getUuid());
+    //if (debugEnabled) log.debug("removing driver with driverUuid = {}, driverData.getUuid()=", driverUuid, driverData.getUuid());
+    driverMap.remove(driverUuid);
+    //driverMap.remove(driverData.getUuid());
     try {
       int n = driverNode.getChildCount();
+      if (debugEnabled) log.debug("removing {} children from driver {}", n, driverUuid);
       int count = 0;
       for (int i=n-1; i>=0; i--) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode ) driverNode.getChildAt(i);

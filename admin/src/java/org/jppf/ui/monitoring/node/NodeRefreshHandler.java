@@ -108,48 +108,54 @@ public class NodeRefreshHandler
   /**
    * Refresh the tree structure.
    */
-  private synchronized void refresh0()
-  {
-    Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
-    Set<String> uuidSet = new HashSet<>();
-    Map<String, JPPFClientConnection> map = new HashMap<>();
-    for (JPPFClientConnection c: connectionList)
-    {
-      String driverUuid = c.getDriverUuid();
-      if (uuidSet.contains(driverUuid)) continue;
-      uuidSet.add(driverUuid);
-      map.put(driverUuid, c);
+  private synchronized void refresh0() {
+    try {
+      Collection<JPPFClientConnection> connectionList = jppfClient.getAllConnections();
+      Set<String> uuidSet = new HashSet<>();
+      Map<String, JPPFClientConnection> map = new HashMap<>();
+      for (JPPFClientConnection c: connectionList)
+      {
+        String driverUuid = c.getDriverUuid();
+        if ((driverUuid == null) || "".equals(driverUuid.trim()) || (uuidSet.contains(driverUuid))) continue;
+        uuidSet.add(driverUuid);
+        map.put(driverUuid, c);
+      }
+      Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
+  
+      // handle drivers that were removed
+      List<String> driversToProcess = new ArrayList<>();
+      for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
+      {
+        String uuid = entry.getValue().getDriverUuid();
+        if ((uuid == null) || "".equals(uuid.trim())) continue;
+        if (!map.containsKey(uuid)) driversToProcess.add(uuid);
+        else refreshNodes(uuid);
+      }
+      for (String uuid: driversToProcess)
+      {
+        if (debugEnabled) log.debug("removing driver " + uuid);
+        nodeDataPanel.driverRemoved(uuid, false);
+      }
+  
+      // handle drivers that were added
+      driversToProcess = new ArrayList<>();
+      for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
+      {
+        String uuid = entry.getKey();
+        if ((uuid == null) || "".equals(uuid.trim())) continue;
+        if (!connectionMap.containsKey(uuid)) driversToProcess.add(uuid);
+      }
+      for (String uuid: driversToProcess)
+      {
+        if (debugEnabled) log.debug("adding driver " + uuid);
+        nodeDataPanel.driverAdded(map.get(uuid));
+        if (debugEnabled) log.debug("after adding driver " + uuid);
+      }
+      nodeDataPanel.refreshNodeStates();
+      nodeDataPanel.repaintTreeTable();
+    } catch(Throwable t) {
+      t.printStackTrace();
     }
-    Map<String, JPPFClientConnection> connectionMap = nodeDataPanel.getAllDriverNames();
-
-    // handle drivers that were removed
-    List<String> driversToProcess = new ArrayList<>();
-    for (Map.Entry<String, JPPFClientConnection> entry: connectionMap.entrySet())
-    {
-      String uuid = entry.getValue().getDriverUuid();
-      if (!map.containsKey(uuid)) driversToProcess.add(uuid);
-      else refreshNodes(uuid);
-    }
-    for (String uuid: driversToProcess)
-    {
-      if (debugEnabled) log.debug("removing driver " + uuid);
-      nodeDataPanel.driverRemoved(uuid, false);
-    }
-
-    // handle drivers that were added
-    driversToProcess = new ArrayList<>();
-    for (Map.Entry<String, JPPFClientConnection> entry: map.entrySet())
-    {
-      String uuid = entry.getKey();
-      if (!connectionMap.containsKey(uuid)) driversToProcess.add(uuid);
-    }
-    for (String uuid: driversToProcess)
-    {
-      if (debugEnabled) log.debug("adding driver " + uuid);
-      nodeDataPanel.driverAdded(map.get(uuid));
-    }
-    nodeDataPanel.refreshNodeStates();
-    nodeDataPanel.repaintTreeTable();
   }
 
   /**
