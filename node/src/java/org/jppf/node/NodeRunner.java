@@ -25,8 +25,7 @@ import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
-import org.jppf.management.JMXServer;
-import org.jppf.node.initialization.*;
+import org.jppf.node.initialization.InitializationHook;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.utils.*;
@@ -312,35 +311,10 @@ public class NodeRunner
    * @exclude
    */
   public static void shutdown(final NodeInternal node, final boolean restart) {
-    //executor.submit(new ShutdownOrRestart(restart));
-    new ShutdownOrRestart(restart, node).run();
-  }
-
-  /**
-   * Stop the JMX server.
-   */
-  private static void stopJmxServer() {
+    Future<?> f = executor.submit(new ShutdownOrRestart(restart, node));
+    // we don't want to wait forever for the connection to close
     try {
-      final JMXServer jmxServer = node.getJmxServer();
-      if (jmxServer != null) {
-        jmxServer.stop();
-        Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              jmxServer.stop();
-            } catch (Exception ignore) {
-            }
-          }
-        };
-        Future<?> f = executor.submit(r);
-        // we don't want to wait forever for the connection to close
-        try {
-          f.get(1000L, TimeUnit.MILLISECONDS);
-        } catch (Exception ignore) {
-        }
-        //if (!f.isDone()) f.cancel(true);
-      }
+      f.get(1000L, TimeUnit.MILLISECONDS);
     } catch (Exception ignore) {
     }
   }
@@ -379,12 +353,6 @@ public class NodeRunner
         @Override
         public Object run() {
           node.stopNode();
-          // close the JMX server connection to avoid request being sent again by the client.
-          stopJmxServer();
-          try {
-            Thread.sleep(500L);
-          } catch(Exception ignore) {
-          }
           System.exit(restart ? 2 : 0);
           return null;
         }
