@@ -87,7 +87,7 @@ public abstract class AbstractJMXServer implements JMXServer
   public void stop() throws Exception
   {
     stopped = true;
-    connectorServer.stop();
+    if (connectorServer != null) connectorServer.stop();
   }
 
   /**

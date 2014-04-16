@@ -313,7 +313,13 @@ public class NodeRunner
    */
   public static void shutdown(final NodeInternal node, final boolean restart) {
     //executor.submit(new ShutdownOrRestart(restart));
-    new ShutdownOrRestart(restart, node).run();
+    //new ShutdownOrRestart(restart, node).run();
+    Future<?> f = executor.submit(new ShutdownOrRestart(restart, node));
+    // we don't want to wait forever for the connection to close
+    try {
+      f.get(1000L, TimeUnit.MILLISECONDS);
+    } catch (Exception ignore) {
+    }
   }
 
   /**
@@ -324,22 +330,6 @@ public class NodeRunner
       final JMXServer jmxServer = node.getJmxServer();
       if (jmxServer != null) {
         jmxServer.stop();
-        Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              jmxServer.stop();
-            } catch (Exception ignore) {
-            }
-          }
-        };
-        Future<?> f = executor.submit(r);
-        // we don't want to wait forever for the connection to close
-        try {
-          f.get(1000L, TimeUnit.MILLISECONDS);
-        } catch (Exception ignore) {
-        }
-        //if (!f.isDone()) f.cancel(true);
       }
     } catch (Exception ignore) {
     }
@@ -369,22 +359,12 @@ public class NodeRunner
       this.node = node;
     }
 
-    /**
-     * Execute this task.
-     * @see java.lang.Runnable#run()
-     */
     @Override
     public void run() {
       AccessController.doPrivileged(new PrivilegedAction<Object>() {
         @Override
         public Object run() {
           node.stopNode();
-          // close the JMX server connection to avoid request being sent again by the client.
-          stopJmxServer();
-          try {
-            Thread.sleep(500L);
-          } catch(Exception ignore) {
-          }
           System.exit(restart ? 2 : 0);
           return null;
         }
