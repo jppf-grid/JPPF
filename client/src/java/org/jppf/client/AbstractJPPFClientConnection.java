@@ -191,11 +191,11 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
     if ( jmxConnection != null && jmxConnection.isConnected())
     {
-      if (debugEnabled) log.debug("requesting cancel of jobUuid=" + jobId);
+      if (debugEnabled) log.debug("{} requesting cancel of jobUuid={}", this, jobId);
       jmxConnection.cancelJob(jobId);
       return true;
     }
-    if (debugEnabled) log.debug("could not cancel jobUuid=" + jobId + " : jmx connection not ready");
+    if (debugEnabled) log.debug("{} could not cancel jobUuid={} : jmx connection not ready", this, jobId);
     return false;
   }
 

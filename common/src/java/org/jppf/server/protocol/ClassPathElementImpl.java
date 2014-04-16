@@ -92,8 +92,20 @@ public class ClassPathElementImpl implements ClassPathElement
    * This default implementation always return true.
    * @return <code>true</code>.
    */
+  @Override
   public boolean validate()
   {
     return true;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("name=").append(name);
+    sb.append(", localLocation=").append(localLocation);
+    sb.append(", remoteLocation=").append(remoteLocation);
+    sb.append(']');
+    return sb.toString();
   }
 }

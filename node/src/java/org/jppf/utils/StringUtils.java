@@ -503,4 +503,17 @@ public final class StringUtils
     }
     return null;
   }
+
+  /**
+   * Get a string mixing the specified number and word, making the word singular or pural dependending on the number.
+   * @param n the number of objects designated by word.
+   * @param word the word to adjust.
+   * @return a string in the format "_n_ _word_[s]".
+   */
+  public static String singularPlural(final int n, final String word) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(n).append(word);
+    if (n > 1) sb.append('s');
+    return sb.toString();
+  }
 }
