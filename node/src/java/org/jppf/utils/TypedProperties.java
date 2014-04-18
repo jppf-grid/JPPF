@@ -22,8 +22,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.utils.streams.StreamUtils;
-
 /**
  * Extension of the <code>java.util.Properties</code> class to handle the conversion of
  * string values to other types.
@@ -62,7 +60,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a string, or null if it is not found.
    */
   public String getString(final String key) {
-    return getString(key, null);
+    return getProperty(key, null);
   }
 
   /**
@@ -72,8 +70,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a string, or the default value if it is not found.
    */
   public String getString(final String key, final String defValue) {
-    String val = getProperty(key);
-    return (val == null) ? defValue : val;
+    return getProperty(key, defValue);
   }
 
   /**
@@ -163,7 +160,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a float, or zero if it is not found.
    */
   public float getFloat(final String key) {
-    return getFloat(key, 0.0f);
+    return getFloat(key, 0f);
   }
 
   /**
@@ -200,7 +197,7 @@ public class TypedProperties extends Properties {
    * @return the value of the property as a double, or zero if it is not found.
    */
   public double getDouble(final String key) {
-    return getDouble(key, 0.0d);
+    return getDouble(key, 0d);
   }
 
   /**
@@ -342,18 +339,13 @@ public class TypedProperties extends Properties {
    * @return the value of the property as another set of properties, or the default value if it is not found.
    */
   public TypedProperties getProperties(final String key, final TypedProperties def) {
-    String path = getString(key);
-    TypedProperties res = new TypedProperties();
-    InputStream is = null;
-    try {
-      is = FileUtils.getFileInputStream(path);
+    try (InputStream is = FileUtils.getFileInputStream(getString(key))) {
+      TypedProperties res = new TypedProperties();
       res.load(is);
+      return res;
     } catch(IOException e) {
       return def;
-    } finally {
-      StreamUtils.closeSilent(is);
     }
-    return res;
   }
 
   /**
@@ -387,17 +379,16 @@ public class TypedProperties extends Properties {
    */
   public String asString() {
     StringBuilder sb = new StringBuilder();
-    Set<Map.Entry<Object, Object>> entries = entrySet();
-    for (Map.Entry<Object, Object> entry: entries) {
-      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
-        sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+    for (Map.Entry<Object, Object> en: entrySet()) {
+      if ((en.getKey() instanceof String) && (en.getValue() instanceof String)) {
+        sb.append(en.getKey()).append(" = ").append(en.getValue()).append('\n');
       }
     }
     return sb.toString();
   }
 
   /**
-   * Extract the properties that pass the specfied filter.
+   * Extract the properties that pass the specified filter.
    * @param filter the filter to use, if <code>null</code> then all properties are retruned.
    * @return a new <code>TypedProperties</code> object containing only the properties matching the filter.
    */

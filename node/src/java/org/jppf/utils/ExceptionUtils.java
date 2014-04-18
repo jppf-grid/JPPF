@@ -44,14 +44,17 @@ public final class ExceptionUtils
   public static String getStackTrace(final Throwable t)
   {
     if (t == null) return "null";
-    String result = null;
+    StringBuilder result = null;
     try (StringWriter writer = new StringWriter(); PrintWriter pw = new PrintWriter(writer)) {
       t.printStackTrace(pw);
-      result = writer.toString();
+      result = new StringBuilder(writer.toString());
+      int n = result.length();
+      char c = result.charAt(n-1);
+      if (c == '\n') result.setLength(n-1);
     } catch(Exception e) {
-      result = getStackTrace2(t);
+      result = new StringBuilder(getStackTrace2(t));
     }
-    return result;
+    return result.toString();
   }
 
   /**

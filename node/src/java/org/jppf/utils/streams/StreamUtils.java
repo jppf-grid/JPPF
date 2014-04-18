@@ -28,22 +28,19 @@ import org.slf4j.Logger;
  * Collection of utility methods for manipulating streams.
  * @author Laurent Cohen
  */
-public final class StreamUtils
-{
+public final class StreamUtils {
   /**
    * Instantiating this class is not permitted.
    */
-  private StreamUtils()
-  {
+  private StreamUtils() {
   }
 
   /**
    * Attempt to close the specified closeable without logging an eventual error.
    * @param closeable the closeable to close.
-   * @throws IOException if any error occurs while closing the closeable.
+   * @throws Exception if any error occurs while closing the closeable.
    */
-  public static void close(final Closeable closeable) throws IOException
-  {
+  public static void close(final AutoCloseable closeable) throws Exception {
     closeable.close();
   }
 
@@ -51,8 +48,7 @@ public final class StreamUtils
    * Attempt to silently close (no exception logging) the specified closeable.
    * @param closeable the closeable to close.
    */
-  public static void closeSilent(final Closeable closeable)
-  {
+  public static void closeSilent(final AutoCloseable closeable) {
     close(closeable, null);
   }
 
@@ -61,18 +57,12 @@ public final class StreamUtils
    * @param closeable the closeable to close.
    * @param log the logger to use; if null no logging occurs.
    */
-  public static void close(final Closeable closeable, final Logger log)
-  {
-    if (closeable != null)
-    {
-      try
-      {
+  public static void close(final AutoCloseable closeable, final Logger log) {
+    if (closeable != null) {
+      try {
         closeable.close();
-      }
-      catch (IOException e)
-      {
-        if (log != null)
-        {
+      } catch (Exception e) {
+        if (log != null) {
           String s = "unable to close stream/reader/writer: " + ExceptionUtils.getMessage(e);
           if (log.isDebugEnabled()) log.debug(s, e);
           else log.warn(s);
@@ -88,8 +78,7 @@ public final class StreamUtils
    * @return a byte array.
    * @throws IOException if an IO error occurs.
    */
-  public static byte[] getInputStreamAsByte(final InputStream is) throws IOException
-  {
+  public static byte[] getInputStreamAsByte(final InputStream is) throws IOException {
     ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
     copyStream(is, baos, true);
     return baos.toByteArray();
@@ -102,8 +91,7 @@ public final class StreamUtils
    * @param os the output stream to write to.
    * @throws IOException if an I/O error occurs.
    */
-  public static void copyStream(final InputStream is, final OutputStream os) throws IOException
-  {
+  public static void copyStream(final InputStream is, final OutputStream os) throws IOException {
     copyStream(is, os, true);
   }
 
@@ -139,8 +127,7 @@ public final class StreamUtils
    * Display a message and wait until a key is pressed.
    * @throws Exception if any I/O error occurs.
    */
-  public static void waitKeyPressed() throws Exception
-  {
+  public static void waitKeyPressed() throws Exception {
     waitKeyPressed("press <Enter> to continue ...");
   }
 
@@ -149,8 +136,7 @@ public final class StreamUtils
    * @param message the message to dispplay
    * @throws Exception if any I/O error occurs.
    */
-  public static void waitKeyPressed(final String message) throws Exception
-  {
+  public static void waitKeyPressed(final String message) throws Exception {
     System.out.println(message);
     System.in.read();
   }

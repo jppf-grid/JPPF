@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class SerializationCaches
-{
+class SerializationCaches {
   /**
    * Logger for this class.
    */
@@ -68,18 +67,14 @@ class SerializationCaches
    * Initialize the descriptors for all primitive types.
    * @return a mapping of primitive types to their class descriptor.
    */
-  private static Map<Class<?>, ClassDescriptor> initGlobalTypes()
-  {
+  private static Map<Class<?>, ClassDescriptor> initGlobalTypes() {
     Map<Class<?>, ClassDescriptor> map = new IdentityHashMap<>();
     AtomicInteger counter = new AtomicInteger(0);
-    try
-    {
+    try {
       for (Class<?> c: PRIMITIVE_TYPES) getClassDescriptorGeneric(c, counter, map, null);
       getClassDescriptorGeneric(Object.class, counter, map, null);
       getClassDescriptorGeneric(String.class, counter, map, null);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error("error initializing global types", e);
     }
     return map;
@@ -88,8 +83,7 @@ class SerializationCaches
   /**
    * Default constructor.
    */
-  SerializationCaches()
-  {
+  SerializationCaches() {
     classToDescMap.putAll(globalTypesMap);
     classHandleCount.set(classToDescMap.size());
   }
@@ -101,8 +95,7 @@ class SerializationCaches
    * @return a {@link ClassDescriptor} object.
    * @throws Exception if nay error occurs.
    */
-  ClassDescriptor getClassDescriptor(final Class<?> clazz, final Map<Class<?>, ClassDescriptor> map) throws Exception
-  {
+  ClassDescriptor getClassDescriptor(final Class<?> clazz, final Map<Class<?>, ClassDescriptor> map) throws Exception {
     return getClassDescriptorGeneric(clazz, classHandleCount, classToDescMap, map);
   }
 
@@ -111,8 +104,7 @@ class SerializationCaches
    * @param o the object for which to get a handle.
    * @return the handle as an int value.
    */
-  int newObjectHandle(final Object o)
-  {
+  int newObjectHandle(final Object o) {
     int handle = objectHandleCount.incrementAndGet();
     objectHandleMap.put(o, handle);
     if (traceEnabled) try { log.trace("created handle " + handle  + " for o=" + o); } catch(Exception e) {}
@@ -129,12 +121,11 @@ class SerializationCaches
    * @throws Exception if nay error occurs.
    */
   static ClassDescriptor getClassDescriptorGeneric(final Class<?> clazz, final AtomicInteger counter,
-      final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception
-      {
+      final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception {
     ClassDescriptor cd = map.get(clazz);
     if (cd == null) cd = addClassGeneric(clazz, counter, map, map2);
     return cd;
-      }
+  }
 
   /**
    * Add a class mapping.
@@ -146,8 +137,7 @@ class SerializationCaches
    * @throws Exception if any error occurs.
    */
   static ClassDescriptor addClassGeneric(final Class<?> clazz, final AtomicInteger counter,
-      final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception
-      {
+      final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception {
     ClassDescriptor cd = new ClassDescriptor(clazz);
     cd.handle = counter.incrementAndGet();
     //if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
@@ -158,5 +148,5 @@ class SerializationCaches
     if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
     if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
     return cd;
-      }
+  }
 }

@@ -141,7 +141,7 @@ public class ConnectionPoolRunner {
     long elapsed = 0L;
     long start = System.nanoTime();
     while (elapsed < timeout * 1_000_000L) {
-      if (pool.getNbConnections(JPPFClientConnectionStatus.ACTIVE) == n) return;
+      if (pool.connectionCount(JPPFClientConnectionStatus.ACTIVE) == n) return;
       elapsed = System.nanoTime() - start;
       if (elapsed >= timeout * 1_000_000L) throw new IllegalStateException("timed out while waiting for " + n + " connections");
     }

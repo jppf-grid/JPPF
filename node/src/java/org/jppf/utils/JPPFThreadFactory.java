@@ -72,9 +72,9 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   private final boolean doPrivileged;
   /**
-   * Indicates whether new thread should be created in PrivilegedAction.
+   * Indicates whether new thread should be created as daemon threads.
    */
-  private final boolean daemon;
+  private final boolean daemonThreads;
 
   /**
    * Initialize this thread factory with the specified name.
@@ -144,7 +144,7 @@ public class JPPFThreadFactory implements ThreadFactory
     this.monitoringEnabled = monitoringEnabled;
     this.priority = priority;
     this.doPrivileged = doPrivileged;
-    this.daemon = daemon;
+    this.daemonThreads = daemon;
     if (monitoringEnabled) threadIDs = new ArrayList<>();
   }
 
@@ -177,7 +177,7 @@ public class JPPFThreadFactory implements ThreadFactory
     }
     thread.setPriority(priority);
     thread.setUncaughtExceptionHandler(defaultExceptionHandler);
-    thread.setDaemon(daemon);
+    thread.setDaemon(daemonThreads);
     return thread;
   }
 

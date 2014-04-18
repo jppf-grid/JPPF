@@ -187,8 +187,9 @@ public class ScriptHandler {
               Object res = runner.evaluate(script, bindings);
               result = res == null ? null : res.toString();
             } catch(Exception e) {
-              if (debugEnabled) log.warn("property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}", new Object[] {name, language, type, script, ExceptionUtils.getStackTrace(e)});
-              else log.warn("property '{}' : error evaluating a '{}' script from source type '{}', exception is: {}", new Object[] {name, language, type, ExceptionUtils.getMessage(e)});
+              String message = "property '{}' : error evaluating a '{}' script from source type '{}', script is {}, exception is: {}";
+              if (debugEnabled) log.warn(message, new Object[] {name, language, type, script, ExceptionUtils.getStackTrace(e)});
+              else log.warn(message, new Object[] {name, language, type, ExceptionUtils.getMessage(e)});
               result = matched;
             } finally {
               ScriptRunnerFactory.releaseScriptRunner(runner);

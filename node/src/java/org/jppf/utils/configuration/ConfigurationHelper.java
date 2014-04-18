@@ -26,8 +26,7 @@ import org.jppf.utils.*;
  * Utility methods to help access and manipulate the JPPF configuration
  * @author Laurent Cohen
  */
-public class ConfigurationHelper
-{
+public class ConfigurationHelper {
   /**
    * The configuration to use.
    */
@@ -37,8 +36,7 @@ public class ConfigurationHelper
    * Initialize this helper witht he specified ocnfiguration.
    * @param config the configuration to use.
    */
-  public ConfigurationHelper(final TypedProperties config)
-  {
+  public ConfigurationHelper(final TypedProperties config) {
     this.config = config;
   }
 
@@ -51,8 +49,7 @@ public class ConfigurationHelper
    * @param max the maximum acceptable value.
    * @return the value of the property as an int.
    */
-  public int getInt(final String name, final int def, final int min, final int max)
-  {
+  public int getInt(final String name, final int def, final int min, final int max) {
     if (!config.containsKey(name)) return def;
     int val = config.getInt(name);
     if ((val < min) || (val > max)) val = def;
@@ -68,11 +65,9 @@ public class ConfigurationHelper
    * @param def the default value to use.
    * @return the value of the property as an int.
    */
-  public int getInt(final String name, final String oldName, final int def)
-  {
+  public int getInt(final String name, final String oldName, final int def) {
     int val = def;
-    if (!config.containsKey(name))
-    {
+    if (!config.containsKey(name)) {
       if (!config.containsKey(oldName)) return def;
       else val = config.getInt(oldName);
     }
@@ -91,11 +86,9 @@ public class ConfigurationHelper
    * @param max the maximum acceptable value.
    * @return the value of the property as an int.
    */
-  public int getInt(final String name, final String oldName, final int def, final int min, final int max)
-  {
+  public int getInt(final String name, final String oldName, final int def, final int min, final int max) {
     int val = def;
-    if (!config.containsKey(name))
-    {
+    if (!config.containsKey(name)) {
       if (!config.containsKey(oldName)) return def;
       else val = config.getInt(oldName);
     }
@@ -113,8 +106,7 @@ public class ConfigurationHelper
    * @param max the maximum acceptable value.
    * @return the value of the property as a long.
    */
-  public long getLong(final String name, final long def, final long min, final long max)
-  {
+  public long getLong(final String name, final long def, final long min, final long max) {
     if (!config.containsKey(name)) return def;
     long val = config.getInt(name);
     if ((val < min) || (val > max)) val = def;
@@ -130,11 +122,9 @@ public class ConfigurationHelper
    * @param def the default value to use.
    * @return the value of the property as a long.
    */
-  public long getLong(final String name, final String oldName, final long def)
-  {
+  public long getLong(final String name, final String oldName, final long def) {
     long val = def;
-    if (!config.containsKey(name))
-    {
+    if (!config.containsKey(name)) {
       if (!config.containsKey(oldName)) return def;
       else val = config.getInt(oldName);
     }

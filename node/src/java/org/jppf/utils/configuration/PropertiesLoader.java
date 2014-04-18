@@ -32,8 +32,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class PropertiesLoader
-{
+public class PropertiesLoader {
   /**
    * Logger for this class.
    */
@@ -74,20 +73,15 @@ public class PropertiesLoader
    * @param reader the reader to get the properties from.
    * @throws IOException if any error occurs.
    */
-  public void load(final Properties props, final Reader reader) throws IOException
-  {
+  public void load(final Properties props, final Reader reader) throws IOException {
     BufferedReader breader = (reader instanceof BufferedReader) ? (BufferedReader) reader : new BufferedReader(reader);
     String list = EMPTY_STRING;
-    try
-    {
+    try {
       list = load(breader);
-      try (Reader r = new StringReader(list))
-      {
+      try (Reader r = new StringReader(list)) {
         props.load(r);
       }
-    }
-    catch (StackOverflowError e)
-    {
+    } catch (StackOverflowError e) {
       String msg = "There is a problem in the configuration: it has cyclic include statements leading to " + ExceptionUtils.getMessage(e);
       System.err.println(msg);
       if (debugEnabled) log.debug(msg, e);
@@ -102,12 +96,10 @@ public class PropertiesLoader
    * @return a list of strings representing a line in a properties file.
    * @throws IOException if any error occurs.
    */
-  private String load(final BufferedReader reader) throws IOException
-  {
+  private String load(final BufferedReader reader) throws IOException {
     StringBuilder sb = new StringBuilder();
     String line = null;
-    while ((line = reader.readLine()) != null)
-    {
+    while ((line = reader.readLine()) != null) {
       line = line.trim();
       if (line.length() <= 0) continue;
       if (INCLUDE_PATTERN.matcher(line).matches()) sb.append(readInclude(line));
@@ -137,7 +129,6 @@ public class PropertiesLoader
           break;
         case URL_SRC:
           URL url = new URL(tokens[2]);
-          //reader = new BufferedReader(new InputStreamReader(url.openStream()));
           reader = new BufferedReader(new InputStreamReader(new URLLocation(url).getInputStream()));
           break;
         case CLASS_SRC:
