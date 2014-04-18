@@ -127,6 +127,9 @@ public class JobData
    */
   public JMXDriverConnectionWrapper getJmxWrapper()
   {
+    if (jmxWrapper == null) {
+      if (clientConnection != null) jmxWrapper = clientConnection.getJmxConnection();
+    }
     return jmxWrapper;
   }
 
@@ -163,7 +166,7 @@ public class JobData
    */
   public DriverJobManagementMBean getProxy()
   {
-    if (jmxWrapper == null) return null;
+    if (getJmxWrapper() == null) return null;
     if (proxy == null)
     {
       try
@@ -193,7 +196,7 @@ public class JobData
     {
       case DRIVER:
         //s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getId();
-        s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getDisplayName();
+        s = (getJmxWrapper() == null) ? "unknown" : jmxWrapper.getDisplayName();
         break;
       case JOB:
         s = jobInformation.getJobName();

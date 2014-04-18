@@ -32,44 +32,35 @@ import org.jppf.utils.JPPFConfiguration;
  * Renderer used to render the tree nodes in the job data panel.
  * @author Laurent Cohen
  */
-public class JobRenderer extends AbstractTreeCellRenderer
-{
+public class JobRenderer extends AbstractTreeCellRenderer {
   /**
    * Configures the renderer based on the passed in components.
-   * @param tree - the tree of which to apply this renderer.
-   * @param value - the node to render.
-   * @param sel - determines whether the node is selected.
-   * @param expanded - determines whether the node is expanded.
-   * @param leaf - determines whether the node is a leaf.
-   * @param row - the node's row number.
-   * @param hasFocus - determines whether the node has the focus.
+   * @param tree the tree of which to apply this renderer.
+   * @param value the node to render.
+   * @param sel determines whether the node is selected.
+   * @param expanded determines whether the node is expanded.
+   * @param leaf determines whether the node is a leaf.
+   * @param row the node's row number.
+   * @param hasFocus determines whether the node has the focus.
    * @return a component used to paint the node.
-   * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
    */
   @Override
   public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean sel, final boolean expanded, final boolean leaf,
-      final int row, final boolean hasFocus)
-  {
+      final int row, final boolean hasFocus) {
     DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-    if (value instanceof DefaultMutableTreeNode)
-    {
+    if (value instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-      if (!node.isRoot())
-      {
+      if (!node.isRoot()) {
         JobData data = (JobData) node.getUserObject();
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
-        switch(data.getType())
-        {
+        switch(data.getType()) {
           case DRIVER:
-            if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus()))
-            {
+            if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus())) {
               path = DRIVER_ICON;
               background = ACTIVE_COLOR;
-            }
-            else
-            {
+            } else {
               path = DRIVER_INACTIVE_ICON;
               background = INACTIVE_COLOR;
               backgroundSelected = INACTIVE_SELECTION_COLOR;
@@ -77,8 +68,7 @@ public class JobRenderer extends AbstractTreeCellRenderer
             break;
           case JOB:
             path = JOB_ICON;
-            if (data.getJobInformation().isSuspended())
-            {
+            if (data.getJobInformation().isSuspended()) {
               background = SUSPENDED_COLOR;
               backgroundSelected = INACTIVE_SELECTION_COLOR;
             }
@@ -89,8 +79,7 @@ public class JobRenderer extends AbstractTreeCellRenderer
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);
-        if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true))
-        {
+        if (JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true)) {
           renderer.setBackgroundNonSelectionColor(background);
           renderer.setBackgroundSelectionColor(backgroundSelected);
         }

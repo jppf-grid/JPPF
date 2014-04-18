@@ -26,8 +26,7 @@ import org.jppf.ui.treetable.*;
 /**
  * Tree table model for the tree table.
  */
-public class JobTreeTableModel extends AbstractJPPFTreeTableModel
-{
+public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Column number for the node's url.
    */
@@ -57,8 +56,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel
    * Initialize this model with the specified tree root.
    * @param node - the root of the tree.
    */
-  public JobTreeTableModel(final TreeNode node)
-  {
+  public JobTreeTableModel(final TreeNode node) {
     super(node);
     BASE = "org.jppf.ui.i18n.JobDataPage";
   }
@@ -69,8 +67,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel
    * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
    */
   @Override
-  public int getColumnCount()
-  {
+  public int getColumnCount() {
     return 6;
   }
 
@@ -82,23 +79,18 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel
    * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
    */
   @Override
-  public Object getValueAt(final Object node, final int column)
-  {
+  public Object getValueAt(final Object node, final int column) {
     Object res = "";
-    if (node instanceof DefaultMutableTreeNode)
-    {
+    if (node instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      if (defNode.getUserObject() instanceof JobData)
-      {
+      if (defNode.getUserObject() instanceof JobData) {
         JobData data = (JobData) defNode.getUserObject();
         JobInformation jobInfo = data.getJobInformation();
-        switch (column)
-        {
+        switch (column) {
           case NODE_URL:
             break;
           case JOB_STATE:
-            if (data.getType().equals(JobDataType.JOB))
-            {
+            if (data.getType().equals(JobDataType.JOB)) {
               String s = null;
               if (jobInfo.isPending()) s = "pending";
               else s = jobInfo.isSuspended() ? "suspended" : "executing";
@@ -115,8 +107,7 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel
             if (data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getPriority());
             break;
           case MAX_NODES:
-            if (data.getType().equals(JobDataType.JOB))
-            {
+            if (data.getType().equals(JobDataType.JOB)) {
               int n = jobInfo.getMaxNodes();
               // \u221E = infinity symbol
               if (n == Integer.MAX_VALUE) res = "\u221E";
@@ -138,11 +129,9 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel
    * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
    */
   @Override
-  public String getColumnName(final int column)
-  {
+  public String getColumnName(final int column) {
     String res = "";
-    switch (column)
-    {
+    switch (column) {
       case NODE_URL:
         //res = localize("column.node.url");
         res = "Driver / Job / Node";

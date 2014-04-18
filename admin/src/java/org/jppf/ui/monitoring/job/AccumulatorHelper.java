@@ -34,8 +34,7 @@ import org.slf4j.*;
  * @author Martin Janda
  * @author Laurent Cohen
  */
-public class AccumulatorHelper
-{
+public class AccumulatorHelper {
   /**
    * Logger for this class.
    */
@@ -73,8 +72,7 @@ public class AccumulatorHelper
    * Initialize this hleper with the spsecified job panel.
    * @param jobPanel a {@link JobDataPanel} instance.
    */
-  AccumulatorHelper(final JobDataPanel jobPanel)
-  {
+  AccumulatorHelper(final JobDataPanel jobPanel) {
     this.jobPanel = jobPanel;
     panelManager = jobPanel.panelManager;
     setup();
@@ -83,18 +81,15 @@ public class AccumulatorHelper
   /**
    * Publish the accumulated changes.
    */
-  protected void publish()
-  {
+  protected void publish() {
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
     Map<String, AccumulatorDriver> map = getMap();
     boolean changed = false;
-    for (Map.Entry<String, AccumulatorDriver> driverEntry : map.entrySet())
-    {
+    for (Map.Entry<String, AccumulatorDriver> driverEntry : map.entrySet()) {
       String driverName = driverEntry.getKey();
       AccumulatorDriver driverAccumulator = driverEntry.getValue();
       JobAccumulator.Type driverType = driverAccumulator.getType();
-      switch (driverType)
-      {
+      switch (driverType) {
         case ADD:
           panelManager.driverAdded(driverAccumulator.getValue());
           changed = true;
@@ -111,8 +106,7 @@ public class AccumulatorHelper
       }
       changed |= publishDriverJobs(driverName, driverAccumulator);
     }
-    if (changed)
-    {
+    if (changed) {
       jobPanel.refreshUI();
       if (jobPanel.getActionHandler() != null) jobPanel.getActionHandler().updateActions();
     }
@@ -125,18 +119,15 @@ public class AccumulatorHelper
    * @param driverAccumulator the accumulater for the driver's jobs.
    * @return changed <code>true</code> if any change occurred, <code>false</code> otherwise.
    */
-  private boolean publishDriverJobs(final String driverName, final AccumulatorDriver driverAccumulator)
-  {
+  private boolean publishDriverJobs(final String driverName, final AccumulatorDriver driverAccumulator) {
     DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
     if (driverNode == null) return false;
     boolean changed = false;
-    for (Map.Entry<String, AccumulatorJob> jobEntry : driverAccumulator.getMap().entrySet())
-    {
+    for (Map.Entry<String, AccumulatorJob> jobEntry : driverAccumulator.getMap().entrySet()) {
       String jobName = jobEntry.getKey();
       AccumulatorJob jobAccumulator = jobEntry.getValue();
       JobAccumulator.Type jobType = jobAccumulator.getType();
-      switch (jobType)
-      {
+      switch (jobType) {
         case ADD:
           panelManager.jobAdded(driverName, jobAccumulator.getValue());
           changed = true;
@@ -163,16 +154,13 @@ public class AccumulatorHelper
    * @param jobAccumulator the job whose subjobs have changes to publish.
    * @return changed <code>true</code> if any change occurred, <code>false</code> otherwise.
    */
-  private boolean publishJobNodes(final String driverName, final String jobName, final AccumulatorJob jobAccumulator)
-  {
+  private boolean publishJobNodes(final String driverName, final String jobName, final AccumulatorJob jobAccumulator) {
     boolean changed = false;
-    for (Map.Entry<String, AccumulatorNode> nodeEntry : jobAccumulator.getMap().entrySet())
-    {
+    for (Map.Entry<String, AccumulatorNode> nodeEntry : jobAccumulator.getMap().entrySet()) {
       String nodeName = nodeEntry.getKey();
       AccumulatorNode nodeAccumulator = nodeEntry.getValue();
       JobAccumulator.Type nodeType = nodeAccumulator.getType();
-      switch (nodeType)
-      {
+      switch (nodeType) {
         case ADD:
           panelManager.subJobAdded(driverName, nodeAccumulator.getJobInfo(), nodeAccumulator.getValue());
           changed = true;
@@ -190,8 +178,7 @@ public class AccumulatorHelper
    * Get the map of accumulated driver changes.
    * @return a map of <code>String</code> to <code>AccumulatorDriver</code> instances.
    */
-  private synchronized Map<String, AccumulatorDriver> getMap()
-  {
+  private synchronized Map<String, AccumulatorDriver> getMap() {
     Map<String, AccumulatorDriver> copy = new HashMap<>(accumulatorMap);
     accumulatorMap.clear();
     return copy;
@@ -200,8 +187,7 @@ public class AccumulatorHelper
   /**
    * Start the timer.
    */
-  synchronized void setup()
-  {
+  synchronized void setup() {
     if (debugEnabled) log.debug("setup invoked");
     if (timer == null) timer = new Timer("accumulator timer");
     timerTask = new MyTimerTask();
@@ -211,8 +197,7 @@ public class AccumulatorHelper
   /**
    * Clear the map of accumalator drivers and stop the timer.
    */
-  synchronized void cleanup()
-  {
+  synchronized void cleanup() {
     if (debugEnabled) log.debug("cleanup invoked");
     if (timerTask != null) timerTask.cancel();
     if (timer != null) timer.purge();
@@ -224,8 +209,7 @@ public class AccumulatorHelper
    * @param driverName the name of the driver.
    * @return an {@link AccumulatorDriver} instance.
    */
-  synchronized AccumulatorDriver getAccumulatedDriver(final String driverName)
-  {
+  synchronized AccumulatorDriver getAccumulatedDriver(final String driverName) {
     AccumulatorDriver driver = accumulatorMap.get(driverName);
     if(driver == null) {
       driver = new AccumulatorDriver(JobAccumulator.Type.KEEP, null);
@@ -240,8 +224,7 @@ public class AccumulatorHelper
    * @param jobInfo the job description
    * @return an {@link AccumulatorJob} instance.
    */
-  synchronized AccumulatorJob getAccumulatorJob(final String driverName, final JobInformation jobInfo)
-  {
+  synchronized AccumulatorJob getAccumulatorJob(final String driverName, final JobInformation jobInfo) {
     AccumulatorDriver driver = getAccumulatedDriver(driverName);
 
     Map<String, AccumulatorJob> jobMap = driver.getMap();
@@ -257,15 +240,13 @@ public class AccumulatorHelper
   /**
    * Definition of an update accumulator for a driver.
    */
-  static class AccumulatorDriver extends JobAccumulatorBranch<JPPFClientConnection, String, AccumulatorJob>
-  {
+  static class AccumulatorDriver extends JobAccumulatorBranch<JPPFClientConnection, String, AccumulatorJob> {
     /**
      * Initialize this driver accumulator for the specified type of updates and value.
      * @param type the type of updates.
      * @param value a {@link JPPFClientConnection} instance.
      */
-    public AccumulatorDriver(final Type type, final JPPFClientConnection value)
-    {
+    public AccumulatorDriver(final Type type, final JPPFClientConnection value) {
       super(type, value);
     }
   }
@@ -273,15 +254,13 @@ public class AccumulatorHelper
   /**
    * Definition of an update accumulator for a job.
    */
-  static class AccumulatorJob extends JobAccumulatorBranch<JobInformation, String, AccumulatorNode>
-  {
+  static class AccumulatorJob extends JobAccumulatorBranch<JobInformation, String, AccumulatorNode> {
     /**
      * Initialize this job accumulator for the specified type of updates and value.
      * @param type the type of updates.
      * @param value a {@link JobInformation} instance.
      */
-    public AccumulatorJob(final Type type, final JobInformation value)
-    {
+    public AccumulatorJob(final Type type, final JobInformation value) {
       super(type, value);
     }
   }
@@ -289,8 +268,7 @@ public class AccumulatorHelper
   /**
    * Definition of an update accumulator for a sub-job.
    */
-  static class AccumulatorNode extends JobAccumulator<JPPFManagementInfo>
-  {
+  static class AccumulatorNode extends JobAccumulator<JPPFManagementInfo> {
     /**
      * Information about the job.
      */
@@ -302,8 +280,7 @@ public class AccumulatorHelper
      * @param jobInfo Information about the job.
      * @param value a {@link JPPFManagementInfo} instance.
      */
-    AccumulatorNode(final Type type, final JobInformation jobInfo, final JPPFManagementInfo value)
-    {
+    AccumulatorNode(final Type type, final JobInformation jobInfo, final JPPFManagementInfo value) {
       super(type, value);
       this.jobInfo = jobInfo;
     }
@@ -312,8 +289,7 @@ public class AccumulatorHelper
      * Get the information about the job.
      * @return a {@link JobInformation} instance.
      */
-    public JobInformation getJobInfo()
-    {
+    public JobInformation getJobInfo() {
       return jobInfo;
     }
   }
@@ -321,21 +297,16 @@ public class AccumulatorHelper
   /**
    * Periodic task that publishes changes to the GUI.
    */
-  private class MyTimerTask extends TimerTask
-  {
+  private class MyTimerTask extends TimerTask {
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         SwingUtilities.invokeAndWait(new Runnable() {
           public void run() {
             publish();
           }
         });
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
