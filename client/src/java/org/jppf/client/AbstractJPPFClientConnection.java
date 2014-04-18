@@ -282,6 +282,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public void close() {
     if (!closed.compareAndSet(false, true)) return;
+    setStatus(FAILED);
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();
