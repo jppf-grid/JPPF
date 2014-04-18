@@ -156,7 +156,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (!queued) {
           driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, clientBundle.getTaskCount());
         }
-        fireQueueEvent(new QueueEvent<>(this, serverJob, false));
+        fireBundleAdded(new QueueEvent<>(this, serverJob, false));
       }
       if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     } finally {
@@ -176,7 +176,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
       priorityMap.putValue(job.getSLA().getPriority(), job);
       sizeMap.putValue(getSize(job), job);
-      fireQueueEvent(new QueueEvent<>(this, job, true));
+      fireBundleAdded(new QueueEvent<>(this, job, true));
     } finally {
       lock.unlock();
     }
@@ -249,6 +249,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         if (debugEnabled) log.debug("adding completion bundle for jobId={} : {}", serverJob.getName(), clientBundle);
         addBundle(clientBundle);
       }
+      fireBundleRemoved(new QueueEvent<>(this, serverJob, false));
     } finally {
       lock.unlock();
     }
@@ -467,7 +468,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     else {
       lock.lock();
       try {
-        fireQueueEvent(new QueueEvent<>(this, broadcastJob, false));
+        fireBundleAdded(new QueueEvent<>(this, broadcastJob, false));
         for (ServerJobBroadcast job : jobList) addBroadcastJob(job);
       } finally {
         lock.unlock();
@@ -495,7 +496,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     jobMap.put(jobUuid, broadcastJob);
     updateLatestMaxSize();
     jobManager.jobQueued(broadcastJob);
-    fireQueueEvent(new QueueEvent<>(this, broadcastJob, false));
+    fireBundleAdded(new QueueEvent<>(this, broadcastJob, false));
 
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, broadcastJob.getTaskCount());

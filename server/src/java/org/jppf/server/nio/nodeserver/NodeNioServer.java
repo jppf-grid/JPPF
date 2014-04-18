@@ -146,9 +146,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     taskQueueChecker = new TaskQueueChecker<>(queue, driver.getStatistics());
     taskQueueChecker.setBundler(bundler);
-    this.queue.addQueueListener(new QueueListener<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
+    this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
-      public void newBundle(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
+      public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
         selector.wakeup();
         taskQueueChecker.wakeUp();
       }
