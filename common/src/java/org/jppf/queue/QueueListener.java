@@ -31,8 +31,15 @@ import java.util.EventListener;
 public interface QueueListener<T, U, V> extends EventListener
 {
   /**
-   * Notify a listener that a queue event occurred.
-   * @param event - a queue event.
+   * Notify a listener that a bundle was added to the queue.
+   * @param event a queue event.
    */
-  void newBundle(QueueEvent<T, U, V> event);
+  void bundleAdded(QueueEvent<T, U, V> event);
+
+  /**
+   * Notify a listener that a bundle was removed from the queue.
+   * @param event a queue event.
+   * @since 4.1
+   */
+  void bundleRemoved(QueueEvent<T, U, V> event);
 }

@@ -28,7 +28,7 @@ import org.jppf.server.scheduler.bundle.JPPFContext;
  * @param <T> type of task bundle.
  * @author Martin JANDA
  */
-public interface ExecutorChannel<T>
+public interface ExecutorChannel<T> extends AutoCloseable
 {
   /**
    * Get the unique identifier of the client.
@@ -101,12 +101,6 @@ public interface ExecutorChannel<T>
    * @param listener the listener to remove from the list.
    */
   void removeExecutionStatusListener(final ExecutorChannelStatusListener listener);
-
-  /**
-   * Close this channel and release the resources it uses.
-   * @throws Exception if any error occurs.
-   */
-  void close() throws Exception;
 
   /**
    * Get the monitor object used for synchronization.

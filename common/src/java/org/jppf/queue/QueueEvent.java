@@ -44,9 +44,9 @@ public class QueueEvent<T, U, V> extends EventObject
 
   /**
    * Initialize this event with the specified queue and bundle.
-   * @param queue         - the queue this event originates from.
-   * @param bundleWrapper - represents part or the totality of a job that was submitted.
-   * @param requeue       - determines if the event is a requeued bundle, following a node failure for instance.
+   * @param queue         the queue this event originates from.
+   * @param bundleWrapper represents part or the totality of a job that was submitted.
+   * @param requeue       determines if the event is a requeued bundle, following a node failure for instance.
    */
   public QueueEvent(final JPPFQueue<T, U, V> queue, final T bundleWrapper, final boolean requeue)
   {

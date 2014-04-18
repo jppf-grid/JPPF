@@ -33,8 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
-{
+public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
   /**
    * Logger for this class.
    */
@@ -83,10 +82,8 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
    * Add a listener to the list of listeners.
    * @param listener the listener to add to the list.
    */
-  public void addQueueListener(final QueueListener<T, U, V> listener)
-  {
-    synchronized (queueListeners)
-    {
+  public void addQueueListener(final QueueListener<T, U, V> listener) {
+    synchronized (queueListeners) {
       queueListeners.add(listener);
     }
   }
@@ -95,10 +92,8 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove from the list.
    */
-  public void removeQueueListener(final QueueListener<T, U, V> listener)
-  {
-    synchronized (queueListeners)
-    {
+  public void removeQueueListener(final QueueListener<T, U, V> listener) {
+    synchronized(queueListeners) {
       queueListeners.remove(listener);
     }
   }
@@ -111,14 +106,23 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   protected abstract int getSize(final T bundleWrapper);
 
   /**
-   * Notify all queue listeners of an event.
+   * Notify all queue listeners that a bundle was added tot he queue.
    * @param event the event to notify of.
    */
-  protected void fireQueueEvent(final QueueEvent<T, U, V> event)
-  {
-    synchronized (queueListeners)
-    {
-      for (QueueListener<T, U, V> listener : queueListeners) listener.newBundle(event);
+  protected void fireBundleAdded(final QueueEvent<T, U, V> event) {
+    synchronized(queueListeners) {
+      for (QueueListener<T, U, V> listener : queueListeners) listener.bundleAdded(event);
+    }
+  }
+
+  /**
+   * Notify all queue listeners of that a bundle was removed form the queue.
+   * @param event the event to notify of.
+   * @since 4.1
+   */
+  protected void fireBundleRemoved(final QueueEvent<T, U, V> event) {
+    synchronized (queueListeners) {
+      for (QueueListener<T, U, V> listener : queueListeners) listener.bundleRemoved(event);
     }
   }
 
@@ -132,28 +136,24 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
   }
 
   @Override
-  public int getMaxBundleSize()
-  {
+  public int getMaxBundleSize() {
     return latestMaxSize.get();
   }
 
   /**
    * Update the value of the max bundle size.
    */
-  protected void updateLatestMaxSize()
-  {
+  protected void updateLatestMaxSize() {
     if (!sizeMap.isEmpty()) latestMaxSize.set(sizeMap.lastKey());
   }
 
   @Override
-  public Iterator<T> iterator()
-  {
+  public Iterator<T> iterator() {
     return priorityMap.iterator(lock);
   }
 
   @Override
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     lock.lock();
     try {
       return priorityMap.isEmpty();
@@ -162,4 +162,19 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V>
     }
   }
 
+  /**
+   * Get the size of this job queue.
+   * <p>This method should be used with caution, as its cost is in O(n),
+   * with n being the number of jobs in the queue.
+   * @return the number of jobs currently in the queue.
+   * @since 4.1
+   */
+  public int getQueueSize() {
+    lock.lock();
+    try {
+      return priorityMap.size();
+    } finally {
+      lock.unlock();
+    }
+  }
 }
