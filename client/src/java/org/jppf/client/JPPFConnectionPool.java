@@ -52,6 +52,10 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
    */
   private final List<JPPFClientConnection> connections = new ArrayList<>();
   /**
+   * List of <code>JPPFClientConnection</code> in the core set.
+   */
+  private final Set<JPPFClientConnection> coreConnections = new HashSet<>();
+  /**
    * The id of this pool.
    */
   private final int id;
@@ -144,22 +148,23 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
 
   /**
    * Add a driver connection to this pool.
-   * @param client the connection too add.
+   * @param connection the connection too add.
    * @return true if the underlying list of connections changed as a result of calling this method.
    * @exclude
    */
-  synchronized boolean add(final JPPFClientConnection client) {
-    return connections.add(client);
+  synchronized boolean add(final JPPFClientConnection connection) {
+    if (connectionCount() < coreSize) coreConnections.add(connection);
+    return connections.add(connection);
   }
 
   /**
    * Remove a driver connection from this pool.
-   * @param client the connection too remove.
+   * @param connection the connection too remove.
    * @return true if the underlying list of connections changed as a result of calling this method.
    * @exclude
    */
-  synchronized boolean remove(final JPPFClientConnection client) {
-    if (connections.remove(client)) {
+  synchronized boolean remove(final JPPFClientConnection connection) {
+    if (connections.remove(connection)) {
       if (lastUsedIndex >= connections.size() && lastUsedIndex > 0) lastUsedIndex--;
       return true;
     }
@@ -274,7 +279,7 @@ public class JPPFConnectionPool implements Comparable<JPPFConnectionPool>, Itera
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
         JPPFClientConnection c = connections.get(i);
-        if (connectionDoesNotMatchStatus(c, EXECUTING)) {
+        if (!coreConnections.contains(c) && connectionDoesNotMatchStatus(c, EXECUTING)) {
           if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
           c.close();
           remove(c);
