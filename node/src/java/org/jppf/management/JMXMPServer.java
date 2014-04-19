@@ -83,6 +83,9 @@ public class JMXMPServer extends AbstractJMXServer
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       env.put("jmx.remote.x.server.max.threads", 1);
       env.put("jmx.remote.x.client.connection.check.period", 0);
+      // remove the "JMX server connection timeout Thread-*" threads
+      // see bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
+      env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
       if (ssl) SSLHelper.configureJMXProperties(env);
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
       boolean found = false;
