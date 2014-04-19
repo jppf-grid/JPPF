@@ -34,8 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JMXMPServer extends AbstractJMXServer
-{
+public class JMXMPServer extends AbstractJMXServer {
   /**
    * Logger for this class.
    */
@@ -48,8 +47,7 @@ public class JMXMPServer extends AbstractJMXServer
   /**
    * Initialize this JMX server.
    */
-  public JMXMPServer()
-  {
+  public JMXMPServer() {
     this(new JPPFUuid().toString(), false);
   }
 
@@ -58,20 +56,17 @@ public class JMXMPServer extends AbstractJMXServer
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    */
-  public JMXMPServer(final String id, final boolean ssl)
-  {
+  public JMXMPServer(final String id, final boolean ssl) {
     this.id = id;
     this.ssl = ssl;
   }
 
   @Override
-  public void start(final ClassLoader cl) throws Exception
-  {
+  public void start(final ClassLoader cl) throws Exception {
     if (debugEnabled) log.debug("starting remote connector server");
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     lock.lock();
-    try
-    {
+    try {
       Thread.currentThread().setContextClassLoader(cl);
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties props = JPPFConfiguration.getProperties();
@@ -83,26 +78,24 @@ public class JMXMPServer extends AbstractJMXServer
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       env.put("jmx.remote.x.server.max.threads", 1);
       env.put("jmx.remote.x.client.connection.check.period", 0);
+      // remove the "JMX server connection timeout Thread-*" threads
+      // see bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
+      env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
       if (ssl) SSLHelper.configureJMXProperties(env);
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
       boolean found = false;
       JMXServiceURL url = null;
-      while (!found)
-      {
-        try
-        {
+      while (!found) {
+        try {
           InetAddress addr = InetAddress.getByName(managementHost);
           String host = (addr instanceof Inet6Address) ? "[" + managementHost + "]" : managementHost;
           url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + managementPort);
           connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
           connectorServer.start();
           found = true;
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           String s = e.getMessage();
-          if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind"))))
-          {
+          if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind")))) {
             if (managementPort >= 65530) managementPort = 1024;
             managementPort++;
           }
@@ -113,9 +106,7 @@ public class JMXMPServer extends AbstractJMXServer
       //if (debugEnabled) log.debug("starting connector server with port = " + port);
       stopped = false;
       if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
       Thread.currentThread().setContextClassLoader(tmp);
     }
