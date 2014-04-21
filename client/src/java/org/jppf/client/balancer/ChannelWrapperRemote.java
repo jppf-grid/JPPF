@@ -72,7 +72,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, channel.isSSLEnabled());
     managementInfo.setSystemInfo(systemInfo);
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName(), false, Thread.NORM_PRIORITY, false, true));
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName(), false, true));
   }
 
   @Override

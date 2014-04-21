@@ -152,7 +152,6 @@ public class NodeRefreshHandler
    */
   private void refreshNodes(final String driverUuid) {
     DefaultMutableTreeNode driverNode = nodeDataPanel.getManager().findDriver(driverUuid);
-    if (debugEnabled) log.debug("driverNode = " + driverNode);
     if (driverNode == null) return;
     TopologyData driverData = (TopologyData) driverNode.getUserObject();
     refreshJmxConnection(driverData);

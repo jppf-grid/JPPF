@@ -22,8 +22,7 @@ package org.jppf.client;
  * Status of the connection between a client and a driver.
  * @author Laurent Cohen
  */
-public enum JPPFClientConnectionStatus
-{
+public enum JPPFClientConnectionStatus {
   /**
    * The connection was just created.
    */
@@ -51,5 +50,26 @@ public enum JPPFClientConnectionStatus
   /**
    * The client failed to connect to the driver and no further attempt will be made.
    */
-  FAILED
+  FAILED;
+
+  /**
+   * Determine whether this status is one of those specified as input.
+   * @param statuses the statuses to check against.
+   * @return {@code true} if this status is one of those specified as input, {@code false} otherwise.
+   */
+  public boolean isOneOf(final JPPFClientConnectionStatus...statuses) {
+    if (statuses == null) return false;
+    for (JPPFClientConnectionStatus status: statuses) {
+      if (this == status) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Determine whether this status a working status.
+   * @return {@code true} if this status is a working status, {@code false} otherwise.
+   */
+  public boolean isWorkingStatus() {
+    return isOneOf(ACTIVE, EXECUTING);
+  }
 }

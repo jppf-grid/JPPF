@@ -25,7 +25,7 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.node.*;
@@ -149,12 +149,16 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
       TopologyData driverData = (TopologyData) driverNode.getUserObject();
       if (driverData.getDiagnostics() == null) continue;
+      JMXDriverConnectionWrapper jmx = driverData.getJmxWrapper();
+      if ((jmx == null) || !jmx.isConnected()) continue;
       try {
         HealthSnapshot health = driverData.getDiagnostics().healthSnapshot();
         if (log.isTraceEnabled()) log.trace("got driver health snapshot: " + health);
         driverData.refreshHealthSnapshot(health);
       } catch (IOException e) {
-        log.error("error getting health snapshot for driver " + driverData.getUuid() + ", reinitializing the connection", e);
+        String format = "error getting health snapshot for driver {}, reinitializing the connection. Exception: {}";
+        if (debugEnabled) log.debug(format, driverData.getUuid(), ExceptionUtils.getStackTrace(e));
+        else log.warn(format, driverData.getUuid(), ExceptionUtils.getMessage(e));
         driverData.initializeProxies();
       } catch (Exception e) {
         log.error("error getting health snapshot for driver " + driverData.getUuid(), e);
@@ -170,7 +174,9 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
       try {
         result = driverData.getNodeForwarder().healthSnapshot(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
       } catch(IOException e) {
-        log.error("error getting node health for driver " + driverData.getUuid() + ", reinitializing the connection", e);
+        String format = "error getting node health for driver {}, reinitializing the connection. Exception: {}";
+        if (debugEnabled) log.debug(format, driverData.getUuid(), ExceptionUtils.getStackTrace(e));
+        else log.warn(format, driverData.getUuid(), ExceptionUtils.getMessage(e));
         driverData.initializeProxies();
       } catch(Exception e) {
         log.error("error getting node health for driver " + driverData.getUuid(), e);

@@ -107,14 +107,11 @@ public class TextAreaOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
    */
   @Override
-  public void setValue(final Object value)
-  {
+  public void setValue(final Object value) {
     this.value = value;
-    SwingUtilities.invokeLater( new Runnable()
-    {
+    SwingUtilities.invokeLater( new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         textArea.setText((String) TextAreaOption.this.value);
       }
     });
@@ -125,13 +122,10 @@ public class TextAreaOption extends AbstractOption
    * @param value a <code>String</code> instance.
    * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
    */
-  public void append(final String value)
-  {
-    SwingUtilities.invokeLater( new Runnable()
-    {
+  public void append(final String value) {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         textArea.append(value);
       }
     });
@@ -142,26 +136,21 @@ public class TextAreaOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
     Document doc = textArea.getDocument();
-    doc.addDocumentListener(new DocumentListener()
-    {
+    doc.addDocumentListener(new DocumentListener() {
       @Override
-      public void changedUpdate(final DocumentEvent e)
-      {
+      public void changedUpdate(final DocumentEvent e) {
         fireValueChanged();
       }
 
       @Override
-      public void insertUpdate(final DocumentEvent e)
-      {
+      public void insertUpdate(final DocumentEvent e) {
         fireValueChanged();
       }
 
       @Override
-      public void removeUpdate(final DocumentEvent e)
-      {
+      public void removeUpdate(final DocumentEvent e) {
         fireValueChanged();
       }
     });

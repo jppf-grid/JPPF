@@ -86,7 +86,7 @@ public class AccumulatorHelper {
     Map<String, AccumulatorDriver> map = getMap();
     boolean changed = false;
     for (Map.Entry<String, AccumulatorDriver> driverEntry : map.entrySet()) {
-      String driverName = driverEntry.getKey();
+      String uuid = driverEntry.getKey();
       AccumulatorDriver driverAccumulator = driverEntry.getValue();
       JobAccumulator.Type driverType = driverAccumulator.getType();
       switch (driverType) {
@@ -95,16 +95,16 @@ public class AccumulatorHelper {
           changed = true;
           break;
         case REMOVE:
-          panelManager.driverRemoved(driverName);
+          panelManager.driverRemoved(uuid);
           changed = true;
           continue;
         case UPDATE:
-          DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
+          DefaultMutableTreeNode driverNode = panelManager.findDriver(uuid);
           if (driverNode != null) jobPanel.getModel().changeNode(driverNode);
           changed = true;
           break;
       }
-      changed |= publishDriverJobs(driverName, driverAccumulator);
+      changed |= publishDriverJobs(uuid, driverAccumulator);
     }
     if (changed) {
       jobPanel.refreshUI();

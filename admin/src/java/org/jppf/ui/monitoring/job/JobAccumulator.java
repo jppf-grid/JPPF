@@ -17,6 +17,8 @@
  */
 package org.jppf.ui.monitoring.job;
 
+import org.slf4j.*;
+
 /**
  * Instances of this class represent changes made to the tree table.
  * @param <T> the type of the values that are changed.
@@ -24,6 +26,14 @@ package org.jppf.ui.monitoring.job;
  */
 public class JobAccumulator<T>
 {
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(JobAccumulator.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * The types of changes.
@@ -106,6 +116,7 @@ public class JobAccumulator<T>
    */
   public boolean mergeChange(final Type type, final T value)
   {
+    if (debugEnabled) log.debug("merging {} into new type {}", this.type, type);
     Type oldType = this.type;
     //if (this.type == type && this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
     if (this.type == type)

@@ -42,7 +42,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   /**
    * The new connection that was created.
    */
-  private JPPFClientConnection c = null;
+  private final JPPFClientConnection c;
   /**
    * The {@link StatsHandler}.
    */
@@ -58,17 +58,12 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
     this.c = c;
   }
 
-  /**
-   * Perform the task.
-   * @see java.lang.Runnable#run()
-   */
   @Override
   @SuppressWarnings("unchecked")
   public void run() {
     synchronized(statsHandler) {
-      if (statsHandler.dataHolderMap.get(c.getName()) == null) {
-        statsHandler.dataHolderMap.put(c.getName(), new ConnectionDataHolder());
-      }
+      if (statsHandler.dataHolderMap.get(statsHandler.connectionId(c)) != null) return;
+      statsHandler.dataHolderMap.put(statsHandler.connectionId(c), new ConnectionDataHolder());
       if (statsHandler.timer != null) {
         TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);

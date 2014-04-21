@@ -63,6 +63,7 @@ class JobDataPanelManager {
    * @param connection a reference to the driver connection.
    */
   public void driverAdded(final JPPFClientConnection connection) {
+    if (!connection.getStatus().isWorkingStatus()) return;
     JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
     String driverName = connection.getDriverUuid();
     final int index = driverInsertIndex(driverName);

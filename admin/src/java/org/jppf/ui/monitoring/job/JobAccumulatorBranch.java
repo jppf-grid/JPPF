@@ -77,11 +77,11 @@ public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("JobAccumulatorBranch");
-    sb.append("{type=").append(getType());
+    sb.append(getClass().getSimpleName());
+    sb.append("[type=").append(getType());
     sb.append(", value=").append(getValue());
     sb.append(", map=").append(getMap());
-    sb.append('}');
+    sb.append(']');
     return sb.toString();
   }
 }
