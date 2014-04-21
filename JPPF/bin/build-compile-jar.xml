@@ -110,7 +110,7 @@ limitations under the License.
   <!--                     Build the source jar files                       -->
   <!-- ==================================================================== -->
 
-  <target name="jar.src" depends="compile"  unless="jar.src.done">
+  <target name="jar.src" depends="compile" unless="jar.src.done">
     <jar.src.module module="common"/>
     <jar.src.module module="node" jar="common-node"/>
     <jar.src.module module="admin"/>
