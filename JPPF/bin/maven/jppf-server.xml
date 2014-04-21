@@ -1,0 +1,16 @@
+<project>
+@header@
+@common@
+  <dependencies>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-common-node</artifactId>
+      <version>@version@</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jppf</groupId>
+      <artifactId>jppf-common</artifactId>
+      <version>@version@</version>
+    </dependency>
+  </dependencies>
+</project>
