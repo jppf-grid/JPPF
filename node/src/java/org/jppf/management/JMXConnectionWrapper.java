@@ -239,7 +239,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         } catch(Exception e2) {
           if (debugEnabled) log.debug(e2.getMessage(), e2);
         }
-        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
+        if ((connectionThread.get() != null) && !connectionThread.get().isConnecting()) connectionThread.get().resume();
       }
       return result;
     }
