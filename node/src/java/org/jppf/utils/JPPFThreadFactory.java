@@ -82,7 +82,7 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public JPPFThreadFactory(final String name)
   {
-    this(name, false, Thread.NORM_PRIORITY);
+    this(name, false, Thread.NORM_PRIORITY, false, false);
   }
 
   /**
@@ -92,7 +92,7 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public JPPFThreadFactory(final String name, final int priority)
   {
-    this(name, false, priority);
+    this(name, false, priority, false, false);
   }
 
   /**
@@ -102,30 +102,18 @@ public class JPPFThreadFactory implements ThreadFactory
    */
   public JPPFThreadFactory(final String name, final boolean monitoringEnabled)
   {
-    this(name, monitoringEnabled, Thread.NORM_PRIORITY);
+    this(name, monitoringEnabled, Thread.NORM_PRIORITY, false, false);
   }
 
   /**
    * Initialize this thread factory with the specified name.
    * @param name the name used as prefix for the constructed threads name.
    * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
-   * @param priority priority assigned to the threads created by this factory.
+   * @param daemon whether created threads are daemon threads.
    */
-  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority)
+  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final boolean daemon)
   {
-    this(name, monitoringEnabled, priority, false);
-  }
-
-  /**
-   * Initialize this thread factory with the specified name.
-   * @param name the name used as prefix for the constructed threads name.
-   * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
-   * @param priority priority assigned to the threads created by this factory.
-   * @param doPrivileged indicates whether thread should be created in PrivilegedAction.
-   */
-  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority, final boolean doPrivileged)
-  {
-    this(name, monitoringEnabled, priority, doPrivileged, false);
+    this(name, monitoringEnabled, Thread.NORM_PRIORITY, false, daemon);
   }
 
   /**
@@ -148,12 +136,6 @@ public class JPPFThreadFactory implements ThreadFactory
     if (monitoringEnabled) threadIDs = new ArrayList<>();
   }
 
-  /**
-   * Constructs a new Thread.
-   * @param r a runnable to be executed by the new thread instance.
-   * @return the constructed thread.
-   * @see java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable)
-   */
   @Override
   public synchronized Thread newThread(final Runnable r)
   {
