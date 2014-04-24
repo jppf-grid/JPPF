@@ -18,7 +18,7 @@
 
 package org.jppf.ui.monitoring.node;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.client.JPPFClientConnection;
 import org.jppf.management.*;
@@ -62,7 +62,7 @@ public class TopologyData {
   /**
    * Wrapper holding the connection to the JMX server on a driver or a node.
    */
-  private JMXDriverConnectionWrapper jmxWrapper = null;
+  private AtomicReference<JMXDriverConnectionWrapper> jmxWrapper = new AtomicReference<>(null);
   /**
    * Information on the JPPF node .
    */
@@ -103,7 +103,7 @@ public class TopologyData {
   public TopologyData(final JPPFClientConnection clientConnection) {
     this.type = TopologyDataType.DRIVER;
     this.clientConnection = clientConnection;
-    this.jmxWrapper = clientConnection.getJmxConnection();
+    this.jmxWrapper.set(clientConnection.getJmxConnection());
     this.uuid = clientConnection.getDriverUuid();
     initializeProxies();
   }
@@ -128,7 +128,7 @@ public class TopologyData {
     this.type = TopologyDataType.PEER;
     this.nodeInformation = nodeInformation;
     this.nodeState = new JPPFNodeState();
-    this.jmxWrapper = peerJmx != null ? peerJmx : new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure());
+    this.jmxWrapper.set(peerJmx != null ? peerJmx : new JMXDriverConnectionWrapper(nodeInformation.getHost(), nodeInformation.getPort(), nodeInformation.isSecure()));
     this.uuid = nodeInformation.getUuid();
   }
 
@@ -145,7 +145,7 @@ public class TopologyData {
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
   public JMXDriverConnectionWrapper getJmxWrapper() {
-    return jmxWrapper;
+    return jmxWrapper.get();
   }
 
   /**
@@ -153,7 +153,7 @@ public class TopologyData {
    * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
    */
   public void setJmxWrapper(final JMXDriverConnectionWrapper jmxWrapper) {
-    this.jmxWrapper = jmxWrapper;
+    this.jmxWrapper.set(jmxWrapper);
   }
 
   /**
@@ -171,7 +171,7 @@ public class TopologyData {
    */
   @Override
   public String toString() {
-    return (type == TopologyDataType.NODE) ? nodeInformation.getHost() + ':' + nodeInformation.getPort() : (jmxWrapper != null ? jmxWrapper.getDisplayName(): "?");
+    return (type == TopologyDataType.NODE) ? nodeInformation.getHost() + ':' + nodeInformation.getPort() : (jmxWrapper.get() != null ? jmxWrapper.get().getDisplayName(): "?");
   }
 
   /**
@@ -251,7 +251,7 @@ public class TopologyData {
    * @return the id as a string.
    */
   public String getId() {
-    return (jmxWrapper == null) ? null : jmxWrapper.getId();
+    return (jmxWrapper.get() == null) ? null : jmxWrapper.get().getId();
   }
 
   /**
@@ -364,19 +364,21 @@ public class TopologyData {
   private class ProxySettingTask implements Runnable {
     @Override
     public void run() {
-      if (jmxWrapper == null) return;
+      if (debugEnabled) log.debug("driverData={}, jmxWrapper={}", this, jmxWrapper);
       try {
         boolean hasNullProxy = true;
         while (hasNullProxy) {
-          try {
-            if (nodeForwarder == null) nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
-          } catch (Exception ignore) {
+          if (jmxWrapper.get() != null) {
+            try {
+              if (nodeForwarder == null) nodeForwarder = jmxWrapper.get().getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+            } catch (Exception ignore) {
+            }
+            try {
+              if (diagnostics == null) diagnostics = jmxWrapper.get().getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+            } catch (Exception ignore) {
+            }
+            hasNullProxy = (nodeForwarder == null) || (diagnostics == null);
           }
-          try {
-            if (diagnostics == null) diagnostics = jmxWrapper.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
-          } catch (Exception ignore) {
-          }
-          hasNullProxy = (nodeForwarder == null) || (diagnostics == null);
           try {
             if (hasNullProxy) Thread.sleep(500L);
           } catch (InterruptedException ignore) {
