@@ -1,0 +1,16 @@
+<jboss-deployment-structure>
+  <!-- Make sub deployments isolated by default, so they cannot see each others classes without a Class-Path entry
+  <ear-subdeployments-isolated>true</ear-subdeployments-isolated> -->
+  <!-- This corresponds to the top level deployment. For a war this is the war's module, for an ear -->
+  <!-- This is the top level ear module, which contains all the classes in the EAR's lib folder     -->
+  <deployment>
+    <dependencies>
+      <module name="deployment.jppf_ra_JBoss-7.rar"/>
+    </dependencies>
+  </deployment>
+  <sub-deployment name="jppftest.war">
+    <dependencies>
+      <module name="deployment.jppf_ra_JBoss-7.rar"/>
+    </dependencies>
+  </sub-deployment>
+</jboss-deployment-structure>
