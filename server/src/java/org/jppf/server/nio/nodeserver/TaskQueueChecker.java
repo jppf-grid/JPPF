@@ -19,6 +19,7 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.*;
@@ -299,7 +300,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
   @SuppressWarnings("unchecked")
   private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) {
     synchronized(channel.getMonitor()) {
-      JPPFFuture<?> future = channel.submit(nodeBundle);
+      Future<?> future = channel.submit(nodeBundle);
       nodeBundle.jobDispatched(channel, future);
     }
   }

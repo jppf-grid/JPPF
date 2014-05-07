@@ -21,7 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.execute.*;
@@ -411,7 +411,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public JPPFFuture<?> submit(final ServerTaskBundleNode nodeBundle) {
+  public Future<?> submit(final ServerTaskBundleNode nodeBundle) {
     setBundle(nodeBundle);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
@@ -486,7 +486,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Create a new future for this cotext.
    * @return a {@link JPFFFuture} instance. 
    */
-  public JPPFFuture<?> createFuture() {
+  public Future<?> createFuture() {
     return new NodeContextFuture(this);
   }
 

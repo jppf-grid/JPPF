@@ -37,7 +37,7 @@ import org.slf4j.*;
  * Wrapper around a JMX connection, providing a thread-safe way of handling disconnections and recovery.
  * @author Laurent Cohen
  */
-public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean {
+public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFAdminMBean, AutoCloseable {
   /**
    * Logger for this class.
    */

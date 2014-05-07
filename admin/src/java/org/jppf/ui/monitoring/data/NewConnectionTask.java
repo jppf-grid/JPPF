@@ -65,7 +65,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
       if (statsHandler.dataHolderMap.get(statsHandler.connectionId(c)) != null) return;
       statsHandler.dataHolderMap.put(statsHandler.connectionId(c), new ConnectionDataHolder());
       if (statsHandler.timer != null) {
-        TimerTask task = new StatsRefreshTask((JPPFClientConnectionImpl) c);
+        TimerTask task = new StatsRefreshTask(c);
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }

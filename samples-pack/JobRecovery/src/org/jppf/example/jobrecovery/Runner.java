@@ -144,8 +144,8 @@ public class Runner
     // wait until the client is fully connected
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
     // get a connection to the driver's JMX server
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection();
-    JMXDriverConnectionWrapper jmxDriver = c.getJmxConnection();
+    JPPFClientConnection c = client.getClientConnection();
+    JMXDriverConnectionWrapper jmxDriver = c.getConnectionPool().getJmxConnection();
     // obtain the current load-balancing settings
     LoadBalancingInformation lbi = jmxDriver.loadBalancerInformation();
     if (lbi == null) return 1;

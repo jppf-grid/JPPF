@@ -84,7 +84,9 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler, Aut
   /**
    * Get the object that provides access to the management functions of the driver.
    * @return a <code>JMXConnectionWrapper</code> instance.
+   * @deprecated use {@link #getConnectionPool()}.{@link JPPFConnectionPool#getJmxConnection() getJmxConnection()} instead.
    */
+  @Deprecated
   JMXDriverConnectionWrapper getJmxConnection();
 
   /**
@@ -102,7 +104,6 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler, Aut
   /**
    * Get the pool this connection belongs to.
    * @return a {@link JPPFConnectionPool} instance.
-   * @exclude
    */
   JPPFConnectionPool getConnectionPool();
 }

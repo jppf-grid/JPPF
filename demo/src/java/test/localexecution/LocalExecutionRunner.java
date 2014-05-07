@@ -184,8 +184,8 @@ public class LocalExecutionRunner
    */
   private static DriverJobManagementMBean getJobManagement() throws Exception
   {
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-    JMXDriverConnectionWrapper wrapper = c.getJmxConnection();
+    JPPFClientConnection c = jppfClient.getClientConnection();
+    JMXDriverConnectionWrapper wrapper = c.getConnectionPool().getJmxConnection();
     return wrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
 

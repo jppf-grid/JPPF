@@ -36,10 +36,6 @@ public class DriverConnectionManager implements AutoCloseable {
    */
   private static final String[] PROVISIONING_SIGNATURE = {int.class.getName(), TypedProperties.class.getName()};
   /**
-   * The wrapper around the JMX APIs for the driver.
-   */
-  private JMXDriverConnectionWrapper jmx;
-  /**
    * A proxy to the driver MBean which forwards management requests to the nodes.
    */
   private JPPFNodeForwardingMBean forwarder;
@@ -65,11 +61,11 @@ public class DriverConnectionManager implements AutoCloseable {
     this.connectionPool = tmpPool;
     // wait until the connection pool has at least one active connection to the driver
     while (this.connectionPool.connectionCount(JPPFClientConnectionStatus.ACTIVE) <= 0) Thread.sleep(20L);
-    JPPFClientConnection connection = this.connectionPool.iterator().next();
-    // wait until the JMX connection wrapper is created
-    while ((this.jmx = connection.getJmxConnection()) == null) Thread.sleep(20L);
+    // wait until the at least one JMX connection wrapper is created
+    JMXDriverConnectionWrapper jmx = null;
+    while ((jmx = connectionPool.getJmxConnection()) == null) Thread.sleep(20L);
     // wait until the JMX connection is established
-    while (!this.jmx.isConnected()) Thread.sleep(20L);
+    while (!jmx.isConnected()) Thread.sleep(20L);
     this.forwarder = jmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
     // create a node selector that only selects master nodes
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
@@ -104,7 +100,7 @@ public class DriverConnectionManager implements AutoCloseable {
    * @throws Exception if any error occurs.
    */
   public int getNbNodes() throws Exception {
-    return jmx.nbNodes();
+    return connectionPool.getJmxConnection().nbNodes();
   }
 
   /**

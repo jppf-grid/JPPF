@@ -159,7 +159,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
     try {
       if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus()))
       {
-        JPPFStatistics stats = c.getJmxConnection().statistics();
+        JPPFStatistics stats = c.getConnectionPool().getJmxConnection().statistics();
         if (stats != null) update(c, stats);
       }
     } catch(Exception e) {
@@ -499,7 +499,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   public JMXDriverConnectionWrapper currentJmxConnection() {
     JPPFClientConnection c = getCurrentConnection();
     if (c == null) return null;
-    return c.getJmxConnection();
+    return c.getConnectionPool().getJmxConnection();
   }
 
   /**
@@ -534,7 +534,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
       public void run() {
         JPPFClientConnection c = getCurrentConnection();
         if (c == null) return;
-        JMXDriverConnectionWrapper jmx = ((JPPFClientConnectionImpl) c).getJmxConnection();
+        JMXDriverConnectionWrapper jmx = c.getConnectionPool().getJmxConnection();
         if ((jmx != null) && jmx.isConnected()) {
           try {
             jmx.resetStatistics();

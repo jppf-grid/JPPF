@@ -18,18 +18,17 @@
 
 package org.jppf.execute;
 
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.JPPFContext;
+import java.util.concurrent.Future;
+
+import org.jppf.management.*;
+import org.jppf.server.scheduler.bundle.*;
 
 /**
  * Execution context associated with a channel serving its state.
  * @param <T> type of task bundle.
  * @author Martin JANDA
  */
-public interface ExecutorChannel<T> extends AutoCloseable
-{
+public interface ExecutorChannel<T> extends AutoCloseable {
   /**
    * Get the unique identifier of the client.
    * @return the uuid as a string.
@@ -76,7 +75,7 @@ public interface ExecutorChannel<T> extends AutoCloseable
    * @param bundle the task bundle to submit.
    * @return a {@link JPPFFuture}.
    */
-  JPPFFuture<?> submit(final T bundle);
+  Future<?> submit(final T bundle);
 
   /**
    * Determine whether this channel is local (for an in-JVM node).

@@ -120,8 +120,8 @@ public class TestDriverRestart
    */
   public static JPPFDriverAdminMBean getDriverJmx() throws Exception
   {
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) client.getClientConnection();
-    JMXDriverConnectionWrapper jmx = c.getJmxConnection();
+    JPPFClientConnection c = client.getClientConnection();
+    JMXDriverConnectionWrapper jmx = c.getConnectionPool().getJmxConnection();
     long start = System.nanoTime();
     while (!jmx.isConnected()) Thread.sleep(10L);
     long elapsed = System.nanoTime() - start;

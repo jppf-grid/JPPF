@@ -150,8 +150,8 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
    */
   protected List<String> getNodeIds() throws Exception
   {
-    JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-    JMXDriverConnectionWrapper driver = c.getJmxConnection();
+    JPPFClientConnection c = jppfClient.getClientConnection();
+    JMXDriverConnectionWrapper driver = c.getConnectionPool().getJmxConnection();
     while (!driver.isConnected()) Thread.sleep(1L);
     Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
     List<String> idList = new ArrayList<>();

@@ -179,7 +179,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
       try
       {
         wrapper = new ChannelWrapperRemote(cnn);
-        JMXDriverConnectionWrapper jmx = cnn.getJmxConnection();
+        JMXDriverConnectionWrapper jmx = cnn.getConnectionPool().getJmxConnection();
         JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), jmx == null ? -1 : jmx.getPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
@@ -232,7 +232,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
     if (wrapper != null) {
       if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
-        JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
+        JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
 
         wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(connection.getHost(), jmx != null ? jmx.getPort() : -1,

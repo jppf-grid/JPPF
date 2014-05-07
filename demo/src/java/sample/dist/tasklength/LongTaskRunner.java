@@ -395,8 +395,8 @@ public class LongTaskRunner
   {
     if (jmx == null)
     {
-      JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-      jmx = c.getJmxConnection();
+      JPPFClientConnection c = jppfClient.getClientConnection();
+      jmx = c.getConnectionPool().getJmxConnection();
       boolean b = jmx.isConnected();
       if (!b) jmx.connect();
     }

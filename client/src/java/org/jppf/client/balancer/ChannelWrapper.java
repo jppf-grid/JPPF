@@ -33,8 +33,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle>
-{
+public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle> {
   /**
    * Logger for this class.
    */
@@ -71,8 +70,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * Default constructor.
    */
-  protected ChannelWrapper()
-  {
+  protected ChannelWrapper() {
   }
 
   /**
@@ -112,8 +110,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @return a {@link Bundler} instance.
    */
   @Override
-  public Bundler getBundler()
-  {
+  public Bundler getBundler() {
     return bundler;
   }
 
@@ -127,14 +124,10 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
   @Override
-  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext)
-  {
+  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext) {
     if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
-
-    if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp())
-    {
-      if (this.bundler != null)
-      {
+    if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp()) {
+      if (this.bundler != null) {
         this.bundler.dispose();
         if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
       }
@@ -148,8 +141,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   }
 
   @Override
-  public JPPFSystemInformation getSystemInformation()
-  {
+  public JPPFSystemInformation getSystemInformation() {
     if (traceEnabled) log.trace("getting system info for " + this + ", jppf.channel.local=" + systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
     return systemInfo;
   }
@@ -158,24 +150,19 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * Set the system information.
    * @param systemInfo a {@link JPPFSystemInformation} instance.
    */
-  public void setSystemInformation(final JPPFSystemInformation systemInfo)
-  {
-    if (systemInfo != null)
-    {
+  public void setSystemInformation(final JPPFSystemInformation systemInfo) {
+    if (systemInfo != null) {
       systemInfo.getJppf().setBoolean("jppf.channel.local", isLocal());
       this.systemInfo = systemInfo;
       if (traceEnabled) log.trace("setting system info for " + this + ", jppf.channel.local=" + this.systemInfo.getJppf().getProperty("jppf.channel.local") + ", isLocal()="+isLocal());
-    }
-    else if (traceEnabled)
-    {
+    } else if (traceEnabled) {
       Exception e = new Exception("call stack for setSystemInfo(null)");
       log.trace(e.getMessage(), e);
     }
   }
 
   @Override
-  public JPPFManagementInfo getManagementInfo()
-  {
+  public JPPFManagementInfo getManagementInfo() {
     return managementInfo;
   }
 
@@ -183,14 +170,12 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * Set the management information.
    * @param managementInfo a {@link JPPFManagementInfo} instance.
    */
-  public void setManagementInfo(final JPPFManagementInfo managementInfo)
-  {
+  public void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (managementInfo != null) this.managementInfo = managementInfo;
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     if (executor != null) executor.shutdownNow();
     if (bundler != null) bundler.dispose();
   }
@@ -217,16 +202,14 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @param oldValue the channel execution status before the change.
    * @param newValue the channel execution status after the change.
    */
-  protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue)
-  {
+  protected void fireExecutionStatusChanged(final ExecutorStatus oldValue, final ExecutorStatus newValue) {
     if (oldValue == newValue) return;
     ExecutorChannelStatusEvent event = new ExecutorChannelStatusEvent(this, oldValue, newValue);
     for (ExecutorChannelStatusListener listener : listenerList) listener.executionStatusChanged(event);
   }
 
   @Override
-  public boolean isActive()
-  {
+  public boolean isActive() {
     return true;
   }
 
@@ -234,8 +217,14 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * The priority assigned to this channel.
    * @return the priority as an int value.
    */
-  public int getPriority()
-  {
+  public int getPriority() {
     return priority;
   }
+
+  /**
+   * Cancel the currently executing job, if any.
+   * @param bundle the bundle to cancel.
+   * @return {@code true} if the job is effectively cancelled, {@code false} otherwise.
+   */
+  public abstract boolean cancel(ClientTaskBundle bundle);
 }

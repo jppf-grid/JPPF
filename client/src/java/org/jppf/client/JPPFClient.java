@@ -36,8 +36,7 @@ import org.slf4j.*;
  * the uuid has changed or not.
  * @author Laurent Cohen
  */
-public class JPPFClient extends AbstractGenericClient
-{
+public class JPPFClient extends AbstractGenericClient {
   /**
    * Logger for this class.
    */
@@ -51,8 +50,7 @@ public class JPPFClient extends AbstractGenericClient
    * Initialize this client with an automatically generated application UUID.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final ClientListener... listeners)
-  {
+  public JPPFClient(final ClientListener... listeners) {
     super(null, JPPFConfiguration.getProperties(), listeners);
   }
 
@@ -61,8 +59,7 @@ public class JPPFClient extends AbstractGenericClient
    * @param uuid the unique identifier for this local client.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final String uuid, final ClientListener... listeners)
-  {
+  public JPPFClient(final String uuid, final ClientListener... listeners) {
     super(uuid, JPPFConfiguration.getProperties(), listeners);
   }
 
@@ -72,8 +69,7 @@ public class JPPFClient extends AbstractGenericClient
    * @param config the JPPF configuration to use for this client.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners)
-  {
+  public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners) {
     super(uuid, config, listeners);
   }
 
@@ -82,9 +78,8 @@ public class JPPFClient extends AbstractGenericClient
    * @exclude
    */
   @Override
-  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final boolean ssl, final JPPFConnectionPool pool)
-  {
-    return new JPPFClientConnectionImpl(this, uuid, name, info, ssl, pool);
+  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
+    return new JPPFClientConnectionImpl(this, uuid, name, info, pool);
   }
 
   /**
@@ -93,16 +88,14 @@ public class JPPFClient extends AbstractGenericClient
    */
   @Deprecated
   @Override
-  public List<JPPFTask> submit(final JPPFJob job) throws Exception
-  {
+  public List<JPPFTask> submit(final JPPFJob job) throws Exception {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
         (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     SubmissionManager submissionManager = getSubmissionManager();
     submissionManager.submitJob(job);
-    if (job.isBlocking())
-    {
+    if (job.isBlocking()) {
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       return collector.waitForResults();
     }
@@ -110,16 +103,14 @@ public class JPPFClient extends AbstractGenericClient
   }
 
   @Override
-  public List<Task<?>> submitJob(final JPPFJob job) throws Exception
-  {
+  public List<Task<?>> submitJob(final JPPFJob job) throws Exception {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
         (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     SubmissionManager submissionManager = getSubmissionManager();
     submissionManager.submitJob(job);
-    if (job.isBlocking())
-    {
+    if (job.isBlocking()) {
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       return collector.awaitResults();
     }
@@ -131,15 +122,11 @@ public class JPPFClient extends AbstractGenericClient
    * @exclude
    */
   @Override
-  protected SubmissionManager createSubmissionManager()
-  {
+  protected SubmissionManager createSubmissionManager() {
     SubmissionManager submissionManager = null;
-    try
-    {
+    try {
       submissionManager = new SubmissionManagerClient(this);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error("Can't initialize Submission Manager", e);
     }
     return submissionManager;
@@ -151,11 +138,9 @@ public class JPPFClient extends AbstractGenericClient
    * @see #reset(TypedProperties)
    * @since 4.0
    */
-  public void reset()
-  {
+  public void reset() {
     if (isClosed()) return;
-    if (resetting.compareAndSet(false, true))
-    {
+    if (resetting.compareAndSet(false, true)) {
       close(true);
       JPPFConfiguration.reset();
       init(JPPFConfiguration.getProperties());
@@ -169,11 +154,9 @@ public class JPPFClient extends AbstractGenericClient
    * @see #reset()
    * @since 4.0
    */
-  public void reset(final TypedProperties configuration)
-  {
+  public void reset(final TypedProperties configuration) {
     if (isClosed()) return;
-    if (resetting.compareAndSet(false, true))
-    {
+    if (resetting.compareAndSet(false, true)) {
       close(true);
       init(configuration);
     }

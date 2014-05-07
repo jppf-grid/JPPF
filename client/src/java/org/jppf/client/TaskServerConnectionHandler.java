@@ -94,7 +94,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
           TaskBundle bundle = ((AbstractJPPFClientConnection) owner).sendHandshakeJob();
           int plainJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT, -1);
           int sslJmxPort = bundle.getParameter(BundleParameter.DRIVER_MANAGEMENT_PORT_SSL, -1);
-          ((AbstractJPPFClientConnection) owner).jmxPort = owner.isSSLEnabled() ? sslJmxPort : plainJmxPort;
+          owner.getConnectionPool().setJmxPort(owner.isSSLEnabled() ? sslJmxPort : plainJmxPort);
           msg = "[client: " + name + "] Reconnected to the JPPF task server";
           System.out.println(msg);
           if (debugEnabled) log.debug(msg);

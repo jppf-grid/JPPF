@@ -35,11 +35,11 @@
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/samples-pack/KryoSerializer/classes&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/JPPF/lib/JFreeChart/jcommon-1.0.15.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/JPPF/lib/JFreeChart/jfreechart-1.0.12.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
-<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/JPPF/lib/jmxremote/jppf-jmxremote_optional-1.0.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/JPPF/lib/jmxremote/jppf-jmxremote_optional-1.1.jar&quot; path=&quot;3&quot; type=&quot;2&quot;/&gt;&#13;&#10;"/>
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.ui.monitoring.ConsoleLoader"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="admin"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-gui.properties -Dlog4j.configuration=log4j-gui.properties -Xmx512m -Djava.util.logging.config.file=config/logging-gui.properties -Duser.language=en"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Djppf.config=jppf-gui.properties -Dlog4j.configuration=log4j-gui.properties -Xmx512m -Djava.util.logging.config.file=config/logging-gui.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>

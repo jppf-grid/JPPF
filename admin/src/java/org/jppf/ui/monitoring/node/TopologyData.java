@@ -103,7 +103,7 @@ public class TopologyData {
   public TopologyData(final JPPFClientConnection clientConnection) {
     this.type = TopologyDataType.DRIVER;
     this.clientConnection = clientConnection;
-    this.jmxWrapper.set(clientConnection.getJmxConnection());
+    this.jmxWrapper.set(clientConnection.getConnectionPool().getJmxConnection());
     this.uuid = clientConnection.getDriverUuid();
     initializeProxies();
   }

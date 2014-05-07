@@ -20,6 +20,7 @@ package org.jppf.client;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
+import java.util.regex.Pattern;
 
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
@@ -135,8 +136,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Get count of all client connections handled by this JPPFClient.
    * @return count of <code>JPPFClientConnection</code> instances.
    */
-  public int getAllConnectionsCount()
-  {
+  public int getAllConnectionsCount() {
     return allConnections.size();
   }
 
@@ -163,11 +163,26 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
-   * Get an available connection with the highest possible priority.
-   * @return a <code>JPPFClientConnection</code> with the highest possible priority.
+   * Get an available connection, that is with the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status, with the highest possible priority.
+   * @return a {@link JPPFClientConnection} with the highest possible priority.
    */
   public JPPFClientConnection getClientConnection() {
-    return getClientConnection(true, true);
+    return getClientConnection(JPPFClientConnectionStatus.ACTIVE);
+  }
+
+  /**
+   * Get an available connection with the highest possible priority that matches one of the psecified statuses.
+   * @param statuses a set of statuses, one of which must match the status of the connection to find.
+   * @return a {@link JPPFClientConnection} with the highest possible priority.
+   */
+  public JPPFClientConnection getClientConnection(final JPPFClientConnectionStatus...statuses) {
+    synchronized(pools) {
+      for (JPPFConnectionPool pool: pools) {
+        List<JPPFClientConnection> list = pool.getConnections(statuses);
+        if (!list.isEmpty()) return list.get(0);
+      }
+    }
+    return null;
   }
 
   /**
@@ -177,12 +192,26 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * This enables the execution to be performed locally if the client is not connected to a server.
    * @param anyState specifies whether this method should look for an active connection or not care about the connection state.
    * @return a <code>JPPFClientConnection</code> with the highest possible priority.
+   * @deprecated use {@link #getClientConnection()} instead.
    */
   public JPPFClientConnection getClientConnection(final boolean oneAttempt, final boolean anyState) {
+    return getClientConnection();
+  }
+
+  /**
+   * Get a connection with the specified priority that matches one of the specified statuses.
+   * @param priority the priority of the connetion to find.
+   * @param statuses a set of statuses, one of which must match the status of the connection to find.
+   * @return a {@link JPPFClientConnection} that matches one of the specified statuses, or {@code null} if none could be found.
+   * @since 4.2
+   */
+  public JPPFClientConnection getClientConnection(final int priority, final JPPFClientConnectionStatus...statuses) {
     synchronized(pools) {
-      for (Integer priority: pools.keySet()) {
-        JPPFClientConnection connection = getClientConnection(priority, oneAttempt, anyState);
-        if (oneAttempt || (connection != null)) return connection;
+      Collection<JPPFConnectionPool> pls = pools.getValues(priority);
+      if (pls == null) return null;
+      for (JPPFConnectionPool pool: pls) {
+        List<JPPFClientConnection> list = pool.getConnections(statuses);
+        if (!list.isEmpty()) return list.get(0);
       }
     }
     return null;
@@ -191,39 +220,14 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Get an available connection for the specified priority.
    * @param priority the priority of the connection to find.
-   * @param oneAttempt determines whether this method should wait until a connection
-   * becomes available (ACTIVE status) or fail immediately if no available connection is found.<br>
+   * @param oneAttempt determines whether this method should wait until a connection becomes available (ACTIVE status) or fail immediately if no available connection is found.<br>
    * This enables the execution to be performed locally if the client is not connected to a server.
    * @param anyState specifies whether this method should look for an active connection or not care about the connection state.
    * @return a <code>JPPFClientConnection</code> with the highest possible priority.
+   * @deprecated use {@link #getClientConnection(int,JPPFClientConnectionStatus[])} instead.
    */
   public JPPFClientConnection getClientConnection(final int priority, final boolean oneAttempt, final boolean anyState) {
-    synchronized(pools) {
-      JPPFClientConnection connection = null;
-      Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
-      if (priorityPools == null) return null;
-      for (JPPFConnectionPool pool: priorityPools) {
-        int count = 0;
-        while ((connection == null) && (count < pool.connectionCount())) {
-          JPPFClientConnection c = pool.nextConnection();
-          if (c == null) break;
-          switch (c.getStatus()) {
-            case ACTIVE:
-              connection = c;
-              break;
-            case FAILED:
-              break;
-            default:
-              if (anyState) connection = c;
-              break;
-          }
-          count++;
-        }
-        if (connection != null) return connection;
-      }
-      if (oneAttempt) return connection;
-    }
-    return null;
+    return getClientConnection(priority, JPPFClientConnectionStatus.ACTIVE);
   }
 
   /**
@@ -304,17 +308,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Close this client and release all the resources it is using.
    */
+  @Override
   public void close() {
-    Set<JPPFClientConnection> connectionSet = new HashSet<>(getAllConnections());
-    connectionSet.addAll(pendingConnections);
-    if (debugEnabled) log.debug("closing all connections: " + connectionSet);
-    for (JPPFClientConnection c : connectionSet) {
-      try {
-        c.close();
-      } catch (Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
+    List<JPPFConnectionPool> pools = getConnectionPools();
+    for (JPPFConnectionPool pool: pools) pool.close();
+    this.pools.clear();
+    allConnections.clear();
+    pendingConnections.clear();
   }
 
   /**
@@ -394,8 +394,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool witht he specified id could be found.
    * @since 4.1
    */
-  public JPPFConnectionPool findConnectionPool(final int priority, final int poolId) {
-    JPPFConnectionPool pool = null;
+  public ConnectionPool findConnectionPool(final int priority, final int poolId) {
+    ConnectionPool pool = null;
     synchronized (pools) {
       Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
       if (priorityPools != null) {
@@ -441,6 +441,67 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
+   * Find the connection pools that have a least one connection matching one of the specified statuses.
+   * @param statuses a set of statuses of which at least one must be matched by at least one connection in any of the returned pools.
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty if none were found matching the specified statuses.
+   * The pools in the list are ordered by descending priority.
+   * @since 4.2
+   */
+  public List<JPPFConnectionPool> findConnectionPools(final JPPFClientConnectionStatus...statuses) {
+    List<JPPFConnectionPool> list = new ArrayList<>();
+    synchronized (pools) {
+      for (JPPFConnectionPool pool: pools) {
+        if (!pool.getConnections(statuses).isEmpty()) list.add(pool);
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Find the connection pools that pass the specified filter.
+   * @param filter an implementation of the {@link ConnectionPoolFilter} interface. A {@code null} value is interpreted as no filter (all pools are accepted).
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty if none passed the specified filter.
+   * The pools in the list are ordered by descending priority.
+   * @since 4.2
+   */
+  public List<JPPFConnectionPool> findConnectionPools(final ConnectionPoolFilter<JPPFConnectionPool> filter) {
+    List<JPPFConnectionPool> list = new ArrayList<>();
+    synchronized (pools) {
+      for (JPPFConnectionPool pool: pools) {
+        if ((filter == null) || filter.accepts(pool)) list.add(pool);
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Find the connection pools whose name matches the specified {@link Pattern regular expression}.
+   * @param pattern the regular expression to match against.
+   * @return a list of {@link JPPFConnectionPool} instances whose name match the input pattern, possibly empty but never {@code null}.
+   * @since 4.2
+   */
+  public List<JPPFConnectionPool> findConnectionPools(final String pattern) {
+    Pattern p = Pattern.compile(pattern);
+    List<JPPFConnectionPool> result = new ArrayList<>();
+    synchronized (pools) {
+      for (JPPFConnectionPool pool: pools) {
+        if (p.matcher(pool.getName()).matches()) result.add(pool);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Get a pool with at least one {@link JPPFClientConnectionStatus#ACTIVE active} connection and with the highest possible priority.
+   * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool was found with an active connection.
+   * @since 4.2
+   */
+  public JPPFConnectionPool getConnectionPool() {
+    List<JPPFConnectionPool> list = findConnectionPools(JPPFClientConnectionStatus.ACTIVE);
+    return list.isEmpty() ? null : list.get(0);
+  }
+
+  /**
    * Get a set of existing connection pools with the specified priority.
    * @param priority the priority of the pool, helps speedup the search.
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never {@code null}.
@@ -460,7 +521,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * Get a list of all priorities for the currently existing pools, ordered by descending priority.
-   * @return a list of integers represent the priorities.
+   * @return a list of integers represent the priorities, possibly empty but never {@code null}.
    * @since 4.1
    */
   public List<Integer> getPoolPriorities() {
@@ -471,7 +532,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
 
   /**
    * Get a list of existing connection pools, ordered by descending priority.
-   * @return a list of {@link JPPFConnectionPool} instances.
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never {@code null}.
    * @since 4.1
    */
   public List<JPPFConnectionPool> getConnectionPools() {

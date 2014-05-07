@@ -18,13 +18,14 @@
 
 package org.jppf.server.nio.nodeserver;
 
-import org.jppf.execute.JPPFFutureTask;
+import java.util.concurrent.FutureTask;
+
 import org.jppf.utils.ExceptionUtils;
 
 /**
  * Fuiture associated with a context which handles the job cancellation.
  */
-class NodeContextFuture extends JPPFFutureTask<Object> {
+class NodeContextFuture extends FutureTask<Object> {
   /**
    * The node context.
    */

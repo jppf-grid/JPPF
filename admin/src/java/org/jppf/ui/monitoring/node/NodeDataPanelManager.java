@@ -93,7 +93,7 @@ public class NodeDataPanelManager {
   void driverAdded(final JPPFClientConnection connection) {
     if (!connection.getStatus().isWorkingStatus()) return;
     if (findDriver(connection.getDriverUuid()) != null) return;
-    JMXDriverConnectionWrapper jmx = connection.getJmxConnection();
+    JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
     String driverName = connection.getDriverUuid();
     int index = driverInsertIndex(driverName);
     if (index < 0) return;

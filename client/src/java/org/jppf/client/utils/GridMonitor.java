@@ -150,7 +150,7 @@ public class GridMonitor
     {
       JPPFClientConnection connection = jppfClient.getClientConnection();
       // get the connection to the driver's JMX connection
-      driver.jmx = connection.getJmxConnection();
+      driver.jmx = connection.getConnectionPool().getJmxConnection();
     }
     // else if we provided the driver host and jmx port
     else

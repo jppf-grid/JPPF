@@ -140,7 +140,7 @@ public class JobManagementTestRunner
       System.out.println("Awaiting server connection ...");
       while (!client.hasAvailableConnection()) Thread.sleep(100L);
       System.out.println("Awaiting JMX connection ...");
-      driver = ((JPPFClientConnectionImpl) client.getClientConnection()).getJmxConnection();
+      driver = client.getClientConnection().getConnectionPool().getJmxConnection();
       while (!driver.isConnected()) driver.connectAndWait(100L);
       JobManagementTestRunner runner = new JobManagementTestRunner();
       System.out.println("Running test 1 ...");

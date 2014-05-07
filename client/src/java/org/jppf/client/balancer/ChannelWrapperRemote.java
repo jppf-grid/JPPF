@@ -20,14 +20,13 @@ package org.jppf.client.balancer;
 
 import java.io.NotSerializableException;
 import java.util.List;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
-import org.jppf.execute.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
@@ -39,8 +38,7 @@ import org.slf4j.*;
  * Context associated with a remote channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler
-{
+public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler {
   /**
    * Logger for this class.
    */
@@ -62,8 +60,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * Default initializer for remote channel wrapper.
    * @param channel to the driver to use.
    */
-  public ChannelWrapperRemote(final JPPFClientConnection channel)
-  {
+  public ChannelWrapperRemote(final JPPFClientConnection channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
 
     this.channel = (AbstractJPPFClientConnection) channel;
@@ -72,14 +69,12 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
     managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, channel.isSSLEnabled());
     managementInfo.setSystemInfo(systemInfo);
-    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName(), false, true));
+    executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName()));
   }
 
   @Override
-  public void setSystemInformation(final JPPFSystemInformation systemInfo)
-  {
-    if (systemInfo != null && uuid == null)
-    {
+  public void setSystemInformation(final JPPFSystemInformation systemInfo) {
+    if (systemInfo != null && uuid == null) {
       uuid = systemInfo.getUuid().getProperty("jppf.uuid");
       if (uuid != null && uuid.isEmpty()) uuid = null;
     }
@@ -87,26 +82,22 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   }
 
   @Override
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
   @Override
-  public String getConnectionUuid()
-  {
+  public String getConnectionUuid() {
     return channel.getConnectionUuid();
   }
 
   @Override
-  public JPPFClientConnectionStatus getStatus()
-  {
+  public JPPFClientConnectionStatus getStatus() {
     return channel.getStatus();
   }
 
   @Override
-  public void setStatus(final JPPFClientConnectionStatus status)
-  {
+  public void setStatus(final JPPFClientConnectionStatus status) {
     channel.getTaskServerConnection().setStatus(status);
   }
 
@@ -114,32 +105,28 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * Get the wrapped channel.
    * @return a <code>AbstractJPPFClientConnection</code> instance.
    */
-  public AbstractJPPFClientConnection getChannel()
-  {
+  public AbstractJPPFClientConnection getChannel() {
     return channel;
   }
 
   @Override
-  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     channel.addClientConnectionStatusListener(listener);
   }
 
   @Override
-  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     channel.removeClientConnectionStatusListener(listener);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public JPPFFuture<?> submit(final ClientTaskBundle bundle)
-  {
+  public Future<?> submit(final ClientTaskBundle bundle) {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    JPPFFutureTask<?> task = new JPPFFutureTask(new RemoteRunnable(getBundler(), bundle, channel), null) {
+    /*
+    FutureTask<?> task = new FutureTask(new RemoteRunnable(getBundler(), bundle, channel), null) {
       @Override
-      public boolean cancel(final boolean mayInterruptIfRunning)
-      {
+      public boolean cancel(final boolean mayInterruptIfRunning) {
         if (isDone()) return false;
         String uuid = bundle.getClientJob().getUuid();
         if (debugEnabled) log.debug("JPPFFutureTask.cancel() : requesting cancel of jobId=" + uuid);
@@ -155,25 +142,26 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         }
       }
     };
-    bundle.jobDispatched(this, task);
+     */
+    Runnable task = new RemoteRunnable(getBundler(), bundle, channel);
+    bundle.jobDispatched(this);
     executor.execute(task);
-    return task;
+    return null;
   }
 
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return false;
   }
 
   /**
    * Called when reconnection of this channel is required.
    */
-  public void reconnect()
-  {
+  public void reconnect() {
     TaskServerConnectionHandler handler = channel.getTaskServerConnection();
     if (handler.isClosed()) return;
     Runnable r = new Runnable() {
+      @Override
       public void run() {
         setStatus(JPPFClientConnectionStatus.DISCONNECTED);
         try {
@@ -187,8 +175,24 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   }
 
   @Override
-  public String toString()
-  {
+  public boolean cancel(final ClientTaskBundle bundle) {
+    if (bundle.isCancelled()) return false;
+    String uuid = bundle.getClientJob().getUuid();
+    if (debugEnabled) log.debug("requesting cancel of jobId=" + uuid);
+    bundle.cancel();
+    /*
+    try {
+      channel.cancelJob(uuid);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(ExceptionUtils.getMessage(e));
+    }
+    */
+    return true;
+  }
+
+  @Override
+  public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
     sb.append("[channel=").append(channel).append(']');
@@ -228,7 +232,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     public void run() {
       Exception exception = null;
       List<Task<?>> tasks = this.clientBundle.getTasksL();
-      AbstractGenericClient client = connection.getClient();
       RegisteredClassLoader registeredClassLoader = null;
       try {
         long start = System.nanoTime();
@@ -236,7 +239,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         boolean completed = false;
         JPPFJob newJob = createNewJob(clientBundle, tasks);
         ClassLoader classLoader = getClassLoader(newJob);
-        registeredClassLoader = client.registerClassLoader(classLoader, newJob.getUuid());
+        registeredClassLoader = connection.getClient().registerClassLoader(classLoader, newJob.getUuid());
         while (!completed) {
           TaskBundle bundle = createBundle(newJob);
           bundle.setUuid(registeredClassLoader.getUuid());
@@ -279,8 +282,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
      * @throws Exception if any error occurs.
      */
-    private JPPFJob createNewJob(final ClientTaskBundle job, final List<Task<?>> tasks) throws Exception
-    {
+    private JPPFJob createNewJob(final ClientTaskBundle job, final List<Task<?>> tasks) throws Exception {
       JPPFJob newJob = new JPPFJob(job.getClientJob().getUuid());
       newJob.setDataProvider(job.getJob().getDataProvider());
       newJob.setSLA(job.getSLA());
@@ -288,8 +290,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       newJob.setMetadata(job.getMetadata());
       newJob.setBlocking(job.getJob().isBlocking());
       newJob.setName(job.getName());
-      for (Task<?> task : tasks)
-      {
+      for (Task<?> task : tasks) {
         // needed as JPPFJob.addTask() resets the position
         int pos = task.getPosition();
         newJob.add(task);
@@ -303,8 +304,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @param job the job to use as a base.
      * @return a JPPFTaskBundle instance.
      */
-    private TaskBundle createBundle(final JPPFJob job)
-    {
+    private TaskBundle createBundle(final JPPFJob job) {
       TaskBundle bundle = new JPPFTaskBundle();
       bundle.setUuid(job.getUuid());
       return bundle;
@@ -315,12 +315,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @param job the job used to determine class loader.
      * @return a <code>ClassLoader</code> instance or <code>null</code> when job has no tasks.
      */
-    private ClassLoader getClassLoader(final JPPFJob job)
-    {
+    private ClassLoader getClassLoader(final JPPFJob job) {
       if (job == null) throw new IllegalArgumentException("job is null");
       if (job.getJobTasks().isEmpty()) return null;
-      else
-      {
+      else {
         Object task = job.getJobTasks().get(0);
         if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
         return task.getClass().getClassLoader();

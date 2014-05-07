@@ -20,6 +20,7 @@ package org.jppf.example.ftp.runner;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.task.storage.MemoryMapDataProvider;
@@ -77,15 +78,12 @@ public class FTPRunner
     JPPFJob job = new JPPFJob();
     job.setName("FTP server example job");
     // fetch the host from the JPPF client, so we don't have to hard-code it in the task.
-    JPPFClientConnectionImpl c = null;
-    do
-    {
-      Thread.sleep(100L);
-      c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-    }
-    while (c == null);
-    while ((c.getJmxConnection() == null) || !c.getJmxConnection().isConnected()) Thread.sleep(100L);
-    String host = c.getJmxConnection().getHost();
+    JPPFClientConnection c = null;
+    while ((c = jppfClient.getClientConnection()) == null) Thread.sleep(10L);
+    JMXDriverConnectionWrapper jmx = null;
+    while ((jmx = c.getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
+    while (!jmx.isConnected()) Thread.sleep(10L);
+    String host = jmx.getHost();
     // store the host in a data provider
     DataProvider dataProvider = new MemoryMapDataProvider();
     dataProvider.setParameter("ftp.host", host);

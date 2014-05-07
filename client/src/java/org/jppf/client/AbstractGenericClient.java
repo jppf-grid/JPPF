@@ -153,8 +153,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @SuppressWarnings("unchecked")
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     int coreThreads = Runtime.getRuntime().availableProcessors();
+    //LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
     if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
@@ -163,22 +164,25 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
 
   /**
    * Initialize remote connection pools according to configuration.
-   * @param props The JPPF configuration properties.
+   * @param config The JPPF configuration properties.
    * @exclude
    */
-  protected void initRemotePools(final TypedProperties props) {
+  protected void initRemotePools(final TypedProperties config) {
     try {
       boolean initPeers;
-      if (props.getBoolean("jppf.discovery.enabled", true)) {
-        final int priority = props.getInt("jppf.discovery.priority", 0);
-        boolean acceptMultipleInterfaces = props.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
+      if (config.getBoolean("jppf.discovery.enabled", true)) {
+        final int priority = config.getInt("jppf.discovery.priority", 0);
+        boolean acceptMultipleInterfaces = config.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
         if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            newConnection(name, info, priority, props.getInt("jppf.pool.size", 1), sslEnabled);
+            ConfigurationHelper ch = new ConfigurationHelper(config);
+            int poolSize = ch.getInt("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
+            int jmxPoolSize = ch.getInt("jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
+            newConnection(name, info, priority, poolSize, sslEnabled, jmxPoolSize);
           }
-        }, new IPFilter(props), acceptMultipleInterfaces);
+        }, new IPFilter(config), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
         initPeers = false;
       } else {
@@ -187,7 +191,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       }
 
       if (debugEnabled) log.debug("found peers in the configuration");
-      String discoveryNames = props.getString("jppf.drivers");
+      String discoveryNames = config.getString("jppf.drivers");
       if ((discoveryNames == null) || "".equals(discoveryNames.trim())) discoveryNames = "default-driver";
       if (debugEnabled) log.debug("list of drivers: " + discoveryNames);
       String[] names = discoveryNames.split("\\s");
@@ -199,15 +203,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
-            info.host = props.getString(String.format("%s.jppf.server.host", name), "localhost");
-            int port = props.getInt(String.format("%s.jppf.server.port", name), sslEnabled ? 11443 : 11111);
+            info.host = config.getString(name + ".jppf.server.host", "localhost");
+            int port = config.getInt(name + ".jppf.server.port", sslEnabled ? 11443 : 11111);
             if (!sslEnabled) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
-            if (!sslEnabled) info.managementPort = props.getInt(String.format("%s.jppf.management.port", name), -1);
-            else info.sslManagementPort = props.getInt(String.format("%s.jppf.management.port", name), -1);
-            int priority = new ConfigurationHelper(props).getInt(String.format("%s.jppf.priority", name), String.format("%s.priority", name), 0);
-            if(receiverThread != null) receiverThread.addConnectionInformation(info);
-            newConnection(name, info, priority, props.getInt(name + ".jppf.pool.size", 1), sslEnabled);
+            if (!sslEnabled) info.managementPort = config.getInt(name + ".jppf.management.port", -1);
+            else info.sslManagementPort = config.getInt(name + ".jppf.management.port", -1);
+            int priority = config.getInt(name + ".jppf.priority", 0);
+            if (receiverThread != null) receiverThread.addConnectionInformation(info);
+            ConfigurationHelper ch = new ConfigurationHelper(config);
+            int poolSize = ch.getInt(name + ".jppf.pool.size", 1, 1, Integer.MAX_VALUE);
+            int jmxPoolSize = ch.getInt(name + ".jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
+            newConnection(name, info, priority, poolSize, sslEnabled, jmxPoolSize);
           }
         }
       }
@@ -223,18 +230,21 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param priority the priority assigned to the connection.
    * @param poolSize the size of the connection pool.
    * @param ssl determines whether the pool is for SSL connections.
+   * @param jmxPoolSize the core size of the JMX connections pool.
    * @exclude
    */
-  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl) {
+  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
     int size = poolSize > 0 ? poolSize : 1;
-    JPPFConnectionPool pool = new JPPFConnectionPool(this, poolSequence.incrementAndGet(), name, priority, poolSize, ssl);
+    JPPFConnectionPool pool = new JPPFConnectionPool(this, poolSequence.incrementAndGet(), name, priority, poolSize, ssl, jmxPoolSize);
+    pool.setDriverHost(info.host);
+    pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
     synchronized(pools) {
       pools.putValue(priority, pool);
       pendingPools.add(pool);
     }
     for (int i=1; i<=size; i++) {
       if (isClosed()) return;
-      submitNewConnection(info, pool, ssl);
+      submitNewConnection(info, pool);
     }
   }
 
@@ -242,26 +252,23 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * Called to submit the initialization of a new connection.
    * @param info the information required for the connection to connect to the driver.
    * @param pool thez connection pool to which the connection belongs.
-   * @param ssl determines whether the connection is an SSL connection.
    * @exclude
    */
-  protected void submitNewConnection(final JPPFConnectionInformation info, final JPPFConnectionPool pool, final boolean ssl) {
-    AbstractJPPFClientConnection c = createConnection(info.uuid, pool.getName() + "-" + pool.nextSequence(), info, ssl, pool);
-    c.setPriority(pool.getPriority());
+  protected void submitNewConnection(final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
+    AbstractJPPFClientConnection c = createConnection(info.uuid, pool.getName() + "-" + pool.nextSequence(), info, pool);
     newConnection(c);
   }
 
   /**
    * Create a new driver connection based on the specified parameters.
-   * @param uuid the uuid of the JPPF client.
+   * @param uuid the uuid of the remote JPPF driver.
    * @param name the name of the connection.
    * @param info the driver connection information.
-   * @param ssl determines whether this is an SSL connection.
    * @param pool id of the connection pool the connection belongs to.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
    * @exclude
    */
-  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final boolean ssl, final JPPFConnectionPool pool);
+  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final JPPFConnectionPool pool);
 
   /**
    * {@inheritDoc}

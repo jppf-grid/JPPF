@@ -36,11 +36,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * This class provides an API to submit execution requests and administration
- * commands, and request server information data.<br>
- * It has its own unique identifier, used by the nodes, to determine whether
- * classes from the submitting application should be dynamically reloaded or not
- * depending on whether the uuid has changed or not.
+ * Instances of this class represent connections to remote JPPF drivers.
  * @author Laurent Cohen
  * @exclude
  */
@@ -63,48 +59,52 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   private static final boolean SEQUENTIAL_DESERIALIZATION = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
   /**
    * A sequence number used as suffix for the {@code connectionUuid}.
+   * @exclude
    */
   protected static AtomicInteger connectionCount = new AtomicInteger(0);
   /**
    * Handler for the connection to the task server.
+   * @exclude
    */
   protected TaskServerConnectionHandler taskServerConnection = null;
   /**
    * Enables loading local classes onto remote nodes.
+   * @exclude
    */
   protected ClassServerDelegate delegate = null;
   /**
-   * Unique identifier of the remote driver.
-   */
-  protected String driverUuid = null;
-  /**
-   * The name or IP address of the host the JPPF driver is running on.
-   */
-  protected String host = null;
-  /**
-   * The TCP port the JPPF driver listening to for submitted tasks.
-   */
-  protected int port = -1;
-  /**
    * Configuration name for this local client.
+   * @exclude
    */
   protected String name = null;
   /**
-   * The JPPF client that owns this connection.
-   */
-  protected AbstractGenericClient client = null;
-  /**
    * Unique ID for this connection and its two channels.
+   * @exclude
    */
   protected String connectionUuid = null;
   /**
    * Status of the connection.
+   * @exclude
    */
   protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(CREATED);
+  /**
+   * The connection pool this connection belongs to.
+   * @exclude
+   */
+  protected final JPPFConnectionPool pool;
+
+  /**
+   * Initialize this connection with a parent pool.
+   * @param pool the connection pool this connection belongs to.
+   * @exclude
+   */
+  protected BaseJPPFClientConnection(final JPPFConnectionPool pool) {
+    this.pool = pool;
+  }
 
   /**
    * Initialize this client connection.
-   * @see org.jppf.client.JPPFClientConnection#init()
+   * @exclude
    */
   @Override
   public abstract void init();
@@ -115,12 +115,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param header the task bundle to send to the driver.
    * @param job the job to execute remotely.
    * @throws Exception if an error occurs while sending the request.
+   * @exclude
    */
   public void sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
-    ObjectSerializer ser = makeHelper(cl, client.getSerializationHelperClassName()).getSerializer();
+    ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
     int count = job.getJobTasks().size() - job.getResults().size();
     TraversalList<String> uuidPath = new TraversalList<>();
-    uuidPath.add(client.getUuid());
+    uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     header.setTaskCount(count);
     header.setName(job.getName());
@@ -164,19 +165,20 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       }
     }
     socketClient.flush();
-    if (hasNotSerializableException) client.cancelJob(job.getUuid());
+    if (hasNotSerializableException) pool.getClient().cancelJob(job.getUuid());
   }
 
   /**
    * Send a handshake job to the server.
    * @return a JPPFTaskBundlesent by the server in response to the handshake job.
    * @throws Exception if an error occurs while sending the request.
+   * @exclude
    */
   public TaskBundle sendHandshakeJob() throws Exception {
     TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
-    uuidPath.add(client.getUuid());
+    uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
     header.setUuid(new JPPFUuid().toString());
@@ -193,12 +195,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Send a close command job to the server.
    * @throws Exception if an error occurs while sending the request.
+   * @exclude
    */
   public void sendCloseConnectionCommand() throws Exception {
     TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
-    uuidPath.add(client.getUuid());
+    uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
     if (debugEnabled) log.debug(this.toDebugString() + " sending close command job, uuidPath=" + uuidPath);
     header.setName("close command job");
@@ -220,6 +223,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
+   * @exclude
    */
   @SuppressWarnings("unchecked")
   protected Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
@@ -278,9 +282,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
+   * @exclude
    */
   public List<Task<?>> receiveResults(final ClassLoader cl) throws Exception {
-    return receiveBundleAndResults(cl, client.getSerializationHelperClassName()).second();
+    return receiveBundleAndResults(cl, pool.getClient().getSerializationHelperClassName()).second();
   }
 
   /**
@@ -288,6 +293,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
+   * @exclude
    */
   protected SerializationHelper makeHelper(final String helperClassName) throws Exception {
     return makeHelper(null, helperClassName);
@@ -299,6 +305,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
+   * @exclude
    */
   protected SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
     ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
@@ -328,12 +335,14 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Create a socket initializer.
    * @return an instance of a class implementing <code>SocketInitializer</code>.
+   * @exclude
    */
   protected abstract SocketInitializer createSocketInitializer();
 
   /**
    * Get the handler for the connection to the task server.
    * @return a <code>TaskServerConnectionHandler</code> instance.
+   * @exclude
    */
   public TaskServerConnectionHandler getTaskServerConnection() {
     return taskServerConnection;
@@ -342,6 +351,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Get the class server delegate that loads local classes onto remote nodes
    * @return a {@link ClassServerDelegate} instance.
+   * @exclude
    */
   public ClassServerDelegate getDelegate() {
     return delegate;
@@ -352,7 +362,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return an <code>AbstractGenericClient</code> instance.
    */
   public AbstractGenericClient getClient() {
-    return client;
+    return pool.getClient();
   }
 
   /**
@@ -361,12 +371,12 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @deprecated use {@link #getDriverUuid()} instead.
    */
   public String getUuid() {
-    return driverUuid;
+    return getDriverUuid();
   }
 
   @Override
   public String getDriverUuid() {
-    return driverUuid;
+    return pool.getDriverUuid();
   }
 
   @Override
@@ -374,27 +384,20 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     return connectionUuid;
   }
 
-  /**
-   * The name or IP address of the host the JPPF driver is running on.
-   * @return the host as a string.
-   */
   @Override
   public String getHost() {
-    return host;
+    return pool.getDriverHost();
   }
 
-  /**
-   * Get the TCP port the JPPF driver listening to for submitted tasks.
-   * @return the port as an int value.
-   */
   @Override
   public int getPort() {
-    return port;
+    return pool.getDriverPort();
   }
 
   /**
    * Get a string representing this connection for debugging purposes.
    * @return a string representing this connection.
+   * @exclude
    */
   protected String toDebugString() {
     StringBuilder sb = new StringBuilder();

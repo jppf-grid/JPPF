@@ -40,8 +40,7 @@ import org.slf4j.*;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, NodeInternal
-{
+public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, NodeInternal {
   /**
    * Logger for this class.
    */
@@ -70,8 +69,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * Default initializer for local channel wrapper.
    */
-  public ChannelWrapperLocal()
-  {
+  public ChannelWrapperLocal() {
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper"));
     executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads", "jppf.local.execution.threads");
     priority = JPPFConfiguration.getProperties().getInt("jppf.local.execution.priority", 0);
@@ -81,26 +79,22 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   }
 
   @Override
-  public String getUuid()
-  {
+  public String getUuid() {
     return connectionUuid;
   }
 
   @Override
-  public String getConnectionUuid()
-  {
+  public String getConnectionUuid() {
     return connectionUuid;
   }
 
   @Override
-  public JPPFClientConnectionStatus getStatus()
-  {
+  public JPPFClientConnectionStatus getStatus() {
     return status;
   }
 
   @Override
-  public void setStatus(final JPPFClientConnectionStatus status)
-  {
+  public void setStatus(final JPPFClientConnectionStatus status) {
     ExecutorStatus oldExecutionStatus = getExecutionStatus();
     JPPFClientConnectionStatus oldValue = this.status;
     this.status = status;
@@ -110,14 +104,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   }
 
   @Override
-  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void addClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.add(listener);
   }
 
   @Override
-  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener)
-  {
+  public void removeClientConnectionStatusListener(final ClientConnectionStatusListener listener) {
     listeners.remove(listener);
   }
 
@@ -126,8 +118,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
    */
-  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus)
-  {
+  protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus, final JPPFClientConnectionStatus newStatus) {
     if (oldStatus == newStatus) return;
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
     for (ClientConnectionStatusListener listener : listeners) listener.statusChanged(event);
@@ -135,10 +126,11 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
 
   @Override
   @SuppressWarnings("unchecked")
-  public JPPFFuture<?> submit(final ClientTaskBundle bundle) {
+  public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("locally submitting {}", bundle);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    JPPFFutureTask<?> task = new JPPFFutureTask(new LocalRunnable(getBundler(), bundle), null) {
+    /*
+    FutureTask<?> task = new FutureTask(new LocalRunnable(getBundler(), bundle), null) {
       @Override
       public boolean cancel(final boolean mayInterruptIfRunning) {
         if (debugEnabled) log.debug("requesting cancel of jobId=" + bundle.getUuid());
@@ -153,20 +145,21 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
         return false;
       }
     };
-    bundle.jobDispatched(this, task);
+    */
+    Runnable task = new LocalRunnable(getBundler(), bundle);
+    bundle.jobDispatched(this);
+    //bundle.jobDispatched(this, task);
     executor.execute(task);
-    return task;
+    return null;
   }
 
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return true;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
     sb.append("[status=").append(status);
@@ -178,8 +171,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    *
    */
-  private class LocalRunnable implements Runnable
-  {
+  private class LocalRunnable implements Runnable {
     /**
      * The task bundle to execute.
      */
@@ -194,39 +186,28 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
      * @param bundler    the bundler to send the resulting statistics to.
      * @param bundle the execution to perform.
      */
-    public LocalRunnable(final Bundler bundler, final ClientTaskBundle bundle)
-    {
+    public LocalRunnable(final Bundler bundler, final ClientTaskBundle bundle) {
       this.bundler = bundler;
       this.bundle = bundle;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
       Exception exception = null;
       List<Task<?>> tasks = this.bundle.getTasksL();
-      try
-      {
+      try {
         long start = System.nanoTime();
         DataProvider dataProvider = bundle.getJob().getDataProvider();
-        for (Task<?> task : tasks)
-        {
-          task.setDataProvider(dataProvider);
-        }
+        for (Task<?> task : tasks) task.setDataProvider(dataProvider);
         executionManager.execute(bundle, tasks);
         bundle.resultsReceived(tasks);
-
         double elapsed = System.nanoTime() - start;
         bundler.feedback(tasks.size(), elapsed);
-      }
-      catch (Throwable t)
-      {
+      } catch (Throwable t) {
         log.error(t.getMessage(), t);
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         bundle.resultsReceived(t);
-      }
-      finally
-      {
+      } finally {
         bundle.taskCompleted(exception);
         setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.getClientJob().removeChannel(ChannelWrapperLocal.this);
@@ -235,14 +216,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   }
 
   @Override
-  public NodeConnection getNodeConnection()
-  {
+  public NodeConnection getNodeConnection() {
     return null;
   }
 
   @Override
-  public void stopNode()
-  {
+  public void stopNode() {
     setStatus(JPPFClientConnectionStatus.DISCONNECTED);
     executionManager.shutdown();
   }
@@ -253,8 +232,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * @throws Exception if any error occurs.
    */
   @Override
-  public JMXServer getJmxServer() throws Exception
-  {
+  public JMXServer getJmxServer() throws Exception {
     return null;
   }
 
@@ -263,27 +241,21 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * @return <code>null</code>.
    */
   @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler()
-  {
+  public LifeCycleEventHandler getLifeCycleEventHandler() {
     return null;
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
   }
 
   @Override
-  public void close()
-  {
+  public void close() {
     if (debugEnabled) log.debug("closing " + this);
     super.close();
-    try
-    {
+    try {
       stopNode();
-    }
-    finally
-    {
+    } finally {
       listeners.clear();
     }
   }
@@ -293,20 +265,17 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    * @return <code>null</code>.
    */
   @Override
-  public AbstractJPPFClassLoader resetTaskClassLoader()
-  {
+  public AbstractJPPFClassLoader resetTaskClassLoader() {
     return null;
   }
 
   @Override
-  public boolean isOffline()
-  {
+  public boolean isOffline() {
     return false;
   }
 
   @Override
-  public NodeExecutionManager getExecutionManager()
-  {
+  public NodeExecutionManager getExecutionManager() {
     return executionManager;
   }
 
@@ -318,5 +287,18 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   @Override
   public boolean isSlaveNode() {
     return false;
+  }
+
+  @Override
+  public boolean cancel(final ClientTaskBundle bundle) {
+    if (bundle.isCancelled()) return false;
+    if (debugEnabled) log.debug("requesting cancel of jobId=" + bundle.getUuid());
+    bundle.cancel();
+    try {
+      executionManager.cancelAllTasks(true, false);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    return true;
   }
 }

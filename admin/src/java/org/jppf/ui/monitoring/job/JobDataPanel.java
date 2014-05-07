@@ -107,7 +107,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     for (JPPFClientConnection c : list) {
       panelManager.driverAdded(c);
       if (debugEnabled) log.debug("added driver " + c);
-      if (c.getJmxConnection() == null) continue;
+      if (c.getConnectionPool().getJmxConnection() == null) continue;
       String driverName = c.getDriverUuid();
       DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
       if (driverNode == null) continue;

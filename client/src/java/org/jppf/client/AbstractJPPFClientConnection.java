@@ -25,19 +25,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.*;
-import org.jppf.comm.socket.SocketInitializer;
 import org.jppf.management.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.protocol.BundleParameter;
 import org.slf4j.*;
 
 /**
- * This class provides an API to submit execution requests and administration
- * commands, and request server information data.<br>
- * It has its own unique identifier, used by the nodes, to determine whether
- * classes from the submitting application should be dynamically reloaded or not
- * depending on whether the uuid has changed or not.
+ * Instances of this class represent connections to remote JPPF drivers.
  * @author Laurent Cohen
+ * @exclude
  */
 public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
   /**
@@ -49,38 +45,15 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Priority given to the driver this client is connected to. The client is always connected to the available driver(s) with the highest
-   * priority. If multiple drivers have the same priority, they will be used as a pool and tasks will be evenly distributed among them.
-   */
-  protected int priority = 0;
-  /**
-   * The connection pool this connection belongs to.
-   */
-  protected final JPPFConnectionPool pool;
-  /**
    * List of status listeners for this connection.
+   * @exclude
    */
   protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * The name displayed for this connection.
+   * @exclude
    */
   protected String displayName;
-  /**
-   * Determines whether the communication via the server is done via SSL.
-   */
-  protected boolean sslEnabled = false;
-  /**
-   * Represents the system information.
-   */
-  private JPPFSystemInformation systemInfo = null;
-  /**
-   * Provides access to the management functions of the driver.
-   */
-  protected JMXDriverConnectionWrapper jmxConnection = null;
-  /**
-   * Port number the rmeote JMX server is listening to.
-   */
-  protected int jmxPort = -1;
   /**
    * Whether this connection is closed.
    */
@@ -89,35 +62,28 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Initialize this connection with a parent pool.
    * @param pool the connection pool this connection belongs to.
+   * @exclude
    */
   protected AbstractJPPFClientConnection(final JPPFConnectionPool pool) {
-    this.pool = pool;
-    this.pool.add(this);
+    super(pool);
   }
 
   /**
    * Configure this client connection with the specified parameters.
    * @param uuid the remote driver's UUID.
    * @param name configuration name for this local client.
-   * @param host the name or IP address of the host the JPPF driver is running on.
-   * @param driverPort the TCP port the JPPF driver listening to for submitted tasks.
    * @param priority the assigned to this client connection.
-   * @param sslEnabled determines whether the communication via the server is done via SSL.
+   * @exclude
    */
-  protected void configure(final String uuid, final String name, final String host, final int driverPort, final int priority, final boolean sslEnabled) {
-    this.driverUuid = uuid;
-    this.host = host;
-    this.port = driverPort;
-    this.priority = priority;
+  protected void configure(final String uuid, final String name, final int priority) {
+    pool.setDriverUuid(uuid);
     this.name = name;
-    this.sslEnabled = sslEnabled;
     displayName = name;
-    this.taskServerConnection = new TaskServerConnectionHandler(this, this.host, this.port);
+    this.taskServerConnection = new TaskServerConnectionHandler(this, getHost(), getPort());
   }
 
   /**
    * Initialize this client connection.
-   * @see org.jppf.client.JPPFClientConnection#init()
    */
   @Override
   public abstract void init();
@@ -125,19 +91,10 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Get the priority assigned to this connection.
    * @return a priority as an int value.
-   * @see org.jppf.client.JPPFClientConnection#getPriority()
    */
   @Override
   public int getPriority() {
-    return priority;
-  }
-
-  /**
-   * Set the priority assigned to this connection.
-   * @param priority a priority as an int value.
-   */
-  public void setPriority(final int priority) {
-    this.priority = priority;
+    return pool.getPriority();
   }
 
   @Override
@@ -168,6 +125,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Notify all listeners that the status of this connection has changed.
    * @param oldStatus the connection status before the change.
+   * @exclude
    */
   protected void fireStatusChanged(final JPPFClientConnectionStatus oldStatus) {
     ClientConnectionStatusEvent event = new ClientConnectionStatusEvent(this, oldStatus);
@@ -182,9 +140,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   public String toString() {
     return displayName + " : " + status;
   }
-
-  @Override
-  protected abstract SocketInitializer createSocketInitializer();
 
   /**
    * Cancel the job with the specified id.
@@ -206,6 +161,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Invoked to notify of a status change event on a client connection.
    * @param event the event to notify of.
+   * @exclude
    */
   public void delegateStatusChanged(final ClientConnectionStatusEvent event) {
     JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
@@ -216,6 +172,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   /**
    * Invoked to notify of a status change event on a client connection.
    * @param event the event to notify of.
+   * @exclude
    */
   public void taskServerConnectionStatusChanged(final ClientConnectionStatusEvent event) {
     JPPFClientConnectionStatus s1 = event.getClientConnectionStatusHandler().getStatus();
@@ -228,6 +185,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * and determine whether it triggers a status change for the client connection.
    * @param delegateStatus status of the class server delegate connection.
    * @param taskConnectionStatus status of the task server connection.
+   * @exclude
    */
   protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus) {
     if (delegateStatus == FAILED) setStatus(FAILED);
@@ -246,34 +204,45 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
 
   @Override
   public boolean isSSLEnabled() {
-    return sslEnabled;
+    return pool.isSslEnabled();
   }
 
   @Override
   public JPPFSystemInformation getSystemInfo() {
-    return systemInfo;
+    return pool.getSystemInfo();
   }
 
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
   @Override
   public TaskBundle sendHandshakeJob() throws Exception {
     TaskBundle bundle = super.sendHandshakeJob();
-    this.systemInfo = bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
-    this.driverUuid = bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM);
+    pool.setSystemInfo((JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM));
+    pool.setDriverUuid((String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM));
     return bundle;
   }
 
   /**
    * Initialize the jmx connection using the specified jmx server information.
    */
+  /*
   void initializeJmxConnection() {
-    if (debugEnabled) log.debug("{} initializing jmx with host={}, jmxPort={}, ssl={}", new Object[] {this, host, jmxPort, sslEnabled});
-    jmxConnection = new JMXDriverConnectionWrapper(host, jmxPort, sslEnabled);
+    if (debugEnabled) log.debug("{} initializing jmx with host={}, jmxPort={}, ssl={}", new Object[] {this, getHost(), pool.getJmxPort(), pool.isSslEnabled()});
+    jmxConnection = new JMXDriverConnectionWrapper(getHost(), pool.getJmxPort(), pool.isSslEnabled());
     jmxConnection.connect();
   }
+  */
 
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #getConnectionPool()}.{@link JPPFConnectionPool#getJmxConnection() getJmxConnection()} instead.
+   */
+  @Deprecated
   @Override
   public JMXDriverConnectionWrapper getJmxConnection() {
-    return jmxConnection;
+    return pool.getJmxConnection();
   }
 
   /**
@@ -298,7 +267,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
       if (debugEnabled) log.debug("closing class server connection " + this);
       if (delegate != null) delegate.close();
       if (debugEnabled) log.debug("closing jmx connection " + this);
-      if (jmxConnection != null) jmxConnection.close();
+      //if (jmxConnection != null) jmxConnection.close();
     } catch (Exception e) {
       if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
       else log.error('[' + name + "] " + e.getMessage());
@@ -309,7 +278,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
 
   @Override
   public boolean isClosed() {
-    return client.isClosed() || closed.get();
+    return pool.getClient().isClosed() || closed.get();
   }
 
   @Override

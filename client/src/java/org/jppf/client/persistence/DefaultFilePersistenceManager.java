@@ -195,47 +195,28 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * {@inheritDoc}
    */
   @Override
-  public synchronized JPPFJob loadJob(final String key) throws JobPersistenceException
-  {
+  public synchronized JPPFJob loadJob(final String key) throws JobPersistenceException {
     InputStream is = null;
-    try
-    {
+    try {
       File file = fileFromKey(key);
       if (debugEnabled) log.debug("loading job key=" + key + ", file=" + file);
       is = new BufferedInputStream(new FileInputStream(file));
       JPPFJob job = (JPPFJob) serializer.deserialize(is, false);
-      int n = 0;
-      byte bytes[] = new byte[4];
-      int count = 0;
-      while (n != -1)
-      {
-        n = is.read(bytes);
-        if (n == -1) break;
-        count += n;
-        if (count < 4) continue;
-        count = 0;
-        int size = SerializationUtils.readInt(bytes, 0);
+      int size = SerializationUtils.readInt(is);
+      if (size > 0) { 
         List<Task<?>> tasks = new ArrayList<>(size);
         for (int i=0; i<size; i++) tasks.add((Task<?>) serializer.deserialize(is, false));
         job.getResults().addResults(tasks);
       }
       if (debugEnabled) log.debug("loaded job " + job);
       return job;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new JobPersistenceException(e);
-    }
-    finally
-    {
-      if (is != null)
-      {
-        try
-        {
+    } finally {
+      if (is != null) {
+        try {
           is.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
           throw new JobPersistenceException(e);
         }
       }

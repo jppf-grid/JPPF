@@ -60,7 +60,6 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
 
   /**
    * Perform the task.
-   * @see java.lang.Runnable#run()
    */
   @Override
   public void run()
@@ -95,7 +94,7 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
         if ((statsHandler.currentConnection == null) || c.equals(statsHandler.currentConnection))
         {
           int n = Math.min(idx, box.getItemCount()-1);
-          JPPFClientConnectionImpl conn = (JPPFClientConnectionImpl) box.getItemAt(n);
+          JPPFClientConnection conn = (JPPFClientConnection) box.getItemAt(n);
           statsHandler.currentConnection = conn;
           box.setSelectedItem(conn);
         }

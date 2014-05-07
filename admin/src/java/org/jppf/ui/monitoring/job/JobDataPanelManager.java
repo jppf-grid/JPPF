@@ -64,7 +64,7 @@ class JobDataPanelManager {
    */
   public void driverAdded(final JPPFClientConnection connection) {
     if (!connection.getStatus().isWorkingStatus()) return;
-    JMXDriverConnectionWrapper wrapper = connection.getJmxConnection();
+    JMXDriverConnectionWrapper wrapper = connection.getConnectionPool().getJmxConnection();
     String driverName = connection.getDriverUuid();
     final int index = driverInsertIndex(driverName);
     if (index < 0) return;
@@ -336,10 +336,11 @@ class JobDataPanelManager {
   public class ConnectionStatusListener implements ClientConnectionStatusListener {
     @Override
     public void statusChanged(final ClientConnectionStatusEvent event) {
-      if (event.getSource() instanceof JPPFClientConnectionImpl) {
+      if (event.getSource() instanceof JPPFClientConnection) {
+        JPPFClientConnection c = (JPPFClientConnection) event.getSource();
         JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
-        if (status == JPPFClientConnectionStatus.FAILED) panel.driverRemoved((JPPFClientConnectionImpl) event.getSource());
-        else panel.driverUpdated((JPPFClientConnectionImpl) event.getSource());
+        if (status == JPPFClientConnectionStatus.FAILED) panel.driverRemoved(c);
+        else panel.driverUpdated(c);
       } else throw new IllegalStateException("Unsupported event source - expected JPPFClientConnectionImpl");
     }
   }

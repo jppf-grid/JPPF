@@ -210,7 +210,7 @@ public class NodeRefreshHandler
    */
   private void refreshJmxConnection(final TopologyData driver) {
     if (driver.getJmxWrapper() == null) {
-      JMXDriverConnectionWrapper jmx = driver.getClientConnection().getJmxConnection();
+      JMXDriverConnectionWrapper jmx = driver.getClientConnection().getConnectionPool().getJmxConnection();
       if (jmx != null) {
         driver.setJmxWrapper(jmx);
         driver.initializeProxies();

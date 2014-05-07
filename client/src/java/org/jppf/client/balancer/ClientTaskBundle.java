@@ -19,12 +19,10 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
-import java.util.concurrent.Future;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.execute.ExecutorChannel;
-import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.Task;
+import org.jppf.server.protocol.JPPFTaskBundle;
 import org.jppf.task.storage.DataProvider;
 
 /**
@@ -159,11 +157,10 @@ public class ClientTaskBundle extends JPPFTaskBundle
   /**
    * Called when all or part of a job is dispatched to a node.
    * @param channel the node to which the job is dispatched.
-   * @param future  future assigned to bundle execution.
    */
-  public void jobDispatched(final ExecutorChannel channel, final Future<?> future)
+  public void jobDispatched(final ChannelWrapper channel)
   {
-    job.jobDispatched(this, channel, future);
+    job.jobDispatched(this, channel);
   }
 
   /**

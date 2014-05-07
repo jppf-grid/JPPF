@@ -32,15 +32,15 @@ public enum JPPFClientConnectionStatus {
    */
   NEW,
   /**
-   * The client was disconnected from the driver.
+   * The connection was disconnected from the driver.
    */
   DISCONNECTED,
   /**
-   * The client is currently attempting to connect to the driver.
+   * The connection is currently attempting to connect to the driver.
    */
   CONNECTING,
   /**
-   * The client is successfully connected to the driver.
+   * The connection is successfully connected to the driver.
    */
   ACTIVE,
   /**
@@ -48,7 +48,7 @@ public enum JPPFClientConnectionStatus {
    */
   EXECUTING,
   /**
-   * The client failed to connect to the driver and no further attempt will be made.
+   * The connection was closed or failed to connect to the driver and no further attempt will be made.
    */
   FAILED;
 

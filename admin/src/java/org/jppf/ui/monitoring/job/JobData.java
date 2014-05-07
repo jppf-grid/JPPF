@@ -87,7 +87,7 @@ public class JobData
   {
     this(JobDataType.DRIVER);
     this.clientConnection = clientConnection;
-    this.jmxWrapper = clientConnection.getJmxConnection();
+    this.jmxWrapper = clientConnection.getConnectionPool().getJmxConnection();
   }
 
   /**
@@ -128,7 +128,7 @@ public class JobData
   public JMXDriverConnectionWrapper getJmxWrapper()
   {
     if (jmxWrapper == null) {
-      if (clientConnection != null) jmxWrapper = clientConnection.getJmxConnection();
+      if (clientConnection != null) jmxWrapper = clientConnection.getConnectionPool().getJmxConnection();
     }
     return jmxWrapper;
   }
