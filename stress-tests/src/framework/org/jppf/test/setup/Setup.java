@@ -91,7 +91,7 @@ public class Setup
   public JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
   {
     JMXDriverConnectionWrapper driver = null;
-    while ((driver = client.getClientConnection().getJmxConnection()) == null) Thread.sleep(10L);
+    while ((driver = client.getClientConnection().getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
     while (!driver.isConnected()) Thread.sleep(10L);
     return driver;
   }

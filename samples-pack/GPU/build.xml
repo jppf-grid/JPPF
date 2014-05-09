@@ -44,7 +44,7 @@
     <pathelement location="${shared.lib}/log4j-1.2.15.jar"/>
     <pathelement location="${shared.lib}/slf4j-api-1.6.1-.jar"/>
     <pathelement location="${shared.lib}/slf4j-log4j12-1.6.1.jar"/>
-    <pathelement location="${shared.lib}/jppf-jmxremote_optional-1.0.jar"/>
+    <pathelement location="${shared.lib}/jppf-jmxremote_optional-1.1.jar"/>
 	</path>
 
   <path id="javadoc.classpath">

@@ -40,6 +40,10 @@ public class BaseSetup {
    */
   private static final Configuration DEFAULT_CONFIG = createDefaultConfiguration();
   /**
+   * The name of the JMX remote jar file.
+   */
+  public static final String JMX_REMOTE_JAR = "jppf-jmxremote_optional-1.1.jar";
+  /**
    * The jppf client to use.
    */
   protected static JPPFClient client = null;
@@ -63,7 +67,7 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getConnectionPool().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
@@ -75,7 +79,7 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getConnectionPool().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver;
   }
@@ -86,7 +90,7 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
+    JMXDriverConnectionWrapper driver = client.getClientConnection().getConnectionPool().getJmxConnection();
     while (!driver.isConnected()) driver.connectAndWait(10L);
     return driver;
   }
@@ -259,7 +263,7 @@ public class BaseSetup {
     }
     Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet()) {
-      JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
+      JMXDriverConnectionWrapper wrapper = entry.getValue().getConnectionPool().getJmxConnection();
       if (!wrapperMap.containsKey(wrapper.getURL())) {
         while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
         wrapperMap.put(wrapper.getURL(), wrapper);
@@ -333,7 +337,7 @@ public class BaseSetup {
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.6.1.jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
-    commonCP.add("../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.0.jar");
+    commonCP.add("../JPPF/lib/jmxremote/" + JMX_REMOTE_JAR);
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../common/classes");
     driverCP.add("../server/classes");

@@ -60,7 +60,7 @@
     <pathelement location="${lib}/slf4j/slf4j-api-1.6.1.jar"/>
     <pathelement location="${lib}/slf4j/slf4j-log4j12-1.6.1.jar"/>
     <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
-    <pathelement location="${lib}/jmxremote/jppf-jmxremote_optional-1.0.jar"/>
+    <pathelement location="${lib}/jmxremote/jppf-jmxremote_optional-1.1.jar"/>
   </path>
 
   <!-- ========================================================================= -->
