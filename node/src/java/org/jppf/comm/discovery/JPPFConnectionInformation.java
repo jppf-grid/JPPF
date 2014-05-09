@@ -29,8 +29,7 @@ import org.slf4j.*;
  * The information includes the host, class server, application and node server ports.
  * @author Laurent Cohen
  */
-public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>, Cloneable
-{
+public class JPPFConnectionInformation implements Serializable, Comparable<JPPFConnectionInformation>, Cloneable {
   /**
    * Explicit serialVersionUID.
    */
@@ -75,8 +74,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   /**
    * Default constructor.
    */
-  public JPPFConnectionInformation()
-  {
+  public JPPFConnectionInformation() {
   }
 
   /**
@@ -86,8 +84,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
-  public int compareTo(final JPPFConnectionInformation ci)
-  {
+  public int compareTo(final JPPFConnectionInformation ci) {
     if ((ci == null) || (ci.uuid == null)) return 1;
     if (uuid == null) return -1;
     return uuid.compareTo(ci.uuid);
@@ -99,9 +96,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @see java.lang.Object#hashCode()
    */
   @Override
-  public int hashCode()
-  {
-    //return managementPort + (host == null ? 0 : host.hashCode());
+  public int hashCode() {
     return 31 + (uuid == null ? 0 : uuid.hashCode());
   }
 
@@ -112,8 +107,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (obj == null) return false;
     if (this == obj) return true;
     if (getClass() != obj.getClass()) return false;
@@ -123,8 +117,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   }
 
   @Override
-  public Object clone() throws CloneNotSupportedException
-  {
+  public Object clone() throws CloneNotSupportedException {
     return super.clone();
   }
 
@@ -133,8 +126,7 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @return a string describing this object.
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("uuid=").append(uuid);
@@ -153,17 +145,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @return a <code>DriverConnectionInformation</code> instance.
    * @throws Exception if an error is raised while deserializing.
    */
-  public static JPPFConnectionInformation fromBytes(final byte[] bytes) throws Exception
-  {
-    ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
+  public static JPPFConnectionInformation fromBytes(final byte[] bytes) throws Exception {
     JPPFConnectionInformation info = null;
-    try
-    {
+    try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
       info = (JPPFConnectionInformation) ois.readObject();
-    }
-    finally
-    {
-      ois.close();
     }
     return info;
   }
@@ -174,17 +159,10 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @return an array of bytes.
    * @throws Exception if an error is raised while serializing.
    */
-  public static byte[] toBytes(final JPPFConnectionInformation info) throws Exception
-  {
+  public static byte[] toBytes(final JPPFConnectionInformation info) throws Exception {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(baos);
-    try
-    {
+    try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
       oos.writeObject(info);
-    }
-    finally
-    {
-      oos.close();
     }
     return baos.toByteArray();
   }

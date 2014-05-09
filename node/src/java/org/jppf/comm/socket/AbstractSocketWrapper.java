@@ -91,14 +91,13 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @throws ConnectException if the connection fails.
    * @throws IOException if there is an issue with the socket streams.
    */
-  public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer)
-      throws ConnectException, IOException
-      {
+  public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer) throws ConnectException, IOException
+  {
     this.host = host;
     this.port = port;
     this.serializer = serializer;
     open();
-      }
+  }
 
   /**
    * Initialize this socket client with an already opened and connected socket.
