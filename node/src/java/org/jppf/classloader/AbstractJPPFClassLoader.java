@@ -133,10 +133,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     int i = name.lastIndexOf('.');
     if (i >= 0) {
       String pkgName = name.substring(0, i);
-      synchronized(this) {
-        Package pkg = getPackage(pkgName);
-        if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
-      }
+      Package pkg = getPackage(pkgName);
+      if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
     }
     if (isOffline()) {
       notFoundCache.add(name);
@@ -148,9 +146,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     Map<ResourceIdentifier, Object> map = new EnumMap<>(ResourceIdentifier.class);
     map.put(ResourceIdentifier.NAME, resName);
     JPPFResourceWrapper resource = null;
-    synchronized(this) {
-      resource = loadResource(map);
-    }
+    resource = loadResource(map);
     if (resource != null) b = resource.getDefinition();
     if ((b == null) || (b.length == 0)) {
       if (debugEnabled) log.debug("definition for resource [" + name + "] not found");
@@ -159,12 +155,10 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
     if (debugEnabled) log.debug(build("found definition for resource [", name, ", definitionLength=", b.length, "]"));
-    synchronized(this) {
-      c = findLoadedClass(name);
-      if (c == null) c = defineClass(name, b, 0, b.length);
-      fireEvent(c, null, false);
-      return c;
-    }
+    c = findLoadedClass(name);
+    if (c == null) c = defineClass(name, b, 0, b.length);
+    fireEvent(c, null, false);
+    return c;
   }
 
   /**
@@ -348,7 +342,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return the resulting Class object.
    * @throws ClassNotFoundException if the class could not be found.
    */
-  private synchronized Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException {
+  private Class<?> loadClassLocalFirst(final String name, final boolean resolve) throws ClassNotFoundException {
     Class<?> c = findLoadedClass(name);
     if(c == null) {
       ClassLoader cl = initSystemClassLoader();
@@ -387,7 +381,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return instance of system ClassLoader or null if not available.
    * @exclude
    */
-  protected synchronized ClassLoader initSystemClassLoader() {
+  private ClassLoader initSystemClassLoader() {
     if(!systemClassLoaderInitialized) {
       systemClassLoaderInitialized = true;
       try {
@@ -406,7 +400,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return a <code>Class</code> instance, or null if the class could not be found in the URL classpath.
    * @exclude
    */
-  protected synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive){
+  private synchronized Class<?> findClassInURLClasspath(final String name, final boolean recursive){
     if (debugEnabled) log.debug(build("looking up up resource [", name, "] in the URL classpath for ", this));
     Class<?> c = findLoadedClass(name);
     if (c == null) {
