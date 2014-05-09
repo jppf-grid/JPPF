@@ -23,6 +23,7 @@ import java.util.EventListener;
 /**
  * Instances of this class listen to execution status change events on channels.
  * @author Martin JANDA
+ * @exclude
  */
 public interface ExecutorChannelStatusListener extends EventListener
 {

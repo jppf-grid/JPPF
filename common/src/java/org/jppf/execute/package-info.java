@@ -18,6 +18,5 @@
 
 /**
  * Interfaces for the new load-balancing execution on the client and server side.
- * @exclude
  */
 package org.jppf.execute;

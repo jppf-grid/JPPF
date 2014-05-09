@@ -21,6 +21,7 @@ package org.jppf.execute;
 /**
  * Status of the channel.
  * @author Martin JANDA
+ * @exclude
  */
 public enum ExecutorStatus
 {
