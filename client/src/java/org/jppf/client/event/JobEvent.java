@@ -20,7 +20,8 @@ package org.jppf.client.event;
 
 import java.util.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
+import org.jppf.client.balancer.ChannelWrapperRemote;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
@@ -29,14 +30,12 @@ import org.jppf.server.protocol.JPPFTask;
  * Event emitted by a job when its execution starts or completes.
  * @author Laurent Cohen
  */
-public class JobEvent extends EventObject
-{
+public class JobEvent extends EventObject {
   /**
    * The type of event.
    * @exclude
    */
-  public enum Type
-  {
+  public enum Type {
     /**
      * The job started.
      */
@@ -69,8 +68,7 @@ public class JobEvent extends EventObject
    * @param source the source of this event.
    * @exclude
    */
-  public JobEvent(final JPPFJob source)
-  {
+  public JobEvent(final JPPFJob source) {
     this(source, null, null);
   }
 
@@ -81,8 +79,7 @@ public class JobEvent extends EventObject
    * @param tasks the tasks that were dispatched or returned.
    * @exclude
    */
-  public JobEvent(final JPPFJob source, final ExecutorChannel channel, final List<Task<?>> tasks)
-  {
+  public JobEvent(final JPPFJob source, final ExecutorChannel channel, final List<Task<?>> tasks) {
     super(source);
     this.channel = channel;
     this.tasks = tasks;
@@ -92,20 +89,8 @@ public class JobEvent extends EventObject
    * Get the source of this event.
    * @return the source as a {@link JPPFJob} object.
    */
-  public JPPFJob getJob()
-  {
+  public JPPFJob getJob() {
     return (JPPFJob) getSource();
-  }
-
-  /**
-   * Get the channel to which a job is dispatched or from which it returns.
-   * <p>This method returns a non-<code>null</code> value only for <code>jobDispatched()</code> events.
-   * @return an instance of {@link ExecutorChannel}.
-   * @exclude
-   */
-  public ExecutorChannel getChannel()
-  {
-    return channel;
   }
 
   /**
@@ -115,8 +100,7 @@ public class JobEvent extends EventObject
    * @deprecated use {@link #getJobTasks()} instead.
    */
   @Deprecated
-  public List<JPPFTask> getTasks()
-  {
+  public List<JPPFTask> getTasks() {
     List<JPPFTask> list = new ArrayList<>(tasks.size());
     for (Task<?> task: tasks) list.add((JPPFTask) task);
     return list;
@@ -128,8 +112,27 @@ public class JobEvent extends EventObject
    * @return a list of {@link JPPFTask} instances.
    * @since 4.0
    */
-  public List<Task<?>> getJobTasks()
-  {
+  public List<Task<?>> getJobTasks() {
     return tasks;
+  }
+
+  /**
+   * Determine whether the current job dispatch is sent to the local executor.
+   * Note that this method is only useful in the scope of the {@link JobListener#jobDispatched(JobEvent)} and {@link JobListener#jobReturned(JobEvent)} notifications.
+   * @return {@code true} if the current job dispatch is executed locally or the job has not yet been dispatched, {@code false} otherwise.
+   * @since 4.2
+   */
+  public boolean isRemoteExecution() {
+    return channel == null ? false : !channel.isLocal();
+  }
+
+  /**
+   * Get the remote driver connection through which the job dispatch was sent.
+   * Note that this method is only useful in the scope of the {@link JobListener#jobDispatched(JobEvent)} and {@link JobListener#jobReturned(JobEvent)} notifications.
+   * @return a {@link JPPFClientConnection} instance, or {@code null} if {@link #isRemoteExecution()} returns {@code false}.
+   * @since 4.2
+   */
+  public JPPFClientConnection getConnection() {
+    return isRemoteExecution() ? ((ChannelWrapperRemote) channel).getChannel() : null;
   }
 }

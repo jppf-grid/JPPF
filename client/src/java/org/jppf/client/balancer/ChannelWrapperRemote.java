@@ -105,7 +105,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * Get the wrapped channel.
    * @return a <code>AbstractJPPFClientConnection</code> instance.
    */
-  public AbstractJPPFClientConnection getChannel() {
+  public JPPFClientConnection getChannel() {
     return channel;
   }
 

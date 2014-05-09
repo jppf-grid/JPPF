@@ -36,8 +36,7 @@ public interface JobListener extends EventListener
 
   /**
    * Called when the execution of a job is complete.
-   * This method may be called multiple times, in the case where the job is resubmitted,
-   * due to a broken connection to the server for instance.
+   * Contrary to {@link #jobStarted(JobEvent)}, this method should only ever be called once.
    * @param event encapsulates the event that caused this method to be called.
    */
   void jobEnded(JobEvent event);
