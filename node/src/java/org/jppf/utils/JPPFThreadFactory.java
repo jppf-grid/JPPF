@@ -28,13 +28,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFThreadFactory implements ThreadFactory
-{
+public class JPPFThreadFactory implements ThreadFactory {
   /**
    * Prefix used in the thread name.
    */
   private static final String THREAD_PREFIX = "-";
-  //private static final String THREAD_PREFIX = "-thread-";
   /**
    * The name used as prefix for the constructed threads name.
    */
@@ -80,9 +78,8 @@ public class JPPFThreadFactory implements ThreadFactory
    * Initialize this thread factory with the specified name.
    * @param name the name used as prefix for the constructed threads name.
    */
-  public JPPFThreadFactory(final String name)
-  {
-    this(name, false, Thread.NORM_PRIORITY, false, false);
+  public JPPFThreadFactory(final String name) {
+    this(name, false, Thread.NORM_PRIORITY, false, true);
   }
 
   /**
@@ -90,9 +87,8 @@ public class JPPFThreadFactory implements ThreadFactory
    * @param name the name used as prefix for the constructed threads name.
    * @param priority priority assigned to the threads created by this factory.
    */
-  public JPPFThreadFactory(final String name, final int priority)
-  {
-    this(name, false, priority, false, false);
+  public JPPFThreadFactory(final String name, final int priority) {
+    this(name, false, priority, false, true);
   }
 
   /**
@@ -100,9 +96,8 @@ public class JPPFThreadFactory implements ThreadFactory
    * @param name the name used as prefix for the constructed threads name.
    * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
    */
-  public JPPFThreadFactory(final String name, final boolean monitoringEnabled)
-  {
-    this(name, monitoringEnabled, Thread.NORM_PRIORITY, false, false);
+  public JPPFThreadFactory(final String name, final boolean monitoringEnabled) {
+    this(name, monitoringEnabled, Thread.NORM_PRIORITY, false, true);
   }
 
   /**
@@ -111,8 +106,7 @@ public class JPPFThreadFactory implements ThreadFactory
    * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
    * @param daemon whether created threads are daemon threads.
    */
-  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final boolean daemon)
-  {
+  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final boolean daemon) {
     this(name, monitoringEnabled, Thread.NORM_PRIORITY, false, daemon);
   }
 
@@ -124,8 +118,7 @@ public class JPPFThreadFactory implements ThreadFactory
    * @param doPrivileged indicates whether thread should be created in PrivilegedAction.
    * @param daemon whether created threads are daemon threads.
    */
-  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority, final boolean doPrivileged, final boolean daemon)
-  {
+  public JPPFThreadFactory(final String name, final boolean monitoringEnabled, final int priority, final boolean doPrivileged, final boolean daemon) {
     this.name = name == null ? "JPPFThreadFactory" : name;
     threadGroup = new ThreadGroup(this.name + " thread group");
     threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
@@ -137,23 +130,18 @@ public class JPPFThreadFactory implements ThreadFactory
   }
 
   @Override
-  public synchronized Thread newThread(final Runnable r)
-  {
+  public synchronized Thread newThread(final Runnable r) {
     Thread thread;
-    if(doPrivileged)
-    {
-      thread = AccessController.doPrivileged(new PrivilegedAction<Thread>()
-      {
+    final String threadName = name + THREAD_PREFIX + String.format("%04d", + incrementCount());
+    if(doPrivileged) {
+      thread = AccessController.doPrivileged(new PrivilegedAction<Thread>() {
         @Override
-        public Thread run()
-        {
-          return new Thread(threadGroup, r, name + THREAD_PREFIX + incrementCount());
+        public Thread run() {
+          return new Thread(threadGroup, r, threadName);
         }
       });
-    } else
-      thread = new Thread(threadGroup, r, name + THREAD_PREFIX + incrementCount());
-    if (monitoringEnabled)
-    {
+    } else thread = new Thread(threadGroup, r, threadName);
+    if (monitoringEnabled) {
       threadIDs.add(thread.getId());
       computeThreadIDs();
     }
@@ -167,16 +155,14 @@ public class JPPFThreadFactory implements ThreadFactory
    * Get the ids of the monitored threads.
    * @return a list of long values.
    */
-  public synchronized long[] getThreadIDs()
-  {
+  public synchronized long[] getThreadIDs() {
     return threadIDsArray;
   }
 
   /**
    * Compute the ids of the monitored threads.
    */
-  private synchronized void computeThreadIDs()
-  {
+  private synchronized void computeThreadIDs() {
     if (!monitoringEnabled || (threadIDs == null) || threadIDs.isEmpty()) return;
     threadIDsArray = new long[threadIDs.size()];
     int i = 0;
@@ -187,8 +173,7 @@ public class JPPFThreadFactory implements ThreadFactory
    * Increment and return the created thread count.
    * @return the created thread count.
    */
-  private int incrementCount()
-  {
+  private int incrementCount() {
     return count.incrementAndGet();
   }
 
@@ -196,8 +181,7 @@ public class JPPFThreadFactory implements ThreadFactory
    * Update the priority of all threads created by this factory.
    * @param newPriority the new priority to set.
    */
-  public synchronized void updatePriority(final int newPriority)
-  {
+  public synchronized void updatePriority(final int newPriority) {
     if ((newPriority < Thread.MIN_PRIORITY) || (newPriority > Thread.MAX_PRIORITY) || (priority == newPriority)) return;
     int count = threadGroup.activeCount();
     // count is an estimate only, so we play it safe and take 2x its value.
@@ -211,19 +195,16 @@ public class JPPFThreadFactory implements ThreadFactory
    * Get the priority assigned to the threads created by this factory.
    * @return the priority as an int value.
    */
-  public synchronized int getPriority()
-  {
+  public synchronized int getPriority() {
     return priority;
   }
 
   /**
    * Default uncaught exception handler set onto the threeads created by the thread factory.
    */
-  private static class ExceptionHandler implements Thread.UncaughtExceptionHandler
-  {
+  private static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     @Override
-    public void uncaughtException(final Thread t, final Throwable e)
-    {
+    public void uncaughtException(final Thread t, final Throwable e) {
       System.out.println("exception caught from thread " + t + " :\n" + ExceptionUtils.getStackTrace(e));
     }
   }

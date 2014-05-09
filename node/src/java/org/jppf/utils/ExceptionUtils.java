@@ -27,13 +27,11 @@ import java.util.*;
  * This class provides a set of utility methods for manipulating {@link Throwable} objects.
  * @author Laurent Cohen
  */
-public final class ExceptionUtils
-{
+public final class ExceptionUtils {
   /**
    * Instantiation of this class is not permitted.
    */
-  private ExceptionUtils()
-  {
+  private ExceptionUtils() {
   }
 
   /**
@@ -41,16 +39,19 @@ public final class ExceptionUtils
    * @param t the throwable to get the stack trace from.
    * @return the stack trace as a string.
    */
-  public static String getStackTrace(final Throwable t)
-  {
+  public static String getStackTrace(final Throwable t) {
     if (t == null) return "null";
     StringBuilder result = null;
     try (StringWriter writer = new StringWriter(); PrintWriter pw = new PrintWriter(writer)) {
       t.printStackTrace(pw);
-      result = new StringBuilder(writer.toString());
+      String s = writer.toString();
+      result = new StringBuilder(s);
       int n = result.length();
-      char c = result.charAt(n-1);
-      if (c == '\n') result.setLength(n-1);
+      if (s.endsWith("\r\n")) result.setLength(n-2);
+      else {
+        char c = result.charAt(n-1);
+        if ((c == '\n') || (c == '\r')) result.setLength(n-1);
+      }
     } catch(Exception e) {
       result = new StringBuilder(getStackTrace2(t));
     }
@@ -62,8 +63,7 @@ public final class ExceptionUtils
    * @param t the throwable to get the stack trace from.
    * @return the stack trace as a string.
    */
-  private static String getStackTrace2(final Throwable t)
-  {
+  private static String getStackTrace2(final Throwable t) {
     Throwable ct = t;
     Set<Throwable> set = new HashSet<>();
     StringBuilder sb = new StringBuilder();
@@ -82,8 +82,7 @@ public final class ExceptionUtils
    * Get the call stack for the current thread.
    * @return the call stack as a string.
    */
-  public static String getCallStack()
-  {
+  public static String getCallStack() {
     Throwable t = new Throwable();
     StringBuilder sb = new StringBuilder();
     StackTraceElement[] st = t.getStackTrace();
@@ -99,8 +98,7 @@ public final class ExceptionUtils
    * @param t the <code>Throwable</code> object from which to get the message.
    * @return a formatted message from the <code>Throwable</code>.
    */
-  public static String getMessage(final Throwable t)
-  {
+  public static String getMessage(final Throwable t) {
     if (t == null) return "null";
     return t.getClass().getName() + ": " + t.getMessage();
   }
@@ -112,8 +110,7 @@ public final class ExceptionUtils
    * @return an (possibly new) {@link Exception} wrapping the {@link Throwable} as its cause.
    * @since 4.0
    */
-  public static Exception toException(final Throwable throwable)
-  {
+  public static Exception toException(final Throwable throwable) {
     if (throwable instanceof Exception) return (Exception) throwable;
     return new Exception(throwable);
   }
@@ -125,8 +122,7 @@ public final class ExceptionUtils
    * @return a new {@link Exception} wrapping the {@link Throwable} as its cause.
    * @since 4.0
    */
-  public static Exception toException(final String message, final Throwable throwable)
-  {
+  public static Exception toException(final String message, final Throwable throwable) {
     return new Exception(message, throwable);
   }
 
@@ -137,8 +133,7 @@ public final class ExceptionUtils
    * @return a (possibly new) {@link RuntimeException} wrapping the {@link Throwable} as its cause.
    * @since 4.0
    */
-  public static RuntimeException toRuntimeException(final Throwable throwable)
-  {
+  public static RuntimeException toRuntimeException(final Throwable throwable) {
     if (throwable instanceof RuntimeException) return (RuntimeException) throwable;
     return new RuntimeException(throwable);
   }
@@ -150,8 +145,7 @@ public final class ExceptionUtils
    * @return a new {@link RuntimeException} wrapping the {@link Throwable} as its cause.
    * @since 4.0
    */
-  public static RuntimeException toRuntimeException(final String message, final Throwable throwable)
-  {
+  public static RuntimeException toRuntimeException(final String message, final Throwable throwable) {
     return new RuntimeException(message, throwable);
   }
 

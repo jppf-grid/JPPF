@@ -478,7 +478,7 @@ public class SSLHandler
   private static ExecutorService createExecutor() {
     int n = JPPFConfiguration.getProperties().getInt("jppf.ssl.thread.pool", 10);
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    JPPFThreadFactory tf = new JPPFThreadFactory("SSLDelegatedTasks", false, Thread.NORM_PRIORITY, false, true);
+    JPPFThreadFactory tf = new JPPFThreadFactory("SSLDelegatedTasks");
     ThreadPoolExecutor exec = new ThreadPoolExecutor(n, n, 10L, TimeUnit.SECONDS, queue, tf);
     exec.allowCoreThreadTimeOut(true);
     return exec;
