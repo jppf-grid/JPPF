@@ -56,7 +56,6 @@ public class SocketWrapperOutputDestination implements OutputDestination
   public int write(final byte[] data, final int offset, final int len) throws Exception
   {
     socketWrapper.write(data, offset, len);
-    //socketWrapper.flush();
     return len;
   }
 
@@ -70,13 +69,16 @@ public class SocketWrapperOutputDestination implements OutputDestination
   @Override
   public int write(final ByteBuffer data) throws Exception
   {
-    ByteBuffer tmp = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
-    byte[] buf = tmp.array();
+    //byte[] buf = new byte[IO.TEMP_BUFFER_SIZE];
+    byte[] buf = IO.TEMP_BUFFER_POOL.get();
+    try {
     int size = Math.min(buf.length, data.remaining());
     data.get(buf, 0, size);
     socketWrapper.write(buf, 0, size);
-    //socketWrapper.flush();
     return size;
+    } finally {
+      IO.TEMP_BUFFER_POOL.put(buf);
+    }
   }
 
   /**

@@ -139,7 +139,8 @@ public class FileDataLocation extends AbstractDataLocation
     {
       transferring = true;
       fileChannel = new FileOutputStream(filePath).getChannel();
-      buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
+      //buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
+      buffer = ByteBuffer.wrap(IO.TEMP_BUFFER_POOL.get());
       if (size < buffer.limit()) buffer.limit(size);
       count = 0;
     }
@@ -261,7 +262,8 @@ public class FileDataLocation extends AbstractDataLocation
     {
       transferring = true;
       fileChannel = new FileInputStream(filePath).getChannel();
-      buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
+      //buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
+      buffer = ByteBuffer.wrap(IO.TEMP_BUFFER_POOL.get());
       count = 0;
     }
     try

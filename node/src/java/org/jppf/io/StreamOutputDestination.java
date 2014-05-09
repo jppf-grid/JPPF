@@ -67,20 +67,22 @@ public class StreamOutputDestination implements OutputDestination
    * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
    */
   @Override
-  public int write(final ByteBuffer buffer) throws Exception
-  {
+  public int write(final ByteBuffer buffer) throws Exception {
     int pos = buffer.position();
-    ByteBuffer tmp = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
-    byte[] bytes = tmp.array();
-    while (buffer.remaining() > 0)
-    {
-      int n = buffer.position();
-      buffer.get(bytes, 0, Math.min(buffer.remaining(), bytes.length));
-      n = buffer.position() - n;
-      if (n <= 0) break;
-      os.write(bytes, 0, n);
+    //byte[] bytes = new byte[IO.TEMP_BUFFER_SIZE];
+    byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
+    try {
+      while (buffer.remaining() > 0) {
+        int n = buffer.position();
+        buffer.get(bytes, 0, Math.min(buffer.remaining(), bytes.length));
+        n = buffer.position() - n;
+        if (n <= 0) break;
+        os.write(bytes, 0, n);
+      }
+      return buffer.position() - pos;
+    } finally {
+      IO.TEMP_BUFFER_POOL.put(bytes);
     }
-    return buffer.position() - pos;
   }
 
   /**

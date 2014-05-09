@@ -22,6 +22,8 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 
+import org.jppf.io.IO;
+
 /**
  * Utility methods for serializing and deserializing data
  * @author Laurent Cohen
@@ -43,7 +45,8 @@ public final class SerializationUtils
    */
   public static byte[] writeInt(final int value)
   {
-    return writeInt(value, new byte[4], 0);
+    //return writeInt(value, new byte[4], 0);
+    return writeInt(value, IO.LENGTH_BUFFER_POOL.get(), 0);
   }
 
   /**

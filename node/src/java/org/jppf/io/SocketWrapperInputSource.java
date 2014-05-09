@@ -70,11 +70,16 @@ public class SocketWrapperInputSource implements InputSource
   @Override
   public int read(final ByteBuffer data) throws Exception
   {
-    byte[] buf = new byte[IO.TEMP_BUFFER_SIZE];
-    int size = Math.min(buf.length, data.remaining());
-    int n = read(buf, 0, size);
-    if (n > 0) data.put(buf, 0, n);
-    return n;
+    //byte[] buf = new byte[IO.TEMP_BUFFER_SIZE];
+    byte[] buf =  IO.TEMP_BUFFER_POOL.get();
+    try {
+      int size = Math.min(buf.length, data.remaining());
+      int n = read(buf, 0, size);
+      if (n > 0) data.put(buf, 0, n);
+      return n;
+    } finally {
+      IO.TEMP_BUFFER_POOL.put(buf);
+    }
   }
 
   /**

@@ -64,7 +64,7 @@ public class ChannelInputSource implements InputSource
   /**
    * Read data from this input source into a byte buffer.
    * <p><b>Implementation details</b>:<br/>
-   * We read the data by small chunks of max {@link StreamConstants#TEMP_BUFFER_SIZE StreamConstants.TEMP_BUFFER_SIZE} bytes wrapped in a direct ByteBuffer,
+   * We read the data by small chunks of max {@link IO#TEMP_BUFFER_SIZE} bytes wrapped in a direct ByteBuffer,
    * to work around the fact that Sun NIO implementation of SocketChannelImpl.read()
    * attempts to allocate a direct buffer of the requested data size (i.e. <code>data</code>.remaining() in our case),
    * <i>if the destination ByteBuffer is not direct</i>.<br/>

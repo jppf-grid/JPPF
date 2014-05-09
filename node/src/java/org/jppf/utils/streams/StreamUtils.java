@@ -104,8 +104,9 @@ public final class StreamUtils {
    * @throws IOException if an I/O error occurs.
    */
   public static void copyStream(final InputStream is, final OutputStream os, final boolean closeStreams) throws IOException {
+    //byte[] bytes = new byte[IO.TEMP_BUFFER_SIZE];
+    byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
     try {
-      byte[] bytes = new byte[IO.TEMP_BUFFER_SIZE];
       while(true) {
         int n = is.read(bytes);
         if (n <= 0) break;
@@ -113,6 +114,7 @@ public final class StreamUtils {
       }
       os.flush();
     } finally {
+      IO.TEMP_BUFFER_POOL.put(bytes);
       if (closeStreams) {
         try {
           is.close();

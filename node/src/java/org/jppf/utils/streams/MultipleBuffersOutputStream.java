@@ -159,7 +159,8 @@ public class MultipleBuffersOutputStream extends OutputStream
     }
     else
     {
-      currentBuffer = new JPPFBuffer(new byte[size], 0);
+      byte[] bytes = (size == IO.TEMP_BUFFER_SIZE) ? IO.TEMP_BUFFER_POOL.get() : new byte[size];
+      currentBuffer = new JPPFBuffer(bytes, 0);
       list.add(currentBuffer);
     }
   }

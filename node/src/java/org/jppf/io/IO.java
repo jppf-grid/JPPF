@@ -22,17 +22,17 @@ import java.io.Closeable;
 
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.ConfigurationHelper;
+import org.jppf.utils.pooling.AbstractBoundedObjectPoolQueue;
 
 /**
  * Super interface for all input source and output destination implementations.
  * @author Laurent Cohen
  */
-public interface IO extends Closeable
-{
+public interface IO extends Closeable {
   /**
    * Size of send and receive buffer for socket connections. Defaults to 32768.
    */
-  int SOCKET_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.socket.buffer.size", 32*1024, 1024, 64 * 1024);
+  int SOCKET_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.socket.buffer.size", 32*1024, 1024, 1024 * 1024);
   /**
    * Disable Nagle's algorithm to improve performance. Defaults to true.
    */
@@ -46,7 +46,23 @@ public interface IO extends Closeable
    */
   int TEMP_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.temp.buffer.size", 32*1024, 1024, 65536);
   /**
+   * Size of temporary buffer pool. Defaults to 10.
+   */
+  int TEMP_BUFFER_POOL_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.temp.buffer.pool.size", 10, 1, 2*1024);
+  /**
+   * Size of temporary buffer pool. Defaults to 100.
+   */
+  int LENGTH_BUFFER_POOL_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.length.buffer.pool.size", 100, 1, 2*1024);
+  /**
    * A definition of an empty byte array.
    */
   byte[] EMPTY_BYTES = new byte[0];
+  /**
+   * A bounded pool of temporary buffers.
+   */
+  AbstractBoundedObjectPoolQueue<byte[]> TEMP_BUFFER_POOL = new BoundedByteArrayPool(TEMP_BUFFER_POOL_SIZE, TEMP_BUFFER_SIZE);
+  /**
+   * A bounded pool of temporary buffers for reading/writing lengths, geenrally from/to a stream.
+   */
+  AbstractBoundedObjectPoolQueue<byte[]> LENGTH_BUFFER_POOL = new BoundedByteArrayPool(LENGTH_BUFFER_POOL_SIZE, 4);
 }
