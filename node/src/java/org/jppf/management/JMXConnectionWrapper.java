@@ -405,7 +405,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     if (!isConnected()) connect();
     if (isConnected()) {
       MBeanServerConnection mbsc = getMbeanConnection();
-      return MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, inf, true);
+      return JMX.newMBeanProxy(mbsc, objectName, inf, true);
     }
     return null;
   }
