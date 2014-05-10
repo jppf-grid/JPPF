@@ -29,13 +29,13 @@ import org.jppf.client.submission.*;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
  * @author Martin JANDA
  */
-public class ClientJob extends AbstractClientJob
-{
+public class ClientJob extends AbstractClientJob {
   /**
    * Logger for this class.
    */
@@ -115,22 +115,17 @@ public class ClientJob extends AbstractClientJob
     this.parentJob = parentJob;
     this.broadcastUUID = broadcastUUID;
     this.initialTaskCount = tasks.size();
-
     if (broadcastUUID == null) {
-      if (job.getSLA().isBroadcastJob())
-        this.broadcastMap = new LinkedHashMap<>();
-      else
-        this.broadcastMap = Collections.emptyMap();
+      if (job.getSLA().isBroadcastJob()) this.broadcastMap = new LinkedHashMap<>();
+      else this.broadcastMap = Collections.emptyMap();
       this.resultsListener = this.job.getResultListener();
     } else {
       this.broadcastMap = Collections.emptyMap();
       this.resultsListener = null;
     }
-
     if (this.job.getResultListener() instanceof SubmissionStatusHandler) this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
     else this.submissionStatus = SubmissionStatus.SUBMITTED;
     this.tasks = new ArrayList<>(tasks);
-
     for (Task<?> result : job.getResults().getAllResults()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
     }
@@ -145,7 +140,6 @@ public class ClientJob extends AbstractClientJob
       if (this.executing == executing) return;
       this.executing = executing;
     }
-    //if (getBroadcastUUID() == null) job.fireJobEvent(executing ? JobEvent.Type.JOB_START: JobEvent.Type.JOB_END);
   }
 
   /**
@@ -175,7 +169,6 @@ public class ClientJob extends AbstractClientJob
    */
   public ClientJob createBroadcastJob(final String broadcastUUID) {
     if (broadcastUUID == null || broadcastUUID.isEmpty()) throw new IllegalArgumentException("broadcastUUID is blank");
-
     ClientJob clientJob;
     synchronized (tasks) {
       clientJob = new ClientJob(job, this.tasks, this, broadcastUUID);
@@ -259,7 +252,6 @@ public class ClientJob extends AbstractClientJob
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (future == null) throw new IllegalArgumentException("future is null");
-
     boolean empty;
     synchronized (bundleMap) {
       empty = bundleMap.isEmpty();
@@ -289,7 +281,6 @@ public class ClientJob extends AbstractClientJob
   public void resultsReceived(final ClientTaskBundle bundle, final List<Task<?>> results) {
     if (debugEnabled) log.debug("received " + results.size() + " results for bundle " + bundle);
     if (results.isEmpty()) return;
-
     synchronized (tasks) {
       for (int i=0; i<results.size(); i++) {
         Task<?> task = results.get(i);
@@ -301,12 +292,7 @@ public class ClientJob extends AbstractClientJob
         }
       }
     }
-    TaskResultListener listener = resultsListener;
-    if (listener != null) {
-      synchronized (listener) {
-        listener.resultsReceived(new TaskResultEvent(results, null));
-      }
-    }
+    callResultListener(results, null);
     job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, results);
   }
 
@@ -318,7 +304,7 @@ public class ClientJob extends AbstractClientJob
   public void resultsReceived(final ClientTaskBundle bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (debugEnabled) log.debug("received  throwable " + throwable + " for bundle " + bundle);
-    boolean ioe = isIOException(throwable);
+    boolean ioe = (throwable instanceof IOException) && !(throwable instanceof NotSerializableException);
     Exception e = throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
     synchronized (tasks) {
       for (Task<?> task : bundle.getTasksL()) {
@@ -329,13 +315,27 @@ public class ClientJob extends AbstractClientJob
         }
       }
     }
+    callResultListener(bundle.getTasksL(), throwable);
+    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, bundle.getTasksL());
+  }
+
+  /**
+   * Invoke the job's {@link TaskResultListener} callback and log any exception that may result from the invocation.
+   * @param results the tasks to provide as results.
+   * @param throwable an eventual {@link Throwable} that may have been raised while the tasks were executing.
+   * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-257">JPPF-257 Better exception handling for overriden or custom TaskResultListener implementations</a>
+   */
+  private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
     TaskResultListener listener = resultsListener;
     if (listener != null) {
-      synchronized (listener) {
-        listener.resultsReceived(new TaskResultEvent(bundle.getTasksL(), throwable));
+      try {
+        synchronized (listener) {
+          listener.resultsReceived(new TaskResultEvent(results, throwable));
+        }
+      } catch(Exception e) {
+        log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
       }
     }
-    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, bundle.getTasksL());
   }
 
   /**
@@ -343,8 +343,7 @@ public class ClientJob extends AbstractClientJob
    * @param bundle    the completed task.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public void taskCompleted(final ClientTaskBundle bundle, final Exception exception)
-  {
+  public void taskCompleted(final ClientTaskBundle bundle, final Exception exception) {
     if (debugEnabled) log.debug("bundle=" + bundle + ", exception=" + exception + " for " + this);
     boolean empty;
     synchronized (bundleMap) {
@@ -352,7 +351,6 @@ public class ClientJob extends AbstractClientJob
       if (bundle != null && future == null) throw new IllegalStateException("future already removed");
       empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
-    //if (empty) clearChannels();
     boolean requeue = false;
     if (getSLA().isBroadcastJob()) {
       List<Task<?>> list = new ArrayList<>();
@@ -399,11 +397,8 @@ public class ClientJob extends AbstractClientJob
         }
       }
     }
-
     if (hasPending()) {
-      if (exception != null) {
-        setSubmissionStatus(exception instanceof NotSerializableException ? SubmissionStatus.COMPLETE : SubmissionStatus.FAILED);
-      }
+      if (exception != null) setSubmissionStatus(exception instanceof NotSerializableException ? SubmissionStatus.COMPLETE : SubmissionStatus.FAILED);
       if (empty) setExecuting(false);
       if (requeue && onRequeue != null) {
         onRequeue.run();
@@ -551,15 +546,5 @@ public class ClientJob extends AbstractClientJob
     //sb.append(", taskStateMap=").append(taskStateMap);
     sb.append(']');
     return sb.toString();
-  }
-
-  /**
-   * Determine if a throwable is an IOException causing a recoonection to the driver.
-   * @param t th throwable to check.
-   * @return .
-   */
-  private boolean isIOException(final Throwable t)
-  {
-    return (t instanceof IOException) && !(t instanceof NotSerializableException);
   }
 }
