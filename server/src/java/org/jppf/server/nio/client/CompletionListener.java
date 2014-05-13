@@ -21,7 +21,9 @@ package org.jppf.server.nio.client;
 import java.util.List;
 
 import org.jppf.nio.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
+import org.jppf.server.queue.JPPFPriorityQueue;
 import org.slf4j.*;
 
 /**
@@ -67,8 +69,8 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     if (!isChannelValid()) {
       if (debugEnabled) log.debug("channel is invalid: {}", channel);
       ClientContext context = (ClientContext) channel.getContext();
-      //if (context.getInitialBundleWrapper() != null) context.getInitialBundleWrapper().removeCompletionListener(this);
-      // context.cancelJobOnClose(); 
+      context.setNbTasksToSend(context.getNbTasksToSend() - results.size());
+      removeJobFromQueue(bundle);
       return;
     }
     if (results.isEmpty()) {
@@ -97,12 +99,6 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   @Override
   public void bundleEnded(final ServerTaskBundleClient bundle) {
     if (debugEnabled) log.debug("bundle ended: {}", bundle);
-    /*
-    String uuid = bundle.getUuid();
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
-    ServerJob job = queue.getBundleForJob(uuid);
-    if (job != null) queue.removeBundle(job);
-    */
   }
 
   /**
@@ -112,5 +108,20 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   private boolean isChannelValid() {
     if (channel instanceof SelectionKeyWrapper) return ((SelectionKeyWrapper) channel).getChannel().isValid();
     return true;
+  }
+
+  /**
+   * Remove the specified job from the queue.
+   * @param bundle the job to remove.
+   */
+  private void removeJobFromQueue(final ServerTaskBundleClient bundle) {
+    String uuid = bundle.getUuid();
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
+    ServerJob job = queue.getBundleForJob(uuid);
+    if (job != null) {
+      if (debugEnabled) log.debug("job {} : status={}, submissionSTatus={}", new Object[] {job.getName(), job.getStatus(), job.getSubmissionStatus()});
+      ClientContext context = (ClientContext) channel.getContext();
+      if (job.isDone() || (context.getNbTasksToSend() <= 0)) queue.removeBundle(job);
+    }
   }
 }

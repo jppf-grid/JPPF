@@ -287,10 +287,18 @@ public abstract class AbstractServerJob {
   }
 
   /**
+   * Get the status of this job.
+   * @return a {@link ServerJobStatus} enum value.
+   */
+  public ServerJobStatus getStatus() {
+    return status;
+  }
+
+  /**
    * @return <code>true</code> when job is cancelled or finished normally.
    */
   public boolean isDone() {
-    return status.compareTo(ServerJobStatus.EXECUTING) >= 0;
+    return status.compareTo(ServerJobStatus.DONE) >= 0;
   }
 
   /**

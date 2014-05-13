@@ -145,9 +145,7 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
-    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) {
-      entry.getKey().resultReceived(entry.getValue(), throwable);
-    }
+    for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) entry.getKey().resultReceived(entry.getValue(), throwable);
     taskCompleted(bundle, throwable);
   }
 
@@ -201,6 +199,7 @@ public class ServerJob extends AbstractServerJobBase {
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
       setSubmissionStatus(SubmissionStatus.COMPLETE);
+      updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
     }
     if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
   }
