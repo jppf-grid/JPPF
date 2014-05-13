@@ -201,6 +201,7 @@ public class ServerJob extends AbstractServerJobBase {
       if (requeue && onRequeue != null) onRequeue.run();
     } else {
       setSubmissionStatus(SubmissionStatus.COMPLETE);
+      updateStatus(ServerJobStatus.EXECUTING, ServerJobStatus.DONE);
     }
     if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
   }
