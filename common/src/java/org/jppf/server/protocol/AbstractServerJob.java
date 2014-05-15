@@ -211,16 +211,7 @@ public abstract class AbstractServerJob {
    * Sets and notifies that job has expired.
    */
   public void jobExpired() {
-    setJobExpired(true);
-  }
-
-  /**
-   * Set the job expired indicator.
-   * @param jobExpired <code>true</code> to indicate that job has expired. <code>false</code> otherwise.
-   */
-  public void setJobExpired(final boolean jobExpired) {
-    this.jobExpired = jobExpired;
-    if (this.jobExpired && !isDone()) setCancelled(true);
+    this.jobExpired = true;
   }
 
   /**
