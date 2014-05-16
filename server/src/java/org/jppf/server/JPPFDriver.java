@@ -17,7 +17,7 @@
  */
 package org.jppf.server;
 
-import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+import static org.jppf.utils.stats.JPPFStatisticsHelper.createServerStatistics;
 
 import java.util.*;
 
@@ -28,7 +28,6 @@ import org.jppf.comm.recovery.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.NioServer;
-import org.jppf.node.initialization.InitializationHook;
 import org.jppf.process.LauncherListener;
 import org.jppf.queue.JPPFQueue;
 import org.jppf.server.job.JPPFJobManager;
@@ -145,8 +144,10 @@ public class JPPFDriver {
     this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
     new JmxMessageNotifier(); // initialize the jmx logger
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
+    /*
     HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
     HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(config));
+    */
     VersionUtils.logVersionInformation("driver", uuid);
     SystemUtils.printPidAndUuid("driver", uuid);
     systemInformation = new JPPFSystemInformation(uuid, false, true);
