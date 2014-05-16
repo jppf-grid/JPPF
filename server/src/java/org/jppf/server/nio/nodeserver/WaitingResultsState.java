@@ -23,14 +23,12 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
 
-import org.jppf.JPPFException;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
-import org.jppf.utils.Pair;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -75,24 +73,18 @@ class WaitingResultsState extends NodeServerState {
    * @throws Exception if any error occurs.
    */
   public NodeTransition process(final BundleResults received, final AbstractNodeContext context) throws Exception {
-    //AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    Exception exception = null;
     ServerTaskBundleNode nodeBundle = context.getBundle();
     server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle));
     boolean requeue = false;
     try {
       TaskBundle newBundle = received.bundle();
       if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + context.getChannel());
-      Pair<Boolean, Exception> res = processResults(context, received);
-      requeue = res.first();
-      exception = res.second();
+      requeue = processResults(context, received);
     }
     catch (Throwable t) {
       log.error(t.getMessage(), t);
-      exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
       nodeBundle.resultsReceived(t);
     } finally {
-      //nodeBundle.taskCompleted(exception);
       context.setBundle(null);
     }
     if (requeue) nodeBundle.resubmit();
@@ -106,19 +98,17 @@ class WaitingResultsState extends NodeServerState {
    * Process the results received from the node.
    * @param context the context associated witht he node channel.
    * @param received groups the job header and resuls of the tasks.
-   * @return A pairing of a requeue indicator and an eventual exception returned by the node.
+   * @return A boolean requeue indicator.
    * @throws Exception if any error occurs.
    */
-  private Pair<Boolean, Exception> processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
+  private boolean processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
     TaskBundle newBundle = received.bundle();
     ServerTaskBundleNode nodeBundle = context.getBundle();
-    Exception exception = null;
     // if an exception prevented the node from executing the tasks or sending back the results
     Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     Bundler bundler = context.getBundler();
     if (t != null) {
       if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
-      exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
       nodeBundle.resultsReceived(t);
     } else {
       if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
@@ -152,7 +142,7 @@ class WaitingResultsState extends NodeServerState {
       context.setNodeInfo(systemInfo, true);
       if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
     }
-    return new Pair<>(requeue, exception);
+    return requeue;
   }
 
   /**
