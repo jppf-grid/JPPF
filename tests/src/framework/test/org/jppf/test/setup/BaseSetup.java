@@ -67,32 +67,32 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getConnectionPool().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
-    return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+    return getJMXConnection(client).getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
 
   /**
-   * Get a proxy to the driver admin MBean.
+   * Get a JMX connection from the specified client.
    * @param client the JPPF client from which to get the proxy.
-   * @return an instance of <code>DriverJobManagementMBean</code>.
-   * @throws Exception if the proxy could not be obtained.
+   * @return a JMXDriverConnectionWrapper instance.
+   * @throws Exception if a JMX connection could not be obtained.
    */
-  public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getConnectionPool().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
-    return driver;
+  public static JMXDriverConnectionWrapper getJMXConnection(final JPPFClient client) throws Exception {
+    List<JPPFConnectionPool> pools = null;
+    while ((pools = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)).isEmpty()) Thread.sleep(10L);
+    JPPFConnectionPool pool = pools.get(0);
+    JMXDriverConnectionWrapper jmx = null;
+    while ((jmx = pool.getJmxConnection()) == null) Thread.sleep(10L);
+    while (!jmx.isConnected()) jmx.connectAndWait(10L);
+    return jmx;
   }
 
   /**
-   * Get a proxy to the driver admin MBean.
-   * @return an instance of <code>DriverJobManagementMBean</code>.
-   * @throws Exception if the proxy could not be obtained.
+   * Get a JMX connection from the default client.
+   * @return a JMXDriverConnectionWrapper instance.
+   * @throws Exception if a JMX connection could not be obtained.
    */
-  public static JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getConnectionPool().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
-    return driver;
+  public static JMXDriverConnectionWrapper getJMXConnection() throws Exception {
+    return getJMXConnection(client);
   }
 
   /**

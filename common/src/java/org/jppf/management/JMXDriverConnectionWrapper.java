@@ -273,6 +273,15 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   /**
+   * This convenience method creates a proxy to the driver's mbean which forwards requests to its nodes.
+   * It is equivalent to calling the more cumbersome {@code getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class)}.
+   * @return an instance of {@link JPPFNodeForwardingMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   */
+  public JPPFNodeForwardingMBean getNodeForwarder() throws Exception {
+    return getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+  }
+  /**
    * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
    * @param selector determines which nodes will be selected.
    * @param mBeanName the name of the MBean from which to receive notificaztions from the selected nodes.

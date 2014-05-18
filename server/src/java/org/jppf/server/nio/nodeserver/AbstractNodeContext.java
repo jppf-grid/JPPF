@@ -35,6 +35,7 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -183,6 +184,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
         tmpBundle.resubmit();
         tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
+        updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -509,5 +511,15 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC, n);
     }
+  }
+
+  /**
+   * Update the statistics to account for the specified number of resubmitted tasks.
+   * @param resubmittedTaskCount the number of tasks to resubmit.
+   */
+  void updateStatsUponTaskResubmit(final int resubmittedTaskCount) {
+    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    //stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, tmpBundle.getTaskCount());
+    stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, resubmittedTaskCount);
   }
 }
