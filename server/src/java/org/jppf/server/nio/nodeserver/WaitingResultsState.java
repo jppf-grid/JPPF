@@ -121,12 +121,17 @@ class WaitingResultsState extends NodeServerState {
         if (debugEnabled) log.debug("*** resubmitSet = {} for {}", resubmitSet, newBundle);
       }
       boolean anyResubmit = resubmitSet != null;
+      int count = 0;
       for (ServerTask task: nodeBundle.getTaskList()) {
         if (anyResubmit && resubmitSet.contains(task.getJobPosition())) {
           int max = nodeBundle.getJob().getSLA().getMaxTaskResubmits();
-          if (task.incResubmitCount() <= max) task.resubmit();
+          if (task.incResubmitCount() <= max) {
+            task.resubmit();
+            count++;
+          }
         }
       }
+      if (count > 0) context.updateStatsUponTaskResubmit(count);
       
       nodeBundle.resultsReceived(received.data());
       long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
