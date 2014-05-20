@@ -63,8 +63,7 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
+    JMXDriverConnectionWrapper driver = getDriverManagementProxy(client);
     return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
 
@@ -75,8 +74,15 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static JMXDriverConnectionWrapper getDriverManagementProxy(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
+    JPPFClientConnectionStatus[] statuses = {JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING};
+    List<JPPFConnectionPool> pools = null;
+    while ((pools = client.getConnectionPools()).isEmpty()) Thread.sleep(10L);
+    JPPFConnectionPool pool = pools.get(0);
+    while (pool.connectionCount(statuses) <= 0) Thread.sleep(10L);
+    JPPFClientConnection c = pool.getConnections(statuses).get(0);
+    JMXDriverConnectionWrapper driver = null;
+    while ((driver = c.getJmxConnection()) == null) Thread.sleep(10L);
+    while (!driver.isConnected()) Thread.sleep(10L);
     return driver;
   }
 
@@ -86,9 +92,7 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception {
-    JMXDriverConnectionWrapper driver = client.getClientConnection().getJmxConnection();
-    while (!driver.isConnected()) driver.connectAndWait(10L);
-    return driver;
+    return getDriverManagementProxy(client);
   }
 
   /**
