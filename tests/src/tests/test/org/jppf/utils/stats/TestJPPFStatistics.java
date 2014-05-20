@@ -21,6 +21,7 @@ package test.org.jppf.utils.stats;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
@@ -55,16 +56,14 @@ public class TestJPPFStatistics extends Setup1D1N1C
     nodeForwarder.restart(NodeSelector.ALL_NODES);
     List<Task<?>> results = ((JPPFResultCollector) job.getResultListener()).awaitResults();
     assertNotNull(results);
-    JPPFStatistics stats = jmx.statistics();
-    JPPFSnapshot snapshot = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
-    assertEquals((Double) 0d, (Double) snapshot.getLatest());
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
   }
 
   /**
    * Test that the latest queue size is zero, after a job has completed and whose tasks resubmit themselves once.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testLatestQueueTaskCountUponTaskResubmit() throws Exception {
     int nbTasks = 2;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, CustomTask.class, 100L);
@@ -74,9 +73,87 @@ public class TestJPPFStatistics extends Setup1D1N1C
     client.submitJob(job);
     List<Task<?>> results = ((JPPFResultCollector) job.getResultListener()).awaitResults();
     assertNotNull(results);
-    JPPFStatistics stats = jmx.statistics();
-    JPPFSnapshot snapshot = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
-    assertEquals((Double) 0d, (Double) snapshot.getLatest());
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+  }
+
+  /**
+   * Test that the latest task count and job count are zero after the client is closed with the job's cancelUponClientDisconnect = true.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskAndJobCountUponClientClose() throws Exception {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 100L);
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    jmx.resetStatistics();
+    job.getSLA().setCancelUponClientDisconnect(true);
+    job.getSLA().setSuspended(true);
+    client.submitJob(job);
+    Thread.sleep(1000L);
+    try {
+      client.close();
+    } finally {
+      client = BaseSetup.createClient(null);
+    }
+    jmx = BaseSetup.getJMXConnection();
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+  }
+
+  /**
+   * Test that the latest task count and job count are zero after the client is closed with the job's cancelUponClientDisconnect = false.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskAndJobCountUponClientCloseWithoutCancel() throws Exception {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    jmx.resetStatistics();
+    job.getSLA().setCancelUponClientDisconnect(false);
+    job.getSLA().setSuspended(false);
+    client.submitJob(job);
+    Thread.sleep(1000L);
+    try {
+      client.close();
+    } finally {
+      client = BaseSetup.createClient(null);
+    }
+    jmx = BaseSetup.getJMXConnection();
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+  }
+
+  /**
+   * Test that the latest task count and job count are zero after the job completes normally.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskAndJobCountUponCompletion() throws Exception {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 100L);
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    jmx.resetStatistics();
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+  }
+
+  /**
+   * Test that the latest task count and job count are zero after the job has been cancelled.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testTaskAndJobCountUponCancel() throws Exception {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 100L);
+    job.getSLA().setSuspended(true);
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    jmx.resetStatistics();
+    client.submitJob(job);
+    Thread.sleep(1000L);
+    jmx.cancelJob(job.getUuid());
+    List<Task<?>> results = ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    assertNotNull(results);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
   }
 
   /**
@@ -95,6 +172,29 @@ public class TestJPPFStatistics extends Setup1D1N1C
     public void run() {
       super.run();
       this.setResubmit(true);
+    }
+  }
+
+  /** */
+  public class TaskAndJobCountTester implements Callable<Object> {
+    /** */
+    private final JMXDriverConnectionWrapper jmx;
+
+    /**
+     * @param jmx .
+     */
+    public TaskAndJobCountTester(final JMXDriverConnectionWrapper jmx) {
+      this.jmx = jmx;
+    }
+
+    @Override
+    public Object call() throws Exception {
+      JPPFStatistics stats = jmx.statistics();
+      JPPFSnapshot snapshot = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
+      assertEquals(Double.valueOf(0d), Double.valueOf(snapshot.getLatest()));
+      snapshot = stats.getSnapshot(JPPFStatisticsHelper.JOB_COUNT);
+      assertEquals(Double.valueOf(0d), Double.valueOf(snapshot.getLatest()));
+      return null;
     }
   }
 }

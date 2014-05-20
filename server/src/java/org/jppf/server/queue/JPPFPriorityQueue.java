@@ -183,12 +183,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public ServerTaskBundleNode nextBundle(final int nbTasks) {
-    Iterator<ServerJob> it = iterator();
-    return it.hasNext() ? nextBundle(it.next(), nbTasks) : null;
-  }
-
-  @Override
   public ServerTaskBundleNode nextBundle(final ServerJob serverJob, final int nbTasks) {
     final ServerTaskBundleNode result;
     lock.lock();
@@ -211,6 +205,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     } finally {
       lock.unlock();
     }
+    if (debugEnabled) log.debug("found " + result.getTaskCount() + " tasks in the job");
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -result.getTaskCount());
     driver.getStatistics().addValues(JPPFStatisticsHelper.TASK_QUEUE_TIME, System.currentTimeMillis() - serverJob.getQueueEntryTime(), result.getTaskCount());
     return result;
@@ -237,14 +232,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       if (removeFromJobMap) {
-        jobMap.remove(serverJob.getUuid());
-        scheduleManager.clearSchedules(serverJob.getUuid());
-        jobManager.jobEnded(serverJob);
+        if (jobMap.remove(serverJob.getUuid()) != null) {
+          scheduleManager.clearSchedules(serverJob.getUuid());
+          jobManager.jobEnded(serverJob);
+        }
       }
-
       if (debugEnabled) log.debug("removing bundle from queue, jobId= " + serverJob.getName() + ", removeFromJobMap=" + removeFromJobMap);
       priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob);
-
       for (ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) {
         if (debugEnabled) log.debug("adding completion bundle for jobId={} : {}", serverJob.getName(), clientBundle);
         addBundle(clientBundle);

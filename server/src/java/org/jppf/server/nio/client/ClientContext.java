@@ -32,6 +32,7 @@ import org.jppf.server.nio.classloader.ClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -265,7 +266,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     ServerTaskBundleClient bundle;
     if ((bundle = getInitialBundleWrapper()) != null)
     {
-      if (debugEnabled) log.debug("cancelUponClientDisconnect bundle={}", bundle);
+      if (debugEnabled) log.debug("bundle={}", bundle);
       bundle.bundleEnded();
       setInitialBundleWrapper(null);
     }
@@ -283,6 +284,8 @@ public class ClientContext extends AbstractNioContext<ClientState>
         bundle.cancel();
         bundle.bundleEnded();
         setInitialBundleWrapper(null);
+        JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+        stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -bundle.getTaskCount());
       }
     }
     else if (debugEnabled) log.debug("getInitialBundleWrapper() is null for {}", this);

@@ -19,7 +19,9 @@
 package test.org.jppf.test.setup.common;
 
 import java.lang.reflect.Constructor;
+import java.util.concurrent.Callable;
 
+import org.jppf.JPPFError;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 
@@ -27,8 +29,7 @@ import org.jppf.node.protocol.Task;
  * Helper methods for setting up and cleaning the environment before and after testing.
  * @author Laurent Cohen
  */
-public class BaseTestHelper
-{
+public class BaseTestHelper {
   /**
    * Message used for successful task execution.
    */
@@ -41,14 +42,11 @@ public class BaseTestHelper
    * @return a <code>constructor</code> instance.
    * @throws Exception if any error occurs if a construcotr could not be found.
    */
-  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception
-  {
+  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception {
     Constructor[] constructors = taskClass.getConstructors();
     Constructor constructor = null;
-    for (Constructor c: constructors)
-    {
-      if (c.getParameterTypes().length == nbParams)
-      {
+    for (Constructor c: constructors) {
+      if (c.getParameterTypes().length == nbParams) {
         constructor = c;
         break;
       }
@@ -67,8 +65,7 @@ public class BaseTestHelper
    * @return an <code>Object</code> representing a task.
    * @throws Exception if any error occurs.
    */
-  public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception
-  {
+  public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception {
     int nbArgs = (params == null) ? 0 : params.length;
     Constructor constructor = findConstructor(taskClass, nbArgs);
     Object o = constructor.newInstance(params);
@@ -89,14 +86,12 @@ public class BaseTestHelper
    * @return a <code>JPPFJob</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFJob createJob(final String name, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception
-  {
+  public static JPPFJob createJob(final String name, final boolean blocking, final boolean broadcast, final int nbTasks, final Class<?> taskClass, final Object...params) throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName(name);
     int nbArgs = (params == null) ? 0 : params.length;
     Constructor constructor = findConstructor(taskClass, nbArgs);
-    for (int i=1; i<=nbTasks; i++)
-    {
+    for (int i=1; i<=nbTasks; i++) {
       Object o = constructor.newInstance(params);
       job.add(o).setId(job.getName() + " - task " + i);
     }
@@ -117,8 +112,7 @@ public class BaseTestHelper
    * @return a <code>JPPFJob</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFJob createJob2(final String name, final boolean blocking, final boolean broadcast, final Object...tasks) throws Exception
-  {
+  public static JPPFJob createJob2(final String name, final boolean blocking, final boolean broadcast, final Object...tasks) throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName(name);
     for (int i=1; i<=tasks.length; i++) job.add(tasks[i-1]).setId(job.getName() + " - task " + i);
@@ -126,5 +120,33 @@ public class BaseTestHelper
     job.getSLA().setBroadcastJob(broadcast);
     if (!blocking) job.setResultListener(new JPPFResultCollector(job));
     return job;
+  }
+
+  /**
+   * Wait untuil the specified test succeed, or the specified timeout expires, whichever happens first.
+   * @param test the test to run.
+   * @param timeout the timeout in milliseconds.
+   * @throws Exception if any error occurs.
+   */
+  public static void waitForTest(final Callable<? super Object> test, final long timeout) throws Exception {
+    Throwable throwable = null;
+    long start = System.currentTimeMillis();
+    while (true) {
+      try {
+        test.call();
+      } catch (Exception|Error e) {
+        throwable = e;
+      }
+      if (throwable == null) return;
+      long elapsed = System.currentTimeMillis() - start;
+      if (elapsed >= timeout) {
+        if (throwable instanceof Exception) throw (Exception) throwable;
+        else if (throwable instanceof Error) throw (Error) throwable;
+        else throw new JPPFError(throwable);
+      } else {
+        throwable = null;
+        Thread.sleep(10L);
+      }
+    }
   }
 }

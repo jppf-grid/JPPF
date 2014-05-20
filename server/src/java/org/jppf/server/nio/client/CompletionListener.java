@@ -119,7 +119,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
     ServerJob job = queue.getBundleForJob(uuid);
     if (job != null) {
-      if (debugEnabled) log.debug("job {} : status={}, submissionSTatus={}", new Object[] {job.getName(), job.getStatus(), job.getSubmissionStatus()});
+      if (debugEnabled) log.debug("job {} : status={}, submissionStatus={}", new Object[] {job.getName(), job.getStatus(), job.getSubmissionStatus()});
       ClientContext context = (ClientContext) channel.getContext();
       if (job.isDone() || (context.getNbTasksToSend() <= 0)) queue.removeBundle(job);
     }

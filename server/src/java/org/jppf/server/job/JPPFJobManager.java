@@ -29,7 +29,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFThreadFactory;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
-import org.jppf.utils.stats.JPPFStatisticsHelper;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -175,16 +175,15 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     if (bundleWrapper.getJob().isHandshake()) return; // skip notifications for handshake bundles
 
     TaskBundle bundle = bundleWrapper.getJob();
-    //long time = System.currentTimeMillis() - (Long) bundle.getParameter(BundleParameter.JOB_RECEIVED_TIME);
     long time = System.currentTimeMillis() - bundleWrapper.getJobReceivedTime();
     String jobUuid = bundle.getUuid();
     jobMap.remove(jobUuid);
     bundleMap.remove(jobUuid);
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
     submitEvent(JobEventType.JOB_ENDED, bundle, null);
-    //driver.getStatsUpdater().jobEnded(time);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TIME, time);
+    JPPFStatistics stats = driver.getStatistics();
+    stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
+    stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
   }
 
   @Override

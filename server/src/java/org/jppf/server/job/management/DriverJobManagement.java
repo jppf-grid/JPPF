@@ -26,6 +26,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -74,6 +75,8 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     {
       if (debugEnabled) log.debug("Request to cancel job '{}'", serverJob.getJob().getName());
       serverJob.cancel(false);
+      JPPFStatistics stats = driver.getStatistics();
+      stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -serverJob.getTaskCount());
     }
     else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
   }
