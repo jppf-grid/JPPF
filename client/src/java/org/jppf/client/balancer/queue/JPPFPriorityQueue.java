@@ -142,12 +142,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   }
 
   @Override
-  public ClientTaskBundle nextBundle(final int nbTasks) {
-    Iterator<ClientJob> it = iterator();
-    return it.hasNext() ? nextBundle(it.next(), nbTasks) : null;
-  }
-
-  @Override
   public ClientTaskBundle nextBundle(final ClientJob bundleWrapper, final int nbTasks) {
     final ClientTaskBundle result;
     lock.lock();

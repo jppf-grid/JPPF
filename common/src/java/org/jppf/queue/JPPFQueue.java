@@ -35,13 +35,6 @@ public interface JPPFQueue<T, U, V> extends Iterable<T>
 
   /**
    * Get the next object in the queue.
-   * @param nbTasks the maximum number of tasks to get out of the bundle.
-   * @return the most recent object that was added to the queue.
-   */
-  V nextBundle(int nbTasks);
-
-  /**
-   * Get the next object in the queue.
    * @param bundleWrapper the bundle to either remove or extract a sub-bundle from.
    * @param nbTasks       the maximum number of tasks to get out of the bundle.
    * @return the most recent object that was added to the queue.
