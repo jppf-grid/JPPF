@@ -306,7 +306,7 @@ public class GenericProcessLauncher implements Runnable {
 
   /**
    * Called when the subprocess has exited with exit value n.
-   * This allows for printing the residual output (both standard and error) to this pJVM's console and log file,
+   * This allows for printing the residual output (both standard and error) to this JVM's console and log file,
    * in order to get additional information if a problem occurred.
    * @param exitCode the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.

@@ -47,8 +47,8 @@ public class ConnectionPoolRunner {
    */
   public static void main(final String[] args) {
     JPPFClient client = null;
-    int nbTasks = 40;
-    long duration = 5000L;
+    int nbTasks = 1;
+    long duration = 1000L;
     //int[] nbJobs = { 1, 5, 1 };
     int[] nbJobs = { 1 };
     try {
@@ -92,7 +92,7 @@ public class ConnectionPoolRunner {
     job.setName(name);
     job.setBlocking(false);
     for (int i=1; i<=nbTasks; i++) job.add(new LongTask(taskDuration)).setId(name + ":task_" + i);
-    job.getSLA().setCancelUponClientDisconnect(false);
+    //job.getSLA().setCancelUponClientDisconnect(false);
     /*
     job.setResultListener(new JPPFResultCollector(job) {
       @Override

@@ -56,12 +56,12 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
   {
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submitJob(job);
     Thread.sleep(TIME_SHORT);
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
+    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     List<Task<?>> results = collector.awaitResults();
     assertEquals(results.size(), nbTasks);
     assertNotNull(results.get(0));
