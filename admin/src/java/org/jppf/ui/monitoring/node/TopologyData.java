@@ -370,7 +370,7 @@ public class TopologyData {
         while (hasNullProxy) {
           if (jmxWrapper.get() != null) {
             try {
-              if (nodeForwarder == null) nodeForwarder = jmxWrapper.get().getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+              if (nodeForwarder == null) nodeForwarder = jmxWrapper.get().getNodeForwarder();
             } catch (Exception ignore) {
             }
             try {

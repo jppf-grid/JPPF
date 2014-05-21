@@ -66,7 +66,7 @@ public class DriverConnectionManager implements AutoCloseable {
     while ((jmx = connectionPool.getJmxConnection()) == null) Thread.sleep(20L);
     // wait until the JMX connection is established
     while (!jmx.isConnected()) Thread.sleep(20L);
-    this.forwarder = jmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+    this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
     this.masterSelector = new NodeSelector.ExecutionPolicySelector(masterPolicy);

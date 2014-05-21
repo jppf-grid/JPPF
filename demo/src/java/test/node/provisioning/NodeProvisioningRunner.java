@@ -50,7 +50,7 @@ public class NodeProvisioningRunner {
       while ((jmxDriver = connection.getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
       while (!jmxDriver.isConnected()) Thread.sleep(10L);
       // get a proxy to the mbean that forwards management requests to the nodes
-      JPPFNodeForwardingMBean forwarder = jmxDriver.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+      JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
 
       // create a node selector that only selects master nodes
       ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
