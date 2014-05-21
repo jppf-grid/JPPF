@@ -28,8 +28,7 @@ import org.jppf.node.protocol.Task;
  * @param <T> the ytpe of result returned by the task.
  * @author Laurent Cohen
  */
-public abstract class JPPFTaskCallback<T> implements Runnable, Serializable
-{
+public abstract class JPPFTaskCallback<T> implements Runnable, Serializable {
   /**
    * The task this callback is associated with.
    */
@@ -39,8 +38,7 @@ public abstract class JPPFTaskCallback<T> implements Runnable, Serializable
    * Get the task this callback is associated with.
    * @return a <code>Task</code> instance.
    */
-  public final Task<T> getTask()
-  {
+  public final Task<T> getTask() {
     return task;
   }
 
@@ -48,8 +46,7 @@ public abstract class JPPFTaskCallback<T> implements Runnable, Serializable
    * Set the task this callback is associated with.
    * @param task a <code>Task</code> instance.
    */
-  final void setTask(final Task<T> task)
-  {
+  final void setTask(final Task<T> task) {
     this.task = task;
   }
 }
