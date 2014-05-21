@@ -21,6 +21,7 @@ package sample.test.clientpool;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -46,9 +47,10 @@ public class ConnectionPoolRunner {
    */
   public static void main(final String[] args) {
     JPPFClient client = null;
-    int nbTasks = 1;
-    long duration = 100L;
-    int[] nbJobs = { 1, 5, 1 };
+    int nbTasks = 40;
+    long duration = 5000L;
+    //int[] nbJobs = { 1, 5, 1 };
+    int[] nbJobs = { 1 };
     try {
       configure();
       client = new JPPFClient();
@@ -64,7 +66,10 @@ public class ConnectionPoolRunner {
         waitForNbConnections(pool, size, 5000L);
         List<JPPFJob> jobs = new ArrayList<>(size);
         for (int i=1; i<=size; i++) jobs.add(createJob("job_" + i, nbTasks, duration));
-        for (JPPFJob job: jobs) client.submitJob(job);
+        for (JPPFJob job: jobs) {
+          client.submitJob(job);
+          print("submittted job '" + job.getName() + "'");
+        }
         for (JPPFJob job: jobs) printJobResults(job);
       }
     } catch (Exception e) {
@@ -87,6 +92,27 @@ public class ConnectionPoolRunner {
     job.setName(name);
     job.setBlocking(false);
     for (int i=1; i<=nbTasks; i++) job.add(new LongTask(taskDuration)).setId(name + ":task_" + i);
+    job.getSLA().setCancelUponClientDisconnect(false);
+    /*
+    job.setResultListener(new JPPFResultCollector(job) {
+      @Override
+      public synchronized void resultsReceived(final TaskResultEvent event) {
+        super.resultsReceived(event);
+        print("result collector resultsReceived() : results = " + this.getAllResults());
+      }
+    });
+    */
+    job.addJobListener(new JobListenerAdapter () {
+      @Override
+      public void jobEnded(final JobEvent event) {
+        //print("jobEnded() called : results = " + event.getJob().getResults().getAllResults());
+      }
+
+      @Override
+      public void jobReturned(final JobEvent event) {
+        print("jobReturned() received " + event.getJobTasks().size() + " tasks");
+      }
+    });
     return job;
   }
 

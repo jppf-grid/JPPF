@@ -86,7 +86,9 @@ public class LongTask extends AbstractTask<String> {
         if (taskLength > 0) Thread.sleep(taskLength);
         elapsed = System.currentTimeMillis() - taskStart;
       }
-      setResult("task has run for " + elapsed + " ms");
+      String result = "task '" + getId() + "' has run for " + elapsed + " ms";
+      setResult(result);
+      System.out.println(result);
     } catch(InterruptedException e) {
       setResult(e.getClass().getName() + " : " + e.getMessage());
     }
