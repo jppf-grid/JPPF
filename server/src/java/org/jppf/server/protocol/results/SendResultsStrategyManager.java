@@ -34,7 +34,7 @@ public class SendResultsStrategyManager
   /**
    * The default strategy to use when a strategy with a given name cannot be found.
    */
-  private static final SendResultsStrategy DEFAULT_STRATEGY = strategyMap.get(SendResultsStrategy.NODE_RESULTS);
+  private static final SendResultsStrategy DEFAULT_STRATEGY = strategyMap.get(SendResultsStrategyConstants.NODE_RESULTS);
 
   /**
    * Initialize the map of available strategies.
@@ -43,8 +43,8 @@ public class SendResultsStrategyManager
   private static Map<String, SendResultsStrategy> initializeMap()
   {
     Map<String, SendResultsStrategy> map = new HashMap<>();
-    map.put(SendResultsStrategy.ALL_RESULTS, new SendResultsStrategy.SendAllResultsStrategy());
-    map.put(SendResultsStrategy.NODE_RESULTS, new SendResultsStrategy.SendNodeResultsStrategy());
+    map.put(SendResultsStrategyConstants.ALL_RESULTS, new SendResultsStrategy.SendAllResultsStrategy());
+    map.put(SendResultsStrategyConstants.NODE_RESULTS, new SendResultsStrategy.SendNodeResultsStrategy());
     return map;
   }
 

@@ -26,17 +26,7 @@ import org.jppf.server.protocol.*;
  * Strategy to determine whether results should be sent immediately.
  * @author Laurent Cohen
  */
-public interface SendResultsStrategy
-{
-  /**
-   * Name of a strategy which returns results as soon as they come back from a node.
-   */
-  String NODE_RESULTS = "NodeResults";
-  /**
-   * Name of a strategy which returns results only when a client bundle is complete.
-   */
-  String ALL_RESULTS = "AllResults";
-
+public interface SendResultsStrategy {
   /**
    * Determine whether results should be sent immediately.
    * @param bundle the client bundle for which results were recived from a node.
@@ -57,18 +47,15 @@ public interface SendResultsStrategy
    * Strategy that sends the results everytime time they are received from a node.
    * @exclude
    */
-  public static class SendNodeResultsStrategy implements SendResultsStrategy
-  {
+  public static class SendNodeResultsStrategy implements SendResultsStrategy {
     @Override
-    public boolean sendResults(final ServerTaskBundleClient bundle, final Collection<ServerTask> tasks)
-    {
+    public boolean sendResults(final ServerTaskBundleClient bundle, final Collection<ServerTask> tasks) {
       return true;
     }
 
     @Override
-    public String getName()
-    {
-      return NODE_RESULTS;
+    public String getName() {
+      return SendResultsStrategyConstants.NODE_RESULTS;
     }
   }
 
@@ -76,18 +63,15 @@ public interface SendResultsStrategy
    * Strategy that sends the results when they have all been received for the client bundle.
    * @exclude
    */
-  public static class SendAllResultsStrategy implements SendResultsStrategy
-  {
+  public static class SendAllResultsStrategy implements SendResultsStrategy {
     @Override
-    public boolean sendResults(final ServerTaskBundleClient bundle, final Collection<ServerTask> tasks)
-    {
+    public boolean sendResults(final ServerTaskBundleClient bundle, final Collection<ServerTask> tasks) {
       return false;
     }
 
     @Override
-    public String getName()
-    {
-      return ALL_RESULTS;
+    public String getName() {
+      return SendResultsStrategyConstants.ALL_RESULTS;
     }
   }
 }
