@@ -231,8 +231,11 @@ public class JobData
       {
         if (proxy != null) proxy.removeNotificationListener(notificationListener);
       }
-      catch (Exception ignore)
+      catch (Exception e)
       {
+        String s = ExceptionUtils.getMessage(e);
+        if (debugEnabled) log.debug(s, e);
+        else log.warn(s);
       }
     }
     notificationListener = listener;
