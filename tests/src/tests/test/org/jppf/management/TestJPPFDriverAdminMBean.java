@@ -52,7 +52,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   {
     int nbTasks = 10;
     long duration = 100L;
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     //waitKeyPressed();
     driver.resetStatistics();
     JPPFStatistics stats = driver.statistics();
@@ -83,7 +83,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000)
   public void testResetStatistics() throws Exception
   {
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 10, LifeCycleTask.class, 100L));
     while (driver.nbIdleNodes() < 2) Thread.sleep(10L);
     driver.resetStatistics();
@@ -103,7 +103,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testNodesInformation() throws Exception
   {
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     Collection<JPPFManagementInfo> coll = driver.nodesInformation();
     assertNotNull(coll);
@@ -127,7 +127,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testNbNodes() throws Exception
   {
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     int n = driver.nbNodes();
     assertEquals(2, n);
@@ -140,7 +140,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testGetLoadBalancerInformation() throws Exception
   {
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     InputStream is = getClass().getClassLoader().getResourceAsStream("config/driver.template.properties");
     assertNotNull(is);
@@ -175,7 +175,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testSetLoadBalancerInformation() throws Exception
   {
     LoadBalancingInformation oldLbi = null;
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     try
     {
       assertNotNull(driver);
@@ -217,7 +217,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testNodesMatchingExecutionPolicy() throws Exception
   {
     int nbNodes = 2;
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     int n = driver.matchingNodes(new Contains("jppf.node.uuid", false, "n"));
     assertEquals(nbNodes, n);
     n = driver.matchingNodes(new Equal("jppf.node.uuid", false, "n1"));
@@ -231,7 +231,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   @Test(timeout=10000L)
   public void testIdleNodesInformation() throws Exception
   {
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     Thread.sleep(500L);
     Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
@@ -254,7 +254,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testNbIdleNodes() throws Exception
   {
     int nbNodes = 2;
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     Thread.sleep(500L);
     int n = driver.nbIdleNodes();
@@ -276,7 +276,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   public void testActivateNode() throws Exception
   {
     int nbTasks = 10;
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     String[] nodeUuids = new String[2];
     assertNotNull(driver);
     NodeSelector selector = null;

@@ -259,7 +259,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     int nbTasks = 20;
     NotifyingTaskListener listener = new NotifyingTaskListener();
     String listenerID = null;
-    JMXDriverConnectionWrapper driverJmx = BaseSetup.getDriverManagementProxy();
+    JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, NotifyingTask2.class);
     try {
       listenerID = driverJmx.registerForwardingNotificationListener(selector, JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
@@ -287,7 +287,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     int nbRuns = 5;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
     // ensure the job is only executed in a single specific node
-    JMXDriverConnectionWrapper jmx = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
     Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
     String nodeUuid = coll.iterator().next().getUuid();
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
@@ -311,7 +311,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     int nbRuns = 5;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
     // ensure the job is only executed in a single specific node
-    JMXDriverConnectionWrapper jmx = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
     Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
     String nodeUuid = coll.iterator().next().getUuid();
     job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));

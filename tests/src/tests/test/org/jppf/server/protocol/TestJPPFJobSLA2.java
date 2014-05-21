@@ -64,7 +64,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
   public void testDispatchExpirationSchedule() throws Exception {
     String listenerId = null;
     checkNodes();
-    JMXDriverConnectionWrapper jmx = BaseSetup.getDriverManagementProxy();
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     try {
       NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
@@ -106,7 +106,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
   public void testMaxDispatchExpirations() throws Exception {
     String listenerId = null;
     checkNodes();
-    JMXDriverConnectionWrapper jmx = BaseSetup.getDriverManagementProxy();
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     try {
       NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
@@ -145,8 +145,8 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
    */
   private void checkNodes() throws Exception {
     int nbNodes = BaseSetup.nbNodes();
-    JMXDriverConnectionWrapper driverJmx = BaseSetup.getDriverManagementProxy(client);
-    JPPFNodeForwardingMBean nodeForwarder = driverJmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+    JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
+    JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
     while (true) {
       Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);
       if (result.size() == nbNodes) {

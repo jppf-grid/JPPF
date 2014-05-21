@@ -248,8 +248,8 @@ public class AbstractNonStandardSetup
    */
   protected void testForwardingMBean() throws Exception
   {
-    JMXDriverConnectionWrapper driverJmx = BaseSetup.getDriverManagementProxy(client);
-    JPPFNodeForwardingMBean nodeForwarder = driverJmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+    JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
+    JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
     boolean ready = false;
     long elapsed = 0L;
     long start = System.currentTimeMillis();

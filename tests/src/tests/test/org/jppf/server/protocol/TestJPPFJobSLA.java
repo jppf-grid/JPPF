@@ -30,7 +30,7 @@ import org.jppf.client.event.TaskResultEvent;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.results.SendResultsStrategy;
+import org.jppf.server.protocol.results.SendResultsStrategyConstants;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.Test;
@@ -372,7 +372,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testSendNodeResultsStrategy() throws Exception {
-    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategy.NODE_RESULTS, 4);
+    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategyConstants.NODE_RESULTS, 4);
   }
 
   /**
@@ -381,7 +381,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    */
   @Test(timeout=5000)
   public void testSendAllResultsStrategy() throws Exception {
-    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategy.ALL_RESULTS, 1);
+    checkSendResultsStrategy(ReflectionUtils.getCurrentMethodName(), SendResultsStrategyConstants.ALL_RESULTS, 1);
   }
 
   /**

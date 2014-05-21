@@ -61,7 +61,7 @@ public class TestJPPFNodeAdminMBean
   public static void setup() throws Exception
   {
     client = BaseSetup.setup(1);
-    driverJmx = BaseSetup.getDriverManagementProxy(client);
+    driverJmx = BaseSetup.getJMXConnection(client);
     Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
     JPPFManagementInfo info = coll.iterator().next();
     nodeJmx = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());

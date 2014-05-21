@@ -70,8 +70,8 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
     int nbNodes = 2;
     client = BaseSetup.setup(2);
     for (int i=1; i<=nbNodes; i++) allNodes.add("n" + i);
-    driverJmx = BaseSetup.getDriverManagementProxy(client);
-    nodeForwarder = driverJmx.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
+    driverJmx = BaseSetup.getJMXConnection(client);
+    nodeForwarder = driverJmx.getNodeForwarder();
     boolean ready = false;
     NodeSelector selector = new AllNodesSelector();
     String[] array = new String[nbNodes];

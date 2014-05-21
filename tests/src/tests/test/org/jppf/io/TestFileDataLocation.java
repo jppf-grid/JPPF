@@ -80,7 +80,7 @@ public class TestFileDataLocation extends Setup1D1N1C
    */
   private void configureLoadBalancing() throws Exception
   {
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     JPPFSystemInformation info = driver.systemInformation();
     System.out.println("runtime driver info: " + info.getRuntime());
@@ -98,7 +98,7 @@ public class TestFileDataLocation extends Setup1D1N1C
   {
     LoadBalancingInformation tmpLbi = oldLbi;
     oldLbi = null;
-    JMXDriverConnectionWrapper driver = BaseSetup.getDriverManagementProxy(client);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     if (tmpLbi != null) driver.changeLoadBalancerSettings(tmpLbi.getAlgorithm(), tmpLbi.getParameters());
   }
 }
