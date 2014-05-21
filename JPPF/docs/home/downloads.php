@@ -158,7 +158,7 @@ else
 				</div>
 				<div class="jppf_content">
   <?php
-    $ver1 = "4.1";
+    $ver1 = "4.1.1";
     $ver2 = "4.0.3";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
   ?>
@@ -235,7 +235,6 @@ else
             class="like" allowTransparency="true"></iframe>
         </td>
         <td align="right">
-          <a href="http://www.parallel-matters.com"><img src="/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
           <a href="http://sourceforge.net/projects/jppf-project">
             <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
               alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
