@@ -140,6 +140,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
     for (int i=0; i<tasks.size(); i++) positions[i] = tasks.get(i).getJobPosition();
     if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
     bundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
+    bundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
     message.addLocation(IOHelper.serializeData(bundle, helper.getSerializer()));
     for (ServerTask task: tasks) message.addLocation(task.getResult());
     message.setBundle(bundle);

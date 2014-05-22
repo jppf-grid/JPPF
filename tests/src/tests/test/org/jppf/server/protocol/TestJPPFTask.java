@@ -325,6 +325,32 @@ public class TestJPPFTask extends Setup1D1N1C {
   }
 
   /**
+   * Test that the max number of task resubmits set in the task works properly and overrides the one in the job SLA.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testMaxTaskResubmitsWithTaskOverride() throws Exception {
+    int nbTasks = 1;
+    int slaMaxResubmits = 2;
+    int taskMaxResubmits = slaMaxResubmits + 1;
+    int nbRuns = 5;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, ResubmittingTask.class, nbRuns);
+    job.getJobTasks().get(0).setMaxResubmits(taskMaxResubmits);
+    // ensure the job is only executed in a single specific node
+    JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+    Collection<JPPFManagementInfo> coll = jmx.nodesInformation();
+    String nodeUuid = coll.iterator().next().getUuid();
+    job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", true, nodeUuid));
+    job.getSLA().setMaxTaskResubmits(slaMaxResubmits);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(results.size(), nbTasks);
+    ResubmittingTask task = (ResubmittingTask) results.get(0);
+    assertTrue(task.getResult() instanceof Integer);
+    assertEquals(Integer.valueOf(taskMaxResubmits + 1), task.getResult());
+  }
+
+  /**
    * A simple Task which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends AbstractTask<Object> {

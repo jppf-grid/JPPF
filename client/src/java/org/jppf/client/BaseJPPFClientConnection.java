@@ -50,6 +50,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Used to prevent parallel deserialization.
    */
   private static Lock lock = new ReentrantLock();
@@ -119,29 +123,16 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   public void sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
-    int count = job.getJobTasks().size() - job.getResults().size();
+    ;
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
-    header.setTaskCount(count);
+    header.setTaskCount(job.unexecutedTaskCount());
     header.setName(job.getName());
     header.setUuid(job.getUuid());
     header.setSLA(job.getSLA());
     header.setMetadata(job.getMetadata());
-
-    int[] positions = new int[count];
-    Task<?>[] tasks = new Task<?>[count];
-    int i = 0;
-    for (Task task : job.getJobTasks()) {
-      int pos = task.getPosition();
-      if (!job.getResults().hasResult(pos)) {
-        tasks[i] = task;
-        positions[i] = pos;
-        i++;
-      }
-    }
-    header.setParameter(BundleParameter.TASK_POSITIONS, positions);
-    if (debugEnabled) log.debug(this.toDebugString() + " sending job " + header + ", positions=" + StringUtils.buildString(positions));
+    Task<?>[] tasks = prepareTasksToSend(header, job);
 
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     boolean hasNotSerializableException = false;
@@ -169,6 +160,33 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   }
 
   /**
+   * Prepare the job header for the remaining tasks to send in the job.
+   * @param header the job header sent to the driver.
+   * @param job the job whose taskss are to be sent.
+   * @return an array of the tasks to send.
+   */
+  private Task<?>[] prepareTasksToSend(final TaskBundle header, final JPPFJob job) {
+    int count = job.unexecutedTaskCount();
+    int[] positions = new int[count];
+    int[] maxResubmits = new int[count];
+    Task<?>[] tasks = new Task<?>[count];
+    int i = 0;
+    for (Task<?> task : job) {
+      int pos = task.getPosition();
+      if (!job.getResults().hasResult(pos)) {
+        tasks[i] = task;
+        positions[i] = pos;
+        maxResubmits[i] = task.getMaxResubmits();
+        i++;
+      }
+    }
+    header.setParameter(BundleParameter.TASK_POSITIONS, positions);
+    header.setParameter(BundleParameter.TASK_MAX_RESUBMITS, maxResubmits);
+    if (traceEnabled) log.trace(this.toDebugString() + " sending job " + header + ", positions=" + StringUtils.buildString(positions));
+    return tasks;
+  }
+
+  /**
    * Send a handshake job to the server.
    * @return a JPPFTaskBundlesent by the server in response to the handshake job.
    * @throws Exception if an error occurs while sending the request.
@@ -183,7 +201,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
     header.setUuid(new JPPFUuid().toString());
     header.setName("handshake job");
-    header.setUuid("handshake job");
+    header.setUuid(header.getName());
     header.setParameter("connection.uuid", connectionUuid);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
@@ -263,11 +281,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     } catch (AsynchronousCloseException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
-    } catch (Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.error(ExceptionUtils.getMessage(e));
-      throw e;
-    } catch (Error e) {
+    } catch (Exception|Error e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.error(ExceptionUtils.getMessage(e));
       throw e;

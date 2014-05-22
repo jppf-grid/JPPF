@@ -40,8 +40,7 @@ import org.jppf.utils.JPPFUuid;
  * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
-public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<?>>
-{
+public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<?>> {
   /**
    * Explicit serialVersionUID.
    */
@@ -100,8 +99,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
    * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
    */
-  public JPPFJob()
-  {
+  public JPPFJob() {
     this(JPPFUuid.normalUUID());
   }
 
@@ -110,8 +108,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
    * @param jobUuid the uuid to assign to this job.
    */
-  public JPPFJob(final String jobUuid)
-  {
+  public JPPFJob(final String jobUuid) {
     this.uuid = (jobUuid == null) ? JPPFUuid.normalUUID() : jobUuid;
     name = (jobUuid == null) ? this.uuid : jobUuid;
   }
@@ -120,8 +117,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Initialize a blocking job with the specified parameters.
    * @param dataProvider the container for data shared between tasks.
    */
-  public JPPFJob(final DataProvider dataProvider)
-  {
+  public JPPFJob(final DataProvider dataProvider) {
     this(dataProvider, null, true, null);
   }
 
@@ -130,8 +126,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param dataProvider the container for data shared between tasks.
    * @param jobSLA service level agreement between job and server.
    */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA)
-  {
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA) {
     this(dataProvider, jobSLA, true, null);
   }
 
@@ -139,8 +134,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Initialize a non-blocking job with the specified parameters.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final TaskResultListener resultsListener)
-  {
+  public JPPFJob(final TaskResultListener resultsListener) {
     this(null, null, false, resultsListener);
   }
 
@@ -149,8 +143,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param dataProvider the container for data shared between tasks.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final TaskResultListener resultsListener)
-  {
+  public JPPFJob(final DataProvider dataProvider, final TaskResultListener resultsListener) {
     this(dataProvider, null, false, resultsListener);
   }
 
@@ -160,8 +153,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param jobSLA service level agreement between job and server.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final TaskResultListener resultsListener)
-  {
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final TaskResultListener resultsListener) {
     this(dataProvider, jobSLA, false, resultsListener);
   }
 
@@ -172,8 +164,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param blocking determines whether this job is blocking.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final boolean blocking, final TaskResultListener resultsListener)
-  {
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final boolean blocking, final TaskResultListener resultsListener) {
     this(dataProvider, jobSLA, null, blocking, resultsListener);
   }
 
@@ -185,9 +176,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param blocking determines whether this job is blocking.
    * @param resultsListener the listener that receives notifications of completed tasks.
    */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final JPPFJobMetadata jobMetadata,
-      final boolean blocking, final TaskResultListener resultsListener)
-  {
+  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final JPPFJobMetadata jobMetadata, final boolean blocking, final TaskResultListener resultsListener) {
     this();
     this.dataProvider = dataProvider;
     if (jobSLA != null) this.jobSLA = jobSLA;
@@ -197,14 +186,12 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   }
 
   @Override
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
   @Override
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
@@ -212,8 +199,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Set the user-defined display name for this job.
    * @param name the display name as a string.
    */
-  public void setName(final String name)
-  {
+  public void setName(final String name) {
     this.name = name;
   }
 
@@ -223,8 +209,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @deprecated use {@link #getJobTasks()} instead.
    */
   @Deprecated
-  public List<JPPFTask> getTasks()
-  {
+  public List<JPPFTask> getTasks() {
     List<JPPFTask> list = new ArrayList<>(tasks.size());
     for (Task<?> task: tasks) list.add((JPPFTask) task);
     return list;
@@ -234,8 +219,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the list of tasks to execute.
    * @return a list of objects.
    */
-  public List<Task<?>> getJobTasks()
-  {
+  public List<Task<?>> getJobTasks() {
     return tasks;
   }
 
@@ -250,8 +234,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @deprecated use {@link #add(Object, Object...)} instead.
    */
   @Deprecated
-  public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException
-  {
+  public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException {
     JPPFTask jppfTask = null;
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
@@ -272,8 +255,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @deprecated use {@link #add(String, Object, Object...)} instead.
    */
   @Deprecated
-  public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException
-  {
+  public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
     tasks.add(jppfTask);
@@ -290,8 +272,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
    */
-  public Task<?> add(final Object taskObject, final Object...args) throws JPPFException
-  {
+  public Task<?> add(final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     Task<?> jppfTask = null;
     if (taskObject instanceof Task) jppfTask = (Task) taskObject;
@@ -310,8 +291,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
    * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
    */
-  public Task<?> add(final String method, final Object taskObject, final Object...args) throws JPPFException
-  {
+  public Task<?> add(final String method, final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     Task <?>jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
     tasks.add(jppfTask);
@@ -323,8 +303,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the container for data shared between tasks.
    * @return a <code>DataProvider</code> instance.
    */
-  public DataProvider getDataProvider()
-  {
+  public DataProvider getDataProvider() {
     return dataProvider;
   }
 
@@ -332,8 +311,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Set the container for data shared between tasks.
    * @param dataProvider a <code>DataProvider</code> instance.
    */
-  public void setDataProvider(final DataProvider dataProvider)
-  {
+  public void setDataProvider(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
   }
 
@@ -341,8 +319,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the listener that receives notifications of completed tasks.
    * @return a <code>TaskCompletionListener</code> instance.
    */
-  public TaskResultListener getResultListener()
-  {
+  public TaskResultListener getResultListener() {
     return resultsListener;
   }
 
@@ -350,8 +327,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Set the listener that receives notifications of completed tasks.
    * @param resultsListener a <code>TaskCompletionListener</code> instance.
    */
-  public void setResultListener(final TaskResultListener resultsListener)
-  {
+  public void setResultListener(final TaskResultListener resultsListener) {
     this.resultsListener = resultsListener;
   }
 
@@ -359,8 +335,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Determine whether the execution of this job is blocking on the client side.
    * @return true if the execution is blocking, false otherwise.
    */
-  public boolean isBlocking()
-  {
+  public boolean isBlocking() {
     return blocking;
   }
 
@@ -368,14 +343,12 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Specify whether the execution of this job is blocking on the client side.
    * @param blocking true if the execution is blocking, false otherwise.
    */
-  public void setBlocking(final boolean blocking)
-  {
+  public void setBlocking(final boolean blocking) {
     this.blocking = blocking;
   }
 
   @Override
-  public JobSLA getSLA()
-  {
+  public JobSLA getSLA() {
     return jobSLA;
   }
 
@@ -383,8 +356,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the service level agreement between the job and the server.
    * @param jobSLA an instance of <code>JobSLA</code>.
    */
-  public void setSLA(final JobSLA jobSLA)
-  {
+  public void setSLA(final JobSLA jobSLA) {
     this.jobSLA = jobSLA;
   }
 
@@ -392,8 +364,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the job SLA for the client side.
    * @return an instance of <code>JobSLA</code>.
    */
-  public JobClientSLA getClientSLA()
-  {
+  public JobClientSLA getClientSLA() {
     return jobClientSLA;
   }
 
@@ -401,14 +372,12 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the service level agreement between the job and the server.
    * @param jobClientSLA an instance of <code>JobSLA</code>.
    */
-  public void setClientSLA(final JobClientSLA jobClientSLA)
-  {
+  public void setClientSLA(final JobClientSLA jobClientSLA) {
     this.jobClientSLA = jobClientSLA;
   }
 
   @Override
-  public JobMetadata getMetadata()
-  {
+  public JobMetadata getMetadata() {
     return jobMetadata;
   }
 
@@ -416,25 +385,18 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Set this job's metadata.
    * @param jobMetadata a {@link JPPFJobMetadata} instance.
    */
-  public void setMetadata(final JobMetadata jobMetadata)
-  {
+  public void setMetadata(final JobMetadata jobMetadata) {
     this.jobMetadata = jobMetadata;
   }
 
   @Override
-  public int hashCode()
-  {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-    return result;
+  public int hashCode() {
+    return 31 + (uuid == null ? 0 : uuid.hashCode());
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (this == obj) return true;
-    if (obj == null) return false;
     if (!(obj instanceof JPPFJob)) return false;
     JPPFJob other = (JPPFJob) obj;
     return (uuid == null) ? other.uuid == null : uuid.equals(other.uuid);
@@ -444,8 +406,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Get the object that holds the results of executed tasks.
    * @return a {@link JobResults} instance.
    */
-  public JobResults getResults()
-  {
+  public JobResults getResults() {
     return results;
   }
 
@@ -453,8 +414,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Add a listener to the list of job listeners.
    * @param listener a {@link JobListener} instance.
    */
-  public void addJobListener(final JobListener listener)
-  {
+  public void addJobListener(final JobListener listener) {
     listeners.add(listener);
   }
 
@@ -462,8 +422,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * Remove a listener from the list of job listeners.
    * @param listener a {@link JobListener} instance.
    */
-  public void removeJobListener(final JobListener listener)
-  {
+  public void removeJobListener(final JobListener listener) {
     listeners.remove(listener);
   }
 
@@ -474,19 +433,17 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param tasks the tasks that were dispatched or returned.
    * @exclude
    */
-  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<Task<?>> tasks)
-  {
+  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<Task<?>> tasks) {
     JobEvent event = new JobEvent(this, channel, tasks);
-    switch(type)
-    {
+    switch(type) {
       case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
-      break;
+        break;
       case JOB_END: for (JobListener listener: listeners) listener.jobEnded(event);
-      break;
+        break;
       case JOB_DISPATCH: for (JobListener listener: listeners) listener.jobDispatched(event);
-      break;
+        break;
       case JOB_RETURN: for (JobListener listener: listeners) listener.jobReturned(event);
-      break;
+        break;
     }
   }
 
@@ -496,8 +453,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param <T> the type of the keys used by the persistence manager.
    */
   @SuppressWarnings("unchecked")
-  public <T> JobPersistence<T> getPersistenceManager()
-  {
+  public <T> JobPersistence<T> getPersistenceManager() {
     return (JobPersistence<T>) persistenceManager;
   }
 
@@ -506,8 +462,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @param persistenceManager a {@link JobPersistence} instance.
    * @param <T> the type of the keys used by the persistence manager.
    */
-  public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager)
-  {
+  public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager) {
     this.persistenceManager = persistenceManager;
   }
 
@@ -521,8 +476,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
@@ -536,8 +490,16 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   }
 
   @Override
-  public Iterator<Task<?>> iterator()
-  {
+  public Iterator<Task<?>> iterator() {
     return tasks.iterator();
+  }
+
+  /**
+   * Get the count of the tasks in this job that haven't yet been executed.
+   * @return the number of unexecuted tasks in this job.
+   * @since 4.2
+   */
+  public int unexecutedTaskCount() {
+    return tasks.size() - results.size();
   }
 }

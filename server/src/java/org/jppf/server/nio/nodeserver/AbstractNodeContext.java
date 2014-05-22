@@ -224,10 +224,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     bundle.checkTaskCount();
     TaskBundle taskBundle = bundle.getJob();
     AbstractTaskBundleMessage message = newMessage();
-    if (!taskBundle.isHandshake()) taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
+    if (!taskBundle.isHandshake()) {
+      taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
+      if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
+    }
     message.addLocation(IOHelper.serializeData(taskBundle, helper.getSerializer()));
     message.addLocation(bundle.getDataProvider());
-    for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getDataLocation());
+    for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getInitialTask());
     message.setBundle(bundle.getJob());
     setMessage(message);
   }

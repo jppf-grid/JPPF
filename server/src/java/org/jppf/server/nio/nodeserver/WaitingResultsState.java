@@ -124,8 +124,7 @@ class WaitingResultsState extends NodeServerState {
       int count = 0;
       for (ServerTask task: nodeBundle.getTaskList()) {
         if (anyResubmit && resubmitSet.contains(task.getJobPosition())) {
-          int max = nodeBundle.getJob().getSLA().getMaxTaskResubmits();
-          if (task.incResubmitCount() <= max) {
+          if (task.incResubmitCount() <= task.getMaxResubmits()) {
             task.resubmit();
             count++;
           }

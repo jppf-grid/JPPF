@@ -48,17 +48,17 @@ public class ServerTask {
    */
   private final int jobPosition;
   /**
-   * The shared data provider for this task.
+   * The initial serialized task.
    */
-  private final DataLocation   dataLocation;
+  private final DataLocation initialTask;
   /**
-   * The execution result.
+   * The serialized execution result.
    */
-  private DataLocation         result = null;
+  private DataLocation result = null;
   /**
    * The exception thrown during execution.
    */
-  private Throwable            exception;
+  private Throwable exception;
   /**
    * The state of this task.
    */
@@ -68,23 +68,28 @@ public class ServerTask {
    */
   private int expirationCount = 0;
   /**
+   * Maximum number of times a task can be resubmitted.
+   */
+  private final int maxResubmits;
+  /**
    * Number of times a task resubmitted itself.
    */
   private int resubmitCount = 0;
 
   /**
    *
-   * @param bundle client bundle that own this task.
-   * @param dataLocation shared data provider for this task.
-   * @param jobPosition the position of this task within the job submitted by the client.
+   * @param bundle client bundle that owns this task.
+   * @param initialTask the initial serialized task.
+   * @param jobPosition the maximum number of times a task can be resubmitted.
+   * @param maxResubmits the position of this task within the job submitted by the client.
    */
-  public ServerTask(final ServerTaskBundleClient bundle, final DataLocation dataLocation, final int jobPosition) {
+  public ServerTask(final ServerTaskBundleClient bundle, final DataLocation initialTask, final int jobPosition, final int maxResubmits) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    if (dataLocation == null) throw new IllegalArgumentException("dataLocation is null");
-
+    if (initialTask == null) throw new IllegalArgumentException("dataLocation is null");
     this.bundle = bundle;
-    this.dataLocation = dataLocation;
+    this.initialTask = initialTask;
     this.jobPosition = jobPosition;
+    this.maxResubmits = maxResubmits;
   }
 
   /**
@@ -96,11 +101,11 @@ public class ServerTask {
   }
 
   /**
-   * Get the provider of shared data for this task.
-   * @return a <code>DataProvider</code> instance.
+   * Get the initial serialized task.
+   * @return a <code>DataLocation</code> instance.
    */
-  public DataLocation getDataLocation() {
-    return dataLocation;
+  public DataLocation getInitialTask() {
+    return initialTask;
   }
 
   /**
@@ -124,7 +129,7 @@ public class ServerTask {
    * @return the result as <code>DataLocation</code>.
    */
   public DataLocation getResult() {
-    return (result == null) ? dataLocation : result;
+    return (result == null) ? initialTask : result;
   }
 
   /**
@@ -140,7 +145,7 @@ public class ServerTask {
    */
   public void cancel() {
     if (traceEnabled) log.trace("cancelling {}", this);
-    result = dataLocation;
+    result = initialTask;
     state = TaskState.CANCELLED;
   }
 
@@ -161,14 +166,14 @@ public class ServerTask {
     if (result == null) throw new IllegalArgumentException("result is null");
     this.result = result;
     this.exception = null;
-    this.state = (result == dataLocation) ? TaskState.CANCELLED : TaskState.RESULT;
+    this.state = (result == initialTask) ? TaskState.CANCELLED : TaskState.RESULT;
   }
 
   /**
    * Called to notify that the task broadcast was completed.
    */
   public void broadcastResultReceived() {
-    this.result = this.dataLocation;
+    this.result = this.initialTask;
     this.state = TaskState.RESULT;
   }
 
@@ -190,7 +195,7 @@ public class ServerTask {
     sb.append("state=").append(getState());
     sb.append(", jobPosition=").append(jobPosition);
     sb.append(", expirationCount=").append(expirationCount);
-    sb.append(", dataLocation=").append(dataLocation);
+    sb.append(", dataLocation=").append(initialTask);
     sb.append(", result=").append(result);
     sb.append(", exception=").append(exception);
     sb.append('}');
@@ -236,5 +241,13 @@ public class ServerTask {
    */
   public int incResubmitCount() {
     return ++resubmitCount;
+  }
+
+  /**
+   * Get the maximum number of times a task can be resubmitted.
+   * @return the maximum number of reesubmits as an int.
+   */
+  public int getMaxResubmits() {
+    return maxResubmits;
   }
 }

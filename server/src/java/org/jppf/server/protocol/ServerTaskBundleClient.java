@@ -114,11 +114,15 @@ public class ServerTaskBundleClient
 
     this.job = job;
     int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
+    int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
     this.dataProvider = dataProvider;
+    int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();
     for (int index = 0; index < taskList.size(); index++) {
       DataLocation dataLocation = taskList.get(index);
       int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
-      this.taskList.add(new ServerTask(this, dataLocation, pos));
+      int maxResubmitCount = (maxResubmits == null) || (index > maxResubmits.length - 1) ? -1 : maxResubmits[index];
+      if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
+      this.taskList.add(new ServerTask(this, dataLocation, pos, maxResubmitCount));
     }
     this.pendingTasksCount.set(this.taskList.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
@@ -286,7 +290,7 @@ public class ServerTaskBundleClient
   public List<DataLocation> getDataLocationList()
   {
     List<DataLocation> list = new ArrayList<>(taskList.size());
-    for (ServerTask task : taskList) list.add(task.getDataLocation());
+    for (ServerTask task : taskList) list.add(task.getInitialTask());
     return list;
   }
 

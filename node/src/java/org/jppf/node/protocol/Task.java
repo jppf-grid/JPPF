@@ -29,8 +29,7 @@ import org.jppf.utils.JPPFCallable;
  * @param <T> the type of results produced by the task.
  * @author Laurent Cohen
  */
-public interface Task<T> extends Runnable, Serializable
-{
+public interface Task<T> extends Runnable, Serializable {
   /**
    * Get the result of the task execution.
    * @return the result as an array of bytes.
@@ -167,7 +166,6 @@ public interface Task<T> extends Runnable, Serializable
    * @param callable the callable to execute on the client side.
    * @return the value computed on the client, or null if the value could not be computed.
    * @throws Exception if the execution of the callable in the client resulted in a {@link Throwable} being raised.
-   * @see org.jppf.utils.JPPFCallable
    */
   <V> V compute(JPPFCallable<V> callable) throws Exception;
 
@@ -183,4 +181,33 @@ public interface Task<T> extends Runnable, Serializable
    * @since 4.0
    */
   void fireNotification(Object userObject, boolean sendViaJmx);
+
+  /**
+   * Determine whether this task should be resubmitted by the server.
+   * @return {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * @since 4.2
+   */
+  boolean isResubmit();
+
+  /**
+   * Specify whether this task should be resubmitted by the server.
+   * @param resubmit {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * @since 4.2
+   */
+  void setResubmit(final boolean resubmit);
+
+  /**
+   * Get the maximum number of times a task can resubmit itself.
+   * @return a positive integer, or -1 if this attribute was never set,
+   * in which case the value set in the job SLA will be used.
+   */
+  int getMaxResubmits();
+
+  /**
+   * Set the maximum number of times a task can resubmit itself.
+   * If the specified value is greater than or equal to  zero, it will override
+   * the job-wide value provided by {@link JobSLA#getMaxTaskResubmits()}.
+   * @param maxResubmits the maximum number of resubmits.
+   */
+  void setMaxResubmits(int maxResubmits);
 }

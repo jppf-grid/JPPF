@@ -157,7 +157,7 @@ public class ServerJob extends AbstractServerJobBase {
    * @param src source list of <code>ServerTask</code> objects.
    */
   private static void addAll(final List<DataLocation> dst, final List<ServerTask> src) {
-    for (ServerTask item : src) dst.add(item.getDataLocation());
+    for (ServerTask item : src) dst.add(item.getInitialTask());
   }
 
   /**
@@ -168,7 +168,7 @@ public class ServerJob extends AbstractServerJobBase {
    */
   private static void addExcluded(final List<DataLocation> dst, final List<ServerTask> src, final TaskState state) {
     for (ServerTask item : src) {
-      if (item.getState() != state) dst.add(item.getDataLocation());
+      if (item.getState() != state) dst.add(item.getInitialTask());
     }
   }
 

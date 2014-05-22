@@ -43,8 +43,7 @@ import org.jppf.utils.JPPFCallable;
  * @author Laurent Cohen
  * @since 4.0
  */
-public abstract class AbstractTask<T> implements Task<T>
-{
+public abstract class AbstractTask<T> implements Task<T> {
   /**
    * Explicit serialVersionUID.
    */
@@ -86,23 +85,24 @@ public abstract class AbstractTask<T> implements Task<T>
    * @since 4.1
    */
   private transient boolean resubmit = false;
+  /**
+   * The max number of times a task can resubmit itself.
+   */
+  private transient int maxResubmits = -1;
 
   @Override
-  public T getResult()
-  {
+  public T getResult() {
     return result;
   }
 
   @Override
-  public void setResult(final T result)
-  {
+  public void setResult(final T result) {
     this.result = result;
   }
 
   @Override
   @Deprecated
-  public Exception getException()
-  {
+  public Exception getException() {
     if (throwable == null) return null;
     return throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
   }
@@ -113,26 +113,22 @@ public abstract class AbstractTask<T> implements Task<T>
    */
   @Override
   @Deprecated
-  public void setException(final Exception exception)
-  {
+  public void setException(final Exception exception) {
     this.throwable = exception;
   }
 
   @Override
-  public Throwable getThrowable()
-  {
+  public Throwable getThrowable() {
     return throwable;
   }
 
   @Override
-  public void setThrowable(final Throwable throwable)
-  {
+  public void setThrowable(final Throwable throwable) {
     this.throwable = throwable;
   }
 
   @Override
-  public DataProvider getDataProvider()
-  {
+  public DataProvider getDataProvider() {
     return dataProvider;
   }
 
@@ -141,48 +137,40 @@ public abstract class AbstractTask<T> implements Task<T>
    * @exclude
    */
   @Override
-  public void setDataProvider(final DataProvider dataProvider)
-  {
+  public void setDataProvider(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
   }
 
   @Override
-  public String getId()
-  {
+  public String getId() {
     return id;
   }
 
   @Override
-  public void setId(final String id)
-  {
+  public void setId(final String id) {
     this.id = id;
   }
 
   @Override
-  public void onCancel()
-  {
+  public void onCancel() {
   }
 
   @Override
-  public void onTimeout()
-  {
+  public void onTimeout() {
   }
 
   @Override
-  public Object getTaskObject()
-  {
+  public Object getTaskObject() {
     return this;
   }
 
   @Override
-  public JPPFSchedule getTimeoutSchedule()
-  {
+  public JPPFSchedule getTimeoutSchedule() {
     return timeoutSchedule;
   }
 
   @Override
-  public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule)
-  {
+  public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule) {
     this.timeoutSchedule = timeoutSchedule;
   }
 
@@ -191,8 +179,7 @@ public abstract class AbstractTask<T> implements Task<T>
    * @exclude
    */
   @Override
-  public int getPosition()
-  {
+  public int getPosition() {
     return position;
   }
 
@@ -201,14 +188,12 @@ public abstract class AbstractTask<T> implements Task<T>
    * @exclude
    */
   @Override
-  public void setPosition(final int position)
-  {
+  public void setPosition(final int position) {
     this.position = position;
   }
 
   @Override
-  public boolean isInNode()
-  {
+  public boolean isInNode() {
     return inNode;
   }
 
@@ -217,21 +202,17 @@ public abstract class AbstractTask<T> implements Task<T>
    * @exclude
    */
   @Override
-  public void setInNode(final boolean inNode)
-  {
+  public void setInNode(final boolean inNode) {
     this.inNode = inNode;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V compute(final JPPFCallable<V> callable) throws Exception
-  {
+  public <V> V compute(final JPPFCallable<V> callable) throws Exception {
     V result = null;
-    if (isInNode())
-    {
+    if (isInNode()) {
       ClassLoader cl = callable.getClass().getClassLoader();
-      if (cl instanceof AbstractJPPFClassLoader)
-      {
+      if (cl instanceof AbstractJPPFClassLoader) {
         AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
         result = loader.computeCallable(callable);
       }
@@ -241,8 +222,7 @@ public abstract class AbstractTask<T> implements Task<T>
   }
 
   @Override
-  public void fireNotification(final Object userObject, final boolean sendViaJmx)
-  {
+  public void fireNotification(final Object userObject, final boolean sendViaJmx) {
     if (executionDisptacher != null) executionDisptacher.fireTaskNotification(this, userObject, sendViaJmx);
   }
 
@@ -251,26 +231,35 @@ public abstract class AbstractTask<T> implements Task<T>
    * @param executionDisptacher a {@link TaskExecutionDispatcher} instance.
    * @exclude
    */
-  public void setExecutionDispatcher(final TaskExecutionDispatcher executionDisptacher)
-  {
+  public void setExecutionDispatcher(final TaskExecutionDispatcher executionDisptacher) {
     this.executionDisptacher = executionDisptacher;
   }
 
   /**
-   * Determine whether this task should be resubmitted by the server.
-   * @return {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * {@inheritDoc}
    * @since 4.1
    */
+  @Override
   public boolean isResubmit() {
     return resubmit;
   }
 
   /**
-   * Specify whether this task should be resubmitted by the server.
-   * @param resubmit {@code true} to indicate this task will be resubmitted, {@code false} otherwise.
+   * {@inheritDoc}
    * @since 4.1
    */
+  @Override
   public void setResubmit(final boolean resubmit) {
     this.resubmit = resubmit;
+  }
+
+  @Override
+  public int getMaxResubmits() {
+    return maxResubmits;
+  }
+
+  @Override
+  public void setMaxResubmits(final int maxResubmits) {
+    this.maxResubmits = maxResubmits;
   }
 }
