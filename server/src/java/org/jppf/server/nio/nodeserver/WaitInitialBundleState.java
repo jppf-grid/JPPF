@@ -28,6 +28,7 @@ import java.nio.channels.SocketChannel;
 import org.jppf.management.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.JPPFConfiguration;
@@ -77,7 +78,6 @@ class WaitInitialBundleState extends NodeServerState
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
       if (debugEnabled) log.debug("read bundle for {], bundle={}", channel, bundle);
-
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
       Bundler bundler = server.getBundler().copy();
@@ -98,7 +98,12 @@ class WaitInitialBundleState extends NodeServerState
           int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
           boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
           byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
-          if (channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
+          if (channel.isLocal()) {
+            type |= JPPFManagementInfo.LOCAL;
+            DriverInitializer initializer = JPPFDriver.getInstance().getInitializer();
+            JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
+            if (jmxServer != null) host = jmxServer.getManagementHost();
+          }
           if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
           else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
           JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, type, sslEnabled);
