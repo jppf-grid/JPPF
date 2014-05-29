@@ -281,6 +281,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     List<Task<?>> pendingTasks = new ArrayList<>();

@@ -195,9 +195,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       if ((discoveryNames == null) || "".equals(discoveryNames.trim())) discoveryNames = "default-driver";
       if (debugEnabled) log.debug("list of drivers: " + discoveryNames);
       String[] names = discoveryNames.split("\\s");
-      for (String name : names) {
-        initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
-      }
+      for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
       if (initPeers) {
         for (String name : names) {

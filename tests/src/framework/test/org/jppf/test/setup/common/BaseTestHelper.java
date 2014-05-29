@@ -97,7 +97,6 @@ public class BaseTestHelper {
     }
     job.setBlocking(blocking);
     job.getSLA().setBroadcastJob(broadcast);
-    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
     return job;
   }
 
@@ -118,7 +117,6 @@ public class BaseTestHelper {
     for (int i=1; i<=tasks.length; i++) job.add(tasks[i-1]).setId(job.getName() + " - task " + i);
     job.setBlocking(blocking);
     job.getSLA().setBroadcastJob(broadcast);
-    if (!blocking) job.setResultListener(new JPPFResultCollector(job));
     return job;
   }
 

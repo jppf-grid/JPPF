@@ -20,6 +20,7 @@ package org.jppf.client.concurrent;
 
 import java.util.concurrent.*;
 
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.DateTimeUtils;
 import org.slf4j.*;
@@ -30,8 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
-{
+public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
   /**
    * Logger for this class.
    */
@@ -43,7 +43,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   /**
    * The collector that receives the results from the server.
    */
-  private final FutureResultCollector collector;
+  //private final FutureResultCollector collector;
+  private final JPPFJob job;
   /**
    * The position of the task in the job.
    */
@@ -51,12 +52,11 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
 
   /**
    * Initialize this future with the specified parameters.
-   * @param collector the collector that receives the results from the server.
+   * @param job the collector that receives the results from the server.
    * @param position the position of the task in the job.
    */
-  public JPPFTaskFuture(final FutureResultCollector collector, final int position)
-  {
-    this.collector = collector;
+  public JPPFTaskFuture(final JPPFJob job, final int position) {
+    this.job = job;
     this.position = position;
   }
 
@@ -67,8 +67,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    * @see org.jppf.client.concurrent.AbstractJPPFFuture#isDone()
    */
   @Override
-  public boolean isDone()
-  {
+  public boolean isDone() {
     return done.get();
   }
 
@@ -80,15 +79,11 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    * @see java.util.concurrent.Future#get()
    */
   @Override
-  public V get() throws InterruptedException, ExecutionException
-  {
+  public V get() throws InterruptedException, ExecutionException {
     V v = null;
-    try
-    {
+    try {
       v = get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-    }
-    catch(TimeoutException e)
-    {
+    } catch(TimeoutException e) {
       if (debugEnabled) log.debug("wait timed out, but it shouldn't have", e);
     }
     return v;
@@ -106,8 +101,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    * @see java.util.concurrent.Future#get(long, java.util.concurrent.TimeUnit)
    */
   @Override
-  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
-  {
+  public V get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
     getResult(millis);
     if (timedout.get()) throw new TimeoutException("wait timed out");
@@ -121,21 +115,16 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    * @throws TimeoutException if the wait timed out.
    */
   @SuppressWarnings("unchecked")
-  void getResult(final long timeout) throws TimeoutException
-  {
-    if (!isDone())
-    {
+  void getResult(final long timeout) throws TimeoutException {
+    if (!isDone()) {
       Task<?> task = null;
-      task = (timeout > 0) ? collector.waitForTask(position, timeout) : collector.getTask(position);
+      task = (timeout > 0) ? job.getResults().waitForTask(position, timeout) : job.getResults().getResultTask(position);
       setDone();
-      if (task == null)
-      {
+      if (task == null) {
         setCancelled();
         timedout.set(timeout > 0);
         if (timeout > 0) throw new TimeoutException();
-      }
-      else
-      {
+      } else {
         result = (V) task.getResult();
         throwable = task.getThrowable();
       }
@@ -145,16 +134,14 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
   /**
    * Mark the task as done.
    */
-  void setDone()
-  {
+  void setDone() {
     done.compareAndSet(false, true);
   }
 
   /**
    * Mark the task as cancelled.
    */
-  void setCancelled()
-  {
+  void setCancelled() {
     cancelled.set(true);
   }
 
@@ -162,26 +149,33 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V>
    * Get the task associated with this future.
    * @return a {@link Task} instance.
    */
-  public Task<?> getTask()
-  {
-    return collector.getTask(position);
+  public Task<?> getTask() {
+    return job.getResults().getResultTask(position);
   }
 
   /**
    * Get the collector that receives the results from the server.
    * @return a {@link FutureResultCollector} instance.
    */
-  FutureResultCollector getCollector()
-  {
+  /*
+  FutureResultCollector getCollector() {
     return collector;
   }
+  */
 
   /**
    * Get the position of the task in the job.
    * @return the position as an integer value. 
    */
-  int getPosition()
-  {
+  int getPosition() {
     return position;
+  }
+
+  /**
+   * Get the job that holds the task.
+   * @return  a {@link JPPFJob} instance.
+   */
+  public JPPFJob getJob() {
+    return job;
   }
 }

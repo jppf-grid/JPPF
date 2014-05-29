@@ -121,8 +121,7 @@ public class ConnectionPoolRunner {
    * @param job the job whose results to print.
    */
   private static void printJobResults(final JPPFJob job) {
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     print("**** results for job %s :", job.getName());
     for (Task<?> task: results) {
       String id = task.getId();

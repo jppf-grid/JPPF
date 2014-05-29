@@ -115,7 +115,7 @@ public class TestJPPFNodeAdminMBean
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
     assertEquals(JPPFNodeState.ExecutionState.EXECUTING, state.getExecutionStatus());
-    ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    job.awaitResults();
     state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(1, state.getNbTasksExecuted());
@@ -279,7 +279,7 @@ public class TestJPPFNodeAdminMBean
     client.submitJob(job);
     Thread.sleep(750L);
     nodeJmx.cancelJob(uuid, false);
-    List<Task<?>> result = ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
     assertEquals(1, result.size());
     LifeCycleTask task = (LifeCycleTask) result.get(0);

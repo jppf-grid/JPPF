@@ -141,8 +141,7 @@ public class NodeMixRunner extends AbstractScenarioRunner {
       for (int i=1; i<=nbJobs; i++) {
         Future<JPPFJob> future = completionService.take();
         JPPFJob job = future.get();
-        JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        List<Task<?>> result = collector.awaitResults();
+        List<Task<?>> result = job.awaitResults();
         int nbNoExec = 0;
         int nbErrors = 0;
         int nbOk = 0;

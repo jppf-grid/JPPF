@@ -61,8 +61,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     assertEquals(results.size(), nbTasks);
     assertNotNull(results.get(0));
     int count = 0;
@@ -77,7 +76,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
    * We test a job with 1 task, and attempt to cancel it after it has completed.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout=10000L)
+  @Test(timeout=10000L)
   public void testCancelJobAfterCompletion() throws Exception
   {
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
@@ -95,7 +94,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
    * See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-126">JPPF-126 Job cancelled from the admin console may get stuck in the server queue</a>.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout=10000L)
+  @Test(timeout=10000L)
   public void testResumeAndCancelSuspendedJob() throws Exception
   {
     int nbTasks = 2;
@@ -108,8 +107,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     proxy.resumeJob(job.getUuid());
     Thread.sleep(500L);
     proxy.cancelJob(job.getUuid());
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     assertEquals(nbTasks, results.size());
     Thread.sleep(1000L);
     String[] ids = proxy.getAllJobIds();

@@ -25,8 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
@@ -152,12 +152,12 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     job2.getSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
     client.submitJob(job1);
     client.submitJob(job2);
-    List<Task<?>> results = ((JPPFResultCollector) job1.getResultListener()).awaitResults();
+    List<Task<?>> results = job1.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), 1);
     Task<?> task = results.get(0);
     assertNull(task.getResult());
-    results = ((JPPFResultCollector) job2.getResultListener()).awaitResults();
+    results = job2.awaitResults();
     assertNotNull(results);
     assertEquals(results.size(), 1);
     task = results.get(0);
@@ -209,7 +209,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       if (i == 0) Thread.sleep(500L);
     }
     List<List<Task<?>>> results = new ArrayList<>();
-    for (int i=0; i<nbJobs; i++) results.add(((JPPFResultCollector) jobs[i].getResultListener()).awaitResults());
+    for (int i=0; i<nbJobs; i++) results.add(jobs[i].awaitResults());
     LifeCycleTask t1 = (LifeCycleTask) results.get(1).get(0);
     assertNotNull(t1);
     LifeCycleTask t2 = (LifeCycleTask) results.get(2).get(0);
@@ -330,10 +330,8 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       client.submitJob(job1);
       Thread.sleep(500L);
       client.submitJob(job2);
-      JPPFResultCollector collector = (JPPFResultCollector) job1.getResultListener();
-      collector.awaitResults();
-      collector = (JPPFResultCollector) job2.getResultListener();
-      collector.awaitResults();
+      job1.awaitResults();
+      job2.awaitResults();
       for (int i=1; i<=2; i++) {
         File file = new File(suffix + "n" + i + ".tmp");
         assertTrue("file '" + file + "' does not exist", file.exists());
@@ -404,14 +402,13 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     int nbTasks = 20;
     JPPFJob job = BaseTestHelper.createJob(jobName, true, false, nbTasks, LifeCycleTask.class, 1L);
     final AtomicInteger returnedCount = new AtomicInteger(0);
-    JPPFResultCollector collector = new JPPFResultCollector(job) {
+    JobListener collector = new JobListenerAdapter() {
       @Override
-      public synchronized void resultsReceived(final TaskResultEvent event) {
-        super.resultsReceived(event);
+      public synchronized void jobReturned(final JobEvent event) {
         returnedCount.incrementAndGet();
       }
     };
-    job.setResultListener(collector);
+    job.addJobListener(collector);
     job.getSLA().setResultsStrategy(strategyName);
     List<Task<?>> results = client.submitJob(job);
     assertEquals(expectedReturnedCount, returnedCount.get());

@@ -84,8 +84,7 @@ public class SubmitQueue extends ThreadSynchronization
         public void run() {
           try {
             client.submitJob(job);
-            JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-            collector.awaitResults();
+            job.awaitResults();
           } catch (Exception e) {
             e.printStackTrace();
           }

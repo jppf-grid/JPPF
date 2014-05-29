@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 
@@ -49,19 +49,16 @@ public class GenericRunner
       client = new JPPFClient();
       List<Task<?>> results = null;
       //results = client.submit(job);
-      JPPFResultCollector collector = new JPPFResultCollector(job)
-      {
+      JobListener jobListener = new JobListenerAdapter() {
         @Override
-        public synchronized void resultsReceived(final TaskResultEvent event)
-        {
-          System.out.println("received " + event.getTasks().size() + " tasks");
-          super.resultsReceived(event);
+        public synchronized void jobReturned(final JobEvent event) {
+          System.out.println("received " + event.getJobTasks().size() + " tasks");
         }
       };
       job.setBlocking(false);
-      job.setResultListener(collector);
+      job.addJobListener(jobListener);
       client.submitJob(job);
-      results = collector.awaitResults();
+      results = job.awaitResults();
       for (Task task: results)
       {
         System.out.println("*****************************************");

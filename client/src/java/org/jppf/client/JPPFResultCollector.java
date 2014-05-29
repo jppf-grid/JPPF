@@ -30,10 +30,12 @@ import org.slf4j.*;
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
  * that can be used &quot;as is&quot; to collect the results of an asynchronous job submission.
- * @see org.jppf.client.JPPFClient#submit(org.jppf.client.JPPFJob)
+ * @deprecated {@code JPPFResultCollector} and its inheritance hierarchy are no longer exposed as public APIs.
+ * {@code JobListener} should be used instead, with the {@code JPPFJob.addJobListener(JobListener)} and {@code JPPFJob.removeJobListener(JobListener)} methods.
  * @author Laurent Cohen
  * @author Martin JANDA
  */
+@SuppressWarnings("deprecation")
 public class JPPFResultCollector implements TaskResultListener, SubmissionStatusHandler {
   /**
    * Logger for this class.
@@ -155,7 +157,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    * Wait until all results of a request have been collected, or the timeout has expired,
    * whichever happens first.
    * @param millis the maximum time to wait, zero meaning an indefinite wait.
-   * @return the list of resulting tasks.
+   * @return the list of resulting tasks, or {@code null} if the timeout expired before all results were received.
    */
   public synchronized List<Task<?>> awaitResults(final long millis) {
     if (millis < 0L) throw new IllegalArgumentException("wait time cannot be negative");

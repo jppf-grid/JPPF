@@ -97,8 +97,7 @@ public class TestJobListener extends Setup1D1N {
       client.submitJob(job);
       Thread.sleep(2000L);
       client.reset();
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, results.get(0).getResult());

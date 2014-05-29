@@ -254,10 +254,8 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
       job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, nodeId));
       // create a task for each trade
       for (String tradeId: tradeIdList) job.add(createTask(tradeId));
-      JPPFResultCollector collector = new JPPFResultCollector(job);
-      job.setResultListener(collector);
       jppfClient.submitJob(job);
-      resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
+      resultsExecutor.submit(new ResultCollectionTask(job, timestamp));
     }
 
     /**
@@ -279,10 +277,8 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
         // set an execution policy that forces execution on the node with the specified id
         job.getSLA().setExecutionPolicy(policy);
         job.add(createTask(tradeId));
-        JPPFResultCollector collector = new JPPFResultCollector(job);
-        job.setResultListener(collector);
         jppfClient.submitJob(job);
-        resultsExecutor.submit(new ResultCollectionTask(collector, timestamp));
+        resultsExecutor.submit(new ResultCollectionTask(job, timestamp));
       }
     }
 
@@ -305,9 +301,9 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
   public class ResultCollectionTask implements Runnable
   {
     /**
-     * The object from which to get the results.
+     * The job from which to get the results.
      */
-    private JPPFResultCollector collector;
+    private JPPFJob job;
     /**
      * Event notification timestamp.
      */
@@ -315,12 +311,12 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
 
     /**
      * Initialize this task with the specified parameter.
-     * @param collector the object from which to get the results.
+     * @param job the job from which to get the results.
      * @param timestamp the event notification timestamp.
      */
-    public ResultCollectionTask(final JPPFResultCollector collector, final long timestamp)
+    public ResultCollectionTask(final JPPFJob job, final long timestamp)
     {
-      this.collector = collector;
+      this.job = job;
       this.timestamp = timestamp;
     }
 
@@ -333,7 +329,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable
     {
       try
       {
-        List<Task<?>> results = collector.awaitResults();
+        List<Task<?>> results = job.awaitResults();
         // do something with the results?
         StringBuilder sb = new StringBuilder("Updated trades: ");
         for (int i=0; i<results.size(); i++)

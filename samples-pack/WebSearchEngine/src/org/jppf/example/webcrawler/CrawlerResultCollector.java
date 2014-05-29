@@ -20,17 +20,14 @@ package org.jppf.example.webcrawler;
 
 import javax.swing.SwingUtilities;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.client.JPPFResultCollector;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Result collector that updates the progress bar's value during the computation.
  */
-public class CrawlerResultCollector extends JPPFResultCollector
+public class CrawlerResultCollector extends JobListenerAdapter
 {
   /**
    * Logger for this class.
@@ -42,37 +39,22 @@ public class CrawlerResultCollector extends JPPFResultCollector
   private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
-   * Initialize this collector with a specified number of tasks.
-   * @param job the job for which ot get the results.
-   */
-  public CrawlerResultCollector(final JPPFJob job)
-  {
-    super(job);
-  }
-
-  /**
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param event a notification of completion for a set of submitted tasks.
-   * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
    */
   @Override
-  public synchronized void resultsReceived(final TaskResultEvent event)
+  public synchronized void jobReturned(final JobEvent event)
   {
-    super.resultsReceived(event);
-    if (event.getThrowable() == null)
+    int sum = 0;
+    for (Task<?> task: event.getJobTasks()) sum += ((CrawlerTask) task).getToVisit().size();
+    final int n = sum;
+    SwingUtilities.invokeLater(new Runnable()
     {
-      int sum = 0;
-      for (Task<?> task: event.getTasks()) sum += ((CrawlerTask) task).getToVisit().size();
-      final int n = sum;
-      SwingUtilities.invokeLater(new Runnable()
+      @Override
+      public void run()
       {
-        @Override
-        public void run()
-        {
-          WebCrawlerRunner.updateProgress(n);
-        }
-      });
-    }
-    else event.getThrowable().printStackTrace();
+        WebCrawlerRunner.updateProgress(n);
+      }
+    });
   }
 }

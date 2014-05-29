@@ -66,12 +66,10 @@ public class JBossTestRunner
   {
     JPPFJob job = new JPPFJob("JBoss Runner");
     job.add(new JBossTask("C:/Tools/jboss-5.1.0.GA", "jppf"));
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
     job.setBlocking(false);
     job.getSLA().setBroadcastJob(true);
     client.submitJob(job);
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     Task task = results.get(0);
     if (task.getThrowable() != null)
     {

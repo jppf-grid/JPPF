@@ -242,7 +242,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     Thread.sleep(500L);
     coll = driver.idleNodesInformation();
     assertEquals(1, coll.size());
-    ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    job.awaitResults();
     while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
@@ -264,7 +264,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     Thread.sleep(500L);
     n = driver.nbIdleNodes();
     assertEquals(nbNodes - 1, n);
-    ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    job.awaitResults();
     while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 

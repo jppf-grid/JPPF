@@ -24,7 +24,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -199,7 +199,7 @@ public class LargeDataRunner
       totalArticles += totalJobArticles;
       jobCount++;
       totalTasksSent += taskCount;
-      job.setResultListener(new MyResultCollector(job));
+      job.addJobListener(new MyJobListener());
       System.out.println("submitting job " + nf.format(jobCount) + " with " + nf.format(taskCount) + " tasks and " + nf.format(totalJobArticles) + " articles");
       return job;
     }
@@ -235,23 +235,13 @@ public class LargeDataRunner
   /**
    * 
    */
-  private static class MyResultCollector extends JPPFResultCollector
+  private static class MyJobListener extends JobListenerAdapter
   {
-    /**
-     * Initialize witht he specified job.
-     * @param job the job whose results to collect.
-     */
-    public MyResultCollector(final JPPFJob job)
-    {
-      super(job);
-    }
-
     @Override
-    public synchronized void resultsReceived(final TaskResultEvent event)
+    public synchronized void jobReturned(final JobEvent event)
     {
-      super.resultsReceived(event);
       //System.out.println("received " + event.getTaskList().size() + " task results");
-      executor.submit(new MergerTask(event.getTasks()));
+      executor.submit(new MergerTask(event.getJobTasks()));
     }
   }
 

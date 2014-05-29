@@ -144,7 +144,6 @@ public class LocalExecutionRunner
         job.setName("job " + i);
         job.setBlocking(false);
         for (int j=0; j<nbTasks; j++) job.add(new LongTask(length)).setId("task " + i + ':' + j);
-        job.setResultListener(new JPPFResultCollector(job));
         jobs.add(job);
       }
       long start = System.nanoTime();
@@ -153,8 +152,7 @@ public class LocalExecutionRunner
       print("getting the results");
       for (JPPFJob job: jobs)
       {
-        JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        collector.awaitResults();
+        job.awaitResults();
         print("got results for " + job.getName());
       }
       long elapsed = System.nanoTime() - start;

@@ -308,8 +308,6 @@ public class LongTaskRunner
     LongTask task = new LongTask(10000L, false);
     task.setId("1");
     job.add(task);
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
     job.setBlocking(false);
     jppfClient.submitJob(job);
     /*
@@ -325,7 +323,7 @@ public class LongTaskRunner
     Thread.sleep(2000L);
     print("restarting the driver");
     restartDriver();
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     for (Task t: results)
     {
       Throwable e = task.getThrowable();
@@ -349,8 +347,6 @@ public class LongTaskRunner
     LongTask task = new LongTask(6000L, false);
     task.setId("1");
     job.add(task);
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
     job.setBlocking(false);
     jppfClient.submitJob(job);
     /*
@@ -359,14 +355,12 @@ public class LongTaskRunner
     Thread.sleep(3000L);
     System.out.println("cancelling the first job");
     jobManager.cancelJob(job.getUuid());
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     System.out.println("job cancelled");
     job.setName("Long task job 2");
-    collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
     System.out.println("submitting the second job");
     jppfClient.submitJob(job);
-    results = collector.awaitResults();
+    results = job.awaitResults();
     for (Task t: results)
     {
       Throwable e = task.getThrowable();

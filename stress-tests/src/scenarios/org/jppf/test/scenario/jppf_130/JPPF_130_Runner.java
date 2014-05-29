@@ -64,8 +64,7 @@ public class JPPF_130_Runner extends AbstractScenarioRunner
           for (int i=0; i<nbTasks; i++) job.add(new JPPF_130_Task(nbLookups));
           job.setBlocking(false);
           getSetup().getClient().submitJob(job);
-          JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-          List<Task<?>> results = collector.awaitResults();
+          List<Task<?>> results = job.awaitResults();
           for (Task<?> task: results)
           {
             Throwable t = task.getThrowable();

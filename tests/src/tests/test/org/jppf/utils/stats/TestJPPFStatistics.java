@@ -54,7 +54,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     client.submitJob(job);
     Thread.sleep(1000L);
     nodeForwarder.restart(NodeSelector.ALL_NODES);
-    List<Task<?>> results = ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
   }
@@ -71,7 +71,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     jmx.resetStatistics();
     job.getSLA().setMaxTaskResubmits(1);
     client.submitJob(job);
-    List<Task<?>> results = ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
   }
@@ -151,7 +151,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     client.submitJob(job);
     Thread.sleep(1000L);
     jmx.cancelJob(job.getUuid());
-    List<Task<?>> results = ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
   }

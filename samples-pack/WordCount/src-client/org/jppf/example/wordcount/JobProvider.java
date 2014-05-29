@@ -24,8 +24,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.client.JPPFResultCollector;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 
 /**
@@ -116,7 +115,7 @@ public class JobProvider {
       totalArticles += totalJobArticles;
       jobCount++;
       totalTasksSent += taskCount;
-      job.setResultListener(new MyResultCollector(job));
+      job.addJobListener(new MyResultCollector());
       System.out.println("submitting job " + nf.format(jobCount) + " with " + nf.format(taskCount) + " tasks and " + nf.format(totalJobArticles) + " articles");
       return job;
     }
@@ -189,19 +188,10 @@ public class JobProvider {
    * With this mechanism, results are processed almost as soon as they are received from the
    * nodes, thus allowing us to emulate a stream of incoming results.
    */
-  private class MyResultCollector extends JPPFResultCollector {
-    /**
-     * Initialize with the specified job.
-     * @param job the job whose results to collect.
-     */
-    public MyResultCollector(final JPPFJob job) {
-      super(job);
-    }
-
+  private class MyResultCollector extends JobListenerAdapter {
     @Override
-    public void resultsReceived(final TaskResultEvent event) {
-      super.resultsReceived(event);
-      if (event.getTasks() != null) executor.submit(new MergerTask(event.getTasks()));
+    public void jobReturned(final JobEvent event) {
+      if (event.getJobTasks() != null) executor.submit(new MergerTask(event.getJobTasks()));
     }
   }
 

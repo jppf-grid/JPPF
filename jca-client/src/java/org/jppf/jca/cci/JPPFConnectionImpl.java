@@ -118,23 +118,27 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void addSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
-    JPPFResultCollector res = getResultCollector(submissionId);
-    if (res != null) res.addSubmissionStatusListener(listener);
+    JPPFJob res = getJob(submissionId);
+    JPPFResultCollector collector = (JPPFResultCollector) res.getResultListener();
+    if (res != null) collector.addSubmissionStatusListener(listener);
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void removeSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
-    JPPFResultCollector res = getResultCollector(submissionId);
-    if (res != null) res.removeSubmissionStatusListener(listener);
+    JPPFJob res = getJob(submissionId);
+    JPPFResultCollector collector = (JPPFResultCollector) res.getResultListener();
+    if (res != null) collector.removeSubmissionStatusListener(listener);
   }
 
   @Override
   public SubmissionStatus getSubmissionStatus(final String submissionId) throws Exception
   {
-    SubmissionStatusHandler res = getResultCollector(submissionId);
+    JPPFJob res = getJob(submissionId);
     if (res == null) return null;
     return res.getStatus();
   }
@@ -155,10 +159,10 @@ public class JPPFConnectionImpl implements JPPFConnection
   public List<JPPFTask> getSubmissionResults(final String submissionId) throws Exception
   {
     JcaSubmissionManager mgr = (JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager();
-    JPPFResultCollector res = mgr.peekSubmission(submissionId);
+    JPPFJob res = mgr.peekSubmission(submissionId);
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
-    return res.getResults();
+    return new ArrayList<>(res.getResults().getAll());
   }
 
   /**
@@ -175,7 +179,7 @@ public class JPPFConnectionImpl implements JPPFConnection
   public List<Task<?>> getResults(final String submissionId) throws Exception
   {
     JcaSubmissionManager mgr = (JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager();
-    JPPFResultCollector res = mgr.peekSubmission(submissionId);
+    JPPFJob res = mgr.peekSubmission(submissionId);
     if (res == null) return null;
     res = mgr.pollSubmission(submissionId);
     return res.getAllResults();
@@ -186,7 +190,7 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @param submissionId the id of the submission to find.
    * @return a <code>JPPFSubmissionResult</code> instance, or null if no submission can be found for the specified id.
    */
-  private JPPFResultCollector getResultCollector(final String submissionId)
+  private @SuppressWarnings("deprecation") JPPFJob getJob(final String submissionId)
   {
     return ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).peekSubmission(submissionId);
   }
@@ -221,23 +225,23 @@ public class JPPFConnectionImpl implements JPPFConnection
   @Override
   public List<JPPFTask> waitForResults(final String submissionId) throws Exception
   {
-    JPPFResultCollector result = getResultCollector(submissionId);
+    JPPFJob job = getJob(submissionId);
+    JPPFResultCollector result = (JPPFResultCollector) job.getResultListener();
     if (debugEnabled) log.debug("result collector = " + result);
     if (result == null) return null;
-    result.waitForResults();
-    List<JPPFTask> tasks = result.getResults();
+    List<JPPFTask> tasks = result.waitForResults();
     ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).pollSubmission(submissionId);
     return tasks;
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public List<Task<?>> awaitResults(final String submissionId) throws Exception
   {
-    JPPFResultCollector result = getResultCollector(submissionId);
-    if (debugEnabled) log.debug("result collector = " + result);
-    if (result == null) return null;
-    result.awaitResults();
-    List<Task<?>> tasks = result.getAllResults();
+    JPPFJob job = getJob(submissionId);
+    if (debugEnabled) log.debug("job = " + job);
+    if (job == null) return null;
+    List<Task<?>> tasks = job.awaitResults();
     ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).pollSubmission(submissionId);
     return tasks;
   }

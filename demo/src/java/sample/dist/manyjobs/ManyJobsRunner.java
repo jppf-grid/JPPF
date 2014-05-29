@@ -78,8 +78,7 @@ public class ManyJobsRunner
    * @param nbJobs the of jobs to submit.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform(final int nbTask, final long length, final int nbJobs) throws Exception
-  {
+  private static void perform(final int nbTask, final long length, final int nbJobs) throws Exception {
     JPPFJob[] jobs = new JPPFJob[nbJobs];
     long start = System.nanoTime();
     for (int n=0; n<nbJobs; n++)
@@ -99,10 +98,8 @@ public class ManyJobsRunner
       jppfClient.submitJob(jobs[n]);
     }
     print("submitted " + nbJobs + " jobs");
-    for (int n=0; n<nbJobs; n++)
-    {
-      JPPFResultCollector collector = (JPPFResultCollector) jobs[n].getResultListener();
-      List<Task<?>> results = collector.awaitResults();
+    for (int n=0; n<nbJobs; n++) {
+      List<Task<?>> results = jobs[n].awaitResults();
     }
     long elapsed = (System.nanoTime() - start) / 1_000_000L;
     print("got all " + nbJobs + " result lists in " + StringUtils.toStringDuration(elapsed));

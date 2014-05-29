@@ -21,12 +21,11 @@ import java.sql.*;
 import java.util.Collection;
 
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Runner class for the square matrix multiplication demo.
@@ -77,27 +76,23 @@ public class DBRunner
       }
       job.setBlocking(false);
       // customize the result listener to display a message each time a task result is received
-      JPPFResultCollector collector = new JPPFResultCollector(job)
-      {
+      JobListener jobListener = new JobListenerAdapter() {
         @Override
-        public synchronized void resultsReceived(final TaskResultEvent event)
-        {
-          for (Task<?> task: event.getTasks())
-          {
+        public synchronized void jobReturned(final JobEvent event) {
+          for (Task<?> task: event.getJobTasks()) {
             if (task.getThrowable() != null) output("task " + task.getId() + " error: " + task.getThrowable().getMessage());
             else output("task " + task.getId() + " result: " + task.getResult());
           }
-          super.resultsReceived(event);
         }
       };
-      job.setResultListener(collector);
+      job.addJobListener(jobListener);
       jppfClient.submitJob(job);
       Thread.sleep(timeBeforeRestartNode);
       // restart the node to demonstrate the transaction recovery
       output("restarting node");
       restartNode();
       // wait for the job completion
-      collector.awaitResults();
+      job.awaitResults();
       // display the list of rows in the DB table
       if (config.getBoolean("display.db.content", false)) displayDBContent();
       output("demo ended");

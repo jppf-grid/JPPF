@@ -132,8 +132,8 @@ public class SequenceAlignmentRunner
     DataProvider dp = new MemoryMapDataProvider();
     dp.setParameter(SequenceAlignmentTask.TARGET_SEQUENCE, target);
     dp.setParameter(SequenceAlignmentTask.SCORING_MATRIX, MatrixLoader.load(matrix));
-    JPPFJob job = new JPPFJob(dp);
-
+    JPPFJob job = new JPPFJob();
+    job.setDataProvider(dp);
     System.out.println("Indexing sequence database...");
     String idx = dbPath+".idx";
     int nb = DatabaseHandler.generateIndex(dbPath, idx, null);
@@ -151,7 +151,7 @@ public class SequenceAlignmentRunner
     //taskList = client.submit(taskList, dp);
     AlignmentResultCollector collector = new AlignmentResultCollector(job.getJobTasks().size());
     job.setBlocking(false);
-    job.setResultListener(collector);
+    job.addJobListener(collector);
     client.submitJob(job);
     List<Task<?>> results = collector.awaitResults();
     long elapsed2 = System.currentTimeMillis() - start2;

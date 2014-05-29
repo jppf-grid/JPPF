@@ -209,4 +209,31 @@ public final class CollectionUtils
   {
     return elts;
   }
+
+  /**
+   * Print the content of a collection map in an easily readable way.
+   * @param map the map to print.
+   * @return a string with the map elements properly indented and formatted.
+   * @param <K> the type of the keys in the map.
+   * @param <V> the type of the values in the map.
+   */
+  public static <K, V> String prettyPrint(final CollectionMap<K, V> map) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{\n");
+    int count1 = 0;
+    for (K key: map.keySet()) {
+      if (count1 > 0) sb.append(",\n");
+      sb.append("  ").append(key).append(" = [\n");
+      int count2 = 0;
+      for (V value: map.getValues(key)) {
+        if (count2 > 0) sb.append(",\n");
+        sb.append("    ").append(value);
+        count2++;
+      }
+      sb.append("\n  ]");
+      count1++;
+    }
+    sb.append("\n}");
+    return sb.toString();
+  }
 }

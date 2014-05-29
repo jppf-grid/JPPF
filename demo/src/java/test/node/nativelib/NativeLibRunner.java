@@ -146,16 +146,6 @@ public class NativeLibRunner
     // set the job in non-blocking (or asynchronous) mode.
     job.setBlocking(false);
 
-    // We need to be notified of when the job execution has completed.
-    // To this effect, we define an instance of the TaskResultListener interface,
-    // which we will register with the job.
-    // Here, we use an instance of JPPFResultCollector, conveniently provided by the JPPF API.
-    // JPPFResultCollector implements TaskResultListener and has a constructor that takes
-    // the number of tasks in the job as a parameter.
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
-
-
     // Submit the job. This call returns immediately without waiting for the execution of
     // the job to complete. As a consequence, the object returned for a non-blocking job is
     // always null. Note that we are calling the exact same method as in the blocking case.
@@ -167,7 +157,7 @@ public class NativeLibRunner
     // We use JPPFResultCollector.waitForResults() for this. This method returns immediately
     // with the results if the job has completed, otherwise it waits until the job execution
     // is complete.
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
 
     // process the results
     for (Task task: results)

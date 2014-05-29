@@ -58,13 +58,11 @@ public class JobManagementTestRunner
     job.setName(jobName);
     job.setBlocking(false);
     for (int i=0; i<nbTasks; i++) job.add(new LongTask(duration)).setId(jobName + " - task " + i);
-    JPPFResultCollector collector = new JPPFResultCollector(job);
-    job.setResultListener(collector);
     client.submitJob(job);
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
     driver.cancelJob(job.getUuid());
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     for (Task task: results)
     {
       Throwable e = task.getThrowable();

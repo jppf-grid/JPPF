@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -53,7 +54,7 @@ import org.slf4j.*;
  * @see org.jppf.client.concurrent.JPPFExecutorService#setBatchTimeout(long)
  * @author Laurent Cohen
  */
-public class JPPFExecutorService implements ExecutorService, FutureResultCollectorListener
+public class JPPFExecutorService extends JobListenerAdapter implements ExecutorService
 {
   /**
    * Logger for this class.
@@ -135,22 +136,19 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
     long start = System.currentTimeMillis();
     long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
     if (debugEnabled) log.debug("timeout in millis: " + millis);
-    Pair<FutureResultCollector, Integer> pair = batchHandler.addTasks(tasks);
-    FutureResultCollector collector = pair.first();
+    Pair<JPPFJob, Integer> pair = batchHandler.addTasks(tasks);
+    JPPFJob job = pair.first();
     int position = pair.second();
     List<Future<T>> futureList = new ArrayList<>(tasks.size());
     for (Callable<T> task: tasks)
     {
       if (task == null) throw new NullPointerException("a task cannot be null");
-      JPPFTaskFuture future = new JPPFTaskFuture<T>(collector, position);
+      JPPFTaskFuture future = new JPPFTaskFuture<T>(job, position);
       futureList.add(future);
       long elapsed = System.currentTimeMillis() - start;
-      try
-      {
+      try {
         future.getResult(millis - elapsed);
-      }
-      catch(TimeoutException ignore)
-      {
+      } catch(TimeoutException ignore) {
       }
       position++;
     }
@@ -428,19 +426,14 @@ public class JPPFExecutorService implements ExecutorService, FutureResultCollect
    * @exclude
    */
   @Override
-  public void resultsComplete(final FutureResultCollectorEvent event)
+  public void jobReturned(final JobEvent event)
   {
-    String jobUuid = event.getCollector().getJobUuid();
+    String jobUuid = event.getJob().getUuid();
     synchronized(jobMap)
     {
       jobMap.remove(jobUuid);
       if (isShutdown() && jobMap.isEmpty()) setTerminated();
     }
-  }
-
-  @Override
-  public void resultsReceived(final FutureResultCollectorEvent event)
-  {
   }
 
   /**

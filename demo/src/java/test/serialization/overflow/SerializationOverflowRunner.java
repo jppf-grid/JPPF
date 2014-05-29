@@ -108,8 +108,6 @@ public class SerializationOverflowRunner
     }
     else
     {
-      JPPFResultCollector collector = new JPPFResultCollector(job);
-      job.setResultListener(collector);
       job.getSLA().setCancelUponClientDisconnect(true);
       jppfClient.submitJob(job);
       output("job '" + job.getName() + "' submitted");

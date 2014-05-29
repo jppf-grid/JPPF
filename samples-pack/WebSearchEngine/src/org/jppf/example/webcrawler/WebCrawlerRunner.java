@@ -125,11 +125,10 @@ public class WebCrawlerRunner
       }
     }
     if (job.getJobTasks() == null) return new ArrayList<>();
-    CrawlerResultCollector collector = new CrawlerResultCollector(job);
-    job.setResultListener(collector);
+    job.addJobListener(new CrawlerResultCollector());
     job.setBlocking(false);
     client.submitJob(job);
-    return collector.awaitResults();
+    return job.awaitResults();
   }
 
   /**

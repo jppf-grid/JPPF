@@ -106,13 +106,12 @@ public class TestJPPFClient extends Setup1D1N
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       int i = 0;
       for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
       client.submitJob(job);
       Thread.sleep(1500L);
       client.cancelJob(job.getUuid());
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
       int count = 0;
@@ -238,7 +237,7 @@ public class TestJPPFClient extends Setup1D1N
    * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception {
     
     try (JPPFClient client = new JPPFClient()) {

@@ -99,10 +99,10 @@ public class NonBlockingPoolMatrixRunner
         List<JPPFJob> submissions = new ArrayList<>();
         for (int n=0; n<nbSubmissions; n++)
         {
-          JPPFJob job = new JPPFJob(dataProvider);
+          JPPFJob job = new JPPFJob();
+          job.setDataProvider(dataProvider);
           for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
           job.setBlocking(false);
-          job.setResultListener(new JPPFResultCollector(job));
           // create a task for each row in matrix a
           submissions.add(job);
         }
@@ -111,8 +111,7 @@ public class NonBlockingPoolMatrixRunner
 
         for (JPPFJob job: submissions)
         {
-          JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-          List<Task<?>> results = collector.awaitResults();
+          List<Task<?>> results = job.awaitResults();
           // initialize the resulting matrix
           Matrix c = new Matrix(size);
           // Get the matrix values from the tasks results

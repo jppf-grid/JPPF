@@ -123,26 +123,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   @SuppressWarnings("unchecked")
   public Future<?> submit(final ClientTaskBundle bundle) {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    /*
-    FutureTask<?> task = new FutureTask(new RemoteRunnable(getBundler(), bundle, channel), null) {
-      @Override
-      public boolean cancel(final boolean mayInterruptIfRunning) {
-        if (isDone()) return false;
-        String uuid = bundle.getClientJob().getUuid();
-        if (debugEnabled) log.debug("JPPFFutureTask.cancel() : requesting cancel of jobId=" + uuid);
-        if (isCancelled()) return true;
-        bundle.cancel();
-        try {
-          channel.cancelJob(uuid);
-        } catch (Exception e) {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.warn(ExceptionUtils.getMessage(e));
-        } finally {
-          return super.cancel(false);
-        }
-      }
-    };
-     */
     Runnable task = new RemoteRunnable(getBundler(), bundle, channel);
     bundle.jobDispatched(this);
     executor.execute(task);
@@ -180,14 +160,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     String uuid = bundle.getClientJob().getUuid();
     if (debugEnabled) log.debug("requesting cancel of jobId=" + uuid);
     bundle.cancel();
-    /*
-    try {
-      channel.cancelJob(uuid);
-    } catch (Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(ExceptionUtils.getMessage(e));
-    }
-    */
     return true;
   }
 

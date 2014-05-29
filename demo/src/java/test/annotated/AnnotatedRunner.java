@@ -82,16 +82,13 @@ public class AnnotatedRunner
       JPPFJob job = new JPPFJob();
       job.setName("demo job " + (i+1));
       job.add(new AnnotatedTask(time, (i+1)));
-      JPPFResultCollector collector = new JPPFResultCollector(job);
-      job.setResultListener(collector);
       job.setBlocking(false);
       jobs.add(job);
       jppfClient.submitJob(job);
     }
     for (JPPFJob job: jobs)
     {
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       Task t = results.get(0);
       output((String) t.getResult());
     }
@@ -121,16 +118,13 @@ public class AnnotatedRunner
       job.setName("demo job " + (i+1));
       JPPFTask task = (JPPFTask) cl.loadClass("test.TestClass").newInstance();
       job.add(task);
-      JPPFResultCollector collector = new JPPFResultCollector(job);
-      job.setResultListener(collector);
       job.setBlocking(false);
       jobs.add(job);
       jppfClient.submitJob(job);
     }
     for (JPPFJob job: jobs)
     {
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       Task t = results.get(0);
       output((String) t.getResult());
     }

@@ -23,13 +23,14 @@ import java.util.*;
 
 import org.jppf.node.protocol.Task;
 import org.jppf.server.protocol.JPPFTask;
+import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
 /**
  * Instances of this class hold and manage the results of a job.
  * @author Laurent Cohen
  */
-public class JobResults implements Serializable
+public class JobResults extends ThreadSynchronization implements Serializable
 {
   /**
    * Explicit serialVersionUID.
@@ -74,7 +75,7 @@ public class JobResults implements Serializable
    * @return a <code>JPPFTask</code> instance, or null if no result was received for a task at this position.
    * @deprecated use {@link #getResultTask(int)} instead.
    */
-  public JPPFTask getResult(final int position)
+  public synchronized JPPFTask getResult(final int position)
   {
     return (JPPFTask) resultMap.get(position);
   }
@@ -84,7 +85,7 @@ public class JobResults implements Serializable
    * @param position the position of the task to get.
    * @return a <code>Task</code> instance, or null if no result was received for a task at this position.
    */
-  public Task<?> getResultTask(final int position)
+  public synchronized Task<?> getResultTask(final int position)
   {
     return resultMap.get(position);
   }
@@ -104,6 +105,7 @@ public class JobResults implements Serializable
       if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
       resultMap.put(pos, task);
     }
+    wakeUp();
   }
 
   /**
@@ -119,6 +121,7 @@ public class JobResults implements Serializable
       if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
       resultMap.put(pos, task);
     }
+    wakeUp();
   }
 
   /**
@@ -143,14 +146,52 @@ public class JobResults implements Serializable
     return Collections.unmodifiableCollection(resultMap.values());
   }
 
+  /**
+   * Get all the tasks received as results for this job.
+   * @return a collection of {@link JPPFTask} instances.
+   */
+  public synchronized List<Task<?>> getResultsList()
+  {
+    return new ArrayList<>(resultMap.values());
+  }
+
   @Override
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("size=").append(size());
-    sb.append(", positions=").append(resultMap.keySet());
+    synchronized(this) {
+      sb.append(", positions=").append(resultMap.keySet());
+    }
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Wait for the execution results of the specified task to be received.
+   * @param position the position of the task in the job it is a part of.
+   * @return the task whose results were received, or null if the timeout expired before it was received.
+   */
+  public synchronized Task<?> waitForTask(final int position)
+  {
+    return waitForTask(position, Long.MAX_VALUE);
+  }
+
+  /**
+   * Wait for the execution results of the specified task to be received.
+   * @param position the position of the task in the job it is a part of.
+   * @param timeout maximum number of milliseconds to wait.
+   * @return the task whose results were received, or null if the timeout expired before it was received.
+   */
+  public synchronized Task<?> waitForTask(final int position, final long timeout)
+  {
+    long start = System.currentTimeMillis();
+    long elapsed = 0L;
+    while ((elapsed < timeout) && !hasResult(position)) {
+      goToSleep(timeout - elapsed);
+      elapsed = System.currentTimeMillis() - start;
+    }
+    return getResultTask(position);
   }
 }

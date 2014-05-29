@@ -41,5 +41,5 @@ public enum SubmissionStatus
   /**
    * The job execution has failed.
    */
-  FAILED,
+  FAILED
 }

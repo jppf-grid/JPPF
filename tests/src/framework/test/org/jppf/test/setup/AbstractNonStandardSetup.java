@@ -107,7 +107,7 @@ public class AbstractNonStandardSetup
     int tasksPerNode = 5;
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
-    String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
+    String name = ReflectionUtils.getCurrentClassAndMethod();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 100L);
     job.getClientSLA().setExecutionPolicy(policy);
     List<Task<?>> results = client.submitJob(job);
@@ -123,6 +123,7 @@ public class AbstractNonStandardSetup
       assertNotNull(t.getResult());
       assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, t.getResult());
     }
+    System.out.println(name + " : map = " + CollectionUtils.prettyPrint(map));
     assertEquals(nbNodes, map.keySet().size());
     for (int i=0; i<nbNodes; i++) {
       String key = "n" + (i+1);
@@ -152,8 +153,7 @@ public class AbstractNonStandardSetup
       for (JPPFJob job: jobs) client.submitJob(job);
       for (JPPFJob job: jobs)
       {
-        JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-        List<Task<?>> results = collector.awaitResults();
+        List<Task<?>> results = job.awaitResults();
         assertNotNull(results);
         assertEquals(nbTasks, results.size());
         for (Task<?> task: results)
@@ -183,11 +183,10 @@ public class AbstractNonStandardSetup
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
     JPPFJob job = BaseTestHelper.createJob("TestJPPFClientCancelJob", false, false, nbTasks, LifeCycleTask.class, 1000L);
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     client.submitJob(job);
     Thread.sleep(1500L);
     client.cancelJob(job.getUuid());
-    List<Task<?>> results = collector.awaitResults();
+    List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     assertEquals("results size should be " + nbTasks + " but is " + results.size(), nbTasks, results.size());
     int count = 0;

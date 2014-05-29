@@ -88,7 +88,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
         assertEquals(0, state.getNbTasksExecuted());
         assertEquals(JPPFNodeState.ExecutionState.EXECUTING, state.getExecutionStatus());
       }
-      ((JPPFResultCollector) job.getResultListener()).awaitResults();
+      job.awaitResults();
       result = nodeForwarder.state(selector);
       checkNodes(result, JPPFNodeState.class, expectedNodes);
       for (Map.Entry<String, Object> entry: result.entrySet())
@@ -149,7 +149,6 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000)
-  //@Test
   public void testUpdateThreadPriority() throws Exception
   {
     testUpdateThreadPriority(new AllNodesSelector(), "n1", "n2");
@@ -415,7 +414,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
     Thread.sleep(750L);
     Map<String, Object> result = nodeForwarder.cancelJob(selector, uuid, false);
     checkNoException(result, expectedNodes);
-    List<Task<?>> jobResult = ((JPPFResultCollector) job.getResultListener()).awaitResults();
+    List<Task<?>> jobResult = job.awaitResults();
     assertNotNull(jobResult);
     assertEquals(nbTasks, jobResult.size());
     int count = 0;

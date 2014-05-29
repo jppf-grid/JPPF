@@ -126,8 +126,7 @@ public class AdaptiveGridDemo implements Runnable {
     for (JPPFJob job: jobs) client.submitJob(job);
     // get the results of the jobs
     for (JPPFJob job: jobs) {
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       SimpleTask task = (SimpleTask) results.get(0);
       Throwable t = task.getThrowable();
       if (t != null) System.out.printf("the job '%' has an error: %s\n", job.getName(), ExceptionUtils.getMessage(t));

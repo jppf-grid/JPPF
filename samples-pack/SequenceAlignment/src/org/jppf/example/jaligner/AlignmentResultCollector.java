@@ -22,22 +22,19 @@ import java.util.*;
 
 import javax.swing.SwingUtilities;
 
-import org.jppf.client.JPPFResultCollector;
-import org.jppf.client.event.TaskResultEvent;
-import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Result collector that updates the progress bar's value during the computation.
  */
-public class AlignmentResultCollector implements TaskResultListener
+public class AlignmentResultCollector extends JobListenerAdapter
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFResultCollector.class);
+  private static Logger log = LoggerFactory.getLogger(AlignmentResultCollector.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -73,12 +70,11 @@ public class AlignmentResultCollector implements TaskResultListener
   /**
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param event a notification of completion for a set of submitted tasks.
-   * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
    */
   @Override
-  public synchronized void resultsReceived(final TaskResultEvent event)
+  public synchronized void jobReturned(final JobEvent event)
   {
-    List<Task<?>> tasks = event.getTasks();
+    List<Task<?>> tasks = event.getJobTasks();
     if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
     for (Task<?> task: tasks) resultMap.put(task.getPosition(), task);
     pendingCount -= tasks.size();

@@ -25,6 +25,7 @@ import javax.resource.ResourceException;
 import javax.resource.cci.ConnectionFactory;
 
 import org.jppf.client.*;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.cci.*;
 import org.jppf.node.protocol.Task;
 
@@ -108,8 +109,8 @@ public class JPPFHelper
   {
     JPPFJob job = statusMap.get(id);
     if (job == null) return "no submission with this id";
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    return collector.getStatus().toString();
+    SubmissionStatus status = job.getStatus();
+    return status == null ? "unknown" : status.toString();
   }
 
   /**
@@ -135,8 +136,7 @@ public class JPPFHelper
     String msg = null;
     JPPFJob job = statusMap.remove(id);
     if (job == null) return "no submission with this id";
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-    List<Task<?>> results = collector.getAllResults();
+    List<Task<?>> results = job.getAllResults();
     if (results == null) msg = "submission is not in queue anymore";
     else
     {

@@ -158,12 +158,12 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
       job2.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(TIME_LONG));
       client.submitJob(job1);
       client.submitJob(job2);
-      List<Task<?>> results = ((JPPFResultCollector) job1.getResultListener()).awaitResults();
+      List<Task<?>> results = job1.awaitResults();
       assertNotNull(results);
       assertEquals(results.size(), 1);
       Task<?> task = results.get(0);
       assertNull(task.getResult());
-      results = ((JPPFResultCollector) job2.getResultListener()).awaitResults();
+      results = job2.awaitResults();
       assertNotNull(results);
       assertEquals(results.size(), 1);
       task = results.get(0);
@@ -230,7 +230,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
    * Test that a job is only executed on one channel at a time, either local or remote.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout=8000)
+  @Test(timeout=8000)
   public void testJobMaxChannelsClient() throws Exception {
     try {
       configure(true, true, 1);

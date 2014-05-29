@@ -123,7 +123,6 @@ public class JobPriorityRunner
       job.add(task);
     }
     job.setBlocking(false);
-    job.setResultListener(new JPPFResultCollector(job));
     return job;
   }
 
@@ -223,9 +222,8 @@ public class JobPriorityRunner
     {
       try
       {
-        JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
         jppfClient.submitJob(job);
-        List<Task<?>> results = collector.awaitResults();
+        List<Task<?>> results = job.awaitResults();
         print("job '" + job.getName() + "' complete");
         for (Task task: results)
         {

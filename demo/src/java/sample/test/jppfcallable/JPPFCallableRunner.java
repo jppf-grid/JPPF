@@ -97,11 +97,10 @@ public class JPPFCallableRunner {
       job.getClientSLA().setMaxChannels(maxChannels);
       job.setBlocking(false);
       for (int i=1; i<=nbTasks; i++) job.add(new MyTask(time, size)).setId(name + ":task-" + StringUtils.padLeft(String.valueOf(i), '0', 5));
-      job.setResultListener(new JPPFResultCollector(job) {
+      job.addJobListener(new JobListenerAdapter() {
         @Override
-        public synchronized void resultsReceived(final TaskResultEvent event) {
-          super.resultsReceived(event);
-          if (event.getTasks() != null) print("received " + jobResults.size() + " results");
+        public synchronized void jobReturned(final JobEvent event) {
+          print("received " + event.getJobTasks().size() + " results");
         }
       });
       //job.addJobListener(new MyJobListener());
@@ -110,8 +109,7 @@ public class JPPFCallableRunner {
     callableResult = "from MyCallable";
     for (JPPFJob job: jobList) jppfClient.submitJob(job);
     for (JPPFJob job: jobList) {
-      JPPFResultCollector coll = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results = coll.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       print("got results for job '" + job.getName() + "'");
     }
     if (loggingHandler != null) loggingHandler.unregister(jmxLogger);

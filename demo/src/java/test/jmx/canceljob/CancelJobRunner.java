@@ -75,8 +75,7 @@ public class CancelJobRunner
       //jobProxy.cancelJob(job.getUuid());
       //jppfClient.cancelJob(job.getUuid());
       print("job cancelled, waiting for results");
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       print("********** got results for job '" + job.getName() + "' **********");
       for (Task task: results)
       {

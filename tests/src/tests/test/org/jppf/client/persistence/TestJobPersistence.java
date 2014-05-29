@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
+import org.jppf.client.event.*;
 import org.jppf.client.persistence.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
@@ -49,7 +49,7 @@ public class TestJobPersistence extends Setup1D1N
     String key = null;
     JobPersistence<String> pm = null;
     TypedProperties config = JPPFConfiguration.getProperties();
-    long duration = 750L;
+    long duration = 1000L;
     JPPFClient client = null;
     try
     {
@@ -65,29 +65,28 @@ public class TestJobPersistence extends Setup1D1N
       key = pm.computeKey(job);
       assertEquals(key, job.getUuid());
       job.setPersistenceManager(pm);
-      JPPFResultCollector collector = new JPPFResultCollector(job) {
+      JobListener jobListener = new JobListenerAdapter() {
         @Override
-        public synchronized void resultsReceived(final TaskResultEvent event) {
-          super.resultsReceived(event);
+        public synchronized void jobReturned(final JobEvent event) {
           resultsReceived.set(true);
         }
       };
-      job.setResultListener(collector);
+      job.addJobListener(jobListener);
       client.submitJob(job);
       while (!resultsReceived.get()) Thread.sleep(100L);
       client.close();
       int n = job.getResults().size();
       assertTrue(n < nbTasks);
+      String uuid = job.getUuid();
+      job = null;
 
       client = BaseSetup.createClient(null);
       JPPFJob job2 = pm.loadJob(key);
-      assertEquals(job2.getUuid(), job.getUuid());
+      assertEquals(uuid, job2.getUuid());
       //int n2 = job2.getResults().size();
       //assertEquals(n, n2);
-      JPPFResultCollector collector2 = new JPPFResultCollector(job2);
-      job2.setResultListener(collector2);
       client.submitJob(job2);
-      List<Task<?>> results = collector2.awaitResults();
+      List<Task<?>> results = job2.awaitResults();
       assertEquals(nbTasks, results.size());
       assertEquals(nbTasks, job2.getResults().size());
     }

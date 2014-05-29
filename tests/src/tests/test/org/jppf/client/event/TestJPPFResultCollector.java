@@ -48,6 +48,7 @@ public class TestJPPFResultCollector extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @Test(timeout=20000)
+  @SuppressWarnings("deprecation")
   public void testAllResultsUponJobEnded() throws Exception {
     try {
       configure(true, false, 1);
@@ -68,6 +69,7 @@ public class TestJPPFResultCollector extends Setup1D1N {
         }
       });
       client.submitJob(job);
+      @SuppressWarnings("deprecation")
       JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       List<Task<?>> results2 = collector.awaitResults();
       assertEquals(nbTasks, results2.size());

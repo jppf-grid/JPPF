@@ -44,7 +44,9 @@ public class JcaSubmissionManager extends SubmissionManagerClient
   /**
    * Mapping of submissions to their submission id.
    */
-  private Map<String, JPPFResultCollector> submissionMap = new Hashtable<>();
+  @SuppressWarnings("deprecation")
+  private Map<String, JPPFJob> submissionMap = new Hashtable<>();
+  //private Map<String, JPPFResultCollector> submissionMap = new Hashtable<>();
 
   /**
    * Initialize this submission worker with the specified JPPF client.
@@ -65,9 +67,7 @@ public class JcaSubmissionManager extends SubmissionManagerClient
   @Override
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener)
   {
-    JPPFResultCollector submission = new JPPFResultCollector(job);
-    job.setResultListener(submission);
-    submissionMap.put(submission.getId(), submission);
+    submissionMap.put(job.getUuid(), job);
     return super.submitJob(job, listener);
   }
 
@@ -76,7 +76,7 @@ public class JcaSubmissionManager extends SubmissionManagerClient
    * @param id the id of the submission to find.
    * @return the submission corresponding to the id, or null if the submission could not be found.
    */
-  public JPPFResultCollector peekSubmission(final String id)
+  public JPPFJob peekSubmission(final String id)
   {
     return submissionMap.get(id);
   }
@@ -86,7 +86,7 @@ public class JcaSubmissionManager extends SubmissionManagerClient
    * @param id the id of the submission to find.
    * @return the submission corresponding to the id, or null if the submission could not be found.
    */
-  public JPPFResultCollector pollSubmission(final String id)
+  public JPPFJob pollSubmission(final String id)
   {
     return submissionMap.remove(id);
   }

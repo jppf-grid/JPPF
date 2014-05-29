@@ -148,9 +148,6 @@ public class CustomLoadBalancerRunner
 
     // Set the job in non-blocking (asynchronous) mode.
     job.setBlocking(false);
-    // For an asynchronous job, we need a TaskResultListener to collect the
-    // execution results, hence we define a JPPFResultCollector.
-    job.setResultListener(new JPPFResultCollector(job));
 
     return job;
   }
@@ -165,13 +162,10 @@ public class CustomLoadBalancerRunner
     // Print a banner to visually separate the results for each job.
     System.out.println("\n********** Results for job : " + job.getName() + " **********\n");
 
-    // Get the results collector.
-    JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
     // We are now ready to get the results of the job execution.
-    // We use JPPFResultCollector.waitForResults() for this. This method returns immediately
-    // with the results if the job has completed, otherwise it waits until the job execution
-    // is complete.
-    List<Task<?>> results = collector.awaitResults();
+    // We use JPPFJob.awaitResults() for this. This method returns immediately with the
+    // results if the job has completed, otherwise it waits until the job execution is complete.
+    List<Task<?>> results = job.awaitResults();
 
     // Process the results
     for (Task<?> task: results)

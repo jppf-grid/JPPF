@@ -57,11 +57,10 @@ public class ResubmitRunner extends AbstractScenarioRunner
       long start = System.nanoTime();
       JPPFJob job = BaseTestHelper.createJob("resubmit", false, false, 1, LifeCycleTask.class, 5000L);
       job.addJobListener(new MyJobListener());
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
       getSetup().getClient().submitJob(job);
       while (!dispatched.get()) Thread.sleep(1000L);
       getSetup().getDriverManagementProxy().restartShutdown(1L, 1L);
-      List<Task<?>> results = collector.awaitResults();
+      List<Task<?>> results = job.awaitResults();
       long elapsed = System.nanoTime() - start;
       output("total time: " + StringUtils.toStringDuration(elapsed/1000000L));
     }

@@ -59,12 +59,12 @@ public class TestJPPFJob
   {
     int nbTasks = 10;
     TypedProperties props = JPPFConfiguration.getProperties();
-    props.setProperty("jppf.remote.execution.enabled", "false");
-    props.setProperty("jppf.local.execution.enabled", "true");
-    props.setProperty("jppf.local.execution.threads", "4");
-    props.setProperty("jppf.load.balancing.algorithm", "manual");
-    props.setProperty("jppf.load.balancing.profile", "manual");
-    props.setProperty("jppf.load.balancing.profile.manual.size", "5");
+    props.setBoolean("jppf.remote.execution.enabled", false);
+    props.setBoolean("jppf.local.execution.enabled", true);
+    props.setInt("jppf.local.execution.threads", 4);
+    props.setString("jppf.load.balancing.algorithm", "manual");
+    props.setString("jppf.load.balancing.profile", "manual");
+    props.setInt("jppf.load.balancing.profile.manual.size", 5);
 
     JPPFClient client = null;
     try

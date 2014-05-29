@@ -21,21 +21,18 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.event.TaskResultEvent;
-import org.jppf.client.event.TaskResultListener;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.task.storage.DataProvider;
-import org.jppf.task.storage.MemoryMapDataProvider;
+import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class NonBlockingMatrixRunner implements TaskResultListener
+public class NonBlockingMatrixRunner extends JobListenerAdapter
 {
   /**
    * Logger for this class.
@@ -115,7 +112,7 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         // create a data provider to share matrix b among all tasks
         job.setDataProvider(new MemoryMapDataProvider());
         job.getDataProvider().setParameter(MatrixTask.DATA_KEY, b);
-        job.setResultListener(this);
+        job.addJobListener(this);
         // submit the tasks for execution
         jppfClient.submitJob(job);
         waitForResults();
@@ -169,10 +166,11 @@ public class NonBlockingMatrixRunner implements TaskResultListener
         // create a data provider to share matrix b among all tasks
         DataProvider dataProvider = new MemoryMapDataProvider();
         dataProvider.setParameter(MatrixTask.DATA_KEY, b);
-        JPPFJob job = new JPPFJob(dataProvider);
+        JPPFJob job = new JPPFJob();
+        job.setDataProvider(dataProvider);
         for (int i=0; i<size; i++) job.add(new MatrixTask(a.getRow(i)));
         job.setBlocking(false);
-        job.setResultListener(this);
+        job.addJobListener(this);
         // submit the tasks for execution
         jppfClient.submitJob(job);
         waitForResults();
@@ -202,12 +200,11 @@ public class NonBlockingMatrixRunner implements TaskResultListener
   /**
    * 
    * @param event notification that a set of tasks results have been received.
-   * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
    */
   @Override
-  public synchronized void resultsReceived(final TaskResultEvent event)
+  public synchronized void jobReturned(final JobEvent event)
   {
-    List<Task<?>> tasks = event.getTasks();
+    List<Task<?>> tasks = event.getJobTasks();
     System.out.println("Received results for " + tasks.size() + " tasks ");
     for (Task<?> task: tasks) resultMap.put(task.getPosition(), task);
     count += tasks.size();

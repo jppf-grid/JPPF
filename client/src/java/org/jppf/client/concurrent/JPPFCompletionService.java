@@ -21,6 +21,8 @@ package org.jppf.client.concurrent;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.client.JPPFJob;
+import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
@@ -102,14 +104,14 @@ public class JPPFCompletionService<V> implements CompletionService<V>
    */
   private JPPFTaskFuture<V> processFuture(final JPPFTaskFuture<V> future)
   {
-    FutureResultCollector collector = future.getCollector();
-    String uuid = collector.getJobUuid();
+    JPPFJob job = future.getJob();
+    String uuid = future.getJob().getUuid();
     synchronized(futureMap)
     {
       Map<Integer, JPPFTaskFuture<V>> map = futureMap.get(uuid);
       if (map == null)
       {
-        collector.addListener(listener);
+        job.addJobListener(listener);
         map = new HashMap<>();
         futureMap.put(uuid, map);
       }
@@ -141,16 +143,16 @@ public class JPPFCompletionService<V> implements CompletionService<V>
    * each job submitted by the {@link JPPFExecutorService}, and updates the queue according
    * to the tasks that are completed.
    */
-  private class ResultCollectorListener implements FutureResultCollectorListener
+  private class ResultCollectorListener extends JobListenerAdapter
   {
     @Override
-    public void resultsReceived(final FutureResultCollectorEvent event)
+    public void jobReturned(final JobEvent event)
     {
-      List<Task<?>> tasks = event.getResults();
+      List<Task<?>> tasks = event.getJobTasks();
       if (tasks != null)
       {
-        FutureResultCollector collector = event.getCollector();
-        String uuid = collector.getJobUuid();
+        JPPFJob job = event.getJob();
+        String uuid = job.getUuid();
         Map<Integer, JPPFTaskFuture<V>> map = null;
         synchronized(futureMap)
         {
@@ -175,10 +177,10 @@ public class JPPFCompletionService<V> implements CompletionService<V>
     }
 
     @Override
-    public void resultsComplete(final FutureResultCollectorEvent event)
+    public void jobEnded(final JobEvent event)
     {
-      FutureResultCollector collector = event.getCollector();
-      String uuid = collector.getJobUuid();
+      JPPFJob job = event.getJob();
+      String uuid = job.getUuid();
       Map<Integer, JPPFTaskFuture<V>> map = null;
       synchronized(futureMap)
       {

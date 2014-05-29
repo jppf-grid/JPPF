@@ -21,15 +21,17 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.server.peer.TestMultiServerWithSSL;
-import test.org.jppf.server.protocol.TestJPPFJobClientSLA;
+import test.org.jppf.client.concurrent.*;
+
+
 
 /**
  * A suite of JUnit tests.
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestJPPFJobClientSLA.class })
+@Suite.SuiteClasses({ TestJPPFExecutorService.class, TestJPPFCompletionService.class, TestExecutorServiceConfiguration.class })
+//@Suite.SuiteClasses({ TestJobPersistence.class, TestMultiServer.class, TestMultiServerWithSSL.class })
 //@Suite.SuiteClasses({ TestSSL.class, TestMultiServer.class, TestFileDataLocation.class, TestSSL2.class })
 public class JPPFSuite
 {

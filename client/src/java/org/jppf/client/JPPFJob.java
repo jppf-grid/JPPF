@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.client.persistence.JobPersistence;
+import org.jppf.client.submission.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
@@ -57,7 +58,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   /**
    * The listener that receives notifications of completed tasks.
    */
-  private transient TaskResultListener resultsListener = null;
+  @SuppressWarnings("deprecation")
+  private transient TaskResultListener resultsListener;
   /**
    * Determines whether the execution of this job is blocking on the client side.
    */
@@ -108,81 +110,11 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
    * @param jobUuid the uuid to assign to this job.
    */
+  @SuppressWarnings("deprecation")
   public JPPFJob(final String jobUuid) {
     this.uuid = (jobUuid == null) ? JPPFUuid.normalUUID() : jobUuid;
     name = (jobUuid == null) ? this.uuid : jobUuid;
-  }
-
-  /**
-   * Initialize a blocking job with the specified parameters.
-   * @param dataProvider the container for data shared between tasks.
-   */
-  public JPPFJob(final DataProvider dataProvider) {
-    this(dataProvider, null, true, null);
-  }
-
-  /**
-   * Initialize a blocking job with the specified parameters.
-   * @param dataProvider the container for data shared between tasks.
-   * @param jobSLA service level agreement between job and server.
-   */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA) {
-    this(dataProvider, jobSLA, true, null);
-  }
-
-  /**
-   * Initialize a non-blocking job with the specified parameters.
-   * @param resultsListener the listener that receives notifications of completed tasks.
-   */
-  public JPPFJob(final TaskResultListener resultsListener) {
-    this(null, null, false, resultsListener);
-  }
-
-  /**
-   * Initialize a non-blocking job with the specified parameters.
-   * @param dataProvider the container for data shared between tasks.
-   * @param resultsListener the listener that receives notifications of completed tasks.
-   */
-  public JPPFJob(final DataProvider dataProvider, final TaskResultListener resultsListener) {
-    this(dataProvider, null, false, resultsListener);
-  }
-
-  /**
-   * Initialize a non-blocking job with the specified parameters.
-   * @param dataProvider the container for data shared between tasks.
-   * @param jobSLA service level agreement between job and server.
-   * @param resultsListener the listener that receives notifications of completed tasks.
-   */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final TaskResultListener resultsListener) {
-    this(dataProvider, jobSLA, false, resultsListener);
-  }
-
-  /**
-   * Initialize a job with the specified parameters.
-   * @param dataProvider the container for data shared between tasks.
-   * @param jobSLA service level agreement between job and server.
-   * @param blocking determines whether this job is blocking.
-   * @param resultsListener the listener that receives notifications of completed tasks.
-   */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final boolean blocking, final TaskResultListener resultsListener) {
-    this(dataProvider, jobSLA, null, blocking, resultsListener);
-  }
-
-  /**
-   * Initialize a job with the specified parameters.
-   * @param dataProvider the container for data shared between tasks.
-   * @param jobSLA service level agreement between job and server.
-   * @param jobMetadata the user-defined job metadata.
-   * @param blocking determines whether this job is blocking.
-   * @param resultsListener the listener that receives notifications of completed tasks.
-   */
-  public JPPFJob(final DataProvider dataProvider, final JobSLA jobSLA, final JPPFJobMetadata jobMetadata, final boolean blocking, final TaskResultListener resultsListener) {
-    this();
-    this.dataProvider = dataProvider;
-    if (jobSLA != null) this.jobSLA = jobSLA;
-    if (jobMetadata != null) this.jobMetadata = jobMetadata;
-    this.resultsListener = resultsListener;
-    this.blocking = blocking;
+    resultsListener = new JPPFResultCollector(this);
   }
 
   @Override
@@ -318,6 +250,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   /**
    * Get the listener that receives notifications of completed tasks.
    * @return a <code>TaskCompletionListener</code> instance.
+   * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
+   * {@link JobListener} should be used instead, with the {@link #addJobListener(JobListener)} and {@link #removeJobListener(JobListener)} methods.
    */
   public TaskResultListener getResultListener() {
     return resultsListener;
@@ -326,6 +260,8 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   /**
    * Set the listener that receives notifications of completed tasks.
    * @param resultsListener a <code>TaskCompletionListener</code> instance.
+   * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
+   * {@link JobListener} should be used instead, with the {@link #addJobListener(JobListener)} and {@link #removeJobListener(JobListener)} methods.
    */
   public void setResultListener(final TaskResultListener resultsListener) {
     this.resultsListener = resultsListener;
@@ -495,11 +431,62 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   }
 
   /**
+   * Get the count of the tasks in this job that haven completed.
+   * @return the number of executed tasks in this job.
+   * @since 4.2
+   */
+  public int executedTaskCount() {
+    return results.size();
+  }
+
+  /**
    * Get the count of the tasks in this job that haven't yet been executed.
    * @return the number of unexecuted tasks in this job.
    * @since 4.2
    */
   public int unexecutedTaskCount() {
     return tasks.size() - results.size();
+  }
+
+  /**
+   * Wait until all execution results of the tasks in this job have been collected.
+   * @return the list of resulting tasks.
+   * @since 4.2
+   */
+  public List<Task<?>> awaitResults() {
+    return awaitResults(Long.MAX_VALUE);
+  }
+
+  /**
+   * Wait until all execution results of the tasks in this job have been collected, or the timeout expires, whichever happens first.
+   * @param timeout the maximum time to wait, zero meaning an infinite wait.
+   * @return the list of resulting tasks, or {@code null} if the timeout expired before all results were received.
+   * @since 4.2
+   */
+  public List<Task<?>> awaitResults(final long timeout) {
+    long start = System.currentTimeMillis();
+    long elapsed;
+    while ((results.size() >= tasks.size()) && ((elapsed = System.currentTimeMillis() - start) < timeout)) results.goToSleep(timeout - elapsed);
+    return results.getResultsList();
+  }
+
+  /**
+   * Get the list of currently available task execution results.
+   * This method is a shortcut for {@code getResults().getResultsList()}.
+   * @return a list of {@link Task} instances, possibly empty.
+   * @since 4.2
+   */
+  public List<Task<?>> getAllResults() {
+    return results.getResultsList();
+  }
+
+  /**
+   * Get the execution status of this job.
+   * @return a {@link SubmissionStatus} enum value, or {@code null} isd the status could not be determined.
+   * @since 4.2
+   */
+  public SubmissionStatus getStatus() {
+    if (resultsListener instanceof SubmissionStatusHandler) return ((SubmissionStatusHandler) resultsListener).getStatus();
+    return null;
   }
 }

@@ -62,6 +62,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The listener that receives notifications of completed tasks.
    */
+  @SuppressWarnings("deprecation")
   private TaskResultListener resultsListener;
   /**
    * Instance of parent broadcast job.
@@ -108,6 +109,7 @@ public class ClientJob extends AbstractClientJob {
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID.
    */
+  @SuppressWarnings("deprecation")
   protected ClientJob(final JPPFJob job, final List<Task<?>> tasks, final ClientJob parentJob, final String broadcastUUID) {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
@@ -122,8 +124,8 @@ public class ClientJob extends AbstractClientJob {
       this.broadcastMap = Collections.emptyMap();
       this.resultsListener = null;
     }
-    if (this.job.getResultListener() instanceof SubmissionStatusHandler) this.submissionStatus = ((SubmissionStatusHandler) this.job.getResultListener()).getStatus();
-    else this.submissionStatus = SubmissionStatus.SUBMITTED;
+    SubmissionStatus s = job.getStatus();
+    this.submissionStatus = s == null ? SubmissionStatus.SUBMITTED : s;
     this.tasks = new ArrayList<>(tasks);
     for (Task<?> result : job.getResults().getAllResults()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
@@ -209,7 +211,7 @@ public class ClientJob extends AbstractClientJob {
    * Get the listener that receives notifications of completed tasks.
    * @return a <code>TaskCompletionListener</code> instance.
    */
-  public TaskResultListener getResultListener() {
+  public @SuppressWarnings("deprecation") TaskResultListener getResultListener() {
     return resultsListener;
   }
 
@@ -217,7 +219,7 @@ public class ClientJob extends AbstractClientJob {
    * Set the listener that receives notifications of completed tasks.
    * @param resultsListener a <code>TaskCompletionListener</code> instance.
    */
-  public void setResultListener(final TaskResultListener resultsListener) {
+  public void setResultListener(@SuppressWarnings("deprecation") final TaskResultListener resultsListener) {
     this.resultsListener = resultsListener;
   }
 
@@ -310,6 +312,7 @@ public class ClientJob extends AbstractClientJob {
    * @param throwable an eventual {@link Throwable} that may have been raised while the tasks were executing.
    * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-257">JPPF-257 Better exception handling for overriden or custom TaskResultListener implementations</a>
    */
+  @SuppressWarnings("deprecation")
   private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
     TaskResultListener listener = resultsListener;
     if (listener != null) {

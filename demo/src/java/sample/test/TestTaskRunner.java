@@ -327,7 +327,8 @@ public class TestTaskRunner
   {
     DataProvider dataProvider = new MemoryMapDataProvider();
     dataProvider.setParameter("DATA", new SimpleData("Data and more data"));
-    JPPFJob job = new JPPFJob(dataProvider);
+    JPPFJob job = new JPPFJob();
+    job.setDataProvider(dataProvider);
     singleTest("my task", dataProvider, new MyTask());
   }
 
@@ -432,7 +433,8 @@ public class TestTaskRunner
     System.out.println("Starting " + title + " test ...");
     try
     {
-      JPPFJob job = new JPPFJob(dp);
+      JPPFJob job = new JPPFJob();
+      job.setDataProvider(dp);
       for (Object task: tasks) job.add(task);
       List<Task<?>> results = jppfClient.submitJob(job);
       Task res = results.get(0);
