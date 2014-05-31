@@ -45,6 +45,10 @@ public class JobResults extends ThreadSynchronization implements Serializable
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * A map containing the tasks that have been successfully executed,
    * ordered by ascending position in the submitted list of tasks.
    */
@@ -101,7 +105,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
     for (JPPFTask task : tasks)
     {
       int pos = task.getPosition();
-      if (debugEnabled) log.debug("adding result at positon {}", pos);
+      if (traceEnabled) log.debug("adding result at positon {}", pos);
       if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
       resultMap.put(pos, task);
     }
@@ -114,14 +118,15 @@ public class JobResults extends ThreadSynchronization implements Serializable
    */
   public synchronized void addResults(final List<Task<?>> tasks)
   {
+    if (debugEnabled) log.debug("adding {} results", tasks.size());
     for (Task<?> task : tasks)
     {
       int pos = task.getPosition();
-      if (debugEnabled) log.debug("adding result at positon {}", pos);
+      if (traceEnabled) log.debug("adding result at positon {}", pos);
       if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
       resultMap.put(pos, task);
     }
-    wakeUp();
+    //wakeUp();
   }
 
   /**
@@ -193,5 +198,12 @@ public class JobResults extends ThreadSynchronization implements Serializable
       elapsed = System.currentTimeMillis() - start;
     }
     return getResultTask(position);
+  }
+
+  /**
+   * Clear all results in case the job is manually resubmitted.
+   */
+  public synchronized void clear() {
+    resultMap.clear();
   }
 }

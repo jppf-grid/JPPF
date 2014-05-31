@@ -106,6 +106,12 @@ public class JPPFClient extends AbstractGenericClient {
   @SuppressWarnings("deprecation")
   public List<Task<?>> submitJob(final JPPFJob job) throws Exception {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
+    if (job.client != null) {
+      if (!job.isDone()) throw new IllegalStateException("this job is already submitted");
+      job.cancelled.set(false);
+      job.getResults().clear();
+    }
+    job.client = this;
     if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     if ((job.getResultListener() == null) ||
         (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));

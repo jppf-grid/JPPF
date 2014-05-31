@@ -18,9 +18,8 @@
 
 package org.jppf.client;
 
-import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
@@ -29,9 +28,9 @@ import org.jppf.client.submission.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class represent a JPPF submission and hold all the required elements:
@@ -41,61 +40,15 @@ import org.jppf.utils.JPPFUuid;
  * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
-public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<?>> {
+public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Future<List<Task<?>>> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFJob.class);
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * The list of tasks to execute.
-   */
-  private final List<Task<?>> tasks = new ArrayList<>();
-  /**
-   * The container for data shared between tasks.
-   * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
-   */
-  private DataProvider dataProvider = null;
-  /**
-   * The listener that receives notifications of completed tasks.
-   */
-  @SuppressWarnings("deprecation")
-  private transient TaskResultListener resultsListener;
-  /**
-   * Determines whether the execution of this job is blocking on the client side.
-   */
-  private boolean blocking = true;
-  /**
-   * The user-defined display name for this job.
-   */
-  private String name = null;
-  /**
-   * The universal unique id for this job.
-   */
-  private final String uuid;
-  /**
-   * The service level agreement between the job and the server.
-   */
-  private JobSLA jobSLA = new JPPFJobSLA();
-  /**
-   * The service level agreement on the client side.
-   */
-  private JobClientSLA jobClientSLA = new JPPFJobClientSLA();
-  /**
-   * The user-defined metadata associated with this job.
-   */
-  private JobMetadata jobMetadata = new JPPFJobMetadata();
-  /**
-   * The object that holds the results of executed tasks.
-   */
-  private final JobResults results = new JobResults();
-  /**
-   * The list of listeners registered with this job.
-   */
-  private transient List<JobListener> listeners = new CopyOnWriteArrayList<>();
-  /**
-   * The persistence manager that enables saving and restoring the state of this job.
-   */
-  private transient JobPersistence<?> persistenceManager = null;
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -112,8 +65,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    */
   @SuppressWarnings("deprecation")
   public JPPFJob(final String jobUuid) {
-    this.uuid = (jobUuid == null) ? JPPFUuid.normalUUID() : jobUuid;
-    name = (jobUuid == null) ? this.uuid : jobUuid;
+    super(jobUuid);
     resultsListener = new JPPFResultCollector(this);
   }
 
@@ -138,61 +90,9 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   /**
    * Get the list of tasks to execute.
    * @return a list of objects.
-   * @deprecated use {@link #getJobTasks()} instead.
-   */
-  @Deprecated
-  public List<JPPFTask> getTasks() {
-    List<JPPFTask> list = new ArrayList<>(tasks.size());
-    for (Task<?> task: tasks) list.add((JPPFTask) task);
-    return list;
-  }
-
-  /**
-   * Get the list of tasks to execute.
-   * @return a list of objects.
    */
   public List<Task<?>> getJobTasks() {
     return tasks;
-  }
-
-  /**
-   * Add a task to this job. This method is for adding a task that is either an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask},
-   * annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
-   * @param taskObject the task to add to this job.
-   * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
-   * or a wrapper around the input object in the other cases.
-   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-   * @deprecated use {@link #add(Object, Object...)} instead.
-   */
-  @Deprecated
-  public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException {
-    JPPFTask jppfTask = null;
-    if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-    if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
-    else jppfTask = new JPPFAnnotatedTask(taskObject, args);
-    tasks.add(jppfTask);
-    jppfTask.setPosition(tasks.size()-1);
-    return jppfTask;
-  }
-
-  /**
-   * Add a POJO task to this job. The POJO task is identified as a method name associated with either an object for a non-static method,
-   * or a class for a static method or for a constructor.
-   * @param taskObject the task to add to this job.
-   * @param method the name of the method to execute.
-   * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
-   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-   * @deprecated use {@link #add(String, Object, Object...)} instead.
-   */
-  @Deprecated
-  public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException {
-    if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-    JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
-    tasks.add(jppfTask);
-    jppfTask.setPosition(tasks.size()-1);
-    return jppfTask;
   }
 
   /**
@@ -248,26 +148,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   }
 
   /**
-   * Get the listener that receives notifications of completed tasks.
-   * @return a <code>TaskCompletionListener</code> instance.
-   * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
-   * {@link JobListener} should be used instead, with the {@link #addJobListener(JobListener)} and {@link #removeJobListener(JobListener)} methods.
-   */
-  public TaskResultListener getResultListener() {
-    return resultsListener;
-  }
-
-  /**
-   * Set the listener that receives notifications of completed tasks.
-   * @param resultsListener a <code>TaskCompletionListener</code> instance.
-   * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
-   * {@link JobListener} should be used instead, with the {@link #addJobListener(JobListener)} and {@link #removeJobListener(JobListener)} methods.
-   */
-  public void setResultListener(final TaskResultListener resultsListener) {
-    this.resultsListener = resultsListener;
-  }
-
-  /**
    * Determine whether the execution of this job is blocking on the client side.
    * @return true if the execution is blocking, false otherwise.
    */
@@ -319,31 +199,10 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
 
   /**
    * Set this job's metadata.
-   * @param jobMetadata a {@link JPPFJobMetadata} instance.
+   * @param jobMetadata a {@link JobMetadata} instance.
    */
   public void setMetadata(final JobMetadata jobMetadata) {
     this.jobMetadata = jobMetadata;
-  }
-
-  @Override
-  public int hashCode() {
-    return 31 + (uuid == null ? 0 : uuid.hashCode());
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) return true;
-    if (!(obj instanceof JPPFJob)) return false;
-    JPPFJob other = (JPPFJob) obj;
-    return (uuid == null) ? other.uuid == null : uuid.equals(other.uuid);
-  }
-
-  /**
-   * Get the object that holds the results of executed tasks.
-   * @return a {@link JobResults} instance.
-   */
-  public JobResults getResults() {
-    return results;
   }
 
   /**
@@ -370,16 +229,17 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
    * @exclude
    */
   public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<Task<?>> tasks) {
+    if (log.isDebugEnabled()) log.debug("firing {} event for {}", type, this);
     JobEvent event = new JobEvent(this, channel, tasks);
     switch(type) {
       case JOB_START: for (JobListener listener: listeners) listener.jobStarted(event);
-        break;
+      break;
       case JOB_END: for (JobListener listener: listeners) listener.jobEnded(event);
-        break;
+      break;
       case JOB_DISPATCH: for (JobListener listener: listeners) listener.jobDispatched(event);
-        break;
+      break;
       case JOB_RETURN: for (JobListener listener: listeners) listener.jobReturned(event);
-        break;
+      break;
     }
   }
 
@@ -412,20 +272,6 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("name=").append(name);
-    sb.append(", uuid=").append(uuid);
-    sb.append(", blocking=").append(blocking);
-    sb.append(", nbTasks=").append(tasks.size());
-    sb.append(", nbResults=").append(results.size());
-    sb.append(", jobSLA=").append(jobSLA);
-    sb.append(']');
-    return sb.toString();
-  }
-
-  @Override
   public Iterator<Task<?>> iterator() {
     return tasks.iterator();
   }
@@ -450,6 +296,7 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
 
   /**
    * Wait until all execution results of the tasks in this job have been collected.
+   * This method is equivalent to {@code get()}, except that it doesn't raise an exception.
    * @return the list of resulting tasks.
    * @since 4.2
    */
@@ -459,14 +306,16 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
 
   /**
    * Wait until all execution results of the tasks in this job have been collected, or the timeout expires, whichever happens first.
-   * @param timeout the maximum time to wait, zero meaning an infinite wait.
+   * This method is equivalent to {@code get(timeout, TimeUnit.MILLISECONDS)}, except that it doesn't raise an exception.
+   * @param timeout the maximum time to wait in milliseconds, zero or less meaning an infinite wait.
    * @return the list of resulting tasks, or {@code null} if the timeout expired before all results were received.
    * @since 4.2
    */
   public List<Task<?>> awaitResults(final long timeout) {
-    long start = System.currentTimeMillis();
-    long elapsed;
-    while ((results.size() >= tasks.size()) && ((elapsed = System.currentTimeMillis() - start) < timeout)) results.goToSleep(timeout - elapsed);
+    try {
+      await(timeout, false);
+    } catch (TimeoutException ignore) {
+    }
     return results.getResultsList();
   }
 
@@ -488,5 +337,59 @@ public class JPPFJob implements Serializable, JPPFDistributedJob, Iterable<Task<
   public SubmissionStatus getStatus() {
     if (resultsListener instanceof SubmissionStatusHandler) return ((SubmissionStatusHandler) resultsListener).getStatus();
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public boolean cancel(final boolean mayInterruptIfRunning) {
+    if (log.isDebugEnabled()) log.debug("request to cancel {}, client={}", this, client);
+    if (mayInterruptIfRunning || (getStatus() != SubmissionStatus.EXECUTING)) {
+      try {
+        if (client != null) return client.cancelJob(uuid);
+      } catch(Exception e) {
+        log.error("error cancelling job {} : {}", this, ExceptionUtils.getStackTrace(e));
+      }
+    }
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public boolean isCancelled() {
+    return cancelled.get();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public boolean isDone() {
+    return cancelled.get() || (unexecutedTaskCount() <= 0);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public List<Task<?>> get() throws InterruptedException, ExecutionException {
+    return awaitResults(Long.MAX_VALUE);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public List<Task<?>> get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    await(DateTimeUtils.toMillis(timeout, unit), true);
+    return results.getResultsList();
   }
 }

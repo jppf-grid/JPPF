@@ -209,8 +209,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
         bundle.resultsReceived(t);
       } finally {
         bundle.taskCompleted(exception);
-        setStatus(JPPFClientConnectionStatus.ACTIVE);
         bundle.getClientJob().removeChannel(ChannelWrapperLocal.this);
+        setStatus(JPPFClientConnectionStatus.ACTIVE);
       }
     }
   }

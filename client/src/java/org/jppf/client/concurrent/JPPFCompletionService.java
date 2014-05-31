@@ -31,8 +31,7 @@ import org.slf4j.*;
  * @param <V> the type of results returned by the submitted tasks.
  * @author Laurent Cohen
  */
-public class JPPFCompletionService<V> implements CompletionService<V>
-{
+public class JPPFCompletionService<V> implements CompletionService<V> {
   /**
    * Logger for this class.
    */
@@ -62,38 +61,32 @@ public class JPPFCompletionService<V> implements CompletionService<V>
    * Initialize this completion service with the specified executor.
    * @param executor the executor to which tasks are submitted.
    */
-  public JPPFCompletionService(final JPPFExecutorService executor)
-  {
+  public JPPFCompletionService(final JPPFExecutorService executor) {
     this.executor = executor;
   }
 
   @Override
-  public Future<V> submit(final Callable<V> task)
-  {
+  public Future<V> submit(final Callable<V> task) {
     return processFuture((JPPFTaskFuture<V>) executor.submit(task));
   }
 
   @Override
-  public Future<V> submit(final Runnable task, final V result)
-  {
+  public Future<V> submit(final Runnable task, final V result) {
     return processFuture((JPPFTaskFuture<V>) executor.submit(task, result));
   }
 
   @Override
-  public Future<V> take() throws InterruptedException
-  {
+  public Future<V> take() throws InterruptedException {
     return queue.take();
   }
 
   @Override
-  public Future<V> poll()
-  {
+  public Future<V> poll() {
     return queue.poll();
   }
 
   @Override
-  public Future<V> poll(final long timeout, final TimeUnit unit) throws InterruptedException
-  {
+  public Future<V> poll(final long timeout, final TimeUnit unit) throws InterruptedException {
     return queue.poll(timeout, unit);
   }
 
@@ -102,15 +95,12 @@ public class JPPFCompletionService<V> implements CompletionService<V>
    * @param future the future to process.
    * @return the process future.
    */
-  private JPPFTaskFuture<V> processFuture(final JPPFTaskFuture<V> future)
-  {
+  private JPPFTaskFuture<V> processFuture(final JPPFTaskFuture<V> future) {
     JPPFJob job = future.getJob();
     String uuid = future.getJob().getUuid();
-    synchronized(futureMap)
-    {
+    synchronized(futureMap) {
       Map<Integer, JPPFTaskFuture<V>> map = futureMap.get(uuid);
-      if (map == null)
-      {
+      if (map == null) {
         job.addJobListener(listener);
         map = new HashMap<>();
         futureMap.put(uuid, map);
@@ -124,15 +114,11 @@ public class JPPFCompletionService<V> implements CompletionService<V>
    * Process the completion of a task future.
    * @param future the future to process.
    */
-  private void processFutureCompletion(final JPPFTaskFuture<V> future)
-  {
+  private void processFutureCompletion(final JPPFTaskFuture<V> future) {
     if (future == null) throw new IllegalArgumentException("future should not be null");
-    try
-    {
+    try {
       future.getResult(0L);
-    }
-    catch (TimeoutException e)
-    {
+    } catch (TimeoutException e) {
       e.printStackTrace();
     }
     queue.offer(future);
@@ -143,59 +129,47 @@ public class JPPFCompletionService<V> implements CompletionService<V>
    * each job submitted by the {@link JPPFExecutorService}, and updates the queue according
    * to the tasks that are completed.
    */
-  private class ResultCollectorListener extends JobListenerAdapter
-  {
+  private class ResultCollectorListener extends JobListenerAdapter {
     @Override
-    public void jobReturned(final JobEvent event)
-    {
+    public void jobReturned(final JobEvent event) {
       List<Task<?>> tasks = event.getJobTasks();
-      if (tasks != null)
-      {
+      if (tasks != null) {
         JPPFJob job = event.getJob();
         String uuid = job.getUuid();
         Map<Integer, JPPFTaskFuture<V>> map = null;
-        synchronized(futureMap)
-        {
+        synchronized(futureMap) {
           map = futureMap.get(uuid);
         }
         if (map == null) return;
-        for (Task<?> task: tasks)
-        {
+        for (Task<?> task: tasks) {
           JPPFTaskFuture<V> future = null;
-          synchronized(futureMap)
-          {
+          synchronized(futureMap) {
             future = map.remove(task.getPosition());
           }
           if (future != null) processFutureCompletion(future);
           if (debugEnabled) log.debug("added future[job uuid=" + uuid + ", position=" + task.getPosition() + "] to the queue");
         }
-        synchronized(futureMap)
-        {
+        synchronized(futureMap) {
           if (map.isEmpty()) futureMap.remove(uuid);
         }
       }
     }
 
     @Override
-    public void jobEnded(final JobEvent event)
-    {
+    public void jobEnded(final JobEvent event) {
       JPPFJob job = event.getJob();
       String uuid = job.getUuid();
       Map<Integer, JPPFTaskFuture<V>> map = null;
-      synchronized(futureMap)
-      {
+      synchronized(futureMap) {
         map = futureMap.remove(uuid);
       }
-      if (map != null)
-      {
-        for (Map.Entry<Integer, JPPFTaskFuture<V>> entry: map.entrySet())
-        {
+      if (map != null) {
+        for (Map.Entry<Integer, JPPFTaskFuture<V>> entry: map.entrySet()) {
           JPPFTaskFuture<V> future = entry.getValue();
           processFutureCompletion(future);
           if (debugEnabled) log.debug("added future[job uuid=" + uuid + ", position=" + future.getPosition() + "] to the queue");
         }
-        synchronized(futureMap)
-        {
+        synchronized(futureMap) {
           futureMap.remove(uuid);
         }
       }

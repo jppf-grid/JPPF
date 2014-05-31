@@ -302,7 +302,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       try {
         ClientJob other = jobMap.get(jobUuid);
         if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
-
         bundleWrapper.addOnDone(new Runnable() {
           @Override
           public void run() {

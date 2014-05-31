@@ -240,10 +240,14 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         clientBundle.resubmit();
         reconnect();
       } finally {
-        if (registeredClassLoader != null) registeredClassLoader.dispose();
-        clientBundle.taskCompleted(exception);
-        clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
-        if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
+        try {
+          if (registeredClassLoader != null) registeredClassLoader.dispose();
+          clientBundle.taskCompleted(exception);
+          clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
+          if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
+        } catch (Exception e) {
+          log.error(e.getMessage(), e);
+        }
       }
     }
 

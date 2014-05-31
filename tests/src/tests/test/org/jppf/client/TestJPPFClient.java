@@ -81,12 +81,12 @@ public class TestJPPFClient extends Setup1D1N
   public void testSubmit() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
-      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
-      assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
+      assertEquals(nbTasks, results.size());
       String msg = BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
       for (i=0; i<nbTasks; i++) {
         Task<?> task = results.get(i);
@@ -101,6 +101,7 @@ public class TestJPPFClient extends Setup1D1N
    * Test the cancellation of a job.
    * @throws Exception if any error occurs
    */
+  @SuppressWarnings("deprecation")
   @Test(timeout=10000)
   public void testCancelJob() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null)) {
@@ -108,8 +109,10 @@ public class TestJPPFClient extends Setup1D1N
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
       int i = 0;
       for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
+      ExecutingJobStatusListener statusListener = new ExecutingJobStatusListener();
+      ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(statusListener);
       client.submitJob(job);
-      Thread.sleep(1500L);
+      statusListener.await();
       client.cancelJob(job.getUuid());
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
@@ -138,7 +141,7 @@ public class TestJPPFClient extends Setup1D1N
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       // submit a job to ensure all local execution threads are created
       int nbTasks = 100;
-      JPPFJob job = BaseTestHelper.createJob("TestSubmit", true, false, nbTasks, LifeCycleTask.class, 0L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 0L);
       int i = 0;
       for (Task<?> task: job) task.setId("" + i++);
       List<Task<?>> results = client.submitJob(job);
@@ -177,7 +180,7 @@ public class TestJPPFClient extends Setup1D1N
     config.setBoolean("jppf.remote.execution.enabled", false);
     config.setBoolean("jppf.local.execution.enabled", true);
     try (JPPFClient client = new JPPFClient()) {
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, ThreadContextClassLoaderTask.class);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, ThreadContextClassLoaderTask.class);
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
@@ -202,8 +205,9 @@ public class TestJPPFClient extends Setup1D1N
     config.setProperty("jppf.local.execution.enabled", "false");
     try (JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-      client.submitJob(BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, 1, ThreadContextClassLoaderTask.class);
+      String name = ReflectionUtils.getCurrentClassAndMethod();
+      client.submitJob(BaseTestHelper.createJob(name + "-1", true, false, 1, ThreadContextClassLoaderTask.class));
+      JPPFJob job = BaseTestHelper.createJob(name + "-2", true, false, 1, ThreadContextClassLoaderTask.class);
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
@@ -221,9 +225,8 @@ public class TestJPPFClient extends Setup1D1N
    */
   @Test(timeout=10000)
   public void testNotSerializableExceptionFromClient() throws Exception {
-    try (JPPFClient client = new JPPFClient())
-    {
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, true);
+    try (JPPFClient client = new JPPFClient()) {
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, true);
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
@@ -241,7 +244,7 @@ public class TestJPPFClient extends Setup1D1N
   public void testNotSerializableExceptionFromNode() throws Exception {
     
     try (JPPFClient client = new JPPFClient()) {
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, NotSerializableTask.class, false);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
@@ -300,13 +303,9 @@ public class TestJPPFClient extends Setup1D1N
    */
   private void restartDriver(final MyClient client, final int poolSize, final long restartDelay) throws Exception {
     JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-    log.info("***** before server restart, delay=" + restartDelay);
     jmx.restartShutdown(100L, restartDelay);
-    log.info("***** server restart requested");
     waitForNbConnections(client, 0, JPPFClientConnectionStatus.ACTIVE);
-    log.info("***** after waitForNbConnections(client, 0, ACTIVE)");
     waitForNbConnections(client, 0, null);
-    log.info("***** after waitForNbConnections(client, 0, null)");
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -314,9 +313,7 @@ public class TestJPPFClient extends Setup1D1N
       }
     };
     new Thread(r, "InitPools").start();
-    log.info("***** before waitForNbConnections(client, poolSize, ACTIVE)");
     waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
-    log.info("***** after waitForNbConnections(client, poolSize, ACTIVE)");
   }
 
   /**

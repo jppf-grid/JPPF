@@ -18,6 +18,8 @@
 
 package org.jppf.client.balancer;
 
+import static org.jppf.client.balancer.ClientJobStatus.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -280,7 +282,6 @@ public class ClientJob extends AbstractClientJob {
       }
     }
     callResultListener(results, null);
-    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, results);
   }
 
   /**
@@ -303,7 +304,6 @@ public class ClientJob extends AbstractClientJob {
       }
     }
     callResultListener(bundle.getTasksL(), throwable);
-    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, bundle.getTasksL());
   }
 
   /**
@@ -440,6 +440,7 @@ public class ClientJob extends AbstractClientJob {
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("requesting cancel of jobId=" + this.getUuid());
     if (super.cancel(mayInterruptIfRunning)) {
+      job.getCancelledFlag().set(true);
       done();
       List<ClientJob> list;
       Map<ClientTaskBundle, ChannelWrapper> map = null;
@@ -479,6 +480,7 @@ public class ClientJob extends AbstractClientJob {
         empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
       }
       if (empty) taskCompleted(null, null);
+      if (debugEnabled) log.debug("setting cancelled flag on job {}", job);
       return true;
     }
     else return false;

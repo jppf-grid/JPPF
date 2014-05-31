@@ -109,12 +109,15 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public String submit(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
   {
-    if (job == null) throw new IllegalArgumentException("job cannot be null");
-    if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
     job.setBlocking(false);
-    return managedConnection.retrieveJppfClient().getSubmissionManager().submitJob(job, listener);
+    if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector)) {
+      ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
+    }
+    managedConnection.retrieveJppfClient().submitJob(job);
+    return job.getUuid();
   }
 
   @Override

@@ -96,7 +96,7 @@ public class TestJPPFResultCollector extends Setup1D1N {
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    Thread.sleep(250L);
+    //Thread.sleep(250L);
     return results;
   }
 
