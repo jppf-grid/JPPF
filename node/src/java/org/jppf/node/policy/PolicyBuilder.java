@@ -23,35 +23,35 @@ package org.jppf.node.policy;
  * descriptor parsed from an XML document.
  * @author Laurent Cohen
  */
-public class PolicyBuilder
-{
+public class PolicyBuilder {
   /**
    * Build an execution policy from a parsed policy descriptor.
    * @param desc the descriptor parsed from an XML document.
    * @return an <code>ExecutionPolicy</code> instance.
    * @throws Exception if an error occurs while generating a policy object.
    */
-  public ExecutionPolicy buildPolicy(final PolicyDescriptor desc) throws Exception
-  {
-    String type = desc.type;
-    if ("NOT".equals(type)) return buildNotPolicy(desc);
-    else if ("AND".equals(type)) return buildAndPolicy(desc);
-    else if ("OR".equals(type)) return buildOrPolicy(desc);
-    else if ("XOR".equals(type)) return buildXorPolicy(desc);
-    else if ("LessThan".equals(type)) return buildLessThanPolicy(desc);
-    else if ("MoreThan".equals(type)) return buildMoreThanPolicy(desc);
-    else if ("AtMost".equals(type)) return buildAtMostPolicy(desc);
-    else if ("AtLeast".equals(type)) return buildAtLeastPolicy(desc);
-    else if ("BetweenII".equals(type)) return buildBetweenIIPolicy(desc);
-    else if ("BetweenIE".equals(type)) return buildBetweenIEPolicy(desc);
-    else if ("BetweenEI".equals(type)) return buildBetweenEIPolicy(desc);
-    else if ("BetweenEE".equals(type)) return buildBetweenEEPolicy(desc);
-    else if ("Equal".equals(type)) return buildEqualPolicy(desc);
-    else if ("Contains".equals(type)) return buildContainsPolicy(desc);
-    else if ("OneOf".equals(type)) return buildOneOfPolicy(desc);
-    else if ("RegExp".equals(type)) return buildRegExpPolicy(desc);
-    else if ("CustomRule".equals(type)) return buildCustomPolicy(desc);
-    else if ("Script".equals(type)) return buildScriptedPolicy(desc);
+  public ExecutionPolicy buildPolicy(final PolicyDescriptor desc) throws Exception {
+    switch(desc.type) {
+      case "NOT": return buildNotPolicy(desc);
+      case "AND": return buildAndPolicy(desc);
+      case "OR": return buildOrPolicy(desc);
+      case "XOR": return buildXorPolicy(desc);
+      case "LessThan": return buildLessThanPolicy(desc);
+      case "MoreThan": return buildMoreThanPolicy(desc);
+      case "AtMost": return buildAtMostPolicy(desc);
+      case "AtLeast": return buildAtLeastPolicy(desc);
+      case "BetweenII": return buildBetweenIIPolicy(desc);
+      case "BetweenIE": return buildBetweenIEPolicy(desc);
+      case "BetweenEI": return buildBetweenEIPolicy(desc);
+      case "BetweenEE": return buildBetweenEEPolicy(desc);
+      case "Equal": return buildEqualPolicy(desc);
+      case "Contains": return buildContainsPolicy(desc);
+      case "OneOf": return buildOneOfPolicy(desc);
+      case "RegExp": return buildRegExpPolicy(desc);
+      case "CustomRule": return buildCustomPolicy(desc);
+      case "Script": return buildScriptedPolicy(desc);
+      case "Preference": return buildPreferencePolicy(desc);
+    }
     return null;
   }
 
@@ -61,8 +61,7 @@ public class PolicyBuilder
    * @return an <code>ExecutionPolicy</code> instance.
    * @throws Exception if an error occurs while generating the policy object.
    */
-  private ExecutionPolicy buildNotPolicy(final PolicyDescriptor desc) throws Exception
-  {
+  private ExecutionPolicy buildNotPolicy(final PolicyDescriptor desc) throws Exception {
     return new ExecutionPolicy.NotRule(buildPolicy(desc.children.get(0)));
   }
 
@@ -72,8 +71,7 @@ public class PolicyBuilder
    * @return an <code>ExecutionPolicy</code> instance.
    * @throws Exception if an error occurs while generating the policy object.
    */
-  private ExecutionPolicy buildAndPolicy(final PolicyDescriptor desc) throws Exception
-  {
+  private ExecutionPolicy buildAndPolicy(final PolicyDescriptor desc) throws Exception {
     ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
     int count = 0;
     for (PolicyDescriptor child: desc.children) rules[count++] = buildPolicy(child);
@@ -86,8 +84,7 @@ public class PolicyBuilder
    * @return an <code>ExecutionPolicy</code> instance.
    * @throws Exception if an error occurs while generating the policy object.
    */
-  private ExecutionPolicy buildOrPolicy(final PolicyDescriptor desc) throws Exception
-  {
+  private ExecutionPolicy buildOrPolicy(final PolicyDescriptor desc) throws Exception {
     ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
     int count = 0;
     for (PolicyDescriptor child: desc.children) rules[count++] = buildPolicy(child);
@@ -100,8 +97,7 @@ public class PolicyBuilder
    * @return an <code>ExecutionPolicy</code> instance.
    * @throws Exception if an error occurs while generating the policy object.
    */
-  private ExecutionPolicy buildXorPolicy(final PolicyDescriptor desc) throws Exception
-  {
+  private ExecutionPolicy buildXorPolicy(final PolicyDescriptor desc) throws Exception {
     ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
     int count = 0;
     for (PolicyDescriptor child: desc.children) rules[count++] = buildPolicy(child);
@@ -113,16 +109,12 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildLessThanPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildLessThanPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value = 0.0d;
-    try
-    {
+    try {
       value = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new LessThan(desc.operands.get(0), value);
@@ -137,12 +129,9 @@ public class PolicyBuilder
   {
     String s = desc.operands.get(1);
     double value = 0.0d;
-    try
-    {
+    try {
       value = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new AtMost(desc.operands.get(0), value);
@@ -153,16 +142,12 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildMoreThanPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildMoreThanPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value = 0.0d;
-    try
-    {
+    try {
       value = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new MoreThan(desc.operands.get(0), value);
@@ -177,12 +162,9 @@ public class PolicyBuilder
   {
     String s = desc.operands.get(1);
     double value = 0.0d;
-    try
-    {
+    try {
       value = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new AtLeast(desc.operands.get(0), value);
@@ -193,19 +175,15 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildBetweenIIPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildBetweenIIPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value1 = 0.0d;
     double value2 = 0.0d;
-    try
-    {
+    try {
       value1 = Double.valueOf(s);
       s = desc.operands.get(2);
       value2 = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new BetweenII(desc.operands.get(0), value1, value2);
@@ -216,19 +194,15 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildBetweenIEPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildBetweenIEPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value1 = 0.0d;
     double value2 = 0.0d;
-    try
-    {
+    try {
       value1 = Double.valueOf(s);
       s = desc.operands.get(2);
       value2 = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new BetweenIE(desc.operands.get(0), value1, value2);
@@ -239,19 +213,15 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildBetweenEIPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildBetweenEIPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value1 = 0.0d;
     double value2 = 0.0d;
-    try
-    {
+    try {
       value1 = Double.valueOf(s);
       s = desc.operands.get(2);
       value2 = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new BetweenEI(desc.operands.get(0), value1, value2);
@@ -262,19 +232,15 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildBetweenEEPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildBetweenEEPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value1 = 0.0d;
     double value2 = 0.0d;
-    try
-    {
+    try {
       value1 = Double.valueOf(s);
       s = desc.operands.get(2);
       value2 = Double.valueOf(s);
-    }
-    catch(NumberFormatException e)
-    {
+    } catch(NumberFormatException e) {
       throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
     }
     return new BetweenEE(desc.operands.get(0), value1, value2);
@@ -285,25 +251,19 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildEqualPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildEqualPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
-    if ("string".equals(desc.valueType))
-    {
+    if ("string".equals(desc.valueType)) {
       boolean ignoreCase = (desc.ignoreCase == null) ? false : Boolean.valueOf(desc.ignoreCase);
       return new Equal(desc.operands.get(0), ignoreCase, s);
     }
-    if ("numeric".equals(desc.valueType))
-    {
+    if ("numeric".equals(desc.valueType)) {
       double value = 0.0d;
-      try
-      {
+      try {
         value = Double.valueOf(s);
         return new Equal(desc.operands.get(0), value);
-      }
-      catch(NumberFormatException e)
-      {
-        throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
+      } catch(NumberFormatException e) {
+        throw new IllegalArgumentException('\'' + s + "' is not a double value", e);
       }
     }
     return new Equal(desc.operands.get(0), Boolean.valueOf(s));
@@ -314,8 +274,7 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildContainsPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildContainsPolicy(final PolicyDescriptor desc) {
     boolean ignoreCase = (desc.ignoreCase == null) ? false : Boolean.valueOf(desc.ignoreCase);
     return new Contains(desc.operands.get(0), ignoreCase, desc.operands.get(1));
   }
@@ -325,20 +284,14 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildOneOfPolicy(final PolicyDescriptor desc)
-  {
-    if ("numeric".equals(desc.valueType))
-    {
+  private ExecutionPolicy buildOneOfPolicy(final PolicyDescriptor desc) {
+    if ("numeric".equals(desc.valueType)) {
       double[] values = new double[desc.operands.size() - 1];
-      for (int i=1; i<desc.operands.size(); i++)
-      {
+      for (int i=1; i<desc.operands.size(); i++) {
         String s = desc.operands.get(i);
-        try
-        {
+        try {
           values[i-1] = Double.valueOf(s);
-        }
-        catch(NumberFormatException e)
-        {
+        } catch(NumberFormatException e) {
           throw new IllegalArgumentException('\'' +s+"' is not a double value", e);
         }
       }
@@ -355,8 +308,7 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private static ExecutionPolicy buildRegExpPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildRegExpPolicy(final PolicyDescriptor desc) {
     return new RegExp(desc.operands.get(0), desc.operands.get(1));
   }
 
@@ -366,8 +318,7 @@ public class PolicyBuilder
    * @return an <code>ExecutionPolicy</code> instance.
    * @throws Exception if an error occurs while generating the custom policy object.
    */
-  private static ExecutionPolicy buildCustomPolicy(final PolicyDescriptor desc) throws Exception
-  {
+  private ExecutionPolicy buildCustomPolicy(final PolicyDescriptor desc) throws Exception {
     Class clazz = Class.forName(desc.className);
     CustomPolicy policy = (CustomPolicy) clazz.newInstance();
     policy.setArgs(desc.arguments.toArray(new String[desc.arguments.size()]));
@@ -380,8 +331,20 @@ public class PolicyBuilder
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private static ExecutionPolicy buildScriptedPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildScriptedPolicy(final PolicyDescriptor desc)  {
     return new ScriptedPolicy(desc.language, desc.script);
+  }
+
+  /**
+   * Build an AND policy from a descriptor.
+   * @param desc the descriptor to use.
+   * @return an <code>ExecutionPolicy</code> instance.
+   * @throws Exception if an error occurs while generating the policy object.
+   */
+  private ExecutionPolicy buildPreferencePolicy(final PolicyDescriptor desc) throws Exception {
+    ExecutionPolicy[] rules = new ExecutionPolicy[desc.children.size()];
+    int count = 0;
+    for (PolicyDescriptor child: desc.children) rules[count++] = buildPolicy(child);
+    return new Preference(rules);
   }
 }

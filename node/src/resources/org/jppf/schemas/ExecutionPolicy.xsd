@@ -46,12 +46,20 @@
       <element name="RegExp" type="jppf:RegExpType"/>
       <element name="CustomRule" type="jppf:CustomRuleType"/>
       <element name="Script" type="jppf:ScriptedRuleType"/>
+      <element name="Preference" type="jppf:OneOrMoreRulesType"/>
     </choice>
   </group>
 
   <!-- unary predicates : NOT -->
   <complexType name="OneRuleType">
     <sequence>
+      <group ref="jppf:Rule"/>
+    </sequence>
+  </complexType>
+
+  <!-- n-ary predicates : Preference -->
+  <complexType name="OneOrMoreRulesType">
+    <sequence minOccurs="1" maxOccurs="unbounded">
       <group ref="jppf:Rule"/>
     </sequence>
   </complexType>
