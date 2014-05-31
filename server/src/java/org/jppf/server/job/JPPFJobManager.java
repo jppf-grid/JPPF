@@ -67,7 +67,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
   /**
-   * Caches the uuids of jobs that were queue so they can be counted properly.
+   * Caches the uuids of jobs that were queued so they can be counted properly.
    */
   private final Map<String, Boolean> jobUuids = new SoftReferenceValuesMap<>();
 
