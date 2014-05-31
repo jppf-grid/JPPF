@@ -110,6 +110,10 @@ public enum  BundleParameter
    */
   TASK_POSITIONS,
   /**
+   * An array of ints holding the max number of resubmits for the tasks to send.
+   */
+  TASK_MAX_RESUBMITS,
+  /**
    * An array of ints that holds the positions of the tasks that are marked as having to be resubmitted.
    */
   RESUBMIT_TASK_POSITIONS,
