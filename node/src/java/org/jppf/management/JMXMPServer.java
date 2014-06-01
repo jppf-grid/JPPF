@@ -18,7 +18,6 @@
 
 package org.jppf.management;
 
-import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.util.*;
 
@@ -27,6 +26,7 @@ import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -43,6 +43,10 @@ public class JMXMPServer extends AbstractJMXServer {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * An ordered set of configuration properties to use for looking up the desired management port.
+   */
+  private final String[] portProperties;
 
   /**
    * Initialize this JMX server.
@@ -55,10 +59,13 @@ public class JMXMPServer extends AbstractJMXServer {
    * Initialize this JMX server with the specified uuid.
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
+   * @param portProperties an ordered set of configuration properties to use for looking up the desired management port.
    */
-  public JMXMPServer(final String id, final boolean ssl) {
+  public JMXMPServer(final String id, final boolean ssl, final String...portProperties) {
     this.id = id;
     this.ssl = ssl;
+    if ((portProperties == null) || (portProperties.length <= 0)) this.portProperties = new String[] { ssl ? "jppf.management.ssl.port" : "jppf.management.port" };
+    else this.portProperties = portProperties;
   }
 
   @Override
@@ -68,18 +75,16 @@ public class JMXMPServer extends AbstractJMXServer {
     lock.lock();
     try {
       Thread.currentThread().setContextClassLoader(cl);
-      server = ManagementFactory.getPlatformMBeanServer();
-      TypedProperties props = JPPFConfiguration.getProperties();
+      TypedProperties config = JPPFConfiguration.getProperties();
       managementHost = NetworkUtils.getManagementHost();
-      if (!ssl) managementPort = props.getInt("jppf.management.port", 11198);
-      else managementPort = props.getInt("jppf.management.ssl.port", 11193);
+      managementPort = new ConfigurationHelper(config).getInt(ssl ? 11193 : 11198, 1024, 65535, portProperties);
+      if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperties));
       Map<String, Object> env = new HashMap<>();
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       env.put("jmx.remote.x.server.max.threads", 1);
       env.put("jmx.remote.x.client.connection.check.period", 0);
-      // remove the "JMX server connection timeout Thread-*" threads
-      // see bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
+      // remove the "JMX server connection timeout Thread-*" threads. See bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
       env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
       if (ssl) SSLHelper.configureJMXProperties(env);
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
@@ -102,8 +107,6 @@ public class JMXMPServer extends AbstractJMXServer {
           else throw e;
         }
       }
-      //props.setProperty("jppf.management.port", Integer.toString(port));
-      //if (debugEnabled) log.debug("starting connector server with port = " + port);
       stopped = false;
       if (debugEnabled) log.debug("JMXConnectorServer started at URL " + url);
     } finally {

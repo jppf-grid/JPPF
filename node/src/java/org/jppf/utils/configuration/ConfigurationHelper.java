@@ -98,6 +98,26 @@ public class ConfigurationHelper {
   }
 
   /**
+   * Get the integer value of one the specified configuration properties ordered by preference.
+   * @param def the default value to use.
+   * @param min the minimum acceptable value.
+   * @param max the maximum acceptable value.
+   * @param names an ordered set of configuration properties to use for looking up the value.
+   * @return the value of the property as an int.
+   */
+  public int getInt(final int def, final int min, final int max, final String...names) {
+    if ((names == null) || (names.length <= 0)) return def;
+    int val = def;
+    for (String key: names) {
+      if ((key == null) || !config.containsKey(key)) continue;
+      val = config.getInt(key, def);
+      break;
+    }
+    if ((val < min) || (val > max)) val = def;
+    return val;
+  }
+
+  /**
    * Get the long value of the specified configuration property.<br>
    * If the property is not defined or the value is not in the range <code>[min, max]</code>, the default value is returned.
    * @param name the name of the property to retrieve.
