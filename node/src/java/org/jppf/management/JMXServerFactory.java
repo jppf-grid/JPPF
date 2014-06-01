@@ -40,12 +40,13 @@ public class JMXServerFactory
    * Create a JMXServer instance based on the specified parameters.
    * @param uuid the server's unique identifier.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
+   * @param portProperties an ordered set of configuration properties to use for looking up the desired management port.
    * @return an instance of {@link JMXServer}.
    * @throws Exception if the server could not be created.
    */
-  public static JMXServer createServer(final String uuid, final boolean ssl) throws Exception
+  public static JMXServer createServer(final String uuid, final boolean ssl, final String...portProperties) throws Exception
   {
-    JMXServer server = new JMXMPServer(uuid, ssl);
+    JMXServer server = new JMXMPServer(uuid, ssl, portProperties);
     if (debugEnabled) log.debug("created JMX server: " + server);
     return server;
   }
