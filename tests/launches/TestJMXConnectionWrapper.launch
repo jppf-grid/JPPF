@@ -26,5 +26,5 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="test.org.jppf.management.TestJMXConnectionWrapper"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="tests"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djppf.config=test/classes/config/client.properties -Dlog4j.configuration=test/classes/config/log4j-client.properties -Xmx64m -Djava.util.logging.config.file=test/classes/config/logging-client.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource -Dlog4j.configuration=test/classes/config/log4j-client.properties -Xmx64m -Djava.util.logging.config.file=test/classes/config/logging-client.properties"/>
 </launchConfiguration>
