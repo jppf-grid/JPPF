@@ -52,7 +52,7 @@ public class TestJPPFClient extends Setup1D1N
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testDefaultConstructor() throws Exception
   {
     JPPFClient client = new JPPFClient();
@@ -70,7 +70,7 @@ public class TestJPPFClient extends Setup1D1N
    * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testConstructorWithUuid() throws Exception
   {
     JPPFClient client = new JPPFClient("some_uuid");
@@ -88,7 +88,7 @@ public class TestJPPFClient extends Setup1D1N
    * Test the submission of a job.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testSubmit() throws Exception
   {
     JPPFClient client = BaseSetup.createClient(null);
@@ -120,7 +120,7 @@ public class TestJPPFClient extends Setup1D1N
    * Test the cancellation of a job.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testCancelJob() throws Exception
   {
     JPPFClient client = BaseSetup.createClient(null);
@@ -155,7 +155,7 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539111&group_id=135654&atid=733518">3539111 - Local execution does not use configured number of threads</a>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testLocalExecutionNbThreads() throws Exception
   {
     int nbThreads = 2;
@@ -206,7 +206,7 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-174">JPPF-174 Thread context class loader is null for client-local execution</a>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testLocalExecutionContextClassLoader() throws Exception
   {
     TypedProperties config = JPPFConfiguration.getProperties();
@@ -236,7 +236,7 @@ public class TestJPPFClient extends Setup1D1N
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution</a>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testRemoteExecutionContextClassLoader() throws Exception
   {
     TypedProperties config = JPPFConfiguration.getProperties();
@@ -290,7 +290,7 @@ public class TestJPPFClient extends Setup1D1N
    * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception
   {
     JPPFClient client = new JPPFClient();
@@ -317,7 +317,7 @@ public class TestJPPFClient extends Setup1D1N
    * This relates to the bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-131">JPPF-131 JPPF client does not release JMX thread upon connection failure</a>
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=15000)
+  @Test(timeout=15000)
   public void testNoJMXConnectionThreadsLeak() throws Exception
   {
     String name = Thread.currentThread().getName();
@@ -339,7 +339,7 @@ public class TestJPPFClient extends Setup1D1N
       waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
       restartDriver(client, poolSize, 1000L * maxReconnect + 1500L);
       String[] threads = threadNames("^" + JMXConnectionWrapper.CONNECTION_NAME_PREFIX + ".*");
-      assertEquals(poolSize, threads.length);
+      assertEquals(0, threads.length);
     } catch(Exception e) {
       e.printStackTrace();
       throw e;
@@ -360,13 +360,9 @@ public class TestJPPFClient extends Setup1D1N
    */
   private void restartDriver(final MyClient client, final int poolSize, final long restartDelay) throws Exception {
     JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-    log.info("***** before server restart, delay=" + restartDelay);
     jmx.restartShutdown(100L, restartDelay);
-    log.info("***** server restart requested");
     waitForNbConnections(client, 0, JPPFClientConnectionStatus.ACTIVE);
-    log.info("***** after waitForNbConnections(client, 0, ACTIVE)");
     waitForNbConnections(client, 0, null);
-    log.info("***** after waitForNbConnections(client, 0, null)");
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -374,9 +370,7 @@ public class TestJPPFClient extends Setup1D1N
       }
     };
     new Thread(r, "InitPools").start();
-    log.info("***** before waitForNbConnections(client, poolSize, ACTIVE)");
     waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
-    log.info("***** after waitForNbConnections(client, poolSize, ACTIVE)");
   }
 
   /**

@@ -18,6 +18,7 @@
 
 package org.jppf.management;
 
+import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.util.*;
 
@@ -75,6 +76,7 @@ public class JMXMPServer extends AbstractJMXServer {
     lock.lock();
     try {
       Thread.currentThread().setContextClassLoader(cl);
+      server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties config = JPPFConfiguration.getProperties();
       managementHost = NetworkUtils.getManagementHost();
       managementPort = new ConfigurationHelper(config).getInt(ssl ? 11193 : 11198, 1024, 65535, portProperties);
