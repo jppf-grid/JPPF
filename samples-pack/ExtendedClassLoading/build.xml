@@ -1,0 +1,197 @@
+<!--
+	JPPF
+	Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name='Extended Class Loading' basedir="." default="build">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="shared"            value="${basedir}/../shared"/>
+	<property name="shared.lib"        value="${shared}/lib"/>
+	<property name="shared.img"        value="${shared}/images"/>
+	<property name="config.dir"        value="${basedir}/config"/>
+	<property name="classes.dir"       value="${basedir}/classes"/>
+	<property name="classes2.dir"      value="${basedir}/classes2"/>
+	<property name="src.dir"           value="${basedir}/src"/>
+	<property name="src2.dir"          value="${basedir}/src2"/>
+	<property name="dynamic.lib.dir"   value="${basedir}/dynamicLibs"/>
+	<property name="javadoc"           value="${basedir}/javadoc"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${classes2.dir}"/>
+		<pathelement location="${config.dir}"/>
+		<fileset dir="${shared.lib}" includes="**/*.jar"/>
+	</path>
+
+	<path id="run.classpath">
+		<pathelement location="${config.dir}"/>
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${dynamic.lib.dir}"/>
+		<fileset dir="${shared.lib}" includes="**/*.jar"/>
+	</path>
+
+  <path id="javadoc.classpath">
+		<pathelement location="${shared.img}"/>
+    <path refid="project.classpath"/>	
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                                    Clean                                  -->
+	<!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete quiet="true">
+  		<fileset dir="${classes.dir}" includes="**/*.*"/>
+  	</delete>
+    <delete quiet="true">
+  		<fileset dir="${classes2.dir}" includes="**/*.*"/>
+  	</delete>
+    <delete quiet="true">
+  		<fileset dir="${dynamic.lib.dir}">
+				<include name="ClientLib1.jar"/>
+				<include name="ClientLib2.jar"/>
+			</fileset>
+  	</delete>
+  </target>               
+
+	<!-- ========================================================================= -->
+	<!--                                    Init                                   -->
+	<!-- ========================================================================= -->
+
+	<target name="init" description="Initialize ressources">
+	</target>
+
+
+	<!-- ========================================================================= -->
+	<!--                                  Build                                    -->
+	<!-- ========================================================================= -->
+
+	<target name="build" depends="jar"/>
+
+	<!-- ========================================================================= -->
+	<!--                                  Compile                                  -->
+	<!-- ========================================================================= -->
+
+	<target name="compile" depends="clean, init, compile.2, compile.1"/>
+
+	<target name="compile.2">
+		<javac srcdir="" destdir="${classes2.dir}" source="1.7" target="1.7"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${src2.dir}"/>
+		</javac>
+  </target>
+
+	<target name="compile.1">
+		<javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7"
+			debug="on" deprecation="off" optimize="on" includes="**/*.java">
+	    <classpath refid="project.classpath"/>
+	    <compilerarg line="-Xlint:unchecked"/>
+			<src path="${src.dir}"/>
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}" includes="META-INF/**/*.*"/>
+		</copy>
+  </target>
+
+	<!-- ========================================================================= -->
+	<!--                                  Jar                                      -->
+	<!-- ========================================================================= -->
+
+	<target name="jar" depends="compile, jar.1, jar.2">
+	  <jar jarfile="${basedir}/NodeListener.jar" index="true">
+			<fileset dir="${classes.dir}">
+        <include name="META-INF/services/*.*"/>
+        <include name="**/extendedclassloading/*.*"/>
+        <include name="**/extendedclassloading/node/*.*"/>
+      </fileset>
+	  </jar>
+ 		<echo message="*** The file NodeListener.jar is now ready to be deployed ***"/>
+	</target>
+
+	<target name="jar.1" depends="compile.2">
+    <delete file="${basedir}/dynamicLibs/ClientLib1.jar" quiet="true"/>
+		<jar jarfile="${basedir}/dynamicLibs/ClientLib1.jar" index="true">
+			<fileset dir="${classes2.dir}" includes="**/extendedclassloading/clientlib1/*.*"/>
+	  </jar>
+		<echo message="*** The file dynamicLibs/ClientLib1.jar is now deployed ***"/>
+	</target>
+
+	<target name="jar.2" depends="compile.2">
+    <delete file="${basedir}/dynamicLibs/ClientLib2.jar" quiet="true"/>
+		<jar jarfile="${basedir}/dynamicLibs/ClientLib2.jar" index="true">
+			<fileset dir="${classes2.dir}" includes="**/extendedclassloading/clientlib2/*.*"/>
+	  </jar>
+		<echo message="*** The file dynamicLibs/ClientLib2.jar is now deployed ***"/>
+	</target>
+	
+	<!-- ========================================================================= -->
+	<!--                     Run the sample application                            -->
+	<!-- ========================================================================= -->
+
+	<target name="run">
+		<echo message="Running the Extended Class Loading demo"/>
+		<java fork="yes" classname="org.jppf.example.extendedclassloading.client.MyRunner" classpathref="run.classpath">
+			<jvmarg value="-Djppf.config=jppf.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j.properties"/>
+			<jvmarg value="-Drestart.node=${restart.node}"/>
+		</java>       
+	</target>
+
+	<!-- ========================================================================= -->
+	<!--                        Generate the Javadoc                               -->
+	<!-- ========================================================================= -->
+
+	<target name="javadoc" description="Generate all javadoc">
+    <delete dir="${javadoc}" quiet="true"/>
+    <mkdir dir="${javadoc}"/>
+		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
+			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
+			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
+			<packageset dir="${src.dir}"/>
+      <link href="http://docs.oracle.com/javase/7/docs/api"/>
+      <link href="http://www.jppf.org/api"/>
+			<doctitle><![CDATA[JPPF - Extended Class Loading Sample]]></doctitle>
+			<header>
+				<![CDATA[
+					<table><tr><td valign="center">
+						<a href="http://www.jppf.org" target="_top">
+							<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+						</a>
+					</td></tr></table>
+				]]>
+			</header>
+			<bottom>
+				<![CDATA[
+					<font face="Arial" size=2 color="#6D78B6"><i>Copyright &copy; 2005-2010 JPPF Team.</i></font>
+				]]>
+			</bottom>
+		</javadoc>
+		<copy todir="${javadoc}/resources" overwrite="true">
+			<fileset dir="${shared.img}" includes="inherit.gif"/>
+		</copy>
+	</target>
+
+</project> 

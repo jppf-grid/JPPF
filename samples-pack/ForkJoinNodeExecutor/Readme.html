@@ -1,0 +1,101 @@
+<html>
+
+  <head>
+    <title>JPPF Samples Pack</title>
+    <meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+    <meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+    <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+  </head>
+
+  <body>
+    <div align="center">
+      <div class="gwrapper" align="center">
+
+        <!-- start header -->
+        <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+          <tr style="height: 80px">
+            <td width="20"></td>
+            <td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+            <td valign="center"><h1>Fibonacci Fork/Join sample</h1></td>
+            <td width="20"></td>
+          </tr>
+        </table>
+        <!-- end header -->
+
+        <!-- start content -->
+        <div align="left" style="margin: 10px">
+          <!-- ${SAMPLE_START_CONTENT} -->
+          <h3>What does the sample do?</h3>
+          This demo demonstrates a node add-on which replaces the standard node processing thread pool with a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html">fork/join thread pool</a>.
+          This allows JPPF tasks to locally (in the node) spawn ForkJoinTask (or any of its subclasses) instances and have them processed as expected for a ForkJoinPool.
+          The use of this fork/join executor is illustrated with a Fibonacci computation demo.
+
+          <h3>How do I run it?</h3>
+          Before running this sample application, you must have a JPPF server and at least one node running.<br>
+          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
+          <ol class="samplesList">
+            <li>For a node to use the fork/join executor add-on, you need to add the following property to its configuration file:
+<pre class="samples">jppf.thread.manager.class = org.jppf.server.node.fj.ThreadManagerForkJoin</pre>
+            </li>
+            <li>Once this is done, start the server and the node(s)</li>
+            <li>From a command prompt, type: <b>&quot;run.bat&quot;</b> (on Windows) or <b>&quot;./run.sh&quot;</b> (on Linux/Unix)</li>
+          </ol>
+
+          <h3>How do I use it?</h3>
+          <p>This sample doesn't have a graphical user interface, however you can modify some of the parameters in the JPPF configuration file:
+          <ol class="samplesList">
+            <li>open the file "<b>config/jppf.properties</b>" in a text editor</li>
+            <li>at the top of the file, you will see the following properties:
+<pre class="samples"><font color="green"># number of Fibonacci computation tasks to execute</font>
+fib.fj.nbTasks = 10
+<font color="green"># order of Fibonacci number to compute</font>
+fib.fj.N = 10</pre>
+            </li>
+            <li>"<b>fib.fj.nbTasks</b>" allows you change the number of tasks in the submitted job, and thusto simulate various workloads on the grid and especially on the nodes</li>
+            <li>"<b>fib.fj.N</b>" is the Fibonacci order, the higher it is the larger the number of spawned fork/join tasks will be</li>
+          </ol>
+
+          <h3>How can I build the sample?</h3>
+          To compile the source code, from a command prompt type: <b>&quot;ant compile&quot;</b><br>
+          To generate the Javadoc, from a command prompt type: <b>&quot;ant javadoc&quot;</b>
+
+          <h3>I have additional questions and comments, where can I go?</h3>
+          <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
+          <a href="javadoc/index.html">API documentation</a>.
+          <p>In addition, There are 2 privileged places you can go to:
+          <ul>
+            <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+            <li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
+          </ul>
+          <!-- ${SAMPLE_END_CONTENT} -->
+        </div>
+        <!-- end content -->
+
+        <!-- start footer -->
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+          <tr>
+            <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+            <td align="right">
+              <a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+              <a href="http://sourceforge.net/projects/jppf-project">
+                <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+                  alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+              </a>
+            </td>
+            <td style="width: 10px"></td>
+          </tr>
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+        </table>
+        <div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+        <!-- end footer -->
+
+      </div>
+    </div>
+
+  </body>
+
+</html>
