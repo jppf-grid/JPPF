@@ -122,7 +122,7 @@ public class NodeRunner {
     }
     try {
       ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
-      while (true) {
+      while (!isShuttingDown()) {
         try {
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
@@ -301,10 +301,11 @@ public class NodeRunner {
    * Stop the JMX server.
    */
   private static void stopJmxServer() {
+    //if (!node.isJmxServerActive()) return;
     try {
       final JMXServer jmxServer = node.getJmxServer();
       if (jmxServer != null) {
-        jmxServer.stop();
+        //jmxServer.stop();
         Runnable r = new Runnable() {
           @Override
           public void run() {
