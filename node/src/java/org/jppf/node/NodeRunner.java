@@ -122,7 +122,7 @@ public class NodeRunner {
     }
     try {
       ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
-      while (true) {
+      while (!isShuttingDown()) {
         try {
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
