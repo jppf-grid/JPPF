@@ -37,7 +37,8 @@ public class PolicyParser {
    * List of possible rule names.
    */
   private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
-      "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference");
+      "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference",
+      "IsinIPv4Subnet", "IsinIPv6Subnet");
   /**
    * The DOM parser used to build the descriptor tree.
    */
@@ -114,7 +115,7 @@ public class PolicyParser {
         String name = childNode.getNodeName();
         /*if ("Script".equals(name)) desc.script = getTextNodeValue(childNode);
         else*/ if (RULE_NAMES.contains(name)) desc.children.add(generateTree(childNode));
-        else if ("Property".equals(name) || "Value".equals(name)) desc.operands.add(getTextNodeValue(childNode));
+        else if ("Property".equals(name) || "Value".equals(name) || "Subnet".equals(name)) desc.operands.add(getTextNodeValue(childNode));
         else if ("Arg".equals(name)) desc.arguments.add(getTextNodeValue(childNode));
       }
     }

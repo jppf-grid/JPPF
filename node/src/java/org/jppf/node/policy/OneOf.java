@@ -112,26 +112,20 @@ public class OneOf extends ExecutionPolicy
    * @return an XML string representation of this object
    */
   @Override
-  public String toString()
-  {
-    if (computedToString == null)
-    {
-      synchronized(ExecutionPolicy.class)
-      {
+  public String toString() {
+    if (computedToString == null) {
+      synchronized(ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<OneOf valueType=\"");
         if (stringValues != null) sb.append("string");
         else if (numberValues != null) sb.append("numeric");
         sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
         toStringIndent++;
-        sb.append(indent()).append("<Property>").append(propertyName).append("</Property>\n");
-        if (stringValues != null)
-        {
-          for (String s: stringValues)sb.append(indent()).append("<Value>").append(s).append("</Value>\n");
-        }
-        else
-        {
-          for (double d: numberValues)sb.append(indent()).append("<Value>").append(d).append("</Value>\n");
+        sb.append(indent()).append(xmlElement("<Property>", propertyName)).append('\n');
+        if (stringValues != null) {
+          for (String s: stringValues) sb.append(indent()).append(xmlElement("<Value>", s)).append('\n');
+        } else {
+          for (double d: numberValues) sb.append(indent()).append(xmlElement("<Value>", d)).append('\n');
         }
         toStringIndent--;
         sb.append(indent()).append("</OneOf>\n");

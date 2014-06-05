@@ -47,6 +47,8 @@
       <element name="CustomRule" type="jppf:CustomRuleType"/>
       <element name="Script" type="jppf:ScriptedRuleType"/>
       <element name="Preference" type="jppf:OneOrMoreRulesType"/>
+      <element name="IsInIPv4Subnet" type="jppf:SubnetRuleType"/>
+      <element name="IsInIPv6Subnet" type="jppf:SubnetRuleType"/>
     </choice>
   </group>
 
@@ -145,6 +147,13 @@
       <enumeration value="false"/>
     </restriction>
   </simpleType>
+
+  <!-- Subnet matching execution policy -->
+  <complexType name="SubnetRuleType">
+    <sequence>
+      <element name="Subnet" type="string" minOccurs="1" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
 
   <!-- custom execution policy -->
   <complexType name="CustomRuleType">

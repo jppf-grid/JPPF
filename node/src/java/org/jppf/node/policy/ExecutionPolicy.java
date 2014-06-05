@@ -384,4 +384,50 @@ public abstract class ExecutionPolicy implements Serializable {
   public static ExecutionPolicy Not(final ExecutionPolicy policy) {
     return policy == null ? null : new NotRule(policy);
   }
+
+  /**
+   * Format the specified name as <i>&lt;name&gt;</i>.
+   * @param name the name of the tag.
+   * @return an XML start tag built from the name.
+   * @exclude
+   */
+  protected String tagStart(final String name) {
+    return new StringBuilder().append('<').append(name).append('>').toString();
+  }
+
+  /**
+   * Format the specified name as <i>&lt;/name&gt;</i>.
+   * @param name the name of the tag.
+   * @return an XML end tag built from the name.
+   * @exclude
+   */
+  protected String tagEnd(final String name) {
+    return new StringBuilder().append('<').append(name).append('>').toString();
+  }
+
+  /**
+   * Format an XML element as <i>&lt;tag;&gt;value&lt/tag&gt;</i>.
+   * @param tag the name of the XML tag.
+   * @param value the string value of the XML element.
+   * @return an XML element built from the tag name and value.
+   * @exclude
+   */
+  protected String xmlElement(final String tag, final String value) {
+    StringBuilder sb = new StringBuilder();
+    sb.append('<').append(tag).append('>');
+    sb.append(value);
+    sb.append("</").append(tag).append('>');
+    return sb.toString();
+  }
+
+  /**
+   * Format an XML element as <i>&lt;tag;&gt;value&lt/tag&gt;</i>.
+   * @param tag the name of the XML tag.
+   * @param value the value of the XML element as a double.
+   * @return an XML element built from the tag name and value.
+   * @exclude
+   */
+  protected String xmlElement(final String tag, final double value) {
+    return xmlElement(tag, Double.toString(value));
+  }
 }

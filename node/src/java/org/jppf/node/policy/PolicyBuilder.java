@@ -51,6 +51,8 @@ public class PolicyBuilder {
       case "CustomRule": return buildCustomPolicy(desc);
       case "Script": return buildScriptedPolicy(desc);
       case "Preference": return buildPreferencePolicy(desc);
+      case "IsInIPv4Subnet":
+      case "IsInIPv6Subnet": return buildIsinIPSubnetPolicy(desc);
     }
     return null;
   }
@@ -346,5 +348,14 @@ public class PolicyBuilder {
     int count = 0;
     for (PolicyDescriptor child: desc.children) rules[count++] = buildPolicy(child);
     return new Preference(rules);
+  }
+
+  /**
+   * Build a OneOf policy from a descriptor.
+   * @param desc the descriptor to use.
+   * @return an <code>ExecutionPolicy</code> instance.
+   */
+  private ExecutionPolicy buildIsinIPSubnetPolicy(final PolicyDescriptor desc) {
+    return "IsInIPv4Subnet".equals(desc.type) ? new IsInIPv4Subnet(desc.operands) : new IsInIPv6Subnet(desc.operands);
   }
 }
