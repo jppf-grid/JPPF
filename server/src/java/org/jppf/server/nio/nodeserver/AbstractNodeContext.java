@@ -182,7 +182,23 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if (tmpBundle != null) server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
       cleanup(channel);
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
-        tmpBundle.resubmit();
+        boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
+        if (!applyMaxResubmit) {
+          tmpBundle.resubmit();
+        } else {
+          int count = 0;
+          List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
+          for (ServerTask task: tmpBundle.getTaskList()) {
+            results.add(task.getDataLocation());
+            int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
+            if (task.incResubmitCount() <= max) {
+              task.resubmit();
+              count++;
+            }
+          }
+          if (count > 0) updateStatsUponTaskResubmit(count);
+          tmpBundle.resultsReceived(results);
+        }
         tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
         updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
       }
