@@ -20,8 +20,9 @@ package org.jppf.node.policy;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.net.IPv6AddressNetmask;
-import org.jppf.utils.PropertiesCollection;
+import org.jppf.net.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * An execution policy rule that encapsulates a test of type <i>IPv6 is in Subnet string</i>.
@@ -45,6 +46,14 @@ public class IsInIPv6Subnet extends ExecutionPolicy {
    */
   private static final long serialVersionUID = 1L;
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IsInIPv6Subnet.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Name of the tag used in the XML representation of this policy.
    */
   private static final String TAG = IsInIPv6Subnet.class.getSimpleName();
@@ -56,10 +65,14 @@ public class IsInIPv6Subnet extends ExecutionPolicy {
    * String value(s) to test for subnet membership
    */
   private String[] subnets = null;
+  /**
+   * Cached list of netmasks, lazily computed.
+   */
+  private transient List<IPv6AddressNetmask> netmasks;
 
   /**
    * Define a membership test using ipv6.addresses property to determine if a
-   * node is in one of the specified subnets.
+   * node or driver is in one of the specified subnets.
    *
    * @param subnets
    *        One or more strings representing either a valid IPv6 subnet in CIDR
@@ -96,31 +109,30 @@ public class IsInIPv6Subnet extends ExecutionPolicy {
   @Override
   public boolean accepts(final PropertiesCollection info) {
     // Build list of subnet netmasks
-    List<IPv6AddressNetmask> netmasks = new ArrayList<>(subnets.length);
-    for (String subnet : subnets) {
-      netmasks.add(new IPv6AddressNetmask(subnet));
+    synchronized(this) {
+      if (netmasks == null) {
+        netmasks = new ArrayList<>(subnets.length);
+        for (String subnet : subnets) {
+          netmasks.add(new IPv6AddressNetmask(subnet));
+        }
+      }
     }
     // Get IP strings from properties
     // Returns as "localhost|::1 foo.com|1080::8:800:200C:417A"
     String ipv6 = getProperty(info, "ipv6.addresses");
 
-    // Combine ipv4 and ipv6 strings and test
     // Iterate and check if any are in subnet
-    for (String ip : ipv6.split("\\s+")) {
-      // For each Host|IP pair, split off the IP
-      ip = ip.substring(ip.lastIndexOf("|") + 1);
-      // Some ipv6 addresses include scope field starting with %
-      if (ip.indexOf("%") >= 0) {
-        ip = ip.substring(0, ip.indexOf("%"));
-      }
+    for (HostIP hip: NetworkUtils.parseAddresses(ipv6)) {
       // Check IP against each subnet
       for (IPv6AddressNetmask netmask : netmasks) {
         try {
-          if (netmask.matches(InetAddress.getByName(ip))) {
+          if (netmask.matches(InetAddress.getByName(hip.ipAddress()))) {
             return true;
           }
         } catch (UnknownHostException e) {
-          e.printStackTrace();
+          String message = "Unknown host '{}' : {}";
+          if (traceEnabled) log.trace(message, hip.ipAddress(), ExceptionUtils.getStackTrace(e));
+          else log.warn(message, hip.ipAddress(), ExceptionUtils.getMessage(e));
         }
       }
     }

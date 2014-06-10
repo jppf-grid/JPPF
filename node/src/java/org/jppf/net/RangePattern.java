@@ -18,12 +18,11 @@
 
 package org.jppf.net;
 
-import static org.jppf.net.PatternConfiguration.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 
-import org.jppf.utils.Range;
+import org.jppf.utils.*;
 
 /**
  * Represents a pattern used for IP addresses inclusion or exclusion lists.<br/>
@@ -62,7 +61,7 @@ public class RangePattern
   {
     if (source == null) throw new IllegalArgumentException("pattern cannot be null");
     String src = preProcess(source);
-    src = SPACES_PATTERN.matcher(src).replaceAll("");
+    src = RegexUtils.SPACES_PATTERN.matcher(src).replaceAll("");
     src = postProcess(src);
     String[] rangeArray = config.compSeparatorPattern.split(src);
     if ((rangeArray == null) || (rangeArray.length == 0)) throw new IllegalArgumentException("invalid empty pattern");
@@ -131,7 +130,7 @@ public class RangePattern
   {
     if ((src == null) || "".equals(src)) return config.fullRange;
     if (src.indexOf('-') < 0) return new Range<>(parseValue(src));
-    String[] vals = MINUS_PATTERN.split(src);
+    String[] vals = RegexUtils.MINUS_PATTERN.split(src);
     if ((vals == null) || vals.length == 0) return config.fullRange;
     if (vals.length > 2) throw new IllegalArgumentException(build("invalid range pattern (pattern: ", src, ")"));
     int lower = 0;

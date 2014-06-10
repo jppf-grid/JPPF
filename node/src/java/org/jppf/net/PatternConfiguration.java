@@ -29,21 +29,13 @@ import org.jppf.utils.Range;
 public final class PatternConfiguration
 {
   /**
-   * Configuration for IPv6 address patterns.
+   * Configuration for IPv4 address patterns.
    */
   public static final PatternConfiguration IPV4_CONFIGURATION = new PatternConfiguration(4, 0, 255, '.', "");
   /**
    * Configuration for IPv6 address patterns.
    */
   public static final PatternConfiguration IPV6_CONFIGURATION = new PatternConfiguration(8, 0, 0xffff, ':', "0x");
-  /**
-   * Regex pattern that matches any sequence of one or more spaces.
-   */
-  static final Pattern SPACES_PATTERN = Pattern.compile("\\s+");
-  /**
-   * Regex pattern that matches any one minus sign.
-   */
-  static final Pattern MINUS_PATTERN = Pattern.compile("-");
   /**
    * The separator for the components of an address.
    */

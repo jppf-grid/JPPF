@@ -20,8 +20,9 @@ package org.jppf.node.policy;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.net.IPv4AddressNetmask;
+import org.jppf.net.*;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * An execution policy rule that encapsulates a test of type <i>IPv4 is in
@@ -45,6 +46,14 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
    */
   private static final long serialVersionUID = 1L;
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(IsInIPv6Subnet.class);
+  /**
+   * Determines whether the trace level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Name of the tag used in the XML representation of this policy.
    */
   private static final String TAG = IsInIPv4Subnet.class.getSimpleName();
@@ -56,10 +65,14 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
    * String value(s) to test for subnet membership
    */
   private final String[] subnets;
+  /**
+   * Cached list of netmasks, lazily computed.
+   */
+  private transient List<IPv4AddressNetmask> netmasks;
 
   /**
    * Define a membership test using ipv4.addresses property to determine if a
-   * node is in one of the specified subnets.
+   * node or driver is in one of the specified subnets.
    *
    * @param subnets
    *        One or more strings representing either a valid IPv4 subnet in CIDR
@@ -76,12 +89,12 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
    * node is in one of the specified subnets.
    *
    * @param subnets
-   *        One or more strings representing either a valid IPv6 subnet in CIDR
-   *        notation or IP address range pattern without double colons ("::") as
-   *        defined in {@link org.jppf.net.IPv6AddressPattern IPv6AddressPattern}
+   *        One or more strings representing either a valid IPv4 subnet in CIDR
+   *        notation or IP address range pattern as defined in
+   *        {@link org.jppf.net.IPv4AddressPattern IPv4AddressPattern}
    */
   public IsInIPv4Subnet(final Collection<String> subnets) {
-    if ((subnets == null) || (subnets.size() <= 0)) throw new IllegalArgumentException("at least one IPv6 subnet must be specified");
+    if ((subnets == null) || (subnets.size() <= 0)) throw new IllegalArgumentException("at least one IPv4 subnet must be specified");
     this.subnets = subnets.toArray(new String[subnets.size()]);
   }
 
@@ -96,25 +109,29 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
   @Override
   public boolean accepts(final PropertiesCollection info) {
     // Build list of subnet netmasks
-    List<IPv4AddressNetmask> netmasks = new ArrayList<>(subnets.length);
-    for (String subnet : subnets) {
-      netmasks.add(new IPv4AddressNetmask(subnet));
+    synchronized(this) {
+      if (netmasks == null) {
+        netmasks = new ArrayList<>(subnets.length);
+        for (String subnet : subnets) {
+          netmasks.add(new IPv4AddressNetmask(subnet));
+        }
+      }
     }
     // Get IP strings from properties
     // Returns as "foo.com|1.2.3.4 bar.org|5.6.7.8"
     String ipv4 = getProperty(info, "ipv4.addresses");
 
-    for (String ip : ipv4.split("\\s+")) {
-      // For each Host|IP pair, split off the IP
-      ip = ip.substring(ip.lastIndexOf("|") + 1);
+    for (HostIP hip: NetworkUtils.parseAddresses(ipv4)) {
       // Check IP against each subnet
       for (IPv4AddressNetmask netmask : netmasks) {
         try {
-          if (netmask.matches(InetAddress.getByName(ip))) {
+          if (netmask.matches(InetAddress.getByName(hip.ipAddress()))) {
             return true;
           }
         } catch (UnknownHostException e) {
-          e.printStackTrace();
+          String message = "Unknown host '{}' : {}";
+          if (traceEnabled) log.trace(message, hip.ipAddress(), ExceptionUtils.getStackTrace(e));
+          else log.warn(message, hip.ipAddress(), ExceptionUtils.getMessage(e));
         }
       }
     }

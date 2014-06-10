@@ -260,9 +260,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    */
   private HostIP[] parseIPV4Addresses()
   {
-    String s = getNetwork().getString("ipv4.addresses");
-    if ((s == null) || "".equals(s.trim())) return null;
-    return parseAddresses(s);
+    return NetworkUtils.parseAddresses(getNetwork().getString("ipv4.addresses"));
   }
 
   /**
@@ -272,62 +270,6 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    */
   private HostIP[] parseIPV6Addresses()
   {
-    String s = getNetwork().getString("ipv6.addresses");
-    if ((s == null) || "".equals(s.trim())) return null;
-    return parseAddresses(s);
-  }
-
-  /**
-   * Parse a list of addresses.
-   * @param addresses a string containing a space-separated list of host_name|ip_address pairs.
-   * @return an array on <code>HostIP</code> instances.
-   */
-  private HostIP[] parseAddresses(final String addresses)
-  {
-    String[] pairs = addresses.split("\\s");
-    if ((pairs == null) || (pairs.length <= 0)) return null;
-    HostIP[] result = new HostIP[pairs.length];
-    int count = 0;
-    for (String pair: pairs)
-    {
-      String[] comps = pair.split("|");
-      if ((comps[0] != null) && "".equals(comps[0].trim())) comps[0] = null;
-      result[count++] = new HostIP(comps[0], comps[1]);
-    }
-    return result;
-  }
-
-  /**
-   * Instances of this class represent a hostname / ip address pair.
-   */
-  public static class HostIP extends Pair<String, String>
-  {
-    /**
-     * Initialize this HostIP object with the specified host name and IP address.
-     * @param first the host name.
-     * @param second the corresponding IP address.
-     */
-    public HostIP(final String first, final String second)
-    {
-      super(first, second);
-    }
-
-    /**
-     * Get the host name.
-     * @return the name as a string.
-     */
-    public String hostName()
-    {
-      return first();
-    }
-
-    /**
-     * Get the ip address.
-     * @return the ip address as a string.
-     */
-    public String ipAddress()
-    {
-      return second();
-    }
+    return NetworkUtils.parseAddresses(getNetwork().getString("ipv6.addresses"));
   }
 }

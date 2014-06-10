@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public final class NetworkUtils
-{
+public final class NetworkUtils {
   /**
    * Logger for this class.
    */
@@ -43,20 +42,22 @@ public final class NetworkUtils
    * These are all the IPs in the 127.0.0.0-8 range.
    */
   private static final Set<String> LOOPBACK_ADDRESSES = createLoopbackAddresses();
+  /**
+   * Constant for empty array of host/ip pairs.
+   */
+  private static final HostIP[] NO_ADDRESS = new HostIP[0];
 
   /**
    * Instantiation opf this class is not permitted.
    */
-  private NetworkUtils()
-  {
+  private NetworkUtils() {
   }
 
   /**
    * Get the non local (meaning neither localhost or loopback) address of the current host.
    * @return the ipv4 address as a string.
    */
-  public static String getNonLocalHostAddress()
-  {
+  public static String getNonLocalHostAddress() {
     List<InetAddress> allAddresses = getNonLocalIPV4Addresses();
     return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
   }
@@ -65,13 +66,10 @@ public final class NetworkUtils
    * Get a list of all known IP v4 addresses for the current host.
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
-  public static List<InetAddress> getIPV4Addresses()
-  {
-    return getIPAddresses(new InetAddressFilter()
-    {
+  public static List<InetAddress> getIPV4Addresses() {
+    return getIPAddresses(new InetAddressFilter() {
       @Override
-      public boolean accepts(final InetAddress addr)
-      {
+      public boolean accepts(final InetAddress addr) {
         return addr instanceof Inet4Address;
       }
     });
@@ -81,13 +79,10 @@ public final class NetworkUtils
    * Get a list of all known non-local IP v4 addresses for the current host.
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
-  public static List<InetAddress> getNonLocalIPV4Addresses()
-  {
-    return getIPAddresses(new InetAddressFilter()
-    {
+  public static List<InetAddress> getNonLocalIPV4Addresses() {
+    return getIPAddresses(new InetAddressFilter() {
       @Override
-      public boolean accepts(final InetAddress addr)
-      {
+      public boolean accepts(final InetAddress addr) {
         return (addr instanceof Inet4Address)
             && !(LOOPBACK_ADDRESSES.contains(addr.getHostAddress()) || "localhost".equals(addr.getHostName()));
       }
@@ -100,11 +95,9 @@ public final class NetworkUtils
    */
   public static List<InetAddress> getIPV6Addresses()
   {
-    return getIPAddresses(new InetAddressFilter()
-    {
+    return getIPAddresses(new InetAddressFilter() {
       @Override
-      public boolean accepts(final InetAddress addr)
-      {
+      public boolean accepts(final InetAddress addr) {
         return addr instanceof Inet6Address;
       }
     });
@@ -114,13 +107,10 @@ public final class NetworkUtils
    * Get a list of all known non-local IP v4 addresses for the current host.
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
-  public static List<InetAddress> getNonLocalIPV6Addresses()
-  {
-    return getIPAddresses(new InetAddressFilter()
-    {
+  public static List<InetAddress> getNonLocalIPV6Addresses() {
+    return getIPAddresses(new InetAddressFilter() {
       @Override
-      public boolean accepts(final InetAddress addr)
-      {
+      public boolean accepts(final InetAddress addr) {
         return (addr instanceof Inet6Address) && 
           !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName()));
       }
@@ -132,26 +122,20 @@ public final class NetworkUtils
    * @param filter filters out unwanted addresses.
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
-  private static List<InetAddress> getIPAddresses(final InetAddressFilter filter)
-  {
+  private static List<InetAddress> getIPAddresses(final InetAddressFilter filter) {
     List<InetAddress> list = new ArrayList<>();
-    try
-    {
+    try {
       Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-      while (interfaces.hasMoreElements())
-      {
+      while (interfaces.hasMoreElements()) {
         NetworkInterface ni = interfaces.nextElement();
         Enumeration<InetAddress> addresses = ni.getInetAddresses();
         if (debugEnabled && addresses.hasMoreElements()) log.debug("found network interface: " + ni);
-        while (addresses.hasMoreElements())
-        {
+        while (addresses.hasMoreElements()) {
           InetAddress addr = addresses.nextElement();
           if ((filter == null) || filter.accepts(addr)) list.add(addr);
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return list;
@@ -161,8 +145,7 @@ public final class NetworkUtils
    * Get a list of all known non-local IP v4  and v6 addresses for the current host.
    * @return a List of <code>InetAddress</code> instances, may be empty but never null.
    */
-  public static List<InetAddress> getNonLocalIPAddresses()
-  {
+  public static List<InetAddress> getNonLocalIPAddresses() {
     List<InetAddress> addresses = new ArrayList<>();
     addresses.addAll(getNonLocalIPV4Addresses());
     addresses.addAll(getNonLocalIPV6Addresses());
@@ -174,8 +157,7 @@ public final class NetworkUtils
    * These are all the IPs in the 127.0.0.0/8 range.
    * @return a set of IP addresses as strings.
    */
-  private static Set<String> createLoopbackAddresses()
-  {
+  private static Set<String> createLoopbackAddresses() {
     Set<String> addresses = new HashSet<>();
     String s = "127.0.0.";
     for (int i=0; i<=8; i++) addresses.add(s + i);
@@ -186,8 +168,7 @@ public final class NetworkUtils
    * Get the management host specified in the configuration file.
    * @return the host as a string.
    */
-  public static String getManagementHost()
-  {
+  public static String getManagementHost() {
     TypedProperties props = JPPFConfiguration.getProperties();
     String host = NetworkUtils.getNonLocalHostAddress();
     if (debugEnabled) log.debug("JMX host from NetworkUtils: "+host);
@@ -202,15 +183,11 @@ public final class NetworkUtils
    * @param ip the ip address to resolve.
    * @return the corresponding host name, or its IP if the name could not be resolved.
    */
-  public static String getHostName(final String ip)
-  {
-    try
-    {
+  public static String getHostName(final String ip) {
+    try {
       InetAddress a = InetAddress.getByName(ip);
       return a.getHostName();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       return ip;
     }
   }
@@ -220,62 +197,23 @@ public final class NetworkUtils
    * @param addr the address for which to get the subnet mask.
    * @return the length (number of bits set to 1) for the corresponding subnet mask.
    */
-  public static int getSubnetMaskLength(final InetAddress addr)
-  {
-    try
-    {
+  public static int getSubnetMaskLength(final InetAddress addr) {
+    try {
       NetworkInterface ni = NetworkInterface.getByInetAddress(addr);
       List<InterfaceAddress> intAddresses = ni.getInterfaceAddresses();
-      for (InterfaceAddress ia: intAddresses)
-      {
+      for (InterfaceAddress ia: intAddresses) {
         if (addr.equals(ia.getAddress())) return ia.getNetworkPrefixLength();
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error("Error getting subnet mask for address "  + addr, e);
     }
     return 0;
   }
 
   /**
-   * Get a {@link SubnetInformation} object for each non local address of the current host.
-   * @return a list of {@link SubnetInformation} instance. This list may be empty, but never null.
-   */
-  public static List<SubnetInformation> getAllNonLocalSubnetInfo()
-  {
-    List<SubnetInformation> result = new ArrayList<>();
-    List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
-    for (InetAddress addr: addresses)
-    {
-      int n = getSubnetMaskLength(addr);
-      result.add(new SubnetInformation(addr, n));
-    }
-    return result;
-  }
-
-  /**
-   * Determine whether the 2 specified IP addresses are on the same subnet.
-   * @param si1 the first IP address to compare.
-   * @param si2 the second IP address to compare.
-   * @return true if the 2 addresses are on the same subnet, false otherwise.
-   */
-  public static boolean isSameSubnet(final SubnetInformation si1, final SubnetInformation si2)
-  {
-    if (!(si1.address() instanceof Inet4Address) || !(si2.address() instanceof Inet4Address)) return false;
-    int[] ip = { si1.rawIPAsInt(), si2.rawIPAsInt() };
-    int[] l = { si1.subnetMaskLength(), si2.subnetMaskLength() };
-    int[] mask = { si1.subnetMask(), si2.subnetMask() };
-    int[] n = new int[2];
-    for (int i=0; i<2; i++) n[i] =  (ip[i] & mask[i]) >> (32-l[i]);
-    return n[0] == n[1];
-  }
-
-  /**
    * Filter interface for the methods discovering available IP addresses.
    */
-  private interface InetAddressFilter
-  {
+  private interface InetAddressFilter {
     /**
      * Determine whether the specified address is accepted.
      * @param addr the address to check.
@@ -285,72 +223,10 @@ public final class NetworkUtils
   }
 
   /**
-   * A pair grouping an {@link InetAddress} and the corresponding subnet mask length.
-   * @exclude
-   */
-  public static class SubnetInformation extends Pair<InetAddress, Integer>
-  {
-    /**
-     * Initialize this pair with the specified InetAddress and subnet mask length.
-     * @param addr the address.
-     * @param subnetMaskLength the subnet mask length.
-     */
-    public SubnetInformation(final InetAddress addr, final Integer subnetMaskLength)
-    {
-      super(addr, subnetMaskLength);
-    }
-
-    /**
-     * Get the internet address.
-     * @return an {@link InetAddress} instance.
-     */
-    public InetAddress address()
-    {
-      return first();
-    }
-
-    /**
-     * Get the subnet mask length.
-     * @return the subnet mask length as an integer.
-     */
-    public Integer subnetMaskLength()
-    {
-      return second();
-    }
-
-    /**
-     * Convert an {@link Inet4Address} to a raw IP value.
-     * @return the IP as a single int value.
-     */
-    public int rawIPAsInt()
-    {
-      byte[] ip = address().getAddress();
-      int result = ip[0] << 24;
-      result &= ip[1] << 16;
-      result &= ip[2] << 8;
-      result &= ip[3];
-      return result;
-    }
-
-    /**
-     * Get the subnet mask for this subnet information.
-     * @return the subnet mask as an int value.
-     */
-    public int subnetMask()
-    {
-      int length = subnetMaskLength();
-      int mask = (length == 0) ? 0 : 1;
-      for (int i=0; i<32; i++) mask = (mask << 1) & ((i < length) ? 1 : 0);
-      return mask;
-    }
-  }
-
-  /**
    * Main entry point.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String...args) {
     System.out.println("This host's ip addresses: " + getNonLocalHostAddress());
   }
 
@@ -359,32 +235,26 @@ public final class NetworkUtils
    * @param addr the source address to convert.
    * @return an array of int values, or null if the source could not be parsed.
    */
-  public static int[] toIntArray(final InetAddress addr)
-  {
+  public static int[] toIntArray(final InetAddress addr) {
     try
     {
       byte[] bytes = addr.getAddress();
       String ip = addr.getHostAddress();
       int[] result = null;
-      if (addr instanceof Inet6Address)
-      {
+      if (addr instanceof Inet6Address) {
         result = new int[8];
         // special processing for scoped IPv6 addresses
         int idx = ip.indexOf('%');
         if (idx >= 0) ip = ip.substring(0, idx);
-        String[] comp = ip.split(":");
+        String[] comp = RegexUtils.COLUMN_PATTERN.split(ip);
         for (int i=0; i<comp.length; i++) result[i] = Integer.decode("0x" + comp[i].toLowerCase());
-      }
-      else
-      {
+      } else {
         result = new int[4];
-        String[] comp = ip.split("\\.");
+        String[] comp = RegexUtils.DOT_PATTERN.split(ip);
         for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
       }
       return result;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
   }
@@ -394,17 +264,35 @@ public final class NetworkUtils
    * @param host the textual representation of the address.
    * @return <code>true</code> if the textual address is an IP address in IPv6 format, <code>false</code> otherwise.
    */
-  public static boolean isIPv6Address(final String host)
-  {
-    try
-    {
+  public static boolean isIPv6Address(final String host) {
+    try {
       InetAddress addr = InetAddress.getByName(host);
       if ((addr instanceof Inet6Address) && addr.getHostAddress().equals(host)) return true;
-    }
-    catch (UnknownHostException e)
-    {
-      //e.printStackTrace();
+    } catch (UnknownHostException ignore) {
     }
     return false;
+  }
+
+  /**
+   * Parse a list of addresses.
+   * @param addresses a string containing a space-separated list of host_name|ip_address pairs.
+   * @return an array on <code>HostIP</code> instances.
+   */
+  public static HostIP[] parseAddresses(final String addresses) {
+    if (addresses == null) return NO_ADDRESS;
+    String[] pairs = RegexUtils.SPACES_PATTERN.split(addresses);
+    if ((pairs == null) || (pairs.length <= 0)) return NO_ADDRESS;
+    HostIP[] result = new HostIP[pairs.length];
+    int count = 0;
+    for (String pair: pairs) {
+      String[] comps = RegexUtils.PIPE_PATTERN.split(pair);
+      if ("".equals(comps[0])) comps[0] = null;
+      if (comps[1] != null) {
+        int idx = comps[1].indexOf('%');
+        if (idx >= 0) comps[1] = comps[1].substring(0, idx);
+      };
+      result[count++] = new HostIP(comps[0], comps[1]);
+    }
+    return result;
   }
 }

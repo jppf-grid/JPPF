@@ -20,6 +20,8 @@ package org.jppf.net;
 
 import java.net.InetAddress;
 
+import org.jppf.utils.RegexUtils;
+
 /**
  * Represents a netmask used for IPv6 addresses inclusion and exclusion lists.<br/>
  * A netmask is in CIDR notation and represents an IPv6 address of which only
@@ -72,9 +74,10 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
     // IPv6AddressPattern except for "::" parsing to follow
     String sourceIP = source;
     int netmask = 128;
-    if (source.indexOf("/") >= 0) {
-      sourceIP = source.split("/")[0];
-      netmask = Integer.parseInt(source.split("/")[1]);
+    if (source.contains("/")) {
+      String[] ipAndNetmask = RegexUtils.SLASH_PATTERN.split(source);
+      sourceIP = ipAndNetmask[0];
+      netmask = Integer.parseInt(ipAndNetmask[1]);
     }
     // Ensure netmask in range
     if (netmask < 0 || netmask > 128) {
@@ -83,18 +86,18 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
     }
     // Handle leading or trailing "::" by appending a 0
     if (sourceIP.startsWith("::")) {
-      sourceIP = ("0").concat(sourceIP);
+      sourceIP = "0".concat(sourceIP);
     }
     if (sourceIP.endsWith("::")) {
       sourceIP = sourceIP.concat("0");
     }
     // Sanity check IP format. Fail if no ":" or more than seven; if invalid
     // ":::" or more than one "::"
-    int parts = sourceIP.split(":").length;
+    int parts = RegexUtils.COLUMN_PATTERN.split(sourceIP).length;
     if (parts < 2 || parts > 8 || sourceIP.contains(":::")
         || sourceIP.split("::").length > 2) {
-      throw new IllegalArgumentException("Invalid IP address pattern: "
-          + sourceIP);
+      //throw new IllegalArgumentException("Invalid IP address pattern: " + sourceIP);
+      return sourceIP;
     }
     // Replace "::" with ":0:0:" as needed to create 8 parts
     if (sourceIP.contains("::")) {
@@ -105,7 +108,7 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
       zeroes.append(":");
       sourceIP = sourceIP.replace("::", zeroes.toString());
     }
-    String[] ip = sourceIP.split(":");
+    String[] ip = RegexUtils.COLUMN_PATTERN.split(sourceIP);
     // This array should have exactly 8 parts if it was a valid IPv6
     if (ip.length != 8) {
       // The only way to be here is if no "::" is included. If netmask is 128,
@@ -115,7 +118,7 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
       }
       // Invalid IP address combined with a netmask
       throw new IllegalArgumentException("Invalid IP address pattern: "
-          + sourceIP);
+          + sourceIP + " (source=" + source + ")");
     }
     // Construct IP range from source. Significant bits left untouched.
     for (int i = 0; i < 8; i++) {
@@ -150,7 +153,7 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
    */
   public static void main(final String[] args) {
     System.out.println("***** IP v6 *****");
-    String[] ipv6patterns = {"1080:0:0:0:8:800:200C:417A", ":0::::::",
+    String[] ipv6patterns = { "1080:0:0:0:8:800:200C:417A", ":0::::::",
         "0:0:aa-bbcc:0:0:0:0:0", "1:2:3:4:5-:6:7:8", "::1", "::", "::1/128",
         "::1/112", "::1/96", "::1/80", "::1/64", "2001:db8::/32",
         "1080::8:800:200C:417A/128", "1080::0:8:800:200C:417A/127",
@@ -158,7 +161,9 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
         "1080::0:0:8:800:200C:417A/124", "1080::0:0:8:800:200C:417A/123",
         "1080::0:0:8:800:200C:417A/97", "1080::0:0:8:800:200C:417A/96",
         "1080::0:0:8:800:200C:417A/95", "1080::0:0:8:800:200C:417A/94",
-        "1080::0:0:8:800:200C:417A/1", "1080::0:0:8:800:200C:417A/2",};
+        "1080::0:0:8:800:200C:417A/1", "1080::0:0:8:800:200C:417A/2"
+    };
+    //String[] ipv6patterns = { "::" };
     String ip = "1080:0:0:0:8:800:200C:417A";
     for (int i = 0; i < ipv6patterns.length; i++) {
       try {
@@ -167,7 +172,7 @@ public class IPv6AddressNetmask extends IPv6AddressPattern {
         System.out.println("pattern " + i + " for source '" + ipv6patterns[i]
             + "' = '" + p + "', ip match = " + p.matches(addr));
       } catch (Exception e) {
-        System.out.println("#" + i + " : " + e.getMessage());
+        System.out.println("#" + i + " pattern='" + ipv6patterns[i] + "' : " + e.getMessage());
       }
     }
   }

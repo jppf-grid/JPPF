@@ -20,6 +20,8 @@ package org.jppf.net;
 
 import java.net.InetAddress;
 
+import org.jppf.utils.RegexUtils;
+
 /**
  * Represents a netmask used for IP addresses include or exclude lists.<br/>
  * A netmask is in CIDR notation and represents an IP address of which only the
@@ -46,7 +48,6 @@ import java.net.InetAddress;
  * @since 4.2
  */
 public class IPv4AddressNetmask extends IPv4AddressPattern {
-
   /**
    * Initialize this object with the specified string pattern.
    * 
@@ -70,17 +71,18 @@ public class IPv4AddressNetmask extends IPv4AddressPattern {
    */
   private static String netmaskToRange(final String source) {
     // If no slash, return string directly to treat as IPv4AddressPattern
-    if (source.indexOf("/") < 0) {
+    if (!source.contains("/")) {
       return source;
     }
+    String[] ipAndNetmask = RegexUtils.SLASH_PATTERN.split(source);
     // Ensure IP address has four parts
-    String[] ip = source.split("/")[0].split("\\.");
+    //String[] ip = ipAndNetmask[0].split("\\.");
+    String[] ip = RegexUtils.DOT_PATTERN.split(ipAndNetmask[0]);
     if (ip.length != 4) {
-      throw new IllegalArgumentException("Invalid IP address pattern: "
-          + source);
+      return source;
     }
     // Ensure netmask in valid range
-    int netmask = Integer.parseInt(source.split("/")[1]);
+    int netmask = Integer.parseInt(ipAndNetmask[1]);
     if (netmask < 0 || netmask > 32) {
       throw new IllegalArgumentException("Netmask " + netmask
           + " must be between 0 and 32");
