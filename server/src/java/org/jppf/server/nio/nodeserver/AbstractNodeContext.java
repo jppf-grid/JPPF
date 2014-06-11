@@ -179,7 +179,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     ServerTaskBundleNode tmpBundle = bundle;
     NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
     try {
-      if (tmpBundle != null) server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+      if (tmpBundle != null) {
+        server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+        tmpBundle.taskCompleted(exception);
+      }
       cleanup(channel);
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
         boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
