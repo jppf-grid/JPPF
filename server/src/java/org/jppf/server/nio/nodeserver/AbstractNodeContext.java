@@ -179,10 +179,29 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     ServerTaskBundleNode tmpBundle = bundle;
     NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
     try {
-      if (tmpBundle != null) server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+      if (tmpBundle != null) {
+        server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+        tmpBundle.taskCompleted(exception);
+      }
       cleanup(channel);
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
-        tmpBundle.resubmit();
+        boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
+        if (!applyMaxResubmit) {
+          tmpBundle.resubmit();
+        } else {
+          int count = 0;
+          List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
+          for (ServerTask task: tmpBundle.getTaskList()) {
+            results.add(task.getInitialTask());
+            int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
+            if (task.incResubmitCount() <= max) {
+              task.resubmit();
+              count++;
+            }
+          }
+          if (count > 0) updateStatsUponTaskResubmit(count);
+          tmpBundle.resultsReceived(results);
+        }
         tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
         updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
       }
