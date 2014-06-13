@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.execute.ExecutorStatus;
-import org.jppf.job.JobListener;
+import org.jppf.job.JobManagerListener;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.JobSLA;
@@ -60,7 +60,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * The list of registered job listeners.
    */
-  private final List<JobListener> jobListeners = new ArrayList<>();
+  private final List<JobManagerListener> jobListeners = new ArrayList<>();
   /**
    * Manages jobs start and expiration scheduling.
    */
@@ -325,7 +325,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public void addJobListener(final JobListener listener) {
+  public void addJobListener(final JobManagerListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
     synchronized (jobListeners) {
       jobListeners.add(listener);
@@ -333,7 +333,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   }
 
   @Override
-  public void removeJobListener(final JobListener listener) {
+  public void removeJobListener(final JobManagerListener listener) {
     if (listener == null) throw new IllegalArgumentException("listener is null");
     synchronized (jobListeners) {
       jobListeners.remove(listener);

@@ -17,7 +17,7 @@
  */
 package org.jppf.server.job;
 
-import org.jppf.job.JobListener;
+import org.jppf.job.JobManagerListener;
 import org.jppf.server.protocol.ServerJob;
 
 import java.util.Set;
@@ -49,13 +49,13 @@ public interface JobManager {
    * Add a listener to the list of listeners.
    * @param listener the listener to add to the list.
    */
-  void addJobListener(final JobListener listener);
+  void addJobListener(final JobManagerListener listener);
 
   /**
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove from the list.
    */
-  void removeJobListener(final JobListener listener);
+  void removeJobListener(final JobManagerListener listener);
 
   /**
    * Get the job for the job unique identifier.

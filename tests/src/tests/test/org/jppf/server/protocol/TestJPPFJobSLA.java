@@ -25,11 +25,18 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.JPPFJob;
+import javax.management.*;
+
+import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.client.event.JobListener;
+import org.jppf.job.*;
+import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.protocol.results.SendResultsStrategyConstants;
 import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
@@ -362,6 +369,46 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
         if (file.exists()) file.delete();
       }
     }
+  }
+
+  /**
+   * Test that a job is not resubmitted when the SLA flag {@code applyMaxResubmitsUponNoError} is true
+   * and {@code maxTaskResubmits} is set to 0.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testApplyMaxResubmitsUponNoError() throws Exception {
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, LifeCycleTask.class, 15000L);
+    ExecutionPolicy n1Policy = new Equal("jppf.uuid", false, "n1");
+    job.getSLA().setExecutionPolicy(n1Policy);
+    job.getSLA().setMaxTaskResubmits(0);
+    job.getSLA().setApplyMaxResubmitsUponNodeError(true);
+    JPPFConnectionPool pool = client.getConnectionPool();
+    JMXDriverConnectionWrapper jmx = pool.getJmxConnection();
+    DriverJobManagementMBean jobManager = jmx.getJobManager();
+    final JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    // restart the node upon first dispatch of the job to this node
+    NotificationListener listener = new NotificationListener() {
+      @Override
+      public synchronized void handleNotification(final Notification notification, final Object handback) {
+        JobNotification jobNotif = (JobNotification) notification;
+        if (jobNotif.getEventType() == JobEventType.JOB_DISPATCHED) {
+          try {
+            forwarder.forwardInvoke(new NodeSelector.UuidSelector("n1"), JPPFNodeAdminMBean.MBEAN_NAME, "restart");
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    };
+    jobManager.addNotificationListener(listener, null, null);
+    List<Task<?>> results = client.submitJob(job);
+    assertNotNull(results);
+    assertEquals(1, results.size());
+    LifeCycleTask task = (LifeCycleTask) results.get(0);
+    assertNull(task.getResult());
+    assertNull(task.getThrowable());
+    assertNull(task.getNodeUuid());
   }
 
   /**

@@ -206,12 +206,12 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * A job manager listeners that sends a notification through the mbean for each job manager event.
    */
-  private class JobEventNotifier implements JobListener
+  private class JobEventNotifier implements JobManagerListener
   {
     /**
      * Called when a new job is put in the job queue.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobListener#jobQueued(org.jppf.job.JobNotification)
+     * @see org.jppf.job.JobManagerListener#jobQueued(org.jppf.job.JobNotification)
      */
     @Override
     public void jobQueued(final JobNotification event)
@@ -222,7 +222,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when a job is complete and has been sent back to the client.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobListener#jobEnded(org.jppf.job.JobNotification)
+     * @see org.jppf.job.JobManagerListener#jobEnded(org.jppf.job.JobNotification)
      */
     @Override
     public void jobEnded(final JobNotification event)
@@ -233,7 +233,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when the current number of tasks in a job was updated.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobListener#jobUpdated(org.jppf.job.JobNotification)
+     * @see org.jppf.job.JobManagerListener#jobUpdated(org.jppf.job.JobNotification)
      */
     @Override
     public void jobUpdated(final JobNotification event)
@@ -244,7 +244,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when all or part of a job is is sent to a node for execution.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobListener#jobDispatched(org.jppf.job.JobNotification)
+     * @see org.jppf.job.JobManagerListener#jobDispatched(org.jppf.job.JobNotification)
      */
     @Override
     public void jobDispatched(final JobNotification event)
@@ -255,7 +255,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when all or part of a job has returned from irs execution on a node.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobListener#jobReturned(org.jppf.job.JobNotification)
+     * @see org.jppf.job.JobManagerListener#jobReturned(org.jppf.job.JobNotification)
      */
     @Override
     public void jobReturned(final JobNotification event)

@@ -74,6 +74,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * Maximum number of times a task can rsubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
    */
   protected int maxTaskResubmits = 1;
+  /**
+   * Whether the max resubmits limit for tasks is also applied when tasks are resubmitted due to a node error.
+   */
+  private boolean applyMaxResubmitsUponNodeError = false;
 
   /**
    * Default constructor.
@@ -252,5 +256,23 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   @Override
   public void setMaxTaskResubmits(final int maxResubmits) {
     this.maxTaskResubmits = maxResubmits;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public boolean isApplyMaxResubmitsUponNodeError() {
+    return applyMaxResubmitsUponNodeError;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public void setApplyMaxResubmitsUponNodeError(final boolean applyMaxResubmitsUponNodeError) {
+    this.applyMaxResubmitsUponNodeError = applyMaxResubmitsUponNodeError;
   }
 }

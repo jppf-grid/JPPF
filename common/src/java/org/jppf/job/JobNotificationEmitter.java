@@ -21,6 +21,7 @@ package org.jppf.job;
 /**
  * Notification interface for job manager events.
  * @author Martin JANDA
+ * @excluded
  */
 public interface JobNotificationEmitter {
 

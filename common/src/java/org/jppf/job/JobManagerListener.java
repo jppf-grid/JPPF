@@ -24,8 +24,9 @@ import java.util.EventListener;
 /**
  * Listener interface for job manager events.
  * @author Laurent Cohen
+ * @excluded
  */
-public interface JobListener extends EventListener
+public interface JobManagerListener extends EventListener
 {
   /**
    * Called when a new job is put in the job queue.

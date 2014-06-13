@@ -61,7 +61,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * The list of registered listeners.
    */
-  private final List<JobListener> eventListeners = new CopyOnWriteArrayList<>();
+  private final List<JobManagerListener> eventListeners = new CopyOnWriteArrayList<>();
   /**
    * Reference to the driver.
    */
@@ -225,7 +225,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Add a listener to the list of listeners.
    * @param listener the listener to add to the list.
    */
-  public void addJobListener(final JobListener listener)
+  public void addJobListener(final JobManagerListener listener)
   {
     eventListeners.add(listener);
   }
@@ -234,7 +234,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove from the list.
    */
-  public void removeJobListener(final JobListener listener)
+  public void removeJobListener(final JobManagerListener listener)
   {
     eventListeners.remove(listener);
   }
@@ -253,23 +253,23 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       switch (event.getEventType())
       {
         case JOB_QUEUED:
-          for (JobListener listener: eventListeners) listener.jobQueued(event);
+          for (JobManagerListener listener: eventListeners) listener.jobQueued(event);
           break;
 
         case JOB_ENDED:
-          for (JobListener listener: eventListeners) listener.jobEnded(event);
+          for (JobManagerListener listener: eventListeners) listener.jobEnded(event);
           break;
 
         case JOB_UPDATED:
-          for (JobListener listener: eventListeners) listener.jobUpdated(event);
+          for (JobManagerListener listener: eventListeners) listener.jobUpdated(event);
           break;
 
         case JOB_DISPATCHED:
-          for (JobListener listener: eventListeners) listener.jobDispatched(event);
+          for (JobManagerListener listener: eventListeners) listener.jobDispatched(event);
           break;
 
         case JOB_RETURNED:
-          for (JobListener listener: eventListeners) listener.jobReturned(event);
+          for (JobManagerListener listener: eventListeners) listener.jobReturned(event);
           break;
 
         default:

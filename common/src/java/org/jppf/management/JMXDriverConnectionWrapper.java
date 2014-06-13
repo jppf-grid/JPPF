@@ -36,8 +36,7 @@ import org.slf4j.*;
  * {@link org.jppf.server.job.management.DriverJobManagementMBean DriverJobManagementMBean}.
  * @author Laurent Cohen
  */
-public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean
-{
+public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements JPPFDriverAdminMBean {
   /**
    * Logger for this class.
    */
@@ -47,14 +46,18 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Signature of the method that registers a node forwarding listener.
+   */
+  private static final String[] FORWARDING_LISTENER_SIGNATURE = {NodeSelector.class.getName(), String.class.getName()};
+  /**
    * 
    */
   private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<>();
+
   /**
    * Initialize a local connection to the MBean server.
    */
-  public JMXDriverConnectionWrapper()
-  {
+  public JMXDriverConnectionWrapper() {
     local = true;
   }
 
@@ -63,8 +66,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param host the host the server is running on.
    * @param port the port used by the server.
    */
-  public JMXDriverConnectionWrapper(final String host, final int port)
-  {
+  public JMXDriverConnectionWrapper(final String host, final int port) {
     this(host, port, false);
   }
 
@@ -74,15 +76,13 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param port the port used by the server.
    * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public JMXDriverConnectionWrapper(final String host, final int port, final boolean secure)
-  {
+  public JMXDriverConnectionWrapper(final String host, final int port, final boolean secure) {
     super(host, port, secure);
     local = false;
   }
 
   @Override
-  public Integer nbNodes() throws Exception
-  {
+  public Integer nbNodes() throws Exception {
     return (Integer) invoke(MBEAN_NAME, "nbNodes");
   }
 
@@ -93,8 +93,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   @Override
   @SuppressWarnings("unchecked")
-  public Collection<JPPFManagementInfo> nodesInformation() throws Exception
-  {
+  public Collection<JPPFManagementInfo> nodesInformation() throws Exception {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation");
   }
 
@@ -104,8 +103,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @throws Exception if any error occurs.
    */
   @Override
-  public JPPFStatistics statistics() throws Exception
-  {
+  public JPPFStatistics statistics() throws Exception {
     JPPFStatistics stats = (JPPFStatistics) invoke(MBEAN_NAME, "statistics");
     return stats;
   }
@@ -118,10 +116,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @throws Exception if any error occurs.
    */
   @Override
-  public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception
-  {
-    return (String) invoke(MBEAN_NAME, "restartShutdown",
-        new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
+  public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception {
+    return (String) invoke(MBEAN_NAME, "restartShutdown", new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
   }
 
   /**
@@ -132,10 +128,8 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @throws Exception if an error occurred while updating the settings.
    */
   @Override
-  public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception
-  {
-    return (String) invoke(MBEAN_NAME, "changeLoadBalancerSettings",
-        new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
+  public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception {
+    return (String) invoke(MBEAN_NAME, "changeLoadBalancerSettings", new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
   }
 
   /**
@@ -144,8 +138,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @throws Exception if any error occurs.
    */
   @Override
-  public LoadBalancingInformation loadBalancerInformation() throws Exception
-  {
+  public LoadBalancingInformation loadBalancerInformation() throws Exception {
     return (LoadBalancingInformation) invoke(MBEAN_NAME, "loadBalancerInformation");
   }
 
@@ -154,8 +147,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param jobId the id of the job to cancel.
    * @throws Exception if any error occurs.
    */
-  public void cancelJob(final String jobId) throws Exception
-  {
+  public void cancelJob(final String jobId) throws Exception {
     invoke(DriverJobManagementMBean.MBEAN_NAME, "cancelJob", new Object[] { jobId }, new String[] { "java.lang.String" });
   }
 
@@ -166,8 +158,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * false if they should be left to execute until completion.
    * @throws Exception if any error occurs.
    */
-  public void suspendJob(final String jobId, final Boolean requeue) throws Exception
-  {
+  public void suspendJob(final String jobId, final Boolean requeue) throws Exception {
     invoke(DriverJobManagementMBean.MBEAN_NAME, "suspendJob", new Object[] { jobId, requeue }, new String[] { "java.lang.String", "java.lang.Boolean" });
   }
 
@@ -176,8 +167,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param jobId the id of the job to resume.
    * @throws Exception if any error occurs.
    */
-  public void resumeJob(final String jobId) throws Exception
-  {
+  public void resumeJob(final String jobId) throws Exception {
     invoke(DriverJobManagementMBean.MBEAN_NAME, "resumeJob", new Object[] { jobId }, new String[] { "java.lang.String" });
   }
 
@@ -187,8 +177,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param maxNodes the new maximum number of nodes for the job.
    * @throws Exception if any error occurs.
    */
-  public void updateMaxNodes(final String jobId, final Integer maxNodes) throws Exception
-  {
+  public void updateMaxNodes(final String jobId, final Integer maxNodes) throws Exception {
     invoke(DriverJobManagementMBean.MBEAN_NAME, "updateMaxNodes", new Object[] { jobId, maxNodes }, new String[] { "java.lang.String", "java.lang.Integer" });
   }
 
@@ -198,8 +187,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param newPriority the new priority of the job.
    * @throws Exception if any error occurs.
    */
-  public void updateJobPriority(final String jobId, final Integer newPriority) throws Exception
-  {
+  public void updateJobPriority(final String jobId, final Integer newPriority) throws Exception {
     invoke(DriverJobManagementMBean.MBEAN_NAME, "updatePriority", new Object[] { jobId, newPriority }, new String[] { "java.lang.String", "java.lang.Integer" });
   }
 
@@ -208,8 +196,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return an array of ids as strings.
    * @throws Exception if any error occurs.
    */
-  public String[] getAllJobIds() throws Exception
-  {
+  public String[] getAllJobIds() throws Exception {
     return (String[]) getAttribute(DriverJobManagementMBean.MBEAN_NAME, "AllJobIds");
   }
 
@@ -219,8 +206,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return an instance of <code>JobInformation</code>.
    * @throws Exception if any error occurs.
    */
-  public JobInformation getJobInformation(final String jobId) throws Exception
-  {
+  public JobInformation getJobInformation(final String jobId) throws Exception {
     return (JobInformation) invoke(DriverJobManagementMBean.MBEAN_NAME, "getJobInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
   }
 
@@ -230,45 +216,38 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @return an array of <code>NodeManagementInfo</code>, <code>JobInformation</code> instances.
    * @throws Exception if any error occurs.
    */
-  public NodeJobInformation[] getNodeInformation(final String jobId) throws Exception
-  {
+  public NodeJobInformation[] getNodeInformation(final String jobId) throws Exception {
     return (NodeJobInformation[]) invoke(DriverJobManagementMBean.MBEAN_NAME, "getNodeInformation", new Object[] { jobId }, new String[] { "java.lang.String" });
   }
 
   @Override
-  public void resetStatistics() throws Exception
-  {
+  public void resetStatistics() throws Exception {
     invoke(MBEAN_NAME, "resetStatistics");
   }
 
   @Override
-  public JPPFSystemInformation systemInformation() throws Exception
-  {
+  public JPPFSystemInformation systemInformation() throws Exception {
     return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation");
   }
 
   @Override
-  public Integer matchingNodes(final ExecutionPolicy policy) throws Exception
-  {
+  public Integer matchingNodes(final ExecutionPolicy policy) throws Exception {
     return (Integer) invoke(MBEAN_NAME, "matchingNodes", new Object[] { policy }, new String[] { ExecutionPolicy.class.getName() });
   }
 
   @Override
-  public Integer nbIdleNodes() throws Exception
-  {
+  public Integer nbIdleNodes() throws Exception {
     return (Integer) invoke(MBEAN_NAME, "nbIdleNodes");
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception
-  {
+  public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation");
   }
 
   @Override
-  public void toggleActiveState(final NodeSelector selector) throws Exception
-  {
+  public void toggleActiveState(final NodeSelector selector) throws Exception {
     invoke(MBEAN_NAME, "toggleActiveState", new Object[] {selector}, new String[] {NodeSelector.class.getName()});
   }
 
@@ -277,10 +256,23 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * It is equivalent to calling the more cumbersome {@code getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class)}.
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    * @throws Exception if a proxy could not be created for any reason.
+   * @since 4.2
    */
   public JPPFNodeForwardingMBean getNodeForwarder() throws Exception {
     return getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
   }
+
+  /**
+   * This convenience method creates a proxy to the driver's mbean which manages and monitors jobs.
+   * It is equivalent to calling the more cumbersome {@code getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class)}.
+   * @return an instance of {@link DriverJobManagementMBean}.
+   * @throws Exception if a proxy could not be created for any reason.
+   * @since 4.2
+   */
+  public DriverJobManagementMBean getJobManager() throws Exception {
+    return getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+  }
+
   /**
    * Register a notification listener which will receive notifications from from the specified MBean on the selected nodes.
    * @param selector determines which nodes will be selected.
@@ -292,18 +284,14 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @throws Exception if any error occurs.
    */
   public String registerForwardingNotificationListener(final NodeSelector selector, final String mBeanName,
-      final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception
-  {
-    String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName},
-      new String[] {NodeSelector.class.getName(), String.class.getName()});
+      final NotificationListener listener, final NotificationFilter filter, final Object handback) throws Exception {
+    String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName}, FORWARDING_LISTENER_SIGNATURE);
     InternalNotificationFilter internalFilter = new InternalNotificationFilter(listenerID, filter);
     addNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, listener, internalFilter, handback);
     ListenerWrapper wrapper = new ListenerWrapper(listener, internalFilter, handback);
-    synchronized(listeners)
-    {
+    synchronized(listeners) {
       Map<String, ListenerWrapper> map = listeners.get(getId());
-      if (map == null)
-      {
+      if (map == null) {
         map = new HashMap<>();
         listeners.put(getId(), map);
       }
@@ -317,24 +305,17 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    * @param listenerID the id of a listener previously registered with {@link #registerForwardingNotificationListener(NodeSelector,String,NotificationListener,NotificationFilter,Object)}.
    * @throws Exception if the listener with this id was not found or if any other error occurss.
    */
-  public void unregisterForwardingNotificationListener(final String listenerID) throws Exception
-  {
-    synchronized(listeners)
-    {
+  public void unregisterForwardingNotificationListener(final String listenerID) throws Exception {
+    synchronized(listeners) {
       Map<String, ListenerWrapper> map = listeners.get(getId());
-      if (map != null)
-      {
+      if (map != null) {
         ListenerWrapper wrapper = map.get(listenerID);
-        if (wrapper != null)
-        {
+        if (wrapper != null) {
           map.remove(listenerID);
           if (map.isEmpty()) listeners.remove(getId());
-          try
-          {
+          try {
             removeNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, wrapper.getListener(), wrapper.getFilter(), wrapper.getHandback());
-          }
-          catch (Exception e)
-          {
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }
@@ -346,8 +327,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    * Wraps the information for each registered node forwarding listener.
    */
-  private static class ListenerWrapper
-  {
+  private static class ListenerWrapper {
     /**
      * The registered listener.
      */
@@ -367,8 +347,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
      * @param filter the notification filter.
      * @param handback the handback object.
      */
-    ListenerWrapper(final NotificationListener listener, final InternalNotificationFilter filter, final Object handback)
-    {
+    ListenerWrapper(final NotificationListener listener, final InternalNotificationFilter filter, final Object handback) {
       this.listener = listener;
       this.filter = filter;
       this.handback = handback;
@@ -378,8 +357,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
      * Get the registered listener.
      * @return a {@link NotificationListener} instance.
      */
-    public NotificationListener getListener()
-    {
+    public NotificationListener getListener() {
       return listener;
     }
 
@@ -387,8 +365,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
      * Get the notification filter.
      * @return an <code>InternalNotificationFilter</code> instance.
      */
-    public InternalNotificationFilter getFilter()
-    {
+    public InternalNotificationFilter getFilter() {
       return filter;
     }
 
@@ -396,8 +373,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
      * Get the handback object.
      * @return the handback object.
      */
-    public Object getHandback()
-    {
+    public Object getHandback() {
       return handback;
     }
   }

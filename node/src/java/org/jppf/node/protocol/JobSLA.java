@@ -150,4 +150,19 @@ public interface JobSLA extends JobCommonSLA
    * @param maxResubmits the maximum number of resubmits; a value of 0 or less means tasks in the job cannot be resubmitted.
    */
   void setMaxTaskResubmits(int maxResubmits);
+
+  /**
+   * Determine whether the max resubmits limit for tasks is also applied when tasks are resubmitted due to a node error.
+   * This flag is false by default.
+   * @return {@code true} if the max resubmits count is applied upon node errors, {@code false} otherwise.
+   * @since 4.2
+   */
+  boolean isApplyMaxResubmitsUponNodeError();
+
+  /**
+   * Specify whether the max resubmits limit for tasks should also be applied when tasks are resubmitted due to a node error.
+   * @param applyMaxResubmitsUponNodeError {@code true} to specify that the max resubmits count is applied upon node errors, {@code false} otherwise.
+   * @since 4.2
+   */
+  void setApplyMaxResubmitsUponNodeError(boolean applyMaxResubmitsUponNodeError);
 }

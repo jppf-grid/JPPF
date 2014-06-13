@@ -28,7 +28,7 @@ import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.management.*;
 import org.jppf.nio.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
@@ -186,6 +186,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       cleanup(channel);
       if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
         boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
+        applyMaxResubmit |= tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
         if (!applyMaxResubmit) {
           tmpBundle.resubmit();
         } else {
