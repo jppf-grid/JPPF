@@ -18,11 +18,22 @@
 
 <project name="JPPF-utils" basedir="..">
 
-	<!-- ========================================================================= -->
-	<!--                     Build and run the JUnit tests                         -->
+  <!-- ========================================================================= -->
+  <!-- Build the JMX remote jar                                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="jmxremote" depends="" description="">
+    <ant antfile="${jmxremote}/build.xml" target="build"/>
+    <copy toDir="${basedir}/lib/jmxremote">
+      <fileset dir="${jmxremote}/build" includes="*.jar"/>
+    </copy>
+  </target>
+
+  <!-- ========================================================================= -->
+	<!-- Build a separate and self-contained jar with common JPPF utility classes  -->
 	<!-- ========================================================================= -->
 
-  <target name="utils.build" depends="build" description="">
+  <target name="utils" depends="build" description="">
     <jar destfile="${build}/jppf-utils.jar">
       <fileset dir="${node}/classes">
         <include name="org/jppf/utils/ExceptionUtils.class"/>

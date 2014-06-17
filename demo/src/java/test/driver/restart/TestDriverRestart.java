@@ -137,9 +137,7 @@ public class TestDriverRestart {
           final JMXDriverConnectionWrapper jmxWrapper = getJmxWrapper();
           if (jmxWrapper != null) {
             try {
-              if (nodeForwarder == null) {
-                nodeForwarder = jmxWrapper.getProxy(JPPFNodeForwardingMBean.MBEAN_NAME, JPPFNodeForwardingMBean.class);
-              }
+              if (nodeForwarder == null) nodeForwarder = jmxWrapper.getNodeForwarder();
             } catch (final Exception ignore) {
             }
             try {

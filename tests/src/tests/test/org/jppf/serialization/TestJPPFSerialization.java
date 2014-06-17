@@ -18,8 +18,6 @@
 
 package test.org.jppf.serialization;
 
-import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.ObjectSerializerImpl;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -40,8 +38,10 @@ public class TestJPPFSerialization extends AbstractNonStandardSetup
   {
     System.out.println("main class loader = " + TestJPPFSerialization.class.getClassLoader());
     client = BaseSetup.setup(1, 1, true, createConfig("jppf_serialization"));
+    /*
     ObjectSerializer ser = new ObjectSerializerImpl();
     ser.serialize("hello lolo");
+    */
   }
 
   /**

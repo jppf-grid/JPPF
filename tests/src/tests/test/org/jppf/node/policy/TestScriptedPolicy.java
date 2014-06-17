@@ -73,6 +73,7 @@ public class TestScriptedPolicy extends Setup1D2N1C {
   @Test(timeout=5000)
   public void testValidXML() throws Exception {
     PolicyParser.validatePolicy(validTrueXML);
+    PolicyParser.validatePolicy(validFalseXML);
   }
 
   /**

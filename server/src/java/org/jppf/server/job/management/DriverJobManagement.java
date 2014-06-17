@@ -270,7 +270,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     if (debugEnabled && (notification instanceof JobNotification))
     {
       JobNotification event = (JobNotification) notification;
-      log.debug("sending event " + event.getEventType() + " for job " + event.getJobInformation().getJobName());
+      log.debug("sending event " + event.getEventType() + " for job " + event.getJobInformation());
     }
     super.sendNotification(notification);
   }

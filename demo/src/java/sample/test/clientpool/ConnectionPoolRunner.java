@@ -21,7 +21,6 @@ package sample.test.clientpool;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -47,8 +46,8 @@ public class ConnectionPoolRunner {
    */
   public static void main(final String[] args) {
     JPPFClient client = null;
-    int nbTasks = 40;
-    long duration = 5000L;
+    int nbTasks = 1;
+    long duration = 100L;
     //int[] nbJobs = { 1, 5, 1 };
     int[] nbJobs = { 1 };
     try {
@@ -91,9 +90,12 @@ public class ConnectionPoolRunner {
     JPPFJob job = new JPPFJob();
     job.setName(name);
     job.setBlocking(false);
+    job.getSLA().setBroadcastJob(true);
     for (int i=1; i<=nbTasks; i++) job.add(new LongTask(taskDuration)).setId(name + ":task_" + i);
-    job.getSLA().setCancelUponClientDisconnect(false);
+    job.getSLA().setApplyMaxResubmitsUponNodeError(true);
+    job.getSLA().setMaxTaskResubmits(0);
     /*
+    job.getSLA().setCancelUponClientDisconnect(false);
     job.setResultListener(new JPPFResultCollector(job) {
       @Override
       public synchronized void resultsReceived(final TaskResultEvent event) {
@@ -101,7 +103,6 @@ public class ConnectionPoolRunner {
         print("result collector resultsReceived() : results = " + this.getAllResults());
       }
     });
-    */
     job.addJobListener(new JobListenerAdapter () {
       @Override
       public void jobEnded(final JobEvent event) {
@@ -113,6 +114,7 @@ public class ConnectionPoolRunner {
         print("jobReturned() received " + event.getJobTasks().size() + " tasks");
       }
     });
+    */
     return job;
   }
 

@@ -145,7 +145,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       } catch(Exception e) {
         log.error(e.getMessage(), e);
         if (checkConnection) connectionChecker.stop();
-        reset(true);
+        if (!isStopped()) reset(true);
       }
     }
     if (debugEnabled) log.debug("End of node main loop");
@@ -164,7 +164,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
-    while (!isStopped()) {
+    while (!checkStopped()) {
       clearResourceCachesIfRequested();
       processNextJob();
     }
@@ -213,6 +213,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void checkInitialBundle(final TaskBundle bundle) throws Exception {
+    checkStopped();
     if (debugEnabled) log.debug("setting initial bundle, offline=" + isOffline() + (currentBundle == null ? ", bundle=" + bundle : ", currentBundle=" + currentBundle.first()));
     bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
     if (isOffline()) {
@@ -233,6 +234,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if any error occurs.
    */
   private void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
+    checkStopped();
     currentBundle = null;
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
     //if (executionManager.checkConfigChanged() || (bundle.isHandshake() && (currentBundle == null))) {
@@ -254,6 +256,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @throws Exception if an error is raised during initialization.
    */
   private synchronized void init() throws Exception {
+    checkStopped();
     if (debugEnabled) log.debug("start node initialization");
     initHelper();
     try {
@@ -371,6 +374,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @exclude
    */
   public void shutdown(final boolean restart) {
+    setStopped(true);
     NodeRunner.setShuttingDown(true);
     lifeCycleEventHandler.fireNodeEnding();
     NodeRunner.shutdown(this, restart);
@@ -498,5 +502,15 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   @Override
   public boolean isSlaveNode() {
     return (systemInformation != null) && systemInformation.getJppf().getBoolean(NodeProvisioningConstants.SLAVE_PROPERTY, false);
+  }
+
+  /**
+   * Chek whther this node is stopped or shutting down.
+   * If not, an unchecked {@code IllegalStateException} is thrown.
+   * @return {@code true} if the node is stopped or shutting down.
+   */
+  private boolean checkStopped() {
+    if (isStopped()) throw new IllegalStateException("this node is shutting down");
+    return false;
   }
 }

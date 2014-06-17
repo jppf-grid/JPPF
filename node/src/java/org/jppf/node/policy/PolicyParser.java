@@ -146,7 +146,7 @@ public class PolicyParser {
    */
   private String getAttributeValue(final Node node, final String name, final String def) {
     NamedNodeMap attrMap = node.getAttributes();
-    Node attrNode = attrMap.getNamedItem("class");
+    Node attrNode = attrMap.getNamedItem(name);
     return attrNode == null ? def : attrNode.getNodeValue();
   }
 

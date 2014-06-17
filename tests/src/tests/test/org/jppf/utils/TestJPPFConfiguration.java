@@ -23,7 +23,9 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
+
+import test.org.jppf.test.setup.BaseSetup;
 
 /**
  * Unit test for the <code>JPPFConfiguration</code> class.
@@ -31,6 +33,36 @@ import org.junit.Test;
  */
 public class TestJPPFConfiguration
 {
+  /**
+   * Value of the {@code JPPFConfiguration.CONFIG_PROPERTY} system property.
+   */
+  private static String configProp;
+  /**
+   * Value of the {@code JPPFConfiguration.CONFIG_PLUGIN_PROPERTY} system property.
+   */
+  private static String configPluginProp;
+
+  /**
+   * Saves the values of {@code JPPFConfiguration.CONFIG_PROPERTY} and {@code JPPFConfiguration.CONFIG_PLUGIN_PROPERTY} system properties.
+   * @throws Exception if a process could not be started.
+   */
+  @BeforeClass
+  public static void setup() throws Exception {
+    configProp = System.getProperty(JPPFConfiguration.CONFIG_PROPERTY);
+    configPluginProp = System.getProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY);
+  }
+
+  /**
+   * Restores the values of {@code JPPFConfiguration.CONFIG_PROPERTY} and {@code JPPFConfiguration.CONFIG_PLUGIN_PROPERTY} system properties.
+   * @throws Exception if a process could not be stopped.
+   */
+  @AfterClass
+  public static void cleanup() throws Exception {
+    System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, configProp == null ? "" : configProp);
+    System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, configPluginProp == null ? "" : configPluginProp);
+    BaseSetup.resetClientConfig();
+  }
+
   /**
    * Test reading the configuration from a {@link JPPFConfiguration.ConfigurationSource} plugin.
    * @throws Exception if any error occurs

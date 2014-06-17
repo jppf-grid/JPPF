@@ -124,7 +124,13 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   public void restart() throws Exception
   {
     if (debugEnabled) log.debug("node restart requested");
-    node.shutdown(true);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        node.shutdown(true);
+      }
+    };
+    new Thread(r, "NodeRestart").start();
   }
 
   /**
@@ -136,7 +142,13 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   public void shutdown() throws Exception
   {
     if (debugEnabled) log.debug("node shutdown requested");
-    node.shutdown(false);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        node.shutdown(false);
+      }
+    };
+    new Thread(r, "NodeShutdown").start();
   }
 
   /**

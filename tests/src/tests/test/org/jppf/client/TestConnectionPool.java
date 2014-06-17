@@ -120,12 +120,12 @@ public class TestConnectionPool extends Setup1D1N
     TypedProperties config = JPPFConfiguration.getProperties();
     config.setProperty("jppf.load.balancing.algorithm", "proportional");
     config.setProperty("jppf.load.balancing.profile", "test");
-    config.setProperty("jppf.load.balancing.profile.test.initialSize", "10");
-    config.setProperty("jppf.pool.size", "2");
+    config.setInt("jppf.load.balancing.profile.test.initialSize", 10);
+    config.setInt("jppf.pool.size", 2);
     if (localThreads > 0)
     {
-      config.setProperty("jppf.local.execution.enabled", "true");
-      config.setProperty("jppf.local.execution.threads", "" + localThreads);
+      config.setBoolean("jppf.local.execution.enabled", true);
+      config.setInt("jppf.local.execution.threads", localThreads);
     }
   }
 

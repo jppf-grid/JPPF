@@ -15,6 +15,9 @@ test.org.jppf.management.TestJMXConnectionWrapper
 test.org.jppf.management.TestJPPFDriverAdminMBean
 test.org.jppf.management.TestJPPFNodeAdminMBean
 test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
+test.org.jppf.node.policy.TestIsInIPv4Subnet
+test.org.jppf.node.policy.TestIsInIPv6Subnet
+test.org.jppf.node.policy.TestPreferencePolicy
 test.org.jppf.node.policy.TestScriptedPolicy
 test.org.jppf.node.protocol.TestScriptedTask
 test.org.jppf.node.TestOfflineNode

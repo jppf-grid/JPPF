@@ -29,8 +29,7 @@ import org.junit.Test;
  * Collection of utility methods ot help building/executing the tests.
  * @author Laurent Cohen
  */
-public class TestListBuilder
-{
+public class TestListBuilder {
   /**
    * The root directory to scan for tests.
    */
@@ -48,10 +47,8 @@ public class TestListBuilder
    * Initialize this test list builder witht he specified root directory.
    * @param rootDir the root directory to scan for tests.
    */
-  public TestListBuilder(final File rootDir)
-  {
-    this(rootDir, new FileFilter()
-    {
+  public TestListBuilder(final File rootDir) {
+    this(rootDir, new FileFilter() {
       @Override
       public boolean accept(final File file)
       {
@@ -66,8 +63,7 @@ public class TestListBuilder
    * @param rootDir the root directory to scan for tests.
    * @param filter a filter to apply to the scanned files.
    */
-  public TestListBuilder(final File rootDir, final FileFilter filter)
-  {
+  public TestListBuilder(final File rootDir, final FileFilter filter) {
     this.rootDir = rootDir;
     this.filter = filter;
   }
@@ -78,8 +74,7 @@ public class TestListBuilder
    * @return a list of Java class names.
    * @throws Exception if I/O error occurs.
    */
-  public List<String> buildList() throws Exception
-  {
+  public List<String> buildList() throws Exception {
     return buildList("", rootDir);
   }
 
@@ -91,22 +86,18 @@ public class TestListBuilder
    * @return a list of Java class names.
    * @throws Exception if any error occurs.
    */
-  public List<String> buildList(final String prefix, final File dir) throws Exception
-  {
+  public List<String> buildList(final String prefix, final File dir) throws Exception {
     //System.out.println("exploring directory " + dir);
     File[] files = dir.listFiles();
     if (files == null) return names;
-    for (File file: files)
-    {
+    for (File file: files) {
       if (file.isDirectory()) buildList(prefix + file.getName() + ".", file);
-      else
-      {
+      else {
         String s = file.getName();
         int i = s.lastIndexOf(".");
         if (i >= 0) s = s.substring(0, i);
         String name = prefix + s;
-        if (filter.accept(file) && hasJUnitTest(name))
-        {
+        if (filter.accept(file) && hasJUnitTest(name)) {
           //System.out.println(name  + " is accepted");
           names.add(name);
         }
@@ -128,8 +119,7 @@ public class TestListBuilder
     int mod = clazz.getModifiers();
     if (Modifier.isAbstract(mod) || !Modifier.isPublic(mod)) return false;
     Method[] methods = clazz.getDeclaredMethods();
-    for (Method m: methods)
-    {
+    for (Method m: methods) {
       mod = m.getModifiers();
       if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) continue;
       if (m.getAnnotation(Test.class) != null) return true;
@@ -142,15 +132,11 @@ public class TestListBuilder
    * @param dest the file to write to.
    * @throws IOException if I/O error occurs.
    */
-  public void writeTestList(final File dest) throws IOException
-  {
+  public void writeTestList(final File dest) throws IOException {
     BufferedWriter writer = new BufferedWriter(new FileWriter(dest));
-    try
-    {
+    try {
       for (String name: names) writer.write(name + '\n');
-    }
-    finally
-    {
+    } finally {
       StreamUtils.closeSilent(writer);
     }
   }
@@ -163,18 +149,14 @@ public class TestListBuilder
    * <li><code>args[1]</code> is the path for the file to write the class names to</li>
    * </ul>
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       File srcDir = new File(args[0]);
       TestListBuilder builder = new TestListBuilder(srcDir);
       List<String> classNames = builder.buildList();
       File dest = new File(args[1]);
       builder.writeTestList(dest);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

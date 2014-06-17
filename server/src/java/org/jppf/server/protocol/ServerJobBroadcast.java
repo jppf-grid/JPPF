@@ -187,12 +187,14 @@ public class ServerJobBroadcast extends ServerJob {
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("received results for {}", this);
     pendingTasksCount -= bundle.getTaskCount();
+    taskCompleted(bundle, null);
     if (pendingTasksCount <= 0) parentJob.broadcastCompleted(this);
   }
 
   @Override
   public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     pendingTasksCount -= bundle.getTaskCount();
+    taskCompleted(bundle, throwable);
     if (pendingTasksCount <= 0) parentJob.broadcastCompleted(this);
   }
 

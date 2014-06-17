@@ -115,6 +115,7 @@ public final class JPPFConfiguration
   private static Reader getReader() throws Exception
   {
     String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
+    if ((altSource != null) && "".equals(altSource.trim())) altSource = null;
     String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
     return getConfigurationReader(filename, altSource);
   }

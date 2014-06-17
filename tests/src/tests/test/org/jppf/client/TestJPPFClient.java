@@ -54,11 +54,8 @@ public class TestJPPFClient extends Setup1D1N
    */
   @Test(timeout=10000)
   public void testDefaultConstructor() throws Exception {
-    JPPFClient client = new JPPFClient();
-    try {
+    try (JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
-    } finally {
-      client.close();
     }
   }
 
