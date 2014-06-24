@@ -18,6 +18,7 @@
 
 package org.jppf.comm.discovery;
 
+import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -31,8 +32,7 @@ import org.slf4j.*;
  * nodes and peer drivers.
  * @author Laurent Cohen
  */
-public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
-{
+public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, Closeable {
   /**
    * Logger for this class.
    */
@@ -62,8 +62,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
    * Initialize this broadcaster using the server configuration information.
    * @param info holds the driver connection information to broadcast.
    */
-  public JPPFBroadcaster(final JPPFConnectionInformation info)
-  {
+  public JPPFBroadcaster(final JPPFConnectionInformation info) {
     this.info = info;
   }
 
@@ -71,8 +70,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
    * Initialize the broadcast socket and data.
    * @throws Exception if an error occurs while initializing the datagram packet or socket.
    */
-  private void init() throws Exception
-  {
+  private void init() throws Exception {
     TypedProperties props = JPPFConfiguration.getProperties();
     broadcastInterval = props.getLong("jppf.discovery.broadcast.interval", 1000L);
     String group = props.getString("jppf.discovery.group", "230.0.0.1");
@@ -83,9 +81,10 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
     if (addresses.isEmpty()) addresses.add(InetAddress.getByName("127.0.0.1"));
     IPFilter filter = new IPFilter(props, true);
     List<InetAddress> filteredAddresses = new LinkedList<>();
-    for (InetAddress addr: addresses) if (filter.isAddressAccepted(addr)) filteredAddresses.add(addr);
-    if (debugEnabled)
-    {
+    for (InetAddress addr: addresses) {
+      if (filter.isAddressAccepted(addr)) filteredAddresses.add(addr);
+    }
+    if (debugEnabled) {
       StringBuilder sb = new StringBuilder();
       sb.append("Found ").append(filteredAddresses.size()).append(" address");
       if (filteredAddresses.size() > 1) sb.append("es");
@@ -94,10 +93,8 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
       log.debug(sb.toString());
     }
     socketsInfo = new ArrayList<>(filteredAddresses.size());
-    for (InetAddress addr: addresses)
-    {
-      try
-      {
+    for (InetAddress addr: addresses) {
+      try {
         JPPFConnectionInformation ci = (JPPFConnectionInformation) info.clone();
         ci.host = addr.getHostAddress();
         byte[] infoBytes = JPPFConnectionInformation.toBytes(ci);
@@ -108,50 +105,45 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable
         MulticastSocket socket = new MulticastSocket(port);
         socket.setInterface(addr);
         socketsInfo.add(new Pair<>(socket, packet));
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         log.error("Unable to bind to interface " + addr.getHostAddress() + " on port " + port, e);
       }
     }
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       init();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
-      setStopped(true);
+      close();
+      return;
     }
-    while (!isStopped())
-    {
-      Iterator<Pair<MulticastSocket, DatagramPacket>> it = socketsInfo.iterator();
-      while (it.hasNext())
-      {
-        Pair<MulticastSocket, DatagramPacket> si = it.next();
-        try
-        {
-          si.first().send(si.second());
-          if (socketsInError.contains(si)) socketsInError.remove(si);
-        }
-        catch(Exception e)
-        {
-          if (!socketsInError.contains(si))
-          {
-            socketsInError.add(si);
-            log.error(e.getMessage(), e);
+    if (!socketsInfo.isEmpty()) {
+      while (!isStopped()) {
+        for (Pair<MulticastSocket, DatagramPacket> si: socketsInfo) {
+          try {
+            if (isStopped()) break;
+            si.first().send(si.second());
+            if (socketsInError.contains(si)) socketsInError.remove(si);
+          } catch(Exception e) {
+            if (!isStopped() && !socketsInError.contains(si)) {
+              socketsInError.add(si);
+              log.error(e.getMessage(), e);
+            }
           }
         }
+        if (!isStopped()) goToSleep(broadcastInterval);
       }
-      if (socketsInfo.isEmpty()) setStopped(true);
-      if (!isStopped()) goToSleep(broadcastInterval);
     }
-    for (Pair<MulticastSocket, DatagramPacket> socketInfo: socketsInfo) socketInfo.first().close();
+    close();
+  }
+
+  @Override
+  public void close() {
+    setStopped(true);
+    for (Pair<MulticastSocket, DatagramPacket> si: socketsInfo) si.first().close();
     socketsInfo.clear();
   }
 }

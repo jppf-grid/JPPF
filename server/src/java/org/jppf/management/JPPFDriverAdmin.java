@@ -66,7 +66,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
    */
   private final Object loadBalancingInformationLock = new Object();
   /**
-   * 
+   *
    */
   private final NodeSelectionHelper selectionHelper = new NodeSelectionHelper();
 
@@ -250,5 +250,19 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   public void toggleActiveState(final NodeSelector selector) throws Exception {
     Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector);
     for (AbstractNodeContext node: nodes) getNodeNioServer().activateNode(node.getUuid(), !node.isActive());
+  }
+
+  @Override
+  public void setBroadcasting(final Boolean broadcasting) throws Exception {
+    DriverInitializer di = driver.getInitializer();
+    boolean b = di.isBroadcasting();
+    if (b == broadcasting) return;
+    if (b) di.initBroadcaster();
+    else di.stopBroadcaster();
+  }
+
+  @Override
+  public Boolean isBroadcasting() throws Exception {
+    return driver.getInitializer().isBroadcasting();
   }
 }

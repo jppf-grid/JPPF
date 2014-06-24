@@ -50,7 +50,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   private static final String[] FORWARDING_LISTENER_SIGNATURE = {NodeSelector.class.getName(), String.class.getName()};
   /**
-   * 
+   *
    */
   private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<>();
 
@@ -249,6 +249,16 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public void toggleActiveState(final NodeSelector selector) throws Exception {
     invoke(MBEAN_NAME, "toggleActiveState", new Object[] {selector}, new String[] {NodeSelector.class.getName()});
+  }
+
+  @Override
+  public void setBroadcasting(final Boolean broadcasting) throws Exception {
+    setAttribute(MBEAN_NAME, "Broadcasting", broadcasting);
+  }
+
+  @Override
+  public Boolean isBroadcasting() throws Exception {
+    return (Boolean) getAttribute(MBEAN_NAME, "Broadcasting");
   }
 
   /**

@@ -159,7 +159,7 @@ public class DriverInitializer {
   /**
    * Initialize and start the discovery service.
    */
-  void initBroadcaster() {
+  public void initBroadcaster() {
     if (config.getBoolean("jppf.discovery.enabled", true)) {
       broadcaster = new JPPFBroadcaster(getConnectionInformation());
       new Thread(broadcaster, "JPPF Broadcaster").start();
@@ -169,11 +169,20 @@ public class DriverInitializer {
   /**
    * Stop the discovery service if it is running.
    */
-  void stopBroadcaster() {
+  public void stopBroadcaster() {
     if (broadcaster != null) {
-      broadcaster.setStopped(true);
+      broadcaster.close();
       broadcaster = null;
     }
+  }
+
+  /**
+   * Determine whether broadcasting is active.
+   * @return {@code true} if broadcasting is active, {@code false} otherwise.
+   * @since 4.2
+   */
+  public boolean isBroadcasting() {
+    return (broadcaster != null) && !broadcaster.isStopped();
   }
 
   /**
@@ -310,7 +319,7 @@ public class DriverInitializer {
   /**
    * Initialize the recovery server.
    */
-  void initRecoveryServer() {
+  public void initRecoveryServer() {
     if (config.getBoolean("jppf.recovery.enabled", false)) {
       recoveryServer = new RecoveryServer();
       new Thread(recoveryServer, "RecoveryServer thread").start();
@@ -320,7 +329,7 @@ public class DriverInitializer {
   /**
    * Stop the recovery server.
    */
-  void stopRecoveryServer() {
+  public void stopRecoveryServer() {
     if (recoveryServer != null) recoveryServer.close();
   }
 
