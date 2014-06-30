@@ -78,6 +78,10 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * Whether the max resubmits limit for tasks is also applied when tasks are resubmitted due to a node error.
    */
   private boolean applyMaxResubmitsUponNodeError = false;
+  /**
+   * Whether remote class loading is enabled for the job.
+   */
+  private boolean remoteClassLoadingEnabled = true;
 
   /**
    * Default constructor.
@@ -274,5 +278,23 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   @Override
   public void setApplyMaxResubmitsUponNodeError(final boolean applyMaxResubmitsUponNodeError) {
     this.applyMaxResubmitsUponNodeError = applyMaxResubmitsUponNodeError;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public boolean isRemoteClassLoadingEnabled() {
+    return remoteClassLoadingEnabled;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 4.2
+   */
+  @Override
+  public void setRemoteClassLoadingEnabled(final boolean enabled) {
+    this.remoteClassLoadingEnabled = enabled;
   }
 }

@@ -328,7 +328,7 @@ public class BaseSetup {
    * Create the default configuratin used when none is specified.
    * @return a {@link Configuration} instance.
    */
-  private static Configuration createDefaultConfiguration() {
+  public static Configuration createDefaultConfiguration() {
     Configuration config = new Configuration();
     List<String> commonCP = new ArrayList<>();
     commonCP.add("classes/addons");

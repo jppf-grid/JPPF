@@ -81,6 +81,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
         JPPFRemoteContainer cont = (JPPFRemoteContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.setNodeConnection((RemoteNodeConnection) node.getNodeConnection());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
+        if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
       } else {
@@ -108,19 +109,11 @@ public class RemoteNodeIO extends AbstractNodeIO {
     getSocketWrapper().setSerializer(node.getHelper().getSerializer());
   }
 
-  /**
-   * Write the execution results to the socket stream.
-   * @param bundle the task wrapper to send along.
-   * @param tasks the list of tasks with their result field updated.
-   * @throws Exception if an error occurs while writing to the socket stream.
-   */
   @Override
-  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
+  protected void sendResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizeBundleData(bundle, tasks);
-    bundle.setSLA(null);
-    bundle.setMetadata(null);
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));

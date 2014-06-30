@@ -34,8 +34,7 @@ import org.slf4j.*;
  * This class performs the I/O operations requested by the JPPFNode, for reading the task bundles and sending the results back.
  * @author Laurent Cohen
  */
-public class LocalNodeIO extends AbstractNodeIO
-{
+public class LocalNodeIO extends AbstractNodeIO {
   /**
    * Logger for this class.
    */
@@ -57,8 +56,7 @@ public class LocalNodeIO extends AbstractNodeIO
    * Initialize this TaskIO with the specified node.
    * @param node - the node who owns this TaskIO.
    */
-  public LocalNodeIO(final JPPFNode node)
-  {
+  public LocalNodeIO(final JPPFNode node) {
     super(node);
     this.channel = ((LocalNodeConnection) node.getNodeConnection()).getChannel();
   }
@@ -69,18 +67,15 @@ public class LocalNodeIO extends AbstractNodeIO
    * @see org.jppf.server.node.AbstractNodeIO#handleReload()
    */
   @Override
-  protected void handleReload() throws Exception
-  {
+  protected void handleReload() throws Exception {
     node.setClassLoader(null);
     node.initHelper();
   }
 
   @Override
-  protected Object[] deserializeObjects() throws Exception
-  {
+  protected Object[] deserializeObjects() throws Exception {
     Object[] result = null;
-    synchronized(channel.getNodeLock())
-    {
+    synchronized(channel.getNodeLock()) {
       channel.setReadyOps(OP_WRITE);
       if (debugEnabled) log.debug("waiting for next request");
       // wait until a message has been sent by the server
@@ -99,45 +94,36 @@ public class LocalNodeIO extends AbstractNodeIO
   }
 
   @Override
-  protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception
-  {
+  protected Object[] deserializeObjects(final TaskBundle bundle) throws Exception {
     int count = bundle.getTaskCount();
     List<Object> list = new ArrayList<>(count + 1);
     list.add(bundle);
-    try
-    {
+    try {
       initializeBundleData(bundle);
       if (debugEnabled) log.debug("bundle task count = " + count + ", hanshake = " + bundle.isHandshake());
-      if (!bundle.isHandshake())
-      {
+      if (!bundle.isHandshake()) {
         JPPFLocalContainer cont = (JPPFLocalContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
+        if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.setCurrentMessage(currentMessage);
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
-      }
-      else
-      {
+      } else {
         // skip null data provider
       }
       if (debugEnabled) log.debug("got all data");
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       log.error("Exception occurred while deserializing the tasks", t);
       bundle.setTaskCount(0);
       bundle.setParameter(NODE_EXCEPTION_PARAM, t);
-    }
-    finally
-    {
+    } finally {
       currentMessage = null;
     }
     return list.toArray(new Object[list.size()]);
   }
 
   @Override
-  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception
-  {
+  protected void sendResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizeBundleData(bundle, tasks);
@@ -146,14 +132,12 @@ public class LocalNodeIO extends AbstractNodeIO
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
     LocalNodeContext ctx = channel.getChannel();
     LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
-    for (Future<DataLocation> f: futureList)
-    {
+    for (Future<DataLocation> f: futureList) {
       DataLocation location = f.get();
       message.addLocation(location);
     }
     message.setBundle(bundle);
-    synchronized(channel.getServerLock())
-    {
+    synchronized(channel.getServerLock()) {
       channel.setReadyOps(OP_READ);
       channel.setServerResource(message);
       if (debugEnabled) log.debug("wrote full results");

@@ -22,7 +22,7 @@ import static org.jppf.utils.StringUtils.build;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.caching.*;
@@ -37,8 +37,7 @@ import org.slf4j.*;
  * application classes, to avoid costly redeployment system-wide.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
-{
+public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
   /**
    * Logger for this class.
    */
@@ -90,7 +89,13 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
   /**
    * Determines whether this class laoder is in connected mode or not.
    */
-  protected boolean offline;
+  protected final boolean offline;
+  /**
+   * Determines whether this remote class loading is enabled.
+   * @since 4.2
+   * @exclude
+   */
+  protected final AtomicBoolean remoteClassLoadingDisabled = new AtomicBoolean(false);
 
   /**
    * Initialize this class loader with a parent class loader.
@@ -140,7 +145,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   protected JPPFResourceWrapper loadResource(final Map<ResourceIdentifier, Object> map) throws ClassNotFoundException {
     JPPFResourceWrapper resource = null;
-    if (!isOffline()) {
+    if (!isRemoteClassLoadingDisabled()) {
       try {
         if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
         resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
@@ -234,9 +239,9 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
           }
         }
       }
-      if (indices.isEmpty() || isOffline()) {
+      if (indices.isEmpty() || isRemoteClassLoadingDisabled()) {
         if (debugEnabled) {
-          if (isOffline()) log.debug(this.toString() + " offline mode: resources were looked up locally only");
+          if (isRemoteClassLoadingDisabled()) log.debug(this.toString() + " offline mode: resources were looked up locally only");
           else log.debug(this.toString() + " all resources were found locally");
         }
         return results;
@@ -340,7 +345,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
 
   @Override
   public void close() {
-    //log.info("closing classloader " + this);
+    if (debugEnabled) log.debug("closing classloader " + this);
     try {
       super.close();
     } catch (IOException e) {
@@ -355,6 +360,27 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader
    */
   public boolean isOffline() {
     return offline;
+  }
+
+  /**
+   * Specify whether remote class loading is disabled.
+   * @param disabled <code>true</code> to disable remote class loading, <code>false</code> to enable it.
+   * @since 4.2
+   * @exclude
+   */
+  public void setRemoteClassLoadingDisabled(final boolean disabled) {
+    remoteClassLoadingDisabled.set(disabled);
+    if (dynamic) ((AbstractJPPFClassLoaderLifeCycle) getParent()).setRemoteClassLoadingDisabled(disabled);
+  }
+
+  /**
+   * Detrmine whether remote class loading is enabled.
+   * @return <code>true</code> if remote class loading is disabled, <code>false</code> if enabled.
+   * @since 4.2
+   * @exclude
+   */
+  public boolean isRemoteClassLoadingDisabled() {
+    return remoteClassLoadingDisabled.get() || isOffline();
   }
 
   /**

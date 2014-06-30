@@ -477,7 +477,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     TaskBundle bundle = executionManager.getBundle();
     if (bundle == null) return null;
     try {
-      return classLoaderManager.resetClassLoader(bundle.getUuidPath().getList());
+      List<String> uuidPath = bundle.getUuidPath().getList();
+      boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath).getClassLoader().isRemoteClassLoadingDisabled();
+      AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath);
+      newCL.setRemoteClassLoadingDisabled(remoteClassLoadingDisabled);
+      return newCL;
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

@@ -77,7 +77,6 @@ public abstract class AbstractNodeIO implements NodeIO {
    * Read a task from the socket connection, along with its header information.
    * @return a pair of <code>JPPFTaskBundle</code> and a <code>List</code> of <code>JPPFTask</code> instances.
    * @throws Exception if an error is raised while reading the task data.
-   * @see org.jppf.server.node.NodeIO#readTask()
    */
   @Override
   public Pair<TaskBundle, List<Task<?>>> readTask() throws Exception {
@@ -149,17 +148,46 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @param bundle the task wrapper to send along.
    * @param tasks the list of tasks with their result field updated.
    * @throws Exception if an error occurs while writing to the socket stream.
-   * @see org.jppf.server.node.NodeIO#writeResults(org.jppf.server.protocol.JPPFTaskBundle, java.util.List)
    */
   @Override
-  public abstract void writeResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
+  public void writeResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
+    try {
+      bundle.setSLA(null);
+      bundle.setMetadata(null);
+      sendResults(bundle, tasks);
+    } finally {
+      postSendResults(bundle);
+    }
+  }
+
+  /**
+   * Write the execution results to the socket stream.
+   * @param bundle the task wrapper to send along.
+   * @param tasks the list of tasks with their result field updated.
+   * @throws Exception if an error occurs while writing to the socket stream.
+   * @since 4.2
+   */
+  protected abstract void sendResults(TaskBundle bundle, List<Task<?>> tasks) throws Exception;
+
+  /**
+   * Perform some cleanup after sending the results.
+   * @param bundle the task wrapper that was sent.
+   * @throws Exception if an error occurs while writing to the socket stream.
+   * @since 4.2
+   */
+  protected void postSendResults(final TaskBundle bundle) throws Exception {
+    if (!node.isOffline()) {
+      if (debugEnabled) log.debug("resetting remoteClassLoadingDisabled to false");
+      JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+      cont.getClassLoader().setRemoteClassLoadingDisabled(false);
+    }
+  }
 
   /**
    * Prepare the task bundle's data that will be sent back to the server.
    * @param bundle the bundle to process.
    */
-  protected void initializeBundleData(final TaskBundle bundle)
-  {
+  protected void initializeBundleData(final TaskBundle bundle) {
     bundle.setNodeExecutionTime(System.nanoTime());
   }
 

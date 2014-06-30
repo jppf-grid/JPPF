@@ -165,4 +165,19 @@ public interface JobSLA extends JobCommonSLA
    * @since 4.2
    */
   void setApplyMaxResubmitsUponNodeError(boolean applyMaxResubmitsUponNodeError);
+
+  /**
+   * Determine whether remote class loading is enabled for the job.
+   * The default value, when not specified via {@link #setRemoteClassLoadingEnabled(boolean)}, is {@code true}.
+   * @return {@code true} is remote class loading is enabled, {@code false} otherwise.
+   * @since 4.2
+   */
+  boolean isRemoteClassLoadingEnabled();
+
+  /**
+   * Specify whether remote class loading is enabled for the job.
+   * @param enabled {@code true} to enable remote class loading, {@code false} to disable it.
+   * @since 4.2
+   */
+  void setRemoteClassLoadingEnabled(boolean enabled);
 }

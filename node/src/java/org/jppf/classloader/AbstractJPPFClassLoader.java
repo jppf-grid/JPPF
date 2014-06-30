@@ -90,7 +90,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     Class<?> c = findLoadedClass(name);
     if (c == null) {
       if (debugEnabled) log.debug(build("resource [", name, "] not already loaded"));
-      c = isOffline() ? Class.forName(name, true, this) : findClass(name, false);
+      c = isRemoteClassLoadingDisabled() ? Class.forName(name, true, this) : findClass(name, false);
     }
     if (debugEnabled) log.debug(build("definition for resource [", name, "] : ", c));
     if ((c != null) && debugEnabled) log.debug("class '" + name + "' loaded by " + c.getClassLoader());
@@ -130,15 +130,15 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
         return c;
       }
     }
+    if (isRemoteClassLoadingDisabled()) {
+      notFoundCache.add(name);
+      throw new ClassNotFoundException(build("Could not load class '", name, "'"));
+    }
     int i = name.lastIndexOf('.');
     if (i >= 0) {
       String pkgName = name.substring(0, i);
       Package pkg = getPackage(pkgName);
       if (pkg == null) definePackage(pkgName, null, null, null, null, null, null, null);
-    }
-    if (isOffline()) {
-      notFoundCache.add(name);
-      throw new ClassNotFoundException(build("Could not load class '", name, "'"));
     }
     if (debugEnabled) log.debug(build("looking up definition for resource [", name, "]"));
     byte[] b = null;
@@ -222,7 +222,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
     if (url == null) {
       url = super.findResource(name);
       if (debugEnabled) log.debug(build(this, " resource [", name, "] ", url == null ? "not " : "", "found in URL classpath"));
-      if (!isOffline() && (url == null)) {
+      if (!isRemoteClassLoadingDisabled() && (url == null)) {
         if (debugEnabled) log.debug(build(this, " resource [", name, "] not found locally, attempting remote lookup"));
         try {
           List<URL> urlList = findRemoteResources(name);
@@ -273,7 +273,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
       try {
         if (resourceCache.isEnabled()) urlList = resourceCache.getResourcesURLs(name);
         if (urlList == null) urlList = new ArrayList<>();
-        if (!isOffline()) {
+        if (!isRemoteClassLoadingDisabled()) {
           List<URL> tempList = findRemoteResources(name);
           if (tempList != null) urlList.addAll(tempList);
         }

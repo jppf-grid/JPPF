@@ -33,8 +33,7 @@ import org.slf4j.*;
  * This class is used as a container for common methods that cannot be implemented in {@link AbstractNode}.
  * @author Laurent Cohen
  */
-public abstract class AbstractCommonNode extends AbstractNode
-{
+public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Logger for this class.
    */
@@ -60,17 +59,13 @@ public abstract class AbstractCommonNode extends AbstractNode
    * @param bundle the bundle to add parameters to.
    * @exclude
    */
-  protected void setupManagementParameters(final TaskBundle bundle)
-  {
-    try
-    {
+  protected void setupManagementParameters(final TaskBundle bundle) {
+    try {
       JMXServer jmxServer = getJmxServer();
       bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_MASTER, isMasterNode());
       bundle.setParameter(BundleParameter.NODE_PROVISIONING_SLAVE, isSlaveNode());
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -80,8 +75,7 @@ public abstract class AbstractCommonNode extends AbstractNode
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @return a <code>ClassLoader</code> used for loading the classes of the framework.
    */
-  public AbstractJPPFClassLoader getClassLoader()
-  {
+  public AbstractJPPFClassLoader getClassLoader() {
     return classLoaderManager.getClassLoader();
   }
 
@@ -90,8 +84,7 @@ public abstract class AbstractCommonNode extends AbstractNode
    * @param cl the class loader to set.
    * @exclude
    */
-  public void setClassLoader(final AbstractJPPFClassLoader cl)
-  {
+  public void setClassLoader(final AbstractJPPFClassLoader cl) {
     classLoaderManager.setClassLoader(cl);
   }
 
@@ -102,8 +95,7 @@ public abstract class AbstractCommonNode extends AbstractNode
    * @throws Exception if an error occurs while getting the container.
    * @exclude
    */
-  public JPPFContainer getContainer(final List<String> uuidPath) throws Exception
-  {
+  public JPPFContainer getContainer(final List<String> uuidPath) throws Exception {
     return classLoaderManager.getContainer(uuidPath);
   }
 
@@ -111,16 +103,11 @@ public abstract class AbstractCommonNode extends AbstractNode
    * Clear the resource caches of all class loaders managed by this object.
    * @exclude
    */
-  protected void clearResourceCachesIfRequested()
-  {
-    if (cacheResetFlag.get())
-    {
-      try
-      {
+  protected void clearResourceCachesIfRequested() {
+    if (cacheResetFlag.get()) {
+      try {
         classLoaderManager.clearResourceCaches();
-      }
-      finally
-      {
+      } finally {
         cacheResetFlag.set(false);
       }
     }
@@ -131,8 +118,7 @@ public abstract class AbstractCommonNode extends AbstractNode
    * This method merely sets a floag, the actual reset will
    * be performed at the next opportunity, when it is safe to do so. 
    */
-  public void requestResourceCacheReset()
-  {
+  public void requestResourceCacheReset() {
     cacheResetFlag.compareAndSet(false, true);
   }
 }
