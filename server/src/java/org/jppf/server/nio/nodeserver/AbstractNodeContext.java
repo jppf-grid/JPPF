@@ -27,8 +27,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.management.*;
+import org.jppf.management.event.*;
 import org.jppf.nio.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.TaskBundle;
 import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
@@ -214,8 +215,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Called when the node sends a close channel command.
    */
-  public void closeChannel()
-  {
+  public void closeChannel() {
     handleException(getChannel(), null);
   }
 
@@ -375,12 +375,19 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public void close() throws Exception {
+    if (debugEnabled) log.debug("closing channel {}", getChannel());
     getChannel().close();
     if ((jmxConnection != null) && jmxConnection.isConnected()) {
-      try {
-        jmxConnection.close();
-      } catch (Exception ignore) {
-      }
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            jmxConnection.close();
+          } catch (Exception ignore) {
+          }
+        }
+      };
+      new Thread(r).start();
     }
   }
 
@@ -398,6 +405,12 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     else {
       if ((info.getHost() != null) && (info.getPort() >= 0)) {
         jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
+        jmxConnection.addJMXWrapperListener(new JMXWrapperListener() {
+          @Override
+          public void jmxWrapperConnected(final JMXWrapperEvent event) {
+            JPPFDriver.getInstance().getNodeNioServer().nodeConnected(AbstractNodeContext.this);
+          }
+        });
         jmxConnection.connect();
       } else jmxConnection = null;
     }

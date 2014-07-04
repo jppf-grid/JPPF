@@ -340,6 +340,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     lock.lock();
     try {
       selector.wakeup();
+      if (debugEnabled) log.debug("closing node {}", context);
       if (context != null) context.close();
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -350,8 +351,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     try {
       JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
+      if (debugEnabled) log.debug("firing nodeDisconnected() for {}", info);
       nodeConnectionHandler.fireNodeDisconnected(info);
-      //driver.getStatsManager().nodeConnectionClosed();
       driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, -1);
       removeConnection(context);
     } catch (Exception e) {
@@ -487,8 +488,8 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public void nodeConnected(final AbstractNodeContext channel) {
     JPPFManagementInfo info = channel.getManagementInfo();
-    if (info != null) nodeConnectionHandler.fireNodeConnected(info);
     addConnection(channel);
+    if (info != null) nodeConnectionHandler.fireNodeConnected(info);
   }
 
   /**

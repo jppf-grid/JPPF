@@ -22,13 +22,15 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.*;
 
 import javax.management.*;
 import javax.management.remote.*;
-import javax.management.remote.generic.*;
+import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.JPPFException;
+import org.jppf.management.event.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -106,6 +108,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * 
    */
   private final Object connectionLock = new Object();
+  /**
+   * The list of listeners to this connection wrapper.
+   */
+  private final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>(); 
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -151,6 +157,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     if (local) {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
       setConnectedStatus(true);
+      fireConnected();
     } else {
       JMXConnectionThread jct = null;
       boolean jctNull = true;
@@ -202,6 +209,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       }
     }
     setConnectedStatus(true);
+    fireConnected();
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
   }
 
@@ -485,5 +493,29 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     sb.append(", secure=").append( sslEnabled);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Add a listener to this connection wrapper
+   * @param listener the listener to add.
+   */
+  public void addJMXWrapperListener(final JMXWrapperListener listener) {
+    listeners.add(listener);
+  }
+
+  /**
+   * Remove a listener from this connection wrapper
+   * @param listener the listener to add.
+   */
+  public void removeJMXWrapperListener(final JMXWrapperListener listener) {
+    listeners.remove(listener);
+  }
+
+  /**
+   * Notify all listeners that the connection was successful.
+   */
+  protected void fireConnected() {
+    JMXWrapperEvent event = new JMXWrapperEvent(this);
+    for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
   }
 }
