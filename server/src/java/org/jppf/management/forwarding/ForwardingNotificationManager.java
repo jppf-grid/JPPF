@@ -40,8 +40,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ForwardingNotificationManager implements NodeConnectionListener, ForwardingNotificationEventListener
-{
+public class ForwardingNotificationManager implements NodeConnectionListener, ForwardingNotificationEventListener {
   /**
    * Logger for this class.
    */
@@ -79,8 +78,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * Initialize this manager.
    * @param forwarder the forwarding mbean instance.
    */
-  public ForwardingNotificationManager(final JPPFNodeForwarding forwarder)
-  {
+  public ForwardingNotificationManager(final JPPFNodeForwarding forwarder) {
     this.forwarder = forwarder;
     this.selectionHelper = forwarder.getSelectionHelper();
     forwarder.driver.getInitializer().getNodeConnectionEventHandler().addNodeConnectionListener(this);
@@ -92,8 +90,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * @param selector the slector which determines from which nodes notification should be forwarded.
    * @param mBeanName the name of the MBean from which to receive notifications from the selected nodes.
    */
-  public void addNotificationListener(final String listenerID, final NodeSelector selector, final String mBeanName)
-  {
+  public void addNotificationListener(final String listenerID, final NodeSelector selector, final String mBeanName) {
     addNotificationListener(new NotificationListenerWrapper(listenerID, selector, mBeanName));
   }
 
@@ -101,47 +98,39 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * Add the specified notification listener to the map of listeners.
    * @param wrapper the listener to add.
    */
-  private void addNotificationListener(final NotificationListenerWrapper wrapper)
-  {
+  private void addNotificationListener(final NotificationListenerWrapper wrapper) {
     if (debugEnabled) log.debug("adding notification listener {}", wrapper);
     NodeSelector selector = wrapper.getSelector();
     Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector);
     if (debugEnabled) log.debug("found {} nodes", nodes.size());
     lock.lock();
-    try
-    {
+    try {
       forwardingHelper.setListener(wrapper.getListenerID(), wrapper);
       for (AbstractNodeContext node: nodes) addNotificationListener(node, wrapper);
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
 
   /**
-   * Add the psecified listener to the specified node.
+   * Add the specified listener to the specified node.
    * @param node the node to which to add the listener.
    * @param wrapper the listener to add.
    */
-  private void addNotificationListener(final AbstractNodeContext node, final NotificationListenerWrapper wrapper)
-  {
+  private void addNotificationListener(final AbstractNodeContext node, final NotificationListenerWrapper wrapper) {
     String uuid = node.getUuid();
     String mbean = wrapper.getMBeanName();
     if (debugEnabled) log.debug("adding notification listener for node={} : {}", uuid, wrapper);
     ForwardingNotificationDispatcher dispatcher = nodeMap.get(uuid);
     boolean wasNull = dispatcher == null;
     if (wasNull) dispatcher = new ForwardingNotificationDispatcher(node);
-    if (dispatcher.addNotificationListener(mbean))
-    {
-      if (wasNull)
-      {
+    if (dispatcher.addNotificationListener(mbean)) {
+      if (wasNull) {
         nodeMap.put(uuid, dispatcher);
         dispatcher.addForwardingNotificationEventListener(this);
       }
       CollectionMap<String, NotificationListenerWrapper> map = clientMap.get(uuid);
-      if (map == null)
-      {
+      if (map == null) {
         map = new ArrayListHashMap<>();
         map.putValue(mbean, wrapper);
       }
@@ -154,8 +143,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * @param listenerID the id of the listener to remove.
    * @throws ListenerNotFoundException if the listener could not be found.
    */
-  public void removeNotificationListener(final String listenerID) throws ListenerNotFoundException
-  {
+  public void removeNotificationListener(final String listenerID) throws ListenerNotFoundException {
     NotificationListenerWrapper wrapper = forwardingHelper.removeListener(listenerID);
     if (wrapper == null) throw new ListenerNotFoundException("could not find listener with id=" + listenerID);
     removeNotificationListener(wrapper);
@@ -166,28 +154,31 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
    * @param wrapper the listener to remove.
    * @throws ListenerNotFoundException if the listener could not be found.
    */
-  public void removeNotificationListener(final NotificationListenerWrapper wrapper) throws ListenerNotFoundException
-  {
+  public void removeNotificationListener(final NotificationListenerWrapper wrapper) throws ListenerNotFoundException {
+    if (debugEnabled) log.debug("removing notification listeners for {}", wrapper);
     NodeSelector selector = wrapper.getSelector();
-    Set<AbstractNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
-    lock.lock();
-    try
-    {
-      for (AbstractNodeContext node: nodes) removeNotificationListener(node, wrapper);
-    }
-    finally
-    {
-      lock.unlock();
-    }
+    final Set<AbstractNodeContext> nodes = forwarder.getSelectionHelper().getChannels(selector);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        lock.lock();
+        try {
+          for (AbstractNodeContext node: nodes) removeNotificationListener(node, wrapper);
+        } finally {
+          lock.unlock();
+        }
+      }
+    };
+    new Thread(r).start();
   }
 
   /**
-   * Remove the psecified listener from the specified node.
+   * Remove the specified listener from the specified node.
    * @param node the node from which to remove the listener.
    * @param wrapper the listener to rmeove.
    */
-  private void removeNotificationListener(final AbstractNodeContext node, final NotificationListenerWrapper wrapper)
-  {
+  private void removeNotificationListener(final AbstractNodeContext node, final NotificationListenerWrapper wrapper) {
+    if (debugEnabled) log.debug("removing notification listener {} for node {}", wrapper, node);
     String mbean = wrapper.getMBeanName();
     String uuid = node.getUuid();
     ForwardingNotificationDispatcher dispatcher = nodeMap.get(uuid);
@@ -196,58 +187,56 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     map.removeValue(mbean, wrapper);
     if (!map.containsKey(mbean)) dispatcher.removeNotificationListener(mbean);
     if (map.isEmpty()) clientMap.remove(uuid);
-    if (!dispatcher.hasNotificationListener())
-    {
+    if (!dispatcher.hasNotificationListener()) {
       dispatcher.removeForwardingNotificationEventListener(this);
       nodeMap.remove(uuid);
     }
   }
 
   @Override
-  public void nodeConnected(final NodeConnectionEvent event)
-  {
+  public void nodeConnected(final NodeConnectionEvent event) {
     JPPFManagementInfo info = event.getNodeInformation();
+    if (debugEnabled) log.debug("handling new connected node {}", info);
     if ((info == null) || (info.getPort() < 0) || (info.getHost() == null)) return;
-    String uuid = event.getNodeInformation().getUuid();
+    String uuid = info.getUuid();
     AbstractNodeContext node = forwarder.driver.getNodeNioServer().getConnection(uuid);
+    if (debugEnabled) log.debug("new connected node {}", node);
     if (node == null) return;
     lock.lock();
-    try
-    {
-      for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners())
-      {
+    try {
+      for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners()) {
         if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) addNotificationListener(node, wrapper);
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public void nodeDisconnected(final NodeConnectionEvent event)
-  {
-    String uuid = event.getNodeInformation().getUuid();
-    AbstractNodeContext node = forwarder.driver.getNodeNioServer().getConnection(uuid);
+  public void nodeDisconnected(final NodeConnectionEvent event) {
+    JPPFManagementInfo info = event.getNodeInformation();
+    if (debugEnabled) log.debug("handling disconnected node {}", info);
+    String uuid = info.getUuid();
+    final AbstractNodeContext node = forwarder.driver.getNodeNioServer().getConnection(uuid);
     if (node == null) return;
-    lock.lock();
-    try
-    {
-      for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners())
-      {
-        if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        lock.lock();
+        try {
+          for (NotificationListenerWrapper wrapper: forwardingHelper.allListeners()) {
+            if (selectionHelper.isNodeAccepted(node, wrapper.getSelector())) removeNotificationListener(node, wrapper);
+          }
+        } finally {
+          lock.unlock();
+        }
       }
-    }
-    finally
-    {
-      lock.unlock();
-    }
+    };
+    new Thread(r).start();
   }
 
   @Override
-  public synchronized void notificationReceived(final ForwardingNotificationEvent event)
-  {
+  public synchronized void notificationReceived(final ForwardingNotificationEvent event) {
     if (debugEnabled) log.debug("received notification from node=" +  event.getNodeUuid() + ", mbean='" + event.getMBeanName() + "' : " + event.getNotification());
     forwarder.sendNotification(new JPPFNodeForwardingNotification(event.getNotification(), event.getNodeUuid(), event.getMBeanName()));
   }

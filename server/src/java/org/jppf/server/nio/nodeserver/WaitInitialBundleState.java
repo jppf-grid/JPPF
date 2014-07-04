@@ -111,8 +111,7 @@ class WaitInitialBundleState extends NodeServerState
           if (systemInfo != null) info.setSystemInfo(systemInfo);
           context.setManagementInfo(info);
         }
-      }
-      server.nodeConnected(context);
+      } else server.nodeConnected(context);
       if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(received, context);
       return finalizeTransition(context);
     }
