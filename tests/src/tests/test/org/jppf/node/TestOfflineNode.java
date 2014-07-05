@@ -46,7 +46,7 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
   public static void setup() throws Exception
   {
     Configuration testConfig = createConfig();
-    client = BaseSetup.setup(1, 2, true, testConfig);
+    client = BaseSetup.setup(1, 2, true, false, testConfig);
   }
 
   /**
@@ -58,7 +58,7 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
   public void testSimpleJobDeserializationError() throws Exception
   {
     int nbTasks = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
     job.getSLA().getClassPath().setForceClassLoaderReset(true);
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
@@ -80,7 +80,7 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
   public void testSimpleJob() throws Exception
   {
     int nbTasks = 5;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 10L);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
     Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
     List<Task<?>> results = client.submitJob(job);
@@ -104,7 +104,7 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
   public void testJobDispatchExpiration() throws Exception
   {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 5000L);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 5000L);
     Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
     job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
