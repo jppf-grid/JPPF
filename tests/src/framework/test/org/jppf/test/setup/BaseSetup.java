@@ -132,13 +132,27 @@ public class BaseSetup {
    * Launches a driver and node and start the client.
    * @param nbDrivers the number of drivers to launch.
    * @param nbNodes the number of nodes to launch.
-   * @param initClient if true then start a client.
+   * @param createClient if true then start a client.
    * @param config the driver and node configuration to use.
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient, final Configuration config) throws Exception {
-    System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (initClient ? " and 1 client" : ""));
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final Configuration config) throws Exception {
+    return setup(nbDrivers, nbNodes, createClient, true, config);
+  }
+
+  /**
+   * Launches a driver and node and start the client.
+   * @param nbDrivers the number of drivers to launch.
+   * @param nbNodes the number of nodes to launch.
+   * @param createClient if true then start a client.
+   * @param checkDriversAndNodes if true then check that all drivers and nodes are connected before returning.
+   * @param config the driver and node configuration to use.
+   * @return an instance of <code>JPPFClient</code>.
+   * @throws Exception if a process could not be started.
+   */
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes, final Configuration config) throws Exception {
+    System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (createClient ? " and 1 client" : ""));
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++) {
@@ -152,9 +166,9 @@ public class BaseSetup {
       else nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
-    if (initClient) {
+    if (createClient) {
       client = createClient(null, true, config);
-      checkDriverAndNodesInitialized(nbDrivers, nbNodes);
+      if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     }
     return client;
   }
