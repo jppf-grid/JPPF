@@ -1,0 +1,155 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2014 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-Maven" basedir=".." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+  <!-- ========================================================================= -->
+  <!--                     Build the maven artifacts                             -->
+  <!-- ========================================================================= -->
+
+  <target name="maven.artifacts" depends="maven.init, maven.generate" description=""/>
+
+  <target name="maven.init" depends="">
+    <property name="maven.dist" value="${build}/maven"/>
+    <delete dir="${maven.dist}" quiet="true"/>
+    <mkdir dir="${maven.dist}"/>
+    <loadfile property="jppf.maven.header" srcFile="${bin}/maven/pom-header.xml"/>
+    <loadfile property="jppf.maven.common" srcFile="${bin}/maven/pom-common.xml"/>
+    <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
+    <!-- defined maven snapshots and staging repository id and url -->
+    <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
+    <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />
+    <property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
+    <property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+    <property name="pom.file" value="${maven.dist}/pom.xml"/>
+    <condition property="maven.snapshot">
+      <contains string="${maven.version}" substring="SNAPSHOT" casesensitive="false"/>
+    </condition>
+  </target>
+
+  <target name="maven.generate" depends="">
+    <maven.artifacts.module module="${node}"   file="common-node"/>
+    <maven.artifacts.module module="${common}" file="common"/>
+    <maven.artifacts.module module="${client}" file="client"/>
+    <maven.artifacts.module module="${server}" file="server"/>
+    <maven.artifacts.module module="${admin}"  file="admin"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Generate the jar, src jar, javadoc jar, pom.xml and their gpg signatures  -->
+  <!-- ========================================================================= -->
+
+  <macrodef name="maven.artifacts.module">
+    <attribute name="module"/>
+    <attribute name="file"/>
+    <sequential>
+      <property name="artifactId" value="jppf-@{file}"/>
+      <property name="maven.dist.javadoc" value="${maven.dist}/${artifactId}-api"/>
+      <delete dir="${maven.dist.javadoc}" quiet="true"/>
+      <waitfor maxwait="5000" maxwaitunit="millisecond">
+        <not><available file="${maven.dist.javadoc}" type="dir"/></not>
+      </waitfor>
+      <mkdir dir="${maven.dist.javadoc}"/>
+      <property name="artifact.prefix" value="${artifactId}-${maven.version}"/>
+      <!-- generate the javadoc -->
+      <javadoc destdir="${maven.dist.javadoc}" access="protected" Windowtitle="JPPF"
+        packagenames="**/*.*" classpathref="javadoc.classpath" stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" additionalparam="-quiet"
+        doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
+        <arg value="-J-Xmx512m"/>
+        <packageset dir="@{module}/src/java"/>
+        <link href="http://download.oracle.com/javase/6/docs/api/"/>
+        <link href="http://docs.oracle.com/javaee/6/api/"/>
+        <link href="http://xstream.codehaus.org/javadoc"/>
+        <link href="http://www.jppf.org/api-3"/>
+        <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
+        <header><![CDATA[<table><tr><td valign="center">
+            <a href="http://www.jppf.org" target="_top"><img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>
+          </td></tr></table>]]>
+        </header>
+        <bottom><![CDATA[<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2013 JPPF Team.</i></font>]]></bottom>
+      </javadoc>
+      <copy todir="${maven.dist.javadoc}/resources" overwrite="true">
+        <fileset dir="${bin}">
+          <include name="*.gif"/>
+          <include name="*.jpg"/>
+        </fileset>
+      </copy>
+      <property name="javadoc.file" value="${maven.dist}/${artifact.prefix}-javadoc.jar"/>
+      <delete file="${javadoc.file}" quiet="true"/>
+      <jar jarfile="${javadoc.file}"><fileset dir="${maven.dist.javadoc}" /></jar>
+      <delete dir="${maven.dist.javadoc}" quiet="true"/>
+      <delete file="${pom.file}" quiet="true"/>
+      <copy file="${build}/jppf-@{file}.jar" toFile="${maven.dist}/${artifact.prefix}.jar"/>
+      <copy file="${build}/jppf-@{file}-src.jar" toFile="${maven.dist}/${artifact.prefix}-sources.jar"/>
+      <copy toFile="${pom.file}" file="${bin}/maven/jppf-@{file}.xml"/>
+      <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
+      <replace file="${pom.file}">
+        <replacefilter token="@header@" value="${jppf.maven.header}"/>
+        <replacefilter token="@common@" value="${jppf.maven.common}"/>
+        <replacefilter token="@module@" value="@{file}"/>
+        <replacefilter token="@version@" value="${maven.version}"/>
+      </replace>
+      <jar jarfile="${maven.dist}/@{file}-bundle.jar">
+        <fileset dir="${maven.dist}" includes="jppf-@{file}*.*,pom.xml"/>
+      </jar>
+      <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+      <antcall target="maven.staging"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
+      <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
+    </sequential>
+  </macrodef>
+
+  <target name="maven.snapshot" depends="" if="maven.snapshot">
+    <echo message="deploying to SNAPSHOT repository !!!"/>
+    <artifact:mvn failonerror="true">
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-snapshots-repository-url}" />
+      <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
+      <arg value="-DpomFile=${pom.file}"/>
+      <arg value="-Dfile=${maven-jar}.jar"/>
+      <arg value="-Dsources=${maven-jar}-sources.jar"/>
+      <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+  </target>
+
+  <target name="maven.staging" depends="" unless="maven.snapshot">
+    <echo message="deploying to STAGING repository !!!"/>
+    <artifact:mvn failonerror="true">
+      <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+      <arg value="-Durl=${maven-staging-repository-url}" />
+      <arg value="-DrepositoryId=${maven-staging-repository-id}" />
+      <arg value="-DpomFile=${pom.file}"/>
+      <arg value="-Dfile=${maven-jar}.jar"/>
+      <arg value="-Dsources=${maven-jar}-sources.jar"/>
+      <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
+      <arg value="-Pgpg" />
+    </artifact:mvn>
+  </target>
+
+  <target name="gpg.sign" depends="">
+    <exec executable="gpg">
+      <arg value="--yes"/>
+      <arg value="--passphrase"/>
+      <arg value="${gpg.pass}"/>
+      <arg value="--armor"/>
+      <arg value="--detach-sign"/>
+      <arg value="${file.sign}"/>
+    </exec>
+  </target>
+
+</project> 
