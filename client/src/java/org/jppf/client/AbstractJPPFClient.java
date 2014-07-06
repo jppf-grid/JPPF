@@ -426,7 +426,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
-   * Find the connection pool with the specified id.
+   * Find the connection pool with the specified name.
    * @param name the name of the pool to find.
    * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool with the specified name could be found.
    * @since 4.1

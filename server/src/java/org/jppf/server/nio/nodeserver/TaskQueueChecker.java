@@ -325,7 +325,7 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
       }
       if (!ch.isActive()) continue;
       if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + ch.getUuid());
-      if (uuidPath.contains(ch.getUuid())) {
+      if (uuidPath.contains(ch.getUuid())) { // cycle detected in P2P routing
         if (debugEnabled) log.debug("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + ch.getUuid());
         continue;
       }

@@ -312,6 +312,7 @@ public class DriverInitializer {
    */
   void initRecoveryServer() {
     if (config.getBoolean("jppf.recovery.enabled", false)) {
+      if (debugEnabled) log.debug("starting recovery server");
       recoveryServer = new RecoveryServer();
       new Thread(recoveryServer, "RecoveryServer thread").start();
     }
