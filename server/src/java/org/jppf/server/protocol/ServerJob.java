@@ -23,7 +23,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
+import org.jppf.job.JobInformation;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -264,5 +267,29 @@ public class ServerJob extends AbstractServerJobBase {
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
+   * @return array of <code>NodeManagementInfo</code> instances.
+   */
+  @SuppressWarnings("unchecked")
+  public NodeJobInformation[] getNodeJobInformation() {
+    ServerTaskBundleNode[] entries;
+    synchronized (dispatchSet) {
+      entries = dispatchSet.values().toArray(new ServerTaskBundleNode[dispatchSet.size()]);
+    }
+    if (entries.length == 0) return NodeJobInformation.EMPTY_ARRAY;
+
+    NodeJobInformation[] result = new NodeJobInformation[entries.length];
+    int i = 0;
+    for (ServerTaskBundleNode nodeBundle : entries) {
+      JPPFManagementInfo nodeInfo = nodeBundle.getChannel().getManagementInfo();
+      TaskBundle bundle = nodeBundle.getJob();
+      JobInformation jobInfo = new JobInformation(bundle);
+      jobInfo.setMaxNodes(bundle.getSLA().getMaxNodes());
+      result[i++] = new NodeJobInformation(nodeInfo, jobInfo);
+    }
+    return result;
   }
 }

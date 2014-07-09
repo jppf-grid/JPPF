@@ -81,8 +81,7 @@ public class JobInformation implements Serializable
    */
   public JobInformation(final TaskBundle bundle)
   {
-    this(bundle.getUuid(), bundle.getName(), bundle.getTaskCount(), bundle.getInitialTaskCount(),
-        bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), bundle.isPending());
+    this(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), bundle.isPending());
   }
 
   /**

@@ -21,7 +21,6 @@ package org.jppf.server.job.management;
 import javax.management.*;
 
 import org.jppf.job.*;
-import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.ServerJob;
@@ -65,7 +64,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * Cancel the job with the specified id.
    * @param jobUuid the id of the job to cancel.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    */
   @Override
   public void cancelJob(final String jobUuid) throws Exception
@@ -87,7 +85,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @param requeue true if the sub-jobs running on each node should be canceled and requeued,
    * false if they should be left to execute until completion.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#suspendJob(java.lang.String,java.lang.Boolean)
    */
   @Override
   public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception
@@ -106,7 +103,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * Resume the job with the specified id.
    * @param jobUuid the id of the job to resume.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#resumeJob(java.lang.String)
    */
   @Override
   public void resumeJob(final String jobUuid) throws Exception
@@ -126,7 +122,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @param jobUuid the id of the job to update.
    * @param maxNodes the new maximum number of nodes for the job.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#updateMaxNodes(java.lang.String, java.lang.Integer)
    */
   @Override
   public void updateMaxNodes(final String jobUuid, final Integer maxNodes) throws Exception
@@ -145,7 +140,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * Get the set of ids for all the jobs currently queued or executing.
    * @return a set of ids as strings.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#getAllJobIds()
    */
   @Override
   public String[] getAllJobIds() throws Exception
@@ -158,17 +152,15 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @param jobUuid the id of the job to get information about.
    * @return an instance of <code>JobInformation</code>.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#getJobInformation(java.lang.String)
    */
   @Override
   public JobInformation getJobInformation(final String jobUuid) throws Exception
   {
-    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
-    if (bundleWrapper == null) return null;
-    TaskBundle bundle = bundleWrapper.getJob();
-    JobInformation job = new JobInformation(bundle);
-    job.setMaxNodes(bundle.getSLA().getMaxNodes());
-    return job;
+    ServerJob job = getJobManager().getBundleForJob(jobUuid);
+    if (job == null) return null;
+    JobInformation jobInfo = new JobInformation(jobUuid, job.getName(), job.getTaskCount(), job.getInitialTaskCount(), job.getSLA().getPriority(), job.isSuspended(), job.isPending());
+    jobInfo.setMaxNodes(job.getSLA().getMaxNodes());
+    return jobInfo;
   }
 
   /**
@@ -176,7 +168,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @param jobUuid the id of the job for which to find node information.
    * @return array of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#getNodeInformation(java.lang.String)
    */
   @Override
   public NodeJobInformation[] getNodeInformation(final String jobUuid) throws Exception
@@ -204,14 +195,13 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   }
 
   /**
-   * A job manager listeners that sends a notification through the mbean for each job manager event.
+   * A job manager listener that sends a notification through the mbean for each job manager event.
    */
   private class JobEventNotifier implements JobManagerListener
   {
     /**
      * Called when a new job is put in the job queue.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobManagerListener#jobQueued(org.jppf.job.JobNotification)
      */
     @Override
     public void jobQueued(final JobNotification event)
@@ -222,7 +212,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when a job is complete and has been sent back to the client.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobManagerListener#jobEnded(org.jppf.job.JobNotification)
      */
     @Override
     public void jobEnded(final JobNotification event)
@@ -233,7 +222,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when the current number of tasks in a job was updated.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobManagerListener#jobUpdated(org.jppf.job.JobNotification)
      */
     @Override
     public void jobUpdated(final JobNotification event)
@@ -244,7 +232,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when all or part of a job is is sent to a node for execution.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobManagerListener#jobDispatched(org.jppf.job.JobNotification)
      */
     @Override
     public void jobDispatched(final JobNotification event)
@@ -255,7 +242,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     /**
      * Called when all or part of a job has returned from irs execution on a node.
      * @param event encapsulates the information about the event.
-     * @see org.jppf.job.JobManagerListener#jobReturned(org.jppf.job.JobNotification)
      */
     @Override
     public void jobReturned(final JobNotification event)

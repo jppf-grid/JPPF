@@ -153,8 +153,8 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     bundleMap.put(jobUuid, bundleWrapper);
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
-    submitEvent(JobEventType.JOB_QUEUED, bundle, null);
-    //driver.getStatsUpdater().jobQueued(bundle.getTaskCount());
+    //submitEvent(JobEventType.JOB_QUEUED, bundle, null);
+    submitEvent(JobEventType.JOB_QUEUED, bundleWrapper, null);
     synchronized(jobUuids) {
       if (jobUuids.get(jobUuid) == null) {
         jobUuids.put(jobUuid, true);
@@ -180,18 +180,18 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     jobMap.remove(jobUuid);
     bundleMap.remove(jobUuid);
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
-    submitEvent(JobEventType.JOB_ENDED, bundle, null);
+    //submitEvent(JobEventType.JOB_ENDED, bundle, null);
+    submitEvent(JobEventType.JOB_ENDED, bundleWrapper, null);
     JPPFStatistics stats = driver.getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
   }
 
   @Override
-  public synchronized void jobUpdated(final AbstractServerJob bundleWrapper)
+  public synchronized void jobUpdated(final AbstractServerJob job)
   {
-    TaskBundle bundle = bundleWrapper.getJob();
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' updated");
-    submitEvent(JobEventType.JOB_UPDATED, bundle, null);
+    if (debugEnabled) log.debug("jobId '" + job.getName() + "' updated");
+    submitEvent(JobEventType.JOB_UPDATED, (ServerJob) job, null);
   }
 
   @Override
@@ -209,6 +209,17 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel)
   {
     executor.submit(new JobEventTask(this, eventType, bundle, channel));
+  }
+
+  /**
+   * Submit an event to the event queue.
+   * @param eventType the type of event to generate.
+   * @param job the job data.
+   * @param channel the id of the job source of the event.
+   */
+  private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel channel)
+  {
+    executor.submit(new JobEventTask(this, eventType, job, channel));
   }
 
   /**

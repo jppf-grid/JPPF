@@ -21,14 +21,13 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.server.protocol.*;
 
 /**
  * Instances of this class are submitted into an event queue and generate actual
  * job manager events that are then dispatched to registered listeners.
  */
-public class JobEventTask implements Runnable
-{
+public class JobEventTask implements Runnable {
   /**
    * The job manager that submits the events.
    */
@@ -44,6 +43,10 @@ public class JobEventTask implements Runnable
   /**
    * The job data.
    */
+  private final ServerJob job;
+  /**
+   * The task bundle data.
+   */
   private final TaskBundle bundle;
   /**
    * Creation timestamp for this task.
@@ -54,36 +57,49 @@ public class JobEventTask implements Runnable
    * Initialize this job manager event task with the specified parameters.
    * @param jobManager the job manager that submits the events.
    * @param eventType the type of event to generate.
-   * @param bundle the job data.
+   * @param bundle the task bundle data.
    * @param channel the id of the job source of the event.
    */
-  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel)
-  {
+  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel) {
     this.jobManager = jobManager;
     this.eventType = eventType;
     this.channel = channel;
     this.bundle = bundle;
+    this.job = null;
+  }
+
+  /**
+   * Initialize this job manager event task with the specified parameters.
+   * @param jobManager the job manager that submits the events.
+   * @param eventType the type of event to generate.
+   * @param serverJob the job data.
+   * @param channel the id of the job source of the event.
+   */
+  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final ServerJob serverJob, final ExecutorChannel channel) {
+    this.jobManager = jobManager;
+    this.eventType = eventType;
+    this.channel = channel;
+    this.bundle = null;
+    this.job = serverJob;
   }
 
   /**
    * Execute this task.
-   * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    JobSLA sla = bundle.getSLA();
-    JobInformation jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(),
-        bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), bundle.getParameter(BundleParameter.JOB_PENDING, false));
+  public void run() {
+    JobSLA sla = null;
+    JobInformation jobInfo = null;
+    if (job != null) {
+      sla = job.getSLA();
+      jobInfo = new JobInformation(job.getUuid(), job.getName(), job.getTaskCount(), job.getInitialTaskCount(), sla.getPriority(), job.isSuspended(), job.isPending());
+    } else {
+      sla = bundle.getSLA();
+      jobInfo = new JobInformation(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(), bundle.getInitialTaskCount(), sla.getPriority(), sla.isSuspended(), bundle.getParameter(BundleParameter.JOB_PENDING, false));
+    }
     jobInfo.setMaxNodes(sla.getMaxNodes());
     JPPFManagementInfo nodeInfo = (channel == null) ? null : channel.getManagementInfo();
     JobNotification event = new JobNotification(eventType, jobInfo, nodeInfo, timestamp);
-    if(eventType == JobEventType.JOB_UPDATED)
-    {
-      int n = bundle.getCurrentTaskCount();
-      jobInfo.setTaskCount(n);
-    }
-
     jobManager.fireJobEvent(event);
   }
 }
