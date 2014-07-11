@@ -244,9 +244,9 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
               removeIdleChannel(channel);
             }
           }
-          if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle" : "channel found for bundle: " + channel);
-        } catch(Exception ex) {
-          log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", ex);
+          if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle " : "channel found for bundle " + channel);
+        } catch(Exception e) {
+          log.error("An error occurred while attempting to dispatch task bundles. This is most likely due to an error in the load balancer implementation.", e);
         } finally {
           queueLock.unlock();
         }
@@ -255,8 +255,8 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
         dispatchJobToChannel(channel, nodeBundle);
         dispatched = true;
       }
-    } catch (Exception ex) {
-      log.error("An error occurred while preparing for bundle creation and dispatching.", ex);
+    } catch (Exception e) {
+      log.error("An error occurred while preparing for bundle creation and dispatching.", e);
     }
     return dispatched;
   }

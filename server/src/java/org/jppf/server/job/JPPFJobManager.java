@@ -26,9 +26,9 @@ import org.jppf.job.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
+import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFThreadFactory;
-import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -53,7 +53,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
    */
-  private final Map<String, ServerJob> bundleMap = new HashMap<>();
+  //private final Map<String, ServerJob> bundleMap = new HashMap<>();
   /**
    * Processes the event queue asynchronously.
    */
@@ -67,9 +67,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
   /**
-   * Caches the uuids of jobs that were queued so they can be counted properly.
+   * Reference to the driver queue.
    */
-  private final Map<String, Boolean> jobUuids = new SoftReferenceValuesMap<>();
+  private final JPPFPriorityQueue queue = (JPPFPriorityQueue) driver.getQueue();
 
   /**
    * Default constructor.
@@ -107,11 +107,12 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public synchronized ServerJob getBundleForJob(final String jobUuid)
   {
-    return bundleMap.get(jobUuid);
+    return ((JPPFPriorityQueue) driver.getQueue()).getBundleForJob(jobUuid);
+    //return bundleMap.get(jobUuid);
   }
 
   @Override
-  public synchronized void jobDispatched(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
+  public synchronized void jobDispatched(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
     TaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
@@ -121,13 +122,13 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       list = new ArrayList<>();
       jobMap.put(jobUuid, list);
     }
-    list.add(new ChannelJobPair(channel, bundleWrapper));
+    list.add(new ChannelJobPair(channel, serverJob));
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
     submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
   }
 
   @Override
-  public synchronized void jobReturned(final AbstractServerJob bundleWrapper, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
+  public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
   {
     TaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
@@ -137,51 +138,45 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
       return;
     }
-    list.remove(new ChannelJobPair(channel, bundleWrapper));
+    list.remove(new ChannelJobPair(channel, serverJob));
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
   }
 
   /**
    * Called when a job is added to the server queue.
-   * @param bundleWrapper the queued job.
+   * @param serverJob the queued job.
    */
-  public synchronized void jobQueued(final ServerJob bundleWrapper)
+  public synchronized void jobQueued(final ServerJob serverJob)
   {
-    TaskBundle bundle = bundleWrapper.getJob();
+    TaskBundle bundle = serverJob.getJob();
     String jobUuid = bundle.getUuid();
-    bundleMap.put(jobUuid, bundleWrapper);
+    //bundleMap.put(jobUuid, serverJob);
     jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
-    //submitEvent(JobEventType.JOB_QUEUED, bundle, null);
-    submitEvent(JobEventType.JOB_QUEUED, bundleWrapper, null);
-    synchronized(jobUuids) {
-      if (jobUuids.get(jobUuid) == null) {
-        jobUuids.put(jobUuid, true);
-        driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
-        driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
-      }
-    }
+    submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
+    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
     driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
   }
 
   /**
    * Called when a job is complete and returned to the client.
-   * @param bundleWrapper the completed job.
+   * @param serverJob the completed job.
    */
-  public synchronized void jobEnded(final ServerJob bundleWrapper)
+  public synchronized void jobEnded(final ServerJob serverJob)
   {
-    if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-    if (bundleWrapper.getJob().isHandshake()) return; // skip notifications for handshake bundles
+    if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
+    if (serverJob.getJob().isHandshake()) return; // skip notifications for handshake bundles
 
-    TaskBundle bundle = bundleWrapper.getJob();
-    long time = System.currentTimeMillis() - bundleWrapper.getJobReceivedTime();
+    TaskBundle bundle = serverJob.getJob();
+    long time = System.currentTimeMillis() - serverJob.getJobReceivedTime();
     String jobUuid = bundle.getUuid();
     jobMap.remove(jobUuid);
-    bundleMap.remove(jobUuid);
+    //bundleMap.remove(jobUuid);
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
     //submitEvent(JobEventType.JOB_ENDED, bundle, null);
-    submitEvent(JobEventType.JOB_ENDED, bundleWrapper, null);
+    submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     JPPFStatistics stats = driver.getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
@@ -229,7 +224,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   {
     executor.shutdownNow();
     jobMap.clear();
-    bundleMap.clear();
+    //bundleMap.clear();
   }
 
   /**
