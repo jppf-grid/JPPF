@@ -47,6 +47,7 @@
     </copy>
     <!-- Convert sources to HTML and include them in the designated samples -->
     <include.code sample="AdaptiveGrid"/>
+    <include.code sample="ConcurrentJobs"/>
     <include.code sample="CustomLoadBalancer"/>
     <include.code sample="DataEncryption"/>
     <include.code sample="ExtendedClassLoading"/>
@@ -86,6 +87,7 @@
         <exclude name="**/package.html"/>
         <exclude name="**/Readme.html"/>
         <include name="AdaptiveGrid/**/jppf.properties"/>
+        <include name="ConcurrentJobs/images/*.*"/>
         <include name="CustomLoadBalancer/**/*.properties"/>
         <include name="InitializationHook/**/*.properties"/>
         <include name="NodeLifeCycle/config/jppf-client.properties"/>

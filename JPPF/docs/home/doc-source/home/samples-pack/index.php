@@ -31,6 +31,7 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
   <li><a href="WordCount/Readme.php">A word count demo on the Wikipedia database</a></li>
   <li><a href="FractalMovieGenerator/Readme.php">Generating AVI movies</a> from images produced by the <a href="Fractals/Readme.php">Mandelbrot fractals sample</a></li>
   <li><a href="AdaptiveGrid/Readme.php">Dynamically adapting the grid topology based on the current workload</a></li>
+  <li><a href="ConcurrentJobs/Readme.php">A demonstration of the patterns for submitting multiple jobs in parallel</a></li>
 </ul>
 <br>
 
