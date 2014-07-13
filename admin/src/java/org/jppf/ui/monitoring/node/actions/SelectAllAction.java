@@ -61,7 +61,7 @@ public class SelectAllAction extends AbstractSelectionAction
         {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(i);
           TopologyData nodeData = (TopologyData) node.getUserObject();
-          if ((nodeData == null) || !(TopologyDataType.NODE == nodeData.getType())) continue;
+          if ((nodeData == null) || !nodeData.isNode()) continue;
           selectionPath.add(treeTable.getPathForNode(node));
         }
       }

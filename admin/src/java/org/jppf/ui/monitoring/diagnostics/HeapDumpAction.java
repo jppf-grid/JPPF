@@ -78,7 +78,7 @@ public class HeapDumpAction extends AbstractTopologyAction
       // do the gc() in the drivers
       for (TopologyData data: dataArray)
       {
-        if ((data.getType() == TopologyDataType.DRIVER) && (data.getDiagnostics() != null))
+        if (data.isDriver() && (data.getDiagnostics() != null))
         {
           try
           {

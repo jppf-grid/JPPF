@@ -81,7 +81,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
       {
         setStatus(CONNECTING);
         if (socketClient == null) initSocketClient();
-        String msg = "[client: " + name + "] Attempting connection to the JPPF task server at " + host + ':' + port;
+        String msg = "[client: " + name + "] Attempting connection to the task server at " + host + ':' + port;
         System.out.println(msg);
         if (debugEnabled) log.debug(msg);
         socketInitializer.initializeSocket(socketClient);

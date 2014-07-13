@@ -97,7 +97,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
       {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
         TopologyData nodeData = (TopologyData) node.getUserObject();
-        if (nodeData.getType() == TopologyDataType.PEER) continue;
+        if (nodeData.isPeer()) continue;
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(nodeData);
         newDriver.add(newNode);
       }
@@ -262,7 +262,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   public synchronized void nodeAdded(final TopologyChangeEvent event)
   {
     if (debugEnabled) log.debug("adding node " + event.getNodeData() + " to driver " + event.getDriverData());
-    if ((event.getPeerData() != null) || (event.getNodeData().getType() == TopologyDataType.PEER)) return;
+    if ((event.getPeerData() != null) || event.getNodeData().isPeer()) return;
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
     if (driver == null) return;
     DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
@@ -277,7 +277,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   public synchronized void nodeRemoved(final TopologyChangeEvent event)
   {
     if (debugEnabled) log.debug("removing node " + event.getNodeData() + " from driver " + event.getDriverData());
-    if (event.getNodeData().getType() == TopologyDataType.PEER) return;
+    if (event.getNodeData().isPeer()) return;
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
     if (driver == null) return;
     DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());

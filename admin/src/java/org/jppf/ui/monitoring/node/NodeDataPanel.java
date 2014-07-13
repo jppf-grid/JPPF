@@ -265,7 +265,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   }
 
   /**
-   * Refresh the states of the node for the psecified driver.
+   * Refresh the states of the node for the specified driver.
    * @param driverData the driver for which to update the nodes.
    * @param nodeUuidMap the map of node uuids to their information.
    */
@@ -294,7 +294,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   }
 
   /**
-   * Refresh the states of the node for the psecified driver.
+   * Refresh the states of the node for the specified driver.
    * @param driverData the driver for which to update the nodes.
    * @param nodeUuidMap the map of node uuids to their information.
    */

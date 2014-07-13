@@ -28,8 +28,7 @@ import org.junit.runner.notification.*;
  * 
  * @author Laurent Cohen
  */
-public class TestRunListener extends RunListener
-{
+public class TestRunListener extends RunListener {
   /**
    * Holds the results of all tests.
    */
@@ -57,14 +56,13 @@ public class TestRunListener extends RunListener
   /**
    * EXIT, WAIT, or NONE
    */
-  private final String actionOnError = "NONE";
+  private final String actionOnError = "EXIT";
 
   /**
    * Initialize this listener with the specified result holder.
    * @param resultHolder holds the results of all tests.
    */
-  public TestRunListener(final ResultHolder resultHolder)
-  {
+  public TestRunListener(final ResultHolder resultHolder) {
     this(resultHolder, null);
   }
 
@@ -73,8 +71,7 @@ public class TestRunListener extends RunListener
    * @param resultHolder holds the results of all tests.
    * @param out used to log the results during execution of the tests.
    */
-  public TestRunListener(final ResultHolder resultHolder, final PrintStream out)
-  {
+  public TestRunListener(final ResultHolder resultHolder, final PrintStream out) {
     if (resultHolder == null) throw new IllegalArgumentException("result holder can't be null");
     this.resultHolder = resultHolder;
     this.out = out;
@@ -85,17 +82,14 @@ public class TestRunListener extends RunListener
    * Get the object that holds the results of all tests.
    * @return a <code>ResultHolder</code> instance.
    */
-  public ResultHolder getResultHolder()
-  {
+  public ResultHolder getResultHolder() {
     return resultHolder;
   }
 
   @Override
-  public void testRunStarted(final Description description) throws Exception
-  {
+  public void testRunStarted(final Description description) throws Exception {
     resultHolder.setStartTime(System.currentTimeMillis());
-    if (isLogging)
-    {
+    if (isLogging) {
       defaultSysout = System.out;
       defaultSyserr = System.err;
       System.setOut(out);
@@ -104,23 +98,18 @@ public class TestRunListener extends RunListener
   }
 
   @Override
-  public void testRunFinished(final Result result) throws Exception
-  {
+  public void testRunFinished(final Result result) throws Exception {
     resultHolder.setEndTime(System.currentTimeMillis());
-    if (isLogging)
-    {
+    if (isLogging) {
       System.setOut(defaultSysout);
       System.setErr(defaultSyserr);
     }
   }
 
   @Override
-  public void testStarted(final Description description) throws Exception
-  {
-    if (isLogging)
-    {
-      if (!description.getClassName().equals(currentClass))
-      {
+  public void testStarted(final Description description) throws Exception {
+    if (isLogging) {
+      if (!description.getClassName().equals(currentClass)) {
         currentClass = description.getClassName();
         out.println("\n---------- end of output for class " + currentClass + " ----------\n");
         defaultSysout.println("class " + currentClass);
@@ -131,8 +120,7 @@ public class TestRunListener extends RunListener
   }
 
   @Override
-  public void testFailure(final Failure failure) throws Exception
-  {
+  public void testFailure(final Failure failure) throws Exception {
     resultHolder.addFailure(failure);
     if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "'");
     if ("EXIT".equals(actionOnError)) System.exit(1);
@@ -140,18 +128,15 @@ public class TestRunListener extends RunListener
   }
 
   @Override
-  public void testFinished(final Description description) throws Exception
-  {
-    if (!resultHolder.hasTest(description))
-    {
+  public void testFinished(final Description description) throws Exception {
+    if (!resultHolder.hasTest(description)) {
       resultHolder.addSuccess(description);
       if (isLogging) defaultSysout.println("  + " + description.getMethodName() + " : OK");
     }
   }
 
   @Override
-  public void testIgnored(final Description description) throws Exception
-  {
+  public void testIgnored(final Description description) throws Exception {
     resultHolder.addIgnored(description);
   }
 }

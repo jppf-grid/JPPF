@@ -104,7 +104,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
     {
       if (!(o instanceof TopologyData)) continue;
       TopologyData data = (TopologyData) o;
-      if (TopologyDataType.DRIVER.equals(data.getType())) list.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
+      if (data.isDriver()) list.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
     }
 
     AbstractButton btn = (AbstractButton) event.getSource();

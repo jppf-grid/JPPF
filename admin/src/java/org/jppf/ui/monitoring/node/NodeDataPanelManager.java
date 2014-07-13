@@ -198,7 +198,7 @@ public class NodeDataPanelManager {
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(data);
     panel.getModel().insertNodeInto(nodeNode, driverNode, index);
     fireNodeAdded((TopologyData) driverNode.getUserObject(), data, peerData);
-    if (data.getType() == TopologyDataType.NODE) panel.updateStatusBar("/StatusNbNodes", 1);
+    if (data.isNode()) panel.updateStatusBar("/StatusNbNodes", 1);
 
     for (int i=0; i<panel.getTreeTableRoot().getChildCount(); i++) {
       DefaultMutableTreeNode driverNode2 = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
@@ -234,7 +234,7 @@ public class NodeDataPanelManager {
     if (nodeData != null) {
       nodeData.setParent(null);
       fireNodeRemoved((TopologyData) driver.getUserObject(), nodeData);
-      if (nodeData.getType() == TopologyDataType.NODE) {
+      if (nodeData.isNode()) {
         nodeMap.remove(nodeData.getUuid());
         panel.updateStatusBar("/StatusNbNodes", -1);
       }

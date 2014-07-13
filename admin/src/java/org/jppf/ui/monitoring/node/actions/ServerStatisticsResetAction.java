@@ -50,15 +50,12 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
    * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
-    for (Object o: selectedElements)
-    {
+    for (Object o: selectedElements) {
       if (!(o instanceof TopologyData)) continue;
       TopologyData data = (TopologyData) o;
-      if (!data.isNode())
-      {
+      if (!data.isNode()) {
         setEnabled(true);
         return;
       }
@@ -81,7 +78,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
       {
         if (!(o instanceof TopologyData)) continue;
         TopologyData data = (TopologyData) o;
-        if (TopologyDataType.DRIVER.equals(data.getType()))
+        if (data.isDriver())
           driverConnections.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
       }
       Runnable r = new Runnable() {
@@ -90,8 +87,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
           for (JMXDriverConnectionWrapper jmx: driverConnections) {
             try {
               jmx.resetStatistics();
-            }
-            catch(Exception e) {
+            } catch(Exception e) {
               log.error(e.getMessage(), e);
             }
           }

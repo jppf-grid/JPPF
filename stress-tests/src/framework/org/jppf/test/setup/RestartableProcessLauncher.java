@@ -31,8 +31,7 @@ import test.org.jppf.test.setup.*;
  * 
  * @author Laurent Cohen
  */
-public class RestartableProcessLauncher extends GenericProcessLauncher
-{
+public class RestartableProcessLauncher extends GenericProcessLauncher {
   /**
    * Logger for this class.
    */
@@ -64,8 +63,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
    * @param processType the type of process (node or driver).
    * @param config the scenario configuration.
    */
-  public RestartableProcessLauncher(final int n, final String processType, final ScenarioConfiguration config)
-  {
+  public RestartableProcessLauncher(final int n, final String processType, final ScenarioConfiguration config) {
     super(n, processType);
     this.config = config;
     variables.put("$n", n);
@@ -73,21 +71,17 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
     variables.put("$templates_dir", ScenarioConfiguration.TEMPLATES_DIR);
     variables.put("$nbDrivers", config.getNbDrivers());
     variables.put("$nbNodes", config.getNbNodes());
-    if (streamsConfigured.compareAndSet(false, true))
-    {
+    if (streamsConfigured.compareAndSet(false, true)) {
       stdout = configureOutput(config.getStdoutFilename());
       stderr = configureOutput(config.getStderrFilename());
     }
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     boolean end = false;
-    try
-    {
-      while (!end)
-      {
+    try {
+      while (!end) {
         if (debugEnabled) log.debug(name + "starting process");
         startProcess();
         int exitCode = process.waitFor();
@@ -95,13 +89,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
         end = onProcessExit(exitCode);
         //if (process != null) process.destroy();
       }
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-    catch (Error e)
-    {
+    } catch (Exception|Error e) {
       e.printStackTrace();
     }
     //System.exit(0);
@@ -114,8 +102,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
    * @param exitCode the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
    */
-  private boolean onProcessExit(final int exitCode)
-  {
+  private boolean onProcessExit(final int exitCode) {
     return exitCode != 2;
   }
 
@@ -125,8 +112,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
    * @param override the name of the override file.
    * @return the path of the created file.
    */
-  protected String doConfigOverride(final String template, final String override)
-  {
+  protected String doConfigOverride(final String template, final String override) {
     File templateFile = new File(config.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
     File overrideFile = new File(config.getConfigDir(), override);
@@ -138,14 +124,11 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
   }
 
   @Override
-  public void stopProcess()
-  {
+  public void stopProcess() {
     super.stopProcess();
-    for (String path: tempFileCache)
-    {
+    for (String path: tempFileCache) {
       File file = new File(path);
-      if (file.exists())
-      {
+      if (file.exists()) {
         if (!file.delete() && debugEnabled) log.debug("could not delete file '" + file + '\'');
       }
     }
@@ -155,15 +138,12 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
   /**
    * 
    */
-  protected void setJVMOptions()
-  {
+  protected void setJVMOptions() {
     TypedProperties props = ConfigurationHelper.loadProperties(new File(jppfConfig));
     String opts = props.getString("jppf.jvm.options");
-    if ((opts != null) && !"".equals(opts.trim()))
-    {
+    if ((opts != null) && !"".equals(opts.trim())) {
       String[] options = opts.split("\\s");
-      for (int i=0; i<options.length; i++)
-      {
+      for (int i=0; i<options.length; i++) {
         if ("-cp".equals(options[i]) || "-classpath".equals(options[i])) addClasspathElement(options[++i]);
         else jvmOptions.add(options[i]);
       }
@@ -175,21 +155,16 @@ public class RestartableProcessLauncher extends GenericProcessLauncher
    * @param outputName the path to create the stream from.
    * @return a <code>PrintStream</code> instance.
    */
-  private PrintStream configureOutput(final String outputName)
-  {
+  private PrintStream configureOutput(final String outputName) {
     PrintStream result = null;
-    try
-    {
+    try {
       if ((outputName == null) || "out".equalsIgnoreCase(outputName)) result = System.out;
       else if ("err".equalsIgnoreCase(outputName)) result = System.err;
-      else
-      {
+      else {
         File file = new File(outputName);
         result = new PrintStream(new FileOutputStream(file));
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
     }
     return result;
   }

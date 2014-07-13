@@ -21,8 +21,8 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.server.protocol.TestJPPFJobSLA;
 import test.org.jppf.utils.TestJPPFConfiguration;
+import test.org.jppf.utils.stats.TestJPPFStatistics;
 
 
 
@@ -31,9 +31,7 @@ import test.org.jppf.utils.TestJPPFConfiguration;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestJPPFConfiguration.class, TestJPPFJobSLA.class })
-//@Suite.SuiteClasses({ TestJobPersistence.class, TestMultiServer.class, TestMultiServerWithSSL.class })
-//@Suite.SuiteClasses({ TestSSL.class, TestMultiServer.class, TestFileDataLocation.class, TestSSL2.class })
+@Suite.SuiteClasses({ TestJPPFConfiguration.class, TestJPPFStatistics.class })
 public class JPPFSuite
 {
 }

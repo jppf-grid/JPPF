@@ -26,8 +26,7 @@ import org.slf4j.*;
 /**
  * This action suspends a job.
  */
-public class ResumeJobAction extends AbstractJobAction
-{
+public class ResumeJobAction extends AbstractJobAction {
   /**
    * Logger for this class.
    */
@@ -40,27 +39,21 @@ public class ResumeJobAction extends AbstractJobAction
   /**
    * Initialize this action.
    */
-  public ResumeJobAction()
-  {
+  public ResumeJobAction() {
     setupIcon("/org/jppf/ui/resources/resume.gif");
     putValue(NAME, localize("job.resume.label"));
   }
 
   /**
    * Update this action's enabled state based on a list of selected elements.
-   * @param selectedElements - a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   * @param selectedElements a list of objects.
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
-    if (jobDataArray.length > 0)
-    {
-      for (JobData data: jobDataArray)
-      {
-        if (data.getJobInformation().isSuspended())
-        {
+    if (jobDataArray.length > 0) {
+      for (JobData data: jobDataArray) {
+        if (data.getJobInformation().isSuspended()) {
           setEnabled(true);
           return;
         }
@@ -72,29 +65,20 @@ public class ResumeJobAction extends AbstractJobAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    Runnable r = new Runnable()
-    {
+  public void actionPerformed(final ActionEvent event) {
+    new Thread(new Runnable() {
       @Override
-      public void run()
-      {
-        for (JobData data: jobDataArray)
-        {
-          try
-          {
+      public void run() {
+        for (JobData data: jobDataArray) {
+          try {
             data.getJmxWrapper().resumeJob(data.getJobInformation().getJobUuid());
-          }
-          catch(Exception e)
-          {
+          } catch(Exception e) {
             log.error(e.getMessage(), e);
           }
         }
       }
-    };
-    new Thread(r).start();
+    }).start();
   }
 }

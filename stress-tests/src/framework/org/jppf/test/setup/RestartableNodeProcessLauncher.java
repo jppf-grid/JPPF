@@ -26,25 +26,20 @@ import org.jppf.test.scenario.ScenarioConfiguration;
  * Used to launch a single node.
  * @author Laurent Cohen
  */
-public class RestartableNodeProcessLauncher extends RestartableProcessLauncher
-{
+public class RestartableNodeProcessLauncher extends RestartableProcessLauncher {
   /**
    * Initialize the node launcher.
    * @param n the id of the node, used to determine which configuration files to use.
    * @param scenarioConfig the scenario configuration.
    */
-  public RestartableNodeProcessLauncher(final int n, final ScenarioConfiguration scenarioConfig)
-  {
+  public RestartableNodeProcessLauncher(final int n, final ScenarioConfiguration scenarioConfig) {
     super(n, "  node", scenarioConfig);
     setJppfConfig(doConfigOverride("node.template.properties", "node-" + n + ".properties"));
     setJVMOptions();
     String s = doConfigOverride("log4j-node.template.properties", "log4j-node-" + n + ".properties");
-    try
-    {
+    try {
       setLog4j(new File(s).toURI().toURL().toString());
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
       throw new RuntimeException(e);
     }
     setLogging(doConfigOverride("logging-node.template.properties", "logging-node-" + n + ".properties"));
@@ -54,8 +49,7 @@ public class RestartableNodeProcessLauncher extends RestartableProcessLauncher
   /**
    * Perform setup common to all configurations.
    */
-  private void setupCommon()
-  {
+  private void setupCommon() {
     setMainClass("org.jppf.node.NodeRunner");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-node" + n + ".properties");
   }

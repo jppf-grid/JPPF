@@ -70,7 +70,7 @@ public class ThreadDumpAction extends AbstractTopologyAction
     String title = "";
     try {
       ThreadDump info = retrieveThreadDump(dataArray[0]);
-      boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
+      boolean isNode = dataArray[0].isNode();
       title = "Thread dump for " + (isNode ? "node " : "driver ") + dataArray[0];
       if (info == null) s = "<p><b>No thread dump was generated</b>";
       else s = HTMLThreadDumpWriter.printToString(info, title);
@@ -108,22 +108,17 @@ public class ThreadDumpAction extends AbstractTopologyAction
    * @param data the topology object for which to get the information.
    * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
    */
-  private ThreadDump retrieveThreadDump(final TopologyData data)
-  {
+  private ThreadDump retrieveThreadDump(final TopologyData data) {
     ThreadDump info = null;
-    try
-    {
-      if (TopologyDataType.NODE == data.getType())
-      {
+    try {
+      if (data.isNode()) {
         TopologyData parent = data.getParent();
         Map<String, Object> result = parent.getNodeForwarder().threadDump(new NodeSelector.UuidSelector(data.getUuid()));
         Object o = result.get(data.getUuid());
         if (o instanceof ThreadDump) info = (ThreadDump) o;
       }
       else info = data.getDiagnostics().threadDump();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return info;

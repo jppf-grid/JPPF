@@ -29,6 +29,7 @@ test.org.jppf.server.peer.TestMultiServerWithSSL
 test.org.jppf.server.protocol.TestJPPFJobClientSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA2
+test.org.jppf.server.protocol.TestJPPFJobSLA3
 test.org.jppf.server.protocol.TestJPPFTask
 test.org.jppf.server.protocol.TestLocation
 test.org.jppf.ssl.TestSSL

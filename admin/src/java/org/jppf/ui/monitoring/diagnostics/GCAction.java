@@ -31,8 +31,7 @@ import org.slf4j.*;
 /**
  * This action restarts a node.
  */
-public class GCAction extends AbstractTopologyAction
-{
+public class GCAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -45,15 +44,13 @@ public class GCAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public GCAction()
-  {
+  public GCAction() {
     setupIcon("/org/jppf/ui/resources/gc.gif");
     setupNameAndTooltip("health.gc");
   }
 
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
     dataArray = selectedElements.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new TopologyData[selectedElements.size()];
     for (int i=0; i<selectedElements.size(); i++) dataArray[i] = (TopologyData) selectedElements.get(i);
@@ -61,57 +58,41 @@ public class GCAction extends AbstractTopologyAction
   }
 
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     runAction(new RunnableAction());
   }
 
   /**
    * 
    */
-  private class RunnableAction implements Runnable
-  {
+  private class RunnableAction implements Runnable {
     @Override
-    public void run()
-    {
+    public void run() {
       // do the gc() in the drivers
-      for (TopologyData data: dataArray)
-      {
-        if ((data.getType() == TopologyDataType.DRIVER) && (data.getDiagnostics() != null))
-        {
-          try
-          {
+      for (TopologyData data: dataArray) {
+        if (data.isDriver() && (data.getDiagnostics() != null)) {
+          try {
             data.getDiagnostics().gc();
-          }
-          catch (IOException e)
-          {
+          } catch (IOException e) {
             data.initializeProxies();
             log.error(e.getMessage(), e);
-          }
-          catch (Exception e)
-          {
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }
       }
       // do the gc() in the nodes grouped by server attachment
       CollectionMap<TopologyData, String> map = getDriverMap();
-      for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet())
-      {
-        try
-        {
+      for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
+        try {
           JPPFNodeForwardingMBean forwarder = entry.getKey().getNodeForwarder();
           if (forwarder == null) continue;
           NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
           forwarder.gc(selector);
-        }
-        catch(IOException e)
-        {
+        } catch(IOException e) {
           entry.getKey().initializeProxies();
           log.error(e.getMessage(), e);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           log.error(e.getMessage(), e);
         }
       }

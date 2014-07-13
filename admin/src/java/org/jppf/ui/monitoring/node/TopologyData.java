@@ -206,7 +206,7 @@ public class TopologyData {
    * @param newSnapshot the new health snapshot fetched from the grid.
    */
   public void refreshHealthSnapshot(final HealthSnapshot newSnapshot) {
-    if (type == TopologyDataType.PEER) return;
+    if (isPeer()) return;
     this.healthSnapshot = newSnapshot;
   }
 
@@ -240,9 +240,6 @@ public class TopologyData {
    */
   public void setStatus(final TopologyDataStatus status) {
     if (status == TopologyDataStatus.DOWN)
-    {
-      boolean breakpoint = true;
-    }
     this.status = status;
   }
 
@@ -255,11 +252,27 @@ public class TopologyData {
   }
 
   /**
-   * Determine whether this object represents an node.
+   * Determine whether this object represents a driver.
+   * @return <code>true</code> if this object represets a driver, <code>false</code> otherwise.
+   */
+  public boolean isDriver() {
+    return type == TopologyDataType.DRIVER;
+  }
+
+  /**
+   * Determine whether this object represents a node.
    * @return <code>true</code> if this object represets a node, <code>false</code> otherwise.
    */
   public boolean isNode() {
-    return (type == TopologyDataType.NODE);
+    return type == TopologyDataType.NODE;
+  }
+
+  /**
+   * Determine whether this object represents a peer driver.
+   * @return <code>true</code> if this object represets a peer driver, <code>false</code> otherwise.
+   */
+  public boolean isPeer() {
+    return type == TopologyDataType.PEER;
   }
 
   @Override
@@ -276,9 +289,7 @@ public class TopologyData {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     TopologyData other = (TopologyData) obj;
-    if (uuid == null) {
-      if (other.uuid != null) return false;
-    }
+    if (uuid == null) return other.uuid == null;
     return uuid.equals(other.uuid);
   }
 

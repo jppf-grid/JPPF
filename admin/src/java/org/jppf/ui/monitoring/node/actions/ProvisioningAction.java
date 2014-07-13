@@ -37,8 +37,7 @@ import org.slf4j.*;
  * This action displays an input panel for the user to type a new
  * thread pool size for a node, and updates the node with it.
  */
-public class ProvisioningAction extends AbstractTopologyAction
-{
+public class ProvisioningAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -67,8 +66,7 @@ public class ProvisioningAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public ProvisioningAction()
-  {
+  public ProvisioningAction() {
     setupIcon("/org/jppf/ui/resources/weather-overcast.png");
     setupNameAndTooltip("node.provisioning");
   }
@@ -96,8 +94,7 @@ public class ProvisioningAction extends AbstractTopologyAction
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ProvisioningPanel.xml");
@@ -137,14 +134,13 @@ public class ProvisioningAction extends AbstractTopologyAction
   /**
    * Perform the action.
    */
-  private void doOK()
-  {
+  private void doOK() {
     OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
     OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
     TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
     final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("useOverrides")).getValue();
     overrides = (String) textArea.getValue();
-    final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesAsMap(overrides) : null;
+    final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesFromString(overrides) : null;
     nbSlaves = ((Number) ((SpinnerNumberOption) thisPanel.findFirstWithName("nbSlaves")).getValue()).intValue();
     final CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
     for (TopologyData data: dataArray) {
@@ -155,15 +151,12 @@ public class ProvisioningAction extends AbstractTopologyAction
     final String[] signature = {int.class.getName(), TypedProperties.class.getName()};
     Runnable r = new Runnable() {
       @Override public void run() {
-        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
-          TopologyData parent = entry.getKey();
+        for (Map.Entry<TopologyData, Collection<String>> en: map.entrySet()) {
+          TopologyData parent = en.getKey();
+          NodeSelector selector = new NodeSelector.UuidSelector(en.getValue());
           try {
-            Map<String, Object> result = parent.getNodeForwarder().forwardInvoke(new NodeSelector.UuidSelector(entry.getValue()),
-              JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
-            for (Map.Entry<String, Object> entry2: result.entrySet()) {
-              if (debugEnabled && (entry2.getValue() instanceof Throwable)) if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}",
-                entry2.getKey(), ExceptionUtils.getStackTrace((Throwable) entry2.getValue()));
-            }
+            Map<String, Object> result = parent.getNodeForwarder().forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
+            printForwardingRequestErrors(result);
           } catch(IOException e) {
             parent.initializeProxies();
             log.error(e.getMessage(), e);
@@ -181,8 +174,7 @@ public class ProvisioningAction extends AbstractTopologyAction
    * @param source - the text from which to read the properties.
    * @return a map of string keys to string values.
    */
-  private static TypedProperties getPropertiesAsMap(final String source)
-  {
+  private static TypedProperties getPropertiesFromString(final String source) {
     TypedProperties props = new TypedProperties();
     try (Reader reader = new StringReader(source)) {
       props.load(reader);
@@ -190,5 +182,20 @@ public class ProvisioningAction extends AbstractTopologyAction
       log.error(e.getMessage(), e);
     }
     return props;
+  }
+
+  /**
+   * Prints the eventual errors resulting from a node forwarding request.
+   * @param result the map containing the results for the request.
+   */
+  private void printForwardingRequestErrors(final Map<String, Object> result) {
+    if (debugEnabled) {
+      for (Map.Entry<String, Object> en2: result.entrySet()) {
+        if (en2.getValue() instanceof Throwable) {
+          Throwable t = (Throwable) en2.getValue();
+          log.debug("provisioning request for node '{}' resulted in error: {}", en2.getKey(), ExceptionUtils.getStackTrace(t));
+        }
+      }
+    }
   }
 }

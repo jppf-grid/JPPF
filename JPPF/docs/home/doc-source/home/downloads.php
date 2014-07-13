@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
   <?php
-    $ver1 = "4.1.1";
+    $ver1 = "4.1.3";
     $ver2 = "4.0.3";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
   ?>
@@ -64,7 +64,7 @@ $template{name="about-page-header" title="Downloads"}$
   <hr>
 
   <h3>Feeling curious or adventurous about JPPF's latest advances?</h3>
-  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 3/30/2014 JPPF 4.1 beta</b></a>.
+  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 6/17/2014 JPPF 4.2 beta</b></a>.
   <p><span style="color: #FF4000"><b><i>Warning: this is not recommended for production environments</b></i></span>
 
 $template{name="about-page-footer"}$

@@ -61,7 +61,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
     for (Object o: selectedElements)
     {
       TopologyData data = (TopologyData) o;
-      if (TopologyDataType.NODE == data.getType())
+      if (data.isNode())
       {
         JPPFManagementInfo info = data.getNodeInformation();
         if (info != null) list.add(data);
@@ -79,7 +79,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
     CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
     for (TopologyData data: dataArray)
     {
-      if (data.getType() != TopologyDataType.NODE) continue;
+      if (!data.isNode()) continue;
       TopologyData parent = data.getParent();
       if (parent != null) map.putValue(parent, data.getUuid());
     }

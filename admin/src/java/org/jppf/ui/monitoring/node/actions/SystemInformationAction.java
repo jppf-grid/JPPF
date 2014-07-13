@@ -80,7 +80,7 @@ public class SystemInformationAction extends AbstractTopologyAction
     try
     {
       JPPFSystemInformation info = retrieveInfo(dataArray[0]);
-      boolean isNode = dataArray[0].getType().equals(TopologyDataType.NODE);
+      boolean isNode = dataArray[0].isNode();
       String title = "information for " + (isNode ? "node " : "driver ") + dataArray[0];
       html = formatProperties(info, new HTMLPropertiesTableFormat(title));
       toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
@@ -93,11 +93,9 @@ public class SystemInformationAction extends AbstractTopologyAction
     final JFrame frame = new JFrame("System Information");
     frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
     frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-    frame.addWindowListener(new WindowAdapter()
-    {
+    frame.addWindowListener(new WindowAdapter() {
       @Override
-      public void windowClosing(final WindowEvent e)
-      {
+      public void windowClosing(final WindowEvent e) {
         frame.dispose();
       }
     });
@@ -121,22 +119,17 @@ public class SystemInformationAction extends AbstractTopologyAction
    * @param data the topology object for which to get the information.
    * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
    */
-  private JPPFSystemInformation retrieveInfo(final TopologyData data)
-  {
+  private JPPFSystemInformation retrieveInfo(final TopologyData data) {
     JPPFSystemInformation info = null;
-    try
-    {
-      if (TopologyDataType.NODE == data.getType())
-      {
+    try {
+      if (data.isNode()) {
         TopologyData parent = data.getParent();
         Map<String, Object> result = parent.getNodeForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
         Object o = result.get(data.getUuid());
         if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
       }
       else info = data.getJmxWrapper().systemInformation();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
     return info;
@@ -148,12 +141,10 @@ public class SystemInformationAction extends AbstractTopologyAction
    * @param format the formatter to use.
    * @return a String with the formatted information.
    */
-  private String formatProperties(final JPPFSystemInformation info, final PropertiesTableFormat format)
-  {
+  private String formatProperties(final JPPFSystemInformation info, final PropertiesTableFormat format) {
     format.start();
     if (info == null) format.print("No information was found");
-    else
-    {
+    else {
       format.formatTable(info.getUuid(), "UUID");
       format.formatTable(info.getSystem(), "System Properties");
       format.formatTable(info.getEnv(), "Environment Variables");

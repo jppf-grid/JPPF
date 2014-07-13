@@ -35,8 +35,7 @@ import org.slf4j.*;
  * Processes right-click events to display popup menus.
  * @author Laurent Cohen
  */
-public abstract class AbstractTopologyMouseListener extends MouseAdapter
-{
+public abstract class AbstractTopologyMouseListener extends MouseAdapter {
   /**
    * Logger for this class.
    */
@@ -70,8 +69,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter
    * Initialize this mouse listener.
    * @param actionHandler the object that handles toolbar and menu actions.
    */
-  public AbstractTopologyMouseListener(final JTreeTableActionHandler actionHandler)
-  {
+  public AbstractTopologyMouseListener(final JTreeTableActionHandler actionHandler) {
     this.actionHandler = actionHandler;
   }
 
@@ -81,8 +79,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter
    * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
    */
   @Override
-  public void mousePressed(final MouseEvent event)
-  {
+  public void mousePressed(final MouseEvent event) {
     Component comp = event.getComponent();
     if (!(comp instanceof JPPFTreeTable)) return;
     JPPFTreeTable treeTable = (JPPFTreeTable) comp;
@@ -91,25 +88,22 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter
     int y = event.getY();
     List<TopologyData> dataList = new ArrayList<>();
     int[] rows = treeTable.getSelectedRows();
-    if ((rows == null) || (rows.length == 0))
-    {
+    if ((rows == null) || (rows.length == 0)) {
       TreePath path = tree.getPathForLocation(x, y);
       if (path == null) return;
       rows = new int[] { tree.getRowForPath(path) };
     }
-    for (int row: rows)
-    {
+    for (int row: rows) {
       TreePath path = tree.getPathForRow(row);
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
       if (!(node.getUserObject() instanceof TopologyData)) continue;
       TopologyData td = (TopologyData) node.getUserObject();
-      if (TopologyDataType.NODE.equals(td.getType())) dataList.add((TopologyData) node.getUserObject());
+      if (td.isNode()) dataList.add((TopologyData) node.getUserObject());
     }
     data = dataList.toArray(new TopologyData[dataList.size()]);
 
     int button = event.getButton();
-    if (button == MouseEvent.BUTTON3)
-    {
+    if (button == MouseEvent.BUTTON3) {
       JPopupMenu menu = createPopupMenu(event);
       menu.show(treeTable, x, y);
     }
@@ -128,8 +122,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter
    * @param actionName the name of action associated with the new item.
    * @param location the location to use for any window create by the action.
    */
-  protected void addItem(final JPopupMenu menu, final String actionName, final Point location)
-  {
+  protected void addItem(final JPopupMenu menu, final String actionName, final Point location) {
     Action action = actionHandler.getAction(actionName);
     if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
     menu.add(new JMenuItem(action));

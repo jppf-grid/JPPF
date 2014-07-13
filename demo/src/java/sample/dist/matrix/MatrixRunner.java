@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.ClassPathImpl;
@@ -71,6 +72,7 @@ public class MatrixRunner {
       runner = new MatrixRunner();
       runner.perform(size, iterations, nbRows, clientUuid, nbChannels);
       //runner.perform2(size, iterations, nbRows, clientUuid);
+      //StreamUtils.waitKeyPressed("***** press {Enter] to exit ...");
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -124,6 +126,9 @@ public class MatrixRunner {
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
+      JMXDriverConnectionWrapper jmx = jppfClient.getConnectionPool().getJmxConnection();
+      String debug = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
+      output(debug);
     } finally {
       output("closing the client");
       if (jppfClient != null) jppfClient.close();

@@ -26,25 +26,20 @@ import org.jppf.test.scenario.ScenarioConfiguration;
  * Used to launch a driver.
  * @author Laurent Cohen
  */
-public class RestartableDriverProcessLauncher extends RestartableProcessLauncher
-{
+public class RestartableDriverProcessLauncher extends RestartableProcessLauncher {
   /**
    * Initialize the driver launcher.
    * @param n the id of the driver, used to determine which configuration files to use.
    * @param scenarioConfig the scenario configuration.
    */
-  public RestartableDriverProcessLauncher(final int n, final ScenarioConfiguration scenarioConfig)
-  {
+  public RestartableDriverProcessLauncher(final int n, final ScenarioConfiguration scenarioConfig) {
     super(n, "driver", scenarioConfig);
     setJppfConfig(doConfigOverride("driver.template.properties", "driver-" + n + ".properties"));
     setJVMOptions();
     String s = doConfigOverride("log4j-driver.template.properties", "log4j-driver-" + n + ".properties");
-    try
-    {
+    try {
       setLog4j(new File(s).toURI().toURL().toString());
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
       throw new RuntimeException(e);
     }
     setLogging(doConfigOverride("logging-driver.template.properties", "logging-driver-" + n + ".properties"));
@@ -54,8 +49,7 @@ public class RestartableDriverProcessLauncher extends RestartableProcessLauncher
   /**
    * Perform setup common to all ocnfigurations.
    */
-  private void setupCommon()
-  {
+  private void setupCommon() {
     setMainClass("org.jppf.server.JPPFDriver");
     addClasspathElement("classes/tests/config");
     addClasspathElement("../common/classes");

@@ -31,8 +31,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class S1Runner extends AbstractScenarioRunner
-{
+public class S1Runner extends AbstractScenarioRunner {
   /**
    * Logger for this class.
    */
@@ -43,10 +42,8 @@ public class S1Runner extends AbstractScenarioRunner
   private int iterationsCount = 0;
 
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       TypedProperties props = getConfiguration().getProperties();
       int size = props.getInt("matrix.size", 300);
       int iterations = props.getInt("matrix.iterations", 10);
@@ -65,8 +62,7 @@ public class S1Runner extends AbstractScenarioRunner
       long max = 0L;
   
       // perform "iteration" times
-      for (int iter=0; iter<iterations; iter++)
-      {
+      for (int iter=0; iter<iterations; iter++) {
         long elapsed = performParallelMultiplication(a, b, nbRows, nbChannels);
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;
@@ -76,9 +72,7 @@ public class S1Runner extends AbstractScenarioRunner
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max) + 
           ", total time: " + StringUtils.toStringDuration(totalIterationTime));
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -92,19 +86,16 @@ public class S1Runner extends AbstractScenarioRunner
    * @return the elapsed time for the computation.
    * @throws Exception if an error is raised during the execution.
    */
-  private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final int nbChannels) throws Exception
-  {
+  private long performParallelMultiplication(final Matrix a, final Matrix b, final int nbRows, final int nbChannels) throws Exception {
     long start = System.nanoTime();
     int size = a.getSize();
     JPPFJob job = new JPPFJob();
     job.setName("matrix sample " + (iterationsCount++));
     job.getClientSLA().setMaxChannels(nbChannels);
     int remaining = size;
-    for (int i=0; i<size; i+= nbRows)
-    {
+    for (int i=0; i<size; i+= nbRows) {
       double[][] rows = null;
-      if (remaining >= nbRows)
-      {
+      if (remaining >= nbRows) {
         rows = new double[nbRows][];
         remaining -= nbRows;
       }
@@ -127,15 +118,14 @@ public class S1Runner extends AbstractScenarioRunner
       rowIdx += rows.length;
     }
     long elapsed = System.nanoTime() - start;
-    return elapsed/1000000L;
+    return elapsed/1_000_000L;
   }
 
   /**
    * Print a message to the console and/or log file.
    * @param message - the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }
