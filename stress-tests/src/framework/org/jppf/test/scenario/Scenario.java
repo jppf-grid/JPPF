@@ -34,8 +34,7 @@ import test.org.jppf.test.setup.ConfigurationHelper;
  * 
  * @author Laurent Cohen
  */
-public class Scenario
-{
+public class Scenario {
   /**
    * Path to where this scenario's config files are located.
    */
@@ -53,15 +52,11 @@ public class Scenario
    * Execute the scenario whose root folder is specified as argument.
    * @param args the first argument contains the scenario's toor folder path.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       Scenario scenario = new Scenario(args[0]);
       scenario.execute();
-    }
-    catch (Throwable e)
-    {
+    } catch (Throwable e) {
       e.printStackTrace();
     }
   }
@@ -70,8 +65,7 @@ public class Scenario
    * Initialize this scenario with the specified config directory.
    * @param configDir path to where this scenario's config files are located.
    */
-  public Scenario(final String configDir)
-  {
+  public Scenario(final String configDir) {
     if (configDir == null) throw new IllegalArgumentException("config directory cannot be null");
     File file = new File(configDir);
     if (!file.exists()) throw new IllegalArgumentException("config directory '" + configDir + "' does not exist");
@@ -84,13 +78,10 @@ public class Scenario
    * Execute this scenario.
    * @throws Exception if any error occurs.
    */
-  public void execute() throws Exception
-  {
+  public void execute() throws Exception {
     int iterations = configuration.getNbIterations();
-    for (int i=1; i<=iterations; i++)
-    {
-      if (iterations > 1)
-      {
+    for (int i=1; i<=iterations; i++) {
+      if (iterations > 1) {
         String hr = StringUtils.padRight("", '-', 15);
         System.out.println(hr);
         System.out.println("Iteration #" + i);
@@ -104,10 +95,8 @@ public class Scenario
    * Execute one iteration of this scenario.
    * @throws Exception if any error occurs.
    */
-  public void executeIteration() throws Exception
-  {
-    try
-    {
+  public void executeIteration() throws Exception {
+    try {
       Map<String, Object> variables = new HashMap<>();
       variables.put("$n", 1);
       variables.put("$scenario_dir", configDir.getPath());
@@ -132,15 +121,10 @@ public class Scenario
       runner.setSetup(setup);
       runner.setConfiguration(configuration);
       runner.run();
-    }
-    finally
-    {
-      try
-      {
+    } finally {
+      try {
         printDiagnostics();
-      }
-      finally
-      {
+      } finally {
         if (setup != null) setup.cleanup();
       }
     }
@@ -150,8 +134,7 @@ public class Scenario
    * Display the diagnostics for all drivers and nodes.
    * @throws Exception if any error occurs.
    */
-  private void printDiagnostics() throws Exception
-  {
+  private void printDiagnostics() throws Exception {
     if (!configuration.isStartClient()) return;
     String fileName = configuration.getDiagnosticsOutputFilename();
     if ("none".equals(fileName)) return;
@@ -159,29 +142,24 @@ public class Scenario
     if ("out".equals(fileName)) out = System.out;
     else if ("err".equals(fileName)) out = System.err;
     else out = new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName)));
-    try
-    {
+    try {
       Map<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> map =
         setup.getJmxHandler().performJmxOperations(new DiagnosticsGrabber(true), new DiagnosticsGrabber(false));
       String rule = "---------------------------------------------------------";
-      for (Map.Entry<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> entry: map.entrySet())
-      {
+      for (Map.Entry<JMXResult<DiagnosticsResult>, List<JMXResult<DiagnosticsResult>>> entry: map.entrySet()) {
         out.println(rule);
         out.println("results for driver " + entry.getKey().getJmxId());
         out.println(rule);
         out.println("before GC: " + entry.getKey().getResult().getDiagnosticsInfo().toFormattedString(null));
         out.println("after GC:  " + entry.getKey().getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
-        for (JMXResult<DiagnosticsResult> dr: entry.getValue())
-        {
+        for (JMXResult<DiagnosticsResult> dr: entry.getValue()) {
           out.println(rule);
           out.println("results for node " + dr.getJmxId());
           out.println("before GC: " + dr.getResult().getDiagnosticsInfo().toFormattedString(null));
           out.println("after GC:  " + dr.getResult().getDiagnosticsInfoAfterGC().toFormattedString(null));
         }
       }
-    }
-    finally
-    {
+    } finally {
       if ((out != null) && (out != System.err) && (out != System.out)) StreamUtils.closeSilent(out);
     }
   }
@@ -190,8 +168,7 @@ public class Scenario
    * Get the configuration for this scenario.
    * @return a {@link ScenarioConfiguration} instance.
    */
-  public ScenarioConfiguration getConfiguration()
-  {
+  public ScenarioConfiguration getConfiguration() {
     return configuration;
   }
 
@@ -202,8 +179,7 @@ public class Scenario
    * @param variables a map of variable names to their value, which can be used in a groovy expression.
    * @return the path of the created file.
    */
-  protected String doConfigOverride(final String template, final String override, final Map<String, Object> variables)
-  {
+  protected String doConfigOverride(final String template, final String override, final Map<String, Object> variables) {
     File templateFile = new File(configuration.getConfigDir(), template);
     if (!templateFile.exists()) templateFile = new File(ScenarioConfiguration.TEMPLATES_DIR, template);
     TypedProperties config = ConfigurationHelper.createConfigFromTemplate(templateFile.getPath(), variables);
@@ -216,8 +192,7 @@ public class Scenario
   /**
    * Instances of this class get the diagnostics information for a driver or a node.
    */
-  private class DiagnosticsGrabber extends JmxAwareCallable<DiagnosticsResult>
-  {
+  private class DiagnosticsGrabber extends JmxAwareCallable<DiagnosticsResult> {
     /**
      * <code>true</code> if this object connects to a driver's JMX, <code>false</code> for a node.
      */
@@ -227,14 +202,12 @@ public class Scenario
      * Initialize this object with the psecified type of remote JMX server.
      * @param driver <code>true</code> if this object connects to a driver's JMX, <code>false</code> for a node.
      */
-    public DiagnosticsGrabber(final boolean driver)
-    {
+    public DiagnosticsGrabber(final boolean driver) {
       this.driver = driver;
     }
 
     @Override
-    public JMXResult<DiagnosticsResult> call() throws Exception
-    {
+    public JMXResult<DiagnosticsResult> call() throws Exception {
       String name = driver ? DiagnosticsMBean.MBEAN_NAME_DRIVER : DiagnosticsMBean.MBEAN_NAME_NODE;
       HealthSnapshot info = (HealthSnapshot) getJmx().invoke(name, "healthSnapshot");
       getJmx().invoke(name, "gc", (Object[]) null, (String[]) null);

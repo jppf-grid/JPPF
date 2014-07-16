@@ -18,11 +18,9 @@
 
 package org.jppf.test.scenario.nodesmix;
 
-import java.io.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.regex.Pattern;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
@@ -156,16 +154,6 @@ public class NodeMixRunner extends AbstractScenarioRunner {
         output("got results for " + job.getName() + ": tasks in error = " + StringUtils.padLeft("" + nbErrors, ' ', digits) +
             ", not executed = " + StringUtils.padLeft("" + nbNoExec, ' ', digits) + ", good = " + StringUtils.padLeft("" + nbOk, ' ', digits));
       }
-      /*
-      JMXDriverConnectionWrapper jmx = getSetup().getDriverManagementProxy();
-      String debug = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
-      output("debug info:\n" + debug);
-      output(jmx.statistics().toString());
-      */
-      for (int i=1; i<=getConfiguration().getNbDrivers(); i++) {
-        File file = new File(String.format("%s/logs/driver-%d.log", getConfiguration().getConfigDir().getPath(), i));
-        searchTextInFile(file, "expiring");
-      }
       StreamUtils.waitKeyPressed();
     } catch (Exception e) {
       e.printStackTrace();
@@ -178,7 +166,6 @@ public class NodeMixRunner extends AbstractScenarioRunner {
    * Creates a submits a job to the JPPF client.
    */
   private class JobSubmitter implements Runnable {
-
     @Override
     public void run() {
       for (int i=1; i<= nbJobs; i++) {
@@ -228,28 +215,5 @@ public class NodeMixRunner extends AbstractScenarioRunner {
   private void output(final String message) {
     System.out.println(message);
     log.info(message);
-  }
-
-  /**
-   * Search for an occurrence of the given text in the specified file.
-   * @param file the file to search.
-   * @param text the text to search for.
-   * @return the line of the file that contains the text, along with the line number, or <code>null</code> if the text couldn't be found.
-   * @throws Exception if any error occurs.
-   */
-  private Pair<Integer, String> searchTextInFile(final File file, final String text) throws Exception {
-    Pair<Integer, String> result = null;
-    Pattern pattern = Pattern.compile(".*" + text + ".*");
-    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-      String s;
-      int count = 0;
-      while (((s = reader.readLine()) != null) && (result == null)) {
-        count++;
-        if (pattern.matcher(s).matches()) result = new Pair<>(count, s);
-      }
-    }
-    if (result != null) output("'" + text + "' found in '" + file + "'" + result.first() + " :\n" + result.second());
-    else output("'" + text + "' was not found in '" + file +  "'");
-    return result;
   }
 }

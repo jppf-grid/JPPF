@@ -24,7 +24,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.test.scenario.Scenario"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="scenarios/s1"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="scenarios/nodes_mix"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="stress-tests"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"/>
 </launchConfiguration>
