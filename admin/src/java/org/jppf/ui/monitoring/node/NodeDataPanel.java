@@ -29,6 +29,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
@@ -301,8 +302,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
   private void refreshProvisioningStates(final TopologyData driverData, final Map<String, TopologyData> nodeUuidMap) {
     if ((nodeUuidMap == null) || nodeUuidMap.isEmpty()) return;
     Map<String, Object> result = null;
+    JPPFNodeForwardingMBean forwarder = driverData.getNodeForwarder();
+    if (forwarder == null) return;
     try {
-      result = driverData.getNodeForwarder().forwardGetAttribute(new NodeSelector.UuidSelector(nodeUuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
+      result = forwarder.forwardGetAttribute(new NodeSelector.UuidSelector(nodeUuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
     } catch(IOException e) {
       log.error("error getting number of slaves for driver " + driverData.getUuid() + ", reinitializing the connection", e);
       driverRemoved(driverData.getUuid(), true);
