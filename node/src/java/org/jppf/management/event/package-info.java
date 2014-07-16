@@ -18,5 +18,6 @@
 
 /**
  * Support for JMX connection wrapper events.
+ * @exclude
  */
 package org.jppf.management.event;
