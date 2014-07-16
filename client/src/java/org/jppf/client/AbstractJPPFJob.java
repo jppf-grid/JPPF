@@ -36,9 +36,6 @@ import org.slf4j.*;
 /**
  * Instances of this class represent a JPPF submission and hold all the required elements:
  * tasks, execution policy, task listener, data provider, priority, blocking indicator.<br>
- * <p>This class also provides the API for handling JPPF-annotated tasks and POJO tasks.
- * <p>All jobs have a name. It can be specified by calling {@link #setName(java.lang.String) setName(String name)}.
- * If left unspecified, JPPF will automatically assign a uuid as its value.
  * @author Laurent Cohen
  */
 public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJob {
@@ -130,7 +127,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Get the list of tasks to execute.
    * @return a list of objects.
-   * @deprecated use {@link #getJobTasks()} instead.
+   * @deprecated use {@link JPPFJob#getJobTasks()} instead.
    */
   @Deprecated
   public List<JPPFTask> getTasks() {
@@ -147,7 +144,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
    * or a wrapper around the input object in the other cases.
    * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-   * @deprecated use {@link #add(Object, Object...)} instead.
+   * @deprecated use {@link JPPFJob#add(Object, Object...)} instead.
    */
   @Deprecated
   public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException {
@@ -168,7 +165,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @param args arguments to use with a JPPF-annotated class.
    * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
    * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-   * @deprecated use {@link #add(String, Object, Object...)} instead.
+   * @deprecated use {@link JPPFJob#add(String, Object, Object...)} instead.
    */
   @Deprecated
   public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException {
@@ -183,7 +180,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * Get the listener that receives notifications of completed tasks.
    * @return a <code>TaskCompletionListener</code> instance.
    * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
-   * {@link JobListener} should be used instead, with the {@link #addJobListener(JobListener)} and {@link #removeJobListener(JobListener)} methods.
+   * {@link JobListener} should be used instead, with the {@link JPPFJob#addJobListener(JobListener)} and {@link JPPFJob#removeJobListener(JobListener)} methods.
    */
   public TaskResultListener getResultListener() {
     return resultsListener;
@@ -193,7 +190,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * Set the listener that receives notifications of completed tasks.
    * @param resultsListener a <code>TaskCompletionListener</code> instance.
    * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
-   * {@link JobListener} should be used instead, with the {@link #addJobListener(JobListener)} and {@link #removeJobListener(JobListener)} methods.
+   * {@link JobListener} should be used instead, with the {@link JPPFJob#addJobListener(JobListener)} and {@link JPPFJob#removeJobListener(JobListener)} methods.
    */
   public void setResultListener(final TaskResultListener resultsListener) {
     this.resultsListener = resultsListener;

@@ -176,7 +176,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   /**
    * Get the list of final results.
    * @return a list of results as tasks, or null if not all tasks have been executed.
-   * @deprecated use {@link JPPF#getAllResults()} instead.
+   * @deprecated use {@link JPPFJob#getAllResults()} instead.
    */
   @Deprecated
   public List<JPPFTask> getResults() {
