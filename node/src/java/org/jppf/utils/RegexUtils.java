@@ -48,7 +48,7 @@ public final class RegexUtils {
    */
   public static final Pattern COLUMN_PATTERN = Pattern.compile(":");
   /**
-   * Pre-compiled regex pattern that matches any column '|' character.
+   * Pre-compiled regex pattern that matches any pipe '|' character.
    */
   public static final Pattern PIPE_PATTERN = Pattern.compile("\\|");
 

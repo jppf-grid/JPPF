@@ -34,7 +34,7 @@ $template{name="samples-page-header" title="Concurrent Jobs demo"}$
           <ul class="samplesList">
             <li><a href="src/org/jppf/example/concurrentjobs/ConcurrentJobs.java.html">ConcurrentJobs.java</a>: The entry point for the demo, implements all the concurrent job patterns</li>
             <li><a href="src/org/jppf/example/concurrentjobs/JobProvider.java.html">JobProvider.java<a/>: provides a stream of jobs based on the data in a text input file</li>
-            <li><a href="src/org/jppf/example/concurrentjobs/MyTask.java.html">MyTask.java</a>: a simmple JPPF task implementation used by all execution patterns in the demo</li>
+            <li><a href="src/org/jppf/example/concurrentjobs/MyTask.java.html">MyTask.java</a>: a simple JPPF task implementation used by all execution patterns in the demo</li>
           </ul>
 
           <h3>I have additional questions and comments, where can I go?</h3>
