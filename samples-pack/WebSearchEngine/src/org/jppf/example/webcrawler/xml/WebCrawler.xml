@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF
+	Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="verticalWrapper" type="page">
+	<property name="layoutConstraints" value="fill, flowy"/>
+	<property name="componentConstraints" value="grow"/>
+
+	<!-- ===================================================================== -->
+	<!--             web crawler configuration parameters                      -->
+	<!-- ===================================================================== -->
+
+	<child name="inputConfig" type="page">
+		<property name="layoutConstraints" value="fill, insets 0 0 0 0"/>
+
+		<child name="ButtonPanel" type="page">
+			<property name="label" value="Actions"/>
+			<property name="layoutConstraints" value="fill, flowy"/>
+			<property name="componentConstraints" value="growx 0, aligny top"/>
+			<property name="bordered" value="true"/>
+
+			<child name="compute" type="Button">
+				<property name="label" value="Compute"/>
+				<property name="tooltip" value="Find all the links that contain a text matching with the search query"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						var url = option.findFirstWithName("/url").getValue();
+						var query = option.findFirstWithName("/query").getValue();
+						var depth = option.findFirstWithName("/depth").getValue().intValue();
+						WebCrawlerRunner.perform(url, query, depth, option);
+					]]></script>
+				</listener>
+			</child>
+
+			<child name="reset" type="Button">
+				<property name="label" value="Reset Defaults"/>
+				<property name="tooltip" value="Reset to the default values"/>
+				<listener type="script">
+					<script language="javascript"><![CDATA[
+						option.findFirstWithName("/url").setValue("http://www.jppf.org/index.php");
+						option.findFirstWithName("/query").setValue("JPPF");
+						option.findFirstWithName("/depth").setValue("2");
+					]]></script>
+				</listener>
+			</child>
+
+		</child>
+
+		<child name="inputPanel" type="page">
+			<property name="label" value="Search parameters"/>
+			<property name="layoutConstraints" value="fill, flowy, gapy 5!"/>
+			<property name="componentConstraints" value="grow, push"/>
+			<property name="bordered" value="true"/>
+
+			<child name="url" type="PlainText">
+				<property name="label" value="Start URL"/>
+				<property name="tooltip" value="The url from which to start the search"/>
+				<property name="layoutConstraints" value="nogrid, gapy 5!, insets 0 0 0 0"/>
+				<property name="value" value="http://www.jppf.org/index.php"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="columns" value="60"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="query" type="PlainText">
+				<property name="label" value="Search query"/>
+				<property name="tooltip" value="The search quey, using the Lucene engine syntax"/>
+				<property name="layoutConstraints" value="nogrid, gapy 5!, insets 0 0 0 0"/>
+				<property name="value" value="JPPF"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="columns" value="60"/>
+				<property name="persistent" value="true"/>
+			</child>
+
+			<child name="wrapper" type="page">
+				<property name="layoutConstraints" value="fill, gapy 5!, insets 0 0 0 0"/>
+				<property name="componentConstraints" value="growx"/>
+	
+				<child name="depth" type="SpinnerNumber">
+					<property name="label" value="Search depth"/>
+					<property name="tooltip" value="Maximum depth (nested links) of the search"/>
+					<property name="value" value="2"/>
+					<property name="minValue" value="1"/>
+					<property name="maxValue" value="50"/>
+					<property name="persistent" value="true"/>
+				</child>
+	
+				<child name="wrfillerapper" type="page">
+					<property name="layoutConstraints" value="fill"/>
+					<property name="componentConstraints" value="growx, pushx"/>
+				</child>
+
+			</child>
+
+		</child>
+
+	</child>
+
+	<child name="resultPanel" type="page">
+		<property name="label" value="Search Results"/>
+		<property name="layoutConstraints" value="fill, flowy"/>
+		<property name="componentConstraints" value="grow, push"/>
+		<property name="bordered" value="true"/>
+
+		<child name="resultText" type="TextArea">
+			<property name="tooltip" value="Displays the links that match with the search query"/>
+			<property name="value" value=""/>
+			<property name="scrollable" value="true"/>
+			<property name="componentConstraints" value="grow, push"/>
+		</child>
+
+	</child>
+
+</opt:main>
