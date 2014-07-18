@@ -32,7 +32,7 @@ import org.jppf.utils.JPPFCallable;
 public interface Task<T> extends Runnable, Serializable {
   /**
    * Get the result of the task execution.
-   * @return the result as an array of bytes.
+   * @return the task result.
    */
   T getResult();
 
@@ -60,13 +60,13 @@ public interface Task<T> extends Runnable, Serializable {
 
   /**
    * Get the Throwable that was raised by this task's execution.
-   * @return a <code>Exception</code> instance, or null if no exception was raised.
+   * @return a <code>Exception</code> instance, or {@code null} if no exception was raised.
    * @since 4.0
    */
   Throwable getThrowable();
 
   /**
-   * Sets the Throwable that was raised by this task's execution in the <code>run</code> method.
+   * Sets the Throwable that was raised by this task's execution in the <code>run()</code> method.
    * The Throwable is normally set by the JPPF framework.
    * @param throwable a <code>Throwable</code> instance.
    * @since 4.0
@@ -172,8 +172,8 @@ public interface Task<T> extends Runnable, Serializable {
   /**
    * Causes the task to send a notification to all listeners.
    * This method can be called at any time during the execution of the task,
-   * i.e. while in the execution scope of the {@link #run()}, {@link #onTimeout()} or {@link #onCancel()} method.
-   * <p>If the parameter <code>sendViaJmx</code> is true, then a notfication will also be sent
+   * i.e. while in the execution scope of the {@link #run()}, {@link #onTimeout()} or {@link #onCancel()} methods.
+   * <p>If the parameter <code>sendViaJmx</code> is {@code true}, then a notfication will also be sent
    * by the {@link org.jppf.management.JPPFNodeTaskMonitorMBean JPPFNodeTaskMonitorMBean} mbean, otherwise only local listeners will be notified.
    * @param userObject a user-defined object to send as part of the notification.
    * @param sendViaJmx if <code>true</code> then also send the notification via the JMX MBean, otherwise only send to local listeners.
@@ -205,7 +205,7 @@ public interface Task<T> extends Runnable, Serializable {
 
   /**
    * Set the maximum number of times a task can resubmit itself.
-   * If the specified value is greater than or equal to  zero, it will override
+   * If the specified value is greater than or equal to zero, it will override
    * the job-wide value provided by {@link JobSLA#getMaxTaskResubmits()}.
    * @param maxResubmits the maximum number of resubmits.
    */

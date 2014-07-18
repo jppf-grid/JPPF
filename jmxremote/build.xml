@@ -170,8 +170,6 @@
 
   <target name="maven.init" depends="">
     <property name="maven.dist" value="${build}"/>
-    <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
-    <mkdir dir="${maven.dist}"/>
     <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
     <!-- defined maven snapshots and staging repository id and url -->
     <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
@@ -186,20 +184,20 @@
 
   <target name="maven.generate" depends="">
     <property name="artifactId" value="jppf-jmxremote_optional"/>
-    <property name="artifact.prefix" value="${artifactId}-${maven.version}"/>
+    <property name="artifact.prefix" value="${artifactId}-${version.number}"/>
+    <delete dir="${maven.dist}" quiet="true" excludes="**/*.jar"/>
     <copy file="${basedir}/pom.xml" toFile="${pom.file}"/>
     <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
-    <copy file="${basedir}/${artifactId}-${version.number}.jar" toFile="${maven.dist}/${artifact.prefix}.jar"/>
-    <copy file="${basedir}/${artifactId}-${version.number}-sources.jar" toFile="${maven.dist}/${artifact.prefix}-sources.jar"/>
-    <copy file="${basedir}/${artifactId}-${version.number}-javadoc.jar" toFile="${maven.dist}/${artifact.prefix}-javadoc.jar"/>
     <echo message="maven-jar = ${maven.dist}/${artifact.prefix}"/>
     <antcall target="maven.snapshot"><param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
     <antcall target="maven.staging"> <param name="maven-jar" value="${maven.dist}/${artifact.prefix}"/></antcall>
-    <delete dir="${maven.dist}" quiet="true" includes="**/*.*"/>
   </target>
 
   <target name="maven.snapshot" depends="" if="maven.snapshot">
     <echo message="deploying to SNAPSHOT repository !!!"/>
+    <copy file="${maven-jar}.jar" toFile="${maven-jar}-SNAPSHOT.jar"/>
+    <copy file="${maven-jar}-sources.jar" toFile="${maven-jar}-SNAPSHOT-sources.jar"/>
+    <copy file="${maven-jar}-javadoc.jar" toFile="${maven-jar}-SNAPSHOT-javadoc.jar"/>
     <artifact:mvn failonerror="true">
       <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
       <arg value="-Durl=${maven-snapshots-repository-url}" />
@@ -210,6 +208,7 @@
       <arg value="-Djavadoc=${maven-jar}-javadoc.jar"/>
       <arg value="-Pgpg" />
     </artifact:mvn>
+    <delete dir="${maven.dist}" quiet="true" includes="**/*SNAPSHOT*.*"/>
   </target>
 
   <target name="maven.staging" depends="" unless="maven.snapshot">

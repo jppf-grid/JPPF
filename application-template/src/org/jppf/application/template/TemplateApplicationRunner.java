@@ -44,13 +44,13 @@ public class TemplateApplicationRunner {
       // create a runner instance.
       TemplateApplicationRunner runner = new TemplateApplicationRunner();
 
-      // execute a blocking job
+      // create and execute a blocking job
       runner.executeBlockingJob(jppfClient);
 
-      // execute a non-blocking job
+      // create and execute a non-blocking job
       //runner.executeNonBlockingJob(jppfClient);
 
-      // execute 3 jobs concurrently
+      // create and execute 3 jobs concurrently
       //runner.executeMultipleConcurrentJobs(jppfClient, 3);
 
     } catch(Exception e) {
@@ -207,7 +207,7 @@ public class TemplateApplicationRunner {
     }
 
     // wait until all desired connections are available (ACTIVE status)
-    while (pool.getConnections(JPPFClientConnectionStatus.ACTIVE).size() != numberOfConnections) {
+    while (pool.getConnections(JPPFClientConnectionStatus.ACTIVE).size() < numberOfConnections) {
       Thread.sleep(10L);
     }
   }

@@ -2,15 +2,15 @@
 $template{name="about-page-header" title="Downloads"}$
 
   <?php
-    $ver1 = "4.1.3";
-    $ver2 = "4.0.3";
+    $ver1 = "4.2";
+    $ver2 = "4.1.3";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
   ?>
   <a name="<?php echo $ver1 ?>"></a>
   <h1>JPPF <?php echo $ver1 ?></h1>
 
   <h3>Installer</h3>
-  <a href="/download/jppf_ws-4.1.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+  <a href="/download/jppf_ws-4.2.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
 
   <h3>Deployable module binaries</h3>
   <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
@@ -36,7 +36,7 @@ $template{name="about-page-header" title="Downloads"}$
   <h1>JPPF <?php echo $ver2 ?></h1>
 
   <h3>Installer</h3>
-  <a href="/download/jppf_ws-4.0.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+  <a href="/download/jppf_ws-4.1.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
 
   <h3>Deployable module binaries</h3>
   <a href="<?php echo $base . 'JPPF-' . $ver2 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>

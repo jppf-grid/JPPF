@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="4.1" ?>
+<?php $jppfVersion="4.2" ?>
 <html>
 	  <head>
     <title>JPPF Press Kit
@@ -148,7 +148,7 @@ else
         <?php if ($currentPage == "current work") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1" class="<?php echo $itemClass; ?>">current work</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -172,40 +172,34 @@ else
   <br>
   <a name="original_release"></a>
 <h3>Press release: JPPF <?php echo $jppfVersion ?></h3>
-<p><b>Node provisioning</b>: not enough nodes in your grid when the workload peaks? Start new nodes on demand wih the <a href="/doc/v4/index.php?title=Node_provisioning">node provisioning facility</a>!
+<p><b>Simplification of the client APIs</b>
 <ul class="samplesList">
-  <li>grow or shrink your JPPF grid dynamically</li>
-  <li>accessible via API and the administration console</li>
-  <li>see it in action with the <a href="/samples-pack/AdaptiveGrid/Readme.php">Adaptive Grid</a> example</li>
+  <li><a href="/doc/v4/index.php?title=Dealing_with_jobs#Cancelling_a_job">Cancelling</a> a job, as well as <a href="/doc/v4/index.php?title=Dealing_with_jobs#Job_execution_results">getting or monitoring</a> its results can now be done from the job itself, in a much simpler way</li>
+  <li>Consequently, the <a href="/api/index.html?org/jppf/client/event/TaskResultListener.html">TaskResultListener</a> API and its <a href="/api/index.html?org/jppf/client/JPPFResultCollector.html">JPPFResultCollector</a> implementation
+  are now deprecated and superseded by the <a href="/doc/v4/index.php?title=Jobs_runtime_behavior,_recovery_and_failover#Job_lifecycle_notifications:_JobListener">job listeners</a> API</li>
+  <li><a href="/api/index.html?org/jppf/client/JPPFJob.html">JPPFJob</a> now implements <a href="http://docs.oracle.com/javase/7/docs/api/index.html?java/util/concurrent/Future.html">Future&lt;List&lt;Task&lt;?&gt;&gt;&gt;</a></li>
 </ul>
-<p><b>Customizable node connection strategies</b>: define which server your nodes will connect and failover to with the <a href="/doc/v4/index.php?title=Defining_the_node_connection_strategy">connection strategy API</a>.
-A <a href="/doc/v4/index.php?title=Defining_the_node_connection_strategy#Built-in_strategies">built-in implementation</a> is provided, which relies on a CSV file of server
-definitions and fails over to the configuration-based default when no server is available.
-<p><b>Client connection pools</b>:
+<p><b>Greater focus on connections pools</b>
 <ul class="samplesList">
-  <li>A <a href="/doc/v4/index.php?title=Connection_pools">new client API</a> enables exploring and growing or shrinking client to server connections dynamically</li>
-  <li>See it in action in the <a href="/samples-pack/AdaptiveGrid/Readme.php">Adaptive Grid</a> example</li>
-  <li>Connection pools of auto-discovered servers, as well as the local executor, can now be assigned a priority</li>
-  <li>Connection failover based on the priority of the server connections was integrated back into the core client functionality. The <a href="/doc/v4/index.php?title=The_ClientWithFailover_wrapper_class">ClientWithFailover</a>
-  feature was deprecated accordingly</li>
+  <li>Each <a href="/doc/v4/index.php?title=Connection_pools">connection pool</a> now manages an associated dynamic <a href="/doc/v4/index.php?title=Connection_pools#Associated_JMX_connection_pool">pool of JMX connections</a>,
+  instead of having one JMX connection per JPPF connection. This results in much less threads created on the client and server sides and increases scalability</li>
+  <li>The <a href="/doc/v4/index.php?title=Connection_pools#The_JPPFConnectionPool_class">JPPFConnectionPool</a> API has been greatly enriched, for an easier and more powerful handling of its capabilities</li>
+  <li>Similarly, the API to <a href="/doc/v4/index.php?title=Connection_pools#Exploring_the_connection_pools">explore connections pools</a> is now broader and more flexible</li>
 </ul>
-<p><b>Powerful configuration enhancements</b>:
+<p><b>Emphasis on submitting jobs concurrently</b>
 <ul class="samplesList">
-  <li><a href="/doc/v4/index.php?title=Includes,_substitutions_and_scripted_values_in_the_configuration#Substitutions_in_the_values_of_properties">Variable substitutions</a>
-  for property values: the syntax ${property} can be used anywhere in the configuration files</li>
-  <li>Similarly, the ${env.VARIABLE} syntax enables environment variables substitution in configuration files</li>
-  <li><a href="/doc/v4/index.php?title=Includes,_substitutions_and_scripted_values_in_the_configuration#Scripted_property_values">Scripting of configuration properties</a>:
-  the property values can now be defined as an expression in any <a href="https://www.jcp.org/aboutJava/communityprocess/pr/jsr223/">JSR 223</a>-compliant dynamic script language</li>
+  <li>a <a href="/doc/v4/index.php?title=Submitting_multiple_jobs_concurrently">new section of the documentation</a> is dedicated to parallel job execution</li>
+  <li>a new <a href="/samples-pack/ConcurrentJobs/Readme.php">dedicated sample</a> illustrates the patterns explored in the documentation</li>
 </ul>
-<p><b>On-demand task resubmission</b>: any JPPF task can now <a href="/doc/v4/index.php?title=Task_objects#Resubmitting_a_task">schedule itself for re-submission</a>.
-<p><b>Capture of nodes and servers console output to files</b>: The output of the JPPF nodes and server processes can now be <a href="/doc/v4/index.php?title=Configuring_a_JPPF_server#Redirecting_the_console_output">redirected to files</a>, for later retrieval and analysis.
-<a name="_clientQueue"></a>
-<p><b>New client job queue listener API</b>: a <a href="/doc/v4/index.php?title=Notifications_of_client_job_queue_events">new client API</a> allows client applications to receive notifications of jobs added to or removed from the job queue.
-<p><b>Documentation improvements</b>:
+<p><b>New execution policies</b>
 <ul class="samplesList">
-  <li>A new section "<a href="/doc/v4/index.php?title=Putting_it_all_together">Putting it all together</a>" was added to the <a href="/doc/v4/index.php?title=Configuration_guide">configuration guide</a>.</li>
-  <li>The <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">JPPF tutorial</a> was updated to reflect the greatest and latest functionalities</li>
+  <li>The new <a href="/doc/v4/index.php?title=Execution_Policy_Elements#IsInIPv4Subnet">IsInIPv4Subnew</a> policy filters nodes based on their membership in one or more IPv4 subnets</li>
+  <li>The <a href="/doc/v4/index.php?title=Execution_Policy_Elements#IsInIPv6Subnet">IsInIPv6Subnet</a> policy plays the same role for IPv6 addresses</li>
 </ul>
+<p><b>Control of tasks resubmmission</b>
+<p>The maximum number of times a task can schedule itself for resubmission is now configurable at the <a href="/doc/v4/index.php?title=Task_objects#Resubmitting_a_task">task level</a>, in addition to the job level.
+<p><b>Tutorial updates</b>
+<p>The <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">JPPF tutorial</a> was updated to account for the greatest and latest features.
 <a name="features"></a>
   <h3>Features</h3>
   <div class="u_link" style="margin-left: 10px">

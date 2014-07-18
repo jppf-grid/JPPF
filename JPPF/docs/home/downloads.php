@@ -147,7 +147,7 @@ else
         <?php if ($currentPage == "current work") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1" class="<?php echo $itemClass; ?>">current work</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -158,14 +158,14 @@ else
 				</div>
 				<div class="jppf_content">
   <?php
-    $ver1 = "4.1.3";
-    $ver2 = "4.0.3";
+    $ver1 = "4.2";
+    $ver2 = "4.1.3";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
   ?>
   <a name="<?php echo $ver1 ?>"></a>
   <h1>JPPF <?php echo $ver1 ?></h1>
   <h3>Installer</h3>
-  <a href="/download/jppf_ws-4.1.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+  <a href="/download/jppf_ws-4.2.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
   <h3>Deployable module binaries</h3>
   <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
   <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node.zip/download'; ?>">JPPF node distribution</a><br>
@@ -184,7 +184,7 @@ else
   <a name="<?php echo $ver2 ?>"></a>
   <h1>JPPF <?php echo $ver2 ?></h1>
   <h3>Installer</h3>
-  <a href="/download/jppf_ws-4.0.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+  <a href="/download/jppf_ws-4.1.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
   <h3>Deployable module binaries</h3>
   <a href="<?php echo $base . 'JPPF-' . $ver2 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
   <a href="<?php echo $base . 'JPPF-' . $ver2 . '-node.zip/download'; ?>">JPPF node distribution</a><br>

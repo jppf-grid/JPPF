@@ -340,6 +340,16 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
+   * Cancel this job unconditionally.
+   * This method is equivalent to calling {@code cancel(true)}.
+   * @return {@code false} if the job could not be cancelled, typically because it has already completed normally; {@code true} otherwise.
+   * @since 4.2
+   */
+  public boolean cancel() {
+    return cancel(true);
+  }
+
+  /**
    * {@inheritDoc}
    * @since 4.2
    */
