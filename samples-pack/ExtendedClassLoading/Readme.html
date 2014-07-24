@@ -1,0 +1,217 @@
+<html>
+
+  <head>
+    <title>Extended Class Loading sample</title>
+    <meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+    <meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid, Cloud, Cloud Computing">
+    <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+  </head>
+
+  <body>
+    <div align="center">
+      <div class="gwrapper" align="center">
+
+        <!-- start header -->
+        <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+          <tr style="height: 80px">
+            <td width="20"></td>
+            <td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+            <td valign="center"><h1>Extended Class Loading sample</h1></td>
+            <td width="20"></td>
+          </tr>
+        </table>
+        <!-- end header -->
+
+        <!-- start content -->
+        <div align="justify" style="margin: 10px">
+          <!-- ${SAMPLE_START_CONTENT} -->
+          <h4 style="margin: 0px">Quick navigation</h4>
+          <table border="0" cellspacing="2px">
+            <tr><td><a href="#1">1. What does the sample do?</a>&nbsp;</td>                                <td><a href="#4">4. How to run the sample</a></td></tr>
+            <tr><td><a href="#2">2. Description of the problem</a>&nbsp;</td>                              <td><a href="#5">5. Source files</a></td></tr>
+            <tr><td><a href="#3">3. Description of the solution</a>&nbsp;</td>                             <td><a href="#5">6. Demonstrated features</a></td></tr>
+            <tr><td style="padding-left: 10px"><a href="#3.1">3.1 On the node side</a>&nbsp;</td>          <td><a href="#7">7. Help and support</a></tr>
+            <tr><td style="padding-left: 10px"><a href="#3.2">3.2 On the client side</a>&nbsp;</td>        <td></td></tr>
+          </table>
+
+          <a name="1"></a>
+          <h3>What does the sample do?</h3>
+          This sample uses the JPPF class loading extensions to automate the management of a repository of application libraries at runtime, for all the nodes in the grid.
+
+          <a name="2"></a>
+          <h3>Description of the problem to solve</h3>
+          <p>Some applications require a large number of internal or external libraries to run.
+          When executed in a JPPF grid, they may incur a significant startup time, due to the loading of a very large number of classes across the network, which is the way JPPF works by default.
+          Futhermore, this startup overhead may occur every time a change occurs, not only in the application's code but also in any of the libraries it relies on.
+
+          <p>A solution to the startup time issue is to deploy the libraries locally on each node.
+          However, this causes a management and deployment overhead, when one or more of the libraries is added, updated or removed.
+          When the number of nodes in the grid is large, the overhead of managing the libraries can be prohibitive.
+
+          <a name="3"></a>
+          <h3>Description of the solution</h3>
+          <p>In this sample, we implement a mechanism that will allow each job to specifiy a set of libraries it needs (jar files) and each node to download these libraries and store them in a local repository,
+          then add them to the classpath of the JPPF tasks class loader. Each library will be stored along with a computed signature (e.g. MD5 or SHA-256), to help resolve the situations where multiple versions
+          of a library have the same name.
+
+          <p>To achieve this, our implementation will handle two main abstractions:
+          <ul class="samplesList">
+            <li>A <a href="src/org/jppf/example/extendedclassloading/Repository.java.html">Repository</a> interface, which will be in charge of maintaining the local node repository and downloading missing libraries
+            when requested by a job. As we can see in the code, this interface has only a few methods, as we tried to keep it simple. There is just enough to perform repository updates and maintenance</li>
+            <li>A <a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath</a> interface, which represents a set of libraries needed by a job and which can be transported within the
+            <a href="http://www.jppf.org/doc/v4/index.php?title=Job_Metadata">job metadata</a></li>
+          </ul>
+
+          <p>Based on these abstractions, we define our mechanism in two distinct sections: node-side behavior and client-side behavior.
+
+          <a name="3.1"></a>
+          <h4>Node-side implementation</h4>
+          <p>We define a repository class <a href="src/org/jppf/example/extendedclassloading/RepositoryImpl.java.html">RepositoryImpl</a> which encapsulates the following:
+          <ul class="samplesList">
+            <li>The repository is implemented as a file folder directly under the node's installation root and named 'repository'. This folder has a flat structure and contains a set of jar files.
+            The jar file names have the format '<i>file_name</i>-<i>file_signature</i>.jar', where <i>file_name</i> is the original file name without the '.jar' extension and <i>file_signature</i> is the computed MD5 signature for the file.</li>
+            <li>The repository also maintains a file named 'toDelete.txt' which contains a list of jar files to delete upon loading of the repository. This is a workaround for the fact that on some OSes (e.g. Windows), the JVM keeps a lock
+            on the jar files it uses,  which makes it impossible to delete them as long as the JVM is alive. Thus this file is used to keep track of the libraries that can't be deleted immediately</li>
+          </ul>
+
+          The node behavior is driven by a <a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle listener</a>:
+          <ul class="samplesList">
+            <li>On "node starting" events, the node creates a <tt>Repository</tt> instance and performs cleanup operations. The cleanup mainly consists in deleting the jar files that were marked as deleted but could not be physically
+            removed from the file system</li>
+            <li>The same is performed upon "node ending" events</li>
+            <li>On "job header loaded" events, the node reads the metadata associated with the jobs and performs repository updates accordingly:
+            <ol class="samplesList">
+              <li>if a <a href="src/org/jppf/example/extendedclassloading/RepositoryFilter.java.html">RepositoryFilter</a> is provided, the repository's <tt>delete()</tt> method will remove the jar files that match the filter.
+              This is a repository maintenance operation, which we recommend to perform via a <a href="http://www.jppf.org/doc/v4/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs">broadcast job</a></li>
+              <li>if a <a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath</a> is provided, then the node will download the specified libraries that are not in the repository, then add them to the
+              client class loader's classpath. If necessary, it will create a new class loader instance, without disconnecting from the driver, using the node's <a href="http://www.jppf.org/api/org/jppf/node/Node.html#resetTaskClassLoader()">resetTaskClassLoader()</a> method.
+              The <a href="http://www.jppf.org/api/org/jppf/node/event/NodeLifeCycleListener.html#jobHeaderLoaded(org.jppf.node.event.NodeLifeCycleEvent)">NodeLifeCycleListener.jobHeaderLoaded()</a> method
+              is in fact the only place where this can be done safely</li>
+            </ol></li>
+            <li>On "job starting" and "job ending" events, there is no specific processing taking place.</li>
+          </ul>
+
+          <a name="3.2"></a>
+          <h4>Client-side implementation</h4>
+
+          <p>On the client side, we have chosen the following implementation:
+          <ul class="samplesList">
+            <li>The jar files that will be dynamically downloaded by the nodes are dropped into a file folder named "dynamicLibs". This folder is added to the JPPF client's classpath, but <i>not the jar files it contains</i>.
+            We need it to be at the client's classpath root, so that the distributed class loader will be able to find it and download its files</li>
+            <li>Upon startup, the client application uses a command-line argument which specifies a file pattern, to determine which jar files will part of the jobs dynamic classpath.
+            From this pattern, it computes the MD5 signature for each matching file and builds a <a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath</a> instance based on the results.<br/>
+            Example: <tt>./run.sh -c "*1.jar|*2.jar"</tt> will cause the aplication to use all jar files whose name ends with '1' or '2'</li>
+            <li>Additionally, the client handles an optional command-line argument to specifiy another file pattern, to request that the node deletes the matching files.
+            This argument is converted into a <a href="src/org/jppf/example/extendedclassloading/RepositoryFilter.java.html">RepositoryFilter</a> instance, which will be used by the nodes to delete the specified jar files.<br/>
+            For instance: <tt>-d "My*1.jar"</tt> will tell the node to remove all files whose name starts with "My" and ends with "1" from their repository</li>
+            <li>The client application then creates 2 jobs. Each job has a task using a single one of two dynamic libraries, adds the <tt>ClassPath</tt> and optional <tt>RepositoryFilter</tt> instances to its metadata,
+            submits the jobs to the grid, then displays their execution results</li>
+          </ul>
+
+          <a name="4"></a>
+          <h3>How to run the sample</h3>
+          Before running this sample, you need to install a JPPF server and at least one node.<br>
+          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+          Once you have installed a server and node, perform the following steps:
+          <ol class="samplesList">
+            <li>open a command prompt or shell console in JPPF-x.y-samples-pack/ExtendedClassLoading</li>
+            <li>build the sample: type "<b>ant jar</b>" or simply "<b>ant</b>"; this will create 3 jar files:<br/>
+              <ul class="samplesNestedList">
+                <li><b>NodeListener.jar</b> in this sample's root folder. This is our node life cycle listener implementation</li>
+                <li><b>ClientLib1.jar</b> and <b>ClientLib2.jar</b> in the "<b>dynamicLibs</b>" folder (this is the client's dynamic classpath).
+                These are here for demonstration purposes. Each of these libraries contains a single class used by a JPPF task in one of the submitted jobs.
+                When running this sample the first time, these classes will initially not be in the classpath of either the client or the node.
+                However, our repository management mechanism will automatically download these libraries to the node, so the task can be executed without error.</li>
+              </ul>
+            </li>
+            <li>copy "NodeListener.jar" in the "lib" folder of the JPPF driver installation, to add it to the driver's classpath. This will cause the nodes to download its classes from the server.</li>
+            <li>start the server and the node</li>
+            <li><b>Test scenario 1:</b> from the command prompt previously opened, run the sample by typing:<br/>
+            <tt>run.bat -c "*.jar"</tt> on Windows<br/>
+            <tt>./run.sh -c "*.jar"</tt> on Linux/Unix<br/>
+            From now on we'll only specifiy the command as "&lt;run&gt;", please substitute the appropriate syntax for your OS.</li>
+            <li>in the client's console output, you will see a message indicating that a classpath with our 2 libraries was found, matching the file pattern specified on the command line.
+            Then, the client shows that the execution of each of our jobs was successful.</li>
+            <li>On the node side, the console output shows the requested jars for each job. The jar files are downloaded for the first job, as they are not yet in the repository. Then the task class loader is updated with the downloaded files.<br/>
+            This is a little different with the second job: the jars are not downloaded this time, as they are now in the repository. Also, since the classpath of the class loader is not empty, we create a new one and add the jars to its classpath.
+            Finally, looking at the content of the node's "repository" folder, we can check that our 2 jars files are effectively present in it.</li>
+            <li><b>Test scenario 2:</b> at the command prompt type: <tt>&lt;run&gt; -d "*.jar"</tt> to ask the node to delete all jar files in its repository.<br/>
+            <li>On the client's console output, we see that the jobs produced an error at execution:<br/><tt>NoClassDefFoundError: org/.../clientlibX/MyClientDynamicClassX</tt><br/>
+            This is the expected result, since we didn't specify any classpath for the jobs.</li>
+            <li>On the node side, there are two different outcomes, depending on the OS you're on:
+              <ul class="samplesNestedList">
+                <li>on Linux/Unix systems, the 'repository' folder is now empty, the jar files were effectively deleted</li>
+                <li>on Windows systems, 'repository' still contains the 2 jars files, plus one additional file 'toDelete.txt'. The node could not delete the jars because the JVM is holding a lock on them.
+                Thus the deletion will only occur at the next node restart. If you look into 'toDelete.txt' with a text editor, you will see that it lists our 2 jars files.</li>
+              </ul>
+            </li>
+            <li>If you are on a Windows system, please kill the node and restart it: you will now see that the node's 'repository' folder is empty, it has been properly cleaned up</li>
+            <li><b>Test scenario 3:</b> at the command prompt type: <tt>&lt;run&gt; -c "*2.jar"</tt><br/>
+            <li>The node output shows that only 'MyLib2.jar' is downloaded from the client. Futhermore, we can see that this jar is now back in the 'repository' folder</li>
+            <li>As expected, the client's output will show a <tt>NoClassDefFoundError</tt> for the 1st job and a successful execution for the 2nd</li>
+            <li>Now, you can continue experimenting with various combinations of the -c and -d arguments, by adding different jars in the client's 'dynamic' lib folder, etc... </li>
+          </ol>
+
+          <a name="5"></a>
+          <h3>Commented source files</h3>
+          <ul class="samplesList">
+            <li><a href="src/org/jppf/example/extendedclassloading/Repository.java.html">Repository.java</a> and <a href="src/org/jppf/example/extendedclassloading/RepositoryImpl.java.html">RepositoryImpl.java</a>:
+            these are the node's <i>Repository</i> abstraction and a default implementation used in this sample</li>
+            <li><a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath.java</a> and <a href="src/org/jppf/example/extendedclassloading/ClassPathImpl.java.html">ClassPathImpl.java</a>:
+            the <i>ClassPath</i> abstraction along with a default implementation</li>
+            <li><a href="src/org/jppf/example/extendedclassloading/RepositoryFilter.java.html">RepositoryFilter.java</a>: provides filtering of repository elements</li>
+            <li><a href="src/org/jppf/example/extendedclassloading/ClassPathHelper.java.html">ClassPathHelper.java</a>: a set of utility methods to compute signatures and handle classpath elements</li>
+            <li><a href="src/org/jppf/example/extendedclassloading/node/NodeListener.java.html">NodeListener.java</a>: our node life cycle listener implementation, which uses the Repository</li>
+            <li><a href="src/org/jppf/example/extendedclassloading/client/MyRunner.java.html">MyRunner.java</a>: the JPPF client application, which handles the '-c' and '-d' command-line arguments</li>
+            <li><a href="src/org/jppf/example/extendedclassloading/client/MyTask1.java.html">MyTask1.java</a> and <a href="src/org/jppf/example/extendedclassloading/client/MyTask2.java.html">MyTask2.java</a>:
+            these are simple JPPF tasks which invoke the classes found in 'MyLib1.jar' and 'MyLib2.jar' respectively</li>
+          </ul>
+
+          <a name="6"></a>
+          <h3>What features of JPPF are demonstrated?</h3>
+          <ul class="samplesList">
+            <li><a href="http://www.jppf.org/doc/v4/index.php?title=Class_loading_in_JPPF#JPPF_class_loading_extensions">Class loading extensions</a></li>
+            <li><a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">Receiving notifications of node life cycle events</a></li>
+            <li><a href="http://www.jppf.org/doc/v4/index.php?title=Job_Metadata">Job metadata</a></li>
+          </ul>
+
+          <a name="7"></a>
+          <h3>I have additional questions and comments, where can I go?</h3>
+          <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>ExtendedClassLoading/src</b> folder.
+          <p>In addition, There are 2 privileged places you can go to:
+          <ul>
+            <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+            <li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+          </ul>
+          <!-- ${SAMPLE_END_CONTENT} -->
+        </div>
+        <!-- end content -->
+
+        <!-- start footer -->
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+          <tr>
+            <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+            <td align="right">
+              <a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+              <a href="http://sourceforge.net/projects/jppf-project">
+                <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+                  alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+              </a>
+            </td>
+            <td style="width: 10px"></td>
+          </tr>
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+        </table>
+        <div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+        <!-- end footer -->
+
+      </div>
+    </div>
+
+  </body>
+
+</html>
