@@ -63,39 +63,32 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   private static final boolean SEQUENTIAL_DESERIALIZATION = JPPFConfiguration.getProperties().getBoolean("jppf.sequential.deserialization", false);
   /**
    * A sequence number used as suffix for the {@code connectionUuid}.
-   * @exclude
    */
-  protected static AtomicInteger connectionCount = new AtomicInteger(0);
+  static AtomicInteger connectionCount = new AtomicInteger(0);
   /**
    * Handler for the connection to the task server.
-   * @exclude
    */
-  protected TaskServerConnectionHandler taskServerConnection = null;
+  TaskServerConnectionHandler taskServerConnection = null;
   /**
    * Enables loading local classes onto remote nodes.
-   * @exclude
    */
-  protected ClassServerDelegate delegate = null;
+  ClassServerDelegate delegate = null;
   /**
    * Configuration name for this local client.
-   * @exclude
    */
-  protected String name = null;
+  String name = null;
   /**
    * Unique ID for this connection and its two channels.
-   * @exclude
    */
-  protected String connectionUuid = null;
+  String connectionUuid = null;
   /**
    * Status of the connection.
-   * @exclude
    */
-  protected AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(CREATED);
+  AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(CREATED);
   /**
    * The connection pool this connection belongs to.
-   * @exclude
    */
-  protected final JPPFConnectionPool pool;
+  final JPPFConnectionPool pool;
 
   /**
    * Initialize this connection with a parent pool.
@@ -123,7 +116,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   public void sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
-    ;
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
@@ -377,15 +369,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   public AbstractGenericClient getClient() {
     return pool.getClient();
-  }
-
-  /**
-   * Get the unique identifier of the remote driver.
-   * @return the uuid as a string.
-   * @deprecated use {@link #getDriverUuid()} instead.
-   */
-  public String getUuid() {
-    return getDriverUuid();
   }
 
   @Override

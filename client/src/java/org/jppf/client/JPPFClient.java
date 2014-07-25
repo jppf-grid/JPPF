@@ -24,7 +24,6 @@ import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -82,26 +81,6 @@ public class JPPFClient extends AbstractGenericClient {
     return new JPPFClientConnectionImpl(this, uuid, name, info, pool);
   }
 
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #submitJob(JPPFJob)} instead.
-   */
-  @Deprecated
-  @Override
-  public List<JPPFTask> submit(final JPPFJob job) throws Exception {
-    if (job == null) throw new IllegalArgumentException("job cannot be null");
-    if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
-    if ((job.getResultListener() == null) ||
-        (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
-    SubmissionManager submissionManager = getSubmissionManager();
-    submissionManager.submitJob(job);
-    if (job.isBlocking()) {
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      return collector.waitForResults();
-    }
-    return null;
-  }
-
   @Override
   @SuppressWarnings("deprecation")
   public List<Task<?>> submitJob(final JPPFJob job) throws Exception {
@@ -113,8 +92,6 @@ public class JPPFClient extends AbstractGenericClient {
     }
     job.client = this;
     if (job.getJobTasks().isEmpty()) throw new IllegalArgumentException("job cannot be empty");
-    if ((job.getResultListener() == null) ||
-        (job.isBlocking() && !(job.getResultListener() instanceof JPPFResultCollector))) job.setResultListener(new JPPFResultCollector(job));
     SubmissionManager submissionManager = getSubmissionManager();
     submissionManager.submitJob(job);
     if (job.isBlocking()) return job.awaitResults();

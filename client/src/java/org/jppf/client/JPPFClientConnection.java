@@ -82,14 +82,6 @@ public interface JPPFClientConnection extends ClientConnectionStatusHandler, Aut
   String getDriverUuid();
 
   /**
-   * Get the object that provides access to the management functions of the driver.
-   * @return a <code>JMXConnectionWrapper</code> instance.
-   * @deprecated use {@link #getConnectionPool()}.{@link JPPFConnectionPool#getJmxConnection() getJmxConnection()} instead.
-   */
-  @Deprecated
-  JMXDriverConnectionWrapper getJmxConnection();
-
-  /**
    * Get the system information for the remote driver this connection refers to.
    * @return a {@link JPPFSystemInformation} instance.
    */

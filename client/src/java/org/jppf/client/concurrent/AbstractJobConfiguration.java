@@ -36,33 +36,46 @@ abstract class AbstractJobConfiguration implements JobConfiguration
   /**
    * The service level agreement between the job and the server.
    */
-  protected JobSLA jobSLA = new JPPFJobSLA();
+  private JobSLA jobSLA = new JPPFJobSLA();
   /**
    * The service level agreement between the job and the server.
    */
-  protected JobClientSLA jobClientSLA = new JPPFJobClientSLA();
+  private JobClientSLA jobClientSLA = new JPPFJobClientSLA();
   /**
    * The user-defined metadata associated with this job.
    */
-  protected JobMetadata jobMetadata = new JPPFJobMetadata();
+  private JobMetadata jobMetadata = new JPPFJobMetadata();
   /**
    * The persistence manager that enables saving and restoring the state of this job.
    */
-  protected JobPersistence<?> persistenceManager = null;
+  private JobPersistence<?> persistenceManager = null;
   /**
    * The data provider to set onto the job.
    */
-  protected DataProvider dataProvider = null;
+  private DataProvider dataProvider = null;
   /**
    * The list of listeners to register with the job.
    */
-  protected List<JobListener> listeners = new LinkedList<>();
+  private List<JobListener> listeners = new LinkedList<>();
 
   /**
    * Default constructor.
    */
   protected AbstractJobConfiguration()
   {
+  }
+
+  /**
+   * Copy constructor.
+   * @param sla the sla configuration.
+   * @param metadata the metadata configuration to use.
+   * @param persistenceManager the persistence manager to use.
+   */
+  AbstractJobConfiguration(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager)
+  {
+    this.jobSLA = sla;
+    this.jobMetadata = metadata;
+    this.persistenceManager = persistenceManager;
   }
 
   @Override

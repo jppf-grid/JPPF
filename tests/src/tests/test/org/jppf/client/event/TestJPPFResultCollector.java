@@ -20,14 +20,11 @@ package test.org.jppf.client.event;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -42,44 +39,6 @@ public class TestJPPFResultCollector extends Setup1D1N {
    * The JPPF client.
    */
   private JPPFClient client = null;
-
-  /**
-   * Test that {@code JPPFResultCollector.getAllResults()} returns the results when a {@code JobListener.jobEnded()} is emitted.
-   * @throws Exception if any error occurs
-   */
-  @Test(timeout=20000)
-  @SuppressWarnings("deprecation")
-  public void testAllResultsUponJobEnded() throws Exception {
-    try {
-      configure(true, false, 1);
-      client = BaseSetup.createClient(null, false);
-      int nbTasks = 5;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 100L);
-      final AtomicBoolean resultsNull = new AtomicBoolean(true);
-      final List<Task<?>> resultCollectorResults = new ArrayList<>();
-      job.addJobListener(new JobListenerAdapter() {
-        @Override
-        public void jobEnded(final JobEvent event) {
-          JPPFResultCollector c = (JPPFResultCollector) event.getJob().getResultListener();
-          final List<Task<?>> list = c.getAllResults();
-          if (list != null) {
-            resultsNull.set(false);
-            resultCollectorResults.addAll(list);
-          }
-        }
-      });
-      client.submitJob(job);
-      @SuppressWarnings("deprecation")
-      JPPFResultCollector collector = (JPPFResultCollector) job.getResultListener();
-      List<Task<?>> results2 = collector.awaitResults();
-      assertEquals(nbTasks, results2.size());
-      assertFalse(resultsNull.get());
-      assertEquals(nbTasks, resultCollectorResults.size());
-      for (int i=0; i<nbTasks; i++) assertTrue("task index " + i + " discrepancy", results2.get(i) == resultCollectorResults.get(i));
-    } finally {
-      reset();
-    }
-  }
 
   /**
    * submit the job with the specified listener and number of tasks.

@@ -285,9 +285,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
   public String submitJob(final JPPFJob job, final SubmissionStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this submission manager was closed");
     List<Task<?>> pendingTasks = new ArrayList<>();
-    if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector)) {
-      ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
-    }
+    if (listener != null) job.getResultCollector().addSubmissionStatusListener(listener);
     List<Task<?>> tasks = job.getJobTasks();
     for (Task<?> task: tasks) if (!job.getResults().hasResult(task.getPosition())) pendingTasks.add(task);
     queue.addBundle(new ClientJob(job, pendingTasks));

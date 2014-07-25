@@ -107,7 +107,7 @@ public class TestJPPFClient extends Setup1D1N
       int i = 0;
       for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
       ExecutingJobStatusListener statusListener = new ExecutingJobStatusListener();
-      ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(statusListener);
+      job.getResultCollector().addSubmissionStatusListener(statusListener);
       client.submitJob(job);
       statusListener.await();
       client.cancelJob(job.getUuid());

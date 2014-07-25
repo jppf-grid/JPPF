@@ -44,9 +44,7 @@ class JobConfigurationImpl extends AbstractJobConfiguration
    */
   JobConfigurationImpl(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager)
   {
-    this.jobSLA = sla;
-    this.jobMetadata = metadata;
-    this.persistenceManager = persistenceManager;
+    super(sla, metadata, persistenceManager);
   }
 
   /**

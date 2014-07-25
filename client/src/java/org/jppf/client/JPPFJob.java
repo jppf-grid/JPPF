@@ -49,6 +49,10 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * The listener that receives notifications of completed tasks.
+   */
+  transient final JPPFResultCollector resultCollector;
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -63,10 +67,18 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * This constructor generates a pseudo-random id as a string of 32 hexadecimal characters.
    * @param jobUuid the uuid to assign to this job.
    */
-  @SuppressWarnings("deprecation")
   public JPPFJob(final String jobUuid) {
     super(jobUuid);
-    resultsListener = new JPPFResultCollector(this);
+    resultCollector = new JPPFResultCollector(this);
+  }
+
+  /**
+   * Get the listener that receives notifications of completed tasks.
+   * @return a <code>TaskCompletionListener</code> instance.
+   * @exclude
+   */
+  public JPPFResultCollector getResultCollector() {
+    return resultCollector;
   }
 
   @Override
@@ -169,14 +181,6 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   }
 
   /**
-   * Get the service level agreement between the job and the server.
-   * @param jobSLA an instance of <code>JobSLA</code>.
-   */
-  public void setSLA(final JobSLA jobSLA) {
-    this.jobSLA = jobSLA;
-  }
-
-  /**
    * Get the job SLA for the client side.
    * @return an instance of <code>JobSLA</code>.
    */
@@ -184,25 +188,9 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
     return jobClientSLA;
   }
 
-  /**
-   * Get the service level agreement between the job and the server.
-   * @param jobClientSLA an instance of <code>JobSLA</code>.
-   */
-  public void setClientSLA(final JobClientSLA jobClientSLA) {
-    this.jobClientSLA = jobClientSLA;
-  }
-
   @Override
   public JobMetadata getMetadata() {
     return jobMetadata;
-  }
-
-  /**
-   * Set this job's metadata.
-   * @param jobMetadata a {@link JobMetadata} instance.
-   */
-  public void setMetadata(final JobMetadata jobMetadata) {
-    this.jobMetadata = jobMetadata;
   }
 
   /**
@@ -260,15 +248,6 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    */
   public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager) {
     this.persistenceManager = persistenceManager;
-  }
-
-  /**
-   * Resolve this instance after deserialization.
-   * @return an instance of {@link Object}.
-   */
-  protected Object readResolve() {
-    listeners = new LinkedList<>();
-    return this;
   }
 
   @Override
@@ -335,7 +314,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @since 4.2
    */
   public SubmissionStatus getStatus() {
-    if (resultsListener instanceof SubmissionStatusHandler) return ((SubmissionStatusHandler) resultsListener).getStatus();
+    if (resultCollector instanceof SubmissionStatusHandler) return ((SubmissionStatusHandler) resultCollector).getStatus();
     return null;
   }
 

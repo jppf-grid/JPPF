@@ -57,25 +57,23 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * Constant for JPPF automatic connection discovery
    */
-  protected static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
+  static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";
   /**
    * The pool of threads used for submitting execution requests.
-   * @exclude
    */
-  protected ThreadPoolExecutor executor = null;
+  private ThreadPoolExecutor executor = null;
   /**
    * The JPPF configuration properties.
    */
   private TypedProperties config;
   /**
    * Performs server discovery.
-   * @exclude
    */
-  protected JPPFMulticastReceiverThread receiverThread = null;
+  private JPPFMulticastReceiverThread receiverThread = null;
   /**
    * Determines whether SSL communication is on or off.
    */
-  protected boolean sslEnabled = false;
+  private boolean sslEnabled = false;
   /**
    * The submission manager.
    */

@@ -27,22 +27,4 @@ import org.jppf.utils.collections.Metadata;
  */
 public interface DataProvider extends Metadata
 {
-  /**
-   * Get a value specified by its key.
-   * @param key the key identifying the value to retrieve in the store.
-   * @return the value as an <code>Object</code>.
-   * @throws Exception if an error occurred while retrieving the data.
-   * @param <T> the type of the value to get.
-   * @deprecated use {@link #getParameter(Object)} instead.
-   */
-  <T> T  getValue(final Object key) throws Exception;
-
-  /**
-   * Set a value specified by its key in the store.
-   * @param key the key identifying the value to retrieve in the store.
-   * @param value the value to store, associated with the key.
-   * @throws Exception if an error occurred setting the data.
-   * @deprecated use {@link #setParameter(Object, Object)} instead)
-   */
-  void setValue(Object key, Object value) throws Exception;
 }

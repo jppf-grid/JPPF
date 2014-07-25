@@ -23,10 +23,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.JPPFException;
-import org.jppf.client.event.*;
+import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
-import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
@@ -56,11 +54,6 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * The data provider should be considered read-only, i.e. no modification will be returned back to the client application.
    */
   DataProvider dataProvider = null;
-  /**
-   * The listener that receives notifications of completed tasks.
-   */
-  @SuppressWarnings("deprecation")
-  transient TaskResultListener resultsListener;
   /**
    * Determines whether the execution of this job is blocking on the client side.
    */
@@ -124,78 +117,6 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
     name = (jobUuid == null) ? this.uuid : jobUuid;
   }
 
-  /**
-   * Get the list of tasks to execute.
-   * @return a list of objects.
-   * @deprecated use {@link JPPFJob#getJobTasks()} instead.
-   */
-  @Deprecated
-  public List<JPPFTask> getTasks() {
-    List<JPPFTask> list = new ArrayList<>(tasks.size());
-    for (Task<?> task: tasks) list.add((JPPFTask) task);
-    return list;
-  }
-
-  /**
-   * Add a task to this job. This method is for adding a task that is either an instance of {@link org.jppf.server.protocol.JPPFTask JPPFTask},
-   * annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
-   * @param taskObject the task to add to this job.
-   * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
-   * or a wrapper around the input object in the other cases.
-   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-   * @deprecated use {@link JPPFJob#add(Object, Object...)} instead.
-   */
-  @Deprecated
-  public JPPFTask addTask(final Object taskObject, final Object...args) throws JPPFException {
-    JPPFTask jppfTask = null;
-    if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-    if (taskObject instanceof JPPFTask) jppfTask = (JPPFTask) taskObject;
-    else jppfTask = new JPPFAnnotatedTask(taskObject, args);
-    tasks.add(jppfTask);
-    jppfTask.setPosition(tasks.size()-1);
-    return jppfTask;
-  }
-
-  /**
-   * Add a POJO task to this job. The POJO task is identified as a method name associated with either an object for a non-static method,
-   * or a class for a static method or for a constructor.
-   * @param taskObject the task to add to this job.
-   * @param method the name of the method to execute.
-   * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
-   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
-   * @deprecated use {@link JPPFJob#add(String, Object, Object...)} instead.
-   */
-  @Deprecated
-  public JPPFTask addTask(final String method, final Object taskObject, final Object...args) throws JPPFException {
-    if (taskObject == null) throw new JPPFException("null tasks are not accepted");
-    JPPFTask jppfTask = new JPPFAnnotatedTask(taskObject, method, args);
-    tasks.add(jppfTask);
-    jppfTask.setPosition(tasks.size()-1);
-    return jppfTask;
-  }
-
-  /**
-   * Get the listener that receives notifications of completed tasks.
-   * @return a <code>TaskCompletionListener</code> instance.
-   * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
-   * {@link JobListener} should be used instead, with the {@link JPPFJob#addJobListener(JobListener)} and {@link JPPFJob#removeJobListener(JobListener)} methods.
-   */
-  public TaskResultListener getResultListener() {
-    return resultsListener;
-  }
-
-  /**
-   * Set the listener that receives notifications of completed tasks.
-   * @param resultsListener a <code>TaskCompletionListener</code> instance.
-   * @deprecated {@code TaskResultListener} and its implementations are no longer exposed as public APIs.
-   * {@link JobListener} should be used instead, with the {@link JPPFJob#addJobListener(JobListener)} and {@link JPPFJob#removeJobListener(JobListener)} methods.
-   */
-  public void setResultListener(final TaskResultListener resultsListener) {
-    this.resultsListener = resultsListener;
-  }
-
   @Override
   public int hashCode() {
     return 31 + (uuid == null ? 0 : uuid.hashCode());
@@ -215,6 +136,30 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    */
   public JobResults getResults() {
     return results;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param jobSLA an instance of <code>JobSLA</code>.
+   */
+  public void setSLA(final JobSLA jobSLA) {
+    this.jobSLA = jobSLA;
+  }
+
+  /**
+   * Get the service level agreement between the job and the server.
+   * @param jobClientSLA an instance of <code>JobSLA</code>.
+   */
+  public void setClientSLA(final JobClientSLA jobClientSLA) {
+    this.jobClientSLA = jobClientSLA;
+  }
+
+  /**
+   * Set this job's metadata.
+   * @param jobMetadata a {@link JobMetadata} instance.
+   */
+  public void setMetadata(final JobMetadata jobMetadata) {
+    this.jobMetadata = jobMetadata;
   }
 
   /**

@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -48,35 +47,29 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Name of the default SerializationHelper implementation class.
-   * @exclude
    */
-  public static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
+  static String SERIALIZATION_HELPER_IMPL = "org.jppf.utils.SerializationHelperImpl";
   /**
    * Name of the SerializationHelper implementation class for the JCA connector.
    * @exclude
    */
-  public static String JCA_SERIALIZATION_HELPER = "org.jppf.jca.serialization.JcaSerializationHelperImpl";
-  /**
-   * Total count of the tasks submitted by this client.
-   * @exclude
-   */
-  protected int totalTaskCount = 0;
+  protected static String JCA_SERIALIZATION_HELPER = "org.jppf.jca.serialization.JcaSerializationHelperImpl";
   /**
    * A sequence number used as an id for connection pools.
    */
-  protected final AtomicInteger poolSequence = new AtomicInteger(0);
+  final AtomicInteger poolSequence = new AtomicInteger(0);
   /**
    * Contains all the connections pools in ascending priority order.
    */
-  protected final CollectionMap<Integer, JPPFConnectionPool> pools = new LinkedListSortedMap<>(new DescendingIntegerComparator());
+  final CollectionMap<Integer, JPPFConnectionPool> pools = new LinkedListSortedMap<>(new DescendingIntegerComparator());
   /**
    * Keeps inactive connection ppols, that is the pools who do not yet have an active connection.
    */
-  protected final Set<JPPFConnectionPool> pendingPools = new HashSet<>();
+  final Set<JPPFConnectionPool> pendingPools = new HashSet<>();
   /**
    * Unique universal identifier for this JPPF client.
    */
-  protected String uuid = null;
+  private String uuid = null;
   /**
    * A list of all the connections not yet active.
    */
@@ -91,19 +84,16 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   private final List<ClientListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * Determines whether this JPPF client is closed.
-   * @exclude
    */
-  protected final AtomicBoolean closed = new AtomicBoolean(false);
+  final AtomicBoolean closed = new AtomicBoolean(false);
   /**
    * Determines whether this JPPF client is resetting.
-   * @exclude
    */
-  protected final AtomicBoolean resetting = new AtomicBoolean(false);
+  final AtomicBoolean resetting = new AtomicBoolean(false);
   /**
    * Fully qualified name of the serilaization helper class to use.
-   * @exclude
    */
-  protected String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
+  private String serializationHelperClassName = JPPFConfiguration.getProperties().getString("jppf.serialization.helper.class", SERIALIZATION_HELPER_IMPL);
 
   /**
    * Initialize this client with a specified application UUID.
@@ -186,19 +176,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   }
 
   /**
-   * Get an available connection with the highest possible priority.
-   * @param oneAttempt determines whether this method should wait until a connection
-   * becomes available (ACTIVE status) or fail immediately if no available connection is found.<br>
-   * This enables the execution to be performed locally if the client is not connected to a server.
-   * @param anyState specifies whether this method should look for an active connection or not care about the connection state.
-   * @return a <code>JPPFClientConnection</code> with the highest possible priority.
-   * @deprecated use {@link #getClientConnection()} instead.
-   */
-  public JPPFClientConnection getClientConnection(final boolean oneAttempt, final boolean anyState) {
-    return getClientConnection();
-  }
-
-  /**
    * Get a connection with the specified priority that matches one of the specified statuses.
    * @param priority the priority of the connetion to find.
    * @param statuses a set of statuses, one of which must match the status of the connection to find.
@@ -216,29 +193,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     }
     return null;
   }
-
-  /**
-   * Get an available connection for the specified priority.
-   * @param priority the priority of the connection to find.
-   * @param oneAttempt determines whether this method should wait until a connection becomes available (ACTIVE status) or fail immediately if no available connection is found.<br>
-   * This enables the execution to be performed locally if the client is not connected to a server.
-   * @param anyState specifies whether this method should look for an active connection or not care about the connection state.
-   * @return a <code>JPPFClientConnection</code> with the highest possible priority.
-   * @deprecated use {@link #getClientConnection(int,JPPFClientConnectionStatus[])} instead.
-   */
-  public JPPFClientConnection getClientConnection(final int priority, final boolean oneAttempt, final boolean anyState) {
-    return getClientConnection(priority, JPPFClientConnectionStatus.ACTIVE);
-  }
-
-  /**
-   * Submit a JPPFJob for execution.
-   * @param job the job to execute.
-   * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
-   * @throws Exception if an error occurs while sending the job for execution.
-   * @deprecated use {@link #submitJob(JPPFJob)} instead.
-   */
-  @Deprecated
-  public abstract List<JPPFTask> submit(JPPFJob job) throws Exception;
 
   /**
    * Submit a JPPFJob for execution.

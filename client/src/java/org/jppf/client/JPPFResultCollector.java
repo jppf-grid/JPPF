@@ -26,20 +26,17 @@ import org.jppf.client.event.JobEvent.Type;
 import org.jppf.client.persistence.*;
 import org.jppf.client.submission.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
  * Implementation of the {@link org.jppf.client.event.TaskResultListener TaskResultListener} interface
  * that can be used &quot;as is&quot; to collect the results of an asynchronous job submission.
- * @deprecated {@code JPPFResultCollector} and its inheritance hierarchy are no longer exposed as public APIs.
- * {@code JobListener} should be used instead, with the {@code JPPFJob.addJobListener(JobListener)} and {@code JPPFJob.removeJobListener(JobListener)} methods.
  * @author Laurent Cohen
  * @author Martin JANDA
+ * @exclude
  */
-@SuppressWarnings("deprecation")
-public class JPPFResultCollector implements TaskResultListener, SubmissionStatusHandler {
+public class JPPFResultCollector implements SubmissionStatusHandler {
   /**
    * Logger for this class.
    */
@@ -49,15 +46,13 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * A map containing the resulting tasks, ordered by ascending position in the
-   * submitted list of tasks.
-   * @exclude
+   * A map containing the resulting tasks, ordered by ascending position in the submitted list of tasks.
    */
-  protected JobResults jobResults;
+  private final JobResults jobResults;
   /**
    * The job whose results this object is collecting.
    */
-  protected JPPFJob job = null;
+  private final JPPFJob job;
   /**
    * The status of this submission.
    */
@@ -66,13 +61,6 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    * List of listeners registered to receive this submission's status change notifications.
    */
   private final List<SubmissionStatusListener> listeners = new ArrayList<>();
-
-  /**
-   * Default constructor, provided as a convenience for subclasses.
-   * @exclude
-   */
-  protected JPPFResultCollector() {
-  }
 
   /**
    * Initialize this collector with the specified job.
@@ -85,14 +73,11 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
 
   /**
    * Called to notify that the results of a number of tasks have been received from the server.
-   * @param event a notification of completion for a set of submitted tasks.
-   * @see org.jppf.client.event.TaskResultListener#resultsReceived(org.jppf.client.event.TaskResultEvent)
+   * @param tasks the list of tasks whose results have been received from the server.
+   * @param throwable the throwable that was raised while receiving the results.
    */
-  @Override
   @SuppressWarnings("unchecked")
-  public synchronized void resultsReceived(final TaskResultEvent event) {
-    Throwable t = event.getThrowable();
-    List<Task<?>> tasks = event.getTasks();
+  public synchronized void resultsReceived(final List<Task<?>> tasks, final Throwable throwable) {
     if (tasks != null) {
       jobResults.addResults(tasks);
       if (debugEnabled) log.debug("Received results for {} tasks, pendingCount={}, count={}, jobResults={}", new Object[] {tasks.size(), job.unexecutedTaskCount(), job.getJobTasks().size(), jobResults});
@@ -105,94 +90,12 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
         }
       }
     } else {
-      if (debugEnabled) log.debug("received throwable '{}'", ExceptionUtils.getMessage(t));
+      if (debugEnabled) log.debug("received throwable '{}'", ExceptionUtils.getMessage(throwable));
     }
     job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, tasks);
     if (job.unexecutedTaskCount() <= 0) job.fireJobEvent(Type.JOB_END, null, tasks);
     jobResults.wakeUp();
     notifyAll();
-  }
-
-  /**
-   * Wait until all results of a request have been collected.
-   * @return the list of resulting tasks.
-   * @deprecated use {@link JPPFJob#awaitResults()} instead.
-   */
-  @Deprecated
-  public List<JPPFTask> waitForResults() {
-    return waitForResults(Long.MAX_VALUE);
-  }
-
-  /**
-   * Wait until all results of a request have been collected, or the timeout has expired,
-   * whichever happens first.
-   * @param millis the maximum time to wait, zero meaning an indefinite wait.
-   * @return the list of resulting tasks.
-   * @deprecated use {@link JPPFJob#awaitResults(long)} instead.
-   */
-  @Deprecated
-  public synchronized List<JPPFTask> waitForResults(final long millis) {
-    awaitResults(millis);
-    return getResults();
-  }
-
-  /**
-   * Wait until all results of a request have been collected.
-   * @return the list of resulting tasks.
-   * @deprecated use {@link JPPFJob#awaitResults()} instead.
-   */
-  public List<Task<?>> awaitResults() {
-    return awaitResults(Long.MAX_VALUE);
-  }
-
-  /**
-   * Wait until all results of a request have been collected, or the timeout has expired,
-   * whichever happens first.
-   * @param millis the maximum time to wait, zero meaning an indefinite wait.
-   * @return the list of resulting tasks, or {@code null} if the timeout expired before all results were received.
-   * @deprecated use {@link JPPFJob#awaitResults(long)} instead.
-   */
-  public synchronized List<Task<?>> awaitResults(final long millis) {
-    if (millis < 0L) throw new IllegalArgumentException("wait time cannot be negative");
-    if (log.isTraceEnabled()) log.trace("timeout = " + millis + ", pendingCount = " + job.unexecutedTaskCount());
-    long timeout = millis > 0 ? millis : Long.MAX_VALUE;
-    long start = System.currentTimeMillis();
-    long elapsed = 0L;
-    int size = job.getJobTasks().size();
-    while ((elapsed < timeout) && (jobResults.size() < size)) {
-      try {
-        if (elapsed >= timeout) return null;
-        wait(timeout - elapsed);
-      } catch(Exception e) {
-        log.error(e.getMessage(), e);
-      }
-      elapsed = System.currentTimeMillis() - start;
-      if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed + ", millis = " + timeout);
-    }
-    if (log.isTraceEnabled()) log.trace("elapsed = " + elapsed);
-    return jobResults.getResultsList();
-  }
-
-  /**
-   * Get the list of final results.
-   * @return a list of results as tasks, or null if not all tasks have been executed.
-   * @deprecated use {@link JPPFJob#getAllResults()} instead.
-   */
-  @Deprecated
-  public List<JPPFTask> getResults() {
-    List<Task<?>> results = jobResults.getResultsList();
-    List<JPPFTask> list = new ArrayList<>(results.size());
-    for (Task<?> task: results) list.add((JPPFTask) task);
-    return list;
-  }
-
-  /**
-   * Get the list of final results.
-   * @return a list of results as tasks, or null if not all tasks have been executed.
-   * @deprecated use {@link JPPFJob#getAllResults()} instead.
-   */
-  public List<Task<?>> getAllResults() {
-    return jobResults.getResultsList();
   }
 
   @Override
@@ -203,32 +106,10 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
   @Override
   public void setStatus(final SubmissionStatus newStatus) {
     if (status.get() != newStatus) {
-      if (debugEnabled) log.debug("submission [" + getId() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
+      if (debugEnabled) log.debug("job [" + job.getUuid() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
       this.status.set(newStatus);
-      try {
-        if (newStatus == SubmissionStatus.COMPLETE) {
-          //if (debugEnabled) log.debug("call stack for COMPLETE: {}", ExceptionUtils.getStackTrace(new Exception("call stack")));
-          onComplete();
-        }
-      } finally {
-        fireStatusChangeEvent(newStatus);
-      }
+      fireStatusChangeEvent(newStatus);
     }
-  }
-
-  /**
-   * Called when status is changed to <code>COMPLETE</code>.
-   */
-  protected void onComplete() {
-  }
-
-  /**
-   * Get the unique id of this submission.
-   * @return the id as a string.
-   * @exclude
-   */
-  public String getId() {
-    return job == null ? "no-id" : job.getUuid();
   }
 
   /**
@@ -237,7 +118,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   public void addSubmissionStatusListener(final SubmissionStatusListener listener) {
     synchronized(listeners) {
-      if (debugEnabled) log.debug("submission [" + getId() + "] adding status listener " + listener);
+      if (debugEnabled) log.debug("job [" + job.getUuid() + "] adding status listener " + listener);
       if (listener != null) listeners.add(listener);
     }
   }
@@ -248,7 +129,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   public void removeSubmissionStatusListener(final SubmissionStatusListener listener) {
     synchronized(listeners) {
-      if (debugEnabled) log.debug("submission [" + getId() + "] removing status listener " + listener);
+      if (debugEnabled) log.debug("job [" + job.getUuid() + "] removing status listener " + listener);
       if (listener != null) listeners.remove(listener);
     }
   }
@@ -260,9 +141,9 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
    */
   protected void fireStatusChangeEvent(final SubmissionStatus newStatus) {
     synchronized(listeners) {
-      if (debugEnabled) log.debug("submission [" + getId() + "] fire status changed event for '" + newStatus + "'");
+      if (debugEnabled) log.debug("job [" + job.getUuid() + "] fire status changed event for '" + newStatus + "'");
       if (!listeners.isEmpty()) {
-        SubmissionStatusEvent event = new SubmissionStatusEvent(getId(), newStatus);
+        SubmissionStatusEvent event = new SubmissionStatusEvent(job.getUuid(), newStatus);
         for (SubmissionStatusListener listener: listeners) listener.submissionStatusChanged(event);
       }
     }

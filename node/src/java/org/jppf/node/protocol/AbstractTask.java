@@ -18,7 +18,6 @@
 
 package org.jppf.node.protocol;
 
-import org.jppf.JPPFException;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.task.storage.DataProvider;
@@ -98,23 +97,6 @@ public abstract class AbstractTask<T> implements Task<T> {
   @Override
   public void setResult(final T result) {
     this.result = result;
-  }
-
-  @Override
-  @Deprecated
-  public Exception getException() {
-    if (throwable == null) return null;
-    return throwable instanceof Exception ? (Exception) throwable : new JPPFException(throwable);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated {@link #setThrowable(java.lang.Throwable)} should be used instead.
-   */
-  @Override
-  @Deprecated
-  public void setException(final Exception exception) {
-    this.throwable = exception;
   }
 
   @Override

@@ -65,7 +65,7 @@ public class ClientJob extends AbstractClientJob {
    * The listener that receives notifications of completed tasks.
    */
   @SuppressWarnings("deprecation")
-  private TaskResultListener resultsListener;
+  private JPPFResultCollector resultCollector;
   /**
    * Instance of parent broadcast job.
    */
@@ -121,10 +121,10 @@ public class ClientJob extends AbstractClientJob {
     if (broadcastUUID == null) {
       if (job.getSLA().isBroadcastJob()) this.broadcastMap = new LinkedHashMap<>();
       else this.broadcastMap = Collections.emptyMap();
-      this.resultsListener = this.job.getResultListener();
+      this.resultCollector = this.job.getResultCollector();
     } else {
       this.broadcastMap = Collections.emptyMap();
-      this.resultsListener = null;
+      this.resultCollector = null;
     }
     SubmissionStatus s = job.getStatus();
     this.submissionStatus = s == null ? SubmissionStatus.SUBMITTED : s;
@@ -207,22 +207,6 @@ public class ClientJob extends AbstractClientJob {
       if (after) this.tasks.addAll(taskList);
       return requeue;
     }
-  }
-
-  /**
-   * Get the listener that receives notifications of completed tasks.
-   * @return a <code>TaskCompletionListener</code> instance.
-   */
-  public @SuppressWarnings("deprecation") TaskResultListener getResultListener() {
-    return resultsListener;
-  }
-
-  /**
-   * Set the listener that receives notifications of completed tasks.
-   * @param resultsListener a <code>TaskCompletionListener</code> instance.
-   */
-  public void setResultListener(@SuppressWarnings("deprecation") final TaskResultListener resultsListener) {
-    this.resultsListener = resultsListener;
   }
 
   /**
@@ -314,11 +298,11 @@ public class ClientJob extends AbstractClientJob {
    */
   @SuppressWarnings("deprecation")
   private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
-    TaskResultListener listener = resultsListener;
+    JPPFResultCollector listener = resultCollector;
     if (listener != null) {
       try {
         synchronized (listener) {
-          listener.resultsReceived(new TaskResultEvent(results, throwable));
+          listener.resultsReceived(results, throwable);
         }
       } catch(Exception e) {
         log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
@@ -433,7 +417,7 @@ public class ClientJob extends AbstractClientJob {
   public void setSubmissionStatus(final SubmissionStatus submissionStatus) {
     if (this.submissionStatus == submissionStatus) return;
     this.submissionStatus = submissionStatus;
-    if (resultsListener instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultsListener).setStatus(this.submissionStatus);
+    if (resultCollector instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultCollector).setStatus(this.submissionStatus);
   }
 
   @Override

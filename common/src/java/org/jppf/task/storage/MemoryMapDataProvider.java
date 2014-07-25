@@ -27,28 +27,4 @@ import org.jppf.utils.collections.MetadataImpl;
  */
 public class MemoryMapDataProvider extends MetadataImpl implements DataProvider
 {
-  /**
-   * Explicit serialVersionUID.
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getParameter(Object)} instead)
-   */
-  @Override
-  public <T> T  getValue(final Object key)
-  {
-    return getParameter(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #setParameter(Object, Object)} instead)
-   */
-  @Override
-  public void setValue(final Object key, final Object value)
-  {
-    setParameter(key, value);
-  }
 }

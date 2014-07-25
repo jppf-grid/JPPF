@@ -41,24 +41,23 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   /**
    * The core size of this pool, that is, the minimum number of connections always present.
    */
-  protected int coreSize;
+  int coreSize;
   /**
    * The max size of this pool.
    */
-  protected int maxSize;
+  int maxSize;
   /**
    * Index of the last used connection in this pool.
-   * @exclude
    */
-  protected int lastUsedIndex = 0;
+  private int lastUsedIndex = 0;
   /**
    * List of connection objects handled by this poool.
    */
-  protected final List<E> connections = new ArrayList<>();
+  final List<E> connections = new ArrayList<>();
   /**
    * The connection objects in the core set.
    */
-  protected final Set<E> coreConnections = new HashSet<>();
+  final Set<E> coreConnections = new HashSet<>();
 
   /**
    * Initialize this pool with the specfiied core size.

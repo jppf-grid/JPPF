@@ -48,54 +48,36 @@ class TaskConfigurationImpl implements TaskConfiguration
   {
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFTaskCallback getOnCancelCallback()
   {
     return cancelCallback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setOnCancelCallback(final JPPFTaskCallback cancelCallback)
   {
     this.cancelCallback = cancelCallback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFTaskCallback getOnTimeoutCallback()
   {
     return timeoutCallback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setOnTimeoutCallback(final JPPFTaskCallback timeoutCallback)
   {
     this.timeoutCallback = timeoutCallback;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public JPPFSchedule getTimeoutSchedule()
   {
     return timeoutSchedule;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule)
   {

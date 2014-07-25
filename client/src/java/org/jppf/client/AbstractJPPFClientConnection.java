@@ -46,14 +46,12 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * List of status listeners for this connection.
-   * @exclude
    */
-  protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
+  private final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
   /**
    * The name displayed for this connection.
-   * @exclude
    */
-  protected String displayName;
+  String displayName;
   /**
    * Whether this connection is closed.
    */
@@ -148,7 +146,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
   public boolean cancelJob(final String jobId) throws Exception {
-    JMXDriverConnectionWrapper jmxConnection = this.getJmxConnection();
+    JMXDriverConnectionWrapper jmxConnection = pool.getJmxConnection();
     if ( jmxConnection != null && jmxConnection.isConnected()) {
       if (debugEnabled) log.debug("requesting cancel of jobUuid=" + jobId);
       jmxConnection.cancelJob(jobId);
@@ -222,27 +220,6 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
     pool.setSystemInfo((JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM));
     pool.setDriverUuid((String) bundle.getParameter(BundleParameter.DRIVER_UUID_PARAM));
     return bundle;
-  }
-
-  /**
-   * Initialize the jmx connection using the specified jmx server information.
-   */
-  /*
-  void initializeJmxConnection() {
-    if (debugEnabled) log.debug("{} initializing jmx with host={}, jmxPort={}, ssl={}", new Object[] {this, getHost(), pool.getJmxPort(), pool.isSslEnabled()});
-    jmxConnection = new JMXDriverConnectionWrapper(getHost(), pool.getJmxPort(), pool.isSslEnabled());
-    jmxConnection.connect();
-  }
-  */
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #getConnectionPool()}.{@link JPPFConnectionPool#getJmxConnection() getJmxConnection()} instead.
-   */
-  @Deprecated
-  @Override
-  public JMXDriverConnectionWrapper getJmxConnection() {
-    return pool.getJmxConnection();
   }
 
   /**

@@ -26,11 +26,10 @@ import javax.resource.spi.ConnectionEvent;
 
 import org.jppf.client.*;
 import org.jppf.client.event.SubmissionStatusListener;
-import org.jppf.client.submission.*;
+import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.work.JcaSubmissionManager;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.slf4j.*;
 
 /**
@@ -113,9 +112,7 @@ public class JPPFConnectionImpl implements JPPFConnection
   public String submit(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
   {
     job.setBlocking(false);
-    if ((listener != null) && (job.getResultListener() instanceof JPPFResultCollector)) {
-      ((JPPFResultCollector) job.getResultListener()).addSubmissionStatusListener(listener);
-    }
+    if (listener != null) job.getResultCollector().addSubmissionStatusListener(listener);
     managedConnection.retrieveJppfClient().submitJob(job);
     return job.getUuid();
   }
@@ -125,8 +122,7 @@ public class JPPFConnectionImpl implements JPPFConnection
   public void addSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
     JPPFJob res = getJob(submissionId);
-    JPPFResultCollector collector = (JPPFResultCollector) res.getResultListener();
-    if (res != null) collector.addSubmissionStatusListener(listener);
+    if (res != null) res.getResultCollector().addSubmissionStatusListener(listener);
   }
 
   @Override
@@ -134,8 +130,7 @@ public class JPPFConnectionImpl implements JPPFConnection
   public void removeSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
   {
     JPPFJob res = getJob(submissionId);
-    JPPFResultCollector collector = (JPPFResultCollector) res.getResultListener();
-    if (res != null) collector.removeSubmissionStatusListener(listener);
+    if (res != null) res.getResultCollector().removeSubmissionStatusListener(listener);
   }
 
   @Override
@@ -144,28 +139,6 @@ public class JPPFConnectionImpl implements JPPFConnection
     JPPFJob res = getJob(submissionId);
     if (res == null) return null;
     return res.getStatus();
-  }
-
-  /**
-   * Get the results of an execution request.<br>
-   * This method should be called only once a call to
-   * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-   * either {@link org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
-   * {@link org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
-   * @param submissionId the id of the submission for which to get the execution results.
-   * @return the list of resulting JPPF tasks, or null if the execution failed.
-   * @throws Exception if an error occurs while submitting the request.
-   * @deprecated use {@link #getResults(String)} instead.
-   */
-  @Deprecated
-  @Override
-  public List<JPPFTask> getSubmissionResults(final String submissionId) throws Exception
-  {
-    JcaSubmissionManager mgr = (JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager();
-    JPPFJob res = mgr.peekSubmission(submissionId);
-    if (res == null) return null;
-    res = mgr.pollSubmission(submissionId);
-    return new ArrayList<>(res.getResults().getAll());
   }
 
   /**
@@ -218,23 +191,6 @@ public class JPPFConnectionImpl implements JPPFConnection
   public void setManagedConnection(final JPPFManagedConnection conn)
   {
     this.managedConnection = conn;
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #awaitResults(String)} instead.
-   */
-  @Deprecated
-  @Override
-  public List<JPPFTask> waitForResults(final String submissionId) throws Exception
-  {
-    JPPFJob job = getJob(submissionId);
-    JPPFResultCollector result = (JPPFResultCollector) job.getResultListener();
-    if (debugEnabled) log.debug("result collector = " + result);
-    if (result == null) return null;
-    List<JPPFTask> tasks = result.waitForResults();
-    ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).pollSubmission(submissionId);
-    return tasks;
   }
 
   @Override

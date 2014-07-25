@@ -21,7 +21,7 @@ package org.jppf.client.concurrent;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.slf4j.*;

@@ -32,8 +32,7 @@ import org.slf4j.*;
  * <p>The same implementation must be used for all nodes, servers and clients.
  * @author Laurent Cohen
  */
-public interface JPPFSerialization
-{
+public interface JPPFSerialization {
   /**
    * Configuration property name for object serialization.
    */
@@ -58,8 +57,7 @@ public interface JPPFSerialization
   /**
    * Factory class for instantiating a default or configured serialization.
    */
-  public static class Factory
-  {
+  public static class Factory {
     /**
      * Logger for this class.
      */
@@ -77,32 +75,20 @@ public interface JPPFSerialization
      * Initialize the serialization.
      * @return the defined {@link JPPFSerialization} instance.
      */
-    private static JPPFSerialization init()
-    {
+    private static JPPFSerialization init() {
       String className = JPPFConfiguration.getProperties().getString(SERIALIZATION_CLASS);
       if (debugEnabled) log.debug("found " + SERIALIZATION_CLASS + " = " + className);
-      if (className != null)
-      {
-        try
-        {
+      if (className != null) {
+        try {
           Class<?> clazz = Class.forName(className);
           return (JPPFSerialization) clazz.newInstance();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           StringBuilder sb = new StringBuilder();
           sb.append("Could not instantiate JPPF serialization [").append(SERIALIZATION_CLASS).append(" = ").append(className);
           sb.append(", terminating this application");
           log.error(sb.toString(), e);
           throw new JPPFError(sb.toString(), e);
         }
-      }
-      else // use "legacy" object stream builder if one is configured
-      {
-        @SuppressWarnings("deprecation")
-        JPPFObjectStreamBuilder builder = JPPFObjectStreamFactory.init();
-        if (debugEnabled) log.debug("found JPPFObjectStreamBuilder = " + builder);
-        if (builder != null) return new ObjectStreamBuilderSerialization(builder);
       }
       if (debugEnabled) log.debug("using DefaultJavaSerialization");
       return new DefaultJavaSerialization();
@@ -112,8 +98,7 @@ public interface JPPFSerialization
      * Get the configured serialization.
      * @return an instance of {@link JPPFSerialization}.
      */
-    public static JPPFSerialization getSerialization()
-    {
+    public static JPPFSerialization getSerialization() {
       return serialization;
     }
 
@@ -121,42 +106,8 @@ public interface JPPFSerialization
      * Reset the configured serialization.
      * @exclude
      */
-    public static void reset()
-    {
+    public static void reset() {
       serialization = init();
-    }
-  }
-
-  /**
-   * This implementation uses a {@link JPPFObjectStreamBuilder} and is used for compatibility with versions up to 3.3.
-   */
-  @SuppressWarnings("deprecation")
-  public static class ObjectStreamBuilderSerialization implements JPPFSerialization
-  {
-    /**
-     * The stream builder to use.
-     */
-    private final JPPFObjectStreamBuilder builder;
-
-    /**
-     * Initialize this serialization with the specified object stream builder.
-     * @param builder the stream builder to use.
-     */
-    ObjectStreamBuilderSerialization(final JPPFObjectStreamBuilder builder)
-    {
-      this.builder = builder;
-    }
-
-    @Override
-    public void serialize(final Object o, final OutputStream os) throws Exception
-    {
-      builder.newObjectOutputStream(os).writeObject(o);
-    }
-
-    @Override
-    public Object deserialize(final InputStream is) throws Exception
-    {
-      return builder.newObjectInputStream(is).readObject();
     }
   }
 }

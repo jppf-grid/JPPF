@@ -24,7 +24,6 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.ChannelWrapperRemote;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 
 /**
  * Event emitted by a job when its execution starts or completes.
@@ -96,20 +95,7 @@ public class JobEvent extends EventObject {
   /**
    * Get the tasks that were dispatched or returned.
    * <p>This method returns a non <code>null</code> value only for <code>jobDispatched()</code> and <code>jobReturned()</code> events.
-   * @return a list of {@link JPPFTask} instances.
-   * @deprecated use {@link #getJobTasks()} instead.
-   */
-  @Deprecated
-  public List<JPPFTask> getTasks() {
-    List<JPPFTask> list = new ArrayList<>(tasks.size());
-    for (Task<?> task: tasks) list.add((JPPFTask) task);
-    return list;
-  }
-
-  /**
-   * Get the tasks that were dispatched or returned.
-   * <p>This method returns a non <code>null</code> value only for <code>jobDispatched()</code> and <code>jobReturned()</code> events.
-   * @return a list of {@link JPPFTask} instances.
+   * @return a list of {@link Task} instances.
    * @since 4.0
    */
   public List<Task<?>> getJobTasks() {

@@ -48,40 +48,39 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * The socket client uses to communicate over a socket connection.
    */
-  protected SocketWrapper socketClient = null;
+  SocketWrapper socketClient = null;
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
-  protected SocketInitializer socketInitializer = createSocketInitializer();
+  SocketInitializer socketInitializer = createSocketInitializer();
   /**
-   * The maximum time the underlying socket may be idle, before it is considered
-   * suspect and recycled.
+   * The maximum time the underlying socket may be idle, before it is considered suspect and recycled.
    */
   private long maxSocketIdleMillis;
   /**
    * The name or IP address of the host the class server is running on.
    */
-  protected String host = null;
+  String host = null;
   /**
    * The TCP port the class server is listening to.
    */
-  protected int port = -1;
+  int port = -1;
   /**
    * The client connection which owns this connection handler.
    */
-  protected JPPFClientConnection owner = null;
+  JPPFClientConnection owner = null;
   /**
    * The name given to this connection handler.
    */
-  protected String name = null;
+  String name = null;
   /**
    * Status of the connection.
    */
-  protected final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(NEW);
+  final AtomicReference<JPPFClientConnectionStatus> status = new AtomicReference<>(NEW);
   /**
    * List of status listeners for this connection.
    */
-  protected final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
+  private final List<ClientConnectionStatusListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Initialize this connection with the specified owner.

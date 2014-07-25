@@ -128,19 +128,6 @@ public class JPPFUuid implements Serializable
    * Instantiate this JPPFUuid with a generated unique identifier.
    * @param codes the set of codes from which to choose randomly to build the uuid.
    * @param length number of codes to use to build the uuid.
-   * @deprecated use {@link #JPPFUuid(char[],int)} instead.
-   */
-  public JPPFUuid(final String[] codes, final int length)
-  {
-    if ((codes != null) && (codes.length > 0)) this.codes = codes;
-    if (length > 0) this.length = length;
-    uuid = generateUuid();
-  }
-
-  /**
-   * Instantiate this JPPFUuid with a generated unique identifier.
-   * @param codes the set of codes from which to choose randomly to build the uuid.
-   * @param length number of codes to use to build the uuid.
    */
   public JPPFUuid(final char[] codes, final int length)
   {

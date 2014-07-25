@@ -106,26 +106,6 @@ public class JobInformation implements Serializable
   }
 
   /**
-   * Get the user-defined identifier for the job.
-   * @return the id as a string.
-   * @deprecated use {@link #getJobName()} instead.
-   */
-  public String getJobId()
-  {
-    return getJobName();
-  }
-
-  /**
-   * Set the user-defined identifier for the job.
-   * @param id the id as a string.
-   * @deprecated use {@link #setJobName(String)} instead.
-   */
-  public void setJobId(final String id)
-  {
-    setJobName(id);
-  }
-
-  /**
    * Get the user-defined name for the job.
    * @return the job name as a string.
    */

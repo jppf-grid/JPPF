@@ -214,17 +214,6 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Get the unique id for the node's mbean server.
    * @return the id as a string.
-   * @deprecated use {@link #getUuid()} instead.
-   * @exclude
-   */
-  public String getId()
-  {
-    return uuid;
-  }
-
-  /**
-   * Get the unique id for the node's mbean server.
-   * @return the id as a string.
    */
   public String getUuid()
   {
