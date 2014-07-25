@@ -29,7 +29,7 @@ import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
- * 
+ * This class loads and resolves the includes in a configuration file or source.
  * @author Laurent Cohen
  */
 public class PropertiesLoader {

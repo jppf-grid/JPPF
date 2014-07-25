@@ -57,7 +57,7 @@ public class SubstitutionsHandler {
   /**
    * Stores the properties whose values are fully resolved.
    */
-  private TypedProperties resolved = new TypedProperties();
+  private final TypedProperties resolved = new TypedProperties();
 
   /**
    * Initialize this substitution handler with the specified unresolved properties.
@@ -114,7 +114,10 @@ public class SubstitutionsHandler {
     }
     // add the unresolved properties
     for (String unresolvedProp: dependenciesMap.keySet()) resolved.put(unresolvedProp, props.getProperty(unresolvedProp));
-    return resolved;
+    props.clear();
+    props.putAll(resolved);
+    resolved.clear();
+    return props;
   }
 
   /**

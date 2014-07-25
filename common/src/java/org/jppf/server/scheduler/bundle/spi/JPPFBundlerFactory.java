@@ -24,7 +24,6 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -76,7 +75,7 @@ public class JPPFBundlerFactory
       try {
         String s = (config instanceof String) ? (String) config : config.toString();
         try (Reader reader = new StringReader(s)) {
-          this.config = ConfigurationHelper.loadAndResolve(reader);
+          this.config = new TypedProperties().loadAndResolve(reader);
         }
       } catch (Exception e) {
         if (debugEnabled) log.debug("could not load default configuration", e);

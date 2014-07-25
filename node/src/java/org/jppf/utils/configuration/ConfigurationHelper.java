@@ -18,9 +18,7 @@
 
 package org.jppf.utils.configuration;
 
-import java.io.*;
-
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Utility methods to help access and manipulate the JPPF configuration
@@ -150,22 +148,5 @@ public class ConfigurationHelper {
     }
     else val = config.getInt(name);
     return val;
-  }
-
-  /**
-   * Load this properties objects from the specified reader.
-   * This load operation will recursively process all <code>!#include</code> statements before parsing the properties,
-   * then perform the properties substitutions.
-   * @param reader the reader to load from.
-   * @return a {@link TypedProperties} object with all includes loaded and substitutions performed.
-   * @throws IOException if any I/O error occurs.
-   * @exclude
-   */
-  public static TypedProperties loadAndResolve(final Reader reader) throws IOException {
-    TypedProperties props = new TypedProperties();
-    new PropertiesLoader().load(props, reader);
-    props = new SubstitutionsHandler(props).resolve();
-    new ScriptHandler().process(props);
-    return props;
   }
 }

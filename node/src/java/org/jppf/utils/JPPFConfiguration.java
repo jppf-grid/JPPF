@@ -21,7 +21,6 @@ import java.io.*;
 
 import org.jppf.serialization.JPPFSerialization;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.configuration.ConfigurationHelper;
 import org.slf4j.*;
 
 /**
@@ -35,8 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Jonathan Newbrough
  */
-public final class JPPFConfiguration
-{
+public final class JPPFConfiguration {
   /**
    * Logger for this class.
    */
@@ -65,16 +63,14 @@ public final class JPPFConfiguration
   /**
    * Prevent instantiation from another class.
    */
-  private JPPFConfiguration()
-  {
+  private JPPFConfiguration() {
   }
 
   /**
    * Get the configuration properties.
    * @return a TypedProperties instance.
    */
-  public static TypedProperties getProperties()
-  {
+  public static TypedProperties getProperties() {
     if (props == null) loadProperties();
     return props;
   }
@@ -84,8 +80,7 @@ public final class JPPFConfiguration
    * This allows reloading the configuration from a different source or file
    * (after changing the values of the related system properties for instance).
    */
-  public static void reset()
-  {
+  public static void reset() {
     SSLHelper.resetConfig();
     loadProperties();
     JPPFSerialization.Factory.reset();
@@ -94,15 +89,15 @@ public final class JPPFConfiguration
   /**
    * Load the JPPF configuration properties from a file.
    */
-  private static void loadProperties()
-  {
-    try (Reader reader = getReader())
-    {
+  private static void loadProperties() {
+    props = new TypedProperties();
+    try (Reader reader = getReader()) {
+      /*
       if (reader != null) props = ConfigurationHelper.loadAndResolve(reader);
       else props = new TypedProperties();
-    }
-    catch(Exception e)
-    {
+      */
+      if (reader != null) props.loadAndResolve(reader);
+    } catch(Exception e) {
       log.error("error reading the configuration", e);
     }
   }
@@ -112,8 +107,7 @@ public final class JPPFConfiguration
    * @return an {@link InputStream} instance.
    * @throws Exception if any error occurs while trying to obtain the stream.
    */
-  private static Reader getReader() throws Exception
-  {
+  private static Reader getReader() throws Exception {
     String altSource = System.getProperty(CONFIG_PLUGIN_PROPERTY);
     if ((altSource != null) && "".equals(altSource.trim())) altSource = null;
     String filename = System.getProperty(CONFIG_PROPERTY, DEFAULT_FILE);
@@ -127,15 +121,11 @@ public final class JPPFConfiguration
    * @return an input stream that can be used to load the properties.
    * @throws Exception if any error occurs while trying to obtain the stream.
    */
-  private static Reader getConfigurationReader(final String filename, final String configurationSourceName) throws Exception
-  {
+  private static Reader getConfigurationReader(final String filename, final String configurationSourceName) throws Exception {
     Reader reader = null;
-    if (configurationSourceName != null)
-    {
+    if (configurationSourceName != null) {
       reader = getConfigurationSourceReader(configurationSourceName);
-    }
-    else
-    {
+    } else {
       if (log.isDebugEnabled()) log.debug("reading JPPF configuration file: " + filename);
       reader = FileUtils.getFileReader(filename);
     }
@@ -150,18 +140,14 @@ public final class JPPFConfiguration
    * @throws Exception if any error occurs while trying to obtain the stream.
    * @exclude
    */
-  public static Reader getConfigurationSourceReader(final String configurationSourceName) throws Exception
-  {
+  public static Reader getConfigurationSourceReader(final String configurationSourceName) throws Exception {
     Reader reader = null;
     if (log.isDebugEnabled()) log.debug("reading JPPF configuration from config source: " + configurationSourceName);
     Class<?> clazz = Class.forName(configurationSourceName);
-    if (ConfigurationSourceReader.class.isAssignableFrom(clazz))
-    {
+    if (ConfigurationSourceReader.class.isAssignableFrom(clazz)) {
       ConfigurationSourceReader source = (ConfigurationSourceReader) clazz.newInstance();
       reader = source.getPropertyReader();
-    }
-    else if (ConfigurationSource.class.isAssignableFrom(clazz))
-    {
+    } else if (ConfigurationSource.class.isAssignableFrom(clazz)) {
       ConfigurationSource source = (ConfigurationSource) clazz.newInstance();
       InputStream is = source.getPropertyStream();
       reader = new InputStreamReader(is);
@@ -175,8 +161,7 @@ public final class JPPFConfiguration
    * Implement this interface to provide an alternate configuration source via an {@link InputStream}.
    * <p>WARNING: not shown in the interface but also required: implementations must have a public no-arg constructor.
    */
-  public interface ConfigurationSource
-  {
+  public interface ConfigurationSource {
     /**
      * Obtain the JPPF configuration properties from an input stream.
      * The returned stream content must conform to the properties file's specifications
@@ -191,8 +176,7 @@ public final class JPPFConfiguration
    * Implement this interface to provide an alternate configuration source via a {@link Reader}.
    * <p>WARNING: not shown in the interface but also required: implementations must have a public no-arg constructor.
    */
-  public interface ConfigurationSourceReader
-  {
+  public interface ConfigurationSourceReader {
     /**
      * Obtain the JPPF configuration properties from a {@link Reader}.
      * The returned reader content must conform to the properties file's specifications

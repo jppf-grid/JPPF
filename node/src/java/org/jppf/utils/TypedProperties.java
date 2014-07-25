@@ -22,6 +22,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.utils.configuration.*;
+
 /**
  * Extension of the <code>java.util.Properties</code> class to handle the conversion of
  * string values to other types.
@@ -414,5 +416,20 @@ public class TypedProperties extends Properties {
      * @return <code>true</code> if the property is accepted, <code>false</code> otherwise.
      */
     boolean accepts(String name, String value);
+  }
+
+  /**
+   * Load the properties from the specified reader.
+   * The properties are first loaded, then includes are resolved, variable substitutions are resolved,
+   * and finally scripted values are computed.
+   * @param reader the reader to read the properties from.
+   * @return this {@code TypedProperties} object.
+   * @throws IOException if any error occurs.
+   */
+  public synchronized TypedProperties loadAndResolve(final Reader reader) throws IOException {
+    new PropertiesLoader().load(this, reader);
+    new SubstitutionsHandler(this).resolve();
+    new ScriptHandler().process(this);
+    return this;
   }
 }
