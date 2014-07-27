@@ -23,7 +23,7 @@ import java.net.*;
 import java.util.List;
 
 import org.jppf.classloader.resource.*;
-import org.jppf.node.protocol.Location;
+import org.jppf.location.Location;
 
 /**
  * Implementation of a {@link URLConnection} for the &quot;jppfres:&quot; URL protocol.

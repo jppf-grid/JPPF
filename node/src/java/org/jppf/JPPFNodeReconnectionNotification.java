@@ -24,7 +24,7 @@ import org.jppf.node.connection.ConnectionReason;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFNodeReconnectionNotification extends JPPFError {
+public class JPPFNodeReconnectionNotification extends JPPFReconnectionNotification {
   /**
    * An enum value indicating the reson for the reconnection.
    */

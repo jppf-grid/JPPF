@@ -18,6 +18,8 @@
 
 package org.jppf.node.connection;
 
+import org.jppf.comm.discovery.JPPFConnectionInformation;
+
 /**
  * A default implementation for the {@link DriverConnectionInfo} interface.
  * @author Laurent Cohen
@@ -154,5 +156,18 @@ public class JPPFDriverConnectionInfo implements DriverConnectionInfo {
     sb.append(", recoveryPort=").append(recoveryPort);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Convert the specified {@link JPPFConnectionInformation} object into a {@link DriverConnectionInfo}.
+   * @param ci the {@link JPPFConnectionInformation} object to convert from.
+   * @param ssl whether ssl is enabled or not.
+   * @param recovery whether discovery is enabled or not.
+   * @return a {@link DriverConnectionInfo} instance.
+   */
+  public static DriverConnectionInfo fromJPPFConnectionInformation(final JPPFConnectionInformation ci, final boolean ssl, final boolean recovery) {
+    int port = ssl ? ci.sslServerPorts[0] : ci.serverPorts[0];
+    boolean recoveryEnabled = recovery && (ci.recoveryPort >= 0);
+    return new JPPFDriverConnectionInfo(ssl, ci.host, port, recoveryEnabled ? ci.recoveryPort: -1);
   }
 }

@@ -58,7 +58,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
     if (log.isDebugEnabled()) log.debug("Discovered driver: " + info);
     boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     boolean recovery = config.getBoolean("jppf.recovery.enabled", false) && (info.recoveryPort >= 0);
-    return info.toDriverConnectionInfo(ssl, recovery);
+    return JPPFDriverConnectionInfo.fromJPPFConnectionInformation(info, ssl, recovery);
   }
 
   /**

@@ -22,6 +22,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.location.*;
 import org.jppf.node.Node;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;

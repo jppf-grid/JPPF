@@ -23,7 +23,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.util.*;
 
-import org.jppf.node.protocol.*;
+import org.jppf.location.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;

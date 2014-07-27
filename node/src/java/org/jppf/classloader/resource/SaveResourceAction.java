@@ -21,7 +21,7 @@ import java.io.File;
 import java.security.PrivilegedAction;
 import java.util.List;
 
-import org.jppf.node.protocol.*;
+import org.jppf.location.*;
 import org.jppf.utils.*;
 
 /**
