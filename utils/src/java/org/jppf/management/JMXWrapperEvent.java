@@ -16,18 +16,28 @@
  * limitations under the License.
  */
 
-package org.jppf.management.event;
+package org.jppf.management;
 
-import java.util.EventListener;
+import java.util.EventObject;
 
 /**
- * 
+ * Event sent when a JMXConnectionWrapper is connected.
  * @author Laurent Cohen
  */
-public interface JMXWrapperListener extends EventListener {
+public class JMXWrapperEvent extends EventObject {
   /**
-   * Notifiy listeners that a JMX connection wrapper successfully connected to the remote JMX server.
-   * @param event the event encapsulating the connection.
+   * Initialize this event witht he specified source.
+   * @param jmxWrapper the jmx connection wrapper source of this event.
    */
-  void jmxWrapperConnected(JMXWrapperEvent event);
+  public JMXWrapperEvent(final JMXConnectionWrapper jmxWrapper) {
+    super(jmxWrapper);
+  }
+
+  /**
+   * Get the jmx connection wrapper source of this event.
+   * @return a {@link JMXConnectionWrapper} instance.
+   */
+  public JMXConnectionWrapper getJMXConnectionWrapper() {
+    return (JMXConnectionWrapper) getSource();
+  }
 }

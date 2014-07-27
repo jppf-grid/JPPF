@@ -30,7 +30,6 @@ import javax.management.remote.*;
 import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.JPPFException;
-import org.jppf.management.event.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
