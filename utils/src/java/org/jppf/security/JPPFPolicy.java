@@ -19,15 +19,13 @@ package org.jppf.security;
 
 import java.security.*;
 
-import org.jppf.classloader.JPPFClassLoader;
 import org.slf4j.*;
 
 /**
  * Security policy for JPPF Nodes.
  * @author Laurent Cohen
  */
-public class JPPFPolicy extends Policy
-{
+public class JPPFPolicy extends Policy {
   /**
    * Logger for this class.
    */
@@ -47,8 +45,7 @@ public class JPPFPolicy extends Policy
    * through a call to <code>getResourceAsStream(String)</code>; may be null.
    * @see java.lang.ClassLoader#getResourceAsStream(String).
    */
-  public JPPFPolicy(final ClassLoader classLoader)
-  {
+  public JPPFPolicy(final ClassLoader classLoader) {
     this.classLoader = classLoader;
     PermissionsFactory.getPermissions(classLoader);
   }
@@ -60,11 +57,10 @@ public class JPPFPolicy extends Policy
    * @see java.security.Policy#getPermissions(java.security.CodeSource)
    */
   @Override
-  public PermissionCollection getPermissions(final CodeSource codesource)
-  {
+  public PermissionCollection getPermissions(final CodeSource codesource) {
     if (debugEnabled) log.debug("in getPermissions(CodeSource) : " + toString(codesource));
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
+    if ((cl == classLoader) || !cl.getClass().getName().contains("org.jppf"))
       return PermissionsFactory.getExtendedPermissions(classLoader);
     return PermissionsFactory.getPermissions(classLoader);
   }
@@ -76,12 +72,11 @@ public class JPPFPolicy extends Policy
    * @see java.security.Policy#getPermissions(java.security.ProtectionDomain)
    */
   @Override
-  public PermissionCollection getPermissions(final ProtectionDomain domain)
-  {
+  public PermissionCollection getPermissions(final ProtectionDomain domain) {
     // domain.toString() causes a StackOverflowException - because it makes its own security checks that invoke this policy
     if (debugEnabled) log.debug("in getPermissions(ProtectionDomain) : " + toString(domain));
     ClassLoader cl = domain.getClassLoader();
-    if ((cl == classLoader) || !(cl instanceof JPPFClassLoader))
+    if ((cl == classLoader) || !cl.getClass().getName().contains("org.jppf"))
       return PermissionsFactory.getExtendedPermissions(classLoader);
     return PermissionsFactory.getPermissions(classLoader);
   }
@@ -91,8 +86,7 @@ public class JPPFPolicy extends Policy
    * @see java.security.Policy#refresh()
    */
   @Override
-  public void refresh()
-  {
+  public void refresh() {
   }
 
   /**
@@ -100,8 +94,7 @@ public class JPPFPolicy extends Policy
    * @param code the code source to print.
    * @return a string representing the specified code source.
    */
-  private static String toString(final CodeSource code)
-  {
+  private static String toString(final CodeSource code) {
     if (code == null) return "null";
     StringBuilder sb = new StringBuilder().append("location = ").append(code.getLocation());
     return sb.toString();
@@ -112,8 +105,7 @@ public class JPPFPolicy extends Policy
    * @param domain the protection domain to print.
    * @return a string representing the specified protection domain.
    */
-  private static String toString(final ProtectionDomain domain)
-  {
+  private static String toString(final ProtectionDomain domain) {
     StringBuilder sb = new StringBuilder().append("class loader = ").append(domain.getClassLoader());
     sb.append(", code source = [").append(toString(domain.getCodeSource())).append(']');
     return sb.toString();
@@ -127,16 +119,12 @@ public class JPPFPolicy extends Policy
    * @see java.security.Policy#implies(java.security.ProtectionDomain, java.security.Permission)
    */
   @Override
-  public boolean implies(final ProtectionDomain domain, final Permission permission)
-  {
-    if (debugEnabled)
-    {
-      if (permission instanceof RuntimePermission)
-      {
+  public boolean implies(final ProtectionDomain domain, final Permission permission) {
+    if (debugEnabled) {
+      if (permission instanceof RuntimePermission) {
         RuntimePermission rp = (RuntimePermission) permission;
         String action = rp.getActions();
-        if ((action != null) && (action.contains("exitVM")))
-        {
+        if ((action != null) && (action.contains("exitVM"))) {
           log.debug("in implies(exitVM)", new Exception());
         }
       }
