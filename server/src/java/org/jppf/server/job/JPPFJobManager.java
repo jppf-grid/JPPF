@@ -29,6 +29,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.collections.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -36,8 +37,7 @@ import org.slf4j.*;
  * Instances of this class manage and monitor the jobs throughout their processing within the JPPF driver.
  * @author Laurent Cohen
  */
-public class JPPFJobManager implements ServerJobChangeListener, JobNotificationEmitter
-{
+public class JPPFJobManager implements ServerJobChangeListener, JobNotificationEmitter {
   /**
    * Logger for this class.
    */
@@ -49,7 +49,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Mapping of jobs to the nodes they are executing on.
    */
-  private final Map<String, List<ChannelJobPair>> jobMap = new HashMap<>();
+  private final CollectionMap<String, ChannelJobPair> jobMap = new ArrayListHashMap<>();
   /**
    * Mapping of job ids to the corresponding <code>JPPFTaskBundle</code>.
    */
@@ -74,8 +74,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Default constructor.
    */
-  public JPPFJobManager()
-  {
+  public JPPFJobManager() {
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobManager"));
   }
 
@@ -84,20 +83,25 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param jobUuid the id of the job.
    * @return a list of <code>SelectableChannel</code> instances.
    */
-  public synchronized List<ChannelJobPair> getNodesForJob(final String jobUuid)
-  {
+  @SuppressWarnings("unchecked")
+  public List<ChannelJobPair> getNodesForJob(final String jobUuid) {
     if (jobUuid == null) return Collections.emptyList();
-    List<ChannelJobPair> list = jobMap.get(jobUuid);
-    return list == null ? Collections.<ChannelJobPair>emptyList() : Collections.unmodifiableList(list);
+    synchronized(jobMap) {
+      List<ChannelJobPair> list = (List<ChannelJobPair>) jobMap.getValues(jobUuid);
+      return list == null ? Collections.<ChannelJobPair>emptyList() : Collections.unmodifiableList(list);
+    }
   }
 
   /**
    * Get the set of ids for all the jobs currently queued or executing.
    * @return an array of ids as strings.
    */
-  public synchronized String[] getAllJobIds()
-  {
-    return jobMap.keySet().toArray(new String[jobMap.size()]);
+  public String[] getAllJobIds() {
+    synchronized(jobMap) {
+      Set<String> keys = jobMap.keySet();
+      if (debugEnabled) log.debug("keys = {}", keys);
+      return keys.toArray(new String[keys.size()]);
+    }
   }
 
   /**
@@ -105,41 +109,30 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param jobUuid the id of the job to look for.
    * @return a <code>ServerJob</code> instance, or null if the job is not queued anymore.
    */
-  public synchronized ServerJob getBundleForJob(final String jobUuid)
-  {
+  public ServerJob getBundleForJob(final String jobUuid) {
     return ((JPPFPriorityQueue) driver.getQueue()).getBundleForJob(jobUuid);
-    //return bundleMap.get(jobUuid);
   }
 
   @Override
-  public synchronized void jobDispatched(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
-  {
+  public void jobDispatched(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
     TaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
-    List<ChannelJobPair> list = jobMap.get(jobUuid);
-    if (list == null)
-    {
-      list = new ArrayList<>();
-      jobMap.put(jobUuid, list);
+    synchronized(jobMap) {
+      jobMap.putValue(jobUuid, new ChannelJobPair(channel, serverJob));
     }
-    list.add(new ChannelJobPair(channel, serverJob));
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
     submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
   }
 
   @Override
-  public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode)
-  {
+  public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
     TaskBundle bundle = bundleNode.getJob();
     String jobUuid = bundle.getUuid();
-    List<ChannelJobPair> list = jobMap.get(jobUuid);
-    if (list == null)
-    {
-      log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
-      return;
+    synchronized(jobMap) {
+      if (!jobMap.removeValue(jobUuid, new ChannelJobPair(channel, serverJob))) {
+        log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
+      } else if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     }
-    list.remove(new ChannelJobPair(channel, serverJob));
-    if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
   }
 
@@ -147,12 +140,9 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Called when a job is added to the server queue.
    * @param serverJob the queued job.
    */
-  public synchronized void jobQueued(final ServerJob serverJob)
-  {
+  public void jobQueued(final ServerJob serverJob) {
     TaskBundle bundle = serverJob.getJob();
     String jobUuid = bundle.getUuid();
-    //bundleMap.put(jobUuid, serverJob);
-    jobMap.put(jobUuid, new ArrayList<ChannelJobPair>());
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
     submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
     driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
@@ -164,18 +154,17 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Called when a job is complete and returned to the client.
    * @param serverJob the completed job.
    */
-  public synchronized void jobEnded(final ServerJob serverJob)
-  {
+  public void jobEnded(final ServerJob serverJob) {
     if (serverJob == null) throw new IllegalArgumentException("bundleWrapper is null");
     if (serverJob.getJob().isHandshake()) return; // skip notifications for handshake bundles
 
     TaskBundle bundle = serverJob.getJob();
     long time = System.currentTimeMillis() - serverJob.getJobReceivedTime();
     String jobUuid = bundle.getUuid();
-    jobMap.remove(jobUuid);
-    //bundleMap.remove(jobUuid);
+    synchronized(jobMap) {
+      jobMap.removeValues(jobUuid);
+    }
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
-    //submitEvent(JobEventType.JOB_ENDED, bundle, null);
     submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     JPPFStatistics stats = driver.getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
@@ -183,15 +172,13 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public synchronized void jobUpdated(final AbstractServerJob job)
-  {
+  public void jobUpdated(final AbstractServerJob job) {
     if (debugEnabled) log.debug("jobId '" + job.getName() + "' updated");
     submitEvent(JobEventType.JOB_UPDATED, (ServerJob) job, null);
   }
 
   @Override
-  public void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue)
-  {
+  public void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue) {
     jobUpdated(source);
   }
 
@@ -201,8 +188,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param bundle the job data.
    * @param channel the id of the job source of the event.
    */
-  private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel)
-  {
+  private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel) {
     executor.submit(new JobEventTask(this, eventType, bundle, channel));
   }
 
@@ -212,27 +198,23 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param job the job data.
    * @param channel the id of the job source of the event.
    */
-  private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel channel)
-  {
+  private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel channel) {
     executor.submit(new JobEventTask(this, eventType, job, channel));
   }
 
   /**
    * Close this job manager and release its resources.
    */
-  public synchronized void close()
-  {
+  public synchronized void close() {
     executor.shutdownNow();
     jobMap.clear();
-    //bundleMap.clear();
   }
 
   /**
    * Add a listener to the list of listeners.
    * @param listener the listener to add to the list.
    */
-  public void addJobListener(final JobManagerListener listener)
-  {
+  public void addJobListener(final JobManagerListener listener) {
     eventListeners.add(listener);
   }
 
@@ -240,8 +222,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove from the list.
    */
-  public void removeJobListener(final JobManagerListener listener)
-  {
+  public void removeJobListener(final JobManagerListener listener) {
     eventListeners.remove(listener);
   }
 
@@ -250,37 +231,31 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param event the event to be fired.
    */
   @Override
-  public void fireJobEvent(final JobNotification event)
-  {
-    if(event == null) throw new IllegalArgumentException("event is null");
+  public void fireJobEvent(final JobNotification event) {
+    if (event == null) throw new IllegalArgumentException("event is null");
+    switch (event.getEventType()) {
+      case JOB_QUEUED:
+        for (JobManagerListener listener: eventListeners) listener.jobQueued(event);
+        break;
 
-    synchronized(eventListeners)
-    {
-      switch (event.getEventType())
-      {
-        case JOB_QUEUED:
-          for (JobManagerListener listener: eventListeners) listener.jobQueued(event);
-          break;
+      case JOB_ENDED:
+        for (JobManagerListener listener: eventListeners) listener.jobEnded(event);
+        break;
 
-        case JOB_ENDED:
-          for (JobManagerListener listener: eventListeners) listener.jobEnded(event);
-          break;
+      case JOB_UPDATED:
+        for (JobManagerListener listener: eventListeners) listener.jobUpdated(event);
+        break;
 
-        case JOB_UPDATED:
-          for (JobManagerListener listener: eventListeners) listener.jobUpdated(event);
-          break;
+      case JOB_DISPATCHED:
+        for (JobManagerListener listener: eventListeners) listener.jobDispatched(event);
+        break;
 
-        case JOB_DISPATCHED:
-          for (JobManagerListener listener: eventListeners) listener.jobDispatched(event);
-          break;
+      case JOB_RETURNED:
+        for (JobManagerListener listener: eventListeners) listener.jobReturned(event);
+        break;
 
-        case JOB_RETURNED:
-          for (JobManagerListener listener: eventListeners) listener.jobReturned(event);
-          break;
-
-        default:
-          throw new IllegalStateException("Unsupported event type: " + event.getEventType());
-      }
+      default:
+        throw new IllegalStateException("Unsupported event type: " + event.getEventType());
     }
   }
 }
