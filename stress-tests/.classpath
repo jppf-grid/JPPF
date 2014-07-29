@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="/JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/tests"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Groovy/groovy-all-1.6.5.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="output" path="classes/framework"/>
 </classpath>

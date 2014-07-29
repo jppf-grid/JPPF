@@ -24,7 +24,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.jppf.node.protocol.*;
+import org.jppf.location.*;
 import org.jppf.utils.FileUtils;
 import org.junit.Test;
 

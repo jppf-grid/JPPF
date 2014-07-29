@@ -6,8 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
 	<classpathentry kind="lib" path="/JPPF/lib/JFreeChart/jcommon-1.0.15.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/JFreeChart/jfreechart-1.0.12.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/JGoodies/looks-2.2.2.jar"/>
@@ -19,5 +17,7 @@
 	<classpathentry kind="lib" path="/JPPF/lib/Jung/jung-graph-impl-2.0.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Jung/jung-visualization-2.0.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/MigLayout/miglayout-3.7-swing.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

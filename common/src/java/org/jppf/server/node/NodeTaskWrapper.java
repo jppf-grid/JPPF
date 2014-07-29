@@ -74,7 +74,7 @@ public class NodeTaskWrapper implements Runnable
   /**
    * 
    */
-  private JPPFNodeReconnectionNotification reconnectionNotification = null;
+  private JPPFReconnectionNotification reconnectionNotification = null;
   /**
    * Holds the used cpu time for this task.
    */
@@ -104,7 +104,7 @@ public class NodeTaskWrapper implements Runnable
    * Set cancel indicator and cancel task when it implements <code>Future</code> interface.
    * @param callOnCancel determines whether the onCancel() callback method of each task should be invoked.
    */
-  synchronized void cancel(final boolean callOnCancel) {
+  public synchronized void cancel(final boolean callOnCancel) {
     this.cancelled = true;
     this.callOnCancel |= callOnCancel;
     if (task instanceof Future) {
@@ -143,7 +143,7 @@ public class NodeTaskWrapper implements Runnable
       Thread.currentThread().setContextClassLoader(taskClassLoader);
       executionInfo = CpuTimeCollector.computeExecutionInfo(id);
       if (!isCancelledOrTimedout()) task.run();
-    } catch(JPPFNodeReconnectionNotification t) {
+    } catch(JPPFReconnectionNotification t) {
       reconnectionNotification = t;
     } catch(Throwable t) {
       task.setThrowable(t);
@@ -152,14 +152,14 @@ public class NodeTaskWrapper implements Runnable
       try {
         elapsedTime = System.nanoTime() - startTime;
         if (executionInfo != null) executionInfo = CpuTimeCollector.computeExecutionInfo(id).subtract(executionInfo);
-      } catch(JPPFNodeReconnectionNotification t) {
+      } catch(JPPFReconnectionNotification t) {
         if (reconnectionNotification == null) reconnectionNotification = t;
       } catch(Throwable ignore) {
       }
       try {
         silentTimeout();
         silentCancel();
-      } catch(JPPFNodeReconnectionNotification t) {
+      } catch(JPPFReconnectionNotification t) {
         if (reconnectionNotification == null) reconnectionNotification = t;
       } catch (Throwable t) {
         task.setThrowable(t);
@@ -173,7 +173,7 @@ public class NodeTaskWrapper implements Runnable
    * Get the task this wrapper executes within a try/catch block.
    * @return the task as a <code>JPPFTask</code> instance.
    */
-  Task getTask() {
+  public Task getTask() {
     return task;
   }
 
@@ -247,9 +247,9 @@ public class NodeTaskWrapper implements Runnable
 
   /**
    * Get the reconnection notification thrown by the atysk execution, if any.
-   * @return a {@link JPPFNodeReconnectionNotification} or <code>null</code>.
+   * @return a {@link JPPFReconnectionNotification} or <code>null</code>.
    */
-  JPPFNodeReconnectionNotification getReconnectionNotification()
+  JPPFReconnectionNotification getReconnectionNotification()
   {
     return reconnectionNotification;
   }
@@ -258,7 +258,7 @@ public class NodeTaskWrapper implements Runnable
    * Remove the specified future from the pending set and notify
    * all threads waiting for the end of the execution.
    */
-  void cancelTimeoutAction()
+  public void cancelTimeoutAction()
   {
     if (future != null) timeoutHandler.cancelAction(future);
   }
@@ -267,7 +267,7 @@ public class NodeTaskWrapper implements Runnable
    * Get trhe object that holds the used cpu time for this task.
    * @return a {@link NodeExecutionInfo} instance.
    */
-  NodeExecutionInfo getExecutionInfo()
+  public NodeExecutionInfo getExecutionInfo()
   {
     return executionInfo;
   }
@@ -276,7 +276,7 @@ public class NodeTaskWrapper implements Runnable
    * Get the elapsed time for this task's execution.
    * @return the elapsed time in nanoseconds.
    */
-  long getElapsedTime()
+  public long getElapsedTime()
   {
     return elapsedTime;
   }

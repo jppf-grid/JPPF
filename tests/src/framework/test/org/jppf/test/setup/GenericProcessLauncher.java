@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.socket.*;
-import org.jppf.process.ProcessWrapper;
+import org.jppf.process.*;
 import org.jppf.process.event.*;
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.streams.StreamUtils;

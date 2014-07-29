@@ -25,6 +25,7 @@ import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
 import org.jppf.node.NodeExecutionManager;
+import org.jppf.node.connection.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.node.AbstractCommonNode;
@@ -181,7 +182,8 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
     if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid, connectionInfo.toDriverConnectionInfo(secure, true));
+        DriverConnectionInfo driverConnectionInfo = JPPFDriverConnectionInfo.fromJPPFConnectionInformation(connectionInfo, secure, true);
+        recoveryConnection = new ClientConnection(uuid, driverConnectionInfo.getHost(), driverConnectionInfo.getRecoveryPort());
         recoveryConnection.addClientConnectionListener(this);
         new Thread(recoveryConnection, getName() + "reaper client connection").start();
       }

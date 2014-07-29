@@ -21,7 +21,7 @@ package sample.dist.commandline;
 import java.io.File;
 import java.util.*;
 
-import org.jppf.process.ProcessWrapper;
+import org.jppf.process.*;
 import org.jppf.process.event.*;
 import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.collections.CollectionUtils;
@@ -233,7 +233,7 @@ public abstract class CommandLineTaskEx extends JPPFTask implements ProcessWrapp
   /**
    * Notification that the process has written to its output stream.
    * @param event encapsulates the output stream's content.
-   * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   * @see org.jppf.process.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
   public void outputStreamAltered(final ProcessWrapperEvent event)
@@ -244,7 +244,7 @@ public abstract class CommandLineTaskEx extends JPPFTask implements ProcessWrapp
   /**
    * Notification that the process has written to its error stream.
    * @param event encapsulate the error stream's content.
-   * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   * @see org.jppf.process.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
   public void errorStreamAltered(final ProcessWrapperEvent event)

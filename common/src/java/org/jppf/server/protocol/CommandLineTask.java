@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.*;
 
 import org.jppf.node.protocol.AbstractTask;
-import org.jppf.process.ProcessWrapper;
+import org.jppf.process.*;
 import org.jppf.process.event.*;
 import org.jppf.utils.collections.CollectionUtils;
 
@@ -238,7 +238,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * Notification that the process has written to its output stream.
    * @param event encapsulates the output stream's content.
-   * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   * @see org.jppf.process.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
   public void outputStreamAltered(final ProcessWrapperEvent event)
@@ -249,7 +249,7 @@ public abstract class CommandLineTask<T> extends AbstractTask<T> implements Proc
   /**
    * Notification that the process has written to its error stream.
    * @param event encapsulate the error stream's content.
-   * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   * @see org.jppf.process.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
   public void errorStreamAltered(final ProcessWrapperEvent event)

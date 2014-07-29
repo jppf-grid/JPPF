@@ -4,7 +4,8 @@
 	<classpathentry kind="src" path="src/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Groovy/groovy-all-1.6.5.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

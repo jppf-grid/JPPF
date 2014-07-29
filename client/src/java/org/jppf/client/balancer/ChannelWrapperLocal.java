@@ -22,15 +22,12 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
-import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.*;
-import org.jppf.execute.*;
+import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.*;
-import org.jppf.node.*;
-import org.jppf.node.event.LifeCycleEventHandler;
+import org.jppf.node.NodeExecutionManager;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.node.NodeExecutionManagerImpl;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
@@ -40,7 +37,7 @@ import org.slf4j.*;
  * Context associated with a local channel serving state and tasks submission.
  * @author Martin JANDA
  */
-public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler, NodeInternal {
+public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnectionStatusHandler {
   /**
    * Logger for this class.
    */
@@ -71,7 +68,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   public ChannelWrapperLocal() {
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper"));
-    executionManager = new NodeExecutionManagerImpl(this, "jppf.local.execution.threads", "jppf.local.execution.threads");
+    executionManager = new ClientExecutionManager("jppf.local.execution.threads", "jppf.local.execution.threads");
     priority = JPPFConfiguration.getProperties().getInt("jppf.local.execution.priority", 0);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
@@ -129,26 +126,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("locally submitting {}", bundle);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    /*
-    FutureTask<?> task = new FutureTask(new LocalRunnable(getBundler(), bundle), null) {
-      @Override
-      public boolean cancel(final boolean mayInterruptIfRunning) {
-        if (debugEnabled) log.debug("requesting cancel of jobId=" + bundle.getUuid());
-        if (super.cancel(mayInterruptIfRunning)) {
-          try {
-            executionManager.cancelAllTasks(true, false);
-          } catch (Exception e) {
-            log.error(e.getMessage(), e);
-          }
-          return true;
-        }
-        return false;
-      }
-    };
-    */
     Runnable task = new LocalRunnable(getBundler(), bundle);
     bundle.jobDispatched(this);
-    //bundle.jobDispatched(this, task);
     executor.execute(task);
     return null;
   }
@@ -216,77 +195,15 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   }
 
   @Override
-  public NodeConnection getNodeConnection() {
-    return null;
-  }
-
-  @Override
-  public void stopNode() {
-    setStatus(JPPFClientConnectionStatus.DISCONNECTED);
-    executionManager.shutdown();
-  }
-
-  /**
-   * This method returns null.
-   * @return <code>null</code>.
-   * @throws Exception if any error occurs.
-   */
-  @Override
-  public JMXServer getJmxServer() throws Exception {
-    return null;
-  }
-
-  /**
-   * This method returns null..
-   * @return <code>null</code>.
-   */
-  @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler() {
-    return null;
-  }
-
-  @Override
-  public void run() {
-  }
-
-  @Override
   public void close() {
     if (debugEnabled) log.debug("closing " + this);
     super.close();
     try {
-      stopNode();
+      setStatus(JPPFClientConnectionStatus.DISCONNECTED);
+      executionManager.shutdown();
     } finally {
       listeners.clear();
     }
-  }
-
-  /**
-   * This implementation does nothing.
-   * @return <code>null</code>.
-   */
-  @Override
-  public AbstractJPPFClassLoader resetTaskClassLoader() {
-    return null;
-  }
-
-  @Override
-  public boolean isOffline() {
-    return false;
-  }
-
-  @Override
-  public NodeExecutionManager getExecutionManager() {
-    return executionManager;
-  }
-
-  @Override
-  public boolean isMasterNode() {
-    return false;
-  }
-
-  @Override
-  public boolean isSlaveNode() {
-    return false;
   }
 
   @Override

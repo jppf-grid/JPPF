@@ -16,14 +16,12 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.client.balancer;
 
 import java.util.*;
 
-import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.node.*;
-import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
+import org.jppf.server.node.AbstractExecutionManager;
 import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -35,39 +33,24 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-public class NodeExecutionManagerImpl extends AbstractExecutionManager
+public class ClientExecutionManager extends AbstractExecutionManager
 {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(NodeExecutionManagerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(ClientExecutionManager.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The node that uses this execution manager.
-   */
-  private NodeInternal node = null;
-  /**
-   * Initialize this execution manager with the specified node.
-   * @param node the node that uses this execution manager.
-   */
-  public NodeExecutionManagerImpl(final NodeInternal node) {
-    this(node, "jppf.processing.threads", "processing.threads");
-  }
 
   /**
-   * Initialize this execution manager with the specified node.
-   * @param node the node that uses this execution manager.
+   * Initialize this execution manager.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    * @param legacyNbThreadsProperty the legacy name of the property which configures the number of threads.
    */
-  public NodeExecutionManagerImpl(final NodeInternal node, final String nbThreadsProperty, final String legacyNbThreadsProperty) {
+  public ClientExecutionManager(final String nbThreadsProperty, final String legacyNbThreadsProperty) {
     super(nbThreadsProperty, legacyNbThreadsProperty);
-    if (node == null) throw new IllegalArgumentException("node is null");
-    this.node = node;
-
   }
 
   /**
@@ -84,7 +67,7 @@ public class NodeExecutionManagerImpl extends AbstractExecutionManager
     this.uuidList = bundle.getUuidPath().getList();
     ClassLoader taskClassLoader = null;
     try {
-      taskClassLoader = node instanceof ClassLoaderProvider ? ((ClassLoaderProvider) node).getClassLoader(uuidList) : getTaskClassLoader(taskList.get(0));
+      taskClassLoader = getTaskClassLoader(taskList.get(0));
       usedClassLoader = threadManager.useClassLoader(taskClassLoader);
     } catch (Exception e) {
       String msg = ExceptionUtils.getMessage(e) + " - class loader lookup failed for uuidPath=" + uuidList;
@@ -92,9 +75,6 @@ public class NodeExecutionManagerImpl extends AbstractExecutionManager
       else log.warn(msg);
     }
     accumulatedElapsed.set(0L);
-    LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
-    if (handler != null) handler.fireJobStarting(bundle, taskClassLoader instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) taskClassLoader : null,
-        taskList, dataProvider);
   }
 
   /**
@@ -104,8 +84,6 @@ public class NodeExecutionManagerImpl extends AbstractExecutionManager
   protected void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     ClassLoader cl = usedClassLoader.getClassLoader();
-    LifeCycleEventHandler handler = node.getLifeCycleEventHandler();
-    if (handler != null) handler.fireJobEnding(bundle, cl instanceof AbstractJPPFClassLoader ? (AbstractJPPFClassLoader) cl : null, taskList, dataProvider);
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;

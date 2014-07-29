@@ -18,6 +18,7 @@
 
 package org.jppf.server.protocol;
 
+import org.jppf.location.Location;
 import org.jppf.node.protocol.*;
 
 /**

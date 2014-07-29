@@ -64,12 +64,11 @@ public class ClientJob extends AbstractClientJob {
   /**
    * The listener that receives notifications of completed tasks.
    */
-  @SuppressWarnings("deprecation")
-  private JPPFResultCollector resultCollector;
+  private final JPPFResultCollector resultCollector;
   /**
    * Instance of parent broadcast job.
    */
-  private transient ClientJob parentJob;
+  private final transient ClientJob parentJob;
   /**
    * Map of all dispatched broadcast jobs.
    */

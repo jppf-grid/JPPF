@@ -21,7 +21,7 @@ package org.jppf.libmanagement;
 import java.io.*;
 import java.util.zip.*;
 
-import org.jppf.node.protocol.*;
+import org.jppf.location.*;
 import org.jppf.utils.FileUtils;
 import org.jppf.utils.streams.StreamUtils;
 

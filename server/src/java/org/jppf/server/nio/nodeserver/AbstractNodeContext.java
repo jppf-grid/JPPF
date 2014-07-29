@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.execute.*;
 import org.jppf.io.*;
 import org.jppf.management.*;
-import org.jppf.management.event.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.serialization.SerializationHelper;

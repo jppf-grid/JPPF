@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 
 import java.util.*;
 
+import org.jppf.location.Location;
 import org.jppf.node.protocol.*;
 
 /**

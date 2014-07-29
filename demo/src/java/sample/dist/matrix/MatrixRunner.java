@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.location.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
