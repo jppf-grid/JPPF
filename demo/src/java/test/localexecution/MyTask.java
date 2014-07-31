@@ -20,14 +20,14 @@ package test.localexecution;
 import java.net.URL;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.collections.CollectionUtils;
 
 /**
  * Test task.
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask
+public class MyTask extends AbstractTask<String>
 {
   /**
    * Explicit serialVersionUID.

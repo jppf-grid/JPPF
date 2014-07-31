@@ -137,7 +137,7 @@ public class CustomLoadBalancerRunner
     for (int i=1; i<=nbTasks; i++)
     {
       // create a task with the specified data size and duration
-      Task<Object> task = new CustomLoadBalancerTask(size, duration);
+      Task<?> task = new CustomLoadBalancerTask(size, duration);
       // task id contains the job name for easier identification
       task.setId(jobName + " - task " + i);
       job.add(task);

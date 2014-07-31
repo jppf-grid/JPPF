@@ -20,13 +20,13 @@ package org.jppf.example.wordcount;
 import java.util.*;
 
 import org.jppf.example.wordcount.node.NodeListener;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class WordCountTask extends JPPFTask {
+public class WordCountTask extends AbstractTask<Map<String, Long>> {
   /**
    * The data in this task.
    */

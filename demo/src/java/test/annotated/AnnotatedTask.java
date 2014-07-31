@@ -19,14 +19,14 @@ package test.annotated;
 
 import java.util.Enumeration;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 
 /**
  * This task is for testing the network transfer of task with various data sizes.
  * @author Laurent Cohen
  */
-public class AnnotatedTask extends JPPFTask
+public class AnnotatedTask extends AbstractTask<String>
 {
   /**
    * The time this task will sleep.

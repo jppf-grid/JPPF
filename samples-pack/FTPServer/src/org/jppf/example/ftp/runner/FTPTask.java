@@ -18,7 +18,7 @@
 package org.jppf.example.ftp.runner;
 
 import org.jppf.example.ftp.service.FTPClientWrapper;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.FileUtils;
 
@@ -28,7 +28,7 @@ import org.jppf.utils.FileUtils;
  * The text file is transformed into a resulting html file which is then uploaded to the same FTP server.
  * @author Laurent Cohen
  */
-public class FTPTask extends JPPFTask
+public class FTPTask extends AbstractTask<String>
 {
   /**
    * The file to download from the driver.

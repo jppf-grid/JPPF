@@ -20,12 +20,9 @@ package org.jppf.example.fj;
 
 import java.util.concurrent.ForkJoinTask;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
+import org.jppf.client.*;
+import org.jppf.node.protocol.*;
+import org.jppf.utils.*;
 
 /**
  * Sample class for fork join support demonstration.
@@ -82,7 +79,7 @@ public class FibonacciFJ {
   /**
    * Implementation of JPPF Fibonacci task.
    */
-  public static class JPPFTaskFibonacci extends JPPFTask {
+  public static class JPPFTaskFibonacci extends AbstractTask<FibonacciResult> {
     /**
      * Explicit serialVersionUID.
      */

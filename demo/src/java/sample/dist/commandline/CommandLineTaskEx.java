@@ -21,9 +21,9 @@ package sample.dist.commandline;
 import java.io.File;
 import java.util.*;
 
-import org.jppf.process.*;
+import org.jppf.node.protocol.AbstractTask;
+import org.jppf.process.ProcessWrapper;
 import org.jppf.process.event.*;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.collections.CollectionUtils;
 
 /**
@@ -34,7 +34,7 @@ import org.jppf.utils.collections.CollectionUtils;
  * external process.
  * @author Laurent Cohen
  */
-public abstract class CommandLineTaskEx extends JPPFTask implements ProcessWrapperEventListener
+public abstract class CommandLineTaskEx extends AbstractTask<Object> implements ProcessWrapperEventListener
 {
   /**
    * Explicit serialVersionUID.

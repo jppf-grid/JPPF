@@ -20,8 +20,7 @@ package sample.dist.broadcastjob;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 
 /**
  * Runner class for the &quot;Nroadcast Job&quot; demo.
@@ -60,7 +59,7 @@ public class BroadcastJobRunner {
   /**
    * 
    */
-  private static class BroadcastTask extends JPPFTask {
+  private static class BroadcastTask extends AbstractTask<String> {
     @Override
     public void run() {
       System.out.println("broadcast task " + getId());

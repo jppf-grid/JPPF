@@ -22,15 +22,15 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.concurrent.JPPFExecutorService;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.protocol.JPPFTask;
 
 /**
  * 
  * @param <V>
  * @author Laurent Cohen
  */
-public abstract class JPPFCallableTask<V> extends JPPFTask implements Callable<V>
+public abstract class JPPFCallableTask<V> extends AbstractTask<V> implements Callable<V>
 {
   /**
    * {@inheritDoc}

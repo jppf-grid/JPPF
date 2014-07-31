@@ -18,7 +18,7 @@
 
 package sample.test.jppfcallable;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -26,7 +26,7 @@ import org.slf4j.*;
 /**
  * 
  */
-public class MyTask extends JPPFTask
+public class MyTask extends AbstractTask<String>
 {
   /**
    * Logger for this class.

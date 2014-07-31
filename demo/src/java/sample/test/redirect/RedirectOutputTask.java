@@ -18,13 +18,13 @@
 
 package sample.test.redirect;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task simply prints a message.
  * @author Laurent Cohen
  */
-public class RedirectOutputTask extends JPPFTask {
+public class RedirectOutputTask extends AbstractTask<String[]> {
   @Override
   public void run() {
     String[] output = null;

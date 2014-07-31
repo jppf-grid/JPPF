@@ -25,8 +25,7 @@ import javax.management.*;
 import org.jppf.client.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 import org.slf4j.*;
 
 /**
@@ -117,7 +116,7 @@ public class JmxLogging {
   /**
    * 
    */
-  public static class MyTask extends JPPFTask {
+  public static class MyTask extends AbstractTask<String> {
     /**
      * 
      */

@@ -17,14 +17,14 @@
  */
 package org.jppf.example.matrix;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task performs the multiplication of one or more matrix rows by another matrix, as part of
  * the multiplication of 2 whole square matrices.
  * @author Laurent Cohen
  */
-public class ExtMatrixTask extends JPPFTask {
+public class ExtMatrixTask extends AbstractTask<double[][]> {
   /**
    * Data provider key mapping to the second matrix operand in the multiplication.
    */

@@ -18,13 +18,13 @@
 
 package sample.test;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask
+public class MyTask extends AbstractTask<String>
 {
   /**
    * serialVersionUID.

@@ -21,7 +21,6 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -104,9 +103,9 @@ public class ProfilingRunner
   private static void performSequential(final int nbTask, final boolean silent) throws Exception
   {
     long start = System.nanoTime();
-    List<JPPFTask> tasks = new ArrayList<>();
+    List<Task<?>> tasks = new ArrayList<>();
     for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
-    for (JPPFTask task: tasks) task.run();
+    for (Task<?> task: tasks) task.run();
     long elapsed = System.nanoTime() - start;
     if (!silent) System.out.println("Sequential iteration performed in "+StringUtils.toStringDuration(elapsed/1000000));
   }

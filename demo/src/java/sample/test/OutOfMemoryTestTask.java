@@ -17,14 +17,14 @@
  */
 package sample.test;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 
 /**
  * JPPF task used to test how exceptions are handled within the nodes.
  * @author Laurent Cohen
  */
-public class OutOfMemoryTestTask extends JPPFTask
+public class OutOfMemoryTestTask extends AbstractTask<String>
 {
   /**
    * Default constructor .

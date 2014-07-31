@@ -51,7 +51,6 @@ public class MatrixTask extends BaseDemoTask
   /**
    * Get the result this task's execution, ie a matrix row.
    * @return a matrix column as an array of <code>double</code> values.
-   * @see org.jppf.server.protocol.JPPFTask#getResult()
    */
   @Override
   public Object getResult()

@@ -17,13 +17,13 @@
  */
 package test.node.nativelib;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This class is a template for a standard JPPF task.
  * @author Laurent Cohen
  */
-public class NativeLibTask extends JPPFTask
+public class NativeLibTask extends AbstractTask<String>
 {
   /**
    * Perform initializations on the client side,

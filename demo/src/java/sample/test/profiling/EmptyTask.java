@@ -19,14 +19,14 @@ package sample.test.profiling;
 
 import java.net.URL;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Instances of this class do nothing and are intended for node profiling purposes,
  * to analyse the JPPF overhead for task execution.
  * @author Laurent Cohen
  */
-public class EmptyTask extends JPPFTask
+public class EmptyTask extends AbstractTask<String>
 {
   /**
    * The data size in KB.

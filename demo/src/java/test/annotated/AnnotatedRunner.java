@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -116,7 +115,7 @@ public class AnnotatedRunner
     {
       JPPFJob job = new JPPFJob();
       job.setName("demo job " + (i+1));
-      JPPFTask task = (JPPFTask) cl.loadClass("test.TestClass").newInstance();
+      Task<?> task = (Task<?>) cl.loadClass("test.TestClass").newInstance();
       job.add(task);
       job.setBlocking(false);
       jobs.add(job);

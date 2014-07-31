@@ -23,8 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 
 import sample.dist.tasklength.LongTask;
@@ -170,7 +169,7 @@ public class JobManagementTestRunner
   /**
    * A simple task.
    */
-  public static class MyBroadcastTask extends JPPFTask
+  public static class MyBroadcastTask extends AbstractTask<String>
   {
     @Override
     public void run()

@@ -17,14 +17,14 @@
  */
 package test.jobfromtask;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.*;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
-public class SourceTask extends JPPFTask
+public class SourceTask extends AbstractTask<String>
 {
   /**
    * Initialize this task.
@@ -63,7 +63,6 @@ public class SourceTask extends JPPFTask
 
   /**
    * Called when this task is cancelled.
-   * @see org.jppf.server.protocol.JPPFTask#onCancel()
    */
   @Override
   public void onCancel()

@@ -21,13 +21,13 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task is intended for testing the framework only.
  * @author Laurent Cohen
  */
-public abstract class JPPFTestTask extends JPPFTask
+public abstract class JPPFTestTask extends AbstractTask<Object>
 {
   /**
    * Holder for the execution results.

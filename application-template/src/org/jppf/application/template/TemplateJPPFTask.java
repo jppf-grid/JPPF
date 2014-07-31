@@ -28,8 +28,8 @@ import org.jppf.node.protocol.AbstractTask;
  * <li>the task execution: this part is performed by the node. It consists in invoking the {@link #run() run()} method,
  * and handling an eventual uncaught {@link java.lang.Throwable Throwable} that would result from this invocation.</li>
  * <li>getting the execution results: the task itself, after its execution, is considered as the result.
- * JPPF provides the convenience methods {@link org.jppf.server.protocol.JPPFTask#setResult(java.lang.Object) setResult(Object)} and
- * {@link org.jppf.server.protocol.JPPFTask#getResult() getResult()}
+ * JPPF provides the convenience methods {@link org.jppf.node.protocol.Task#setResult(java.lang.Object) setResult(Object)} and
+ * {@link org.jppf.server.node.Task#getResult() getResult()}
  * to this effect, however any accessible attribute of the task will be available when the task is returned to the client.</li>
  * </ol>
  * @author Laurent Cohen
@@ -45,14 +45,7 @@ public class TemplateJPPFTask extends AbstractTask<String> {
 
   /**
    * This method contains the code that will be executed by a node.
-   * Any uncaught {@link java.lang.Throwable Throwable} will be handled as follows:
-   * <ul>
-   * <li>if the {@link java.lang.Throwable Throwable} is an instance of {@link java.lang.Exception Exception},
-   * it will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
-   * <li>otherwise, it will first be wrapped in a {@link org.jppf.JPPFException JPPFException},
-   * then this <code>JPPFException</code> will be stored in the task via a call to {@link org.jppf.server.protocol.JPPFTask#setException(java.lang.Exception) JPPFTask.setException(Exception)}</li>
-   * </ul>
-   * @see java.lang.Runnable#run()
+   * Any uncaught {@link java.lang.Throwable Throwable} will be stored in the task via a call to {@link org.jppf.node.protocol.Task#setThrowable(java.lang.Throwable) Task.setThrowable(Throwable)}.
    */
   @Override
   public void run() {

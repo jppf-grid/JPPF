@@ -18,13 +18,13 @@
 
 package sample.helloworld;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * A simple hello world JPPF task.
  * @author Laurent Cohen
  */
-public class HelloWorld extends JPPFTask
+public class HelloWorld extends AbstractTask<String>
 {
   /**
    * Execute the task.

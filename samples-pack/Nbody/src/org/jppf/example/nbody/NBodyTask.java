@@ -38,13 +38,13 @@
 
 package org.jppf.example.nbody;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class NBodyTask extends JPPFTask
+public class NBodyTask extends AbstractTask<String>
 {
   /**
    * The bodies for which this task computes the position.

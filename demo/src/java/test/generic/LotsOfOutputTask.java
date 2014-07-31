@@ -18,14 +18,14 @@
 
 package test.generic;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task generates a lot of output, to test if this use case is handled correctly by the NodeLauncher.
  * See bug report <a href="http://sourceforge.net/tracker/?func=detail&aid=2713542&group_id=135654&atid=733518">2713542 - OOM when node/driver generates too much console output</a>
  * @author Laurent Cohen
  */
-public class LotsOfOutputTask extends JPPFTask
+public class LotsOfOutputTask extends AbstractTask<String>
 {
   /**
    * Number of output lines to print.

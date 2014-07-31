@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 import com.amd.aparapi.*;
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
@@ -35,7 +35,7 @@ import com.amd.aparapi.Kernel.EXECUTION_MODE;
  * to avoid race conditions with unpredicatble consequences.
  * @author Laurent Cohen
  */
-public class AparapiTask extends JPPFTask {
+public class AparapiTask extends AbstractTask<Object> {
   /**
    * Used to display information only on the first Aparapi invocation.
    */

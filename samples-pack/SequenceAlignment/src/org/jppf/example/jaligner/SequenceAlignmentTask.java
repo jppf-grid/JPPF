@@ -22,13 +22,13 @@ import jaligner.*;
 import jaligner.matrix.Matrix;
 import jaligner.util.SequenceParser;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task performs the alignment of 2 DNA or protein sequences.
  * @author Laurent Cohen
  */
-public class SequenceAlignmentTask extends JPPFTask
+public class SequenceAlignmentTask extends AbstractTask<Float>
 {
   /**
    * Data provider key for the target sequence.

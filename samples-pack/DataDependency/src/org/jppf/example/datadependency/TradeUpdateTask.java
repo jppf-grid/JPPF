@@ -22,14 +22,14 @@ import java.util.*;
 
 import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.startup.DataDependencyStartup;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.slf4j.*;
 
 /**
  * JPPF task whose role is to recompute a trade when some market data was updated.
  * @author Laurent Cohen
  */
-public class TradeUpdateTask extends JPPFTask
+public class TradeUpdateTask extends AbstractTask<Object>
 {
   /**
    * Logger for this class.

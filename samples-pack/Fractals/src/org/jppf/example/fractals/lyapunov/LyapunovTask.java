@@ -18,14 +18,14 @@
 
 package org.jppf.example.fractals.lyapunov;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Instances of this task compute the Lyapunov lambda exponent for each point of a line in
  * the resulting image.
  * @author Laurent Cohen
  */
-public class LyapunovTask extends JPPFTask
+public class LyapunovTask extends AbstractTask<double[]>
 {
   /**
    * The line number, for which to compute the lambda exponent for each point in the line.

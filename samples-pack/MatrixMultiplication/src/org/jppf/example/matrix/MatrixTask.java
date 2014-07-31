@@ -17,23 +17,18 @@
  */
 package org.jppf.example.matrix;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task performs the multiplication of a matrix row by another matrix, as part of
  * the multiplication of 2 whole matrices.
  * @author Laurent Cohen
  */
-public class MatrixTask extends JPPFTask
-{
+public class MatrixTask extends AbstractTask<double[]> {
   /**
    * Data provider key mapping to the second matrix operand in the multiplication.
    */
   public static final String DATA_KEY = "matrix";
-  /**
-   * The result of this task's execution, ie a matrix row.
-   */
-  private double[] result = null;
   /**
    * The row of values to multiply by a matrix.
    */
@@ -43,20 +38,8 @@ public class MatrixTask extends JPPFTask
    * Initialize this task with a specified row of values to multiply.
    * @param rowValues the values as an array of <code>double</code> values.
    */
-  public MatrixTask(final double[] rowValues)
-  {
+  public MatrixTask(final double[] rowValues) {
     this.rowValues = rowValues;
-  }
-
-  /**
-   * Get the result this task's execution, ie a matrix row.
-   * @return a matrix column as an array of <code>double</code> values.
-   * @see org.jppf.server.protocol.JPPFTask#getResult()
-   */
-  @Override
-  public Object getResult()
-  {
-    return result;
   }
 
   /**
@@ -64,26 +47,19 @@ public class MatrixTask extends JPPFTask
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       Matrix matrix = getDataProvider().getParameter(DATA_KEY);
       int size = matrix.getSize();
-      result = new double[size];
+      double[] result = new double[size];
 
-      for (int col=0; col<size; col++)
-      {
+      for (int col=0; col<size; col++) {
         double sum = 0d;
-        for (int row=0; row<size; row++)
-        {
-          sum += matrix.getValueAt(row, col) * rowValues[row];
-        }
+        for (int row=0; row<size; row++) sum += matrix.getValueAt(row, col) * rowValues[row];
         result[col] = sum;
       }
-    }
-    catch(Exception e)
-    {
+      setResult(result);
+    } catch(Exception e) {
       setThrowable(e);
     }
   }

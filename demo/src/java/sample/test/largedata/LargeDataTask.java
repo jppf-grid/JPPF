@@ -19,13 +19,13 @@ package sample.test.largedata;
 
 import java.util.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class LargeDataTask extends JPPFTask
+public class LargeDataTask extends AbstractTask<Map<String, Long>>
 {
   /**
    * The data in this task.

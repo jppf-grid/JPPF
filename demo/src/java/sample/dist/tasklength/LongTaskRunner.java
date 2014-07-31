@@ -26,7 +26,6 @@ import org.jppf.client.concurrent.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -140,7 +139,7 @@ public class LongTaskRunner
         for (int i=0; i<nbTasks; i++)
         {
           //JPPFTask task = new LongTask(length, false);
-          JPPFTask task = new PrintTask();
+          Task<?> task = new PrintTask();
           task.setId("" + iter + ':' + (i+1));
           job.add(task);
         }
@@ -426,7 +425,7 @@ public class LongTaskRunner
   /**
    * A task that prints a lot of messages to the console.
    */
-  private static class PrintTask extends JPPFTask
+  private static class PrintTask extends AbstractTask<String>
   {
     @Override
     public void run()

@@ -21,7 +21,7 @@ package sample.dist.taskcommunication;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.node.NodeRunner;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 import com.hazelcast.core.*;
 
@@ -29,7 +29,7 @@ import com.hazelcast.core.*;
  * Sample task using a Hazelcast distributed queue.
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask implements ItemListener
+public class MyTask extends AbstractTask<String> implements ItemListener
 {
   /**
    * Determines whether the task should stop processing.

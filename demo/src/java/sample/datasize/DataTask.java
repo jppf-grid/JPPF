@@ -17,14 +17,14 @@
  */
 package sample.datasize;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 
 /**
  * This task is for testing the network transfer of task with various data sizes.
  * @author Laurent Cohen
  */
-public class DataTask extends JPPFTask
+public class DataTask extends AbstractTask<String>
 {
   /**
    * The data this task owns.

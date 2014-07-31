@@ -21,7 +21,7 @@ package sample.dist.taskcommunication;
 import java.util.*;
 
 import org.jppf.node.NodeRunner;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 import com.hazelcast.core.Hazelcast;
 
@@ -29,7 +29,7 @@ import com.hazelcast.core.Hazelcast;
  * Common abstract super class for the tasks in the sample. It provides a simple API to initialize and access a distributed Map.
  * @author Laurent Cohen
  */
-public abstract class AbstractMyTask extends JPPFTask
+public abstract class AbstractMyTask extends AbstractTask<String>
 {
   /**
    * Initialize this task.

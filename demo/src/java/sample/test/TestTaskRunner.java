@@ -22,7 +22,6 @@ import java.util.List;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTask;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -405,7 +404,7 @@ public class TestTaskRunner
    */
   static void performBasicTest() throws Exception
   {
-    JPPFTask[] tasks = new JPPFTask[1];
+    Task<?>[] tasks = new Task<?>[1];
     for (int i=0; i<1; i++) tasks[i] = new TemplateJPPFTask(i);
     singleTest("basic", null, (Object[]) tasks);
   }

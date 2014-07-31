@@ -26,7 +26,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.memory.MemoryIndex;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 import com.torunski.crawler.Crawler;
 import com.torunski.crawler.events.*;
@@ -43,10 +43,8 @@ import com.torunski.crawler.parser.httpclient.SimpleHttpClientParser;
  * In the second phase, all gathered links are downloaded, indexed and matched with the user-specified query.
  * @author Laurent Cohen
  */
-public class CrawlerTask extends JPPFTask
-{
-  static
-  {
+public class CrawlerTask extends AbstractTask<String> {
+  static {
     /*
      * Set the default http and socket parameters for the commons-http-client API.
      */
@@ -81,8 +79,7 @@ public class CrawlerTask extends JPPFTask
    * @param number uniquely identifies this task.
    * @param doSearch determines whether the search should also be done.
    */
-  public CrawlerTask(final String url, final String query, final int number, final boolean doSearch)
-  {
+  public CrawlerTask(final String url, final String query, final int number, final boolean doSearch) {
     this.url = url;
     this.query = query;
     this.doSearch = doSearch;
@@ -94,15 +91,11 @@ public class CrawlerTask extends JPPFTask
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (doSearch) search();
       else crawl();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       setThrowable(e);
     }
   }
@@ -111,8 +104,7 @@ public class CrawlerTask extends JPPFTask
    * Crawl to find all links in the current page.
    * @throws Exception if an error occurs.
    */
-  private void crawl() throws Exception
-  {
+  private void crawl() throws Exception {
     URL u = new URL(url);
     String server = u.getProtocol() + "://" + u.getHost();
     while (server.endsWith("/")) server = server.substring(0, server.length() -1);
@@ -132,11 +124,9 @@ public class CrawlerTask extends JPPFTask
     filter = LinkFilterUtil.and(filter, filter2);
     crawler.setLinkFilter(filter);
     crawler.setModel(new MaxDepthModel(depth));
-    crawler.addParserListener(new IParserEventListener()
-    {
+    crawler.addParserListener(new IParserEventListener() {
       @Override
-      public void parse(final ParserEvent event)
-      {
+      public void parse(final ParserEvent event) {
         String url = event.getLink().getURI();
         if (!toVisit.contains(url)) toVisit.add(url);
       }
@@ -149,8 +139,7 @@ public class CrawlerTask extends JPPFTask
    * Search for the user-specified query expression in the current page.
    * @throws Exception if an error occurs.
    */
-  private void search() throws Exception
-  {
+  private void search() throws Exception {
     QueryParser parser = new QueryParser("contents", new StandardAnalyzer());
     Query q = parser.parse(query);
 
@@ -162,10 +151,8 @@ public class CrawlerTask extends JPPFTask
     Hits hits = searcher.search(q);
     Iterator it = hits.iterator();
     float relevance = 0f;
-    if (it.hasNext())
-    {
-      while (it.hasNext())
-      {
+    if (it.hasNext()) {
+      while (it.hasNext()) {
         Hit hit = (Hit) it.next();
         relevance += ((float) Math.round(hit.getScore() * 1000)) / 10;
       }
@@ -177,8 +164,7 @@ public class CrawlerTask extends JPPFTask
    * Get the sequence number of this task.
    * @return the sequence number as an int.
    */
-  public int getNumber()
-  {
+  public int getNumber() {
     return Integer.valueOf(getId());
   }
 
@@ -186,8 +172,7 @@ public class CrawlerTask extends JPPFTask
    * Get the list of links matching the search query.
    * @return a list of <code>LinkMatch</code> instances.
    */
-  public Collection<LinkMatch> getMatchedLinks()
-  {
+  public Collection<LinkMatch> getMatchedLinks() {
     return matchedLinks;
   }
 
@@ -195,8 +180,7 @@ public class CrawlerTask extends JPPFTask
    * Get the start url.
    * @return the url as a string.
    */
-  public String getUrl()
-  {
+  public String getUrl() {
     return url;
   }
 
@@ -204,8 +188,7 @@ public class CrawlerTask extends JPPFTask
    * Get the URLs left to visit.
    * @return a list of url strings.
    */
-  public Collection<String> getToVisit()
-  {
+  public Collection<String> getToVisit() {
     return toVisit;
   }
 }

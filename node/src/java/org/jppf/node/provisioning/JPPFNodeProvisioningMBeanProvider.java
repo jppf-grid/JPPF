@@ -20,7 +20,6 @@ package org.jppf.node.provisioning;
 
 import static org.jppf.node.provisioning.NodeProvisioningConstants.*;
 
-import org.jppf.management.RegistrationCondition;
 import org.jppf.management.spi.JPPFNodeMBeanProvider;
 import org.jppf.node.Node;
 import org.jppf.utils.*;
@@ -31,7 +30,7 @@ import org.jppf.utils.*;
  * @since 4.1
  * @exclude
  */
-public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider, RegistrationCondition {
+public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider {
   /**
    * Iniitialize this MBean provider.
    */
@@ -45,7 +44,7 @@ public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider,
 
   @Override
   public Object createMBean(final Node node) {
-    return new JPPFNodeProvisioning();
+    return mustRegister(node) ? new JPPFNodeProvisioning() : null;
   }
 
   @Override
@@ -53,9 +52,12 @@ public class JPPFNodeProvisioningMBeanProvider implements JPPFNodeMBeanProvider,
     return JPPFNodeProvisioningMBean.MBEAN_NAME;
   }
 
-  @Override
-  public boolean mustRegister(final Object...params) {
-    Node node = (Node) params[0];
+  /**
+   * Determine whether this MBean should be registeres in the current node
+   * @param node the node in which to register.
+   * @return true if the node is a master node, false otherwise.
+   */
+  private boolean mustRegister(final Node node) {
     TypedProperties config = JPPFConfiguration.getProperties();
     boolean slave = !node.isOffline() && config.getBoolean(SLAVE_PROPERTY, false);
     boolean master = !node.isOffline() && config.getBoolean(MASTER_PROPERTY, true);

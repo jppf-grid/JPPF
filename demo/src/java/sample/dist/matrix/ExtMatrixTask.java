@@ -17,7 +17,7 @@
  */
 package sample.dist.matrix;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 
 /**
@@ -25,7 +25,7 @@ import org.jppf.server.protocol.JPPFTask;
  * the multiplication of 2 whole square matrices.
  * @author Laurent Cohen
  */
-public class ExtMatrixTask extends JPPFTask {
+public class ExtMatrixTask extends AbstractTask<double[][]> {
   /**
    * Data provider key mapping to the second matrix operand in the multiplication.
    */

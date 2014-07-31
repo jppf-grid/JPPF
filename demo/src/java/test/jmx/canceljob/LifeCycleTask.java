@@ -18,14 +18,14 @@
 
 package test.jmx.canceljob;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.slf4j.*;
 
 /**
  * A simple JPPF task for unit-testing the task life cycle.
  * @author Laurent Cohen
  */
-public class LifeCycleTask extends JPPFTask
+public class LifeCycleTask extends AbstractTask<String>
 {
   /**
    * Explicit serialVersionUID.

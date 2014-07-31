@@ -18,14 +18,14 @@
 
 package org.jppf.example.jobrecovery;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * A sample task implementation, which waits for a specified time
  * then prints a message on the node console.
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask
+public class MyTask extends AbstractTask<String>
 {
   /**
    * How long this task waits before completing.

@@ -18,13 +18,13 @@
 
 package sample.cascading;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Task2.
  * @author Laurent Cohen
  */
-public class Task2 extends JPPFTask
+public class Task2 extends AbstractTask<String>
 {
 
   /**

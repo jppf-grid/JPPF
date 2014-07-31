@@ -91,6 +91,7 @@ public class NodeDataPanelManager {
    * @param connection a reference to the driver connection.
    */
   void driverAdded(final JPPFClientConnection connection) {
+    try {
     if (!connection.getStatus().isWorkingStatus()) return;
     if (findDriver(connection.getDriverUuid()) != null) return;
     JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
@@ -125,6 +126,9 @@ public class NodeDataPanelManager {
       treeTable.expand(driverNode);
     }
     repaintTreeTable();
+    } catch(RuntimeException | Error e) {
+      log.debug(e.getMessage(), e);
+    }
   }
 
   /**

@@ -18,14 +18,14 @@
 
 package sample.test;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task is for testing the scenario where an attribute is not serializable, initially null at task construction time,
  * and non-null after the task is executed.
  * @author Laurent Cohen
  */
-public class NonSerializableAttributeTask extends JPPFTask
+public class NonSerializableAttributeTask extends AbstractTask<String>
 {
   /**
    * Non-serializable attribute, must be null before the task execution..

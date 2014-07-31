@@ -20,14 +20,14 @@ package sample;
 
 import java.util.Date;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.Pair;
 
 /**
  * This task implementation encapsulates base functionality for demonstration tasks, such as start and end event notifications.
  * @author Laurent Cohen
  */
-public abstract class BaseDemoTask extends JPPFTask
+public abstract class BaseDemoTask extends AbstractTask<Object>
 {
   /**
    * Run the task with start and end event notifications.

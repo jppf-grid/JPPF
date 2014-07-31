@@ -17,7 +17,7 @@
  */
 package org.jppf.example.loadbalancer.client;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * This task is used to test our custom load-balancer.
@@ -28,7 +28,7 @@ import org.jppf.server.protocol.JPPFTask;
  * to the maximum task length specified in the job metadata.
  * @author Laurent Cohen
  */
-public class CustomLoadBalancerTask extends JPPFTask
+public class CustomLoadBalancerTask extends AbstractTask<String>
 {
   /**
    * The task data, corresponding approximately to its memory footprint.

@@ -20,13 +20,13 @@ package sample.dist.xstream;
 
 import java.lang.reflect.*;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Sample task using XStream to serialize/deserialize objects.
  * @author Laurent Cohen
  */
-public class XstreamTask extends JPPFTask
+public class XstreamTask extends AbstractTask<String>
 {
   /**
    * Person object to serialize with xstream. Note that it must be declared as transient.

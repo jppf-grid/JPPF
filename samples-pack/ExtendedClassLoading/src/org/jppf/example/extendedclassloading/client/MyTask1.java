@@ -19,14 +19,14 @@
 package org.jppf.example.extendedclassloading.client;
 
 import org.jppf.example.extendedclassloading.clientlib1.MyClientDynamicClass1;
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.*;
 
 /**
- * A simple {@link JPPFTask} implementation which demonstrates
+ * A simple JPPF {@link Task} implementation which demonstrates
  * the use of classes downloaded via the library repository management facility.
  * @author Laurent Cohen
  */
-public class MyTask1 extends JPPFTask {
+public class MyTask1 extends AbstractTask<String> {
   @Override
   public void run() {
     try {

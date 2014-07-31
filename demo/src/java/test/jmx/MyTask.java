@@ -18,14 +18,14 @@
 
 package test.jmx;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.JPPFCallable;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class MyTask extends JPPFTask {
+public class MyTask extends AbstractTask<String> {
   @Override
   public void run() {
     // ... some code ...

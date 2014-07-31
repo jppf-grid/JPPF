@@ -19,7 +19,7 @@ package sample.prime;
 
 import java.math.BigInteger;
 
-import org.jppf.server.protocol.JPPFTask;
+import org.jppf.node.protocol.AbstractTask;
 
 
 /**
@@ -27,7 +27,7 @@ import org.jppf.server.protocol.JPPFTask;
  * the multiplication of 2 whole matrices.
  * @author Laurent Cohen
  */
-public class PrimeTask extends JPPFTask
+public class PrimeTask extends AbstractTask<Integer>
 {
   /**
    * BigInteger representation of 0.
