@@ -69,6 +69,5 @@
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-2.22-all.jar"/>
 	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.26.jar"/>
 	<classpathentry kind="lib" path="shared/lib/commons-io-2.4.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="output" path="JobRecovery/classes"/>
 </classpath>

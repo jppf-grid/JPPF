@@ -12,7 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/samples-pack"/>
 	<classpathentry kind="lib" path="/jca-client/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Hazelcast/hazelcast.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

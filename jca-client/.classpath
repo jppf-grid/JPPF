@@ -18,6 +18,5 @@
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/geronimo-servlet_2.5_spec-1.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/tests"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry kind="output" path="classes/jca"/>
 </classpath>

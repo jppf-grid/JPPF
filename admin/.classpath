@@ -16,7 +16,6 @@
 	<classpathentry kind="lib" path="/JPPF/lib/Jung/jung-graph-impl-2.0.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Jung/jung-visualization-2.0.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/MigLayout/miglayout-3.7-swing.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

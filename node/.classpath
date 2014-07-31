@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="/JPPF/lib/Groovy/groovy-all-1.6.5.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/ApacheCommons/commons-io-2.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/utils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
