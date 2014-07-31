@@ -16,21 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
-
-import java.util.List;
-
 /**
- * Interface for a class loader provider.
- * @author Martin JANDA
- * @exclude
+ * Classes supporting the server node-side of the JPPF asynchronous communication model.
  */
-public interface ClassLoaderProvider {
-  /**
-   * Get a reference to the class loader associated with an application uuid.
-   * @param uuidPath the uuid path containing the key to the container.
-   * @return a <code>ClassLoader</code> used for loading the classes of the framework.
-   * @throws Exception if an error occurs while getting the class loader.
-   */
-  ClassLoader getClassLoader(final List<String> uuidPath) throws Exception;
-}
+package org.jppf.server.node;

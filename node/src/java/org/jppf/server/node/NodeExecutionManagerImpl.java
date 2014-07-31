@@ -35,8 +35,7 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-public class NodeExecutionManagerImpl extends AbstractExecutionManager
-{
+public class NodeExecutionManagerImpl extends AbstractExecutionManager {
   /**
    * Logger for this class.
    */
@@ -67,7 +66,6 @@ public class NodeExecutionManagerImpl extends AbstractExecutionManager
     super(nbThreadsProperty, legacyNbThreadsProperty);
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
-
   }
 
   /**
