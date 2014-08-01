@@ -25,6 +25,7 @@ import javax.management.*;
 
 import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.execute.ExecutionManager;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.node.*;
@@ -57,7 +58,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * The task execution manager for this node.
    * @exclude
    */
-  protected NodeExecutionManager executionManager = null;
+  protected ExecutionManager executionManager = null;
   /**
    * The object responsible for this node's I/O.
    * @exclude
@@ -109,7 +110,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   public JPPFNode() {
     uuid = NodeRunner.getUuid();
-    executionManager = new NodeExecutionManagerImpl(this);
+    executionManager = new NodeExecutionManager(this);
     lifeCycleEventHandler = new LifeCycleEventHandler(this);
     updateSystemInformation();
   }
@@ -344,7 +345,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   @Override
-  public NodeExecutionManager getExecutionManager() {
+  public ExecutionManager getExecutionManager() {
     return executionManager;
   }
 

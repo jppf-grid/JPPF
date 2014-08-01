@@ -22,9 +22,9 @@ import java.util.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.comm.socket.SocketWrapper;
+import org.jppf.execute.ExecutionManager;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
-import org.jppf.node.NodeExecutionManager;
 import org.jppf.node.connection.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
@@ -280,7 +280,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   }
 
   @Override
-  public NodeExecutionManager getExecutionManager() {
+  public ExecutionManager getExecutionManager() {
     return null;
   }
 

@@ -20,7 +20,7 @@ package org.jppf.server.node;
 
 import java.lang.management.*;
 
-import org.jppf.node.NodeExecutionInfo;
+import org.jppf.execute.ExecutionInfo;
 
 /**
  * 
@@ -49,9 +49,9 @@ public class CpuTimeCollector
    * @param threadID the thread ID.
    * @return a <code>NodeExecutionInfo</code> instance.
    */
-  public static NodeExecutionInfo computeExecutionInfo(final long threadID)
+  public static ExecutionInfo computeExecutionInfo(final long threadID)
   {
-    return (!cpuTimeEnabled) ? new NodeExecutionInfo() : new NodeExecutionInfo(threadMXBean.getThreadCpuTime(threadID), threadMXBean.getThreadUserTime(threadID));
+    return (!cpuTimeEnabled) ? new ExecutionInfo() : new ExecutionInfo(threadMXBean.getThreadCpuTime(threadID), threadMXBean.getThreadUserTime(threadID));
   }
 
   /**

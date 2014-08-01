@@ -35,11 +35,11 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-public class NodeExecutionManagerImpl extends AbstractExecutionManager {
+public class NodeExecutionManager extends AbstractExecutionManager {
   /**
    * Logger for this class.
    */
-  private static final Logger log = LoggerFactory.getLogger(NodeExecutionManagerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(NodeExecutionManager.class);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
@@ -52,7 +52,7 @@ public class NodeExecutionManagerImpl extends AbstractExecutionManager {
    * Initialize this execution manager with the specified node.
    * @param node the node that uses this execution manager.
    */
-  public NodeExecutionManagerImpl(final NodeInternal node) {
+  public NodeExecutionManager(final NodeInternal node) {
     this(node, "jppf.processing.threads", "processing.threads");
   }
 
@@ -62,7 +62,7 @@ public class NodeExecutionManagerImpl extends AbstractExecutionManager {
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    * @param legacyNbThreadsProperty the legacy name of the property which configures the number of threads.
    */
-  public NodeExecutionManagerImpl(final NodeInternal node, final String nbThreadsProperty, final String legacyNbThreadsProperty) {
+  public NodeExecutionManager(final NodeInternal node, final String nbThreadsProperty, final String legacyNbThreadsProperty) {
     super(nbThreadsProperty, legacyNbThreadsProperty);
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;

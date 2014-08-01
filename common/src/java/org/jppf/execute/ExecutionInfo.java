@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.node;
+package org.jppf.execute;
 
 import java.io.Serializable;
 
@@ -25,7 +25,7 @@ import java.io.Serializable;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeExecutionInfo implements Serializable
+public class ExecutionInfo implements Serializable
 {
   /**
    * Explicit serialVersionUID.
@@ -43,7 +43,7 @@ public class NodeExecutionInfo implements Serializable
   /**
    * Default no-arg constructor.
    */
-  public NodeExecutionInfo()
+  public ExecutionInfo()
   {
     this(0L, 0L);
   }
@@ -53,7 +53,7 @@ public class NodeExecutionInfo implements Serializable
    * @param cpuTime total cpu time used by the tasks.
    * @param userTime total user time used by the tasks.
    */
-  public NodeExecutionInfo(final long cpuTime, final long userTime)
+  public ExecutionInfo(final long cpuTime, final long userTime)
   {
     this.cpuTime = cpuTime;
     this.userTime = userTime;
@@ -64,7 +64,7 @@ public class NodeExecutionInfo implements Serializable
    * @param other the other execution info object from which to add the values.
    * @return this execution info.
    */
-  public NodeExecutionInfo add(final NodeExecutionInfo other)
+  public ExecutionInfo add(final ExecutionInfo other)
   {
     cpuTime += other.cpuTime;
     userTime += other.userTime;
@@ -76,7 +76,7 @@ public class NodeExecutionInfo implements Serializable
    * @param other the other execution info object from which to subtract the values.
    * @return this execution info.
    */
-  public NodeExecutionInfo subtract(final NodeExecutionInfo other)
+  public ExecutionInfo subtract(final ExecutionInfo other)
   {
     cpuTime -= other.cpuTime;
     userTime -= other.userTime;

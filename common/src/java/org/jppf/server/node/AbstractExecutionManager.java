@@ -23,8 +23,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.JPPFReconnectionNotification;
-import org.jppf.node.*;
-import org.jppf.node.ThreadManager.UsedClassLoader;
+import org.jppf.execute.*;
+import org.jppf.execute.ThreadManager.UsedClassLoader;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.server.protocol.JPPFExceptionResult;
@@ -40,7 +40,7 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-public abstract class AbstractExecutionManager implements NodeExecutionManager {
+public abstract class AbstractExecutionManager implements ExecutionManager {
   /**
    * Logger for this class.
    */
@@ -252,7 +252,7 @@ public abstract class AbstractExecutionManager implements NodeExecutionManager {
   private void taskEnded(final NodeTaskWrapper taskWrapper) {
     long elapsedTime = taskWrapper.getElapsedTime();
     accumulatedElapsed.addAndGet(elapsedTime);
-    NodeExecutionInfo info = taskWrapper.getExecutionInfo();
+    ExecutionInfo info = taskWrapper.getExecutionInfo();
     long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
     Task task = taskWrapper.getTask();
     taskNotificationDispatcher.fireTaskEnded(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);

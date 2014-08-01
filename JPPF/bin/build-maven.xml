@@ -43,11 +43,11 @@
   </target>
 
   <target name="maven.generate" depends="">
-    <maven.artifacts.module module="${node}"   file="common-node"/>
-    <maven.artifacts.module module="${common}" file="common"/>
-    <maven.artifacts.module module="${client}" file="client"/>
-    <maven.artifacts.module module="${server}" file="server"/>
-    <maven.artifacts.module module="${admin}"  file="admin"/>
+    <maven.artifacts.module module="${node}"/>
+    <maven.artifacts.module module="${common}"/>
+    <maven.artifacts.module module="${client}"/>
+    <maven.artifacts.module module="${server}"/>
+    <maven.artifacts.module module="${admin}"/>
   </target>
 
   <!-- ========================================================================= -->
@@ -56,7 +56,7 @@
 
   <macrodef name="maven.artifacts.module">
     <attribute name="module"/>
-    <attribute name="file"/>
+    <attribute name="file" default="@{module}"/>
     <sequential>
       <property name="artifactId" value="jppf-@{file}"/>
       <property name="maven.dist.javadoc" value="${maven.dist}/${artifactId}-api"/>

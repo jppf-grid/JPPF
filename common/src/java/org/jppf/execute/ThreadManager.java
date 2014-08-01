@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.node;
+package org.jppf.execute;
 
 import java.util.concurrent.*;
 
@@ -43,14 +43,14 @@ public interface ThreadManager
    * Computes the total CPU time used by the execution threads.
    * @return a <code>NodeExecutionInfo</code> instance.
    */
-  NodeExecutionInfo computeExecutionInfo();
+  ExecutionInfo computeExecutionInfo();
 
   /**
    * Computes the CPU time used by thread identified by threadID.
    * @param threadID the thread ID.
    * @return a <code>NodeExecutionInfo</code> instance.
    */
-  NodeExecutionInfo computeExecutionInfo(final long threadID);
+  ExecutionInfo computeExecutionInfo(final long threadID);
 
   /**
    * Get the current cpu time for the thread identified by the specified id.

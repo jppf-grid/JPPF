@@ -20,7 +20,7 @@ package org.jppf.server.node;
 import java.util.concurrent.Future;
 
 import org.jppf.*;
-import org.jppf.node.NodeExecutionInfo;
+import org.jppf.execute.ExecutionInfo;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.*;
 import org.slf4j.*;
@@ -78,7 +78,7 @@ public class NodeTaskWrapper implements Runnable
   /**
    * Holds the used cpu time for this task.
    */
-  private NodeExecutionInfo executionInfo = null;
+  private ExecutionInfo executionInfo = null;
   /**
    * The elapsed time for this task's execution.
    */
@@ -265,9 +265,9 @@ public class NodeTaskWrapper implements Runnable
 
   /**
    * Get trhe object that holds the used cpu time for this task.
-   * @return a {@link NodeExecutionInfo} instance.
+   * @return a {@link ExecutionInfo} instance.
    */
-  public NodeExecutionInfo getExecutionInfo()
+  public ExecutionInfo getExecutionInfo()
   {
     return executionInfo;
   }

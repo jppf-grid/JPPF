@@ -24,9 +24,8 @@ import java.util.concurrent.*;
 import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.*;
-import org.jppf.execute.ExecutorStatus;
+import org.jppf.execute.*;
 import org.jppf.management.*;
-import org.jppf.node.NodeExecutionManager;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.task.storage.DataProvider;
@@ -49,7 +48,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * The task execution manager for this wrapper.
    */
-  private final NodeExecutionManager executionManager;
+  private final ExecutionManager executionManager;
   /**
    * Status of the connection.
    */

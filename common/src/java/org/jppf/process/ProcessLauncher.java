@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.node.idle.*;
-import org.jppf.process.event.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -329,7 +328,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
   /**
    * Notification that the process has written to its error stream.
    * @param event encapsulate the error stream's content.
-   * @see org.jppf.process.event.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   * @see org.jppf.process.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
   public void errorStreamAltered(final ProcessWrapperEvent event)
@@ -340,7 +339,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
   /**
    * Notification that the process has written to its output stream.
    * @param event encapsulate the output stream's content.
-   * @see org.jppf.process.event.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.event.ProcessWrapperEvent)
+   * @see org.jppf.process.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
   public void outputStreamAltered(final ProcessWrapperEvent event)

@@ -57,7 +57,6 @@
 		<pathelement location="${classes.dir}/j2eeclient"/>
 		<pathelement location="${ejb.client.jar}"/>
 		<fileset dir="${lib.dir}">
-			<include name="jppf-common-node.jar"/>
 			<include name="jppf-common.jar"/>
 			<include name="jppf-client.jar"/>
 		</fileset>
@@ -310,7 +309,6 @@
           <include name="jppf-jca.jar"/>
         </zipfileset>
         <zipfileset dir="${lib.dir}">
-          <include name="jppf-common-node.jar"/>
           <include name="jppf-common.jar"/>
           <include name="jppf-client.jar"/>
           <include name="jppf-jmxremote_optional-1.1.jar"/>

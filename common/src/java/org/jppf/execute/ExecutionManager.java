@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.node;
+package org.jppf.execute;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -28,7 +28,7 @@ import org.jppf.node.protocol.*;
  * @author Laurent Cohen
  * @exclude
  */
-public interface NodeExecutionManager {
+public interface ExecutionManager {
   /**
    * Execute the specified tasks of the specified tasks bundle.
    * @param bundle the bundle to which the tasks are associated.

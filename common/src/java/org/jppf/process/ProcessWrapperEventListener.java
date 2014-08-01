@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.process.event;
+package org.jppf.process;
 
 import java.util.EventListener;
 

@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.socket.*;
 import org.jppf.process.*;
-import org.jppf.process.event.*;
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -137,6 +136,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
@@ -155,6 +155,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));

@@ -21,7 +21,7 @@ package org.jppf.server.node.fj;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.node.NodeExecutionInfo;
+import org.jppf.execute.ExecutionInfo;
 import org.jppf.server.node.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -144,7 +144,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
     /**
      * Summary information for all terminated threads.
      */
-    private NodeExecutionInfo terminatedInfo = new NodeExecutionInfo();
+    private ExecutionInfo terminatedInfo = new ExecutionInfo();
     /**
      * List of monitored threads.
      */
@@ -286,7 +286,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * Get the summary information for all terminated threads.
      * @return a <code>NodeExecutionInfo</code> instance.
      */
-    public synchronized NodeExecutionInfo getTerminatedInfo() {
+    public synchronized ExecutionInfo getTerminatedInfo() {
       return terminatedInfo;
     }
 

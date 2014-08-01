@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.jppf.node.protocol.AbstractTask;
 import org.jppf.process.*;
-import org.jppf.process.event.*;
 import org.jppf.utils.collections.CollectionUtils;
 
 /**

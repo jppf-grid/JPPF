@@ -18,6 +18,7 @@
 
 package org.jppf.node;
 
+import org.jppf.execute.ExecutionManager;
 import org.jppf.management.JMXServer;
 import org.jppf.node.event.LifeCycleEventHandler;
 
@@ -49,7 +50,7 @@ public interface NodeInternal extends Node
    * Get the task execution manager for this node.
    * @return a <code>NodeExecutionManager</code> instance.
    */
-  NodeExecutionManager getExecutionManager();
+  ExecutionManager getExecutionManager();
 
     /**
    * Get the JMX connector server associated with the node.

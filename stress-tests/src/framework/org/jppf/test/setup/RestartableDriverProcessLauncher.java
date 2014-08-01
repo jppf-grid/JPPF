@@ -52,7 +52,6 @@ public class RestartableDriverProcessLauncher extends RestartableProcessLauncher
   private void setupCommon() {
     setMainClass("org.jppf.server.JPPFDriver");
     addClasspathElement("classes/tests/config");
-    addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");
     //addJvmOption("-Xrunjdwp:transport=dt_socket,address=localhost:800" + n +",server=y,suspend=y");

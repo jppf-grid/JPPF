@@ -40,7 +40,7 @@ public class MyTask extends AbstractTask<String>
   /**
    * Path to some jar on the client side.
    */
-  private static final String[] JAR_PATHS = { "../samples-pack/shared/lib/hazelcast-1.9.3.jar", "../samples-pack/shared/lib/jaligner.jar", "../samples-pack/shared/lib/js.jar", "lib/jppf-common-node.jar" };
+  private static final String[] JAR_PATHS = { "../samples-pack/shared/lib/hazelcast-1.9.3.jar", "../samples-pack/shared/lib/jaligner.jar", "../samples-pack/shared/lib/js.jar", "lib/jppf-node.jar" };
   /**
    * To determine if we must load the jars or not.
    */

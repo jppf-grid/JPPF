@@ -38,7 +38,7 @@
     <!-- Copy the JPPF jars to the shared/lib directory -->
     <copy todir="${samples-pack}/shared/lib">
       <fileset dir="${build}">
-        <include name="jppf-common-node.jar"/>
+        <include name="jppf-node.jar"/>
         <include name="jppf-common.jar"/>
         <include name="jppf-client.jar"/>
         <include name="jppf-admin.jar"/>
@@ -71,7 +71,7 @@
       </zipfileset>
       <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}" includes="**/*.sh" filemode="755"/>
       <zipfileset dir="${build}/" prefix="${samples.pack.prefix}/shared/lib-src">
-        <include name="jppf-common-node-src.jar"/>
+        <include name="jppf-node-src.jar"/>
         <include name="jppf-common-src.jar"/>
         <include name="jppf-client-src.jar"/>
         <include name="jppf-admin-src.jar"/>

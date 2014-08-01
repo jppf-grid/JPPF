@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
-import org.jppf.node.*;
+import org.jppf.execute.ExecutionInfo;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -110,7 +110,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   public JPPFSystemInformation systemInformation() throws Exception
   {
     JPPFSystemInformation info = node.getSystemInformation();
-    NodeExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
+    ExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
     info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime / 1000000L));
     return info;
   }

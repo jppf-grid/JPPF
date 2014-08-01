@@ -23,8 +23,8 @@ limitations under the License.
   <!-- ==================================================================== -->
 
   <target name="compile" depends="init, i18n" unless="compile.done">
-    <compile.module path="${node}"/>
     <compile.module path="${common}"/>
+    <compile.module path="${node}"/>
     <compile.module path="${client}"/>
     <compile.module path="${admin}"/>
     <compile.module path="${server}"/>
@@ -74,7 +74,7 @@ limitations under the License.
   <!-- ==================================================================== -->
 
   <target name="jar" depends="compile" unless="jar.done">
-    <jar.module module="node" jar="common-node"/>
+    <jar.module module="node"/>
     <jar.module module="common"/>
     <jar.module module="client"/>
     <jar.module module="admin"/>
@@ -112,7 +112,7 @@ limitations under the License.
 
   <target name="jar.src" depends="compile" unless="jar.src.done">
     <jar.src.module module="common"/>
-    <jar.src.module module="node" jar="common-node"/>
+    <jar.src.module module="node"/>
     <jar.src.module module="admin"/>
     <jar.src.module module="client"/>
     <jar.src.module module="server"/>

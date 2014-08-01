@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.jar.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.process.event.ProcessWrapperEvent;
+import org.jppf.process.ProcessWrapperEvent;
 import org.jppf.server.protocol.CommandLineTask;
 import org.jppf.utils.ExceptionUtils;
 

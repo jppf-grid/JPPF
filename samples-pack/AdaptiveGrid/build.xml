@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name='MandelbrotMovieGenerator' basedir="." default="build">
+<project name='AdaptiveGrid' basedir="." default="build">
 
 	<!-- ========================================================================= -->
 	<!--                          Property definitions                             -->
@@ -86,7 +86,7 @@
 	<!--                                  Compile                                  -->
 	<!-- ========================================================================= -->
 
-	<target name="compile" depends="clean, init, build.external">
+	<target name="compile" depends="clean, init">
 		<javac srcdir="" destdir="${classes.dir}" source="1.7" target="1.7"
 			debug="on" deprecation="off" optimize="on" includes="**/*.java">
 	    <classpath refid="project.classpath"/>
@@ -103,81 +103,22 @@
 	<!-- ========================================================================= -->
 
   <target name="jar" depends="compile">
-    <jar jarfile="${basedir}/MandelbrotMovieGenerator.jar" index="true">
+    <jar jarfile="${basedir}/AdaptiveGrid.jar" index="true">
       <fileset dir="${classes.dir}"/>
-      <fileset dir="${fractals.sample}/classes"/>
     </jar>
-    <echo message="*** The file MandelbrotMovieGenerator.jar is now ready to be deployed ***"/>
+    <echo message="*** The file AdaptiveGrid.jar is now ready to be deployed ***"/>
   </target>
 
-  <target name="build.external">
-    <ant antfile="${fractals.sample}/build.xml" target="compile" inheritAll="false" useNativeBasedir="true"/>
-    <ant antfile="${idle.sample}/build.xml" target="jar" inheritAll="false" useNativeBasedir="true"/>
-  </target>
-
-  <!-- ========================================================================= -->
-  <!--                     Build the deployment archive files                    -->
-  <!-- ========================================================================= -->
-
-  <target name="zip" depends="jar">
-    <property name="zip.file" value="${prefix}.zip"/>
-    <delete file="${zip.file}" quiet="true"/>
-    <zip destfile="${zip.file}">
-      <zipfileset dir="${shared.lib}" prefix="${prefix}/lib">
-        <include name="jppf-common-node.jar"/>
-        <include name="jppf-common.jar"/>
-        <include name="jppf-server.jar"/>
-        <include name="log4j-1.2.15.jar"/>
-        <include name="slf4j-api-1.6.1.jar"/>
-        <include name="slf4j-log4j12-1.6.1.jar"/>
-        <include name="jppf-jmxremote_optional-1.1.jar"/>
-    	</zipfileset>
-      <zipfileset dir="${basedir}" includes="MandelbrotMovieGenerator.jar" prefix="${prefix}/lib"/>
-      <zipfileset dir="${idle.sample}/lib" includes="*.jar" prefix="${prefix}/lib"/>
-      <zipfileset dir="${config.dir}/node" includes="*.properties" prefix="${prefix}/config"/>
-      <zipfileset dir="${config.dir}/node" includes="startNode.bat" prefix="${prefix}"/>
-      <zipfileset dir="${config.dir}/node" includes="startNode.sh" filemode="755" prefix="${prefix}"/>
-    </zip>
-    <echo/>
-    <echo message="*** The file ${zip.file} is now ready to be deployed ***"/>
-    <echo/>
-  </target>
-
-  <target name="tar.gz" depends="jar">
-    <property name="tar.gz.file" value="${prefix}.tar.gz"/>
-    <delete file="${tar.gz.file}" quiet="true"/>
-    <tar destfile="${tar.gz.file}" compression="gzip" excludes="**/*.*">
-      <tarfileset dir="${shared.lib}" prefix="${prefix}/lib">
-        <include name="jppf-common-node.jar"/>
-        <include name="jppf-common.jar"/>
-        <include name="jppf-server.jar"/>
-        <include name="log4j-1.2.15.jar"/>
-        <include name="slf4j-api-1.6.1.jar"/>
-        <include name="slf4j-log4j12-1.6.1.jar"/>
-        <include name="jppf-jmxremote_optional-1.1.jar"/>
-      </tarfileset>
-      <tarfileset dir="${basedir}" includes="MandelbrotMovieGenerator.jar" prefix="${prefix}/lib"/>
-      <tarfileset dir="${idle.sample}/lib" includes="*.jar" prefix="${prefix}/lib"/>
-      <tarfileset dir="${config.dir}/node" includes="*.properties" prefix="${prefix}/config"/>
-      <tarfileset dir="${config.dir}/node" includes="startNode.bat" prefix="${prefix}"/>
-      <tarfileset dir="${config.dir}/node" includes="startNode.sh" filemode="755" prefix="${prefix}"/>
-    </tar>
-    <echo/>
-    <echo message="*** The file ${tar.gz.file} is now ready to be deployed ***"/>
-    <echo/>
-  </target>
-  
 	<!-- ========================================================================= -->
 	<!--                     Run the sample application                            -->
 	<!-- ========================================================================= -->
 
 	<target name="run">
-		<echo message="Running the Mandelbrot Movie Generator demo"/>
-		<java fork="yes" classname="org.jppf.example.fractals.moviegenerator.MovieGenerator" classpathref="run.classpath">
-      <jvmarg value="-Xmx512m"/>
+		<echo message="Adaptive Grid demo"/>
+		<java fork="yes" classname="org.jppf.example.adaptivegrid.AdaptiveGridDemo" classpathref="run.classpath">
+      <jvmarg value="-Xmx256m"/>
       <jvmarg value="-Djppf.config=jppf.properties"/>
 			<jvmarg value="-Dlog4j.configuration=log4j.properties"/>
-			<jvmarg value="-Drestart.node=${restart.node}"/>
 		</java>       
 	</target>
 
@@ -194,7 +135,7 @@
 			<packageset dir="${src.dir}"/>
       <link href="http://docs.oracle.com/javase/7/docs/api"/>
 			<link href="http://www.jppf.org/api"/>
-			<doctitle><![CDATA[JPPF - Mandelbrot Movie Generator Sample]]></doctitle>
+			<doctitle><![CDATA[JPPF - Adaptive Grid Sample]]></doctitle>
 			<header>
 				<![CDATA[
 					<table><tr><td valign="center">

@@ -4,12 +4,7 @@
   <dependencies>
     <dependency>
       <groupId>org.jppf</groupId>
-      <artifactId>jppf-common-node</artifactId>
-      <version>@version@</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jppf</groupId>
-      <artifactId>jppf-common</artifactId>
+      <artifactId>jppf-node</artifactId>
       <version>@version@</version>
     </dependency>
   </dependencies>

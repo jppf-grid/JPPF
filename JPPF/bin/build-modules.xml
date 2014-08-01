@@ -38,8 +38,8 @@
         </zipfileset>
         <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" excludes="**/*.sh,JPPFDriver,JPPFNode"/>
         <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755"/>
-        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib"     includes="jppf-common-node.jar"/>
-        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
+        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib"     includes="jppf-common.jar"/>
+        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src.jar"/>
         <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.1.jar"/>
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
@@ -58,11 +58,9 @@
     <package-module module="application-template">
       <module-elements>
         <zipfileset dir="${build}" prefix="${application-template.prefix}/lib">
-          <include name="jppf-common.jar"/>
           <include name="jppf-client.jar"/>
         </zipfileset>
         <zipfileset dir="${build}" prefix="${application-template.prefix}/lib-src">
-          <include name="jppf-common-src.jar"/>
           <include name="jppf-client-src.jar"/>
         </zipfileset>
         <zipfileset dir="${application.template}/src" prefix="${application-template.prefix}/src" includes="**/*.*"/>
@@ -78,11 +76,11 @@
       <module-elements>
         <zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib">
-          <include name="jppf-common.jar"/>
+          <include name="jppf-node.jar"/>
           <include name="jppf-server.jar"/>
         </zipfileset>
         <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src">
-          <include name="jppf-common-src.jar"/>
+          <include name="jppf-node-src.jar"/>
           <include name="jppf-server-src.jar"/>
         </zipfileset>
       </module-elements>
@@ -92,7 +90,17 @@
   <!-- =========== Node packaging =========== -->
 
   <target name="runtime.node">
-    <package-module module="node"/>
+    <package-module module="node">
+      <module-elements>
+        <zipfileset dir="${config}/node/config" prefix="${node.prefix}/config" includes="jppf.policy"/>
+        <zipfileset dir="${build}" prefix="${node.prefix}/lib">
+          <include name="jppf-node.jar"/>
+        </zipfileset>
+        <zipfileset dir="${build}" prefix="${node.prefix}/lib-src">
+          <include name="jppf-node-src.jar"/>
+        </zipfileset>
+      </module-elements>
+    </package-module>
   </target>
 
   <!-- =========== GUI packaging =========== -->
@@ -101,12 +109,10 @@
     <package-module module="gui" zip-prefix="admin-ui">
       <module-elements>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib">
-          <include name="jppf-common.jar"/>
           <include name="jppf-client.jar"/>
           <include name="jppf-admin.jar"/>
         </zipfileset>
         <zipfileset dir="${build}" prefix="${gui.prefix}/lib-src">
-          <include name="jppf-common-src.jar"/>
           <include name="jppf-client-src.jar"/>
           <include name="jppf-admin-src.jar"/>
         </zipfileset>

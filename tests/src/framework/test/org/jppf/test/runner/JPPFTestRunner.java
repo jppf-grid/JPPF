@@ -100,7 +100,8 @@ public class JPPFTestRunner {
     try {
       BaseSetup.Configuration config = new BaseSetup.Configuration();
       List<String> commonCP = new ArrayList<>();
-      commonCP.add("../lib/jppf-common-node.jar");
+      commonCP.add("../lib/jppf-common.jar");
+      commonCP.add("../lib/jppf-node.jar");
       commonCP.add("../lib/slf4j-api-1.6.1.jar");
       commonCP.add("../lib/slf4j-log4j12-1.6.1.jar");
       commonCP.add("../lib/log4j-1.2.15.jar");
@@ -108,7 +109,6 @@ public class JPPFTestRunner {
       config.driverJppf = "config/driver.template.properties";
       config.driverLog4j = "config/log4j-driver.template.properties";
       config.driverClasspath.addAll(commonCP);
-      config.driverClasspath.add("../lib/jppf-common.jar");
       config.driverClasspath.add("../lib/jppf-server.jar");
       config.driverJvmOptions.add("-Djava.util.logging.config.file=config/logging-driver.properties");
       config.nodeJppf = "config/node.template.properties";

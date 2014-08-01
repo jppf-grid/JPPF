@@ -59,7 +59,6 @@ public class DriverProcessLauncher extends GenericProcessLauncher
     setMainClass("org.jppf.server.JPPFDriver");
     addClasspathElement("classes/addons");
     addClasspathElement("classes/tests/config");
-    addClasspathElement("../common/classes");
     addClasspathElement("../server/classes");
     addClasspathElement("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
     addJvmOption("-Djava.util.logging.config.file=classes/tests/config/logging-driver.properties");

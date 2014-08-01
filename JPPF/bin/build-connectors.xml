@@ -30,7 +30,6 @@
 		<zip destfile="${connector.release.file}">
 			<zipfileset dir="${jca-client}" prefix="${j2ee.prefix}" excludes=".*"/>
 			<zipfileset dir="${build}" prefix="${j2ee.prefix}/lib-src">
-				<include name="jppf-common-node-src.jar"/>
 				<include name="jppf-common-src.jar"/>
 				<include name="jppf-client-src.jar"/>
 			</zipfileset>
@@ -43,8 +42,6 @@
       <fileset dir="${build}">
         <include name="jppf-client*.jar"/>
         <include name="jppf-common*.jar"/>
-        <include name="jppf-common-node*.jar"/>
-        <include name="jppf-server*.jar"/>
       </fileset>
     </copy>
     <copy todir="${jca-client}">

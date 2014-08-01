@@ -18,7 +18,7 @@
 
 package org.jppf.server.node;
 
-import org.jppf.node.*;
+import org.jppf.execute.*;
 
 /**
  * This class manages the thread for the node's execution manager.
@@ -40,16 +40,16 @@ public abstract class AbstractThreadManager implements ThreadManager
   }
 
   @Override
-  public NodeExecutionInfo computeExecutionInfo()
+  public ExecutionInfo computeExecutionInfo()
   {
-    NodeExecutionInfo info = new NodeExecutionInfo();
+    ExecutionInfo info = new ExecutionInfo();
     long[] ids = getThreadIds();
     for (long id: ids) info.add(computeExecutionInfo(id));
     return info;
   }
 
   @Override
-  public NodeExecutionInfo computeExecutionInfo(final long threadID)
+  public ExecutionInfo computeExecutionInfo(final long threadID)
   {
     return CpuTimeCollector.computeExecutionInfo(threadID);
   }
