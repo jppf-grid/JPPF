@@ -18,6 +18,5 @@
 
 /**
  * Support for pluggable load-balancing algorithms.
- * @exclude
  */
 package org.jppf.server.scheduler.bundle.spi;

@@ -152,7 +152,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
   }
 
   /**
-   * Get the user-defined variable he bindings.
+   * Get the user-defined variable bindings.
    * @return a map of variable names to their value.
    */
   public Map<String, Object> getBindings() {

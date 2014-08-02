@@ -175,6 +175,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Read a job to execute or a hanshake job.
    * @throws Exception if any error occurs.
+   * @exclude
    */
   private void processNextJob() throws Exception {
     Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
@@ -212,6 +213,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * and prepare a specific response if it is.
    * @param bundle the bundle to check.
    * @throws Exception if any error occurs.
+   * @exclude
    */
   private void checkInitialBundle(final TaskBundle bundle) throws Exception {
     checkStopped();
@@ -233,6 +235,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param bundle the bundle that contains the tasks and header information.
    * @param taskList the tasks results.
    * @throws Exception if any error occurs.
+   * @exclude
    */
   private void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
     checkStopped();
@@ -255,6 +258,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
+   * @exclude
    */
   private synchronized void init() throws Exception {
     checkStopped();
