@@ -23,9 +23,9 @@ import static org.junit.Assert.assertNotNull;
 import java.util.List;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.task.storage.*;
 import org.jppf.utils.*;
 import org.junit.Test;

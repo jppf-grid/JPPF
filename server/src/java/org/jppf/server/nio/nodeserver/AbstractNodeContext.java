@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.execute.*;
 import org.jppf.io.*;
+import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
@@ -33,7 +34,6 @@ import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;

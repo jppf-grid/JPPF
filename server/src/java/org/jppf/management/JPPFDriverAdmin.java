@@ -22,11 +22,11 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
 
+import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.*;
 import org.jppf.server.nio.nodeserver.*;
-import org.jppf.server.scheduler.bundle.*;
-import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;

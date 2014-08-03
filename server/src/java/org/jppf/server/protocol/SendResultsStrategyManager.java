@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol.results;
+package org.jppf.server.protocol;
 
 import java.util.*;
 

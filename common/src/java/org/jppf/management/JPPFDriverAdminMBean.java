@@ -20,8 +20,8 @@ package org.jppf.management;
 
 import java.util.*;
 
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**

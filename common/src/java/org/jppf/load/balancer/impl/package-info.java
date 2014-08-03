@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes supporting the handling of the results of processing the tasks.
+ * Classes supporting the automatic tuning of the task bundle size, using the proportional bundling algorithm.
  */
-package org.jppf.server.protocol.results;
+package org.jppf.load.balancer.impl;

@@ -18,8 +18,8 @@
 
 package org.jppf.client;
 
+import org.jppf.load.balancer.JPPFContext;
 import org.jppf.queue.JPPFQueue;
-import org.jppf.server.scheduler.bundle.JPPFContext;
 
 /**
  * Context associated with a client.

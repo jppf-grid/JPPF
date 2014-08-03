@@ -20,8 +20,8 @@ package org.jppf.execute;
 
 import java.util.concurrent.Future;
 
+import org.jppf.load.balancer.*;
 import org.jppf.management.*;
-import org.jppf.server.scheduler.bundle.*;
 
 /**
  * Execution context associated with a channel serving its state.
@@ -43,7 +43,7 @@ public interface ExecutorChannel<T> extends AutoCloseable {
 
   /**
    * Get the bundler used to schedule tasks for the corresponding node.
-   * @return a {@link org.jppf.server.scheduler.bundle.Bundler} instance.
+   * @return a {@link org.jppf.load.balancer.Bundler} instance.
    */
   Bundler getBundler();
 

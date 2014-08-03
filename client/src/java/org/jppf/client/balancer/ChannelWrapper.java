@@ -24,8 +24,8 @@ import java.util.concurrent.*;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.execute.*;
+import org.jppf.load.balancer.*;
 import org.jppf.management.*;
-import org.jppf.server.scheduler.bundle.*;
 import org.slf4j.*;
 
 /**

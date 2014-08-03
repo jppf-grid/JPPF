@@ -25,12 +25,12 @@ import static org.jppf.utils.StringUtils.build;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
+import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
-import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 

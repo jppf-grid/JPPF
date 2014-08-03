@@ -25,11 +25,11 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.queue.*;
 import org.jppf.client.event.*;
 import org.jppf.client.submission.SubmissionManager;
+import org.jppf.load.balancer.Bundler;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
-import org.jppf.server.scheduler.bundle.Bundler;
-import org.jppf.server.scheduler.bundle.spi.JPPFBundlerFactory;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 

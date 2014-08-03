@@ -23,12 +23,12 @@ import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
 
+import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
-import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 

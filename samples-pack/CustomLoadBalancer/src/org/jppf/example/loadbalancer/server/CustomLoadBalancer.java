@@ -18,9 +18,9 @@
 
 package org.jppf.example.loadbalancer.server;
 
+import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.protocol.JobMetadata;
-import org.jppf.server.scheduler.bundle.*;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
@@ -74,7 +74,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
    * Make a copy of this bundler.
    * Which parts are actually copied depends on the implementation.
    * @return a new <code>Bundler</code> instance.
-   * @see org.jppf.server.scheduler.bundle.Bundler#copy()
+   * @see org.jppf.load.balancer.Bundler#copy()
    */
   @Override
   public Bundler copy()
@@ -85,7 +85,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   /**
    * Get the current number of tasks to send to the node.
    * @return  the bundle size as an int value.
-   * @see org.jppf.server.scheduler.bundle.Bundler#getBundleSize()
+   * @see org.jppf.load.balancer.Bundler#getBundleSize()
    */
   @Override
   public int getBundleSize()
@@ -96,7 +96,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   /**
    * Get the corresponding node's system information.
    * @return a {@link JPPFSystemInformation} instance.
-   * @see org.jppf.server.scheduler.bundle.NodeAwareness#getNodeConfiguration()
+   * @see org.jppf.load.balancer.NodeAwareness#getNodeConfiguration()
    */
   @Override
   public JPPFSystemInformation getNodeConfiguration()
@@ -107,7 +107,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   /**
    * Set the corresponding node's system information.
    * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
-   * @see org.jppf.server.scheduler.bundle.NodeAwareness#setNodeConfiguration(org.jppf.management.JPPFSystemInformation)
+   * @see org.jppf.load.balancer.NodeAwareness#setNodeConfiguration(org.jppf.management.JPPFSystemInformation)
    */
   @Override
   public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration)
@@ -119,7 +119,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   /**
    * Get the max bundle size that can be used for this bundler.
    * @return the bundle size as an int.
-   * @see org.jppf.server.scheduler.bundle.AbstractBundler#maxSize()
+   * @see org.jppf.load.balancer.AbstractBundler#maxSize()
    */
   @Override
   protected int maxSize()
@@ -130,7 +130,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   /**
    * Get the current job's metadata.
    * @return a {@link JobMetadata} instance.
-   * @see org.jppf.server.scheduler.bundle.JobAwareness#getJobMetadata()
+   * @see org.jppf.load.balancer.JobAwareness#getJobMetadata()
    */
   @Override
   public JobMetadata getJobMetadata()
@@ -141,7 +141,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   /**
    * Set the current job's metadata.
    * @param metadata a {@link JobMetadata} instance.
-   * @see org.jppf.server.scheduler.bundle.JobAwareness#setJobMetadata(JobMetadata)
+   * @see org.jppf.load.balancer.JobAwareness#setJobMetadata(JobMetadata)
    */
   @Override
   public void setJobMetadata(final JobMetadata metadata)
@@ -200,7 +200,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 
   /**
    * Release the resources used by this bundler.
-   * @see org.jppf.server.scheduler.bundle.AbstractBundler#dispose()
+   * @see org.jppf.load.balancer.AbstractBundler#dispose()
    */
   @Override
   public void dispose()

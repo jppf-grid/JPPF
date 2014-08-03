@@ -16,11 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol.results;
+package org.jppf.server.protocol;
 
 import java.util.Collection;
-
-import org.jppf.server.protocol.*;
 
 /**
  * Strategy to determine whether results should be sent immediately.

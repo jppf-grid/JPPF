@@ -27,10 +27,10 @@ import org.jppf.client.*;
 import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.event.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
+import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.protocol.JPPFTaskBundle;
-import org.jppf.server.scheduler.bundle.Bundler;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.utils.GuiUtils;

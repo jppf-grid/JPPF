@@ -15,8 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.jppf.load.balancer;
+
+import java.io.Serializable;
 
 /**
- * Classes supporting the handling of the results of processing the tasks.
+ * This interface defines the set of parameters used by a load-balancing algorithm.
+ * @author Domingos Creado
+ * @author Laurent Cohen
  */
-package org.jppf.server.protocol.results;
+public interface LoadBalancingProfile extends Serializable
+{
+  /**
+   * Make a copy of this profile.
+   * @return a newly created <code>LoadBalancingProfile</code> instance.
+   */
+  LoadBalancingProfile copy();
+}

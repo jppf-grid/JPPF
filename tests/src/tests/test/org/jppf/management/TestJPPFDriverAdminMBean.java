@@ -25,10 +25,10 @@ import java.io.InputStream;
 import java.util.*;
 
 import org.jppf.client.*;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.junit.Test;

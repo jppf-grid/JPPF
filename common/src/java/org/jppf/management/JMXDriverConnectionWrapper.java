@@ -23,10 +23,10 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.job.JobInformation;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.job.management.*;
-import org.jppf.server.scheduler.bundle.LoadBalancingInformation;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
