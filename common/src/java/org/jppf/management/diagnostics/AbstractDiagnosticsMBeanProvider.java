@@ -16,8 +16,19 @@
  * limitations under the License.
  */
 
+package org.jppf.management.diagnostics;
+
+import org.jppf.management.spi.JPPFMBeanProvider;
+
 /**
- * Support for the SPI of the JVM health monitoring and diagnostics.
- * @exclude
+ * 
+ * @author Laurent Cohen
  */
-package org.jppf.management.diagnostics.spi;
+public abstract class AbstractDiagnosticsMBeanProvider implements JPPFMBeanProvider
+{
+  @Override
+  public String getMBeanInterfaceName()
+  {
+    return DiagnosticsMBean.class.getName();
+  }
+}
