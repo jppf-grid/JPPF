@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
-
-import org.jppf.execute.*;
+package org.jppf.execute;
 
 /**
  * This class manages the thread for the node's execution manager.

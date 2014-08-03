@@ -15,12 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node;
+package org.jppf.execute;
 
 import java.util.concurrent.Future;
 
 import org.jppf.*;
-import org.jppf.execute.ExecutionInfo;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.*;
 import org.slf4j.*;

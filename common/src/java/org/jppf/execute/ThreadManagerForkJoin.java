@@ -16,13 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node.fj;
+package org.jppf.execute;
 
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.execute.ExecutionInfo;
-import org.jppf.server.node.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 

@@ -21,6 +21,7 @@ package org.jppf.server.node;
 import java.util.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.execute.AbstractExecutionManager;
 import org.jppf.node.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;

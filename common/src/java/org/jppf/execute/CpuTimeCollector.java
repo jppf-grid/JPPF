@@ -16,11 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.execute;
 
 import java.lang.management.*;
-
-import org.jppf.execute.ExecutionInfo;
 
 /**
  * 

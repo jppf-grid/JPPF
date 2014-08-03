@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
+import org.jppf.execute.AbstractThreadManager;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
-import org.jppf.server.node.AbstractThreadManager;
 import org.jppf.utils.*;
 import org.junit.Test;
 import org.slf4j.*;

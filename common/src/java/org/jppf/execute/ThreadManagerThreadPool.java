@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.node;
+package org.jppf.execute;
 
 import java.util.concurrent.*;
 
