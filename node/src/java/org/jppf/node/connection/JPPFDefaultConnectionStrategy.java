@@ -36,7 +36,9 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
 
   @Override
   public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
-    return JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true) ? discoverDriver() : connectionFromManualConfiguration();
+    DriverConnectionInfo info = JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true) ? discoverDriver() : connectionFromManualConfiguration();
+    if (log.isDebugEnabled()) log.debug("got connection info: {}", info);
+    return info;
   }
 
   /**
@@ -55,7 +57,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
       if (log.isDebugEnabled()) log.debug("Could not auto-discover the driver connection information");
       return connectionFromManualConfiguration();
     }
-    if (log.isDebugEnabled()) log.debug("Discovered driver: " + info);
+    if (log.isDebugEnabled()) log.debug("discovered driver: {}", info);
     boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     boolean recovery = config.getBoolean("jppf.recovery.enabled", false) && (info.recoveryPort >= 0);
     return info.toDriverConnectionInfo(ssl, recovery);
@@ -70,7 +72,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
     boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     String host = config.getString("jppf.server.host", "localhost");
     int port = config.getInt("jppf.server.port", ssl ? 11111 : 11143);
-    int recoveryPort  = config.getBoolean("jppf.recovery.enabled", false) ? config.getInt("jppf.recovery.port", -1) : -1; 
+    int recoveryPort  = config.getBoolean("jppf.recovery.enabled", false) ? config.getInt("jppf.recovery.server.port", -1) : -1; 
     return new JPPFDriverConnectionInfo(ssl, host, port, recoveryPort);
   }
 }
