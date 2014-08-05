@@ -20,9 +20,9 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.TimerTask;
 
-import javax.swing.JComboBox;
+import javax.swing.*;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClientConnection;
 import org.jppf.ui.options.ComboBoxOption;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
@@ -69,11 +69,22 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }
-    JComboBox box = null;
     while (statsHandler.getServerListOption() == null) goToSleep(50L);
-    synchronized(statsHandler) {
-      if (debugEnabled) log.debug("adding client connection " + c.getName());
-      box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
+    if (debugEnabled) log.debug("adding client connection " + c.getName());
+    try {
+      SwingUtilities.invokeAndWait(new ComboUpdate());
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * 
+   */
+  private class ComboUpdate implements Runnable {
+    @Override
+    public void run() {
+      JComboBox box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
       int count = box.getItemCount();
       boolean found = false;
       for (int i=0; i<count; i++) {
@@ -102,5 +113,5 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
         box.setSelectedItem(c);
       }
     }
-  }
+  };
 }
