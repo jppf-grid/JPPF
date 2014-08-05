@@ -31,6 +31,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassContext;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
+import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
@@ -39,8 +40,7 @@ import org.slf4j.*;
  * Context associated with a channel receiving jobs from a client, and sending the results back.
  * @author Laurent Cohen
  */
-public class ClientContext extends AbstractNioContext<ClientState>
-{
+public class ClientContext extends AbstractNioContext<ClientState> {
   /**
    * Logger for this class.
    */
@@ -83,8 +83,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the task bundle to send or receive.
    * @return a <code>ServerJob</code> instance.
    */
-  public ServerTaskBundleClient getBundle()
-  {
+  public ServerTaskBundleClient getBundle() {
     return clientBundle;
   }
 
@@ -92,14 +91,12 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Set the task bundle to send or receive.
    * @param bundle a {@link ServerTaskBundleClient} instance.
    */
-  public void setBundle(final ServerTaskBundleClient bundle)
-  {
+  public void setBundle(final ServerTaskBundleClient bundle) {
     this.clientBundle = bundle;
   }
 
   @Override
-  public void handleException(final ChannelWrapper<?> channel, final Exception e)
-  {
+  public void handleException(final ChannelWrapper<?> channel, final Exception e) {
     ClientNioServer.closeClient(channel);
     if (uuid != null) {
       ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
@@ -129,8 +126,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Serialize this context's bundle into a byte buffer.
    * @throws Exception if any error occurs.
    */
-  public void serializeBundle() throws Exception
-  {
+  public void serializeBundle() throws Exception {
     ClientMessage message = newMessage();
     TaskBundle bundle = clientBundle.getJob();
     bundle.setSLA(null);
@@ -152,8 +148,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * @return a {@link ClientContext} instance.
    * @throws Exception if an error occurs during the deserialization.
    */
-  public ServerTaskBundleClient deserializeBundle() throws Exception
-  {
+  public ServerTaskBundleClient deserializeBundle() throws Exception {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
     TaskBundle bundle = ((ClientMessage) message).getBundle();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
@@ -164,8 +159,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Create a new message.
    * @return an {@link ClientMessage} instance.
    */
-  public ClientMessage newMessage()
-  {
+  public ClientMessage newMessage() {
     return new ClientMessage(getChannel());
   }
 
@@ -173,8 +167,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the message wrapping the data sent or received over the socket channel.
    * @return a {@link ClientMessage NodeMessage} instance.
    */
-  public ClientMessage getClientMessage()
-  {
+  public ClientMessage getClientMessage() {
     return (ClientMessage) message;
   }
 
@@ -182,22 +175,17 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Set the message wrapping the data sent or received over the socket channel.
    * @param message a {@link ClientMessage NodeMessage} instance.
    */
-  public void setClientMessage(final ClientMessage message)
-  {
+  public void setClientMessage(final ClientMessage message) {
     this.message = message;
   }
 
   @Override
-  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
-  {
+  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
     if (message == null) message = newMessage();
     boolean b = false;
-    try
-    {
+    try {
       b = message.read();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       updateInStats();
       throw e;
     }
@@ -206,15 +194,11 @@ public class ClientContext extends AbstractNioContext<ClientState>
   }
 
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
-  {
+  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
     boolean b = false;
-    try
-    {
+    try {
       b = message.write();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       updateOutStats();
       throw e;
     }
@@ -226,8 +210,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Add a completed bundle to the queue of bundles to send to the client
    * @param bundleWrapper the bundle to add.
    */
-  public void offerCompletedBundle(final ServerTaskBundleClient bundleWrapper)
-  {
+  public void offerCompletedBundle(final ServerTaskBundleClient bundleWrapper) {
     completedBundles.offer(bundleWrapper);
   }
 
@@ -235,8 +218,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the next bundle in the queue.
    * @return A {@link ServerJob} instance, or null if the queue is empty.
    */
-  public ServerTaskBundleClient pollCompletedBundle()
-  {
+  public ServerTaskBundleClient pollCompletedBundle() {
     return completedBundles.poll();
   }
 
@@ -244,8 +226,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the number of tasks that remain to be sent to the client.
    * @return the number of tasks as an int.
    */
-  public int getPendingTasksCount()
-  {
+  public int getPendingTasksCount() {
     if(initialBundleWrapper == null) throw new IllegalStateException("initialBundleWrapper is null");
     return initialBundleWrapper.getPendingTasksCount();
   }
@@ -254,19 +235,16 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Determine whether list of completed bundles is empty.
    * @return whether list of <code>ServerJob</code> instances is empty.
    */
-  public boolean isCompletedBundlesEmpty()
-  {
+  public boolean isCompletedBundlesEmpty() {
     return completedBundles.isEmpty();
   }
 
   /**
    * Send the job ended notification.
    */
-  void jobEnded()
-  {
+  void jobEnded() {
     ServerTaskBundleClient bundle;
-    if ((bundle = getInitialBundleWrapper()) != null)
-    {
+    if ((bundle = getInitialBundleWrapper()) != null) {
       if (debugEnabled) log.debug("bundle={}", bundle);
       bundle.bundleEnded();
       setInitialBundleWrapper(null);
@@ -277,16 +255,28 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Send the job ended notification.
    */
   void cancelJobOnClose() {
-    ServerTaskBundleClient bundle;
-    if ((bundle = getInitialBundleWrapper()) != null) {
-      TaskBundle header = bundle.getJob();
-      if (debugEnabled) log.debug("cancelUponClientDisconnect = " + header.getSLA().isCancelUponClientDisconnect() + " for " + header);
+    ServerTaskBundleClient clientBundle;
+    if ((clientBundle = getInitialBundleWrapper()) != null) {
+      TaskBundle header = clientBundle.getJob();
+      if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
-        bundle.cancel();
-        bundle.bundleEnded();
+        int pending = getNbTasksToSend(); // number of non-completed tasks
+        int n = 0;
+        ServerJob job = ((JPPFPriorityQueue) driver.getQueue()).getJob(clientBundle.getUuid());
+        if (job != null) {
+          // count the tasks from the client bundle that are dispatched to nodes
+          for (ServerTaskBundleNode nodeBundle: job.getDispatchSet()) {
+            for (ServerTask task: nodeBundle.getTaskList()) {
+              if (task.getBundle() == clientBundle) n++;
+            }
+          }
+        }
+        if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {pending, n, job});
+        clientBundle.cancel();
+        clientBundle.bundleEnded();
         setInitialBundleWrapper(null);
         JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
-        stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -bundle.getTaskCount());
+        stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -pending + n);
       }
     }
     else if (debugEnabled) log.debug("getInitialBundleWrapper() is null for {}", this);
@@ -296,8 +286,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the job as initially submitted by the client.
    * @return a <code>ServerTaskBundleClient</code> instance.
    */
-  public synchronized ServerTaskBundleClient getInitialBundleWrapper()
-  {
+  public synchronized ServerTaskBundleClient getInitialBundleWrapper() {
     return initialBundleWrapper;
   }
 
@@ -305,15 +294,13 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Set the job as initially submitted by the client.
    * @param initialBundleWrapper <code>ServerTaskBundleClient</code> instance.
    */
-  synchronized void setInitialBundleWrapper(final ServerTaskBundleClient initialBundleWrapper)
-  {
+  synchronized void setInitialBundleWrapper(final ServerTaskBundleClient initialBundleWrapper) {
     this.initialBundleWrapper = initialBundleWrapper;
     nbTasksToSend = initialBundleWrapper == null ? 0 : initialBundleWrapper.getPendingTasksCount();
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return new StringBuilder(super.toString()).append(", nbTasksToSend=").append(nbTasksToSend).toString();
   }
 
@@ -321,8 +308,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Get the number of tasks remaining to send.
    * @return the number of tasks as an <code>int</code>.
    */
-  synchronized int getNbTasksToSend()
-  {
+  synchronized int getNbTasksToSend() {
     return nbTasksToSend;
   }
 
@@ -330,8 +316,7 @@ public class ClientContext extends AbstractNioContext<ClientState>
    * Set the number of tasks remaining to send.
    * @param nbTasksToSend the number of tasks as an <code>int</code>.
    */
-  synchronized void setNbTasksToSend(final int nbTasksToSend)
-  {
+  synchronized void setNbTasksToSend(final int nbTasksToSend) {
     this.nbTasksToSend = nbTasksToSend;
   }
 
