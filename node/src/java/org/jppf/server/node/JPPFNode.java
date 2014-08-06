@@ -34,7 +34,6 @@ import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.NodeProvisioningConstants;
 import org.jppf.serialization.*;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;

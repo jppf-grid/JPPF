@@ -29,10 +29,9 @@ import org.jppf.client.balancer.*;
 import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.protocol.JobSLA;
+import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.scheduling.*;
-import org.jppf.server.protocol.JPPFJobSLA;
 import org.jppf.utils.JPPFUuid;
 import org.slf4j.*;
 

@@ -25,10 +25,9 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.event.*;
+import org.jppf.client.event.JobEvent;
 import org.jppf.client.submission.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 

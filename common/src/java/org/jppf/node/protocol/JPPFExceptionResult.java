@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
-import org.jppf.node.protocol.AbstractTask;
 import org.jppf.utils.ExceptionUtils;
 
 /**

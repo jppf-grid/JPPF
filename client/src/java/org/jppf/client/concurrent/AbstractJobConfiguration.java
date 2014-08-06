@@ -23,7 +23,6 @@ import java.util.*;
 import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 
 /**

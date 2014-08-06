@@ -22,8 +22,7 @@ import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.socket.*;
-import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

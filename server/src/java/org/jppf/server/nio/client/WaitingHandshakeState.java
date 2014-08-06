@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.jppf.management.JMXServer;
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;

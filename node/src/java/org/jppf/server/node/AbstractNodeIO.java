@@ -18,7 +18,7 @@
 
 package org.jppf.server.node;
 
-import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
+import static org.jppf.node.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.io.InvalidClassException;
 import java.util.*;
@@ -27,7 +27,6 @@ import java.util.concurrent.Callable;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.server.protocol.*;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;

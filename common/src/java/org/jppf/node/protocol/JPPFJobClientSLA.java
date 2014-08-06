@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JobClientSLA;
 
 /**
  * This class represents the Service Level Agreement Between a JPPF job and a server.

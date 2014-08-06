@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.JobCommonSLA;
 import org.jppf.scheduling.JPPFSchedule;
 
 /**

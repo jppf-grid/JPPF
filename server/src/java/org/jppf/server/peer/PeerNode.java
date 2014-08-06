@@ -26,7 +26,7 @@ import org.jppf.execute.ExecutionManager;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
 import org.jppf.node.connection.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.*;

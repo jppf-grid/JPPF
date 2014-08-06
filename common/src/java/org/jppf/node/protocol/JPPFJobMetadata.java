@@ -16,21 +16,21 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
-import java.lang.annotation.*;
+import org.jppf.utils.collections.MetadataImpl;
 
 /**
- * Annotation to determine which method in a class is the task's main method.
+ * Instances of this class hold metadata about a job, that can be used from a load-balancer,
+ * to adapt the load balancing to the computational weight of the job and/or the contained tasks.
+ * It may be used in other places in future versions.
+ * @see org.jppf.load.balancer.JobAwareness
  * @author Laurent Cohen
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.METHOD, ElementType.CONSTRUCTOR } )
-public @interface JPPFRunnable
+public class JPPFJobMetadata extends MetadataImpl implements JobMetadata
 {
   /**
-   * Specifies the execution order, in the case where multiple methods are annotated in the same class.<br>
-   * When specified orders are the same, the ordering is the same as the one used in {@link java.lang.Class#getDeclaredMethods() Class.getDeclaredMethods()}
+   * Explicit serialVersionUID.
    */
-  int value() default 0;
+  private static final long serialVersionUID = 1L;
 }

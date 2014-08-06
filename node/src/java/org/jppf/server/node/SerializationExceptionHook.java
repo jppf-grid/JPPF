@@ -18,7 +18,7 @@
 
 package org.jppf.server.node;
 
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.JPPFExceptionResult;
 
 /**
  * This interface represents a hook invoked when the serialization of a task raises an exception.

@@ -19,6 +19,7 @@
 package org.jppf.server.protocol;
 
 import org.jppf.io.DataLocation;
+import org.jppf.node.protocol.TaskState;
 import org.slf4j.*;
 
 /**

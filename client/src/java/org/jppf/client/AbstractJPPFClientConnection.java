@@ -26,8 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.*;
 import org.jppf.management.*;
-import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.node.protocol.*;
 import org.slf4j.*;
 
 /**

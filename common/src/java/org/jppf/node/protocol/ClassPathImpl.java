@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 import java.util.*;
 
 import org.jppf.location.Location;
-import org.jppf.node.protocol.*;
 
 /**
  * A simple implementation of the {@link ClassPath} interface

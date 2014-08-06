@@ -21,7 +21,7 @@ package org.jppf.client.balancer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.server.protocol.TaskState;
+import org.jppf.node.protocol.TaskState;
 
 
 /**

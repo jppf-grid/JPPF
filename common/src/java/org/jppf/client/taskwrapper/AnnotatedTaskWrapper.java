@@ -25,7 +25,7 @@ import java.lang.reflect.*;
 import java.security.AccessController;
 
 import org.jppf.JPPFException;
-import org.jppf.server.protocol.JPPFRunnable;
+import org.jppf.node.protocol.JPPFRunnable;
 
 /**
  * Wrapper class for a task not implementing {@link org.jppf.node.protocol.Task Task<T>}.

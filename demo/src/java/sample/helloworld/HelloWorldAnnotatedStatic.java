@@ -19,7 +19,7 @@ package sample.helloworld;
 
 import java.io.Serializable;
 
-import org.jppf.server.protocol.JPPFRunnable;
+import org.jppf.node.protocol.JPPFRunnable;
 
 /**
  * A simple hello world JPPF task with a JPPF-annotated static method.

@@ -18,7 +18,7 @@
 
 package org.jppf.server.node.remote;
 
-import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
+import static org.jppf.node.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
 import java.util.*;
 import java.util.concurrent.*;

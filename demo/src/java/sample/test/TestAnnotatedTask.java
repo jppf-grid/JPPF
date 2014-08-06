@@ -20,7 +20,7 @@ package sample.test;
 
 import java.io.Serializable;
 
-import org.jppf.server.protocol.JPPFRunnable;
+import org.jppf.node.protocol.JPPFRunnable;
 
 /**
  * Class used to test the annotated task wrapper.

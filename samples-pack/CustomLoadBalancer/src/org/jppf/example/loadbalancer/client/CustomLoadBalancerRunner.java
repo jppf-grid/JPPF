@@ -17,16 +17,13 @@
  */
 package org.jppf.example.loadbalancer.client;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.example.loadbalancer.common.MyCustomPolicy;
-import org.jppf.node.policy.AtLeast;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFJobMetadata;
+import org.jppf.node.policy.*;
+import org.jppf.node.protocol.*;
 
 /**
  * This is a fully commented job runner for the Custom Load Balancer sample.
@@ -127,7 +124,7 @@ public class CustomLoadBalancerRunner
     job.setName(jobName);
 
     // Specify the job metadata.
-    JPPFJobMetadata metadata = (JPPFJobMetadata) job.getMetadata();
+    JobMetadata metadata = job.getMetadata();
     metadata.setParameter("task.memory", "" + size);
     metadata.setParameter("task.time", "" + duration);
     metadata.setParameter("allowed.time", "" + allowedTime);

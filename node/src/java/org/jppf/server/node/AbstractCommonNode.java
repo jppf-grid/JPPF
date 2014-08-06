@@ -24,8 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.JMXServer;
 import org.jppf.node.AbstractNode;
-import org.jppf.node.protocol.TaskBundle;
-import org.jppf.server.protocol.BundleParameter;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 

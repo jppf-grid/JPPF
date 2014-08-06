@@ -29,7 +29,7 @@ import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.nio.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.serialization.*;

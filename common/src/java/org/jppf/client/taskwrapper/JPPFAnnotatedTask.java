@@ -26,7 +26,7 @@ import org.jppf.task.storage.DataProvider;
 
 
 /**
- * JPPF task wrapper for an object whose class is annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
+ * JPPF task wrapper for an object whose class is annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}.
  * @author Laurent Cohen
  */
 public class JPPFAnnotatedTask extends AbstractTask<Object>
@@ -49,10 +49,10 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
   protected JPPFTaskCallback timeoutCallback = null;
 
   /**
-   * Initialize this task with an object whose class is either annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable},
+   * Initialize this task with an object whose class is either annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable},
    * an instance of {@link java.lang.Runnable Runnable} or  an instance of {@link java.util.concurrent.Callable Callable}.
    * @param taskObject an object that encapsulates the task to execute.
-   * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.server.protocol.JPPFRunnable JPPFRunnable}.
+   * @param args the optional arguments for a class that has one of its methods annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}.
    * @throws JPPFException if an error is raised while initializing this task.
    */
   public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException

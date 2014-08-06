@@ -18,8 +18,8 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import static org.jppf.node.protocol.BundleParameter.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
-import static org.jppf.server.protocol.BundleParameter.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.net.InetSocketAddress;

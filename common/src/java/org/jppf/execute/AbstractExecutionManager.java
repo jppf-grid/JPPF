@@ -26,7 +26,6 @@ import org.jppf.JPPFReconnectionNotification;
 import org.jppf.execute.ThreadManager.UsedClassLoader;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
-import org.jppf.server.protocol.JPPFExceptionResult;
 import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.ConfigurationHelper;

@@ -18,15 +18,15 @@
 
 package org.jppf.server.nio.nodeserver;
 
+import static org.jppf.node.protocol.BundleParameter.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
-import static org.jppf.server.protocol.BundleParameter.*;
 
 import java.util.*;
 
 import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.stats.*;

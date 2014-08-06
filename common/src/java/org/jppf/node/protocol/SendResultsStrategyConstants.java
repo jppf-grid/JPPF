@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.server.protocol;
+package org.jppf.node.protocol;
 
 /**
  * COnstantqs used to specify or retrieve the strategy for sending results back to clients.

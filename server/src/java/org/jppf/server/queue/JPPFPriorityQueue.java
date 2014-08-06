@@ -28,7 +28,7 @@ import org.jppf.execute.ExecutorStatus;
 import org.jppf.job.JobManagerListener;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
-import org.jppf.node.protocol.JobSLA;
+import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.server.*;
 import org.jppf.server.job.*;

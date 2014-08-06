@@ -20,6 +20,8 @@ package org.jppf.server.protocol;
 
 import java.util.Collection;
 
+import org.jppf.node.protocol.SendResultsStrategyConstants;
+
 /**
  * Strategy to determine whether results should be sent immediately.
  * @author Laurent Cohen

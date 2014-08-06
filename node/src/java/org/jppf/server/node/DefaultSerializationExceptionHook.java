@@ -18,7 +18,7 @@
 
 package org.jppf.server.node;
 
-import org.jppf.server.protocol.*;
+import org.jppf.node.protocol.JPPFExceptionResult;
 
 /**
  * This default hook is used when none is specified in the node configuration.

@@ -25,7 +25,6 @@ import org.jppf.execute.AbstractExecutionManager;
 import org.jppf.node.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.BundleParameter;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 

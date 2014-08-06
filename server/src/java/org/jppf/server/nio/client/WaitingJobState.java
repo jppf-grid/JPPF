@@ -21,7 +21,7 @@ package org.jppf.server.nio.client;
 import static org.jppf.server.nio.client.ClientTransition.*;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.slf4j.*;

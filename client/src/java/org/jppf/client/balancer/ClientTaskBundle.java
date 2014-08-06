@@ -21,8 +21,7 @@ package org.jppf.client.balancer;
 import java.util.*;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.Task;
-import org.jppf.server.protocol.JPPFTaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.task.storage.DataProvider;
 
 /**
