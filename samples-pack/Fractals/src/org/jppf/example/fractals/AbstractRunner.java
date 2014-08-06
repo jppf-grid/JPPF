@@ -29,8 +29,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import org.jppf.client.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.task.storage.*;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

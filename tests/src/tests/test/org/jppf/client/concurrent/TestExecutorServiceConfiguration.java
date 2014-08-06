@@ -28,8 +28,8 @@ import org.jppf.client.concurrent.*;
 import org.jppf.client.persistence.DefaultFilePersistenceManager;
 import org.jppf.client.taskwrapper.*;
 import org.jppf.node.policy.Equal;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.task.storage.*;
 import org.jppf.utils.JPPFConfiguration;
 import org.junit.*;
 

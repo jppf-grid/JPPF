@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.task.storage;
+package org.jppf.node.protocol;
 
 import org.jppf.utils.collections.Metadata;
 

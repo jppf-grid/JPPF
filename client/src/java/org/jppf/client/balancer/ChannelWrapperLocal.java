@@ -27,8 +27,7 @@ import org.jppf.client.event.*;
 import org.jppf.execute.*;
 import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
-import org.jppf.node.protocol.Task;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

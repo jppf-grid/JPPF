@@ -21,9 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.protocol.Task;
-import org.jppf.task.storage.DataProvider;
-import org.jppf.task.storage.MemoryMapDataProvider;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.StringUtils;
 import org.slf4j.Logger;

@@ -26,7 +26,6 @@ import org.jppf.location.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.task.storage.MemoryMapDataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

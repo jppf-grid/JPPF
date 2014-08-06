@@ -18,7 +18,7 @@
 
 package org.jppf.client.taskwrapper;
 
-import org.jppf.task.storage.DataProvider;
+import org.jppf.node.protocol.DataProvider;
 
 /**
  * This interface must be implemented by tasks that are not implementations of {@link org.jppf.node.protocol.Task Task<T>}

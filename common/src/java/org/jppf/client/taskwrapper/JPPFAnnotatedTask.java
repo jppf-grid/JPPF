@@ -21,8 +21,7 @@ package org.jppf.client.taskwrapper;
 import java.util.concurrent.Callable;
 
 import org.jppf.JPPFException;
-import org.jppf.node.protocol.AbstractTask;
-import org.jppf.task.storage.DataProvider;
+import org.jppf.node.protocol.*;
 
 
 /**

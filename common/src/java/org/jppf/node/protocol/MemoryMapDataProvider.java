@@ -15,10 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.jppf.node.protocol;
+
+import org.jppf.utils.collections.MetadataImpl;
+
 
 /**
- * Support for tasks to access and share read-only data.<br/>
- * The data is transported to the nodes along with he tasks, so it is immediately accessible without
- * need for reading it from or writing it to a specified source.
+ * Implementation of a data provider that handles in-memory data backed by a <code>Map</code>.
+ * @see org.jppf.node.protocol.DataProvider
+ * @author Laurent Cohen
  */
-package org.jppf.task.storage;
+public class MemoryMapDataProvider extends MetadataImpl implements DataProvider
+{
+}

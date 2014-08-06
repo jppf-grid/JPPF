@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 
 import org.jppf.JPPFException;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFCallable;
 
 /**

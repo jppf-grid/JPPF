@@ -28,7 +28,6 @@ import org.jppf.client.submission.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

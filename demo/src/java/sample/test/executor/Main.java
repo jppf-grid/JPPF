@@ -24,8 +24,8 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.concurrent.JPPFExecutorService;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.task.storage.*;
 import org.slf4j.*;
 
 

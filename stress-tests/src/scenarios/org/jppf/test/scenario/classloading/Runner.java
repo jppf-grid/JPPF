@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
-import org.jppf.task.storage.*;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;

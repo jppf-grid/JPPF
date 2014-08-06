@@ -32,9 +32,7 @@ import javax.swing.*;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.Task;
-import org.jppf.task.storage.DataProvider;
-import org.jppf.task.storage.MemoryMapDataProvider;
+import org.jppf.node.protocol.*;
 import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.options.Option;
 import org.jppf.utils.FileUtils;

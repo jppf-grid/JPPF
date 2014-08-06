@@ -22,7 +22,6 @@ import java.util.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
-import org.jppf.task.storage.DataProvider;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,

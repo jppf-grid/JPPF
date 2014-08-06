@@ -23,7 +23,6 @@ import java.util.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.Node;
 import org.jppf.node.protocol.*;
-import org.jppf.task.storage.DataProvider;
 
 /**
  * Instances of this class represent node life cycle events.

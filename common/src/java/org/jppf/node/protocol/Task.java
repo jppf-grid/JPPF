@@ -21,7 +21,6 @@ package org.jppf.node.protocol;
 import java.io.Serializable;
 
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.JPPFCallable;
 
 /**

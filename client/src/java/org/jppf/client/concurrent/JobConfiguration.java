@@ -23,7 +23,6 @@ import java.util.List;
 import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
-import org.jppf.task.storage.DataProvider;
 
 /**
  * This interface defines the properties that can be provided to a task submitted by a {@link JPPFExecutorService}..

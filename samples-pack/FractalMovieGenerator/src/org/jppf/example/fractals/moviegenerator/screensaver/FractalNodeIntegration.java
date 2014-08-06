@@ -21,8 +21,8 @@ package org.jppf.example.fractals.moviegenerator.screensaver;
 import org.jppf.example.fractals.FractalPoint;
 import org.jppf.example.fractals.mandelbrot.MandelbrotConfiguration;
 import org.jppf.node.event.*;
+import org.jppf.node.protocol.DataProvider;
 import org.jppf.node.screensaver.impl.NodeState;
-import org.jppf.task.storage.DataProvider;
 
 /**
  * This class extends the default screen saver's implementation to receive notifications from the tasks

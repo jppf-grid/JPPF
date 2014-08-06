@@ -27,7 +27,6 @@ import java.util.concurrent.Callable;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.task.storage.DataProvider;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
