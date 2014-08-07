@@ -121,7 +121,7 @@ public class BaseTestHelper {
   }
 
   /**
-   * Wait untuil the specified test succeed, or the specified timeout expires, whichever happens first.
+   * Wait untul the specified test succeeds, or the specified timeout expires, whichever happens first.
    * @param test the test to run.
    * @param timeout the timeout in milliseconds.
    * @throws Exception if any error occurs.

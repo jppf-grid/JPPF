@@ -37,22 +37,19 @@ import test.org.jppf.test.setup.common.*;
  * Test for the <code>JobPersistence</code> interface.
  * @author Laurent Cohen
  */
-public class TestJobPersistence extends Setup1D1N
-{
+public class TestJobPersistence extends Setup1D1N {
   /**
    * Test the recovery of a job by closing the JPPF client before it completes.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=15000)
-  public void testJobRecovery() throws Exception
-  {
+  @Test(timeout=20000)
+  public void testJobRecovery() throws Exception {
     String key = null;
     JobPersistence<String> pm = null;
     TypedProperties config = JPPFConfiguration.getProperties();
     long duration = 1000L;
     JPPFClient client = null;
-    try
-    {
+    try {
       // send tasks 1 at a time
       config.setProperty("jppf.load.balancing.algorithm", "manual");
       config.setProperty("jppf.load.balancing.profile", "test");
@@ -89,9 +86,7 @@ public class TestJobPersistence extends Setup1D1N
       List<Task<?>> results = job2.awaitResults();
       assertEquals(nbTasks, results.size());
       assertEquals(nbTasks, job2.getResults().size());
-    }
-    finally
-    {
+    } finally {
       config.remove("jppf.load.balancing.algorithm");
       config.remove("jppf.load.balancing.profile");
       config.remove("jppf.load.balancing.profile.test.size");

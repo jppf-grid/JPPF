@@ -18,6 +18,7 @@
 
 package org.jppf.client;
 
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -51,7 +52,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   /**
    * The listener that receives notifications of completed tasks.
    */
-  transient final JPPFResultCollector resultCollector;
+  transient JPPFResultCollector resultCollector;
 
   /**
    * Default constructor, creates a blocking job with no data provider, default SLA values and a priority of 0.
@@ -379,5 +380,25 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   public List<Task<?>> get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     await(DateTimeUtils.toMillis(timeout, unit), true);
     return results.getResultsList();
+  }
+
+  /**
+   * Save the state of the {@code JPPFJob} instance to a stream (i.e.,serialize it).
+   * @param out the output stream to which to write the job. 
+   * @throws IOException if any I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream out) throws IOException {
+    out.defaultWriteObject();
+  }
+
+  /**
+   * Reconstitute the {@code TreeMap} instance from a stream (i.e., deserialize it).
+   * @param in the input stream from which to read the job. 
+   * @throws IOException if any I/O error occurs.
+   * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
+   */
+  private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    resultCollector = new JPPFResultCollector(this);
   }
 }

@@ -305,7 +305,7 @@ public class ClientJob extends AbstractClientJob {
       } catch(Exception e) {
         log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
       }
-    }
+    } else log.warn("<null> result collector for job {}", this.job);
   }
 
   /**

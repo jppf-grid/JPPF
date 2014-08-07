@@ -8,6 +8,7 @@
 <project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/demo,demo"/>
 <project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/jca-client,jca-client"/>
 <project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/JPPF,JPPF"/>
+<project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/jmxremote,jmxremote"/>
 <project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/node,node"/>
 <project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/samples-pack,samples-pack"/>
 <project reference="0.9.3,https://svn.code.sf.net/p/jppf-project/code/trunk/server,server"/>

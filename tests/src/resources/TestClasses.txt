@@ -3,7 +3,6 @@ test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
 test.org.jppf.client.concurrent.TestJPPFCompletionService
 test.org.jppf.client.concurrent.TestJPPFExecutorService
 test.org.jppf.client.event.TestJobListener
-test.org.jppf.client.event.TestJPPFResultCollector
 test.org.jppf.client.persistence.TestJobPersistence
 test.org.jppf.client.TestConnectionPool
 test.org.jppf.client.TestJPPFClient

@@ -21,8 +21,8 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.utils.TestJPPFConfiguration;
-import test.org.jppf.utils.stats.TestJPPFStatistics;
+import test.org.jppf.client.persistence.TestJobPersistence;
+import test.org.jppf.server.peer.TestMultiServerWithSSL;
 
 
 
@@ -31,7 +31,7 @@ import test.org.jppf.utils.stats.TestJPPFStatistics;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestJPPFConfiguration.class, TestJPPFStatistics.class })
+@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestJobPersistence.class })
 public class JPPFSuite
 {
 }

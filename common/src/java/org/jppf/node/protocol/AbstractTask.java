@@ -18,7 +18,7 @@
 
 package org.jppf.node.protocol;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 import org.jppf.JPPFException;
 import org.jppf.scheduling.JPPFSchedule;
@@ -192,6 +192,7 @@ public abstract class AbstractTask<T> implements Task<T> {
   @Override
   @SuppressWarnings("unchecked")
   public <V> V compute(final JPPFCallable<V> callable) throws Exception {
+    try {
     V result = null;
     if (isInNode()) {
       ClassLoader cl = callable.getClass().getClassLoader();
@@ -200,7 +201,7 @@ public abstract class AbstractTask<T> implements Task<T> {
       try {
         m = clClass.getMethod("computeCallable", JPPFCallable.class);
       } catch(Exception e) {
-        throw new JPPFException("the task class loader cannot send a comptation request to the client, method 'computeCallable' is missing");
+        throw new JPPFException("the task class loader cannot send a computation request to the client, method 'computeCallable' is missing");
       }
       result = (V) m.invoke(cl, callable);
       /*
@@ -212,6 +213,10 @@ public abstract class AbstractTask<T> implements Task<T> {
     }
     else result = callable.call();
     return result;
+    } catch(InvocationTargetException e) {
+      Throwable t = e.getCause();
+      throw (t instanceof Exception) ? (Exception) t: e;
+    }
   }
 
   @Override

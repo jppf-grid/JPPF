@@ -204,7 +204,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     {
       log.error('[' + name + "] " + e.getMessage(), e);
     }
-    if (debugEnabled) log.debug(name  + "closed");
+    if (debugEnabled) log.debug(name  + " closed");
   }
 
   @Override

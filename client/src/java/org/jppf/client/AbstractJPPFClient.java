@@ -513,4 +513,13 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
       return 0;
     }
   }
+
+  /**
+   * Determine whether this client is resetting. 
+   * @return {@code true} if this client is resetting, {@code false} otherwise.
+   * @exclude
+   */
+  public boolean isResetting() {
+    return resetting.get();
+  }
 }

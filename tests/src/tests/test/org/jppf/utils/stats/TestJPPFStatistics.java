@@ -23,9 +23,8 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
-import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.stats.*;
@@ -47,13 +46,12 @@ public class TestJPPFStatistics extends Setup1D1N1C
   @Test(timeout=15000)
   public void testLatestQueueTaskCountUponNodeRestart() throws Exception {
     int nbTasks = 2;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 1000L);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
-    JPPFNodeForwardingMBean nodeForwarder = jmx.getNodeForwarder();
     client.submitJob(job);
     Thread.sleep(1000L);
-    nodeForwarder.restart(NodeSelector.ALL_NODES);
+    jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
@@ -110,7 +108,6 @@ public class TestJPPFStatistics extends Setup1D1N1C
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(false);
-    job.getSLA().setSuspended(false);
     client.submitJob(job);
     Thread.sleep(1000L);
     try {

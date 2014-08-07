@@ -13,7 +13,7 @@ $template{name="samples-page-header" title="Fibonacci Fork/Join sample"}$
           For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
           <ol class="samplesList">
             <li>For a node to use the fork/join executor add-on, you need to add the following property to its configuration file:
-<pre class="samples">jppf.thread.manager.class = org.jppf.server.node.fj.ThreadManagerForkJoin</pre>
+<pre class="samples">jppf.thread.manager.class = org.jppf.execute.ThreadManagerForkJoin</pre>
             </li>
             <li>Once this is done, start the server and the node(s)</li>
             <li>From a command prompt, type: <b>&quot;run.bat&quot;</b> (on Windows) or <b>&quot;./run.sh&quot;</b> (on Linux/Unix)</li>

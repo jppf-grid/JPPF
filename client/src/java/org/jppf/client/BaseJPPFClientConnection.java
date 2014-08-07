@@ -403,4 +403,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     sb.append(']');
     return sb.toString();
   }
+
+  /**
+   * Get the pool this connection belongs to.
+   * @return a {@link JPPFConnectionPool} instance.
+   * @exclude
+   */
+  public JPPFConnectionPool getPool() {
+    return pool;
+  }
 }

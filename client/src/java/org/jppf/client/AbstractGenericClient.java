@@ -312,11 +312,12 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     closed.set(true);
     if (debugEnabled) log.debug("unregistering startup classes");
     HookFactory.unregister(JPPFClientStartupSPI.class);
-    if (debugEnabled) log.debug("closing submission manager");
     if (submissionManager != null) {
       if (reset) {
+        if (debugEnabled) log.debug("resetting submission manager");
         submissionManager.reset();
       } else {
+        if (debugEnabled) log.debug("closing submission manager");
         submissionManager.close();
         submissionManager = null;
       }

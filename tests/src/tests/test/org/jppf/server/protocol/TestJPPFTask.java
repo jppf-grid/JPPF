@@ -138,8 +138,7 @@ public class TestJPPFTask extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testComputeCallable() throws Exception {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
-        MyComputeCallableTask.class, MyComputeCallable.class.getName());
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
     callableResult = "test successful";
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
@@ -156,16 +155,16 @@ public class TestJPPFTask extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testComputeCallableThrowingException() throws Exception {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
-        MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyExceptionalCallable.class.getName());
     callableResult = "test successful";
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    MyComputeCallableTask task = (MyComputeCallableTask) results.get(0);
+    Task<?> task = results.get(0);
     assertNull(task.getResult());
-    assertNotNull(task.getThrowable());
-    assertTrue(task.getThrowable() instanceof UnsupportedOperationException);
+    Throwable t = task.getThrowable();
+    assertNotNull(t);
+    assertTrue("throwable class is " + t.getClass().getName(), t instanceof UnsupportedOperationException);
   }
 
   /**
@@ -177,8 +176,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     try {
       configure();
       int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks,
-          MyComputeCallableTask.class, MyComputeCallable.class.getName());
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, MyComputeCallableTask.class, MyComputeCallable.class.getName());
       callableResult = "test successful";
       List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);

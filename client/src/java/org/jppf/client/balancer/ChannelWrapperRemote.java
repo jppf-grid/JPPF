@@ -137,8 +137,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    * Called when reconnection of this channel is required.
    */
   public void reconnect() {
+    if (channel.isClosed()) return;
     TaskServerConnectionHandler handler = channel.getTaskServerConnection();
-    if (handler.isClosed()) return;
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -231,17 +231,20 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       } catch (Throwable t) {
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));
+        if (channel.isClosed() && !channel.getPool().getClient().isResetting()) return;
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) {
           clientBundle.resultsReceived(t);
           return;
         }
-        clientBundle.resubmit();
-        reconnect();
+        if (!channel.isClosed() || channel.getPool().getClient().isResetting()) {
+          clientBundle.resubmit();
+          reconnect();
+        }
       } finally {
         try {
           if (registeredClassLoader != null) registeredClassLoader.dispose();
-          clientBundle.taskCompleted(exception);
+          if (!channel.isClosed() || channel.getPool().getClient().isResetting()) clientBundle.taskCompleted(exception);
           clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
           if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
         } catch (Exception e) {
