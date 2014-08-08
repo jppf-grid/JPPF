@@ -71,7 +71,8 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
     TypedProperties config = JPPFConfiguration.getProperties();
     boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
     String host = config.getString("jppf.server.host", "localhost");
-    int port = config.getInt("jppf.server.port", ssl ? 11111 : 11143);
+    //int port = config.getInt("jppf.server.port", ssl ? 11111 : 11143);
+    int port = config.getInt("jppf.server.port", ssl ? 11143 : 11111);
     int recoveryPort  = config.getBoolean("jppf.recovery.enabled", false) ? config.getInt("jppf.recovery.server.port", -1) : -1; 
     return new JPPFDriverConnectionInfo(ssl, host, port, recoveryPort);
   }
