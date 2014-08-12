@@ -104,7 +104,7 @@ public class JPPFClient extends AbstractGenericClient {
 
   @Override
   @SuppressWarnings("deprecation")
-  public List<Task<?>> submitJob(final JPPFJob job) throws Exception {
+  public List<Task<?>> submitJob(final JPPFJob job) {
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.client != null) {
       if (!job.isDone()) throw new IllegalStateException("this job is already submitted");

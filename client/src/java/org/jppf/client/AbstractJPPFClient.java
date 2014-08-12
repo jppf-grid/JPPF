@@ -244,10 +244,9 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * Submit a JPPFJob for execution.
    * @param job the job to execute.
    * @return the results of the tasks' execution, as a list of <code>JPPFTask</code> instances for a blocking job, or null if the job is non-blocking.
-   * @throws Exception if an error occurs while sending the job for execution.
    * @since 4.0
    */
-  public abstract List<Task<?>> submitJob(JPPFJob job) throws Exception;
+  public abstract List<Task<?>> submitJob(JPPFJob job);
 
   /**
    * Invoked when the status of a client connection has changed.
