@@ -83,7 +83,7 @@ public class JPPFClient extends AbstractGenericClient {
 
   @Override
   @SuppressWarnings("deprecation")
-  public List<Task<?>> submitJob(final JPPFJob job) throws Exception {
+  public List<Task<?>> submitJob(final JPPFJob job) {
     if (isClosed()) throw new IllegalStateException("this client is closed");
     if (job == null) throw new IllegalArgumentException("job cannot be null");
     if (job.getJobTasks().isEmpty()) throw new IllegalStateException("job cannot be empty");
