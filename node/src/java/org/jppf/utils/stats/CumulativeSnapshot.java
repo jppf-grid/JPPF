@@ -52,10 +52,25 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot
     {
       valueCount += count;
       latest += accumulatedValues;
+      if (latest < 0d) latest = 0d;
       if (latest > max) max = latest;
       if (latest < min) min = latest;
       if (valueCount != 0d) avg = total / valueCount;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
+  @Override
+  public synchronized void assignLatestToMax()
+  {
+    max = latest;
+    total = latest;
+    valueCount = 1L;
+    avg = latest;
+    min = 0d;
   }
 
   /**

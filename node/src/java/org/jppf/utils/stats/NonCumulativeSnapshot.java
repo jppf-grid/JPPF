@@ -62,6 +62,20 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
+  public synchronized void assignLatestToMax()
+  {
+    max = latest;
+    total = latest;
+    valueCount = 0L;
+    avg = 0d;
+    min = (latest < min) ? latest : Double.POSITIVE_INFINITY;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
+  @Override
   public JPPFSnapshot copy()
   {
     return copy(new NonCumulativeSnapshot(getLabel()));

@@ -95,7 +95,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   public JPPFStatistics  statistics() throws Exception {
     try {
       JPPFStatistics  stats = driver.getStatistics().copy();
-      if (debugEnabled) log.debug("stats request = " + stats);
+      if (log.isTraceEnabled()) log.trace("stats request = {}", stats);
       return stats;
     } catch(Throwable e) {
       log.error(e.getMessage(), e);
@@ -177,8 +177,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public void resetStatistics() throws Exception {
-    JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS);
-    driver.getStatistics().reset(filter);
+    if (debugEnabled) log.debug("statistics reset requested");
+    JPPFStatistics stats = driver.getStatistics();
+    JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS, JOB_COUNT, TASK_QUEUE_COUNT);
+    stats.reset(filter);
+    for (String s: new String[] {JOB_COUNT, TASK_QUEUE_COUNT}) {
+      JPPFSnapshot snapshot = stats.getSnapshot(s);
+      if (snapshot instanceof AbstractJPPFSnapshot) ((AbstractJPPFSnapshot) snapshot).assignLatestToMax();
+    }
   }
 
   @Override
@@ -190,7 +196,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   public Integer matchingNodes(final ExecutionPolicy policy) throws Exception {
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
 
-    if (debugEnabled) log.debug("Testing policy against " + allChannels.size() + " nodes:\n" + policy );
+    if (debugEnabled) log.debug("Testing policy against {} nodes: {}", allChannels.size(), policy );
     if (policy == null) return allChannels.size();
 
     int count = 0;
@@ -209,10 +215,10 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
           else log.warn(msg);
         }
         if (match) count++;
-        if (debugEnabled) log.debug("testing against " + mgtInfo + " returns " + match);
+        if (debugEnabled) log.debug("testing against {} returns {}", mgtInfo, match);
       }
     }
-    if (debugEnabled) log.debug("matching nodes = " + count);
+    if (debugEnabled) log.debug("matching nodes = {}", count);
     return count;
   }
 
