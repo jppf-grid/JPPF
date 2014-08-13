@@ -54,9 +54,27 @@ public class TestRunListener extends RunListener {
    */
   private String currentClass = "";
   /**
+   * Enum of possible action upon test failure.
+   */
+  private enum FailureAction {
+    /**
+     * No action: just continue running the tests.
+     */
+    NONE,
+    /**
+     * Exit with a System.exit(1), keeps the logs in the state of the last (and first) failure.
+     */
+    EXIT,
+    /**
+     * Wait until user presses [Enter].
+     */
+    WAIT
+  }
+  /**
+   * What to do upon test failure.
    * EXIT, WAIT, or NONE
    */
-  private final String actionOnError = "EXIT";
+  private FailureAction actionOnError = FailureAction.NONE;
 
   /**
    * Initialize this listener with the specified result holder.
@@ -76,6 +94,13 @@ public class TestRunListener extends RunListener {
     this.resultHolder = resultHolder;
     this.out = out;
     isLogging = (out != null);
+    String s = System.getProperty("failure.action", "NONE");
+    for (FailureAction action: FailureAction.values()) {
+      if (action.name().equalsIgnoreCase(s)) {
+        actionOnError = action;
+        break;
+      }
+    }
   }
 
   /**
@@ -123,8 +148,8 @@ public class TestRunListener extends RunListener {
   public void testFailure(final Failure failure) throws Exception {
     resultHolder.addFailure(failure);
     if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "'");
-    if ("EXIT".equals(actionOnError)) System.exit(1);
-    if ("WAIT".equals(actionOnError)) StreamUtils.waitKeyPressed("Press [Enter] to continue ...");
+    if (actionOnError == FailureAction.EXIT) System.exit(1);
+    if (actionOnError == FailureAction.WAIT) StreamUtils.waitKeyPressed("Press [Enter] to continue ...");
   }
 
   @Override

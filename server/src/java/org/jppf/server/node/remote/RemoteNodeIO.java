@@ -59,12 +59,11 @@ public class RemoteNodeIO extends AbstractNodeIO {
   @Override
   protected Object[] deserializeObjects() throws Exception {
     ObjectSerializer ser = node.getHelper().getSerializer();
-    if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
+    if (debugEnabled) log.debug("waiting for next request. Serializer = {} (class loader = {})", ser, ser.getClass().getClassLoader());
     TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), node.getHelper().getSerializer());
     if (debugEnabled) log.debug("got bundle " + bundle);
     if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
     Object[] result = deserializeObjects(bundle);
-    //if (node.isOffline() && !bundle.isHandshake()) sendOfflineCloseRequest(bundle);
     if (node.isOffline() && !bundle.isHandshake()) waitChannelClosed(getSocketWrapper());
     return result;
   }

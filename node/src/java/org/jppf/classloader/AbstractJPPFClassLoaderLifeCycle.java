@@ -110,7 +110,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
     this.dynamic = parent instanceof AbstractJPPFClassLoaderLifeCycle;
     this.offline = dynamic ? ((AbstractJPPFClassLoaderLifeCycle) parent).isOffline() : connection == null;
     if (uuidPath != null) this.uuidPath = uuidPath;
-    HookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
+    if (!dynamic) HookFactory.registerSPIMultipleHook(ClassLoaderListener.class, null, null);
   }
 
   /**

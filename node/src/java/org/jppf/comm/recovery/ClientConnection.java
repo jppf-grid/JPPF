@@ -115,14 +115,15 @@ public class ClientConnection extends AbstractRecoveryConnection
    */
   private void configure()
   {
-    if (debugEnabled) log.debug("configuring connection");
     TypedProperties config = JPPFConfiguration.getProperties();
     String host = null;
     int port = -1;
     if (connectionInfo == null) {
       host = config.getString("jppf.server.host", "localhost");
       port = config.getInt("jppf.recovery.server.port", 22222);
+      if (debugEnabled) log.debug("host={}, port={}", host, port);
     } else {
+      if (debugEnabled) log.debug("configuring: connectionInfo={}", connectionInfo);
       host = connectionInfo.getHost();
       port = connectionInfo.getRecoveryPort();
     }
@@ -131,6 +132,7 @@ public class ClientConnection extends AbstractRecoveryConnection
     socketWrapper = new BootstrapSocketClient();
     socketWrapper.setHost(host);
     socketWrapper.setPort(port);
+    if (debugEnabled) log.debug("host={},  port={}, socketWrapper={}", new Object[] {host, port, socketWrapper});
   }
 
   /**

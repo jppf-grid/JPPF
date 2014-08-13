@@ -29,8 +29,7 @@ import org.slf4j.*;
  * and detects whether the corresponding peer is dead.
  * @author Laurent Cohen
  */
-public class Reaper
-{
+public class Reaper {
   /**
    * Logger for this class.
    */
@@ -70,8 +69,7 @@ public class Reaper
    * @param poolSize this reaper's thread pool size.
    * @param runInterval the interval between two runs of this reaper.
    */
-  public Reaper(final RecoveryServer server, final int poolSize, final long runInterval)
-  {
+  public Reaper(final RecoveryServer server, final int poolSize, final long runInterval) {
     this.server = server;
     this.poolSize = poolSize;
     this.runInterval = runInterval;
@@ -84,13 +82,11 @@ public class Reaper
    * Submit a new connection for immediate check and get the corresponding node or client uuid.
    * @param connection the connection to check.
    */
-  void newConnection(final ServerConnection connection)
-  {
-    Runnable r = new Runnable()
-    {
+  void newConnection(final ServerConnection connection) {
+    if (debugEnabled) log.debug("new connection {}", connection);
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         connection.run();
         checkConnection(connection);
         if (connection.isOk()) server.addConnection(connection);
@@ -103,11 +99,10 @@ public class Reaper
    * Add a listener to the list of listeners.
    * @param listener the listener to add.
    */
-  public void addReaperListener(final ReaperListener listener)
-  {
+  public void addReaperListener(final ReaperListener listener) {
     if (listener == null) return;
-    synchronized (listeners)
-    {
+    if (debugEnabled) log.debug("adding reaper listener {}", listener);
+    synchronized (listeners) {
       listeners.add(listener);
     }
   }
@@ -116,11 +111,10 @@ public class Reaper
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove.
    */
-  public void removeReaperListener(final ReaperListener listener)
-  {
+  public void removeReaperListener(final ReaperListener listener) {
     if (listener == null) return;
-    synchronized (listeners)
-    {
+    if (debugEnabled) log.debug("removing reaper listener {}", listener);
+    synchronized (listeners) {
       listeners.remove(listener);
     }
   }
@@ -129,11 +123,10 @@ public class Reaper
    * Notify all listeners that a connection has failed.
    * @param connection the server-side connection that failed.
    */
-  private void fireReaperEvent(final ServerConnection connection)
-  {
+  private void fireReaperEvent(final ServerConnection connection) {
+    if (debugEnabled) log.debug("firing connectionFailed() for connection {}", connection);
     ReaperEvent event = new ReaperEvent(connection);
-    synchronized (listeners)
-    {
+    synchronized (listeners) {
       for (ReaperListener listener: listeners) listener.connectionFailed(event);
     }
   }
@@ -142,15 +135,11 @@ public class Reaper
    * Check a connection after an attempt to reach the remote peer.
    * @param connection the connection to check.
    */
-  private void checkConnection(final ServerConnection connection)
-  {
-    if (!connection.isOk())
-    {
+  private void checkConnection(final ServerConnection connection) {
+    if (!connection.isOk()) {
       server.removeConnection(connection);
       fireReaperEvent(connection);
-    }
-    else if (!connection.isInitialized())
-    {
+    } else if (!connection.isInitialized()) {
       fireReaperEvent(connection);
       connection.setInitialized(true);
     }
@@ -159,25 +148,16 @@ public class Reaper
   /**
    * The timer task that submits the connection checks to the the executor.
    */
-  private class ReaperTask extends TimerTask
-  {
-    /**
-     * {@inheritDoc}
-     */
+  private class ReaperTask extends TimerTask {
     @Override
-    public void run()
-    {
+    public void run() {
       ServerConnection[] connections = server.connections();
       List<Future<?>> futures = new ArrayList<>(connections.length);
       for (ServerConnection c: connections) futures.add(threadPool.submit(c));
-      for (Future<?> f: futures)
-      {
-        try
-        {
+      for (Future<?> f: futures) {
+        try {
           f.get();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
       }

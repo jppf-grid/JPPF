@@ -67,6 +67,7 @@ public class Hook<E> {
       try {
         Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);
         processConcreteInstance(clazz.newInstance(), false);
+        if (debugEnabled) log.debug("added concrete class {} for {}={}", new Object[] {clazz.getName(), property, fqn});
       } catch(Exception e) {
         String format = "failed to instantiate concrete class for {}, {}={}, exception={}";
         Object[] params = new Object[] {this, property, fqn, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e)};
@@ -156,6 +157,7 @@ public class Hook<E> {
   private void processConcreteInstance(final E concrete, final boolean isDefault)
   {
     if ((concrete != null) && (!isDefault || instances.isEmpty())) {
+      if (debugEnabled) log.debug("adding concrete instance {}, default={}", concrete, isDefault);
       instances.add(new HookInstance(concrete));
     }
   }

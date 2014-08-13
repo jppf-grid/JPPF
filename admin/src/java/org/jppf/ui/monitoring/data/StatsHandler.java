@@ -534,6 +534,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
       public void run() {
         JPPFClientConnection c = getCurrentConnection();
         if (c == null) return;
+        if (debugEnabled) log.debug("requesting statistics reset on {}", c);
         JMXDriverConnectionWrapper jmx = c.getConnectionPool().getJmxConnection();
         if ((jmx != null) && jmx.isConnected()) {
           try {

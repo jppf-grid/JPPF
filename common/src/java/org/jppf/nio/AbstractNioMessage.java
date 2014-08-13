@@ -64,7 +64,7 @@ public abstract class AbstractNioMessage implements NioMessage
   /**
    * The length of the location at the current position.
    */
-  protected int currentLength = 0;
+  protected int currentLength = -1;
   /**
    * Object storing the length of the object currently being read or written.
    */
@@ -170,7 +170,7 @@ public abstract class AbstractNioMessage implements NioMessage
    */
   protected boolean readNextObject() throws Exception {
     if (currentLengthObject == null) currentLengthObject = ssl ? new SSLNioObject(4, sslHandler) : new PlainNioObject(channel, 4);
-    if (currentLength <= 0) {
+    if (currentLength < 0) {
       try {
         if (!currentLengthObject.read()) return false;
       } catch(Exception e) {
@@ -201,7 +201,7 @@ public abstract class AbstractNioMessage implements NioMessage
     locations.add(currentObject.getData());
     currentLengthObject = null;
     currentObject = null;
-    currentLength = 0;
+    currentLength = -1;
     if (debug) log.debug("channel id={} read object at position {}", channel.getId(), position);
     position++;
     return true;
@@ -219,7 +219,7 @@ public abstract class AbstractNioMessage implements NioMessage
       DataLocation dl = new MultipleBuffersLocation(bytes);
       currentLengthObject = ssl ? new SSLNioObject(dl, sslHandler) : new PlainNioObject(channel, dl);
     }
-    if (currentLength <= 0) {
+    if (currentLength < 0) {
       try {
         if (!currentLengthObject.write()) return false;
       } catch(Exception e) {
@@ -246,7 +246,7 @@ public abstract class AbstractNioMessage implements NioMessage
     position++;
     currentLengthObject = null;
     currentObject = null;
-    currentLength = 0;
+    currentLength = -1;
     currentDataLocation = null;
     return true;
   }

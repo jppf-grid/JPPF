@@ -456,6 +456,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
 
   @Override
   public void close() {
+    if (!dynamic) HookFactory.unregister(ClassLoaderListener.class);
     resourceCache.close();
     notFoundCache.clear();
     super.close();

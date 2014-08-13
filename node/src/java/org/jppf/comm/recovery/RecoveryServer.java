@@ -104,6 +104,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
       while (!isStopped())
       {
         Socket socket = serverSocket.accept();
+        if (debugEnabled) log.debug("accepted connection {}", socket);
         ServerConnection connection = new ServerConnection(socket, maxRetries, socketReadTimeout);
         reaper.newConnection(connection);
       }
@@ -134,6 +135,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
    */
   public void close()
   {
+    if (debugEnabled) log.debug("closing {}", this);
     setStopped(true);
     synchronized(connections)
     {

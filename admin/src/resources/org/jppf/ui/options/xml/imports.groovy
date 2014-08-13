@@ -22,3 +22,4 @@ import org.jppf.ui.options.event.*
 import org.jppf.ui.options.factory.*
 import org.jppf.ui.utils.*
 import org.apache.commons.logging.*
+import org.slf4j.*

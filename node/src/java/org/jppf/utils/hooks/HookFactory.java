@@ -20,6 +20,8 @@ package org.jppf.utils.hooks;
 
 import java.util.*;
 
+import org.slf4j.*;
+
 
 /**
  * Factcory methods for the registration and invocation of hooks.
@@ -27,6 +29,14 @@ import java.util.*;
  */
 public class HookFactory
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(HookFactory.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * Mapping of the hooks to their interface name.
    */
@@ -80,6 +90,7 @@ public class HookFactory
    */
   private static <T> Hook<T> register(final Hook<T> hook)
   {
+    if (debugEnabled) log.debug("registering {}", hook);
     hookMap.put(hook.getInterfaceName(), hook);
     return hook;
   }
