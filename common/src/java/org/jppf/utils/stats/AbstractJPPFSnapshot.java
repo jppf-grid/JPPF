@@ -107,6 +107,12 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
   }
 
   /**
+   * Assign the value of {@code getLatest()} to {@code max}.
+   * @exclude
+   */
+  public abstract void assignLatestToMax();
+
+  /**
    * {@inheritDoc}
    * @exclude
    */

@@ -177,8 +177,14 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public void resetStatistics() throws Exception {
-    JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS);
-    driver.getStatistics().reset(filter);
+    if (debugEnabled) log.debug("statistics reset requested");
+    JPPFStatistics stats = driver.getStatistics();
+    JPPFSnapshot.LabelExcludingFilter filter = new JPPFSnapshot.LabelExcludingFilter(NODES, IDLE_NODES, CLIENTS, JOB_COUNT, TASK_QUEUE_COUNT);
+    stats.reset(filter);
+    for (String s: new String[] {JOB_COUNT, TASK_QUEUE_COUNT}) {
+      JPPFSnapshot snapshot = stats.getSnapshot(s);
+      if (snapshot instanceof AbstractJPPFSnapshot) ((AbstractJPPFSnapshot) snapshot).assignLatestToMax();
+    }
   }
 
   @Override

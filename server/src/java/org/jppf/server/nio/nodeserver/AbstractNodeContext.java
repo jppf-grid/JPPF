@@ -407,6 +407,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         jmxConnection.addJMXWrapperListener(new JMXWrapperListener() {
           @Override
           public void jmxWrapperConnected(final JMXWrapperEvent event) {
+            if (debugEnabled) log.debug("jmx ocnnected {} for node {}", jmxConnection, AbstractNodeContext.this);
             JPPFDriver.getInstance().getNodeNioServer().nodeConnected(AbstractNodeContext.this);
           }
         });

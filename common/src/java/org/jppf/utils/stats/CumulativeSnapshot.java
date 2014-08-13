@@ -63,6 +63,20 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
+  public synchronized void assignLatestToMax()
+  {
+    max = latest;
+    total = latest;
+    valueCount = 1L;
+    avg = latest;
+    min = 0d;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
+  @Override
   public JPPFSnapshot copy()
   {
     return copy(new CumulativeSnapshot(getLabel()));
