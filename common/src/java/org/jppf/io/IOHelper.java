@@ -54,6 +54,10 @@ public final class IOHelper {
    */
   private static final double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);
   /**
+   * Whether to trigger a garbage collection whenever disk overflow is triggered.
+   */
+  private static final boolean GC_ON_DISK_OVERFLOW = JPPFConfiguration.getProperties().getBoolean("jppf.gc.on.disk.overflow", true);
+  /**
    * The available heap threshold above which it is unlikely that memory fragmentation will cause object allocations to fail,
    * i.e. when there is enough free memory but not enough <i><b>contiguous</b></i> free memory. Default value is 32 MB.  
    */
@@ -138,7 +142,7 @@ public final class IOHelper {
    */
   public static File createTempFile(final int size) throws Exception {
     File file = File.createTempFile("jppf", ".tmp");
-    if (debugEnabled) log.debug("disk overflow: creating temp file '" + file.getCanonicalPath() + "' with size=" + nf.format(size));
+    if (debugEnabled) log.debug("disk overflow: creating temp file '{}' with size={}", file.getCanonicalPath(), nf.format(size));
     file.deleteOnExit();
     return file;
   }
@@ -151,14 +155,32 @@ public final class IOHelper {
   public static boolean fitsInMemory(final int size) {
     lock.lock();
     try {
-      long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
-      if (traceEnabled) log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
-      boolean b = ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > LOW_MEMORY_THRESHOLD);
+      if (traceEnabled) {
+        long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
+        log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
+      }
+      boolean b = fitsInMemory0(size);
+      if (!b && GC_ON_DISK_OVERFLOW) {
+        if (debugEnabled) log.debug("triggering GC to avoid disk overflow, requested size={}", size);
+        System.gc();
+        b = fitsInMemory0(size);
+      }
       if (b) footprint.addAndGet(size);
       return b;
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Determines whether the data of the specified size would fit in memory.
+   * @param size the data size to check.
+   * @return true if the data would fit in memory, false otherwise.
+   */
+  private static boolean fitsInMemory0(final int size) {
+    long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
+    //if (traceEnabled) log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
+    return ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > LOW_MEMORY_THRESHOLD);
   }
 
   /**
