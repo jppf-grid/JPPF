@@ -84,8 +84,10 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     masterDir = new File(System.getProperty("user.dir"));
     log.debug("masterDir = {}", masterDir);
     computeSlaveClasspath();
+    /*
     int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
     if (n > 0) shrinkOrGrowSlaves(n, null);
+    */
   }
 
   /**
@@ -94,7 +96,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    * @param requestedSlaves the number of slaves to reach.
    * @param configOverrides a set of overrides to the slave's configuration.
    */
-  public synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final TypedProperties configOverrides) {
+  synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final TypedProperties configOverrides) {
     // if new config ovverides, stop all the slaves and restart new ones
     if (configOverrides != null) {
       log.debug("stopping all processes");
@@ -194,5 +196,13 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     }
     slaveClasspath.add(".");
     slaveClasspath.add(SLAVE_LOCAL_CONFIG_DIR);
+  }
+
+  /**
+   * Automatically start slaves if specified in the configuration.
+   */
+  public static void handleStartup() {
+    int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
+    if (n > 0) INSTANCE.shrinkOrGrowSlaves(n, null);
   }
 }

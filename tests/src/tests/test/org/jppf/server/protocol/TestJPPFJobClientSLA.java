@@ -306,7 +306,6 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
   private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) throws Exception {
     BaseSetup.resetClientConfig();
     TypedProperties config = JPPFConfiguration.getProperties();
-    //config.setBoolean("jppf.ssl.enabled", false);
     config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
     config.setBoolean("jppf.local.execution.enabled", localEnabled);
     config.setInt("jppf.local.execution.threads", Runtime.getRuntime().availableProcessors());

@@ -26,6 +26,7 @@ import org.jppf.utils.collections.MetadataImpl;
  * It may be used in other places in future versions.
  * @see org.jppf.load.balancer.JobAwareness
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFJobMetadata extends MetadataImpl implements JobMetadata
 {

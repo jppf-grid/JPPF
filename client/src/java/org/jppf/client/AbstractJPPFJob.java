@@ -139,6 +139,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Get the service level agreement between the job and the server.
    * @param jobSLA an instance of <code>JobSLA</code>.
+   * @exclude
    */
   public void setSLA(final JobSLA jobSLA) {
     this.jobSLA = jobSLA;
@@ -147,6 +148,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Get the service level agreement between the job and the server.
    * @param jobClientSLA an instance of <code>JobSLA</code>.
+   * @exclude
    */
   public void setClientSLA(final JobClientSLA jobClientSLA) {
     this.jobClientSLA = jobClientSLA;
@@ -155,6 +157,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Set this job's metadata.
    * @param jobMetadata a {@link JobMetadata} instance.
+   * @exclude
    */
   public void setMetadata(final JobMetadata jobMetadata) {
     this.jobMetadata = jobMetadata;
@@ -163,6 +166,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   /**
    * Resolve this instance after deserialization.
    * @return an instance of {@link Object}.
+   * @exclude
    */
   protected Object readResolve() {
     listeners = new LinkedList<>();

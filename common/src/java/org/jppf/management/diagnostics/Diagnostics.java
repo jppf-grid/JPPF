@@ -82,6 +82,9 @@ public class Diagnostics implements DiagnosticsMBean, Closeable
       thread.start();
     }
     else if (debugEnabled) log.debug("CPU time collection is not supported - CPU load will be unavailable");
+    if (threadsMXBean.isThreadContentionMonitoringSupported()) {
+      if (!threadsMXBean.isThreadContentionMonitoringEnabled()) threadsMXBean.setThreadContentionMonitoringEnabled(true);
+    }
     heapDumpCollector = HeapDumpCollector.Factory.newInstance();
     if (heapDumpCollector == null)
     {

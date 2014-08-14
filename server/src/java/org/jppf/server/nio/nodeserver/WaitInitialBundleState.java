@@ -75,7 +75,7 @@ class WaitInitialBundleState extends NodeServerState {
       boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
-      if (debugEnabled) log.debug("read bundle for {], bundle={}", channel, bundle);
+      if (debugEnabled) log.debug("read bundle for {}, bundle={}", channel, bundle);
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
       Bundler bundler = server.getBundler().copy();

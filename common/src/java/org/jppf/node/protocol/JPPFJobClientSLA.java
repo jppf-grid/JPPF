@@ -24,6 +24,7 @@ import org.jppf.node.policy.ExecutionPolicy;
  * This class represents the Service Level Agreement Between a JPPF job and a server.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA
 {

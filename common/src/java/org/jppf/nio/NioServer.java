@@ -167,7 +167,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
-      server.socket().bind(addr);
+      server.socket().bind(addr, 100);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();

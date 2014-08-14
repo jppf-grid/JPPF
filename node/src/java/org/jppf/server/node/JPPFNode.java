@@ -32,7 +32,7 @@ import org.jppf.node.*;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
-import org.jppf.node.provisioning.NodeProvisioningConstants;
+import org.jppf.node.provisioning.*;
 import org.jppf.serialization.*;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
@@ -204,6 +204,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       checkInitialBundle(bundle);
       currentBundle = null;
       processResults(bundle, taskList);
+      if (isMasterNode()) SlaveNodeManager.handleStartup();
     }
   }
 

@@ -21,6 +21,7 @@ package org.jppf.node.protocol;
 /**
  * COnstantqs used to specify or retrieve the strategy for sending results back to clients.
  * @author Laurent Cohen
+ * @exclude
  */
 public class SendResultsStrategyConstants {
   /**

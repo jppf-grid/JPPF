@@ -25,6 +25,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * This class represents the Service Level Agreement Between a JPPF job and a server.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
+ * @exclude
  */
 public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
 {

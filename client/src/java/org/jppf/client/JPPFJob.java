@@ -386,6 +386,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * Save the state of the {@code JPPFJob} instance to a stream (i.e.,serialize it).
    * @param out the output stream to which to write the job. 
    * @throws IOException if any I/O error occurs.
+   * @since 5.0
    */
   private void writeObject(final ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
@@ -396,6 +397,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @param in the input stream from which to read the job. 
    * @throws IOException if any I/O error occurs.
    * @throws ClassNotFoundException if the class of an object in the object graph can not be found.
+   * @since 5.0
    */
   private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
