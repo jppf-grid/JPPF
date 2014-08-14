@@ -14,6 +14,8 @@ RewriteEngine on
 RewriteRule ^wiki\/?(.*)$ "\/doc\/v2\/$1" [R]
 #RewriteRule ^/wiki$ /doc/v2 [R]
 
+#RewriteRule ^/?doc5(/.*)?$ %{DOCUMENT_ROOT}/doc/v5/index.php/ [L]
+
 ErrorDocument 403 /JPPF-403.php
 ErrorDocument 404 /JPPF-404.php
 ErrorDocument 500 /JPPF-500.php
