@@ -20,7 +20,9 @@ package org.jppf.node.policy;
 
 import java.io.Serializable;
 
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.stats.JPPFStatistics;
 
 /**
  * Interface for all execution policy implementations.
@@ -45,7 +47,23 @@ public abstract class ExecutionPolicy implements Serializable {
    * The children of this rule.
    * @exclude
    */
-  protected ExecutionPolicy[] children = null;
+  protected final ExecutionPolicy[] children;
+  /**
+   * The root of an execution policy graph, set by the queue manager on the client or server side.
+   */
+  transient ExecutionPolicy root = null;
+  /**
+   * The context for this policy.
+   */
+  transient PolicyContext context = null;
+
+  /**
+   * Initialize this policy with the specified children.
+   * @param children the children of this policy.
+   */
+  protected ExecutionPolicy(final ExecutionPolicy... children) {
+    this.children = children;
+  }
 
   /**
    * Determines whether this policy accepts the specified node.
@@ -182,7 +200,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @param rules the first operand.
      */
     public LogicalRule(final ExecutionPolicy...rules) {
-      this.children = rules;
+      super(rules);
     }
 
     /**
@@ -190,8 +208,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return an XML string representation of this object
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
       synchronized(ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         toStringIndent++;
@@ -223,8 +240,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return true if and only if the 2 operands' accepts() method return true or an empty or null operand list was specified.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info)
-    {
+    public boolean accepts(final PropertiesCollection info) {
       if ((children == null) || (children.length <= 0)) return true; boolean b = true;
       for (ExecutionPolicy ep: children) b = b && ep.accepts(info);
       return b;
@@ -294,8 +310,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * Initialize this OR operator with the specified operands.
      * @param rules the rules to combine.
      */
-    public XorRule(final ExecutionPolicy...rules)
-    {
+    public XorRule(final ExecutionPolicy...rules) {
       super(rules);
     }
 
@@ -332,16 +347,12 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   public static class NotRule extends ExecutionPolicy {
     /**
-     * The operand.
-     */
-    private ExecutionPolicy rule = null;
-
-    /**
      * Initialize this binary logical operator with the specified operands.
      * @param rule the operand.
      */
     public NotRule(final ExecutionPolicy rule) {
-      this.rule = rule;
+      super(new ExecutionPolicy[] { rule });
+      if (rule == null) throw new IllegalArgumentException("negated rule cannot be null");
     }
 
     /**
@@ -351,7 +362,7 @@ public abstract class ExecutionPolicy implements Serializable {
      */
     @Override
     public boolean accepts(final PropertiesCollection info) {
-      return !rule.accepts(info);
+      return !children[0].accepts(info);
     }
 
     /**
@@ -365,8 +376,7 @@ public abstract class ExecutionPolicy implements Serializable {
           StringBuilder sb = new StringBuilder();
           sb.append(indent()).append("<NOT>\n");
           toStringIndent++;
-          if (rule == null) sb.append(indent()).append("null\n");
-          else sb.append(rule.toString());
+          sb.append(children[0].toString());
           toStringIndent--;
           sb.append(indent()).append("</NOT>\n");
           computedToString = sb.toString();
@@ -429,5 +439,52 @@ public abstract class ExecutionPolicy implements Serializable {
    */
   protected String xmlElement(final String tag, final double value) {
     return xmlElement(tag, Double.toString(value));
+  }
+
+  /**
+   * Initialize the root for all the elements in the policy graph for which this is the root.
+   * @since 5.0
+   */
+  private void initializeRoot() {
+    if (children != null) {
+      for (ExecutionPolicy child: children) child.initializeRoot(this);
+    }
+  }
+
+  /**
+   * Initialize the specified root for all the elements in the policy sub-graph for which this is the root.
+   * @param root the root to set.
+   * @since 5.0
+   */
+  private void initializeRoot(final ExecutionPolicy root) {
+    if (this.root != null) return;
+    this.root = root;
+    if (children != null) {
+      for (ExecutionPolicy child: children) child.initializeRoot(root);
+    }
+  }
+
+  /**
+   * Set the parameters used as bound variables in the script.
+   * @param sla the job server-side sla.
+   * @param clientSla the job client-side sla.
+   * @param metadata the job metadata.
+   * @param jobDispatches the number of nodes the job is already dispatched to.
+   * @param stats the server statistics.
+   * @since 5.0
+   * @exclude
+   */
+  public void setContext(final JobSLA sla, final JobClientSLA clientSla, final JobMetadata metadata, final int jobDispatches, final JPPFStatistics stats) {
+    initializeRoot();
+    context = new PolicyContext(sla, clientSla, metadata, jobDispatches, stats);
+  }
+
+  /**
+   * Get the context for this policy.
+   * @return a {@link PolicyContext} object.
+   * @since 5.0
+   */
+  public PolicyContext getContext() {
+    return root == null ? context : root.context;
   }
 }

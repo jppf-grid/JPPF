@@ -127,9 +127,9 @@ public class TestScriptedPolicy extends Setup1D2N1C {
     sn.addValues(10, 10);
     JPPFJob job = new JPPFJob();
     job.getSLA().setPriority(7);
-    p.setVariables(job.getSLA(), job.getClientSLA(), null, 3, stats);
+    p.setContext(job.getSLA(), job.getClientSLA(), null, 3, stats);
     assertTrue(p.accepts(null));
-    p.setVariables(job.getSLA(), job.getClientSLA(), null, 7, stats);
+    p.setContext(job.getSLA(), job.getClientSLA(), null, 7, stats);
     assertFalse(p.accepts(null));
   }
 
@@ -147,9 +147,9 @@ public class TestScriptedPolicy extends Setup1D2N1C {
     sn.addValues(10, 10);
     JPPFJob job = new JPPFJob();
     job.getSLA().setPriority(7);
-    p.setVariables(job.getSLA(), job.getClientSLA(), null, 3, stats);
+    p.setContext(job.getSLA(), job.getClientSLA(), null, 3, stats);
     assertTrue(p.accepts(null));
-    p.setVariables(job.getSLA(), job.getClientSLA(), null, 7, stats);
+    p.setContext(job.getSLA(), job.getClientSLA(), null, 7, stats);
     assertFalse(p.accepts(null));
   }
 

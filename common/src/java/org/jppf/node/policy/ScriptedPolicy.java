@@ -22,10 +22,8 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.JPPFException;
-import org.jppf.node.protocol.*;
 import org.jppf.scripting.*;
 import org.jppf.utils.*;
-import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
 /**
@@ -41,26 +39,6 @@ public class ScriptedPolicy extends ExecutionPolicy {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The job's server side SLA, set at runtime by the server.
-   */
-  protected transient JobSLA sla;
-  /**
-   * The job's client side SLA, set at runtime by the server.
-   */
-  protected transient JobClientSLA clientSla;
-  /**
-   * The job's metadata, set at runtime by the server.
-   */
-  protected transient JobMetadata metadata;
-  /**
-   * Number of nodes the job is already dispatched to.
-   */
-  protected transient int jobDispatches;
-  /**
-   * The server statistics.
-   */
-  protected transient JPPFStatistics stats;
   /**
    * The script language to use.
    */
@@ -130,11 +108,14 @@ public class ScriptedPolicy extends ExecutionPolicy {
     if ((script == null) || evaluationError) return false;
     Map<String, Object> variables = new HashMap<>();
     variables.put("jppfSystemInfo", info);
-    variables.put("jppfSla", sla);
-    variables.put("jppfClientSla", clientSla);
-    variables.put("jppfMetadata", metadata);
-    variables.put("jppfDispatches", jobDispatches);
-    variables.put("jppfStats", stats);
+    PolicyContext ctx = getContext();
+    if (ctx != null) {
+      variables.put("jppfSla", ctx.getSLA());
+      variables.put("jppfClientSla", ctx.getClientSLA());
+      variables.put("jppfMetadata", ctx.getMetadata());
+      variables.put("jppfDispatches", ctx.getJobDispatches());
+      variables.put("jppfStats", ctx.getStats());
+    }
     ScriptRunner runner = null;
     try {
       runner = ScriptRunnerFactory.getScriptRunner(language);
@@ -169,22 +150,5 @@ public class ScriptedPolicy extends ExecutionPolicy {
       }
     }
     return computedToString;
-  }
-
-  /**
-   * Set the parameters used as bound variables in the script.
-   * @param sla the job server-side sla.
-   * @param clientSla the job client-side sla.
-   * @param metadata the job metadata.
-   * @param jobDispatches the number of nodes the job is already dispatched to.
-   * @param stats the server statistics.
-   * @exclude
-   */
-  public void setVariables(final JobSLA sla, final JobClientSLA clientSla, final JobMetadata metadata, final int jobDispatches, final JPPFStatistics stats) {
-    this.sla = sla;
-    this.clientSla = clientSla;
-    this.metadata = metadata;
-    this.jobDispatches = jobDispatches;
-    this.stats = stats;
   }
 }

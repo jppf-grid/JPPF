@@ -33,8 +33,8 @@ public class Preference extends LogicalRule {
    * @param policies the polcies in order of preference.
    */
   public Preference(final ExecutionPolicy... policies) {
+    super(policies);
     if ((policies == null) || (policies.length == 0)) throw new IllegalArgumentException("there must be at least one policy in the list");
-    this.children = policies;
   }
 
   /**
@@ -42,8 +42,8 @@ public class Preference extends LogicalRule {
    * @param policies the polcies in order of preference.
    */
   public Preference(final List<ExecutionPolicy> policies) {
+    super(policies.toArray(new ExecutionPolicy[policies.size()]));
     if ((policies == null) || policies.isEmpty()) throw new IllegalArgumentException("there must be at least one policy in the list");
-    this.children = policies.toArray(new ExecutionPolicy[policies.size()]);
   }
 
   @Override

@@ -391,13 +391,7 @@ public abstract class AbstractClientJob {
    */
   private void preparePolicy(final ExecutionPolicy policy) {
     if (policy == null) return;
-    if (policy instanceof ScriptedPolicy) {
-      ((ScriptedPolicy) policy).setVariables(sla, clientSla, metadata, channelsCount.get(), null);
-    } else if (policy.getChildren() != null) {
-      for (ExecutionPolicy child: policy.getChildren()) {
-        if (child != null) preparePolicy(child);
-      }
-    }
+    policy.setContext(sla, clientSla, metadata, channelsCount.get(), null);
   }
 
   /**
