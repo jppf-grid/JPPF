@@ -123,7 +123,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   public void sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
-    ;
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
@@ -149,14 +148,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
         IOHelper.sendData(socketClient, task, ser);
       } catch(NotSerializableException e) {
         hasNotSerializableException = true;
-        log.error("error serializing task {} for {} : {}\nthe job will be cancelled", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
+        log.error("error serializing task {} for {} : {}", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
         Task<?> t = new JPPFExceptionResult(e, task);
         t.setPosition(task.getPosition());
         IOHelper.sendData(socketClient, t, ser);
       }
     }
     socketClient.flush();
-    if (hasNotSerializableException) pool.getClient().cancelJob(job.getUuid());
   }
 
   /**
