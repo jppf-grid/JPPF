@@ -137,6 +137,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addJvmOption("-Djava.io.tmpdir=" + System.getProperty("java.io.tmpdir"));
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     addClasspathElement(libDir + "slf4j/slf4j-api-1.6.1.jar");
@@ -155,6 +156,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addJvmOption("-Djava.io.tmpdir=" + System.getProperty("java.io.tmpdir"));
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
     jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
@@ -178,6 +180,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate, final List<String> classpath, final List<String> jvmOptions) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addJvmOption("-Djava.io.tmpdir=" + System.getProperty("java.io.tmpdir"));
     jppfConfig = ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(jppfTemplate, n));
     log4j = getFileURL(ConfigurationHelper.createTempConfigFile(ConfigurationHelper.createConfigFromTemplate(log4jTemplate, n)));
     for (String elt: classpath) addClasspathElement(elt);
@@ -322,7 +325,9 @@ public class GenericProcessLauncher implements Runnable {
   public void startProcess() throws IOException {
     startDriverSocket();
     List<String> command = new ArrayList<>();
-    command.add(System.getProperty("java.home")+"/bin/java");
+    String javaHome = System.getProperty("jppf.java.home");
+    if ((javaHome == null) || !(new File(javaHome).exists())) javaHome = System.getProperty("java.home");
+    command.add(javaHome + "/bin/java");
     command.add("-cp");
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<classpath.size(); i++) {

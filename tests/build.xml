@@ -35,6 +35,8 @@
   <property name="tests.classes"      value="${classes}/tests"/>
   <property name="addons.classes"     value="${classes}/addons"/>
   <property name="build"              value="${basedir}/build"/>
+  <property name="jppf.tmp.dir"            value="${java.io.tmpdir}"/>
+  <property name="jppf.java.home"     value="${java.home}"/>
 
   <!-- JPPF modules -->
   <property name="client"             value="${basedir}/../client"/>
@@ -169,6 +171,8 @@
       <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
       <jvmarg value="-Dfailure.action=EXIT"/>
+      <jvmarg value="-Djava.io.tmpdir=${jppf.tmp.dir}"/>
+      <jvmarg value="-Djppf.java.home=${jppf.java.home}"/>
       <arg value="-s"/>
     </java>
   </target>
