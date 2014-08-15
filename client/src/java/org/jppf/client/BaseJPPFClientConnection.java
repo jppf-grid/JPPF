@@ -140,14 +140,13 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
         IOHelper.sendData(socketClient, task, ser);
       } catch(NotSerializableException e) {
         hasNotSerializableException = true;
-        log.error("error serializing task {} for {} : {}\nthe job will be cancelled", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
+        log.error("error serializing task {} for {} : {}", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
         Task<?> t = new JPPFExceptionResult(e, task);
         t.setPosition(task.getPosition());
         IOHelper.sendData(socketClient, t, ser);
       }
     }
     socketClient.flush();
-    if (hasNotSerializableException) pool.getClient().cancelJob(job.getUuid());
   }
 
   /**
