@@ -77,6 +77,39 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
   }
 
   /**
+   * Determine whether this connection information contains a valid port of the specified type,
+   * that is, at least one port of the specified type greater than zero.
+   * @param secure {@code true} to specifiy that secure (SSL/TLS) ports must be checked, {@code false} to look for plain ports.
+   * @return {@code true} if this information has a valid port, {@code false} otherwise.
+   * @since 5.0
+   */
+  public boolean hasValidPort(final boolean secure) {
+    int[] ports = secure ? sslServerPorts: serverPorts;
+    if (ports != null) {
+      for (int port: ports) {
+        if (port > 0) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get a valid port of the specified type, that is, the first port of the specified type greater than zero.
+   * @param secure {@code true} to specifiy that secure (SSL/TLS) ports must be checked, {@code false} to look for plain ports.
+   * @return the value of the first valmid port found if this information has a valid port, {@code -1} otherwise.
+   * @since 5.0
+   */
+  public int getValidPort(final boolean secure) {
+    int[] ports = secure ? sslServerPorts: serverPorts;
+    if (ports != null) {
+      for (int port: ports) {
+        if (port > 0) return port;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * Compare this connection information with another.
    * @param ci the other object to compare to.
    * @return -1 if this connection information is less than the other, 1 if it is greater, 0 if they are equal.
@@ -117,7 +150,21 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    return super.clone();
+    JPPFConnectionInformation ci = new JPPFConnectionInformation();
+    ci.uuid = uuid;
+    ci.host = host;
+    ci.managementPort = managementPort;
+    ci.sslManagementPort = sslManagementPort;
+    ci.recoveryPort = recoveryPort;
+    if (serverPorts != null) {
+      ci.serverPorts = new int[serverPorts.length];
+      System.arraycopy(serverPorts, 0, ci.serverPorts, 0, serverPorts.length);
+    }
+    if (sslServerPorts != null) {
+      ci.sslServerPorts = new int[sslServerPorts.length];
+      System.arraycopy(sslServerPorts, 0, ci.sslServerPorts, 0, sslServerPorts.length);
+    }
+    return ci;
   }
 
   /**

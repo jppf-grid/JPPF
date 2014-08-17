@@ -71,10 +71,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   private JPPFMulticastReceiverThread receiverThread = null;
   /**
-   * Determines whether SSL communication is on or off.
-   */
-  private boolean sslEnabled = false;
-  /**
    * The submission manager.
    */
   private SubmissionManager submissionManager;
@@ -108,8 +104,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     closed.set(false);
     resetting.set(false);
     this.config = initConfig(configuration);
-    sslEnabled = this.config.getBoolean("jppf.ssl.enabled", false);
-    log.info("JPPF client starting with sslEnabled = " + sslEnabled);
     try {
       HookFactory.registerSPIMultipleHook(JPPFClientStartupSPI.class, null, null).invoke("run");
     } catch (Exception e) {
@@ -152,7 +146,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     int coreThreads = Runtime.getRuntime().availableProcessors();
-    //LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
@@ -176,9 +169,17 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
             ConfigurationHelper ch = new ConfigurationHelper(config);
-            int poolSize = ch.getInt("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
-            int jmxPoolSize = ch.getInt("jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
-            newConnection(name, info, priority, poolSize, sslEnabled, jmxPoolSize);
+            boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
+            if (info.hasValidPort(ssl)) {
+              int poolSize = ch.getInt("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
+              int jmxPoolSize = ch.getInt("jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
+              newConnection(name, info, priority, poolSize, ssl, jmxPoolSize);
+            } else {
+              String type = ssl ? "secure" : "plain";
+              String msg = String.format("this client cannot fulfill a %s connection request to %s:%d because the host does not expose that port as a %s port",
+                  type, info.host, info.getValidPort(ssl), type);
+              log.warn(msg);
+            }
           }
         }, new IPFilter(config), acceptMultipleInterfaces);
         new Thread(receiverThread).start();
@@ -199,18 +200,19 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
+            boolean ssl = config.getBoolean(name + ".jppf.ssl.enabled", false);
             info.host = config.getString(name + ".jppf.server.host", "localhost");
-            int port = config.getInt(name + ".jppf.server.port", sslEnabled ? 11443 : 11111);
-            if (!sslEnabled) info.serverPorts = new int[] { port };
+            int port = config.getInt(name + ".jppf.server.port", ssl ? 11443 : 11111);
+            if (!ssl) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
-            if (!sslEnabled) info.managementPort = config.getInt(name + ".jppf.management.port", -1);
+            if (!ssl) info.managementPort = config.getInt(name + ".jppf.management.port", -1);
             else info.sslManagementPort = config.getInt(name + ".jppf.management.port", -1);
             int priority = config.getInt(name + ".jppf.priority", 0);
             if (receiverThread != null) receiverThread.addConnectionInformation(info);
             ConfigurationHelper ch = new ConfigurationHelper(config);
             int poolSize = ch.getInt(name + ".jppf.pool.size", 1, 1, Integer.MAX_VALUE);
             int jmxPoolSize = ch.getInt(name + ".jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
-            newConnection(name, info, priority, poolSize, sslEnabled, jmxPoolSize);
+            newConnection(name, info, priority, poolSize, ssl, jmxPoolSize);
           }
         }
       }
