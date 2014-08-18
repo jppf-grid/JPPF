@@ -160,18 +160,18 @@ public class ClientClassNioServer extends ClassNioServer
    * @param uuid the uuid of the client for which to get connections.
    * @return a list of connection channels.
    */
-  public List<ChannelWrapper<?>> getProviderConnections(final String uuid)
-  {
-    return new ArrayList<>(providerConnections.getValues(uuid));
+  public List<ChannelWrapper<?>> getProviderConnections(final String uuid) {
+    Collection<ChannelWrapper<?>> channels = providerConnections.getValues(uuid);
+    return channels == null ? null : new ArrayList<>(channels);
   }
 
   /**
    * Get all the provider connections handled by this server.
    * @return a list of connection channels.
    */
-  public List<ChannelWrapper<?>> getAllConnections()
-  {
-    return new ArrayList<>(providerConnections.allValues());
+  public List<ChannelWrapper<?>> getAllConnections() {
+    Collection<ChannelWrapper<?>> channels = providerConnections.allValues();
+    return channels == null ? null : new ArrayList<>(channels);
   }
 
   /**
@@ -179,17 +179,18 @@ public class ClientClassNioServer extends ClassNioServer
    * @see org.jppf.nio.NioServer#removeAllConnections()
    */
   @Override
-  public synchronized void removeAllConnections()
-  {
+  public synchronized void removeAllConnections() {
     if (!isStopped()) return;
     List<ChannelWrapper<?>> list = providerConnections.allValues();
     providerConnections.clear();
     super.removeAllConnections();
-    for (ChannelWrapper<?> channel: list) {
-      try {
-        closeConnection(channel);
-      } catch (Exception e) {
-        log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+    if (list != null) {
+      for (ChannelWrapper<?> channel: list) {
+        try {
+          closeConnection(channel);
+        } catch (Exception e) {
+          log.error("error closing channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+        }
       }
     }
   }
