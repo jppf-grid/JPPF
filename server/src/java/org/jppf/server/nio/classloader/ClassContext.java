@@ -447,7 +447,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource == null ? "null" : resource.getName());
@@ -470,6 +470,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
     sb.append(", uuid=").append(uuid);
     sb.append(", secure=").append(isSecure());
     sb.append(", ssl=").append(ssl);
+    sb.append(']');
     return sb.toString();
   }
 
