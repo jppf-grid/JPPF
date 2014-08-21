@@ -120,7 +120,7 @@
 			</header>
 			<bottom>
 				<![CDATA[
-					<font face="Arial" size=2 color="#6D78B6"><i>Copyright &copy; 2005-2010 JPPF Team.</i></font>
+					<font face="Arial" size=2 color="#6D78B6"><i>Copyright &copy; 2005-2014 JPPF Team.</i></font>
 				]]>
 			</bottom>
 		</javadoc>
