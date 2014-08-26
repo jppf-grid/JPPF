@@ -23,6 +23,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import java.text.NumberFormat;
 import java.util.*;
 
+import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
@@ -31,8 +32,7 @@ import org.slf4j.*;
  * This class provides a set of methods to format the statistics data received from the server.
  * @author Laurent Cohen
  */
-public final class StatsFormatter implements StatsConstants
-{
+public final class StatsFormatter implements StatsConstants {
   /**
    * Logger for this class.
    */
@@ -53,16 +53,14 @@ public final class StatsFormatter implements StatsConstants
   /**
    * Instantiation of this class is not allowed.
    */
-  private StatsFormatter()
-  {
+  private StatsFormatter() {
   }
 
   /**
    * Initialize the formatter for double values.
    * @return a <code>NumberFormat</code> instance.
    */
-  private static NumberFormat initDoubleFormatter()
-  {
+  private static NumberFormat initDoubleFormatter() {
     NumberFormat doubleFormatter = NumberFormat.getInstance();
     doubleFormatter.setGroupingUsed(true);
     doubleFormatter.setMinimumFractionDigits(2);
@@ -75,8 +73,7 @@ public final class StatsFormatter implements StatsConstants
    * Initialize the formatter for integer values.
    * @return a <code>NumberFormat</code> instance.
    */
-  private static NumberFormat initIntegerFormatter()
-  {
+  private static NumberFormat initIntegerFormatter() {
     NumberFormat integerFormatter = NumberFormat.getInstance();
     integerFormatter.setGroupingUsed(true);
     integerFormatter.setMinimumFractionDigits(0);
@@ -90,8 +87,7 @@ public final class StatsFormatter implements StatsConstants
    * @param stats the data snapshot to map.
    * @return a map of field names to their corresponding string values.
    */
-  public static Map<Fields, String> getStringValuesMap(final JPPFStatistics stats)
-  {
+  public static Map<Fields, String> getStringValuesMap(final JPPFStatistics stats) {
     Map<Fields, String> map = new HashMap<>();
     map.put(TOTAL_TASKS_EXECUTED, formatInt(stats.getSnapshot(TASK_DISPATCH).getTotal()));
     JPPFSnapshot snapshot = stats.getSnapshot(EXECUTION);
@@ -123,9 +119,12 @@ public final class StatsFormatter implements StatsConstants
     map.put(QUEUE_SIZE, formatInt(snapshot.getLatest()));
     map.put(MAX_QUEUE_SIZE, formatInt(snapshot.getMax()));
     snapshot = stats.getSnapshot(NODES);
-    map.put(NB_NODES, formatInt(snapshot.getLatest()));
+    double d = snapshot.getLatest();
+    map.put(NB_NODES, formatInt(d));
     map.put(MAX_NODES, formatInt(snapshot.getMax()));
-    map.put(NB_IDLE_NODES, formatInt(stats.getSnapshot(IDLE_NODES).getLatest()));
+    double idle = stats.getSnapshot(IDLE_NODES).getLatest();
+    map.put(NB_IDLE_NODES, formatInt(idle));
+    map.put(NB_BUSY_NODES, formatInt(d - idle));
     snapshot = stats.getSnapshot(CLIENTS);
     map.put(NB_CLIENTS, formatInt(snapshot.getLatest()));
     map.put(MAX_CLIENTS, formatInt(snapshot.getMax()));
@@ -163,8 +162,7 @@ public final class StatsFormatter implements StatsConstants
    * @param map the map to fill.
    * @param stats the data snapshot to map.
    */
-  private static void stringValues2(final Map<Fields, String> map, final JPPFStatistics stats)
-  {
+  private static void stringValues2(final Map<Fields, String> map, final JPPFStatistics stats) {
     double d;
     double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
     map.put(CLIENT_INBOUND_MB, formatMB(d));
@@ -188,12 +186,31 @@ public final class StatsFormatter implements StatsConstants
   }
 
   /**
+   * Fill the map of values represented as strings for a specified data snapshot.
+   * @param map the map to fill.
+   * @param snapshot the data snapshot to map.
+   */
+  public static void stringValues2(final Map<Fields, String> map, final HealthSnapshot snapshot) {
+    map.put(HEALTH_HEAP, formatInt(snapshot.getHeapUsed() / MB));
+    double d = snapshot.getHeapUsedRatio();
+    if (d < 0d) d = 0d;
+    map.put(HEALTH_HEAP_PCT, formatDouble(100d * d));
+    map.put(HEALTH_NON_HEAP, formatInt(snapshot.getNonheapUsed() / MB));
+    d = snapshot.getNonheapUsedRatio();
+    if (d < 0d) d = 0d;
+    map.put(HEALTH_NON_HEAP_PCT, formatDouble(100d * d));
+    map.put(HEALTH_THREADS, formatInt(snapshot.getLiveThreads()));
+    d = snapshot.getCpuLoad();
+    if (d < 0d) d = 0d;
+    map.put(HEALTH_CPU, formatDouble(100d * d));
+  }
+
+  /**
    * Get the map of values represented as double for a specified data snapshot.
    * @param stats the data snapshot to map.
    * @return a map of field names to their corresponding double values.
    */
-  public static Map<Fields, Double> getDoubleValuesMap(final JPPFStatistics stats)
-  {
+  public static Map<Fields, Double> getDoubleValuesMap(final JPPFStatistics stats) {
     Map<Fields, Double> map = new HashMap<>();
     map.put(TOTAL_TASKS_EXECUTED, stats.getSnapshot(TASK_DISPATCH).getTotal());
     JPPFSnapshot snapshot = stats.getSnapshot(EXECUTION);
@@ -225,9 +242,12 @@ public final class StatsFormatter implements StatsConstants
     map.put(QUEUE_SIZE, snapshot.getLatest());
     map.put(MAX_QUEUE_SIZE, snapshot.getMax());
     snapshot = stats.getSnapshot(NODES);
-    map.put(NB_NODES, snapshot.getLatest());
+    double d = snapshot.getLatest();
+    map.put(NB_NODES, d);
     map.put(MAX_NODES, snapshot.getMax());
-    map.put(NB_IDLE_NODES, stats.getSnapshot(IDLE_NODES).getLatest());
+    double idle = stats.getSnapshot(IDLE_NODES).getLatest();
+    map.put(NB_IDLE_NODES, idle);
+    map.put(NB_BUSY_NODES, d - idle);
     snapshot = stats.getSnapshot(CLIENTS);
     map.put(NB_CLIENTS, snapshot.getLatest());
     map.put(MAX_CLIENTS, snapshot.getMax());
@@ -265,8 +285,7 @@ public final class StatsFormatter implements StatsConstants
    * @param map the map to fill.
    * @param stats the data snapshot to map.
    */
-  private static void doubleValues2(final Map<Fields, Double> map, final JPPFStatistics stats)
-  {
+  private static void doubleValues2(final Map<Fields, Double> map, final JPPFStatistics stats) {
     double d = 0d;
     double sum = (d = stats.getSnapshot(CLIENT_IN_TRAFFIC).getTotal());
     map.put(CLIENT_INBOUND_MB, d);
@@ -289,12 +308,31 @@ public final class StatsFormatter implements StatsConstants
   }
 
   /**
+   * Fill the map of values represented as doubles for a specified data snapshot.
+   * @param map the map to fill.
+   * @param snapshot the data snapshot to map.
+   */
+  public static void doubleValues2(final Map<Fields, Double> map, final HealthSnapshot snapshot) {
+    map.put(HEALTH_HEAP, (double) snapshot.getHeapUsed() / MB);
+    double d = snapshot.getHeapUsedRatio();
+    if (d < 0d) d = 0d;
+    map.put(HEALTH_HEAP_PCT, 100d * d);
+    map.put(HEALTH_NON_HEAP, (double) snapshot.getNonheapUsed() / MB);
+    d = snapshot.getNonheapUsedRatio();
+    if (d < 0d) d = 0d;
+    map.put(HEALTH_NON_HEAP_PCT, 100d * d);
+    map.put(HEALTH_THREADS, (double) snapshot.getLiveThreads());
+    d = snapshot.getCpuLoad();
+    if (d < 0d) d = 0d;
+    map.put(HEALTH_CPU, 100d * d);
+  }
+
+  /**
    * Format an integer value.
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatInt(final long value)
-  {
+  private static String formatInt(final long value) {
     return (value == Long.MAX_VALUE) ? "" : integerFormatter.format(value);
   }
 
@@ -303,8 +341,7 @@ public final class StatsFormatter implements StatsConstants
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatInt(final double value)
-  {
+  private static String formatInt(final double value) {
     return (value == Long.MAX_VALUE) ? "" : integerFormatter.format(value);
   }
 
@@ -313,9 +350,7 @@ public final class StatsFormatter implements StatsConstants
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatMB(final double value)
-  {
-
+  private static String formatMB(final double value) {
     return doubleFormatter.format(value/MB);
   }
 
@@ -324,8 +359,7 @@ public final class StatsFormatter implements StatsConstants
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatDouble(final double value)
-  {
+  private static String formatDouble(final double value) {
     return doubleFormatter.format(value);
   }
 
@@ -334,8 +368,7 @@ public final class StatsFormatter implements StatsConstants
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatDouble(final long value)
-  {
+  private static String formatDouble(final long value) {
     return (value == Long.MAX_VALUE) ? "" : doubleFormatter.format(value);
   }
 
@@ -344,8 +377,7 @@ public final class StatsFormatter implements StatsConstants
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatTime(final long value)
-  {
+  private static String formatTime(final long value) {
     return StringUtils.toStringDuration(value);
   }
 
@@ -354,8 +386,7 @@ public final class StatsFormatter implements StatsConstants
    * @param value the value to format.
    * @return the formatted value as a string.
    */
-  private static String formatTime(final double value)
-  {
+  private static String formatTime(final double value) {
     return StringUtils.toStringDuration((long) value);
   }
 }

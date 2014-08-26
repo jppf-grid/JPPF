@@ -31,7 +31,7 @@ public interface StatsConstants
    * List of stats properties related to network connections.
    */
   Fields[] CONNECTION_PROPS = {
-      NB_NODES, MAX_NODES, NB_IDLE_NODES, NB_CLIENTS, MAX_CLIENTS
+      NB_NODES, MAX_NODES, NB_IDLE_NODES, NB_BUSY_NODES, NB_CLIENTS, MAX_CLIENTS
   };
   /**
    * List of stats properties related to queue operations.
@@ -94,9 +94,21 @@ public interface StatsConstants
       CLIENT_OUTBOUND_MB, NODE_OUTBOUND_MB, UNIDENTIFIED_OUTBOUND_MB, TOTAL_OUTBOUND_MB
   };
   /**
-   * List of all fields.
+   * List of properties for health snapshots.
+   */
+  Fields[] HEALTH_PROPS = {
+      HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_THREADS, HEALTH_CPU
+  };
+  /**
+   * List of all fields displayed in the server stats view.
    */
   Fields[] ALL_FIELDS =
     CollectionUtils.concatArrays(EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, JOB_PROPS, QUEUE_PROPS, CONNECTION_PROPS, NODE_CL_REQUEST_TIME_PROPS,
         INBOUND_NETWORK_TRAFFIC_PROPS, OUTBOUND_NETWORK_TRAFFIC_PROPS);
+  /**
+   * List of all fields available in the charts.
+   */
+  Fields[] ALL_CHART_FIELDS =
+    CollectionUtils.concatArrays(EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, JOB_PROPS, QUEUE_PROPS, CONNECTION_PROPS, NODE_CL_REQUEST_TIME_PROPS,
+        INBOUND_NETWORK_TRAFFIC_PROPS, OUTBOUND_NETWORK_TRAFFIC_PROPS, HEALTH_PROPS);
 }

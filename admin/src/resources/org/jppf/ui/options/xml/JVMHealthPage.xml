@@ -22,6 +22,7 @@
 	<!--<property name="label" value="Graph View"/>-->
   <property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
   <property name="icon" value="/org/jppf/ui/resources/utilities-system-monitor-3.png"/>
+  <property name="scrollable" value="true"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Toolbar                                        -->

@@ -1,9 +1,9 @@
 void refresh() {
-  StatsHandler.getInstance().refreshLoadBalancer();
+  StatsHandler.getInstance().getClientHandler().refreshLoadBalancer();
 }
 
 void apply() {
-  def connection = StatsHandler.getInstance().currentJmxConnection();
+  def connection = StatsHandler.getInstance().getClientHandler().currentJmxConnection();
   if (connection == null) {
     option.findFirstWithName("/LoadBalancingMessages").setValue("Not connected to a server");
     return;

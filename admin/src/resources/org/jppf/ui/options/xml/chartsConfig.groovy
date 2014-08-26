@@ -106,7 +106,7 @@ void changePreview(final config)
     def comp = option.findFirstWithName("/ChartPreview").getUIComponent();
     comp.removeAll();
     comp.add(cfg.chartPanel);
-    cfg.chart.setBackgroundPaint(comp.getBackground());
+    //cfg.chart.setBackgroundPaint(comp.getBackground());
     comp.updateUI();
   }
 }
@@ -159,7 +159,7 @@ void initMain()
   option.setEventsEnabled(false);
   def values = CollectionUtils.list(ChartType.values());
   option.findFirstWithName("ChartType").setItems(values);
-  values = CollectionUtils.list(StatsConstants.ALL_FIELDS);
+  values = CollectionUtils.list(StatsConstants.ALL_CHART_FIELDS);
   option.findFirstWithName("/FieldsList").setItems(values);
   populateTabsList(null);
   populateChartsList(null, null);

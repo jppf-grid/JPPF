@@ -19,6 +19,8 @@ package org.jppf.ui.monitoring.charts;
 
 import static org.jppf.utils.ReflectionHelper.*;
 
+import java.awt.Color;
+
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.StatsHandler;
 
@@ -51,6 +53,7 @@ public class RingChartHandler extends Pie3DChartHandler
     Class[] classes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE};
     Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createRingChart", classes,
         config.name, ds, false, true, false);
+    invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE );
     config.chart = chart;
     return config;
   }

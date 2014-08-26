@@ -21,6 +21,7 @@ package org.jppf.ui.monitoring.node.graph;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.ui.monitoring.node.*;
@@ -124,66 +125,65 @@ public class GraphTopologyHandler implements TopologyChangeListener {
 
   @Override
   public void driverAdded(final TopologyChangeEvent event) {
-    TopologyData driver = event.getDriverData();
-    synchronized(drivers) {
-      if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
-      java.util.List<TopologyData> list = driversAsNodes.get(driver.getUuid());
-      if (list != null) {
-        for (TopologyData tmpDriver: list) {
-          tmpDriver.setClientConnection(driver.getClientConnection());
-          tmpDriver.setJmxWrapper(driver.getJmxWrapper());
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        TopologyData driver = event.getDriverData();
+        synchronized(drivers) {
+          if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
+          java.util.List<TopologyData> list = driversAsNodes.get(driver.getUuid());
+          if (list != null) {
+            for (TopologyData tmpDriver: list) {
+              tmpDriver.setClientConnection(driver.getClientConnection());
+              tmpDriver.setJmxWrapper(driver.getJmxWrapper());
+            }
+            driversAsNodes.remove(driver.getUuid());
+          }
         }
-        driversAsNodes.remove(driver.getUuid());
+        insertDriverVertex(driver);
+        graphOption.repaintGraph(graphOption.isAutoLayout());
+        if (debugEnabled) log.debug("added driver " + driver + " to graph");
       }
-    }
-    insertDriverVertex(driver);
-    graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("added driver " + driver + " to graph");
+    };
+    SwingUtilities.invokeLater(r);
   }
 
   @Override
   public void driverRemoved(final TopologyChangeEvent event) {
-    TopologyData driver = event.getDriverData();
-    synchronized(drivers) {
-      drivers.remove(driver.getUuid());
-      driversAsNodes.remove(driver.getUuid());
-    }
-    removeVertex(driver);
-    graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("removed driver " + driver + " from graph");
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        TopologyData driver = event.getDriverData();
+        synchronized(drivers) {
+          drivers.remove(driver.getUuid());
+          driversAsNodes.remove(driver.getUuid());
+        }
+        removeVertex(driver);
+        graphOption.repaintGraph(graphOption.isAutoLayout());
+        if (debugEnabled) log.debug("removed driver " + driver + " from graph");
+      }
+    };
+    SwingUtilities.invokeLater(r);
   }
 
   @Override
   public void nodeAdded(final TopologyChangeEvent event) {
-    TopologyData driver = event.getDriverData();
-    TopologyData node = event.getNodeData();
-    TopologyData peerDriver = event.getPeerData();
-    synchronized(drivers) {
-      if (peerDriver != null) {
-        node.setClientConnection(peerDriver.getClientConnection());
-        node.setJmxWrapper(peerDriver.getJmxWrapper());
-        insertPeerVertex(driver, peerDriver);
-      } else {
-        java.util.List<TopologyData> list = driversAsNodes.get(node.getUuid());
-        if (list == null) {
-          list = new ArrayList<>();
-          driversAsNodes.put(node.getUuid(), list);
-        }
-        list.add(node);
-      }
-      insertNodeVertex(driver, node);
-    }
-    graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node + " to driver " + driver);
+    SwingUtilities.invokeLater(new NodeAdded(event));
   }
 
   @Override
   public void nodeRemoved(final TopologyChangeEvent event) {
-    TopologyData driver = event.getDriverData();
-    TopologyData node = event.getNodeData();
-    removeVertex(node);
-    graphOption.repaintGraph(graphOption.isAutoLayout());
-    if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        TopologyData driver = event.getDriverData();
+        TopologyData node = event.getNodeData();
+        removeVertex(node);
+        graphOption.repaintGraph(graphOption.isAutoLayout());
+        if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
+      }
+    };
+    SwingUtilities.invokeLater(r);
   }
 
   /**
@@ -192,10 +192,16 @@ public class GraphTopologyHandler implements TopologyChangeListener {
    */
   @Override
   public void dataUpdated(final TopologyChangeEvent event) {
-    TopologyData driver = event.getDriverData();
-    TopologyData node = event.getNodeData();
-    if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
-    graphOption.repaintGraph(false);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        TopologyData driver = event.getDriverData();
+        TopologyData node = event.getNodeData();
+        if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
+        graphOption.repaintGraph(false);
+      }
+    };
+    SwingUtilities.invokeLater(r);
   }
 
   /**
@@ -287,4 +293,46 @@ public class GraphTopologyHandler implements TopologyChangeListener {
       }
     }
   }
+
+  /**
+   * Action run when a new node is added. 
+   */
+  private class NodeAdded implements Runnable {
+    /**
+     * The event that encapsulates information about the added node.
+     */
+    private final TopologyChangeEvent event;
+
+    /**
+     * Initialize this action with the specified event.
+     * @param event the event that encapsulates information about the added node.
+     */
+    public NodeAdded(final TopologyChangeEvent event) {
+      this.event = event;
+    }
+
+    @Override
+    public void run() {
+      TopologyData driver = event.getDriverData();
+      TopologyData node = event.getNodeData();
+      TopologyData peerDriver = event.getPeerData();
+      synchronized(drivers) {
+        if (peerDriver != null) {
+          node.setClientConnection(peerDriver.getClientConnection());
+          node.setJmxWrapper(peerDriver.getJmxWrapper());
+          insertPeerVertex(driver, peerDriver);
+        } else {
+          java.util.List<TopologyData> list = driversAsNodes.get(node.getUuid());
+          if (list == null) {
+            list = new ArrayList<>();
+            driversAsNodes.put(node.getUuid(), list);
+          }
+          list.add(node);
+        }
+        insertNodeVertex(driver, node);
+      }
+      graphOption.repaintGraph(graphOption.isAutoLayout());
+      if (debugEnabled) log.debug("added " + (node.isNode() ? "node " : "peer driver ") + node + " to driver " + driver);
+    }
+  };
 }

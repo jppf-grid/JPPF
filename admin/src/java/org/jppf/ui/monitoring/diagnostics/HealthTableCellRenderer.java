@@ -145,7 +145,7 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
    */
   private void computeColor(final DefaultTableCellRenderer renderer, final JTable table, final double value, final boolean selected, final Name warning, final Name critical)
   {
-    Thresholds thr = healthPanel.thresholds;
+    Thresholds thr = healthPanel.getThresholds();
     if (value < thr.getValue(warning)) renderer.setBackground(selected ? table.getSelectionBackground() : ACTIVE_COLOR);
     else if (value < thr.getValue(critical)) renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
     else renderer.setBackground(selected ? INACTIVE_SELECTION_COLOR : INACTIVE_COLOR);

@@ -21,6 +21,7 @@ import static org.jppf.ui.monitoring.charts.ChartType.*;
 import static org.jppf.ui.monitoring.data.Fields.*;
 import static org.jppf.utils.ReflectionHelper.*;
 
+import java.awt.Color;
 import java.util.*;
 
 import javax.swing.*;
@@ -35,16 +36,11 @@ import org.jppf.ui.utils.GuiUtils;
  * to all defined charts.
  * @author Laurent Cohen
  */
-public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListener
-{
+public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListener {
   /**
    * Mapping of chart types to the chart handler used to create and update them.
    */
-  private Map<ChartType, ChartHandler> handlerMap = new HashMap<>();
-  /**
-   * The tabbed pane in which each pane contains user-defined charts.
-   */
-  //private JTabbedPane tabbedPane = new JTabbedPane();
+  private Map<ChartType, ChartHandler> handlerMap = new EnumMap<>(ChartType.class);
   /**
    * The list of tab names handled by this chart builder.
    */
@@ -61,46 +57,9 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * Initialize this charts builder.
    */
-  public JPPFChartBuilder()
-  {
+  public JPPFChartBuilder() {
     storage = new PreferencesStorage(this);
     initHandlerMap();
-    /*
-		String s = System.getProperty("swing.defaultlaf");
-		if ((s == null) || SubstanceLookAndFeel.class.getName().equals(s))
-		{
-			//SubstanceLookAndFeel.setCurrentTitlePainter(new RandomCubesTitlePainter());
-			TabPreviewPainter p = new DefaultTabPreviewPainter()
-			{
-				public int getUpdateCycle(JTabbedPane arg0)
-				{
-					return 3000;
-				}
-				public boolean toUpdatePeriodically(JTabbedPane arg0)
-				{
-					return true;
-				}
-			};
-			putClientProperty(LafWidget.TABBED_PANE_PREVIEW_PAINTER, p);
-			SubstanceLookAndFeel.registerThemeChangeListener(new ThemeChangeListener()
-			{
-				public void themeChanged()
-				{
-					SubstanceTheme th = SubstanceLookAndFeel.getTheme();
-					ColorScheme scheme = th.getColorScheme();
-					//Color c = scheme.getUltraDarkColor();
-					Color c = scheme.getUltraLightColor();
-					for (TabConfiguration tab: tabList)
-					{
-						for (ChartConfiguration config: tab.configs)
-						{
-							config.chart.setBackgroundPaint(c);
-						}
-					}
-				}
-			});
-		}
-     */
     createInitialCharts();
     StatsHandler.getInstance().addStatsHandlerListener(this);
   }
@@ -108,8 +67,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * Initialize the mapping of chart types to the chart handler used to create and update them.
    */
-  private void initHandlerMap()
-  {
+  private void initHandlerMap() {
     StatsHandler statsHandler = StatsHandler.getInstance();
     handlerMap.put(CHART_PLOTXY, new PlotXYChartHandler(statsHandler));
     handlerMap.put(CHART_3DBAR, new Bar3DChartHandler(statsHandler));
@@ -117,6 +75,10 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
     handlerMap.put(CHART_3DPIE, new Pie3DChartHandler(statsHandler));
     handlerMap.put(CHART_RING, new RingChartHandler(statsHandler));
     handlerMap.put(CHART_DIFFERENCE, new DifferenceChartHandler(statsHandler));
+    handlerMap.put(CHART_STACKED_AREA, new StackedAreaChartHandler(statsHandler));
+    handlerMap.put(CHART_3DBAR_SERIES, new BarSeries3DChartHandler(statsHandler));
+    handlerMap.put(CHART_STACKED_3DBAR_SERIES, new StackedBarSeries3DChartHandler(statsHandler));
+    handlerMap.put(CHART_METER, new MeterChartHandler(statsHandler));
   }
 
   /**
@@ -126,14 +88,28 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * A negative value means it's simply appended.
    * @return the configuration with its created chart set.
    */
-  public ChartConfiguration createChart(final ChartConfiguration config, final boolean preview)
-  {
+  public ChartConfiguration createChart(final ChartConfiguration config, final boolean preview) {
     ChartConfiguration cfg = preview ? new ChartConfiguration(config) : config;
     ChartHandler handler = handlerMap.get(cfg.type);
     if (handler == null) return null;
     handler.createChart(cfg);
-    //cfg.chartPanel = new ChartPanel(cfg.chart);
-    cfg.chartPanel = (JPanel) invokeConstructor(getClass0("org.jfree.chart.ChartPanel"), new Class[] {getClass0("org.jfree.chart.JFreeChart")}, cfg.chart);
+    Class<?> jfChartClass = getClass0("org.jfree.chart.JFreeChart");
+    Class<?> chartPanelClass = getClass0("org.jfree.chart.ChartPanel");
+    if (cfg.chart instanceof Object[]) {
+      JPanel panel = new JPanel();
+      panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+      Object[] charts = (Object[]) cfg.chart;
+      for (Object chart: charts) {
+        //chartPanel = new ChartPanel(chart);
+        JPanel chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass}, chart);
+        chartPanel.setBackground(Color.WHITE);
+        panel.add(chartPanel);
+      }
+      cfg.chartPanel = panel;
+    } else {
+      //cfg.chartPanel = new ChartPanel(cfg.chart);
+      cfg.chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass}, cfg.chart);
+    }
     return cfg;
   }
 
@@ -141,8 +117,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * Remove a tab from the list of tabs.
    * @param tab the configuration information for the tab to remove.
    */
-  public void removeTab(final TabConfiguration tab)
-  {
+  public void removeTab(final TabConfiguration tab) {
     remove(tab.panel);
     tabList.remove(tab);
     tabMap.remove(tab.name);
@@ -153,16 +128,12 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * Remove a tab from the list of tabs.
    * @param tab the configuration information for the tab to remove.
    */
-  public void addTab(final TabConfiguration tab)
-  {
+  public void addTab(final TabConfiguration tab) {
     tab.panel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
-    if (tab.position < 0)
-    {
+    if (tab.position < 0) {
       addTab(tab.name, tab.panel);
       tabList.add(tab);
-    }
-    else
-    {
+    } else {
       insertTab(tab.name, null, tab.panel, null, tab.position);
       tabList.add(tab.position, tab);
     }
@@ -176,8 +147,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * @param tab the configuration information for the tab containing the chart.
    * @param config the configuration to remove.
    */
-  public void removeChart(final TabConfiguration tab, final ChartConfiguration config)
-  {
+  public void removeChart(final TabConfiguration tab, final ChartConfiguration config) {
     tab.configs.remove(config);
     JPanel panel = tab.panel;
     panel.remove(config.chartPanel);
@@ -189,23 +159,15 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * @param event holds the new stats values.
    */
   @Override
-  public void dataUpdated(final StatsHandlerEvent event)
-  {
-    for (TabConfiguration tab: tabMap.values())
-    {
-      for (final ChartConfiguration config: tab.configs)
-      {
-        SwingUtilities.invokeLater(new Runnable()
-        {
+  public void dataUpdated(final StatsHandlerEvent event) {
+    for (TabConfiguration tab: tabMap.values()) {
+      for (final ChartConfiguration config: tab.configs) {
+        SwingUtilities.invokeLater(new Runnable() {
           @Override
-          public void run()
-          {
-            if (event.getType().equals(StatsHandlerEvent.Type.UPDATE))
-            {
+          public void run() {
+            if (event.getType().equals(StatsHandlerEvent.Type.UPDATE)) {
               handlerMap.get(config.type).updateDataset(config);
-            }
-            else
-            {
+            } else {
               handlerMap.get(config.type).populateDataset(config);
             }
           }
@@ -218,8 +180,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * Get the tabbed pane in which each pane contains user-defined charts.
    * @return a <code>JTabbedPane</code> instance.
    */
-  public JTabbedPane getTabbedPane()
-  {
+  public JTabbedPane getTabbedPane() {
     return this;
   }
 
@@ -227,8 +188,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * Get the list of active tabs in this chart builder.
    * @return a list of tabs names.
    */
-  public List<TabConfiguration> getTabList()
-  {
+  public List<TabConfiguration> getTabList() {
     return tabList;
   }
 
@@ -237,8 +197,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * @param tabName the name of the tab to lookup.
    * @return a <code>JPanel</code> instance.
    */
-  public JPanel getTabPanel(final String tabName)
-  {
+  public JPanel getTabPanel(final String tabName) {
     return tabMap.get(tabName).panel;
   }
 
@@ -254,8 +213,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   /**
    * Create a set of default charts if none is defined.
    */
-  public void createDefaultCharts()
-  {
+  public void createDefaultCharts() {
     TabConfiguration network = new TabConfiguration("Network", 0);
     addTab(network);
     TabConfiguration plot = new TabConfiguration("Plot Charts", 1);
@@ -281,17 +239,13 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * @param tab the tab to add a chart to.
    * @param config the chart to add.
    */
-  public void addChart(final TabConfiguration tab, final ChartConfiguration config)
-  {
+  public void addChart(final TabConfiguration tab, final ChartConfiguration config) {
     createChart(config, false);
-    if (config.position < 0)
-    {
+    if (config.position < 0) {
       config.position = tab.configs.size();
       tab.configs.add(config);
       tab.panel.add(config.chartPanel);
-    }
-    else
-    {
+    } else {
       tab.configs.add(config.position, config);
       tab.panel.add(config.chartPanel, config.position);
     }
@@ -301,8 +255,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    * Get the object used to store and retrieve the configuration, to and from the preferences tree.
    * @return a PreferencesStorage object.
    */
-  public PreferencesStorage getStorage()
-  {
+  public PreferencesStorage getStorage() {
     return storage;
   }
 }

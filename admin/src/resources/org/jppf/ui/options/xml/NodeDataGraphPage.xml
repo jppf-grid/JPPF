@@ -22,6 +22,7 @@
 	<!--<property name="label" value="Graph View"/>-->
 	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
   <property name="icon" value="/org/jppf/ui/resources/code-class.png"/>
+  <property name="scrollable" value="true"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->
@@ -59,7 +60,26 @@
     <child name="graph.toggle.layout" type="Button">
       <property name="toggle" value="true"/>
     </child>
-		
+
+    <!--
+    <child name="Layout" type="ComboBox">
+      <property name="label" value="Layout"/>
+      <property name="tooltip" value="choose a graph layout form the list"/>
+      <property name="value" value="Radial"/>
+      <property name="persistent" value="true"/>
+      <listener type="script">
+        <script language="groovy">option.findFirstWithName("/NodeGraph").setLayout(option.getValue())</script>
+      </listener>
+      <item name="Radial" selected="true"/>
+      <item name="Circle" selected="false"/>
+      <item name="Fruchterman-Reingold" selected="false"/>
+      <item name="Fruchterman-Reingold-2" selected="false"/>
+      <item name="Self Organizing Map" selected="false"/>
+      <item name="Kamada-Kawai" selected="false"/>
+      <item name="Spring-2" selected="false"/>
+    </child>
+    -->
+
 		<child name="sep3" type="ToolbarSeparator"/>
 		<child name="graph.button.expand" type="Button"/>
 		<child name="graph.button.collapse" type="Button"/>

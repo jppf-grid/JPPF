@@ -20,10 +20,10 @@ package org.jppf.ui.monitoring.charts;
 import static org.jppf.utils.ReflectionHelper.*;
 
 import java.awt.*;
-import java.lang.reflect.*;
-import java.text.NumberFormat;
+import java.lang.reflect.Proxy;
 import java.util.Map;
 
+import org.jppf.ui.monitoring.charts.StackedAreaChartHandler.CategoryItemLabelGeneratorInvocationHandler;
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
 
@@ -157,66 +157,5 @@ public class Bar3DChartHandler implements ChartHandler
       }
     }
     return config;
-  }
-
-  /**
-   * Invocation handler for a dynamic proxy to a <code>org.jppf.ui.monitoring.charts.PlotXYChartHandler.LegendLabelGenerator</code> implementation.
-   */
-  public static class CategoryItemLabelGeneratorInvocationHandler implements InvocationHandler
-  {
-    /**
-     * Number format that formats double values in <i>##...##0.00</i> format.
-     */
-    private NumberFormat nf = NumberFormat.getInstance();
-    /**
-     * Name of the unit to display in the labels.
-     */
-    private String unit = null;
-    /**
-     * The default label generator.
-     */
-    private Object stdGenerator = newInstance("org.jfree.chart.labels.StandardCategoryItemLabelGenerator");
-
-    /**
-     * Initialize this label generator by configuring the NumberFormat instance it uses.
-     * @param unit the unit to display for the values.
-     * @param precision the number of fraction digits to display for the values.
-     */
-    public CategoryItemLabelGeneratorInvocationHandler(final String unit, final int precision)
-    {
-      this.unit = unit;
-      nf.setGroupingUsed(true);
-      nf.setMinimumIntegerDigits(1);
-      nf.setMinimumFractionDigits(precision);
-      nf.setMaximumFractionDigits(precision);
-    }
-
-    /**
-     * Invoke a specified method on the specified proxy.
-     * @param proxy the dynamic proxy to invoke the method on.
-     * @param method the method to invoke.
-     * @param args the method parameters values.
-     * @return the result of the method invocation.
-     * @throws Throwable if any error occurs.
-     * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
-     */
-    @Override
-    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-    {
-      if ("".equals(method.getName()))
-      {
-        //double val = dataset.getValue(row, col).doubleValue();
-        double val = (Double) invokeMethod(args[0].getClass(), args[0], "getValue", args[1], args[2]);
-        //Object key = dataset.getColumnKey(col);
-        Object key = invokeMethod(args[0].getClass(), args[0], "getColumnKey", args[2]);
-        StringBuilder sb = new StringBuilder(String.valueOf(key)).append(" : ").append(nf.format(val));
-        if (unit != null) sb.append(' ').append(unit);
-        return sb.toString();
-      }
-      else
-      {
-        return invokeMethod(stdGenerator.getClass(), stdGenerator, method.getName(), args);
-      }
-    }
   }
 }

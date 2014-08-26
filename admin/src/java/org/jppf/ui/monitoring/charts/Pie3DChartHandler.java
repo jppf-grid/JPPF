@@ -19,6 +19,7 @@ package org.jppf.ui.monitoring.charts;
 
 import static org.jppf.utils.ReflectionHelper.*;
 
+import java.awt.Color;
 import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
@@ -57,6 +58,7 @@ public class Pie3DChartHandler implements ChartHandler
     Class[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
     Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D", paramTypes,
         config.name, ds, false, true, false);
+    invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE );
     config.chart = chart;
     return config;
   }

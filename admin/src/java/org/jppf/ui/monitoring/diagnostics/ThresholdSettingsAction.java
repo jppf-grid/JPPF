@@ -89,7 +89,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
     try
     {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JVMHealthThresholdsPanel.xml");
-      Map<Name, Double> values = healthPanel.thresholds.getValues();
+      Map<Name, Double> values = healthPanel.getThresholds().getValues();
       for (Map.Entry<Name, Double> entry: values.entrySet())
       {
         AbstractOption option = (AbstractOption) panel.findFirstWithName(entry.getKey().getName());
@@ -136,7 +136,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
    */
   private void setAllLabelsColors()
   {
-    Map<Name, Double> values = healthPanel.thresholds.getValues();
+    Map<Name, Double> values = healthPanel.getThresholds().getValues();
     for (Map.Entry<Name, Double> entry: values.entrySet()) setLabelColors(entry.getKey());
   }
 
@@ -173,7 +173,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
    */
   private void doOK()
   {
-    final Map<Thresholds.Name, Double> values = healthPanel.thresholds.getValues();
+    final Map<Thresholds.Name, Double> values = healthPanel.getThresholds().getValues();
     final List<Thresholds.Name> list = new ArrayList<>(values.keySet());
     Runnable r = new Runnable() {
       @Override

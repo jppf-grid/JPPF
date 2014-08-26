@@ -39,8 +39,7 @@ import org.slf4j.*;
  * and switching the color scheme (skin) fot the whole UI.
  * @author Laurent Cohen
  */
-public class MonitoringPanel extends JPanel implements StatsHandlerListener, StatsConstants
-{
+public class MonitoringPanel extends JPanel implements StatsHandlerListener, StatsConstants {
   /**
    * Logger for this class.
    */
@@ -61,8 +60,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   /**
    * Default constructor.
    */
-  public MonitoringPanel()
-  {
+  public MonitoringPanel() {
     this.statsHandler = StatsHandler.getInstance();
     WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
     wl.setAlignOnBaseline(true);
@@ -91,8 +89,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * @param fields the fields displayed in the table.
    * @param title the reference to the localized title of the table.
    */
-  private void addTablePanel(final Fields[] fields, final String title)
-  {
+  private void addTablePanel(final Fields[] fields, final String title) {
     JComponent comp = makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, title + ".label"));
     comp.setToolTipText(LocalizationUtils.getLocalized(BASE, title + ".tooltip"));
     add(comp);
@@ -103,10 +100,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * @param event holds the new stats values.
    */
   @Override
-  public void dataUpdated(final StatsHandlerEvent event)
-  {
-    for (final MonitorTableModel model: tableModels)
-    {
+  public void dataUpdated(final StatsHandlerEvent event) {
+    for (final MonitorTableModel model: tableModels) {
       SwingUtilities.invokeLater(new Runnable() {
         @Override
         public void run() {
@@ -122,8 +117,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * @param title the title of the chartPanel.
    * @return a <code>JComponent</code> instance.
    */
-  private JComponent makeTablePanel(final Fields[] props, final String title)
-  {
+  private JComponent makeTablePanel(final Fields[] props, final String title) {
     JPanel panel = new JPanel();
     panel.setAlignmentY(0f);
     panel.setLayout(new MigLayout("fill"));

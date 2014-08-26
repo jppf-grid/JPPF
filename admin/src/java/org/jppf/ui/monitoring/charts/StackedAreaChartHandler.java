@@ -20,18 +20,17 @@ package org.jppf.ui.monitoring.charts;
 import static org.jppf.utils.ReflectionHelper.*;
 
 import java.lang.reflect.*;
+import java.text.NumberFormat;
 import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
-import org.jppf.ui.utils.GuiUtils;
 
 /**
- * Instances of this class are used to create and update 3D bar charts with a horizontal orientation.
+ * Instances of this class are used to create and update line charts with an horizontal orientation.
  * @author Laurent Cohen
  */
-public class AreaChartHandler implements ChartHandler
-{
+public class StackedAreaChartHandler implements ChartHandler {
   /**
    * The stats formatter that provides the data.
    */
@@ -41,8 +40,7 @@ public class AreaChartHandler implements ChartHandler
    * Initialize this chart handler with a specified stats formatter.
    * @param statsHandler the stats formatter that provides the data.
    */
-  public AreaChartHandler(final StatsHandler statsHandler)
-  {
+  public StackedAreaChartHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
   }
 
@@ -50,30 +48,20 @@ public class AreaChartHandler implements ChartHandler
    * Create a plot XY chart based on a chart configuration.
    * @param config holds the configuration parameters for the chart created, modified by this method.
    * @return a <code>ChartConfiguration</code> instance.
-   * @see org.jppf.ui.monitoring.charts.ChartHandler#createChart(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration createChart(final ChartConfiguration config)
-  {
+  public ChartConfiguration createChart(final ChartConfiguration config) {
     Object ds = createDataset(config);
-    //JFreeChart chart = ChartFactory.createAreaChart(null, null, config.name, ds, PlotOrientation.VERTICAL, true, true, false);
-    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createAreaChart",
-        (String) null, null, config.name, ds, getField("org.jfree.chart.plot.PlotOrientation", "VERTICAL"), true, true, false);
-    //CategoryPlot plot = chart.getCategoryPlot();
+    String s = config.name;
+    if (config.unit != null) s += " (" + config.unit+ ')';
+    //JFreeChart chart = ChartFactory.createStackedAreaChart(s, null, null, ds, PlotOrientation.VERTICAL, true, true, false);
+    Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createStackedAreaChart",
+        s, null, null, ds, getField("org.jfree.chart.plot.PlotOrientation", "VERTICAL"), true, true, false);
     Object plot = invokeMethod(chart.getClass(), chart, "getCategoryPlot");
-    //plot.setForegroundAlpha(0.5f);
-    invokeMethod(plot.getClass(), plot, "setForegroundAlpha", 0.5f);
     //CategoryAxis axis = plot.getDomainAxis();
     Object axis = invokeMethod(plot.getClass(), plot, "getDomainAxis");
     //axis.setTickLabelsVisible(false);
     invokeMethod(axis.getClass(), axis, "setTickLabelsVisible", false);
-    //AreaRenderer rend = (AreaRenderer) plot.getRenderer();
-    Object rend = invokeMethod(plot.getClass(), plot, "getRenderer");
-    //rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
-    Object labelGenerator = Proxy.newProxyInstance(
-        getCurrentClassLoader(), getClasses("org.jfree.chart.labels.CategorySeriesLabelGenerator"), new CategorySeriesLabelGeneratorInvocationHandler());
-    invokeMethod(rend.getClass(), rend, "setLegendItemLabelGenerator", labelGenerator);
-
     config.chart = chart;
     return config;
   }
@@ -83,8 +71,7 @@ public class AreaChartHandler implements ChartHandler
    * @param config the names of the fields whose values populate the dataset.
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
-  private Object createDataset(final ChartConfiguration config)
-  {
+  private Object createDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
     Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
@@ -96,20 +83,16 @@ public class AreaChartHandler implements ChartHandler
    * Populate a dataset based on a chart configuration.
    * @param config the chart configuration containing the dataset to populate.
    * @return a <code>ChartConfiguration</code> instance.
-   * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration populateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration populateDataset(final ChartConfiguration config) {
     Object ds = config.dataset;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");
     int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
-    for (int j=0; j<statsHandler.getStatsCount(); j++)
-    {
+    for (int j=0; j<statsHandler.getStatsCount(); j++) {
       Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
-      for (Fields key: config.fields)
-      {
+      for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(j + start));
       }
@@ -121,24 +104,19 @@ public class AreaChartHandler implements ChartHandler
    * Update a dataset based on a chart configuration.
    * @param config the chart configuration containing the dataset to update.
    * @return a <code>ChartConfiguration</code> instance.
-   * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration updateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration updateDataset(final ChartConfiguration config) {
     Object ds = config.dataset;
     Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-    if (valueMap != null)
-    {
-      for (Fields key: config.fields)
-      {
+    if (valueMap != null) {
+      for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
       }
     }
     //if (ds.getRowCount() > statsHandler.getRolloverPosition())
-    if ((Integer) invokeMethod(ds.getClass(), ds, "getRowCount") > statsHandler.getRolloverPosition())
-    {
+    if ((Integer) invokeMethod(ds.getClass(), ds, "getRowCount") > statsHandler.getRolloverPosition()) {
       //ds.removeRow(0);
       invokeMethod(ds.getClass(), ds, "removeRow", 0);
     }
@@ -148,8 +126,33 @@ public class AreaChartHandler implements ChartHandler
   /**
    * Invocation handler for a dynamic proxy to a <code>org.jppf.ui.monitoring.charts.PlotXYChartHandler.LegendLabelGenerator</code> implementation.
    */
-  public static class CategorySeriesLabelGeneratorInvocationHandler implements InvocationHandler
-  {
+  public static class CategoryItemLabelGeneratorInvocationHandler implements InvocationHandler {
+    /**
+     * Number format that formats double values in <i>##...##0.00</i> format.
+     */
+    private NumberFormat nf = NumberFormat.getInstance();
+    /**
+     * Name of the unit to display in the labels.
+     */
+    private String unit = null;
+    /**
+     * The default label generator.
+     */
+    private Object stdGenerator = newInstance("org.jfree.chart.labels.StandardCategoryItemLabelGenerator");
+
+    /**
+     * Initialize this label generator by configuring the NumberFormat instance it uses.
+     * @param unit the unit to display for the values.
+     * @param precision the number of fraction digits to display for the values.
+     */
+    public CategoryItemLabelGeneratorInvocationHandler(final String unit, final int precision) {
+      this.unit = unit;
+      nf.setGroupingUsed(true);
+      nf.setMinimumIntegerDigits(1);
+      nf.setMinimumFractionDigits(precision);
+      nf.setMaximumFractionDigits(precision);
+    }
+
     /**
      * Invoke a specified method on the specified proxy.
      * @param proxy the dynamic proxy to invoke the method on.
@@ -160,10 +163,18 @@ public class AreaChartHandler implements ChartHandler
      * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
      */
     @Override
-    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable
-    {
-      Fields key = (Fields) invokeMethod(args[0].getClass(), args[0], "getRowKey", args[1]);
-      return GuiUtils.shortenLabel(key.toString());
+    public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+      if ("".equals(method.getName())) {
+        //double val = dataset.getValue(row, col).doubleValue();
+        double val = (Double) invokeMethod(args[0].getClass(), args[0], "getValue", args[1], args[2]);
+        //Object key = dataset.getColumnKey(col);
+        Object key = invokeMethod(args[0].getClass(), args[0], "getColumnKey", args[2]);
+        StringBuilder sb = new StringBuilder(String.valueOf(key)).append(" : ").append(nf.format(val));
+        if (unit != null) sb.append(' ').append(unit);
+        return sb.toString();
+      } else {
+        return invokeMethod(stdGenerator.getClass(), stdGenerator, method.getName(), args);
+      }
     }
   }
 }

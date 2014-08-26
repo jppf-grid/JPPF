@@ -62,14 +62,14 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   @SuppressWarnings("unchecked")
   public void run() {
     synchronized(statsHandler) {
-      if (statsHandler.dataHolderMap.get(statsHandler.connectionId(c)) != null) return;
-      statsHandler.dataHolderMap.put(statsHandler.connectionId(c), new ConnectionDataHolder());
+      if (statsHandler.dataHolderMap.get(statsHandler.getClientHandler().connectionId(c)) != null) return;
+      statsHandler.dataHolderMap.put(statsHandler.getClientHandler().connectionId(c), new ConnectionDataHolder());
       if (statsHandler.timer != null) {
         TimerTask task = new StatsRefreshTask(c);
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }
-    while (statsHandler.getServerListOption() == null) goToSleep(50L);
+    while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
     if (debugEnabled) log.debug("adding client connection " + c.getName());
     try {
       SwingUtilities.invokeAndWait(new ComboUpdate());
@@ -84,7 +84,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   private class ComboUpdate implements Runnable {
     @Override
     public void run() {
-      JComboBox box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
+      JComboBox box = ((ComboBoxOption) statsHandler.getClientHandler().getServerListOption()).getComboBox();
       int count = box.getItemCount();
       boolean found = false;
       for (int i=0; i<count; i++) {
@@ -108,8 +108,8 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
         }
         if (proto != null) box.setPrototypeDisplayValue(proto);
       }
-      if (statsHandler.currentConnection == null) {
-        statsHandler.setCurrentConnection(c);
+      if (statsHandler.getClientHandler().currentConnection == null) {
+        statsHandler.getClientHandler().setCurrentConnection(c);
         box.setSelectedItem(c);
       }
     }

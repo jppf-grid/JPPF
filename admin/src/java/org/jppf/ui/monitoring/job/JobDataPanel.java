@@ -76,7 +76,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     panelManager = new JobDataPanelManager(this);
     accumulatorHelper = new AccumulatorHelper(this);
     populateTreeTableModel();
-    StatsHandler.getInstance().getJppfClient(null).addClientListener(this);
+    StatsHandler.getInstance().getClientHandler().getJppfClient(this);
   }
 
   /**
@@ -102,7 +102,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     if (debugEnabled) log.debug("populating the tree table");
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
 
-    List<JPPFClientConnection> list = StatsHandler.getInstance().getJppfClient(null).getAllConnections();
+    List<JPPFClientConnection> list = StatsHandler.getInstance().getClientHandler().getJppfClient(null).getAllConnections();
     if (debugEnabled) log.debug("connections = " + list);
     for (JPPFClientConnection c : list) {
       panelManager.driverAdded(c);

@@ -92,40 +92,40 @@ public class NodeDataPanelManager {
    */
   void driverAdded(final JPPFClientConnection connection) {
     try {
-    if (!connection.getStatus().isWorkingStatus()) return;
-    if (findDriver(connection.getDriverUuid()) != null) return;
-    JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
-    String driverName = connection.getDriverUuid();
-    int index = driverInsertIndex(driverName);
-    if (index < 0) return;
-    TopologyData driverData = new TopologyData(connection);
-    driverMap.put(driverData.getUuid(), driverData);
-    DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
-    if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
-    panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
-    fireDriverAdded(driverData);
-    panel.updateStatusBar("/StatusNbServers", 1);
-    if (jmx != null) {
-      if ((jmx != null) && (panel.getListenerMap().get(jmx.getId()) == null)) {
-        ConnectionStatusListener listener = new ConnectionStatusListener(panel, driverData.getUuid());
-        connection.addClientConnectionStatusListener(listener);
-        panel.getListenerMap().put(jmx.getId(), listener);
+      if (!connection.getStatus().isWorkingStatus()) return;
+      if (findDriver(connection.getDriverUuid()) != null) return;
+      JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
+      String driverName = connection.getDriverUuid();
+      int index = driverInsertIndex(driverName);
+      if (index < 0) return;
+      TopologyData driverData = new TopologyData(connection);
+      driverMap.put(driverData.getUuid(), driverData);
+      DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driverData);
+      if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
+      panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
+      fireDriverAdded(driverData);
+      panel.updateStatusBar("/StatusNbServers", 1);
+      if (jmx != null) {
+        if ((jmx != null) && (panel.getListenerMap().get(jmx.getId()) == null)) {
+          ConnectionStatusListener listener = new ConnectionStatusListener(panel, driverData.getUuid());
+          connection.addClientConnectionStatusListener(listener);
+          panel.getListenerMap().put(jmx.getId(), listener);
+        }
+        Collection<JPPFManagementInfo> nodes = null;
+        try {
+          nodes = jmx.nodesInformation();
+        } catch(Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          return;
+        }
+        if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
       }
-      Collection<JPPFManagementInfo> nodes = null;
-      try {
-        nodes = jmx.nodesInformation();
-      } catch(Exception e) {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        return;
+      JPPFTreeTable treeTable = panel.getTreeTable();
+      if (treeTable != null) {
+        treeTable.expand(panel.getTreeTableRoot());
+        treeTable.expand(driverNode);
       }
-      if (nodes != null) for (JPPFManagementInfo nodeInfo: nodes) nodeAdded(driverNode, nodeInfo);
-    }
-    JPPFTreeTable treeTable = panel.getTreeTable();
-    if (treeTable != null) {
-      treeTable.expand(panel.getTreeTableRoot());
-      treeTable.expand(driverNode);
-    }
-    repaintTreeTable();
+      repaintTreeTable();
     } catch(RuntimeException | Error e) {
       log.debug(e.getMessage(), e);
     }

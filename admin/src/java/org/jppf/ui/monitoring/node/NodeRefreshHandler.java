@@ -76,7 +76,7 @@ public class NodeRefreshHandler
   public NodeRefreshHandler(final NodeDataPanel nodeDataPanel)
   {
     this.nodeDataPanel = nodeDataPanel;
-    this.jppfClient = StatsHandler.getInstance().getJppfClient(null);
+    this.jppfClient = StatsHandler.getInstance().getClientHandler().getJppfClient(null);
     initialize();
   }
 

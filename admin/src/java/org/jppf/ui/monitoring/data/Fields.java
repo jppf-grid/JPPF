@@ -23,8 +23,7 @@ import org.jppf.utils.LocalizationUtils;
  * 
  * @author Laurent Cohen
  */
-public enum Fields
-{
+public enum Fields {
   /**
    * Name for the total number of tasks executed.
    */
@@ -133,6 +132,10 @@ public enum Fields
    * Name for the current number of idle nodes connected to the server.
    */
   NB_IDLE_NODES,
+  /**
+   * Name for the current number of busy nodes connected to the server.
+   */
+  NB_BUSY_NODES,
   /**
    * Name for the current number of clients connected to the server.
    */
@@ -260,7 +263,31 @@ public enum Fields
   /**
    * Total outbound network traffic.
    */
-  TOTAL_OUTBOUND_MB;
+  TOTAL_OUTBOUND_MB,
+  /**
+   * Amount of heap used.
+   */
+  HEALTH_HEAP,
+  /**
+   * Percentage of heap used.
+   */
+  HEALTH_HEAP_PCT,
+  /**
+   * Amount of non-heap memory used.
+   */
+  HEALTH_NON_HEAP,
+  /**
+   * Percentage of non-heap meory used.
+   */
+  HEALTH_NON_HEAP_PCT,
+  /**
+   * Number of live threads.
+   */
+  HEALTH_THREADS,
+  /**
+   * CPU load.
+   */
+  HEALTH_CPU;
 
   /**
    * The localized name of this enum item.
@@ -274,8 +301,7 @@ public enum Fields
   /**
    * Initialize an enum item with a localized name.
    */
-  private Fields()
-  {
+  private Fields() {
     localName = LocalizationUtils.getLocalized(BASE, name());
   }
 
@@ -285,8 +311,7 @@ public enum Fields
    * @see java.lang.Enum#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return localName;
   }
 }

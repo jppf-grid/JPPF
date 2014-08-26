@@ -28,6 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.actions.*;
+import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.factory.OptionsHandler;
@@ -39,8 +40,7 @@ import org.slf4j.*;
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyChangeListener
-{
+public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyChangeListener {
   /**
    * Logger for this class.
    */
@@ -57,16 +57,11 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    * 
    */
   protected RefreshHandler refreshHandler = null;
-  /**
-   * The threshold values.
-   */
-  protected Thresholds thresholds = new Thresholds();
 
   /**
    * Initialize this panel with the specified information.
    */
-  public JVMHealthPanel()
-  {
+  public JVMHealthPanel() {
     BASE = "org.jppf.ui.i18n.JVMHealthPage";
     if (debugEnabled) log.debug("initializing JVMHealthPanel");
     createTreeTableModel();
@@ -75,8 +70,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   /**
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
-  private void createTreeTableModel()
-  {
+  private void createTreeTableModel() {
     treeTableRoot = new DefaultMutableTreeNode(localize("tree.root.name"));
     model = new JVMHealthTreeTableModel(treeTableRoot);
   }
@@ -84,17 +78,14 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   /**
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
-  public void populate()
-  {
+  public void populate() {
     DefaultMutableTreeNode mainRoot = nodePanel.getTreeTableRoot();
-    for (int i=0; i<mainRoot.getChildCount(); i++)
-    {
+    for (int i=0; i<mainRoot.getChildCount(); i++) {
       DefaultMutableTreeNode driver = (DefaultMutableTreeNode) mainRoot.getChildAt(i);
       TopologyData driverData = (TopologyData) driver.getUserObject();
       DefaultMutableTreeNode newDriver = new DefaultMutableTreeNode(driverData);
       treeTableRoot.add(newDriver);
-      for (int j=0; j<driver.getChildCount(); j++)
-      {
+      for (int j=0; j<driver.getChildCount(); j++) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
         TopologyData nodeData = (TopologyData) node.getUserObject();
         if (nodeData.isPeer()) continue;
@@ -107,8 +98,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   }
 
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     treeTable = new JPPFTreeTable(model);
     treeTable.getTree().setLargeModel(true);
     treeTable.getTree().setRootVisible(false);
@@ -128,8 +118,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   /**
    * Repaint the tree table area.
    */
-  void repaintTreeTable()
-  {
+  void repaintTreeTable() {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
@@ -188,9 +177,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
         if (entry.getValue() instanceof Exception) {
           data.setStatus(TopologyDataStatus.DOWN);
           log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
-        }
-        else if (entry.getValue() instanceof HealthSnapshot)
-        {
+        } else if (entry.getValue() instanceof HealthSnapshot) {
           data.refreshHealthSnapshot((HealthSnapshot) entry.getValue());
           if (log.isTraceEnabled()) log.trace("got node health snapshot: " + entry.getValue());
         }
@@ -202,8 +189,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   /**
    * Initialize all actions used in the panel.
    */
-  public void setupActions()
-  {
+  public void setupActions() {
     actionHandler = new JTreeTableActionHandler(treeTable);
     actionHandler.putAction("health.gc", new GCAction());
     actionHandler.putAction("health.heap.dump", new HeapDumpAction());
@@ -223,8 +209,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    * Get the main topology tree view.
    * @return a {@link NodeDataPanel} instance.
    */
-  public NodeDataPanel getNodePanel()
-  {
+  public NodeDataPanel getNodePanel() {
     return nodePanel;
   }
 
@@ -232,14 +217,12 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    * Set the main topology tree view.
    * @param nodePanel a {@link NodeDataPanel} instance.
    */
-  public void setNodePanel(final NodeDataPanel nodePanel)
-  {
+  public void setNodePanel(final NodeDataPanel nodePanel) {
     this.nodePanel = nodePanel;
   }
 
   @Override
-  public synchronized void driverAdded(final TopologyChangeEvent event)
-  {
+  public synchronized void driverAdded(final TopologyChangeEvent event) {
     if (debugEnabled) log.debug("adding driver " + event.getDriverData());
     TopologyData driverData = event.getDriverData();
     DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
@@ -248,19 +231,19 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
     int n = treeTableRoot.getChildCount();
     model.insertNodeInto(driver, treeTableRoot, n);
     if (n == 0) treeTable.expand(treeTableRoot);
+    ConnectionDataHolder cdh = StatsHandler.getInstance().getConnectionDataHolder(driverData.getClientConnection());
+    if (cdh != null) cdh.setDriverData(driverData);
   }
 
   @Override
-  public synchronized void driverRemoved(final TopologyChangeEvent event)
-  {
+  public synchronized void driverRemoved(final TopologyChangeEvent event) {
     if (debugEnabled) log.debug("removing driver " + event.getDriverData());
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
     if (driver != null) model.removeNodeFromParent(driver);
   }
 
   @Override
-  public synchronized void nodeAdded(final TopologyChangeEvent event)
-  {
+  public synchronized void nodeAdded(final TopologyChangeEvent event) {
     if (debugEnabled) log.debug("adding node " + event.getNodeData() + " to driver " + event.getDriverData());
     if ((event.getPeerData() != null) || event.getNodeData().isPeer()) return;
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
@@ -274,23 +257,20 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   }
 
   @Override
-  public synchronized void nodeRemoved(final TopologyChangeEvent event)
-  {
+  public synchronized void nodeRemoved(final TopologyChangeEvent event) {
     if (debugEnabled) log.debug("removing node " + event.getNodeData() + " from driver " + event.getDriverData());
     if (event.getNodeData().isPeer()) return;
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
     if (driver == null) return;
     DefaultMutableTreeNode node = findNode(driver, event.getNodeData().getUuid());
-    if (node != null)
-    {
+    if (node != null) {
       model.removeNodeFromParent(node);
       repaintTreeTable();
     }
   }
 
   @Override
-  public synchronized void dataUpdated(final TopologyChangeEvent event)
-  {
+  public synchronized void dataUpdated(final TopologyChangeEvent event) {
   }
 
   /**
@@ -325,33 +305,37 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   /**
    * 
    */
-  public void initRefreshHandler()
-  {
+  public void initRefreshHandler() {
     refreshHandler = new RefreshHandler(this);
   }
 
   /**
    * Save the threshold values to the preferences store.
    */
-  public void saveThresholds()
-  {
+  public void saveThresholds() {
     Preferences pref = OptionsHandler.getPreferences().node("thresholds");
-    for (Map.Entry<Thresholds.Name, Double> entry: thresholds.getValues().entrySet()) pref.putDouble(entry.getKey().toString().toLowerCase(), entry.getValue());
+    for (Map.Entry<Thresholds.Name, Double> entry: getThresholds().getValues().entrySet()) pref.putDouble(entry.getKey().toString().toLowerCase(), entry.getValue());
   }
 
   /**
    * Load the threshold values from the preferences store.
    */
-  public void loadThresholds()
-  {
+  public void loadThresholds() {
     Preferences pref = OptionsHandler.getPreferences().node("thresholds");
-    Map<Thresholds.Name, Double> values = thresholds.getValues();
+    Map<Thresholds.Name, Double> values = getThresholds().getValues();
     List<Thresholds.Name> list = new ArrayList<>(values.keySet());
-    for (Thresholds.Name name: list)
-    {
+    for (Thresholds.Name name: list) {
       Double value = pref.getDouble(name.toString().toLowerCase(), -1d);
       if (value <= 0d) continue;
       values.put(name, value);
     }
+  }
+
+  /**
+   * Get the threshold values.
+   * @return a {@link Thresholds} object.
+   */
+  public Thresholds getThresholds() {
+    return StatsHandler.getInstance().getClientHandler().getThresholds();
   }
 }

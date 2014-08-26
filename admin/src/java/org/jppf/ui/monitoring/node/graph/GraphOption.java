@@ -42,8 +42,7 @@ import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
  * Displays and updates the graph view of the grid topology.
  * @author Laurent Cohen
  */
-public class GraphOption extends AbstractOption implements ActionHolder
-{
+public class GraphOption extends AbstractOption implements ActionHolder {
   /**
    * Explicit serialVersionUID.
    */
@@ -96,16 +95,13 @@ public class GraphOption extends AbstractOption implements ActionHolder
   /**
    * Default constructor.
    */
-  public GraphOption()
-  {
+  public GraphOption() {
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public synchronized void createUI()
-  {
-    if (graphHandler == null)
-    {
+  public synchronized void createUI() {
+    if (graphHandler == null) {
       if (debugEnabled) log.debug("creating UI");
       graphHandler = new GraphTopologyHandler(this);
       SparseMultigraph<TopologyData, Number> graph = graphHandler.getDisplayGraph();
@@ -123,8 +119,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
       int height = 50;
       Dimension d = renderer.getPreferredSize();
       d.width = 100;
-      if (d.height < height)
-      {
+      if (d.height < height) {
         d.height = height;
         renderer.setPreferredSize(d);
       }
@@ -151,8 +146,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
   }
 
   @Override
-  public JComponent getUIComponent()
-  {
+  public JComponent getUIComponent() {
     return graphComponent;
   }
 
@@ -160,8 +154,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Set the corresponding tree view onto this graph.
    * @param treeTableOption a {@link AbstractTreeTableOption} instance.
    */
-  public void setTreeTableOption(final NodeDataPanel treeTableOption)
-  {
+  public void setTreeTableOption(final NodeDataPanel treeTableOption) {
     this.treeTableOption = treeTableOption;
   }
 
@@ -169,8 +162,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Get the current layout.
    * @return the layout.
    */
-  public String getLayout()
-  {
+  public String getLayout() {
     return layout;
   }
 
@@ -178,33 +170,31 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Set the current layout.
    * @param name the layout name.
    */
-  public void setLayout(final String name)
-  {
-    layout = name;
-    if (viewer != null) viewer.setGraphLayout(layoutFactory.createLayout(name));
+  public void setLayout(final String name) {
+    if (!name.equals(layout)) {
+      layout = name;
+      if (viewer != null) viewer.setGraphLayout(layoutFactory.createLayout(name));
+    }
   }
 
   /**
    * Set the current layout.
    */
-  public void setLayout()
-  {
-    setLayout("Radial");
+  void setLayout() {
+    //setLayout(layout == null ? "Radial" : layout);
+    if (viewer != null) viewer.setGraphLayout(layoutFactory.createLayout(layout == null ? "Radial" : layout));
   }
 
   @Override
-  public ActionHandler getActionHandler()
-  {
+  public ActionHandler getActionHandler() {
     return actionHandler;
   }
 
   /**
    * Initialize all actions used in the panel.
    */
-  public void setupActions()
-  {
-    synchronized(actionHandler)
-    {
+  public void setupActions() {
+    synchronized(actionHandler) {
       actionHandler.putAction("graph.shutdown.restart.driver", new ServerShutdownRestartAction());
       actionHandler.putAction("graph.driver.reset.statistics", new ServerStatisticsResetAction());
       actionHandler.putAction("graph.update.configuration", new NodeConfigurationAction());
@@ -231,8 +221,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Get the graph visualization component.
    * @return a <code>VisualizationViewer</code> instance.
    */
-  public VisualizationViewer<TopologyData, Number> getViewer()
-  {
+  public VisualizationViewer<TopologyData, Number> getViewer() {
     return viewer;
   }
 
@@ -240,19 +229,14 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Repaint the graph after changes have occurred.
    * @param updateLayout true if the layout should be updated, false otherwise.
    */
-  void repaintGraph(final boolean updateLayout)
-  {
+  void repaintGraph(final boolean updateLayout) {
     if (!repaintFlag.get()) return;
-    if (getUIComponent() != null)
-    {
-      SwingUtilities.invokeLater(new Runnable()
-      {
+    if (getUIComponent() != null) {
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           if (updateLayout) setLayout();
-          else
-          {
+          else {
             getUIComponent().invalidate();
             getUIComponent().repaint();
           }
@@ -266,8 +250,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * @param node contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
-  private String computeNodeTooltip(final TopologyData node)
-  {
+  private String computeNodeTooltip(final TopologyData node) {
     StringBuilder sb = new StringBuilder();
     sb.append("<html>uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
@@ -280,8 +263,7 @@ public class GraphOption extends AbstractOption implements ActionHolder
   /**
    * Redraw the graph.
    */
-  public void populate()
-  {
+  public void populate() {
     graphHandler.populate(treeTableOption.getTreeTableRoot());
   }
 
@@ -289,27 +271,23 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Get the object that handles operations modifying the graph.
    * @return a {@link GraphTopologyHandler} instance.
    */
-  public GraphTopologyHandler getGraphHandler()
-  {
+  public GraphTopologyHandler getGraphHandler() {
     return graphHandler;
   }
 
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
   }
 
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
   }
 
   /**
    * Determine whether to automatically layout the graph.
    * @return <code>true</code> if auto-layout is on, <code>false</code> otherwise.
    */
-  public boolean isAutoLayout()
-  {
+  public boolean isAutoLayout() {
     return autoLayout.get();
   }
 
@@ -317,35 +295,29 @@ public class GraphOption extends AbstractOption implements ActionHolder
    * Specify whether to automatically layout the graph.
    * @param autoLayout <code>true</code> to set auto-layout on, <code>false</code> otherwise.
    */
-  public void setAutoLayout(final boolean autoLayout)
-  {
+  public void setAutoLayout(final boolean autoLayout) {
     this.autoLayout.set(autoLayout);
   }
 
   /**
    * Listens to resize events to perform a graph layout.
    */
-  public class ViewerComponentListener implements ComponentListener
-  {
+  public class ViewerComponentListener implements ComponentListener {
     @Override
-    public void componentResized(final ComponentEvent e)
-    {
+    public void componentResized(final ComponentEvent e) {
       if (e.getComponent() != null) repaintGraph(isAutoLayout());
     }
 
     @Override
-    public void componentMoved(final ComponentEvent e)
-    {
+    public void componentMoved(final ComponentEvent e) {
     }
 
     @Override
-    public void componentShown(final ComponentEvent e)
-    {
+    public void componentShown(final ComponentEvent e) {
     }
 
     @Override
-    public void componentHidden(final ComponentEvent e)
-    {
+    public void componentHidden(final ComponentEvent e) {
     }
   }
 }

@@ -41,7 +41,7 @@ public class WindowClosingListener extends WindowAdapter
   @Override
   public void windowClosing(final WindowEvent event)
   {
-    StatsHandler.getInstance().close();
+    StatsHandler.getInstance().getClientHandler().close();
     Preferences pref = OptionsHandler.getPreferences();
     List<OptionElement> list = OptionsHandler.getPageList();
     if (!list.isEmpty())

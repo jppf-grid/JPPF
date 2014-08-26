@@ -20,34 +20,37 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.*;
 
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**
  * Instances of this class hold and manage statistics data snapshots for a single driver connection.
  * @author Laurent Cohen
  */
-public class ConnectionDataHolder
-{
+public class ConnectionDataHolder {
   /**
    * The list of all snapshots kept in memory. the size of this list is always equal to or less than
    * the rollover position.
    */
-  private List<JPPFStatistics> dataList = new Vector<>();
+  private final List<JPPFStatistics> dataList = new Vector<>();
   /**
    * Cache of the data snapshots fields maps to their corresponding string values.
    */
-  private List<Map<Fields, String>> stringValuesMaps = new Vector<>();
+  private final List<Map<Fields, String>> stringValuesMaps = new Vector<>();
   /**
    * Cache of the data snapshots fields maps to their corresponding double values.
    */
-  private List<Map<Fields, Double>> doubleValuesMaps = new Vector<>();
+  private final List<Map<Fields, Double>> doubleValuesMaps = new Vector<>();
+  /**
+   * The topology data associated with the driver connection.
+   */
+  private TopologyData driverData;
 
   /**
    * Get the list of statistic snapshots for this connection data holder.
    * @return a list of <code>JPPFStats</code> instances.
    */
-  public List<JPPFStatistics> getDataList()
-  {
+  public List<JPPFStatistics> getDataList() {
     return dataList;
   }
 
@@ -55,8 +58,7 @@ public class ConnectionDataHolder
    * Get a cache of the data snapshots fields maps to their corresponding double values.
    * @return a list of maps of field names to double values.
    */
-  public List<Map<Fields, Double>> getDoubleValuesMaps()
-  {
+  public List<Map<Fields, Double>> getDoubleValuesMaps() {
     return doubleValuesMaps;
   }
 
@@ -64,8 +66,43 @@ public class ConnectionDataHolder
    * Get a cache of the data snapshots fields maps to their corresponding string values.
    * @return a list of maps of field names to string values.
    */
-  public List<Map<Fields, String>> getStringValuesMaps()
-  {
+  public List<Map<Fields, String>> getStringValuesMaps() {
     return stringValuesMaps;
+  }
+
+  /**
+   * Get the latest data snapshot mapping fields to their corresponding double values.
+   * @return a map of field names to double values.
+   */
+  public Map<Fields, Double> getLatestDoubleValues() {
+    synchronized(doubleValuesMaps) {
+      return doubleValuesMaps.isEmpty() ? null : doubleValuesMaps.get(doubleValuesMaps.size() - 1);
+    }
+  }
+
+  /**
+   * Get the latest data snapshot mapping fields to their corresponding string values.
+   * @return a map of field names to string values.
+   */
+  public Map<Fields, String> getLatestStringValues() {
+    synchronized(stringValuesMaps) {
+      return stringValuesMaps.isEmpty() ? null : stringValuesMaps.get(stringValuesMaps.size() - 1);
+    }
+  }
+
+  /**
+   * Get the topology data associated with the driver connection.
+   * @return a {@link TopologyData} object.
+   */
+  public TopologyData getDriverData() {
+    return driverData;
+  }
+
+  /**
+   * Set the topology data associated with the driver connection.
+   * @param driverData a {@link TopologyData} object.
+   */
+  public void setDriverData(final TopologyData driverData) {
+    this.driverData = driverData;
   }
 }

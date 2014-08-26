@@ -32,8 +32,7 @@ import org.slf4j.*;
 /**
  * This action stops a server and optionally restarts it after a specified delay.
  */
-public class ServerShutdownRestartAction extends AbstractTopologyAction
-{
+public class ServerShutdownRestartAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -62,8 +61,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public ServerShutdownRestartAction()
-  {
+  public ServerShutdownRestartAction() {
     setupIcon("/org/jppf/ui/resources/server_restart.gif");
     setupNameAndTooltip("shutdown.restart.driver");
   }
@@ -75,15 +73,12 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
    * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
-    for (Object o: selectedElements)
-    {
+    for (Object o: selectedElements) {
       if (!(o instanceof TopologyData)) continue;
       TopologyData data = (TopologyData) o;
-      if (!data.isNode())
-      {
+      if (!data.isNode()) {
         setEnabled(true);
         return;
       }
@@ -97,11 +92,9 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     final List<JMXDriverConnectionWrapper> list = new ArrayList<>();
-    for (Object o: selectedElements)
-    {
+    for (Object o: selectedElements) {
       if (!(o instanceof TopologyData)) continue;
       TopologyData data = (TopologyData) o;
       if (data.isDriver()) list.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
@@ -110,8 +103,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
-    try
-    {
+    try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/DriverShutdownRestartPanel.xml");
       OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(panel);
       OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
@@ -142,9 +134,7 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
       frame.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
       frame.setVisible(true);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -153,31 +143,22 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction
    * Perform the action.
    * @param driverConnections - the list of driver jmx connections to send the shutdown or restart command to.
    */
-  private void doOK(final List<JMXDriverConnectionWrapper> driverConnections)
-  {
+  private void doOK(final List<JMXDriverConnectionWrapper> driverConnections) {
     AbstractOption option = (AbstractOption) panel.findFirstWithName("Shutdown_delay");
     shutdownDelay = ((Number) option.getValue()).longValue();
     option = (AbstractOption) panel.findFirstWithName("Restart");
     boolean restart = (Boolean) option.getValue();
-    if (restart)
-    {
+    if (restart) {
       option = (AbstractOption) panel.findFirstWithName("Restart_delay");
       restartDelay = ((Number) option.getValue()).longValue();
-    }
-    else restartDelay = -1L;
-    Runnable r = new Runnable()
-    {
+    } else restartDelay = -1L;
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        for (JMXDriverConnectionWrapper jmx: driverConnections)
-        {
-          try
-          {
+      public void run() {
+        for (JMXDriverConnectionWrapper jmx: driverConnections) {
+          try {
             jmx.restartShutdown(shutdownDelay, restartDelay);
-          }
-          catch(Exception e)
-          {
+          } catch(Exception e) {
             log.error(e.getMessage(), e);
           }
         }

@@ -21,8 +21,7 @@ package org.jppf.ui.monitoring.charts;
  * Type-safe enumeration of all available types of charts.
  * @author Laurent Cohen
  */
-public enum ChartType
-{
+public enum ChartType {
   /**
    * Chart type definition for a 3D bar chart.
    */
@@ -46,7 +45,23 @@ public enum ChartType
   /**
    * Chart type definition for a plot XY chart.
    */
-  CHART_DIFFERENCE("Difference chart");
+  CHART_DIFFERENCE("Difference chart"),
+  /**
+   * Chart type definition for a stacked area chart.
+   */
+  CHART_STACKED_AREA("Stacked area chart"),
+  /**
+   * Chart type definition for a 3D series bar chart.
+   */
+  CHART_3DBAR_SERIES("3D series bar chart"),
+  /**
+   * Chart type definition for a 3D series bar chart.
+   */
+  CHART_STACKED_3DBAR_SERIES("Stacked 3D series bar chart"),
+  /**
+   * Chart type definition for a 3D series bar chart.
+   */
+  CHART_METER("Meter (0-100%)");
 
   /**
    * An english-like name for this enum type.
@@ -57,8 +72,7 @@ public enum ChartType
    * Initialize this enum type with a nice display name.
    * @param name the name as a string.
    */
-  ChartType(final String name)
-  {
+  ChartType(final String name) {
     this.name = name;
   }
 
@@ -68,8 +82,7 @@ public enum ChartType
    * @see java.lang.Enum#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return name;
   }
 }

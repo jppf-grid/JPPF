@@ -18,16 +18,16 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
-  <property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="layoutConstraints" value="flowx, flowy, fill, gap rel, insets 0"/>
   <property name="icon" value="/org/jppf/ui/resources/view-list-tree-4.png"/>
-
+  <property name="scrollable" value="true"/>
 
 	<!-- ===================================================================== -->
 	<!--                        Buttons area                                   -->
 	<!-- ===================================================================== -->
 
 	<child name="topology.toolbar" type="page">
-		<property name="componentConstraints" value="gap rel"/>
+    <property name="componentConstraints" value="gap rel"/>
 		<property name="layoutConstraints" value="insets 4 2 0 2"/>
 
 		<child name="shutdown.restart.driver" type="Button"/>

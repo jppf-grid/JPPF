@@ -228,11 +228,20 @@
 
 	</child>
 
-	<child name="ChartPreview" type="page">
-		<property name="label" value="Preview"/>
-		<property name="componentConstraints" value="grow, push"/>
-		<property name="bordered" value="true"/>
-		<property name="tooltip" value="Display a preview of the chart with the current configuration parameters"/>
-	</child>
+  <child name="ChartPreviewContainer" type="page">
+    <property name="layoutConstraints" value="width 99%, flowy"/>
+
+    <child name="ChartPreview" type="page">
+      <property name="label" value="Preview"/>
+      <property name="componentConstraints" value="width 99%"/>
+      <property name="bordered" value="true"/>
+      <property name="tooltip" value="Display a preview of the chart with the current configuration parameters"/>
+    </child>
+
+  </child>
+
+  <child name="filler_1" type="page">
+    <property name="componentConstraints" value="flowy, grow 1000, pushy"/>
+  </child>
 
 </opt:main>

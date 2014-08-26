@@ -20,15 +20,12 @@ package org.jppf.ui.monitoring.data;
 import java.awt.Toolkit;
 import java.awt.datatransfer.*;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.options.*;
+import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -38,7 +35,7 @@ import org.slf4j.*;
  * This class provides a convenient access to the statistics obtained from the JPPF server.
  * @author Laurent Cohen
  */
-public final class StatsHandler implements StatsConstants, ClientListener {
+public final class StatsHandler implements StatsConstants {
   /**
    * Logger for this class.
    */
@@ -50,16 +47,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   /**
    * Singleton instance of this class.
    */
-  //private static StatsHandler instance = null;
   private static AtomicReference<StatsHandler> instance = new AtomicReference<>();
-  /**
-   * JPPF client used to submit execution requests.
-   */
-  private JPPFClient jppfClient = null;
-  /**
-   * The current client connection for which statistics and charts are displayed.
-   */
-  JPPFClientConnection currentConnection = null;
   /**
    * The object holding the current statistics values.
    */
@@ -89,13 +77,9 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    */
   private int tickCount = 0;
   /**
-   * Option containing the combobox with the list of driver connections.
+   * The client handler.
    */
-  private OptionElement serverListOption = null;
-  /**
-   * Thread pool used to process new connection events.
-   */
-  private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("StasHandler"));
+  private final ClientHandler clientHandler;
 
   /**
    * Get the singleton instance of this class.
@@ -113,7 +97,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
     if (debugEnabled) log.debug("initializing StatsHandler");
     refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.stats", 1000L);
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
-    getJppfClient(null);
+    clientHandler = new ClientHandler(this);
     update(null, stats);
   }
 
@@ -147,8 +131,8 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * Request an update from the current server connection.
    */
   public void requestUpdate() {
-    if (getCurrentConnection() == null) return;
-    requestUpdate(getCurrentConnection());
+    if (clientHandler.getCurrentConnection() == null) return;
+    requestUpdate(clientHandler.getCurrentConnection());
   }
 
   /**
@@ -168,67 +152,36 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   }
 
   /**
-   * Request the server settings.
-   * @param algorithm the name of the load-balancing algorithm to set on the server.
-   * @param params the algorithm's parameters.
-   * @return the response message from the server.
-   */
-  public String changeSettings(final String algorithm, final Map params) {
-    if (getCurrentConnection() == null) return "No active server connection";
-    String msg = null;
-    try {
-      if (debugEnabled) log.debug("command: CHANGE_SETTINGS, parameters: " + params);
-      msg = currentJmxConnection().changeLoadBalancerSettings(algorithm, params);
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-      msg = "An exception occurred:\n"+e.getMessage();
-    }
-    return msg;
-  }
-
-  /**
-   * Shutdown, and eventually restart, the server.
-   * @param shutdownDelay the delay before shutting down.
-   * @param restartDelay the delay, starting after shutdown, before restarting. If it is < 0, no restart occurs.
-   * @return the response message from the server.
-   */
-  public String requestShutdownRestart(final Number shutdownDelay, final Number restartDelay) {
-    if (getCurrentConnection() == null) return "No active server connection";
-    String msg = null;
-    try {
-      return currentJmxConnection().restartShutdown(shutdownDelay.longValue(), restartDelay.longValue());
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-      return "An exception occurred:\n"+e.getMessage();
-    }
-  }
-
-  /**
    * Update the current statistics with new values obtained from the server.
    * @param connection the client connection from which the data is obtained.
    * @param stats the object holding the new statistics values.
    */
   public synchronized void update(final JPPFClientConnection connection, final JPPFStatistics stats) {
-    JPPFClientConnection c = connection;
     if (stats == null) return;
+    JPPFClientConnection c = connection;
     if (c == null) {
-      List<JPPFClientConnection> list = getJppfClient(null).getAllConnections();
+      List<JPPFClientConnection> list = clientHandler.getJppfClient(null).getAllConnections();
       if ((list == null) || list.isEmpty()) return;
-      else c = getJppfClient(null).getAllConnections().get(0);
+      else c = clientHandler.getJppfClient(null).getAllConnections().get(0);
     }
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(c));
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(c));
     tickCount++;
     if (dataHolder == null) return;
     dataHolder.getDataList().add(stats);
     dataHolder.getStringValuesMaps().add(StatsFormatter.getStringValuesMap(stats));
     dataHolder.getDoubleValuesMaps().add(StatsFormatter.getDoubleValuesMap(stats));
+    TopologyData data = dataHolder.getDriverData();
+    if ((data != null) && (data.getHealthSnapshot() != null)) {
+      StatsFormatter.stringValues2(dataHolder.getLatestStringValues(), data.getHealthSnapshot());
+      StatsFormatter.doubleValues2(dataHolder.getLatestDoubleValues(), data.getHealthSnapshot());
+    }
     int diff = dataHolder.getDataList().size() - rolloverPosition;
     for (int i=0; i<diff; i++) {
       dataHolder.getDataList().remove(0);
       dataHolder.getStringValuesMaps().remove(0);
       dataHolder.getDoubleValuesMaps().remove(0);
     }
-    if ((getCurrentConnection() != null) && connectionId(c).equals(connectionId(getCurrentConnection()))) fireStatsHandlerEvent(StatsHandlerEvent.Type.UPDATE);
+    if ((clientHandler.getCurrentConnection() != null) && clientHandler.connectionId(c).equals(clientHandler.connectionId(clientHandler.getCurrentConnection()))) fireStatsHandlerEvent(StatsHandlerEvent.Type.UPDATE);
   }
 
   /**
@@ -271,7 +224,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    */
   public synchronized void setRolloverPosition(final int rolloverPosition) {
     if (rolloverPosition <= 0) throw new IllegalArgumentException("zero or less not accepted: "+rolloverPosition);
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     int diff = dataHolder.getDataList().size() - rolloverPosition;
     for (int i=0; i<diff; i++) {
       dataHolder.getDataList().remove(0);
@@ -286,8 +239,8 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return the number of snapshots as an int.
    */
   public int getStatsCount() {
-    if (getCurrentConnection() == null) return 0;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    if (clientHandler.getCurrentConnection() == null) return 0;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     return (dataHolder == null) ? -1 : dataHolder.getDataList().size();
   }
 
@@ -297,8 +250,8 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return a <code>JPPFStats</code> instance.
    */
   public synchronized JPPFStatistics getStats(final int position) {
-    if (getCurrentConnection() == null) return stats;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    if (clientHandler.getCurrentConnection() == null) return stats;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     return dataHolder.getDataList().get(position);
   }
 
@@ -316,8 +269,8 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return a map of field names to their values represented as strings.
    */
   public synchronized Map<Fields, String> getStringValues(final int position) {
-    if (getCurrentConnection() == null) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    if (clientHandler.getCurrentConnection() == null) return null;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     return dataHolder.getStringValuesMaps().get(position);
   }
 
@@ -326,10 +279,10 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return a map of field names to their values represented as strings.
    */
   public Map<Fields, String> getLatestStringValues() {
-    if (getCurrentConnection() == null) return new HashMap<>();
+    if (clientHandler.getCurrentConnection() == null) return new HashMap<>();
     int n = getStatsCount() - 1;
     if (n < 0) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     List<Map<Fields, String>> list = dataHolder.getStringValuesMaps();
     if (n < list.size()) return list.get(n);
     return list.get(list.size()-1);
@@ -341,8 +294,8 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return a map of field names to their values represented as double values.
    */
   public synchronized Map<Fields, Double> getDoubleValues(final int position) {
-    if (getCurrentConnection() == null) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    if (clientHandler.getCurrentConnection() == null) return null;
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     return dataHolder.getDoubleValuesMaps().get(position);
   }
 
@@ -351,10 +304,10 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @return a map of field names to their values represented as double values.
    */
   public Map<Fields, Double> getLatestDoubleValues() {
-    if (getCurrentConnection() == null) return null;
+    if (clientHandler.getCurrentConnection() == null) return null;
     int n = getStatsCount() - 1;
     if (n < 0) return null;
-    ConnectionDataHolder dataHolder = dataHolderMap.get(connectionId(getCurrentConnection()));
+    ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
     List<Map<Fields, Double>> list = dataHolder.getDoubleValuesMaps();
     if (n < list.size()) return list.get(n);
     return list.get(list.size()-1);
@@ -366,140 +319,6 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    */
   public int getTickCount() {
     return tickCount;
-  }
-
-  /**
-   * Get the current client connection for which statistics and charts are displayed.
-   * @return a <code>JPPFClientConnection</code> instance.
-   */
-  public synchronized JPPFClientConnection getCurrentConnection() {
-    return currentConnection;
-  }
-
-  /**
-   * Set the current client connection for which statistics and charts are displayed.
-   * @param connection a <code>JPPFClientConnection</code> instance.
-   */
-  public synchronized void setCurrentConnection(final JPPFClientConnection connection) {
-    if ((currentConnection == null) || ((connection != null) && !connectionId(connection).equals(connectionId(currentConnection)))) {
-      executor.submit(new Runnable() {
-        @Override public void run() {
-          final boolean currentConnectionNull = (currentConnection == null);
-          if (connection != null) {
-            synchronized(StatsHandler.this) {
-              currentConnection = connection;
-              JPPFClientConnectionStatus status = currentConnection.getStatus();
-              if ((status != null) && status.isWorkingStatus()) {
-                fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
-                if (currentConnectionNull) executor.submit(new Runnable() {
-                  @Override public void run() {
-                    log.info("first refreshLoadBalancer()");
-                    refreshLoadBalancer();
-                  }
-                });
-              }
-            }
-          }
-        }
-      });
-    }
-  }
-
-  /**
-   * Refresh the load balancer settings view for the currently slected driver.
-   */
-  @SuppressWarnings("unchecked")
-  public void refreshLoadBalancer() {
-    OptionElement option = getServerListOption();
-    if (option == null) {
-      log.info("server chooser is null");
-      return;
-    }
-    JMXDriverConnectionWrapper connection = StatsHandler.getInstance().currentJmxConnection();
-    AbstractOption messageArea = (AbstractOption) option.findFirstWithName("/LoadBalancingMessages");
-    if ((connection == null) || !connection.isConnected()) {
-      messageArea.setValue("Not connected to a server, please click on 'Refresh' to try again");
-      return;
-    }
-    messageArea.setValue("");
-    try {
-      LoadBalancingInformation info = connection.loadBalancerInformation();
-      log.info("info = {}", info);
-      if (info != null) {
-        ComboBoxOption combo = (ComboBoxOption) option.findFirstWithName("/Algorithm");
-        List items = combo.getItems();
-        if ((items == null) || items.isEmpty()) combo.setItems(info.getAlgorithmNames());
-        combo.setValue(info.getAlgorithm());
-        AbstractOption params = (AbstractOption) option.findFirstWithName("/LoadBalancingParameters");
-        params.setValue(info.getParameters().asString());
-      }
-    }
-    catch(Exception ignore) {
-    }
-  }
-
-  /**
-   * JPPF client used to submit data update and administration requests.
-   * @param clientListener a listener to register with the JPPF client.
-   * @return a <code>JPPFClient</code> instance.
-   */
-  public synchronized JPPFClient getJppfClient(final ClientListener clientListener) {
-    if (jppfClient == null) {
-      jppfClient = (clientListener == null) ? new JPPFClient(this) : new JPPFClient(this, clientListener);
-    }
-    return jppfClient;
-  }
-
-  /**
-   * Notify this listener that a new driver connection was created.
-   * @param event the event to notify this listener of.
-   */
-  @Override
-  public synchronized void newConnection(final ClientEvent event) {
-    final JPPFClientConnection c = event.getConnection();
-    JPPFClientConnectionStatus status = c.getStatus();
-    if ((status != null) && status.isWorkingStatus()) executor.submit(new NewConnectionTask(this, c));
-    else c.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
-      @Override
-      public void statusChanged(final ClientConnectionStatusEvent event) {
-        if (c.getStatus().isWorkingStatus()) executor.submit(new NewConnectionTask(StatsHandler.this, c));
-      }
-    });
-  }
-
-  @Override
-  public synchronized void connectionFailed(final ClientEvent event) {
-    executor.submit(new ConnectionFailedTask(this, event.getConnection()));
-  }
-
-  /**
-   * Get the option containing the combobox with the list of driver connections.
-   * @return an <code>OptionElement</code> instance.
-   */
-  public synchronized OptionElement getServerListOption() {
-    return serverListOption;
-  }
-
-  /**
-   * Set the option containing the combobox with the list of driver connections.
-   * @param serverListOption an <code>OptionElement</code> instance.
-   */
-  public synchronized void setServerListOption(final OptionElement serverListOption) {
-    this.serverListOption = serverListOption;
-    List<JPPFClientConnection> list = getJppfClient(null).getAllConnections();
-    if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
-    for (JPPFClientConnection c: list) executor.submit(new NewConnectionTask(this, c));
-    notifyAll();
-  }
-
-  /**
-   * Get the JMX connection for the current driver connection.
-   * @return a <code>JMXDriverConnectionWrapper</code> instance.
-   */
-  public JMXDriverConnectionWrapper currentJmxConnection() {
-    JPPFClientConnection c = getCurrentConnection();
-    if (c == null) return null;
-    return c.getConnectionPool().getJmxConnection();
   }
 
   /**
@@ -519,20 +338,13 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   }
 
   /**
-   * Close all connections to the driver(s).
-   */
-  public void close() {
-    if (jppfClient != null) jppfClient.close();
-  }
-
-  /**
    * Reset the statistics of the currently selected driver, if any.
    */
   public void resetCurrentStats() {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        JPPFClientConnection c = getCurrentConnection();
+        JPPFClientConnection c = clientHandler.getCurrentConnection();
         if (c == null) return;
         JMXDriverConnectionWrapper jmx = c.getConnectionPool().getJmxConnection();
         if ((jmx != null) && jmx.isConnected()) {
@@ -549,11 +361,19 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   }
 
   /**
-   * Get the identifier for the specified connection.
-   * @param c the connection for which to get the identifier.
-   * @return the identifier as a string, or {@code null} if the ocnnection is {@code null}.
+   * Get the object that holds the statistics for the specified driver connection.
+   * @param connection the connection to get the stats for.
+   * @return a {@link ConnectionDataHolder} object.
    */
-  public String connectionId(final JPPFClientConnection c) {
-    return (c == null) ? null : c.getDriverUuid();
+  public ConnectionDataHolder getConnectionDataHolder(final JPPFClientConnection connection) {
+    return connection == null ? null : dataHolderMap.get(clientHandler.connectionId(clientHandler.getCurrentConnection()));
+  }
+
+  /**
+   * Get the client handler.
+   * @return a {@code ClientHandler} object.
+   */
+  public ClientHandler getClientHandler() {
+    return clientHandler;
   }
 }

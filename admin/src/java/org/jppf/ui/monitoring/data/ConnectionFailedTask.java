@@ -72,11 +72,11 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
       }
     }
     JComboBox box = null;
-    while (statsHandler.getServerListOption() == null) goToSleep(50L);
+    while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
     synchronized(statsHandler)
     {
       if (debugEnabled) log.debug("removing client connection " + c.getName() + " from driver combo box");
-      box = ((ComboBoxOption) statsHandler.getServerListOption()).getComboBox();
+      box = ((ComboBoxOption) statsHandler.getClientHandler().getServerListOption()).getComboBox();
       int count = box.getItemCount();
       int idx = -1;
       for (int i=0; i<count; i++)
@@ -91,11 +91,11 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
       }
       if ((idx >= 0) && (box.getItemCount() > 0))
       {
-        if ((statsHandler.currentConnection == null) || c.equals(statsHandler.currentConnection))
+        if ((statsHandler.getClientHandler().currentConnection == null) || c.equals(statsHandler.getClientHandler().currentConnection))
         {
           int n = Math.min(idx, box.getItemCount()-1);
           JPPFClientConnection conn = (JPPFClientConnection) box.getItemAt(n);
-          statsHandler.currentConnection = conn;
+          statsHandler.getClientHandler().currentConnection = conn;
           box.setSelectedItem(conn);
         }
       }

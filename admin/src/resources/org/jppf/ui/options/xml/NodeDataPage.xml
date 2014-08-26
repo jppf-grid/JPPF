@@ -97,10 +97,10 @@
 
 	<child name="treeTableContainer" type="page">
 		<property name="layoutConstraints" value="fill, nogrid"/>
-		<property name="componentConstraints" value="grow, span, push, width 0"/>
+		<property name="componentConstraints" value="growy, span, pushy, width 100%"/>
 	
 		<child name="NodeTreeTable" type="NodeDataPanel">
-			<property name="componentConstraints" value="grow, width 0"/>
+			<property name="componentConstraints" value="growy, width 100%"/>
 			<property name="value" value=""/>
 			<initializer type="script">
 				<script language="groovy">

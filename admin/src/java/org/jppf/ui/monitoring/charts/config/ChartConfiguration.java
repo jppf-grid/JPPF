@@ -17,6 +17,8 @@
  */
 package org.jppf.ui.monitoring.charts.config;
 
+import java.util.*;
+
 import javax.swing.JPanel;
 
 import org.jppf.ui.monitoring.charts.ChartType;
@@ -67,6 +69,10 @@ public class ChartConfiguration
    * Position of the chart in its containing panel.
    */
   public int position = -1;
+  /**
+   * Holds non persited parmaters for quick access.
+   */
+  public final Map<String, Object> params = new HashMap<>();
 
   /**
    * Default constructor.

@@ -35,26 +35,29 @@
 	<child name="Tabs" type="page">
 		<property name="tooltip" value="The list of drivers to connect to"/>
 		<property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
-		<property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
+    <property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
+    <!--
+    <property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
+    -->
 
 		<child name="ServerChooser" type="ComboBox">
 			<property name="label" value="Server connection"/>
 			<property name="tooltip" value="The list of drivers to connect to"/>
 			<property name="value" value=""/>
 			<initializer type="script">
-				<script language="groovy">StatsHandler.getInstance().setServerListOption(option)</script>
+				<script language="groovy">StatsHandler.getInstance().getClientHandler().setServerListOption(option)</script>
 			</initializer>
 			<listener type="script">
-				<script language="groovy">StatsHandler.getInstance().setCurrentConnection(option.getValue())</script>
+				<script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentConnection(option.getValue())</script>
 			</listener>
 		</child>
 
 	</child>
 
 	<child name="AdminPanels" type="TabbedPane">
-		<property name="componentConstraints" value="push, grow"/>
+		<property name="componentConstraints" value="push, grow, width 99%"/>
 		<property name="layoutConstraints" value="fill"/>
-		<property name="bordered" value="false"/>
+    <property name="bordered" value="false"/>
 		<property name="tooltip" value="Perform the remote administration of the server"/>
 		<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>
 	</child>

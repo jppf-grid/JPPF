@@ -25,13 +25,11 @@ import org.jppf.ui.monitoring.data.StatsHandler;
  * Event sent when the stats data has changed.
  * @author Laurent Cohen
  */
-public class StatsHandlerEvent extends EventObject
-{
+public class StatsHandlerEvent extends EventObject {
   /**
    * Enumeration of the types of events.
    */
-  public enum Type
-  {
+  public enum Type {
     /**
      * Update with a new data snapshot.
      */
@@ -41,6 +39,7 @@ public class StatsHandlerEvent extends EventObject
      */
     RESET
   }
+
   /**
    * The type of this event.
    */
@@ -51,27 +50,16 @@ public class StatsHandlerEvent extends EventObject
    * @param source the stats formatter whose data has changed.
    * @param type the type of this event.
    */
-  public StatsHandlerEvent(final StatsHandler source, final Type type)
-  {
+  public StatsHandlerEvent(final StatsHandler source, final Type type) {
     super(source);
     this.type = type;
-  }
-
-  /**
-   * Get the <code>StatsHandler</code> source of this event.
-   * @return a <code>StatsHandler</code> instance.
-   */
-  public StatsHandler getStatsFormatter()
-  {
-    return (StatsHandler) getSource();
   }
 
   /**
    * Get the type of this event.
    * @return the type as a typesafe <code>Type</code> enumerated value.
    */
-  public Type getType()
-  {
+  public Type getType() {
     return type;
   }
 }

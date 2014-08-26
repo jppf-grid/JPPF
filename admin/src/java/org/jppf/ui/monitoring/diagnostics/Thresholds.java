@@ -24,51 +24,61 @@ import java.util.*;
  * 
  * @author Laurent Cohen
  */
-public class Thresholds
-{
+public class Thresholds {
   /**
    * An enumeration of names for all types of thresholds.
    */
-  public enum Name
-  {
+  public enum Name {
     /**
      * Memory warning.
      */
-    MEMORY_WARNING("health.thresholds.memory.warning"),
+    MEMORY_WARNING("health.thresholds.memory.warning", "Warning"),
     /**
      * Critical memory.
      */
-    MEMORY_CRITICAL("health.thresholds.memory.critical"),
+    MEMORY_CRITICAL("health.thresholds.memory.critical", "Critical"),
     /**
      * CPU warning.
      */
-    CPU_WARNING("health.thresholds.cpu.warning"),
+    CPU_WARNING("health.thresholds.cpu.warning", "Warning"),
     /**
      * Critical CPU.
      */
-    CPU_CRITICAL("health.thresholds.cpu.critical");
+    CPU_CRITICAL("health.thresholds.cpu.critical", "Critical");
 
     /**
      * The associated name.
      */
     private final String name;
+    /**
+     * The display name.
+     */
+    private final String displayName;
 
     /**
      * Initialize with t he specified name.
      * @param name the name to use.
+     * @param displayName the display name to use.
      */
-    private Name(final String name)
-    {
+    private Name(final String name, final String displayName) {
       this.name = name;
+      this.displayName = displayName;
     }
 
     /**
      * Get the associated name.
      * @return the name as a string.
      */
-    public String getName()
-    {
+    public String getName() {
       return name;
+    }
+
+    /**
+     * Get the display name.
+     * @return the name as a string.
+     */
+    public String getDisplayName() {
+      return displayName;
     }
   }
 
@@ -80,8 +90,7 @@ public class Thresholds
   /**
    * Default contructor.
    */
-  public Thresholds()
-  {
+  public Thresholds() {
     values.put(Name.MEMORY_WARNING, 0.6d);
     values.put(Name.MEMORY_CRITICAL, 0.8d);
     values.put(Name.CPU_WARNING, 0.6d);
@@ -92,8 +101,7 @@ public class Thresholds
    * Get the map of values.
    * @return a map of <code>Name</code> enum values to their threshold value.
    */
-  public Map<Name, Double> getValues()
-  {
+  public Map<Name, Double> getValues() {
     return values;
   }
 
@@ -102,8 +110,7 @@ public class Thresholds
    * @param name the name of the threshold.
    * @return the threshold value as a <code>Double</code>.
    */
-  public Double getValue(final Name name)
-  {
+  public Double getValue(final Name name) {
     return values.get(name);
   }
 }

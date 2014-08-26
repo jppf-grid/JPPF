@@ -37,10 +37,10 @@
 			<property name="tooltip" value="The list of drivers to connect to"/>
 			<property name="value" value=""/>
 			<initializer type="script">
-				<script language="groovy">StatsHandler.getInstance().setServerListOption(option)</script>
+				<script language="groovy">StatsHandler.getInstance().getClientHandler().setServerListOption(option)</script>
 			</initializer>
 			<listener type="script">
-				<script language="groovy">StatsHandler.getInstance().setCurrentConnection(option.getValue())</script>
+				<script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentConnection(option.getValue())</script>
 			</listener>
 		</child>
 	
