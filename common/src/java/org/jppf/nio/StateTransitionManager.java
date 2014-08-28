@@ -63,6 +63,16 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * Determines whether the channels handled by the server are node job channels.
    */
   private final boolean isNodeServer;
+  /**
+   * Global thread pool used by all NIO servers.
+   * @since 5.0
+   */
+  private static ExecutorService globalExecutor;
+  /**
+   * The server lock.
+   * @since 5.0
+   */
+  private final Lock lock;
 
   /**
    * Initialize this transition manager with the specified server and sequential flag.
@@ -72,7 +82,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   public StateTransitionManager(final NioServer<S, T> server) {
     this.server = server;
     this.factory = server.getFactory();
-    executor = Executors.newFixedThreadPool(NioConstants.THREAD_POOL_SIZE, new JPPFThreadFactory(server.getName()));
+    this.lock = server.getLock();
+    //executor = Executors.newFixedThreadPool(NioConstants.THREAD_POOL_SIZE, new JPPFThreadFactory(server.getName()));
+    executor = initExecutor();
     isNodeServer = server.getIdentifier() == JPPFIdentifiers.NODE_JOB_DATA_CHANNEL;
   }
 
@@ -103,8 +115,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param interestOps the operations to set on the key.
    */
   private void setInterestOps(final ChannelWrapper<?> channel, final int interestOps) {
-    Lock lock = server.getLock();
-    lock.lock();
+    //lock.lock();
+    obtainLock();
     try {
       server.getSelector().wakeup();
       channel.setInterestOps(interestOps);
@@ -131,8 +143,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    */
   @SuppressWarnings("unchecked")
   public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) {
-    Lock lock = server.getLock();
-    lock.lock();
+    //lock.lock();
+    obtainLock();
     try {
       server.getSelector().wakeup();
       synchronized(channel) {
@@ -203,12 +215,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   private ChannelWrapper<?> registerChannel(final SocketChannel channel, final int interestOps, final NioContext context) {
     ChannelWrapper<?> wrapper = null;
     try {
-      Lock lock = server.getLock();
-      lock.lock();
+      //lock.lock();
+      obtainLock();
       try {
-        server.getSelector().wakeup();
         if (channel.isBlocking()) channel.configureBlocking(false);
-        SelectionKey key = channel.register(server.getSelector(), interestOps, context);
+        SelectionKey key = channel.register(server.getSelector().wakeup(), interestOps, context);
         wrapper = new SelectionKeyWrapper(key);
         context.setChannel(wrapper);
       } finally {
@@ -265,5 +276,38 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     boolean b = (interestOps != readyOps) && (interestOps != 0) && !server.isIdle(channel) &&
         ((sslHandler.getApplicationReceiveBuffer().position() > 0) || (sslHandler.getChannelReceiveBuffer().position() > 0));
     return b;
+  }
+
+  /**
+   * Initialize the executor for this transition manager.
+   * @return an {@link ExecutorService} object.
+   * @since 5.0
+   */
+  private static synchronized ExecutorService initExecutor() {
+    if (globalExecutor == null) {
+      int n = NioConstants.THREAD_POOL_SIZE;
+      globalExecutor = Executors.newFixedThreadPool(n, new JPPFThreadFactory("JPPF NIO"));
+      //globalExecutor = new ThreadPoolExecutor(n, n, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JPPF NIO"));
+      //globalExecutor = new ThreadPoolExecutor(n, n, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory("JPPF NIO"));
+      //globalExecutor = Executors.newCachedThreadPool(new JPPFThreadFactory("JPPF NIO"));
+      //globalExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(true), new JPPFThreadFactory("JPPF NIO"));
+      log.info("globalExecutor={}, maxSize={}", globalExecutor, ((ThreadPoolExecutor) globalExecutor).getMaximumPoolSize());
+    }
+    return globalExecutor;
+  }
+
+  /**
+   * 
+   */
+  private /*synchronized*/ void obtainLock() {
+    /*
+    try {
+      //while (!lock.tryLock(10L, TimeUnit.MILLISECONDS));
+      while (!lock.tryLock()) wait(5L);
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    */
+    lock.lock();
   }
 }

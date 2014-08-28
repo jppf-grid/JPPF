@@ -167,7 +167,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       ServerSocketChannel server = ServerSocketChannel.open();
       server.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
       InetSocketAddress addr = new InetSocketAddress(portsToInit[i]);
-      server.socket().bind(addr, 100);
+      //server.socket().bind(addr, 100);
+      server.socket().bind(addr);
       // If the user specified port zero, the operating system should dynamically allocate a port number.
       // we store the actual assigned port number so that it can be broadcast.
       if (portsToInit[i] == 0) portsToInit[i] = server.socket().getLocalPort();
@@ -202,8 +203,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     try {
       boolean hasTimeout = selectTimeout > 0L;
       while (!isStopped() && !externalStopCondition()) {
@@ -213,7 +213,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
           lock.unlock();
         }
         int n = hasTimeout ? selector.select(selectTimeout) : selector.select();
-        if (!isStopped() && !externalStopCondition() && (n > 0)) go(selector.selectedKeys());
+        //if (!isStopped() && (n > 0) && !externalStopCondition()) go(selector.selectedKeys());
+        if (n > 0) go(selector.selectedKeys());
       }
     } catch (Throwable t) {
       log.error("error in selector loop for {} : {}", getClass().getSimpleName(), t);
@@ -228,16 +229,14 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Subclasses may override this behavior.
    * @return true if this server should be stopped, false otherwise.
    */
-  protected boolean externalStopCondition()
-  {
+  protected boolean externalStopCondition() {
     return requestShutdown.get();
   }
 
   /**
    * Initiates shutdown of this server.
    */
-  public void shutdown()
-  {
+  public void shutdown() {
     requestShutdown.set(true);
     try {
       lock.lock();
@@ -295,8 +294,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     }
     if (channel == null) return;
     Runnable task = new AcceptChannelTask(channel, ssl);
-    //transitionManager.submit(task);
-    task.run();
+    transitionManager.submit(task);
+    //task.run();
   }
 
   /**
@@ -315,9 +314,8 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     SelectionKeyWrapper wrapper = null;
     lock.lock();
     try {
-      selector.wakeup();
       if (sslHandler != null) context.setSSLHandler(sslHandler);
-      SelectionKey selKey = channel.register(selector,	0, context);
+      SelectionKey selKey = channel.register(selector.wakeup(),	0, context);
       wrapper = new SelectionKeyWrapper(selKey);
       context.setChannel(wrapper);
       context.setSsl(ssl);
