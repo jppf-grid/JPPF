@@ -109,7 +109,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     this.priority = priority;
     this.name = name;
     this.sslEnabled = sslEnabled;
-    jmxPool = new JMXConnectionPool(jmxCoreSize);
+    jmxPool = new JMXConnectionPool(this, jmxCoreSize);
   }
 
   @Override
@@ -460,102 +460,87 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
-   * Implementation of a pool of {@link JMXDriverConnectionWrapper} instances.
-   * @since 4.2
+   * Wait for the specified number of connections to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status.
+   * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE)}.
+   * This method will create or close connections as needed to reach the desired number of connections.
+   * @param nbConnections the number of connections to wait for.
+   * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
+   * @since 5.0
    */
-  private class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrapper> {
-    /**
-     * The jmx port to use on the remote driver.
-     */
-    private int port = -1;
+  public synchronized List<JPPFClientConnection> awaitActiveConnections(final int nbConnections) {
+    return awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
+  }
 
-    /**
-     * Initialize this pool witht he psecified core size.
-     * @param coreSize the pool core size.
-     */
-    public JMXConnectionPool(final int coreSize) {
-      super(coreSize);
-    }
+  /**
+   * Wait for the specified number of connections to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
+   * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
+   * This method will create or close connections as needed to reach the desired number of connections.
+   * @param nbConnections the number of connections to wait for.
+   * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
+   * @since 5.0
+   */
+  public synchronized List<JPPFClientConnection> awaitWorkingConnections(final int nbConnections) {
+    return awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+  }
 
-    @Override
-    public synchronized JMXDriverConnectionWrapper getConnection() {
-      int count = 0;
-      int size = connections.size();
-      while (count++ < size) {
-        JMXDriverConnectionWrapper jmx = nextConnection();
-        if (jmx.isConnected()) return jmx;
-      }
-      return null;
-    }
+  /**
+   * Wait for the specified number of connections to be in one of the specified states.
+   * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFstatuses)}.
+   * This method will create or close connections as needed to reach the desired number of connections.
+   * @param nbConnections the number of connections to wait for.
+   * @param statuses the possible statuses of the connections to wait for.
+   * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances.
+   * @since 5.0
+   */
+  public synchronized List<JPPFClientConnection> awaitConnections(final int nbConnections, final JPPFClientConnectionStatus...statuses) {
+    return awaitConnections(nbConnections, Long.MAX_VALUE, statuses);
+  }
 
-    @Override
-    public synchronized int setMaxSize(final int maxSize) {
-      if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.maxSize);
-      if ((maxSize < coreSize) || (maxSize == this.maxSize)) return this.maxSize;
-      int diff = maxSize - this.maxSize;
-      int size = connectionCount();
-      if (diff < 0) {
-        int actual = 0;
-        int i = size;
-        while ((--i >= 0) && (actual < -diff)) {
-          JMXDriverConnectionWrapper c = connections.get(i);
-          if (!coreConnections.contains(c)) {
-            if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
-            try {
-              c.close();
-            } catch(Exception ignore) {
-            }
-            remove(c);
-            actual++;
-          }
-        }
-        this.maxSize -= actual;
-      } else {
-        for (int i=0; i<diff; i++) {
-          JMXDriverConnectionWrapper c = new JMXDriverConnectionWrapper(driverHost, port, sslEnabled);
-          this.add(c);
-          c.connect();
-        }
-        this.maxSize += diff;
-      }
-      return this.maxSize;
+  /**
+   * Wait for the specified number of connections to be in one of the specified states, or the specified timeout to expire, whichever happens first.
+   * This method will increase or decrease the number of connections in this pool as needed.
+   * This method will create or close connections as needed to reach the desired number of connections.
+   * @param nbConnections the number of connections to wait for.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param statuses the possible statuses of the connections to wait for.
+   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @since 5.0
+   */
+  public synchronized List<JPPFClientConnection> awaitConnections(final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    setMaxSize(nbConnections);
+    long start = System.currentTimeMillis();
+    List<JPPFClientConnection> list = new ArrayList<>();
+    try {
+      while (((list = getConnections(statuses)).size() != nbConnections) && (System.currentTimeMillis() - start < timeout)) wait(1L);
+    } catch (InterruptedException e) {
+      log.error(e.getMessage(), e);
     }
+    return list;
+  }
 
-    /**
-     * Callback invoked when the driver host is set on the enclosing {@link JPPFConnectionPool}.
-     */
-    synchronized void hostSet() {
-      if (getPort() >= 0) initializeCoreConnections();
-    }
+  /**
+   * Wait for the specified number of JMX connections to be in the specified state.
+   * This is a shorthand for {@code awaitJMXConnections(nbConnections, Long.MAX_VALUE, connectedOnly)}.
+   * This method will create or close JMX connections as needed to reach the desired number of connections.
+   * @param nbConnections the number of connections to wait for.
+   * @param connectedOnly .
+   * @return a list of at least {@code nbConnections} {@link JPPFClientConnection} instances.
+   * @since 5.0
+   */
+  public synchronized List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final boolean connectedOnly) {
+    return jmxPool.awaitJMXConnections(nbConnections, Long.MAX_VALUE, connectedOnly);
+  }
 
-    /**
-     * Get the JMX port to use on the remote driver.
-     * @return the port as an int.
-     */
-    public synchronized int getPort() {
-      return port;
-    }
-
-    /**
-     * Set the JMX port to use on the remote driver.
-     * @param port the port as an int.
-     */
-    synchronized void setPort(final int port) {
-      if ((this.port < 0) && (port >= 0)) {
-        this.port = port;
-        if (driverHost != null) initializeCoreConnections();
-      }
-    }
-
-    /**
-     * Initialize all the core connections.
-     */
-    private void initializeCoreConnections() {
-      for (int i=0; i<coreSize; i++) {
-        JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(driverHost, port, sslEnabled);
-        this.add(jmx);
-        jmx.connect();
-      }
-    }
+  /**
+   * Wait for the specified number of JMX connections to be in the specified state, or the specified timeout to expire, whichever happens first.
+   * This method will create or close JMX connections as needed to reach the desired number of connections.
+   * @param nbConnections the number of connections to wait for.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param connectedOnly the possible statuses of the connections to wait for.
+   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @since 5.0
+   */
+  public synchronized List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final long timeout, final boolean connectedOnly) {
+    return jmxPool.awaitJMXConnections(nbConnections, timeout, connectedOnly);
   }
 }

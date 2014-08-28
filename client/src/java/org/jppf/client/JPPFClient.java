@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.ClientListener;
@@ -142,5 +142,70 @@ public class JPPFClient extends AbstractGenericClient {
       close(true);
       init(configuration);
     }
+  }
+
+  /**
+   * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status.
+   * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE)}.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @since 5.0
+   */
+  public JPPFConnectionPool awaitActiveConnectionPool() {
+    return awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
+  }
+
+  /**
+   * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
+   * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @since 5.0
+   */
+  public JPPFConnectionPool awaitWorkingConnectionPool() {
+    return awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+  }
+
+  /**
+   * Wait until there is at least one connection pool with at least one connection in one of the specified statuses.
+   * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, statuses)}.
+   * @param statuses the possible statuses of the connections in the pools to wait for.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @since 5.0
+   */
+  public JPPFConnectionPool awaitConnectionPool(final JPPFClientConnectionStatus...statuses) {
+    return awaitConnectionPool(Long.MAX_VALUE, statuses);
+  }
+
+  /**
+   * Wait until at least one connection pool with at least one connection in one of the specified statuses,
+   * or until the specified timeout to expire, whichever happens first.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param statuses the possible statuses of the connections in the pools to wait for.
+   * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
+   * @since 5.0
+   */
+  public JPPFConnectionPool awaitConnectionPool(final long timeout, final JPPFClientConnectionStatus...statuses) {
+    List<JPPFConnectionPool> list = awaitConnectionPools(timeout, statuses);
+    return list.isEmpty() ? null : list.get(0);
+  }
+
+  /**
+   * Wait until at least one connection pool with at least one connection in one of the specified statuses,
+   * or until the specified timeout to expire, whichever happens first.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param statuses the possible statuses of the connections in the pools to wait for.
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
+   * @since 5.0
+   */
+  public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final JPPFClientConnectionStatus...statuses) {
+    List<JPPFConnectionPool> list = new ArrayList<>();
+    long start = System.currentTimeMillis();
+    try {
+      synchronized(pools) { 
+        while ((list = findConnectionPools(statuses)).isEmpty() && (System.currentTimeMillis() - start < timeout)) pools.wait(1L);
+      }
+    } catch (InterruptedException e) {
+      log.error(e.getMessage(), e);
+    }
+    return list;
   }
 }
