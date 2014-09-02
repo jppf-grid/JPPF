@@ -18,40 +18,42 @@
 
 package org.jppf.example.wordcount;
 
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.JPPFJob;
-import org.jppf.client.event.*;
+import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.node.protocol.Task;
+import org.jppf.utils.StringUtils;
 
 /**
- * This class reads Wikipedia articles from a file and builds JPPF tasks and jobs from these articles.
+ * This job provider builds a sequence of JPPF jobs based on a {@link DataReader} which
+ * reads a Wikipedia database in XML format. Each task in the jobs is made of a configurable
+ * number of Wikipedia articles which are then processed on the grid.
+ * <p>This job provider is designed to produce a stream of jobs that can be used in a {@code for} loop:
+ * <pre> DataReader reader = new DataReader("wikipedia-en-db.xml");
+ * // reads parameters from the JPPF configuration
+ * Params params = new Params();
+ * JobProvider provider = new JobProvider(reader, params);
+ * for (JPPFJob job: provider) {
+ *   doSomething(job);
+ * }</pre>
  * @author Laurent Cohen
  */
-public class JobProvider {
+public class JobProvider extends AbstractJPPFJobStream {
   /**
    * The object that reads articles from a file.
    */
   private final DataReader reader;
   /**
-   * Processes and merges the results.
-   */
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
-  /**
    * The configuration parameters extracted from the configuration file.
    */
   private final Parameters params;
   /**
-   * Count of submitted jobs.
+   * Processes and merges the results asynchronously in a single thread.
    */
-  private int jobCount = 0;
-  /**
-   * Count of tasks sent for execution.
-   */
-  private int totalTasksSent = 0;
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
   /**
    * Count of tasks whose results have been processed.
    */
@@ -65,77 +67,79 @@ public class JobProvider {
    */
   private final AtomicInteger totalRedirects = new AtomicInteger(0);
   /**
-   * Number formatter.
-   */
-  private final NumberFormat nf = WordCountRunner.createFormatter();
-  /**
    * Holds the merged results.
    */
   private final Map<String, Long> mergedResults = new HashMap<>();
 
   /**
    * Initialize this job provider with the specified application parameters.
+   * @param concurrencyLimit the maximum number of jobs submitted concurrently.
    * @param params the parameters to use.
    */
-  public JobProvider(final Parameters params) {
+  public JobProvider(final int concurrencyLimit, final Parameters params) {
+    super(concurrencyLimit);
     this.params = params;
     reader = new DataReader(params.dataFile);
   }
 
-  /**
-   * Read the data and return the next job from its tasks.
-   * @return a <code>JPPFJob</code>.
-   * @throws Exception if any error occurs.
-   */
-  public JPPFJob nextJob() throws Exception {
+  @Override
+  public boolean hasNext() {
+    return !reader.isClosed();
+  }
+
+  @Override
+  public void close() {
+    if (reader != null) reader.close();
+    executor.shutdown();
+    try {
+      while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS));
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  protected JPPFJob createNextJob() {
     int taskCount  = 0;
     int totalJobArticles = 0;
     JPPFJob job = new JPPFJob();
-    job.setName("job-" + (jobCount + 1));
+    job.setName(String.format("WordCount-%04d", (getJobCount() + 1)));
     // job can be sent over this number of channels in parallel
     job.getClientSLA().setMaxChannels(params.nbChannels);
-    job.setBlocking(false);
-    while (!reader.isClosed() && (taskCount < params.nbTasks)) {
-      int articleCount = 0;
-      String article = null;
-      List<String> list = new ArrayList<>(params.nbArticles);
-      while (!reader.isClosed() && (articleCount < params.nbArticles)) {
-        article = reader.nextArticle();
-        if (article == null) break;
-        list.add(article);
-        articleCount++;
+    try {
+      // build up to {params.nbTasks} tasks
+      while (!reader.isClosed() && (taskCount < params.nbTasks)) {
+        int articleCount = 0;
+        String article = null;
+        List<String> list = new ArrayList<>(params.nbArticles);
+        // read up to {params.nbArticles} articles for each task
+        while (!reader.isClosed() && (articleCount < params.nbArticles)) {
+          article = reader.nextArticle();
+          if (article == null) break;
+          list.add(article);
+          articleCount++;
+        }
+        if (articleCount > 0) {
+          job.add(new WordCountTask(list));
+          totalJobArticles += articleCount;
+          taskCount++;
+        }
       }
-      if (articleCount > 0) {
-        job.add(new WordCountTask(list));
-        totalJobArticles += articleCount;
-        taskCount++;
+      if (taskCount > 0) {
+        totalArticles += totalJobArticles;
+        // set the job start timestamp
+        job.getMetadata().setParameter("startTime", System.nanoTime());
+        return job;
       }
-    }
-    if (taskCount > 0) {
-      totalArticles += totalJobArticles;
-      jobCount++;
-      totalTasksSent += taskCount;
-      job.addJobListener(new MyResultCollector());
-      System.out.println("submitting job " + nf.format(jobCount) + " with " + nf.format(taskCount) + " tasks and " + nf.format(totalJobArticles) + " articles");
-      return job;
+    } catch(Exception e) {
+      e.printStackTrace();
     }
     return null;
   }
 
-  /**
-   * Get the total number of submitted jobs.
-   * @return an int value.
-   */
-  public int getJobCount() {
-    return jobCount;
-  }
-
-  /**
-   * Get the total number of tasks to the server.
-   * @return the number of tasks as an int value.
-   */
-  public int getTotalTasksSent() {
-    return totalTasksSent;
+  @Override
+  protected void processResults(final JPPFJob job) {
+    executor.execute(new MergeResultsTask(job));
   }
 
   /**
@@ -171,63 +175,46 @@ public class JobProvider {
   }
 
   /**
-   * Close this job provider and release the system resources it uses.
+   * This class merges the results received from a set of tasks into the aggregated map of word counts.
    */
-  public void close() {
-    if (!reader.isClosed()) reader.close();;
-    executor.shutdown();
-    try {
-      while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS));
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * This result collector submits a work item to merge the results of the received tasks.
-   * With this mechanism, results are processed almost as soon as they are received from the
-   * nodes, thus allowing us to emulate a stream of incoming results.
-   */
-  private class MyResultCollector extends JobListenerAdapter {
-    @Override
-    public void jobReturned(final JobEvent event) {
-      if (event.getJobTasks() != null) executor.submit(new MergerTask(event.getJobTasks()));
-    }
-  }
-
-  /**
-   * This class merges the results received from a set set of tasks into the aggregated map of word counts.
-   */
-  private class MergerTask implements Runnable {
+  private class MergeResultsTask implements Runnable {
     /**
-     * The tasks whose results are to be merged.
+     * The job whose results are to be merged.
      */
-    private final List<Task<?>> tasks;
+    private final JPPFJob job;
 
     /**
      * Initialize with the specified set of tasks.
-     * @param tasks the tasks to process.
+     * @param job the job to process.
      */
-    public MergerTask(final List<Task<?>> tasks) {
-      this.tasks = tasks;
+    public MergeResultsTask(final JPPFJob job) {
+      this.job = job;
     }
 
     @Override
     public void run() {
-      for (Task<?> task: tasks) {
-        int nbRedirects = ((WordCountTask) task).getNbRedirects();
+      long jobRedirects = 0L;
+      long jobArticles = 0L;
+      for (Task<?> task: job.getAllResults()) {
+        WordCountTask wTask = (WordCountTask) task;
+        int nbRedirects = wTask.getNbRedirects();
         if (nbRedirects > 0) totalRedirects.addAndGet(nbRedirects);
-        @SuppressWarnings("unchecked")
-        Map<String, Long> map = (Map<String, Long>) task.getResult();
+        jobRedirects += nbRedirects;
+        jobArticles += wTask.getNbArticles();
+        Map<String, Long> map = wTask.getResult();
         if (map == null) continue;
         task.setResult(null); // to free some memory asap
         for (Map.Entry<String, Long> entry: map.entrySet()) {
           Long count = mergedResults.get(entry.getKey());
-          long n = entry.getValue() + (count == null ?  0L : count);
+          long n = entry.getValue() + (count == null ? 0L : count);
           mergedResults.put(entry.getKey(), n);
         }
       }
-      totalTasksProcessed.addAndGet(tasks.size());
+      totalTasksProcessed.addAndGet(job.executedTaskCount());
+      // job completion time in millis
+      long jobCompletionTime = (System.nanoTime() - (Long) job.getMetadata().getParameter("startTime")) / 1_000_000L;
+      System.out.printf("processed results of job '%s' - %,4d tasks, %,6d articles, including %,5d redirects. Completion time: %s%n",
+          job.getName(), job.executedTaskCount(), jobArticles, jobRedirects, StringUtils.toStringDuration(jobCompletionTime));
     }
   }
 }

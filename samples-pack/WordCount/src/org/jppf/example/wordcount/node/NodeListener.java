@@ -23,38 +23,49 @@ import java.util.*;
 
 import org.jppf.node.event.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 
 /**
- * 
+ * This node life cycle listener performs two tasks:
+ * <ol>
+ * <li>Load the disctionary once the node is connected to the server</li>
+ * <li>When a job completes, aggregate the word counts of all its tasks into a single map</li>
+ * </ol>
  * @author Laurent Cohen
  */
-public class NodeListener implements NodeLifeCycleListener, NodeLifeCycleErrorHandler {
+public class NodeListener extends NodeLifeCycleListenerAdapter implements  NodeLifeCycleErrorHandler {
   /**
    * Path to the dictionary file in the server's classpath.
    */
-  private static final String DICTIONARY_PATH = "dictonary_en_US.txt";
+  private static final String DICTIONARY_PATH = "5desk.txt";
+  //private static final String DICTIONARY_PATH = "dictonary_en_US.txt";
   /**
    * The dictionary of words to count.
    */
   private static Set<String> dictionary = null;
 
+  /**
+   * This method loads a dictionary from the server classpath.
+   * {@inheritDoc}
+   */
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {
-    try {
-      // load the dictionary from the server
-      loadDictonary();
+    // load the dictionary from the server
+    try (BufferedReader reader = new BufferedReader(FileUtils.getFileReader(DICTIONARY_PATH))) {
+      System.out.print("Loading dictionary '" + DICTIONARY_PATH + "' ");
+      dictionary = new HashSet<>();
+      String s = null;
+      int count = 0;
+      while ((s = reader.readLine()) != null) {
+        count++;
+        if (count % 10_000 == 0) System.out.print(".");
+        // add the dictionary entry
+        dictionary.add(s.trim().toLowerCase());
+      }
+      System.out.printf(" %d entries\n", dictionary.size());
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  @Override
-  public void nodeEnding(final NodeLifeCycleEvent event) {
-  }
-
-  @Override
-  public void jobStarting(final NodeLifeCycleEvent event) {
   }
 
   /**
@@ -72,11 +83,14 @@ public class NodeListener implements NodeLifeCycleListener, NodeLifeCycleErrorHa
 
     Map<String, Long> reduced = null;
     int initialIndex = 0;
+    // find the first task whose result is not null
+    // (the result is be null when all the articles of a task are redirects)
     while ((initialIndex < tasks.size()) && (reduced == null)) {
       reduced = (Map<String, Long>) tasks.get(initialIndex).getResult();
       if (reduced == null) initialIndex++;
     }
     if (reduced == null) return;
+    // aggregate the word cunts of the other tasks into the first one found
     for (int i=initialIndex+1; i<tasks.size(); i++) {
       Task<?> task = tasks.get(i);
       Map<String, Long> map = (Map<String, Long>) task.getResult();
@@ -93,34 +107,8 @@ public class NodeListener implements NodeLifeCycleListener, NodeLifeCycleErrorHa
   }
 
   @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
-  }
-
-  @Override
   public void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
     System.out.println("error on listener " + listener + ", event type=" + event.getType() + " : " + ExceptionUtils.getStackTrace(t));
-  }
-
-  /**
-   * Load the dictionary form the server's cclasspath.
-   * @throws Exception if any error occurs.
-   */
-  private void loadDictonary() throws Exception {
-    BufferedReader reader = null;
-    try {
-      InputStream is = getClass().getClassLoader().getResourceAsStream(DICTIONARY_PATH);
-      if (is == null) throw new RuntimeException("could not find '" + DICTIONARY_PATH + "'");
-      dictionary = new HashSet<>();
-      reader = new BufferedReader(new InputStreamReader(is));
-      String s = "";
-      while (s != null) {
-        s = reader.readLine();
-        if (s!= null) dictionary.add(s.trim().toLowerCase());
-      }
-      System.out.println("loaded dictionary: " + dictionary.size() + " entries");
-    } finally {
-      if (reader != null) reader.close();
-    }
   }
 
   /**

@@ -23,7 +23,7 @@ import org.jppf.example.wordcount.node.NodeListener;
 import org.jppf.node.protocol.AbstractTask;
 
 /**
- * 
+ * This task builds a word count map for a number of Wikipedia articles it takes as input.
  * @author Laurent Cohen
  */
 public class WordCountTask extends AbstractTask<Map<String, Long>> {
@@ -31,6 +31,10 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
    * The data in this task.
    */
   private List<String> articles = null;
+  /**
+   * Number of articles in the list.
+   */
+  private final int nbArticles;
   /**
    * Number of redirects found in the list of articles.
    */
@@ -42,11 +46,11 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
    */
   public WordCountTask(final List<String> articles) {
     this.articles = articles;
+    this.nbArticles = (articles == null) ? 0 : articles.size();
   }
 
   /**
    * Perform the execution of this task.
-   * @see java.lang.Runnable#run()
    */
   @Override
   public void run() {
@@ -54,6 +58,7 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
     try {
       for (String article: articles) {
         String text = tagValue(article, "text");
+        // skip articles that are mere redirects
         if (text.startsWith("#REDIRECT")) {
           nbRedirects++;
           continue;
@@ -131,5 +136,13 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
    */
   public int getNbRedirects() {
     return nbRedirects;
+  }
+
+  /**
+   * Get the number of articles in this task.
+   * @return the number of articles including redirects.
+   */
+  public int getNbArticles() {
+    return nbArticles;
   }
 }

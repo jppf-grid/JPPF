@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.client.utils.AbstractJPPFJobStream;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 
@@ -63,8 +64,9 @@ public class ConcurrentJobs {
 
   /**
    * Execute multiple blocking jobs from multiple threads.
+   * @throws Exception if any error occurs.
    */
-  public void multipleThreadsBlockingJobs() {
+  public void multipleThreadsBlockingJobs() throws Exception {
     int nbJobs = 4;
     ExecutorService executor = Executors.newFixedThreadPool(nbJobs);
     try (JPPFClient jppfClient = new JPPFClient()) {
@@ -85,10 +87,9 @@ public class ConcurrentJobs {
           e.printStackTrace();
         }
       }
-    } catch(Exception e) {
-      e.printStackTrace();
+    } finally {
+      executor.shutdown();
     }
-    executor.shutdown();
   }
 
   /**
@@ -125,8 +126,9 @@ public class ConcurrentJobs {
 
   /**
    * Submit multiple non-blocking jobs from a single thread, process the results in sequence.
+   * @throws Exception if any error occurs.
    */
-  public void singleThreadNonBlockingJobs() {
+  public void singleThreadNonBlockingJobs() throws Exception {
     int nbJobs = 4;
     try (final JPPFClient jppfClient = new JPPFClient()) {
       // make sure the client has enough connections
@@ -144,15 +146,14 @@ public class ConcurrentJobs {
         // process the job results
         processResults(job);
       }
-    } catch(Exception e) {
-      e.printStackTrace();
     }
   }
 
   /**
    * Execute multiple non-blocking jobs from a single thread, process the results asynchronously.
+   * @throws Exception if any error occurs.
    */
-  public void asynchronousNonBlockingJobs() {
+  public void asynchronousNonBlockingJobs() throws Exception {
     int nbJobs = 4;
     try (final JPPFClient jppfClient = new JPPFClient()) {
       // make sure the client has enough connections
@@ -169,8 +170,7 @@ public class ConcurrentJobs {
           public synchronized void jobEnded(final JobEvent event) {
             // ... process the job results ...
             processResults(event.getJob());
-            // decrease the jobs count down
-            // when the count reaches 0, countDown.await() will exit immediately
+            // decrease the jobs count down: when the count reaches 0, countDown.await() will exit immediately
             countDown.countDown();
           }
         });
@@ -180,18 +180,17 @@ public class ConcurrentJobs {
       // wait until all jobs are complete
       // i.e. until the count down reaches 0
       countDown.await();
-    } catch(Exception e) {
-      e.printStackTrace();
     }
   }
 
   /**
    * Execute a stream of non-blocking jobs from a single thread, process the results asynchronously.
+   * @throws Exception if any error occurs.
    */
-  public void jobStreaming() {
+  public void jobStreaming() throws Exception {
     int concurrencyLimit = 4;
     try (JPPFClient jppfClient = new JPPFClient();
-        JobProvider jobProvider = new JobProvider(concurrencyLimit)) {
+        AbstractJPPFJobStream jobProvider = new JobProvider(concurrencyLimit)) {
       // make sure the client has enough connections
       ensureSufficientConnections(jppfClient, concurrencyLimit);
       // build and submit the provided jobs until no more is available
@@ -200,10 +199,7 @@ public class ConcurrentJobs {
       }
       // wait until no more job is executing before exiting
       while (jobProvider.hasPendingJob()) Thread.sleep(10L);
-      System.out.printf("*** executed a total of %d jobs and %d tasks\n",
-          jobProvider.getJobCount(), jobProvider.getTaskCount());
-    } catch (Exception e) {
-      e.printStackTrace();
+      System.out.printf("*** executed a total of %d jobs and %d tasks%n", jobProvider.getJobCount(), jobProvider.getTaskCount());
     }
   }
 
@@ -236,14 +232,13 @@ public class ConcurrentJobs {
    * @param job the JPPF job whose results are printed.
    */
   public static void processResults(final JPPFJob job) {
-    System.out.printf("*** results for job '%s' ***\n", job.getName());
+    System.out.printf("*** results for job '%s' ***%n", job.getName());
     List<Task<?>> results = job.getAllResults();
     for (Task<?> task: results) {
       if (task.getThrowable() != null) { // if the task execution raised an exception
-        System.out.printf("%s raised an exception : %s\n",
-            task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+        System.out.printf("%s raised an exception : %s%n", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
       } else { // otherwise display the task result
-        System.out.printf("result of %s : %s\n", task.getId(), task.getResult());
+        System.out.printf("result of %s : %s%n", task.getId(), task.getResult());
       }
     }
   }
@@ -256,11 +251,8 @@ public class ConcurrentJobs {
    */
   private static void ensureSufficientConnections(final JPPFClient jppfClient, final int nbConnections) throws Exception {
     // wait until a connection pool is available
-    JPPFConnectionPool pool = null;
-    while ((pool = jppfClient.getConnectionPool()) == null) Thread.sleep(10L);
-    // make sure the pool has enough connections
-    pool.setMaxSize(nbConnections);
-    // wait until all connections are active
-    while (pool.connectionCount(JPPFClientConnectionStatus.ACTIVE) < nbConnections) Thread.sleep(10L);
+    JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
+    // make sure the pool has enough connections and wait until all connections are active
+    pool.awaitActiveConnections(nbConnections);
   }
 }

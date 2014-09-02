@@ -17,6 +17,6 @@
  */
 
 /**
- * Classes for the node life cycle listener.
+ * Classes for the node life cycle listener of the Wikipedia Word Count demo.
  */
 package org.jppf.example.wordcount.node;

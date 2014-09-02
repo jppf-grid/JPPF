@@ -18,11 +18,10 @@
 package org.jppf.example.wordcount;
 
 import java.io.*;
-import java.text.NumberFormat;
 import java.util.*;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.utils.*;
+import org.jppf.client.*;
+import org.jppf.utils.TimeMarker;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -41,45 +40,39 @@ public class WordCountRunner {
    * @param args not used.
    */
   public static void main(final String...args) {
-    SubmitQueue queue = null;
-    JobProvider jobProvider = null;
-    NumberFormat nf = createFormatter();
-    try {
-      Parameters params = new Parameters();
-      nf.setGroupingUsed(true);
-      JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(params.nbChannels));
-      queue = new SubmitQueue(params.jobCapacity);
-      System.out.println("Processing '" + params.dataFile + "' with " + nf.format(params.nbArticles) +
-          " articles per task, " + nf.format(params.nbTasks) + " tasks per job, nb channels = " + params.nbChannels);
-      jobProvider = new JobProvider(params);
-      boolean end = false;
-      long start = System.nanoTime();
-      JPPFJob job;
-      // read the wikipedia file and build a job according to the configuration parameters
-      while ((job = jobProvider.nextJob()) != null) {
-        // this call may block if the job capacity is reached
-        queue.submit(job);
+    Parameters params = new Parameters();
+    TimeMarker marker = null;
+    JobProvider provider = null;
+    try (JPPFClient client = new JPPFClient();
+        // the auto-close of jobProvider will wait until all results are merged
+        JobProvider jobProvider = new JobProvider(params.jobCapacity, params)) {
+      provider = jobProvider;
+      System.out.printf(Locale.US, "Processing '%s' with %,d articles per task, %,d tasks per job, nb channels = %d, max concurrent jobs = %d%n",
+          params.dataFile, params.nbArticles, params.nbTasks, params.nbChannels, params.jobCapacity);
+      JPPFConnectionPool pool = client.awaitActiveConnectionPool();
+      // set the pool size to the desried number of connections
+      pool.setMaxSize(params.nbChannels);
+      marker = new TimeMarker().start();
+      // read the wikipedia file and build jobs according to the configuration parameters
+      for (JPPFJob job:  jobProvider) {
+        if (job != null) client.submitJob(job);
       }
-      Object lock = new Object();
       // wait until all job results have been processed
-      while (jobProvider.getTotalTasksProcessed() < jobProvider.getTotalTasksSent()) {
-        synchronized(lock) {
-          lock.wait(1L);
-        }
-      }
-      long elapsed = (System.nanoTime() - start) / 1000000L;
-      System.out.println("processed " + jobProvider.getJobCount() + " jobs for " + nf.format(jobProvider.getTotalArticles() - jobProvider.getTotalRedirects()) +
-          " articles in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms), total redirects = " + nf.format(jobProvider.getTotalRedirects()));
-
-      // group the words with equal count and sort by descending count then ascending word within each group,
-      // then write the results to the specified file
-      writeResults(sortResults(jobProvider.getMergedResults()), "WordCountResults.txt");
+      while (jobProvider.hasPendingJob()) Thread.sleep(10L);
 
     } catch(Exception e) {
       e.printStackTrace();
-    } finally {
-      if (queue != null) queue.stop();
-      if (jobProvider != null) jobProvider.close();
+    }
+    try {
+      // group the words with equal count and sort by descending count then ascending word within each group,
+      // then write the results to the specified file
+      writeResults(sortResults(provider.getMergedResults()), "WordCountResults.txt");
+
+      System.out.printf(Locale.US, "processed %,d jobs for %,d articles in %s, total redirects = %,d%n",
+          provider.getJobCount(), (provider.getTotalArticles() - provider.getTotalRedirects()),
+          marker.stop().getLastElapsedAsString(), provider.getTotalRedirects());
+    } catch(Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -89,22 +82,20 @@ public class WordCountRunner {
    * @return a map of long values to collections of text words.
    */
   private static CollectionMap<Long, String> sortResults(final Map<String, Long> mergedResults) {
-    System.out.println("sorting " + mergedResults.size() + " results ...");
-    long start = System.nanoTime();
+    System.out.printf("sorting %s results ... ", mergedResults.size());
+    TimeMarker marker = new TimeMarker().start();
     Comparator<Long> comp = new Comparator<Long>() {
       @Override
       public int compare(final Long o1, final Long o2) {
         if (o1 == null) return o2 == null ? 0 : -1;
-        if (o2 == null) return o1 == null ? 0 : 1;
+        else if (o2 == null) return 1;
         return o2.compareTo(o1);
       }
     };
     // using a multimap (JPPF implementation) makes code a lot simpler
     CollectionMap<Long, String> result = new SortedSetSortedMap<>(comp);
     for (Map.Entry<String, Long> entry: mergedResults.entrySet()) result.putValue(entry.getValue(), entry.getKey());
-    long elapsed = (System.nanoTime() - start) / 1000000L;
-    NumberFormat nf = createFormatter();
-    System.out.println("results sorted in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms)");
+    System.out.printf("done in %s%n", marker.stop().getLastElapsedAsString());
     return result;
   }
 
@@ -116,32 +107,16 @@ public class WordCountRunner {
    */
   private static void writeResults(final CollectionMap<Long, String> results, final String destFile) throws Exception {
     String filename = "WordCountResults.txt";
-    System.out.println("writing results to '" + filename + "' ...");
-    long start = System.nanoTime();
-    NumberFormat nf = createFormatter();
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+    System.out.printf("writing results to '%s' ... ", filename);
+    TimeMarker marker = new TimeMarker().start();
+    try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename)))) {
       for (Map.Entry<Long, Collection<String>> entry: results.entrySet()) {
         long n = entry.getKey();
         for (String word: entry.getValue()) {
-          writer.write(StringUtils.padRight(word, ' ', 26, false));
-          writer.write(": ");
-          writer.write(StringUtils.padLeft(nf.format(n), ' ', 12));
-          writer.write('\n');
+          writer.printf(Locale.US, "%-26s: %,12d%n", word, n);
         }
       }
-      writer.flush();
     }
-    long elapsed = (System.nanoTime() - start) / 1000000L;
-    System.out.println("results written in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms)");
-  }
-
-  /**
-   * Utility method to create a number formatter.
-   * @return a {@link NumberFormat} instance.
-   */
-  public static NumberFormat createFormatter() {
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
-    nf.setGroupingUsed(true);
-    return nf;
+    System.out.printf("done in %s%n", marker.stop().getLastElapsedAsString());
   }
 }
