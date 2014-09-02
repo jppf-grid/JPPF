@@ -52,6 +52,11 @@ public class SlaveNodeLauncher implements Runnable {
    */
   private Process process = null;
   /**
+   * Id given to this process.
+   * @since 4.2.2
+   */
+  private final int id;
+  /**
    * Name given to this process, also used as root installation directory.
    */
   private final String name;
@@ -78,10 +83,12 @@ public class SlaveNodeLauncher implements Runnable {
 
   /**
    * Initialize this process launcher.
+   * @param id the id as an int.
    * @param name internal name given tot he process.
    * @param classpath the slave node's classpath.
    */
-  public SlaveNodeLauncher(final String name, final List<String> classpath) {
+  public SlaveNodeLauncher(final int id, final String name, final List<String> classpath) {
+    this.id = id;
     this.name = name;
     this.classpath = classpath;
     slaveDir = new File(name);
@@ -283,5 +290,13 @@ public class SlaveNodeLauncher implements Runnable {
     if (log.isDebugEnabled()) log.debug("process [{}:{}] has stopped", name, process);
     SlaveNodeLauncherEvent event = new SlaveNodeLauncherEvent(this);
     for (SlaveNodeLauncherListener listener: listeners) listener.processStopped(event);
+  }
+
+  /**
+   * Get the id given to this process.
+   * @return the id as an int.
+   */
+  public int getId() {
+    return id;
   }
 }
