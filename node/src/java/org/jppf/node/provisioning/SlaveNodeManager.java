@@ -63,7 +63,12 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
   /**
    * A mapping of the slave processes to their internal name.
    */
-  private final Map<String, SlaveNodeLauncher> slaves = new HashMap<>();
+  private final SortedMap<Integer, SlaveNodeLauncher> slaves = new TreeMap<>();
+  /**
+   * The set of already reserved slave ids.
+   * @since 4.2.2
+   */
+  private Set<Integer> reservedIds = new HashSet<>();
   /**
    * Master node root directory.
    */
@@ -97,16 +102,16 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    * @param configOverrides a set of overrides to the slave's configuration.
    */
   synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final TypedProperties configOverrides) {
-    // if new config ovverides, stop all the slaves and restart new ones
+    // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
       log.debug("stopping all processes");
       this.configOverrides = configOverrides;
-      for (Map.Entry<String, SlaveNodeLauncher> entry: slaves.entrySet()) {
-        SlaveNodeLauncher slave = entry.getValue();
+      for (SlaveNodeLauncher slave: slaves.values()) {
         slave.removeProcessLauncherListener(this);
         slave.stopProcess();
       }
       slaves.clear();
+      reservedIds.clear();
     }
     int size = slaves.size();
     int diff = size - requestedSlaves;
@@ -114,9 +119,10 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     if (diff > 0) {
       log.debug("stopping " + diff + " processes");
       for (int i=requestedSlaves; i<size; i++) {
-        String slaveDirPath = SLAVE_PATH_PREFIX + i;
-        log.debug("stopping {}", slaveDirPath);
-        SlaveNodeLauncher slave = slaves.remove(slaveDirPath);
+        int id = slaves.lastKey();
+        SlaveNodeLauncher slave = slaves.remove(id);
+        log.debug("stopping {}", slave.getName());
+        reservedIds.remove(id);
         slave.removeProcessLauncherListener(this);
         slave.stopProcess();
       }
@@ -124,11 +130,12 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
       // otherwise start the missing number of slaves
       log.debug("starting " + -diff + " processes");
       for (int i=size; i<requestedSlaves; i++) {
-        String slaveDirPath = SLAVE_PATH_PREFIX + i;
+        int id = reserveNextAvailableId();
+        String slaveDirPath = SLAVE_PATH_PREFIX + id;
         try {
           log.debug("starting {}", slaveDirPath);
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides);
-          final SlaveNodeLauncher slave = new SlaveNodeLauncher(slaveDirPath, slaveClasspath);
+          final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
           slave.addProcessLauncherListener(this);
           new Thread(slave, slaveDirPath).start();
         } catch(Exception e) {
@@ -175,13 +182,14 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
   @Override
   public synchronized void processStarted(final SlaveNodeLauncherEvent event) {
     SlaveNodeLauncher slave = event.getProcessLauncher();
-    slaves.put(slave.getName(), slave);
+    slaves.put(slave.getId(), slave);
   }
 
   @Override
   public synchronized void processStopped(final SlaveNodeLauncherEvent event) {
     SlaveNodeLauncher slave = event.getProcessLauncher();
-    slaves.remove(slave.getName());
+    slaves.remove(slave.getId());
+    reservedIds.remove(slave.getId());
   }
 
   /**
@@ -204,5 +212,27 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
   public static void handleStartup() {
     int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
     if (n > 0) INSTANCE.shrinkOrGrowSlaves(n, null);
+  }
+
+  /**
+   * Get the next available slavez id.
+   * @return the next id as an int value.
+   * @since 4.2.2
+   */
+  private int nextAvailableId() {
+    int count = 0;
+    while (reservedIds.contains(count)) count++;
+    return count;
+  }
+
+  /**
+   * Get the next available slavez id.
+   * @return the next id as an int value.
+   * @since 4.2.2
+   */
+  private synchronized int reserveNextAvailableId() {
+    int count = nextAvailableId();
+    reservedIds.add(count);
+    return count;
   }
 }
