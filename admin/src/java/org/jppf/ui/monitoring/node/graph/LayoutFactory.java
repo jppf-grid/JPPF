@@ -18,6 +18,7 @@
 
 package org.jppf.ui.monitoring.node.graph;
 
+import java.awt.Dimension;
 import java.util.Collection;
 
 import org.jppf.ui.monitoring.node.TopologyData;
@@ -40,6 +41,10 @@ class LayoutFactory
    * The graph visualization component.
    */
   private VisualizationViewer<TopologyData, Number> viewer = null;
+  /**
+   * The size of all the verices (drivers and nodes) in the graph.
+   */
+  static final Dimension VERTEX_SIZE = new Dimension(100, 50);
 
   /**
    * Create a factory instance for the specified graph.

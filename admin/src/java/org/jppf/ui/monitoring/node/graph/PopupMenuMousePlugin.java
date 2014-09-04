@@ -38,8 +38,7 @@ import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
  * @param <E> the type of the edges.
  * @author Laurent Cohen
  */
-public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin
-{
+public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
   /**
    * The object that handles toolbar and menu actions.
    */
@@ -49,8 +48,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin
    * Initialize this popup handler with the specified action handler.
    * @param actionHandler the action handler to use.
    */
-  public PopupMenuMousePlugin(final ActionHandler actionHandler)
-  {
+  public PopupMenuMousePlugin(final ActionHandler actionHandler) {
     super(InputEvent.BUTTON3_MASK);
     this.actionHandler = actionHandler;
   }
@@ -61,17 +59,14 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin
    */
   @Override
   @SuppressWarnings("unchecked")
-  protected void handlePopup(final MouseEvent e)
-  {
+  protected void handlePopup(final MouseEvent e) {
     final VisualizationViewer<V, E> viewer = (VisualizationViewer<V, E>) e.getSource();
     Point p = e.getPoint();
 
     GraphElementAccessor<V, E> pickSupport = viewer.getPickSupport();
-    if (pickSupport != null)
-    {
+    if (pickSupport != null) {
       final V vertex = pickSupport.getVertex(viewer.getGraphLayout(), p.getX(), p.getY());
-      if (vertex != null)
-      {
+      if (vertex != null) {
         JPopupMenu vertexMenu = createMenu(vertex, viewer, e.getLocationOnScreen());
         vertexMenu.show(viewer, e.getX(), e.getY());
       }
@@ -96,8 +91,13 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin
     menu.add(createMenuItem(actionHandler.getAction("graph.update.configuration"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.update.threads"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.reset.counter"), point));
+    menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.restart.node"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.restart.node.deferred"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node.deferred"), point));
+    menu.addSeparator();
+    menu.add(createMenuItem(actionHandler.getAction("graph.toggle.active"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.node.provisioning"), point));
     return menu;
   }

@@ -60,17 +60,18 @@
     <child name="configOverridesContainer" type="page">
       <property name="label" value="Configuration overrides"/>
       <property name="bordered" value="true"/>
-      <property name="layoutConstraints" value="fill"/>
+      <property name="layoutConstraints" value="fill, insets 1"/>
       <property name="componentConstraints" value="grow, push"/>
 
       <!-- Text area -->
   		<child name="configOverrides" type="TextArea">
-  			<property name="scrollable" value="true"/>
+        <property name="bordered" value="false"/>
+        <property name="scrollable" value="true"/>
   			<property name="editable" value="true"/>
   			<property name="label" value="Configuration overrides"/>
   			<property name="tooltip" value="Configuration properties that will override the default slaves configuration"/>
   			<property name="value" value=""/>
-  			<property name="componentConstraints" value="grow, push, w 400, h 300"/>
+  			<property name="componentConstraints" value="grow, push, w 250, h 150"/>
         <property name="persistent" value="true"/>
       </child>
 

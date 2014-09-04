@@ -336,8 +336,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     actionHandler.putAction("show.information", new SystemInformationAction());
     actionHandler.putAction("update.threads", new NodeThreadsAction());
     actionHandler.putAction("reset.counter", new ResetTaskCounterAction());
-    actionHandler.putAction("restart.node", new RestartNodeAction());
-    actionHandler.putAction("shutdown.node", new ShutdownNodeAction());
+    actionHandler.putAction("restart.node", new ShutdownOrRestartNodeAction(true, true, "restart.node"));
+    actionHandler.putAction("restart.node.deferred", new ShutdownOrRestartNodeAction(true, false, "restart.node.deferred"));
+    actionHandler.putAction("shutdown.node", new ShutdownOrRestartNodeAction(false, true, "shutdown.node"));
+    actionHandler.putAction("shutdown.node.deferred", new ShutdownOrRestartNodeAction(false, false, "shutdown.node.deferred"));
     actionHandler.putAction("toggle.active", new ToggleNodeActiveAction(this));
     actionHandler.putAction("node.provisioning", new ProvisioningAction());
     actionHandler.putAction("select.drivers", new SelectDriversAction(this));
@@ -345,7 +347,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
     actionHandler.updateActions();
     treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
     Runnable r = new ActionsInitializer(this, "/topology.toolbar");
+    Runnable r2 = new ActionsInitializer(this, "/topology.toolbar.bottom");
     new Thread(r).start();
+    new Thread(r2).start();
   }
 
   /**

@@ -27,8 +27,7 @@ import org.jppf.ui.treetable.JTreeTable;
  * Abstract implementation of the <code>ActionManager</code> interface for <code>JTreeTable</code> components.
  * @author Laurent Cohen
  */
-public class JTreeTableActionHandler extends AbstractActionHandler
-{
+public class JTreeTableActionHandler extends AbstractActionHandler {
   /**
    * The JTreeTable whose actions are managed.
    */
@@ -38,8 +37,7 @@ public class JTreeTableActionHandler extends AbstractActionHandler
    * Initialize this action manager with the specified JTreeTable component.
    * @param treeTable the JTreeTable whose actions are managed.
    */
-  public JTreeTableActionHandler(final JTreeTable treeTable)
-  {
+  public JTreeTableActionHandler(final JTreeTable treeTable) {
     this(treeTable, true);
   }
 
@@ -48,8 +46,7 @@ public class JTreeTableActionHandler extends AbstractActionHandler
    * @param treeTable the JTreeTable whose actions are managed.
    * @param useListener if <code>true</code> then register a selection listener on the tree table to handle action states updates.
    */
-  public JTreeTableActionHandler(final JTreeTable treeTable, final boolean useListener)
-  {
+  public JTreeTableActionHandler(final JTreeTable treeTable, final boolean useListener) {
     this.treeTable = treeTable;
     if (useListener) registerSelectionListener();
   }
@@ -57,17 +54,12 @@ public class JTreeTableActionHandler extends AbstractActionHandler
   /**
    * Register a selection listener on the tree table to handle action states updates.
    */
-  private void registerSelectionListener()
-  {
-    treeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-    {
+  private void registerSelectionListener() {
+    treeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       @Override
-      public void valueChanged(final ListSelectionEvent e)
-      {
-        if (!e.getValueIsAdjusting())
-        {
-          synchronized(JTreeTableActionHandler.this)
-          {
+      public void valueChanged(final ListSelectionEvent e) {
+        if (!e.getValueIsAdjusting()) {
+          synchronized(JTreeTableActionHandler.this) {
             computeSelectedElements();
             updateActions();
           }
@@ -79,13 +71,11 @@ public class JTreeTableActionHandler extends AbstractActionHandler
   /**
    * Compute the list of elements selected in the component.
    */
-  protected synchronized void computeSelectedElements()
-  {
+  protected synchronized void computeSelectedElements() {
     selectedElements.clear();
     int[] rows = treeTable.getSelectedRows();
     if ((rows == null) || (rows.length <= 0)) return;
-    for (int n: rows)
-    {
+    for (int n: rows) {
       TreePath path = treeTable.getTree().getPathForRow(n);
       if (path == null) continue;
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();

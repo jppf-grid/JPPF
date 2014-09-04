@@ -20,12 +20,12 @@ package org.jppf.ui.actions;
 import javax.swing.*;
 
 import org.jppf.ui.options.*;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Task that sets the actions in the toolbar.
  */
-public class ActionsInitializer implements Runnable
-{
+public class ActionsInitializer implements Runnable {
   /**
    * The panel to which the actions apply.
    */
@@ -44,8 +44,7 @@ public class ActionsInitializer implements Runnable
    * @param mainPanel the panel to which the actions apply.
    * @param btnContainerName the container for the buttons associated with the actions (toolbar).
    */
-  public ActionsInitializer(final OptionElement mainPanel, final String btnContainerName)
-  {
+  public ActionsInitializer(final OptionElement mainPanel, final String btnContainerName) {
     this(mainPanel, (ActionHolder) mainPanel, btnContainerName);
   }
 
@@ -55,8 +54,7 @@ public class ActionsInitializer implements Runnable
    * @param actionHolder the panel to which the actions apply.
    * @param btnContainerName the container for the buttons associated with the actions (toolbar).
    */
-  public ActionsInitializer(final OptionElement mainPanel, final ActionHolder actionHolder, final String btnContainerName)
-  {
+  public ActionsInitializer(final OptionElement mainPanel, final ActionHolder actionHolder, final String btnContainerName) {
     this.mainPanel = mainPanel;
     this.actionHolder = actionHolder;
     this.btnContainerName = btnContainerName;
@@ -64,31 +62,27 @@ public class ActionsInitializer implements Runnable
 
   /**
    * Execute this task.
-   * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     OptionContainer page = null;
-    while (page == null)
-    {
+    while (page == null) {
       final OptionElement parent = mainPanel.getParent();
       if (parent != null) page = (OptionContainer) mainPanel.findFirstWithName(btnContainerName);
-      try
-      {
+      try {
         Thread.sleep(100L);
+      } catch(final InterruptedException e) {
       }
-      catch(final InterruptedException e)
-      {
-      }
-      if (page != null)
-      {
-        for (OptionElement elt: page.getChildren())
-        {
+      if (page != null) {
+        for (OptionElement elt: page.getChildren()) {
           if (!(elt.getUIComponent() instanceof AbstractButton)) continue;
           final AbstractButton button = (AbstractButton) elt.getUIComponent();
           final UpdatableAction action = actionHolder.getActionHandler().getAction(elt.getName());
           if (action == null) continue;
+          if (elt instanceof ButtonOption) {
+            ButtonOption btnOption = (ButtonOption) elt;
+            if (btnOption.getIconPath() != null) action.putValue(Action.SMALL_ICON, GuiUtils.loadIcon(btnOption.getIconPath()));
+          }
           button.setAction(action);
           button.setText("");
           button.setToolTipText((String) action.getValue(Action.NAME));

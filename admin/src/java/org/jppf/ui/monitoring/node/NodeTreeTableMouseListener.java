@@ -30,20 +30,17 @@ import org.jppf.ui.actions.JTreeTableActionHandler;
  * Processes right-click events to display popup menus.
  * @author Laurent Cohen
  */
-public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener
-{
+public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener {
   /**
    * Initialize this mouse listener.
    * @param actionHandler the object that handles toolbar and menu actions.
    */
-  public NodeTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
-  {
+  public NodeTreeTableMouseListener(final JTreeTableActionHandler actionHandler) {
     super(actionHandler);
   }
 
   @Override
-  protected JPopupMenu createPopupMenu(final MouseEvent event)
-  {
+  protected JPopupMenu createPopupMenu(final MouseEvent event) {
     Component comp = event.getComponent();
     Point p = comp.getLocationOnScreen();
     JPopupMenu menu = new JPopupMenu();
@@ -55,8 +52,13 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener
     addItem(menu, "update.configuration", p);
     addItem(menu, "update.threads", p);
     addItem(menu, "reset.counter", p);
+    menu.addSeparator();
     addItem(menu, "restart.node", p);
+    addItem(menu, "restart.node.deferred", p);
     addItem(menu, "shutdown.node", p);
+    addItem(menu, "shutdown.node.deferred", p);
+    menu.addSeparator();
+    addItem(menu, "toggle.active", p);
     addItem(menu, "node.provisioning", p);
     return menu;
   }

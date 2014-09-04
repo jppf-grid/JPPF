@@ -126,7 +126,9 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.getRenderContext().setVertexLabelRenderer(renderer);
       viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
       viewer.getRenderContext().setVertexDrawPaintTransformer(new ConstantTransformer(null));
-      viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(0.5f)));
+      viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(1f)));
+      //viewer.getRenderContext().setEdgeShapeTransformer(new EdgeShape.SimpleLoop());
+      //viewer.getRenderContext().setEdgeArrowTransformer();
       viewer.setVertexToolTipTransformer(new ToStringLabeller<TopologyData>() {
         @Override
         public String transform(final TopologyData v) {
@@ -201,8 +203,10 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       actionHandler.putAction("graph.show.information", new SystemInformationAction());
       actionHandler.putAction("graph.update.threads", new NodeThreadsAction());
       actionHandler.putAction("graph.reset.counter", new ResetTaskCounterAction());
-      actionHandler.putAction("graph.restart.node", new RestartNodeAction());
-      actionHandler.putAction("graph.shutdown.node", new ShutdownNodeAction());
+      actionHandler.putAction("graph.restart.node", new ShutdownOrRestartNodeAction(true, true, "restart.node"));
+      actionHandler.putAction("graph.restart.node.deferred", new ShutdownOrRestartNodeAction(true, false, "restart.node.deferred"));
+      actionHandler.putAction("graph.shutdown.node", new ShutdownOrRestartNodeAction(false, true, "shutdown.node"));
+      actionHandler.putAction("graph.shutdown.node.deferred", new ShutdownOrRestartNodeAction(false, false, "shutdown.node.deferred"));
       actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction(treeTableOption));
       actionHandler.putAction("graph.node.provisioning", new ProvisioningAction());
       actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
@@ -214,7 +218,9 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       actionHandler.updateActions();
     }
     Runnable r = new ActionsInitializer(this, "/graph.topology.toolbar");
+    Runnable r2 = new ActionsInitializer(this, "/graph.topology.toolbar.bottom");
     new Thread(r).start();
+    new Thread(r2).start();
   }
 
   /**

@@ -49,6 +49,10 @@ class JobDataPanelManager {
    *
    */
   private final ConnectionStatusListener listener = new ConnectionStatusListener();
+  /**
+   * 
+   */
+  private boolean firstDriverAdded = false;
 
   /**
    * Initialize this job data panel manager.
@@ -78,10 +82,28 @@ class JobDataPanelManager {
     final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
     if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
     panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
-    JPPFTreeTable treeTable = panel.getTreeTable();
-    if (treeTable != null) {
-      treeTable.expand(panel.getTreeTableRoot());
-      treeTable.expand(driverNode);
+    if (!firstDriverAdded) {
+      firstDriverAdded = true;
+      if (debugEnabled) log.debug("adding first driver: " + driverName + " at index " + index);
+      Runnable r =  new Runnable() {
+        @Override public synchronized void run() {
+          try {
+            JPPFTreeTable treeTable = null;
+            while ((treeTable = panel.getTreeTable()) == null) wait(10L);
+            treeTable.expand(panel.getTreeTableRoot());
+            treeTable.expand(driverNode);
+          } catch (Exception e) {
+          }
+        }
+      };
+      new Thread(r, "Job tree expansion").start();
+    } else {
+      if (debugEnabled) log.debug("additional driver: " + driverName + " at index " + index);
+      JPPFTreeTable treeTable = panel.getTreeTable();
+      if (treeTable != null) {
+        treeTable.expand(panel.getTreeTableRoot());
+        treeTable.expand(driverNode);
+      }
     }
   }
 

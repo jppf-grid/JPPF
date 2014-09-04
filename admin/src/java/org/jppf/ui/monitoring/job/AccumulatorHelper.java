@@ -191,7 +191,8 @@ public class AccumulatorHelper {
     if (debugEnabled) log.debug("setup invoked");
     if (timer == null) timer = new Timer("accumulator timer");
     timerTask = new MyTimerTask();
-    timer.schedule(timerTask, period, period);
+    //timer.schedule(timerTask, period, period);
+    timer.schedule(timerTask, 0L, period);
   }
 
   /**

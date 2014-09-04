@@ -72,9 +72,9 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   public JobDataPanel() {
     BASE = "org.jppf.ui.i18n.JobDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
-    createTreeTableModel();
     panelManager = new JobDataPanelManager(this);
     accumulatorHelper = new AccumulatorHelper(this);
+    createTreeTableModel();
     populateTreeTableModel();
     StatsHandler.getInstance().getClientHandler().getJppfClient(this);
   }
@@ -85,6 +85,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   private void createTreeTableModel() {
     treeTableRoot = new DefaultMutableTreeNode(localize("job.tree.root.name"));
     model = new JobTreeTableModel(treeTableRoot);
+    treeTable = new JPPFTreeTable(model);
+    treeTable.expand(treeTableRoot);
   }
 
   /**
@@ -145,7 +147,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
    */
   @Override
   public void createUI() {
-    treeTable = new JPPFTreeTable(model);
     treeTable.getTree().setLargeModel(true);
     treeTable.getTree().setRootVisible(false);
     treeTable.getTree().setShowsRootHandles(true);
@@ -157,6 +158,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer());
     JScrollPane sp = new JScrollPane(treeTable);
     setUIComponent(sp);
+    treeTable.setVisible(true);
     treeTable.expandAll();
   }
 
@@ -336,7 +338,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
   /**
    * Notify this listener that a new driver connection was created.
    * @param event the event to notify this listener of.
-   * @see org.jppf.client.event.ClientListener#newConnection(org.jppf.client.event.ClientEvent)
    */
   @Override
   public void newConnection(final ClientEvent event) {

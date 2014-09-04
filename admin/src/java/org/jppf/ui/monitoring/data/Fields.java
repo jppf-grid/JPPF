@@ -134,6 +134,7 @@ public enum Fields {
   NB_IDLE_NODES,
   /**
    * Name for the current number of busy nodes connected to the server.
+   * @since 5.0
    */
   NB_BUSY_NODES,
   /**
@@ -266,26 +267,32 @@ public enum Fields {
   TOTAL_OUTBOUND_MB,
   /**
    * Amount of heap used.
+   * @since 5.0
    */
   HEALTH_HEAP,
   /**
    * Percentage of heap used.
+   * @since 5.0
    */
   HEALTH_HEAP_PCT,
   /**
    * Amount of non-heap memory used.
+   * @since 5.0
    */
   HEALTH_NON_HEAP,
   /**
    * Percentage of non-heap meory used.
+   * @since 5.0
    */
   HEALTH_NON_HEAP_PCT,
   /**
    * Number of live threads.
+   * @since 5.0
    */
   HEALTH_THREADS,
   /**
    * CPU load.
+   * @since 5.0
    */
   HEALTH_CPU;
 

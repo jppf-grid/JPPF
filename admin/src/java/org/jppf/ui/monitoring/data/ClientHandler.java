@@ -36,6 +36,7 @@ import org.slf4j.*;
 /**
  * 
  * @author Laurent Cohen
+ * @since 5.0
  */
 public class ClientHandler implements ClientListener {
   /**

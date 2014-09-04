@@ -27,8 +27,7 @@ import org.jppf.ui.utils.GuiUtils;
  * An option that uses a <code>JTextArea</code> to edit its value.
  * @author Laurent Cohen
  */
-public class TextAreaOption extends AbstractOption
-{
+public class TextAreaOption extends AbstractOption {
   /**
    * The underlying UI component used to edit the value of this option.
    */
@@ -42,8 +41,8 @@ public class TextAreaOption extends AbstractOption
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  public TextAreaOption()
-  {
+  public TextAreaOption() {
+    //this.bordered = true;
   }
 
   /**
@@ -53,12 +52,12 @@ public class TextAreaOption extends AbstractOption
    * @param tooltip - the tooltip associated with the text area.
    * @param value - the initial value of this component.
    */
-  public TextAreaOption(final String name, final String label, final String tooltip, final String value)
-  {
+  public TextAreaOption(final String name, final String label, final String tooltip, final String value) {
     this.name = name;
     this.label = label;
     setToolTipText(tooltip);
     this.value = value;
+    //this.bordered = true;
     createUI();
   }
 
@@ -66,24 +65,23 @@ public class TextAreaOption extends AbstractOption
    * Create the UI components for this option.
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     textArea = new JTextArea((String) value);
     textArea.setBorder(BorderFactory.createEmptyBorder());
     if (toolTipText != null) textArea.setToolTipText(toolTipText);
     textArea.setEditable(editable);
+    //if (!bordered) textArea.setBorder(BorderFactory.createEmptyBorder());
     //textArea.setOpaque(false);
-    if (scrollable)
-    {
+    if (scrollable) {
       JScrollPane scrollPane = new JScrollPane(textArea);
       scrollPane.setOpaque(false);
+      if (!bordered) scrollPane.setBorder(BorderFactory.createEmptyBorder());
       UIComponent = scrollPane;
-    }
-    else
-    {
+    } else {
       JPanel mainPanel = GuiUtils.createBoxPanel(BoxLayout.Y_AXIS);
       mainPanel.setBorder(BorderFactory.createTitledBorder(label));
       mainPanel.add(textArea);
+      if (!bordered) mainPanel.setBorder(BorderFactory.createEmptyBorder());
       UIComponent = mainPanel;
     }
     setupValueChangeNotifications();
@@ -95,8 +93,7 @@ public class TextAreaOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#getValue()
    */
   @Override
-  public Object getValue()
-  {
+  public Object getValue() {
     value = textArea.getText();
     return value;
   }
@@ -133,7 +130,6 @@ public class TextAreaOption extends AbstractOption
 
   /**
    * Add a listener to the underlying text document, to receive and propagate change events.
-   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
   protected void setupValueChangeNotifications() {
@@ -160,8 +156,7 @@ public class TextAreaOption extends AbstractOption
    * Determine whether the text area is editable.
    * @return true if the text area is editable, false otherwise.
    */
-  public boolean isEditable()
-  {
+  public boolean isEditable() {
     return editable;
   }
 
@@ -170,8 +165,7 @@ public class TextAreaOption extends AbstractOption
    * @param editable true if the text area is editable, false otherwise.
    */
   @Override
-  public void setEditable(final boolean editable)
-  {
+  public void setEditable(final boolean editable) {
     this.editable = editable;
     if (textArea != null) textArea.setEditable(editable);
   }
@@ -179,11 +173,9 @@ public class TextAreaOption extends AbstractOption
   /**
    * Enable or disable this option.
    * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.Option#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
     textArea.setEnabled(enabled);
   }
 
@@ -191,8 +183,7 @@ public class TextAreaOption extends AbstractOption
    * Get the underlying <code>JTextArea</code>.
    * @return an instance of {@link JTextArea}.
    */
-  public JTextArea getTextArea()
-  {
+  public JTextArea getTextArea() {
     return textArea;
   }
 }

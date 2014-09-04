@@ -28,36 +28,44 @@ import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
 /**
- * This action restarts a node.
+ * This action stops a node.
  */
-public class RestartNodeAction extends AbstractTopologyAction
-{
+public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(RestartNodeAction.class);
+  private static Logger log = LoggerFactory.getLogger(ShutdownOrRestartNodeAction.class);
   /**
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Whether to restart the nodes or to shut them down.
+   */
+  private final boolean restart;
+  /**
+   * Whether to restart/shutdown immediately or wait until each node are idle.
+   */
+  private final boolean interruptIfRunning;
 
   /**
    * Initialize this action.
+   * @param restart whether to restart the nodes or to shut them down.
+   * @param interruptIfRunning whether to restart/shutdown immediately or wait until each node are idle.
+   * @param name the name of the corresponding UI element.
    */
-  public RestartNodeAction()
-  {
-    setupIcon("/org/jppf/ui/resources/traffic_light_red_green.gif");
-    setupNameAndTooltip("restart.node");
+  public ShutdownOrRestartNodeAction(final boolean restart, final boolean interruptIfRunning, final String name) {
+    this.restart = restart;
+    this.interruptIfRunning = interruptIfRunning;
+    if (name != null) setupNameAndTooltip(name);
   }
 
   /**
    * Update this action's enabled state based on a list of selected elements.
-   * @param selectedElements - a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   * @param selectedElements a list of objects selected in the tre table.
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     setEnabled(dataArray.length > 0);
   }
@@ -65,11 +73,9 @@ public class RestartNodeAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -79,7 +85,8 @@ public class RestartNodeAction extends AbstractTopologyAction
             JPPFNodeForwardingMBean forwarder = entry.getKey().getNodeForwarder();
             if (forwarder == null) continue;
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
-            forwarder.restart(selector);
+            if (restart) forwarder.restart(selector, interruptIfRunning);
+            else forwarder.shutdown(selector, interruptIfRunning);
           } catch(IOException e) {
             entry.getKey().initializeProxies();
             log.error(e.getMessage(), e);

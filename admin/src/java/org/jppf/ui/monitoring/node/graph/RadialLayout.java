@@ -83,6 +83,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number> {
       double radius = radiusFactor * (height < width ? height : width);
       radius *= (dSize > 1) ? 1d : 2d;
 
+      int vertextWidth = LayoutFactory.VERTEX_SIZE.width;
       int i = 0;
       for (TopologyData driver : drivers) {
         Point2D coord = transform(driver);
@@ -96,7 +97,11 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number> {
         for (TopologyData node : nodes) {
           Point2D nodeCoord = transform(node);
           double nodeAngle = firstAngle + factor * Math.PI * j / nodes.size();
-          nodeCoord.setLocation(Math.cos(nodeAngle) * radius + coord.getX(), Math.sin(nodeAngle) * radius + coord.getY());
+          double nodeX = Math.cos(nodeAngle) * radius + coord.getX();
+          if (nodeX < vertextWidth/2) nodeX = vertextWidth/2;
+          double offset = nodeX + vertextWidth/2 - width;
+          if (offset > 0) nodeX -= offset;
+          nodeCoord.setLocation(nodeX, Math.sin(nodeAngle) * radius + coord.getY());
           j++;
         }
         i++;

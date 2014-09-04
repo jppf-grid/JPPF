@@ -95,6 +95,7 @@ public interface StatsConstants
   };
   /**
    * List of properties for health snapshots.
+   * @since 5.0
    */
   Fields[] HEALTH_PROPS = {
       HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_THREADS, HEALTH_CPU
@@ -107,6 +108,7 @@ public interface StatsConstants
         INBOUND_NETWORK_TRAFFIC_PROPS, OUTBOUND_NETWORK_TRAFFIC_PROPS);
   /**
    * List of all fields available in the charts.
+   * @since 5.0
    */
   Fields[] ALL_CHART_FIELDS =
     CollectionUtils.concatArrays(EXECUTION_PROPS, NODE_EXECUTION_PROPS, TRANSPORT_PROPS, JOB_PROPS, QUEUE_PROPS, CONNECTION_PROPS, NODE_CL_REQUEST_TIME_PROPS,

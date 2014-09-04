@@ -23,7 +23,7 @@
   <property name="scrollable" value="true"/>
 
 	<!-- ===================================================================== -->
-	<!--                        Buttons area                                   -->
+	<!--  Top toolbar                                                          -->
 	<!-- ===================================================================== -->
 
 	<child name="topology.toolbar" type="page">
@@ -36,58 +36,81 @@
 		<child name="sep1" type="ToolbarSeparator"/>
 		<child name="update.configuration" type="Button"/>
 		<child name="show.information" type="Button"/>
+    <child name="sep2" type="ToolbarSeparator"/>
 		<child name="update.threads" type="Button"/>
 		<child name="reset.counter" type="Button"/>
-		<child name="restart.node" type="Button"/>
-    <child name="shutdown.node" type="Button"/>
+    <child name="sep3" type="ToolbarSeparator"/>
+		<child name="restart.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green.gif"/>
+    </child>
+    <child name="restart.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green_yellow.gif"/>
+    </child>
+    <child name="sep3.5" type="ToolbarSeparator"/>
+    <child name="shutdown.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red.gif"/>
+    </child>
+    <child name="shutdown.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_yellow.gif"/>
+    </child>
+    <child name="sep4" type="ToolbarSeparator"/>
     <child name="toggle.active" type="Button"/>
     <child name="node.provisioning" type="Button"/>
 
-		<child name="sep2" type="ToolbarSeparator"/>
-		<child name="Auto" type="Boolean">
-			<property name="label" value="Auto refresh"/>
-			<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
-			<property name="value" value="true"/>
-			<property name="persistent" value="true"/>
-			<listener type="script">
-				<script language="groovy"><![CDATA[
-					def b = option.getValue().booleanValue();
-					def handler = option.findFirstWithName("/NodeTreeTable").getRefreshHandler();
-					if (handler != null)
-					{
-						if (b) handler.startRefreshTimer();
-						else handler.stopRefreshTimer();
-					}
-				]]></script>
-			</listener>
-		</child>
-
-		<child name="button.refresh" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
-			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/NodeTreeTable").getRefreshHandler().refresh()</script>
-			</listener>
-		</child>
-		
-		<child name="sep3" type="ToolbarSeparator"/>
-		<child name="button.expand" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
-			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/NodeTreeTable").getTreeTable().expandAll()</script>
-			</listener>
-		</child>
-
-		<child name="button.collapse" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
-			<listener type="script">
-				<script language="groovy">option.findFirstWithName("/NodeTreeTable").getTreeTable().collapseAll()</script>
-			</listener>
-		</child>
-
-		<child name="sep4" type="ToolbarSeparator"/>
-		<child name="select.drivers" type="Button"/>
-		<child name="select.nodes" type="Button"/>
 	</child>
+
+  <!-- ===================================================================== -->
+  <!-- Bottom tool bar                                                       -->
+  <!-- ===================================================================== -->
+
+  <child name="topology.toolbar.bottom" type="page">
+    <property name="componentConstraints" value="gap rel"/>
+    <property name="layoutConstraints" value="insets 4 2 0 2"/>
+
+    <child name="Auto" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/synch.gif"/>
+      <property name="toggle" value="true"/>
+      <initializer type="script">
+        <script language="groovy">option.getUIComponent().setSelected(true)</script>
+      </initializer>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          def b = option.getUIComponent().isSelected();
+          def handler = option.findFirstWithName("/NodeTreeTable").getRefreshHandler();
+          if (handler != null) {
+            if (b) handler.startRefreshTimer();
+            else handler.stopRefreshTimer();
+          }
+        ]]></script>
+      </listener>
+    </child>
+
+    <child name="button.refresh" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+      <listener type="script">
+        <script language="groovy">option.findFirstWithName("/NodeTreeTable").getRefreshHandler().refresh()</script>
+      </listener>
+    </child>
+    
+    <child name="sep5" type="ToolbarSeparator"/>
+    <child name="button.expand" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/expand.gif"/>
+      <listener type="script">
+        <script language="groovy">option.findFirstWithName("/NodeTreeTable").getTreeTable().expandAll()</script>
+      </listener>
+    </child>
+
+    <child name="button.collapse" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/collapse.gif"/>
+      <listener type="script">
+        <script language="groovy">option.findFirstWithName("/NodeTreeTable").getTreeTable().collapseAll()</script>
+      </listener>
+    </child>
+
+    <child name="sep6" type="ToolbarSeparator"/>
+    <child name="select.drivers" type="Button"/>
+    <child name="select.nodes" type="Button"/>
+  </child>
 
 	<!-- ===================================================================== -->
 	<!--                      Tree table area                                  -->

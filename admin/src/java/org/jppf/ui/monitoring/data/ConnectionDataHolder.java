@@ -43,6 +43,7 @@ public class ConnectionDataHolder {
   private final List<Map<Fields, Double>> doubleValuesMaps = new Vector<>();
   /**
    * The topology data associated with the driver connection.
+   * @since 5.0
    */
   private TopologyData driverData;
 
@@ -73,6 +74,7 @@ public class ConnectionDataHolder {
   /**
    * Get the latest data snapshot mapping fields to their corresponding double values.
    * @return a map of field names to double values.
+   * @since 5.0
    */
   public Map<Fields, Double> getLatestDoubleValues() {
     synchronized(doubleValuesMaps) {
@@ -83,6 +85,7 @@ public class ConnectionDataHolder {
   /**
    * Get the latest data snapshot mapping fields to their corresponding string values.
    * @return a map of field names to string values.
+   * @since 5.0
    */
   public Map<Fields, String> getLatestStringValues() {
     synchronized(stringValuesMaps) {
@@ -93,6 +96,7 @@ public class ConnectionDataHolder {
   /**
    * Get the topology data associated with the driver connection.
    * @return a {@link TopologyData} object.
+   * @since 5.0
    */
   public TopologyData getDriverData() {
     return driverData;
@@ -101,6 +105,7 @@ public class ConnectionDataHolder {
   /**
    * Set the topology data associated with the driver connection.
    * @param driverData a {@link TopologyData} object.
+   * @since 5.0
    */
   public void setDriverData(final TopologyData driverData) {
     this.driverData = driverData;

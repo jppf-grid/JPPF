@@ -72,6 +72,7 @@ public final class StatsFormatter implements StatsConstants {
   /**
    * Initialize the formatter for integer values.
    * @return a <code>NumberFormat</code> instance.
+   * @since 5.0
    */
   private static NumberFormat initIntegerFormatter() {
     NumberFormat integerFormatter = NumberFormat.getInstance();
@@ -189,6 +190,7 @@ public final class StatsFormatter implements StatsConstants {
    * Fill the map of values represented as strings for a specified data snapshot.
    * @param map the map to fill.
    * @param snapshot the data snapshot to map.
+   * @since 5.0
    */
   public static void stringValues2(final Map<Fields, String> map, final HealthSnapshot snapshot) {
     map.put(HEALTH_HEAP, formatInt(snapshot.getHeapUsed() / MB));

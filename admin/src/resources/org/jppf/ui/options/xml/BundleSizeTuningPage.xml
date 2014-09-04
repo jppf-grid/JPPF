@@ -101,7 +101,8 @@
 	<child name="LoadBalancingMessages" type="TextArea">
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Feedback messages received from the server"/>
-		<property name="value" value=""/>
+    <property name="bordered" value="true"/>
+    <property name="value" value=""/>
 		<property name="componentConstraints" value="grow, pushx, pushy 1"/>
 	</child>
 

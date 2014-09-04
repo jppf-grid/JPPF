@@ -28,6 +28,7 @@ import org.jppf.ui.monitoring.data.*;
 /**
  * Instances of this class are used to create and update 3D pie charts.
  * @author Laurent Cohen
+ * @since 5.0
  */
 public class MeterChartHandler implements ChartHandler {
   /**

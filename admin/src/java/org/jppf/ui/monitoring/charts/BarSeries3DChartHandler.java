@@ -27,6 +27,7 @@ import org.jppf.ui.monitoring.data.*;
 /**
  * Instances of this class are used to create and update line charts with an horizontal orientation.
  * @author Laurent Cohen
+ * @since 5.0
  */
 public class BarSeries3DChartHandler implements ChartHandler {
   /**

@@ -28,40 +28,62 @@
 	<!--                        Buttons area                                   -->
 	<!-- ===================================================================== -->
 
-	<child name="graph.topology.toolbar" type="page">
-		<property name="componentConstraints" value="gap rel"/>
-		<property name="layoutConstraints" value="insets 4 2 0 2"/>
+  <child name="graph.topology.toolbar" type="page">
+    <property name="componentConstraints" value="gap rel"/>
+    <property name="layoutConstraints" value="insets 4 2 0 2"/>
 
-		<child name="graph.shutdown.restart.driver" type="Button"/>
-		<child name="graph.driver.reset.statistics" type="Button"/>
+    <child name="graph.shutdown.restart.driver" type="Button"/>
+    <child name="graph.driver.reset.statistics" type="Button"/>
 
-		<child name="sep1" type="ToolbarSeparator"/>
-		<child name="graph.update.configuration" type="Button"/>
-		<child name="graph.show.information" type="Button"/>
-		<child name="graph.update.threads" type="Button"/>
-		<child name="graph.reset.counter" type="Button"/>
-		<child name="graph.restart.node" type="Button"/>
-		<child name="graph.shutdown.node" type="Button"/>
+    <child name="sep1" type="ToolbarSeparator"/>
+    <child name="graph.update.configuration" type="Button"/>
+    <child name="graph.show.information" type="Button"/>
+
+    <child name="sep2" type="ToolbarSeparator"/>
+    <child name="graph.update.threads" type="Button"/>
+    <child name="graph.reset.counter" type="Button"/>
+
+    <child name="sep3" type="ToolbarSeparator"/>
+    <child name="graph.restart.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green.gif"/>
+    </child>
+    <child name="graph.restart.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green_yellow.gif"/>
+    </child>
+
+    <child name="sep4" type="ToolbarSeparator"/>
+    <child name="graph.shutdown.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red.gif"/>
+    </child>
+    <child name="graph.shutdown.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_yellow.gif"/>
+    </child>
+
+    <child name="sep5" type="ToolbarSeparator"/>
     <child name="graph.toggle.active" type="Button"/>
     <child name="graph.node.provisioning" type="Button"/>
 
-		<child name="sep2" type="ToolbarSeparator"/>
-		<child name="graph.button.refresh" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
-			<listener type="script">
-				<script language="groovy">
-				  def graph = option.findFirstWithName("/NodeGraph");
-				  graph.populate();
-				  graph.setLayout();
-				</script>
-			</listener>
-		</child>
+  </child>
+  
+  <child name="graph.topology.toolbar.bottom" type="page">
+    <property name="componentConstraints" value="gap rel"/>
+    <property name="layoutConstraints" value="insets 4 2 0 2"/>
+
+    <child name="graph.button.refresh" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+      <listener type="script">
+        <script language="groovy">
+          def graph = option.findFirstWithName("/NodeGraph");
+          graph.populate();
+          graph.setLayout();
+        </script>
+      </listener>
+    </child>
 
     <child name="graph.toggle.layout" type="Button">
       <property name="toggle" value="true"/>
     </child>
 
-    <!--
     <child name="Layout" type="ComboBox">
       <property name="label" value="Layout"/>
       <property name="tooltip" value="choose a graph layout form the list"/>
@@ -78,23 +100,21 @@
       <item name="Kamada-Kawai" selected="false"/>
       <item name="Spring-2" selected="false"/>
     </child>
-    -->
 
-		<child name="sep3" type="ToolbarSeparator"/>
-		<child name="graph.button.expand" type="Button"/>
-		<child name="graph.button.collapse" type="Button"/>
+    <child name="sep6" type="ToolbarSeparator"/>
+    <child name="graph.button.expand" type="Button"/>
+    <child name="graph.button.collapse" type="Button"/>
 
-		<child name="sep4" type="ToolbarSeparator"/>
-		<child name="graph.select.drivers" type="Button"/>
-		<child name="graph.select.nodes" type="Button"/>
+    <child name="sep7" type="ToolbarSeparator"/>
+    <child name="graph.select.drivers" type="Button"/>
+    <child name="graph.select.nodes" type="Button"/>
 
-		<child name="sep5" type="ToolbarSeparator"/>
-		<child name="graph.toggle.mode" type="Button">
-			<property name="toggle" value="true"/>
-		</child>
-	</child>
-	
-
+    <child name="sep8" type="ToolbarSeparator"/>
+    <child name="graph.toggle.mode" type="Button">
+      <property name="toggle" value="true"/>
+    </child>
+  </child>
+  
 	<!-- ===================================================================== -->
 	<!--                      Graph area                                       -->
 	<!-- ===================================================================== -->
