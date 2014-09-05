@@ -441,7 +441,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
         boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
         jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, "jppf.node.management.port", "jppf.management.port");
         jmxServer.start(getClass().getClassLoader());
-        System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());
+        System.out.printf("JPPF Node management initialized at %s:%s%n", jmxServer.getManagementHost(), jmxServer.getManagementPort());
       }
     }
     return jmxServer;
@@ -509,7 +509,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Chek whther this node is stopped or shutting down.
+   * Chek whether this node is stopped or shutting down.
    * If not, an unchecked {@code IllegalStateException} is thrown.
    * @return {@code true} if the node is stopped or shutting down.
    */
