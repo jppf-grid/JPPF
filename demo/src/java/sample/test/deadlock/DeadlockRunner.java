@@ -77,7 +77,8 @@ public class DeadlockRunner {
     System.out.printf("*** results for job '%s' ***\n", job.getName());
     List<Task<?>> results = job.getAllResults();
     for (Task<?> task: results) {
-      if (task.getThrowable() != null) System.out.printf("%s raised an exception : %s\n", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+      //if (task.getThrowable() != null) System.out.printf("%s raised an exception : %s\n", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
+      if (task.getThrowable() != null) System.out.printf("%s raised an exception : %s\n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));
       //else System.out.printf("result of %s : %s\n", task.getId(), task.getResult());
     }
   }

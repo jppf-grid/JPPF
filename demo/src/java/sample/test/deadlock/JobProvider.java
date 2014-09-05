@@ -107,6 +107,7 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
       for (int i=1; i<=tasksPerJob; i++) {
         String message = "this is task " + i;
         MyTask task = new MyTask(message, taskDuration);
+        //TaskWithDates task = new TaskWithDates();
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
         taskCount++;
       }

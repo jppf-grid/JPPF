@@ -39,6 +39,8 @@ permission java.lang.RuntimePermission "modifyThread";
 permission java.lang.RuntimePermission "getProtectionDomain";
 permission java.lang.RuntimePermission "getenv.*";
 
+permission java.lang.RuntimePermission "closeClassLoader";
+
 //------------------------------------------------------------------------------//
 // Security permissions.                                                        //
 // Please do not change these permissions. JPPF may not work any more if you do //

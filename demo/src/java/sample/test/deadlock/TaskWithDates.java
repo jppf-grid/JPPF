@@ -18,46 +18,35 @@
 
 package sample.test.deadlock;
 
+import java.util.Date;
+
 import org.jppf.node.protocol.AbstractTask;
 
 /**
  * A simple task used in the demo.
  */
-public class MyTask extends AbstractTask<String> {
+public class TaskWithDates extends AbstractTask<String> {
   /**
    * A string message to transform and set as result of this task.
    */
-  private final String message;
-  /**
-   * How long this task will sleep to simulate code execution.
-   */
-  private final long duration;
+  private final Date[] dates;
 
   /**
    * Initialize this task.
-   * @param message a string message to transform and set as result of this task.
-   * @param duration how long this task will sleep to simulate code execution.
    */
-  public MyTask(final String message, final long duration) {
-    this.message = message;
-    this.duration = duration;
+  public TaskWithDates() {
+    dates = new Date[100];
+    for (int i=0; i<dates.length; i++) dates[i] = new Date();
   }
 
   @Override
   public void run() {
     try {
-      // wait for the specified time, to simulate actual execution
-      //if (duration > 0) Thread.sleep(duration);
-      long taskStart = System.currentTimeMillis();
-      for (long elapsed = 0L; elapsed < duration; elapsed = System.currentTimeMillis() - taskStart) {
-        String s = "";
-        for (int i=0; i<10; i++) s += "A10";
+      for (int i=0; i<dates.length; i++) {
+        assert dates[i] != null : "dates[" + i + "] is null";
       }
-      /*
-      System.out.println("before System.exit(1)");
-      System.exit(1);
-      */
-      setResult("execution success for " + message);
+      Thread.sleep(100L);
+      setResult("execution success");
     } catch (Exception e) {
       setThrowable(e);
     }
