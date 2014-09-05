@@ -48,7 +48,7 @@ public final class NetworkUtils {
   private static final HostIP[] NO_ADDRESS = new HostIP[0];
 
   /**
-   * Instantiation opf this class is not permitted.
+   * Instantiation of this class is not permitted.
    */
   private NetworkUtils() {
   }

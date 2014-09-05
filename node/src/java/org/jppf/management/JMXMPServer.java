@@ -78,7 +78,12 @@ public class JMXMPServer extends AbstractJMXServer {
       Thread.currentThread().setContextClassLoader(cl);
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties config = JPPFConfiguration.getProperties();
-      managementHost = NetworkUtils.getManagementHost();
+      managementHost = config.getString("jppf.management.host", null);
+      if (debugEnabled) log.debug("management host from configuration: {}", managementHost);
+      if (managementHost == null) {
+        managementHost = NetworkUtils.getManagementHost();
+        if (debugEnabled) log.debug("computed management host: {}", managementHost);
+      }
       managementPort = new ConfigurationHelper(config).getInt(ssl ? 11193 : 11198, 1024, 65535, portProperties);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperties));
       Map<String, Object> env = new HashMap<>();
