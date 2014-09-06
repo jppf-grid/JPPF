@@ -35,7 +35,7 @@ public class RLProfile extends AbstractAutoTuneProfile
   /**
    * Variation of the mean execution time that triggers a change in bundle size.
    */
-  private double performanceVariationThreshold = 0.05d;
+  private double performanceVariationThreshold = 0.0001d;
   /**
    * The absolute value of the maximum increase of the the bundle size.
    */
@@ -57,7 +57,7 @@ public class RLProfile extends AbstractAutoTuneProfile
     String prefix = "jppf.load.balancing.profile." + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
-    performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.05);
+    performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.0001d);
     maxActionRange = props.getInt(prefix + "maxActionRange", 50);
   }
 

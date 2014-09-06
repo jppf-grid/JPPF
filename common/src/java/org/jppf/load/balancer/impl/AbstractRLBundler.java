@@ -26,8 +26,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
-{
+public abstract class AbstractRLBundler extends AbstractAdaptiveBundler {
   /**
    * Logger for this class.
    */
@@ -57,8 +56,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the algorithm grouped as a performance analysis profile.
    */
-  public AbstractRLBundler(final LoadBalancingProfile profile)
-  {
+  public AbstractRLBundler(final LoadBalancingProfile profile) {
     super(profile);
     log.info("Bundler#" + bundlerNumber + ": Using Reinforcement Learning bundle size");
     log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize +
@@ -71,8 +69,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * set the current size of bundle.
    * @param bundleSize - the bundle size as an int value.
    */
-  public void setBundleSize(final int bundleSize)
-  {
+  public void setBundleSize(final int bundleSize) {
     this.bundleSize = bundleSize;
   }
 
@@ -80,11 +77,9 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * This method computes the bundle size based on the new state of the server.
    * @param size the number of tasks executed.
    * @param totalTime the time in nanoseconds it took to execute the tasks.
-   * @see org.jppf.load.balancer.AbstractBundler#feedback(int, double)
    */
   @Override
-  public void feedback(final int size, final double totalTime)
-  {
+  public void feedback(final int size, final double totalTime) {
     if (size <= 0) return;
     BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / size, size);
     dataHolder.addSample(sample);
@@ -94,14 +89,12 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
   /**
    * Compute the new bundle size.
    */
-  protected void computeBundleSize()
-  {
+  protected void computeBundleSize() {
     double d = dataHolder.getPreviousMean() - dataHolder.getMean();
     double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
     prevBundleSize = bundleSize;
     if (action == 0) action = (int) -Math.signum(d);
-    if ((d < -threshold) || (d > threshold))
-    {
+    if ((d < -threshold) || (d > threshold)) {
       action = (int) Math.signum(action) * (int) Math.round(d / threshold);
     }
     else action = 0;
@@ -119,14 +112,12 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
   /**
    * Compute the new bundle size.
    */
-  protected void computeBundleSize2()
-  {
+  protected void computeBundleSize2() {
     double d = dataHolder.getPreviousMean() - dataHolder.getMean();
     double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
     prevBundleSize = bundleSize;
     if (action == 0) action = (int) -Math.signum(d);
-    if ((d < -threshold) || (d > threshold))
-    {
+    if ((d < -threshold) || (d > threshold)) {
       action = (int) Math.signum(action) * (int) Math.round(d / threshold);
     }
     else action = 0;
@@ -147,8 +138,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * @param totalTime the time in nanoseconds it took to execute the tasks.
    * @see org.jppf.load.balancer.AbstractBundler#feedback(int, double)
    */
-  public void feedback2(final int size, final double totalTime)
-  {
+  public void feedback2(final int size, final double totalTime) {
     if (size <= 0) return;
     BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / size, size);
     dataHolder.addSample(sample);
@@ -156,12 +146,9 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
     double d = dataHolder.getPreviousMean() - dataHolder.getMean();
     double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
     prevBundleSize = bundleSize;
-    if (d < -threshold)
-    {
+    if (d < -threshold) {
       action += (int) Math.signum(action) * STEP;
-    }
-    else if (d > threshold)
-    {
+    } else if (d > threshold) {
       //action = (int) -Math.signum(action) * Math.max(STEP, Math.abs(action/2));
       action = (int) -Math.signum(action) * STEP;
     }
@@ -175,8 +162,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
     int max = maxSize();
     if (bundleSize > max) bundleSize = max;
     if (bundleSize <= 0) bundleSize = 1;
-    if (debugEnabled)
-    {
+    if (debugEnabled) {
       StringBuilder sb = new StringBuilder();
       sb.append("bundler #").append(getBundlerNumber()).append(" : size=").append(getBundleSize());
       sb.append(", ").append(getDataHolder());
@@ -189,8 +175,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * @see org.jppf.load.balancer.AbstractBundler#setup()
    */
   @Override
-  public void setup()
-  {
+  public void setup() {
   }
 
   /**
@@ -198,8 +183,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * @see org.jppf.load.balancer.AbstractBundler#dispose()
    */
   @Override
-  public void dispose()
-  {
+  public void dispose() {
     dataHolder = null;
   }
 
@@ -207,8 +191,7 @@ public abstract class AbstractRLBundler extends AbstractAdaptiveBundler
    * Get the bounded memory of the past performance updates.
    * @return a BundleDataHolder instance.
    */
-  public BundleDataHolder getDataHolder()
-  {
+  public BundleDataHolder getDataHolder() {
     return dataHolder;
   }
 }
