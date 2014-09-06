@@ -87,79 +87,46 @@ import com.sun.jmx.remote.opt.util.*;
  * {@link #MESSAGE_CONNECTION_SERVER} is the standard way to define the transport. An implementation can recognize other attributes to define the transport differently.
  */
 public class GenericConnectorServer extends JMXConnectorServer {
-  /**
-   * 
-   */
+  /** */
   private static final ClassLogger logger = new ClassLogger("javax.management.remote.generic", "GenericConnectorServer");
-  /**
-   * 
-   */
+  /** */
   private Receiver receiver;
-  /**
-   * 
-   */
+  /** */
   private SynchroMessageConnectionServer sMsgServer;
-  /**
-   * 
-   */
+  /** */
   private ObjectWrapping objectWrapping;
-  /**
-   * 
-   */
+  /** */
   private Map<String, ?> env;
-  /**
-   * 
-   */
+  /** */
   private ClassLoader defaultClassLoader = null;
-  /**
-   * 
-   */
+  /** */
   private List<ServerIntermediary> clientList = new ArrayList<>();
-  /**
-   * 
-   */
+  /** */
   private static final int DEFAULT_NOTIF_BUFFER_SIZE = 1000;
-  /**
-   * 
-   */
+  /** */
   private static final int CREATED = 0;
-  /**
-   * 
-   */
+  /** */
   private static final int STARTED = 1;
-  /**
-   * 
-   */
+  /** */
   private static final int STOPPED = 2;
-  /**
-   * 
-   */
+  /** */
   private int state = CREATED;
-  /**
-   * 
-   */
+  /** */
   private int[] lock = new int[0];
-  // client id
   /**
-   * 
+   * client id
    */
-  private static long clientIDCount = 0;
-  /**
-   * 
-   */
-  private static final int[] clientIDCountLock = new int[0];
-  /**
-   * 
-   */
+  //private static long clientIDCount = 0;
+  /** */
+  //private static final int[] clientIDCountLock = new int[0];
+  /** */
   private NotificationBuffer notifBuffer;
   /**
    * client connecting control
    */
   private final long connectingTimeout;
   //private final int maxConnecting;
-  /**
-   * 
-   */
+  /** */
   private static Timer cancelConnecting = new Timer(true);
   /**
    * Name of the attribute that specifies the object wrapping for parameters whose deserialization requires special treatment.
@@ -232,8 +199,7 @@ public class GenericConnectorServer extends JMXConnectorServer {
         if (tracing) logger.trace("start", "already stopped");
         throw new IOException("The server has been stopped.");
       }
-      if (tracing) logger.trace("start", "starting...");
-      if (tracing) logger.trace("start", "setting MBeanServer...");
+      if (tracing) logger.trace("start", "starting, setting MBeanServer...");
       MBeanServer mbs = getMBeanServer();
       if (mbs == null) throw new IllegalStateException("This connector server is not attached to an MBean server");
       // Check the internal access file property to see if an MBeanServerForwarder is to be provided
@@ -268,20 +234,13 @@ public class GenericConnectorServer extends JMXConnectorServer {
       final MessageConnectionServer messageServer = (MessageConnectionServer) env.get(MESSAGE_CONNECTION_SERVER);
       if (messageServer == null) {
         sMsgServer = DefaultConfig.getSynchroMessageConnectionServer(env);
-        if (sMsgServer == null) {
-          final String msg = "No message connection server";
-          throw new IllegalArgumentException(msg);
-        }
+        if (sMsgServer == null) throw new IllegalArgumentException("No message connection server");
       } else sMsgServer = new SynchroMessageConnectionServerImpl(messageServer, env);
       sMsgServer.start(env);
       state = STARTED;
-      if (tracing) {
-        logger.trace("start", "Connector Server Address = " + sMsgServer.getAddress());
-        logger.trace("start", "started.");
-      }
+      if (tracing) logger.trace("start", "Started, Connector Server Address = " + sMsgServer.getAddress());
       // start to receive clients
-      receiver = new Receiver();
-      receiver.start();
+      ThreadService.getShared().handoff(receiver = new Receiver());
     }
   }
 
@@ -314,7 +273,6 @@ public class GenericConnectorServer extends JMXConnectorServer {
         }
       }
       if (notifBuffer != null) notifBuffer.dispose();
-      //threads.terminate();
     }
     cancelConnecting.cancel();
     if (tracing) logger.trace("stop", "stopped.");
@@ -337,10 +295,8 @@ public class GenericConnectorServer extends JMXConnectorServer {
     super.connectionFailed(connectionId, message, userData);
   }
 
-  /**
-   * 
-   */
-  private class Receiver extends Thread {
+  /** */
+  private class Receiver implements Runnable {
     @Override
     public void run() {
       if (logger.debugOn()) logger.debug("Receiver.run", "starting receiver.");
@@ -386,25 +342,16 @@ public class GenericConnectorServer extends JMXConnectorServer {
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   private class ClientCreation implements Runnable {
-    /**
-     * 
-     */
+    /** */
     ServerSynchroMessageConnection connection;
-    /**
-     * 
-     */
+    /** */
     private boolean done = false;
-    /**
-     * 
-     */
+    /** */
     private ConnectingStopper stopper;
 
     /**
-     * 
      * @param connection .
      */
     public ClientCreation(final ServerSynchroMessageConnection connection) {
@@ -479,12 +426,10 @@ public class GenericConnectorServer extends JMXConnectorServer {
    */
   private class ConnectingStopper extends TimerTask {
     /**
-     * 
      */
     private final ClientCreation cc;
 
     /**
-     * 
      * @param cc .
      */
     public ConnectingStopper(final ClientCreation cc) {
@@ -508,7 +453,6 @@ public class GenericConnectorServer extends JMXConnectorServer {
   }
 
   /**
-   * 
    * @return .
    */
   synchronized NotificationBuffer getNotifBuffer() {
