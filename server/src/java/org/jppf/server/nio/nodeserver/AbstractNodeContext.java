@@ -149,8 +149,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Check whether the bundler held by this context is up to date by comparison
    * with the specified bundler.<br>
-   * If it is not, then it is replaced with a copy of the specified bundler, with a
-   * timestamp taken at creation time.
+   * If it is not, then it is replaced with a copy of the specified bundler, with a timestamp taken at creation time.
    * @param serverBundler the bundler to compare with.
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
@@ -158,7 +157,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext) {
     if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
-
     if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp()) {
       if (this.bundler != null) {
         this.bundler.dispose();
@@ -418,7 +416,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   /**
-   * Get the object that provides access to the management functions of the driver.
+   * Get the object that provides access to the management functions of the node.
    * @return a <code>JMXConnectionWrapper</code> instance.
    */
   public JMXNodeConnectionWrapper getJmxConnection() {
@@ -555,7 +553,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void updateStatsUponTaskResubmit(final int resubmittedTaskCount) {
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
-    //stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_TOTAL, tmpBundle.getTaskCount());
     stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, resubmittedTaskCount);
   }
 }

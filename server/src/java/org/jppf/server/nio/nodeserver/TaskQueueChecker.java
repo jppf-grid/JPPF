@@ -361,7 +361,8 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
    */
   public static void preparePolicy(final ExecutionPolicy policy, final ServerJob job, final JPPFStatistics stats, final int nbJobNodes) {
     if (policy == null) return;
-    policy.setContext(job.getSLA(), null, job.getMetadata(), nbJobNodes, stats);
+    if (job == null) policy.setContext(null, null, null, nbJobNodes, stats);
+    else policy.setContext(job.getSLA(), null, job.getMetadata(), nbJobNodes, stats);
   }
 
   /**
