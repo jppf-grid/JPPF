@@ -33,8 +33,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @exclude
  */
-public class ClassServerDelegateImpl extends AbstractClassServerDelegate
-{
+public class ClassServerDelegateImpl extends AbstractClassServerDelegate {
   /**
    * Logger for this class.
    */
@@ -52,8 +51,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
    * @param port the TCP port the class server is listening to.
    * @throws Exception if the connection could not be opened.
    */
-  public ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception
-  {
+  public ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception {
     super(owner);
     this.clientUuid = uuid;
     this.host = host;
@@ -65,10 +63,8 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
    * @throws Exception if an error is raised during initialization.
    */
   @Override
-  public final void init() throws Exception
-  {
-    try
-    {
+  public final void init() throws Exception {
+    try {
       if (owner.isClosed()) {
         log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
         return;
@@ -80,20 +76,16 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
       System.out.println(msg);
       log.info(msg);
       socketInitializer.initializeSocket(socketClient);
-      if (!socketInitializer.isSuccessful() && !socketInitializer.isClosed())
-      {
+      if (!socketInitializer.isSuccessful() && !socketInitializer.isClosed()) {
         throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
       }
-      if (!socketInitializer.isClosed())
-      {
+      if (!socketInitializer.isClosed()) {
         msg = "[client: " + getName() + "] Reconnected to the class server";
         System.out.println(msg);
         log.info(msg);
         setStatus(ACTIVE);
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(ExceptionUtils.getMessage(e));
       setStatus(FAILED);
       throw e;
@@ -102,25 +94,17 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
 
   /**
    * Main processing loop of this delegate.
-   * @see org.jppf.client.ClassServerDelegate#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       Thread.currentThread().setUncaughtExceptionHandler(this);
-      while (!stop && !isClosed())
-      {
-        try
-        {
+      while (!stop && !isClosed()) {
+        try {
           if (!handshakeDone) handshake();
           processNextRequest();
-        }
-        catch(Exception e)
-        {
-          if (!isClosed())
-          {
+        } catch(Exception e) {
+          if (!isClosed()) {
             if (debugEnabled) log.debug('[' + getName()+ "] caught " + e + ", will re-initialise ...", e);
             else log.warn('[' + getName()+ "] caught " + ExceptionUtils.getMessage(e) + ", will re-initialise ...");
             init();
@@ -128,9 +112,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
           }
         }
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error('[' +getName()+"] "+e.getMessage(), e);
       close();
     }
@@ -141,8 +123,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate
    * @return a <code>SocketInitializer</code> instance.
    */
   @Override
-  protected SocketInitializer createSocketInitializer()
-  {
+  protected SocketInitializer createSocketInitializer() {
     return new SocketInitializerImpl();
   }
 }

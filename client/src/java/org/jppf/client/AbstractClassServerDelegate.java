@@ -32,8 +32,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate, Thread.UncaughtExceptionHandler
-{
+public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate, Thread.UncaughtExceptionHandler {
   /**
    * Logger for this class.
    */
@@ -67,8 +66,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * Default instantiation of this class is not permitted.
    * @param owner the client connection which owns this connection delegate.
    */
-  protected AbstractClassServerDelegate(final JPPFClientConnection owner)
-  {
+  protected AbstractClassServerDelegate(final JPPFClientConnection owner) {
     super(owner, owner.getName() + " - ClassServer");
     formattedName = "[" + name + ']';
   }
@@ -76,33 +74,27 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Get the name of this delegate.
    * @return the name as a string.
-   * @see org.jppf.client.ClassServerDelegate#getName()
    */
   @Override
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
   /**
    * Set the name of this delegate.
    * @param name the name as a string.
-   * @see org.jppf.client.ClassServerDelegate#setName(java.lang.String)
    */
   @Override
-  public void setName(final String name)
-  {
+  public void setName(final String name) {
     this.name = name;
   }
 
   /**
    * Initialize this delegate's resources.
    * @throws Exception if an error is raised during initialization.
-   * @see org.jppf.client.ClassServerDelegate#initSocketClient()
    */
   @Override
-  public void initSocketClient() throws Exception
-  {
+  public void initSocketClient() throws Exception {
     socketClient = new SocketClient();
     socketClient.setHost(host);
     socketClient.setPort(port);
@@ -113,8 +105,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @return a <code>JPPFResourceWrapper</code> instance.
    * @throws Exception if any error is raised.
    */
-  protected JPPFResourceWrapper readResource() throws Exception
-  {
+  protected JPPFResourceWrapper readResource() throws Exception {
     if (debugEnabled) log.debug(formattedName + " reading next resource ...");
     return (JPPFResourceWrapper) IOHelper.unwrappedData(socketClient, socketClient.getSerializer());
   }
@@ -124,8 +115,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @param resource a <code>JPPFResourceWrapper</code> instance.
    * @throws Exception if any error is raised.
    */
-  protected void writeResource(final JPPFResourceWrapper resource) throws Exception
-  {
+  protected void writeResource(final JPPFResourceWrapper resource) throws Exception {
     IOHelper.sendData(socketClient, resource, socketClient.getSerializer());
     socketClient.flush();
     if (debugEnabled) log.debug(formattedName + " data sent to the server");
@@ -135,8 +125,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * Perform the handshake with the server.
    * @throws Exception if any error occurs.
    */
-  protected void handshake() throws Exception
-  {
+  protected void handshake() throws Exception {
     if (debugEnabled) log.debug(formattedName + " : sending channel identifier");
     socketClient.writeInt(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL);
     if (owner.isSSLEnabled()) createSSLConnection();
@@ -156,8 +145,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * Process the next class laodign request from the server.
    * @throws Exception if any error occcurs.
    */
-  protected void processNextRequest() throws Exception
-  {
+  protected void processNextRequest() throws Exception {
     boolean found = true;
     JPPFResourceWrapper resource = readResource();
     String name = resource.getName();
@@ -165,19 +153,14 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     ClassLoader cl = getClassLoader(resource.getRequestUuid());
     //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
     if (debugEnabled) log.debug(formattedName + " using classloader=" + cl);
-    if (resource.getData(ResourceIdentifier.MULTIPLE) != null)
-    {
+    if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
       List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
       if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
-    }
-    else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null)
-    {
+    } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
       String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
       Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
       resource.setData(ResourceIdentifier.RESOURCE_MAP, result);
-    }
-    else
-    {
+    } else {
       byte[] b;
       byte[] callable = resource.getCallable();
       if (callable != null) b = resourceProvider.computeCallable(callable);
@@ -185,8 +168,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       if (b == null) found = false;
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);
-      if (debugEnabled)
-      {
+      if (debugEnabled) {
         if (found) log.debug(formattedName + " found resource: " + name + " (" + b.length + " bytes)");
         else log.debug(formattedName + " resource not found: " + name);
       }
@@ -201,8 +183,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @param uuid the uuid of the request from which the class loader was obtained.
    * @return a <code>ClassLoader</code> instance, or null if none could be found.
    */
-  protected ClassLoader getClassLoader(final String uuid)
-  {
+  protected ClassLoader getClassLoader(final String uuid) {
     //return ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(uuid);
     RegisteredClassLoader rcl = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoader(uuid);
     return rcl.getClassLoader();
@@ -213,8 +194,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    * @see org.jppf.client.ClassServerDelegate#close()
    */
   @Override
-  public void close()
-  {
+  public void close() {
     if (debugEnabled) log.debug("closing " + getName());
     stop = true;
     super.close();
@@ -222,8 +202,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   }
 
   @Override
-  public void uncaughtException(final Thread t, final Throwable e)
-  {
+  public void uncaughtException(final Thread t, final Throwable e) {
     log.error("uncaught exception", e);
   }
 }
