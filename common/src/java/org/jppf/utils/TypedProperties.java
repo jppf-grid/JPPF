@@ -103,9 +103,14 @@ public class TypedProperties extends Properties {
     int intVal = defValue;
     String val = getProperty(key, null);
     if (val != null) {
+      val = val.trim();
       try {
-        intVal = Integer.parseInt(val.trim());
-      } catch(NumberFormatException e) {
+        intVal = Integer.valueOf(val);
+      } catch(NumberFormatException ignore) {
+        try {
+          intVal = Double.valueOf(val).intValue();
+        } catch(NumberFormatException ignore2) {
+        }
       }
     }
     return intVal;
@@ -139,9 +144,14 @@ public class TypedProperties extends Properties {
     long longVal = defValue;
     String val = getProperty(key, null);
     if (val != null) {
+      val = val.trim();
       try {
-        longVal = Long.parseLong(val.trim());
-      } catch(NumberFormatException e) {
+        longVal = Long.valueOf(val);
+      } catch(NumberFormatException ignore) {
+        try {
+          longVal = Double.valueOf(val).longValue();
+        } catch(NumberFormatException ignore2) {
+        }
       }
     }
     return longVal;

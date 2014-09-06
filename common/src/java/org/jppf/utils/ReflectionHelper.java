@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public final class ReflectionHelper
-{
+public final class ReflectionHelper {
   /**
    * Logger for this class.
    */
@@ -49,15 +48,11 @@ public final class ReflectionHelper
    * @return the result of the method's invocation, or null if the method's return type is void,
    * or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Class<?>[] paramTypes, final Object...values)
-  {
-    try
-    {
+  public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Class<?>[] paramTypes, final Object...values) {
+    try {
       Method m = clazz.getMethod(methodName, paramTypes);
       return m.invoke(instance, values);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -74,16 +69,12 @@ public final class ReflectionHelper
    * @return the result of the method's invocation, or null if the method's return type is void,
    * or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Object...values)
-  {
-    try
-    {
+  public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName, final Object...values) {
+    try {
       int nbArgs = (values == null) ? 0 : values.length;
       Method m = findMethod(clazz, methodName, nbArgs);
       return m.invoke(instance, values);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -97,8 +88,7 @@ public final class ReflectionHelper
    * @return the result of the method's invocation, or null if the method's return type is void,
    * or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object invokeMethod(final Class clazz, final Object instance, final String methodName)
-  {
+  public static Object invokeMethod(final Class clazz, final Object instance, final String methodName) {
     return invokeMethod(clazz, instance, methodName, null, (Object[]) null);
   }
 
@@ -112,11 +102,9 @@ public final class ReflectionHelper
    * @return the method with the specified name and number of parameters.
    * @throws Exception if any erorr occurs.
    */
-  public static Method findMethod(final Class<?> clazz, final String methodName, final int nbArgs) throws Exception
-  {
+  public static Method findMethod(final Class<?> clazz, final String methodName, final int nbArgs) throws Exception {
     Method[] methods = clazz.getMethods();
-    for (Method m: methods)
-    {
+    for (Method m: methods) {
       if (m.getName().equals(methodName) && (m.getParameterTypes().length == nbArgs)) return m;
     }
     throw new NoSuchMethodException("class : " + clazz.getName() + ", method: " + methodName);
@@ -130,8 +118,7 @@ public final class ReflectionHelper
    * @return the method with the specified name and no parameters.
    * @throws Exception if any erorr occurs.
    */
-  public static Method findMethod(final Class<?> clazz, final String methodName) throws Exception
-  {
+  public static Method findMethod(final Class<?> clazz, final String methodName) throws Exception {
     return findMethod(clazz, methodName, 0);
   }
 
@@ -143,11 +130,9 @@ public final class ReflectionHelper
    * @return the method with the specified name and number of parameters.
    * @throws Exception if any erorr occurs.
    */
-  public static Method findMethodAnyArgs(final Class<?> clazz, final String methodName) throws Exception
-  {
+  public static Method findMethodAnyArgs(final Class<?> clazz, final String methodName) throws Exception {
     Method[] methods = clazz.getMethods();
-    for (Method m: methods)
-    {
+    for (Method m: methods) {
       if (m.getName().equals(methodName)) return m;
     }
     throw new NoSuchMethodException("class : " + clazz.getName() + ", method: " + methodName);
@@ -158,15 +143,25 @@ public final class ReflectionHelper
    * @param className the name of the class to instantiate.
    * @return an instance of the class whose name is specified, or a <code>JPPFException</code> if the instantiation failed.
    */
-  public static Object newInstance(final String className)
-  {
-    try
-    {
+  public static Object newInstance(final String className) {
+    try {
       Class c = getCurrentClassLoader().loadClass(className);
       return c.newInstance();
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+      return new JPPFException(e);
     }
-    catch(Exception e)
-    {
+  }
+
+  /**
+   * Invoke a default constructor using reflection.
+   * @param clazz the class to instantiate.
+   * @return an instance of the class whose name is specified, or a <code>JPPFException</code> if the instantiation failed.
+   */
+  public static Object newInstance(final Class<?> clazz) {
+    try {
+      return clazz.newInstance();
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -179,15 +174,11 @@ public final class ReflectionHelper
    * @param values the values of the constructor's parameters, may be null if no parameters.
    * @return the result of the constructor's invocation, or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object invokeConstructor(final Class<?> clazz, final Class<?>[] paramTypes, final Object...values)
-  {
-    try
-    {
+  public static Object invokeConstructor(final Class<?> clazz, final Class<?>[] paramTypes, final Object...values) {
+    try {
       Constructor<?> c = clazz.getConstructor(paramTypes);
       return c.newInstance(values);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
@@ -200,18 +191,35 @@ public final class ReflectionHelper
    * @param fieldName the name of the field to get the value  of.
    * @return the value of the field, or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object getField(final Class clazz, final Object instance, final String fieldName)
-  {
-    try
-    {
+  public static Object getField(final Class clazz, final Object instance, final String fieldName) {
+    try {
       Field f = clazz.getField(fieldName);
       return f.get(instance);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return new JPPFException(e);
     }
+  }
+
+  /**
+   * Get the value of the specified static field for a specified class.
+   * @param className the class declaring the field.
+   * @param fieldName the name of the field to get the value  of.
+   * @return the value of the field, or a <code>JPPFException</code> if the invocation failed.
+   */
+  public static Object getField(final String className, final String fieldName) {
+    return getField(getClass0(className), null, fieldName);
+  }
+
+  /**
+   * Get the value of the specified field for a specified class and specified instance.
+   * @param className the class declaring the field.
+   * @param instance  the class instance for which to get the field's value, may be null if the field is static.
+   * @param fieldName the name of the field to get the value  of.
+   * @return the value of the field, or a <code>JPPFException</code> if the invocation failed.
+   */
+  public static Object getField(final String className, final Object instance, final String fieldName) {
+    return getField(getClass0(className), instance, fieldName);
   }
 
   /**
@@ -219,18 +227,14 @@ public final class ReflectionHelper
    * @param classNames the names of the classes to find.
    * @return n array of <code>Class</code> objects, or null if one of the classes could not be found.
    */
-  public static Class[] getClasses(final String...classNames)
-  {
-    try
-    {
+  public static Class[] getClasses(final String...classNames) {
+    try {
       if ((classNames == null) || (classNames.length <= 0)) return new Class[0];
       Class[] classes = new Class[classNames.length];
       ClassLoader cl = getCurrentClassLoader();
       for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i], true, cl);
       return classes;
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -239,16 +243,12 @@ public final class ReflectionHelper
   /**
    * Transform a class name into a <code>Class</code> object.
    * @param className the name of the class to find.
-   * @return n array of <code>Class</code> objects, or null if one of the classes could not be found.
+   * @return a <code>Class</code>, or null if the classe could not be found.
    */
-  public static Class getClass0(final String className)
-  {
-    try
-    {
+  public static Class getClass0(final String className) {
+    try {
       return Class.forName(className, true, getCurrentClassLoader());
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -258,15 +258,14 @@ public final class ReflectionHelper
    * Returns the current thread's context class loader, or this class's class loader if it is null.
    * @return a <code>ClassLoader</code> instance.
    */
-  public static ClassLoader getCurrentClassLoader()
-  {
+  public static ClassLoader getCurrentClassLoader() {
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = ReflectionHelper.class.getClassLoader();
     return cl;
   }
 
   /**
-   * 
+   *
    * @param clazz the class on which to find the method.
    * @param methodName the name of the method to find.
    * @param params the concrete parameters.
@@ -274,21 +273,16 @@ public final class ReflectionHelper
    * @return a method that matches the name and parameters.
    * @throws Exception if any erorr occurs.
    */
-  public Method findMethodFromConcreteArgs(final Class<?> clazz, final String methodName, final Object...params) throws Exception
-  {
+  public Method findMethodFromConcreteArgs(final Class<?> clazz, final String methodName, final Object...params) throws Exception {
     Method[] methods = clazz.getMethods();
     Object[] p = params == null ? new Object[0] : params;
-    for (Method m: methods)
-    {
+    for (Method m: methods) {
       Class<?>[] formalParams = m.getParameterTypes();
-      if (m.getName().equals(methodName) && (formalParams.length == p.length))
-      {
+      if (m.getName().equals(methodName) && (formalParams.length == p.length)) {
         boolean mismatch = false;
-        for (int i=0; i<formalParams.length; i++)
-        {
+        for (int i=0; i<formalParams.length; i++) {
           Class<?> paramClass = formalParams[i];
-          if ((p[i] != null) && !formalParams[i].isAssignableFrom(p[i].getClass()))
-          {
+          if ((p[i] != null) && !formalParams[i].isAssignableFrom(p[i].getClass())) {
             mismatch = true;
             break;
           }

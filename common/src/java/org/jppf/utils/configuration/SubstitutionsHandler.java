@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.collections.*;
+import org.slf4j.*;
 
 /**
  * Handles property substitutions in a properties file, that is resolve all
@@ -30,6 +31,18 @@ import org.jppf.utils.collections.*;
  * @author Laurent Cohen
  */
 public class SubstitutionsHandler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(SubstitutionsHandler.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether trace log statements are enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Start of a value substitution.
    */
@@ -58,6 +71,10 @@ public class SubstitutionsHandler {
    * Stores the properties whose values are fully resolved.
    */
   private final TypedProperties resolved = new TypedProperties();
+  /**
+   * 
+   */
+  private final TypedProperties tmpProps;
 
   /**
    * Initialize this substitution handler with the specified unresolved properties.
@@ -65,6 +82,7 @@ public class SubstitutionsHandler {
    */
   public SubstitutionsHandler(final TypedProperties props) {
     this.props = props;
+    this.tmpProps = new TypedProperties(props);
   }
 
   /**
@@ -76,6 +94,7 @@ public class SubstitutionsHandler {
       if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
       String key = (String) entry.getKey();
       String value = (String) entry.getValue();
+      if (traceEnabled) log.trace("processing entry '{} = {}'", key, value);
       if (value == null) continue;
       boolean found = true;
       int pos = 0;
@@ -86,12 +105,16 @@ public class SubstitutionsHandler {
         int idx2 = value.indexOf(SUBST_STOP, pos);
         if (idx2 < 0) break;
         String name = value.substring(pos, idx2);
+        if (traceEnabled) log.trace("  found variable to substitute '{}'", name);
         if (name.startsWith(ENV_PREFIX)) {
           String envVar = name.substring(ENV_PREFIX.length());
           String resolvedValue = System.getenv(envVar);
           if (resolvedValue == null) resolvedValue = "";
           value = value.replace(SUBST_START + name + SUBST_STOP, resolvedValue);
-        } else dependenciesMap.putValue(key, name);
+        } else {
+          if (traceEnabled) log.trace("  adding dependency '{}' to '{}'", name, key);
+          dependenciesMap.putValue(key, name);
+        }
         pos = idx2 + SUBST_STOP.length() + 1;
       }
       if (dependenciesMap.containsKey(key)) {
@@ -99,6 +122,7 @@ public class SubstitutionsHandler {
         for (String dep: dependenciesMap.getValues(key)) {
           if (resolved.containsKey(dep)) {
             String resolvedValue = resolved.getProperty(dep);
+            if (traceEnabled) log.trace("  resolved variable '{}' into '{}'", dep, resolvedValue);
             value = value.replace(SUBST_START + dep + SUBST_STOP, resolvedValue);
             toRemove.add(dep);
           }
@@ -111,9 +135,10 @@ public class SubstitutionsHandler {
         resolved.setProperty(key, value);
         propagateResolution(key, value);
       }
+      tmpProps.put(key, value);
     }
     // add the unresolved properties
-    for (String unresolvedProp: dependenciesMap.keySet()) resolved.put(unresolvedProp, props.getProperty(unresolvedProp));
+    for (String unresolvedProp: dependenciesMap.keySet()) resolved.put(unresolvedProp, tmpProps.getProperty(unresolvedProp));
     props.clear();
     props.putAll(resolved);
     resolved.clear();
@@ -126,11 +151,12 @@ public class SubstitutionsHandler {
    * @param resolvedValue the resolved value of the property.
    */
   private void propagateResolution(final String key, final String resolvedValue) {
+    if (traceEnabled) log.trace("  propagating resolution of '{}' into '{}'", key, resolvedValue);
     if (!dependedOnMap.containsKey(key)) return;
     Map<String, String> toPropagate = new HashMap<>();
     for (String dependent: dependedOnMap.getValues(key)) {
       if (!dependenciesMap.containsKey(dependent)) continue;
-      String value = props.getProperty(dependent);
+      String value = tmpProps.getProperty(dependent);
       if (value != null) props.setProperty(dependent, value = value.replace(SUBST_START + key + SUBST_STOP, resolvedValue));
       dependenciesMap.removeValue(dependent, key);
       if (!dependenciesMap.containsKey(dependent)) toPropagate.put(dependent, value);

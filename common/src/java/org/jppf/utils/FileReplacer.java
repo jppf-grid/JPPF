@@ -109,7 +109,8 @@ public class FileReplacer
    */
   private void replaceFolder(final File folder) throws Exception
   {
-    if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
+    //if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
+    print("Processing folder " + folder.getAbsolutePath());
     File[] fileList = folder.listFiles(filter);
     List<File> folders = new ArrayList<>();
     List<File> files = new ArrayList<>();
@@ -148,7 +149,7 @@ public class FileReplacer
     {
       nbFilesChanged++;
       nbReplacements += nbFound;
-      log.info("Found "+nbFound+" occurrence" + (nbFound > 1 ? "s" : "") + " of the sequence in file '" + file + '\'');
+      log.info("Found " + nbFound + " occurrence" + (nbFound > 1 ? "s" : "") + " of the sequence in file '" + file + '\'');
       String s = matcher.replaceAll(dest);
       if (debugEnabled) log.debug("Content with replacements performed:\n" + s);
       if (!searchOnly) FileUtils.writeTextFile(file.getPath(), s);
@@ -178,6 +179,15 @@ public class FileReplacer
     {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * Print hte specified message ot the console and to the log file.
+   * @param message the message to print.
+   */
+  private static void print(final String message) {
+    //log.info(message);
+    System.out.println(message);
   }
 
   /**

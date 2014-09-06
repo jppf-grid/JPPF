@@ -186,7 +186,7 @@ public final class FileUtils {
   }
 
   /**
-   * Get a <code>Reader</code> for the specified file path.
+   * Get a <code>Reader</code> for the specified file path, looked up first in the file system then in the classpath.
    * @param path the path to the file to lookup.
    * @return a <code>Reader</code> instance, or null if the file could not be found.
    * @throws IOException if an IO error occurs while looking up the file.
