@@ -28,8 +28,7 @@ import com.hazelcast.core.Hazelcast;
  * the market data updates on a per-event basis.
  * @author Laurent Cohen
  */
-public class EventBasedTradeUpdater extends AbstractTradeUpdater
-{
+public class EventBasedTradeUpdater extends AbstractTradeUpdater {
   /**
    * Logger for this class.
    */
@@ -42,18 +41,15 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
   /**
    * Default constructor.
    */
-  public EventBasedTradeUpdater()
-  {
+  public EventBasedTradeUpdater() {
   }
 
   /**
    * Main loop.
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (debugEnabled) log.debug("starting trade updater");
       initializeData();
       // start the ticker
@@ -78,9 +74,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
       print(statsCollector.toString());
       marketDataHandler.close();
       Hazelcast.shutdownAll();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       System.out.println(e.getMessage());
       log.error(e.getMessage(), e);
     }
@@ -93,8 +87,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater
    * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
    */
   @Override
-  public void marketDataUpdated(final TickerEvent event)
-  {
+  public void marketDataUpdated(final TickerEvent event) {
     if (jobExecutor.isShutdown()) return;
     if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());
     jobExecutor.submit(new SubmissionTask(event.getMarketData()));

@@ -30,8 +30,7 @@ import org.slf4j.*;
  * This class simulates a market ticker by generating random updates at random intervals.
  * @author Laurent Cohen
  */
-public class Ticker extends ThreadSynchronization implements Runnable
-{
+public class Ticker extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -81,8 +80,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
    * @param maxEvents the maximum number of events to generate.
    * @param dataFactory the random number generator used by this ticker.
    */
-  public Ticker(final List<MarketData> marketData, final int minInterval, final int maxInterval, final int maxEvents, final DataFactory dataFactory)
-  {
+  public Ticker(final List<MarketData> marketData, final int minInterval, final int maxInterval, final int maxEvents, final DataFactory dataFactory) {
     this.marketData = marketData;
     this.minInterval = minInterval;
     this.maxInterval = maxInterval;
@@ -95,15 +93,12 @@ public class Ticker extends ThreadSynchronization implements Runnable
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     if (debugEnabled) log.debug("starting ticker");
     int size = marketData.size();
     eventCount.set(0);
-    while (!isStopped())
-    {
-      try
-      {
+    while (!isStopped()) {
+      try {
         // compute a random interval int the [min, max] range
         //int n = minInterval + random.nextInt(maxInterval - minInterval + 1);
         int n = dataFactory.getRandomInt(minInterval, maxInterval);
@@ -113,9 +108,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
         fireTickerEvent(marketData.get(n));
         eventCount.incrementAndGet();
         if ((maxEvents > 0) && (eventCount.get() >= maxEvents)) setStopped(true);
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         System.out.println(e.getMessage());
         log.error(e.getMessage(), e);
       }
@@ -128,8 +121,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
    * Add a listener to this ticker's list of listeners.
    * @param listener the listener to add.
    */
-  public void addTickerListener(final TickerListener listener)
-  {
+  public void addTickerListener(final TickerListener listener) {
     listeners.add(listener);
   }
 
@@ -137,8 +129,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
    * Remove a listener from this ticker's list of listeners.
    * @param listener the listener to remove.
    */
-  public void removeTickerListener(final TickerListener listener)
-  {
+  public void removeTickerListener(final TickerListener listener) {
     listeners.remove(listener);
   }
 
@@ -146,8 +137,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
    * Fire an event to notify that the market data with the specified identifier was updated.
    * @param marketData the market data that was updated.
    */
-  private void fireTickerEvent(final MarketData marketData)
-  {
+  private void fireTickerEvent(final MarketData marketData) {
     notificationExecutor.submit(new NotificationTask(marketData));
   }
 
@@ -155,16 +145,14 @@ public class Ticker extends ThreadSynchronization implements Runnable
    * Get the count of generated events.
    * @return the event count as an int.
    */
-  public int getEventCount()
-  {
+  public int getEventCount() {
     return eventCount.get();
   }
 
   /**
    * Instances of this class notify listeners of data updates.
    */
-  public class NotificationTask implements Runnable
-  {
+  public class NotificationTask implements Runnable {
     /**
      * The data that was updated.
      */
@@ -174,8 +162,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
      * Initialize this task with the specified market data.
      * @param marketData the market data that was updated.
      */
-    public NotificationTask(final MarketData marketData)
-    {
+    public NotificationTask(final MarketData marketData) {
       this.marketData = marketData;
     }
 
@@ -184,8 +171,7 @@ public class Ticker extends ThreadSynchronization implements Runnable
      * @see java.lang.Runnable#run()
      */
     @Override
-    public void run()
-    {
+    public void run() {
       TickerEvent event = new TickerEvent(marketData);
       for (TickerListener l: listeners) l.marketDataUpdated(event);
       if (debugEnabled) log.debug("fired update event for " + event.getMarketData().getId());

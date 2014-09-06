@@ -145,13 +145,15 @@ public class AdaptiveGridDemo implements Runnable {
     String[] tokens = s.split("\\s");
     List<Integer> result = new ArrayList<>(tokens.length);
     int position = 0;
+    String errorMessage = "the property '" + JOB_BATCHES_PROPERTY + "' has an invalid value '%s' at position %d, it will be ignored\n";
     for (String token: tokens) {
       try {
         position++;
-        result.add(Integer.valueOf(token));
+        int n = Integer.valueOf(token);
+        if (n <= 0) System.out.printf(errorMessage, token, position);
+        else result.add(n);
       } catch (NumberFormatException e) {
-        System.out.printf("the property '%s' has an invalid value '%s' at position %d, it will be ignored\n",
-          JOB_BATCHES_PROPERTY, token, position);
+        System.out.printf(errorMessage, token, position);
       }
     }
     return result.toArray(new Integer[result.size()]);

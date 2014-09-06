@@ -31,8 +31,7 @@ import com.hazelcast.core.Hazelcast;
  * 
  * @author Laurent Cohen
  */
-public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
-{
+public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater {
   /**
    * Logger for this class.
    */
@@ -61,18 +60,15 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
   /**
    * Default constructor.
    */
-  public SnapshotBasedTradeUpdater()
-  {
+  public SnapshotBasedTradeUpdater() {
   }
 
   /**
    * Main loop.
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (debugEnabled) log.debug("starting trade updater");
       initializeData();
       // start the ticker
@@ -93,12 +89,9 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
       print("ticker stopped: " + ticker.getEventCount() + " events generated");
       timer.cancel();
       lock.lock();
-      try
-      {
+      try {
         snapshotTask.run();
-      }
-      finally
-      {
+      } finally       {
         lock.unlock();
       }
       jobExecutor.shutdown();
@@ -111,9 +104,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
       print(statsCollector.toString());
       marketDataHandler.close();
       Hazelcast.shutdownAll();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       System.out.println(e.getMessage());
       log.error(e.getMessage(), e);
     }
@@ -126,17 +117,13 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
    * @see org.jppf.example.datadependency.simulation.TickerListener#marketDataUpdated(org.jppf.example.datadependency.simulation.TickerEvent)
    */
   @Override
-  public void marketDataUpdated(final TickerEvent event)
-  {
+  public void marketDataUpdated(final TickerEvent event) {
     if (jobExecutor.isShutdown()) return;
     if (debugEnabled) log.debug("received update event for " + event.getMarketData().getId());
     lock.lock();
-    try
-    {
+    try {
       pendingUpdates.add(event.getMarketData());
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
     //jobExecutor.submit(new SubmissionTask(event.getMarketData()));
@@ -146,29 +133,22 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater
   /**
    * Process all pending updates generated since the last snapshot.
    */
-  public class ProcessSnapshotTask extends TimerTask
-  {
+  public class ProcessSnapshotTask extends TimerTask {
     /**
      * Process all pending updates.
-     * @see java.util.TimerTask#run()
      */
     @Override
-    public void run()
-    {
-      if (jobExecutor.isTerminated())
-      {
+    public void run() {
+      if (jobExecutor.isTerminated()) {
         cancel();
         return;
       }
       log.info("processing new snapshot: " + pendingUpdates.size() + " updates");
-      try
-      {
+      try {
         lock.lock();
         processingUpdates = pendingUpdates;
         pendingUpdates = new HashSet<>();
-      }
-      finally
-      {
+      } finally {
         lock.unlock();
       }
       //for (MarketData marketData: processingUpdates) jobExecutor.submit(new SubmissionTask(marketData));

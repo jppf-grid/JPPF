@@ -25,16 +25,13 @@ import org.jppf.utils.JPPFConfiguration;
  * Runner for the sample.
  * @author Laurent Cohen
  */
-public class DataDependency
-{
+public class DataDependency {
   /**
    * The entry point for this application runner to be run from a Java command line.
    * @param args by default, we do not use the command line arguments.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       // create the JPPFClient
       AbstractTradeUpdater.openJPPFClient();
       String s = JPPFConfiguration.getProperties().getString("runMode", "event");
@@ -42,13 +39,9 @@ public class DataDependency
       // create a runner instance.
       AbstractTradeUpdater tradeUpdater = "event".equalsIgnoreCase(s) ? new EventBasedTradeUpdater() : new SnapshotBasedTradeUpdater();
       tradeUpdater.run();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       AbstractTradeUpdater.closeJPPFClient();
     }
   }

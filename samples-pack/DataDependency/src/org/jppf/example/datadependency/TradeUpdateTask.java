@@ -29,7 +29,7 @@ import org.slf4j.*;
  * JPPF task whose role is to recompute a trade when some market data was updated.
  * @author Laurent Cohen
  */
-public class TradeUpdateTask extends AbstractTask<Object>
+public class TradeUpdateTask extends AbstractTask<String>
 {
   /**
    * Logger for this class.
