@@ -165,14 +165,19 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
     while (!checkStopped()) {
+      if (isShutdownRequested()) shutdown(isRestart());
       clearResourceCachesIfRequested();
-      processNextJob();
+      try {
+        processNextJob();
+      } finally {
+        setExecuting(false);
+      }
     }
     if (debugEnabled) log.debug("End of node secondary loop");
   }
 
   /**
-   * Read a job to execute or a hanshake job.
+   * Read a job to execute or a handshake job.
    * @throws Exception if any error occurs.
    * @exclude
    */
@@ -379,10 +384,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @exclude
    */
   public void shutdown(final boolean restart) {
-    setStopped(true);
-    NodeRunner.setShuttingDown(true);
-    lifeCycleEventHandler.fireNodeEnding();
-    NodeRunner.shutdown(this, restart);
+    if (!isLocal()) {
+      setStopped(true);
+      NodeRunner.setShuttingDown(true);
+      lifeCycleEventHandler.fireNodeEnding();
+      NodeRunner.shutdown(this, restart);
+    }
   }
 
   /**
@@ -450,6 +457,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
     }
     return jmxServer;
+  }
+
+  /**
+   * Stop the jmx server.
+   * @throws Exception if any error occurs.
+   * @since 5.0
+   * @exclude
+   */
+  public void stopJmxServer() throws Exception {
+    if (jmxServer != null) jmxServer.stop();
   }
 
   /**

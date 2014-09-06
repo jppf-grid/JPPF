@@ -34,8 +34,7 @@ import org.slf4j.*;
  * their attached nodes, for management and monitoring purposes.
  * @author Laurent Cohen
  */
-public class NodeRefreshHandler
-{
+public class NodeRefreshHandler {
   /**
    * Logger for this class.
    */
@@ -73,34 +72,28 @@ public class NodeRefreshHandler
    * Initialize this node handler.
    * @param nodeDataPanel the panel to refresh.
    */
-  public NodeRefreshHandler(final NodeDataPanel nodeDataPanel)
-  {
+  public NodeRefreshHandler(final NodeDataPanel nodeDataPanel) {
     this.nodeDataPanel = nodeDataPanel;
-    this.jppfClient = StatsHandler.getInstance().getClientHandler().getJppfClient(null);
+    this.jppfClient = StatsHandler.getInstance().getClientHandler().getJppfClient();
     initialize();
   }
 
   /**
    * Initialize this node refresh handler.
    */
-  private void initialize()
-  {
+  private void initialize() {
     startRefreshTimer();
   }
 
   /**
    * Refresh the tree structure asynchronously (not in the AWT event thread).
    */
-  public void refresh()
-  {
+  public void refresh() {
     if (refreshing.get()) return;
     refreshing.set(true);
-    try
-    {
+    try {
       refresh0();
-    }
-    finally
-    {
+    } finally {
       refreshing.set(false);
     }
   }

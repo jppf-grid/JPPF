@@ -123,6 +123,16 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
   Map<String, Object> restart(NodeSelector selector) throws Exception;
 
   /**
+   * Restart the specified nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param interruptIfRunning whether to restart immediately or wait until each node is idle.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> restart(NodeSelector selector, Boolean interruptIfRunning) throws Exception;
+
+  /**
    * Shutdown the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
@@ -130,6 +140,16 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
    * @throws Exception if any error occurs.
    */
   Map<String, Object> shutdown(NodeSelector selector) throws Exception;
+
+  /**
+   * Shutdown the specified nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param interruptIfRunning whether to shutdown immediately or wait until each node is idle.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> shutdown(NodeSelector selector, Boolean interruptIfRunning) throws Exception;
 
   /**
    * Reset the specified nodes' executed tasks counter to zero.

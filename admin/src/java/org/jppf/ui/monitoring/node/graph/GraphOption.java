@@ -116,11 +116,10 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.getRenderer().setVertexLabelRenderer(vlasr);
       viewer.getRenderContext().setVertexShapeTransformer(vlasr);
       JPPFVertexLabelRenderer renderer = new JPPFVertexLabelRenderer();
-      int height = 50;
       Dimension d = renderer.getPreferredSize();
-      d.width = 100;
-      if (d.height < height) {
-        d.height = height;
+      d.width = LayoutFactory.VERTEX_SIZE.width;
+      if (d.height < LayoutFactory.VERTEX_SIZE.height) {
+        d.height = LayoutFactory.VERTEX_SIZE.height;
         renderer.setPreferredSize(d);
       }
       viewer.getRenderContext().setVertexLabelRenderer(renderer);

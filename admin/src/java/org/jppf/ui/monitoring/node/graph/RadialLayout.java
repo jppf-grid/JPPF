@@ -98,6 +98,7 @@ public class RadialLayout extends AbstractLayout<TopologyData, Number> {
           Point2D nodeCoord = transform(node);
           double nodeAngle = firstAngle + factor * Math.PI * j / nodes.size();
           double nodeX = Math.cos(nodeAngle) * radius + coord.getX();
+          // make sure the vertex fits fully in the view
           if (nodeX < vertextWidth/2) nodeX = vertextWidth/2;
           double offset = nodeX + vertextWidth/2 - width;
           if (offset > 0) nodeX -= offset;

@@ -46,11 +46,21 @@ public class JPPFNodeProvisioning implements JPPFNodeProvisioningMBean {
 
   @Override
   public void provisionSlaveNodes(final int nbNodes) {
-    slaveManager.shrinkOrGrowSlaves(nbNodes, null);
+    slaveManager.shrinkOrGrowSlaves(nbNodes, true, null);
+  }
+
+  @Override
+  public void provisionSlaveNodes(final int nbNodes, final boolean interruptIfRunning) {
+    slaveManager.shrinkOrGrowSlaves(nbNodes, interruptIfRunning, null);
   }
 
   @Override
   public void provisionSlaveNodes(final int nbNodes, final TypedProperties configOverrides) {
-    slaveManager.shrinkOrGrowSlaves(nbNodes, configOverrides);
+    slaveManager.shrinkOrGrowSlaves(nbNodes, true, configOverrides);
+  }
+
+  @Override
+  public void provisionSlaveNodes(final int nbNodes, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+    slaveManager.shrinkOrGrowSlaves(nbNodes, interruptIfRunning, configOverrides);
   }
 }

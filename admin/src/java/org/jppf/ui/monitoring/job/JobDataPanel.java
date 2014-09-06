@@ -104,7 +104,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements ClientListe
     if (debugEnabled) log.debug("populating the tree table");
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
 
-    List<JPPFClientConnection> list = StatsHandler.getInstance().getClientHandler().getJppfClient(null).getAllConnections();
+    List<JPPFClientConnection> list = StatsHandler.getInstance().getClientHandler().getJppfClient().getAllConnections();
     if (debugEnabled) log.debug("connections = " + list);
     for (JPPFClientConnection c : list) {
       panelManager.driverAdded(c);

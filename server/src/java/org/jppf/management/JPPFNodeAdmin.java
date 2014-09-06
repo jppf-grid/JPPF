@@ -75,7 +75,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Get the latest state information from the node.
    * @return a <code>JPPFNodeState</code> information.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#state()
    */
   @Override
   public JPPFNodeState state() throws Exception
@@ -89,7 +88,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Set the size of the node's thread pool.
    * @param size the size as an int.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
    */
   @Override
   public void updateThreadPoolSize(final Integer size) throws Exception
@@ -104,7 +102,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * and runtime information such as memory usage and available processors.
    * @return a <code>JPPFSystemInformation</code> instance.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
    */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
@@ -118,43 +115,67 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * Restart the node.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#restart()
    */
   @Override
-  public void restart() throws Exception
-  {
+  public void restart() throws Exception {
+    restart(true);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.0
+   */
+  @Override
+  public void restart(final Boolean interruptIfRunning) throws Exception {
     if (debugEnabled) log.debug("node restart requested");
-    Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        node.shutdown(true);
-      }
-    };
-    new Thread(r, "NodeRestart").start();
+    boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
+    shutdownOrRestart(interrupt, true);
   }
 
   /**
    * Shutdown the node.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
    */
   @Override
-  public void shutdown() throws Exception
-  {
+  public void shutdown() throws Exception {
+    shutdown(true);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.0
+   */
+  @Override
+  public void shutdown(final Boolean interruptIfRunning) throws Exception {
     if (debugEnabled) log.debug("node shutdown requested");
-    Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        node.shutdown(false);
-      }
-    };
-    new Thread(r, "NodeShutdown").start();
+    boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
+    shutdownOrRestart(interrupt, false);
+  }
+
+  /**
+   * Perform or request a shtudown or restart.
+   * @param interrupt whether the operation should be performed immediately, or the node
+   * should wait until it is not executing any task.
+   * @param restart {@code true} to perform/request a restart, {@code false} for a shutdown.
+   * @since 5.0
+   */
+  private void shutdownOrRestart(final boolean interrupt, final boolean restart) {
+    if (interrupt || !node.isExecuting()) {
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          node.shutdown(restart);
+        }
+      };
+      new Thread(r, "NodeShutdown").start();
+    } else {
+      node.requestShutdown(restart);
+    }
   }
 
   /**
    * Reset the node's executed tasks counter to zero.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#resetTaskCounter()
    */
   @Override
   public void resetTaskCounter() throws Exception
@@ -167,7 +188,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Set the node's executed tasks counter to the specified value.
    * @param n the new value of the task counter.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
    */
   @Override
   public synchronized void setTaskCounter(final Integer n) throws Exception
@@ -181,7 +201,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Update the priority of all execution threads.
    * @param newPriority the new priority to set.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
    */
   @Override
   public void updateThreadsPriority(final Integer newPriority) throws Exception
@@ -196,7 +215,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @param config the set of properties to update.
    * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
    */
   @Override
   public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception
@@ -229,7 +247,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @param jobId the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)
    */
   @Override
   public void cancelJob(final String jobId, final Boolean requeue) throws Exception

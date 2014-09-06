@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class LauncherListener extends Thread
-{
+public class LauncherListener extends Thread {
   /**
    * Logger for this class.
    */
@@ -43,35 +42,68 @@ public class LauncherListener extends Thread
   /**
    * The port on which to listen for the launcher signals.
    */
-  private int port = -1;
+  private final int port;
+  /**
+   * The action handler for this listener.
+   * @since 5.0
+   */
+  private LauncherListenerProtocolHandler actionHandler;
 
   /**
    * Initialize this LauncherListener with the specified port.
-   * @param port - the port to listen to.
+   * @param port the port to listen to.
    */
-  public LauncherListener(final int port)
-  {
+  public LauncherListener(final int port) {
     super("LauncherListener thread");
     this.port = port;
   }
 
   /**
+   * Initialize this LauncherListener with the specified port.
+   * @param port the port to listen to.
+   * @param actionHandler the action handler for this listener.
+   * @since 5.0
+   */
+  public LauncherListener(final int port, final LauncherListenerProtocolHandler actionHandler) {
+    super("LauncherListener thread");
+    this.port = port;
+    this.actionHandler = actionHandler;
+  }
+
+  /**
    * Create a socket connection and listen to it, and exit this process when the connection is broken.
-   * @see java.lang.Thread#run()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       Socket s = new Socket("localhost", port);
-      int n = s.getInputStream().read();
-      if (n == -1) throw new EOFException("eof");
-    }
-    catch(Throwable t)
-    {
+      while (true) {
+        int n = s.getInputStream().read();
+        if (n == -1) throw new EOFException("eof");
+        LauncherListenerProtocolHandler ah = getActionHandler();
+        if (ah != null) ah.performAction(n);
+      }
+    } catch(Throwable t) {
       if (debugEnabled) log.debug("exiting with exception: " + ExceptionUtils.getMessage(t));
       System.exit(0);
     }
+  }
+
+  /**
+   * Get the action handler for this listener.
+   * @return a {@link LauncherListenerProtocolHandler} object.
+   * @since 5.0
+   */
+  public synchronized LauncherListenerProtocolHandler getActionHandler() {
+    return actionHandler;
+  }
+
+  /**
+   * Set the action handler for this listener.
+   * @param actionHandler a {@link LauncherListenerProtocolHandler} object.
+   * @since 5.0
+   */
+  public synchronized void setActionHandler(final LauncherListenerProtocolHandler actionHandler) {
+    this.actionHandler = actionHandler;
   }
 }

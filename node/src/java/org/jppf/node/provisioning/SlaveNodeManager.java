@@ -39,6 +39,10 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    */
   private static Logger log = LoggerFactory.getLogger(SlaveNodeManager.class);
   /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
    * Path prefix used for the root directory of each slave node.
    * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
    */
@@ -87,7 +91,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    */
   private SlaveNodeManager() {
     masterDir = new File(System.getProperty("user.dir"));
-    log.debug("masterDir = {}", masterDir);
+    if (debugEnabled) log.debug("masterDir = {}", masterDir);
     computeSlaveClasspath();
     /*
     int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
@@ -99,19 +103,26 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    * Start or stop the required number of slaves to reach the specified number,
    * using the specified config overrides. If {@code configOverrides} is null, then previous overrides are applied.
    * @param requestedSlaves the number of slaves to reach.
+   * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    * @param configOverrides a set of overrides to the slave's configuration.
    */
-  synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final TypedProperties configOverrides) {
+  synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+    int action = interruptIfRunning ? SlaveNodeProtocolHandler.SHUTDOWN_INTERRUPT : SlaveNodeProtocolHandler.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
-      log.debug("stopping all processes");
+      if (debugEnabled) log.debug("stopping all processes");
       this.configOverrides = configOverrides;
       for (SlaveNodeLauncher slave: slaves.values()) {
+        /*
         slave.removeProcessLauncherListener(this);
         slave.stopProcess();
+        */
+        slave.sendActionCommand(action);
       }
+      /*
       slaves.clear();
       reservedIds.clear();
+      */
     }
     int size = slaves.size();
     int diff = size - requestedSlaves;
@@ -122,13 +133,16 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
         int id = slaves.lastKey();
         SlaveNodeLauncher slave = slaves.remove(id);
         log.debug("stopping {}", slave.getName());
+        /*
         reservedIds.remove(id);
         slave.removeProcessLauncherListener(this);
         slave.stopProcess();
+        */
+        slave.sendActionCommand(action);
       }
     } else {
       // otherwise start the missing number of slaves
-      log.debug("starting " + -diff + " processes");
+      if (debugEnabled) log.debug("starting " + -diff + " processes");
       for (int i=size; i<requestedSlaves; i++) {
         int id = reserveNextAvailableId();
         String slaveDirPath = SLAVE_PATH_PREFIX + id;
@@ -211,7 +225,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    */
   public static void handleStartup() {
     int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
-    if (n > 0) INSTANCE.shrinkOrGrowSlaves(n, null);
+    if (n > 0) INSTANCE.shrinkOrGrowSlaves(n, true, null);
   }
 
   /**

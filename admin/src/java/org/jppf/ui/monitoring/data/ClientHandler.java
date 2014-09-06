@@ -78,7 +78,7 @@ public class ClientHandler implements ClientListener {
    */
   ClientHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
-    getJppfClient(null);
+    getJppfClient();
   }
 
   /**
@@ -183,13 +183,23 @@ public class ClientHandler implements ClientListener {
   }
 
   /**
-   * JPPF client used to submit data update and administration requests.
+   * Get the JPPF client used to submit data update and administration requests.
+   * @return a <code>JPPFClient</code> instance.
+   */
+  public JPPFClient getJppfClient() {
+    return getJppfClient(null);
+  }
+
+  /**
+   * Get the JPPF client used to submit data update and administration requests.
    * @param clientListener a listener to register with the JPPF client.
    * @return a <code>JPPFClient</code> instance.
    */
   public synchronized JPPFClient getJppfClient(final ClientListener clientListener) {
     if (jppfClient == null) {
       jppfClient = (clientListener == null) ? new JPPFClient(this) : new JPPFClient(this, clientListener);
+    } else if (clientListener != null) {
+      jppfClient.addClientListener(clientListener);
     }
     return jppfClient;
   }
@@ -218,7 +228,7 @@ public class ClientHandler implements ClientListener {
    */
   public synchronized void setServerListOption(final OptionElement serverListOption) {
     this.serverListOption = serverListOption;
-    List<JPPFClientConnection> list = getJppfClient(null).getAllConnections();
+    List<JPPFClientConnection> list = getJppfClient().getAllConnections();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
     for (JPPFClientConnection c: list) executor.submit(new NewConnectionTask(statsHandler, c));
     notifyAll();

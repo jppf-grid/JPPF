@@ -110,7 +110,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements ClientList
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
   private void populateTreeTableModel() {
-    JPPFClient client = StatsHandler.getInstance().getClientHandler().getJppfClient(null);
+    JPPFClient client = StatsHandler.getInstance().getClientHandler().getJppfClient();
     List<JPPFClientConnection> allConnections = client.getAllConnections();
     for (JPPFClientConnection c: allConnections) driverAdded(c);
   }

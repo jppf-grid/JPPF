@@ -90,8 +90,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
 
   /**
    * Perform the action.
-   * @param event - not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   * @param event not used.
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
@@ -142,13 +141,14 @@ public class ProvisioningAction extends AbstractTopologyAction {
     overrides = (String) textArea.getValue();
     final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesFromString(overrides) : null;
     nbSlaves = ((Number) ((SpinnerNumberOption) thisPanel.findFirstWithName("nbSlaves")).getValue()).intValue();
+    final Boolean interruptIfRunning = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("interruptIfRunning")).getValue();
     final CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
     for (TopologyData data: dataArray) {
       if (data.getParent() == null) continue;
       map.putValue(data.getParent(), data.getUuid());
     }
-    final Object[] params = {nbSlaves, props};
-    final String[] signature = {int.class.getName(), TypedProperties.class.getName()};
+    final Object[] params = {nbSlaves, interruptIfRunning, props};
+    final String[] signature = {int.class.getName(), boolean.class.getName(), TypedProperties.class.getName()};
     Runnable r = new Runnable() {
       @Override public void run() {
         for (Map.Entry<TopologyData, Collection<String>> en: map.entrySet()) {
@@ -193,7 +193,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
       for (Map.Entry<String, Object> en2: result.entrySet()) {
         if (en2.getValue() instanceof Throwable) {
           Throwable t = (Throwable) en2.getValue();
-          log.debug("provisioning request for node '{}' resulted in error: {}", en2.getKey(), ExceptionUtils.getStackTrace(t));
+          if (debugEnabled) log.debug("provisioning request for node '{}' resulted in error: {}", en2.getKey(), ExceptionUtils.getStackTrace(t));
         }
       }
     }

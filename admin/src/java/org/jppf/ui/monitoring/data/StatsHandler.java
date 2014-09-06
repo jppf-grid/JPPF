@@ -160,9 +160,9 @@ public final class StatsHandler implements StatsConstants {
     if (stats == null) return;
     JPPFClientConnection c = connection;
     if (c == null) {
-      List<JPPFClientConnection> list = clientHandler.getJppfClient(null).getAllConnections();
+      List<JPPFClientConnection> list = clientHandler.getJppfClient().getAllConnections();
       if ((list == null) || list.isEmpty()) return;
-      else c = clientHandler.getJppfClient(null).getAllConnections().get(0);
+      else c = list.get(0);
     }
     ConnectionDataHolder dataHolder = dataHolderMap.get(clientHandler.connectionId(c));
     tickCount++;

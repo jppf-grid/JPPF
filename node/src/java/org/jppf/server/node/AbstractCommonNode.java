@@ -51,7 +51,22 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * should be performed at the next opportunity.
    * @exclude
    */
-  protected AtomicBoolean cacheResetFlag = new AtomicBoolean(false);
+  AtomicBoolean cacheResetFlag = new AtomicBoolean(false);
+  /**
+   * Flag indicating whether a node shutdown or restart has been requested.
+   * @since 5.0
+   */
+  final AtomicBoolean shutdownRequestFlag = new AtomicBoolean(false);
+  /**
+   * Flag indicating whether it is a shutdown or restart that was last requested.
+   * @since 5.0
+   */
+  final AtomicBoolean restart = new AtomicBoolean(false);
+  /**
+   * Determines whetehr the node is currently processing tasks.
+   * @since 5.0
+   */
+  boolean executing = false;
 
   /**
    * Add management parameters to the specified bundle, before sending it back to a server.
@@ -115,9 +130,56 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Request a reset of the class loaders resource caches.
    * This method merely sets a floag, the actual reset will
-   * be performed at the next opportunity, when it is safe to do so. 
+   * be performed at the next opportunity, when it is safe to do so.
    */
   public void requestResourceCacheReset() {
     cacheResetFlag.compareAndSet(false, true);
+  }
+
+  /**
+   * Request that the node be shut down or restarted when it is no longer executing tasks.
+   * @param restart {@code true} to restart the node, {@code false} to shut it down.
+   * @since 5.0
+   */
+  public void requestShutdown(final boolean restart) {
+    if (shutdownRequestFlag.compareAndSet(false, true)) {
+      this.restart.set(restart);
+    }
+  }
+
+  /**
+   * Determine whether a node shurdown or restart was requested..
+   * @return {@code true} if a shudown or restart was requested, {@code false} otherwise.
+   * @since 5.0
+   */
+  protected boolean isShutdownRequested() {
+    return shutdownRequestFlag.get();
+  }
+
+  /**
+   * Determine whether a restart or shutdown was requested.
+   * @return {@code true} if a restart was requested, false if a {@code shutdown} was requested.
+   * @since 5.0
+   */
+  protected boolean isRestart() {
+    return restart.get();
+  }
+
+  /**
+   * Determine whether the node is currently processing tasks.
+   * @return {@code true} if the node is processing tasks, {@code false} otherwise.
+   * @since 5.0
+   */
+  public boolean isExecuting() {
+    return executing;
+  }
+
+  /**
+   * Specifiy whether the node is currently processing tasks.
+   * @param executing {@code true} to specify that the node is processing tasks, {@code false} otherwise.
+   * @since 5.0
+   */
+  public void setExecuting(final boolean executing) {
+    this.executing = executing;
   }
 }

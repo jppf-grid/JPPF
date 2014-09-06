@@ -45,6 +45,14 @@ public interface JPPFNodeProvisioningMBean {
   void provisionSlaveNodes(int nbNodes);
 
   /**
+   * Start or stop the required number of slaves to reach the specified number.
+   * This is equivalent to calling {@code provisionSlaveNodes(nbNodes, null)}.
+   * @param nbNodes the number of slave nodes to reach.
+   * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
+   */
+  void provisionSlaveNodes(int nbNodes, boolean interruptIfRunning);
+
+  /**
    * Start or stop the required number of slaves to reach the specified number,
    * using the specified config overrides.
    * <p>If {@code configOverrides} is null, then previous overrides are applied,
@@ -53,4 +61,15 @@ public interface JPPFNodeProvisioningMBean {
    * @param configOverrides the configuration overriddes to apply.
    */
   void provisionSlaveNodes(int nbNodes, TypedProperties configOverrides);
+
+  /**
+   * Start or stop the required number of slaves to reach the specified number,
+   * using the specified config overrides.
+   * <p>If {@code configOverrides} is null, then previous overrides are applied,
+   * and already running slave nodes do not need to be stopped.
+   * @param nbNodes the number of slave nodes to reach.
+   * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
+   * @param configOverrides the configuration overriddes to apply.
+   */
+  void provisionSlaveNodes(int nbNodes, boolean interruptIfRunning, TypedProperties configOverrides);
 }

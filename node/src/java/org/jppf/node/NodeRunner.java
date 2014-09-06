@@ -25,11 +25,12 @@ import java.util.concurrent.*;
 import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
-import org.jppf.management.JMXServer;
 import org.jppf.node.connection.*;
 import org.jppf.node.initialization.InitializationHook;
+import org.jppf.node.provisioning.SlaveNodeProtocolHandler;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
+import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
@@ -70,7 +71,7 @@ public class NodeRunner {
   /**
    * The JPPF node.
    */
-  private static NodeInternal node = null;
+  private static JPPFNode node = null;
   /**
    * Used to synchronize start and stop methods when the node is run as a service.
    */
@@ -96,6 +97,10 @@ public class NodeRunner {
    * The current server connection information.
    */
   private static DriverConnectionInfo currentConnectionInfo = null;
+  /**
+   * 
+   */
+  private static LauncherListener launcherListener = null;
 
   /**
    * Run a node as a standalone application.
@@ -114,7 +119,7 @@ public class NodeRunner {
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
         int port = Integer.parseInt(args[0]);
-        new LauncherListener(port).start();
+        (launcherListener = new LauncherListener(port)).start();
       }
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -127,6 +132,7 @@ public class NodeRunner {
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
           node = createNode(context);
+          if (node.isSlaveNode() && (launcherListener != null)) launcherListener.setActionHandler(new SlaveNodeProtocolHandler(node));
           node.run();
         } catch(JPPFNodeReconnectionNotification e) {
           if (debugEnabled) log.debug("received reconnection notification : {}", ExceptionUtils.getStackTrace(e));
@@ -165,11 +171,11 @@ public class NodeRunner {
   /**
    * Start the node.
    * @param connectionContext provides context information on the new connection request to the driver.
-   * @return the node that was started, as a <code>MonitoredNode</code> instance.
+   * @return the node that was started, as a <code>JPPFNode</code> instance.
    * @throws Exception if the node failed to run or couldn't connect to the server.
    * @exclude
    */
-  public static NodeInternal createNode(final ConnectionContext connectionContext) throws Exception {
+  public static JPPFNode createNode(final ConnectionContext connectionContext) throws Exception {
     HookFactory.invokeHook(InitializationHook.class, "initializing", new UnmodifiableTypedProperties(initialConfig));
     SystemUtils.printPidAndUuid("node", uuid);
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
@@ -177,7 +183,7 @@ public class NodeRunner {
     String className = "org.jppf.server.node.remote.JPPFRemoteNode";
     Class<?> clazz = getJPPFClassLoader().loadClass(className);
     Constructor c = clazz.getConstructor(DriverConnectionInfo.class);
-    NodeInternal node = (NodeInternal) c.newInstance(currentConnectionInfo);
+    JPPFNode node = (JPPFNode) c.newInstance(currentConnectionInfo);
     if (debugEnabled) log.debug("Created new node instance: " + node);
     return node;
   }
@@ -302,25 +308,21 @@ public class NodeRunner {
    */
   private static void stopJmxServer() {
     try {
-      final JMXServer jmxServer = node.getJmxServer();
-      if (jmxServer != null) {
-        jmxServer.stop();
-        Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            try {
-              jmxServer.stop();
-            } catch (Exception ignore) {
-            }
+      node.stopJmxServer();
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            node.stopJmxServer();
+          } catch (Exception ignore) {
           }
-        };
-        Future<?> f = executor.submit(r);
-        // we don't want to wait forever for the connection to close
-        try {
-          f.get(1000L, TimeUnit.MILLISECONDS);
-        } catch (Exception ignore) {
         }
-        //if (!f.isDone()) f.cancel(true);
+      };
+      Future<?> f = executor.submit(r);
+      // we don't want to wait forever for the connection to close
+      try {
+        f.get(1000L, TimeUnit.MILLISECONDS);
+      } catch (Exception ignore) {
       }
     } catch (Exception ignore) {
     }

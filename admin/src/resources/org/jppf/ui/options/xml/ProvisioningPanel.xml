@@ -37,11 +37,19 @@
       <property name="persistent" value="true"/>
     </child>
 
+    <!-- Interrupt if running flag -->
+    <child name="interruptIfRunning" type="Boolean">
+      <property name="label" value="Interrupt nodes even if running"/>
+      <property name="tooltip" value="Whether the nodes can be stopped immediately \nor only once they are idle (deferred stop)"/>
+      <property name="persistent" value="true"/>
+      <property name="value" value="true"/>
+    </child>
+
     <!-- Use config overrides checkbox -->
-		<child name="useOverrides" type="Boolean">
-			<property name="label" value="Use configuration overrides"/>
-			<property name="tooltip" value="Whether to specify configuration override for the slaves"/>
-			<property name="persistent" value="true"/>
+    <child name="useOverrides" type="Boolean">
+      <property name="label" value="Use configuration overrides"/>
+      <property name="tooltip" value="Whether to specify configuration override for the slaves"/>
+      <property name="persistent" value="true"/>
       <script language="groovy">
         void updateTextArea() {
           def ov = option.findFirstWithName("/configOverrides")
@@ -52,10 +60,10 @@
       <initializer type="script">
         <script language="groovy">updateTextArea()</script>
       </initializer>
-			<listener type="script">
+      <listener type="script">
         <script language="groovy">updateTextArea()</script>
       </listener>
-		</child>
+    </child>
 
     <child name="configOverridesContainer" type="page">
       <property name="label" value="Configuration overrides"/>

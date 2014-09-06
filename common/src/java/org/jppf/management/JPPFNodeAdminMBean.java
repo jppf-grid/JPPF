@@ -53,14 +53,31 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean
   void updateThreadsPriority(Integer newPriority) throws Exception;
   /**
    * Restart the node.
+   * This is equivalent to calling {@code restart(true)}.
    * @throws Exception if any error occurs.
    */
   void restart() throws Exception;
+  /**
+   * Restart the node.
+   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks,
+   * when {@code false}, then only restart the node when it is no longer executing.
+   * @throws Exception if any error occurs.
+   * @since 5.0
+   */
+  void restart(Boolean interruptIfRunning) throws Exception;
   /**
    * Shutdown the node.
    * @throws Exception if any error occurs.
    */
   void shutdown() throws Exception;
+  /**
+   * Shutdown the node.
+   * @param interruptIfRunning when {@code true}, then shutdown the node even if it is executing tasks,
+   * when {@code false}, then only shutdown the node when it is no longer executing.
+   * @throws Exception if any error occurs.
+   * @since 5.0
+   */
+  void shutdown(Boolean interruptIfRunning) throws Exception;
   /**
    * Reset the node's executed tasks counter to zero.
    * @throws Exception if any error occurs.

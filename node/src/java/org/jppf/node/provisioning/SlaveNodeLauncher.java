@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.socket.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -79,6 +79,10 @@ public class SlaveNodeLauncher implements Runnable {
    * The port number the server socket listens to.
    */
   private int processPort = 0;
+  /**
+   * 
+   */
+  private SlaveSocketWrapper slaveSocketWrapper = null;
 
   /**
    * Initialize this process launcher.
@@ -213,23 +217,8 @@ public class SlaveNodeLauncher implements Runnable {
         processServer = new ServerSocket(0);
         processPort = processServer.getLocalPort();
       }
-      Runnable r = new Runnable() {
-        /** Wrapper for the accepted socket. */
-        private SocketWrapper socketClient = null;
-
-        @Override
-        public void run() {
-          try {
-            socketClient = new BootstrapSocketClient(processServer.accept());
-            int n = socketClient.readInt();
-            if (n == -1) throw new EOFException();
-          } catch(Exception ioe) {
-            if (log.isDebugEnabled()) log.debug(name, ioe);
-            if (socketClient != null) StreamUtils.closeSilent(socketClient);
-          }
-        }
-      };
-      Thread thread = new Thread(r, name + "ServerSocket");
+      slaveSocketWrapper = new SlaveSocketWrapper();
+      Thread thread = new Thread(slaveSocketWrapper, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
     } catch(Exception e) {
@@ -302,5 +291,46 @@ public class SlaveNodeLauncher implements Runnable {
    */
   public int getId() {
     return id;
+  }
+
+  /**
+   * Send an action command to the slave node.
+   * @param action the code of the action command to send.
+   */
+  public void sendActionCommand(final int action) {
+    if (slaveSocketWrapper != null) slaveSocketWrapper.sendActionCommand(action);
+  }
+
+  /**
+   *
+   */
+  private class SlaveSocketWrapper implements Runnable {
+    /** Wrapper for the accepted socket. */
+    private SocketWrapper socketClient = null;
+
+    @Override
+    public void run() {
+      try {
+        socketClient = new BootstrapSocketClient(processServer.accept());
+        int n = socketClient.readInt();
+        if (n == -1) throw new EOFException();
+      } catch(Exception ioe) {
+        if (log.isDebugEnabled()) log.debug(name, ioe);
+        if (socketClient != null) StreamUtils.closeSilent(socketClient);
+      }
+    }
+
+    /**
+     * Send an action command to the slave node.
+     * @param action the code of the action command to send.
+     */
+    private void sendActionCommand(final int action) {
+      if (socketClient == null) return;
+      try {
+        socketClient.writeInt(action);
+      } catch (Exception e) {
+        if (log.isDebugEnabled()) log.debug("could not send command to slave process {} : {}", name, ExceptionUtils.getStackTrace(e));
+      }
+    }
   }
 }
