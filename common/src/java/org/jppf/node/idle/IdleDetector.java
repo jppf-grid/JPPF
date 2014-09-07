@@ -29,8 +29,7 @@ import org.slf4j.*;
  * and performs a specified action when this happens.
  * @author Laurent Cohen
  */
-public class IdleDetector implements Runnable
-{
+public class IdleDetector implements Runnable {
   /**
    * Logger for this class.
    */
@@ -68,8 +67,7 @@ public class IdleDetector implements Runnable
    * Default constructor.
    * @param listener specifies the action to perform upon idle state changes.
    */
-  public IdleDetector(final IdleStateListener listener)
-  {
+  public IdleDetector(final IdleStateListener listener) {
     this.listener = listener;
   }
 
@@ -77,8 +75,7 @@ public class IdleDetector implements Runnable
    * Initialize this detector from the JPPF configuration
    * @throws Exception if any error occurs during initialization.
    */
-  private void init() throws Exception
-  {
+  private void init() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
     String factoryName = config.getString("jppf.idle.detector.factory", null);
     idleTimeout = config.getLong("jppf.idle.timeout", 300000L);
@@ -88,29 +85,20 @@ public class IdleDetector implements Runnable
     factory = (IdleTimeDetectorFactory) c.newInstance();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (factory == null) init();
-      IdleStateListener tmp = new IdleStateListener()
-      {
+      IdleStateListener tmp = new IdleStateListener() {
         @Override
-        public void idleStateChanged(final IdleStateEvent event)
-        {
+        public void idleStateChanged(final IdleStateEvent event) {
           System.out.println("System is now " + event.getState());
         }
       };
       task = new IdleDetectionTask(factory, idleTimeout, listener, tmp);
       timer = new Timer(IdleDetector.class.getSimpleName() + " Timer");
       timer.schedule(task, 0L, pollInterval);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.debug(e.getMessage(), e);
     }
   }
@@ -119,10 +107,8 @@ public class IdleDetector implements Runnable
    * Main entry point.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       TypedProperties config = JPPFConfiguration.getProperties();
       String factoryName = config.getProperty("jppf.idle.detector.factory", null);
       if (factoryName == null) throw new JPPFException("Idle detector factory name not specified");
@@ -130,20 +116,16 @@ public class IdleDetector implements Runnable
       IdleTimeDetectorFactory factory = (IdleTimeDetectorFactory) c.newInstance();
       Timer timer = new Timer(IdleDetector.class.getSimpleName() + " Timer");
       IdleDetectionTask task = new IdleDetectionTask(factory, 6000L);
-      task.addIdleStateListener(new IdleStateListener()
-      {
+      task.addIdleStateListener(new IdleStateListener() {
         @Override
-        public void idleStateChanged(final IdleStateEvent event)
-        {
+        public void idleStateChanged(final IdleStateEvent event) {
           if (IdleState.IDLE.equals(event.getState())) System.out.println("System is now idle !");
           else System.out.println("System is now busy");
         }
       });
       timer.schedule(task, 0L, 200L);
       Thread.sleep(60000L);
-    }
-    catch (Throwable t)
-    {
+    } catch (Throwable t) {
       t.printStackTrace();
     }
   }

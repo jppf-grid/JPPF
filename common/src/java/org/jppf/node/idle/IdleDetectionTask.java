@@ -30,8 +30,7 @@ import org.slf4j.*;
  * Timer tasks that displays a message whenever the computer has received
  * no mouse or keyboard input for at least the timeout time.
  */
-public class IdleDetectionTask extends TimerTask
-{
+public class IdleDetectionTask extends TimerTask {
   /**
    * Logger for this class.
    */
@@ -67,33 +66,26 @@ public class IdleDetectionTask extends TimerTask
    * @param idleTimeout the time of inactivity after which the system is considered idle, in milliseconds.
    * @param initialListeners a set of listeners to add to this task at construction time.
    */
-  public IdleDetectionTask(final IdleTimeDetectorFactory factory, final long idleTimeout, final IdleStateListener...initialListeners)
-  {
+  public IdleDetectionTask(final IdleTimeDetectorFactory factory, final long idleTimeout, final IdleStateListener...initialListeners) {
     this.idleTimeout = idleTimeout;
     this.factory = factory;
-    if (initialListeners != null)
-    {
+    if (initialListeners != null) {
       for (IdleStateListener listener: initialListeners) addIdleStateListener(listener);
     }
     init();
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
-      if (detector == null)
-      {
+  public void run() {
+    try {
+      if (detector == null) {
         cancel();
         return;
       }
       long idleTime = detector.getIdleTimeMillis();
       if ((idleTime >= idleTimeout) && BUSY.equals(state)) changeStateTo(IDLE);
       else if ((idleTime < idleTimeout) && IDLE.equals(state)) changeStateTo(BUSY);
-    }
-    catch(JPPFError e)
-    {
+    } catch(JPPFError e) {
       System.out.println(ExceptionUtils.getMessage(e) + " - idle mode is disabled");
       detector = null;
       cancel();
@@ -103,14 +95,10 @@ public class IdleDetectionTask extends TimerTask
   /**
    * Initialize this task.
    */
-  private void init()
-  {
-    try
-    {
+  private void init() {
+    try {
       detector = factory.newIdleTimeDetector();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       cancel();
       log.error(e.getMessage(), e);
     }
@@ -120,8 +108,7 @@ public class IdleDetectionTask extends TimerTask
    * Get the idle state of the system, as specified by the idle timeout.
    * @return an {@link IdleState} enum value.
    */
-  public IdleState getState()
-  {
+  public IdleState getState() {
     return state;
   }
 
@@ -130,8 +117,7 @@ public class IdleDetectionTask extends TimerTask
    * and fire a corresponding state change event.
    * @param state an {@link IdleState} enum value.
    */
-  private void changeStateTo(final IdleState state)
-  {
+  private void changeStateTo(final IdleState state) {
     this.state = state;
     fireIdleStateEvent();
   }
@@ -140,11 +126,9 @@ public class IdleDetectionTask extends TimerTask
    * Add a listener to the list of listeners.
    * @param listener the listener to add.
    */
-  public void addIdleStateListener(final IdleStateListener listener)
-  {
+  public void addIdleStateListener(final IdleStateListener listener) {
     if (listener == null) return;
-    synchronized (listeners)
-    {
+    synchronized (listeners) {
       listeners.add(listener);
     }
   }
@@ -153,11 +137,9 @@ public class IdleDetectionTask extends TimerTask
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove.
    */
-  public void removeIdleStateListener(final IdleStateListener listener)
-  {
+  public void removeIdleStateListener(final IdleStateListener listener) {
     if (listener == null) return;
-    synchronized (listeners)
-    {
+    synchronized (listeners) {
       listeners.remove(listener);
     }
   }
@@ -165,11 +147,9 @@ public class IdleDetectionTask extends TimerTask
   /**
    * Notify all listeners that an event has occurred.
    */
-  private void fireIdleStateEvent()
-  {
+  private void fireIdleStateEvent() {
     IdleStateEvent event = new IdleStateEvent(this);
-    synchronized (listeners)
-    {
+    synchronized (listeners) {
       for (IdleStateListener listener : listeners) listener.idleStateChanged(event);
     }
   }

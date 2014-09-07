@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.node.provisioning;
+package org.jppf.process;
 
 import java.util.EventListener;
 
@@ -27,16 +27,16 @@ import java.util.EventListener;
  * @since 4.1
  * @exclude
  */
-public interface SlaveNodeLauncherListener extends EventListener {
+public interface ProcessLauncherListener extends EventListener {
   /**
    * Notifies that a process was started.
    * @param event encapsulates the process that was started.
    */
-  void processStarted(SlaveNodeLauncherEvent event);
+  void processStarted(ProcessLauncherEvent event);
 
   /**
    * Notifies that a process was stopped.
    * @param event encapsulates the process that was stopped.
    */
-  void processStopped(SlaveNodeLauncherEvent event);
+  void processStopped(ProcessLauncherEvent event);
 }

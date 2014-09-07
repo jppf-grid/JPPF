@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.node.provisioning;
+package org.jppf.process;
 
 import java.util.EventObject;
 
@@ -26,20 +26,20 @@ import java.util.EventObject;
  * @since 4.1
  * @exclude
  */
-public class SlaveNodeLauncherEvent extends EventObject {
+public class ProcessLauncherEvent extends EventObject {
   /**
    * Intiialize this event with the specified process launcher as source.
    * @param source the event source.
    */
-  public SlaveNodeLauncherEvent(final SlaveNodeLauncher source) {
+  public ProcessLauncherEvent(final AbstractProcessLauncher source) {
     super(source);
   }
 
   /**
-   * Convenience method to return the event source as a {@link SlaveNodeLauncher}.
-   * @return a {@link SlaveNodeLauncher} instance.
+   * Convenience method to return the event source as a {@link AbstractProcessLauncher}.
+   * @return a {@link AbstractProcessLauncher} instance.
    */
-  public SlaveNodeLauncher getProcessLauncher() {
-    return (SlaveNodeLauncher) getSource();
+  public AbstractProcessLauncher getProcessLauncher() {
+    return (AbstractProcessLauncher) getSource();
   }
 }

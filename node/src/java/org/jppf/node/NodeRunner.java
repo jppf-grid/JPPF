@@ -27,8 +27,8 @@ import org.jppf.classloader.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.node.connection.*;
 import org.jppf.node.initialization.InitializationHook;
-import org.jppf.node.provisioning.SlaveNodeProtocolHandler;
-import org.jppf.process.LauncherListener;
+import org.jppf.node.provisioning.ShutdownRestartNodeProtocolHandler;
+import org.jppf.process.*;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
@@ -132,7 +132,7 @@ public class NodeRunner {
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
           node = createNode(context);
-          if (node.isSlaveNode() && (launcherListener != null)) launcherListener.setActionHandler(new SlaveNodeProtocolHandler(node));
+          if (launcherListener != null) launcherListener.setActionHandler(new ShutdownRestartNodeProtocolHandler(node));
           node.run();
         } catch(JPPFNodeReconnectionNotification e) {
           if (debugEnabled) log.debug("received reconnection notification : {}", ExceptionUtils.getStackTrace(e));

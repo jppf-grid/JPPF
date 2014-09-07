@@ -18,7 +18,6 @@
 package org.jppf.process;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,8 +36,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class ProcessLauncher extends ThreadSynchronization implements Runnable, ProcessWrapperEventListener, IdleStateListener
-{
+public class ProcessLauncher extends AbstractProcessLauncher implements ProcessWrapperEventListener, IdleStateListener {
   /**
    * Logger for this class.
    */
@@ -47,18 +45,6 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
-   */
-  private Process process = null;
-  /**
-   * The server socket the driver listens to.
-   */
-  private ServerSocket processServer = null;
-  /**
-   * The port number the server socket listens to.
-   */
-  private int processPort = 0;
   /**
    * The fully qualified name of the main class of the subprocess to launch.
    */
@@ -84,40 +70,37 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * Initialize this process launcher.
    * @param mainClass the fully qualified name of the main class of the sub process to launch.
    */
-  public ProcessLauncher(final String mainClass)
-  {
+  public ProcessLauncher(final String mainClass) {
+    if (mainClass == null) throw new IllegalArgumentException("the main class name cannot be null");
     this.mainClass = mainClass;
+    int idx = mainClass.lastIndexOf('.');
+    this.name = (idx < 0) ? mainClass : mainClass.substring(idx);
   }
 
   /**
    * Start the socket listener and the subprocess.
    */
   @Override
-  public void run()
-  {
-    idleMode = JPPFConfiguration.getProperties().getBoolean("jppf.idle.mode.enabled", false);
+  public void run() {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    idleMode = config.getBoolean("jppf.idle.mode.enabled", false);
     boolean end = false;
-    try
-    {
+    try {
       createShutdownHook();
-      startDriverSocket();
-      if (idleMode)
-      {
+      startSocketListener();
+      if (idleMode) {
         idleDetector = new IdleDetector(this);
         System.out.println("Node running in \"Idle Host\" mode");
         idleDetector.run();
       }
-      while (!end)
-      {
+      while (!end) {
         if (idleMode) while (!idle.get()) goToSleep();
         startProcess();
         int n = process.waitFor();
         end = onProcessExit(n);
         if (process != null) process.destroy();
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     System.exit(0);
@@ -127,8 +110,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * Start the sub-process.
    * @throws Exception if any error occurs.
    */
-  public void startProcess() throws Exception
-  {
+  public void startProcess() throws Exception {
     stoppedOnBusyState.set(false);
     process = buildProcess();
     createProcessWrapper(process);
@@ -140,33 +122,19 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * @return A reference to the {@link Process} object representing the JPPF driver subprocess.
    * @throws Exception if the process failed to start.
    */
-  public Process buildProcess() throws Exception
-  {
+  private Process buildProcess() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
-    List<String> jvmOptions = new ArrayList<>();
-    List<String> cpElements = new ArrayList<>();
-    cpElements.add(System.getProperty("java.class.path"));
     String s = config.getString("jppf.jvm.options");
-    // for backward compatibility with 1.x versions
-    if (s == null) s = config.getString("other.jvm.options");
-    if (s != null)
-    {
-      String[] options = s.split("\\s");
-      int count = 0;
-      while (count < options.length)
-      {
-        String option = options[count++];
-        if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options[count++]);
-        else jvmOptions.add(option);
-      }
-    }
+    Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
+    List<String> jvmOptions = parsed.first();
+    List<String> cpElements = parsed.second();
+    cpElements.add(0, System.getProperty("java.class.path"));
     List<String> command = new ArrayList<>();
     command.add(System.getProperty("java.home")+"/bin/java");
     command.add("-cp");
     StringBuilder sb = new StringBuilder();
     String sep = System.getProperty("path.separator");
-    for (int i=0; i<cpElements.size(); i++)
-    {
+    for (int i=0; i<cpElements.size(); i++) {
       if (i > 0) sb.append(sep);
       sb.append(cpElements.get(i));
     }
@@ -190,8 +158,7 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * @param p the process whose output is to be captured.
    * @return a <code>ProcessWrapper</code> instance.
    */
-  private ProcessWrapper createProcessWrapper(final Process p)
-  {
+  protected ProcessWrapper createProcessWrapper(final Process p) {
     ProcessWrapper wrapper = new ProcessWrapper(process);
     wrapper.addListener(this);
     return wrapper;
@@ -204,91 +171,18 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * @param n the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
    */
-  private boolean onProcessExit(final int n)
-  {
+  protected boolean onProcessExit(final int n) {
     String s = getOutput(process, "std").trim();
-    if (s.length() > 0)
-    {
+    if (s.length() > 0) {
       System.out.println("\nstandard output:\n" + s);
       log.info("standard output:\n" + s);
     }
     s = getOutput(process, "err").trim();
-    if (s.length() > 0)
-    {
+    if (s.length() > 0) {
       System.out.println("\nerror output:\n" + s);
       log.info("error output:\n" + s);
     }
     return (n != 2) && !stoppedOnBusyState.get();
-  }
-
-  /**
-   * Create a shutdown hook that is run when this JVM terminates.<br>
-   * This is normally used to ensure the subprocess is terminated as well.
-   */
-  protected void createShutdownHook()
-  {
-    Runnable hook = new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        if (process != null) process.destroy();
-      }
-    };
-    Runtime.getRuntime().addShutdownHook(new Thread(hook));
-  }
-
-  /**
-   * Start a server socket that will accept one connection at a time with the JPPF driver, so the server can shutdown properly,
-   * when this driver is killed, by a way other than the API (ie CTRL-C or killing the process through the OS shell).<br>
-   * The port the server socket listens to is dynamically attributed, which is obtained by using the constructor
-   * <code>new ServerSocket(0)</code>.<br>
-   * The driver will connect and listen to this port, and exit when the connection is broken.<br>
-   * The single connection at a time is obtained by doing the <code>ServerSocket.accept()</code> and the
-   * <code>Socket.getInputStream().read()</code> in the same thread.
-   * @return the port number on which the server socket is listening.
-   */
-  protected int startDriverSocket()
-  {
-    try
-    {
-      processServer = new ServerSocket(0);
-      processPort = processServer.getLocalPort();
-      Runnable r = new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          while (true)
-          {
-            try
-            {
-              Socket s = processServer.accept();
-              s.getInputStream().read();
-            }
-            catch(IOException ioe)
-            {
-              if (debugEnabled) log.debug(ioe.getMessage(), ioe);
-            }
-          }
-        }
-      };
-      new Thread(r).start();
-    }
-    catch(Exception e)
-    {
-      try
-      {
-        processServer.close();
-      }
-      catch(IOException ioe)
-      {
-        ioe.printStackTrace();
-        if (debugEnabled) log.debug(ioe.getMessage(), ioe);
-        System.exit(1);
-      }
-    }
-    return processPort;
   }
 
   /**
@@ -297,29 +191,21 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
    * @param streamType determines whether to obtain the standard or error output.
    * @return the output as a string.
    */
-  public String getOutput(final Process process, final String streamType)
-  {
+  public String getOutput(final Process process, final String streamType) {
     StringBuilder sb = new StringBuilder();
-    try
-    {
+    try {
       InputStream is = "std".equals(streamType) ? process.getInputStream() : process.getErrorStream();
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-      try
-      {
+      try {
         String s = "";
-        while (s != null)
-        {
+        while (s != null) {
           s = reader.readLine();
           if (s != null) sb.append(s).append('\n');
         }
-      }
-      finally
-      {
+      } finally {
         reader.close();
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return sb.toString();
@@ -328,40 +214,35 @@ public class ProcessLauncher extends ThreadSynchronization implements Runnable, 
   /**
    * Notification that the process has written to its error stream.
    * @param event encapsulate the error stream's content.
-   * @see org.jppf.process.ProcessWrapperEventListener#errorStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
-  public void errorStreamAltered(final ProcessWrapperEvent event)
-  {
+  public void errorStreamAltered(final ProcessWrapperEvent event) {
     System.err.print(event.getContent());
   }
 
   /**
    * Notification that the process has written to its output stream.
    * @param event encapsulate the output stream's content.
-   * @see org.jppf.process.ProcessWrapperEventListener#outputStreamAltered(org.jppf.process.ProcessWrapperEvent)
    */
   @Override
-  public void outputStreamAltered(final ProcessWrapperEvent event)
-  {
+  public void outputStreamAltered(final ProcessWrapperEvent event) {
     System.out.print(event.getContent());
   }
 
   @Override
-  public void idleStateChanged(final IdleStateEvent event)
-  {
+  public void idleStateChanged(final IdleStateEvent event) {
     IdleState state = event.getState();
-    if (IdleState.BUSY.equals(state))
-    {
-      if (idleMode && (process != null))
-      {
+    if (IdleState.BUSY.equals(state)) {
+      if (idleMode && (process != null)) {
         idle.set(false);
         stoppedOnBusyState.set(true);
-        process.destroy();
+        boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.idle.interruptIfRunning", true);
+        int action = b ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
+        if (debugEnabled) log.debug("sending command {}", ProcessCommands.getCommandName(action));
+        //process.destroy();
+        sendActionCommand(action);
       }
-    }
-    else
-    {
+    } else {
       idle.set(true);
       wakeUp();
     }

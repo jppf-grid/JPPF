@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 
 import org.apache.commons.io.FileUtils;
+import org.jppf.process.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -33,7 +34,7 @@ import org.slf4j.*;
  * @since 4.1
  * @exclude
  */
-public final class SlaveNodeManager implements SlaveNodeLauncherListener {
+public final class SlaveNodeManager implements ProcessLauncherListener {
   /**
    * Logger for this class.
    */
@@ -107,7 +108,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
    * @param configOverrides a set of overrides to the slave's configuration.
    */
   synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
-    int action = interruptIfRunning ? SlaveNodeProtocolHandler.SHUTDOWN_INTERRUPT : SlaveNodeProtocolHandler.SHUTDOWN_NO_INTERRUPT;
+    int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
       if (debugEnabled) log.debug("stopping all processes");
@@ -194,14 +195,14 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
   }
 
   @Override
-  public synchronized void processStarted(final SlaveNodeLauncherEvent event) {
-    SlaveNodeLauncher slave = event.getProcessLauncher();
+  public synchronized void processStarted(final ProcessLauncherEvent event) {
+    SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     slaves.put(slave.getId(), slave);
   }
 
   @Override
-  public synchronized void processStopped(final SlaveNodeLauncherEvent event) {
-    SlaveNodeLauncher slave = event.getProcessLauncher();
+  public synchronized void processStopped(final ProcessLauncherEvent event) {
+    SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     slaves.remove(slave.getId());
     reservedIds.remove(slave.getId());
   }

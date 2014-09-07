@@ -16,18 +16,16 @@
  * limitations under the License.
  */
 
-package org.jppf.node.provisioning;
+package org.jppf.process;
 
-import org.jppf.management.JPPFNodeAdminMBean;
-import org.jppf.process.LauncherListenerProtocolHandler;
-import org.jppf.server.node.JPPFNode;
+import java.util.*;
 
 /**
- *
+ * This class holds the constant for actions handled by a {@link LauncherListenerProtocolHandler}.
  * @author Laurent Cohen
  * @since 5.0
  */
-public class SlaveNodeProtocolHandler implements LauncherListenerProtocolHandler {
+public final class ProcessCommands {
   /**
    * Request a restart with {@code interruptIfRunning = true}.
    */
@@ -45,40 +43,40 @@ public class SlaveNodeProtocolHandler implements LauncherListenerProtocolHandler
    */
   public final static int SHUTDOWN_NO_INTERRUPT = 4;
   /**
-   * The node to send requests to.
+   *
    */
-  private final JPPFNode node;
-
-  /**
-   * Initialize this rpotocol handler witht he specified node.
-   * @param node the node to send requests to.
-   */
-  public SlaveNodeProtocolHandler(final JPPFNode node) {
-    this.node = node;
+  private final static Map<Integer, String> commandMap = new HashMap<>();
+  static {
+    registerCommand(RESTART_INTERRUPT, "RESTART_INTERRUPT");
+    registerCommand(RESTART_NO_INTERRUPT, "RESTART_NO_INTERRUPT");
+    registerCommand(SHUTDOWN_INTERRUPT, "SHUTDOWN_INTERRUPT");
+    registerCommand(SHUTDOWN_NO_INTERRUPT, "SHUTDOWN_NO_INTERRUPT");
   }
 
-  @Override
-  public void performAction(final int actionCode) {
-    if (node == null) return;
-    JPPFNodeAdminMBean mbean = node.getNodeAdmin();
-    if (mbean == null) return;
-    try {
-      switch(actionCode) {
-        case RESTART_INTERRUPT:
-          mbean.restart(true);
-          break;
-        case RESTART_NO_INTERRUPT:
-          mbean.restart(false);
-          break;
-        case SHUTDOWN_INTERRUPT:
-          mbean.shutdown(true);
-          break;
-        case SHUTDOWN_NO_INTERRUPT:
-          mbean.shutdown(false);
-          break;
-      }
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
+  /**
+   * Instantiation is not permitted.
+   */
+  private ProcessCommands() {
+  }
+
+  /**
+   *
+   * @param command the command code.
+   * @param name the nassociated command name.
+   * @return the command code.
+   */
+  private static int registerCommand(final int command, final String name) {
+    commandMap.put(command, name);
+    return command;
+  }
+
+  /**
+   * Get the name associated with a command code.
+   * @param command the command code to lookup.
+   * @return a related name.
+   */
+  public static String getCommandName(final int command) {
+    String s = commandMap.get(command);
+    return s == null ? Integer.valueOf(command).toString() : s;
   }
 }
