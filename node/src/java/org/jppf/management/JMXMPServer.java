@@ -87,6 +87,7 @@ public class JMXMPServer extends AbstractJMXServer {
       managementPort = new ConfigurationHelper(config).getInt(ssl ? 11193 : 11198, 1024, 65535, portProperties);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperties));
       Map<String, Object> env = new HashMap<>();
+      if (!config.getBoolean("jppf.management.host.wildcard", true)) env.put("jmx.remote.server.address.wildcard", "false");
       env.put("jmx.remote.default.class.loader", cl);
       env.put("jmx.remote.protocol.provider.class.loader", cl);
       env.put("jmx.remote.x.server.max.threads", 1);
