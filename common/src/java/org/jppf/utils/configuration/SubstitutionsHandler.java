@@ -19,15 +19,16 @@
 package org.jppf.utils.configuration;
 
 import java.util.*;
+import java.util.regex.*;
 
 import org.jppf.utils.TypedProperties;
-import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
  * Handles property substitutions in a properties file, that is resolve all
  * references of the following form in properties values:
- * <pre>property.name = ${other.property.name}</pre>
+ * <pre> property.name = ${other.property.name}
+ * some.property.name = ${env.&lt;environment_variable_name&gt;}</pre>
  * @author Laurent Cohen
  */
 public class SubstitutionsHandler {
@@ -44,127 +45,115 @@ public class SubstitutionsHandler {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Start of a value substitution.
-   */
-  private static final String SUBST_START ="${";
-  /**
-   * Stop of a value substitution.
-   */
-  private static final String SUBST_STOP = "}";
-  /**
    * Prefix for references to environment variables.
    */
   private static final String ENV_PREFIX ="env.";
   /**
-   * The properties object in which to resolve substitutions.
+   * The regex pattern for identifying scripted property values.
    */
-  private final TypedProperties props;
-  /**
-   * Mapping of properties whose resolution other properties depend on.
-   */
-  private final CollectionMap<String, String> dependedOnMap = new SetHashMap<>();
-  /**
-   * Mapping of properties to the properties they depend on.
-   */
-  private final CollectionMap<String, String> dependenciesMap = new SetHashMap<>();
+  private static final Pattern SUBST_PATTERN = Pattern.compile("(?:\\$\\{){1}?(.*?)\\}+?");
   /**
    * Stores the properties whose values are fully resolved.
    */
-  private final TypedProperties resolved = new TypedProperties();
+  private final TypedProperties resolvedProps = new TypedProperties();
   /**
-   * 
+   * Number of properties resolved at each iteration, used as a
+   * stop conidition for the resolution loop.
    */
-  private final TypedProperties tmpProps;
+  private int resolutionCount = 1;
 
   /**
-   * Initialize this substitution handler with the specified unresolved properties.
-   * @param props the properties where substitutions must be resolved.
+   * Initialize this substitution handler.
    */
-  public SubstitutionsHandler(final TypedProperties props) {
-    this.props = props;
-    this.tmpProps = new TypedProperties(props);
+  public SubstitutionsHandler() {
   }
 
   /**
-   * Resolve the substitutions.
+   * Resolve the substitutions in the input {@link TypedProperties} object.
+   * This method actually changes the property values in the input, i.e. it mutates the input {@link TypedProperties} object.
+   * @param props the properties where substitutions must be resolved.
    * @return TypedProperties object in which substitutions have been resolved whenever possible.
    */
-  public TypedProperties resolve() {
-    for (Map.Entry<Object, Object> entry: props.entrySet()) {
-      if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
-      String key = (String) entry.getKey();
-      String value = (String) entry.getValue();
-      if (traceEnabled) log.trace("processing entry '{} = {}'", key, value);
-      if (value == null) continue;
-      boolean found = true;
-      int pos = 0;
-      while (found) {
-        int idx1 = value.indexOf(SUBST_START, pos);
-        if (idx1 < 0) break;
-        pos = idx1 + SUBST_START.length();
-        int idx2 = value.indexOf(SUBST_STOP, pos);
-        if (idx2 < 0) break;
-        String name = value.substring(pos, idx2);
-        if (traceEnabled) log.trace("  found variable to substitute '{}'", name);
-        if (name.startsWith(ENV_PREFIX)) {
-          String envVar = name.substring(ENV_PREFIX.length());
-          String resolvedValue = System.getenv(envVar);
-          if (resolvedValue == null) resolvedValue = "";
-          value = value.replace(SUBST_START + name + SUBST_STOP, resolvedValue);
-        } else {
-          if (traceEnabled) log.trace("  adding dependency '{}' to '{}'", name, key);
-          dependenciesMap.putValue(key, name);
-        }
-        pos = idx2 + SUBST_STOP.length() + 1;
+  public TypedProperties resolve(final TypedProperties props) {
+    int i = 0;
+    if (traceEnabled) log.trace("starting substitution handling");
+    //resolvedProps.put("", "${}");
+    Set<String> set = props.stringPropertyNames();
+    while (resolutionCount > 0) {
+      resolutionCount = 0;
+      i++;
+      for (String key: set) {
+        String value = evaluateProp(key, (String) props.getProperty(key));
+        props.setProperty(key, value);
       }
-      if (dependenciesMap.containsKey(key)) {
-        Set<String> toRemove = new HashSet<>();
-        for (String dep: dependenciesMap.getValues(key)) {
-          if (resolved.containsKey(dep)) {
-            String resolvedValue = resolved.getProperty(dep);
-            if (traceEnabled) log.trace("  resolved variable '{}' into '{}'", dep, resolvedValue);
-            value = value.replace(SUBST_START + dep + SUBST_STOP, resolvedValue);
-            toRemove.add(dep);
-          }
-        }
-        for (String dep: toRemove) dependenciesMap.removeValue(key, dep);
-      }
-      if (dependenciesMap.containsKey(key)) {
-        for (String dep: dependenciesMap.getValues(key)) dependedOnMap.putValue(dep, key);
-      } else {
-        resolved.setProperty(key, value);
-        propagateResolution(key, value);
-      }
-      tmpProps.put(key, value);
+      if (traceEnabled) log.trace("iteration {} : resolutionCount = {}", i, resolutionCount);
     }
-    // add the unresolved properties
-    for (String unresolvedProp: dependenciesMap.keySet()) resolved.put(unresolvedProp, tmpProps.getProperty(unresolvedProp));
-    props.clear();
-    props.putAll(resolved);
-    resolved.clear();
+    resolvedProps.clear();
     return props;
   }
 
   /**
-   * Recursively propagate the resolution of a property value to the properties that depend on it.
-   * @param key the name of the resolved property.
-   * @param resolvedValue the resolved value of the property.
+   * Resolve the substitutions for the specified property.
+   * @param key the name of the property.
+   * @param value the current value of the property.
+   * @return the new value of the property after 0 or more substitutions have been handled.
    */
-  private void propagateResolution(final String key, final String resolvedValue) {
-    if (traceEnabled) log.trace("  propagating resolution of '{}' into '{}'", key, resolvedValue);
-    if (!dependedOnMap.containsKey(key)) return;
-    Map<String, String> toPropagate = new HashMap<>();
-    for (String dependent: dependedOnMap.getValues(key)) {
-      if (!dependenciesMap.containsKey(dependent)) continue;
-      String value = tmpProps.getProperty(dependent);
-      if (value != null) props.setProperty(dependent, value = value.replace(SUBST_START + key + SUBST_STOP, resolvedValue));
-      dependenciesMap.removeValue(dependent, key);
-      if (!dependenciesMap.containsKey(dependent)) toPropagate.put(dependent, value);
+  private String evaluateProp(final String key, final String value) {
+    Matcher matcher = SUBST_PATTERN.matcher(value);
+    StringBuilder sb = new StringBuilder();
+    int pos = 0;
+    int matches = 0;
+    int resolvedRefCount = 0;
+    if (traceEnabled) log.trace("evaluating [key={}, value={}]", key, value);
+    while (matcher.find()) {
+      matches++;
+      String resolvedValue = null;
+      sb.append(value.substring(pos, matcher.start()));
+      String name = matcher.group(1);
+      if (traceEnabled) log.trace("  found match [name={}]", name);
+      if (name == null) name = "";
+      if (name.startsWith(ENV_PREFIX)) {
+        if (resolvedProps.containsKey(name)) {
+          resolvedValue = resolvedProps.getProperty(name);
+          if (traceEnabled) log.trace("  env var already resolved [name={}, value={}]", name, resolvedValue);
+        } else {
+          resolvedRefCount++;
+          String envVar = name.substring(ENV_PREFIX.length());
+          if (envVar == null) envVar = "";
+          resolvedValue = System.getenv(envVar);
+          if (resolvedValue != null) {
+            if (traceEnabled) log.trace("  got env var from System.getenv() : [envVar={}, value={}]", envVar, resolvedValue);
+          } else {
+            resolvedValue = value.substring(matcher.start(), matcher.end());
+            if (traceEnabled) log.trace("  env var not found in System.getenv() : [envVar={}, value={}]", envVar, resolvedValue);
+          }
+          resolvedProps.put(name, resolvedValue);
+        }
+        sb.append(resolvedValue);
+      } else {
+        if (resolvedProps.containsKey(name)) {
+          resolvedValue = resolvedProps.getProperty(name);
+          if (!"".equals(name.trim())) resolvedRefCount++;
+          if (traceEnabled) log.trace("  property already resolved [name={}, value={}]", name, resolvedValue);
+        } else {
+          resolvedValue = value.substring(matcher.start(), matcher.end());
+          if ("".equals(name.trim())) {
+            if (traceEnabled) log.trace("  empty property [name={}]", name);
+            resolvedRefCount++;
+            resolvedProps.put(name, resolvedValue);
+          } else {
+            if (traceEnabled) log.trace("  unresolved property [name={}]", name);
+          }
+        }
+        sb.append(resolvedValue);
+      }
+      pos = matcher.end();
     }
-    dependedOnMap.removeKey(key);
-    for (Map.Entry<String, String> entry: toPropagate.entrySet()) {
-      resolved.setProperty(entry.getKey(), entry.getValue());
-      propagateResolution(entry.getKey(), entry.getValue());
-    }
+    if (pos < value.length()) sb.append(value.substring(pos, value.length()));
+    String s = sb.toString();
+    if (resolvedRefCount > 0) resolutionCount++;
+    if ((matches <= 0) || (resolvedRefCount >= matches)) resolvedProps.put(key, s);
+    if (traceEnabled) log.trace("final value [key={}, value={}]", key, s);
+    return s;
   }
 }

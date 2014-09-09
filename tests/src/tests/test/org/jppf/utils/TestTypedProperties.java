@@ -180,6 +180,27 @@ public class TestTypedProperties {
   }
 
   /**
+   * Test that property substitutions are handled properly when the property name to substitute is empty (after trimming).
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testEmptyPropertyNameSubstitutions() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${prop.2}/${prop.3}\n");
+    sb.append("prop.2 = 2-${}-${prop.3}\n");
+    sb.append("prop.3 = 3\n");
+    sb.append("prop.4 = ${  }+${prop.3}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = new TypedProperties().loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.4", "${  }+3");
+      checkProperty(props, "prop.3", "3");
+      checkProperty(props, "prop.2", "2-${}-3");
+      checkProperty(props, "prop.1", "1/2-${}-3/3");
+    }
+  }
+
+  /**
    * Test that property substitutions are handled properly.
    * @throws Exception if any error occurs.
    */
@@ -230,6 +251,23 @@ public class TestTypedProperties {
   }
 
   /**
+   * Test that substitutions of environment variables references are handled properly when the environment variable name is empty (after trimming).
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testEmptyEnvironmentVariableNameSubstitution() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${env.  }\n");
+    sb.append("prop.2 = 2-${prop.1}-${env.}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = new TypedProperties().loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/${env.  }");
+      checkProperty(props, "prop.2", "2-1/${env.  }-${env.}");
+    }
+  }
+
+  /**
    * Test that substitutions of undefined environment variables references are handled properly.
    * @throws Exception if any error occurs.
    */
@@ -241,8 +279,8 @@ public class TestTypedProperties {
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
-      checkProperty(props, "prop.1", "1/");
-      checkProperty(props, "prop.2", "2-1/");
+      checkProperty(props, "prop.1", "1/${env.This_is_my_undefined_environment_variable}");
+      checkProperty(props, "prop.2", "2-1/${env.This_is_my_undefined_environment_variable}");
     }
   }
 
