@@ -16,10 +16,11 @@
  * limitations under the License.
  */
 
-package org.jppf.example.idlesystem;
+package org.jppf.node.idle;
+
+import java.util.*;
 
 import org.jppf.JPPFError;
-import org.jppf.node.idle.IdleTimeDetector;
 
 import com.sun.jna.*;
 import com.sun.jna.platform.unix.*;
@@ -31,13 +32,11 @@ import com.sun.jna.platform.unix.X11.Window;
  * Instances of this class provide the computer idle time on a Linux system with X11.
  * @author Laurent Cohen
  */
-public class X11IdleTimeDetector implements IdleTimeDetector
-{
+class X11IdleTimeDetector implements IdleTimeDetector {
   /**
    * Structure providing info on the XScreensaver.
    */
-  public static class XScreenSaverInfo extends Structure
-  {
+  public static class XScreenSaverInfo extends Structure {
     /**
      * screen saver window
      */
@@ -63,22 +62,18 @@ public class X11IdleTimeDetector implements IdleTimeDetector
      */
     public NativeLong event_mask;
 
-    /*
     @Override
-    protected List getFieldOrder()
-    {
+    protected List getFieldOrder() {
       return Arrays.asList("window", "state", "kind", "til_or_since", "idle", "event_mask");
     }
-    */
   }
 
   /**
    * Definition (incomplete) of the Xext library.
    */
-  public interface Xss extends Library
-  {
+  public interface Xss extends Library {
     /**
-     * Instance of the Xext library bindings.
+     * Instance of the Xss library bindings.
      */
     Xss INSTANCE = (Xss) Native.loadLibrary("Xss", Xss.class);
 
@@ -99,15 +94,13 @@ public class X11IdleTimeDetector implements IdleTimeDetector
   }
 
   @Override
-  public long getIdleTimeMillis()
-  {
+  public long getIdleTimeMillis() {
     X11.Window window = null;
     XScreenSaverInfo info = null;
     Display display = null;
 
     long idleMillis = 0L;
-    try
-    {
+    try {
       display = X11.INSTANCE.XOpenDisplay(null);
       if (display == null) display = X11.INSTANCE.XOpenDisplay(":0.0");
       if (display == null) throw new JPPFError("Could not find a display, please setup your DISPLAY environment variable");
@@ -115,13 +108,9 @@ public class X11IdleTimeDetector implements IdleTimeDetector
       info = new XScreenSaverInfo();
       Xss.INSTANCE.XScreenSaverQueryInfo(display, window, info);
       idleMillis = info.idle.longValue();
-    }
-    catch(UnsatisfiedLinkError e)
-    {
+    } catch(UnsatisfiedLinkError e) {
       throw new JPPFError(e.getMessage(), e);
-    }
-    finally
-    {
+    } finally {
       info = null;
       if (display != null) X11.INSTANCE.XCloseDisplay(display);
       display = null;

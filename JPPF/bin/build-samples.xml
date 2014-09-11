@@ -53,7 +53,6 @@
     <include.code sample="ExtendedClassLoading"/>
     <include.code sample="FTPServer"/>
     <include.code sample="GPU"/>
-    <include.code sample="IdleSystem"/>
     <include.code sample="InitializationHook"/>
     <include.code sample="JobRecovery"/>
     <include.code sample="KryoSerializer"/>
@@ -65,7 +64,7 @@
     <zip destfile="${samples.pack.file}">
       <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
         <exclude name="**/*.log"/>
-        <exclude name="**/IdleSystem/lib/IdleSystem.*"/>
+        <exclude name="**/IdleSystem/**/*.*"/>
         <exclude name="**/javadoc/**/*.*"/>
         <exclude name="**/*.sh"/>
       </zipfileset>
@@ -80,7 +79,7 @@
     </zip>
     <!-- Clean up and add the samples pack sources to the proper web site folder -->
     <delete dir="${home}/samples-pack" quiet="true"/>
-     <mkdir dir="${home}/samples-pack"/>
+    <mkdir dir="${home}/samples-pack"/>
     <copy todir="${home}/samples-pack">
       <fileset dir="${samples-pack}">
         <include name="**/*.html"/>

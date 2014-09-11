@@ -48,15 +48,19 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   /**
    * The fully qualified name of the main class of the subprocess to launch.
    */
-  private String mainClass = null;
+  private final String mainClass;
   /**
    * Determines whether the process was stopped because the system went into "busy state".
    */
-  private AtomicBoolean stoppedOnBusyState = new AtomicBoolean(false);
+  private final AtomicBoolean stoppedOnBusyState = new AtomicBoolean(false);
   /**
    * Determines whether the system is in "idle state".
    */
-  private AtomicBoolean idle = new AtomicBoolean(false);
+  private final AtomicBoolean idle = new AtomicBoolean(false);
+  /**
+   * Whether idle mode can be used on the process.
+   */
+  private final boolean idleModeSupported;
   /**
    * Specifies whether the subprocess is launched only when the system is idle.
    */
@@ -69,10 +73,12 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   /**
    * Initialize this process launcher.
    * @param mainClass the fully qualified name of the main class of the sub process to launch.
+   * @param idleModeSupported whether idle mode can be used on the process.
    */
-  public ProcessLauncher(final String mainClass) {
+  public ProcessLauncher(final String mainClass, final boolean idleModeSupported) {
     if (mainClass == null) throw new IllegalArgumentException("the main class name cannot be null");
     this.mainClass = mainClass;
+    this.idleModeSupported = idleModeSupported;
     int idx = mainClass.lastIndexOf('.');
     this.name = (idx < 0) ? mainClass : mainClass.substring(idx);
   }
@@ -82,8 +88,10 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    */
   @Override
   public void run() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    idleMode = config.getBoolean("jppf.idle.mode.enabled", false);
+    if (idleModeSupported) {
+      TypedProperties config = JPPFConfiguration.getProperties();
+      idleMode = config.getBoolean("jppf.idle.mode.enabled", false);
+    }
     boolean end = false;
     try {
       createShutdownHook();

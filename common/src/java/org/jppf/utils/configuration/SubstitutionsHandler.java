@@ -49,7 +49,8 @@ public class SubstitutionsHandler {
    */
   private static final String ENV_PREFIX ="env.";
   /**
-   * The regex pattern for identifying scripted property values.
+   * The regex pattern for identifying scripted property values. This pattern uses explicit reluctant quantifiers, as opposed
+   * to the default greedy quantifiers, to avoid problems when multiple property references are found in a single property value. 
    */
   private static final Pattern SUBST_PATTERN = Pattern.compile("(?:\\$\\{){1}?(.*?)\\}+?");
   /**
@@ -60,7 +61,7 @@ public class SubstitutionsHandler {
    * Number of properties resolved at each iteration, used as a
    * stop conidition for the resolution loop.
    */
-  private int resolutionCount = 1;
+  private int resolutionCount;
 
   /**
    * Initialize this substitution handler.
@@ -77,8 +78,8 @@ public class SubstitutionsHandler {
   public TypedProperties resolve(final TypedProperties props) {
     int i = 0;
     if (traceEnabled) log.trace("starting substitution handling");
-    //resolvedProps.put("", "${}");
     Set<String> set = props.stringPropertyNames();
+    resolutionCount = 1;
     while (resolutionCount > 0) {
       resolutionCount = 0;
       i++;
@@ -138,11 +139,11 @@ public class SubstitutionsHandler {
         } else {
           resolvedValue = value.substring(matcher.start(), matcher.end());
           if ("".equals(name.trim())) {
-            if (traceEnabled) log.trace("  empty property [name={}]", name);
+            if (traceEnabled) log.trace("  empty property name [name={}]", name);
             resolvedRefCount++;
             resolvedProps.put(name, resolvedValue);
           } else {
-            if (traceEnabled) log.trace("  unresolved property [name={}]", name);
+            if (traceEnabled) log.trace("  unresolved property [name={}, value={}]", name, resolvedValue);
           }
         }
         sb.append(resolvedValue);

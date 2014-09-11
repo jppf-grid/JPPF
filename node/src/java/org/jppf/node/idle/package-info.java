@@ -16,19 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.node.idle;
-
 /**
- * Enumeration for the possible states of the system.
- * @author Laurent Cohen
+ * Support for detection of an idle state on the current host.<br/>
+ * Here idle means no keyboard or mouse activity was detected for a specified time.
+ * @exclude
  */
-public enum IdleState {
-  /**
-   * The system is idle.
-   */
-  IDLE,
-  /**
-   * The system is busy.
-   */
-  BUSY
-}
+package org.jppf.node.idle;

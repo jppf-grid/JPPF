@@ -24,8 +24,7 @@ import java.util.EventObject;
  * Event emitted when the idle state of an {@link IdleDetectionTask} changes.
  * @author Laurent Cohen
  */
-public class IdleStateEvent extends EventObject
-{
+public class IdleStateEvent extends EventObject {
   /**
    * The idle state when this event was emitted.
    */
@@ -35,8 +34,7 @@ public class IdleStateEvent extends EventObject
    * Initialize this event with the task as source.
    * @param task an {@link IdleDetectionTask} instance.
    */
-  public IdleStateEvent(final IdleDetectionTask task)
-  {
+  public IdleStateEvent(final IdleDetectionTask task) {
     super(task);
     this.state = task.getState();
   }
@@ -45,8 +43,7 @@ public class IdleStateEvent extends EventObject
    * Get the task source of this event.
    * @return an {@link IdleDetectionTask} instance.
    */
-  public IdleDetectionTask getTask()
-  {
+  public IdleDetectionTask getTask() {
     return (IdleDetectionTask) getSource();
   }
 
@@ -54,8 +51,7 @@ public class IdleStateEvent extends EventObject
    * Get the idle state when this event was emitted.
    * @return an {@link IdleState} enum value.
    */
-  public IdleState getState()
-  {
+  public IdleState getState() {
     return state;
   }
 }

@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.example.idlesystem;
+package org.jppf.node.idle;
 
-import org.jppf.node.idle.*;
-import org.jppf.utils.SystemUtils;
+import com.sun.jna.platform.win32.*;
 
 /**
- * A factory implementation that returns an idle system detector based on the OS detected for the current host.
+ * Instances of this class provide the computer idle time on a Windows system.
  * @author Laurent Cohen
  */
-public class IdleTimeDetectorFactoryImpl implements IdleTimeDetectorFactory
-{
-  /**
-   * {@inheritDoc}
-   */
+class WindowsIdleTimeDetector implements IdleTimeDetector {
   @Override
-  public IdleTimeDetector newIdleTimeDetector()
-  {
-    if (SystemUtils.isWindows()) return new WindowsIdleTimeDetector();
-    else if (SystemUtils.isX11()) return new X11IdleTimeDetector();
-    else if (SystemUtils.isMac()) return new MacIdleTimeDetector();
-    return null;
+  public long getIdleTimeMillis() {
+    WinUser.LASTINPUTINFO lastInputInfo = new WinUser.LASTINPUTINFO();
+    User32.INSTANCE.GetLastInputInfo(lastInputInfo);
+    return Kernel32.INSTANCE.GetTickCount() - lastInputInfo.dwTime;
   }
 }

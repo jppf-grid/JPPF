@@ -16,8 +16,20 @@
  * limitations under the License.
  */
 
+package org.jppf.node.idle;
+
+import org.jppf.utils.SystemUtils;
+
 /**
- * Support for detection of an idle state on the current host.<br/>
- * Here idle means no keyboard or mouse activity was detected for a specified time.
+ * A factory implementation that returns an idle system detector based on the OS detected for the current host.
+ * @author Laurent Cohen
  */
-package org.jppf.example.idlesystem;
+class IdleTimeDetectorFactoryImpl implements IdleTimeDetectorFactory {
+  @Override
+  public IdleTimeDetector newIdleTimeDetector() {
+    if (SystemUtils.isWindows()) return new WindowsIdleTimeDetector();
+    else if (SystemUtils.isX11()) return new X11IdleTimeDetector();
+    else if (SystemUtils.isMac()) return new MacIdleTimeDetector();
+    return null;
+  }
+}

@@ -77,10 +77,9 @@ public class IdleDetector implements Runnable {
    */
   private void init() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
-    String factoryName = config.getString("jppf.idle.detector.factory", null);
+    String factoryName = "org.jppf.node.idle.IdleTimeDetectorFactoryImpl";
     idleTimeout = config.getLong("jppf.idle.timeout", 300000L);
     pollInterval = config.getLong("jppf.idle.poll.interval", 1000L);
-    if (factoryName == null) throw new JPPFException("Idle detector factory name not specified");
     Class c = Class.forName(factoryName);
     factory = (IdleTimeDetectorFactory) c.newInstance();
   }

@@ -13,7 +13,6 @@
 	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
 	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
 	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
-	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
 	<classpathentry kind="src" output="InitializationHook/classes" path="InitializationHook/src"/>
 	<classpathentry kind="src" path="JobRecovery/src"/>
 	<classpathentry kind="src" output="KryoSerializer/classes" path="KryoSerializer/src"/>
@@ -43,8 +42,6 @@
 	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.6.1.jar"/>
-	<classpathentry kind="lib" path="IdleSystem/lib/jna.jar"/>
-	<classpathentry kind="lib" path="IdleSystem/lib/platform.jar"/>
 	<classpathentry kind="lib" path="shared/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/geronimo-jta_1.1_spec-1.1.1.jar"/>
 	<classpathentry kind="lib" path="NodeLifeCycle/lib/transactions-essentials-all.jar" sourcepath="C:/ftp/dev/Database/Atomikos/AtomikosTransactionsEssentials-3.7.0M5/sources"/>

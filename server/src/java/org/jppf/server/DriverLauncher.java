@@ -41,7 +41,7 @@ public class DriverLauncher
   {
     try
     {
-      ProcessLauncher launcher = new ProcessLauncher("org.jppf.server.JPPFDriver");
+      ProcessLauncher launcher = new ProcessLauncher("org.jppf.server.JPPFDriver", false);
       launcher.run();
     }
     catch (Exception e)

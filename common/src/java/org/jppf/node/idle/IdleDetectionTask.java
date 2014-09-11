@@ -30,7 +30,7 @@ import org.slf4j.*;
  * Timer tasks that displays a message whenever the computer has received
  * no mouse or keyboard input for at least the timeout time.
  */
-public class IdleDetectionTask extends TimerTask {
+class IdleDetectionTask extends TimerTask {
   /**
    * Logger for this class.
    */

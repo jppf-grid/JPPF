@@ -17,9 +17,8 @@ $template{name="samples-page-header" title="JPPF Samples Pack"}$
   <li><a href="DataDependency/Readme.php">Simulation of large portfolio updates</a></li>
   <li><a href="NodeTray/Readme.php">JPPF node health monitor in the system tray</a></li>
   <li><a href="CustomLoadBalancer/Readme.php">An example of a sophisticated load-balancer implementation</a></li>
-  <li><a href="IdleSystem/Readme.php">An extension that enables nodes to run only when the machine is idle</a></li>
   <li><a href="NodeLifeCycle/Readme.php">Control of database transactions via node life cycle events</a></li>
-  <li><a href="Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a  magnetic field</a></li>
+  <li><a href="Nbody/Readme.php">Parallel N-body problem applied to anti-protons trapped in a magnetic field</a></li>
   <li><a href="FTPServer/Readme.php">How to embed and use an FTP server in JPPF</a></li>
   <li><a href="NodeConnectionEvents/Readme.php">How to receive notifications of nodes connecting and disconnecting on the server</a></li>
   <li><a href="JobRecovery/Readme.php">Job recovery after an application crash</a></li>

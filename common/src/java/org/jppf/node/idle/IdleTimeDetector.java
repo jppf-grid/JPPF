@@ -22,8 +22,7 @@ package org.jppf.node.idle;
  * Interface for classes fetching the computer idle time on a specific OS.
  * @author Laurent Cohen
  */
-public interface IdleTimeDetector
-{
+interface IdleTimeDetector {
   /**
    * Get the total idle time of the system.
    * @return the idle time in milliseconds.

@@ -235,7 +235,7 @@ public class JPPFResourceWrapper implements Serializable
 
   /**
    * Set the uuid sent by a node when it first contacts a resource provider.
-   * @param providerUuid - the uuid as a string.
+   * @param providerUuid the uuid as a string.
    */
   public void setProviderUuid(final String providerUuid)
   {

@@ -34,7 +34,7 @@ public class NodeLauncher
   {
     try
     {
-      ProcessLauncher launcher = new ProcessLauncher("org.jppf.node.NodeRunner");
+      ProcessLauncher launcher = new ProcessLauncher("org.jppf.node.NodeRunner", true);
       launcher.run();
     }
     catch (Exception e)

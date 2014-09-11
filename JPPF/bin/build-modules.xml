@@ -99,6 +99,7 @@
         <zipfileset dir="${build}" prefix="${node.prefix}/lib-src">
           <include name="jppf-node-src.jar"/>
         </zipfileset>
+        <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
       </module-elements>
     </package-module>
   </target>
