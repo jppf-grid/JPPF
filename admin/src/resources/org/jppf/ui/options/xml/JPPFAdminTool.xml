@@ -36,9 +36,6 @@
 		<property name="tooltip" value="The list of drivers to connect to"/>
 		<property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
     <property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
-    <!--
-    <property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
-    -->
 
 		<child name="ServerChooser" type="ComboBox">
 			<property name="label" value="Server connection"/>

@@ -132,6 +132,10 @@
 			</listener>
 		</child>
 
+    <child name="filler_0" type="page">
+      <property name="componentConstraints" value="flowy, grow 1000, push"/>
+    </child>
+
 	</child>
 	
 	<!-- ===================================================================== -->
