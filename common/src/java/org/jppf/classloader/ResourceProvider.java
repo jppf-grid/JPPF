@@ -74,11 +74,13 @@ public class ResourceProvider {
     InputStream is = null;
     try {
       Enumeration<URL> urls = cl.getResources(resName);
-      if (urls != null) {
+      if ((urls != null) && urls.hasMoreElements()) {
         while (urls.hasMoreElements() && (is == null)) {
           URL url = urls.nextElement();
           if (url != null) is = url.openStream();
         }
+      } else {
+        is = cl.getResourceAsStream(resName);
       }
       if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
         File file = new File(resName);
@@ -139,15 +141,22 @@ public class ResourceProvider {
     if (cl == null) cl = this.getClass().getClassLoader();
     try {
       Enumeration<URL> urlEnum = cl.getResources(name);
-      if (urlEnum != null) {
+      if ((urlEnum != null) && urlEnum.hasMoreElements()) {
         while (urlEnum.hasMoreElements()) {
           URL url = urlEnum.nextElement();
-          if (url != null) {
+          if ((urlEnum != null) && urlEnum.hasMoreElements()) {
             InputStream is = url.openStream();
             byte[] b = StreamUtils.getInputStreamAsByte(is);
             if (result == null) result = new ArrayList<>();
             result.add(b);
           }
+        }
+      } else {
+        InputStream is = cl.getResourceAsStream(name);
+        if (is != null) {
+          byte[] b = StreamUtils.getInputStreamAsByte(is);
+          if (result == null) result = new ArrayList<>();
+          result.add(b);
         }
       }
     }
