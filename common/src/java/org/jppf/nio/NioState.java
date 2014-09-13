@@ -18,6 +18,9 @@
 
 package org.jppf.nio;
 
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
+
 
 
 /**
@@ -25,8 +28,7 @@ package org.jppf.nio;
  * @param <T> the type of transitions for this state.
  * @author Laurent Cohen
  */
-public abstract class NioState<T extends Enum<T>>
-{
+public abstract class NioState<T extends Enum<T>> {
   /**
    * Execute the action associated with this channel state.
    * @param channel the selection key corresponding to the channel and selector for this state.
@@ -34,4 +36,41 @@ public abstract class NioState<T extends Enum<T>>
    * @throws Exception if an error occurs while transitioning to another state.
    */
   public abstract T performTransition(ChannelWrapper<?> channel) throws Exception;
+
+  /**
+   * Extract the remote host name from the specified channel.
+   * @param channel the channel that carries the host information.
+   * @return the remote host name as a string.
+   * @throws Exception if any error occurs.
+   */
+  public static String getChannelHost(final ChannelWrapper<?> channel) throws Exception {
+    SocketChannel ch = getSocketChannel(channel);
+    return  (ch == null) ? null : ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
+  }
+
+  /**
+   * Extract the remote host name from the specified channel.
+   * @param channel the channel that carries the host information.
+   * @return the remote host name as a string.
+   * @throws Exception if any error occurs.
+   */
+  public static String getSocketChannelAsString(final ChannelWrapper<?> channel) throws Exception {
+    SocketChannel ch = getSocketChannel(channel);
+    if (ch == null) return "null";
+    return ch.socket().toString();
+  }
+
+  /**
+   * Extract the socket channel from the specified channel wrapper.
+   * @param channel the channel that carries the host information.
+   * @return a {@link SocketChannel} instance, or {@code null} if the underlying channel is not a {@code SocketChannel}.
+   * @throws Exception if any error occurs.
+   */
+  public static SocketChannel getSocketChannel(final ChannelWrapper<?> channel) throws Exception {
+    if (channel instanceof SelectionKeyWrapper) {
+      SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
+      return  (SocketChannel) skw.getChannel().channel();
+    }
+    return null;
+  }
 }

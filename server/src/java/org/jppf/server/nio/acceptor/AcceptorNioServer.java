@@ -29,8 +29,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransition>
-{
+public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransition> {
   /**
    * Logger for this class.
    */
@@ -54,37 +53,30 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * @param sslPorts the SSL ports this socket server is listening to.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception
-  {
+  public AcceptorNioServer(final int[] ports, final int[] sslPorts) throws Exception {
     super(ports, sslPorts, JPPFIdentifiers.ACCEPTOR_CHANNEL);
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
   }
 
   @Override
-  protected void createSSLContext() throws Exception
-  {
+  protected void createSSLContext() throws Exception {
   }
 
   @Override
-  protected void configureSSLEngine(final SSLEngine engine) throws Exception
-  {
+  protected void configureSSLEngine(final SSLEngine engine) throws Exception {
   }
 
   @Override
-  protected NioServerFactory<AcceptorState, AcceptorTransition> createFactory()
-  {
+  protected NioServerFactory<AcceptorState, AcceptorTransition> createFactory() {
     return new AcceptorServerFactory(this);
   }
 
   @Override
-  public void postAccept(final ChannelWrapper<?> channel)
-  {
-    try
-    {
+  public void postAccept(final ChannelWrapper<?> channel) {
+    try {
+      if (debugEnabled) log.debug("accepted channel {}", NioState.getSocketChannelAsString(channel));
       transitionManager.transitionChannel(channel, AcceptorTransition.TO_IDENTIFYING_PEER);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeChannel(channel);
@@ -92,8 +84,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   }
 
   @Override
-  public NioContext createNioContext()
-  {
+  public NioContext createNioContext() {
     AcceptorContext context = new AcceptorContext();
     return context;
   }
@@ -102,21 +93,16 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * Close a connection to a node.
    * @param channel a <code>SocketChannel</code> that encapsulates the connection.
    */
-  public void closeChannel(final ChannelWrapper<?> channel)
-  {
-    try
-    {
+  public void closeChannel(final ChannelWrapper<?> channel) {
+    try {
       channel.close();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
 
   @Override
-  public boolean isIdle(final ChannelWrapper<?> channel)
-  {
+  public boolean isIdle(final ChannelWrapper<?> channel) {
     return false;
   }
 }

@@ -22,11 +22,8 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.server.protocol.BundleParameter.*;
 import static org.jppf.utils.StringUtils.build;
 
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
-
 import org.jppf.management.*;
-import org.jppf.nio.*;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
@@ -94,6 +91,7 @@ class WaitInitialBundleState extends NodeServerState {
         String host = getChannelHost(channel);
         int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
+        if (debugEnabled) log.debug(String.format("configuring management for node @ {}:{}, secure="));
         byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
         if (channel.isLocal()) {
           type |= JPPFManagementInfo.LOCAL;
@@ -143,20 +141,5 @@ class WaitInitialBundleState extends NodeServerState {
     context.setBundle(nodeBundle);
     WaitingResultsState wrs = (WaitingResultsState) server.getFactory().getState(NodeState.WAITING_RESULTS);
     return wrs.process(received, context);
-  }
-
-  /**
-   * Extract the remote host name from the specified channel.
-   * @param channel the channel that carries the host information.
-   * @return the remote host name as a string.
-   * @throws Exception if any error occurs.
-   */
-  private String getChannelHost(final ChannelWrapper<?> channel) throws Exception {
-    if (channel instanceof SelectionKeyWrapper) {
-      SelectionKeyWrapper skw = (SelectionKeyWrapper) channel;
-      SocketChannel ch = (SocketChannel) skw.getChannel().channel();
-      return  ((InetSocketAddress) (ch.getRemoteAddress())).getHostString();
-    }
-    return null;
   }
 }
