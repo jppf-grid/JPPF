@@ -131,8 +131,8 @@ public final class StatsHandler implements StatsConstants {
    * Request an update from the current server connection.
    */
   public void requestUpdate() {
-    if (clientHandler.getCurrentConnection() == null) return;
-    requestUpdate(clientHandler.getCurrentConnection());
+    JPPFClientConnection c = clientHandler.getCurrentConnection();
+    if (c != null) requestUpdate(c);
   }
 
   /**
@@ -141,10 +141,12 @@ public final class StatsHandler implements StatsConstants {
    */
   public void requestUpdate(final JPPFClientConnection c) {
     try {
-      if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus()))
-      {
-        JPPFStatistics stats = c.getConnectionPool().getJmxConnection().statistics();
-        if (stats != null) update(c, stats);
+      if ((c != null) && JPPFClientConnectionStatus.ACTIVE.equals(c.getStatus())) {
+        JMXDriverConnectionWrapper jmx = c.getConnectionPool().getJmxConnection();
+        if ((jmx != null) && jmx.isConnected()) {
+          JPPFStatistics stats = jmx.statistics();
+          if (stats != null) update(c, stats);
+        }
       }
     } catch(Exception e) {
       log.error(e.getMessage(), e);
