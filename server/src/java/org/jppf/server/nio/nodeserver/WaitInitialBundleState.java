@@ -70,6 +70,7 @@ class WaitInitialBundleState extends NodeServerState {
     //if (debugEnabled) log.debug("exec() for " + channel);
     if (context.getMessage() == null) context.setMessage(context.newMessage());
     if (context.readMessage(channel)) {
+      log.info("received handshake response for channel id = {}", context.getChannel().getId());
       BundleResults received = context.deserializeBundle();
       TaskBundle bundle = received.bundle();
       boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));

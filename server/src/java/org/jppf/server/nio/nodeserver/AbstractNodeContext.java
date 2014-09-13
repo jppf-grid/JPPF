@@ -427,9 +427,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Cancel the job with the specified id.
    * @param jobId the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
+   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
-   * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    */
   public boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
     if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);

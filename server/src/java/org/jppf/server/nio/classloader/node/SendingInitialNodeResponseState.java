@@ -67,6 +67,7 @@ class SendingInitialNodeResponseState extends ClassServerState
     ClassContext context = (ClassContext) channel.getContext();
     if (context.writeMessage(channel))
     {
+      log.info("sent node init response for uuid = {}", context.getUuid());
       if (debugEnabled) log.debug("sent uuid=" + context.getResource().getProviderUuid() + " to node " + channel);
       context.setMessage(null);
       return TO_WAITING_NODE_REQUEST;

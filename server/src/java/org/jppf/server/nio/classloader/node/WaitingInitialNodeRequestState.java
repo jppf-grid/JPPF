@@ -75,6 +75,7 @@ class WaitingInitialNodeRequestState extends ClassServerState
       context.setPeer((Boolean) resource.getData("peer", Boolean.FALSE));
       if (debugEnabled) log.debug("initiating node: " + wrapper);
       String uuid = (String) resource.getData(ResourceIdentifier.NODE_UUID);
+      log.info("received node init request for uuid = {}", uuid);
       if (uuid != null)
       {
         context.setUuid(uuid);
