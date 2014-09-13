@@ -132,12 +132,16 @@ else
         <?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
         <hr/>
         <?php if ($currentPage == "Documentation") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/v4" class="<?php echo $itemClass; ?>">&raquo; Documentation</a><br></div>
+        <!--
         <?php if ($currentPage == "v5.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/v5" class="<?php echo $itemClass; ?>">v5.x</a><br></div>
+        -->
         <?php if ($currentPage == "v4.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/v4" class="<?php echo $itemClass; ?>">v4.x</a><br></div>
         <?php if ($currentPage == "v3.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/v3" class="<?php echo $itemClass; ?>">v3.x</a><br></div>
         <?php if ($currentPage == "v2.x") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/v2" class="<?php echo $itemClass; ?>">v2.x</a><br></div>
         <?php if ($currentPage == "Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/api" class="<?php echo $itemClass; ?>">&raquo; Javadoc</a><br></div>
+        <!--
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/api-5" class="<?php echo $itemClass; ?>">v5.x</a><br></div>
+        -->
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/api" class="<?php echo $itemClass; ?>">v4.x</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/api-3" class="<?php echo $itemClass; ?>">v3.x</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/api-2.0" class="<?php echo $itemClass; ?>">v2.x</a><br></div>
@@ -201,6 +205,16 @@ else
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=Charts-04.gif&shotTitle=Charts 04">
+									<img src="screenshots/_th_Charts-04.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=ChartsConfiguration-01.gif&shotTitle=Charts Configuration 01">
+									<img src="screenshots/_th_ChartsConfiguration-01.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=DeadlockMonitoring.gif&shotTitle=Deadlock Monitoring">
 									<img src="screenshots/_th_DeadlockMonitoring.jpg" border="0" alt="screenshot"/>
 								</a>
@@ -215,6 +229,8 @@ else
 									<img src="screenshots/_th_Docking-2.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=Docking-3.gif&shotTitle=Docking 3">
 									<img src="screenshots/_th_Docking-3.jpg" border="0" alt="screenshot"/>
@@ -225,8 +241,6 @@ else
 									<img src="screenshots/_th_DriverSystemInformation.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=FractalsSample-2.gif&shotTitle=Fractals Sample 2">
 									<img src="screenshots/_th_FractalsSample-2.jpg" border="0" alt="screenshot"/>
@@ -262,6 +276,8 @@ else
 									<img src="screenshots/_th_ManyJobs-02.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ManyJobs-03.gif&shotTitle=Many Jobs 03">
 									<img src="screenshots/_th_ManyJobs-03.jpg" border="0" alt="screenshot"/>
@@ -272,8 +288,6 @@ else
 									<img src="screenshots/_th_MaxtrixSample-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=NodeSystemInformation.gif&shotTitle=Node System Information">
 									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
@@ -309,6 +323,8 @@ else
 									<img src="screenshots/_th_RuntimeMonitoring.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01">
 									<img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
@@ -319,8 +335,6 @@ else
 									<img src="screenshots/_th_Topology-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=Topology-GraphView-02.gif&shotTitle=Topology  Graph View 02">
 									<img src="screenshots/_th_Topology-GraphView-02.jpg" border="0" alt="screenshot"/>
@@ -377,6 +391,7 @@ else
         <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2014 JPPF.org</td>
         <td align="center" valign="center">
           <!-- Google+ button -->
+          <!--
           <div class="g-plusone" data-href="http://www.jppf.org" data-annotation="bubble" data-size="small" data-width="300"></div>
           <script type="text/javascript">
             (function() {
@@ -385,6 +400,7 @@ else
               var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
             })();
           </script>
+          -->
           <!-- Twitter share button -->
           <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.jppf.org" data-via="jppfgrid" data-count="horizontal" data-dnt="true">Tweet</a>
           <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
