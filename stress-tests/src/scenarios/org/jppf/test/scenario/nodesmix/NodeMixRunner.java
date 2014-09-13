@@ -19,14 +19,12 @@
 package org.jppf.test.scenario.nodesmix;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.client.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.test.scenario.AbstractScenarioRunner;
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -101,6 +99,7 @@ public class NodeMixRunner extends AbstractScenarioRunner {
     client = getSetup().getClient();
     TypedProperties config = getConfiguration().getProperties();
     try {
+      /*
       StreamUtils.waitKeyPressed("Start the admin console and press [Enter] ...");
       nbJobs = config.getInt("nbJobs", 1);
       nbTasks = config.getInt("nbTasks", 1);
@@ -154,7 +153,8 @@ public class NodeMixRunner extends AbstractScenarioRunner {
         output("got results for " + job.getName() + ": tasks in error = " + StringUtils.padLeft("" + nbErrors, ' ', digits) +
             ", not executed = " + StringUtils.padLeft("" + nbNoExec, ' ', digits) + ", good = " + StringUtils.padLeft("" + nbOk, ' ', digits));
       }
-      StreamUtils.waitKeyPressed();
+      */
+      StreamUtils.waitKeyPressed("Press [Enter] to terminate ...");
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
