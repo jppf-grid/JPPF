@@ -78,7 +78,6 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
    * </ul>
    * @param bundleSize bundle size of the new performance sample.
    * @param time total execution time of the new sample.
-   * @see org.jppf.load.balancer.Bundler#feedback(int, double)
    */
   @Override
   public void feedback(final int bundleSize, final double time)
