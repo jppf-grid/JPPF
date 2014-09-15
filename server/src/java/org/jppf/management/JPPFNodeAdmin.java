@@ -75,7 +75,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Get the latest state information from the node.
    * @return a <code>JPPFNodeState</code> information.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#state()
    */
   @Override
   public JPPFNodeState state() throws Exception
@@ -89,7 +88,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Set the size of the node's thread pool.
    * @param size the size as an int.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadPoolSize(java.lang.Integer)
    */
   @Override
   public void updateThreadPoolSize(final Integer size) throws Exception
@@ -104,7 +102,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * and runtime information such as memory usage and available processors.
    * @return a <code>JPPFSystemInformation</code> instance.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#systemInformation()
    */
   @Override
   public JPPFSystemInformation systemInformation() throws Exception
@@ -118,37 +115,42 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
   /**
    * Restart the node.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#restart()
    */
   @Override
   public void restart() throws Exception
   {
-    if (debugEnabled) log.debug("node restart requested");
-    Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        node.shutdown(true);
-      }
-    };
-    new Thread(r, "NodeRestart").start();
+    shutdownOrRestart(true);
   }
 
   /**
    * Shutdown the node.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#shutdown()
    */
   @Override
   public void shutdown() throws Exception
   {
-    if (debugEnabled) log.debug("node shutdown requested");
-    Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        node.shutdown(false);
-      }
-    };
-    new Thread(r, "NodeShutdown").start();
+    shutdownOrRestart(false);
+  }
+
+  /**
+   * Shutdown and eventually restart the node.
+   * @param restart determines whether this node should be restarted by the node launcher.
+   * @since 4.2.3
+   */
+  private void shutdownOrRestart(final boolean restart) {
+    if (node.isLocal()) return;
+    if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
+      String s = restart ? "Restart" : "Shutdown";
+      System.out.println(s + " requested");
+      log.info("node {} requested", s);
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          node.shutdown(restart);
+        }
+      };
+      new Thread(r, s).start();
+    }
   }
 
   /**
@@ -167,7 +169,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Set the node's executed tasks counter to the specified value.
    * @param n the new value of the task counter.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#setTaskCounter(java.lang.Integer)
    */
   @Override
   public synchronized void setTaskCounter(final Integer n) throws Exception
@@ -181,7 +182,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Update the priority of all execution threads.
    * @param newPriority the new priority to set.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#updateThreadsPriority(java.lang.Integer)
    */
   @Override
   public void updateThreadsPriority(final Integer newPriority) throws Exception
@@ -196,7 +196,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @param config the set of properties to update.
    * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#updateConfiguration(java.util.Map, java.lang.Boolean)
    */
   @Override
   public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception
@@ -229,7 +228,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @param jobId the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
    * @throws Exception if any error occurs.
-   * @see org.jppf.management.JPPFNodeAdminMBean#cancelJob(java.lang.String,java.lang.Boolean)
    */
   @Override
   public void cancelJob(final String jobId, final Boolean requeue) throws Exception
