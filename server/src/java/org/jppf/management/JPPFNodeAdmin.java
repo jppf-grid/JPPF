@@ -23,6 +23,7 @@ import java.util.Map;
 import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
 import org.jppf.execute.ExecutionInfo;
+import org.jppf.node.NodeRunner;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.JPPFConfiguration;
@@ -160,16 +161,22 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @since 5.0
    */
   private void shutdownOrRestart(final boolean interrupt, final boolean restart) {
-    if (interrupt || !node.isExecuting()) {
-      Runnable r = new Runnable() {
-        @Override
-        public void run() {
-          node.shutdown(restart);
-        }
-      };
-      new Thread(r, "NodeShutdown").start();
-    } else {
-      node.requestShutdown(restart);
+    if (node.isLocal()) return;
+    if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
+      String s = restart ? "Restart" : "Shutdown";
+      System.out.println(s + " requested");
+      log.info("node {} requested", s);
+      if (interrupt || !node.isExecuting()) {
+        Runnable r = new Runnable() {
+          @Override
+          public void run() {
+            node.shutdown(restart);
+          }
+        };
+        new Thread(r, "Node" + s).start();
+      } else {
+        node.requestShutdown(restart);
+      }
     }
   }
 

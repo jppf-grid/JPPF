@@ -125,7 +125,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("Start of node main loop, nodeUuid=" + uuid);
     while (!isStopped()) {
       try {
-        if (NodeRunner.isShuttingDown()) break;
+        if (!isLocal() && NodeRunner.getShuttingDown().get()) break;
         init();
         if (!initialized) {
           System.out.println("Node successfully initialized");
@@ -386,7 +386,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public void shutdown(final boolean restart) {
     if (!isLocal()) {
       setStopped(true);
-      NodeRunner.setShuttingDown(true);
       lifeCycleEventHandler.fireNodeEnding();
       NodeRunner.shutdown(this, restart);
     }

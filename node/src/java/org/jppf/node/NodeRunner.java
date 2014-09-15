@@ -21,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.*;
 import org.jppf.classloader.*;
@@ -28,7 +29,7 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.node.connection.*;
 import org.jppf.node.initialization.InitializationHook;
 import org.jppf.node.provisioning.ShutdownRestartNodeProtocolHandler;
-import org.jppf.process.*;
+import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
@@ -92,7 +93,7 @@ public class NodeRunner {
   /**
    * Determines whether this node is currently shutting down.
    */
-  private static boolean shuttingDown = false;
+  private static AtomicBoolean shuttingDown = new AtomicBoolean(false);
   /**
    * The current server connection information.
    */
@@ -127,7 +128,7 @@ public class NodeRunner {
     }
     try {
       ConnectionContext context = new ConnectionContext("Initial connection", null, ConnectionReason.INITIAL_CONNECTION_REQUEST);
-      while (!isShuttingDown()) {
+      while (!getShuttingDown().get()) {
         try {
           if (initialConfig == null) initialConfig = new TypedProperties(JPPFConfiguration.getProperties());
           else restoreInitialConfig();
@@ -381,18 +382,10 @@ public class NodeRunner {
 
   /**
    * Determine whether this node is currently shutting down.
-   * @return <code>true</code> if the node is shutting down, <code>false</code> otherwise.
+   * @return an {@link AtomicBoolean} instance whose value is <code>true</code> if the node is shutting down, <code>false</code> otherwise.
    */
-  public synchronized static boolean isShuttingDown() {
+  public static AtomicBoolean getShuttingDown() {
     return shuttingDown;
-  }
-
-  /**
-   * Specify whether this node is currently shutting down.
-   * @param shuttingDown <code>true</code> if the node is shutting down, <code>false</code> otherwise.
-   */
-  public synchronized static void setShuttingDown(final boolean shuttingDown) {
-    NodeRunner.shuttingDown = shuttingDown;
   }
 
   /**
