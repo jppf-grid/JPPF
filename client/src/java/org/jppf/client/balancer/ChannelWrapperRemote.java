@@ -26,7 +26,6 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.event.*;
-import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
@@ -296,11 +295,10 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     private ClassLoader getClassLoader(final JPPFJob job) {
       if (job == null) throw new IllegalArgumentException("job is null");
       if (job.getJobTasks().isEmpty()) return null;
-      else {
-        Object task = job.getJobTasks().get(0);
-        if (task instanceof JPPFAnnotatedTask) task = ((JPPFAnnotatedTask) task).getTaskObject();
-        return task.getClass().getClassLoader();
-      }
+      Task<?> task = job.getJobTasks().get(0);
+      if (task == null) return null;
+      Object o = task.getTaskObject();
+      return (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
     }
   }
 }
