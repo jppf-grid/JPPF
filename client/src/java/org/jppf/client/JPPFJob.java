@@ -112,9 +112,9 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable}, or an instance of {@link java.lang.Runnable Runnable} or {@link java.util.concurrent.Callable Callable}.
    * @param taskObject the task to add to this job.
    * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of <code>JPPFTask</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * @return an instance of <code>Task</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
    * or a wrapper around the input object in the other cases.
-   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+   * @throws JPPFException if one of the tasks is neither a <code>Task</code> or a JPPF-annotated class.
    */
   public Task<?> add(final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
@@ -132,8 +132,8 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @param taskObject the task to add to this job.
    * @param method the name of the method to execute.
    * @param args arguments to use with a JPPF-annotated class.
-   * @return an instance of <code>JPPFTask</code> that is a wrapper around the input task object.
-   * @throws JPPFException if one of the tasks is neither a <code>JPPFTask</code> or a JPPF-annotated class.
+   * @return an instance of <code>Task</code> that is a wrapper around the input task object.
+   * @throws JPPFException if one of the tasks is neither a <code>Task</code> or a JPPF-annotated class.
    */
   public Task<?> add(final String method, final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
@@ -141,6 +141,42 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
     tasks.add(jppfTask);
     jppfTask.setPosition(tasks.size()-1);
     return jppfTask;
+  }
+
+  /**
+   * Add a {@link Task} to this job.
+   * @param task the task to add to this job.
+   * @return an instance of <code>Task</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * or a wrapper around the input object in the other cases.
+   * @throws JPPFException if one of the tasks is neither a <code>Task</code> or a JPPF-annotated class.
+   * @since 5.0
+   */
+  public Task<?> add(final Task<?> task) throws JPPFException {
+    return add(task, (Object[]) null);
+  }
+
+  /**
+   * Add a {@link Runnable} task to this job.
+   * @param runnable the runnable task to add to this job.
+   * @return an instance of <code>Task</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * or a wrapper around the input object in the other cases.
+   * @throws JPPFException if one of the tasks is neither a <code>Task</code> or a JPPF-annotated class.
+   * @since 5.0
+   */
+  public Task<?> add(final Runnable runnable) throws JPPFException {
+    return add(runnable, (Object[]) null);
+  }
+
+  /**
+   * Add a {@link Callable} task to this job.
+   * @param callable the callable task to add to this job.
+   * @return an instance of <code>Task</code> that is either the same as the input if the input is a subclass of <code>JPPFTask</code>,
+   * or a wrapper around the input object in the other cases.
+   * @throws JPPFException if one of the tasks is neither a <code>Task</code> or a JPPF-annotated class.
+   * @since 5.0
+   */
+  public Task<?> add(final Callable<?> callable) throws JPPFException {
+    return add(callable, (Object[]) null);
   }
 
   /**
