@@ -100,7 +100,6 @@ public class ClientExecutionManager extends AbstractExecutionManager
    * @return an instance of {@link ClassLoader}.
    */
   private ClassLoader getTaskClassLoader(final Task<?> task) {
-    Object o = task.getTaskObject();
-    return (o == null) ? task.getClass().getClassLoader() : o.getClass().getClassLoader();
+    return task.getTaskClassLoader();
   }
 }

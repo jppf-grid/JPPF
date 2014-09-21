@@ -381,8 +381,7 @@ public class TestJPPFClient extends Setup1D1N
       if (isInNode()) {
         if (!(cl instanceof AbstractJPPFClassLoader))
           throw new IllegalStateException("thread context class loader for remote execution should be an AbstractJPPFClassLoader, but is " + cl);
-        Object o = getTaskObject();
-        AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader)  (o == null ? getClass().getClassLoader() : o.getClass().getClassLoader());
+        AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader) getTaskClassLoader();
         if (cl != ajcl2) {
           throw new IllegalStateException("thread context class loader and task class loader do not match:\n" +
             "thread context class loader = " + cl + "\n" +

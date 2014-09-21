@@ -260,4 +260,16 @@ public abstract class AbstractTask<T> implements Task<T> {
   public void setMaxResubmits(final int maxResubmits) {
     this.maxResubmits = maxResubmits;
   }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.0
+   * @exclude
+   */
+  @Override
+  public ClassLoader getTaskClassLoader() {
+    Object o = getTaskObject();
+    if (o == null) o = this;
+    return o.getClass().getClassLoader();
+  }
 }

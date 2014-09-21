@@ -193,4 +193,12 @@ public interface Task<T> extends Runnable, Serializable {
    * @param maxResubmits the maximum number of resubmits.
    */
   void setMaxResubmits(int maxResubmits);
+
+  /**
+   * Get the class loader used to load this task, or the object it wraps if any.
+   * @return a {@link ClassLoader} instance.
+   * @since 5.0
+   * @exclude
+   */
+  ClassLoader getTaskClassLoader();
 }

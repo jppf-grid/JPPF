@@ -297,8 +297,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       if (job.getJobTasks().isEmpty()) return null;
       Task<?> task = job.getJobTasks().get(0);
       if (task == null) return null;
-      Object o = task.getTaskObject();
-      return (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
+      return task.getTaskClassLoader();
     }
   }
 }
