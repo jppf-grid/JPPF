@@ -75,7 +75,6 @@ public class NodeThreadsAction extends AbstractTopologyAction
   /**
    * Update this action's enabled state based on a list of selected elements.
    * @param selectedElements - a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
   public void updateState(final List<Object> selectedElements)
@@ -87,7 +86,6 @@ public class NodeThreadsAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
   public void actionPerformed(final ActionEvent event)
