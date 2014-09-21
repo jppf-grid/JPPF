@@ -73,6 +73,21 @@ limitations under the License.
   <!--                     Build the jar files                              -->
   <!-- ==================================================================== -->
 
+  <macrodef name="copy.jppf.jars">
+    <attribute name="todir"/>
+    <sequential>
+      <copy todir="@{todir}">
+        <fileset dir="${build}">
+          <include name="jppf-node.jar"/>
+          <include name="jppf-common.jar"/>
+          <include name="jppf-client.jar"/>
+          <include name="jppf-admin.jar"/>
+          <include name="jppf-server.jar"/>
+        </fileset>
+      </copy>
+    </sequential>
+  </macrodef>
+
   <target name="jar" depends="compile" unless="jar.done">
     <jar.module module="node"/>
     <jar.module module="common"/>
@@ -81,6 +96,7 @@ limitations under the License.
     <jar.module module="server"/>
     <jar.module module="demo"/>
     <property name="jar.done" value="true"/>
+    <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
   </target>
 
   <!--

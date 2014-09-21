@@ -36,15 +36,7 @@
   <target name="samples.pack" description="Generate the packaging for the samples pack"
     depends="init, build" if="samples.pack.present">
     <!-- Copy the JPPF jars to the shared/lib directory -->
-    <copy todir="${samples-pack}/shared/lib">
-      <fileset dir="${build}">
-        <include name="jppf-node.jar"/>
-        <include name="jppf-common.jar"/>
-        <include name="jppf-client.jar"/>
-        <include name="jppf-admin.jar"/>
-        <include name="jppf-server.jar"/>
-      </fileset>
-    </copy>
+    <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
     <!-- Convert sources to HTML and include them in the designated samples -->
     <include.code sample="AdaptiveGrid"/>
     <include.code sample="ConcurrentJobs"/>
