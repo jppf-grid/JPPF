@@ -33,8 +33,7 @@ import org.slf4j.*;
  * However, in most cases this is a reasonable approximation, whose computation does not tax the CPU too heavily.
  * @author Laurent Cohen
  */
-public class CPUTimeCollector extends ThreadSynchronization implements Runnable
-{
+public class CPUTimeCollector extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -45,7 +44,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The interval between two computations in milliseconds.
-   * Taken form the value of configuration property "jppf.cpu.load.compuation.interval".
+   * Taken from the value of configuration property "jppf.cpu.load.compuation.interval".
    * It defaults to 1000 (1 second) if the property is unspecified.
    */
   protected static long INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.cpu.load.computation.interval", 1L * 1000L);
@@ -67,18 +66,14 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
   OperatingSystemMXBean systemMXBean = ManagementFactory.getOperatingSystemMXBean();
 
   @Override
-  public void run()
-  {
-    try
-    {
-      while (!isStopped())
-      {
+  public void run() {
+    try {
+      while (!isStopped()) {
         long oldValue = totalCpuTime.get();
         long start = System.currentTimeMillis();
         long[] ids = threadMXBean.getAllThreadIds();
         long time = 0L;
-        for (long id: ids)
-        {
+        for (long id: ids) {
           long l = threadMXBean.getThreadCpuTime(id);
           if (l >= 0L) time += l;
         }
@@ -91,9 +86,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
         //log.info("computed difference ms = " + (cpuTime - oldValue) + ", sleep time = " + sleepTime);
         goToSleep(sleepTime <= 0L ? INTERVAL : sleepTime);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -102,8 +95,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable
    * Get the CPU load as the ratio of <code>totalCpuTime / computationInterval</code>.
    * @return the CPU load as a double value in the range <code>[0, 1]</code>.
    */
-  public double getLoad()
-  {
+  public double getLoad() {
     double d = Double.longBitsToDouble(load.get());
     if (d > 1d) d = 1d;
     return d;

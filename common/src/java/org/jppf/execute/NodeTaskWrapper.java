@@ -19,7 +19,7 @@ package org.jppf.execute;
 
 import java.util.concurrent.Future;
 
-import org.jppf.*;
+import org.jppf.JPPFReconnectionNotification;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.*;
 import org.slf4j.*;
@@ -126,7 +126,6 @@ public class NodeTaskWrapper implements Runnable
 
   /**
    * Execute the task within a try/catch block.
-   * @see Runnable#run()
    */
   @Override
   public void run()
