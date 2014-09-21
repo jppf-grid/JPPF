@@ -21,6 +21,7 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -159,18 +160,17 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
    * @param connected the possible statuses of the connections to wait for.
-   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @return a list of {@link JMXDriverConnectionWrapper} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
   synchronized List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final long timeout, final boolean connected) {
     setMaxSize(nbConnections);
-    long start = System.currentTimeMillis();
-    List<JMXDriverConnectionWrapper> list = new ArrayList<>();
-    try {
-      while (((list = getConnections(connected)).size() != nbConnections) && (System.currentTimeMillis() - start < timeout)) wait(1L);
-    } catch (InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
-    return list;
+    final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        return ref.set(getConnections(connected)).size() == nbConnections;
+      }
+    }, timeout);
+    return ref.get();
   }
 }

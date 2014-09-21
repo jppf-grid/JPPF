@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.*;
+import java.util.List;
 
 import org.jppf.client.balancer.SubmissionManagerClient;
 import org.jppf.client.event.ClientListener;
@@ -44,6 +44,13 @@ public class JPPFClient extends AbstractGenericClient {
    * Determines whether debug-level logging is enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+
+  /**
+   * Initialize this client with an automatically generated application UUID.
+   */
+  public JPPFClient() {
+    super(null, JPPFConfiguration.getProperties());
+  }
 
   /**
    * Initialize this client with an automatically generated application UUID.
@@ -82,7 +89,6 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public List<Task<?>> submitJob(final JPPFJob job) {
     if (isClosed()) throw new IllegalStateException("this client is closed");
     if (job == null) throw new IllegalArgumentException("job cannot be null");
@@ -197,15 +203,12 @@ public class JPPFClient extends AbstractGenericClient {
    * @since 5.0
    */
   public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final JPPFClientConnectionStatus...statuses) {
-    List<JPPFConnectionPool> list = new ArrayList<>();
-    long start = System.currentTimeMillis();
-    try {
-      synchronized(pools) { 
-        while ((list = findConnectionPools(statuses)).isEmpty() && (System.currentTimeMillis() - start < timeout)) pools.wait(1L);
+    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        return !ref.setSynchronized(findConnectionPools(statuses), pools).isEmpty();
       }
-    } catch (InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
-    return list;
+    }, timeout);
+    return ref.get();
   }
 }

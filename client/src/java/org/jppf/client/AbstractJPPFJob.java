@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -194,11 +194,12 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
    * @throws TimeoutException if the tiemout expired and {@code raiseTimeoutException == true}.
    */
   void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
-    long millis = timeout > 0L ? timeout : Long.MAX_VALUE;
-    long elapsed = 0L;
-    long start = System.currentTimeMillis();
-    while ((results.size() < tasks.size()) && ((elapsed = System.currentTimeMillis() - start) < millis)) results.goToSleep(millis - elapsed);
-    if ((elapsed >= millis) && raiseTimeoutException) throw new TimeoutException("timeout expired");
+    boolean fullfilled = ConcurrentUtils.awaitCondition(results, new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        return results.size() >= tasks.size();
+      }
+    }, timeout);
+    if (!fullfilled && raiseTimeoutException) throw new TimeoutException("timeout expired");
   }
 
   /**

@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.management.*;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -508,14 +509,13 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    */
   public synchronized List<JPPFClientConnection> awaitConnections(final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
     setMaxSize(nbConnections);
-    long start = System.currentTimeMillis();
-    List<JPPFClientConnection> list = new ArrayList<>();
-    try {
-      while (((list = getConnections(statuses)).size() != nbConnections) && (System.currentTimeMillis() - start < timeout)) wait(1L);
-    } catch (InterruptedException e) {
-      log.error(e.getMessage(), e);
-    }
-    return list;
+    final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        return ref.set(getConnections(statuses)).size() == nbConnections;
+      }
+    }, timeout);
+    return ref.get();
   }
 
   /**
