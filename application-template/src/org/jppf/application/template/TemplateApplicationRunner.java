@@ -194,11 +194,8 @@ public class TemplateApplicationRunner {
    * @throws Exception if any error occurs.
    */
   public void ensureNumberOfConnections(final JPPFClient jppfClient, final int numberOfConnections) throws Exception {
-    JPPFConnectionPool pool = null;
     // wait until the client has at least one connection pool with at least one avaialable connection
-    while ((pool = jppfClient.getConnectionPool()) == null) {
-      Thread.sleep(10L);
-    }
+    JPPFConnectionPool pool = jppfClient.awaitActiveConnectionPool();
 
     // if the pool doesn't have the expected number of connections, change its size
     if (pool.getConnections().size() != numberOfConnections) {
@@ -207,9 +204,7 @@ public class TemplateApplicationRunner {
     }
 
     // wait until all desired connections are available (ACTIVE status)
-    while (pool.getConnections(JPPFClientConnectionStatus.ACTIVE).size() < numberOfConnections) {
-      Thread.sleep(10L);
-    }
+    pool.awaitActiveConnections(numberOfConnections);
   }
 
   /**
