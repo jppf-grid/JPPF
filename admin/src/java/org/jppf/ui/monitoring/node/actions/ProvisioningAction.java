@@ -103,12 +103,12 @@ public class ProvisioningAction extends AbstractTopologyAction {
 
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
-    final JFrame frame = new JFrame(localize("provisioning.frame.caption"));
-    frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("provisioning.frame.caption"), false);
+    dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        frame.setVisible(false);
-        frame.dispose();
+        dialog.setVisible(false);
+        dialog.dispose();
         doOK();
       }
     };
@@ -116,18 +116,18 @@ public class ProvisioningAction extends AbstractTopologyAction {
       @Override public void actionPerformed(final ActionEvent event) {
         TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
         overrides = (String) textArea.getValue();
-        frame.setVisible(false);
-        frame.dispose();
+        dialog.setVisible(false);
+        dialog.dispose();
       }
     };
     okBtn.addActionListener(okAction);
     cancelBtn.addActionListener(cancelAction);
     setOkCancelKeys(thisPanel, okAction, cancelAction);
-    frame.getContentPane().add(thisPanel.getUIComponent());
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    if (location != null) frame.setLocation(location);
-    frame.setVisible(true);
+    dialog.getContentPane().add(thisPanel.getUIComponent());
+    dialog.pack();
+    dialog.setLocationRelativeTo(null);
+    if (location != null) dialog.setLocation(location);
+    dialog.setVisible(true);
   }
 
   /**

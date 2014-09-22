@@ -109,13 +109,13 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
       OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
       JButton okBtn = (JButton) panel.findFirstWithName("driverShutdownRestartOK").getUIComponent();
       JButton cancelBtn = (JButton) panel.findFirstWithName("serverShutdownRestartCancel").getUIComponent();
-      final JFrame frame = new JFrame(localize("shutdown.restart.driver.label"));
-      frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/server_restart.gif").getImage());
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("shutdown.restart.driver.label"), false);
+      dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/server_restart.gif").getImage());
       Action okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          frame.setVisible(false);
-          frame.dispose();
+          dialog.setVisible(false);
+          dialog.dispose();
           doOK(list);
         }
       };
@@ -123,17 +123,17 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
       Action cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          frame.setVisible(false);
-          frame.dispose();
+          dialog.setVisible(false);
+          dialog.dispose();
         }
       };
       cancelBtn.addActionListener(cancelAction);
-      frame.getContentPane().add(panel.getUIComponent());
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      frame.setLocation(location);
+      dialog.getContentPane().add(panel.getUIComponent());
+      dialog.pack();
+      dialog.setLocationRelativeTo(null);
+      dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
-      frame.setVisible(true);
+      dialog.setVisible(true);
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

@@ -34,8 +34,7 @@ import org.slf4j.*;
  * This action displays an input panel for the user to type a new
  * thread pool size for a node, and updates the node with it.
  */
-public class ThresholdSettingsAction extends AbstractTopologyAction
-{
+public class ThresholdSettingsAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -69,8 +68,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
    * Initialize this action.
    * @param healthPanel the JVM Health Panel option.
    */
-  public ThresholdSettingsAction(final JVMHealthPanel healthPanel)
-  {
+  public ThresholdSettingsAction(final JVMHealthPanel healthPanel) {
     this.healthPanel = healthPanel;
     setupIcon("/org/jppf/ui/resources/thresholds.gif");
     setupNameAndTooltip("health.update.thresholds");
@@ -79,32 +77,28 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
-    try
-    {
+    try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JVMHealthThresholdsPanel.xml");
       Map<Name, Double> values = healthPanel.getThresholds().getValues();
-      for (Map.Entry<Name, Double> entry: values.entrySet())
-      {
+      for (Map.Entry<Name, Double> entry: values.entrySet()) {
         AbstractOption option = (AbstractOption) panel.findFirstWithName(entry.getKey().getName());
         option.setValue(entry.getValue()*100d);
       }
 
       JButton okBtn = (JButton) panel.findFirstWithName("/health.thresholds.buttons.ok").getUIComponent();
       JButton cancelBtn = (JButton) panel.findFirstWithName("/health.thresholds.buttons.cancel").getUIComponent();
-      final JFrame frame = new JFrame("Alert Threshold Settings");
-      frame.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Alert Threshold Settings", false);
+      dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
       AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          frame.setVisible(false);
-          frame.dispose();
+          dialog.setVisible(false);
+          dialog.dispose();
           doOK();
         }
       };
@@ -112,21 +106,19 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
       AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          frame.setVisible(false);
-          frame.dispose();
+          dialog.setVisible(false);
+          dialog.dispose();
         }
       };
       cancelBtn.addActionListener(cancelAction);
       setAllLabelsColors();
-      frame.getContentPane().add(panel.getUIComponent());
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      frame.setLocation(location);
+      dialog.getContentPane().add(panel.getUIComponent());
+      dialog.pack();
+      dialog.setLocationRelativeTo(null);
+      dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
-      frame.setVisible(true);
-    }
-    catch(Exception e)
-    {
+      dialog.setVisible(true);
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -134,8 +126,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
   /**
    * Set the color of the labels of the spinners.
    */
-  private void setAllLabelsColors()
-  {
+  private void setAllLabelsColors() {
     Map<Name, Double> values = healthPanel.getThresholds().getValues();
     for (Map.Entry<Name, Double> entry: values.entrySet()) setLabelColors(entry.getKey());
   }
@@ -144,11 +135,9 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
    * Set the color of the labels of the spinners.
    * @param name the name of the spinner option.
    */
-  private void setLabelColors(final Name name)
-  {
+  private void setLabelColors(final Name name) {
     Color c = null;
-    switch(name)
-    {
+    switch(name) {
       case MEMORY_WARNING:
       case CPU_WARNING:
         c = AbstractTreeCellRenderer.SUSPENDED_COLOR;
@@ -161,8 +150,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
     if (c == null) return;
     SpinnerNumberOption option = (SpinnerNumberOption) panel.findFirstWithName(name.getName());
     JLabel label = option.getSpinnerLabel();
-    if (label != null)
-    {
+    if (label != null) {
       label.setOpaque(true);
       label.setBackground(c);
     }
@@ -171,8 +159,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction
   /**
    * Perform the action.
    */
-  private void doOK()
-  {
+  private void doOK() {
     final Map<Thresholds.Name, Double> values = healthPanel.getThresholds().getValues();
     final List<Thresholds.Name> list = new ArrayList<>(values.keySet());
     Runnable r = new Runnable() {

@@ -31,8 +31,7 @@ import org.slf4j.*;
 /**
  * This action updates the maximum number of nodes a job can run on.
  */
-public class UpdateMaxNodesAction extends AbstractJobAction
-{
+public class UpdateMaxNodesAction extends AbstractJobAction {
   /**
    * Logger for this class.
    */
@@ -57,20 +56,17 @@ public class UpdateMaxNodesAction extends AbstractJobAction
   /**
    * Initialize this action.
    */
-  public UpdateMaxNodesAction()
-  {
+  public UpdateMaxNodesAction() {
     setupIcon("/org/jppf/ui/resources/impl_co.gif");
     putValue(NAME, localize("job.update.max.nodes.label"));
   }
 
   /**
    * Update this action's enabled state based on a list of selected elements.
-   * @param selectedElements - a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
+   * @param selectedElements a list of objects.
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     setEnabled(jobDataArray.length > 0);
   }
@@ -78,20 +74,16 @@ public class UpdateMaxNodesAction extends AbstractJobAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
-    try
-    {
+    try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JobMaxNodesPanel.xml");
       maxNodes = Integer.MAX_VALUE;
-      for (JobData data: jobDataArray)
-      {
+      for (JobData data: jobDataArray) {
         int n = data.getJobInformation().getMaxNodes();
         if (n < maxNodes) maxNodes = n;
       }
@@ -100,35 +92,29 @@ public class UpdateMaxNodesAction extends AbstractJobAction
 
       JButton okBtn = (JButton) panel.findFirstWithName("/job.max.nodes.OK").getUIComponent();
       JButton cancelBtn = (JButton) panel.findFirstWithName("/job.max.nodes.Cancel").getUIComponent();
-      final JFrame frame = new JFrame("Enter the number of threads and their priority");
-      frame.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
-      okBtn.addActionListener(new ActionListener()
-      {
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Enter the number of threads and their priority", false);
+      dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
+      okBtn.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          frame.setVisible(false);
-          frame.dispose();
+        public void actionPerformed(final ActionEvent event) {
+          dialog.setVisible(false);
+          dialog.dispose();
           doOK();
         }
       });
-      cancelBtn.addActionListener(new ActionListener()
-      {
+      cancelBtn.addActionListener(new ActionListener() {
         @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          frame.setVisible(false);
-          frame.dispose();
+        public void actionPerformed(final ActionEvent event) {
+          dialog.setVisible(false);
+          dialog.dispose();
         }
       });
-      frame.getContentPane().add(panel.getUIComponent());
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      frame.setLocation(location);
-      frame.setVisible(true);
-    }
-    catch(Exception e)
-    {
+      dialog.getContentPane().add(panel.getUIComponent());
+      dialog.pack();
+      dialog.setLocationRelativeTo(null);
+      dialog.setLocation(location);
+      dialog.setVisible(true);
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -136,26 +122,19 @@ public class UpdateMaxNodesAction extends AbstractJobAction
   /**
    * Perform the action.
    */
-  private void doOK()
-  {
+  private void doOK() {
     AbstractOption noLimitOption = (AbstractOption) panel.findFirstWithName("job.nolimit.toggle");
     AbstractOption maxNodesOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
     boolean noLimit = (Boolean) noLimitOption.getValue();
     maxNodes = noLimit ? Integer.MAX_VALUE : ((Number) maxNodesOption.getValue()).intValue();
-    Runnable r = new Runnable()
-    {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        for (JobData data: jobDataArray)
-        {
-          try
-          {
+      public void run() {
+        for (JobData data: jobDataArray) {
+          try {
             JMXDriverConnectionWrapper jmx = data.getJmxWrapper();
             jmx.updateMaxNodes(data.getJobInformation().getJobUuid(), maxNodes);
-          }
-          catch(Exception e)
-          {
+          } catch(Exception e) {
             log.error(e.getMessage(), e);
           }
         }

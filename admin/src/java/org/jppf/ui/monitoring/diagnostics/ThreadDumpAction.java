@@ -28,14 +28,14 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
  * This action displays the driver or node environment information in a separate frame.
  */
-public class ThreadDumpAction extends AbstractTopologyAction
-{
+public class ThreadDumpAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -48,15 +48,13 @@ public class ThreadDumpAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public ThreadDumpAction()
-  {
+  public ThreadDumpAction() {
     setupIcon("/org/jppf/ui/resources/thread_dump.gif");
     setupNameAndTooltip("health.thread.dump");
   }
 
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
     dataArray = new TopologyData[selectedElements.size()];
     int count = 0;
@@ -74,14 +72,14 @@ public class ThreadDumpAction extends AbstractTopologyAction
       title = "Thread dump for " + (isNode ? "node " : "driver ") + dataArray[0];
       if (info == null) s = "<p><b>No thread dump was generated</b>";
       else s = HTMLThreadDumpWriter.printToString(info, title);
-      final JFrame frame = new JFrame(title);
-      frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
-      frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), title, false);
+      dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
+      dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
       //frame.get
-      frame.addWindowListener(new WindowAdapter() {
+      dialog.addWindowListener(new WindowAdapter() {
         @Override
         public void windowClosing(final WindowEvent e) {
-          frame.dispose();
+          dialog.dispose();
         }
       });
       JEditorPane editor = new JEditorPane("text/html", "");
@@ -93,11 +91,11 @@ public class ThreadDumpAction extends AbstractTopologyAction
       if (btn.isShowing()) location = btn.getLocationOnScreen();
       editor.setEditable(false);
       editor.setOpaque(true);
-      frame.getContentPane().add(new JScrollPane(editor));
-      frame.setLocationRelativeTo(null);
-      frame.setLocation(location);
-      frame.setSize(600, 600);
-      frame.setVisible(true);
+      dialog.getContentPane().add(new JScrollPane(editor));
+      dialog.setLocationRelativeTo(null);
+      dialog.setLocation(location);
+      dialog.setSize(600, 600);
+      dialog.setVisible(true);
     } catch(Exception e) {
       s = ExceptionUtils.getStackTrace(e).replace("\n", "<br>");
     }

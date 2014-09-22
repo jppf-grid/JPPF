@@ -36,8 +36,7 @@ import org.slf4j.*;
  * This action displays an input panel for the user to type a new
  * thread pool size for a node, and updates the node with it.
  */
-public class NodeThreadsAction extends AbstractTopologyAction
-{
+public class NodeThreadsAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -66,19 +65,17 @@ public class NodeThreadsAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public NodeThreadsAction()
-  {
+  public NodeThreadsAction() {
     setupIcon("/org/jppf/ui/resources/threads.gif");
     setupNameAndTooltip("update.threads");
   }
 
   /**
    * Update this action's enabled state based on a list of selected elements.
-   * @param selectedElements - a list of objects.
+   * @param selectedElements a list of objects.
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     setEnabled(dataArray.length > 0);
   }
@@ -88,16 +85,13 @@ public class NodeThreadsAction extends AbstractTopologyAction
    * @param event not used.
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     if (selectedElements.isEmpty()) return;
-    try
-    {
+    try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/NodeThreadPoolPanel.xml");
-      if (dataArray.length == 1)
-      {
+      if (dataArray.length == 1) {
         nbThreads = dataArray[0].getNodeState().getThreadPoolSize();
         priority = dataArray[0].getNodeState().getThreadPriority();
       }
@@ -106,13 +100,13 @@ public class NodeThreadsAction extends AbstractTopologyAction
 
       JButton okBtn = (JButton) panel.findFirstWithName("/nodeThreadsOK").getUIComponent();
       JButton cancelBtn = (JButton) panel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
-      final JFrame frame = new JFrame("Enter the number of threads and their priority");
-      frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/threads.gif").getImage());
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Enter the number of threads and their priority", false);
+      dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/threads.gif").getImage());
       AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          frame.setVisible(false);
-          frame.dispose();
+          dialog.setVisible(false);
+          dialog.dispose();
           doOK();
         }
       };
@@ -120,21 +114,19 @@ public class NodeThreadsAction extends AbstractTopologyAction
       AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
-          frame.setVisible(false);
-          frame.dispose();
+          dialog.setVisible(false);
+          dialog.dispose();
         }
       };
       cancelBtn.addActionListener(cancelAction);
       JComponent comp = panel.getUIComponent();
-      frame.getContentPane().add(comp);
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      frame.setLocation(location);
+      dialog.getContentPane().add(comp);
+      dialog.pack();
+      dialog.setLocationRelativeTo(null);
+      dialog.setLocation(location);
       setOkCancelKeys(panel, okAction, cancelAction);
-      frame.setVisible(true);
-    }
-    catch(Exception e)
-    {
+      dialog.setVisible(true);
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
@@ -142,8 +134,7 @@ public class NodeThreadsAction extends AbstractTopologyAction
   /**
    * Perform the action.
    */
-  private void doOK()
-  {
+  private void doOK() {
     AbstractOption nbThreadsOption = (AbstractOption) panel.findFirstWithName("nbThreads");
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("threadPriority");
     nbThreads = ((Number) nbThreadsOption.getValue()).intValue();

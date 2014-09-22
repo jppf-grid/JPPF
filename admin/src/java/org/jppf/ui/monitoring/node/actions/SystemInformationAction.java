@@ -26,6 +26,7 @@ import javax.swing.*;
 import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -70,7 +71,6 @@ public class SystemInformationAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
   public void actionPerformed(final ActionEvent event)
@@ -90,13 +90,14 @@ public class SystemInformationAction extends AbstractTopologyAction
       toClipboard = ExceptionUtils.getStackTrace(e);
       html = toClipboard.replace("\n", "<br>");
     }
-    final JFrame frame = new JFrame("System Information");
-    frame.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
-    frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-    frame.addWindowListener(new WindowAdapter() {
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "System Information", false);
+    //dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+    dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
+    dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+    dialog.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
-        frame.dispose();
+        dialog.dispose();
       }
     });
     JEditorPane editor = new JEditorPane("text/html", html);
@@ -106,12 +107,12 @@ public class SystemInformationAction extends AbstractTopologyAction
     editor.setOpaque(true);
     editor.setBackground(Color.WHITE);
     editor.setCaretPosition(0);
-    frame.getContentPane().add(new JScrollPane(editor));
-    frame.setLocationRelativeTo(null);
-    frame.setLocation(location);
-    frame.setSize(600, 600);
+    dialog.getContentPane().add(new JScrollPane(editor));
+    dialog.setLocationRelativeTo(null);
+    dialog.setLocation(location);
+    dialog.setSize(600, 600);
     editor.addMouseListener(new EditorMouseListener(toClipboard));
-    frame.setVisible(true);
+    dialog.setVisible(true);
   }
 
   /**

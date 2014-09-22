@@ -83,11 +83,9 @@ public class NodeConfigurationAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event - not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
@@ -96,39 +94,34 @@ public class NodeConfigurationAction extends AbstractTopologyAction
 
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
-    final JFrame frame = new JFrame("Update the JPPF configuration");
-    frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
-    okBtn.addActionListener(new ActionListener()
-    {
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration",false);
+    dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
+    okBtn.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        frame.setVisible(false);
-        frame.dispose();
+      public void actionPerformed(final ActionEvent event) {
+        dialog.setVisible(false);
+        dialog.dispose();
         doOK();
       }
     });
-    cancelBtn.addActionListener(new ActionListener()
-    {
+    cancelBtn.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        frame.setVisible(false);
-        frame.dispose();
+      public void actionPerformed(final ActionEvent event) {
+        dialog.setVisible(false);
+        dialog.dispose();
       }
     });
-    frame.getContentPane().add(thisPanel.getUIComponent());
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    if (location != null) frame.setLocation(location);
-    frame.setVisible(true);
+    dialog.getContentPane().add(thisPanel.getUIComponent());
+    dialog.pack();
+    dialog.setLocationRelativeTo(null);
+    if (location != null) dialog.setLocation(location);
+    dialog.setVisible(true);
   }
 
   /**
    * Perform the action.
    */
-  private void doOK()
-  {
+  private void doOK() {
     TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
     final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceReconnect")).getValue();
@@ -156,11 +149,9 @@ public class NodeConfigurationAction extends AbstractTopologyAction
    * Obtain the JPPF configuration as a string, one property per line.
    * @return the properties as a string.
    */
-  private String getPropertiesAsString()
-  {
+  private String getPropertiesAsString() {
     StringBuilder sb = new StringBuilder();
-    try
-    {
+    try {
       TopologyData data = dataArray[0];
       TopologyData parent = data.getParent();
       if (parent == null) return "could not get the parent driver for the selected node";
@@ -174,9 +165,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
       Set<String> keys = new TreeSet<>();
       for (Map.Entry<Object, Object> entry: props.entrySet()) keys.add((String) entry.getKey());
       for (String s: keys) sb.append(s).append(" = ").append(props.get(s)).append('\n');
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       sb.append("an error occurred while retrieving the system information for the selected node: " + ExceptionUtils.getMessage(e));
     }
     return sb.toString();
@@ -187,15 +176,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction
    * @param source - the text from which to read the properties.
    * @return a map of string keys to string values.
    */
-  private static Map<Object, Object> getPropertiesAsMap(final String source)
-  {
-    try
-    {
+  private static Map<Object, Object> getPropertiesAsMap(final String source) {
+    try {
       Map<Object, Object> map = new HashMap<>();
       BufferedReader reader = new BufferedReader(new StringReader(source));
       try {
-        while (true)
-        {
+        while (true) {
           String s = reader.readLine();
           if (s == null) break;
           int idx = s.indexOf('=');
@@ -209,9 +195,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
         reader.close();
       }
       return map;
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return null;
