@@ -21,6 +21,8 @@ package org.jppf.ui.options.docking;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
+import org.jppf.ui.options.factory.OptionsHandler;
+
 /**
  * 
  * @author Laurent Cohen
@@ -56,7 +58,8 @@ public class DockToNewViewAction extends AbstractDockingAction
     ViewDescriptor view = dmgr.getView(id);
     DetachableComponentDescriptor desc = dmgr.getComponent(comp);
     dmgr.attach(desc.getComponent(), id);
-    view.getFrame().pack();
+    //view.getFrame().pack();
+    view.getFrame().setSize(OptionsHandler.getMainWindow().getSize());
     view.getFrame().setVisible(true);
   }
 }
