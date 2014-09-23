@@ -27,8 +27,7 @@ import org.slf4j.*;
  * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
-public abstract class ClassNioServer extends NioServer<ClassState, ClassTransition>
-{
+public abstract class ClassNioServer extends NioServer<ClassState, ClassTransition> {
   /**
    * Logger for this class.
    */
@@ -42,6 +41,10 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
+   * Reads resource files from the classpath.
+   */
+  protected ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
+  /**
    * Reference to the driver.
    */
   protected final JPPFDriver driver;
@@ -53,8 +56,7 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClassNioServer(final int identifier, final JPPFDriver driver, final boolean useSSL) throws Exception
-  {
+  public ClassNioServer(final int identifier, final JPPFDriver driver, final boolean useSSL) throws Exception {
     super(identifier, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
 
@@ -66,14 +68,12 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    * Get the soft cache of classes downloaded form the clients r from this driver's classpath.
    * @return an instance of {@link ClassCache}.
    */
-  public ClassCache getClassCache()
-  {
+  public ClassCache getClassCache() {
     return driver.getInitializer().getClassCache();
   }
 
   @Override
-  public NioContext<?> createNioContext()
-  {
+  public NioContext<?> createNioContext() {
     return new ClassContext();
   }
 
@@ -81,8 +81,7 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    * Get the resource provider for this server.
    * @return a ResourceProvider instance.
    */
-  public ResourceProvider getResourceProvider()
-  {
+  public ResourceProvider getResourceProvider() {
     return resourceProvider;
   }
 }

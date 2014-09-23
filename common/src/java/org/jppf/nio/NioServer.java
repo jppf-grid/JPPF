@@ -27,7 +27,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 
-import org.jppf.classloader.ResourceProvider;
 import org.jppf.io.IO;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.JPPFIdentifiers;
@@ -60,10 +59,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * the selector of all socket channels open with providers or nodes.
    */
   protected Selector selector;
-  /**
-   * Reads resource files from the classpath.
-   */
-  protected ResourceProvider resourceProvider = new ResourceProvider();
   /**
    * Flag indicating that this socket server is closed.
    */

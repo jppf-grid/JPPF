@@ -15,41 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.jppf.classloader;
 
-import java.io.*;
-import java.net.URL;
 import java.util.*;
 
-import org.jppf.JPPFException;
-import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
- * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into
- * arrays of bytes.
+ * Instances of this interface are dedicated to reading resource files form the JVM's classpath and converting them into arrays of bytes.
  * @author Laurent Cohen
- * @author Domingos Creado
+ * @since 5.0
  * @exclude
  */
-public class ResourceProvider {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(ResourceProvider.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-
-  /**
-   * Default constructor.
-   */
-  public ResourceProvider() {
-  }
-
+public interface ResourceProvider {
   /**
    * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
    * This method simply calls {@link #getResource(java.lang.String, java.lang.ClassLoader) getResource(String, ClassLoader)}
@@ -57,139 +37,70 @@ public class ResourceProvider {
    * @param resName the name of the resource to find.
    * @return the content of the resource as an array of bytes.
    */
-  public byte[] getResource(final String resName) {
-    return getResource(resName, null);
-  }
+  byte[] getResource(String resName);
 
   /**
    * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
    * @param resName the name of the resource to find.
-   * @param classLoader the class loader to use to load the request resource.
+   * @param classloader the class loader to use to load the request resource.
    * @return the content of the resource as an array of bytes.
    */
-  public byte[] getResource(final String resName, final ClassLoader classLoader) {
-    ClassLoader cl = classLoader;
-    if (cl == null) cl = Thread.currentThread().getContextClassLoader();
-    if (cl == null) cl = getClass().getClassLoader();
-    InputStream is = null;
-    try {
-      Enumeration<URL> urls = cl.getResources(resName);
-      if ((urls != null) && urls.hasMoreElements()) {
-        while (urls.hasMoreElements() && (is == null)) {
-          URL url = urls.nextElement();
-          if (url != null) is = url.openStream();
-        }
-      } else {
-        is = cl.getResourceAsStream(resName);
-      }
-      if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
-        File file = new File(resName);
-        if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
-      }
-      if (is != null) {
-        if (debugEnabled) log.debug("resource [" + resName + "] found");
-        return StreamUtils.getInputStreamAsByte(is);
-      }
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-    }
-
-    if (debugEnabled) log.debug("resource [" + resName + "] not found");
-    return null;
-  }
+  byte[] getResource(String resName, ClassLoader classloader);
 
   /**
    * Compute a callable sent through the JPPF class loader.
    * @param serializedCallable the callable to execute in serialized form.
    * @return the serialized result of the callable's execution, or of an eventually resulting exception.
    */
-  public byte[] computeCallable(final byte[] serializedCallable) {
-    if (debugEnabled) log.debug("before deserialization");
-    JPPFCallable callable = null;
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    Object result = null;
-    try {
-      callable = (JPPFCallable) ser.deserialize(serializedCallable);
-      result = callable.call();
-    } catch(Throwable t) {
-      result = (t instanceof Exception) ? t : new JPPFException(t);
-    }
-    byte[] bytes = null;
-    try {
-      bytes = ser.serialize(result).getBuffer();
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-      try {
-        bytes = ser.serialize(e).getBuffer();
-      } catch(Exception e2) {
-        log.error(e2.getMessage(), e2);
-      }
-    }
-    return bytes;
-  }
+  byte[] computeCallable(byte[] serializedCallable);
 
   /**
    * Get all resources associated with the specified resource name.
    * @param name the name of the resources to look for.
-   * @param classLoader the class loader used to load the resources.
+   * @param classloader the class loader used to load the resources.
    * @return the content of all found resources as a list of byte arrays.
    */
-  public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classLoader) {
-    ClassLoader cl = classLoader;
-    List<byte[]> result = null;
-    if (cl == null) cl = Thread.currentThread().getContextClassLoader();
-    if (cl == null) cl = this.getClass().getClassLoader();
-    try {
-      Enumeration<URL> urlEnum = cl.getResources(name);
-      if ((urlEnum != null) && urlEnum.hasMoreElements()) {
-        while (urlEnum.hasMoreElements()) {
-          URL url = urlEnum.nextElement();
-          if ((urlEnum != null) && urlEnum.hasMoreElements()) {
-            InputStream is = url.openStream();
-            byte[] b = StreamUtils.getInputStreamAsByte(is);
-            if (result == null) result = new ArrayList<>();
-            result.add(b);
-          }
-        }
-      } else {
-        InputStream is = cl.getResourceAsStream(name);
-        if (is != null) {
-          byte[] b = StreamUtils.getInputStreamAsByte(is);
-          if (result == null) result = new ArrayList<>();
-          result.add(b);
-        }
-      }
-    }
-    catch(Exception e) {
-      log.error(e.getMessage(), e);
-    }
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
-      try {
-        File file = new File(name);
-        if (file.exists()) {
-          if (result == null) result = new ArrayList<>();
-          result.add(FileUtils.getFileAsByte(file));
-        }
-      }
-      catch(Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
-    return result;
-  }
+  List<byte[]> getMultipleResourcesAsBytes(String name, ClassLoader classloader);
 
   /**
    * Get all resources associated with each specified resource name.
-   * @param cl the class loader used to load the resources.
+   * @param classloader the class loader used to load the resources.
    * @param names the names of all the resources to look for.
    * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
    */
-  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader cl, final String...names) {
-    Map<String, List<byte[]>> result = new HashMap<>();
-    for (String name: names) {
-      List<byte[]> resources = getMultipleResourcesAsBytes(name, cl);
-      if (resources != null) result.put(name, resources);
+  Map<String, List<byte[]>> getMultipleResourcesAsBytes(ClassLoader classloader, String... names);
+
+  /**
+   * Factory class for {@link ResourceProvider} implementations.
+   * The implementation must have a public no-arg constructor and is specified
+   * with the configuration property {@code "jppf.resource.provider.class"}.
+   * @since 5.0
+   * @exclude
+  */
+  public static class Factory {
+    /**
+     * Logger for this class.
+     */
+    private static Logger log = LoggerFactory.getLogger(Factory.class);
+    /**
+     * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+     */
+    private static boolean debugEnabled = log.isDebugEnabled();
+    /**
+     * Construct a resource provider based on the JPPF configuration.
+     * @return an {@link AbstractResourceProvider} implementation.
+     */
+    public static ResourceProvider initResourceProvider() {
+      TypedProperties config = JPPFConfiguration.getProperties();
+      String name = config.getString("jppf.resource.provider.class", ResourceProviderImpl.class.getName());
+      if (debugEnabled) log.debug("jppf.resource.provider.class = {}", name);
+      try {
+        Class<?> clazz = Class.forName(name);
+        return (ResourceProvider) clazz.newInstance(); 
+      } catch (Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+      }
+      return new ResourceProviderImpl();
     }
-    return result;
   }
 }

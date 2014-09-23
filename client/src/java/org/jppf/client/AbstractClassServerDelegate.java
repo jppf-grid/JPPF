@@ -24,7 +24,7 @@ import org.jppf.classloader.*;
 import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.IOHelper;
-import org.jppf.utils.JPPFIdentifiers;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -48,7 +48,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   /**
    * Reads resource files from the classpath.
    */
-  protected final ResourceProvider resourceProvider = new ResourceProvider();
+  protected final ResourceProvider resourceProvider = ResourceProvider.Factory.initResourceProvider();
   /**
    * Unique identifier for this class server delegate, obtained from the local JPPF client.
    */
@@ -69,6 +69,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   protected AbstractClassServerDelegate(final JPPFClientConnection owner) {
     super(owner, owner.getName() + " - ClassServer");
     formattedName = "[" + name + ']';
+    if (debugEnabled) log.debug("resourceProvider={}", resourceProvider);
   }
 
   /**
@@ -204,5 +205,22 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
   @Override
   public void uncaughtException(final Thread t, final Throwable e) {
     log.error("uncaught exception", e);
+  }
+
+  /**
+   * Construct a resource provider based on the JPPF configuration.
+   * @return an {@link AbstractResourceProvider} implementation.
+   */
+  private ResourceProvider initResourceProvider() {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    String name = config.getString("jppf.resource.provider.class", ResourceProviderImpl.class.getName());
+    if (debugEnabled) log.debug("jppf.resource.provider.class = {}", name);
+    try {
+      Class<?> clazz = Class.forName(name);
+      return (ResourceProvider) clazz.newInstance(); 
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    return new ResourceProviderImpl();
   }
 }
