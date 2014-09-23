@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.*;
 
 import org.jppf.ui.options.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LocalizationUtils;
 
@@ -35,8 +36,7 @@ import org.jppf.utils.LocalizationUtils;
  * This class handles the docking / undocking of of the tabs in all tabbed views.
  * @author Laurent Cohen
  */
-public final class DockingManager
-{
+public final class DockingManager {
   /**
    * 
    */
@@ -98,24 +98,21 @@ public final class DockingManager
    * Get the docking manager for the JVM.
    * @return an instance of {@link DockingManager}.
    */
-  public static DockingManager getInstance()
-  {
+  public static DockingManager getInstance() {
     return instance;
   }
 
   /**
    * Prevent instantiation from another class.
    */
-  private DockingManager()
-  {
+  private DockingManager() {
   }
 
   /**
-   * Set the main view for thez application.
+   * Set the main view for the application.
    * @param frame the {@link JFrame} to set as the main view.
    */
-  public void setMainView(final JFrame frame)
-  {
+  public void setMainView(final JFrame frame) {
     if (viewMap.get(INITIAL_VIEW) != null) throw new IllegalStateException("the main view is already set");
     ViewDescriptor view = new ViewDescriptor(frame, null);
     viewMap.put(INITIAL_VIEW, view);
@@ -127,8 +124,7 @@ public final class DockingManager
    * @param element the component to add.
    * @param listenerComponent the UI component which has the mouse listener.
    */
-  public void register(final OptionElement element, final Component listenerComponent)
-  {
+  public void register(final OptionElement element, final Component listenerComponent) {
     DetachableComponentDescriptor desc = new DetachableComponentDescriptor(element, listenerComponent);
     componentMap.put(element.getUIComponent(), desc);
     listenerToComponentMap.put(listenerComponent, element.getUIComponent());
@@ -142,8 +138,7 @@ public final class DockingManager
    * @param element the component to add.
    * @param listenerComponent the UI component which has the mouse listener.
    */
-  public void update(final OptionElement element, final Component listenerComponent)
-  {
+  public void update(final OptionElement element, final Component listenerComponent) {
     DetachableComponentDescriptor desc = getComponent(element.getUIComponent());
     listenerToComponentMap.remove(desc.getListenerComponent());
     desc.setListenerComponent(listenerComponent);
@@ -155,8 +150,7 @@ public final class DockingManager
    * @param element the component to add.
    * @return <code>true</code> if the component is already registered, <code>false</code> otherwise.
    */
-  public boolean isRegistered(final OptionElement element)
-  {
+  public boolean isRegistered(final OptionElement element) {
     return componentMap.containsKey(element.getUIComponent());
   }
 
@@ -165,8 +159,7 @@ public final class DockingManager
    * @param element the component to qttqch to the viez.
    * @param viewId the id of the viez to zhcih to attach the co;ponent.
    */
-  public void attach(final OptionElement element, final String viewId)
-  {
+  public void attach(final OptionElement element, final String viewId) {
     ViewDescriptor newView = viewMap.get(viewId);
     if (newView == null) throw new IllegalArgumentException("the view '" + viewId + "' does not exist");
     DetachableComponentDescriptor desc = componentMap.get(element.getUIComponent());
@@ -185,17 +178,16 @@ public final class DockingManager
    * Create a new view.
    * @return the id of the view.
    */
-  public String createView()
-  {
+  public String createView() {
     String id = VIEW_PREFIX + VIEW_SEQ.incrementAndGet();
-    JFrame frame = new JFrame(id);
-    frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
-    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    frame.addWindowListener(windowAdapter);
+    JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), id, false);
+    dialog.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
+    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    dialog.addWindowListener(windowAdapter);
     TabbedPaneOption container = new TabbedPaneOption();
     container.createUI();
-    frame.getContentPane().add(container.getUIComponent(), BorderLayout.CENTER);
-    ViewDescriptor view = new ViewDescriptor(frame, container);
+    dialog.getContentPane().add(container.getUIComponent(), BorderLayout.CENTER);
+    ViewDescriptor view = new ViewDescriptor(dialog, container);
     viewMap.put(id, view);
     return id;
   }
@@ -205,8 +197,7 @@ public final class DockingManager
    * @param viewId the id of the view to find.
    * @return a {@link ViewDescriptor} object.
    */
-  public ViewDescriptor getView(final String viewId)
-  {
+  public ViewDescriptor getView(final String viewId) {
     return viewMap.get(viewId);
   }
 
@@ -215,8 +206,7 @@ public final class DockingManager
    * @param comp the component for which to find a descriptor.
    * @return a {@link DetachableComponentDescriptor} object.
    */
-  public DetachableComponentDescriptor getComponent(final Component comp)
-  {
+  public DetachableComponentDescriptor getComponent(final Component comp) {
     return componentMap.get(comp);
   }
 
@@ -225,8 +215,7 @@ public final class DockingManager
    * @param comp the component for which to find a descriptor.
    * @return a {@link DetachableComponentDescriptor} object.
    */
-  public DetachableComponentDescriptor getComponentFromListenerComp(final Component comp)
-  {
+  public DetachableComponentDescriptor getComponentFromListenerComp(final Component comp) {
     Component temp = listenerToComponentMap.get(comp);
     return temp == null ? null : componentMap.get(temp);
   }
@@ -236,10 +225,8 @@ public final class DockingManager
    * @param container the container tolook for.
    * @return the id of the view which has the container as main container.
    */
-  public String getViewIdForContainer(final OptionContainer container)
-  {
-    for (Map.Entry<String, ViewDescriptor> entry: viewMap.entrySet())
-    {
+  public String getViewIdForContainer(final OptionContainer container) {
+    for (Map.Entry<String, ViewDescriptor> entry: viewMap.entrySet()) {
       if (entry.getValue().getContainer() == container) return entry.getKey();
     }
     return INITIAL_VIEW;
@@ -249,8 +236,7 @@ public final class DockingManager
    * Get the mouse listener for the popup menu on right-click.
    * @return an {@link UndockingMouseAdapter} object.
    */
-  public UndockingMouseAdapter getMouseAdapter()
-  {
+  public UndockingMouseAdapter getMouseAdapter() {
     return mouseAdapter;
   }
 
@@ -258,8 +244,7 @@ public final class DockingManager
    * Remove the specified view, and move the tabs it contains to their initial containers.
    * @param viewId the id of the view to remove.
    */
-  private void removeView(final String viewId)
-  {
+  private void removeView(final String viewId) {
     ViewDescriptor view = viewMap.get(viewId);
     Set<DetachableComponentDescriptor> set = new HashSet<>(view.getComponents());
     for (DetachableComponentDescriptor desc: set) dockToInitialContainer(desc.getComponent().getUIComponent());
@@ -272,8 +257,7 @@ public final class DockingManager
    * Dock a component to its initial container.
    * @param comp the component to move.
    */
-  public void dockToInitialContainer(final Component comp)
-  {
+  public void dockToInitialContainer(final Component comp) {
     DetachableComponentDescriptor desc = componentMap.get(comp);
     OptionElement element = desc.getComponent();
     desc.getCurrentContainer().remove(element);
@@ -292,8 +276,7 @@ public final class DockingManager
    * @return a message in the current locale, or the default locale
    * if the localization for the current locale is not found.
    */
-  static String localize(final String message)
-  {
+  static String localize(final String message) {
     return LocalizationUtils.getLocalized(I18N_BASE, message);
   }
 
@@ -301,8 +284,22 @@ public final class DockingManager
    * Get the Mapping of view ids to the corresponding UI frame.
    * @return a map of string ids to {@link ViewDescriptor} instances.
    */
-  public Map<String, ViewDescriptor> getViewMap()
-  {
+  public Map<String, ViewDescriptor> getViewMap() {
     return viewMap;
+  }
+
+  /**
+   * Search all esiting views for an eklement with the specified name.
+   * @param name the name of the element to find.
+   * @return an {@link OptionElement} instance representing the element.
+   */
+  public OptionElement findFirstElementWithName(final String name) {
+    for (ViewDescriptor view: viewMap.values()) {
+      OptionContainer cont = view.getContainer();
+      if (cont == null) continue;
+      OptionElement elt = cont.findFirstWithName(name);
+      if (elt != null) return elt;
+    }
+    return null;
   }
 }

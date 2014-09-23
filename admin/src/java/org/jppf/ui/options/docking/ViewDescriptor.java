@@ -18,21 +18,19 @@
 
 package org.jppf.ui.options.docking;
 
+import java.awt.Window;
 import java.util.*;
-
-import javax.swing.JFrame;
 
 import org.jppf.ui.options.*;
 
 /**
  * Encapsulates a JFrame and main container for a given view id.
  */
-public class ViewDescriptor
-{
+public class ViewDescriptor {
   /**
    * The frame for this view.
    */
-  private final JFrame frame;
+  private final Window frame;
   /**
    * The main container to which other elements are attached.
    */
@@ -43,22 +41,20 @@ public class ViewDescriptor
   private final Set<DetachableComponentDescriptor> components = new LinkedHashSet<>();
 
   /**
-   * Initiailze this view descriptor.
+   * Initialize this view descriptor.
    * @param frame the frame for this view.
    * @param container the main container to which other elements are attached.
    */
-  public ViewDescriptor(final JFrame frame, final OptionContainer container)
-  {
+  public ViewDescriptor(final Window frame, final OptionContainer container) {
     this.frame = frame;
     this.container = container;
   }
 
   /**
    * Get the frame for this view.
-   * @return a {@link JFrame} instance.
+   * @return a {@link Window} instance.
    */
-  public JFrame getFrame()
-  {
+  public Window getFrame() {
     return frame;
   }
 
@@ -66,8 +62,7 @@ public class ViewDescriptor
    * Get the main container to which other elements are attached.
    * @return an {@link OptionElement} instance.
    */
-  public OptionContainer getContainer()
-  {
+  public OptionContainer getContainer() {
     return container;
   }
 
@@ -75,8 +70,7 @@ public class ViewDescriptor
    * Get the components attached to this view.
    * @return a Set of components.
    */
-  public Set<DetachableComponentDescriptor> getComponents()
-  {
+  public Set<DetachableComponentDescriptor> getComponents() {
     return components;
   }
 
@@ -84,8 +78,7 @@ public class ViewDescriptor
    * Add a component to this view.
    * @param desc the component to add.
    */
-  public void addComponent(final DetachableComponentDescriptor desc)
-  {
+  public void addComponent(final DetachableComponentDescriptor desc) {
     components.add(desc);
   }
 
@@ -93,8 +86,7 @@ public class ViewDescriptor
    * Remove a component from this view.
    * @param desc the component to remove.
    */
-  public void removeComponent(final DetachableComponentDescriptor desc)
-  {
+  public void removeComponent(final DetachableComponentDescriptor desc) {
     components.remove(desc);
   }
 }

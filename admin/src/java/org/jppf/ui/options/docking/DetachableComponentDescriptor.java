@@ -25,8 +25,7 @@ import org.jppf.ui.options.*;
 /**
  * Describes the state of a component with regard to the view to which it is attached.
  */
-public class DetachableComponentDescriptor
-{
+public class DetachableComponentDescriptor {
   /**
    * The component to describe.
    */
@@ -53,8 +52,7 @@ public class DetachableComponentDescriptor
    * @param component the component to describe.
    * @param listenerComponent the UI component which has the mouse listener.
    */
-  public DetachableComponentDescriptor(final OptionElement component, final Component listenerComponent)
-  {
+  public DetachableComponentDescriptor(final OptionElement component, final Component listenerComponent) {
     this.component = component;
     this.listenerComponent = listenerComponent;
     this.initialContainer = (OptionContainer) component.getParent();
@@ -66,8 +64,7 @@ public class DetachableComponentDescriptor
    * Get the described component.
    * @return the component as an {@link OptionElement} object.
    */
-  public OptionElement getComponent()
-  {
+  public OptionElement getComponent() {
     return component;
   }
 
@@ -75,8 +72,7 @@ public class DetachableComponentDescriptor
    * Get the container to which the component was initially attached.
    * @return the initial container as an {@link OptionContainer} object.
    */
-  public OptionContainer getInitialContainer()
-  {
+  public OptionContainer getInitialContainer() {
     return initialContainer;
   }
 
@@ -84,8 +80,7 @@ public class DetachableComponentDescriptor
    * Get the container to which the component is currently attached.
    * @return the current container as an {@link OptionContainer} object.
    */
-  public OptionContainer getCurrentContainer()
-  {
+  public OptionContainer getCurrentContainer() {
     return currentContainer;
   }
 
@@ -93,8 +88,7 @@ public class DetachableComponentDescriptor
    * Set the container to which the component is currently attached.
    * @param currentContainer the current container as an {@link OptionContainer} object.
    */
-  public void setCurrentContainer(final OptionContainer currentContainer)
-  {
+  public void setCurrentContainer(final OptionContainer currentContainer) {
     this.currentContainer = currentContainer;
   }
 
@@ -102,8 +96,7 @@ public class DetachableComponentDescriptor
    * Get the  id of the view in which the component is currently displayed.
    * @return the view id as a string.
    */
-  public String getViewId()
-  {
+  public String getViewId() {
     return viewId;
   }
 
@@ -111,8 +104,7 @@ public class DetachableComponentDescriptor
    * Get the  id of the view in which the component is currently displayed.
    * @param viewId the view id as a string.
    */
-  public void setViewId(final String viewId)
-  {
+  public void setViewId(final String viewId) {
     this.viewId = viewId;
   }
 
@@ -120,8 +112,7 @@ public class DetachableComponentDescriptor
    * Get the UI component which has the mouse listener.
    * @return a {@link Component}.
    */
-  public Component getListenerComponent()
-  {
+  public Component getListenerComponent() {
     return listenerComponent;
   }
 
@@ -129,8 +120,7 @@ public class DetachableComponentDescriptor
    * Set the UI component which has the mouse listener.
    * @param listenerComponent a {@link Component}.
    */
-  public void setListenerComponent(final Component listenerComponent)
-  {
+  public void setListenerComponent(final Component listenerComponent) {
     this.listenerComponent = listenerComponent;
   }
 }
