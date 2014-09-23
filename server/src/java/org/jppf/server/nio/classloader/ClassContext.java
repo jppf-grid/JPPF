@@ -491,7 +491,7 @@ public class ClassContext extends SimpleNioContext<ClassState>
       updateInStats();
       throw e;
     }
-    if (b) updateOutStats();
+    if (b) updateInStats();
     return b;
   }
 
