@@ -24,10 +24,10 @@
 	<script language="groovy">BASE = "org.jppf.ui.i18n.ChartsPage"</script>
 
 	<child name="ChartsBuilder" type="Java">
-		<finalizer type="script">
+      <property name="class" value="org.jppf.ui.monitoring.charts.config.JPPFChartBuilder"/>
+	  <finalizer type="script">
 			<script language="groovy">option.getUIComponent().getStorage().saveAll();</script>
 		</finalizer>
-		<property name="class" value="org.jppf.ui.monitoring.charts.config.JPPFChartBuilder"/>
 	</child>
 
 </opt:main>

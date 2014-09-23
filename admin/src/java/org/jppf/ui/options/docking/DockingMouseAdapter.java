@@ -25,29 +25,23 @@ import java.util.Map;
 import javax.swing.*;
 
 /**
- * Mouse adapter that handles the popup menus on the tabs,
- * along with the processing of the tab selection via mouse click.
+ * Mouse adapter that handles the popup menus on the tabs, along with the processing of the tab selection via mouse click.
  */
-class UndockingMouseAdapter extends MouseAdapter
-{
+class DockingMouseAdapter extends MouseAdapter {
   @Override
-  public void mousePressed(final MouseEvent event)
-  {
+  public void mousePressed(final MouseEvent event) {
     if (event.getButton() != MouseEvent.BUTTON3) return;
     Component comp = event.getComponent();
-    int x = event.getX();
-    int y = event.getY();
     JPopupMenu menu = createPopupMenu(comp);
-    menu.show(comp, x, y);
+    menu.show(comp, event.getX(), event.getY());
   }
 
   /**
-   * 
+   * Create and display the popup menu of docking actions.
    * @param comp the component to move.
    * @return a popup menu.
    */
-  protected JPopupMenu createPopupMenu(final Component comp)
-  {
+  protected JPopupMenu createPopupMenu(final Component comp) {
     DockingManager dm = DockingManager.getInstance();
     DetachableComponentDescriptor desc = dm.getComponentFromListenerComp(comp);
     Component realComp = desc.getComponent().getUIComponent();
@@ -56,12 +50,10 @@ class UndockingMouseAdapter extends MouseAdapter
       menu.add(new JMenuItem(new DockToInitialContainerAction(realComp, DockingManager.localize("attach.to.initial.container"))));
     menu.add(new JMenuItem(new DockToNewViewAction(realComp, DockingManager.localize("attach.to.new.view"))));
     Map<String, ViewDescriptor> viewMap = dm.getViewMap();
-    if (viewMap.size() > 1)
-    {
+    if (viewMap.size() > 1) {
       JMenu subMenu = new JMenu(DockingManager.localize("attach.to.existing.view"));
       menu.add(subMenu);
-      for (String id: viewMap.keySet())
-      {
+      for (String id: viewMap.keySet()) {
         if (!id.equals(desc.getViewId()) && (!id.equals(DockingManager.INITIAL_VIEW))) subMenu.add(new JMenuItem(new DockToExistingViewAction(realComp, id, id)));
       }
     }
@@ -69,10 +61,8 @@ class UndockingMouseAdapter extends MouseAdapter
   }
 
   @Override
-  public void mouseClicked(final MouseEvent e)
-  {
-    if (e.getButton() == MouseEvent.BUTTON1)
-    {
+  public void mouseClicked(final MouseEvent e) {
+    if (e.getButton() == MouseEvent.BUTTON1) {
       Component comp = e.getComponent();
       DetachableComponentDescriptor desc = DockingManager.getInstance().getComponentFromListenerComp(comp);
       if (desc == null) return;

@@ -2,19 +2,17 @@ import java.util.List;
 
 import org.jppf.ui.monitoring.charts.config.*;
 
-chartBuilder = option.findFirstWithName("/ChartsBuilder").getUIComponent();
+chartBuilderOption = option.findFirstWithName("/ChartsBuilder")
+if (chartBuilderOption == null) chartBuilderOption = DockingManager.getInstance().findFirstElementWithName("/ChartsBuilder")
+chartBuilder = chartBuilderOption.getUIComponent();
 pageRoot = option.findFirstWithName("/ChartsConfiguration");
 
-void populateChartsList(final tabConfig, final chartConfig)
-{
+void populateChartsList(final tabConfig, final chartConfig) {
   def listOption = option.findFirstWithName("/ChartsList");
-  if (tabConfig == null)
-  {
+  if (tabConfig == null) {
     listOption.setItems(new ArrayList());
     listOption.setValue(null);
-  }
-  else
-  {
+  } else {
     listOption.setItems(tabConfig.configs);
     def values = new ArrayList();
     if (chartConfig != null) values.add(chartConfig);
@@ -22,27 +20,23 @@ void populateChartsList(final tabConfig, final chartConfig)
   }
 }
 
-void populateTabsList(final tab)
-{
+void populateTabsList(final tab) {
   def listOption = option.findFirstWithName("/TabsList");
   listOption.setItems(chartBuilder.getTabList());
-  if (tab != null)
-  {
+  if (tab != null) {
     def value = new ArrayList();
     value.add(tab);
     listOption.setValue(value);
   }
 }
 
-void populateTabsCombo(final tab)
-{
+void populateTabsCombo(final tab) {
   def comboOption = option.findFirstWithName("/TabName");
   comboOption.setItems(chartBuilder.getTabList());
   if (tab != null) comboOption.setValue(tab);
 }
 
-void populateFields(final tab, final config)
-{
+void populateFields(final tab, final config) {
   option.findFirstWithName("/ChartName").setValue(config.name);
   option.findFirstWithName("/TabName").setValue(tab);
   option.findFirstWithName("/Unit").setValue(config.unit == null ? "" : config.unit);
@@ -51,8 +45,7 @@ void populateFields(final tab, final config)
   option.findFirstWithName("/FieldsList").setValue(CollectionUtils.list(config.fields));
 }
 
-ChartConfiguration getPopulatedConfiguration()
-{
+ChartConfiguration getPopulatedConfiguration() {
   def config = new ChartConfiguration();
   config.name = option.findFirstWithName("/ChartName").getValue();
   config.unit = option.findFirstWithName("/Unit").getValue();
@@ -66,22 +59,19 @@ ChartConfiguration getPopulatedConfiguration()
   return config;
 }
 
-TabConfiguration getTabConfig()
-{
+TabConfiguration getTabConfig() {
   def values = getListValues("TabsList");
   if (values.isEmpty()) return null;
   return values.get(0);
 }
 
-ChartConfiguration getChartConfig()
-{
+ChartConfiguration getChartConfig() {
   def values = getListValues("ChartsList");
   if (values.isEmpty()) return null;
   return values.get(0);
 }
 
-List getListValues(final optionName)
-{
+List getListValues(final optionName) {
   if (option == null) return new ArrayList();
   def listOption = option.findFirstWithName("/" + optionName);
   def values = listOption.getValue();
@@ -89,8 +79,7 @@ List getListValues(final optionName)
   return values;
 }
 
-List getListItems(final optionName)
-{
+List getListItems(final optionName) {
   if (option == null) return new ArrayList();
   def listOption = option.findFirstWithName("/" + optionName);
   def items = listOption.getItems();
@@ -98,10 +87,8 @@ List getListItems(final optionName)
   return items;
 }
 
-void changePreview(final config)
-{
-  if (config != null)
-  {
+void changePreview(final config) {
+  if (config != null) {
     def cfg = chartBuilder.createChart(config, true);
     def comp = option.findFirstWithName("/ChartPreview").getUIComponent();
     comp.removeAll();
@@ -111,14 +98,12 @@ void changePreview(final config)
   }
 }
 
-void resetAllEnabledStates()
-{
+void resetAllEnabledStates() {
   resetListEnabledStates("TabsList", "TabRemove", "TabUp", "TabDown");
   resetListEnabledStates("ChartsList", "ChartRemove", "ChartUp", "ChartDown");
 }
 
-void resetListEnabledStates(final listName, final btnName0, final btnName1, final btnName2)
-{
+void resetListEnabledStates(final listName, final btnName0, final btnName1, final btnName2) {
   def list = getListValues(listName);
   def o = list.isEmpty() ? null : list.get(0);
   def items = getListItems(listName);
@@ -128,8 +113,7 @@ void resetListEnabledStates(final listName, final btnName0, final btnName1, fina
   option.findFirstWithName("/" + btnName2).setEnabled((idx >= 0) && (idx < items.size() - 1));
 }
 
-void tabMoved()
-{
+void tabMoved() {
   pageRoot.setEventsEnabled(false);
   def tab = getTabConfig();
   def increment = "TabUp".equals(option.getName()) ? -1 : 1;
@@ -141,8 +125,7 @@ void tabMoved()
   pageRoot.setEventsEnabled(true);
 }
 
-void chartMoved()
-{
+void chartMoved() {
   pageRoot.setEventsEnabled(false);
   def chartConfig = getChartConfig();
   def tabConfig = getTabConfig();
@@ -154,8 +137,7 @@ void chartMoved()
   pageRoot.setEventsEnabled(true);
 }
 
-void initMain()
-{
+void initMain() {
   option.setEventsEnabled(false);
   def values = CollectionUtils.list(ChartType.values());
   option.findFirstWithName("ChartType").setItems(values);
@@ -167,14 +149,12 @@ void initMain()
   option.setEventsEnabled(true);
 }
 
-void doTabNew()
-{
+void doTabNew() {
   pageRoot.setEventsEnabled(false);
   def BASE_NAME = "org/jppf/ui/options/xml/ChartsConfigPage";
   def s = JOptionPane.showInputDialog(option.getUIComponent(), LocalizationUtils.getLocalized(BASE_NAME, "new.tab.name"),
       LocalizationUtils.getLocalized(BASE_NAME, "new.tab.title"), JOptionPane.PLAIN_MESSAGE, null, null, null);
-  if ((s != null) && !"".equals(s.trim()))
-  {
+  if ((s != null) && !"".equals(s.trim())) {
     def tab = new TabConfiguration(s, -1);
     chartBuilder.addTab(tab);
     populateTabsList(tab);
@@ -184,8 +164,7 @@ void doTabNew()
   pageRoot.setEventsEnabled(true);
 }
 
-void doTabRemove()
-{
+void doTabRemove() {
   pageRoot.setEventsEnabled(false);
   chartBuilder.removeTab(getTabConfig());
   populateTabsList(null);
@@ -194,20 +173,17 @@ void doTabRemove()
   pageRoot.setEventsEnabled(true);
 }
 
-void doTabsList()
-{
+void doTabsList() {
   pageRoot.setEventsEnabled(false);
   def values = option.getValue();
-  if ((values != null) && !values.isEmpty())
-  {
+  if ((values != null) && !values.isEmpty()) {
     populateChartsList(getTabConfig(), null);
     resetAllEnabledStates();
   }
   pageRoot.setEventsEnabled(true);
 }
 
-void doChartRemove()
-{
+void doChartRemove() {
   option.findElement("/").setEventsEnabled(false);
   def tabConfig = getTabConfig();
   def chartConfig = getChartConfig();
@@ -216,12 +192,10 @@ void doChartRemove()
   pageRoot.setEventsEnabled(true);
 }
 
-void doChartsList()
-{
+void doChartsList() {
   pageRoot.setEventsEnabled(false);
   def values = option.getValue();
-  if ((values != null) && !values.isEmpty())
-  {
+  if ((values != null) && !values.isEmpty()) {
     def config = values.get(0);
     populateFields(getTabConfig(), config);
     changePreview(config);
@@ -230,8 +204,7 @@ void doChartsList()
   pageRoot.setEventsEnabled(true);
 }
 
-void doSaveNewChart()
-{
+void doSaveNewChart() {
   pageRoot.setEventsEnabled(false);
   def config = getPopulatedConfiguration();
   def tabConfig = getTabConfig();
@@ -241,8 +214,7 @@ void doSaveNewChart()
   pageRoot.setEventsEnabled(true);
 }
 
-void doUpdateChart()
-{
+void doUpdateChart() {
   pageRoot.setEventsEnabled(false);
   def newTab = option.findFirstWithName("/TabName").getValue();
   def currentTab = getTabConfig();

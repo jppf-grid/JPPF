@@ -88,7 +88,7 @@ public final class DockingManager {
   /**
    * The mouse listener for the popup menu on right-click.
    */
-  private final UndockingMouseAdapter mouseAdapter = new UndockingMouseAdapter();
+  private final DockingMouseAdapter mouseAdapter = new DockingMouseAdapter();
   /**
    * 
    */
@@ -110,9 +110,9 @@ public final class DockingManager {
 
   /**
    * Set the main view for the application.
-   * @param frame the {@link JFrame} to set as the main view.
+   * @param frame the {@link Frame} to set as the main view.
    */
-  public void setMainView(final JFrame frame) {
+  public void setMainView(final Frame frame) {
     if (viewMap.get(INITIAL_VIEW) != null) throw new IllegalStateException("the main view is already set");
     ViewDescriptor view = new ViewDescriptor(frame, null);
     viewMap.put(INITIAL_VIEW, view);
@@ -234,9 +234,9 @@ public final class DockingManager {
 
   /**
    * Get the mouse listener for the popup menu on right-click.
-   * @return an {@link UndockingMouseAdapter} object.
+   * @return an {@link DockingMouseAdapter} object.
    */
-  public UndockingMouseAdapter getMouseAdapter() {
+  public DockingMouseAdapter getMouseAdapter() {
     return mouseAdapter;
   }
 

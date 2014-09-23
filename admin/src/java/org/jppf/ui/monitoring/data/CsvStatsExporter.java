@@ -25,11 +25,10 @@ import java.util.*;
 import org.jppf.utils.*;
 
 /**
- * 
+ * Utility class to export the latest server statistics snapshot to CSV format.
  * @author Laurent Cohen
  */
-public class CsvStatsExporter implements StatsExporter
-{
+public class CsvStatsExporter implements StatsExporter {
   /**
    * Base name for localization bundle lookups.
    */
@@ -43,14 +42,12 @@ public class CsvStatsExporter implements StatsExporter
    * 
    * @param statsHandler the object from which to get the values.
    */
-  public CsvStatsExporter(final StatsHandler statsHandler)
-  {
+  public CsvStatsExporter(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
   }
 
   @Override
-  public String formatAll()
-  {
+  public String formatAll() {
     StringBuilder sb = new StringBuilder();
     sb.append("\"JPPF driver statistics\",\n\n");
     Map<Fields, Double> m = statsHandler.getLatestDoubleValues();
@@ -75,13 +72,11 @@ public class CsvStatsExporter implements StatsExporter
    * @param label the title given to the set of values.
    * @return the values formatted as plain text.
    */
-  private String format(final Map<Fields, Double> map, final Fields[] fields, final String label)
-  {
+  private String format(final Map<Fields, Double> map, final Fields[] fields, final String label) {
     StringBuilder sb = new StringBuilder();
     String title = LocalizationUtils.getLocalized(BASE, label);
     sb.append('\"').append(title).append("\",\n\n");
-    for (Fields field: fields)
-    {
+    for (Fields field: fields) {
       Double value = map.get(field);
       if (value == null) value = 0d;
       String name = field.toString();

@@ -34,7 +34,6 @@ import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
-import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -42,8 +41,7 @@ import org.slf4j.*;
  * It also provides a few customization options, such as setting the interval between 2 server refreshes.
  * @author Laurent Cohen
  */
-public class ConsoleLoader
-{
+public class ConsoleLoader {
   /**
    * Logger for this class.
    */
@@ -65,18 +63,14 @@ public class ConsoleLoader
    * Start the console UI, optionally with the charting components.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       System.out.println("Default charset: " + Charset.defaultCharset());
       boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.console.download.charts", false);
       if (!b) startWithCheckNoDownload();
       else startWithCheckAndDownload();
       log.info("terminating");
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
@@ -87,15 +81,11 @@ public class ConsoleLoader
    * Check if the charting library classes are avaialble from the classpath.
    * @return <code>true</code> if the classes are available, <code>false</code> otherwise.
    */
-  private static boolean checkChartClassesAvailable()
-  {
-    try
-    {
+  private static boolean checkChartClassesAvailable() {
+    try {
       Class clazz = Class.forName("org.jfree.chart.ChartFactory");
       return true;
-    }
-    catch(ClassNotFoundException e)
-    {
+    } catch(ClassNotFoundException e) {
       return false;
     }
   }
@@ -106,8 +96,7 @@ public class ConsoleLoader
    * If not, the charting functionalities are discarded from the application.
    * @throws Exception if any error occurs.
    */
-  private static void startWithCheckNoDownload() throws Exception
-  {
+  private static void startWithCheckNoDownload() throws Exception {
     boolean present = checkChartClassesAvailable();
     String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
     UILauncher.main(xmlPath, "file");
@@ -119,25 +108,21 @@ public class ConsoleLoader
    * If not, we propose the user to either download and install the jars automatically, or use the console without charts.
    * @throws Exception if any error occurs.
    */
-  private static void startWithCheckAndDownload() throws Exception
-  {
+  private static void startWithCheckAndDownload() throws Exception {
     String[] names = { "jcommon-1.0.15.jar", "jfreechart-1.0.12.jar" };
     File folder = new File("lib");
     File[] files = FileUtils.toFiles(folder, names);
     Downloader downloader = new Downloader();
     boolean available = checkChartClassesAvailable();
     boolean present = downloader.checkFilesPresent(folder, names);
-    if (!present && !available)
-    {
+    if (!present && !available) {
       File dontAskAgain = new File(".dontAskAgain");
-      if (!dontAskAgain.exists())
-      {
+      if (!dontAskAgain.exists()) {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         frame = new JFrame(TITLE);
         frame.setUndecorated(true);
         frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
-        if (showDownloadDialog())
-        {
+        if (showDownloadDialog()) {
           downloader.setListener(new DownloadListener());
           downloader.extractFiles("http://sourceforge.net/projects/jfreechart/files/1.%20JFreeChart/1.0.12/jfreechart-1.0.12.zip/download", "lib/", names);
           present = downloader.checkFilesPresent(folder, names);
@@ -146,8 +131,7 @@ public class ConsoleLoader
         frame.dispose();
       }
     }
-    if (present && !available)
-    {
+    if (present && !available) {
       ClassLoader cl = ConsoleLoader.class.getClassLoader();
       URL[] urls = FileUtils.toURLs(files);
       ConsoleClassLoader consoleClassLoader = new ConsoleClassLoader(null, cl);
@@ -163,27 +147,22 @@ public class ConsoleLoader
    * @return true if the user accepted automatic dialog.
    * @throws Exception if any error occurs.
    */
-  private static boolean showDownloadDialog() throws Exception
-  {
+  private static boolean showDownloadDialog() throws Exception {
     final OptionElement panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ChartsCheckPanel.xml");
     JButton yesBtn = (JButton) panel.findFirstWithName("/YesBtn").getUIComponent();
     JButton noBtn = (JButton) panel.findFirstWithName("/NoBtn").getUIComponent();
     final JDialog dialog = new JDialog(frame, TITLE, true);
     doDownload = false;
-    yesBtn.addActionListener(new ActionListener()
-    {
+    yesBtn.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent event)
-      {
+      public void actionPerformed(final ActionEvent event) {
         doDownload = true;
         closeDialog(dialog, panel);
       }
     });
-    noBtn.addActionListener(new ActionListener()
-    {
+    noBtn.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent event)
-      {
+      public void actionPerformed(final ActionEvent event) {
         closeDialog(dialog, panel);
       }
     });
@@ -196,11 +175,9 @@ public class ConsoleLoader
     textArea.setValue(sb.toString());
     dialog.add(panel.getUIComponent());
     frame.setVisible(true);
-    SwingUtilities.invokeAndWait(new Runnable()
-    {
+    SwingUtilities.invokeAndWait(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         dialog.pack();
         dialog.setVisible(true);
       }
@@ -213,34 +190,20 @@ public class ConsoleLoader
    * @param d the dialog to close.
    * @param panel the panel managed by the dialog.
    */
-  private static void closeDialog(final JDialog d, final OptionElement panel)
-  {
+  private static void closeDialog(final JDialog d, final OptionElement panel) {
     BooleanOption opt = (BooleanOption) panel.findFirstWithName("/dontAskAgain");
     Boolean dontAskAgain = (Boolean) opt.getValue();
     if (dontAskAgain == null) dontAskAgain = Boolean.TRUE;
-    if (dontAskAgain)
-    {
-      FileWriter writer = null;
-      try
-      {
-        writer = new FileWriter(".dontAskAgain");
-      }
-      catch(Exception e)
-      {
+    if (dontAskAgain) {
+      try (FileWriter writer = new FileWriter(".dontAskAgain")) {
+      } catch(Exception e) {
         e.printStackTrace();
       }
-      finally
-      {
-        StreamUtils.closeSilent(writer);
-      }
     }
-    SwingUtilities.invokeLater(new Runnable()
-    {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
-        if (d != null)
-        {
+      public void run() {
+        if (d != null) {
           d.setVisible(false);
           d.dispose();
         }
@@ -251,8 +214,7 @@ public class ConsoleLoader
   /**
    * 
    */
-  private static class DownloadListener implements LocationEventListener
-  {
+  private static class DownloadListener implements LocationEventListener {
     /**
      * Total count of bytes transferred.
      */
@@ -277,8 +239,7 @@ public class ConsoleLoader
     /**
      * Default constructor.
      */
-    public DownloadListener()
-    {
+    public DownloadListener() {
       nf = NumberFormat.getPercentInstance();
       nf.setMinimumFractionDigits(1);
       nf.setMaximumFractionDigits(1);
@@ -305,15 +266,12 @@ public class ConsoleLoader
      * @see org.jppf.location.LocationEventListener#dataTransferred(org.jppf.location.LocationEvent)
      */
     @Override
-    public void dataTransferred(final LocationEvent event)
-    {
+    public void dataTransferred(final LocationEvent event) {
       count += event.getTransferredBytes();
       /*
-      SwingUtilities.invokeLater(new Runnable()
-      {
+      SwingUtilities.invokeLater(new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           label.setText(nf.format(count / max));
         }
       });
@@ -324,15 +282,13 @@ public class ConsoleLoader
   /**
    * Custom class loader.
    */
-  private static class ConsoleClassLoader extends URLClassLoader
-  {
+  private static class ConsoleClassLoader extends URLClassLoader {
     /**
      * Initialize with the specified urls and parent class loader.
      * @param urls - the initial URLs.
      * @param cl - the parent class loader.
      */
-    public ConsoleClassLoader(final URL[] urls, final ClassLoader cl)
-    {
+    public ConsoleClassLoader(final URL[] urls, final ClassLoader cl) {
       super(urls == null ? new URL[0] : urls, cl);
     }
 
@@ -342,8 +298,7 @@ public class ConsoleLoader
      * @see java.net.URLClassLoader#addURL(java.net.URL)
      */
     @Override
-    public void addURL(final URL url)
-    {
+    public void addURL(final URL url) {
       super.addURL(url);
     }
   }

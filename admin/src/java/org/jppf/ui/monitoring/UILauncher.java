@@ -17,13 +17,17 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Frame;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
 
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.OptionElement;
+import org.jppf.ui.options.docking.DockingManager;
+import org.jppf.ui.options.event.WindowClosingListener;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.utils.JPPFSplash;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
@@ -34,8 +38,7 @@ import org.slf4j.*;
  * and switching the color scheme (skin) for the whole UI.
  * @author Laurent Cohen
  */
-public class UILauncher
-{
+public class UILauncher {
   /**
    * Logger for this class.
    */
@@ -75,17 +78,10 @@ public class UILauncher
         }
       }
       boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
-      if (showSplash) {
-        splash = new JPPFSplash("The management console is starting ...");
-        splash.start();
-      }
-      OptionElement elt = null;
-      if ("url".equalsIgnoreCase(args[1])) elt = OptionsHandler.addPageFromURL(args[0], null);
-      else elt = OptionsHandler.addPageFromXml(args[0]);
-      OptionsHandler.loadPreferences();
-      OptionsHandler.getBuilder().triggerInitialEvents(elt);
+      if (showSplash) (splash = new JPPFSplash("The management console is starting ...")).start();
+      loadUI(args[0], args[1], true);
       if (showSplash) splash.stop();
-      Frame[] frames = JFrame.getFrames();
+      Frame[] frames = Frame.getFrames();
       for (final Frame f: frames) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
@@ -98,6 +94,90 @@ public class UILauncher
       e.printStackTrace();
       log.error(e.getMessage(), e);
       System.exit(1);
+    }
+  }
+
+  /**
+   * Load the UI from the default XML descriptor.
+   * @return the root {@link JComponent} of the admin console.
+   * @since 5.0
+   */
+  public static JComponent loadUI() {
+    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", false);
+  }
+
+  /**
+   * Load the UI from the specified path to an XML descriptor.
+   * @param src the path tot he XML docuemnt to load
+   * @param type the type of the path: url or file.
+   * @param createFrame determines whether the main application frame should alsd be created and initialized.
+   * @return the root {@link JComponent} of the admin console.
+   * @since 5.0
+   */
+  private static JComponent loadUI(final String src, final String type, final boolean createFrame) {
+    try {
+      OptionElement elt = null;
+      if ("url".equalsIgnoreCase(type)) elt = OptionsHandler.addPageFromURL(src, null);
+      else elt = OptionsHandler.addPageFromXml(src);
+      OptionsHandler.loadPreferences();
+      OptionsHandler.getBuilder().triggerInitialEvents(elt);
+      if (createFrame) {
+        JFrame frame = new JFrame(elt.getLabel());
+        OptionsHandler.setMainWindow(frame);
+        DockingManager.getInstance().setMainView(frame);
+        frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
+        frame.addWindowListener(new WindowClosingListener());
+        StatsHandler.getInstance();
+        frame.getContentPane().add(elt.getUIComponent());
+        OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
+      } else {
+        JComponent comp = elt.getUIComponent();
+        comp.addHierarchyListener(new MainFrameObserver());
+      }
+      return elt.getUIComponent();
+    } catch (Exception e) {
+      e.printStackTrace();
+      log.error(e.getMessage(), e);
+    }
+    return null;
+  }
+
+  /**
+   * Listens for hierarchy events to find out when the component is finally linked to a frame.
+   * @since 5.0
+   */
+  private static class MainFrameObserver implements HierarchyListener {
+    /**
+     * Set to true whenever the application main frame is found.
+     */
+    private boolean frameFound = false;
+
+    @Override
+    public void hierarchyChanged(final HierarchyEvent event) {
+      if (frameFound) return;
+      long flags = event.getChangeFlags();
+      Frame frame = getTopFrame(event.getChanged());
+      if (frame != null) {
+        frameFound = true;
+        //System.out.println("found frame = " + frame);
+        OptionsHandler.setMainWindow(frame);
+        DockingManager.getInstance().setMainView(frame);
+      }
+    }
+
+    /**
+     * Get the frame, if any, at the top of the specified components hierarchy.
+     * @param comp the component for which to lookup the hierarchy.
+     * @return the top {@link Frame}, or {@code null} if there is no frame in the hierarchy.
+     */
+    private Frame getTopFrame(final Component comp) {
+      if (comp instanceof Frame) return (Frame) comp;
+      else if (comp != null) {
+        Component tmp = comp;
+        while (tmp.getParent() != null) tmp = tmp.getParent();
+        if (tmp instanceof Frame) return (Frame) tmp;
+      }
+      return null;
     }
   }
 }

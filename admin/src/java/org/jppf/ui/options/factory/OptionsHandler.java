@@ -31,8 +31,7 @@ import org.slf4j.*;
  * This class handles the persistence of the dynamic UI com
  * @author Laurent Cohen
  */
-public final class OptionsHandler
-{
+public final class OptionsHandler {
   /**
    * Logger for this class.
    */
@@ -60,14 +59,13 @@ public final class OptionsHandler
   /**
    * The main window of the application.
    */
-  private static JFrame mainWindow = null;
+  private static Frame mainWindow = null;
 
   /**
    * Get the list of option pages managed by this handler.
    * @return a list of <code>OptionsPage</code> instances.
    */
-  public static List<OptionElement> getPageList()
-  {
+  public static List<OptionElement> getPageList() {
     return pageList;
   }
 
@@ -76,8 +74,7 @@ public final class OptionsHandler
    * @param name the name of the page to retrieve.
    * @return an <code>OptionsPage</code> instance.
    */
-  public static synchronized OptionElement getPage(final String name)
-  {
+  public static synchronized OptionElement getPage(final String name) {
     return pageMap.get(name);
   }
 
@@ -86,15 +83,11 @@ public final class OptionsHandler
    * @param page an <code>OptionsPage</code> instance.
    * @return the page that was added.
    */
-  public static synchronized OptionElement addPage(final OptionElement page)
-  {
+  public static synchronized OptionElement addPage(final OptionElement page) {
     pageList.add(page);
-    try
-    {
+    try {
       pageMap.put(page.getName(), page);
-    }
-    catch(RuntimeException e)
-    {
+    } catch(RuntimeException e) {
       int breakpoint = 0;
       log.info("Exception for page = \"" + page + "\" : " + e.getMessage());
       throw e;
@@ -106,8 +99,7 @@ public final class OptionsHandler
    * Remove a page from the list of pages managed by this handler.
    * @param page an <code>OptionsPage</code> instance.
    */
-  public static synchronized void removePage(final OptionContainer page)
-  {
+  public static synchronized void removePage(final OptionContainer page) {
     pageList.remove(page);
     pageMap.remove(page.getName());
   }
@@ -117,14 +109,10 @@ public final class OptionsHandler
    * @param xmlPath the path to the xml document.
    * @return the page that was added.
    */
-  public static synchronized OptionElement loadPageFromXml(final String xmlPath)
-  {
-    try
-    {
+  public static synchronized OptionElement loadPageFromXml(final String xmlPath) {
+    try {
       return builder.buildPage(xmlPath, null);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return null;
@@ -135,8 +123,7 @@ public final class OptionsHandler
    * @param xmlPath the path to the xml document.
    * @return the page that was added.
    */
-  public static synchronized OptionElement addPageFromXml(final String xmlPath)
-  {
+  public static synchronized OptionElement addPageFromXml(final String xmlPath) {
     return addPage(loadPageFromXml(xmlPath));
   }
 
@@ -146,14 +133,10 @@ public final class OptionsHandler
    * @param baseName base name for resource bundle lookup.
    * @return the page that was added.
    */
-  public static synchronized OptionElement loadPageFromURL(final String xmlPath, final String baseName)
-  {
-    try
-    {
+  public static synchronized OptionElement loadPageFromURL(final String xmlPath, final String baseName) {
+    try {
       return builder.buildPageFromURL(xmlPath, baseName);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
     return null;
@@ -165,27 +148,21 @@ public final class OptionsHandler
    * @param baseName base name for resource bundle lookup.
    * @return the page that was added.
    */
-  public static synchronized OptionElement addPageFromURL(final String xmlPath, final String baseName)
-  {
+  public static synchronized OptionElement addPageFromURL(final String xmlPath, final String baseName) {
     return addPage(loadPageFromURL(xmlPath, baseName));
   }
 
   /**
    * Save the value of all persistent options in the preferences store.
    */
-  public static void savePreferences()
-  {
-    try
-    {
-      for (OptionElement elt: pageList)
-      {
+  public static void savePreferences() {
+    try {
+      for (OptionElement elt: pageList) {
         OptionNode node = buildPersistenceGraph(elt);
         savePreferences(node, getPreferences());
       }
       getPreferences().flush();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -195,15 +172,11 @@ public final class OptionsHandler
    * @param node the root of the options subtree to save.
    * @param prefs the preferences node in which to save the values.
    */
-  public static void savePreferences(final OptionNode node, final Preferences prefs)
-  {
-    if (!node.children.isEmpty())
-    {
+  public static void savePreferences(final OptionNode node, final Preferences prefs) {
+    if (!node.children.isEmpty()) {
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) savePreferences(child, p);
-    }
-    else if (node.elt instanceof Option)
-    {
+    } else if (node.elt instanceof Option) {
       Option option = (Option) node.elt;
       if (option.isPersistent()) prefs.put(option.getName(), String.valueOf(option.getValue()));
     }
@@ -212,10 +185,8 @@ public final class OptionsHandler
   /**
    * Load the value of all persistent options in the preferences store.
    */
-  public static void loadPreferences()
-  {
-    for (OptionElement elt: pageList)
-    {
+  public static void loadPreferences() {
+    for (OptionElement elt: pageList) {
       OptionNode node = buildPersistenceGraph(elt);
       loadPreferences(node, getPreferences());
     }
@@ -226,16 +197,12 @@ public final class OptionsHandler
    * @param node the root of the options subtree to save.
    * @param prefs the preferences node in which to save the values.
    */
-  public static void loadPreferences(final OptionNode node, final Preferences prefs)
-  {
+  public static void loadPreferences(final OptionNode node, final Preferences prefs) {
     //if (node == null) return;
-    if (!node.children.isEmpty())
-    {
+    if (!node.children.isEmpty()) {
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) loadPreferences(child, p);
-    }
-    else if (node.elt instanceof AbstractOption)
-    {
+    } else if (node.elt instanceof AbstractOption) {
       AbstractOption option = (AbstractOption) node.elt;
       Object def = option.getValue();
       String val = prefs.get(option.getName(), def == null ? null : def.toString());
@@ -247,8 +214,7 @@ public final class OptionsHandler
    * Get the page builder used to instantiate pages from XML descriptors.
    * @return an <code>OptionsPageBuilder</code> instance.
    */
-  public static OptionsPageBuilder getBuilder()
-  {
+  public static OptionsPageBuilder getBuilder() {
     return builder;
   }
 
@@ -257,25 +223,19 @@ public final class OptionsHandler
    * @param elt the root of the current subgraph.
    * @return an <code>OptionNode</code> instance.
    */
-  public static OptionNode buildPersistenceGraph(final OptionElement elt)
-  {
+  public static OptionNode buildPersistenceGraph(final OptionElement elt) {
     OptionNode node = null;
-    if (elt instanceof OptionContainer)
-    {
+    if (elt instanceof OptionContainer) {
       node = new OptionNode(elt);
       OptionContainer page = (OptionContainer) elt;
-      for (OptionElement child: page.getChildren())
-      {
+      for (OptionElement child: page.getChildren()) {
         OptionNode childNode = buildPersistenceGraph(child);
-        if (childNode != null)
-        {
+        if (childNode != null) {
           if (node == null) node = new OptionNode(elt);
           node.children.add(childNode);
         }
       }
-    }
-    else if (elt instanceof AbstractOption)
-    {
+    } else if (elt instanceof AbstractOption) {
       if (((AbstractOption) elt).isPersistent()) node = new OptionNode(elt);
     }
     return node;
@@ -285,8 +245,7 @@ public final class OptionsHandler
    * Get the root of the preferences subtree in which the chart configurations are saved.
    * @return a {@link Preferences} instance.
    */
-  public static synchronized Preferences getPreferences()
-  {
+  public static synchronized Preferences getPreferences() {
     return preferences;
   }
 
@@ -294,8 +253,7 @@ public final class OptionsHandler
    * Set the root of the preferences subtree in which the chart configurations are saved.
    * @param preferences a {@link Preferences} instance.
    */
-  public static synchronized void setPreferences(final Preferences preferences)
-  {
+  public static synchronized void setPreferences(final Preferences preferences) {
     OptionsHandler.preferences = preferences;
   }
 
@@ -303,8 +261,7 @@ public final class OptionsHandler
    * Load the application's main window state from the preferences store.
    * @param pref the preferences node from where the attributes are loaded.
    */
-  public static void loadMainWindowAttributes(final Preferences pref)
-  {
+  public static void loadMainWindowAttributes(final Preferences pref) {
     loadFrameAttributes(mainWindow, pref);
   }
 
@@ -312,8 +269,7 @@ public final class OptionsHandler
    * Save the application's main window state to the preferences store.
    * @param pref the preferences node where the attributes are saved.
    */
-  public static void saveMainWindowAttributes(final Preferences pref)
-  {
+  public static void saveMainWindowAttributes(final Preferences pref) {
     saveFrameAttributes(mainWindow, pref);
   }
 
@@ -322,8 +278,7 @@ public final class OptionsHandler
    * @param frame the frame for which the attributes are retrieved.
    * @param pref the preferences node from where the attributes are loaded.
    */
-  public static void loadFrameAttributes(final Frame frame, final Preferences pref)
-  {
+  public static void loadFrameAttributes(final Frame frame, final Preferences pref) {
     int x = pref.getInt("locationx", 0);
     int y = pref.getInt("locationy", 0);
     int width = pref.getInt("width", 600);
@@ -339,8 +294,7 @@ public final class OptionsHandler
    * @param frame the frame for which the attributes are saved.
    * @param pref the preferences node where the attributes are saved.
    */
-  public static void saveFrameAttributes(final Frame frame, final Preferences pref)
-  {
+  public static void saveFrameAttributes(final Frame frame, final Preferences pref) {
     int state = frame.getExtendedState();
     boolean maximized = (state & Frame.MAXIMIZED_BOTH) > 0;
     if (maximized) frame.setExtendedState(Frame.NORMAL);
@@ -351,21 +305,16 @@ public final class OptionsHandler
     pref.putInt("width", d.width);
     pref.putInt("height", d.height);
     pref.putBoolean("maximized", maximized);
-
-    try
-    {
+    try {
       pref.flush();
-    }
-    catch(BackingStoreException e)
-    {
+    } catch(BackingStoreException e) {
     }
   }
 
   /**
    * A graph of the persistent options.
    */
-  public static class OptionNode
-  {
+  public static class OptionNode {
     /**
      * The corresponding option element.
      */
@@ -379,8 +328,7 @@ public final class OptionsHandler
      * Initialize this node.
      * @param elt the corresponding option element.
      */
-    public OptionNode(final OptionElement elt)
-    {
+    public OptionNode(final OptionElement elt) {
       this.elt = elt;
     }
   }
@@ -389,8 +337,7 @@ public final class OptionsHandler
    * Get the main window of the application.
    * @return a {@link JFrame} instance.
    */
-  public static JFrame getMainWindow()
-  {
+  public static Frame getMainWindow() {
     return mainWindow;
   }
 
@@ -398,8 +345,15 @@ public final class OptionsHandler
    * Set the main window of the application.
    * @param mainWindow a {@link JFrame} instance.
    */
-  public static void setMainWindow(final JFrame mainWindow)
-  {
+  public static void setMainWindow(final Frame mainWindow) {
     OptionsHandler.mainWindow = mainWindow;
+  }
+
+  /**
+   * Create the main application frame.
+   * @return a {@link JFrame} instance.
+   */
+  private static JFrame createMainWindow() {
+    return null;
   }
 }

@@ -22,19 +22,17 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 /**
- * 
+ * Action to dock a tab to an existing view.
  * @author Laurent Cohen
  */
-public class DockToExistingViewAction extends AbstractDockingAction
-{
+public class DockToExistingViewAction extends AbstractDockingAction {
   /**
    * Initialize this action with the specified view id.
    * @param comp the id of the view to which the component will be attached.
    * @param label the text of the corresponding menu item.
    * @param viewId the id of the view to which the component will be attached.
    */
-  public DockToExistingViewAction(final Component comp, final String label, final String viewId)
-  {
+  public DockToExistingViewAction(final Component comp, final String label, final String viewId) {
     super(comp, label, null, viewId);
   }
 
@@ -45,14 +43,12 @@ public class DockToExistingViewAction extends AbstractDockingAction
    * @param iconPath the path to an optional icon.
    * @param viewId the id of the view to which the component will be attached.
    */
-  public DockToExistingViewAction(final Component comp, final String label, final String iconPath, final String viewId)
-  {
+  public DockToExistingViewAction(final Component comp, final String label, final String iconPath, final String viewId) {
     super(comp, label, iconPath, viewId);
   }
 
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     DockingManager dmgr = DockingManager.getInstance();
     DetachableComponentDescriptor desc = dmgr.getComponent(comp);
     dmgr.attach(desc.getComponent(), viewId);

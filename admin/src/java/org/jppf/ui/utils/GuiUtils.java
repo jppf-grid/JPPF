@@ -18,11 +18,14 @@
 package org.jppf.ui.utils;
 
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
+
+import org.slf4j.*;
 
 /**
  * Collection of GUI utility methods.
@@ -30,6 +33,10 @@ import javax.swing.*;
  */
 public final class GuiUtils
 {
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(GuiUtils.class);
   /**
    * Path tot he JPPF icon used in the GUI.
    */
@@ -86,18 +93,23 @@ public final class GuiUtils
    * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
    * could not be loaded.
    */
-  public static ImageIcon loadIcon(final String path, final boolean useCache)
-  {
+  public static ImageIcon loadIcon(final String path, final boolean useCache) {
     ImageIcon icon = null;
-    if (useCache)
-    {
+    if (useCache) {
       icon = iconMap.get(path);
       if (icon != null) return icon;
     }
-    URL url = GuiUtils.class.getResource(path);
-    if (url == null) return null;
-    icon = new ImageIcon(url);
-    if (useCache) iconMap.put(path, icon);
+    URL url = null;
+    try {
+      File file = new File(path);
+      if (file.exists()) url = file.toURI().toURL();
+      else url = GuiUtils.class.getResource(path);
+      if (url == null) return null;
+      icon = new ImageIcon(url);
+      if (useCache) iconMap.put(path, icon);
+    } catch(Exception e) {
+      log.warn(e.getMessage(), e);
+    }
     return icon;
   }
 

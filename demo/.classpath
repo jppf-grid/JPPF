@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="/jca-client/lib/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Hazelcast/hazelcast.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

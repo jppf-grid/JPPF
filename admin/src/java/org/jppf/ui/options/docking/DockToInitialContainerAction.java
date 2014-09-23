@@ -22,18 +22,16 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 /**
- * 
+ * Action to dock a tab to its initial view/container.
  * @author Laurent Cohen
  */
-public class DockToInitialContainerAction extends AbstractDockingAction
-{
+public class DockToInitialContainerAction extends AbstractDockingAction {
   /**
    * Initialize this action.
    * @param comp the id of the view to which the component will be attached.
    * @param label the text of the corresponding menu item.
    */
-  public DockToInitialContainerAction(final Component comp, final String label)
-  {
+  public DockToInitialContainerAction(final Component comp, final String label) {
     super(comp, label);
   }
 
@@ -43,14 +41,12 @@ public class DockToInitialContainerAction extends AbstractDockingAction
    * @param label the text of the corresponding menu item.
    * @param iconPath the path to an optional icon.
    */
-  public DockToInitialContainerAction(final Component comp, final String label, final String iconPath)
-  {
+  public DockToInitialContainerAction(final Component comp, final String label, final String iconPath) {
     super(comp, label, iconPath, null);
   }
 
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     DockingManager.getInstance().dockToInitialContainer(comp);
   }
 }
