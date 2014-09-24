@@ -23,8 +23,7 @@ package org.jppf.utils;
  * @author Laurent Cohen
  * @exclude
  */
-public class FileReplacerEx
-{
+public class FileReplacerEx {
   /**
    * 
    */
@@ -48,13 +47,10 @@ public class FileReplacerEx
    * 
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       boolean searchOnly = Boolean.valueOf(args[0]);
-      for (int i=0; i<arguments.length; i++)
-      {
+      for (int i=0; i<arguments.length; i++) {
         String root = arguments[i][0];
         String ext = arguments[i][2];
         String in = arguments[i][1] + "/in.txt";
@@ -66,9 +62,7 @@ public class FileReplacerEx
         System.out.println(hr);
         FileReplacer.main(root, in, out, ext, args[0]);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

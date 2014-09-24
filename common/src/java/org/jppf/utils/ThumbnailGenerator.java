@@ -30,8 +30,7 @@ import javax.imageio.ImageIO;
  * @author Laurent Cohen
  * @exclude
  */
-public class ThumbnailGenerator
-{
+public class ThumbnailGenerator {
   /**
    * The name prefix for the generated thumbnails.
    */
@@ -75,8 +74,7 @@ public class ThumbnailGenerator
    * @param width the width of the generated thumbnails.
    * @param height the height of the generated thumbnails.
    */
-  public ThumbnailGenerator(final String path, final int width, final int height)
-  {
+  public ThumbnailGenerator(final String path, final int width, final int height) {
     this(path, width, height, DEFAULT_INCLUDE_PATH, DEFAULT_ROW_LENGTH);
   }
 
@@ -88,8 +86,7 @@ public class ThumbnailGenerator
    * @param height the height of the generated thumbnails.
    * @param rowLength the number of thumbnails per row.
    */
-  public ThumbnailGenerator(final String path, final int width, final int height, final int rowLength)
-  {
+  public ThumbnailGenerator(final String path, final int width, final int height, final int rowLength) {
     this(path, width, height, DEFAULT_INCLUDE_PATH, rowLength);
   }
 
@@ -102,8 +99,7 @@ public class ThumbnailGenerator
    * @param includePath the generated file to include in the screenshots php page.
    * @param rowLength the number of thumbnails per row..
    */
-  public ThumbnailGenerator(final String path, final int width, final int height, final String includePath, final int rowLength)
-  {
+  public ThumbnailGenerator(final String path, final int width, final int height, final String includePath, final int rowLength) {
     this.path = path;
     this.width = width;
     this.height = height;
@@ -115,8 +111,7 @@ public class ThumbnailGenerator
    * Generate all thumbnails.
    * @throws Exception if an IO error is raised.
    */
-  public void generate() throws Exception
-  {
+  public void generate() throws Exception {
     generateFileMap();
     generateThumbnails();
     generateIncludeFile();
@@ -126,10 +121,8 @@ public class ThumbnailGenerator
    * Generate all thumbnails.
    * @throws Exception if an error is raised while generating the thumbnails.
    */
-  private void generateThumbnails() throws Exception
-  {
-    for (Map.Entry<File, File> entry: fileMap.entrySet())
-    {
+  private void generateThumbnails() throws Exception {
+    for (Map.Entry<File, File> entry: fileMap.entrySet()) {
       BufferedImage img = ImageIO.read(entry.getKey());
       BufferedImage thumbnail = scale(img);
       ImageIO.write(thumbnail, "jpeg", entry.getValue());
@@ -140,14 +133,12 @@ public class ThumbnailGenerator
    * Generate the file to include in the screenshots php page.
    * @throws Exception if an IO error is raised.
    */
-  private void generateIncludeFile() throws Exception
-  {
+  private void generateIncludeFile() throws Exception {
     StringBuilder sb = new StringBuilder();
     int count = 0;
     String indent = "\t\t\t\t\t";
     sb.append(indent).append("<table align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n");
-    for (Map.Entry<File, File> entry: fileMap.entrySet())
-    {
+    for (Map.Entry<File, File> entry: fileMap.entrySet()) {
       if (count % rowLength == 0)
       {
         if (count > 0) sb.append(indent).append("\t</tr>\n");
@@ -177,13 +168,11 @@ public class ThumbnailGenerator
    * Generate the map of image files to their corresponding thumbnail file.
    * @throws Exception if an IO error occurs.
    */
-  private void generateFileMap() throws Exception
-  {
+  private void generateFileMap() throws Exception {
     File dir = new File(path);
     if (!dir.isDirectory()) throw new IOException("The specified path is not a directory");
     File[] list = dir.listFiles(new ImageFileFilter("gif", "jpg", "png"));
-    for (File file: list)
-    {
+    for (File file: list) {
       String s = path;
       if (s.endsWith("/") || s.endsWith("\\")) s = s.substring(0, s.length() - 1);
       s += '/' + TH_PREFIX + file.getName();
@@ -198,8 +187,7 @@ public class ThumbnailGenerator
    * @param img the image to scaled.
    * @return a scaled version of the input image.
    */
-  private BufferedImage scale(final BufferedImage img)
-  {
+  private BufferedImage scale(final BufferedImage img) {
     int w = img.getWidth();
     int h = img.getHeight();
     double r = Math.max((double) w / width, (double) h / height);
@@ -214,16 +202,14 @@ public class ThumbnailGenerator
    * @param source the source from which to geenrate a title.
    * @return the generated title as a string.
    */
-  private String titleFromFilename(final String source)
-  {
+  private String titleFromFilename(final String source) {
     String name = FileUtils.getFileName(source);
     int idx = name.lastIndexOf('.');
     if (idx >= 0) name = name.substring(0, idx);
     char[] chars = name.toCharArray();
     StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (char c: chars)
-    {
+    for (char c: chars) {
       if ((c == '-') || (c == '-')) sb.append(' ');
       else if (Character.isUpperCase(c) && (count > 0)) sb.append(' ').append(c);
       else sb.append(c);
@@ -236,8 +222,7 @@ public class ThumbnailGenerator
    * File filter that only accepts GIF, JPG and PNG files.
    * @exclude
    */
-  public static class ImageFileFilter implements FileFilter
-  {
+  public static class ImageFileFilter implements FileFilter {
     /**
      * An array of the accepted extensions.
      */
@@ -247,24 +232,15 @@ public class ThumbnailGenerator
      * Initialize this filter width he specified extensions.
      * @param extensions an array of the accepted extensions.
      */
-    public ImageFileFilter(final String...extensions)
-    {
+    public ImageFileFilter(final String...extensions) {
       this.extensions = extensions;
     }
 
-    /**
-     * Tests whether or not the specified abstract pathname should be included in a pathname list.
-     * @param file the abstract pathname to be tested.
-     * @return true if and only if pathname  should be included.
-     * @see java.io.FileFilter#accept(java.io.File)
-     */
     @Override
-    public boolean accept(final File file)
-    {
+    public boolean accept(final File file) {
       String ext = FileUtils.getFileExtension(file);
       if (file.getName().startsWith(TH_PREFIX)) return false;
-      for (String s: extensions)
-      {
+      for (String s: extensions) {
         if (s.equalsIgnoreCase(ext)) return true;
       }
       return false;
@@ -275,8 +251,7 @@ public class ThumbnailGenerator
    * Perform the thumbnail generation.
    * @param args contains in that order: root path, thumbnail width, thumbnail height.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String...args) {
     try
     {
       String path = args[0];

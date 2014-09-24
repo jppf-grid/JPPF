@@ -27,8 +27,7 @@ import org.slf4j.*;
  * their own code.
  * @author Laurent Cohen
  */
-public final class VersionUtils
-{
+public final class VersionUtils {
   /**
    * Logger for this class.
    */
@@ -45,27 +44,22 @@ public final class VersionUtils
   /**
    * Instantiation of this class is not permitted.
    */
-  private VersionUtils()
-  {
+  private VersionUtils() {
   }
 
   /**
    * Read the version information properties file and return the information in a dedicated object.
    * @return a {@link Version} instance.
    */
-  private static Version createVersionInfo()
-  {
+  private static Version createVersionInfo() {
     String result = null;
     TypedProperties props = new TypedProperties();
     Version v = null;
-    try
-    {
+    try {
       InputStream is = VersionUtils.class.getClassLoader().getResourceAsStream("META-INF/jppf-version.properties");
       props.load(is);
       v = new Version(props.getString("version.number", ""), props.getString("build.number", ""), props.getString("build.date", ""));
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       String s = "JPPF version information could not be determined";
       if (debugEnabled) log.debug(s, e);
       else log.warn(s + ": " + ExceptionUtils.getMessage(e));
@@ -79,8 +73,7 @@ public final class VersionUtils
    * @param component the JPPF component type: driver, node or client.
    * @param uuid the component uuid.
    */
-  public static void logVersionInformation(final String component, final String uuid)
-  {
+  public static void logVersionInformation(final String component, final String uuid) {
     String comp = component == null ? "<unknown component type>" : component;
     int pid = SystemUtils.getPID();
     String hrule = StringUtils.padRight("", '-', 80);
@@ -94,16 +87,14 @@ public final class VersionUtils
    * Return the singleton object which provides the JPPF version information. 
    * @return a {@link Version} instance.
    */
-  public static Version getVersion()
-  {
+  public static Version getVersion() {
     return VERSION;
   }
 
   /**
    * Describes the available version information.
    */
-  public static class Version implements Serializable
-  {
+  public static class Version implements Serializable {
     /**
      * The JPPF version number.
      */
@@ -123,8 +114,7 @@ public final class VersionUtils
      * @param buildNumber the JPPF build number.
      * @param buildDate the JPPF build date.
      */
-    public Version(final String versionNumber, final String buildNumber, final String buildDate)
-    {
+    public Version(final String versionNumber, final String buildNumber, final String buildDate) {
       super();
       this.versionNumber = versionNumber;
       this.buildNumber = buildNumber;
@@ -135,8 +125,7 @@ public final class VersionUtils
      * Get the JPPF version number.
      * @return the version number as a string.
      */
-    public String getVersionNumber()
-    {
+    public String getVersionNumber() {
       return versionNumber;
     }
 
@@ -144,8 +133,7 @@ public final class VersionUtils
      * Get the JPPF build number.
      * @return the build number as a string.
      */
-    public String getBuildNumber()
-    {
+    public String getBuildNumber() {
       return buildNumber;
     }
 
@@ -153,14 +141,12 @@ public final class VersionUtils
      * Get the JPPF build date.
      * @return the build date as a string.
      */
-    public String getBuildDate()
-    {
+    public String getBuildDate() {
       return buildDate;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
       StringBuilder sb = new StringBuilder();
       sb.append("JPPF Version: ").append(versionNumber);
       sb.append(", Build number: ").append(buildNumber);

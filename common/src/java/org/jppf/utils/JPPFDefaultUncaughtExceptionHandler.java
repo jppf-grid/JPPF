@@ -27,8 +27,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFDefaultUncaughtExceptionHandler implements UncaughtExceptionHandler
-{
+public class JPPFDefaultUncaughtExceptionHandler implements UncaughtExceptionHandler {
   /**
    * Logger for this class.
    */
@@ -39,8 +38,7 @@ public class JPPFDefaultUncaughtExceptionHandler implements UncaughtExceptionHan
   private static boolean debugEnabled = log.isDebugEnabled();
 
   @Override
-  public void uncaughtException(final Thread t, final Throwable e)
-  {
+  public void uncaughtException(final Thread t, final Throwable e) {
     if (debugEnabled) log.debug("Uncaught exception in thread {} : {}", t, ExceptionUtils.getStackTrace(e));
     else log.warn("Uncaught exception in thread {} : {}", t, ExceptionUtils.getMessage(e));
   }

@@ -92,10 +92,6 @@ public final class JPPFConfiguration {
   private static void loadProperties() {
     props = new TypedProperties();
     try (Reader reader = getReader()) {
-      /*
-      if (reader != null) props = ConfigurationHelper.loadAndResolve(reader);
-      else props = new TypedProperties();
-      */
       if (reader != null) props.loadAndResolve(reader);
     } catch(Exception e) {
       log.error("error reading the configuration", e);

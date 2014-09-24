@@ -41,16 +41,13 @@ public final class FileUtils {
    * @throws IOException if the file can't be found or read.
    */
   public static String readTextFile(final Reader aReader) throws IOException {
-    BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader);
     StringBuilder sb = new StringBuilder();
-    try {
+    try (BufferedReader reader = (aReader instanceof BufferedReader) ? (BufferedReader) aReader : new BufferedReader(aReader)) {
       String s = "";
       while (s != null) {
         s = reader.readLine();
         if (s != null) sb.append(s).append('\n');
       }
-    } finally {
-      reader.close();
     }
     return sb.toString();
   }
@@ -129,9 +126,8 @@ public final class FileUtils {
    * @throws IOException if the file can't be found or read.
    */
   public static void writeTextFile(final Writer dest, final String content) throws IOException {
-    BufferedReader reader = new BufferedReader(new StringReader(content));
-    Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest);
-    try {
+    try (BufferedReader reader = new BufferedReader(new StringReader(content));
+        Writer writer = (dest instanceof BufferedWriter) ? dest : new BufferedWriter(dest)) {
       String s = "";
       while (s != null) {
         s = reader.readLine();
@@ -141,8 +137,6 @@ public final class FileUtils {
         }
       }
       writer.flush();
-    } finally {
-      writer.close();
     }
   }
 
@@ -214,19 +208,14 @@ public final class FileUtils {
    * @throws IOException if an error occurs while looking up or reading the file.
    */
   public static List<String> getFilePathList(final String fileListPath) throws IOException {
-    InputStream is = getFileInputStream(fileListPath);
-    String content = readTextFile(new BufferedReader(new InputStreamReader(is)));
-    BufferedReader reader = new BufferedReader(new StringReader(content));
     List<String> filePaths = new ArrayList<>();
-    try {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(getFileInputStream(fileListPath)))) {
       boolean end = false;
       while (!end) {
         String s = reader.readLine();
         if (s != null) filePaths.add(s);
         else end = true;
       }
-    } finally {
-      reader.close();
     }
     return filePaths;
   }
@@ -297,11 +286,10 @@ public final class FileUtils {
    * @throws IOException if an IO error occurs.
    */
   public static void splitTextFile(final String file, final int splitSize) throws IOException {
-    BufferedReader reader = new BufferedReader(new FileReader(file));
     BufferedWriter writer = null;
     int count = 0;
     int size = 0;
-    try {
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String s = "";
       while (s != null) {
         if (writer == null) {
@@ -321,8 +309,6 @@ public final class FileUtils {
         }
       }
       if (writer != null) writer.close();
-    } finally {
-      reader.close();
     }
   }
 

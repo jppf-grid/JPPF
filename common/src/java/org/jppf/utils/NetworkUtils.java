@@ -236,8 +236,7 @@ public final class NetworkUtils {
    * @return an array of int values, or null if the source could not be parsed.
    */
   public static int[] toIntArray(final InetAddress addr) {
-    try
-    {
+    try {
       byte[] bytes = addr.getAddress();
       String ip = addr.getHostAddress();
       int[] result = null;

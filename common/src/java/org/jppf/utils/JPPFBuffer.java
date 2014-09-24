@@ -25,8 +25,7 @@ import org.jppf.io.IO;
  * @author Domingos Creado
  * @exclude
  */
-public class JPPFBuffer
-{
+public class JPPFBuffer {
   /**
    * The actual buffer, intended to contain a serialized object graph.
    */
@@ -43,16 +42,14 @@ public class JPPFBuffer
   /**
    * Initialize this buffer.
    */
-  public JPPFBuffer()
-  {
+  public JPPFBuffer() {
   }
 
   /**
    * Initialize this buffer with the specified String, using UTF-8 encoding.
    * @param str the string whose contents will be put into this buffer.
    */
-  public JPPFBuffer(final String str)
-  {
+  public JPPFBuffer(final String str) {
     this.buffer = str.getBytes(StringUtils.UTF_8);
     this.length = buffer.length;
   }
@@ -61,8 +58,7 @@ public class JPPFBuffer
    * Initialize this buffer with a specified buffer.
    * @param buffer the buffer to use.
    */
-  public JPPFBuffer(final byte[] buffer)
-  {
+  public JPPFBuffer(final byte[] buffer) {
     this.buffer = buffer;
     this.length = buffer.length;
   }
@@ -72,8 +68,7 @@ public class JPPFBuffer
    * @param buffer the buffer to use.
    * @param length the number of bytes to use in the buffer.
    */
-  public JPPFBuffer(final byte[] buffer, final int length)
-  {
+  public JPPFBuffer(final byte[] buffer, final int length) {
     this.buffer = buffer;
     this.length = length;
   }
@@ -82,8 +77,7 @@ public class JPPFBuffer
    * Set the buffered data.
    * @param buffer an array of bytes containing the data.
    */
-  public void setBuffer(final byte[] buffer)
-  {
+  public void setBuffer(final byte[] buffer) {
     this.buffer = buffer;
   }
 
@@ -91,8 +85,7 @@ public class JPPFBuffer
    * Get the buffered data.
    * @return an array of bytes containing the data.
    */
-  public byte[] getBuffer()
-  {
+  public byte[] getBuffer() {
     return buffer;
   }
 
@@ -100,8 +93,7 @@ public class JPPFBuffer
    * Set the length of the buffered data.
    * @param length the length as an int.
    */
-  public void setLength(final int length)
-  {
+  public void setLength(final int length) {
     this.length = length;
   }
 
@@ -109,8 +101,7 @@ public class JPPFBuffer
    * Get the length of the buffered data.
    * @return the length as an int.
    */
-  public int getLength()
-  {
+  public int getLength() {
     return length;
   }
 
@@ -118,8 +109,7 @@ public class JPPFBuffer
    * Return the number of bytes available for writing in this buffer.
    * @return the available bytes as an int value.
    */
-  public int remaining()
-  {
+  public int remaining() {
     return buffer.length - length;
   }
 
@@ -127,8 +117,7 @@ public class JPPFBuffer
    * Return the number of bytes available for reading in this buffer.
    * @return the available bytes as an int value.
    */
-  public int remainingFromPos()
-  {
+  public int remainingFromPos() {
     return length - pos;
   }
 
@@ -136,8 +125,7 @@ public class JPPFBuffer
    * Transform this buffer into a string using UTF-8 encoding.
    * @return the content of this buffer as a string.
    */
-  public String asString()
-  {
+  public String asString() {
     return new String(buffer, pos, length, StringUtils.UTF_8);
   }
 }

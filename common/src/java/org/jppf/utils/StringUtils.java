@@ -25,15 +25,12 @@ import java.text.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import org.jppf.utils.streams.StreamUtils;
-
 
 /**
  * This class provides a set of utility methods for manipulating strings.
  * @author Laurent Cohen
  */
-public final class StringUtils
-{
+public final class StringUtils {
   /**
    * Logger for this class.
    */
@@ -196,8 +193,7 @@ public final class StringUtils
    * @param duration the duration to transform, expressed in milliseconds.
    * @return a string specifying the duration in terms of hours, minutes, seconds and milliseconds.
    */
-  public static String toStringDuration(final long duration)
-  {
+  public static String toStringDuration(final long duration) {
     long elapsed = duration;
     StringBuilder sb = new StringBuilder();
     sb.append(padLeft(""+(elapsed / 3600000L), '0', 2)).append(':');
@@ -361,8 +357,7 @@ public final class StringUtils
    * @param separatorPattern the values separator, expressed as a regular expression, must comply with the specifications for {@link java.util.regex.Pattern}.
    * @return an array of int value, or null if the source could not be parsed.
    */
-  public static int[] toIntArray(final String source, final Pattern separatorPattern)
-  {
+  public static int[] toIntArray(final String source, final Pattern separatorPattern) {
     try {
       String[] vals = separatorPattern.split(source);
       int[] result = new int[vals.length];
@@ -378,14 +373,12 @@ public final class StringUtils
    * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.
    */
   private static Charset makeUTF8() {
-    Charset utf8 = null;
     try {
-      utf8 = Charset.forName("UTF-8");
+      return Charset.forName("UTF-8");
     } catch(Exception e) {
       //log.error("Charset UTF-8 could not be instantiated", e);
       return null;
     }
-    return utf8;
   }
 
   /**
@@ -400,15 +393,11 @@ public final class StringUtils
     if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
     boolean endsWithNewline = source.endsWith("\n") || source.endsWith("\r");
     StringBuilder sb = new StringBuilder();
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new StringReader(source));
+    try (BufferedReader reader = new BufferedReader(new StringReader(source))) {
       String s;
       while ((s = reader.readLine()) != null) sb.append(indentation).append(s).append('\n');
       if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
     } catch(Exception ignore) {
-    } finally {
-      if (reader != null) StreamUtils.closeSilent(reader);
     }
     return sb.toString();
   }
@@ -421,13 +410,9 @@ public final class StringUtils
   public static TypedProperties toProperties(final String source) {
     TypedProperties props = new TypedProperties();
     if (source != null) {
-      BufferedReader reader = null;
-      try {
-        reader = new BufferedReader(new StringReader(source));
+      try (Reader reader = new StringReader(source)) {
         props.load(reader);
       } catch(Exception ignore) {
-      } finally {
-        if (reader != null) StreamUtils.closeSilent(reader);
       }
     }
     return props;
@@ -464,7 +449,7 @@ public final class StringUtils
   /**
    * Print a representation of a <code>URLClassLoader</code> into a string.
    * The resulting string includes the class loader's classpath.
-   * @param cl  the classloader to print.
+   * @param cl the classloader to print.
    * @return a string representation of the input class loader.
    */
   public static String toString(final URLClassLoader cl) {

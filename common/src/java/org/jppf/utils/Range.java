@@ -22,8 +22,7 @@ package org.jppf.utils;
  * Instances of this class represent a range of values.
  * @param <T> the type of values handled by this object.
  */
-public class Range<T extends Comparable<T>>
-{
+public class Range<T extends Comparable<T>> {
   /**
    * The lower bound.
    */
@@ -37,8 +36,7 @@ public class Range<T extends Comparable<T>>
    * Initialize this range with the specified single value used as both lower and upper bounds.
    * @param value the value to use for the bounds.
    */
-  public Range(final T value)
-  {
+  public Range(final T value) {
     this(value, value);
   }
 
@@ -47,8 +45,7 @@ public class Range<T extends Comparable<T>>
    * @param lower the lower bound.
    * @param upper the upper bound.
    */
-  public Range(final T lower, final T upper)
-  {
+  public Range(final T lower, final T upper) {
     this.lower = lower;
     this.upper = upper;
   }
@@ -58,8 +55,7 @@ public class Range<T extends Comparable<T>>
    * @param value the value to check.
    * @return true if the value is in range, false otherwise.
    */
-  public boolean isValueInRange(final T value)
-  {
+  public boolean isValueInRange(final T value) {
     return isValueInRange(value, true);
   }
 
@@ -69,16 +65,13 @@ public class Range<T extends Comparable<T>>
    * @param includeBounds specifies whether the bounds of this range shoud be included in the comparisons.
    * @return true if the value is in range, false otherwise.
    */
-  public boolean isValueInRange(final T value, final boolean includeBounds)
-  {
-    return includeBounds
-        ? (value.compareTo(lower) >= 0) && (value.compareTo(upper) <= 0)
-            : (value.compareTo(lower) > 0) && (value.compareTo(upper) < 0);
+  public boolean isValueInRange(final T value, final boolean includeBounds) {
+    return includeBounds ? (value.compareTo(lower) >= 0) && (value.compareTo(upper) <= 0)
+      : (value.compareTo(lower) > 0) && (value.compareTo(upper) < 0);
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append('[');
     sb.append(lower);
@@ -91,8 +84,7 @@ public class Range<T extends Comparable<T>>
    * Get the lower bound.
    * @return the lower bound.
    */
-  public T getLower()
-  {
+  public T getLower() {
     return lower;
   }
 
@@ -100,8 +92,7 @@ public class Range<T extends Comparable<T>>
    * Get the upper bound.
    * @return the upper bound.
    */
-  public T getUpper()
-  {
+  public T getUpper() {
     return upper;
   }
 
@@ -110,8 +101,7 @@ public class Range<T extends Comparable<T>>
    * @param other the range to check against.
    * @return true if and only if part of <code>other</code> overlaps this range.
    */
-  public boolean intersects(final Range<T> other)
-  {
+  public boolean intersects(final Range<T> other) {
     return intersects(other, true);
   }
 
@@ -121,8 +111,7 @@ public class Range<T extends Comparable<T>>
    * @param includeBounds specifies whether the bounds of each range shoud be included in the comparisons.
    * @return true if and only if part of <code>other</code> overlaps this range.
    */
-  public boolean intersects(final Range<T> other, final boolean includeBounds)
-  {
+  public boolean intersects(final Range<T> other, final boolean includeBounds) {
     if (other == null) return false;
     return other.isValueInRange(lower, includeBounds) || other.isValueInRange(upper, includeBounds) || includes(other);
   }
@@ -133,8 +122,7 @@ public class Range<T extends Comparable<T>>
    * @param other the range to check against.
    * @return true if and only if this range includes all the values from <code>other</code>.
    */
-  public boolean includes(final Range<T> other)
-  {
+  public boolean includes(final Range<T> other) {
     if (other == null) return false;
     return (other.getLower().compareTo(lower) >= 0) && (other.getUpper().compareTo(upper) <= 0);
   }
@@ -149,8 +137,7 @@ public class Range<T extends Comparable<T>>
    * @return a new <code>Range</code> object that encompasses all values between the lowest lower bound and the highest upper bound,
    * or a copy of this range if the other is null.
    */
-  public Range<T> merge(final Range<T> other)
-  {
+  public Range<T> merge(final Range<T> other) {
     if (other == null) return new Range<>(getLower(), getUpper());
     T minLower = lower.compareTo(other.getLower()) <= 0 ? lower : other.getLower();
     T maxUpper = upper.compareTo(other.getUpper()) >= 0 ? upper : other.getUpper();
@@ -165,8 +152,7 @@ public class Range<T extends Comparable<T>>
    * @return a Range object representing the intersection of 2 ranges, or null if <code>other</code> is null or the ranges are disjointed
    * (i.e if <code>this.{@link #intersects(Range) intersects(other)} == false</code>).
    */
-  public Range<T> intersection(final Range<T> other)
-  {
+  public Range<T> intersection(final Range<T> other) {
     if ((other == null) || !intersects(other)) return null;
     T maxLower = lower.compareTo(other.getLower()) >= 0 ? lower : other.getLower();
     T minUpper = upper.compareTo(other.getUpper()) <= 0 ? upper : other.getUpper();
@@ -174,14 +160,12 @@ public class Range<T extends Comparable<T>>
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     return 31 + lower.hashCode() + 3 * upper.hashCode();
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (!(obj instanceof Range)) return false;
     Range other = (Range) obj; 
     return lower.equals(other.lower) && upper.equals(other.upper);

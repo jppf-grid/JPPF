@@ -32,8 +32,7 @@ import org.xml.sax.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class SchemaValidator
-{
+public class SchemaValidator {
   /**
    * Schema factory instance used to load XML schemas.
    */
@@ -47,29 +46,23 @@ public class SchemaValidator
    * Entry point to test this class.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       if ((args == null) || (args.length != 2)) usageAndExit();
       List<String> docPaths = FileUtils.getFilePathList(args[1]);
-      for (String path: docPaths)
-      {
+      for (String path: docPaths) {
         JPPFErrorReporter reporter = new JPPFErrorReporter(path);
         SchemaValidator validator = new SchemaValidator(reporter);
         boolean b = validator.validate(path, args[0]);
         String s = "the document " + path;
         System.out.println(s + (b ? " is valid." : " has errors."));
-        if (!b)
-        {
+        if (!b) {
           System.out.println("fatal errors: " + reporter.allFatalErrorsAsStrings());
           System.out.println("errors      : " + reporter.allErrorsAsStrings());
           System.out.println("warnings    : " + reporter.allWarningsAsStrings());
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
       System.exit(1);
     }
@@ -79,8 +72,7 @@ public class SchemaValidator
   /**
    * Show usage instructions for this validation toll, and exit the JVM.
    */
-  public static void usageAndExit()
-  {
+  public static void usageAndExit() {
     StringBuilder sb = new StringBuilder();
     sb.append("Usage:\n\n");
     sb.append("    SchemaValidator <xml schema> <xml document list>\n\n");
@@ -98,8 +90,7 @@ public class SchemaValidator
    * Initialize this validator with the specified error reporter.
    * @param reporter used to collect validation error and warning messages.
    */
-  public SchemaValidator(final JPPFErrorReporter reporter)
-  {
+  public SchemaValidator(final JPPFErrorReporter reporter) {
     this.reporter = (reporter == null)  ? new JPPFErrorReporter("Error Reporter") : reporter;
   }
 
@@ -112,8 +103,7 @@ public class SchemaValidator
    * @throws IOException if an IO error occurs while looking up the schema file.
    * @throws SAXException if an error occurs while loading the schema.
    */
-  public Schema loadSchema(final String schemaPath) throws IOException, SAXException
-  {
+  public Schema loadSchema(final String schemaPath) throws IOException, SAXException {
     InputStream is = FileUtils.getFileInputStream(schemaPath);
     if (is == null) return null;
     Schema schema = getSchemaFactory().newSchema(new StreamSource(is));
@@ -129,8 +119,7 @@ public class SchemaValidator
    * @throws IOException if an IO error occurs while looking up the schema file.
    * @throws SAXException if an error occurs while loading the schema.
    */
-  public Schema loadSchema(final InputStream schemaStream) throws IOException, SAXException
-  {
+  public Schema loadSchema(final InputStream schemaStream) throws IOException, SAXException {
     if (schemaStream == null) return null;
     return getSchemaFactory().newSchema(new StreamSource(schemaStream));
   }
@@ -144,8 +133,7 @@ public class SchemaValidator
    * @throws IOException if an IO error occurs while looking up the schema file.
    * @throws SAXException if an error occurs while loading the schema.
    */
-  public Schema loadSchema(final Reader schemaReader) throws IOException, SAXException
-  {
+  public Schema loadSchema(final Reader schemaReader) throws IOException, SAXException {
     if (schemaReader == null) return null;
     return getSchemaFactory().newSchema(new StreamSource(schemaReader));
   }
@@ -158,8 +146,7 @@ public class SchemaValidator
    * @throws IOException if an IO error occurs while looking up one of the files.
    * @throws SAXException if an error occurs while loading the schema or validating the document.
    */
-  public boolean validate(final String docPath, final String schemaPath) throws IOException, SAXException
-  {
+  public boolean validate(final String docPath, final String schemaPath) throws IOException, SAXException {
     return validate(FileUtils.getFileReader(docPath), FileUtils.getFileReader(schemaPath));
   }
 
@@ -171,8 +158,7 @@ public class SchemaValidator
    * @throws IOException if an IO error occurs while looking up one of the files.
    * @throws SAXException if an error occurs while loading the schema or validating the document.
    */
-  public boolean validate(final Reader docReader, final Reader schemaReader) throws IOException, SAXException
-  {
+  public boolean validate(final Reader docReader, final Reader schemaReader) throws IOException, SAXException {
     if (docReader == null) return false;
     Schema schema = loadSchema(schemaReader);
     if (schema == null) return false;
@@ -187,12 +173,9 @@ public class SchemaValidator
    * Get the schema factory for this validator.
    * @return a <code>SchemaFactory</code> instance.
    */
-  public SchemaFactory getSchemaFactory()
-  {
-    synchronized(SchemaValidator.class)
-    {
-      if (sf == null)
-      {
+  public SchemaFactory getSchemaFactory() {
+    synchronized(SchemaValidator.class) {
+      if (sf == null) {
         sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         sf.setErrorHandler(new ValidatorErrorHandler(null));
       }
@@ -206,8 +189,7 @@ public class SchemaValidator
    * @param name an identifier for the document being parsed.
    * @return the resulting message as a string.
    */
-  public String printSAXParseException(final SAXParseException e, final String name)
-  {
+  public String printSAXParseException(final SAXParseException e, final String name) {
     StringBuilder sb = new StringBuilder();
     sb.append("Document ").append(name).append(" at ");
     sb.append(e.getLineNumber()).append(':').append(e.getColumnNumber()).append('\n');
@@ -218,8 +200,7 @@ public class SchemaValidator
   /**
    * Error handler for XML validation and parsing operations.
    */
-  private class ValidatorErrorHandler implements ErrorHandler
-  {
+  private class ValidatorErrorHandler implements ErrorHandler {
     /**
      * Number of recoverable errors.
      */
@@ -241,8 +222,7 @@ public class SchemaValidator
      * Initialize this error handler with the specified error reporter.
      * @param reporter used to collect validation error and warning messages.
      */
-    public ValidatorErrorHandler(final JPPFErrorReporter reporter)
-    {
+    public ValidatorErrorHandler(final JPPFErrorReporter reporter) {
       this.reporter = (reporter == null) ? new JPPFErrorReporter("Error Reporter") : reporter;
     }
 
@@ -250,11 +230,9 @@ public class SchemaValidator
      * Receive notification of a recoverable error.
      * @param exception encapsulates the XML error.
      * @throws SAXException any SAX exception, possibly wrapping another exception.
-     * @see org.xml.sax.ErrorHandler#error(org.xml.sax.SAXParseException)
      */
     @Override
-    public void error(final SAXParseException exception) throws SAXException
-    {
+    public void error(final SAXParseException exception) throws SAXException {
       errorCount++;
       reporter.errors.add(printSAXParseException(exception, reporter.name));
     }
@@ -263,11 +241,9 @@ public class SchemaValidator
      * Receive notification of a non-recoverable error.
      * @param exception encapsulates the XML error.
      * @throws SAXException any SAX exception, possibly wrapping another exception.
-     * @see org.xml.sax.ErrorHandler#fatalError(org.xml.sax.SAXParseException)
      */
     @Override
-    public void fatalError(final SAXParseException exception) throws SAXException
-    {
+    public void fatalError(final SAXParseException exception) throws SAXException {
       fatalCount++;
       reporter.fatalErrors.add(printSAXParseException(exception, reporter.name));
     }
@@ -276,11 +252,9 @@ public class SchemaValidator
      * Receive notification of a warning.
      * @param exception encapsulates the XML warning.
      * @throws SAXException any SAX exception, possibly wrapping another exception.
-     * @see org.xml.sax.ErrorHandler#warning(org.xml.sax.SAXParseException)
      */
     @Override
-    public void warning(final SAXParseException exception) throws SAXException
-    {
+    public void warning(final SAXParseException exception) throws SAXException {
       warningCount++;
       reporter.warnings.add(printSAXParseException(exception, reporter.name));
     }

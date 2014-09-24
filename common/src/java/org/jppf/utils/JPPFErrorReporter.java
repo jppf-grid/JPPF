@@ -25,8 +25,7 @@ import java.util.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFErrorReporter
-{
+public class JPPFErrorReporter {
   /**
    * A list of collected warnings.
    */
@@ -48,8 +47,7 @@ public class JPPFErrorReporter
    * Initialize this error reporter with the specified name.
    * @param name a name used to identify this error reporter.
    */
-  public JPPFErrorReporter(final String name)
-  {
+  public JPPFErrorReporter(final String name) {
     this.name = name;
   }
 
@@ -57,8 +55,7 @@ public class JPPFErrorReporter
    * Get a string concatenating all the error messages.
    * @return a string.
    */
-  public String allErrorsAsStrings()
-  {
+  public String allErrorsAsStrings() {
     return concatenateMessages(errors);
   }
 
@@ -66,8 +63,7 @@ public class JPPFErrorReporter
    * Get a string concatenating all the fatal error messages.
    * @return a string.
    */
-  public String allFatalErrorsAsStrings()
-  {
+  public String allFatalErrorsAsStrings() {
     return concatenateMessages(fatalErrors);
   }
 
@@ -75,8 +71,7 @@ public class JPPFErrorReporter
    * Get a string concatenating all the warning messages.
    * @return a string.
    */
-  public String allWarningsAsStrings()
-  {
+  public String allWarningsAsStrings() {
     return concatenateMessages(warnings);
   }
 
@@ -85,16 +80,12 @@ public class JPPFErrorReporter
    * @param list the list to get the messages to concatenate from.
    * @return a concatenation of all messages in the list, separated by new lines.
    */
-  protected String concatenateMessages(final List<String> list)
-  {
+  protected String concatenateMessages(final List<String> list) {
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<list.size(); i++)
-    {
+    for (int i=0; i<list.size(); i++) {
       if (i > 0) sb.append('\n');
       sb.append(list.get(i));
     }
     return sb.toString();
   }
-
-  //public class
 }

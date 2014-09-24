@@ -22,15 +22,13 @@ package org.jppf.utils;
 /**
  * Instances of this class represent a hostname / ip address pair.
  */
-public class HostIP extends Pair<String, String>
-{
+public class HostIP extends Pair<String, String> {
   /**
    * Initialize this HostIP object with the specified host name and IP address.
    * @param first the host name.
    * @param second the corresponding IP address.
    */
-  public HostIP(final String first, final String second)
-  {
+  public HostIP(final String first, final String second) {
     super(first, second);
   }
 
@@ -38,8 +36,7 @@ public class HostIP extends Pair<String, String>
    * Get the host name.
    * @return the name as a string.
    */
-  public String hostName()
-  {
+  public String hostName() {
     return first();
   }
 
@@ -47,8 +44,7 @@ public class HostIP extends Pair<String, String>
    * Get the ip address.
    * @return the ip address as a string.
    */
-  public String ipAddress()
-  {
+  public String ipAddress() {
     return second();
   }
 }

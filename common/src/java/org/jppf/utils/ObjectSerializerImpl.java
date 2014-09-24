@@ -29,8 +29,7 @@ import org.jppf.utils.streams.JPPFByteArrayOutputStream;
  * @author Laurent Cohen
  * @exclude
  */
-public class ObjectSerializerImpl implements ObjectSerializer
-{
+public class ObjectSerializerImpl implements ObjectSerializer {
   /**
    * 
    */
@@ -39,8 +38,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
   /**
    * The default constructor must be public to allow for instantiation through Java reflection.
    */
-  public ObjectSerializerImpl()
-  {
+  public ObjectSerializerImpl() {
   }
 
   /**
@@ -51,8 +49,7 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object)
    */
   @Override
-  public JPPFBuffer serialize(final Object o) throws Exception
-  {
+  public JPPFBuffer serialize(final Object o) throws Exception {
     return serialize(o, false);
   }
 
@@ -78,17 +75,12 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param o the object to Serialize.
    * @param os the output stream to serialize to.
    * @throws Exception if the object can't be serialized.
-   * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object, java.io.OutputStream)
    */
   @Override
-  public void serialize(final Object o, final OutputStream os) throws Exception
-  {
-    try
-    {
+  public void serialize(final Object o, final OutputStream os) throws Exception {
+    try {
       serialization.serialize(o, os);
-    }
-    finally
-    {
+    } finally {
       os.close();
     }
   }
@@ -98,11 +90,9 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param buf buffer holding the array of bytes to deserialize from.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.serialization.ObjectSerializer#deserialize(org.jppf.utils.JPPFBuffer)
    */
   @Override
-  public Object deserialize(final JPPFBuffer buf) throws Exception
-  {
+  public Object deserialize(final JPPFBuffer buf) throws Exception {
     return deserialize(new ByteArrayInputStream(buf.getBuffer(), 0, buf.getLength()));
   }
 
@@ -111,11 +101,9 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param bytes buffer holding the array of bytes to deserialize from.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.serialization.ObjectSerializer#deserialize(byte[])
    */
   @Override
-  public Object deserialize(final byte[] bytes) throws Exception
-  {
+  public Object deserialize(final byte[] bytes) throws Exception {
     return deserialize(new ByteArrayInputStream(bytes));
   }
 
@@ -126,17 +114,14 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @param length the number of bytes to read.
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
-   * @see org.jppf.serialization.ObjectSerializer#deserialize(byte[], int, int)
    */
   @Override
-  public Object deserialize(final byte[] bytes, final int offset, final int length) throws Exception
-  {
+  public Object deserialize(final byte[] bytes, final int offset, final int length) throws Exception {
     return deserialize(new ByteArrayInputStream(bytes, offset, length));
   }
 
   @Override
-  public Object deserialize(final InputStream is) throws Exception
-  {
+  public Object deserialize(final InputStream is) throws Exception {
     return deserialize(is, true);
   }
 
@@ -147,14 +132,10 @@ public class ObjectSerializerImpl implements ObjectSerializer
    * @return the object that was deserialized from the array of bytes.
    * @throws Exception if the ObjectInputStream used for deserialization raises an error.
    */
-  public Object deserialize(final InputStream is, final boolean closeStream) throws Exception
-  {
-    try
-    {
+  public Object deserialize(final InputStream is, final boolean closeStream) throws Exception {
+    try {
       return serialization.deserialize(is);
-    }
-    finally
-    {
+    } finally {
       if (closeStream) is.close();
     }
   }

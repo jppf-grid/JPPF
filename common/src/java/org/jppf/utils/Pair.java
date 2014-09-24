@@ -25,8 +25,7 @@ import java.io.Serializable;
  * @param <V> the type of the second element in the pair.
  * @author Laurent Cohen
  */
-public class Pair<U, V> implements Serializable
-{
+public class Pair<U, V> implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -43,8 +42,7 @@ public class Pair<U, V> implements Serializable
   /**
    * Default constructor provided as a convenience for subclasses.
    */
-  protected Pair()
-  {
+  protected Pair() {
   }
 
   /**
@@ -52,8 +50,7 @@ public class Pair<U, V> implements Serializable
    * @param first the first value of the new pair.
    * @param second the second value of the new pair.
    */
-  public Pair(final U first, final V second)
-  {
+  public Pair(final U first, final V second) {
     this.first = first;
     this.second = second;
   }
@@ -62,8 +59,7 @@ public class Pair<U, V> implements Serializable
    * Get the first value of this pair.
    * @return an object of type U.
    */
-  public U first()
-  {
+  public U first() {
     return first;
   }
 
@@ -71,14 +67,12 @@ public class Pair<U, V> implements Serializable
    * Get the second value of this pair.
    * @return an object of type V.
    */
-  public V second()
-  {
+  public V second() {
     return second;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((first == null) ? 0 : first.hashCode());
@@ -87,27 +81,23 @@ public class Pair<U, V> implements Serializable
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     Pair other = (Pair) obj;
-    if (first == null)
-    {
+    if (first == null) {
       if (other.first != null) return false;
     }
     else if (!first.equals(other.first)) return false;
-    if (second == null)
-    {
+    if (second == null) {
       return  other.second == null;
     }
     return second.equals(other.second);
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return StringUtils.build(getClass().getSimpleName(), "[first=", first, ", second=", second, "]");
   }
 }

@@ -26,8 +26,7 @@ import java.util.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class TraversalList<E> implements Serializable
-{
+public class TraversalList<E> implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -44,8 +43,7 @@ public class TraversalList<E> implements Serializable
   /**
    * Default initialization.
    */
-  public TraversalList()
-  {
+  public TraversalList() {
     list = new LinkedList<>();
   }
 
@@ -53,8 +51,7 @@ public class TraversalList<E> implements Serializable
    * Initialize this traversal list with a specified list with the same element type.
    * @param list a list with the same element type as this traversal list.
    */
-  public TraversalList(final List<E> list)
-  {
+  public TraversalList(final List<E> list) {
     this.list = list;
   }
 
@@ -62,8 +59,7 @@ public class TraversalList<E> implements Serializable
    * Add a new element to the list.
    * @param element the element to add.
    */
-  public void add(final E element)
-  {
+  public void add(final E element) {
     list.add(element);
   }
 
@@ -71,8 +67,7 @@ public class TraversalList<E> implements Serializable
    * Get the first element in the list.
    * @return the first element.
    */
-  public E getFirst()
-  {
+  public E getFirst() {
     return list.get(0);
   }
 
@@ -80,16 +75,14 @@ public class TraversalList<E> implements Serializable
    * Get the last element in the list.
    * @return the last element.
    */
-  public E getLast()
-  {
+  public E getLast() {
     return list.get(list.size() - 1);
   }
 
   /**
    * Increment the current position by 1.
    */
-  public void incPosition()
-  {
+  public void incPosition() {
     if (position >= list.size() - 1) throw new ArrayIndexOutOfBoundsException("position " + (position + 1) + " larger than " + list.size());
     position++;
   }
@@ -97,8 +90,7 @@ public class TraversalList<E> implements Serializable
   /**
    * Increment the current position by 1.
    */
-  public void decPosition()
-  {
+  public void decPosition() {
     if (position <= 0) throw new ArrayIndexOutOfBoundsException("position " + (position + 1) + " less than 0");
     position--;
   }
@@ -107,8 +99,7 @@ public class TraversalList<E> implements Serializable
    * Get the list of elements of this traversal list.
    * @return an unmodifiable copy of the list.
    */
-  public List<E> getList()
-  {
+  public List<E> getList() {
     return list;
   }
 
@@ -116,8 +107,7 @@ public class TraversalList<E> implements Serializable
    * Get the current position in the list.
    * @return the position as an int value, -1 if the list is empty.
    */
-  public int getPosition()
-  {
+  public int getPosition() {
     return list.isEmpty() ? -1 : position;
   }
 
@@ -125,8 +115,7 @@ public class TraversalList<E> implements Serializable
    * Set the current position in the list.
    * @param pos the position as an int value, -1 if the list is empty.
    */
-  public void setPosition(final int pos)
-  {
+  public void setPosition(final int pos) {
     if (list.isEmpty()) throw new IndexOutOfBoundsException("list is empty");
     else if (pos < 0) throw new IndexOutOfBoundsException("value "+pos+" is negative");
     else if (pos >= list.size()) throw new IndexOutOfBoundsException("value "+pos+" larger than "+(list.size()-1));
@@ -137,8 +126,7 @@ public class TraversalList<E> implements Serializable
    * Return the element at the current position in the list.
    * @return the element at the current position.
    */
-  public E getCurrentElement()
-  {
+  public E getCurrentElement() {
     return list.get(position);
   }
 
@@ -146,8 +134,7 @@ public class TraversalList<E> implements Serializable
    * Get the number of elements in this traversal list.
    * @return the size of the list as an int value.
    */
-  public int size()
-  {
+  public int size() {
     return list.size();
   }
 
@@ -156,14 +143,12 @@ public class TraversalList<E> implements Serializable
    * @param element the element to lookup.
    * @return true if this list contains the element, false otherwise.
    */
-  public boolean contains(final E element)
-  {
+  public boolean contains(final E element) {
     return list.contains(element);
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("position=").append(position);
@@ -173,15 +158,13 @@ public class TraversalList<E> implements Serializable
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if (!(obj instanceof TraversalList)) return false;
     return list.equals(((TraversalList) obj).list);
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     return list.hashCode();
   }
 }

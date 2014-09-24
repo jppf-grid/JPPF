@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ServiceFinder
-{
+public class ServiceFinder {
   /**
    * Logger for this class.
    */
@@ -50,27 +49,22 @@ public class ServiceFinder
    * @return a list of concrete providers of the specified type.
    */
   @SuppressWarnings("unchecked")
-  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single)
-  {
+  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single) {
     if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
     if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
     List<T> list = new ArrayList<>();
     String name = providerClass.getName();
     List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
     Set<String> alreadyLoaded = new HashSet<>();
-    for (String s: lines)
-    {
+    for (String s: lines) {
       if (alreadyLoaded.contains(s)) continue;
-      try
-      {
+      try {
         Class<?> clazz = cl.loadClass(s);
         T t = (T) clazz.newInstance();
         list.add(t);
         if (single) break;
         alreadyLoaded.add(s);
-      }
-      catch(Exception|NoClassDefFoundError e)
-      {
+      } catch(Exception|NoClassDefFoundError e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }
@@ -86,8 +80,7 @@ public class ServiceFinder
    * @return a list of concrete providers of the specified type.
    */
   @SuppressWarnings("unchecked")
-  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl)
-  {
+  public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl) {
     return findProviders(providerClass, cl, false);
   }
 
@@ -97,8 +90,7 @@ public class ServiceFinder
    * @param providerClass the provider class.
    * @return a list of concrete providers of the specified type.
    */
-  public <T> List<T> findProviders(final Class<T> providerClass)
-  {
+  public <T> List<T> findProviders(final Class<T> providerClass) {
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
     return findProviders(providerClass, cl);
@@ -110,16 +102,12 @@ public class ServiceFinder
    * @param cl the class loader to user for the lookup.
    * @return a list of URLs.
    */
-  private List<URL> resourcesList(final String path, final ClassLoader cl)
-  {
+  private List<URL> resourcesList(final String path, final ClassLoader cl) {
     List<URL> urls = new ArrayList<>();
-    try
-    {
+    try {
       Enumeration<URL> enu = cl.getResources(path);
       while (enu.hasMoreElements()) urls.add(enu.nextElement());
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
       String s = ExceptionUtils.getMessage(e);
       if (debugEnabled) log.debug(s, e);
       else log.warn(s);
@@ -133,35 +121,22 @@ public class ServiceFinder
    * @param cl the class loader to use for classpath lookup.
    * @return the definitions found as a list of strings.
    */
-  public List<String> findServiceDefinitions(final String path, final ClassLoader cl)
-  {
+  public List<String> findServiceDefinitions(final String path, final ClassLoader cl) {
     List<String> lines = new ArrayList<>();
-    try
-    {
+    try {
       List<URL> urls = resourcesList(path, cl);
-      for (URL url: urls)
-      {
-        InputStream is = url.openStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        try
-        {
+      for (URL url: urls) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
           List<String> fileLines = FileUtils.textFileAsLines(reader);
-          for (String s: fileLines)
-          {
+          for (String s: fileLines) {
             int idx = s.indexOf('#');
             if (idx > 0) s = s.substring(0, idx);
             s = s.trim();
             if (!s.startsWith("#")&& (s.length() > 0)) lines.add(s);
           }
         }
-        finally
-        {
-          reader.close();
-        }
       }
-    }
-    catch(IOException e)
-    {
+    } catch(IOException e) {
       String s = ExceptionUtils.getMessage(e);
       if (debugEnabled) log.debug(s, e);
       else log.warn(s);
@@ -177,8 +152,7 @@ public class ServiceFinder
    * @param single determines whether only the first looked up provider should be returned, or all the providers found.
    * @return an iterator over concrete providers of the specified type.
    */
-  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single)
-  {
+  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single) {
     return new ServiceFinder().findProviders(providerClass, cl).iterator();
   }
 
@@ -189,8 +163,7 @@ public class ServiceFinder
    * @param cl the class loader to user for the lookup.
    * @return an iterator over concrete providers of the specified type.
    */
-  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl)
-  {
+  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass, final ClassLoader cl) {
     return lookupProviders(providerClass, cl, false);
   }
 
@@ -200,8 +173,7 @@ public class ServiceFinder
    * @param providerClass the provider class.
    * @return an iterator over concrete providers of the specified type.
    */
-  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass)
-  {
+  public static <T> Iterator<T> lookupProviders(final Class<T> providerClass) {
     return new ServiceFinder().findProviders(providerClass).iterator();
   }
 }

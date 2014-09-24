@@ -32,8 +32,7 @@ import org.slf4j.*;
  * JVM-level or System-level information.
  * @author Laurent Cohen
  */
-public final class SystemUtils
-{
+public final class SystemUtils {
   /**
    * Logger for this class.
    */
@@ -82,8 +81,7 @@ public final class SystemUtils
   /**
    * Instantiation of this class is not permitted.
    */
-  private SystemUtils()
-  {
+  private SystemUtils() {
   }
 
   /**
@@ -91,10 +89,8 @@ public final class SystemUtils
    * {@link java.lang.System#getProperties() System.getProperties()}.
    * @return the properties as a <code>TypedProperties</code> instance.
    */
-  public static synchronized TypedProperties getSystemProperties()
-  {
-    if (systemProps == null)
-    {
+  public static synchronized TypedProperties getSystemProperties() {
+    if (systemProps == null) {
       TypedProperties props = new TypedProperties();
       addOtherSystemProperties(props);
       systemProps = props;
@@ -106,37 +102,26 @@ public final class SystemUtils
    * Add system properties whose name is not known in advance.
    * @param props the TypedProperties instance to add the system properties to.
    */
-  private static void addOtherSystemProperties(final TypedProperties props)
-  {
-    try
-    {
-      // run as privileged so we don't have to set write access on all properties
-      // in the security policy file.
-      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>()
-          {
+  private static void addOtherSystemProperties(final TypedProperties props) {
+    try {
+      // run as privileged so we don't have to set write access on all properties in the security policy file.
+      Properties sysProps = AccessController.doPrivileged(new PrivilegedAction<Properties>() {
         @Override
-        public Properties run()
-        {
+        public Properties run() {
           return System.getProperties();
         }
-          });
+      });
       Enumeration en = sysProps.propertyNames();
-      while (en.hasMoreElements())
-      {
+      while (en.hasMoreElements()) {
         String name = (String) en.nextElement();
-        try
-        {
+        try {
           if (!props.contains(name)) props.setProperty(name, System.getProperty(name));
-        }
-        catch(SecurityException e)
-        {
+        } catch(SecurityException e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.info(e.getMessage());
         }
       }
-    }
-    catch(SecurityException e)
-    {
+    } catch(SecurityException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
     }
@@ -146,12 +131,10 @@ public final class SystemUtils
    * Get information about the number of processors available to the JVM and the JVM memory usage.
    * @return a <code>TypedProperties</code> instance holding the requested information.
    */
-  public static TypedProperties getRuntimeInformation()
-  {
+  public static TypedProperties getRuntimeInformation() {
     TypedProperties props = new TypedProperties();
     String s = null;
-    try
-    {
+    try {
       s = String.valueOf(Runtime.getRuntime().availableProcessors());
       props.setProperty("availableProcessors", s);
       s = String.valueOf(Runtime.getRuntime().freeMemory());
@@ -160,9 +143,7 @@ public final class SystemUtils
       props.setProperty("totalMemory", s);
       s = String.valueOf(Runtime.getRuntime().maxMemory());
       props.setProperty("maxMemory", s);
-    }
-    catch(SecurityException e)
-    {
+    } catch(SecurityException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
     }
@@ -179,8 +160,7 @@ public final class SystemUtils
    * An example root name would be &quot;C:\&quot; for a Windows system and &quot;/&quot; for a Unix system.
    * @return TypedProperties object with storage information.
    */
-  public static synchronized TypedProperties getStorageInformation()
-  {
+  public static synchronized TypedProperties getStorageInformation() {
     TypedProperties props = new TypedProperties();
     File[] roots = File.listRoots();
     if ((roots == null) || (roots.length <= 0)) return props;
@@ -188,22 +168,17 @@ public final class SystemUtils
     Method usableSpaceMethod = null;
     Method freeSpaceMethod = null;
     Method totalSpaceMethod = null;
-    try
-    {
+    try {
       usableSpaceMethod = File.class.getMethod("getUsableSpace");
       freeSpaceMethod = File.class.getMethod("getFreeSpace");
       totalSpaceMethod = File.class.getMethod("getTotalSpace");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       atLeastJdk16 = false;
     }
     props.setProperty("host.roots.number", String.valueOf(roots.length));
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<roots.length; i++)
-    {
-      try
-      {
+    for (int i=0; i<roots.length; i++) {
+      try {
         if (i > 0) sb.append(' ');
         String s = roots[i].getCanonicalPath();
         sb.append(s);
@@ -216,9 +191,7 @@ public final class SystemUtils
         props.setProperty(prefix + ".space.free", Long.toString(space));
         space = (Long) usableSpaceMethod.invoke(roots[i]);
         props.setProperty(prefix + ".space.usable", Long.toString(space));
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.info(e.getMessage());
       }
@@ -231,21 +204,15 @@ public final class SystemUtils
    * Get a map of the environment variables.
    * @return a mapping of environment variables to their value.
    */
-  public static synchronized TypedProperties getEnvironment()
-  {
-    if (env == null)
-    {
+  public static synchronized TypedProperties getEnvironment() {
+    if (env == null) {
       env = new TypedProperties();
-      try
-      {
+      try {
         Map<String, String> props = System.getenv();
-        for (Map.Entry<String, String> entry: props.entrySet())
-        {
+        for (Map.Entry<String, String> entry: props.entrySet()) {
           env.setProperty(entry.getKey(), entry.getValue());
         }
-      }
-      catch(SecurityException e)
-      {
+      } catch(SecurityException e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.info(e.getMessage());
       }
@@ -257,18 +224,13 @@ public final class SystemUtils
    * Get a map of the environment variables.
    * @return a mapping of environment variables to their value.
    */
-  public static synchronized TypedProperties getNetwork()
-  {
-    if (network == null)
-    {
+  public static synchronized TypedProperties getNetwork() {
+    if (network == null) {
       network = new TypedProperties();
-      try
-      {
+      try {
         network.setProperty("ipv4.addresses", formatAddresses(NetworkUtils.getIPV4Addresses()));
         network.setProperty("ipv6.addresses", formatAddresses(NetworkUtils.getIPV6Addresses()));
-      }
-      catch(SecurityException e)
-      {
+      } catch(SecurityException e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.info(e.getMessage());
       }
@@ -281,11 +243,9 @@ public final class SystemUtils
    * @param addresses a List of <code>InetAddress</code> instances.
    * @return a string containing a space-separated list of <i>hostname</i>|<i>ip_address</i> pairs.
    */
-  private static String formatAddresses(final List<? extends InetAddress> addresses)
-  {
+  private static String formatAddresses(final List<? extends InetAddress> addresses) {
     StringBuilder sb = new StringBuilder();
-    for (InetAddress addr: addresses)
-    {
+    for (InetAddress addr: addresses) {
       String name = addr.getHostName();
       String ip = addr.getHostAddress();
       if (sb.length() > 0) sb.append(' ');
@@ -298,8 +258,7 @@ public final class SystemUtils
    * Compute the maximum memory currently available for the Java heap.
    * @return the maximum number of free bytes in the heap.
    */
-  public static long maxFreeHeap()
-  {
+  public static long maxFreeHeap() {
     Runtime rt = Runtime.getRuntime();
     return rt.maxMemory() - (rt.totalMemory() - rt.freeMemory());
   }
@@ -309,8 +268,7 @@ public final class SystemUtils
    * of the system property &quot;os.name&quot;.
    * @return an int value identifying the type of OS.
    */
-  private static int determineOSType()
-  {
+  private static int determineOSType() {
     String name = System.getProperty("os.name");
     if (StringUtils.startsWithOneOf(name, true, "Linux", "SunOS", "Solaris", "FreeBSD", "OpenBSD")) return X11_OS;
     else if (StringUtils.startsWithOneOf(name, true, "Mac", "Darwin")) return MAC_OS;
@@ -322,8 +280,7 @@ public final class SystemUtils
    * Determine whether the current OS is Windows.
    * @return true if the system is Windows, false otherwise.
    */
-  public static boolean isWindows()
-  {
+  public static boolean isWindows() {
     return OS_TYPE == WINDOWS_OS;
   }
 
@@ -331,8 +288,7 @@ public final class SystemUtils
    * Determine whether the current OS is X11-based.
    * @return true if the system is X11, false otherwise.
    */
-  public static boolean isX11()
-  {
+  public static boolean isX11() {
     return OS_TYPE == X11_OS;
   }
 
@@ -340,8 +296,7 @@ public final class SystemUtils
    * Determine whether the current OS is Mac-based.
    * @return true if the system is Mac-based, false otherwise.
    */
-  public static boolean isMac()
-  {
+  public static boolean isMac() {
     return OS_TYPE == MAC_OS;
   }
 
@@ -349,22 +304,17 @@ public final class SystemUtils
    * Return the current process ID.
    * @return the pid as an int, or -1 if the pid could not be obtained.
    */
-  public static int getPID()
-  {
+  public static int getPID() {
     int pid = -1;
     // we expect the name to be in '<pid>@hostname' format - this is JVM dependent
     String name = ManagementFactory.getRuntimeMXBean().getName();
     int idx = name.indexOf('@');
-    if (idx >= 0)
-    {
+    if (idx >= 0) {
       String sub = name.substring(0, idx);
-      try
-      {
+      try {
         pid = Integer.valueOf(sub);
         if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         String msg = "could not parse '" + sub +"' into a valid integer pid : " + ExceptionUtils.getMessage(e);
         if (debugEnabled) log.debug(msg, e);
         else log.warn(msg);
@@ -378,8 +328,7 @@ public final class SystemUtils
    * @param key the hokk's key.
    * @param hook the shutdown hook to add.
    */
-  public static void addShutdownHook(final String key, final Thread hook)
-  {
+  public static void addShutdownHook(final String key, final Thread hook) {
     shutdownHooks.put(key, hook);
     Runtime.getRuntime().addShutdownHook(hook);
   }
@@ -389,8 +338,7 @@ public final class SystemUtils
    * Add the specified shutdown hook with the specified key.
    * @param key the hokk's key.
    */
-  public static void removeShutdownHook(final String key)
-  {
+  public static void removeShutdownHook(final String key) {
     Thread hook = shutdownHooks.remove(key);
     if (hook != null) Runtime.getRuntime().removeShutdownHook(hook);
   }
@@ -400,8 +348,7 @@ public final class SystemUtils
    * @param component the JPPF component type: driver, node or client.
    * @param uuid the component uuid.
    */
-  public static void printPidAndUuid(final String component, final String uuid)
-  {
+  public static void printPidAndUuid(final String component, final String uuid) {
     StringBuilder sb = new StringBuilder(component == null ? "<unknown component type>" : component);
     int pid = getPID();
     if (pid >= 0) sb = sb.append(" process id: ").append(pid).append(',');

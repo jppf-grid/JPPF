@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public final class LocalizationUtils
-{
+public final class LocalizationUtils {
   /**
    * Logger for this class.
    */
@@ -37,27 +36,21 @@ public final class LocalizationUtils
 
   /**
    * Get a localized property value.
-   * @param baseName the base name to use, in combination with the default locale,
-   * to lookup the appropriate resource bundle.
+   * @param baseName the base name to use, in combination with the default locale, to lookup the appropriate resource bundle.
    * @param key the key for the localized value to lookup.
-   * @return the name localized through the default locale information, or the key itself if
-   * it could not be localized.
-   * @see java.util.ResourceBundle
+   * @return the name localized through the default locale information, or the key itself if it could not be localized.
    */
-  public static String getLocalized(final String baseName, final String key)
-  {
+  public static String getLocalized(final String baseName, final String key) {
     return getLocalized(baseName, key, key);
   }
 
   /**
    * Get a localized array of property values.
-   * @param baseName the base name to use, in combination with the default locale,
-   * to lookup the appropriate resource bundle.
+   * @param baseName the base name to use, in combination with the default locale, to lookup the appropriate resource bundle.
    * @param keys the keys for which to lookup a localized value.
    * @return an array of localized values looked up using the default locale. If a key could not be localized, it is returned as the value.
    */
-  public static String[] getLocalized(final String baseName, final String...keys)
-  {
+  public static String[] getLocalized(final String baseName, final String...keys) {
     return getLocalized(baseName, Locale.getDefault(), keys);
   }
 
@@ -68,8 +61,7 @@ public final class LocalizationUtils
    * @param keys the keys for which to lookup a localized value.
    * @return an array of localized values looked up using the default locale. If a key could not be localized, it is returned as the value.
    */
-  public static String[] getLocalized(final String baseName, final Locale locale, final String...keys)
-  {
+  public static String[] getLocalized(final String baseName, final Locale locale, final String...keys) {
     if (keys == null) return new String[0];
     String[] localized = new String[keys.length];
     for (int i=0; i<keys.length; i++) localized[i] = getLocalized(baseName, keys[i], keys[i], locale);
@@ -84,8 +76,7 @@ public final class LocalizationUtils
    * @return the name localized through the default locale information, or the key itself if it could not be localized.
    * @see java.util.ResourceBundle
    */
-  public static String getLocalized(final String baseName, final String key, final String def)
-  {
+  public static String getLocalized(final String baseName, final String key, final String def) {
     return getLocalized(baseName, key, def, Locale.getDefault());
   }
 
@@ -98,26 +89,19 @@ public final class LocalizationUtils
    * @return the name localized through the default locale information, or the key itself if it could not be localized.
    * @see java.util.ResourceBundle
    */
-  public static String getLocalized(final String baseName, final String key, final String def, final Locale locale)
-  {
+  public static String getLocalized(final String baseName, final String key, final String def, final Locale locale) {
     if (baseName == null) return def;
     ResourceBundle bundle = null;
-    try
-    {
+    try {
       bundle = ResourceBundle.getBundle(baseName, locale);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (log.isDebugEnabled()) log.debug("Could not find resource bundle \""+baseName+ '\"', e);
       return def;
     }
     String result = null;
-    try
-    {
+    try {
       result = bundle.getString(key);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (log.isDebugEnabled()) log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+ '\"', e);
     }
     return result == null ? def : result;
@@ -129,19 +113,15 @@ public final class LocalizationUtils
    * @param filename the filename from which to get the resource bundle name.
    * @return the complete path to a resource bundle.
    */
-  public static String getLocalisationBase(final String base, final String filename)
-  {
+  public static String getLocalisationBase(final String base, final String filename) {
     String result = null;
-    try
-    {
+    try {
       File file = new File(filename);
       result = file.getName();
       int idx = result.lastIndexOf('.');
       if (idx >= 0) result = result.substring(0, idx);
       result = base + '/' + result;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
     return result;

@@ -27,8 +27,7 @@ import org.jppf.nio.NioConstants;
  * @author Laurent Cohen
  * @exclude
  */
-public final class JPPFIdentifiers
-{
+public final class JPPFIdentifiers {
   /**
    * Identifier for an unidentified channel.
    */
@@ -57,8 +56,7 @@ public final class JPPFIdentifiers
    * Mapping of ids to readable names.
    */
   private static Map<Integer, String> idMap = new HashMap<>();
-  static
-  {
+  static {
     idMap.put(ACCEPTOR_CHANNEL, "ACCEPTOR_CHANNEL");
     idMap.put(CLIENT_JOB_DATA_CHANNEL, "CLIENT_JOB_DATA_CHANNEL");
     idMap.put(CLIENT_CLASSLOADER_CHANNEL, "CLIENT_CLASSLOADER_CHANNEL");
@@ -69,8 +67,7 @@ public final class JPPFIdentifiers
    * Mapping of ids to server names.
    */
   private static Map<Integer, String> serverMap = new HashMap<>();
-  static
-  {
+  static {
     serverMap.put(ACCEPTOR_CHANNEL, NioConstants.ACCEPTOR);
     serverMap.put(CLIENT_JOB_DATA_CHANNEL, NioConstants.CLIENT_SERVER);
     serverMap.put(CLIENT_CLASSLOADER_CHANNEL, NioConstants.CLIENT_CLASS_SERVER);
@@ -83,8 +80,7 @@ public final class JPPFIdentifiers
    * @param id the id to lookup.
    * @return a readable string for the id.
    */
-  public static String asString(final int id)
-  {
+  public static String asString(final int id) {
     String s = idMap.get(id);
     return s == null ? "UNKNOWN" : s;
   }
@@ -94,8 +90,7 @@ public final class JPPFIdentifiers
    * @param id the id to lookup.
    * @return a readable string for the server name.
    */
-  public static String serverName(final int id)
-  {
+  public static String serverName(final int id) {
     String s = serverMap.get(id);
     return s == null ? "UNKNOWN" : s;
   }

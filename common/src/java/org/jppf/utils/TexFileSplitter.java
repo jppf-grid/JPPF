@@ -24,8 +24,7 @@ import java.io.*;
  * Utility class that splits a text file into smaller ones with the same number of lines.
  * @author Laurent Cohen
  */
-public class TexFileSplitter
-{
+public class TexFileSplitter {
   /**
    * A map of the specified options and their values.
    */
@@ -35,64 +34,39 @@ public class TexFileSplitter
    * Split the input text files into output text files according to the specified options.
    * @param args specifies the options in the format -&lt;option1&gt; &lt;value1&gt; ... -&lt;optionN&gt; &lt;valueN&gt;.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       processArguments(args);
       File file = new File(props.getString("inputFile"));
-      BufferedReader reader = new BufferedReader(new FileReader(file));
       int lines = 0;
       String s = "";
-      try
-      {
-        while (s != null)
-        {
+      try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        while (s != null) {
           s = reader.readLine();
           if (s != null) lines++;
         }
       }
-      finally
-      {
-        reader.close();
-      }
       System.out.println("counted " + lines  + " lines");
-      reader = new BufferedReader(new FileReader(file));
-      try
-      {
+      try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
         int nbFiles = props.getInt("nbFiles");
         int n = lines/nbFiles;
-        for (int i=0; i<nbFiles; i++)
-        {
+        for (int i=0; i<nbFiles; i++) {
           int nb = (i < nbFiles - 1) ? n : lines - (nbFiles - 1)*n;
           s = "";
           File out = new File(props.getString("outputDir") + '/' + props.getString("prefix") + '-' + i + props.getString("extension"));
           FileUtils.mkdirs(out);
-          BufferedWriter writer = new BufferedWriter(new FileWriter(out));
-          try
-          {
-            for (int j=0; j<nb && s != null; j++)
-            {
+          try (BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
+            for (int j=0; j<nb && s != null; j++) {
               s = reader.readLine();
               if (s != null) writer.write(s + '\n');
             }
             writer.flush();
           }
-          finally
-          {
-            writer.close();
-          }
           System.out.println("created file '" + out.getName() + '\'');
         }
       }
-      finally
-      {
-        reader.close();
-      }
       System.out.println("wrote all files");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       System.out.println(e.getMessage());
       displayOptions();
     }
@@ -103,12 +77,10 @@ public class TexFileSplitter
    * @param args contains the specified options and their value.
    * @throws Exception if any error occurs while parsing the options.
    */
-  private static void processArguments(final String...args) throws Exception
-  {
+  private static void processArguments(final String...args) throws Exception {
     if ((args == null) || (args.length < 1)) throw new Exception("you must specify at least the input file (-i option)");
     int i = 0;
-    while (i <args.length)
-    {
+    while (i <args.length) {
       String s = args[i++];
       if (StringUtils.isOneOf(s, false, "-?", "-h", "-help")) throw new Exception("\nFile splitter help");
       else if ("-i".equals(s)) props.setProperty("inputFile", args[i++]);
@@ -127,8 +99,7 @@ public class TexFileSplitter
   /**
    * Display the list of options and their meaning.
    */
-  public static void displayOptions()
-  {
+  public static void displayOptions() {
     //System.out.println("\nFile splitter help");
     System.out.println("command-line format: java -cp <classpath> org.jppf.utils.FileSplitter -option_1 value_1 ... -option_n value_n");
     System.out.println("Available options:");

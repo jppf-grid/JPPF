@@ -24,8 +24,7 @@ import java.util.*;
  * Abstract class for formatters that print the contents of a {@link java.util.Properties Properties} object as a string.
  * @author Laurent Cohen
  */
-public abstract class PropertiesTableFormat
-{
+public abstract class PropertiesTableFormat {
   /**
    * Contains the formatted text.
    */
@@ -39,8 +38,7 @@ public abstract class PropertiesTableFormat
    * Initialize this formatter with the specified title.
    * @param docTitle the title of the whole document.
    */
-  public PropertiesTableFormat(final String docTitle)
-  {
+  public PropertiesTableFormat(final String docTitle) {
     this.docTitle = docTitle;
   }
 
@@ -48,23 +46,20 @@ public abstract class PropertiesTableFormat
    * Get the formatted text.
    * @return the text as a string.
    */
-  public String getText()
-  {
+  public String getText() {
     return sb.toString();
   }
 
   /**
    * Write the prologue for the formatted text.
    */
-  public void start()
-  {
+  public void start() {
   }
 
   /**
    * Write the epilogue for the formatted text.
    */
-  public void end()
-  {
+  public void end() {
   }
 
   /**
@@ -72,14 +67,12 @@ public abstract class PropertiesTableFormat
    * @param props the set of properties to format.
    * @param title the title of the formatted table.
    */
-  public void formatTable(final Properties props, final String title)
-  {
+  public void formatTable(final Properties props, final String title) {
     Set<String> orderedProps = new TreeSet<>();
     Enumeration en = props.propertyNames();
     while (en.hasMoreElements()) orderedProps.add((String) en.nextElement());
     tableStart(title);
-    for (String name: orderedProps)
-    {
+    for (String name: orderedProps) {
       rowStart();
       cellStart();
       sb.append(name);
@@ -97,58 +90,50 @@ public abstract class PropertiesTableFormat
    * Write the prologue of a table.
    * @param title the title for the table.
    */
-  public void tableStart(final String title)
-  {
+  public void tableStart(final String title) {
   }
 
   /**
    * Write the prologue of a table.
    */
-  public void tableEnd()
-  {
+  public void tableEnd() {
   }
 
   /**
    * Write the prologue of a table row.
    */
-  public void rowStart()
-  {
+  public void rowStart() {
   }
 
   /**
    * Write the prologue of a table row.
    */
-  public void rowEnd()
-  {
+  public void rowEnd() {
   }
 
   /**
    * Write the prologue of a table cell.
    */
-  public void cellStart()
-  {
+  public void cellStart() {
   }
 
   /**
    * Write the prologue of a table cell.
    */
-  public void cellEnd()
-  {
+  public void cellEnd() {
   }
 
   /**
    * Write the separator between 2 cells.
    */
-  public void cellSeparator()
-  {
+  public void cellSeparator() {
   }
 
   /**
    * Print the specified string.
    * @param message the string to print.
    */
-  public void print(final String message)
-  {
+  public void print(final String message) {
     sb.append(message);
   }
 }

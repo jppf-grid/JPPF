@@ -29,8 +29,7 @@ import org.slf4j.*;
  * rasing any exception.
  * @author Laurent Cohen
  */
-public class UnmodifiableTypedProperties extends TypedProperties
-{
+public class UnmodifiableTypedProperties extends TypedProperties {
   /**
    * Explicit serialVersionUID.
    */
@@ -43,8 +42,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
   /**
    * Creates an empty unmodifiable properties map.
    */
-  public UnmodifiableTypedProperties()
-  {
+  public UnmodifiableTypedProperties() {
   }
 
   /**
@@ -52,14 +50,10 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * This will copy into the present object all map entries such that both key and value are strings.
    * @param map the properties to be copied. No reference to this parameter is kept in this TypedProperties object.
    */
-  public UnmodifiableTypedProperties(final Map<Object, Object> map)
-  {
-    if (map != null)
-    {
-      for (Map.Entry<Object, Object> entry: map.entrySet())
-      {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-        {
+  public UnmodifiableTypedProperties(final Map<Object, Object> map) {
+    if (map != null) {
+      for (Map.Entry<Object, Object> entry: map.entrySet()) {
+        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
           super.put(entry.getKey(), entry.getValue());
         }
       }
@@ -73,8 +67,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @return <code>null</code>.
    */
   @Override
-  public synchronized Object setProperty(final String key, final String value)
-  {
+  public synchronized Object setProperty(final String key, final String value) {
     return null;
   }
 
@@ -84,8 +77,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @throws IOException never thrown.
    */
   @Override
-  public synchronized void load(final Reader reader) throws IOException
-  {
+  public synchronized void load(final Reader reader) throws IOException {
   }
 
   /**
@@ -94,8 +86,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @throws IOException never thrown.
    */
   @Override
-  public synchronized void load(final InputStream in) throws IOException
-  {
+  public synchronized void load(final InputStream in) throws IOException {
   }
 
   /**
@@ -105,8 +96,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @throws InvalidPropertiesFormatException never thrown.
    */
   @Override
-  public synchronized void loadFromXML(final InputStream in) throws IOException, InvalidPropertiesFormatException
-  {
+  public synchronized void loadFromXML(final InputStream in) throws IOException, InvalidPropertiesFormatException {
   }
 
   /**
@@ -116,8 +106,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @return <code>null</code>.
    */
   @Override
-  public synchronized Object put(final Object key, final Object value)
-  {
+  public synchronized Object put(final Object key, final Object value) {
     return null;
   }
 
@@ -127,8 +116,7 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @return <code>null</code>.
    */
   @Override
-  public synchronized Object remove(final Object key)
-  {
+  public synchronized Object remove(final Object key) {
     return null;
   }
 
@@ -137,7 +125,6 @@ public class UnmodifiableTypedProperties extends TypedProperties
    * @param map not used.
    */
   @Override
-  public synchronized void putAll(final Map<? extends Object, ? extends Object> map)
-  {
+  public synchronized void putAll(final Map<? extends Object, ? extends Object> map) {
   }
 }

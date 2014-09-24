@@ -23,6 +23,5 @@ package org.jppf.utils;
  * @author Laurent Cohen
  * @exclude
  */
-public class SimpleObjectLock extends ThreadSynchronization
-{
+public class SimpleObjectLock extends ThreadSynchronization {
 }
