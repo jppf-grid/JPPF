@@ -252,13 +252,13 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
-  public void setBroadcasting(final Boolean broadcasting) throws Exception {
+  public void setBroadcasting(final boolean broadcasting) throws Exception {
     setAttribute(MBEAN_NAME, "Broadcasting", broadcasting);
   }
 
   @Override
-  public Boolean isBroadcasting() throws Exception {
-    return (Boolean) getAttribute(MBEAN_NAME, "Broadcasting");
+  public boolean getBroadcasting() throws Exception {
+    return (boolean) getAttribute(MBEAN_NAME, "Broadcasting");
   }
 
   /**

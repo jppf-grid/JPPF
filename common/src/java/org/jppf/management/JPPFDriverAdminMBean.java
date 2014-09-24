@@ -123,12 +123,12 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @param broadcasting {@code true} to activate the broadcast, {@code false} to deactivate it.
    * @throws Exception if any error occurs.
    */
-  void setBroadcasting(Boolean broadcasting) throws Exception;
+  void setBroadcasting(boolean broadcasting) throws Exception;
 
   /**
    * Determine whether the driver is broadcasting or not.
    * @return {@code true} if the broadcasting service is on, {@code false} if it is off.
    * @throws Exception if any error occurs.
    */
-  Boolean isBroadcasting() throws Exception;
+  boolean getBroadcasting() throws Exception;
 }
