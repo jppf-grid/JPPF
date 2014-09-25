@@ -31,8 +31,7 @@ import org.slf4j.*;
  * The menu provides one option to reload the page.
  * @author laurentcohen
  */
-public class DebugMouseListener extends MouseAdapter
-{
+public class DebugMouseListener extends MouseAdapter {
   /**
    * Logger for this class.
    */
@@ -56,63 +55,69 @@ public class DebugMouseListener extends MouseAdapter
 
   /**
    * 
-   * @param option - the option to debug.
-   * @param source - determines whether the XML is loaded from a url or file location.
-   * @param location - where to load the xml descriptor from.
+   * @param option the option to debug.
+   * @param source determines whether the XML is loaded from a url or file location.
+   * @param location where to load the xml descriptor from.
    */
-  public DebugMouseListener(final OptionElement option, final String source, final String location)
-  {
+  public DebugMouseListener(final OptionElement option, final String source, final String location) {
     this.option = option;
     this.source = source;
     this.location = location;
   }
+
   /**
    * Processes right-click events to display popup menus.
-   * @param event - the mouse event to process.
-   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+   * @param event the mouse event to process.
    */
   @Override
-  public void mousePressed(final MouseEvent event)
-  {
+  public void mousePressed(final MouseEvent event) {
     if (event.getButton() != MouseEvent.BUTTON3) return;
     Component comp = event.getComponent();
-    int x = event.getX();
-    int y = event.getY();
-
     JPopupMenu menu = new JPopupMenu();
     JMenuItem item = new JMenuItem("Reload");
-    item.addActionListener(new ActionListener()
-    {
+    item.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent ev)
-      {
+      public void actionPerformed(final ActionEvent event) {
         doReloadPage();
       }
     });
     menu.add(item);
-    menu.show(comp, x, y);
+    menu.show(comp, event.getX(), event.getY());
   }
 
   /**
    * Reload the page.
    */
-  private void doReloadPage()
-  {
-    try
-    {
+  private void doReloadPage() {
+    try {
       OptionContainer parent = (OptionContainer) option.getParent();
+      TabbedPaneOption tpo = null;
+      int idx = -1;
+      if (parent instanceof TabbedPaneOption){
+        tpo = (TabbedPaneOption) parent;
+        idx = ((JTabbedPane) tpo.getUIComponent()).getSelectedIndex();
+      }
       parent.remove(option);
       OptionsPageBuilder builder = new OptionsPageBuilder(true);
       OptionElement elt;
       if ("url".equalsIgnoreCase(source)) elt = builder.buildPageFromURL(location, builder.getBaseName());
       else elt = builder.buildPage(location, null);
       builder.getFactory().addDebugComp(elt, source, location);
-      parent.add(elt);
+      if (tpo != null) {
+        tpo.add(elt, idx);
+        final JTabbedPane pane = (JTabbedPane) tpo.getUIComponent();
+        final int i = idx;
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            pane.setSelectedIndex(i);
+          }
+        });
+      }
+      else parent.add(elt);
       builder.triggerInitialEvents(elt);
       parent.getUIComponent().updateUI();
-    }
-    catch(Exception  e)
-    {
+    } catch(Exception  e) {
       log.error(e.getMessage(), e);
     }
   }

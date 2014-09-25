@@ -31,8 +31,7 @@ import org.jppf.ui.utils.GuiUtils;
 public class TabbedPaneOption extends AbstractOptionContainer
 {
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     JTabbedPane pane = new JTabbedPane();
     pane.setDoubleBuffered(true);
     if (!bordered) pane.setBorder(BorderFactory.createEmptyBorder());
@@ -40,35 +39,41 @@ public class TabbedPaneOption extends AbstractOptionContainer
   }
 
   @Override
-  public void add(final OptionElement element)
-  {
-    int idx = children.size();
-    super.add(element);
+  public void add(final OptionElement element) {
+    add(element, children.size());
+  }
+
+  /**
+   * Add the specified component at the specified index.
+   * @param element the component to add.
+   * @param index the index at which to add the component.
+   */
+  public void add(final OptionElement element, final int index) {
+    if (index > children.size()) throw new IndexOutOfBoundsException("index should be < " + children.size() + " but is " + index);
+    if (index < 0) throw new IndexOutOfBoundsException("negative index " + index);
+    //int idx = children.size();
+    super.add(element, index);
     JTabbedPane pane = (JTabbedPane) UIComponent;
     ImageIcon icon = null;
     if (element.getIconPath() != null) icon = GuiUtils.loadIcon(element.getIconPath());
     DockingManager dmgr = DockingManager.getInstance();
-    try
-    {
-      pane.addTab("", null, element.getUIComponent(), element.getToolTipText());
+    try {
+      //pane.addTab("", null, element.getUIComponent(), element.getToolTipText());
+      pane.insertTab("", null, element.getUIComponent(), element.getToolTipText(), index);
       JLabel l = new JLabel(element.getLabel(), icon, SwingConstants.CENTER);
-      pane.setTabComponentAt(idx, l);
-      if (element.isDetachable())
-      {
+      pane.setTabComponentAt(index, l);
+      if (element.isDetachable()) {
         l.addMouseListener(dmgr.getMouseAdapter());
         if (!dmgr.isRegistered(element)) dmgr.register(element, l);
         else dmgr.update(element, l);
       }
-    }
-    catch(Throwable t)
-    {
+    } catch(Throwable t) {
       t.printStackTrace();
     }
   }
 
   @Override
-  public void remove(final OptionElement element)
-  {
+  public void remove(final OptionElement element) {
     super.remove(element);
     UIComponent.remove(element.getUIComponent());
     Component comp = null;

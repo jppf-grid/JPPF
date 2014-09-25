@@ -47,7 +47,17 @@ public abstract class AbstractOptionContainer extends AbstractOptionElement impl
   @Override
   public void add(final OptionElement element)
   {
-    children.add(element);
+    add(element, children.size());
+  }
+
+  /**
+   * 
+   * @param element the element to add.
+   * @param index the index at which to add the element.
+   */
+  public void add(final OptionElement element, final int index)
+  {
+    children.add(index, element);
     if (element instanceof AbstractOptionElement) ((AbstractOptionElement) element).setParent(this);
   }
 
