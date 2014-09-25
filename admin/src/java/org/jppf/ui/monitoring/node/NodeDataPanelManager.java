@@ -21,6 +21,7 @@ package org.jppf.ui.monitoring.node;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.*;
@@ -348,11 +349,16 @@ public class NodeDataPanelManager {
    * Repaint the tree table area.
    */
   void repaintTreeTable() {
-    JPPFTreeTable treeTable = panel.getTreeTable();
-    if (treeTable != null) {
-      treeTable.invalidate();
-      treeTable.repaint();
-    }
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        JPPFTreeTable treeTable = panel.getTreeTable();
+        if (treeTable != null) {
+          treeTable.invalidate();
+          treeTable.repaint();
+        }
+      }
+    });
   }
 
   /**

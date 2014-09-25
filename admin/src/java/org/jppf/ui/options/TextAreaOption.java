@@ -106,12 +106,15 @@ public class TextAreaOption extends AbstractOption {
   @Override
   public void setValue(final Object value) {
     this.value = value;
+    textArea.setText((String) TextAreaOption.this.value);
+    /*
     SwingUtilities.invokeLater( new Runnable() {
       @Override
       public void run() {
         textArea.setText((String) TextAreaOption.this.value);
       }
     });
+    */
   }
 
   /**
