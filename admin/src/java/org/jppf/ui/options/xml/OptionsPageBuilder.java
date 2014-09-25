@@ -36,8 +36,7 @@ import org.slf4j.*;
  * Instances of this class build options pages from XML descriptors.
  * @author Laurent Cohen
  */
-public class OptionsPageBuilder
-{
+public class OptionsPageBuilder {
   /**
    * Logger for this class.
    */
@@ -71,17 +70,14 @@ public class OptionsPageBuilder
   /**
    * Default constructor.
    */
-  public OptionsPageBuilder()
-  {
+  public OptionsPageBuilder() {
   }
 
   /**
    * Initialize this page builder.
-   * @param enableEvents determines if events triggering should be performed
-   * once the page is built.
+   * @param enableEvents determines if events triggering should be performed once the page is built.
    */
-  public OptionsPageBuilder(final boolean enableEvents)
-  {
+  public OptionsPageBuilder(final boolean enableEvents) {
     this.eventEnabled = enableEvents;
   }
 
@@ -92,8 +88,7 @@ public class OptionsPageBuilder
    * @return an <code>OptionElement</code> instance, or null if the page could not be build.
    * @throws Exception if an error was raised while parsing the xml document or building the page.
    */
-  public OptionElement buildPageFromContent(final String content, final String baseName) throws Exception
-  {
+  public OptionElement buildPageFromContent(final String content, final String baseName) throws Exception {
     this.baseName = baseName;
     OptionDescriptor desc = new OptionDescriptorParser().parse(new StringReader(content));
     if (desc == null) return null;
@@ -109,16 +104,12 @@ public class OptionsPageBuilder
    * @return an <code>OptionsPage</code> instance, or null if the page could not be build.
    * @throws Exception if an error was raised while parsing the xml document or building the page.
    */
-  public OptionElement buildPageFromURL(final String urlString, final String baseName) throws Exception
-  {
+  public OptionElement buildPageFromURL(final String urlString, final String baseName) throws Exception {
     if (urlString == null) return null;
     URL url = null;
-    try
-    {
+    try {
       url = new URL(urlString);
-    }
-    catch(MalformedURLException e)
-    {
+    } catch(MalformedURLException e) {
       log.error(e.getMessage(), e);
       return null;
     }
@@ -137,10 +128,8 @@ public class OptionsPageBuilder
    * @return an <code>OptionElement</code> instance, or null if the page could not be build.
    * @throws Exception if an error was raised while parsing the xml document or building the page.
    */
-  public OptionElement buildPage(final String xmlPath, final String baseName) throws Exception
-  {
-    if (baseName == null)
-    {
+  public OptionElement buildPage(final String xmlPath, final String baseName) throws Exception {
+    if (baseName == null) {
       String path = xmlPath.replace("\\", "/");
       int idx = path.lastIndexOf('/');
       this.baseName = BASE_NAME + ((idx < 0) ? path : path.substring(idx + 1));
@@ -169,8 +158,7 @@ public class OptionsPageBuilder
    * This enables saving some state that can be reloaded upon the next startup.
    * @param elt the root element of the options on which to trigger the events.
    */
-  public void triggerFinalEvents(final OptionElement elt)
-  {
+  public void triggerFinalEvents(final OptionElement elt) {
     triggerLifeCycleEvents(elt, false);
   }
 
@@ -217,8 +205,7 @@ public class OptionsPageBuilder
    * @param desc the descriptor to get the attribute values from.
    * @throws Exception if an error was raised while building the page.
    */
-  public void initCommonAttributes(final AbstractOptionElement elt, final OptionDescriptor desc) throws Exception
-  {
+  public void initCommonAttributes(final AbstractOptionElement elt, final OptionDescriptor desc) throws Exception {
     elt.setName(desc.name);
     elt.setLabel(LocalizationUtils.getLocalized(baseName, desc.name+".label", desc.getProperty("label")));
     elt.setToolTipText(LocalizationUtils.getLocalized(baseName, desc.name+".tooltip", desc.getProperty("tooltip")));
@@ -241,18 +228,15 @@ public class OptionsPageBuilder
    * @param desc the descriptor to get the attribute values from.
    * @throws Exception if an error was raised while building the page.
    */
-  public void initCommonOptionAttributes(final AbstractOption option, final OptionDescriptor desc) throws Exception
-  {
+  public void initCommonOptionAttributes(final AbstractOption option, final OptionDescriptor desc) throws Exception {
     initCommonAttributes(option, desc);
-    if (desc.mouseListener != null)
-    {
+    if (desc.mouseListener != null) {
       MouseListener listener = createMouseListener(option, desc.mouseListener);
       option.setMouseListener(listener);
     }
     //option.setEditable(desc.getBoolean("editable", false));
     option.setPersistent(desc.getBoolean("persistent", false));
-    for (ListenerDescriptor listenerDesc: desc.listeners)
-    {
+    for (ListenerDescriptor listenerDesc: desc.listeners) {
       ValueChangeListener listener = createListener(listenerDesc);
       if (listener != null) option.addValueChangeListener(listener);
     }
@@ -264,18 +248,13 @@ public class OptionsPageBuilder
    * @return a ValueChangeListener instance.
    * @throws Exception if an error was raised while building the page.
    */
-  public ValueChangeListener createListener(final ListenerDescriptor listenerDesc) throws Exception
-  {
+  public ValueChangeListener createListener(final ListenerDescriptor listenerDesc) throws Exception {
     ValueChangeListener listener = null;
-    if (listenerDesc != null)
-    {
-      if ("java".equals(listenerDesc.type))
-      {
+    if (listenerDesc != null) {
+      if ("java".equals(listenerDesc.type)) {
         Class clazz = Class.forName(listenerDesc.className);
         listener = (ValueChangeListener) clazz.newInstance();
-      }
-      else
-      {
+      } else {
         ScriptDescriptor script = listenerDesc.script;
         listener = new ScriptedValueChangeListener(script.language, script.content);
       }
@@ -290,18 +269,13 @@ public class OptionsPageBuilder
    * @return a ValueChangeListener instance.
    * @throws Exception if an error was raised while building the page.
    */
-  public MouseListener createMouseListener(final AbstractOption option, final ListenerDescriptor listenerDesc) throws Exception
-  {
+  public MouseListener createMouseListener(final AbstractOption option, final ListenerDescriptor listenerDesc) throws Exception {
     MouseListener listener = null;
-    if (listenerDesc != null)
-    {
-      if ("java".equals(listenerDesc.type))
-      {
+    if (listenerDesc != null) {
+      if ("java".equals(listenerDesc.type)) {
         Class clazz = Class.forName(listenerDesc.className);
         listener = (MouseListener) clazz.newInstance();
-      }
-      else
-      {
+      } else {
         ScriptDescriptor script = listenerDesc.script;
         listener = new ScriptedMouseListener(option, script.language, script.content);
       }
@@ -315,8 +289,7 @@ public class OptionsPageBuilder
    * @return an OptionElement instance.
    * @throws Exception if an error was raised while building the page.
    */
-  public List<OptionElement> build(final OptionDescriptor desc) throws Exception
-  {
+  public List<OptionElement> build(final OptionDescriptor desc) throws Exception {
     OptionElementFactory f = getFactory();
     List<OptionElement> list = new ArrayList<>();
     String type = desc.type;
@@ -331,7 +304,7 @@ public class OptionsPageBuilder
     else if ("PlainText".equalsIgnoreCase(desc.type)) list.add(f.buildPlainText(desc));
     else if ("FormattedNumber".equalsIgnoreCase(desc.type)) list.add(f.buildFormattedNumber(desc));
     else if ("SpinnerNumber".equalsIgnoreCase(desc.type)) list.add(f.buildSpinnerNumber(desc));
-    else if ("Boolean".equalsIgnoreCase(desc.type)) list.add(f.buildBoolean(desc));
+    else if (StringUtils.isOneOf(desc.type, true, "Boolean", "Checkbox")) list.add(f.buildBoolean(desc));
     else if ("Radio".equalsIgnoreCase(desc.type)) list.add(f.buildRadio(desc));
     else if ("ComboBox".equalsIgnoreCase(desc.type)) list.add(f.buildComboBox(desc));
     else if ("Filler".equalsIgnoreCase(desc.type)) list.add(f.buildFiller(desc));
@@ -348,8 +321,7 @@ public class OptionsPageBuilder
    * Get the element factory used by this builder.
    * @return an <code>OptionElementFactory</code> instance.
    */
-  public OptionElementFactory getFactory()
-  {
+  public OptionElementFactory getFactory() {
     if (factory == null) factory = new OptionElementFactory(this);
     return factory;
   }
@@ -358,8 +330,7 @@ public class OptionsPageBuilder
    * Get the base name used to localize labels and tooltips.
    * @return the base name as a string value.
    */
-  public String getBaseName()
-  {
+  public String getBaseName() {
     return baseName;
   }
 
@@ -367,8 +338,7 @@ public class OptionsPageBuilder
    * Set the base name used to localize labels and tooltips.
    * @param baseName the base name as a string value.
    */
-  public void setBaseName(final String baseName)
-  {
+  public void setBaseName(final String baseName) {
     this.baseName = baseName;
   }
 
@@ -376,8 +346,7 @@ public class OptionsPageBuilder
    * Determine whether events should be triggered after the component is built.
    * @return true if events should be triggered, false otherwise.
    */
-  public boolean isEventEnabled()
-  {
+  public boolean isEventEnabled() {
     return eventEnabled;
   }
 }

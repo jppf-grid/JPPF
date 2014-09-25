@@ -17,6 +17,7 @@
  */
 package org.jppf.ui.options.xml;
 
+import java.awt.Color;
 import java.util.*;
 
 import javax.swing.*;
@@ -103,8 +104,7 @@ public class OptionElementFactory {
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public OptionElement buildToolbar(final OptionDescriptor desc) throws Exception
-  {
+  public OptionElement buildToolbar(final OptionDescriptor desc) throws Exception {
     OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
     ToolbarOption option = new ToolbarOption();
     option.setEventsEnabled(false);
@@ -123,8 +123,7 @@ public class OptionElementFactory {
    * @return an <code>Option</code> instance, or null if the option could not be build.
    * @throws Exception if an error was raised while building the option.
    */
-  public OptionElement buildTabbedPane(final OptionDescriptor desc) throws Exception
-  {
+  public OptionElement buildTabbedPane(final OptionDescriptor desc) throws Exception {
     OptionsPageBuilder tmpBuilder = getOrCreateBuilder(desc.i18n);
     TabbedPaneOption option = new TabbedPaneOption();
     option.setEventsEnabled(false);
@@ -179,7 +178,6 @@ public class OptionElementFactory {
     TextAreaOption option = new TextAreaOption();
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
-    //option.setBordered(desc.getBoolean("bordered", true));
     option.setEditable(desc.getBoolean("editable", false));
     option.createUI();
     option.setEventsEnabled(true);
@@ -383,9 +381,15 @@ public class OptionElementFactory {
     List<OptionElement> list = new ArrayList<>();
     String source = desc.getProperty("source");
     String location = desc.getProperty("location");
-    if ("url".equalsIgnoreCase(source)) list.add(builder.buildPageFromURL(location, builder.getBaseName()));
-    else if ("file".equalsIgnoreCase(source)) list.add(builder.buildPage(location, null));
-    else if ("plugin".equalsIgnoreCase(source)) {
+    if ("url".equalsIgnoreCase(source)) {
+      OptionElement elt = builder.buildPageFromURL(location, builder.getBaseName());
+      list.add(elt);
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
+    } else if ("file".equalsIgnoreCase(source)) {
+      OptionElement elt = builder.buildPage(location, null);
+      list.add(elt);
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
+    } else if ("plugin".equalsIgnoreCase(source)) {
       List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
       Set<String> names = new HashSet<>();
       for (String def: pathList) {
@@ -393,6 +397,7 @@ public class OptionElementFactory {
         if (!names.contains(elt.getName())) {
           names.add(elt.getName());
           list.add(elt);
+          if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, def);
         }
       }
     } else if ("script".equalsIgnoreCase(source)) {
@@ -400,38 +405,31 @@ public class OptionElementFactory {
         ScriptDescriptor scriptDesc = desc.scripts.get(0);
         ScriptRunner runner = null;
         try {
-        runner = ScriptRunnerFactory.getScriptRunner(scriptDesc.language);
-        String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
-        if (path != null) list.add(builder.buildPage(path, null));
+          runner = ScriptRunnerFactory.getScriptRunner(scriptDesc.language);
+          String path = (String) runner.evaluate(scriptDesc.content, new HashMap<String, Object>());
+          if (path != null) list.add(builder.buildPage(path, null));
         } finally {
           ScriptRunnerFactory.releaseScriptRunner(runner);
         }
       }
     }
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) {
-      for (OptionElement elt: list) addDebugComp(elt, source, location);
-    }
     return list;
   }
 
   /**
-   * Add an invisible component from which to get a popup menu to reload the page.
-   * @param elt - the option to debug.
-   * @param source - determines whether the XML is loaded from a url or file location.
-   * @param location - where to load the xml descriptor from.
+   * Add a component from which to get a popup menu to reload the page.
+   * @param elt the option to debug.
+   * @param source determines whether the XML is loaded from a url or file location.
+   * @param location where to load the xml descriptor from.
    */
-  public void addDebugComp(final OptionElement elt, final String source, final String location) {
-    JLabel label = new JLabel("X") {
-      @Override
-      public java.awt.Color getBackground() {
-        return java.awt.Color.red;
-      }
-    };
-    label.setMinimumSize(new java.awt.Dimension(10, 10));
-    label.setBackground(java.awt.Color.red);
+  void addDebugComp(final OptionElement elt, final String source, final String location) {
+    if (elt instanceof TabbedPaneOption) return;
+    JLabel label = new JLabel(" X ");
+    label.setOpaque(true);
+    label.setBackground(Color.RED);
     JComponent comp = elt.getUIComponent();
     if (comp instanceof JScrollPane) comp = (JComponent) ((JScrollPane) comp).getViewport().getView();
-    comp.add(label, "w 10:10:10, h 10:10:10", 0);
+    comp.add(label, "w 20:20:20, h 12:12:12", 0);
     label.addMouseListener(new DebugMouseListener(elt, source, location));
   }
 
