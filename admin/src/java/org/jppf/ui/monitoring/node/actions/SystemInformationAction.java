@@ -33,8 +33,7 @@ import org.slf4j.*;
 /**
  * This action displays the driver or node environment information in a separate frame.
  */
-public class SystemInformationAction extends AbstractTopologyAction
-{
+public class SystemInformationAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -47,8 +46,7 @@ public class SystemInformationAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public SystemInformationAction()
-  {
+  public SystemInformationAction() {
     setupIcon("/org/jppf/ui/resources/info.gif");
     setupNameAndTooltip("show.information");
   }
@@ -56,11 +54,9 @@ public class SystemInformationAction extends AbstractTopologyAction
   /**
    * Update this action's enabled state based on a list of selected elements.
    * @param selectedElements a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
     dataArray = new TopologyData[selectedElements.size()];
     int count = 0;
@@ -73,20 +69,16 @@ public class SystemInformationAction extends AbstractTopologyAction
    * @param event not used.
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
+  public void actionPerformed(final ActionEvent event) {
     String html = null;
     String toClipboard = null;
-    try
-    {
+    try {
       JPPFSystemInformation info = retrieveInfo(dataArray[0]);
       boolean isNode = dataArray[0].isNode();
       String title = "information for " + (isNode ? "node " : "driver ") + dataArray[0];
       html = formatProperties(info, new HTMLPropertiesTableFormat(title));
       toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       toClipboard = ExceptionUtils.getStackTrace(e);
       html = toClipboard.replace("\n", "<br>");
     }
@@ -97,6 +89,7 @@ public class SystemInformationAction extends AbstractTopologyAction
     dialog.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosing(final WindowEvent e) {
+        dialog.setVisible(false);
         dialog.dispose();
       }
     });
@@ -107,7 +100,16 @@ public class SystemInformationAction extends AbstractTopologyAction
     editor.setOpaque(true);
     editor.setBackground(Color.WHITE);
     editor.setCaretPosition(0);
-    dialog.getContentPane().add(new JScrollPane(editor));
+    JScrollPane panel = new JScrollPane(editor);
+    dialog.getContentPane().add(panel);
+    AbstractAction escAction = new AbstractAction() {
+      @Override
+      public void actionPerformed(final ActionEvent event) {
+        dialog.setVisible(false);
+        dialog.dispose();
+      }
+    };
+    setOkCancelKeys(panel, null, escAction);
     dialog.setLocationRelativeTo(null);
     dialog.setLocation(location);
     dialog.setSize(600, 600);

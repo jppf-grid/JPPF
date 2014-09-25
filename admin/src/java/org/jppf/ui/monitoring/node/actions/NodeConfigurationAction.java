@@ -36,8 +36,7 @@ import org.slf4j.*;
  * This action displays an input panel for the user to type a new
  * thread pool size for a node, and updates the node with it.
  */
-public class NodeConfigurationAction extends AbstractTopologyAction
-{
+public class NodeConfigurationAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -62,8 +61,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public NodeConfigurationAction()
-  {
+  public NodeConfigurationAction() {
     setupIcon("/org/jppf/ui/resources/update.gif");
     setupNameAndTooltip("update.configuration");
   }
@@ -74,8 +72,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction
    * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     setEnabled(dataArray.length > 0);
   }
@@ -96,21 +93,24 @@ public class NodeConfigurationAction extends AbstractTopologyAction
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration",false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
-    okBtn.addActionListener(new ActionListener() {
+    AbstractAction okAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
         dialog.dispose();
         doOK();
       }
-    });
-    cancelBtn.addActionListener(new ActionListener() {
+    };
+    okBtn.addActionListener(okAction);
+    AbstractAction cancelAction = new AbstractAction() {
       @Override
       public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
         dialog.dispose();
       }
-    });
+    };
+    cancelBtn.addActionListener(cancelAction);
+    setOkCancelKeys(thisPanel, okAction, cancelAction);
     dialog.getContentPane().add(thisPanel.getUIComponent());
     dialog.pack();
     dialog.setLocationRelativeTo(null);

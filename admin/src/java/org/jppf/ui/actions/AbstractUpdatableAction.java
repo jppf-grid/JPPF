@@ -33,8 +33,7 @@ import org.jppf.utils.LocalizationUtils;
  * Abstract superclass for actions used in toolbars or popup menus.
  * @author Laurent Cohen
  */
-public abstract class AbstractUpdatableAction extends AbstractAction implements UpdatableAction
-{
+public abstract class AbstractUpdatableAction extends AbstractAction implements UpdatableAction {
   /**
    * The base location for internationalized messages.
    */
@@ -52,8 +51,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * Get the location at which to display any window or dialog created by this action.
    * @return a <code>Point</code> instance.
    */
-  public Point getLocation()
-  {
+  public Point getLocation() {
     return location;
   }
 
@@ -61,30 +59,25 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * Set the location at which to display any window or dialog created by this action.
    * @param location a <code>Point</code> instance.
    */
-  public void setLocation(final Point location)
-  {
+  public void setLocation(final Point location) {
     this.location = location;
   }
 
   /**
    * Update this action's enabled state based on a list of selected elements.
    * @param selectedElements a list of objects.
-   * @see org.jppf.ui.actions.UpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
   }
 
   /**
    * Method called when the action is triggered.
    * @param event the event encapsulating the source of the event.
-   * @see org.jppf.ui.options.event.ValueChangeListener#valueChanged(org.jppf.ui.options.event.ValueChangeEvent)
    */
   @Override
-  public void valueChanged(final ValueChangeEvent event)
-  {
+  public void valueChanged(final ValueChangeEvent event) {
     actionPerformed(new ActionEvent(event.getSource(), ActionEvent.ACTION_PERFORMED, ""));
   }
 
@@ -92,8 +85,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * Set the icon for this action using the specified image file name.
    * @param name  the name of the icon image file.
    */
-  protected void setupIcon(final String name)
-  {
+  protected void setupIcon(final String name) {
     if (name != null) putValue(Action.SMALL_ICON, GuiUtils.loadIcon(name));
   }
 
@@ -101,8 +93,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * Set the action name and tooltip text.
    * @param name the key to find the name and tooltip in the localized resource bundles.
    */
-  protected void setupNameAndTooltip(final String name)
-  {
+  protected void setupNameAndTooltip(final String name) {
     putValue(NAME, localize(name + ".label"));
     putValue(SHORT_DESCRIPTION, localize(name + ".tooltip"));
   }
@@ -111,19 +102,16 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * Set the action tooltip text.
    * @param name the key to find the tooltip in the localized resource bundles.
    */
-  protected void setupTooltip(final String name)
-  {
+  protected void setupTooltip(final String name) {
     putValue(SHORT_DESCRIPTION, localize(name + ".tooltip"));
   }
 
   /**
    * Get a localized message given its unique name and the current locale.
    * @param message the unique name of the localized message.
-   * @return a message in the current locale, or the default locale
-   * if the localization for the current locale is not found.
+   * @return a message in the current locale, or the default locale if the localization for the current locale is not found.
    */
-  protected String localize(final String message)
-  {
+  protected String localize(final String message) {
     return LocalizationUtils.getLocalized(BASE, message);
   }
 
@@ -132,22 +120,19 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * The thread name is <code>this.getClass().getSimpleName()</code>.
    * @param r the <code>Runnable</code> to execute.
    */
-  protected void runAction(final Runnable r)
-  {
+  protected void runAction(final Runnable r) {
     GuiUtils.runAction(r, getClass().getSimpleName());
   }
 
   /**
    * Associate a keyboard virtual key with an action.
-   * @param option contains the {@link JComponent} whose {@link InputMap} and {@link ActionMap} this method modifies.
+   * @param comp the {@link JComponent} whose {@link InputMap} and {@link ActionMap} this method modifies.
    * @param vkey the virtual key code to associate with the action, built from
    * one of the values in {@link KeyEvent}, for instance: <code>KeyEvent.VK_ENTER</code>.
    * @param action the action to trigger upon pressing the keyboard key.
    * @param actionKey a key to use int he {@link ActionMap}.
    */
-  protected void setKeyAction(final OptionElement option, final KeyStroke vkey, final Action action, final Object actionKey )
-  {
-    JComponent comp = option.getUIComponent();
+  protected void setKeyAction(final JComponent comp, final KeyStroke vkey, final Action action, final Object actionKey) {
     InputMap inputMap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     inputMap.put(vkey, actionKey);
     ActionMap map = comp.getActionMap();
@@ -160,9 +145,18 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @param okAction the action to execute upon pressing 'Enter'.
    * @param cancelAction the action to execute upon pressing 'Esc'.
    */
-  protected void setOkCancelKeys(final OptionElement option, final Action okAction, final Action cancelAction)
-  {
-    setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
-    setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
+  protected void setOkCancelKeys(final OptionElement option, final Action okAction, final Action cancelAction) {
+    setOkCancelKeys(option.getUIComponent(), okAction, cancelAction);
+  }
+
+  /**
+   * Associate 'ok' and 'cancel' actions with 'Enter' and 'Esc' keys, repsectively.
+   * @param option contains the {@link JComponent} whose {@link InputMap} and {@link ActionMap} this method modifies.
+   * @param okAction the action to execute upon pressing 'Enter'.
+   * @param cancelAction the action to execute upon pressing 'Esc'.
+   */
+  protected void setOkCancelKeys(final JComponent option, final Action okAction, final Action cancelAction) {
+    if (okAction != null) setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
+    if (cancelAction != null) setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
   }
 }
