@@ -17,8 +17,7 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="BundleSizeTuning" type="page">
-	<property name="label" value="Bundle Size Tuning"/>
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="LoadBalancingPanel" type="page" i18n="org.jppf.ui.i18n.BundleSizeTuningPage">
 	<property name="scrollable" value="true"/>
   <property name="icon" value="/org/jppf/ui/resources/configure-2.png"/>
 	<property name="layoutConstraints" value="fill, flowy"/>
