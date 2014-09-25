@@ -24,7 +24,9 @@ import java.util.prefs.*;
 import javax.swing.JFrame;
 
 import org.jppf.ui.options.*;
+import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -87,9 +89,9 @@ public final class OptionsHandler {
     pageList.add(page);
     try {
       pageMap.put(page.getName(), page);
+      if (log.isDebugEnabled()) log.debug("adding page '{}' = {}", page.getName(), page);
     } catch(RuntimeException e) {
-      int breakpoint = 0;
-      log.info("Exception for page = \"" + page + "\" : " + e.getMessage());
+      log.error("Exception for page = {} : {}", page, ExceptionUtils.getMessage(e));
       throw e;
     }
     return page;
@@ -100,6 +102,7 @@ public final class OptionsHandler {
    * @param page an <code>OptionsPage</code> instance.
    */
   public static synchronized void removePage(final OptionContainer page) {
+    if (log.isDebugEnabled()) log.debug("removing page '{}'", page.getName());
     pageList.remove(page);
     pageMap.remove(page.getName());
   }
@@ -355,5 +358,20 @@ public final class OptionsHandler {
    */
   private static JFrame createMainWindow() {
     return null;
+  }
+
+  /**
+   * 
+   * @param searchRoot the root option to search from.
+   * @param name the name of the option to search.
+   * @return th first option found with the specified name.
+   */
+  public static OptionElement findOptionWithName(final OptionElement searchRoot, final String name) {
+    OptionElement result = null;
+    if (searchRoot != null) {
+      result = searchRoot.findFirstWithName(name);
+    }
+    if (result == null) result = DockingManager.getInstance().findFirstElementWithName(name);
+    return result;
   }
 }
