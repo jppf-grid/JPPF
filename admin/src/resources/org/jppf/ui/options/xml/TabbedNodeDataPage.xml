@@ -22,7 +22,8 @@
 	<property name="layoutConstraints" value="fill"/>
 	<property name="bordered" value="false"/>
   <property name="icon" value="/org/jppf/ui/resources/retroshare1.png"/>
-	<import source="file" location="org/jppf/ui/options/xml/NodeDataPage2.xml"/>
-  <import source="file" location="org/jppf/ui/options/xml/NodeDataGraphPage.xml"/>
-  <import source="file" location="org/jppf/ui/options/xml/JVMHealthPage.xml"/>
+  <!--<import source="plugin" location="jppf-plugins/jppf-ui-topology-plugin"/>-->
+  <import source="file" location="org/jppf/ui/options/xml/NodeDataPage2.xml" pluggableView="TopologyTree"/>
+  <import source="file" location="org/jppf/ui/options/xml/NodeDataGraphPage.xml" pluggableView="TopologyGraph"/>
+  <import source="file" location="org/jppf/ui/options/xml/JVMHealthPage.xml" pluggableView="TopologyHealth"/>
 </opt:main>

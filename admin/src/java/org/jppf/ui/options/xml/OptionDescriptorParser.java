@@ -260,6 +260,8 @@ public class OptionDescriptorParser {
     NamedNodeMap attrMap = node.getAttributes();
     OptionDescriptor desc = new OptionDescriptor();
     desc.type = "import";
+    Node attr = attrMap.getNamedItem("pluggableView");
+    desc.setProperty("pluggableView", (attr != null) ? attr.getNodeValue() : "");
     desc.setProperty("source", attrMap.getNamedItem("source").getNodeValue());
     if (attrMap.getNamedItem("location") != null)  desc.setProperty("location", attrMap.getNamedItem("location").getNodeValue());
     Node debugNode = attrMap.getNamedItem("debug");

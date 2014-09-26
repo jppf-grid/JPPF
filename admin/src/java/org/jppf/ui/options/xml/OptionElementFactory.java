@@ -381,14 +381,17 @@ public class OptionElementFactory {
     List<OptionElement> list = new ArrayList<>();
     String source = desc.getProperty("source");
     String location = desc.getProperty("location");
-    if ("url".equalsIgnoreCase(source)) {
-      OptionElement elt = builder.buildPageFromURL(location, builder.getBaseName());
-      list.add(elt);
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
-    } else if ("file".equalsIgnoreCase(source)) {
-      OptionElement elt = builder.buildPage(location, null);
-      list.add(elt);
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
+    if (StringUtils.isOneOf(source, true, "url", "file")) {
+      boolean enabled = true;
+      String pluggableView = desc.getProperty("pluggableView");
+      if ((pluggableView != null) && !"".equals(pluggableView.trim())) {
+        enabled = JPPFConfiguration.getProperties().getBoolean(String.format("jppf.admin.console.view.%s.enabled", pluggableView), true);
+      }
+      if (enabled) {
+        OptionElement elt = "url".equalsIgnoreCase(source) ? builder.buildPageFromURL(location, builder.getBaseName()) : builder.buildPage(location, null);
+        list.add(elt);
+        if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
+      }
     } else if ("plugin".equalsIgnoreCase(source)) {
       List<String> pathList = new ServiceFinder().findServiceDefinitions(location, getClass().getClassLoader());
       Set<String> names = new HashSet<>();

@@ -131,9 +131,8 @@
 					option.setupActions();
           def graph = option.findFirstWithName("/NodeGraph");
           option.setGraphOption(graph);
-          //graph.setTreeTableOption(option);
           def healthPanel = option.findFirstWithName("/health.treetable");
-          option.setJVMHealthPanel(healthPanel);
+          if (healthPanel != null) option.setJVMHealthPanel(healthPanel);
 				</script>
 			</initializer>
 			<finalizer type="script">

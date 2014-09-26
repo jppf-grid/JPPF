@@ -86,8 +86,7 @@ public class PreferencesStorage
       tabs[cnt] = tab;
       cnt++;
     }
-    Arrays.sort(tabs, new Comparator<TabConfiguration>()
-        {
+    Arrays.sort(tabs, new Comparator<TabConfiguration>() {
       @Override
       public int compare(final TabConfiguration o1, final TabConfiguration o2)
       {
@@ -96,13 +95,11 @@ public class PreferencesStorage
         if (o2 == null) return 1;
         return Integer.valueOf(o1.position).compareTo(o2.position);
       }
-        });
+    });
 
-    for (TabConfiguration tab: tabs)
-    {
+    for (TabConfiguration tab: tabs) {
       chartBuilder.addTab(tab);
-      for (ChartConfiguration config : tab.configs)
-      {
+      for (ChartConfiguration config : tab.configs) {
         chartBuilder.createChart(config, false);
         tab.panel.add(config.chartPanel);
       }

@@ -24,8 +24,7 @@ import java.util.EventObject;
  * 
  * @author Laurent Cohen
  */
-public class TopologyChangeEvent extends EventObject
-{
+public class TopologyChangeEvent extends EventObject {
   /**
    * Data for the driver.
    */
@@ -46,8 +45,7 @@ public class TopologyChangeEvent extends EventObject
    * @param nodeData the node data.
    * @param peerData the peer data.
    */
-  public TopologyChangeEvent(final NodeDataPanel source, final TopologyData driverData, final TopologyData nodeData, final TopologyData peerData)
-  {
+  public TopologyChangeEvent(final NodeDataPanel source, final TopologyData driverData, final TopologyData nodeData, final TopologyData peerData) {
     super(source);
     this.driverData = driverData;
     this.nodeData = nodeData;
@@ -58,8 +56,7 @@ public class TopologyChangeEvent extends EventObject
    * Get the driver data.
    * @return a {@link TopologyData} instance.
    */
-  public TopologyData getDriverData()
-  {
+  public TopologyData getDriverData() {
     return driverData;
   }
 
@@ -67,8 +64,7 @@ public class TopologyChangeEvent extends EventObject
    * Get the node data.
    * @return a {@link TopologyData} instance.
    */
-  public TopologyData getNodeData()
-  {
+  public TopologyData getNodeData() {
     return nodeData;
   }
 
@@ -76,8 +72,7 @@ public class TopologyChangeEvent extends EventObject
    * Get the peer data.
    * @return a {@link TopologyData} instance.
    */
-  public TopologyData getPeerData()
-  {
+  public TopologyData getPeerData() {
     return peerData;
   }
 
@@ -85,8 +80,7 @@ public class TopologyChangeEvent extends EventObject
    * Get the node panel which emitted this event.
    * @return a {@link NodeDataPanel} instance.
    */
-  public NodeDataPanel getNodePanel()
-  {
+  public NodeDataPanel getNodePanel() {
     return (NodeDataPanel) getSource();
   }
 }

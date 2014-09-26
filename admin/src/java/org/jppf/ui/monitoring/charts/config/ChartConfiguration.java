@@ -70,7 +70,7 @@ public class ChartConfiguration
    */
   public int position = -1;
   /**
-   * Holds non persited parmaters for quick access.
+   * Holds non persisted parameters for quick access.
    * @since 5.0
    */
   public final Map<String, Object> params = new HashMap<>();

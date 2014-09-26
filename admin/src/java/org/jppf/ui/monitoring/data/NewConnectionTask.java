@@ -23,7 +23,7 @@ import java.util.TimerTask;
 import javax.swing.*;
 
 import org.jppf.client.JPPFClientConnection;
-import org.jppf.ui.options.ComboBoxOption;
+import org.jppf.ui.options.*;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
@@ -69,7 +69,7 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }
-    while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
+    //while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
     if (debugEnabled) log.debug("adding client connection " + c.getName());
     try {
       SwingUtilities.invokeAndWait(new ComboUpdate());
@@ -84,33 +84,36 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   private class ComboUpdate implements Runnable {
     @Override
     public void run() {
-      JComboBox box = ((ComboBoxOption) statsHandler.getClientHandler().getServerListOption()).getComboBox();
-      int count = box.getItemCount();
-      boolean found = false;
-      for (int i=0; i<count; i++) {
-        Object o = box.getItemAt(i);
-        if (c.equals(o)) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        box.addItem(c);
-        int maxLen = 0;
-        Object proto = null;
-        for (int i=0; i<box.getItemCount(); i++) {
+      OptionElement serverList = statsHandler.getClientHandler().getServerListOption();
+      JComboBox box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
+      if (box != null) {
+        int count = box.getItemCount();
+        boolean found = false;
+        for (int i=0; i<count; i++) {
           Object o = box.getItemAt(i);
-          int n = o.toString().length();
-          if (n > maxLen) {
-            maxLen = n;
-            proto = o;
+          if (c.equals(o)) {
+            found = true;
+            break;
           }
         }
-        if (proto != null) box.setPrototypeDisplayValue(proto);
+        if (!found) {
+          box.addItem(c);
+          int maxLen = 0;
+          Object proto = null;
+          for (int i=0; i<box.getItemCount(); i++) {
+            Object o = box.getItemAt(i);
+            int n = o.toString().length();
+            if (n > maxLen) {
+              maxLen = n;
+              proto = o;
+            }
+          }
+          if (proto != null) box.setPrototypeDisplayValue(proto);
+        }
       }
       if (statsHandler.getClientHandler().currentConnection == null) {
         statsHandler.getClientHandler().setCurrentConnection(c);
-        box.setSelectedItem(c);
+        if (box != null) box.setSelectedItem(c);
       }
     }
   };

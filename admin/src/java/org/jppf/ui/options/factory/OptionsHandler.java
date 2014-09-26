@@ -86,13 +86,15 @@ public final class OptionsHandler {
    * @return the page that was added.
    */
   public static synchronized OptionElement addPage(final OptionElement page) {
-    pageList.add(page);
-    try {
-      pageMap.put(page.getName(), page);
-      if (log.isDebugEnabled()) log.debug("adding page '{}' = {}", page.getName(), page);
-    } catch(RuntimeException e) {
-      log.error("Exception for page = {} : {}", page, ExceptionUtils.getMessage(e));
-      throw e;
+    if (page != null) {
+      pageList.add(page);
+      try {
+        pageMap.put(page.getName(), page);
+        if (log.isDebugEnabled()) log.debug("adding page '{}' = {}", page.getName(), page);
+      } catch(RuntimeException e) {
+        log.error("Exception for page = {} : {}", page, ExceptionUtils.getMessage(e));
+        throw e;
+      }
     }
     return page;
   }

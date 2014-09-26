@@ -18,82 +18,79 @@
 	limitations under the License.
 -->
 
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-  elementFormDefault="unqualified"
-  attributeFormDefault="unqualified"
-	targetNamespace="http://www.jppf.org/Options.xsd"
-	xmlns:opt="http://www.jppf.org/Options.xsd"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified" targetNamespace="http://www.jppf.org/Options.xsd"
+  xmlns:opt="http://www.jppf.org/Options.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<!-- Page root -->
-	<xs:element name="main" type="opt:OptionElement"/>
+  <xs:element name="main" type="opt:OptionElement"/>
 
-	<xs:complexType name="OptionElement">
-		<xs:sequence maxOccurs="unbounded">
-			<xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="initializer" type="opt:Listener" minOccurs="0"/>
-			<xs:element name="finalizer" type="opt:Listener" minOccurs="0"/>
+  <xs:complexType name="OptionElement">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="property" type="opt:Property" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="script" type="opt:Script" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="initializer" type="opt:Listener" minOccurs="0"/>
+      <xs:element name="finalizer" type="opt:Listener" minOccurs="0"/>
       <xs:element name="listener" type="opt:Listener" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="mouselistener" type="opt:Listener" minOccurs="0"/>
-			<xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="import" type="opt:Import" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="child" type="opt:OptionElement" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-		<xs:attribute name="name"/>
-		<xs:attribute name="type"/>
+      <xs:element name="item" type="opt:Item" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="import" type="opt:Import" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="child" type="opt:OptionElement" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name"/>
+    <xs:attribute name="type"/>
     <xs:attribute name="i18n" use="optional"/>
-	</xs:complexType>
+  </xs:complexType>
 
 	<!-- Property with value and name -->
-	<xs:complexType name="Property">
-		<xs:attribute name="name"/>
-		<xs:attribute name="value"/>
-	</xs:complexType>
+  <xs:complexType name="Property">
+    <xs:attribute name="name"/>
+    <xs:attribute name="value"/>
+  </xs:complexType>
 
-	<xs:complexType name="Listener">
-		<xs:choice>
-			<xs:element name="class" type="xs:string"/>
-			<xs:element name="script" type="opt:Script"/>
-		</xs:choice>
-		<xs:attribute name="type" type="opt:ListenerType"/>
-	</xs:complexType>
+  <xs:complexType name="Listener">
+    <xs:choice>
+      <xs:element name="class" type="xs:string"/>
+      <xs:element name="script" type="opt:Script"/>
+    </xs:choice>
+    <xs:attribute name="type" type="opt:ListenerType"/>
+  </xs:complexType>
 
-	<xs:complexType name="Item">
-		<xs:attribute name="name"/>
-		<xs:attribute name="selected"/>
-	</xs:complexType>
+  <xs:complexType name="Item">
+    <xs:attribute name="name"/>
+    <xs:attribute name="selected"/>
+  </xs:complexType>
 
-	<xs:complexType name="Import">
+  <xs:complexType name="Import">
     <xs:element name="script" type="opt:Script" minOccurs="0"/>
-		<xs:attribute name="source" type="opt:ImportSource"/>
-		<xs:attribute name="location" use="optional"/>
+    <xs:attribute name="source" type="opt:ImportSource"/>
+    <xs:attribute name="location" use="optional"/>
+    <xs:attribute name="pluggableView" use="optional" default=""/>
     <xs:attribute name="debug" use="optional" default="false"/>
-	</xs:complexType>
+  </xs:complexType>
 
-	<xs:complexType name="Script">
-		<xs:simpleContent>
-			<xs:extension base="xs:string">
-				<xs:attribute name="language"/>
-				<xs:attribute name="source" use="optional" default="inline"/>
-			</xs:extension>
-		</xs:simpleContent>
-	</xs:complexType>
+  <xs:complexType name="Script">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="language"/>
+        <xs:attribute name="source" use="optional" default="inline"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
-	<xs:simpleType name="ImportSource">
-	  <xs:restriction base="xs:string">
-	    <xs:enumeration value="file"/>
-	    <xs:enumeration value="url"/>
-        <xs:enumeration value="plugin"/>
-        <xs:enumeration value="script"/>
-	  </xs:restriction>
-	</xs:simpleType>
+  <xs:simpleType name="ImportSource">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="file"/>
+      <xs:enumeration value="url"/>
+      <xs:enumeration value="plugin"/>
+      <xs:enumeration value="script"/>
+    </xs:restriction>
+  </xs:simpleType>
 
-	<xs:simpleType name="ListenerType">
-	  <xs:restriction base="xs:string">
-	    <xs:enumeration value="java"/>
-	    <xs:enumeration value="script"/>
-	  </xs:restriction>
-	</xs:simpleType>
+  <xs:simpleType name="ListenerType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="java"/>
+      <xs:enumeration value="script"/>
+    </xs:restriction>
+  </xs:simpleType>
 
 </schema>

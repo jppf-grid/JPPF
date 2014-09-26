@@ -1,9 +1,4 @@
-import java.util.List;
-
-import org.jppf.ui.monitoring.charts.config.*;
-
-chartBuilderOption = option.findFirstWithName("/ChartsBuilder")
-if (chartBuilderOption == null) chartBuilderOption = DockingManager.getInstance().findFirstElementWithName("/ChartsBuilder")
+chartBuilderOption = OptionsHandler.findOptionWithName(option, "/ChartsBuilder")
 chartBuilder = chartBuilderOption.getUIComponent();
 pageRoot = option.findFirstWithName("/ChartsConfiguration");
 

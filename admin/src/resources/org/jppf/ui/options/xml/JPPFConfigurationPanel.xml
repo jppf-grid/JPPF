@@ -31,7 +31,7 @@
 		<property name="componentConstraints" value="grow, push"/>
 		<property name="bordered" value="true"/>
 
-		<child name="forceReconnect" type="Boolean">
+		<child name="forceReconnect" type="Checkbox">
 			<property name="label" value="Force Reconnection"/>
 			<property name="tooltip" value="Determines whether the node should reconnect after its configuration is updated"/>
 			<property name="value" value="true"/>

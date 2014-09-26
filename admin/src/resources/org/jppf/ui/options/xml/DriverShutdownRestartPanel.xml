@@ -40,7 +40,7 @@
 			<property name="persistent" value="true"/>
 		</child>
 
-		<child name="Restart" type="Boolean">
+		<child name="Restart" type="Checkbox">
 			<property name="label" value="Restart"/>
 			<property name="tooltip" value="Determines whether the server should be restarted"/>
 			<property name="value" value="false"/>

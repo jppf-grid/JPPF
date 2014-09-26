@@ -57,8 +57,7 @@ public class JavaOption extends AbstractOption
           panel.setLayout(new MigLayout(layoutConstraints));
       }
       if (mouseListenerClassName != null) {
-        JavaOptionMouseListener ml =
-          (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
+        JavaOptionMouseListener ml = (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
         ml.setOption(this);
         comp.addMouseListener(ml);
       }

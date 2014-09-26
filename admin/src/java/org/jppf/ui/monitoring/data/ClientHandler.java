@@ -29,16 +29,17 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.diagnostics.Thresholds;
 import org.jppf.ui.monitoring.event.StatsHandlerEvent;
 import org.jppf.ui.options.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  * @since 5.0
  */
-public class ClientHandler implements ClientListener {
+public class ClientHandler implements ClientListener, AutoCloseable {
   /**
    * Logger for this class.
    */
@@ -47,6 +48,10 @@ public class ClientHandler implements ClientListener {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether trace log statements are enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * JPPF client used to submit execution requests.
    */
@@ -70,10 +75,10 @@ public class ClientHandler implements ClientListener {
   /**
    * Thread pool used to process new connection events.
    */
-  private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("StasHandler"));
+  private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new JPPFThreadFactory("StatScheduler"));
 
   /**
-   * 
+   *
    * @param statsHandler the stats handler.
    */
   ClientHandler(final StatsHandler statsHandler) {
@@ -89,18 +94,18 @@ public class ClientHandler implements ClientListener {
   public synchronized void newConnection(final ClientEvent event) {
     final JPPFClientConnection c = event.getConnection();
     JPPFClientConnectionStatus status = c.getStatus();
-    if ((status != null) && status.isWorkingStatus()) executor.submit(new NewConnectionTask(statsHandler, c));
+    if ((status != null) && status.isWorkingStatus()) scheduler.submit(new NewConnectionTask(statsHandler, c));
     else c.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
       @Override
       public void statusChanged(final ClientConnectionStatusEvent event) {
-        if (c.getStatus().isWorkingStatus()) executor.submit(new NewConnectionTask(statsHandler, c));
+        if (c.getStatus().isWorkingStatus()) scheduler.submit(new NewConnectionTask(statsHandler, c));
       }
     });
   }
 
   @Override
   public synchronized void connectionFailed(final ClientEvent event) {
-    if ((jppfClient != null) && !jppfClient.isClosed()) executor.submit(new ConnectionFailedTask(statsHandler, event.getConnection()));
+    if ((jppfClient != null) && !jppfClient.isClosed()) scheduler.submit(new ConnectionFailedTask(statsHandler, event.getConnection()));
   }
 
   /**
@@ -117,26 +122,48 @@ public class ClientHandler implements ClientListener {
    */
   public synchronized void setCurrentConnection(final JPPFClientConnection connection) {
     if ((currentConnection == null) || ((connection != null) && !connectionId(connection).equals(connectionId(currentConnection)))) {
-      executor.submit(new Runnable() {
-        @Override public void run() {
-          final boolean currentConnectionNull = (currentConnection == null);
-          if (connection != null) {
-            synchronized(statsHandler) {
-              currentConnection = connection;
-              JPPFClientConnectionStatus status = currentConnection.getStatus();
-              if ((status != null) && status.isWorkingStatus()) {
-                statsHandler.fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
-                if (currentConnectionNull) executor.submit(new Runnable() {
-                  @Override public void run() {
-                    log.info("first refreshLoadBalancer()");
-                    refreshLoadBalancer();
-                  }
-                });
-              }
+      scheduler.submit(new SetCurrentConnectionTask(connection));
+    }
+  }
+
+  /**
+   * Task submitted when changing the current connection.
+   */
+  private class SetCurrentConnectionTask implements Runnable {
+    /**
+     * The connection to set.
+     */
+    private final JPPFClientConnection connection;
+
+    /**
+     * Initiailize this task with the specified client connection.
+     * @param connection the connection to set.
+     */
+    public SetCurrentConnectionTask(final JPPFClientConnection connection) {
+      this.connection = connection;
+    }
+
+    @Override
+    public void run() {
+      final boolean currentConnectionNull = (currentConnection == null);
+      if (connection != null) {
+        synchronized(statsHandler) {
+          currentConnection = connection;
+          JPPFClientConnectionStatus status = currentConnection.getStatus();
+          if ((status != null) && status.isWorkingStatus()) {
+            statsHandler.fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
+            if (currentConnectionNull) {
+              Runnable r = new Runnable() {
+                @Override public void run() {
+                  log.debug("first refreshLoadBalancer()");
+                  if (refreshLoadBalancer()) throw new IllegalStateException("");
+                }
+              };
+              scheduler.scheduleWithFixedDelay(r, 0L, 1000L, TimeUnit.MILLISECONDS);
             }
           }
         }
-      });
+      }
     }
   }
 
@@ -151,35 +178,44 @@ public class ClientHandler implements ClientListener {
 
   /**
    * Refresh the load balancer settings view for the currently slected driver.
+   * @return {@code true} to indicate success, {@code false} otherwise.
    */
   @SuppressWarnings("unchecked")
-  public void refreshLoadBalancer() {
-    OptionElement option = getServerListOption();
+  public boolean refreshLoadBalancer() {
+    OptionElement option = OptionsHandler.getPage("JPPFAdminTool");
     if (option == null) {
-      log.info("server chooser is null");
-      return;
+      log.debug("JPPFAdminTool element is null");
+      return false;
     }
+    OptionElement lbOption = OptionsHandler.findOptionWithName(option, "LoadBalancingPanel");
+    if (lbOption == null) {
+      log.debug("LoadBalancingPanel element is null");
+      return false;
+    }
+    log.info("LoadBalancingPanel = " + lbOption);
     JMXDriverConnectionWrapper connection = currentJmxConnection();
-    AbstractOption messageArea = (AbstractOption) option.findFirstWithName("/LoadBalancingMessages");
+    AbstractOption messageArea = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingMessages");
     if ((connection == null) || !connection.isConnected()) {
       messageArea.setValue("Not connected to a server, please click on 'Refresh' to try again");
-      return;
+      return false;
     }
     messageArea.setValue("");
     try {
       LoadBalancingInformation info = connection.loadBalancerInformation();
       log.info("info = {}", info);
       if (info != null) {
-        ComboBoxOption combo = (ComboBoxOption) option.findFirstWithName("/Algorithm");
+        ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
         List items = combo.getItems();
         if ((items == null) || items.isEmpty()) combo.setItems(info.getAlgorithmNames());
         combo.setValue(info.getAlgorithm());
-        AbstractOption params = (AbstractOption) option.findFirstWithName("/LoadBalancingParameters");
+        AbstractOption params = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingParameters");
         params.setValue(info.getParameters().asString());
+        return true;
       }
     }
     catch(Exception ignore) {
     }
+    return false;
   }
 
   /**
@@ -219,7 +255,8 @@ public class ClientHandler implements ClientListener {
    * @return an <code>OptionElement</code> instance.
    */
   public synchronized OptionElement getServerListOption() {
-    return serverListOption;
+    //return serverListOption;
+    return OptionsHandler.getPage("JPPFAdminTool").findFirstWithName("ServerChooser");
   }
 
   /**
@@ -230,14 +267,16 @@ public class ClientHandler implements ClientListener {
     this.serverListOption = serverListOption;
     List<JPPFClientConnection> list = getJppfClient().getAllConnections();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
-    for (JPPFClientConnection c: list) executor.submit(new NewConnectionTask(statsHandler, c));
+    for (JPPFClientConnection c: list) scheduler.submit(new NewConnectionTask(statsHandler, c));
     notifyAll();
   }
 
   /**
    * Close all connections to the driver(s).
    */
+  @Override
   public void close() {
+    scheduler.shutdownNow();
     if (jppfClient != null) jppfClient.close();
   }
 
@@ -255,7 +294,7 @@ public class ClientHandler implements ClientListener {
    * @return an array, possibly empty but never null, of interval objects.
    */
   public Object[] getMeterIntervals(final Fields field) {
-    if (debugEnabled) log.debug("getting intervals for {}", field);
+    if (traceEnabled) log.trace("getting intervals for {}", field);
     switch(field) {
       case HEALTH_HEAP_PCT:
       case HEALTH_NON_HEAP_PCT:
@@ -277,11 +316,11 @@ public class ClientHandler implements ClientListener {
         double lastValue = 0d;
         int len = names.length + 2;
         double[] values = new double[len];
-        // convert from [name1, ..., nameN] to [0, value1, ..., valueN, 100] 
+        // convert from [name1, ..., nameN] to [0, value1, ..., valueN, 100]
         values[0] = 0d;
         for (int i=0; i<names.length; i++) {
           values[i+1] = 100d * thresholds.getValue(names[i]);
-          if (debugEnabled) log.debug("value for '{}' = {}", names[i], values[i+1]);
+          if (traceEnabled) log.trace("value for '{}' = {}", names[i], values[i+1]);
         }
         values[len-1] = 100d;
         Object[] intervals = new Object[len - 1];

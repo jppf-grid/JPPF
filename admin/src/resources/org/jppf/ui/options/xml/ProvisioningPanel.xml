@@ -38,7 +38,7 @@
     </child>
 
     <!-- Interrupt if running flag -->
-    <child name="interruptIfRunning" type="Boolean">
+    <child name="interruptIfRunning" type="Checkbox">
       <property name="label" value="Interrupt nodes even if running"/>
       <property name="tooltip" value="Whether the nodes can be stopped immediately \nor only once they are idle (deferred stop)"/>
       <property name="persistent" value="true"/>
@@ -46,7 +46,7 @@
     </child>
 
     <!-- Use config overrides checkbox -->
-    <child name="useOverrides" type="Boolean">
+    <child name="useOverrides" type="Checkbox">
       <property name="label" value="Use configuration overrides"/>
       <property name="tooltip" value="Whether to specify configuration override for the slaves"/>
       <property name="persistent" value="true"/>
