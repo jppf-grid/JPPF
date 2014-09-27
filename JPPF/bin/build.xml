@@ -30,7 +30,7 @@
 	<property name="server"                value="${basedir}/../server"/>
 	<property name="demo"                  value="${basedir}/../demo"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
-  <property name="jmxremote"            value="${basedir}/../jmxxremote"/>
+  <property name="jmxremote"             value="${basedir}/../jmxxremote"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="tests"                 value="${basedir}/../tests"/>
@@ -134,7 +134,7 @@
     </tstamp>
     <!-- Write thebuild and version information to a resource file -->
     <!-- The resource file will be part of the corresponding jar   -->
-    <propertyfile file="${node}/src/resources/META-INF/jppf-version.properties">
+    <propertyfile file="${common}/src/resources/META-INF/jppf-version.properties">
       <entry key="version.number" type="string" value="${version.number}"/>
       <entry key="build.number" type="string" value="${build.number}"/>
       <entry key="build.date" type="string" value="${readable.now}"/>
