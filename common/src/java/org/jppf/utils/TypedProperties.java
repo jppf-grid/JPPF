@@ -391,11 +391,7 @@ public class TypedProperties extends Properties {
    */
   public String asString() {
     StringBuilder sb = new StringBuilder();
-    for (Map.Entry<Object, Object> en: entrySet()) {
-      if ((en.getKey() instanceof String) && (en.getValue() instanceof String)) {
-        sb.append(en.getKey()).append(" = ").append(en.getValue()).append('\n');
-      }
-    }
+    for (String key: stringPropertyNames()) sb.append(key).append(" = ").append(getProperty(key)).append('\n');
     return sb.toString();
   }
 
@@ -406,11 +402,9 @@ public class TypedProperties extends Properties {
    */
   public TypedProperties filter(final Filter filter) {
     TypedProperties result = new TypedProperties();
-    for (Map.Entry<Object, Object> entry: entrySet()) {
-      if ((entry.getKey() instanceof String) && (entry.getKey() instanceof String)) {
-        if ((filter == null) || filter.accepts((String) entry.getKey(), (String) entry.getValue()))
-          result.put(entry.getKey(), entry.getValue());
-      }
+    for (String key: stringPropertyNames()) {
+      String value = getProperty(key);
+      if ((filter == null) || filter.accepts(key, value)) result.put(key, value);
     }
     return result;
   }
