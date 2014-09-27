@@ -22,6 +22,7 @@ import java.util.concurrent.Future;
 import org.jppf.JPPFReconnectionNotification;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -32,8 +33,7 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-public class NodeTaskWrapper implements Runnable
-{
+public class NodeTaskWrapper implements Runnable {
   /**
    * Logger for this class.
    */
@@ -145,6 +145,7 @@ public class NodeTaskWrapper implements Runnable
       reconnectionNotification = t;
     } catch(Throwable t) {
       task.setThrowable(t);
+      if (t instanceof UnsatisfiedLinkError) task.setResult(ExceptionUtils.getStackTrace(t));
     } finally {
       Thread.currentThread().setContextClassLoader(oldCl);
       try {
@@ -229,8 +230,7 @@ public class NodeTaskWrapper implements Runnable
    * Get the future created by the executor service.
    * @return an instance of {@link Future}.
    */
-  public Future<?> getFuture()
-  {
+  public Future<?> getFuture() {
     return future;
   }
 
@@ -238,8 +238,7 @@ public class NodeTaskWrapper implements Runnable
    * Set the future created by the executor service.
    * @param future an instance of {@link Future}.
    */
-  public void setFuture(final Future<?> future)
-  {
+  public void setFuture(final Future<?> future) {
     this.future = future;
   }
 
@@ -247,8 +246,7 @@ public class NodeTaskWrapper implements Runnable
    * Get the reconnection notification thrown by the atysk execution, if any.
    * @return a {@link JPPFReconnectionNotification} or <code>null</code>.
    */
-  JPPFReconnectionNotification getReconnectionNotification()
-  {
+  JPPFReconnectionNotification getReconnectionNotification() {
     return reconnectionNotification;
   }
 
@@ -256,8 +254,7 @@ public class NodeTaskWrapper implements Runnable
    * Remove the specified future from the pending set and notify
    * all threads waiting for the end of the execution.
    */
-  public void cancelTimeoutAction()
-  {
+  public void cancelTimeoutAction() {
     if (future != null) timeoutHandler.cancelAction(future);
   }
 
@@ -265,8 +262,7 @@ public class NodeTaskWrapper implements Runnable
    * Get trhe object that holds the used cpu time for this task.
    * @return a {@link ExecutionInfo} instance.
    */
-  public ExecutionInfo getExecutionInfo()
-  {
+  public ExecutionInfo getExecutionInfo() {
     return executionInfo;
   }
 
@@ -274,8 +270,7 @@ public class NodeTaskWrapper implements Runnable
    * Get the elapsed time for this task's execution.
    * @return the elapsed time in nanoseconds.
    */
-  public long getElapsedTime()
-  {
+  public long getElapsedTime() {
     return elapsedTime;
   }
 }

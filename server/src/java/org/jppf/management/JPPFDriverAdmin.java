@@ -259,7 +259,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   }
 
   @Override
-  public void setBroadcasting(final Boolean broadcasting) throws Exception {
+  public void setBroadcasting(final boolean broadcasting) throws Exception {
     DriverInitializer di = driver.getInitializer();
     boolean b = di.isBroadcasting();
     if (b == broadcasting) return;
@@ -268,7 +268,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   }
 
   @Override
-  public Boolean isBroadcasting() throws Exception {
+  public boolean getBroadcasting() throws Exception {
     return driver.getInitializer().isBroadcasting();
   }
 }
