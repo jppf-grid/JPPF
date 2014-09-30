@@ -26,8 +26,8 @@ import javax.swing.*;
 
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.jppf.ui.actions.*;
-import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.AbstractOption;
 import org.slf4j.*;
 
@@ -56,13 +56,9 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The tree view.
-   */
-  protected NodeDataPanel treeTableOption = null;
-  /**
    * The graph visualization component.
    */
-  protected VisualizationViewer<TopologyData, Number> viewer = null;
+  protected VisualizationViewer<AbstractTopologyComponent, Number> viewer = null;
   /**
    * The graph component.
    */
@@ -104,7 +100,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     if (graphHandler == null) {
       if (debugEnabled) log.debug("creating UI");
       graphHandler = new GraphTopologyHandler(this);
-      SparseMultigraph<TopologyData, Number> graph = graphHandler.getDisplayGraph();
+      SparseMultigraph<AbstractTopologyComponent, Number> graph = graphHandler.getDisplayGraph();
       layoutFactory = new LayoutFactory(graph);
       layout = "Radial";
       viewer = new VisualizationViewer<>(layoutFactory.createLayout(layout));
@@ -112,7 +108,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.setBackground(Color.white);
       viewer.setPickedVertexState(new MultiPickedState());
       viewer.setPickSupport(new ShapePickSupport(viewer));
-      VertexLabelAsShapeRenderer<TopologyData, Number> vlasr = new VertexLabelAsShapeRenderer<>(viewer.getRenderContext());
+      VertexLabelAsShapeRenderer<AbstractTopologyComponent, Number> vlasr = new VertexLabelAsShapeRenderer<>(viewer.getRenderContext());
       viewer.getRenderer().setVertexLabelRenderer(vlasr);
       viewer.getRenderContext().setVertexShapeTransformer(vlasr);
       JPPFVertexLabelRenderer renderer = new JPPFVertexLabelRenderer();
@@ -128,17 +124,17 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(1f)));
       //viewer.getRenderContext().setEdgeShapeTransformer(new EdgeShape.SimpleLoop());
       //viewer.getRenderContext().setEdgeArrowTransformer();
-      viewer.setVertexToolTipTransformer(new ToStringLabeller<TopologyData>() {
+      viewer.setVertexToolTipTransformer(new ToStringLabeller<AbstractTopologyComponent>() {
         @Override
-        public String transform(final TopologyData v) {
-          return v.isNode() ? computeNodeTooltip(v) : super.transform(v);
+        public String transform(final AbstractTopologyComponent v) {
+          return v.isNode() ? computeNodeTooltip((TopologyNode) v) : super.transform(v);
         }
       });
       graphComponent = new GraphZoomScrollPane(viewer);
       actionHandler = new GraphActionHandler(viewer);
-      EditingModalGraphMouse<TopologyData, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
+      EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
       graphMouse.setMode(ModalGraphMouse.Mode.PICKING);
-      PopupMenuMousePlugin<TopologyData, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
+      PopupMenuMousePlugin<AbstractTopologyComponent, Number> myPlugin = new PopupMenuMousePlugin<>(actionHandler);
       graphMouse.remove(graphMouse.getPopupEditingPlugin());
       graphMouse.add(myPlugin);
       viewer.setGraphMouse(graphMouse);
@@ -146,17 +142,18 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     }
   }
 
+  /**
+   * Initialize the graph refreshing.
+   */
+  public void init() {
+    if (debugEnabled) log.debug("initializing graph");
+    populate();
+    TopologyManager.getInstance().addTopologyListener(graphHandler);
+  }
+
   @Override
   public JComponent getUIComponent() {
     return graphComponent;
-  }
-
-  /**
-   * Set the corresponding tree view onto this graph.
-   * @param treeTableOption a {@link AbstractTreeTableOption} instance.
-   */
-  public void setTreeTableOption(final NodeDataPanel treeTableOption) {
-    this.treeTableOption = treeTableOption;
   }
 
   /**
@@ -206,7 +203,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       actionHandler.putAction("graph.restart.node.deferred", new ShutdownOrRestartNodeAction(true, false, "restart.node.deferred"));
       actionHandler.putAction("graph.shutdown.node", new ShutdownOrRestartNodeAction(false, true, "shutdown.node"));
       actionHandler.putAction("graph.shutdown.node.deferred", new ShutdownOrRestartNodeAction(false, false, "shutdown.node.deferred"));
-      actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction(treeTableOption));
+      actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction());
       actionHandler.putAction("graph.node.provisioning", new ProvisioningAction());
       actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
       actionHandler.putAction("graph.select.nodes", new SelectGraphNodesAction(this));
@@ -226,7 +223,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * Get the graph visualization component.
    * @return a <code>VisualizationViewer</code> instance.
    */
-  public VisualizationViewer<TopologyData, Number> getViewer() {
+  public VisualizationViewer<AbstractTopologyComponent, Number> getViewer() {
     return viewer;
   }
 
@@ -255,12 +252,12 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * @param node contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
-  private String computeNodeTooltip(final TopologyData node) {
+  private String computeNodeTooltip(final TopologyNode node) {
     StringBuilder sb = new StringBuilder();
     sb.append("<html>uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
-    if (node.getNodeInformation().isMasterNode()) sb.append(" | Slaves: ").append(node.getNbSlaveNodes());
+    if (node.getManagementInfo().isMasterNode()) sb.append(" | Slaves: ").append(node.getNbSlaveNodes());
     sb.append("</html>");
     return sb.toString();
   }
@@ -269,7 +266,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
    * Redraw the graph.
    */
   public void populate() {
-    graphHandler.populate(treeTableOption.getTreeTableRoot());
+    graphHandler.populate();
   }
 
   /**

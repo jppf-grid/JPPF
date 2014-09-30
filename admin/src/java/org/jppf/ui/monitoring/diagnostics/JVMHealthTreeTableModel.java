@@ -23,14 +23,13 @@ import java.text.NumberFormat;
 import javax.swing.tree.*;
 
 import org.jppf.management.diagnostics.HealthSnapshot;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**
  * Tree table model for the tree table.
  */
-public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
-{
+public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Value of one megabyte.
    */
@@ -66,10 +65,6 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
   /**
    * Column number for the node's last event.
    */
-  //static final int DEADLOCK_STATUS = 6;
-  /**
-   * Column number for the node's last event.
-   */
   static final int CPU_LOAD = 6;
   /**
    * A number formatter for the used memory %.
@@ -80,32 +75,26 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
    * Initialize this model with the specified tree.
    * @param node the root of the tree.
    */
-  public JVMHealthTreeTableModel(final TreeNode node)
-  {
+  public JVMHealthTreeTableModel(final TreeNode node) {
     super(node);
     BASE = "org.jppf.ui.i18n.NodeDataPage";
   }
 
   @Override
-  public int getColumnCount()
-  {
+  public int getColumnCount() {
     return 7;
   }
 
   @Override
-  public Object getValueAt(final Object node, final int column)
-  {
+  public Object getValueAt(final Object node, final int column) {
     Object res = "";
-    if (node instanceof DefaultMutableTreeNode)
-    {
+    if (node instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      if (defNode.getUserObject() instanceof TopologyData)
-      {
-        TopologyData info = (TopologyData) defNode.getUserObject();
+      if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
+        AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
         HealthSnapshot health = info.getHealthSnapshot();
         if (health == null) return res;
-        switch (column)
-        {
+        switch (column) {
           case URL:
             res = info.toString();
             break;
@@ -129,19 +118,12 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
             int n = health.getLiveThreads();
             res = n < 0 ? NA : Integer.toString(n);
             break;
-          /*
-          case DEADLOCK_STATUS:
-            res = health.isDeadlocked() ? "yes" : "no";
-            break;
-          */
           case CPU_LOAD:
             d = health.getCpuLoad();
             res = d < 0d ? NA : nf.format(d * 100d) + " %";
             break;
         }
-      }
-      else
-      {
+      } else {
         if (column == 0) res = defNode.getUserObject().toString();
       }
     }
@@ -149,11 +131,9 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
   }
 
   @Override
-  public String getColumnName(final int column)
-  {
+  public String getColumnName(final int column) {
     String res = "";
-    switch (column)
-    {
+    switch (column) {
       case URL:
         res = localize("column.health.url");
         break;
@@ -169,11 +149,6 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
       case NON_HEAP_MEM_MB:
         res = localize("column.health.nonheap.mb");
         break;
-      /*
-      case DEADLOCK_STATUS:
-        res = localize("column.health.deadlocked");
-        break;
-      */
       case THREADS:
         res = localize("column.health.livethreads");
         break;
@@ -188,8 +163,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
    * Get a number formatter for the used memory %.
    * @return a <code>NumberFormat</code> instance.
    */
-  private NumberFormat createNumberFormat()
-  {
+  private NumberFormat createNumberFormat() {
     NumberFormat nf = NumberFormat.getInstance();
     nf.setGroupingUsed(true);
     nf.setMaximumFractionDigits(1);
@@ -198,11 +172,9 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
   }
 
   @Override
-  public String getColumnTooltip(final int column)
-  {
+  public String getColumnTooltip(final int column) {
     String res = "";
-    switch (column)
-    {
+    switch (column) {
       case URL:
         res = localize("column.health.url.tooltip");
         break;
@@ -218,11 +190,6 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel
       case NON_HEAP_MEM_MB:
         res = localize("column.health.nonheap.mb.tooltip");
         break;
-      /*
-      case DEADLOCK_STATUS:
-        res = localize("column.health.deadlocked.tooltip");
-        break;
-      */
       case THREADS:
         res = localize("column.health.livethreads.tooltip");
         break;

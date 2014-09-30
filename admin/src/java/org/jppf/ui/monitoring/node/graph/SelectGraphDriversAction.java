@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
 
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 
@@ -49,8 +49,8 @@ public class SelectGraphDriversAction extends AbstractGraphSelectionAction
   {
     synchronized(panel)
     {
-      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
-      for (TopologyData data: getVertices()) viewer.getPickedVertexState().pick(data, !data.isNode());
+      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      for (AbstractTopologyComponent data: getVertices()) viewer.getPickedVertexState().pick(data, !data.isNode());
     }
   }
 }

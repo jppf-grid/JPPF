@@ -23,7 +23,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.jppf.ui.monitoring.data.StatsHandler;
-import org.jppf.ui.options.OptionElement;
+import org.jppf.ui.options.*;
 import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.options.event.WindowClosingListener;
 import org.jppf.ui.options.factory.OptionsHandler;
@@ -124,7 +124,7 @@ public class UILauncher {
       if (createFrame) {
         JFrame frame = new JFrame(elt.getLabel());
         OptionsHandler.setMainWindow(frame);
-        DockingManager.getInstance().setMainView(frame);
+        DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
         frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
         frame.addWindowListener(new WindowClosingListener());
         StatsHandler.getInstance();
@@ -132,7 +132,7 @@ public class UILauncher {
         OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
       } else {
         JComponent comp = elt.getUIComponent();
-        comp.addHierarchyListener(new MainFrameObserver());
+        comp.addHierarchyListener(new MainFrameObserver(elt));
       }
       return elt.getUIComponent();
     } catch (Exception e) {
@@ -146,11 +146,23 @@ public class UILauncher {
    * Listens for hierarchy events to find out when the component is finally linked to a frame.
    * @since 5.0
    */
-  private static class MainFrameObserver implements HierarchyListener {
+  private final static class MainFrameObserver implements HierarchyListener {
     /**
      * Set to true whenever the application main frame is found.
      */
     private boolean frameFound = false;
+    /**
+     * 
+     */
+    private final OptionElement uiRoot;
+
+    /**
+     * 
+     * @param uiRoot .
+     */
+    private MainFrameObserver(final OptionElement uiRoot) {
+      this.uiRoot = uiRoot;
+    }
 
     @Override
     public void hierarchyChanged(final HierarchyEvent event) {
@@ -161,7 +173,7 @@ public class UILauncher {
         frameFound = true;
         //System.out.println("found frame = " + frame);
         OptionsHandler.setMainWindow(frame);
-        DockingManager.getInstance().setMainView(frame);
+        DockingManager.getInstance().setMainView(frame, (OptionContainer) uiRoot);
       }
     }
 

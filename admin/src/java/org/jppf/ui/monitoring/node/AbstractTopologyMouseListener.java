@@ -27,6 +27,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.ui.actions.*;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.slf4j.*;
 
@@ -47,7 +48,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter {
   /**
    * Constant for an empty <code>TopologyData</code> array.
    */
-  protected static final TopologyData[] EMPTY_TOPOLOGY_DATA_ARRAY = new TopologyData[0];
+  protected static final AbstractTopologyComponent[] EMPTY_TOPOLOGY_DATA_ARRAY = new AbstractTopologyComponent[0];
   /**
    * Path to the cancel icon resource.
    */
@@ -59,7 +60,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter {
   /**
    * Array of current corresponding jmx connections.
    */
-  protected TopologyData[] data = null;
+  protected AbstractTopologyComponent[] data = null;
   /**
    * The object that handles toolbar and menu actions.
    */
@@ -86,7 +87,7 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter {
     JTree tree = treeTable.getTree();
     int x = event.getX();
     int y = event.getY();
-    List<TopologyData> dataList = new ArrayList<>();
+    List<AbstractTopologyComponent> dataList = new ArrayList<>();
     int[] rows = treeTable.getSelectedRows();
     if ((rows == null) || (rows.length == 0)) {
       TreePath path = tree.getPathForLocation(x, y);
@@ -96,11 +97,11 @@ public abstract class AbstractTopologyMouseListener extends MouseAdapter {
     for (int row: rows) {
       TreePath path = tree.getPathForRow(row);
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-      if (!(node.getUserObject() instanceof TopologyData)) continue;
-      TopologyData td = (TopologyData) node.getUserObject();
-      if (td.isNode()) dataList.add((TopologyData) node.getUserObject());
+      if (!(node.getUserObject() instanceof AbstractTopologyComponent)) continue;
+      AbstractTopologyComponent td = (AbstractTopologyComponent) node.getUserObject();
+      if (td.isNode()) dataList.add((AbstractTopologyComponent) node.getUserObject());
     }
-    data = dataList.toArray(new TopologyData[dataList.size()]);
+    data = dataList.toArray(new AbstractTopologyComponent[dataList.size()]);
 
     int button = event.getButton();
     if (button == MouseEvent.BUTTON3) {

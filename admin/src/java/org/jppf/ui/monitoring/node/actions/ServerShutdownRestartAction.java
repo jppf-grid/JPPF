@@ -17,13 +17,13 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.util.*;
 
 import javax.swing.*;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -76,8 +76,8 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
   public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     for (Object o: selectedElements) {
-      if (!(o instanceof TopologyData)) continue;
-      TopologyData data = (TopologyData) o;
+      if (!(o instanceof AbstractTopologyComponent)) continue;
+      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (!data.isNode()) {
         setEnabled(true);
         return;
@@ -95,9 +95,9 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     final List<JMXDriverConnectionWrapper> list = new ArrayList<>();
     for (Object o: selectedElements) {
-      if (!(o instanceof TopologyData)) continue;
-      TopologyData data = (TopologyData) o;
-      if (data.isDriver()) list.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
+      if (!(o instanceof AbstractTopologyComponent)) continue;
+      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+      if (data.isDriver()) list.add(((TopologyDriver) data).getJmx());
     }
 
     AbstractButton btn = (AbstractButton) event.getSource();

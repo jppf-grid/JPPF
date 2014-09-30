@@ -28,8 +28,7 @@ import org.slf4j.*;
 /**
  * Task executed when a new driver connection is created.
  */
-class ConnectionFailedTask extends ThreadSynchronization implements Runnable
-{
+class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -52,8 +51,7 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
    * @param statsHandler the {@link StatsHandler}.
    * @param c the new connection that was created.
    */
-  public ConnectionFailedTask(final StatsHandler statsHandler, final JPPFClientConnection c)
-  {
+  public ConnectionFailedTask(final StatsHandler statsHandler, final JPPFClientConnection c) {
     this.statsHandler = statsHandler;
     this.c = c;
   }
@@ -62,37 +60,27 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable
    * Perform the task.
    */
   @Override
-  public void run()
-  {
-    synchronized(statsHandler)
-    {
-      if (statsHandler.dataHolderMap.get(c.getName()) != null)
-      {
-        statsHandler.dataHolderMap.remove(c.getName());
-      }
+  public void run() {
+    synchronized(statsHandler) {
+      if (statsHandler.dataHolderMap.get(c.getName()) != null)  statsHandler.dataHolderMap.remove(c.getName());
     }
     JComboBox box = null;
     while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
-    synchronized(statsHandler)
-    {
+    synchronized(statsHandler) {
       if (debugEnabled) log.debug("removing client connection " + c.getName() + " from driver combo box");
       box = ((ComboBoxOption) statsHandler.getClientHandler().getServerListOption()).getComboBox();
       int count = box.getItemCount();
       int idx = -1;
-      for (int i=0; i<count; i++)
-      {
+      for (int i=0; i<count; i++) {
         Object o = box.getItemAt(i);
-        if (c.equals(o))
-        {
+        if (c.equals(o)) {
           box.removeItemAt(i);
           idx = i;
           break;
         }
       }
-      if ((idx >= 0) && (box.getItemCount() > 0))
-      {
-        if ((statsHandler.getClientHandler().currentConnection == null) || c.equals(statsHandler.getClientHandler().currentConnection))
-        {
+      if ((idx >= 0) && (box.getItemCount() > 0)) {
+        if ((statsHandler.getClientHandler().currentConnection == null) || c.equals(statsHandler.getClientHandler().currentConnection)) {
           int n = Math.min(idx, box.getItemCount()-1);
           JPPFClientConnection conn = (JPPFClientConnection) box.getItemAt(n);
           statsHandler.getClientHandler().currentConnection = conn;

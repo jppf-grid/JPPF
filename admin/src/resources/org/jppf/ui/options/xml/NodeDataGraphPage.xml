@@ -74,8 +74,8 @@
       <listener type="script">
         <script language="groovy">
           def graph = option.findFirstWithName("/NodeGraph");
-          graph.populate();
           graph.setLayout();
+          graph.init();
         </script>
       </listener>
     </child>
@@ -131,6 +131,7 @@
 				<script language="groovy">
 					option.setupActions();
 					option.setLayout();
+          option.init();
 				</script>
 			</initializer>
 		</child>

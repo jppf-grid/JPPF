@@ -92,6 +92,7 @@
           option.setupTableColumns();
           option.loadThresholds();
           option.setupActions();
+          option.init();
         </script>
       </initializer>
       <finalizer type="script">

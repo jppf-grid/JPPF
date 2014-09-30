@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node.graph;
 import java.awt.Dimension;
 import java.util.Collection;
 
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.Graph;
@@ -36,11 +36,11 @@ class LayoutFactory
   /**
    * The graph for which to create a layout.
    */
-  private Graph<TopologyData, Number> initialGraph = null;
+  private Graph<AbstractTopologyComponent, Number> initialGraph = null;
   /**
    * The graph visualization component.
    */
-  private VisualizationViewer<TopologyData, Number> viewer = null;
+  private VisualizationViewer<AbstractTopologyComponent, Number> viewer = null;
   /**
    * The size of all the verices (drivers and nodes) in the graph.
    */
@@ -50,7 +50,7 @@ class LayoutFactory
    * Create a factory instance for the specified graph.
    * @param graph the viewer of the graph for which to create layouts.
    */
-  LayoutFactory(final Graph<TopologyData, Number> graph)
+  LayoutFactory(final Graph<AbstractTopologyComponent, Number> graph)
   {
     this.initialGraph = graph;
   }
@@ -60,9 +60,9 @@ class LayoutFactory
    * @param name the name of the layout to create.
    * @return a <code>mxIGraphLayout</code> instance.
    */
-  Layout<TopologyData, Number> createLayout(final String name)
+  Layout<AbstractTopologyComponent, Number> createLayout(final String name)
   {
-    Layout<TopologyData, Number> layout = null;
+    Layout<AbstractTopologyComponent, Number> layout = null;
     if ("Circle".equals(name)) return createCircleLayout();
     else if ("Fruchterman-Reingold".equals(name)) return createFRLayout();
     else if ("Fruchterman-Reingold-2".equals(name)) return createFRLayout2();
@@ -79,9 +79,9 @@ class LayoutFactory
    * Create a new circle layout.
    * @return a <code>CircleLayout</code> instance.
    */
-  private CircleLayout<TopologyData, Number> createCircleLayout()
+  private CircleLayout<AbstractTopologyComponent, Number> createCircleLayout()
   {
-    CircleLayout<TopologyData, Number> layout = new CircleLayout<>(initialGraph);
+    CircleLayout<AbstractTopologyComponent, Number> layout = new CircleLayout<>(initialGraph);
     layout.setRadius(150);
     return layout;
   }
@@ -90,9 +90,9 @@ class LayoutFactory
    * Create a new Fruchterman-Reingold layout.
    * @return a <code>FRLayout</code> instance.
    */
-  private FRLayout<TopologyData, Number> createFRLayout()
+  private FRLayout<AbstractTopologyComponent, Number> createFRLayout()
   {
-    FRLayout<TopologyData, Number> layout = new FRLayout<>(initialGraph);
+    FRLayout<AbstractTopologyComponent, Number> layout = new FRLayout<>(initialGraph);
     layout.setAttractionMultiplier(0.75d);
     layout.setRepulsionMultiplier(0.75d);
     layout.setMaxIterations(700);
@@ -103,9 +103,9 @@ class LayoutFactory
    * Create a new Fruchterman-Reingold (2) layout.
    * @return a <code>FRLayout2</code> instance.
    */
-  private FRLayout2<TopologyData, Number> createFRLayout2()
+  private FRLayout2<AbstractTopologyComponent, Number> createFRLayout2()
   {
-    FRLayout2<TopologyData, Number> layout = new FRLayout2<>(initialGraph);
+    FRLayout2<AbstractTopologyComponent, Number> layout = new FRLayout2<>(initialGraph);
     layout.setAttractionMultiplier(0.75d);
     layout.setRepulsionMultiplier(0.75d);
     layout.setMaxIterations(700);
@@ -116,9 +116,9 @@ class LayoutFactory
    * Create a new Self Organizing Map layout.
    * @return a <code>ISOMLayout</code> instance.
    */
-  private ISOMLayout<TopologyData, Number> createISOMLayout()
+  private ISOMLayout<AbstractTopologyComponent, Number> createISOMLayout()
   {
-    ISOMLayout<TopologyData, Number> layout = new ISOMLayout<>(initialGraph);
+    ISOMLayout<AbstractTopologyComponent, Number> layout = new ISOMLayout<>(initialGraph);
     return layout;
   }
 
@@ -126,9 +126,9 @@ class LayoutFactory
    * Create a new Kamada-Kawai layout.
    * @return a <code>KKLayout</code> instance.
    */
-  private KKLayout<TopologyData, Number> createKKLayout()
+  private KKLayout<AbstractTopologyComponent, Number> createKKLayout()
   {
-    KKLayout<TopologyData, Number> layout = new KKLayout<>(initialGraph);
+    KKLayout<AbstractTopologyComponent, Number> layout = new KKLayout<>(initialGraph);
     layout.setAdjustForGravity(true);
     layout.setDisconnectedDistanceMultiplier(0.5d);
     layout.setExchangeVertices(true);
@@ -141,9 +141,9 @@ class LayoutFactory
    * Create a new Spring layout.
    * @return a <code>SpringLayout</code> instance.
    */
-  private SpringLayout<TopologyData, Number> createSpringLayout()
+  private SpringLayout<AbstractTopologyComponent, Number> createSpringLayout()
   {
-    SpringLayout<TopologyData, Number> layout = new SpringLayout<>(initialGraph);
+    SpringLayout<AbstractTopologyComponent, Number> layout = new SpringLayout<>(initialGraph);
     layout.setForceMultiplier(1d/3d);
     layout.setRepulsionRange(100*100);
     layout.setStretch(0.7d);
@@ -154,9 +154,9 @@ class LayoutFactory
    * Create a new Spring (2) layout.
    * @return a <code>SpringLayout2</code> instance.
    */
-  private SpringLayout2<TopologyData, Number> createSpringLayout2()
+  private SpringLayout2<AbstractTopologyComponent, Number> createSpringLayout2()
   {
-    SpringLayout2<TopologyData, Number> layout = new SpringLayout2<>(initialGraph);
+    SpringLayout2<AbstractTopologyComponent, Number> layout = new SpringLayout2<>(initialGraph);
     layout.setForceMultiplier(1d/3d);
     layout.setRepulsionRange(100*100);
     layout.setStretch(0.7d);
@@ -178,10 +178,10 @@ class LayoutFactory
    * Create a new Static layout.
    * @return a <code>StaticLayout</code> instance.
    */
-  private StaticLayout<TopologyData, Number> createStaticLayout()
+  private StaticLayout<AbstractTopologyComponent, Number> createStaticLayout()
   {
-    Collection<TopologyData> vertices = initialGraph.getVertices();
-    StaticLayout<TopologyData, Number> layout = new StaticLayout<>(initialGraph);
+    Collection<AbstractTopologyComponent> vertices = initialGraph.getVertices();
+    StaticLayout<AbstractTopologyComponent, Number> layout = new StaticLayout<>(initialGraph);
     return layout;
   }
 
@@ -189,7 +189,7 @@ class LayoutFactory
    * Set the graph visualization component.
    * @param viewer a <code>VisualizationViewer</code> instance.
    */
-  void setViewer(final VisualizationViewer<TopologyData, Number> viewer)
+  void setViewer(final VisualizationViewer<AbstractTopologyComponent, Number> viewer)
   {
     this.viewer = viewer;
     initialGraph = viewer.getGraphLayout().getGraph();

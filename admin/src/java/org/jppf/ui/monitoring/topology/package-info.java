@@ -16,23 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
-
 /**
- * 
- * @author Laurent Cohen
+ * Classes supporting the monitoring and refreshing of the JPPF grid topology.
+ * @since 5.0
+ * @exclude
  */
-public enum TopologyDataType {
-  /**
-   * Object is a JPPF driver.
-   */
-  DRIVER,
-  /**
-   * Object is a JPPF peer driver connected as a node.
-   */
-  PEER,
-  /**
-   * Object is a JPPF node.
-   */
-  NODE
-}
+package org.jppf.ui.monitoring.topology;

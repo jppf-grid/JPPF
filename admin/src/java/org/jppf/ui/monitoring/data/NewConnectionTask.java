@@ -23,6 +23,7 @@ import java.util.TimerTask;
 import javax.swing.*;
 
 import org.jppf.client.JPPFClientConnection;
+import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.*;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
@@ -42,35 +43,41 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   /**
    * The new connection that was created.
    */
-  private final JPPFClientConnection c;
+  private final TopologyDriver driver;
   /**
    * The {@link StatsHandler}.
    */
   private final StatsHandler statsHandler;
+  /**
+   * The {@link ClientHandler}.
+   */
+  private final ClientHandler clientHandler;
 
   /**
    * Initialized this task with the specified client connection.
    * @param statsHandler the {@link StatsHandler}.
-   * @param c the new connection that was created.
+   * @param driver represents the new connection that was created.
    */
-  public NewConnectionTask(final StatsHandler statsHandler, final JPPFClientConnection c) {
+  public NewConnectionTask(final StatsHandler statsHandler, final TopologyDriver driver) {
     this.statsHandler = statsHandler;
-    this.c = c;
+    this.clientHandler = statsHandler.getClientHandler();
+    this.driver = driver;
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public void run() {
     synchronized(statsHandler) {
-      if (statsHandler.dataHolderMap.get(statsHandler.getClientHandler().connectionId(c)) != null) return;
-      statsHandler.dataHolderMap.put(statsHandler.getClientHandler().connectionId(c), new ConnectionDataHolder());
+      if (statsHandler.dataHolderMap.get(driver.getUuid()) != null) return;
+      if (debugEnabled) log.debug("adding client connection " + driver);
+      ConnectionDataHolder cdh = new ConnectionDataHolder();
+      cdh.setDriverData(driver);
+      statsHandler.dataHolderMap.put(driver.getUuid(), cdh);
       if (statsHandler.timer != null) {
-        TimerTask task = new StatsRefreshTask(c);
+        TimerTask task = new StatsRefreshTask(driver);
         statsHandler.timer.schedule(task, 1000L, statsHandler.refreshInterval);
       }
     }
-    //while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
-    if (debugEnabled) log.debug("adding client connection " + c.getName());
     try {
       SwingUtilities.invokeAndWait(new ComboUpdate());
     } catch (Exception e) {
@@ -84,20 +91,21 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   private class ComboUpdate implements Runnable {
     @Override
     public void run() {
-      OptionElement serverList = statsHandler.getClientHandler().getServerListOption();
+      JPPFClientConnection connection = driver.getConnection();
+      OptionElement serverList = clientHandler.getServerListOption();
       JComboBox box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
       if (box != null) {
         int count = box.getItemCount();
         boolean found = false;
         for (int i=0; i<count; i++) {
           Object o = box.getItemAt(i);
-          if (c.equals(o)) {
+          if (connection.equals(o)) {
             found = true;
             break;
           }
         }
         if (!found) {
-          box.addItem(c);
+          box.addItem(connection);
           int maxLen = 0;
           Object proto = null;
           for (int i=0; i<box.getItemCount(); i++) {
@@ -111,9 +119,9 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
           if (proto != null) box.setPrototypeDisplayValue(proto);
         }
       }
-      if (statsHandler.getClientHandler().currentConnection == null) {
-        statsHandler.getClientHandler().setCurrentConnection(c);
-        if (box != null) box.setSelectedItem(c);
+      if (clientHandler.currentConnection == null) {
+        clientHandler.setCurrentConnection(connection);
+        if (box != null) box.setSelectedItem(connection);
       }
     }
   };

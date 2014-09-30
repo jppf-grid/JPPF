@@ -127,12 +127,8 @@
 			<initializer type="script">
 				<script language="groovy">
 					option.setupTableColumns();
-					option.refreshStatusBar();
 					option.setupActions();
-          def graph = option.findFirstWithName("/NodeGraph");
-          option.setGraphOption(graph);
-          def healthPanel = option.findFirstWithName("/health.treetable");
-          if (healthPanel != null) option.setJVMHealthPanel(healthPanel);
+          option.init();
 				</script>
 			</initializer>
 			<finalizer type="script">

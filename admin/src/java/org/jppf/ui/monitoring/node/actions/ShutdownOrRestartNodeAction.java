@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.*;
 
 import org.jppf.management.NodeSelector;
-import org.jppf.management.forwarding.*;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -79,10 +79,10 @@ public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyData, String> map = getDriverMap();
-        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
+        CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            JPPFNodeForwardingMBean forwarder = entry.getKey().getNodeForwarder();
+            JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             if (restart) forwarder.restart(selector, interruptIfRunning);

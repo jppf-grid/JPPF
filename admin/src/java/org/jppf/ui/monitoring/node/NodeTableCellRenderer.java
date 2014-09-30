@@ -27,6 +27,7 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.*;
 
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
 
 /**
@@ -71,12 +72,12 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
       if (path != null) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object o = node.getUserObject();
-        if (o instanceof TopologyData) {
-          TopologyData data = (TopologyData) o;
+        if (o instanceof AbstractTopologyComponent) {
+          AbstractTopologyComponent data = (AbstractTopologyComponent) o;
           if (data.isNode()) {
-            if (data.getStatus() == TopologyDataStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
+            if (((TopologyNode) data).getStatus() == TopologyDataStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
             else {
-              if (!data.getNodeInformation().isActive())
+              if (!data.getManagementInfo().isActive())
                 renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
               else renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
               renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());

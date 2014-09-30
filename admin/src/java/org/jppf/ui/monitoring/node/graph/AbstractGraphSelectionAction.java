@@ -20,8 +20,8 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.util.Collection;
 
-import org.jppf.ui.monitoring.node.TopologyData;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
@@ -52,10 +52,10 @@ public abstract class AbstractGraphSelectionAction extends AbstractTopologyActio
    * Get the list of all tree nodes representing a driver.
    * @return an list of driver cells.
    */
-  protected Collection<TopologyData> getVertices()
+  protected Collection<AbstractTopologyComponent> getVertices()
   {
-    VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
-    SparseMultigraph<TopologyData, Number> graph = (SparseMultigraph<TopologyData, Number>) viewer.getGraphLayout().getGraph();
+    VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+    SparseMultigraph<AbstractTopologyComponent, Number> graph = (SparseMultigraph<AbstractTopologyComponent, Number>) viewer.getGraphLayout().getGraph();
     return graph.getVertices();
   }
 }

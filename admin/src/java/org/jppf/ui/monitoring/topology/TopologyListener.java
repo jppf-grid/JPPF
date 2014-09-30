@@ -16,42 +16,44 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.topology;
+
 
 /**
- * Listener interface for changes in the grid topology emitted by the {@link NodeDataPanel}. 
+ * Listener interface for changes in the grid topology. 
  * @author Laurent Cohen
+ * @since 5.0
  */
-public interface TopologyChangeListener
+public interface TopologyListener
 {
   /**
    * Called when a driver is added.
    * @param event the event encapsulating the change information.
    */
-  void driverAdded(TopologyChangeEvent event);
+  void driverAdded(TopologyEvent event);
 
   /**
    * Called when a driver is removed.
    * @param event the event encapsulating the change information.
    */
-  void driverRemoved(TopologyChangeEvent event);
+  void driverRemoved(TopologyEvent event);
 
   /**
    * Called when a node is added.
    * @param event the event encapsulating the change information.
    */
-  void nodeAdded(TopologyChangeEvent event);
+  void nodeAdded(TopologyEvent event);
 
   /**
    * Called when a node is removed.
    * @param event the event encapsulating the change information.
    */
-  void nodeRemoved(TopologyChangeEvent event);
+  void nodeRemoved(TopologyEvent event);
 
   /**
    * Called when the data for a node or driver changed.
    * @param event the event encapsulating the change information.
    */
-  void dataUpdated(TopologyChangeEvent event);
+  void nodeUpdated(TopologyEvent event);
 
 }

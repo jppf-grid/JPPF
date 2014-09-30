@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node.graph;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.*;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 
@@ -29,8 +29,7 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
  * Action performed to select all drivers in the topology view.
  * @author Laurent Cohen
  */
-public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
-{
+public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction {
   /**
    * Determines whether this action is for collapsing or expanding graph vertices.
    */
@@ -41,52 +40,36 @@ public class ExpandOrCollapseGraphAction extends AbstractGraphSelectionAction
    * @param panel the tree table panel to which this action applies.
    * @param collapse determines whether this action is for collapsing or expanding graph vertices.
    */
-  public ExpandOrCollapseGraphAction(final GraphOption panel, final boolean collapse)
-  {
+  public ExpandOrCollapseGraphAction(final GraphOption panel, final boolean collapse) {
     super(panel);
     this.collapse = collapse;
     //String s = collapse ? "collapse" : "expand";
-    if (collapse)
-    {
+    if (collapse) {
       setupIcon("/org/jppf/ui/resources/collapse.gif");
       setupNameAndTooltip("graph.button.collapse");
-    }
-    else
-    {
+    } else {
       setupIcon("/org/jppf/ui/resources/expand.gif");
       setupNameAndTooltip("graph.button.expand");
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
-      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
-      Set<TopologyData> sel = viewer.getPickedVertexState().getPicked();
+  public void actionPerformed(final ActionEvent e) {
+    synchronized(panel) {
+      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      Set<AbstractTopologyComponent> sel = viewer.getPickedVertexState().getPicked();
       int count = 0;
-      if (collapse)
-      {
-        for (TopologyData data: sel)
-        {
-          if (!data.isNode() && !data.isCollapsed())
-          {
-            panel.getGraphHandler().collapse(data);
+      if (collapse) {
+        for (AbstractTopologyComponent data: sel) {
+          if (data.isDriver() && !((TopologyDriver) data).isCollapsed()) {
+            panel.getGraphHandler().collapse((TopologyDriver) data);
             count++;
           }
         }
-      }
-      else
-      {
-        for (TopologyData data: sel)
-        {
-          if (!data.isNode() && data.isCollapsed())
-          {
-            panel.getGraphHandler().expand(data);
+      } else {
+        for (AbstractTopologyComponent data: sel) {
+          if (data.isDriver() && ((TopologyDriver) data).isCollapsed()) {
+            panel.getGraphHandler().expand((TopologyDriver) data);
             count++;
           }
         }

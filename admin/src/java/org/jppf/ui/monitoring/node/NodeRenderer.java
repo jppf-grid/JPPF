@@ -23,7 +23,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -60,44 +60,40 @@ public class NodeRenderer extends AbstractTreeCellRenderer
     if (value instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
-        TopologyData data = (TopologyData) node.getUserObject();
+        AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
         Font f = renderer.getFont();
         Font font = getPlainFont(f);
-        switch(data.getType()) {
-          case DRIVER:
-            if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus())) {
-              path = DRIVER_ICON;
-              background = ACTIVE_COLOR;
-              font = getBoldFont(f);
-            } else {
-              path = DRIVER_INACTIVE_ICON;
-              background = INACTIVE_COLOR;
-              backgroundSelected = INACTIVE_SELECTION_COLOR;
-              font = getBoldItalicFont(f);
-            }
-            break;
-
-          case PEER:
+        if (data.isDriver()) {
+          TopologyDriver driverData = (TopologyDriver) data;
+          if (driverData.getConnection().getStatus().isWorkingStatus()) {
             path = DRIVER_ICON;
+            background = ACTIVE_COLOR;
+            font = getBoldFont(f);
+          } else {
+            path = DRIVER_INACTIVE_ICON;
+            background = INACTIVE_COLOR;
+            backgroundSelected = INACTIVE_SELECTION_COLOR;
             font = getBoldItalicFont(f);
-            foreground = DIMMED_FOREGROUND;
-            break;
-
-          case NODE:
-            path = data.getNodeInformation().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
-            if (!TopologyDataStatus.UP.equals(data.getStatus())) {
-              background = INACTIVE_COLOR;
-              backgroundSelected = INACTIVE_SELECTION_COLOR;
-              font = getItalicFont(f);
-            } else if (!data.getNodeInformation().isActive()) {
-              background = SUSPENDED_COLOR;
-              backgroundSelected = INACTIVE_SELECTION_COLOR;
-            }
-            break;
+          }
+        } else if (data.isPeer()) {
+          path = DRIVER_ICON;
+          font = getBoldItalicFont(f);
+          foreground = DIMMED_FOREGROUND;
+        } else if (data.isNode()) {
+          TopologyNode nodeData = (TopologyNode) data;
+          path = nodeData.getManagementInfo().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
+          if (!TopologyDataStatus.UP.equals(nodeData.getStatus())) {
+            background = INACTIVE_COLOR;
+            backgroundSelected = INACTIVE_SELECTION_COLOR;
+            font = getItalicFont(f);
+          } else if (!nodeData.getManagementInfo().isActive()) {
+            background = SUSPENDED_COLOR;
+            backgroundSelected = INACTIVE_SELECTION_COLOR;
+          }
         }
         if (font != null) setFont(font);
         ImageIcon icon = GuiUtils.loadIcon(path);

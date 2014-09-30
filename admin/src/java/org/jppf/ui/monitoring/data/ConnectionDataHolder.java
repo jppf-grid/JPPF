@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.*;
 
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**
@@ -45,7 +45,13 @@ public class ConnectionDataHolder {
    * The topology data associated with the driver connection.
    * @since 5.0
    */
-  private TopologyData driverData;
+  private TopologyDriver driverData;
+
+  /**
+   * Default constructor.
+   */
+  public ConnectionDataHolder() {
+  }
 
   /**
    * Get the list of statistic snapshots for this connection data holder.
@@ -95,19 +101,19 @@ public class ConnectionDataHolder {
 
   /**
    * Get the topology data associated with the driver connection.
-   * @return a {@link TopologyData} object.
+   * @return a {@link TopologyDriver} object.
    * @since 5.0
    */
-  public TopologyData getDriverData() {
+  public synchronized TopologyDriver getDriverData() {
     return driverData;
   }
 
   /**
    * Set the topology data associated with the driver connection.
-   * @param driverData a {@link TopologyData} object.
+   * @param driverData a {@link TopologyDriver} object.
    * @since 5.0
    */
-  public void setDriverData(final TopologyData driverData) {
+  public synchronized void setDriverData(final TopologyDriver driverData) {
     this.driverData = driverData;
   }
 }

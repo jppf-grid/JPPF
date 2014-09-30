@@ -25,7 +25,7 @@ import javax.swing.*;
 
 import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -58,9 +58,9 @@ public class SystemInformationAction extends AbstractTopologyAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
-    dataArray = new TopologyData[selectedElements.size()];
+    dataArray = new AbstractTopologyComponent[selectedElements.size()];
     int count = 0;
-    for (Object o: selectedElements) dataArray[count++] = (TopologyData) o;
+    for (Object o: selectedElements) dataArray[count++] = (AbstractTopologyComponent) o;
     setEnabled(dataArray.length > 0);
   }
 
@@ -122,16 +122,24 @@ public class SystemInformationAction extends AbstractTopologyAction {
    * @param data the topology object for which to get the information.
    * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
    */
-  private JPPFSystemInformation retrieveInfo(final TopologyData data) {
+  private JPPFSystemInformation retrieveInfo(final AbstractTopologyComponent data) {
     JPPFSystemInformation info = null;
     try {
       if (data.isNode()) {
-        TopologyData parent = data.getParent();
-        Map<String, Object> result = parent.getNodeForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
+        TopologyDriver parent = (TopologyDriver) data.getParent();
+        Map<String, Object> result = parent.getForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
         Object o = result.get(data.getUuid());
         if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
+      } else {
+        if (data.isPeer()) {
+          String uuid = ((TopologyPeer) data).getPeerUuid();
+          if (uuid != null) {
+            TopologyDriver driver = TopologyManager.getInstance().getDriver(uuid);
+            if (driver != null) info = driver.getJmx().systemInformation();
+          }
+        }
+        info = ((TopologyDriver) data).getJmx().systemInformation();
       }
-      else info = data.getJmxWrapper().systemInformation();
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

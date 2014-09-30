@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node.graph;
 import java.awt.event.*;
 
 import org.jppf.ui.actions.AbstractActionHandler;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.picking.MultiPickedState;
@@ -35,13 +35,13 @@ public class GraphActionHandler extends AbstractActionHandler
   /**
    * The JTreeTable whose actions are managed.
    */
-  protected VisualizationViewer<TopologyData, Number> graph = null;
+  protected VisualizationViewer<AbstractTopologyComponent, Number> graph = null;
 
   /**
    * Initialize this action manager with the specified JTreeTable component.
    * @param graph the graph whose actions are managed.
    */
-  public GraphActionHandler(final VisualizationViewer<TopologyData, Number> graph)
+  public GraphActionHandler(final VisualizationViewer<AbstractTopologyComponent, Number> graph)
   {
     this.graph = graph;
     MultiPickedState mps = (MultiPickedState) graph.getPickedVertexState();
@@ -62,7 +62,7 @@ public class GraphActionHandler extends AbstractActionHandler
   protected synchronized void computeSelectedElements()
   {
     selectedElements.clear();
-    Object[] sel = ((MultiPickedState<TopologyData>) graph.getPickedVertexState()).getSelectedObjects();
+    Object[] sel = ((MultiPickedState<AbstractTopologyComponent>) graph.getPickedVertexState()).getSelectedObjects();
     if ((sel == null) || (sel.length <= 0)) return;
     for (Object data: sel) selectedElements.add(data);
   }

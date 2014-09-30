@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
+import org.slf4j.*;
 
 /**
  * Instances of this class are used to create and update line charts with an horizontal orientation.
@@ -30,6 +31,14 @@ import org.jppf.ui.monitoring.data.*;
  * @since 5.0
  */
 public class BarSeries3DChartHandler implements ChartHandler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(BarSeries3DChartHandler.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The stats formatter that provides the data.
    */
@@ -101,14 +110,28 @@ public class BarSeries3DChartHandler implements ChartHandler {
     Object ds = config.dataset;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");
-    int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
-    for (int j=0; j<statsHandler.getStatsCount(); j++) {
+    ConnectionDataHolder cdh = statsHandler.getCurrentDataHolder();
+    if (cdh == null) return config;
+    int statsCount = cdh.getDataList().size();
+    if (debugEnabled) log.debug("data holder for {} has {} snapshots", statsHandler.getClientHandler().getCurrentConnection(), statsCount);
+    int start = Math.max(0, statsHandler.getTickCount() - statsCount);
+    int count = 0;
+    for (Map<Fields, Double> valueMap: cdh.getDoubleValuesMaps()) {
+      count++;
+      for (Fields key: config.fields) {
+        //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
+        invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(count + start));
+      }
+    }
+    /*
+    for (int j=0; j<statsCount; j++) {
       Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
       for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(j + start));
       }
     }
+    */
     return config;
   }
 

@@ -18,14 +18,14 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.Point;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
 
 import org.jppf.management.*;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -128,12 +128,12 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyData parent = null;
+        TopologyDriver parent = null;
         try {
-          TopologyData data = dataArray[0];
-          parent = data.getParent();
+          AbstractTopologyComponent data = dataArray[0];
+          parent = (TopologyDriver) data.getParent();
           if (parent == null) return;
-          parent.getNodeForwarder().updateConfiguration(new NodeSelector.UuidSelector(data.getUuid()), map, b);
+          parent.getForwarder().updateConfiguration(new NodeSelector.UuidSelector(data.getUuid()), map, b);
         } catch(IOException e) {
           parent.initializeProxies();
           log.error(e.getMessage(), e);
@@ -152,10 +152,10 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
   private String getPropertiesAsString() {
     StringBuilder sb = new StringBuilder();
     try {
-      TopologyData data = dataArray[0];
-      TopologyData parent = data.getParent();
+      AbstractTopologyComponent data = dataArray[0];
+      TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent == null) return "could not get the parent driver for the selected node";
-      Map<String, Object> result = parent.getNodeForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
+      Map<String, Object> result = parent.getForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
       if (result == null) return "could not retrieve system information for the selected node";
       Object o = result.get(data.getUuid());
       if (o == null) return "could not retrieve system information for the selected node";

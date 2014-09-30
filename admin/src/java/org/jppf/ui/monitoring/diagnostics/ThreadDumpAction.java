@@ -26,8 +26,8 @@ import javax.swing.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.ui.actions.EditorMouseListener;
-import org.jppf.ui.monitoring.node.*;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -56,9 +56,9 @@ public class ThreadDumpAction extends AbstractTopologyAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
-    dataArray = new TopologyData[selectedElements.size()];
+    dataArray = new AbstractTopologyComponent[selectedElements.size()];
     int count = 0;
-    for (Object o: selectedElements) dataArray[count++] = (TopologyData) o;
+    for (Object o: selectedElements) dataArray[count++] = (AbstractTopologyComponent) o;
     setEnabled(dataArray.length > 0);
   }
 
@@ -116,16 +116,16 @@ public class ThreadDumpAction extends AbstractTopologyAction {
    * @param data the topology object for which to get the information.
    * @return a {@link JPPFSystemInformation} or <code>null</code> if the information could not be retrieved.
    */
-  private ThreadDump retrieveThreadDump(final TopologyData data) {
+  private ThreadDump retrieveThreadDump(final AbstractTopologyComponent data) {
     ThreadDump info = null;
     try {
       if (data.isNode()) {
-        TopologyData parent = data.getParent();
-        Map<String, Object> result = parent.getNodeForwarder().threadDump(new NodeSelector.UuidSelector(data.getUuid()));
+        TopologyDriver parent = (TopologyDriver) data.getParent();
+        Map<String, Object> result = parent.getForwarder().threadDump(new NodeSelector.UuidSelector(data.getUuid()));
         Object o = result.get(data.getUuid());
         if (o instanceof ThreadDump) info = (ThreadDump) o;
       }
-      else info = data.getDiagnostics().threadDump();
+      else info = ((TopologyDriver) data).getDiagnostics().threadDump();
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }

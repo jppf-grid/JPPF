@@ -165,7 +165,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run() {
-            if (event.getType().equals(StatsHandlerEvent.Type.UPDATE)) {
+            if (event.getType() == StatsHandlerEvent.Type.UPDATE) {
               handlerMap.get(config.type).updateDataset(config);
             } else {
               handlerMap.get(config.type).populateDataset(config);

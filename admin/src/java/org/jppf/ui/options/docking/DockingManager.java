@@ -111,10 +111,11 @@ public final class DockingManager {
   /**
    * Set the main view for the application.
    * @param frame the {@link Frame} to set as the main view.
+   * @param container the option container for the view.
    */
-  public void setMainView(final Frame frame) {
+  public void setMainView(final Frame frame, final OptionContainer container) {
     if (viewMap.get(INITIAL_VIEW) != null) throw new IllegalStateException("the main view is already set");
-    ViewDescriptor view = new ViewDescriptor(frame, null);
+    ViewDescriptor view = new ViewDescriptor(frame, container);
     viewMap.put(INITIAL_VIEW, view);
     while (!pendingQueue.isEmpty()) view.addComponent(pendingQueue.poll());
   }
@@ -185,6 +186,7 @@ public final class DockingManager {
     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     dialog.addWindowListener(windowAdapter);
     TabbedPaneOption container = new TabbedPaneOption();
+    container.setName(id);
     container.createUI();
     dialog.getContentPane().add(container.getUIComponent(), BorderLayout.CENTER);
     ViewDescriptor view = new ViewDescriptor(dialog, container);

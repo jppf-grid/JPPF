@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.actions.AbstractUpdatableAction;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.utils.collections.*;
 
 /**
@@ -34,11 +34,11 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
   /**
    * Constant for an empty <code>TopologyData</code> array.
    */
-  protected static final TopologyData[] EMPTY_TOPOLOGY_DATA_ARRAY = new TopologyData[0];
+  protected static final AbstractTopologyComponent[] EMPTY_TOPOLOGY_DATA_ARRAY = new AbstractTopologyComponent[0];
   /**
    * The object representing the JPPF nodes in the tree table.
    */
-  protected TopologyData[] dataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
+  protected AbstractTopologyComponent[] dataArray = EMPTY_TOPOLOGY_DATA_ARRAY;
 
   /**
    * Initialize this action.
@@ -51,36 +51,35 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
   /**
    * Update this action's enabled state based on a list of selected elements.
    * @param selectedElements a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
   public void updateState(final List<Object> selectedElements)
   {
     super.updateState(selectedElements);
-    List<TopologyData> list = new ArrayList<>();
+    List<AbstractTopologyComponent> list = new ArrayList<>();
     for (Object o: selectedElements)
     {
-      TopologyData data = (TopologyData) o;
+      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (data.isNode())
       {
-        JPPFManagementInfo info = data.getNodeInformation();
+        JPPFManagementInfo info = ((TopologyNode) data).getManagementInfo();
         if (info != null) list.add(data);
       }
     }
-    dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new TopologyData[list.size()]);
+    dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new AbstractTopologyComponent[list.size()]);
   }
 
   /**
    * Get a mapping of driver node forwarder MBeans to corresponding selected nodes.
-   * @return a mapping of {@link JPPFNodeForwardingMBean} keys to lists of node uuid values.
+   * @return a mapping of driver uuids to lists of node uuid values.
    */
-  protected CollectionMap<TopologyData, String> getDriverMap()
+  protected CollectionMap<TopologyDriver, String> getDriverMap()
   {
-    CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
-    for (TopologyData data: dataArray)
+    CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
+    for (AbstractTopologyComponent data: dataArray)
     {
       if (!data.isNode()) continue;
-      TopologyData parent = data.getParent();
+      TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent != null) map.putValue(parent, data.getUuid());
     }
     return map;

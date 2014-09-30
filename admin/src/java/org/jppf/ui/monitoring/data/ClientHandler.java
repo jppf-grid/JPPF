@@ -28,6 +28,7 @@ import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.diagnostics.Thresholds;
 import org.jppf.ui.monitoring.event.StatsHandlerEvent;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
@@ -39,7 +40,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 5.0
  */
-public class ClientHandler implements ClientListener, AutoCloseable {
+public class ClientHandler extends TopologyListenerAdapter implements AutoCloseable {
   /**
    * Logger for this class.
    */
@@ -83,29 +84,18 @@ public class ClientHandler implements ClientListener, AutoCloseable {
    */
   ClientHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
+    TopologyManager.getInstance().addTopologyListener(this);
     getJppfClient();
   }
 
-  /**
-   * Notify this listener that a new driver connection was created.
-   * @param event the event to notify this listener of.
-   */
   @Override
-  public synchronized void newConnection(final ClientEvent event) {
-    final JPPFClientConnection c = event.getConnection();
-    JPPFClientConnectionStatus status = c.getStatus();
-    if ((status != null) && status.isWorkingStatus()) scheduler.submit(new NewConnectionTask(statsHandler, c));
-    else c.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
-      @Override
-      public void statusChanged(final ClientConnectionStatusEvent event) {
-        if (c.getStatus().isWorkingStatus()) scheduler.submit(new NewConnectionTask(statsHandler, c));
-      }
-    });
+  public void driverAdded(final TopologyEvent event) {
+    scheduler.submit(new NewConnectionTask(statsHandler, event.getDriverData()));
   }
 
   @Override
-  public synchronized void connectionFailed(final ClientEvent event) {
-    if ((jppfClient != null) && !jppfClient.isClosed()) scheduler.submit(new ConnectionFailedTask(statsHandler, event.getConnection()));
+  public void driverRemoved(final TopologyEvent event) {
+    if ((jppfClient != null) && !jppfClient.isClosed()) scheduler.submit(new ConnectionFailedTask(statsHandler, event.getDriverData().getConnection()));
   }
 
   /**
@@ -136,7 +126,7 @@ public class ClientHandler implements ClientListener, AutoCloseable {
     private final JPPFClientConnection connection;
 
     /**
-     * Initiailize this task with the specified client connection.
+     * Initialize this task with the specified client connection.
      * @param connection the connection to set.
      */
     public SetCurrentConnectionTask(final JPPFClientConnection connection) {
@@ -156,6 +146,7 @@ public class ClientHandler implements ClientListener, AutoCloseable {
               Runnable r = new Runnable() {
                 @Override public void run() {
                   log.debug("first refreshLoadBalancer()");
+                  // to cancel the task
                   if (refreshLoadBalancer()) throw new IllegalStateException("");
                 }
               };
@@ -192,7 +183,7 @@ public class ClientHandler implements ClientListener, AutoCloseable {
       log.debug("LoadBalancingPanel element is null");
       return false;
     }
-    log.info("LoadBalancingPanel = " + lbOption);
+    log.debug("LoadBalancingPanel = " + lbOption);
     JMXDriverConnectionWrapper connection = currentJmxConnection();
     AbstractOption messageArea = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingMessages");
     if ((connection == null) || !connection.isConnected()) {
@@ -202,7 +193,7 @@ public class ClientHandler implements ClientListener, AutoCloseable {
     messageArea.setValue("");
     try {
       LoadBalancingInformation info = connection.loadBalancerInformation();
-      log.info("info = {}", info);
+      log.debug("info = {}", info);
       if (info != null) {
         ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
         List items = combo.getItems();
@@ -233,8 +224,8 @@ public class ClientHandler implements ClientListener, AutoCloseable {
    */
   public synchronized JPPFClient getJppfClient(final ClientListener clientListener) {
     if (jppfClient == null) {
-      jppfClient = (clientListener == null) ? new JPPFClient(this) : new JPPFClient(this, clientListener);
-    } else if (clientListener != null) {
+      jppfClient = TopologyManager.getInstance().getClient();
+    } else if ((clientListener != null) && (clientListener != this)) {
       jppfClient.addClientListener(clientListener);
     }
     return jppfClient;
@@ -267,7 +258,7 @@ public class ClientHandler implements ClientListener, AutoCloseable {
     this.serverListOption = serverListOption;
     List<JPPFClientConnection> list = getJppfClient().getAllConnections();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
-    for (JPPFClientConnection c: list) scheduler.submit(new NewConnectionTask(statsHandler, c));
+    for (TopologyDriver driver: TopologyManager.getInstance().getDrivers()) scheduler.submit(new NewConnectionTask(statsHandler, driver));
     notifyAll();
   }
 

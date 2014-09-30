@@ -1,6 +1,8 @@
+
 chartBuilderOption = OptionsHandler.findOptionWithName(option, "/ChartsBuilder")
-chartBuilder = chartBuilderOption.getUIComponent();
-pageRoot = option.findFirstWithName("/ChartsConfiguration");
+if (chartBuilderOption == null) System.out.println("chartBuilderOption = " + chartBuilderOption)
+chartBuilder = chartBuilderOption.getUIComponent()
+pageRoot = OptionsHandler.findOptionWithName(option, "/ChartsConfiguration")
 
 void populateChartsList(final tabConfig, final chartConfig) {
   def listOption = option.findFirstWithName("/ChartsList");

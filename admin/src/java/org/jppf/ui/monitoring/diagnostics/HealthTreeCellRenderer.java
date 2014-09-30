@@ -24,7 +24,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -32,13 +32,11 @@ import org.jppf.ui.utils.GuiUtils;
  * Renderer used to render the tree nodes (1st column) in the node data panel.
  * @author Laurent Cohen
  */
-public class HealthTreeCellRenderer extends AbstractTreeCellRenderer
-{
+public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
   /**
    * Default constructor.
    */
-  public HealthTreeCellRenderer()
-  {
+  public HealthTreeCellRenderer() {
     defaultNonSelectionBackground = getBackgroundNonSelectionColor();
     defaultSelectionBackground = getBackgroundSelectionColor();
   }
@@ -61,23 +59,15 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer
     if (value instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
-        TopologyData data = (TopologyData) node.getUserObject();
+        AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
-        switch(data.getType()) {
-          case DRIVER:
-            if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus())) {
-              path = DRIVER_ICON;
-            } else {
-              path = DRIVER_INACTIVE_ICON;
-            }
-            break;
-
-          case NODE:
-            path = data.getNodeInformation().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
-            break;
+        if (data.isDriver()) {
+          path = (JPPFClientConnectionStatus.ACTIVE.equals(((TopologyDriver) data).getConnection().getStatus())) ? DRIVER_ICON : DRIVER_INACTIVE_ICON;
+        } else if (data.isNode()) {
+          path = data.getManagementInfo().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);

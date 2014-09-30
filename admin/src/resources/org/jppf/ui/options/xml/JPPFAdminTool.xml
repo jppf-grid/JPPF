@@ -22,7 +22,10 @@
 	<property name="layoutConstraints" value="flowy, fill, insets 0 0 0 0"/>
 	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
 	<initializer type="script">
-		<script language="groovy">option.findFirstWithName("/AdminPanels").getUIComponent().setSelectedIndex(0)</script>
+		<script language="groovy">
+      StatsHandler.getInstance()
+      option.findFirstWithName("/AdminPanels").getUIComponent().setSelectedIndex(0)
+    </script>
 	</initializer>
 	<finalizer type="script">
 		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));</script>

@@ -16,27 +16,54 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.topology;
 
 import java.util.EventObject;
 
 /**
  * 
  * @author Laurent Cohen
+ * @since 5.0
  */
-public class TopologyChangeEvent extends EventObject {
+public class TopologyEvent extends EventObject {
   /**
    * Data for the driver.
    */
-  private final TopologyData driverData;
+  private final TopologyDriver driverData;
   /**
    * Data for the node, if any.
    */
-  private final TopologyData nodeData;
+  private final TopologyNode nodeData;
   /**
    * Data for the peer, if any.
    */
-  private final TopologyData peerData;
+  private final TopologyPeer peerData;
+
+  /**
+   * The possible types of events.
+   */
+  enum Type {
+    /**
+     * A driver was added.
+     */
+    DRIVER_ADDED,
+    /**
+     * A driver was removed.
+     */
+    DRIVER_REMOVED,
+    /**
+     * A node was added.
+     */
+    NODE_ADDED,
+    /**
+     * A node was removed.
+     */
+    NODE_REMOVED,
+    /**
+     * A node was updated.
+     */
+    NODE_UPDATED
+  };
 
   /**
    * Initialize this event.
@@ -45,7 +72,7 @@ public class TopologyChangeEvent extends EventObject {
    * @param nodeData the node data.
    * @param peerData the peer data.
    */
-  public TopologyChangeEvent(final NodeDataPanel source, final TopologyData driverData, final TopologyData nodeData, final TopologyData peerData) {
+  public TopologyEvent(final TopologyManager source, final TopologyDriver driverData, final TopologyNode nodeData, final TopologyPeer peerData) {
     super(source);
     this.driverData = driverData;
     this.nodeData = nodeData;
@@ -54,33 +81,33 @@ public class TopologyChangeEvent extends EventObject {
 
   /**
    * Get the driver data.
-   * @return a {@link TopologyData} instance.
+   * @return a {@link TopologyDriver} instance.
    */
-  public TopologyData getDriverData() {
+  public TopologyDriver getDriverData() {
     return driverData;
   }
 
   /**
    * Get the node data.
-   * @return a {@link TopologyData} instance.
+   * @return a {@link TopologyNode} instance.
    */
-  public TopologyData getNodeData() {
+  public TopologyNode getNodeData() {
     return nodeData;
   }
 
   /**
    * Get the peer data.
-   * @return a {@link TopologyData} instance.
+   * @return a {@link TopologyPeer} instance.
    */
-  public TopologyData getPeerData() {
+  public TopologyPeer getPeerData() {
     return peerData;
   }
 
   /**
-   * Get the node panel which emitted this event.
-   * @return a {@link NodeDataPanel} instance.
+   * Get the topology manager which emitted this event.
+   * @return a {@link TopologyManager} instance.
    */
-  public NodeDataPanel getNodePanel() {
-    return (NodeDataPanel) getSource();
+  public TopologyManager getTopologyManager() {
+    return (TopologyManager) getSource();
   }
 }

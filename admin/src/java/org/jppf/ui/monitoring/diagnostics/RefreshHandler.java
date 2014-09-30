@@ -29,8 +29,7 @@ import org.slf4j.*;
  * their attached nodes, for management and monitoring purposes.
  * @author Laurent Cohen
  */
-public class RefreshHandler
-{
+public class RefreshHandler {
   /**
    * Logger for this class.
    */
@@ -64,8 +63,7 @@ public class RefreshHandler
    * Initialize this node handler.
    * @param nodeDataPanel - the panel to refresh.
    */
-  public RefreshHandler(final JVMHealthPanel nodeDataPanel)
-  {
+  public RefreshHandler(final JVMHealthPanel nodeDataPanel) {
     this.panel = nodeDataPanel;
     initialize();
   }
@@ -73,24 +71,19 @@ public class RefreshHandler
   /**
    * Initialize this node refresh handler.
    */
-  private void initialize()
-  {
+  private void initialize() {
     startRefreshTimer();
   }
 
   /**
    * Refresh the tree structure asynchronously (not in the AWT event thread).
    */
-  public void refresh()
-  {
+  public void refresh() {
     if (refreshing.get()) return;
     refreshing.set(true);
-    try
-    {
+    try {
       panel.refreshSnapshots();
-    }
-    finally
-    {
+    } finally {
       refreshing.set(false);
     }
   }
@@ -98,10 +91,8 @@ public class RefreshHandler
   /**
    * Stop the automatic refresh of the nodes state through a timer.
    */
-  public void stopRefreshTimer()
-  {
-    if (refreshTimer != null)
-    {
+  public void stopRefreshTimer() {
+    if (refreshTimer != null) {
       refreshTimer.cancel();
       refreshTimer = null;
     }
@@ -110,16 +101,13 @@ public class RefreshHandler
   /**
    * Start the automatic refresh of the nodes state through a timer.
    */
-  public void startRefreshTimer()
-  {
+  public void startRefreshTimer() {
     if (refreshTimer != null) return;
     if (refreshInterval <= 0L) return;
     refreshTimer = new Timer("JVM Health Update Timer");
-    TimerTask task = new TimerTask()
-    {
+    TimerTask task = new TimerTask() {
       @Override
-      public void run()
-      {
+      public void run() {
         refresh();
       }
     };

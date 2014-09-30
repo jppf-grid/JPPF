@@ -17,7 +17,7 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.*;
 
@@ -25,7 +25,7 @@ import javax.swing.*;
 
 import org.jppf.management.NodeSelector;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -92,8 +92,8 @@ public class NodeThreadsAction extends AbstractTopologyAction {
     try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/NodeThreadPoolPanel.xml");
       if (dataArray.length == 1) {
-        nbThreads = dataArray[0].getNodeState().getThreadPoolSize();
-        priority = dataArray[0].getNodeState().getThreadPriority();
+        nbThreads = ((TopologyNode) dataArray[0]).getNodeState().getThreadPoolSize();
+        priority = ((TopologyNode) dataArray[0]).getNodeState().getThreadPriority();
       }
       ((AbstractOption) panel.findFirstWithName("nbThreads")).setValue(nbThreads);
       ((AbstractOption) panel.findFirstWithName("threadPriority")).setValue(priority);
@@ -142,10 +142,10 @@ public class NodeThreadsAction extends AbstractTopologyAction {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyData, String> map = getDriverMap();
-        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
+        CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            JPPFNodeForwardingMBean forwarder = entry.getKey().getNodeForwarder();
+            JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             forwarder.updateThreadPoolSize(selector, nbThreads);

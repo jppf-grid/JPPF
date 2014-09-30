@@ -21,7 +21,7 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 
 import org.jppf.management.*;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -38,18 +38,12 @@ public class ToggleNodeActiveAction extends AbstractTopologyAction
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * The tree table panel to which this action applies.
-   */
-  private final NodeDataPanel panel;
 
   /**
    * Initialize this action.
-   * @param panel the tree table panel to which this action applies.
    */
-  public ToggleNodeActiveAction(final NodeDataPanel panel)
+  public ToggleNodeActiveAction()
   {
-    this.panel = panel;
     setupIcon("/org/jppf/ui/resources/toggle_active.gif");
     setupNameAndTooltip("toggle.active");
   }
@@ -77,10 +71,10 @@ public class ToggleNodeActiveAction extends AbstractTopologyAction
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        CollectionMap<TopologyData, String> map = getDriverMap();
-        for (Map.Entry<TopologyData, Collection<String>> entry: map.entrySet()) {
+        CollectionMap<TopologyDriver, String> map = getDriverMap();
+        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
           try {
-            JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmxWrapper();
+            JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmx();
             if (driverJmx == null) continue;
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             driverJmx.toggleActiveState(selector);

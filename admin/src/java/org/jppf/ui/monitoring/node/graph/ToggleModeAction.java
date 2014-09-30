@@ -22,7 +22,7 @@ import java.awt.event.*;
 
 import javax.swing.AbstractButton;
 
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.*;
@@ -31,8 +31,7 @@ import edu.uci.ics.jung.visualization.control.*;
  * Action performed to toggle the graph mode from selection to pan and vice versa.
  * @author Laurent Cohen
  */
-public class ToggleModeAction extends AbstractGraphSelectionAction
-{
+public class ToggleModeAction extends AbstractGraphSelectionAction {
   /**
    * Listens to state changes for the toggle button.
    */
@@ -46,35 +45,27 @@ public class ToggleModeAction extends AbstractGraphSelectionAction
    * Initialize this action with the specified tree table panel.
    * @param panel the graph panel to which this action applies.
    */
-  public ToggleModeAction(final GraphOption panel)
-  {
+  public ToggleModeAction(final GraphOption panel) {
     super(panel);
     setupIcon("/org/jppf/ui/resources/task-active.gif");
     setupNameAndTooltip("graph.toggle.mode");
     button = (AbstractButton) panel.findFirstWithName("/graph.toggle.mode").getUIComponent();
-    itemListener = new ItemListener()
-    {
+    itemListener = new ItemListener() {
       @Override
-      public void itemStateChanged(final ItemEvent e)
-      {
+      public void itemStateChanged(final ItemEvent e) {
         actionPerformed(null);
       }
     };
     button.addItemListener(itemListener);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @SuppressWarnings("unchecked")
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
+  public void actionPerformed(final ActionEvent e) {
+    synchronized(panel) {
       AbstractButton button = (AbstractButton) panel.findFirstWithName("/graph.toggle.mode").getUIComponent();
-      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
-      EditingModalGraphMouse<TopologyData, Number> graphMouse = (EditingModalGraphMouse<TopologyData, Number>) viewer.getGraphMouse();
+      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = (EditingModalGraphMouse<AbstractTopologyComponent, Number>) viewer.getGraphMouse();
       graphMouse.setMode(button.isSelected() ? ModalGraphMouse.Mode.TRANSFORMING : ModalGraphMouse.Mode.PICKING);
       /*
       if (e != null)

@@ -16,23 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
-
 /**
- * 
- * @author Laurent Cohen
+ * Support for pluggable views that can be added to the admin console.
  */
-public enum TopologyDataType {
-  /**
-   * Object is a JPPF driver.
-   */
-  DRIVER,
-  /**
-   * Object is a JPPF peer driver connected as a node.
-   */
-  PEER,
-  /**
-   * Object is a JPPF node.
-   */
-  NODE
-}
+package org.jppf.ui.plugin;

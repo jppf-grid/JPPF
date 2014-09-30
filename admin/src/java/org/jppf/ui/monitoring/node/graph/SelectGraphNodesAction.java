@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
 
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 
@@ -28,29 +28,22 @@ import edu.uci.ics.jung.visualization.VisualizationViewer;
  * Action performed to select all drivers in the topology view.
  * @author Laurent Cohen
  */
-public class SelectGraphNodesAction extends AbstractGraphSelectionAction
-{
+public class SelectGraphNodesAction extends AbstractGraphSelectionAction {
   /**
    * Initialize this action with the specified tree table panel.
    * @param panel the tree table panel to which this action applies.
    */
-  public SelectGraphNodesAction(final GraphOption panel)
-  {
+  public SelectGraphNodesAction(final GraphOption panel) {
     super(panel);
     setupIcon("/org/jppf/ui/resources/select_nodes.gif");
     setupNameAndTooltip("select.nodes");
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
-      VisualizationViewer<TopologyData, Number> viewer = panel.getViewer();
-      for (TopologyData data: getVertices()) viewer.getPickedVertexState().pick(data, data.isNode());
+  public void actionPerformed(final ActionEvent e) {
+    synchronized(panel) {
+      VisualizationViewer<AbstractTopologyComponent, Number> viewer = panel.getViewer();
+      for (AbstractTopologyComponent data: getVertices()) viewer.getPickedVertexState().pick(data, data.isNode());
     }
   }
 }

@@ -21,26 +21,25 @@ package org.jppf.ui.monitoring.data;
 import java.util.TimerTask;
 
 import org.jppf.client.*;
+import org.jppf.ui.monitoring.topology.TopologyDriver;
 
 /**
  * Instances of this class are tasks run periodically from a timer thread, requesting the latest
  * statistics form a JPPF driver connection each time they are run.
  * @author Laurent Cohen
  */
-public class StatsRefreshTask extends TimerTask
-{
+public class StatsRefreshTask extends TimerTask {
   /**
    * Client connection to request the data from.
    */
-  private final JPPFClientConnection connection;
+  private final TopologyDriver driver;
 
   /**
    * Initialize this task with a specified client connection.
-   * @param connection the connection to use to request data.
+   * @param driver represents the connection to use to request data.
    */
-  public StatsRefreshTask(final JPPFClientConnection connection)
-  {
-    this.connection = connection;
+  public StatsRefreshTask(final TopologyDriver driver) {
+    this.driver = driver;
   }
 
   /**
@@ -48,9 +47,8 @@ public class StatsRefreshTask extends TimerTask
    * @see java.util.TimerTask#run()
    */
   @Override
-  public void run()
-  {
-    JPPFClientConnectionStatus status = connection.getStatus();
-    if ((status != null) && status.isWorkingStatus()) StatsHandler.getInstance().requestUpdate(connection);
+  public void run() {
+    JPPFClientConnectionStatus status = driver.getConnection().getStatus();
+    if (status.isWorkingStatus()) StatsHandler.getInstance().requestUpdate(driver);
   }
 }

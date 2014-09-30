@@ -29,7 +29,7 @@ import javax.swing.tree.*;
 
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.diagnostics.Thresholds.Name;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -94,8 +94,8 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         renderer.setForeground(selected ? table.getSelectionForeground() : table.getForeground());
         Object o = node.getUserObject();
-        if (o instanceof TopologyData) {
-          TopologyData data = (TopologyData) o;
+        if (o instanceof AbstractTopologyComponent) {
+          AbstractTopologyComponent data = (AbstractTopologyComponent) o;
           HealthSnapshot health = data.getHealthSnapshot();
           switch(column) {
             case JVMHealthTreeTableModel.THREADS:

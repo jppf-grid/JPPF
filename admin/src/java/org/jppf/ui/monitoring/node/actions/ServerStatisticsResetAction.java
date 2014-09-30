@@ -21,14 +21,13 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.slf4j.*;
 
 /**
  * This action stops a node.
  */
-public class ServerStatisticsResetAction extends AbstractTopologyAction
-{
+public class ServerStatisticsResetAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
@@ -37,8 +36,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
   /**
    * Initialize this action.
    */
-  public ServerStatisticsResetAction()
-  {
+  public ServerStatisticsResetAction() {
     setupIcon("/org/jppf/ui/resources/server_reset_stats.gif");
     setupNameAndTooltip("driver.reset.statistics");
   }
@@ -47,14 +45,13 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
    * Update this action's enabled state based on a list of selected elements.
    * This method sets the enabled state to true if at list one driver is selected in the tree.
    * @param selectedElements a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
   public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
     for (Object o: selectedElements) {
-      if (!(o instanceof TopologyData)) continue;
-      TopologyData data = (TopologyData) o;
+      if (!(o instanceof AbstractTopologyComponent)) continue;
+      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
       if (!data.isNode()) {
         setEnabled(true);
         return;
@@ -66,20 +63,15 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event encapsulates the source of the event and additional information.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    try
-    {
+  public void actionPerformed(final ActionEvent event) {
+    try {
       final List<JMXDriverConnectionWrapper> driverConnections = new ArrayList<>();
-      for (Object o: selectedElements)
-      {
-        if (!(o instanceof TopologyData)) continue;
-        TopologyData data = (TopologyData) o;
-        if (data.isDriver())
-          driverConnections.add((JMXDriverConnectionWrapper) data.getJmxWrapper());
+      for (Object o: selectedElements) {
+        if (!(o instanceof AbstractTopologyComponent)) continue;
+        AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+        if (data.isDriver()) driverConnections.add(((TopologyDriver) data).getJmx());
       }
       Runnable r = new Runnable() {
         @Override
@@ -94,9 +86,7 @@ public class ServerStatisticsResetAction extends AbstractTopologyAction
         }
       };
       runAction(r);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
   }

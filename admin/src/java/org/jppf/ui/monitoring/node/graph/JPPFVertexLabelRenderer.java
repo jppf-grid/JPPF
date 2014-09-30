@@ -23,7 +23,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import org.jppf.client.*;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -44,10 +44,9 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
   }
 
   @Override
-  public <V> Component getVertexLabelRendererComponent(final JComponent vv, final Object value, final Font fnt, final boolean sel, final V vertex)
-  {
+  public <V> Component getVertexLabelRendererComponent(final JComponent vv, final Object value, final Font fnt, final boolean sel, final V vertex)   {
     DefaultVertexLabelRenderer renderer = (DefaultVertexLabelRenderer) super.getVertexLabelRendererComponent(vv, value, fnt, sel, vertex);
-    TopologyData data = (TopologyData) vertex;
+    AbstractTopologyComponent data = (AbstractTopologyComponent) vertex;
     renderer.setHorizontalTextPosition(SwingConstants.CENTER);
     renderer.setVerticalTextPosition(SwingConstants.BOTTOM);
     //renderer.setText(data.getId());
@@ -60,40 +59,30 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
     Font f = renderer.getFont();
     Font font = AbstractTreeCellRenderer.getPlainFont(f);
 
-    if (!data.isNode())
-    {
-      JPPFClientConnection c = data.getClientConnection();
-      if (c == null)
-      {
+    if (data.isDriver()) {
+      JPPFClientConnection c = ((TopologyDriver) data).getConnection();
+      if (c == null) {
         path = AbstractTreeCellRenderer.DRIVER_ICON;
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
-      }
-      else if ((c.getStatus() != JPPFClientConnectionStatus.FAILED) && (c.getStatus() != JPPFClientConnectionStatus.DISCONNECTED))
-      {
+      } else if ((c.getStatus() != JPPFClientConnectionStatus.FAILED) && (c.getStatus() != JPPFClientConnectionStatus.DISCONNECTED)) {
         path = AbstractTreeCellRenderer.DRIVER_ICON;
         background = AbstractTreeCellRenderer.ACTIVE_COLOR;
         font = AbstractTreeCellRenderer.getBoldFont(f);
-      }
-      else
-      {
+      } else {
         path = AbstractTreeCellRenderer.DRIVER_INACTIVE_ICON;
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
         backgroundSelected = AbstractTreeCellRenderer.INACTIVE_SELECTION_COLOR;
         font = AbstractTreeCellRenderer.getBoldItalicFont(f);
       }
-    }
-    else
-    {
-      path = data.getNodeInformation().isMasterNode() ? AbstractTreeCellRenderer.NODE_MASTER_ICON : AbstractTreeCellRenderer.NODE_ICON;
-      if (!TopologyDataStatus.UP.equals(data.getStatus()))
-      {
+    } else {
+      path = data.getManagementInfo().isMasterNode() ? AbstractTreeCellRenderer.NODE_MASTER_ICON : AbstractTreeCellRenderer.NODE_ICON;
+      if (!TopologyDataStatus.UP.equals(((TopologyNode) data).getStatus())) {
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
         backgroundSelected = AbstractTreeCellRenderer.INACTIVE_SELECTION_COLOR;
         font = AbstractTreeCellRenderer.getItalicFont(f);
       }
       /*
-      else
-      {
+      else {
         JMXConnectionWrapper wrapper = data.getJmxWrapper();
         boolean b = wrapper != null && wrapper.isConnected();
         if (!b) foreground = AbstractTreeCellRenderer.UNMANAGED_COLOR;
@@ -116,8 +105,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
    * @param node contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
-  private String computeNodeText(final TopologyData node)
-  {
+  private String computeNodeText(final TopologyNode node) {
     StringBuilder sb = new StringBuilder();
     sb.append("uuid: ").append(node.getUuid()).append("<br>");
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());

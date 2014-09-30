@@ -17,7 +17,7 @@
  */
 package org.jppf.ui.monitoring.node.actions;
 
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.*;
 
@@ -25,7 +25,7 @@ import javax.swing.*;
 
 import org.jppf.management.*;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
-import org.jppf.ui.monitoring.node.TopologyData;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -78,13 +78,13 @@ public class ProvisioningAction extends AbstractTopologyAction {
   @Override
   public void updateState(final List<Object> selectedElements) {
     this.selectedElements = selectedElements;
-    List<TopologyData> list = new ArrayList<>();
+    List<AbstractTopologyComponent> list = new ArrayList<>();
     for (Object o: selectedElements) {
-      TopologyData data = (TopologyData) o;
-      JPPFManagementInfo info = data.getNodeInformation();
+      AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+      JPPFManagementInfo info = data.getManagementInfo();
       if ((info != null) && info.isMasterNode()) list.add(data);
     }
-    dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new TopologyData[list.size()]);
+    dataArray = list.toArray(list.isEmpty() ? EMPTY_TOPOLOGY_DATA_ARRAY : new AbstractTopologyComponent[list.size()]);
     setEnabled(dataArray.length > 0);
   }
 
@@ -142,20 +142,20 @@ public class ProvisioningAction extends AbstractTopologyAction {
     final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesFromString(overrides) : null;
     nbSlaves = ((Number) ((SpinnerNumberOption) thisPanel.findFirstWithName("nbSlaves")).getValue()).intValue();
     final Boolean interruptIfRunning = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("interruptIfRunning")).getValue();
-    final CollectionMap<TopologyData, String> map = new ArrayListHashMap<>();
-    for (TopologyData data: dataArray) {
+    final CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
+    for (AbstractTopologyComponent data: dataArray) {
       if (data.getParent() == null) continue;
-      map.putValue(data.getParent(), data.getUuid());
+      map.putValue((TopologyDriver) data.getParent(), data.getUuid());
     }
     final Object[] params = {nbSlaves, interruptIfRunning, props};
     final String[] signature = {int.class.getName(), boolean.class.getName(), TypedProperties.class.getName()};
     Runnable r = new Runnable() {
       @Override public void run() {
-        for (Map.Entry<TopologyData, Collection<String>> en: map.entrySet()) {
-          TopologyData parent = en.getKey();
+        for (Map.Entry<TopologyDriver, Collection<String>> en: map.entrySet()) {
+          TopologyDriver parent = en.getKey();
           NodeSelector selector = new NodeSelector.UuidSelector(en.getValue());
           try {
-            Map<String, Object> result = parent.getNodeForwarder().forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
+            Map<String, Object> result = parent.getForwarder().forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
             printForwardingRequestErrors(result);
           } catch(IOException e) {
             parent.initializeProxies();

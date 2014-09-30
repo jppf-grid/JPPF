@@ -366,7 +366,7 @@ public final class OptionsHandler {
    * 
    * @param searchRoot the root option to search from.
    * @param name the name of the option to search.
-   * @return th first option found with the specified name.
+   * @return the first option found with the specified name.
    */
   public static OptionElement findOptionWithName(final OptionElement searchRoot, final String name) {
     OptionElement result = null;

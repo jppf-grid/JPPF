@@ -363,7 +363,7 @@ class JobDataPanelManager {
         JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
         if (status == JPPFClientConnectionStatus.FAILED) panel.driverRemoved(c);
         else panel.driverUpdated(c);
-      } else throw new IllegalStateException("Unsupported event source - expected JPPFClientConnectionImpl");
+      } else throw new IllegalStateException("Unsupported event source - expected JPPFClientConnection");
     }
   }
 }

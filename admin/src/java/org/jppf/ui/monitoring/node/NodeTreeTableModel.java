@@ -23,13 +23,13 @@ import java.text.NumberFormat;
 import javax.swing.tree.*;
 
 import org.jppf.management.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**
  * Tree table model for the tree table.
  */
-public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
-{
+public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
   /**
    * Column number for the node's url.
    */
@@ -63,8 +63,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    * Initialize this model with the specified tree.
    * @param node the root of the tree.
    */
-  public NodeTreeTableModel(final TreeNode node)
-  {
+  public NodeTreeTableModel(final TreeNode node) {
     super(node);
     BASE = "org.jppf.ui.i18n.NodeDataPage";
   }
@@ -75,8 +74,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
    */
   @Override
-  public int getColumnCount()
-  {
+  public int getColumnCount() {
     return 6;
   }
 
@@ -92,12 +90,14 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
     Object res = "";
     if (node instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      if (defNode.getUserObject() instanceof TopologyData) {
-        TopologyData info = (TopologyData) defNode.getUserObject();
-        JPPFManagementInfo mgtInfo = info.getNodeInformation();
+      if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
+        AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
+        JPPFManagementInfo mgtInfo = info.getManagementInfo();
         boolean isNode = (mgtInfo != null) && mgtInfo.isNode();
-        if (info.isDriver() && (column > 0)) return res;
-        JPPFNodeState state = info.getNodeState();
+        if (info.isDriver()) {
+          return (column > 0) ? res : info.toString();
+        }
+        JPPFNodeState state = ((TopologyNode) info).getNodeState();
         if (state == null) return res;
         switch (column) {
           case NODE_URL:
@@ -122,7 +122,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
           case NB_SLAVES:
             if (isNode) {
               if ((mgtInfo != null) && mgtInfo.isMasterNode()) {
-                int n = info.getNbSlaveNodes();
+                int n = ((TopologyNode) info).getNbSlaveNodes();
                 res = n >= 0 ? nf.format(n) : "";
               } else res = "";
             }
@@ -142,11 +142,9 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
    */
   @Override
-  public String getColumnName(final int column)
-  {
+  public String getColumnName(final int column) {
     String res = "";
-    switch (column)
-    {
+    switch (column) {
       case NODE_URL:
         res = localize("column.node.url");
         break;
@@ -173,8 +171,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel
    * Get a number formatter for the number of tasks for each node.
    * @return a <code>NumberFormat</code> instance.
    */
-  private static NumberFormat createNumberFormat()
-  {
+  private static NumberFormat createNumberFormat() {
     NumberFormat nf = NumberFormat.getIntegerInstance();
     nf.setGroupingUsed(true);
     return nf;

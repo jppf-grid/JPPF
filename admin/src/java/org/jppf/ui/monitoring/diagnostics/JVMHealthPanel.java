@@ -28,9 +28,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.actions.*;
-import org.jppf.ui.monitoring.data.*;
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
+import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.ExceptionUtils;
@@ -40,7 +40,7 @@ import org.slf4j.*;
  * Panel displaying the tree of all driver connections and attached nodes.
  * @author Laurent Cohen
  */
-public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyChangeListener {
+public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyListener {
   /**
    * Logger for this class.
    */
@@ -50,13 +50,13 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
    */
   static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The main topology tree view.
-   */
-  protected NodeDataPanel nodePanel = null;
-  /**
    * 
    */
   protected RefreshHandler refreshHandler = null;
+  /**
+   * Manages the topology updates.
+   */
+  private final TopologyManager manager;
 
   /**
    * Initialize this panel with the specified information.
@@ -64,6 +64,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   public JVMHealthPanel() {
     BASE = "org.jppf.ui.i18n.JVMHealthPage";
     if (debugEnabled) log.debug("initializing JVMHealthPanel");
+    manager = TopologyManager.getInstance();
     createTreeTableModel();
   }
 
@@ -76,21 +77,25 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   }
 
   /**
+   * Initialize the refresh of tree structure.
+   */
+  public void init() {
+    initRefreshHandler();
+    populate();
+    TopologyManager.getInstance().addTopologyListener(this);
+  }
+
+  /**
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
   public void populate() {
-    DefaultMutableTreeNode mainRoot = nodePanel.getTreeTableRoot();
-    for (int i=0; i<mainRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode driver = (DefaultMutableTreeNode) mainRoot.getChildAt(i);
-      TopologyData driverData = (TopologyData) driver.getUserObject();
-      DefaultMutableTreeNode newDriver = new DefaultMutableTreeNode(driverData);
-      treeTableRoot.add(newDriver);
-      for (int j=0; j<driver.getChildCount(); j++) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(j);
-        TopologyData nodeData = (TopologyData) node.getUserObject();
-        if (nodeData.isPeer()) continue;
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(nodeData);
-        newDriver.add(newNode);
+    for (TopologyDriver driver: manager.getDrivers()) {
+      driverAdded(new TopologyEvent(manager, driver, null, null));
+      for (AbstractTopologyComponent child: driver.getChildren()) {
+        if (child.isPeer()) continue;
+        TopologyNode node = (TopologyNode) child;
+        log.debug("adding node " + node+ " to driver " + driver);
+        nodeAdded(new TopologyEvent(manager, driver, node, null));
       }
     }
     treeTable.expandAll();
@@ -136,14 +141,14 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   public synchronized void refreshSnapshots() {
     for (int i=0; i<treeTableRoot.getChildCount(); i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      TopologyData driverData = (TopologyData) driverNode.getUserObject();
+      TopologyDriver driverData = (TopologyDriver) driverNode.getUserObject();
       if (driverData.getDiagnostics() == null) continue;
-      JMXDriverConnectionWrapper jmx = driverData.getJmxWrapper();
+      JMXDriverConnectionWrapper jmx = driverData.getJmx();
       if ((jmx == null) || !jmx.isConnected()) continue;
       try {
         HealthSnapshot health = driverData.getDiagnostics().healthSnapshot();
         if (log.isTraceEnabled()) log.trace("got driver health snapshot: " + health);
-        driverData.refreshHealthSnapshot(health);
+        if (health != null) driverData.refreshHealthSnapshot(health);
       } catch (IOException e) {
         String format = "error getting health snapshot for driver {}, reinitializing the connection. Exception: {}";
         if (debugEnabled) log.debug(format, driverData.getUuid(), ExceptionUtils.getStackTrace(e));
@@ -152,16 +157,16 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
       } catch (Exception e) {
         log.error("error getting health snapshot for driver " + driverData.getUuid(), e);
       }
-      if ((driverNode.getChildCount() <= 0) || (driverData.getNodeForwarder() == null)) continue;
-      Map<String, TopologyData> uuidMap = new HashMap<>();
+      if ((driverNode.getChildCount() <= 0) || (driverData.getForwarder() == null)) continue;
+      Map<String, TopologyNode> uuidMap = new HashMap<>();
       for (int j=0; j<driverNode.getChildCount(); j++) {
         DefaultMutableTreeNode nodeNode = (DefaultMutableTreeNode) driverNode.getChildAt(j);
-        TopologyData data = (TopologyData) nodeNode.getUserObject();
+        TopologyNode data = (TopologyNode) nodeNode.getUserObject();
         uuidMap.put(data.getUuid(), data);
       }
       Map<String, Object> result = null;
       try {
-        result = driverData.getNodeForwarder().healthSnapshot(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
+        result = driverData.getForwarder().healthSnapshot(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
       } catch(IOException e) {
         String format = "error getting node health for driver {}, reinitializing the connection. Exception: {}";
         if (debugEnabled) log.debug(format, driverData.getUuid(), ExceptionUtils.getStackTrace(e));
@@ -172,7 +177,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
       }
       if (result == null) continue;
       for (Map.Entry<String, Object> entry: result.entrySet()) {
-        TopologyData data = uuidMap.get(entry.getKey());
+        TopologyNode data = uuidMap.get(entry.getKey());
         if (data == null) continue;
         if (entry.getValue() instanceof Exception) {
           data.setStatus(TopologyDataStatus.DOWN);
@@ -205,45 +210,27 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
     new Thread(r).start();
   }
 
-  /**
-   * Get the main topology tree view.
-   * @return a {@link NodeDataPanel} instance.
-   */
-  public NodeDataPanel getNodePanel() {
-    return nodePanel;
-  }
-
-  /**
-   * Set the main topology tree view.
-   * @param nodePanel a {@link NodeDataPanel} instance.
-   */
-  public void setNodePanel(final NodeDataPanel nodePanel) {
-    this.nodePanel = nodePanel;
-  }
-
   @Override
-  public synchronized void driverAdded(final TopologyChangeEvent event) {
+  public synchronized void driverAdded(final TopologyEvent event) {
     if (debugEnabled) log.debug("adding driver " + event.getDriverData());
-    TopologyData driverData = event.getDriverData();
+    TopologyDriver driverData = event.getDriverData();
     DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
     if (driver != null) return;
     driver = new DefaultMutableTreeNode(driverData);
     int n = treeTableRoot.getChildCount();
     model.insertNodeInto(driver, treeTableRoot, n);
     if (n == 0) treeTable.expand(treeTableRoot);
-    ConnectionDataHolder cdh = StatsHandler.getInstance().getConnectionDataHolder(driverData.getClientConnection());
-    if (cdh != null) cdh.setDriverData(driverData);
   }
 
   @Override
-  public synchronized void driverRemoved(final TopologyChangeEvent event) {
+  public synchronized void driverRemoved(final TopologyEvent event) {
     if (debugEnabled) log.debug("removing driver " + event.getDriverData());
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
     if (driver != null) model.removeNodeFromParent(driver);
   }
 
   @Override
-  public synchronized void nodeAdded(final TopologyChangeEvent event) {
+  public synchronized void nodeAdded(final TopologyEvent event) {
     if (debugEnabled) log.debug("adding node " + event.getNodeData() + " to driver " + event.getDriverData());
     if ((event.getPeerData() != null) || event.getNodeData().isPeer()) return;
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
@@ -257,7 +244,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   }
 
   @Override
-  public synchronized void nodeRemoved(final TopologyChangeEvent event) {
+  public synchronized void nodeRemoved(final TopologyEvent event) {
     if (debugEnabled) log.debug("removing node " + event.getNodeData() + " from driver " + event.getDriverData());
     if (event.getNodeData().isPeer()) return;
     DefaultMutableTreeNode driver = findDriver(event.getDriverData().getUuid());
@@ -270,7 +257,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   }
 
   @Override
-  public synchronized void dataUpdated(final TopologyChangeEvent event) {
+  public synchronized void nodeUpdated(final TopologyEvent event) {
   }
 
   /**
@@ -281,7 +268,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   DefaultMutableTreeNode findDriver(final String driverUuid) {
     for (int i=0; i<treeTableRoot.getChildCount(); i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      TopologyData data = (TopologyData) driverNode.getUserObject();
+      TopologyDriver data = (TopologyDriver) driverNode.getUserObject();
       if (data.getUuid().equals(driverUuid)) return driverNode;
     }
     return null;
@@ -296,7 +283,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyC
   DefaultMutableTreeNode findNode(final DefaultMutableTreeNode driver, final String nodeUuid) {
     for (int i=0; i<driver.getChildCount(); i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(i);
-      TopologyData nodeData = (TopologyData) node.getUserObject();
+      TopologyNode nodeData = (TopologyNode) node.getUserObject();
       if (nodeUuid.equals(nodeData.getUuid())) return node;
     }
     return null;

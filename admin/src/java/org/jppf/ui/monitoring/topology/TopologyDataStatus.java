@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
+package org.jppf.ui.monitoring.topology;
 
 /**
  * Used for temporary display of the status of a node, before it is removed.
  * @author Laurent Cohen
+ * @since 5.0
  */
 public enum TopologyDataStatus
 {

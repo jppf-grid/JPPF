@@ -23,7 +23,7 @@ import java.util.*;
 
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.node.*;
+import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.*;
 
 /**
@@ -47,20 +47,16 @@ public class SelectAllAction extends AbstractSelectionAction
    * {@inheritDoc}
    */
   @Override
-  public void actionPerformed(final ActionEvent e)
-  {
-    synchronized(panel)
-    {
+  public void actionPerformed(final ActionEvent e) {
+    synchronized(panel) {
       JPPFTreeTable treeTable = panel.getTreeTable();
       TreeTableModelAdapter model = (TreeTableModelAdapter) treeTable.getModel();
       List<TreePath> selectionPath = new ArrayList<>();
-      for (DefaultMutableTreeNode driver: getDriverNodes())
-      {
+      for (DefaultMutableTreeNode driver: getDriverNodes()) {
         selectionPath.add(treeTable.getPathForNode(driver));
-        for (int i=0; i<driver.getChildCount(); i++)
-        {
+        for (int i=0; i<driver.getChildCount(); i++) {
           DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(i);
-          TopologyData nodeData = (TopologyData) node.getUserObject();
+          AbstractTopologyComponent nodeData = (AbstractTopologyComponent) node.getUserObject();
           if ((nodeData == null) || !nodeData.isNode()) continue;
           selectionPath.add(treeTable.getPathForNode(node));
         }

@@ -24,6 +24,7 @@ import org.jppf.client.JPPFClientConnection;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.ui.monitoring.topology.TopologyDataStatus;
 import org.slf4j.*;
 
 /**
@@ -133,14 +134,6 @@ public class TopologyData {
   }
 
   /**
-   * Get the type of this job data object.
-   * @return a <code>TopologyDataType</code> enum value.
-   */
-  public TopologyDataType getType() {
-    return type;
-  }
-
-  /**
    * Get the wrapper holding the connection to the JMX server on a driver or node.
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
@@ -167,7 +160,6 @@ public class TopologyData {
   /**
    * Get a string representation of this object.
    * @return a string displaying the host and port of the underlying jmx connection.
-   * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
@@ -191,7 +183,6 @@ public class TopologyData {
     this.nodeState = newState;
     setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
   }
-
 
   /**
    * Get the object describing the health of a node or driver.
@@ -318,7 +309,7 @@ public class TopologyData {
   }
 
   /**
-   * Set the connection uuuid.
+   * Set the connection uuid.
    * @param uuid the uuid as a string.
    */
   public void setUuid(final String uuid) {
