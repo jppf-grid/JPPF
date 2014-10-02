@@ -25,12 +25,12 @@ import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
 import org.jppf.utils.ExceptionUtils;
@@ -64,7 +64,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
   public JVMHealthPanel() {
     BASE = "org.jppf.ui.i18n.JVMHealthPage";
     if (debugEnabled) log.debug("initializing JVMHealthPanel");
-    manager = TopologyManager.getInstance();
+    manager = StatsHandler.getInstance().getTopologyManager();
     createTreeTableModel();
   }
 
@@ -82,7 +82,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
   public void init() {
     initRefreshHandler();
     populate();
-    TopologyManager.getInstance().addTopologyListener(this);
+    manager.addTopologyListener(this);
   }
 
   /**
@@ -91,7 +91,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
   public void populate() {
     for (TopologyDriver driver: manager.getDrivers()) {
       driverAdded(new TopologyEvent(manager, driver, null, null));
-      for (AbstractTopologyComponent child: driver.getChildren()) {
+      for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) {
         if (child.isPeer()) continue;
         TopologyNode node = (TopologyNode) child;
         log.debug("adding node " + node+ " to driver " + driver);
@@ -180,7 +180,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
         TopologyNode data = uuidMap.get(entry.getKey());
         if (data == null) continue;
         if (entry.getValue() instanceof Exception) {
-          data.setStatus(TopologyDataStatus.DOWN);
+          data.setStatus(TopologyNodeStatus.DOWN);
           log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
         } else if (entry.getValue() instanceof HealthSnapshot) {
           data.refreshHealthSnapshot((HealthSnapshot) entry.getValue());

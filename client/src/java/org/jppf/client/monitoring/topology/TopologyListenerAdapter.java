@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.topology;
+package org.jppf.client.monitoring.topology;
 
 /**
  * A convenience class for subclasses that wish to receive topology events

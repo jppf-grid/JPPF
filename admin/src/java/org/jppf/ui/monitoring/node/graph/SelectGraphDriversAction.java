@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.ActionEvent;
 
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 

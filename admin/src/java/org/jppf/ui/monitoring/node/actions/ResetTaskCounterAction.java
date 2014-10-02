@@ -21,9 +21,9 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.*;
 
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.NodeSelector;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 

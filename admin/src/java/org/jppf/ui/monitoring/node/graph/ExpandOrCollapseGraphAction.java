@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node.graph;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 

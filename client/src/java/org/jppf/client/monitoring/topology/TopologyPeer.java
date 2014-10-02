@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.topology;
+package org.jppf.client.monitoring.topology;
 
 import org.jppf.management.JPPFManagementInfo;
 
 
 /**
- * Implementation of {@link TopologyDriver} for JPPF nodes.
+ * Instances of this class represent peer drivers as nodes for the driver they are connected to.
  * @author Laurent Cohen
  * @since 5.0
  */
@@ -53,7 +53,7 @@ public class TopologyPeer extends TopologyNode {
   }
 
   /**
-   * Get the peer driver.
+   * Get the uuid of the referenced peer driver.
    * @return the peer uuid.
    */
   public String getPeerUuid() {
@@ -61,7 +61,7 @@ public class TopologyPeer extends TopologyNode {
   }
 
   /**
-   * Set the peer driver.
+   * Set the uuid of the referenced peer driver.
    * @param peerUuid the peer uuid.
    */
   public void setPeerUuid(final String peerUuid) {

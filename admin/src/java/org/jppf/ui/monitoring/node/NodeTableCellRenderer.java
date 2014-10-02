@@ -27,7 +27,7 @@ import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
 
 /**
@@ -75,7 +75,7 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
         if (o instanceof AbstractTopologyComponent) {
           AbstractTopologyComponent data = (AbstractTopologyComponent) o;
           if (data.isNode()) {
-            if (((TopologyNode) data).getStatus() == TopologyDataStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
+            if (((TopologyNode) data).getStatus() == TopologyNodeStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
             else {
               if (!data.getManagementInfo().isActive())
                 renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);

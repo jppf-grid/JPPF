@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.topology;
+package org.jppf.client.monitoring.topology;
 
 import org.jppf.management.*;
 
@@ -37,7 +37,7 @@ public class TopologyNode extends AbstractTopologyComponent {
   /**
    * The status of the node.
    */
-  private TopologyDataStatus status = TopologyDataStatus.UP;
+  private TopologyNodeStatus status = TopologyNodeStatus.UP;
 
   /**
    * Initialize this topology data as holding information about a node.
@@ -67,14 +67,14 @@ public class TopologyNode extends AbstractTopologyComponent {
    */
   public void refreshNodeState(final JPPFNodeState newState) {
     this.nodeState = newState;
-    setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
+    setStatus(this.nodeState == null ? TopologyNodeStatus.DOWN : TopologyNodeStatus.UP);
   }
 
   /**
    * Get the status of the node.
    * @return the node status.
    */
-  public TopologyDataStatus getStatus() {
+  public TopologyNodeStatus getStatus() {
     return status;
   }
 
@@ -82,8 +82,8 @@ public class TopologyNode extends AbstractTopologyComponent {
    * Set the status of the node.
    * @param status the node status.
    */
-  public void setStatus(final TopologyDataStatus status) {
-    if (status == TopologyDataStatus.DOWN)
+  public void setStatus(final TopologyNodeStatus status) {
+    if (status == TopologyNodeStatus.DOWN)
       this.status = status;
   }
 

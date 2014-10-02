@@ -23,7 +23,7 @@ import java.util.TimerTask;
 import javax.swing.*;
 
 import org.jppf.client.JPPFClientConnection;
-import org.jppf.ui.monitoring.topology.TopologyDriver;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.*;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;

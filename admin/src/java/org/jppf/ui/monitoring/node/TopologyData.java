@@ -21,10 +21,10 @@ package org.jppf.ui.monitoring.node;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.monitoring.topology.TopologyNodeStatus;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.ui.monitoring.topology.TopologyDataStatus;
 import org.slf4j.*;
 
 /**
@@ -47,7 +47,7 @@ public class TopologyData {
   /**
    * The status of the node.
    */
-  private TopologyDataStatus status = TopologyDataStatus.UP;
+  private TopologyNodeStatus status = TopologyNodeStatus.UP;
   /**
    * A driver connection.
    */
@@ -181,7 +181,7 @@ public class TopologyData {
   public void refreshNodeState(final JPPFNodeState newState) {
     if (!TopologyDataType.NODE.equals(type)) return;
     this.nodeState = newState;
-    setStatus(this.nodeState == null ? TopologyDataStatus.DOWN : TopologyDataStatus.UP);
+    setStatus(this.nodeState == null ? TopologyNodeStatus.DOWN : TopologyNodeStatus.UP);
   }
 
   /**
@@ -221,7 +221,7 @@ public class TopologyData {
    * Get the status of the node.
    * @return the node status.
    */
-  public TopologyDataStatus getStatus() {
+  public TopologyNodeStatus getStatus() {
     return status;
   }
 
@@ -229,8 +229,8 @@ public class TopologyData {
    * Set the status of the node.
    * @param status the node status.
    */
-  public void setStatus(final TopologyDataStatus status) {
-    if (status == TopologyDataStatus.DOWN)
+  public void setStatus(final TopologyNodeStatus status) {
+    if (status == TopologyNodeStatus.DOWN)
     this.status = status;
   }
 

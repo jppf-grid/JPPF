@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.topology;
+package org.jppf.client.monitoring.topology;
 
 import java.util.*;
 

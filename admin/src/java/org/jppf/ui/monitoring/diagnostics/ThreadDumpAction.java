@@ -23,11 +23,11 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;

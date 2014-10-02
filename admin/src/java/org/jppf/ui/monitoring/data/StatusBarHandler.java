@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.slf4j.*;
 
@@ -56,7 +56,7 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    */
   public StatusBarHandler(final OptionElement statusBarOption) {
     this.statusBarOption = statusBarOption;
-    TopologyManager manager = TopologyManager.getInstance();
+    TopologyManager manager = StatsHandler.getInstance().getTopologyManager();
     updateStatusBar("/StatusNbServers", manager.getDriverCount());
     updateStatusBar("/StatusNbNodes", manager.getNodeCount());
     manager.addTopologyListener(this);

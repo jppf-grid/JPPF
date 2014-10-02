@@ -21,11 +21,11 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.NodeSelector;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 

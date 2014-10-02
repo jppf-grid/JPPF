@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.client.*;
-import org.jppf.client.event.*;
+import org.jppf.client.event.ClientListener;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.diagnostics.Thresholds;
 import org.jppf.ui.monitoring.event.StatsHandlerEvent;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
@@ -77,6 +77,10 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    * Thread pool used to process new connection events.
    */
   private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new JPPFThreadFactory("StatScheduler"));
+  /**
+   * Monitors and maintains a representation of the grid topology.
+   */
+  private final TopologyManager manager;
 
   /**
    *
@@ -84,7 +88,8 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   ClientHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
-    TopologyManager.getInstance().addTopologyListener(this);
+    manager = statsHandler.getTopologyManager();
+    manager.addTopologyListener(this);
     getJppfClient();
   }
 
@@ -224,7 +229,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   public synchronized JPPFClient getJppfClient(final ClientListener clientListener) {
     if (jppfClient == null) {
-      jppfClient = TopologyManager.getInstance().getClient();
+      jppfClient = manager.getJPPFClient();
     } else if ((clientListener != null) && (clientListener != this)) {
       jppfClient.addClientListener(clientListener);
     }
@@ -258,7 +263,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     this.serverListOption = serverListOption;
     List<JPPFClientConnection> list = getJppfClient().getAllConnections();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
-    for (TopologyDriver driver: TopologyManager.getInstance().getDrivers()) scheduler.submit(new NewConnectionTask(statsHandler, driver));
+    for (TopologyDriver driver: manager.getDrivers()) scheduler.submit(new NewConnectionTask(statsHandler, driver));
     notifyAll();
   }
 

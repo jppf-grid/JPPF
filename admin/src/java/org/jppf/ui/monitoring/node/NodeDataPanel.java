@@ -22,11 +22,11 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.node.actions.*;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.*;
 import org.slf4j.*;
 
@@ -54,7 +54,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   public NodeDataPanel() {
     BASE = "org.jppf.ui.i18n.NodeDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
-    manager = TopologyManager.getInstance();
+    manager = StatsHandler.getInstance().getTopologyManager();
     createTreeTableModel();
     manager.addTopologyListener(this);
   }
@@ -74,7 +74,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   private void populateTreeTableModel() {
     for (TopologyDriver driver: manager.getDrivers()) {
       addDriver(driver);
-      for (AbstractTopologyComponent child: driver.getChildren()) addNode(driver, (TopologyNode) child);
+      for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) addNode(driver, (TopologyNode) child);
     }
   }
 
@@ -84,7 +84,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   public void init() {
     if (debugEnabled) log.debug("initializing tree model");
     populateTreeTableModel();
-    TopologyManager.getInstance().addTopologyListener(this);
+    manager.addTopologyListener(this);
   }
   /**
    * Remove all drivers and nodes from the tree table.
@@ -162,7 +162,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
         treeTable.expand(treeTableRoot);
         treeTable.expand(driverNode);
       }
-      repaintTreeTable();
     } catch(RuntimeException | Error e) {
       log.debug(e.getMessage(), e);
     }
@@ -178,7 +177,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     DefaultMutableTreeNode driverNode = findDriver(uuid);
     if (driverNode == null) return;
     model.removeNodeFromParent(driverNode);
-    repaintTreeTable();
   }
 
   /**
@@ -212,7 +210,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
       }
     }
     if ((driverNode.getChildCount() == 1) && !driverData.isCollapsed()) treeTable.expand(driverNode);
-    repaintTreeTable();
   }
 
   /**
@@ -230,7 +227,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     if (node != null) {
       if (debugEnabled) log.debug("removing node: " + nodeData);
       model.removeNodeFromParent(node);
-      repaintTreeTable();
     }
   }
 

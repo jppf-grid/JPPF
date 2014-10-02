@@ -22,8 +22,8 @@ import java.text.NumberFormat;
 
 import javax.swing.tree.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**

@@ -26,8 +26,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.actions.*;
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.JPPFTreeTable;
 import org.slf4j.*;
 

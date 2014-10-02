@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.*;
 
-import org.jppf.ui.monitoring.topology.TopologyDriver;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**

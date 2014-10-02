@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.topology;
+package org.jppf.client.monitoring.topology;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
@@ -35,7 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 5.0
  */
-public class NodeRefreshHandler {
+class NodeRefreshHandler {
   /**
    * Logger for this class.
    */
@@ -44,10 +43,6 @@ public class NodeRefreshHandler {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * JPPF client used to submit execution requests.
-   */
-  private JPPFClient jppfClient = null;
   /**
    * Timer used to query the driver management data.
    */
@@ -75,7 +70,6 @@ public class NodeRefreshHandler {
    */
   public NodeRefreshHandler(final TopologyManager manager) {
     this.manager = manager;
-    this.jppfClient = manager.getClient();
     initialize();
   }
 
@@ -116,9 +110,7 @@ public class NodeRefreshHandler {
    */
   private void refreshNodes(final TopologyDriver driver) {
     Set<String> knownUuids = new HashSet<>();
-    for (AbstractTopologyComponent child: driver.getChildren()) {
-      knownUuids.add(child.getUuid());
-    }
+    for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) knownUuids.add(child.getUuid());
     JMXDriverConnectionWrapper wrapper = driver.getJmx();
     if ((wrapper == null) || !wrapper.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
@@ -189,7 +181,7 @@ public class NodeRefreshHandler {
       TopologyNode node = uuidMap.get(entry.getKey());
       if (node == null) continue;
       if (entry.getValue() instanceof Exception) {
-        node.setStatus(TopologyDataStatus.DOWN);
+        node.setStatus(TopologyNodeStatus.DOWN);
         log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
       }
       else if (entry.getValue() instanceof JPPFNodeState) {
@@ -221,7 +213,7 @@ public class NodeRefreshHandler {
       TopologyNode node = uuidMap.get(entry.getKey());
       if (node == null) continue;
       if (entry.getValue() instanceof Exception) {
-        node.setStatus(TopologyDataStatus.DOWN);
+        node.setStatus(TopologyNodeStatus.DOWN);
         log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
       }
       else if (entry.getValue() instanceof Integer) {

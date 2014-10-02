@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.data;
 import java.util.TimerTask;
 
 import org.jppf.client.*;
-import org.jppf.ui.monitoring.topology.TopologyDriver;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 
 /**
  * Instances of this class are tasks run periodically from a timer thread, requesting the latest

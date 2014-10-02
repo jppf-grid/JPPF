@@ -20,9 +20,9 @@ package org.jppf.ui.monitoring.node.actions;
 
 import java.util.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.actions.AbstractUpdatableAction;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.utils.collections.*;
 
 /**

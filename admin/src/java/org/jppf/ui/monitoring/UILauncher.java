@@ -102,7 +102,7 @@ public class UILauncher {
    * @return the root {@link JComponent} of the admin console.
    * @since 5.0
    */
-  public static JComponent loadUI() {
+  public static JComponent loadAdminConsole() {
     return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", false);
   }
 
@@ -152,13 +152,13 @@ public class UILauncher {
      */
     private boolean frameFound = false;
     /**
-     * 
+     * Contains the root UI component of the admin console.
      */
     private final OptionElement uiRoot;
 
     /**
-     * 
-     * @param uiRoot .
+     * Initiialize this observer with the specified UI root.
+     * @param uiRoot contains the root UI component of the admin console.
      */
     private MainFrameObserver(final OptionElement uiRoot) {
       this.uiRoot = uiRoot;

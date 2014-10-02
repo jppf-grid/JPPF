@@ -20,8 +20,8 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.util.Collection;
 
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;

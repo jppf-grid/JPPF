@@ -23,7 +23,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import org.jppf.client.*;
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -76,7 +76,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer
       }
     } else {
       path = data.getManagementInfo().isMasterNode() ? AbstractTreeCellRenderer.NODE_MASTER_ICON : AbstractTreeCellRenderer.NODE_ICON;
-      if (!TopologyDataStatus.UP.equals(((TopologyNode) data).getStatus())) {
+      if (!TopologyNodeStatus.UP.equals(((TopologyNode) data).getStatus())) {
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
         backgroundSelected = AbstractTreeCellRenderer.INACTIVE_SELECTION_COLOR;
         font = AbstractTreeCellRenderer.getItalicFont(f);

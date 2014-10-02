@@ -23,9 +23,10 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -134,7 +135,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
         if (data.isPeer()) {
           String uuid = ((TopologyPeer) data).getPeerUuid();
           if (uuid != null) {
-            TopologyDriver driver = TopologyManager.getInstance().getDriver(uuid);
+            TopologyDriver driver = StatsHandler.getInstance().getTopologyManager().getDriver(uuid);
             if (driver != null) info = driver.getJmx().systemInformation();
           }
         }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.topology;
+package org.jppf.client.monitoring.topology;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -27,11 +27,11 @@ import org.jppf.utils.JPPFThreadFactory;
 import org.slf4j.*;
 
 /**
- *
+ * Instances of this class discover and maintain a representation of a JPPF grid topology.
  * @author Laurent Cohen
  * @since 5.0
  */
-public final class TopologyManager implements ClientListener{
+public class TopologyManager implements ClientListener {
   /**
    * The drivers in the topology.
    */
@@ -61,37 +61,36 @@ public final class TopologyManager implements ClientListener{
    */
   private final List<TopologyListener> listeners = new CopyOnWriteArrayList<>();
   /**
-   * Separate thread used to sequentialize events that impact the tree table.
+   * Separate thread used to sequentialize events emitted by this topology manager.
    */
-  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("TopologyHandler"));
+  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("TopologyEvents"));
   /**
    * The JPPF client.
    */
   private final JPPFClient client;
   /**
-   * The singleton instance of this class.
-   */
-  private static final TopologyManager INSTANCE = new TopologyManager();
-  /**
-   *
+   * Refreshes the states of the nodes at rehular intervals.
    */
   private final NodeRefreshHandler refreshHandler;
 
   /**
-   * Private constructor to prevent the creation of instances other than the singleton.
+   * Initialize this toplogy manager with a new {@link JPPFClient}.
    */
-  private TopologyManager() {
+  public TopologyManager() {
     this.refreshHandler = new NodeRefreshHandler(this);
     refreshHandler.startRefreshTimer();
     this.client = new JPPFClient(this);
   }
 
   /**
-   * Get the singleton instance of this class.
-   * @return a {@link TopologyManager} object.
+   * Initialize this toplogy manager with the specified {@link JPPFClient}.
+   * @param client the JPPF client used to discover and monitor the grid topology.
    */
-  public static TopologyManager getInstance() {
-    return INSTANCE;
+  public TopologyManager(final JPPFClient client) {
+    this.refreshHandler = new NodeRefreshHandler(this);
+    refreshHandler.startRefreshTimer();
+    this.client = client;
+    this.client.addClientListener(this);
   }
 
   /**
@@ -276,7 +275,7 @@ public final class TopologyManager implements ClientListener{
    * Get the JPPF client.
    * @return a {@link JPPFClient} object.
    */
-  public JPPFClient getClient() {
+  public JPPFClient getJPPFClient() {
     return client;
   }
 }

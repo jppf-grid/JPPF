@@ -22,7 +22,7 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.*;
 
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.Graph;

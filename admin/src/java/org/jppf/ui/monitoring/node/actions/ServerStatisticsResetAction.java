@@ -20,8 +20,8 @@ package org.jppf.ui.monitoring.node.actions;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.ui.monitoring.topology.*;
 import org.slf4j.*;
 
 /**

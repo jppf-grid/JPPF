@@ -20,8 +20,8 @@ package org.jppf.ui.monitoring.node.actions;
 import java.awt.event.ActionEvent;
 import java.util.*;
 
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
-import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 

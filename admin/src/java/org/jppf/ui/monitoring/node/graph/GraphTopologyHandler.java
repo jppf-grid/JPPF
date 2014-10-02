@@ -23,7 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.SwingUtilities;
 
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -80,7 +81,7 @@ public class GraphTopologyHandler implements TopologyListener {
    * @param graphOption the panel that displays the graph.
    */
   public GraphTopologyHandler(final GraphOption graphOption) {
-    manager = TopologyManager.getInstance();
+    manager = StatsHandler.getInstance().getTopologyManager();
     this.graphOption = graphOption;
     fullGraph = new SparseMultigraph<>();
     displayGraph = new SparseMultigraph<>();
@@ -111,7 +112,7 @@ public class GraphTopologyHandler implements TopologyListener {
     try {
       for (TopologyDriver driver: manager.getDrivers()) {
         driverAdded(new TopologyEvent(manager, driver, null, null));
-        for (AbstractTopologyComponent child: driver.getChildren()) {
+        for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) {
           TopologyNode node = (TopologyNode) child;
           if (node.isNode()) {
             log.debug("adding node " + node + " to driver " + driver);

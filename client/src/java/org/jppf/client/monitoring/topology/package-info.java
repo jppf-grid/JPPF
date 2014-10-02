@@ -16,21 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.topology;
-
 /**
- * Used for temporary display of the status of a node, before it is removed.
- * @author Laurent Cohen
+ * Classes supporting the monitoring and refreshing of the JPPF grid topology.
  * @since 5.0
+ * @exclude
  */
-public enum TopologyDataStatus
-{
-  /**
-   * The node is up.
-   */
-  UP,
-  /**
-   * The node is down.
-   */
-  DOWN
-}
+package org.jppf.client.monitoring.topology;

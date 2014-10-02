@@ -20,8 +20,8 @@ package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.event.*;
 
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.actions.AbstractActionHandler;
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.picking.MultiPickedState;

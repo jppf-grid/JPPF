@@ -25,9 +25,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.*;
 
 import org.apache.commons.collections15.functors.ConstantTransformer;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.actions.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.AbstractOption;
 import org.slf4j.*;
 
@@ -148,7 +149,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
   public void init() {
     if (debugEnabled) log.debug("initializing graph");
     populate();
-    TopologyManager.getInstance().addTopologyListener(graphHandler);
+    StatsHandler.getInstance().getTopologyManager().addTopologyListener(graphHandler);
   }
 
   @Override

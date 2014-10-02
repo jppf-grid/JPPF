@@ -23,9 +23,9 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
-import org.jppf.ui.monitoring.topology.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;

@@ -22,8 +22,8 @@ import java.text.NumberFormat;
 
 import javax.swing.tree.*;
 
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.management.diagnostics.HealthSnapshot;
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**

@@ -23,7 +23,7 @@ import java.util.*;
 
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.treetable.*;
 
 /**

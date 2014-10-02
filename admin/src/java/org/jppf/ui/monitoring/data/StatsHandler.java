@@ -20,13 +20,12 @@ package org.jppf.ui.monitoring.data;
 import java.awt.Toolkit;
 import java.awt.datatransfer.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.client.*;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.monitoring.topology.TopologyDriver;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
@@ -48,7 +47,7 @@ public final class StatsHandler implements StatsConstants {
   /**
    * Singleton instance of this class.
    */
-  private static AtomicReference<StatsHandler> instance = new AtomicReference<>();
+  private static StatsHandler instance = new StatsHandler();
   /**
    * The object holding the current statistics values.
    */
@@ -81,14 +80,17 @@ public final class StatsHandler implements StatsConstants {
    * The client handler.
    */
   private final ClientHandler clientHandler;
+  /**
+   * The object which monitors and maintains a representation of the grid topology.
+   */
+  private final TopologyManager topologyManager;
 
   /**
    * Get the singleton instance of this class.
    * @return a <code>StatsHandler</code> instance.
    */
-  public static synchronized StatsHandler getInstance() {
-    if (instance.get() == null) instance.set(new StatsHandler());
-    return instance.get();
+  public static StatsHandler getInstance() {
+    return instance;
   }
 
   /**
@@ -98,6 +100,7 @@ public final class StatsHandler implements StatsConstants {
     if (debugEnabled) log.debug("initializing StatsHandler");
     refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.stats", 1000L);
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
+    topologyManager = new TopologyManager();
     clientHandler = new ClientHandler(this);
     //update(null, stats);
   }
@@ -395,5 +398,13 @@ public final class StatsHandler implements StatsConstants {
    */
   public ClientHandler getClientHandler() {
     return clientHandler;
+  }
+
+  /**
+   * Get the object which monitors and maintains a representation of the grid topology.
+   * @return a {@link TopologyManager} object.
+   */
+  public TopologyManager getTopologyManager() {
+    return topologyManager;
   }
 }

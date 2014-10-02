@@ -23,7 +23,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.jppf.ui.monitoring.topology.*;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -86,7 +86,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer
         } else if (data.isNode()) {
           TopologyNode nodeData = (TopologyNode) data;
           path = nodeData.getManagementInfo().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
-          if (!TopologyDataStatus.UP.equals(nodeData.getStatus())) {
+          if (!TopologyNodeStatus.UP.equals(nodeData.getStatus())) {
             background = INACTIVE_COLOR;
             backgroundSelected = INACTIVE_SELECTION_COLOR;
             font = getItalicFont(f);

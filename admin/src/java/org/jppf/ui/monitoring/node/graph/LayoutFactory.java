@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.node.graph;
 import java.awt.Dimension;
 import java.util.Collection;
 
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.algorithms.layout.*;
 import edu.uci.ics.jung.graph.Graph;

@@ -22,7 +22,7 @@ import java.awt.event.*;
 
 import javax.swing.AbstractButton;
 
-import org.jppf.ui.monitoring.topology.AbstractTopologyComponent;
+import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.*;
