@@ -36,14 +36,6 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    */
   static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Determines the suspended state of this connection thread.
-   */
-  private boolean suspended = false;
-  /**
-   * Determines the connecting state of this connection thread.
-   */
-  private boolean connecting = true;
-  /**
    * The connection that holds this thread.
    */
   private final JMXConnectionWrapper connectionWrapper;
@@ -56,97 +48,25 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
     this.connectionWrapper = connectionWrapper;
   }
 
-  /**
-   * 
-   * @see java.lang.Runnable#run()
-   */
   @Override
   public void run() {
     while (!isStopped()) {
-      if (isSuspended()) {
-        if (debugEnabled) log.debug(connectionWrapper.getId() + " about to go to sleep");
-        goToSleep();
-        continue;
-      }
-      if (isConnecting()) {
-        try {
-          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
-          connectionWrapper.performConnection();
-          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
-          suspend();
-          connectionWrapper.wakeUp();
-        } catch(Exception ignored) {
-          if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
-          try {
-            Thread.sleep(100);
-          } catch(InterruptedException e) {
-            log.error(e.getMessage(), e);
-          }
-        } finally {
-          connectionWrapper.wakeUp();
-        }
+      try {
+        if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
+        connectionWrapper.performConnection();
+        if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
+      } catch(Exception ignored) {
+        if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
+        goToSleep(10L);
       }
     }
-  }
-
-  /**
-   * Suspend the current thread.
-   */
-  public synchronized void suspend() {
-    if (debugEnabled) log.debug(connectionWrapper.getId() + " suspending connection attempts");
-    setConnecting(false);
-    setSuspended(true);
-    wakeUp();
-  }
-
-  /**
-   * Resume the current thread's execution.
-   */
-  public synchronized void resume() {
-    if (debugEnabled) log.debug(connectionWrapper.getId() + " resuming connection attempts");
-    setConnecting(true);
-    setSuspended(false);
-    wakeUp();
   }
 
   /**
    * Stop this thread.
    */
   public synchronized void close() {
-    setConnecting(false);
     setStopped(true);
     wakeUp();
-  }
-
-  /**
-   * Get the connecting state of this connection thread.
-   * @return true if the connection is established, false otherwise.
-   */
-  public synchronized boolean isConnecting() {
-    return connecting;
-  }
-
-  /**
-   * Get the connecting state of this connection thread.
-   * @param connecting true if the connection is established, false otherwise.
-   */
-  public synchronized void setConnecting(final boolean connecting) {
-    this.connecting = connecting;
-  }
-
-  /**
-   * Determines the suspended state of this connection thread.
-   * @return true if the thread is suspended, false otherwise.
-   */
-  public synchronized boolean isSuspended() {
-    return suspended;
-  }
-
-  /**
-   * Set the suspended state of this connection thread.
-   * @param suspended true if the connection is suspended, false otherwise.
-   */
-  public synchronized void setSuspended(final boolean suspended) {
-    this.suspended = suspended;
   }
 }
