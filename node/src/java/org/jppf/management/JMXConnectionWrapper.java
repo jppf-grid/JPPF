@@ -156,14 +156,12 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     if (isConnected()) return;
     if (local) {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
-      setConnectedStatus(true);
+      connected.set(true);
       fireConnected();
     } else {
       JMXConnectionThread jct = null;
-      boolean jctNull = true;
       synchronized(this) {
-        jctNull = (jct = connectionThread.get()) == null;
-        if (jctNull) {
+        if ((jct = connectionThread.get()) == null) {
           jct = new JMXConnectionThread(this);
           connectionThread.set(jct);
           Thread t = new Thread(jct, CONNECTION_NAME_PREFIX + getId());
@@ -171,7 +169,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
           t.start();
         }
       }
-      if (!jctNull && !jct.isConnecting()) jct.resume();
     }
   }
 
@@ -194,7 +191,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the connection could not be established.
    */
   void performConnection() throws Exception {
-    setConnectedStatus(false);
+    connected.set(false);
     synchronized(connectionLock) {
       if (jmxc == null) jmxc = JMXConnectorFactory.newJMXConnector(url, env);
       jmxc.connect();
@@ -208,7 +205,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       } catch (UnknownHostException e) {
       }
     }
-    setConnectedStatus(true);
+    connected.set(true);
     fireConnected();
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
   }
@@ -233,7 +230,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
-    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
+    if (!isConnected()) return null;
     synchronized(this) {
       Object result = null;
       try {
@@ -241,13 +238,8 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
       } catch(IOException e) {
         if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
-        setConnectedStatus(false);
-        try {
-          if (jmxc != null) jmxc.close();
-        } catch(Exception e2) {
-          if (debugEnabled) log.debug(e2.getMessage(), e2);
-        }
-        if ((connectionThread.get() != null) && !connectionThread.get().isConnecting()) connectionThread.get().resume();
+        reset();
+        throw e;
       }
       return result;
     }
@@ -274,21 +266,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public Object getAttribute(final String name, final String attribute) throws Exception {
-    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return null;
     synchronized(this) {
       Object result = null;
       try {
         ObjectName mbeanName = new ObjectName(name);
         result = getMbeanConnection().getAttribute(mbeanName, attribute);
       } catch(IOException e) {
-        setConnectedStatus(false);
-        try {
-          if (jmxc != null) jmxc.close();
-        } catch(Exception e2) {
-          if (debugEnabled) log.debug(e2.getMessage(), e2);
-        }
-        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
         if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+        reset();
         throw e;
       }
       return result;
@@ -303,23 +288,33 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public void setAttribute(final String name, final String attribute, final Object value) throws Exception {
-    if (!isConnected() || ((connectionThread.get() != null) && connectionThread.get().isConnecting())) return;
+    if (!isConnected()) return;
     synchronized(this) {
       try {
         ObjectName mbeanName = new ObjectName(name);
         getMbeanConnection().setAttribute(mbeanName, new Attribute(attribute, value));
       } catch(IOException e) {
-        setConnectedStatus(false);
-        try {
-          if (jmxc != null) jmxc.close();
-        } catch(Exception e2) {
-          if (debugEnabled) log.debug(e2.getMessage(), e2);
-        }
-        if (!connectionThread.get().isConnecting()) connectionThread.get().resume();
         if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+        reset();
         throw e;
       }
     }
+  }
+
+  /**
+   * Reset the JMX connection and attempt to reconnect.
+   */
+  private void reset() {
+    connected.set(false);
+    if (jmxc != null) {
+      try {
+        jmxc.close();
+      } catch(Exception e2) {
+        if (debugEnabled) log.debug(e2.getMessage(), e2);
+      }
+      jmxc = null;
+    }
+    connect();
   }
 
   /**
@@ -370,15 +365,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public MBeanServerConnection getMbeanConnection() {
     return mbeanConnection.get();
-  }
-
-  /**
-   * Set the connected state of this connection wrapper.
-   * @param status true if the jmx connection is established, false otherwise.
-   */
-  protected void setConnectedStatus(final boolean status) {
-    connected.set(status);
-    wakeUp();
   }
 
   /**
