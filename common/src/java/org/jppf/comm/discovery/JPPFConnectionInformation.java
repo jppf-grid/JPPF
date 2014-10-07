@@ -18,6 +18,8 @@
 
 package org.jppf.comm.discovery;
 
+import static org.jppf.utils.ComparisonUtils.*;
+
 import java.io.*;
 
 import org.jppf.utils.StringUtils;
@@ -113,7 +115,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * Compare this connection information with another.
    * @param ci the other object to compare to.
    * @return -1 if this connection information is less than the other, 1 if it is greater, 0 if they are equal.
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
   public int compareTo(final JPPFConnectionInformation ci) {
@@ -136,7 +137,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * Determine whether this object is equal to another.
    * @param obj the object to compare to.
    * @return true if the 2 objects are equal, false otherwise.
-   * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(final Object obj) {
@@ -144,6 +144,24 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (this == obj) return true;
     if (getClass() != obj.getClass()) return false;
     JPPFConnectionInformation other = (JPPFConnectionInformation) obj;
+    if (uuid == null) return other.uuid == null;
+    return uuid.equals(other.uuid);
+  }
+
+  /**
+   * Determine whether this object is equal to another.
+   * @param other the object to compare to.
+   * @return true if the 2 objects are equal, false otherwise.
+   */
+  public boolean isSame(final JPPFConnectionInformation other) {
+    if (other == null) return false;
+    if (this == other) return true;
+    if (!equalStrings(host, other.host)) return false;
+    if (!equalIntArrays(serverPorts, other.serverPorts)) return false;
+    if (!equalIntArrays(sslServerPorts, other.sslServerPorts)) return false;
+    if (managementPort != other.managementPort) return false;
+    if (sslManagementPort != other.sslManagementPort) return false;
+    if (recoveryPort != other.recoveryPort) return false;
     if (uuid == null) return other.uuid == null;
     return uuid.equals(other.uuid);
   }
