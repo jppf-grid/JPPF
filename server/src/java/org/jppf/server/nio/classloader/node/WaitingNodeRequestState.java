@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.node.NodeClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jppf.classloader.*;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.TraversalList;
 import org.slf4j.*;
@@ -36,7 +36,7 @@ import org.slf4j.*;
  * This class represents the state of waiting for a request from a node.
  * @author Laurent Cohen
  */
-class WaitingNodeRequestState extends ClassServerState {
+class WaitingNodeRequestState extends NodeClassServerState {
   /**
    * Logger for this class.
    */
@@ -58,7 +58,7 @@ class WaitingNodeRequestState extends ClassServerState {
    * Initialize this state with a specified NioServer.
    * @param server the JPPFNIOServer this state relates to.
    */
-  public WaitingNodeRequestState(final ClassNioServer server) {
+  public WaitingNodeRequestState(final NodeClassNioServer server) {
     super(server);
   }
 
@@ -69,8 +69,8 @@ class WaitingNodeRequestState extends ClassServerState {
    * @throws Exception if an error occurs while transitioning to another state.
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClassContext context = (ClassContext) channel.getContext();
+  public NodeClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    NodeClassContext context = (NodeClassContext) channel.getContext();
     if (context.readMessage(channel)) {
       JPPFResourceWrapper res = context.deserializeResource();
       if (debugEnabled) log.debug("read resource request {} from node: {}", res, channel);
@@ -115,7 +115,7 @@ class WaitingNodeRequestState extends ClassServerState {
   private boolean processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
     byte[] b = null;
     String name = resource.getName();
-    ClassContext context = (ClassContext) channel.getContext();
+    NodeClassContext context = (NodeClassContext) channel.getContext();
     TraversalList<String> uuidPath = resource.getUuidPath();
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
@@ -157,7 +157,7 @@ class WaitingNodeRequestState extends ClassServerState {
     byte[] b = null;
     String name = resource.getName();
     TraversalList<String> uuidPath = resource.getUuidPath();
-    ClassContext context = (ClassContext) channel.getContext();
+    NodeClassContext context = (NodeClassContext) channel.getContext();
     if (resource.isSingleResource()) {
       b = classCache.getCacheContent(uuidPath.getFirst(), name);
       if (b != null) {
@@ -173,7 +173,7 @@ class WaitingNodeRequestState extends ClassServerState {
     ChannelWrapper<?> provider = findProviderConnection(uuid);
     if (provider != null) {
       if (debugEnabled) log.debug(build("requesting resource " + resource + " from client: ", provider, " for node: ", channel));
-      ClassContext providerContext = (ClassContext) provider.getContext();
+      ClientClassContext providerContext = (ClientClassContext) provider.getContext();
       ResourceRequest request = new ResourceRequest(channel, resource);
       resource.setState(JPPFResourceWrapper.State.PROVIDER_REQUEST);
       context.addPendingResponse(resource, request);
@@ -199,7 +199,7 @@ class WaitingNodeRequestState extends ClassServerState {
     if (connections == null) return null;
     int minRequests = Integer.MAX_VALUE;
     for (ChannelWrapper<?> channel: connections) {
-      ClassContext ctx = (ClassContext) channel.getContext();
+      ClientClassContext ctx = (ClientClassContext) channel.getContext();
       int size = ctx.getNbPendingRequests();
       if (size < minRequests) {
         minRequests = size;

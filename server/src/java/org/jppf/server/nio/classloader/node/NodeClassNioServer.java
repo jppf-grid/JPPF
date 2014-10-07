@@ -24,7 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jppf.comm.recovery.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -32,8 +33,7 @@ import org.slf4j.*;
  * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeClassNioServer extends ClassNioServer implements ReaperListener
-{
+public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClassTransition> implements ReaperListener {
   /**
    * Logger for this class.
    */
@@ -66,8 +66,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
-  {
+  public NodeClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.NODE_CLASSLOADER_CHANNEL, driver, useSSL);
   }
 
@@ -75,10 +74,8 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * Initialize the local channel connection.
    * @param localChannel the local channel to use.
    */
-  public void initLocalChannel(final ChannelWrapper<?> localChannel)
-  {
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false))
-    {
+  public void initLocalChannel(final ChannelWrapper<?> localChannel) {
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false)) {
       this.localChannel = localChannel;
       ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);
@@ -90,24 +87,23 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   }
 
   @Override
-  protected NioServerFactory<ClassState, ClassTransition> createFactory()
-  {
+  protected NioServerFactory<NodeClassState, NodeClassTransition> createFactory() {
     return new NodeClassServerFactory(this);
   }
 
   @Override
-  public void postAccept(final ChannelWrapper<?> channel)
-  {
-    try
-    {
-      synchronized(channel)
-      {
-        transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
+  public NioContext<?> createNioContext() {
+    return new NodeClassContext();
+  }
+
+  @Override
+  public void postAccept(final ChannelWrapper<?> channel) {
+    try {
+      synchronized(channel) {
+        transitionManager.transitionChannel(channel, NodeClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
         if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeConnection(channel);
@@ -119,8 +115,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * @param uuid the uuid key to look up in the the map.
    * @return channel the corresponding channel.
    */
-  protected ChannelWrapper<?> getNodeConnection(final String uuid)
-  {
+  protected ChannelWrapper<?> getNodeConnection(final String uuid) {
     return nodeConnections.get(uuid);
   }
 
@@ -129,8 +124,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * @param uuid the uuid key to add to the map.
    * @param channel the corresponding channel.
    */
-  public void addNodeConnection(final String uuid, final ChannelWrapper<?> channel)
-  {
+  public void addNodeConnection(final String uuid, final ChannelWrapper<?> channel) {
     if (debugEnabled) log.debug("adding node connection: uuid=" + uuid + ", channel=" + channel);
     nodeConnections.put(uuid, channel);
   }
@@ -140,8 +134,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * @param uuid the uuid key to remove from the map.
    * @return channel the corresponding channel.
    */
-  public ChannelWrapper<?> removeNodeConnection(final String uuid)
-  {
+  public ChannelWrapper<?> removeNodeConnection(final String uuid) {
     if (debugEnabled) log.debug("removing node connection: uuid=" + uuid);
     return nodeConnections.remove(uuid);
   }
@@ -150,34 +143,29 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * Close the specified connection.
    * @param channel the channel representing the connection.
    */
-  public static void closeConnection(final ChannelWrapper<?> channel)
-  {
-    if (channel == null)
-    {
+  public static void closeConnection(final ChannelWrapper<?> channel) {
+    if (channel == null) {
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
     NodeClassNioServer server = JPPFDriver.getInstance().getNodeClassServer();
-    ClassContext context = (ClassContext) channel.getContext();
+    NodeClassContext context = (NodeClassContext) channel.getContext();
     String uuid = context.getUuid();
     if (uuid != null) server.removeNodeConnection(uuid);
-    try
-    {
+    try {
       channel.close();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
+    AbstractNodeContext nodeContext = JPPFDriver.getInstance().getNodeNioServer().getConnection(uuid);
+    if (nodeContext != null) nodeContext.handleException(nodeContext.getChannel(), null);
   }
 
   @Override
-  public void connectionFailed(final ReaperEvent event)
-  {
+  public void connectionFailed(final ReaperEvent event) {
     ServerConnection c = event.getConnection();
-    if (!c.isOk())
-    {
+    if (!c.isOk()) {
       String uuid = c.getUuid();
       ChannelWrapper<?> channel = getNodeConnection(uuid);
       if (debugEnabled) log.debug("about to close channel = " + channel + " with uuid = " + uuid);
@@ -190,8 +178,7 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * @see org.jppf.nio.NioServer#removeAllConnections()
    */
   @Override
-  public synchronized void removeAllConnections()
-  {
+  public synchronized void removeAllConnections() {
     if (!isStopped()) return;
     List<ChannelWrapper<?>> list  = new ArrayList<>(nodeConnections.values());
     nodeConnections.clear();
@@ -206,14 +193,12 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
   }
 
   @Override
-  public boolean isIdle(final ChannelWrapper<?> channel)
-  {
-    return ClassState.IDLE_NODE == channel.getContext().getState();
+  public boolean isIdle(final ChannelWrapper<?> channel) {
+    return NodeClassState.IDLE_NODE == channel.getContext().getState();
   }
 
   @Override
-  public List<ChannelWrapper<?>> getAllConnections()
-  {
+  public List<ChannelWrapper<?>> getAllConnections() {
     List<ChannelWrapper<?>> list = super.getAllConnections();
     if (localChannel != null) list.add(localChannel);
     return list;

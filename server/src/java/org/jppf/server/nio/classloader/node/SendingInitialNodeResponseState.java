@@ -18,20 +18,18 @@
 
 package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.node.NodeClassTransition.*;
 
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
  * State of sending the initial response to a newly created node channel.
  * @author Laurent Cohen
  */
-class SendingInitialNodeResponseState extends ClassServerState
-{
+class SendingInitialNodeResponseState extends NodeClassServerState {
   /**
    * Logger for this class.
    */
@@ -45,8 +43,7 @@ class SendingInitialNodeResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingInitialNodeResponseState(final ClassNioServer server)
-  {
+  public SendingInitialNodeResponseState(final NodeClassNioServer server) {
     super(server);
   }
 
@@ -58,16 +55,13 @@ class SendingInitialNodeResponseState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    if (channel.isReadable() && !channel.isLocal())
-    {
+  public NodeClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException("node " + channel + " has been disconnected");
     }
-    ClassContext context = (ClassContext) channel.getContext();
-    if (context.writeMessage(channel))
-    {
-      log.info("sent node init response for uuid = {}", context.getUuid());
+    NodeClassContext context = (NodeClassContext) channel.getContext();
+    if (context.writeMessage(channel)) {
+      if (debugEnabled) log.debug("sent node init response for uuid = {}", context.getUuid());
       if (debugEnabled) log.debug("sent uuid=" + context.getResource().getProviderUuid() + " to node " + channel);
       context.setMessage(null);
       return TO_WAITING_NODE_REQUEST;

@@ -18,12 +18,11 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
@@ -32,8 +31,7 @@ import org.slf4j.*;
  * register a node class loader channel.
  * @author Laurent Cohen
  */
-public class SendingPeerInitiationRequestState extends ClassServerState
-{
+public class SendingPeerInitiationRequestState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -47,8 +45,7 @@ public class SendingPeerInitiationRequestState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingPeerInitiationRequestState(final ClassNioServer server)
-  {
+  public SendingPeerInitiationRequestState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -60,16 +57,13 @@ public class SendingPeerInitiationRequestState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !channel.isLocal())
-    {
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
     //if (context.writePeerInitiationMessage(channel))
-    if (context.writeMessage(channel))
-    {
+    if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent peer initiation to server " + channel);
       context.setMessage(null);
       return TO_WAITING_PEER_INITIATION_RESPONSE;

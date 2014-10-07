@@ -341,7 +341,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
-    if ((managementInfo.getHost() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
+    if (isPeer()) driver.getNodeNioServer().nodeConnected(this);
+    else  if ((managementInfo.getHost() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
   }
 
   @Override
@@ -406,7 +407,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
           @Override
           public void jmxWrapperConnected(final JMXWrapperEvent event) {
             if (debugEnabled) log.debug("jmx ocnnected {} for node {}", jmxConnection, AbstractNodeContext.this);
-            JPPFDriver.getInstance().getNodeNioServer().nodeConnected(AbstractNodeContext.this);
+            driver.getNodeNioServer().nodeConnected(AbstractNodeContext.this);
           }
         });
         jmxConnection.connect();

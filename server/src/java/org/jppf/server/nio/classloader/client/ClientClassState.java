@@ -15,18 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.client;
 
 /**
  * Enumeration of the possible states for a class server channel.
  * @author Laurent Cohen
  */
-public enum ClassState
-{
-  /**
-   * State of determining the type of a channel.
-   */
-  DEFINING_TYPE,
+public enum ClientClassState {
   /**
    * State of sending the initial information to a client.
    */
@@ -47,30 +42,6 @@ public enum ClassState
    * State of doing nothing for a resource provider.
    */
   IDLE_PROVIDER,
-  /**
-   * State of sending the initial information to a client.
-   */
-  WAITING_INITIAL_NODE_REQUEST,
-  /**
-   * State of sending the initial information to a node classloader.
-   */
-  SENDING_INITIAL_NODE_RESPONSE,
-  /**
-   * State of waiting for a request from a node classloader.
-   */
-  WAITING_NODE_REQUEST,
-  /**
-   * State of waiting for a response to a node classloader.
-   */
-  SENDING_NODE_RESPONSE,
-  /**
-   * State of doing nothing for a resource provider.
-   */
-  IDLE_NODE,
-  /**
-   * Waiting for a provider (client) to provide a class or resource definition.
-   */
-  NODE_WAITING_PROVIDER_RESPONSE,
   /**
    * Sending of the channel type identifier by a peer server.
    */

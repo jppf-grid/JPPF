@@ -20,14 +20,14 @@ package org.jppf.server.nio.classloader;
 
 import org.jppf.classloader.*;
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.server.nio.classloader.node.NodeClassContext;
 import org.slf4j.*;
 
 /**
  * Context object associated with a socket channel used by the class server of the JPPF driver.
  * @author Laurent Cohen
  */
-public class LocalClassContext extends ClassContext
-{
+public class LocalClassContext extends NodeClassContext {
   /**
    * Logger for this class.
    */
@@ -38,13 +38,11 @@ public class LocalClassContext extends ClassContext
   private static boolean traceEnabled = log.isTraceEnabled();
 
   @Override
-  public void serializeResource() throws Exception
-  {
+  public void serializeResource() throws Exception {
   }
 
   @Override
-  public JPPFResourceWrapper deserializeResource() throws Exception
-  {
+  public JPPFResourceWrapper deserializeResource() throws Exception {
     return resource;
   }
 
@@ -55,13 +53,11 @@ public class LocalClassContext extends ClassContext
    * @throws Exception if an error occurs while reading the data.
    */
   @Override
-  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
     LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
     if (traceEnabled) log.trace("reading message for " + wrapper + ", message = " + message);
     JPPFResourceWrapper res;
-    synchronized(channel.getServerLock())
-    {
+    synchronized(channel.getServerLock()) {
       while ((res = channel.getServerResource()) == null) channel.getServerLock().goToSleep();
       channel.setServerResource(null);
     }
@@ -77,8 +73,7 @@ public class LocalClassContext extends ClassContext
    * @throws Exception if an error occurs while writing the data.
    */
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
     if (traceEnabled) log.trace("writing message for " + wrapper + ", resource=" + resource);
     LocalClassLoaderChannel channel = (LocalClassLoaderChannel) wrapper;
     channel.setNodeResource(resource);

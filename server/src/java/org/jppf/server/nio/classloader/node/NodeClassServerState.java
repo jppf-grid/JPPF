@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.server.nio.classloader.ClassTransition.TO_SENDING_NODE_RESPONSE;
+import static org.jppf.server.nio.classloader.node.NodeClassTransition.TO_SENDING_NODE_RESPONSE;
 import static org.jppf.utils.StringUtils.build;
 
 import org.jppf.nio.NioState;
@@ -29,12 +29,12 @@ import org.slf4j.*;
  * Abstract superclass for all possible states of a class server connection.
  * @author Laurent Cohen
  */
-public abstract class ClassServerState extends NioState<ClassTransition>
+public abstract class NodeClassServerState extends NioState<NodeClassTransition>
 {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ClassServerState.class);
+  private static Logger log = LoggerFactory.getLogger(NodeClassServerState.class);
   /**
    * Determines whether DEBUG logging level is enabled.
    */
@@ -42,7 +42,7 @@ public abstract class ClassServerState extends NioState<ClassTransition>
   /**
    * The server that handles this state.
    */
-  protected final ClassNioServer server;
+  protected final NodeClassNioServer server;
   /**
    * Reference to the driver.
    */
@@ -52,7 +52,7 @@ public abstract class ClassServerState extends NioState<ClassTransition>
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public ClassServerState(final ClassNioServer server)
+  public NodeClassServerState(final NodeClassNioServer server)
   {
     this.server = server;
   }
@@ -63,8 +63,7 @@ public abstract class ClassServerState extends NioState<ClassTransition>
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if any error occurs.
    */
-  protected ClassTransition sendResponse(final ClassContext context) throws Exception
-  {
+  protected NodeClassTransition sendResponse(final NodeClassContext context) throws Exception {
     context.serializeResource();
     if (debugEnabled) log.debug(build("sending response ", context.getResource(), " to node: ", context.getChannel()));
     return TO_SENDING_NODE_RESPONSE;

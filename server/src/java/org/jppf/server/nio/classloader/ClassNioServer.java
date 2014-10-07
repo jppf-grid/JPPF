@@ -25,9 +25,11 @@ import org.slf4j.*;
 
 /**
  * Instances of this class serve class loading requests from the JPPF nodes.
+ * @param <S> the types of the states of the channels.
+ * @param <T> the supported channel state transitions.
  * @author Laurent Cohen
  */
-public abstract class ClassNioServer extends NioServer<ClassState, ClassTransition> {
+public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> extends NioServer<S, T> {
   /**
    * Logger for this class.
    */
@@ -70,11 +72,6 @@ public abstract class ClassNioServer extends NioServer<ClassState, ClassTransiti
    */
   public ClassCache getClassCache() {
     return driver.getInitializer().getClassCache();
-  }
-
-  @Override
-  public NioContext<?> createNioContext() {
-    return new ClassContext();
   }
 
   /**

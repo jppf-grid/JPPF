@@ -32,8 +32,7 @@ import org.slf4j.*;
  * Instances of this class serve class loading requests from the JPPF nodes.
  * @author Laurent Cohen
  */
-public class ClientClassNioServer extends ClassNioServer
-{
+public class ClientClassNioServer extends ClassNioServer<ClientClassState, ClientClassTransition> {
   /**
    * Logger for this class.
    */
@@ -67,30 +66,28 @@ public class ClientClassNioServer extends ClassNioServer
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public ClientClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception
-  {
+  public ClientClassNioServer(final JPPFDriver driver, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL, driver, useSSL);
   }
 
   @Override
-  protected NioServerFactory<ClassState, ClassTransition> createFactory()
-  {
+  protected NioServerFactory<ClientClassState, ClientClassTransition> createFactory() {
     return new ClientClassServerFactory(this);
   }
 
   @Override
-  public void postAccept(final ChannelWrapper<?> channel)
-  {
-    try
-    {
-      synchronized(channel)
-      {
-        transitionManager.transitionChannel(channel, ClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
+  public NioContext<?> createNioContext() {
+    return new ClientClassContext();
+  }
+
+  @Override
+  public void postAccept(final ChannelWrapper<?> channel) {
+    try {
+      synchronized(channel) {
+        transitionManager.transitionChannel(channel, ClientClassTransition.TO_WAITING_INITIAL_PROVIDER_REQUEST);
         if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeConnection(channel);
@@ -101,8 +98,7 @@ public class ClientClassNioServer extends ClassNioServer
    * Close the specified connection.
    * @param channel the channel representing the connection.
    */
-  public static void closeConnection(final ChannelWrapper<?> channel)
-  {
+  public static void closeConnection(final ChannelWrapper<?> channel) {
     closeConnection(channel, true);
   }
 
@@ -117,7 +113,8 @@ public class ClientClassNioServer extends ClassNioServer
       return;
     }
     ClientClassNioServer server = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
-    ClassContext context = (ClassContext) channel.getContext();
+    ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (debugEnabled) log.debug("closing {}", context);
     String uuid = context.getUuid();
     if (uuid != null) server.removeProviderConnection(uuid, channel);
     else if (debugEnabled) log.debug("null uuid for {}", context);
@@ -138,8 +135,7 @@ public class ClientClassNioServer extends ClassNioServer
    * @param uuid the provider uuid as a string.
    * @param channel the provider's communication channel.
    */
-  public void addProviderConnection(final String uuid, final ChannelWrapper<?> channel)
-  {
+  public void addProviderConnection(final String uuid, final ChannelWrapper<?> channel) {
     if (debugEnabled) log.debug("adding provider connection: uuid=" + uuid + ", channel=" + channel);
     providerConnections.putValue(uuid, channel);
   }
@@ -149,8 +145,7 @@ public class ClientClassNioServer extends ClassNioServer
    * @param uuid the provider uuid as a string.
    * @param channel the provider's communication channel.
    */
-  public void removeProviderConnection(final String uuid, final ChannelWrapper channel)
-  {
+  public void removeProviderConnection(final String uuid, final ChannelWrapper channel) {
     if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
     providerConnections.removeValue(uuid, channel);
   }
@@ -196,9 +191,8 @@ public class ClientClassNioServer extends ClassNioServer
   }
 
   @Override
-  public boolean isIdle(final ChannelWrapper<?> channel)
-  {
-    return ClassState.IDLE_PROVIDER == channel.getContext().getState();
+  public boolean isIdle(final ChannelWrapper<?> channel) {
+    return ClientClassState.IDLE_PROVIDER == channel.getContext().getState();
   }
 
   /**
@@ -207,20 +201,15 @@ public class ClientClassNioServer extends ClassNioServer
    * @param request the request to send.
    * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
    */
-  public boolean addResourceRequest(final String uuid, final ResourceRequest request)
-  {
-    //CacheClassKey key = new CacheClassKey(uuid, request.getResource().getName());
-    CacheClassKey key = new CacheClassKey(uuid, ClassContext.getResourceName(request.getResource()));
+  public boolean addResourceRequest(final String uuid, final ResourceRequest request) {
+    CacheClassKey key = new CacheClassKey(uuid, AbstractClassContext.getResourceName(request.getResource()));
     if (debugEnabled) log.debug("adding resource request for {}", key);
     lockRequests.lock();
-    try
-    {
+    try {
       boolean result = requestMap.containsKey(key);
       requestMap.putValue(key, request);
       return result;
-    }
-    finally
-    {
+    } finally {
       lockRequests.unlock();
     }
   }
@@ -231,19 +220,15 @@ public class ClientClassNioServer extends ClassNioServer
    * @param name the name of the resource.
    * @return <code>true</code> if a request for the same client and resource name already exists, <code>false</code> otherwise.
    */
-  public Collection<ResourceRequest> removeResourceRequest(final String uuid, final String name)
-  {
+  public Collection<ResourceRequest> removeResourceRequest(final String uuid, final String name) {
     CacheClassKey key = new CacheClassKey(uuid, name);
     if (debugEnabled) log.debug("removing resource request for {}", key);
     lockRequests.lock();
-    try
-    {
+    try {
       Collection<ResourceRequest> c = requestMap.removeKey(key);
       if (debugEnabled) log.debug("removing resource request for {} : {} requests", key, c == null ? "null" : c.size());
       return c;
-    }
-    finally
-    {
+    } finally {
       lockRequests.unlock();
     }
   }

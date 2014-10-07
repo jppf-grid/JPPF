@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import java.net.*;
 import java.nio.channels.*;
@@ -28,7 +28,6 @@ import javax.net.ssl.*;
 import org.jppf.classloader.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.classloader.*;
 import org.jppf.ssl.SSLHelper;
 import org.slf4j.*;
 
@@ -38,7 +37,7 @@ import org.slf4j.*;
  * register a node class loader channel.
  * @author Laurent Cohen
  */
-public class SendingPeerChannelIdentifierState extends ClassServerState
+public class SendingPeerChannelIdentifierState extends ClientClassServerState
 {
   /**
    * Logger for this class.
@@ -53,7 +52,7 @@ public class SendingPeerChannelIdentifierState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingPeerChannelIdentifierState(final ClassNioServer server)
+  public SendingPeerChannelIdentifierState(final ClientClassNioServer server)
   {
     super(server);
   }
@@ -66,15 +65,12 @@ public class SendingPeerChannelIdentifierState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !channel.isLocal())
-    {
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if (context.writeIdentifier(channel))
-    {
+    if (context.writeIdentifier(channel)) {
       if (debugEnabled) log.debug("sent peer channel identitifer to server {}", channel);
       if (context.isSsl()) configureSSL(channel);
       JPPFResourceWrapper resource = new JPPFResourceWrapper();
@@ -98,7 +94,7 @@ public class SendingPeerChannelIdentifierState extends ClassServerState
   private void configureSSL(final ChannelWrapper<?> channel) throws Exception
   {
     SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
-    ClassContext context = (ClassContext) channel.getContext();
+    ClientClassContext context = (ClientClassContext) channel.getContext();
     SSLContext sslContext = server.getSSLContext();
     Socket socket = socketChannel.socket();
     SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());

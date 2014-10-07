@@ -18,20 +18,18 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
  * State of sending the initial response to a newly created provider channel.
  * @author Laurent Cohen
  */
-public class SendingProviderInitialResponseState extends ClassServerState
-{
+public class SendingProviderInitialResponseState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -45,8 +43,7 @@ public class SendingProviderInitialResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingProviderInitialResponseState(final ClassNioServer server)
-  {
+  public SendingProviderInitialResponseState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -58,17 +55,13 @@ public class SendingProviderInitialResponseState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
-    if (channel.isReadable() && !channel.isLocal())
-    {
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
-    if (context.writeMessage(channel))
-    {
+    if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent management to provider: " + channel);
-      //context.setMessage(null);
       return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
     }
     return TO_SENDING_INITIAL_PROVIDER_RESPONSE;

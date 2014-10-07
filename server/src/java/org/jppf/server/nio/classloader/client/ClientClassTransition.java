@@ -15,13 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.nio.classloader;
+package org.jppf.server.nio.classloader.client;
 
 /**
  * Enumeration of the possible state transitions for a class server channel.
  * @author Laurent Cohen
  */
-public enum ClassTransition
+public enum ClientClassTransition
 {
   /**
    * Transition to the WAITING_INITIAL_PROVIDER_REQUEST state.
@@ -47,30 +47,6 @@ public enum ClassTransition
    * Transition to the IDLE_PROVIDER state in idle mode for a peer server connection.
    */
   TO_IDLE_PEER_PROVIDER,
-  /**
-   * Transition to the WAITING_INITIAL_NODE_REQUEST state.
-   */
-  TO_WAITING_INITIAL_NODE_REQUEST,
-  /**
-   * Transition to the SENDING_INITIAL_RESPONSE state.
-   */
-  TO_SENDING_INITIAL_NODE_RESPONSE,
-  /**
-   * Transition to the WAITING_NODE_REQUEST state.
-   */
-  TO_WAITING_NODE_REQUEST,
-  /**
-   * Transition to the SENDING_NODE_RESPONSE state.
-   */
-  TO_SENDING_NODE_RESPONSE,
-  /**
-   * Transition to NODE_WAITING_PROVIDER_RESPONSE state.
-   */
-  TO_NODE_WAITING_PROVIDER_RESPONSE,
-  /**
-   * Transition to the IDLE_NODE state in idle mode.
-   */
-  TO_IDLE_NODE,
   /**
    * Sending of the initial request by a peer server.
    */

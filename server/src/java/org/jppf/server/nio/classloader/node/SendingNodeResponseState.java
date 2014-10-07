@@ -18,13 +18,12 @@
 
 package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.node.NodeClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -32,8 +31,7 @@ import org.slf4j.*;
  * This class represents the state of sending a response to a node.
  * @author Laurent Cohen
  */
-class SendingNodeResponseState extends ClassServerState
-{
+class SendingNodeResponseState extends NodeClassServerState {
   /**
    * Logger for this class.
    */
@@ -47,8 +45,7 @@ class SendingNodeResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingNodeResponseState(final ClassNioServer server)
-  {
+  public SendingNodeResponseState(final NodeClassNioServer server) {
     super(server);
   }
 
@@ -59,15 +56,12 @@ class SendingNodeResponseState extends ClassServerState
    * @throws Exception if an error occurs while transitioning to another state.
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    if (channel.isReadable() && !channel.isLocal())
-    {
+  public NodeClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    if (channel.isReadable() && !channel.isLocal()) {
       throw new ConnectException(build("node ", channel, " has been disconnected"));
     }
-    ClassContext context = (ClassContext) channel.getContext();
-    if (context.writeMessage(channel))
-    {
+    NodeClassContext context = (NodeClassContext) channel.getContext();
+    if (context.writeMessage(channel)) {
       long elapsed = (System.nanoTime() - context.getRequestStartTime()) / 1_000_000L;
       driver.getStatistics().addValues(JPPFStatisticsHelper.NODE_CLASS_REQUESTS_TIME, elapsed, context.getResource().getResources().length);
       if (debugEnabled) log.debug(build("node: ", channel, ", response [", context.getResource(), "] sent to the node"));

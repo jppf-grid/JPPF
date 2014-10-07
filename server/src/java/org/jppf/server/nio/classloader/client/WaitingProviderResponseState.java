@@ -17,7 +17,7 @@
  */
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import org.jppf.classloader.JPPFResourceWrapper;
@@ -30,8 +30,7 @@ import org.slf4j.*;
  * This class represents the state of waiting for the response from a provider.
  * @author Laurent Cohen
  */
-class WaitingProviderResponseState extends ClassServerState
-{
+class WaitingProviderResponseState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -49,8 +48,7 @@ class WaitingProviderResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public WaitingProviderResponseState(final ClassNioServer server)
-  {
+  public WaitingProviderResponseState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -63,21 +61,15 @@ class WaitingProviderResponseState extends ClassServerState
    */
   @Override
   @SuppressWarnings("unchecked")
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
-    if (context.readMessage(channel))
-    {
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (context.readMessage(channel)) {
       ResourceRequest request = context.getCurrentRequest();
       JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug(build("read response from provider: ", channel, ", sending to node ", request.getChannel(), ", resource: ", resource.getName()));
-      if ("org/jppf/utils/ObjectSerializerImpl.class".equals(resource.getName())) {
-        boolean breakpoint = true;
-      }
       if ((resource.getDefinition() != null) && resource.isSingleResource())
         classCache.setCacheContent(resource.getUuidPath().getFirst(), resource.getName(), resource.getDefinition());
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);
-
       if (debugEnabled) log.debug(build("client ", channel, " sending response ", resource, " to node ", request.getChannel()));
       double elapsed = (System.nanoTime() - request.getRequestStartTime()) / 1_000_000d;
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENT_CLASS_REQUESTS_TIME, elapsed);

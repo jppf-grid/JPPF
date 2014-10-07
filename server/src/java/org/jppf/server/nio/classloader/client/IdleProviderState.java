@@ -18,20 +18,18 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
 import org.slf4j.*;
 
 /**
  * This class represents an idle state for a class loader provider.
  * @author Laurent Cohen
  */
-public class IdleProviderState extends ClassServerState
-{
+public class IdleProviderState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -45,8 +43,7 @@ public class IdleProviderState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public IdleProviderState(final ClassNioServer server)
-  {
+  public IdleProviderState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -58,9 +55,8 @@ public class IdleProviderState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
     if (channel.isReadable() && !channel.isLocal())
     {
       ((ClientClassNioServer) server).removeProviderConnection(context.getUuid(), channel);

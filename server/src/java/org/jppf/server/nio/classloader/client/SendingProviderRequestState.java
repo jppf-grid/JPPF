@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
 import java.net.ConnectException;
@@ -32,8 +32,7 @@ import org.slf4j.*;
  * This class represents the state of sending a request to a provider.
  * @author Laurent Cohen
  */
-class SendingProviderRequestState extends ClassServerState
-{
+class SendingProviderRequestState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -47,8 +46,7 @@ class SendingProviderRequestState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public SendingProviderRequestState(final ClassNioServer server)
-  {
+  public SendingProviderRequestState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -60,8 +58,8 @@ class SendingProviderRequestState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
-    ClassContext context = (ClassContext) channel.getContext();
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
     if (channel.isReadable() && !channel.isLocal()) throw new ConnectException(build("provider ", channel, " has been disconnected"));
     ResourceRequest request = context.getCurrentRequest();
     if (request == null) {

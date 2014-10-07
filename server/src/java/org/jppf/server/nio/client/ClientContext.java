@@ -28,8 +28,7 @@ import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.classloader.ClassContext;
-import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
@@ -105,7 +104,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       if (debugEnabled) log.debug("{} found {} provider connections for clientUuid={}", new Object[] {s, list == null ? 0 : list.size(), uuid});
       if ((list != null) && !list.isEmpty()) {
         for (ChannelWrapper<?> classChannel: list) {
-          ClassContext ctx = (ClassContext) classChannel.getContext();
+          ClientClassContext ctx = (ClientClassContext) classChannel.getContext();
           if (ctx.getConnectionUuid().equals(connectionUuid)) {
             if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
             try {

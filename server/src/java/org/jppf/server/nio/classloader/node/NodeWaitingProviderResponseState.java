@@ -18,7 +18,7 @@
 
 package org.jppf.server.nio.classloader.node;
 
-import static org.jppf.server.nio.classloader.ClassTransition.TO_IDLE_NODE;
+import static org.jppf.server.nio.classloader.node.NodeClassTransition.TO_IDLE_NODE;
 import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
@@ -32,8 +32,7 @@ import org.slf4j.*;
  * This class represents the state of waiting for a request from a node.
  * @author Laurent Cohen
  */
-class NodeWaitingProviderResponseState extends ClassServerState
-{
+class NodeWaitingProviderResponseState extends NodeClassServerState {
   /**
    * Logger for this class.
    */
@@ -47,8 +46,7 @@ class NodeWaitingProviderResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the JPPFNIOServer this state relates to.
    */
-  public NodeWaitingProviderResponseState(final ClassNioServer server)
-  {
+  public NodeWaitingProviderResponseState(final NodeClassNioServer server) {
     super(server);
   }
 
@@ -59,9 +57,8 @@ class NodeWaitingProviderResponseState extends ClassServerState
    * @throws Exception if an error occurs while transitioning to another state.
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
+  public NodeClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    NodeClassContext context = (NodeClassContext) channel.getContext();
     if (!context.hasPendingResponse()) return sendResponse(context);
     Map<JPPFResourceWrapper, ResourceRequest>  pendingResponses = context.getPendingResponses();
     JPPFResourceWrapper res = context.getResource();

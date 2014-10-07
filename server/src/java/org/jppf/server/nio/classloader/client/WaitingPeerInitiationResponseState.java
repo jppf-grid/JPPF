@@ -17,11 +17,11 @@
  */
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.ClassCache;
 import org.slf4j.*;
 
 /**
@@ -30,8 +30,7 @@ import org.slf4j.*;
  * register a client class loader channel.
  * @author Laurent Cohen
  */
-class WaitingPeerInitiationResponseState extends ClassServerState
-{
+class WaitingPeerInitiationResponseState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -49,8 +48,7 @@ class WaitingPeerInitiationResponseState extends ClassServerState
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.
    */
-  public WaitingPeerInitiationResponseState(final ClassNioServer server)
-  {
+  public WaitingPeerInitiationResponseState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -59,14 +57,11 @@ class WaitingPeerInitiationResponseState extends ClassServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
-    ClassContext context = (ClassContext) channel.getContext();
-    if (context.readMessage(channel))
-    {
+  public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
+    ClientClassContext context = (ClientClassContext) channel.getContext();
+    if (context.readMessage(channel)) {
       JPPFResourceWrapper resource = context.deserializeResource();
       String uuid = resource.getProviderUuid();
       if (debugEnabled) log.debug("read initial response from peer " + channel + ", providerUuid=" + uuid);

@@ -18,11 +18,10 @@
 
 package org.jppf.server.nio.classloader.client;
 
-import static org.jppf.server.nio.classloader.ClassTransition.*;
+import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import org.jppf.classloader.*;
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.nio.classloader.*;
 import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
@@ -30,8 +29,7 @@ import org.slf4j.*;
  * This class represents the state of a new class server connection, whose type is yet undetermined.
  * @author Laurent Cohen
  */
-class WaitingProviderInitialRequestState extends ClassServerState
-{
+class WaitingProviderInitialRequestState extends ClientClassServerState {
   /**
    * Logger for this class.
    */
@@ -43,15 +41,13 @@ class WaitingProviderInitialRequestState extends ClassServerState
   /**
    * Determines whether management features are enabled for this driver.
    */
-  private static boolean managementEnabled =
-    JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
+  private static boolean managementEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
 
   /**
    * Initialize this state with a specified NioServer.
    * @param server the JPPFNIOServer this state relates to.
    */
-  public WaitingProviderInitialRequestState(final ClassNioServer server)
-  {
+  public WaitingProviderInitialRequestState(final ClientClassNioServer server) {
     super(server);
   }
 
@@ -63,15 +59,12 @@ class WaitingProviderInitialRequestState extends ClassServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public ClientClassTransition performTransition(final ChannelWrapper<?> wrapper) throws Exception {
     // we don't know yet which whom we are talking, is it a node or a provider?
-    ClassContext context = (ClassContext) wrapper.getContext();
-    if (context.readMessage(wrapper))
-    {
+    ClientClassContext context = (ClientClassContext) wrapper.getContext();
+    if (context.readMessage(wrapper)) {
       JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug("read initial request from provider " + wrapper);
-      context.setProvider(true);
       if (debugEnabled) log.debug("initiating provider: " + wrapper);
       String uuid = resource.getUuidPath().getFirst();
       // it is a provider
