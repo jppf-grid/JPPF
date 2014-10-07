@@ -18,7 +18,8 @@
 package org.jppf.server.peer;
 
 import org.jppf.comm.discovery.JPPFConnectionInformation;
-import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.slf4j.*;
 
 
@@ -28,12 +29,15 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class JPPFPeerInitializer extends Thread
-{
+public class JPPFPeerInitializer extends Thread {
   /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(JPPFPeerInitializer.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static final boolean debugEnabled = log.isDebugEnabled();
   /**
    * Name of the peer in the configuration file.
    */
@@ -45,11 +49,15 @@ public class JPPFPeerInitializer extends Thread
   /**
    * JPPF class server
    */
-  private final ClassNioServer classServer;
+  private final ClientClassNioServer classServer;
   /**
    * Determines whether communication with remote peer servers should be secure.
    */
   private final boolean secure;
+  /**
+   * 
+   */
+  private final boolean fromDiscovery;
 
   /**
    * Initialize this peer initializer from a specified peerName.
@@ -58,38 +66,60 @@ public class JPPFPeerInitializer extends Thread
    * @param classServer JPPF class server
    * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClassNioServer classServer, final boolean secure)
-  {
-    if(peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
-    if(connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
+  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClientClassNioServer classServer, final boolean secure) {
+    this(peerName, connectionInfo, classServer, secure, false);
+  }
 
+  /**
+   * Initialize this peer initializer from a specified peerName.
+   * @param peerName the name of the peer in the configuration file.
+   * @param connectionInfo peer connection information.
+   * @param classServer JPPF class server
+   * @param secure specifies whether the connection should be established over SSL/TLS.
+   * @param fromDiscovery determines whether the connection info was obtained from the auto-discovery mechanism.
+   */
+  public JPPFPeerInitializer(final String peerName, final JPPFConnectionInformation connectionInfo, final ClientClassNioServer classServer, final boolean secure, final boolean fromDiscovery) {
+    if (peerName == null || peerName.isEmpty()) throw new IllegalArgumentException("peerName is blank");
+    if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
     this.peerName       = peerName;
     this.connectionInfo = connectionInfo;
     this.classServer    = classServer;
     this.secure         = secure;
-    setName("Peer Initializer [" + peerName + ']');
+    this.fromDiscovery = fromDiscovery;
+    setName(String.format("%s[%s]", getClass().getSimpleName(), peerName));
+    log.debug("created new peer initializer {}", this);
   }
 
   /**
    * Perform the peer initialization.
-   * @see java.lang.Thread#run()
    */
   @Override
-  public void run()
-  {
-    log.info("start initialization of peer [" + peerName + ']');
-    try
-    {
-      new PeerResourceProvider(peerName, connectionInfo, classServer, secure).init();
-      new PeerNode(peerName, connectionInfo, secure).run();
-    }
-    catch(Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-    finally
-    {
-      log.info("end initialization of peer [" + peerName + ']');
+  public void run() {
+    boolean end = false;
+    while (!end) {
+      log.info("start initialization of peer [{}]", peerName);
+      PeerResourceProvider prp = null;
+      try {
+        prp = new PeerResourceProvider(peerName, connectionInfo, classServer, secure);
+        prp.init();
+        new PeerNode(peerName, connectionInfo, secure).run();
+      } catch(Exception e) {
+        log.error(e.getMessage(), e);
+        if (prp != null) {
+          prp.close();
+          prp = null;
+        }
+        if (fromDiscovery) {
+          PeerDiscoveryThread pdt = JPPFDriver.getInstance().getInitializer().getPeerDiscoveryThread();
+          if (pdt != null) {
+            boolean removed = pdt.removeConnectionInformation(connectionInfo);
+            if (debugEnabled) log.debug((removed ? "successfully removed " : "failure to remove ") + "{}", connectionInfo);
+          }
+          end = true;
+        }
+      } finally {
+        log.info("end initialization of peer [{}]", peerName);
+      }
     }
   }
 }

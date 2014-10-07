@@ -34,8 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
-{
+public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper> {
   /**
    * Logger for this class.
    */
@@ -71,28 +70,23 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
    * @param connectionInfo peer connection information.
    * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public RemotePeerConnection(final String name, final JPPFConnectionInformation connectionInfo, final boolean secure)
-  {
+  public RemotePeerConnection(final String name, final JPPFConnectionInformation connectionInfo, final boolean secure) {
     this.connectionInfo = connectionInfo;
     this.secure = secure;
     this.name = name;
   }
 
   @Override
-  public void init() throws Exception
-  {
+  public void init() throws Exception {
     if (debugEnabled) log.debug(name + " initializing socket client");
     lock.lock();
-    try
-    {
+    try {
       boolean mustInit = false;
-      if (channel == null)
-      {
+      if (channel == null) {
         mustInit = true;
         initchannel();
       }
-      if (mustInit)
-      {
+      if (mustInit) {
         if (debugEnabled) log.debug(name + " initializing socket");
         System.out.println("Connecting to  " + name);
         socketInitializer.initializeSocket(channel);
@@ -102,9 +96,7 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
         System.out.println("Reconnected to " + name);
         if (secure) channel = SSLHelper.createSSLClientConnection(channel);
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -113,8 +105,7 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public void initchannel() throws Exception
-  {
+  public void initchannel() throws Exception {
     if (debugEnabled) log.debug(name + " initializing socket client");
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
@@ -127,20 +118,15 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper>
   }
 
   @Override
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
     lock.lock();
-    try
-    {
-      if (channel != null)
-      {
+    try {
+      if (channel != null) {
         SocketWrapper tmp = channel;
         channel = null;
         tmp.close();
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }

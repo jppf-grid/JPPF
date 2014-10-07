@@ -29,7 +29,8 @@ import org.jppf.management.*;
 import org.jppf.management.spi.*;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
-import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.classloader.ClassCache;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -146,12 +147,9 @@ public class DriverInitializer {
       s = config.getString("jppf.ssl.server.port", null);
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
       connectionInfo.host = NetworkUtils.getManagementHost();
-      if (config.getBoolean("jppf.management.enabled", true))
-        connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
-      if (config.getBoolean("jppf.management.ssl.enabled", false))
-        connectionInfo.sslManagementPort = config.getInt("jppf.management.ssl.port", 11193);
-      boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
-      if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+      if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
+      if (config.getBoolean("jppf.management.ssl.enabled", false)) connectionInfo.sslManagementPort = config.getInt("jppf.management.ssl.port", 11193);
+      if (config.getBoolean("jppf.recovery.enabled", false)) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
     }
     return connectionInfo;
   }
@@ -178,7 +176,7 @@ public class DriverInitializer {
 
   /**
    * Determine whether broadcasting is active.
-   * @return {@code true} if broadcasting is active, {@code false} otherwise.
+   * @return {@code true} if broadcast is active, {@code false} otherwise.
    * @since 4.2
    */
   public boolean isBroadcasting() {
@@ -189,7 +187,7 @@ public class DriverInitializer {
    * Initialize this driver's peers.
    * @param classServer JPPF class server
    */
-  void initPeers(final ClassNioServer classServer) {
+  void initPeers(final ClientClassNioServer classServer) {
     boolean initPeers;
     TypedProperties props = JPPFConfiguration.getProperties();
     final boolean ssl = props.getBoolean("jppf.peer.ssl.enabled", false);
@@ -198,7 +196,8 @@ public class DriverInitializer {
       peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
         @Override
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-          new JPPFPeerInitializer(name, info, classServer, ssl).start();
+          peerDiscoveryThread.addConnectionInformation(info);
+          new JPPFPeerInitializer(name, info, classServer, ssl, true).start();
         }
       }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
@@ -213,7 +212,7 @@ public class DriverInitializer {
       String[] names = discoveryNames.split("\\s");
       for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
-      if(initPeers) {
+      if (initPeers) {
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
@@ -222,7 +221,7 @@ public class DriverInitializer {
             int[] ports = StringUtils.parseIntValues(s);
             if (ssl) info.sslServerPorts = ports;
             else info.serverPorts = ports;
-            if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
+            if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
             new JPPFPeerInitializer(name, info, classServer, ssl).start();
           }
         }

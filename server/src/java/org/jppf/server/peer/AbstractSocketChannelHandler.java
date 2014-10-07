@@ -28,8 +28,7 @@ import org.slf4j.*;
  * They handle (re)connection services when needed.
  * @author Laurent Cohen
  */
-public abstract class AbstractSocketChannelHandler
-{
+public abstract class AbstractSocketChannelHandler {
   /**
    * Logger for this class.
    */
@@ -55,8 +54,7 @@ public abstract class AbstractSocketChannelHandler
    * Initialize this socket channel handler.
    * @param server the NioServer to which the channel is registered.
    */
-  public AbstractSocketChannelHandler(final ClassNioServer server)
-  {
+  public AbstractSocketChannelHandler(final ClassNioServer server) {
     this.server = server;
   }
 
@@ -64,8 +62,7 @@ public abstract class AbstractSocketChannelHandler
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public synchronized void init() throws Exception
-  {
+  public synchronized void init() throws Exception {
     if (socketClient == null) socketClient = initSocketChannel();
     String msg =  "to remote peer [" + socketClient.getHost() + ':' + socketClient.getPort() + ']';
     if (debugEnabled) log.debug("Attempting connection " + msg);
@@ -92,8 +89,7 @@ public abstract class AbstractSocketChannelHandler
    * Get the wrapper around the underlying socket connection.
    * @return a <code>SocketChannelClient</code> instance.
    */
-  public SocketChannelClient getSocketClient()
-  {
+  public SocketChannelClient getSocketClient() {
     return socketClient;
   }
 }

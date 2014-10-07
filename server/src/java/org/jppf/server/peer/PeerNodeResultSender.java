@@ -33,8 +33,7 @@ import org.slf4j.*;
  * and send the results back to this driver.
  * @author Laurent Cohen
  */
-class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
-{
+class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener {
   /**
    * Logger for this class.
    */
@@ -64,8 +63,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
    * Initialize this result sender with a specified socket client.
    * @param socketClient the socket client used to send results back.
    */
-  public PeerNodeResultSender(final SocketWrapper socketClient)
-  {
+  public PeerNodeResultSender(final SocketWrapper socketClient) {
     this.socketClient = socketClient;
     destination = new SocketWrapperOutputDestination(socketClient);
   }
@@ -74,8 +72,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
    * This method waits until all tasks of a request have been completed.
    * @throws Exception if handing of the results fails.
    */
-  public synchronized void waitForExecution() throws Exception
-  {
+  public synchronized void waitForExecution() throws Exception {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     while (bundle.getPendingTasksCount() > 0) wait();
   }
@@ -85,8 +82,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
    * @param clientBundle the bundle to get the task results from.
    * @throws Exception if an IO exception occurred while sending the results back.
    */
-  public void sendResults(final ServerTaskBundleClient clientBundle) throws Exception
-  {
+  public void sendResults(final ServerTaskBundleClient clientBundle) throws Exception {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
     if (clientBundle == null) throw new IllegalArgumentException("bundleWrapper is null");
     TaskBundle bundle = clientBundle.getJob();
@@ -104,19 +100,13 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener
   @Override
   public void taskCompleted(final ServerTaskBundleClient clientBundle, final List<ServerTask> results) {
     if (clientBundle == null) throw new IllegalStateException("bundle is null");
-
-    if (clientBundle.isCancelled())
-    {
+    if (clientBundle.isCancelled()) {
       clientBundle.removeCompletionListener(this);
-    }
-    else
-    {
+    } else {
       int pendingTasksCount = this.bundle.getPendingTasksCount();
       if (debugEnabled) log.debug("Sending notification of bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
-      if (pendingTasksCount <= 0)
-      {
-        synchronized(this)
-        {
+      if (pendingTasksCount <= 0) {
+        synchronized(this) {
           if (debugEnabled) log.debug("result sender = " + this);
           notifyAll();
         }

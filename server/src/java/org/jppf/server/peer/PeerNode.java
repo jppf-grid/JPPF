@@ -19,6 +19,7 @@ package org.jppf.server.peer;
 
 import java.util.*;
 
+import org.jppf.JPPFRuntimeException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.comm.socket.SocketWrapper;
@@ -29,7 +30,7 @@ import org.jppf.node.connection.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.node.AbstractCommonNode;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -90,7 +91,6 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure) {
     if(peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerNameBase is blank");
     if(connectionInfo == null) throw new IllegalArgumentException(peerNameBase +" connectionInfo is null");
-
     this.secure = secure;
     this.peerNameBase = peerNameBase;
     this.uuid = driver.getUuid();
@@ -105,7 +105,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   @Override
   public void run() {
     stopped = false;
-    if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
+    if (debugEnabled) log.debug(getName() + " start of peer node main loop");
     while (!isStopped()) {
       try {
         init();
@@ -118,9 +118,12 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
           resultSender = new PeerNodeResultSender(getSocketWrapper());
           perform();
         } catch(Exception e) {
+          /*
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
+          */
           close();
+          throw new JPPFRuntimeException(e);
         } catch(Error e) {
           log.error(e.getMessage(), e);
           e.printStackTrace();
@@ -174,8 +177,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public synchronized void init() throws Exception
-  {
+  public synchronized void init() throws Exception {
     this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     nodeConnection.init();
     is = new SocketWrapperInputSource(getSocketWrapper());
@@ -224,22 +226,20 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
 
   /**
    * Stop this node and release the resources it is using.
-   * @see org.jppf.node.Node#stopNode()
    */
   @Override
   public void stopNode() {
-    if (debugEnabled) log.debug(getName() + " stopping node");
+    if (debugEnabled) log.debug(getName() + " stopping peer node");
     this.setStopped(true);
     close();
-    driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
+    //driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
   }
 
   /**
    * Stop this node and release the resources it is using.
-   * @see org.jppf.node.Node#stopNode()
    */
   public void close() {
-    if (debugEnabled) log.debug(getName() + " closing node");
+    if (debugEnabled) log.debug(getName() + " closing peer node");
     try {
       if (debugEnabled) log.debug(getName() + " closing socket: " + nodeConnection.getChannel());
       nodeConnection.close();
