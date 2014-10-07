@@ -27,8 +27,7 @@ import org.jppf.utils.LocalizationUtils;
  * They are used as the result of node JMX monitoring request.
  * @author Laurent Cohen
  */
-public class JPPFNodeState implements Serializable
-{
+public class JPPFNodeState implements Serializable {
   /**
    * Base name for the localizationr esource bundles.
    */
@@ -37,8 +36,7 @@ public class JPPFNodeState implements Serializable
   /**
    * Enumeration of connection states.
    */
-  public enum ConnectionState
-  {
+  public enum ConnectionState {
     /**
      * The state is not yet known.
      */
@@ -60,14 +58,12 @@ public class JPPFNodeState implements Serializable
      * Initialize this enum element witht he specified localized display name.
      * @param msg the display name ot localize.
      */
-    private ConnectionState(final String msg)
-    {
+    private ConnectionState(final String msg) {
       displayName = LocalizationUtils.getLocalized(I18N, msg);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
       return displayName;
     }
   }
@@ -75,8 +71,7 @@ public class JPPFNodeState implements Serializable
   /**
    * Enumeration of execution states.
    */
-  public enum ExecutionState
-  {
+  public enum ExecutionState {
     /**
      * The state is not yet known.
      */
@@ -98,14 +93,12 @@ public class JPPFNodeState implements Serializable
      * Initialize this enum element witht he specified localized display name.
      * @param msg the display name ot localize.
      */
-    private ExecutionState(final String msg)
-    {
+    private ExecutionState(final String msg) {
       displayName = LocalizationUtils.getLocalized(I18N, msg);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
       return displayName;
     }
   }
@@ -144,8 +137,7 @@ public class JPPFNodeState implements Serializable
    * Get the number of tasks executed by the node.
    * @return the number of tasks as an int.
    */
-  public synchronized int getNbTasksExecuted()
-  {
+  public synchronized int getNbTasksExecuted() {
     return nbTasksExecuted;
   }
 
@@ -153,8 +145,7 @@ public class JPPFNodeState implements Serializable
    * Set the number of tasks executed by the node.
    * @param nbTasksExecuted the number of tasks as an int.
    */
-  public synchronized void setNbTasksExecuted(final int nbTasksExecuted)
-  {
+  public synchronized void setNbTasksExecuted(final int nbTasksExecuted) {
     this.nbTasksExecuted = nbTasksExecuted;
   }
 
@@ -162,8 +153,7 @@ public class JPPFNodeState implements Serializable
    * Get the status of the connection between the node and the server.
    * @return the connection status.
    */
-  public synchronized ConnectionState getConnectionStatus()
-  {
+  public synchronized ConnectionState getConnectionStatus() {
     return connectionStatus;
   }
 
@@ -171,8 +161,7 @@ public class JPPFNodeState implements Serializable
    * Set the status of the connection between the node and the server.
    * @param connectionStatus the connection status.
    */
-  public synchronized void setConnectionStatus(final ConnectionState connectionStatus)
-  {
+  public synchronized void setConnectionStatus(final ConnectionState connectionStatus) {
     this.connectionStatus = connectionStatus;
   }
 
@@ -180,8 +169,7 @@ public class JPPFNodeState implements Serializable
    * Get the latest execution status of the node.
    * @return the execution status.
    */
-  public synchronized ExecutionState getExecutionStatus()
-  {
+  public synchronized ExecutionState getExecutionStatus() {
     return executionStatus;
   }
 
@@ -189,8 +177,7 @@ public class JPPFNodeState implements Serializable
    * Get the latest execution status of the node.
    * @param executionStatus the execution status.
    */
-  public synchronized void setExecutionStatus(final ExecutionState executionStatus)
-  {
+  public synchronized void setExecutionStatus(final ExecutionState executionStatus) {
     this.executionStatus = executionStatus;
   }
 
@@ -198,8 +185,7 @@ public class JPPFNodeState implements Serializable
    * Get the size of the node's thread pool.
    * @return the size as an int.
    */
-  public int getThreadPoolSize()
-  {
+  public int getThreadPoolSize() {
     return threadPoolSize;
   }
 
@@ -207,8 +193,7 @@ public class JPPFNodeState implements Serializable
    * Set the size of the node's thread pool.
    * @param threadPoolSize the size as an int.
    */
-  public void setThreadPoolSize(final int threadPoolSize)
-  {
+  public void setThreadPoolSize(final int threadPoolSize) {
     this.threadPoolSize = threadPoolSize;
   }
 
@@ -216,8 +201,7 @@ public class JPPFNodeState implements Serializable
    * Get the total cpu time used by the task processing threads.
    * @return the cpu time in milliseconds.
    */
-  public synchronized long getCpuTime()
-  {
+  public synchronized long getCpuTime() {
     return cpuTime;
   }
 
@@ -225,8 +209,7 @@ public class JPPFNodeState implements Serializable
    * Set the total cpu time used by the task processing threads.
    * @param cpuTime the cpu time in milliseconds.
    */
-  public synchronized void setCpuTime(final long cpuTime)
-  {
+  public synchronized void setCpuTime(final long cpuTime) {
     this.cpuTime = cpuTime;
   }
 
@@ -234,8 +217,7 @@ public class JPPFNodeState implements Serializable
    * Get the priority of the threads in the pool.
    * @return the priority as an int value.
    */
-  public int getThreadPriority()
-  {
+  public int getThreadPriority() {
     return threadPriority;
   }
 
@@ -243,8 +225,7 @@ public class JPPFNodeState implements Serializable
    * Set the priority of the threads in the pool.
    * @param threadPriority the priority as an int value.
    */
-  public void setThreadPriority(final int threadPriority)
-  {
+  public void setThreadPriority(final int threadPriority) {
     this.threadPriority = threadPriority;
   }
 
@@ -252,8 +233,7 @@ public class JPPFNodeState implements Serializable
    * Make a copy of this node state.
    * @return a <code>JPPFNodeState</code> instance.
    */
-  public JPPFNodeState copy()
-  {
+  public JPPFNodeState copy() {
     JPPFNodeState s = new JPPFNodeState();
     s.setNbTasksExecuted(getNbTasksExecuted());
     s.setConnectionStatus(getConnectionStatus());
@@ -265,8 +245,7 @@ public class JPPFNodeState implements Serializable
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("threadPoolSize=").append(threadPoolSize);
@@ -277,5 +256,33 @@ public class JPPFNodeState implements Serializable
     sb.append(", cpuTime=").append(cpuTime);
     sb.append(']');
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + nbTasksExecuted;
+    //result = prime * result + (int) (cpuTime ^ (cpuTime >>> 32));
+    result = prime * result + ((executionStatus == null) ? 0 : executionStatus.hashCode());
+    result = prime * result + ((connectionStatus == null) ? 0 : connectionStatus.hashCode());
+    result = prime * result + threadPoolSize;
+    result = prime * result + threadPriority;
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    JPPFNodeState other = (JPPFNodeState) obj;
+    if (nbTasksExecuted != other.nbTasksExecuted) return false;
+    //if (cpuTime != other.cpuTime) return false;
+    if (executionStatus != other.executionStatus) return false;
+    if (connectionStatus != other.connectionStatus) return false;
+    if (threadPoolSize != other.threadPoolSize) return false;
+    if (threadPriority != other.threadPriority) return false;
+    return true;
   }
 }

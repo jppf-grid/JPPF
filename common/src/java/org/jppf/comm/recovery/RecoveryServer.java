@@ -29,8 +29,7 @@ import org.slf4j.*;
  * This class handles the server-side management of recovery connections to remote peers.
  * @author Laurent Cohen
  */
-public class RecoveryServer extends ThreadSynchronization implements Runnable
-{
+public class RecoveryServer extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -39,22 +38,6 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Indicates the remote peer is a driver.
-   */
-  public static final char DRIVER = 'D';
-  /**
-   * Indicates the remote peer is a node.
-   */
-  public static final char NODE = 'N';
-  /**
-   * Indicates the remote peer is a client.
-   */
-  public static final char CLIENT = 'C';
-  /**
-   * Constant used to avoid instantiating new empty arrays.
-   */
-  private static final ServerConnection[] EMPTY_CONNECTION_ARRAY = new ServerConnection[0];
   /**
    * The server socket.
    */
@@ -66,83 +49,50 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
   /**
    * The count of connections that have been opened.
    */
-  private AtomicInteger connectionCount = new AtomicInteger(0);
-  /**
-   * Maximum number of failed write/read attempts on a connection before the remote peer is considered dead.
-   */
-  private int maxRetries = 3;
-  /**
-   * Maximum wait time on the response from the remote peer.
-   */
-  private int socketReadTimeout = 6000;
-  /**
-   * Port this server is accepting connections on.
-   */
-  private int recoveryPort = 22222;
+  private final AtomicInteger connectionCount = new AtomicInteger(0);
   /**
    * Performs the connections checks at regular intervals.
    */
-  private Reaper reaper = null;
+  private final Reaper reaper;
 
   /**
    * Default constructor.
    */
-  public RecoveryServer()
-  {
-    configure();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void run()
-  {
-    try
-    {
-      serverSocket = new ServerSocket(recoveryPort);
-      while (!isStopped())
-      {
-        Socket socket = serverSocket.accept();
-        ServerConnection connection = new ServerConnection(socket, maxRetries, socketReadTimeout);
-        reaper.newConnection(connection);
-      }
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-    close();
-  }
-
-  /**
-   * Initialize this server's parameters from the JPPF configuration.
-   */
-  private void configure()
-  {
+  public RecoveryServer() {
     TypedProperties config = JPPFConfiguration.getProperties();
-    maxRetries = config.getInt("jppf.recovery.max.retries", 3);
-    socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
-    recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
     int reaperPoolSize = config.getInt("jppf.recovery.reaper.pool.size", Runtime.getRuntime().availableProcessors());
     long reaperRunInterval = config.getLong("jppf.recovery.reaper.run.interval", 60000L);
     reaper = new Reaper(this, reaperPoolSize, reaperRunInterval);
   }
 
+  @Override
+  public void run() {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    int maxRetries = config.getInt("jppf.recovery.max.retries", 3);
+    int socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
+    int recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+    try {
+      serverSocket = new ServerSocket(recoveryPort);
+      while (!isStopped()) {
+        Socket socket = serverSocket.accept();
+        ServerConnection connection = new ServerConnection(socket, maxRetries, socketReadTimeout);
+        reaper.newConnection(connection);
+      }
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    close();
+  }
+
   /**
    * Close this server and release the resources it is using.
    */
-  public void close()
-  {
+  public void close() {
     setStopped(true);
-    synchronized(connections)
-    {
-      try
-      {
+    synchronized(connections) {
+      try {
         serverSocket.close();
-      }
-      catch(Exception e)
-      {
+      } catch(Exception e) {
         if (debugEnabled) log.debug("error closing the recovery server socket", e);
       }
       for (ServerConnection c: connections) c.close();
@@ -155,10 +105,8 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
    * The resulting array is independent from the original collection: changes to one has no effect on the other.
    * @return an array of {@link ServerConnection} instances.
    */
-  ServerConnection[] connections()
-  {
-    synchronized(connections)
-    {
+  ServerConnection[] connections() {
+    synchronized(connections) {
       return connections.toArray(new ServerConnection[connections.size()]);
     }
   }
@@ -167,10 +115,8 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
    * Add the specified connection to the list of connections handled by this server.
    * @param connection the connection to add.
    */
-  void addConnection(final ServerConnection connection)
-  {
-    synchronized(connections)
-    {
+  void addConnection(final ServerConnection connection) {
+    synchronized(connections) {
       connections.add(connection);
     }
   }
@@ -179,10 +125,8 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
    * Remove the specified connection from the list of connections handled by this server.
    * @param connection the connection to remove.
    */
-  void removeConnection(final ServerConnection connection)
-  {
-    synchronized(connections)
-    {
+  void removeConnection(final ServerConnection connection) {
+    synchronized(connections) {
       connections.remove(connection);
     }
   }
@@ -191,8 +135,7 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable
    * Get the reaper for this recover server.
    * @return a {@link Reaper} instance.
    */
-  public Reaper getReaper()
-  {
+  public Reaper getReaper() {
     return reaper;
   }
 }
