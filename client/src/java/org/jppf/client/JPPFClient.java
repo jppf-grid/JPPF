@@ -20,6 +20,7 @@ package org.jppf.client;
 import java.util.List;
 
 import org.jppf.client.balancer.SubmissionManagerClient;
+import org.jppf.client.debug.Debug;
 import org.jppf.client.event.ClientListener;
 import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
@@ -50,6 +51,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public JPPFClient() {
     super(null, JPPFConfiguration.getProperties());
+    Debug.register(this);
   }
 
   /**
@@ -58,6 +60,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public JPPFClient(final ClientListener... listeners) {
     super(null, JPPFConfiguration.getProperties(), listeners);
+    Debug.register(this);
   }
 
   /**
@@ -67,6 +70,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public JPPFClient(final String uuid, final ClientListener... listeners) {
     super(uuid, JPPFConfiguration.getProperties(), listeners);
+    Debug.register(this);
   }
 
   /**
@@ -77,6 +81,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners) {
     super(uuid, config, listeners);
+    Debug.register(this);
   }
 
   /**
@@ -210,5 +215,11 @@ public class JPPFClient extends AbstractGenericClient {
       }
     }, timeout);
     return ref.get();
+  }
+
+  @Override
+  public void close() {
+    Debug.unregister(this);
+    super.close();
   }
 }
