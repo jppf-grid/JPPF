@@ -31,7 +31,7 @@ import org.jppf.utils.collections.*;
  * transitions between those states.
  * @author Laurent Cohen
  */
-final class ClientClassServerFactory	extends NioServerFactory<ClientClassState, ClientClassTransition> {
+final class ClientClassServerFactory extends NioServerFactory<ClientClassState, ClientClassTransition> {
   /**
    * Initialize this factory with the specified server.
    * @param server the server for which to initialize.
@@ -46,8 +46,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClientClassState, 
    * @see org.jppf.nio.NioServerFactory#createStateMap()
    */
   @Override
-  public Map<ClientClassState, NioState<ClientClassTransition>> createStateMap()
-  {
+  public Map<ClientClassState, NioState<ClientClassTransition>> createStateMap() {
     Map<ClientClassState, NioState<ClientClassTransition>> map = new EnumMap<>(ClientClassState.class);
     map.put(WAITING_INITIAL_PROVIDER_REQUEST, new WaitingProviderInitialRequestState((ClientClassNioServer) server));
     map.put(SENDING_INITIAL_PROVIDER_RESPONSE, new SendingProviderInitialResponseState((ClientClassNioServer) server));
@@ -66,8 +65,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClientClassState, 
    * @see org.jppf.nio.NioServerFactory#createTransitionMap()
    */
   @Override
-  public Map<ClientClassTransition, NioTransition<ClientClassState>> createTransitionMap()
-  {
+  public Map<ClientClassTransition, NioTransition<ClientClassState>> createTransitionMap() {
     Map<ClientClassTransition, NioTransition<ClientClassState>> map = new EnumMap<>(ClientClassTransition.class);
     map.put(TO_WAITING_INITIAL_PROVIDER_REQUEST, transition(WAITING_INITIAL_PROVIDER_REQUEST, R));
     map.put(TO_SENDING_INITIAL_PROVIDER_RESPONSE, transition(SENDING_INITIAL_PROVIDER_RESPONSE, NioConstants.CHECK_CONNECTION ? RW : W));
@@ -82,8 +80,7 @@ final class ClientClassServerFactory	extends NioServerFactory<ClientClassState, 
   }
 
   @Override
-  protected CollectionMap<ClientClassState, ClientClassState> createAllowedTransitionsMap()
-  {
+  protected CollectionMap<ClientClassState, ClientClassState> createAllowedTransitionsMap() {
     CollectionMap<ClientClassState, ClientClassState> map = new EnumSetEnumMap<>(ClientClassState.class);
     map.addValues(WAITING_INITIAL_PROVIDER_REQUEST, WAITING_INITIAL_PROVIDER_REQUEST, SENDING_INITIAL_PROVIDER_RESPONSE);
     map.addValues(SENDING_INITIAL_PROVIDER_RESPONSE, SENDING_INITIAL_PROVIDER_RESPONSE, IDLE_PROVIDER);
