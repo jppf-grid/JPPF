@@ -154,6 +154,16 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * @return true if the 2 objects are equal, false otherwise.
    */
   public boolean isSame(final JPPFConnectionInformation other) {
+    return isSame(other, true);
+  }
+
+  /**
+   * Determine whether this object is equal to another.
+   * @param other the object to compare to.
+   * @param compareUuid whether to compare the uuids.
+   * @return true if the 2 objects are equal, false otherwise.
+   */
+  public boolean isSame(final JPPFConnectionInformation other, final boolean compareUuid) {
     if (other == null) return false;
     if (this == other) return true;
     if (!equalStrings(host, other.host)) return false;
@@ -162,8 +172,11 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
     if (managementPort != other.managementPort) return false;
     if (sslManagementPort != other.sslManagementPort) return false;
     if (recoveryPort != other.recoveryPort) return false;
-    if (uuid == null) return other.uuid == null;
-    return uuid.equals(other.uuid);
+    if (compareUuid) {
+      if (uuid == null) return other.uuid == null;
+      return uuid.equals(other.uuid);
+    }
+    return true;
   }
 
   @Override

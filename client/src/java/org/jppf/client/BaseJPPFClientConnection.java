@@ -191,6 +191,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
     header.setUuid(new JPPFUuid().toString());
     header.setName("handshake job");
+    header.setHandshake(true);
     header.setUuid(header.getName());
     header.setParameter("connection.uuid", connectionUuid);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();

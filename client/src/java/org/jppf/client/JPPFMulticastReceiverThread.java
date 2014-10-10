@@ -17,11 +17,11 @@
  */
 package org.jppf.client;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -29,8 +29,7 @@ import org.slf4j.*;
  * to establish a connection with one or more servers.
  * @exclude
  */
-class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable
-{
+class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -42,7 +41,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   /**
    * Contains the set of retrieved connection information objects.
    */
-  private final Map<String, Set<JPPFConnectionInformation>> infoMap = new HashMap<>();
+  private final CollectionMap<String, JPPFConnectionInformation> infoMap = new SetHashMap<>();
   /**
    * Count of distinct retrieved connection information objects.
    */
@@ -71,10 +70,8 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * @param ipFilter for accepted IP addresses
    * @param acceptMultipleInterfaces accept all discovered interfaces for same driver
    */
-  JPPFMulticastReceiverThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final boolean acceptMultipleInterfaces)
-  {
-    if(connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
-
+  JPPFMulticastReceiverThread(final ConnectionHandler connectionHandler, final IPFilter ipFilter, final boolean acceptMultipleInterfaces) {
+    if (connectionHandler == null) throw new IllegalArgumentException("connectionHandler is null");
     this.connectionHandler = connectionHandler;
     this.ipFilter = ipFilter;
     this.acceptMultipleInterfaces = acceptMultipleInterfaces;
@@ -85,34 +82,25 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     runningThread = Thread.currentThread();
     JPPFMulticastReceiver receiver = null;
-    try
-    {
+    try {
       receiver = new JPPFMulticastReceiver(ipFilter);
-      while (!isStopped())
-      {
+      while (!isStopped()) {
         JPPFConnectionInformation info = receiver.receive();
         if (isStopped()) break;
-        synchronized(this)
-        {
-          if ((info != null) && !hasConnectionInformation(info))
-          {
+        synchronized(this) {
+          if ((info != null) && !hasConnectionInformation(info)) {
             if (debugEnabled) log.debug("Found connection information: " + info);
             addConnectionInformation(info);
             onNewConnection(AbstractGenericClient.VALUE_JPPF_DISCOVERY + '-' + count.incrementAndGet(), info);
           }
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
-    }
-    finally
-    {
+    } finally {
       if (receiver != null) receiver.setStopped(true);
     }
   }
@@ -122,8 +110,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * @param name for the connection
    * @param info the peer's connection information.
    */
-  protected synchronized void onNewConnection(final String name, final JPPFConnectionInformation info)
-  {
+  protected synchronized void onNewConnection(final String name, final JPPFConnectionInformation info) {
     connectionHandler.onNewConnection(name, info);
   }
 
@@ -132,30 +119,23 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * @param info the connection information to lookup.
    * @return true if the connection information is in the map, false otherwise.
    */
-  private boolean hasConnectionInformation(final JPPFConnectionInformation info)
-  {
-    if (acceptMultipleInterfaces)
-    {
-      Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
-      if (set == null) return false;
-      return set.contains(info);
+  private boolean hasConnectionInformation(final JPPFConnectionInformation info) {
+    if (acceptMultipleInterfaces) {
+      if (infoMap.containsValue(info.uuid, info)) return true;
     }
-    return infoMap.get(info.uuid) != null;
+    if (infoMap.containsKey(info.uuid)) return true;
+    for (JPPFConnectionInformation tmp: infoMap) {
+      if (info.isSame(tmp, false)) return true;
+    }
+    return false;
   }
 
   /**
    * Add the specified connection information to discovered map.
    * @param info a {@link JPPFConnectionInformation} instance.
    */
-  public synchronized void addConnectionInformation(final JPPFConnectionInformation info)
-  {
-    Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
-    if (set == null)
-    {
-      set = new HashSet<>();
-      infoMap.put(info.uuid, set);
-    }
-    set.add(info);
+  public synchronized void addConnectionInformation(final JPPFConnectionInformation info) {
+    infoMap.putValue(info.uuid, info);
   }
 
   /**
@@ -163,9 +143,8 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * @param uuid uuid of the driver for the connections to remove.
    * @return whether connection was successfully removed
    */
-  public synchronized boolean removeConnectionInformation(final String uuid)
-  {
-    return infoMap.remove(uuid) != null;
+  public synchronized boolean removeConnectionInformation(final String uuid) {
+    return infoMap.removeKey(uuid) != null;
   }
 
   /**
@@ -173,38 +152,24 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
    * @param info connection info of the peer to remove
    * @return whether connection was successfully removed
    */
-  public synchronized boolean removeConnectionInformation(final JPPFConnectionInformation info)
-  {
-    if(acceptMultipleInterfaces)
-    {
-      Set<JPPFConnectionInformation> set = infoMap.get(info.uuid);
-      return set != null && set.remove(info);
-    }
-    else
-    {
-      return infoMap.remove(info.uuid) != null;
-    }
+  public synchronized boolean removeConnectionInformation(final JPPFConnectionInformation info) {
+    if (acceptMultipleInterfaces) return infoMap.removeValue(info.uuid, info);
+    return infoMap.removeKey(info.uuid) != null;
   }
 
   /**
    * Close this multicast receiver and interrupt the thread that runs it.
    */
-  public void close()
-  {
+  public void close() {
     setStopped(true);
-    if (runningThread != null)
-    {
-      try
-      {
+    if (runningThread != null) {
+      try {
         runningThread.interrupt();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
       }
       runningThread = null;
-      synchronized(this)
-      {
+      synchronized(this) {
         infoMap.clear();
       }
     }
@@ -213,8 +178,7 @@ class JPPFMulticastReceiverThread extends ThreadSynchronization implements Runna
   /**
    * Defines a callback for objects wishing to be notified of discovery events.
    */
-  public interface ConnectionHandler
-  {
+  public interface ConnectionHandler {
     /**
      * Called when a new connection is discovered.
      * @param name the name assigned to the connection.
