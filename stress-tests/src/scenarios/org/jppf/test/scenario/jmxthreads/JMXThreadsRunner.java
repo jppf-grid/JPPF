@@ -66,7 +66,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
         output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
       }
       Thread.sleep(3000L);
-      DiagnosticsMBean proxy = jmxDriver.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+      DiagnosticsMBean proxy = jmxDriver.getDiagnosticsProxy();
       String[] threadNames = proxy.threadNames();
       int count = 0;
       for (String name: threadNames)

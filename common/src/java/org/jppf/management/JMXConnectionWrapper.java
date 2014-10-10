@@ -29,7 +29,8 @@ import javax.management.*;
 import javax.management.remote.*;
 import javax.management.remote.generic.GenericConnector;
 
-import org.jppf.JPPFException;
+import org.jppf.*;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -402,6 +403,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       return JMX.newMBeanProxy(mbsc, objectName, inf, true);
     }
     return null;
+  }
+
+  /**
+   * Get a proxy to the diagnostics/JVM health MBean.
+   * @return a DiagnosticsMBean instance.
+   * @throws Exception if any error occurs.
+   */
+  public DiagnosticsMBean getDiagnosticsProxy() throws Exception {
+    throw new JPPFUnsupportedOperationException("this method can only be invoked on a subclass of " + getClass().getName());
   }
 
   /**

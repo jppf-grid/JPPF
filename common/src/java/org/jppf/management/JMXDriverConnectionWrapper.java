@@ -24,6 +24,7 @@ import javax.management.*;
 
 import org.jppf.job.JobInformation;
 import org.jppf.load.balancer.LoadBalancingInformation;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.job.management.*;
@@ -50,7 +51,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   private static final String[] FORWARDING_LISTENER_SIGNATURE = {NodeSelector.class.getName(), String.class.getName()};
   /**
-   *
+   * 
    */
   private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<>();
 
@@ -386,5 +387,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     public Object getHandback() {
       return handback;
     }
+  }
+
+  @Override
+  public DiagnosticsMBean getDiagnosticsProxy() throws Exception {
+    return getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
   }
 }
