@@ -457,7 +457,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
    * @param event the event to notify this listener of.
    */
   @Override
-  public synchronized void newConnection(final ClientEvent event) {
+  public void newConnection(final ClientEvent event) {
     final JPPFClientConnection c = event.getConnection();
     JPPFClientConnectionStatus status = c.getStatus();
     if ((status != null) && status.isWorkingStatus()) executor.submit(new NewConnectionTask(this, c));
@@ -470,7 +470,7 @@ public final class StatsHandler implements StatsConstants, ClientListener {
   }
 
   @Override
-  public synchronized void connectionFailed(final ClientEvent event) {
+  public void connectionFailed(final ClientEvent event) {
     executor.submit(new ConnectionFailedTask(this, event.getConnection()));
   }
 
