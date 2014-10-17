@@ -363,18 +363,29 @@ public class JPPFResourceWrapper implements Serializable
   }
 
   @Override
-  public boolean equals(final Object obj)
-  {
+  public boolean equals(final Object obj) {
     if ((obj == null) || (obj.getClass() != this.getClass())) return false;
     JPPFResourceWrapper other = (JPPFResourceWrapper) obj;
-    return (dynamic == other.dynamic) && uuidPath.equals(other.uuidPath) && (getCallableID() == other.getCallableID()) && getName().equals(other.getName());
+    if (dynamic != other.dynamic) return false;
+    if (getCallableID() != other.getCallableID()) return false;
+    if (uuidPath == null) {
+      if (other.uuidPath != null) return false;
+    } else {
+      if (!uuidPath.equals(other.uuidPath)) return false;
+    }
+    String name = getName();
+    String otherName = other.getName();
+    if (name == null) {
+      if (otherName != null) return false;
+    }
+    return name.equals(otherName);
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     long id = getCallableID();
-    return 31 + (dynamic ? 1 : 0) + uuidPath.hashCode() + (int) id + getName().hashCode();
+    String name = getName();
+    return 31 + (dynamic ? 1 : 0) + (uuidPath == null ? 0 : uuidPath.hashCode()) + (int) id + (name == null ? 0 : name.hashCode());
   }
 
   /**
