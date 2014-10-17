@@ -25,6 +25,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -150,10 +151,8 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
    * Close the specified connection.
    * @param channel the channel representing the connection.
    */
-  public static void closeConnection(final ChannelWrapper<?> channel)
-  {
-    if (channel == null)
-    {
+  public static void closeConnection(final ChannelWrapper<?> channel) {
+    if (channel == null) {
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
@@ -161,12 +160,17 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
     ClassContext context = (ClassContext) channel.getContext();
     String uuid = context.getUuid();
     if (uuid != null) server.removeNodeConnection(uuid);
-    try
-    {
+    try {
       channel.close();
+    } catch(Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(e.getMessage());
     }
-    catch(Exception e)
-    {
+    try {
+      NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
+      AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
+      if (ctx != null) ctx.handleException(ctx.getChannel(), null);
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }

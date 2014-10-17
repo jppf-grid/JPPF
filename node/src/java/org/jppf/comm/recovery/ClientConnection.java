@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.socket.*;
-import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -55,7 +54,11 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * 
    */
-  private DriverConnectionInfo connectionInfo = null;
+  private String host = null;
+  /**
+   * 
+   */
+  private int port = -1;
 
   /**
    * Initialize this client connection with the specified uuid.
@@ -69,12 +72,14 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * Initialize this client connection with the specified uuid.
    * @param uuid the JPPF node or client uuid.
-   * @param connectionInfo information on connecting to the remote peer.
+   * @param host the host ot which to connect.
+   * @param port the port number to connect to on the host.
    */
-  public ClientConnection(final String uuid, final DriverConnectionInfo connectionInfo)
+  public ClientConnection(final String uuid, final String host, final int port)
   {
     this.uuid = uuid;
-    this.connectionInfo = connectionInfo;
+    this.host = host;
+    this.port = port;
   }
 
   @Override
@@ -115,24 +120,15 @@ public class ClientConnection extends AbstractRecoveryConnection
    */
   private void configure()
   {
+    if (debugEnabled) log.debug("configuring connection");
     TypedProperties config = JPPFConfiguration.getProperties();
-    String host = null;
-    int port = -1;
-    if (connectionInfo == null) {
-      host = config.getString("jppf.server.host", "localhost");
-      port = config.getInt("jppf.recovery.server.port", 22222);
-      if (debugEnabled) log.debug("host={}, port={}", host, port);
-    } else {
-      if (debugEnabled) log.debug("configuring: connectionInfo={}", connectionInfo);
-      host = connectionInfo.getHost();
-      port = connectionInfo.getRecoveryPort();
-    }
+    if (host == null) host = config.getString("jppf.server.host", "localhost");
+    if (port < 0) port = config.getInt("jppf.recovery.server.port", 22222);
     maxRetries = config.getInt("jppf.recovery.max.retries", 2);
     socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 60000);
     socketWrapper = new BootstrapSocketClient();
     socketWrapper.setHost(host);
     socketWrapper.setPort(port);
-    if (debugEnabled) log.debug("host={},  port={}, socketWrapper={}", new Object[] {host, port, socketWrapper});
   }
 
   /**

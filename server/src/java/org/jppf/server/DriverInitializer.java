@@ -146,12 +146,9 @@ public class DriverInitializer {
       s = config.getString("jppf.ssl.server.port", null);
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
       connectionInfo.host = NetworkUtils.getManagementHost();
-      if (config.getBoolean("jppf.management.enabled", true))
-        connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
-      if (config.getBoolean("jppf.management.ssl.enabled", false))
-        connectionInfo.sslManagementPort = config.getInt("jppf.management.ssl.port", 11193);
-      boolean recoveryEnabled = config.getBoolean("jppf.recovery.enabled", false);
-      if (recoveryEnabled) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+      if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
+      if (config.getBoolean("jppf.management.ssl.enabled", false)) connectionInfo.sslManagementPort = config.getInt("jppf.management.ssl.port", 11193);
+      if (config.getBoolean("jppf.recovery.enabled", false)) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
     }
     return connectionInfo;
   }
@@ -198,7 +195,8 @@ public class DriverInitializer {
       peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
         @Override
         public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-          new JPPFPeerInitializer(name, info, classServer, ssl).start();
+          peerDiscoveryThread.addConnectionInformation(info);
+          new JPPFPeerInitializer(name, info, classServer, ssl, true).start();
         }
       }, new IPFilter(props, true), getConnectionInformation());
       initPeers = false;
@@ -218,11 +216,11 @@ public class DriverInitializer {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
             info.host = props.getString(String.format("jppf.peer.%s.server.host", name), "localhost");
-            // to keep backward compatibility with v2.x configurations
             String s = props.getString(String.format("jppf.peer.%s.server.port", name), "11111");
-            if (ssl) info.sslServerPorts = StringUtils.parseIntValues(s);
-            else info.serverPorts = StringUtils.parseIntValues(s);
-            if(peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
+            int[] ports = StringUtils.parseIntValues(s);
+            if (ssl) info.sslServerPorts = ports;
+            else info.serverPorts = ports;
+            if (peerDiscoveryThread != null) peerDiscoveryThread.addConnectionInformation(info);
             new JPPFPeerInitializer(name, info, classServer, ssl).start();
           }
         }

@@ -35,8 +35,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-class PeerResourceProvider
-{
+class PeerResourceProvider {
   /**
    * Logger for this class.
    */
@@ -73,6 +72,10 @@ class PeerResourceProvider
    * Used to synchronize access to the underlying socket from multiple threads.
    */
   private SocketInitializer socketInitializer = new SocketInitializerImpl();
+  /**
+   * 
+   */
+  private ClassContext context = null;
 
   /**
    * Initialize this peer provider with the specified configuration name.
@@ -81,11 +84,9 @@ class PeerResourceProvider
    * @param server the NioServer to which the channel is registered.
    * @param secure <code>true</code> if the connection is established over SSL, <code>false</code> otherwise.
    */
-  public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClassNioServer server, final boolean secure)
-  {
+  public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClassNioServer server, final boolean secure) {
     if (peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
-
     this.peerNameBase = peerNameBase;
     this.peerName = peerNameBase;
     this.connectionInfo = connectionInfo;
@@ -97,8 +98,7 @@ class PeerResourceProvider
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public synchronized void init() throws Exception
-  {
+  public synchronized void init() throws Exception {
     if (socketClient == null) socketClient = initSocketChannel();
     String msg =  "to remote peer [" + socketClient.getHost() + ':' + socketClient.getPort() + ']';
     if (debugEnabled) log.debug("Attempting connection " + msg);
@@ -112,12 +112,11 @@ class PeerResourceProvider
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  private void postInit() throws Exception
-  {
-    try
-    {
-      ClassContext context = (ClassContext) server.createNioContext();
+  private void postInit() throws Exception {
+    try {
+      context = (ClassContext) server.createNioContext();
       context.setPeer(true);
+      context.setProvider(true);
       SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
       ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
@@ -126,9 +125,7 @@ class PeerResourceProvider
       server.getTransitionManager().transitionChannel(channel, ClassTransition.TO_SENDING_PEER_CHANNEL_IDENTIFIER);
       socketClient = null;
       peerName = peerNameBase;
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage());
       throw new RuntimeException(e);
     }
@@ -139,8 +136,7 @@ class PeerResourceProvider
    * @return a non-connected <code>SocketChannelClient</code> instance.
    * @throws Exception if an error is raised during initialization.
    */
-  private SocketChannelClient initSocketChannel() throws Exception
-  {
+  private SocketChannelClient initSocketChannel() throws Exception {
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
     int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
@@ -153,8 +149,7 @@ class PeerResourceProvider
    * @param  channel the channel for which to configure SSL.
    * @throws Exception if any error occurs.
    */
-  private void configureSSL(final ChannelWrapper<?> channel) throws Exception
-  {
+  private void configureSSL(final ChannelWrapper<?> channel) throws Exception {
     SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
     ClassContext context = (ClassContext) channel.getContext();
     SSLContext sslContext = JPPFDriver.getInstance().getAcceptorServer().getSSLContext();
@@ -165,5 +160,13 @@ class PeerResourceProvider
     engine.setSSLParameters(params);
     SSLHandler sslHandler = new SSLHandler(channel, engine);
     context.setSSLHandler(sslHandler);
+  }
+
+  /**
+   * Close this chanel.
+   */
+  public void close() {
+    if (debugEnabled) log.debug("closing {}, context={} ", this, context);
+    if (context != null) context.handleException(context.getChannel(), null);
   }
 }

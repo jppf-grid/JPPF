@@ -25,11 +25,12 @@ import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.management.JMXServer;
 import org.jppf.node.NodeExecutionManager;
+import org.jppf.node.connection.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -104,7 +105,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   @Override
   public void run() {
     stopped = false;
-    if (debugEnabled) log.debug(getName() + "Start of peer node main loop");
+    if (debugEnabled) log.debug(getName() + " start of peer node main loop");
     while (!isStopped()) {
       try {
         init();
@@ -117,9 +118,8 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
           resultSender = new PeerNodeResultSender(getSocketWrapper());
           perform();
         } catch(Exception e) {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.warn(ExceptionUtils.getMessage(e));
           close();
+          throw new RuntimeException(e);
         } catch(Error e) {
           log.error(e.getMessage(), e);
           e.printStackTrace();
@@ -173,15 +173,15 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public synchronized void init() throws Exception
-  {
+  public synchronized void init() throws Exception {
     this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     nodeConnection.init();
     is = new SocketWrapperInputSource(getSocketWrapper());
     if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid, connectionInfo.toDriverConnectionInfo(secure, true));
+        DriverConnectionInfo driverConnectionInfo = JPPFDriverConnectionInfo.fromJPPFConnectionInformation(connectionInfo, secure, true);
+        recoveryConnection = new ClientConnection(uuid, driverConnectionInfo.getHost(), driverConnectionInfo.getRecoveryPort());
         recoveryConnection.addClientConnectionListener(this);
         new Thread(recoveryConnection, getName() + "reaper client connection").start();
       }
@@ -226,10 +226,9 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
    */
   @Override
   public void stopNode() {
-    if (debugEnabled) log.debug(getName() + " stopping node");
+    if (debugEnabled) log.debug(getName() + " stopping peer node");
     this.setStopped(true);
     close();
-    driver.getInitializer().getPeerDiscoveryThread().removeConnectionInformation(connectionInfo);
   }
 
   /**
@@ -237,7 +236,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
    * @see org.jppf.node.Node#stopNode()
    */
   public void close() {
-    if (debugEnabled) log.debug(getName() + " closing node");
+    if (debugEnabled) log.debug(getName() + " closing peer node");
     try {
       if (debugEnabled) log.debug(getName() + " closing socket: " + nodeConnection.getChannel());
       nodeConnection.close();

@@ -22,6 +22,8 @@ import java.util.*;
 
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.classloader.ClassContext;
+import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
@@ -135,6 +137,24 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
       channel.close();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
+    }
+    try {
+      ClientContext ctx = (ClientContext) channel.getContext();
+      String connectionUuid = ctx.getConnectionUuid();
+      if (connectionUuid != null) {
+        ClientClassNioServer ccns = JPPFDriver.getInstance().getClientClassServer();
+        List<ChannelWrapper<?>> list = ccns.getProviderConnections(ctx.getUuid());
+        for (ChannelWrapper<?> ch: list) {
+          ClassContext cctx = (ClassContext) ch.getContext();
+          if (connectionUuid.equals(cctx.getConnectionUuid())) {
+            ClientClassNioServer.closeConnection(ch, false);
+            break;
+          }
+        }
+      }
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(e.getMessage());
     }
     try {
       driver.getStatistics().addValue(JPPFStatisticsHelper.CLIENTS, -1);
