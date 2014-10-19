@@ -308,7 +308,7 @@ public class SubmissionManagerClient extends ThreadSynchronization implements Su
 
   @Override
   public synchronized boolean hasAvailableConnection() {
-    return taskQueueChecker.hasIdleChannel() || wrapperLocal != null && wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE;
+    return taskQueueChecker.hasIdleChannel() || ((wrapperLocal != null) && (wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE));
   }
 
   @Override
