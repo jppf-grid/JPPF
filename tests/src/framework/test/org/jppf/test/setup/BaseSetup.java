@@ -277,7 +277,8 @@ public class BaseSetup {
     }
     Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
     for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet()) {
-      JMXDriverConnectionWrapper wrapper = entry.getValue().getConnectionPool().getJmxConnection();
+      JMXDriverConnectionWrapper wrapper = null;
+      while ((wrapper = entry.getValue().getConnectionPool().getJmxConnection()) == null) Thread.sleep(1L);
       if (!wrapperMap.containsKey(wrapper.getURL())) {
         while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
         wrapperMap.put(wrapper.getURL(), wrapper);

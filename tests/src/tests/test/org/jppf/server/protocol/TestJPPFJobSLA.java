@@ -343,7 +343,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * event though another job is already executing at the time it is submitted.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=15000)
+  @Test(timeout=20000)
   public void testBroadcastJob2() throws Exception {
     try {
       client.close();

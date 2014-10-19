@@ -20,7 +20,8 @@ package test.org.jppf.test.runner;
 
 import java.io.PrintStream;
 
-import org.jppf.utils.streams.StreamUtils;
+import javax.swing.*;
+
 import org.junit.runner.*;
 import org.junit.runner.notification.*;
 
@@ -68,7 +69,11 @@ public class TestRunListener extends RunListener {
     /**
      * Wait until user presses [Enter].
      */
-    WAIT
+    WAIT_EXIT,
+    /**
+     * Wait until user presses [Enter].
+     */
+    WAIT_CONTINUE
   }
   /**
    * What to do upon test failure.
@@ -147,9 +152,19 @@ public class TestRunListener extends RunListener {
   @Override
   public void testFailure(final Failure failure) throws Exception {
     resultHolder.addFailure(failure);
-    if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "'");
+    if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "' trace:\n" + failure.getTrace());
     if (actionOnError == FailureAction.EXIT) System.exit(1);
-    if (actionOnError == FailureAction.WAIT) StreamUtils.waitKeyPressed("Press [Enter] to continue ...");
+    if ((actionOnError == FailureAction.WAIT_EXIT) || (actionOnError == FailureAction.WAIT_CONTINUE)) {
+      JFrame frame = new JFrame("error in test");
+      JPanel panel = new JPanel();
+      frame.add(panel);
+      frame.setVisible(true);
+      //StreamUtils.waitKeyPressed("Press [Enter] to continue ...");
+      JOptionPane.showMessageDialog(panel, failure.getTrace(), failure.getMessage(), JOptionPane.ERROR_MESSAGE);
+      frame.dispose();
+      if (actionOnError == FailureAction.WAIT_EXIT) System.exit(1);
+    }
+      
   }
 
   @Override
