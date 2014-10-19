@@ -35,8 +35,7 @@ import org.slf4j.*;
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class LongTaskRunner
-{
+public class LongTaskRunner {
   /**
    * Logger for this class.
    */
@@ -53,28 +52,22 @@ public class LongTaskRunner
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       jppfClient = new JPPFClient();
       TypedProperties props = JPPFConfiguration.getProperties();
       int length = props.getInt("longtask.length");
       int nbTask = props.getInt("longtask.number");
       int iterations = props.getInt("longtask.iterations");
       print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-      //perform(nbTask, length, iterations);
-      performAsync(nbTask, length, iterations);
+      perform(nbTask, length, iterations);
+      //performAsync(nbTask, length, iterations);
       //perform3(nbTask, length, iterations);
       //perform4();
       //perform5();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -84,12 +77,9 @@ public class LongTaskRunner
    * @param nbTasks the number of tasks to send at each iteration.
    * @param length the executionlength of each task.
    * @param iterations the number of times the the tasks will be sent.
-   * @throws Throwable if an error is raised during the execution.
+   * @throws Exception if any error occurs.
    */
-  private static void perform(final int nbTasks, final int length, final int iterations) throws Throwable
-  {
-    try
-    {
+  private static void perform(final int nbTasks, final int length, final int iterations) throws Exception {
       // perform "iteration" times
       long totalTime = 0L;
       for (int iter=1; iter<=iterations; iter++)
@@ -103,7 +93,7 @@ public class LongTaskRunner
         for (Task task: results)
         {
           Throwable e = task.getThrowable();
-          if (e != null) throw e;
+          if (e != null) System.out.printf("task %s got exception %s%n", task.getId(), ExceptionUtils.getMessage(e));
         }
         long elapsed = System.currentTimeMillis() - start;
         print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
@@ -112,11 +102,6 @@ public class LongTaskRunner
       print("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
       //JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
       //print("End statistics :\n"+stats.toString());
-    }
-    catch(Exception e)
-    {
-      throw new JPPFException(e.getMessage(), e);
-    }
   }
 
   /**

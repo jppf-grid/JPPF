@@ -1,6 +1,6 @@
-# server 1
-false, localhost, 11111, -1
 # server 2
 false, localhost, 11112, -1
+# server 1
+false, localhost, 11111, -1
 # server 3
 #false, 192.168.1.15, 11113, -1
