@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the node ocnfiguration update dialog.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="nodeConfigurationUpdatePanel" type="page">
 	<property name="label" value="Update number of threads and priority"/>
 	<property name="layoutConstraints" value="flowy, fill"/>

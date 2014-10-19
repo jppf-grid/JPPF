@@ -134,9 +134,6 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
           parent = (TopologyDriver) data.getParent();
           if (parent == null) return;
           parent.getForwarder().updateConfiguration(new NodeSelector.UuidSelector(data.getUuid()), map, b);
-        } catch(IOException e) {
-          parent.initializeProxies();
-          log.error(e.getMessage(), e);
         } catch(Exception e) {
           log.error(e.getMessage(), e);
         }

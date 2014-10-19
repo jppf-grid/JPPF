@@ -18,14 +18,15 @@
 
 package org.jppf.client.monitoring.topology;
 
+import java.util.EventListener;
+
 
 /**
  * Listener interface for changes in the grid topology. 
  * @author Laurent Cohen
  * @since 5.0
  */
-public interface TopologyListener
-{
+public interface TopologyListener extends EventListener {
   /**
    * Called when a driver is added.
    * @param event the event encapsulating the change information.
@@ -37,6 +38,12 @@ public interface TopologyListener
    * @param event the event encapsulating the change information.
    */
   void driverRemoved(TopologyEvent event);
+
+  /**
+   * Called when the state of a driver has changed.
+   * @param event the event encapsulating the change information.
+   */
+  void driverUpdated(TopologyEvent event);
 
   /**
    * Called when a node is added.
@@ -55,5 +62,4 @@ public interface TopologyListener
    * @param event the event encapsulating the change information.
    */
   void nodeUpdated(TopologyEvent event);
-
 }

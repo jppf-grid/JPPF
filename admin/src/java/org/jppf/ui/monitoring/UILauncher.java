@@ -32,8 +32,7 @@ import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
- * This class provides a graphical interface for monitoring the status and health
- * of the JPPF server.<br>
+ * This class provides a graphical interface for monitoring the status and health of the JPPF server.<br>
  * It also provides a few customization options, such as setting the interval between 2 server refreshes,
  * and switching the color scheme (skin) for the whole UI.
  * @author Laurent Cohen
@@ -43,6 +42,10 @@ public class UILauncher {
    * Logger for this class.
    */
   static Logger log = LoggerFactory.getLogger(UILauncher.class);
+  /**
+   * The unique instance of the embedded admin console.
+   */
+  private static JComponent consoleComponent = null;
   /**
    * The splash screen window.
    */
@@ -54,7 +57,7 @@ public class UILauncher {
    */
   public static void main(final String...args) {
     try {
-      if ((args  == null) || (args.length < 2)) throw new Exception("Usage: UILauncher page_location location_source");
+      if ((args  == null) || (args.length < 2)) throw new IllegalArgumentException("Usage: UILauncher page_location location_source");
       String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
           "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
       int n = 3;
@@ -114,32 +117,35 @@ public class UILauncher {
    * @return the root {@link JComponent} of the admin console.
    * @since 5.0
    */
-  private static JComponent loadUI(final String src, final String type, final boolean createFrame) {
-    try {
+  private synchronized static JComponent loadUI(final String src, final String type, final boolean createFrame) {
+    if (consoleComponent == null) {
       OptionElement elt = null;
-      if ("url".equalsIgnoreCase(type)) elt = OptionsHandler.addPageFromURL(src, null);
-      else elt = OptionsHandler.addPageFromXml(src);
-      OptionsHandler.loadPreferences();
-      OptionsHandler.getBuilder().triggerInitialEvents(elt);
-      if (createFrame) {
-        JFrame frame = new JFrame(elt.getLabel());
-        OptionsHandler.setMainWindow(frame);
-        DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
-        frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
-        frame.addWindowListener(new WindowClosingListener());
-        StatsHandler.getInstance();
-        frame.getContentPane().add(elt.getUIComponent());
-        OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
-      } else {
-        JComponent comp = elt.getUIComponent();
-        comp.addHierarchyListener(new MainFrameObserver(elt));
+      try {
+        if ("url".equalsIgnoreCase(type)) elt = OptionsHandler.addPageFromURL(src, null);
+        else elt = OptionsHandler.addPageFromXml(src);
+        OptionsHandler.loadPreferences();
+        OptionsHandler.getBuilder().triggerInitialEvents(elt);
+        if (createFrame) {
+          JFrame frame = new JFrame(elt.getLabel());
+          OptionsHandler.setMainWindow(frame);
+          DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
+          frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
+          frame.addWindowListener(new WindowClosingListener());
+          StatsHandler.getInstance();
+          frame.getContentPane().add(elt.getUIComponent());
+          OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
+        } else {
+          JComponent comp = elt.getUIComponent();
+          comp.addHierarchyListener(new MainFrameObserver(elt));
+        }
+        OptionsHandler.getPluggableViewHandler().installViews();
+      } catch (Exception e) {
+        e.printStackTrace();
+        log.error(e.getMessage(), e);
       }
-      return elt.getUIComponent();
-    } catch (Exception e) {
-      e.printStackTrace();
-      log.error(e.getMessage(), e);
+      consoleComponent = elt == null ? null : elt.getUIComponent();
     }
-    return null;
+    return consoleComponent;
   }
 
   /**

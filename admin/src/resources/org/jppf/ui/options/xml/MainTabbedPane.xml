@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the main tabbed pane in the JPPF admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="AdminPanels" type="TabbedPane">
+	<property name="componentConstraints" value="push, grow, width 99%"/>
+	<property name="layoutConstraints" value="fill"/>
+  <property name="bordered" value="false"/>
+	<property name="tooltip" value="Perform the remote administration of the server"/>
+
+	<!--<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>-->
+
+  <import source="file" location="org/jppf/ui/options/xml/Topology.xml" pluggableView="Topology"/>
+  <import source="file" location="org/jppf/ui/options/xml/JobData.xml" pluggableView="JobData"/>
+  <import source="file" location="org/jppf/ui/options/xml/ServerStats.xml" pluggableView="ServerStats"/>
+  <import source="file" location="org/jppf/ui/options/xml/Charts.xml" pluggableView="Charts"/>
+  <import source="file" location="org/jppf/ui/options/xml/LoadBalancingSettings.xml" pluggableView="LoadBalancing"/>
+</opt:main>

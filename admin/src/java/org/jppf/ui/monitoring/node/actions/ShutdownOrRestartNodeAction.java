@@ -18,7 +18,6 @@
 package org.jppf.ui.monitoring.node.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.*;
 
 import org.jppf.client.monitoring.topology.TopologyDriver;
@@ -87,9 +86,6 @@ public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
             NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
             if (restart) forwarder.restart(selector, interruptIfRunning);
             else forwarder.shutdown(selector, interruptIfRunning);
-          } catch(IOException e) {
-            entry.getKey().initializeProxies();
-            log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }

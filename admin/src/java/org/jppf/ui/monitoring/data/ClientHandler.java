@@ -22,8 +22,9 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.*;
 
+import javax.swing.*;
+
 import org.jppf.client.*;
-import org.jppf.client.event.ClientListener;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -54,13 +55,9 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * JPPF client used to submit execution requests.
-   */
-  private JPPFClient jppfClient = null;
-  /**
    * The current client connection for which statistics and charts are displayed.
    */
-  JPPFClientConnection currentConnection = null;
+  TopologyDriver currentDriver = null;
   /**
    * The stats handler.
    */
@@ -90,34 +87,34 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     this.statsHandler = statsHandler;
     manager = statsHandler.getTopologyManager();
     manager.addTopologyListener(this);
-    getJppfClient();
+    //getJppfClient(null);
   }
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    scheduler.submit(new NewConnectionTask(statsHandler, event.getDriverData()));
+    scheduler.submit(new NewConnectionTask(statsHandler, event.getDriver()));
   }
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    if ((jppfClient != null) && !jppfClient.isClosed()) scheduler.submit(new ConnectionFailedTask(statsHandler, event.getDriverData().getConnection()));
+    if (!manager.getJPPFClient().isClosed()) scheduler.submit(new ConnectionFailedTask(statsHandler, event.getDriver()));
   }
 
   /**
    * Get the current client connection for which statistics and charts are displayed.
-   * @return a <code>JPPFClientConnection</code> instance.
+   * @return a <code>TopologyDriver</code> instance.
    */
-  public synchronized JPPFClientConnection getCurrentConnection() {
-    return currentConnection;
+  public synchronized TopologyDriver getCurrentDriver() {
+    return currentDriver;
   }
 
   /**
    * Set the current client connection for which statistics and charts are displayed.
-   * @param connection a <code>JPPFClientConnection</code> instance.
+   * @param driver a <code>JPPFClientConnection</code> instance.
    */
-  public synchronized void setCurrentConnection(final JPPFClientConnection connection) {
-    if ((currentConnection == null) || ((connection != null) && !connectionId(connection).equals(connectionId(currentConnection)))) {
-      scheduler.submit(new SetCurrentConnectionTask(connection));
+  public synchronized void setCurrentDriver(final TopologyDriver driver) {
+    if ((currentDriver == null) || ((driver != null) && !driver.getUuid().equals(currentDriver.getUuid()))) {
+      scheduler.submit(new SetCurrentConnectionTask(driver));
     }
   }
 
@@ -128,26 +125,26 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     /**
      * The connection to set.
      */
-    private final JPPFClientConnection connection;
+    private final TopologyDriver driver;
 
     /**
      * Initialize this task with the specified client connection.
-     * @param connection the connection to set.
+     * @param driver the connection to set.
      */
-    public SetCurrentConnectionTask(final JPPFClientConnection connection) {
-      this.connection = connection;
+    public SetCurrentConnectionTask(final TopologyDriver driver) {
+      this.driver = driver;
     }
 
     @Override
     public void run() {
-      final boolean currentConnectionNull = (currentConnection == null);
-      if (connection != null) {
+      final boolean currentDriverNull = (currentDriver == null);
+      if (driver != null) {
         synchronized(statsHandler) {
-          currentConnection = connection;
-          JPPFClientConnectionStatus status = currentConnection.getStatus();
-          if ((status != null) && status.isWorkingStatus()) {
+          currentDriver = driver;
+          JPPFClientConnectionStatus status = currentDriver.getConnection().getStatus();
+          if (status.isWorkingStatus()) {
             statsHandler.fireStatsHandlerEvent(StatsHandlerEvent.Type.RESET);
-            if (currentConnectionNull) {
+            if (currentDriverNull) {
               Runnable r = new Runnable() {
                 @Override public void run() {
                   log.debug("first refreshLoadBalancer()");
@@ -161,15 +158,6 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
         }
       }
     }
-  }
-
-  /**
-   * Get the identifier for the specified connection.
-   * @param c the connection for which to get the identifier.
-   * @return the identifier as a string, or {@code null} if the ocnnection is {@code null}.
-   */
-  public String connectionId(final JPPFClientConnection c) {
-    return (c == null) ? null : c.getDriverUuid();
   }
 
   /**
@@ -189,15 +177,15 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
       return false;
     }
     log.debug("LoadBalancingPanel = " + lbOption);
-    JMXDriverConnectionWrapper connection = currentJmxConnection();
+    JMXDriverConnectionWrapper jmx = currentJmxConnection();
     AbstractOption messageArea = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingMessages");
-    if ((connection == null) || !connection.isConnected()) {
+    if ((jmx == null) || !jmx.isConnected()) {
       messageArea.setValue("Not connected to a server, please click on 'Refresh' to try again");
       return false;
     }
     messageArea.setValue("");
     try {
-      LoadBalancingInformation info = connection.loadBalancerInformation();
+      LoadBalancingInformation info = jmx.loadBalancerInformation();
       log.debug("info = {}", info);
       if (info != null) {
         ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
@@ -215,35 +203,12 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   }
 
   /**
-   * Get the JPPF client used to submit data update and administration requests.
-   * @return a <code>JPPFClient</code> instance.
-   */
-  public JPPFClient getJppfClient() {
-    return getJppfClient(null);
-  }
-
-  /**
-   * Get the JPPF client used to submit data update and administration requests.
-   * @param clientListener a listener to register with the JPPF client.
-   * @return a <code>JPPFClient</code> instance.
-   */
-  public synchronized JPPFClient getJppfClient(final ClientListener clientListener) {
-    if (jppfClient == null) {
-      jppfClient = manager.getJPPFClient();
-    } else if ((clientListener != null) && (clientListener != this)) {
-      jppfClient.addClientListener(clientListener);
-    }
-    return jppfClient;
-  }
-
-  /**
    * Get the JMX connection for the current driver connection.
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
   public JMXDriverConnectionWrapper currentJmxConnection() {
-    JPPFClientConnection c = getCurrentConnection();
-    if (c == null) return null;
-    return c.getConnectionPool().getJmxConnection();
+    TopologyDriver driver = getCurrentDriver();
+    return (driver == null) ? null : driver.getJmx();
   }
 
   /**
@@ -261,9 +226,18 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   public synchronized void setServerListOption(final OptionElement serverListOption) {
     this.serverListOption = serverListOption;
-    List<JPPFClientConnection> list = getJppfClient().getAllConnections();
+    JComboBox box = ((ComboBoxOption) serverListOption).getComboBox();
+    box.setRenderer(new DefaultListCellRenderer() {
+      @Override
+      public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+        DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        renderer.setText(value == null ? "" : ((TopologyDriver) value).getDisplayName());
+        return renderer;
+      }
+    });
+    List<TopologyDriver> list = manager.getDrivers();
     if (debugEnabled) log.debug("setting serverList option=" + serverListOption + ", connections = " + list);
-    for (TopologyDriver driver: manager.getDrivers()) scheduler.submit(new NewConnectionTask(statsHandler, driver));
+    for (TopologyDriver driver: list) scheduler.submit(new NewConnectionTask(statsHandler, driver));
     notifyAll();
   }
 
@@ -273,7 +247,8 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   @Override
   public void close() {
     scheduler.shutdownNow();
-    if (jppfClient != null) jppfClient.close();
+    JPPFClient client = manager.getJPPFClient();
+    if (client != null) client.close();
   }
 
   /**

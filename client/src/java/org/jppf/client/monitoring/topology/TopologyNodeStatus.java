@@ -22,6 +22,7 @@ package org.jppf.client.monitoring.topology;
  * Used for temporary display of the status of a node, before it is removed.
  * @author Laurent Cohen
  * @since 5.0
+ * @exclude
  */
 public enum TopologyNodeStatus {
   /**

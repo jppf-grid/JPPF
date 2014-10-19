@@ -17,6 +17,9 @@
   limitations under the License.
 -->
 
+<!--
+  XML descriptor for the server chooser combo box in the admin console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ServerChooserPanel" type="page">
   <property name="tooltip" value="The list of drivers to connect to"/>
   <property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
@@ -30,7 +33,7 @@
       <script language="groovy">StatsHandler.getInstance().getClientHandler().setServerListOption(option)</script>
     </initializer>
     <listener type="script">
-      <script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentConnection(option.getValue())</script>
+      <script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentDriver(option.getValue())</script>
     </listener>
   </child>
 

@@ -22,7 +22,6 @@ import java.util.TimerTask;
 
 import javax.swing.*;
 
-import org.jppf.client.JPPFClientConnection;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.*;
 import org.jppf.utils.ThreadSynchronization;
@@ -91,7 +90,6 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   private class ComboUpdate implements Runnable {
     @Override
     public void run() {
-      JPPFClientConnection connection = driver.getConnection();
       OptionElement serverList = clientHandler.getServerListOption();
       JComboBox box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
       if (box != null) {
@@ -99,13 +97,13 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
         boolean found = false;
         for (int i=0; i<count; i++) {
           Object o = box.getItemAt(i);
-          if (connection.equals(o)) {
+          if (driver.equals(o)) {
             found = true;
             break;
           }
         }
         if (!found) {
-          box.addItem(connection);
+          box.addItem(driver);
           int maxLen = 0;
           Object proto = null;
           for (int i=0; i<box.getItemCount(); i++) {
@@ -119,9 +117,9 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
           if (proto != null) box.setPrototypeDisplayValue(proto);
         }
       }
-      if (clientHandler.currentConnection == null) {
-        clientHandler.setCurrentConnection(connection);
-        if (box != null) box.setSelectedItem(connection);
+      if (clientHandler.currentDriver == null) {
+        clientHandler.setCurrentDriver(driver);
+        if (box != null) box.setSelectedItem(driver);
       }
     }
   };

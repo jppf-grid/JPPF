@@ -16,24 +16,25 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.diagnostics;
+package org.jppf.client.monitoring.topology;
 
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
  * Instances of this class hold information about the associations between JPPF drivers and
  * their attached nodes, for management and monitoring purposes.
  * @author Laurent Cohen
+ * @since 5.0
+ * @exclude
  */
-public class RefreshHandler {
+abstract class AbstractRefreshHandler {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(RefreshHandler.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractRefreshHandler.class);
   /**
    * Determines whether debug log statements are enabled.
    */
@@ -45,11 +46,7 @@ public class RefreshHandler {
   /**
    * Interval, in milliseconds, between refreshes from the server.
    */
-  private long refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.health", 3000L);
-  /**
-   * The panel to refresh.
-   */
-  private JVMHealthPanel panel = null;
+  private final long refreshInterval;
   /**
    * Count of refresh invocations.
    */
@@ -58,13 +55,25 @@ public class RefreshHandler {
    * Determines whether we are currently refreshing.
    */
   private AtomicBoolean refreshing = new AtomicBoolean(false);
+  /**
+   * The topology manager to which topology change notifications are to be sent. 
+   */
+  final TopologyManager manager;
+  /**
+   * Name given to this refresher and its timer thread.
+   */
+  private final String name;
 
   /**
    * Initialize this node handler.
-   * @param nodeDataPanel - the panel to refresh.
+   * @param manager the topology manager.
+   * @param refreshInterval interval in milliseconds between refreshes.
+   * @param name the name given to this refresher and its timer thread.
    */
-  public RefreshHandler(final JVMHealthPanel nodeDataPanel) {
-    this.panel = nodeDataPanel;
+  public AbstractRefreshHandler(final TopologyManager manager, final String name, final long refreshInterval) {
+    this.manager = manager;
+    this.refreshInterval = refreshInterval;
+    this.name = name;
     initialize();
   }
 
@@ -79,14 +88,20 @@ public class RefreshHandler {
    * Refresh the tree structure asynchronously (not in the AWT event thread).
    */
   public void refresh() {
-    if (refreshing.get()) return;
-    refreshing.set(true);
-    try {
-      panel.refreshSnapshots();
-    } finally {
-      refreshing.set(false);
+    if (refreshing.compareAndSet(false, true)) {
+      try {
+        performRefresh();
+      } finally {
+        refreshing.set(false);
+      }
     }
   }
+
+  /**
+   * Refresh the refresh.
+   * @exclude
+   */
+  protected abstract void performRefresh();
 
   /**
    * Stop the automatic refresh of the nodes state through a timer.
@@ -104,7 +119,7 @@ public class RefreshHandler {
   public void startRefreshTimer() {
     if (refreshTimer != null) return;
     if (refreshInterval <= 0L) return;
-    refreshTimer = new Timer("JVM Health Update Timer");
+    refreshTimer = new Timer(name == null ? "RefreshHandler Timer" : name);
     TimerTask task = new TimerTask() {
       @Override
       public void run() {

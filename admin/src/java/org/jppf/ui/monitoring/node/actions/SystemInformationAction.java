@@ -76,7 +76,8 @@ public class SystemInformationAction extends AbstractTopologyAction {
     try {
       JPPFSystemInformation info = retrieveInfo(dataArray[0]);
       boolean isNode = dataArray[0].isNode();
-      String title = "information for " + (isNode ? "node " : "driver ") + dataArray[0];
+      String name = info == null ? "unknown" : (dataArray[0].isDriver() ? dataArray[0].getManagementInfo().toDisplayString() : dataArray[0].toString());
+      String title = "information for " + (isNode ? "node " : "driver ") + name;
       html = formatProperties(info, new HTMLPropertiesTableFormat(title));
       toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
     } catch(Exception e) {
@@ -133,7 +134,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
         if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
       } else {
         if (data.isPeer()) {
-          String uuid = ((TopologyPeer) data).getPeerUuid();
+          String uuid = ((TopologyPeer) data).getUuid();
           if (uuid != null) {
             TopologyDriver driver = StatsHandler.getInstance().getTopologyManager().getDriver(uuid);
             if (driver != null) info = driver.getJmx().systemInformation();

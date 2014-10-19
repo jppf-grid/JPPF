@@ -1,5 +1,5 @@
 @echo off
-set JAVA_ARGS=-cp config;lib/* -Xmx256m -Dlog4j.configuration=log4j-gui.properties -Djppf.config=jppf-gui.properties -Djava.util.logging.config.file=config/logging-gui.properties org.jppf.ui.monitoring.UILauncher org/jppf/ui/options/xml/JPPFAdminTool.xml file
+set JAVA_ARGS=-cp config;lib/* -Xmx256m -Dlog4j.configuration=log4j-gui.properties -Djppf.config=jppf-gui.properties -Djava.util.logging.config.file=config/logging-gui.properties org.jppf.ui.console.JPPFAdminConsole
 
 rem *** start the JPPF admin UI with the DOS console,
 rem call java %JAVA_ARGS%

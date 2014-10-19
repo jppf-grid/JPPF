@@ -25,7 +25,7 @@ import org.jppf.client.JPPFClientConnection;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.actions.*;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
 import org.slf4j.*;
@@ -47,6 +47,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * Manages the topology updates.
    */
   private final TopologyManager manager;
+  /**
+   * Whether auto-refresh is on or off.
+   */
+  private boolean autoRefresh = true;
 
   /**
    * Initialize this panel with the specified information.
@@ -71,10 +75,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   /**
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
-  private void populateTreeTableModel() {
+  private synchronized  void populateTreeTableModel() {
     for (TopologyDriver driver: manager.getDrivers()) {
       addDriver(driver);
-      for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) addNode(driver, (TopologyNode) child);
+      for (AbstractTopologyComponent child: driver.getChildren()) addNode(driver, (TopologyNode) child);
     }
   }
 
@@ -89,8 +93,12 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   /**
    * Remove all drivers and nodes from the tree table.
    */
-  private void clearTreeTableModel() {
-    for (TopologyDriver driver: manager.getDrivers()) removeDriver(driver);
+  public synchronized void refreshTreeTableModel() {
+    for (TopologyDriver driver: manager.getDrivers()) {
+      for (AbstractTopologyComponent child: driver.getChildren()) removeNode(driver, (TopologyNode) child);
+      removeDriver(driver);
+    }
+    populateTreeTableModel();
   }
 
   /**
@@ -145,7 +153,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * Add the specified driver to the treeTable.
    * @param driver the driver to add.
    */
-  private void addDriver(final TopologyDriver driver) {
+  private synchronized void addDriver(final TopologyDriver driver) {
     try {
       if (!driver.getConnection().getStatus().isWorkingStatus()) return;
       String uuid = driver.getUuid();
@@ -153,8 +161,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
       JMXDriverConnectionWrapper jmx = driver.getJmx();
       int index = driverInsertIndex(uuid);
       if (index < 0) return;
-      ConnectionDataHolder cdh = StatsHandler.getInstance().getConnectionDataHolder(driver.getConnection());
-      if (cdh != null) cdh.setDriverData(driver);
       DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);
       if (debugEnabled) log.debug("adding driver: " + driver + " at index " + index);
       model.insertNodeInto(driverNode, treeTableRoot, index);
@@ -171,7 +177,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * Remove the specified driver from the treeTable.
    * @param driverData the driver to add.
    */
-  private void removeDriver(final TopologyDriver driverData) {
+  private synchronized void removeDriver(final TopologyDriver driverData) {
     if (debugEnabled) log.debug("removing driver: " + driverData);
     String uuid = driverData.getUuid();
     DefaultMutableTreeNode driverNode = findDriver(uuid);
@@ -184,7 +190,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * @param driverData the driver to add to.
    * @param nodeData the node to add.
    */
-  private void addNode(final TopologyDriver driverData, final TopologyNode nodeData) {
+  private synchronized void addNode(final TopologyDriver driverData, final TopologyNode nodeData) {
     if ((driverData == null) || (nodeData == null)) return;
     DefaultMutableTreeNode driverNode = findDriver(driverData.getUuid());
     if (driverNode == null) return;
@@ -196,19 +202,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     if (debugEnabled) log.debug("adding node: " + nodeUuid + " at index " + index);
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
     model.insertNodeInto(nodeNode, driverNode, index);
-
-    for (int i=0; i<treeTableRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode driverNode2 = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      if (driverNode2 == driverNode) continue;
-      DefaultMutableTreeNode nodeNode2 = findNode(driverNode2, nodeUuid);
-      if (nodeNode2 != null) {
-        TopologyNode tmp = (TopologyNode) nodeNode2.getUserObject();
-        if (tmp.getManagementInfo().isNode()) {
-          tmp.setParent(null);
-          model.removeNodeFromParent(nodeNode2);
-        }
-      }
-    }
     if ((driverNode.getChildCount() == 1) && !driverData.isCollapsed()) treeTable.expand(driverNode);
   }
 
@@ -217,7 +210,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    * @param driverData the driver to add to.
    * @param nodeData the node to add.
    */
-  private void removeNode(final TopologyDriver driverData, final TopologyNode nodeData) {
+  private synchronized void removeNode(final TopologyDriver driverData, final TopologyNode nodeData) {
     if ((driverData == null) || (nodeData == null)) return;
     if (debugEnabled) log.debug("attempting to remove node=" + nodeData + " from driver=" + driverData);
     DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
@@ -232,44 +225,38 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    addDriver(event.getDriverData());
+    if (isAutoRefresh()) addDriver(event.getDriver());
   }
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    removeDriver(event.getDriverData());
+    if (isAutoRefresh()) removeDriver(event.getDriver());
+  }
+
+  @Override
+  public void driverUpdated(final TopologyEvent event) {
   }
 
   @Override
   public void nodeAdded(final TopologyEvent event) {
-    addNode(event.getDriverData(), nodeFromEvent(event));
+    if (isAutoRefresh()) addNode(event.getDriver(), event.getNodeOrPeer());
   }
 
   @Override
   public void nodeRemoved(final TopologyEvent event) {
-    removeNode(event.getDriverData(),  nodeFromEvent(event));
+    if (isAutoRefresh()) removeNode(event.getDriver(),  event.getNodeOrPeer());
   }
 
   @Override
-  public void nodeUpdated(final TopologyEvent event) {
-    TopologyDriver driverData = event.getDriverData();
+  public synchronized void nodeUpdated(final TopologyEvent event) {
+    if (!isAutoRefresh()) return;
+    TopologyDriver driverData = event.getDriver();
     final DefaultMutableTreeNode driverNode = findDriver(driverData.getUuid());
     if (driverNode == null) return;
-    TopologyNode nodeData = nodeFromEvent(event);
+    TopologyNode nodeData = event.getNodeOrPeer();
     if (nodeData == null) return;
     final DefaultMutableTreeNode node = findNode(driverNode, nodeData.getUuid());
     if (node != null) model.changeNode(node);
-  }
-
-  /**
-   * Get the topology node held by the sepcified event.
-   * @param event the event to analyze.
-   * @return a {@link TopologyNode} object.
-   */
-  private TopologyNode nodeFromEvent(final TopologyEvent event) {
-    TopologyNode nodeData = event.getNodeData();
-    if (nodeData == null) nodeData = event.getPeerData();
-    return nodeData;
   }
 
   /**
@@ -367,5 +354,21 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
         }
       }
     });
+  }
+
+  /**
+   * Determine whether auto-refresh is on or off.
+   * @return {@code true} if auto refresh is {@code on}, false otherwise.
+   */
+  public synchronized boolean isAutoRefresh() {
+    return autoRefresh;
+  }
+
+  /**
+   * Specify whether auto-refresh is on or off.
+   * @param autoRefresh {@code true} to turn auto-refresh on, {@code false} otherwise.
+   */
+  public synchronized void setAutoRefresh(final boolean autoRefresh) {
+    this.autoRefresh = autoRefresh;
   }
 }

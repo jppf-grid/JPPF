@@ -24,6 +24,7 @@ import javax.swing.*;
 
 import org.jppf.scripting.*;
 import org.jppf.ui.options.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
 import org.jppf.utils.*;
@@ -383,13 +384,14 @@ public class OptionElementFactory {
     String location = desc.getProperty("location");
     if (StringUtils.isOneOf(source, true, "url", "file")) {
       boolean enabled = true;
-      String pluggableView = desc.getProperty("pluggableView");
-      if ((pluggableView != null) && !"".equals(pluggableView.trim())) {
-        enabled = JPPFConfiguration.getProperties().getBoolean(String.format("jppf.admin.console.view.%s.enabled", pluggableView), true);
+      String pluggableViewName = desc.getProperty("pluggableView");
+      if ((pluggableViewName != null) && !"".equals(pluggableViewName.trim())) {
+        enabled = JPPFConfiguration.getProperties().getBoolean(String.format("jppf.admin.console.view.%s.enabled", pluggableViewName), true);
       }
       if (enabled) {
         OptionElement elt = "url".equalsIgnoreCase(source) ? builder.buildPageFromURL(location, builder.getBaseName()) : builder.buildPage(location, null);
         list.add(elt);
+        OptionsHandler.getPluggableViewHandler().addView(pluggableViewName, elt);
         if (JPPFConfiguration.getProperties().getBoolean("jppf.ui.debug.enabled", false)) addDebugComp(elt, source, location);
       }
     } else if ("plugin".equalsIgnoreCase(source)) {

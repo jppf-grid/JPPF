@@ -125,10 +125,10 @@ public class AreaChartHandler implements ChartHandler {
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
       }
     }
-    //if (ds.getRowCount() > statsHandler.getRolloverPosition())
-    if ((Integer) invokeMethod(ds.getClass(), ds, "getRowCount") > statsHandler.getRolloverPosition()) {
+    //if (ds.getColumnCount() > statsHandler.getRolloverPosition())
+    if ((Integer) invokeMethod(ds.getClass(), ds, "getColumnCount") > statsHandler.getRolloverPosition()) {
       //ds.removeRow(0);
-      invokeMethod(ds.getClass(), ds, "removeRow", 0);
+      invokeMethod(ds.getClass(), ds, "removeColumn", new Class[] {int.class}, 0);
     }
     return config;
   }

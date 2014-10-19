@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the topology graph view of the admin console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="graph.NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<!-- test comment for save -->
 	<!--<property name="label" value="Graph View"/>-->

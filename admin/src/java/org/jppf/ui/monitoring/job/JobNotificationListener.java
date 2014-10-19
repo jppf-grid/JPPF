@@ -19,14 +19,14 @@ package org.jppf.ui.monitoring.job;
 
 import javax.management.*;
 
-import org.jppf.job.JobNotification;
+import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.job.*;
 import org.slf4j.*;
 
 /**
  * Implementation of a notification listener for processing of job events.
  */
-public class JobNotificationListener implements NotificationListener
-{
+public class JobNotificationListener implements NotificationListener {
   /**
    * Logger for this class.
    */
@@ -36,9 +36,9 @@ public class JobNotificationListener implements NotificationListener
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * String identifying the driver that sends the notifications.
+   * The driver that sends the notifications.
    */
-  private final String driverName;
+  private final TopologyDriver driver;
   /**
    * The panel to which the notifications are delegated.
    */
@@ -46,27 +46,25 @@ public class JobNotificationListener implements NotificationListener
 
   /**
    * Initialize this listener with the specified driver name.
-   * @param driverName - a string identifying the driver that sends the notifications.
-   * @param jobDataPanel - the panel to which the notifications are delegated.
+   * @param driver the driver that sends the notifications.
+   * @param jobDataPanel the panel to which the notifications are delegated.
    */
-  public JobNotificationListener(final JobDataPanel jobDataPanel, final String driverName)
-  {
-    this.driverName = driverName;
+  public JobNotificationListener(final JobDataPanel jobDataPanel, final TopologyDriver driver) {
+    this.driver = driver;
     this.jobDataPanel = jobDataPanel;
   }
 
   /**
    * Handle notifications of job events.
-   * @param notification - encapsulates the job event ot handle.
-   * @param handback - not used.
-   * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+   * @param notification encapsulates the job event ot handle.
+   * @param handback not used.
    */
   @Override
-  public void handleNotification(final Notification notification, final Object handback)
-  {
+  public void handleNotification(final Notification notification, final Object handback) {
     if (!(notification instanceof JobNotification)) return;
     JobNotification notif = (JobNotification) notification;
-    if (traceEnabled) log.trace("driver " + driverName + " received notification: " + notif);
-    jobDataPanel.handleNotification(driverName, notif);
+    if (log.isDebugEnabled() && (notif.getEventType() == JobEventType.JOB_ENDED)) log.debug("job removed notif: {}", notif);
+    if (traceEnabled) log.trace("driver " + driver + " received notification: " + notif);
+    jobDataPanel.handleNotification(driver, notif);
   }
 }

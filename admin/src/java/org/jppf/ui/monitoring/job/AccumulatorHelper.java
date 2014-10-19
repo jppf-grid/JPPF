@@ -23,7 +23,7 @@ import java.util.*;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.utils.JPPFConfiguration;
@@ -91,11 +91,11 @@ public class AccumulatorHelper {
       JobAccumulator.Type driverType = driverAccumulator.getType();
       switch (driverType) {
         case ADD:
-          panelManager.driverAdded(driverAccumulator.getValue());
+          panelManager.addDriver(driverAccumulator.getValue());
           changed = true;
           break;
         case REMOVE:
-          panelManager.driverRemoved(uuid);
+          panelManager.removeDriver(uuid);
           changed = true;
           continue;
         case UPDATE:
@@ -115,12 +115,12 @@ public class AccumulatorHelper {
 
   /**
    * Process the changes that occurred to the jobs executing on the specified driver.
-   * @param driverName the name of the driver where jobs are executing.
+   * @param driverUuid the name of the driver where jobs are executing.
    * @param driverAccumulator the accumulater for the driver's jobs.
    * @return changed <code>true</code> if any change occurred, <code>false</code> otherwise.
    */
-  private boolean publishDriverJobs(final String driverName, final AccumulatorDriver driverAccumulator) {
-    DefaultMutableTreeNode driverNode = panelManager.findDriver(driverName);
+  private boolean publishDriverJobs(final String driverUuid, final AccumulatorDriver driverAccumulator) {
+    DefaultMutableTreeNode driverNode = panelManager.findDriver(driverUuid);
     if (driverNode == null) return false;
     boolean changed = false;
     for (Map.Entry<String, AccumulatorJob> jobEntry : driverAccumulator.getMap().entrySet()) {
@@ -129,20 +129,21 @@ public class AccumulatorHelper {
       JobAccumulator.Type jobType = jobAccumulator.getType();
       switch (jobType) {
         case ADD:
-          panelManager.jobAdded(driverName, jobAccumulator.getValue());
+          panelManager.addJob(driverUuid, jobAccumulator.getValue());
           changed = true;
           break;
         case REMOVE:
-          panelManager.jobRemoved(driverName, jobName);
+          if (debugEnabled) log.debug("removing job {} from driver {}", jobName, driverUuid);
+          panelManager.removeJob(driverUuid, jobName);
           changed = true;
           continue;
         case UPDATE:
           DefaultMutableTreeNode jobNode = panelManager.findJob(driverNode, jobName);
-          if (jobNode != null) panelManager.jobUpdated(driverName, jobAccumulator.getValue());
+          if (jobNode != null) panelManager.updateJob(driverUuid, jobAccumulator.getValue());
           changed = true;
           break;
       }
-      changed |= publishJobNodes(driverName, jobName, jobAccumulator);
+      changed |= publishJobNodes(driverUuid, jobName, jobAccumulator);
     }
     return changed;
   }
@@ -162,11 +163,11 @@ public class AccumulatorHelper {
       JobAccumulator.Type nodeType = nodeAccumulator.getType();
       switch (nodeType) {
         case ADD:
-          panelManager.subJobAdded(driverName, nodeAccumulator.getJobInfo(), nodeAccumulator.getValue());
+          panelManager.addJobDispatch(driverName, nodeAccumulator.getJobInfo(), nodeAccumulator.getValue());
           changed = true;
           break;
         case REMOVE:
-          panelManager.subJobRemoved(driverName, jobName, nodeName);
+          panelManager.removeJobDispatch(driverName, jobName, nodeName);
           changed = true;
           continue;
       }
@@ -207,33 +208,33 @@ public class AccumulatorHelper {
 
   /**
    * Get the update accumulator for the specified driver.
-   * @param driverName the name of the driver.
+   * @param driverUuid the uuid of the driver.
    * @return an {@link AccumulatorDriver} instance.
    */
-  synchronized AccumulatorDriver getAccumulatedDriver(final String driverName) {
-    AccumulatorDriver driver = accumulatorMap.get(driverName);
+  synchronized AccumulatorDriver getAccumulatedDriver(final String driverUuid) {
+    AccumulatorDriver driver = accumulatorMap.get(driverUuid);
     if(driver == null) {
       driver = new AccumulatorDriver(JobAccumulator.Type.KEEP, null);
-      accumulatorMap.put(driverName, driver);
+      accumulatorMap.put(driverUuid, driver);
     }
     return driver;
   }
 
   /**
    * Get the update accumulator for the specified job.
-   * @param driverName the name of the driver to which the job is submitted.
+   * @param driverUuid the name of the driver to which the job is submitted.
    * @param jobInfo the job description
    * @return an {@link AccumulatorJob} instance.
    */
-  synchronized AccumulatorJob getAccumulatorJob(final String driverName, final JobInformation jobInfo) {
-    AccumulatorDriver driver = getAccumulatedDriver(driverName);
+  synchronized AccumulatorJob getAccumulatorJob(final String driverUuid, final JobInformation jobInfo) {
+    AccumulatorDriver driver = getAccumulatedDriver(driverUuid);
 
     Map<String, AccumulatorJob> jobMap = driver.getMap();
-    String jobName = jobInfo.getJobName();
-    AccumulatorJob job = jobMap.get(jobName);
+    String jobUuid = jobInfo.getJobUuid();
+    AccumulatorJob job = jobMap.get(jobUuid);
     if(job == null) {
       job = new AccumulatorJob(JobAccumulator.Type.KEEP, jobInfo);
-      jobMap.put(jobName, job);
+      jobMap.put(jobUuid, job);
     }
     return job;
   }
@@ -241,13 +242,13 @@ public class AccumulatorHelper {
   /**
    * Definition of an update accumulator for a driver.
    */
-  static class AccumulatorDriver extends JobAccumulatorBranch<JPPFClientConnection, String, AccumulatorJob> {
+  static class AccumulatorDriver extends JobAccumulatorBranch<TopologyDriver, String, AccumulatorJob> {
     /**
      * Initialize this driver accumulator for the specified type of updates and value.
      * @param type the type of updates.
-     * @param value a {@link JPPFClientConnection} instance.
+     * @param value a {@link TopologyDriver} instance.
      */
-    public AccumulatorDriver(final Type type, final JPPFClientConnection value) {
+    public AccumulatorDriver(final Type type, final TopologyDriver value) {
       super(type, value);
     }
   }

@@ -17,8 +17,10 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the JVM health monitoring view of the admin console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="health.page" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
-	<!-- test comment for save -->
 	<!--<property name="label" value="Graph View"/>-->
   <property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
   <property name="icon" value="/org/jppf/ui/resources/utilities-system-monitor-3.png"/>
@@ -65,7 +67,6 @@
         <script language="groovy">option.findFirstWithName("/health.treetable").getTreeTable().collapseAll()</script>
       </listener>
     </child>
-
 
 		<child name="sep4" type="ToolbarSeparator"/>
 		<child name="health.select.drivers" type="Button"/>

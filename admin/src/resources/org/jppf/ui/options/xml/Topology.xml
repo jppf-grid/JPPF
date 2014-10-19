@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the tabbed pane containing the topology views of the admin console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataTabsPage" type="TabbedPane" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<property name="componentConstraints" value="push, grow"/>
 	<property name="layoutConstraints" value="fill"/>
@@ -26,7 +29,7 @@
   <import source="plugin" location="jppf-plugins/jppf-ui-topology-plugin"/>
   <import source="file" location="org/jppf/ui/options/xml/NodeDataPage2.xml" pluggableView="TopologyTree"/>
   -->
-  <import source="file" location="org/jppf/ui/options/xml/NodeDataPage2.xml" pluggableView="TopologyTree"/>
-  <import source="file" location="org/jppf/ui/options/xml/NodeDataGraphPage.xml" pluggableView="TopologyGraph"/>
-  <import source="file" location="org/jppf/ui/options/xml/JVMHealthPage.xml" pluggableView="TopologyHealth"/>
+  <import source="file" location="org/jppf/ui/options/xml/TopologyTree.xml" pluggableView="TopologyTree"/>
+  <import source="file" location="org/jppf/ui/options/xml/TopologyGraph.xml" pluggableView="TopologyGraph"/>
+  <import source="file" location="org/jppf/ui/options/xml/TopologyHealth.xml" pluggableView="TopologyHealth"/>
 </opt:main>

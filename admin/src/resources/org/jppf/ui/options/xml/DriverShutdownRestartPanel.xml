@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the sevrer shtudown or restart dialog.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="DriverShutdownRestartPanel" type="page">
 	<property name="label" value="Shutdown or restart one or more drivers"/>
 	<property name="layoutConstraints" value="flowy"/>

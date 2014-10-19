@@ -18,7 +18,6 @@
 package org.jppf.ui.monitoring.diagnostics;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.*;
 
 import org.jppf.client.monitoring.topology.*;
@@ -77,9 +76,6 @@ public class HeapDumpAction extends AbstractTopologyAction {
             DiagnosticsMBean diagnostics = driver.getDiagnostics();
             if (diagnostics == null) continue;
             diagnostics.heapDump();
-          } catch (IOException e) {
-            driver.initializeProxies();
-            log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
@@ -87,23 +83,14 @@ public class HeapDumpAction extends AbstractTopologyAction {
       }
       // do the gc() in the nodes grouped by server attachment
       CollectionMap<TopologyDriver, String> map = getDriverMap();
-      for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet())
-      {
-        try
-        {
+      for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        try {
           JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
           NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
           forwarder.gc(selector);
           forwarder.forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "heapDump");
-        }
-        catch(IOException e)
-        {
-          entry.getKey().initializeProxies();
-          log.error(e.getMessage(), e);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           log.error(e.getMessage(), e);
         }
       }

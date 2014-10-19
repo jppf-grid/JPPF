@@ -21,11 +21,10 @@ import java.awt.Frame;
 import java.util.*;
 import java.util.prefs.*;
 
-import javax.swing.JFrame;
-
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
+import org.jppf.ui.plugin.PluggableViewHandler;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -62,6 +61,10 @@ public final class OptionsHandler {
    * The main window of the application.
    */
   private static Frame mainWindow = null;
+  /**
+   * Handles user-defined pluggable views.
+   */
+  private static final PluggableViewHandler pluggableViewHandler = new PluggableViewHandler();
 
   /**
    * Get the list of option pages managed by this handler.
@@ -116,9 +119,10 @@ public final class OptionsHandler {
    */
   public static synchronized OptionElement loadPageFromXml(final String xmlPath) {
     try {
+      if (log.isDebugEnabled()) log.debug("loading page '{}'", xmlPath);
       return builder.buildPage(xmlPath, null);
     } catch(Exception e) {
-      log.error(e.getMessage(), e);
+      log.error("error loading page '{}'", xmlPath, e);
     }
     return null;
   }
@@ -140,9 +144,10 @@ public final class OptionsHandler {
    */
   public static synchronized OptionElement loadPageFromURL(final String xmlPath, final String baseName) {
     try {
+      if (log.isDebugEnabled()) log.debug("loading page '{}', baseName={}", xmlPath, baseName);
       return builder.buildPageFromURL(xmlPath, baseName);
     } catch(Exception e) {
-      log.error(e.getMessage(), e);
+      log.error("error loading page '{}'", xmlPath, e);
     }
     return null;
   }
@@ -340,7 +345,7 @@ public final class OptionsHandler {
 
   /**
    * Get the main window of the application.
-   * @return a {@link JFrame} instance.
+   * @return a {@link Frame} instance.
    */
   public static Frame getMainWindow() {
     return mainWindow;
@@ -348,18 +353,10 @@ public final class OptionsHandler {
 
   /**
    * Set the main window of the application.
-   * @param mainWindow a {@link JFrame} instance.
+   * @param mainWindow a {@link Frame} instance.
    */
   public static void setMainWindow(final Frame mainWindow) {
     OptionsHandler.mainWindow = mainWindow;
-  }
-
-  /**
-   * Create the main application frame.
-   * @return a {@link JFrame} instance.
-   */
-  private static JFrame createMainWindow() {
-    return null;
   }
 
   /**
@@ -375,5 +372,13 @@ public final class OptionsHandler {
     }
     if (result == null) result = DockingManager.getInstance().findFirstElementWithName(name);
     return result;
+  }
+
+  /**
+   * Get the object which handles user-defined pluggable views.
+   * @return a {@link PluggableViewHandler} instance.
+   */
+  public static PluggableViewHandler getPluggableViewHandler() {
+    return pluggableViewHandler;
   }
 }

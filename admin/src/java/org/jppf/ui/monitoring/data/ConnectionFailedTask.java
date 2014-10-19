@@ -20,7 +20,8 @@ package org.jppf.ui.monitoring.data;
 
 import javax.swing.JComboBox;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.ComboBoxOption;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
@@ -40,7 +41,8 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   /**
    * The new connection that was created.
    */
-  private JPPFClientConnection c = null;
+  private final TopologyDriver driver;
+  //private JPPFClientConnection c = null;
   /**
    * The {@link StatsHandler}.
    */
@@ -49,11 +51,11 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   /**
    * Initialized this task with the specified client connection.
    * @param statsHandler the {@link StatsHandler}.
-   * @param c the new connection that was created.
+   * @param driver the new connection that was created.
    */
-  public ConnectionFailedTask(final StatsHandler statsHandler, final JPPFClientConnection c) {
+  public ConnectionFailedTask(final StatsHandler statsHandler, final TopologyDriver driver) {
     this.statsHandler = statsHandler;
-    this.c = c;
+    this.driver = driver;
   }
 
   /**
@@ -62,10 +64,11 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   @Override
   public void run() {
     synchronized(statsHandler) {
-      if (statsHandler.dataHolderMap.get(c.getName()) != null)  statsHandler.dataHolderMap.remove(c.getName());
+      if (statsHandler.dataHolderMap.get(driver.getUuid()) != null)  statsHandler.dataHolderMap.remove(driver.getUuid());
     }
     JComboBox box = null;
     while (statsHandler.getClientHandler().getServerListOption() == null) goToSleep(50L);
+    JPPFClientConnection c = driver.getConnection();
     synchronized(statsHandler) {
       if (debugEnabled) log.debug("removing client connection " + c.getName() + " from driver combo box");
       box = ((ComboBoxOption) statsHandler.getClientHandler().getServerListOption()).getComboBox();
@@ -80,11 +83,11 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
         }
       }
       if ((idx >= 0) && (box.getItemCount() > 0)) {
-        if ((statsHandler.getClientHandler().currentConnection == null) || c.equals(statsHandler.getClientHandler().currentConnection)) {
+        if ((statsHandler.getClientHandler().currentDriver == null) || c.equals(statsHandler.getClientHandler().currentDriver)) {
           int n = Math.min(idx, box.getItemCount()-1);
-          JPPFClientConnection conn = (JPPFClientConnection) box.getItemAt(n);
-          statsHandler.getClientHandler().currentConnection = conn;
-          box.setSelectedItem(conn);
+          TopologyDriver item = (TopologyDriver) box.getItemAt(n);
+          statsHandler.getClientHandler().currentDriver = item;
+          box.setSelectedItem(item);
         }
       }
     }

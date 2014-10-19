@@ -16,23 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.node;
-
 /**
- * 
- * @author Laurent Cohen
+ * Support classes for launching the JPPF administration console as a standalone GUI application
+ * or to embed it within ane external Swing-based GUI. 
+ * @since 5.0
  */
-public enum TopologyDataType {
-  /**
-   * Object is a JPPF driver.
-   */
-  DRIVER,
-  /**
-   * Object is a JPPF peer driver connected as a node.
-   */
-  PEER,
-  /**
-   * Object is a JPPF node.
-   */
-  NODE
-}
+package org.jppf.ui.console;

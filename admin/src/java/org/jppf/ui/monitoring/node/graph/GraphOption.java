@@ -128,7 +128,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer.setVertexToolTipTransformer(new ToStringLabeller<AbstractTopologyComponent>() {
         @Override
         public String transform(final AbstractTopologyComponent v) {
-          return v.isNode() ? computeNodeTooltip((TopologyNode) v) : super.transform(v);
+          return v.isNode() ? computeNodeTooltip((TopologyNode) v) : computeDriverTooltip((TopologyDriver) v);
         }
       });
       graphComponent = new GraphZoomScrollPane(viewer);
@@ -249,7 +249,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
   }
 
   /**
-   * Compute ther tooltipe for a node vertex.
+   * Compute the tooltip for a node vertex.
    * @param node contains the information to put in the tooltip.
    * @return the text to set as tooltip.
    */
@@ -259,6 +259,18 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
     if (node.getManagementInfo().isMasterNode()) sb.append(" | Slaves: ").append(node.getNbSlaveNodes());
+    sb.append("</html>");
+    return sb.toString();
+  }
+
+  /**
+   * Compute the tooltip for a driver vertex.
+   * @param driver contains the information to put in the tooltip.
+   * @return the text to set as tooltip.
+   */
+  private String computeDriverTooltip(final TopologyDriver driver) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("<html>uuid: ").append(driver.getUuid());
     sb.append("</html>");
     return sb.toString();
   }

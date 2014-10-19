@@ -157,9 +157,6 @@ public class ProvisioningAction extends AbstractTopologyAction {
           try {
             Map<String, Object> result = parent.getForwarder().forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
             printForwardingRequestErrors(result);
-          } catch(IOException e) {
-            parent.initializeProxies();
-            log.error(e.getMessage(), e);
           } catch(Exception e) {
             log.error(e.getMessage(), e);
           }

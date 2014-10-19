@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  Root XML descriptor for the JPPF administration console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
 	<property name="label" value="JPPF Monitoring and Administration Tool"/>
 	<property name="layoutConstraints" value="flowy, fill, insets 0 0 0 0"/>
@@ -24,33 +27,21 @@
 	<initializer type="script">
 		<script language="groovy">
       StatsHandler.getInstance()
-      option.findFirstWithName("/AdminPanels").getUIComponent().setSelectedIndex(0)
+      def adminPanels = OptionsHandler.findOptionWithName(option,"/AdminPanels")
+      if (adminPanels != null) adminPanels.getUIComponent().setSelectedIndex(0)
     </script>
 	</initializer>
 	<finalizer type="script">
 		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));</script>
 	</finalizer>
 
-	<!-- ===================================================================== -->
-	<!--                    Server Chooser Panel                               -->
-	<!-- ===================================================================== -->
+  <!-- Server Chooser Panel -->
+  <import source="file" location="org/jppf/ui/options/xml/ServerChooser.xml" pluggableView="ServerChooser"/>
 
-  <import source="file" location="org/jppf/ui/options/xml/ServerChooserPanel.xml" pluggableView="ServerChooser"/>
+  <!-- Main tabbed pane -->
+  <import source="file" location="org/jppf/ui/options/xml/MainTabbedPane.xml" pluggableView="Main"/>
 
-	<child name="AdminPanels" type="TabbedPane">
-		<property name="componentConstraints" value="push, grow, width 99%"/>
-		<property name="layoutConstraints" value="fill"/>
-    <property name="bordered" value="false"/>
-		<property name="tooltip" value="Perform the remote administration of the server"/>
-		<!--<import source="plugin" location="jppf-plugins/jppf-ui-plugin"/>-->
-
-    <import source="file" location="org/jppf/ui/options/xml/TabbedNodeDataPage.xml" pluggableView="Topology"/>
-    <import source="file" location="org/jppf/ui/options/xml/JobDataPage.xml" pluggableView="JobData"/>
-    <import source="file" location="org/jppf/ui/options/xml/StatsPage.xml" pluggableView="ServerStats"/>
-    <import source="file" location="org/jppf/ui/options/xml/TabbedChartsPage.xml" pluggableView="Charts"/>
-    <import source="file" location="org/jppf/ui/options/xml/BundleSizeTuningPage.xml" pluggableView="LoadBalancing"/>
-	</child>
-
-  <import source="file" location="org/jppf/ui/options/xml/StatusBarPage.xml" pluggableView="StatusBar"/>
+  <!-- Status bar -->
+  <import source="file" location="org/jppf/ui/options/xml/StatusBar.xml" pluggableView="StatusBar"/>
 
 </opt:main>

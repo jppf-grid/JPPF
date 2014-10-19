@@ -31,8 +31,7 @@ import org.jppf.ui.monitoring.data.*;
  * Instances of this class are used to create and update 3D bar charts with an horizontal orientation.
  * @author Laurent Cohen
  */
-public class Bar3DChartHandler implements ChartHandler
-{
+public class Bar3DChartHandler implements ChartHandler {
   /**
    * The stats formatter that provides the data.
    */
@@ -42,8 +41,7 @@ public class Bar3DChartHandler implements ChartHandler
    * Initialize this chart handler with a specified stats formatter.
    * @param statsHandler the stats formatter that provides the data.
    */
-  public Bar3DChartHandler(final StatsHandler statsHandler)
-  {
+  public Bar3DChartHandler(final StatsHandler statsHandler) {
     this.statsHandler = statsHandler;
   }
 
@@ -114,8 +112,7 @@ public class Bar3DChartHandler implements ChartHandler
    * @param config the names of the fields whose values populate the dataset.
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
-  private Object createDataset(final ChartConfiguration config)
-  {
+  private Object createDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
     Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
@@ -130,8 +127,7 @@ public class Bar3DChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#populateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration populateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration populateDataset(final ChartConfiguration config) {
     //((DefaultCategoryDataset) config.dataset).clear();
     invokeMethod(config.dataset.getClass(), config.dataset, "clear");
     return updateDataset(config);
@@ -144,14 +140,11 @@ public class Bar3DChartHandler implements ChartHandler
    * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration updateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration updateDataset(final ChartConfiguration config) {
     Object ds = config.dataset;
     Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
-    if (valueMap != null)
-    {
-      for (Fields key: config.fields)
-      {
+    if (valueMap != null) {
+      for (Fields key: config.fields) {
         //ds.setValue(valueMap.get(key), "0", key);
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), "0", key);
       }

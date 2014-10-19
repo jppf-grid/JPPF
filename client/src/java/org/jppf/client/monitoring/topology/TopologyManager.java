@@ -49,6 +49,14 @@ public class TopologyManager implements ClientListener {
    */
   private final Map<String, TopologyDriver> driverMap = new Hashtable<>();
   /**
+   * Mapping of JMX ids to the corresponding {@link TopologyDriver} objects.
+   */
+  private final Map<String, TopologyDriver> driverJmxMap = new Hashtable<>();
+  /**
+   * Synchronizationlock.
+   */
+  private final Object driversLock = new Object();
+  /**
    * Mapping of peer driver uuids to the corresponding {@link TopologyPeer} objects.
    */
   private final Map<String, TopologyPeer> peerMap = new Hashtable<>();
@@ -56,6 +64,10 @@ public class TopologyManager implements ClientListener {
    * Mapping of node uuids to the corresponding {@link TopologyNode} objects.
    */
   private final Map<String, TopologyNode> nodeMap = new Hashtable<>();
+  /**
+   *
+   */
+  private final Map<JPPFClientConnection, ClientConnectionStatusListener> statusListenerMap = new Hashtable<>();
   /**
    * List of listeners to the changes in the topology.
    */
@@ -72,25 +84,60 @@ public class TopologyManager implements ClientListener {
    * Refreshes the states of the nodes at rehular intervals.
    */
   private final NodeRefreshHandler refreshHandler;
+  /**
+   * Refreshes the latests JVM health snapshots of the drivers and nodes at rehular intervals.
+   */
+  private final JVMHealthRefreshHandler jvmHealthRefreshHandler;
 
   /**
-   * Initialize this toplogy manager with a new {@link JPPFClient}.
+   * Initialize this topology manager with a new {@link JPPFClient}.
    */
   public TopologyManager() {
+    this((TopologyListener[]) null);
+  }
+
+  /**
+   * Initialize this topology manager with a new {@link JPPFClient} and the specified listeners.
+   * @param listeners a set of listeners to subscribe immediately for topology events.
+   */
+  public TopologyManager(final TopologyListener...listeners) {
     this.refreshHandler = new NodeRefreshHandler(this);
-    refreshHandler.startRefreshTimer();
+    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this);
+    if (listeners != null) for (TopologyListener listener: listeners) addTopologyListener(listener);
     this.client = new JPPFClient(this);
   }
 
   /**
-   * Initialize this toplogy manager with the specified {@link JPPFClient}.
+   * Initialize this topology manager with the specified {@link JPPFClient}.
    * @param client the JPPF client used to discover and monitor the grid topology.
    */
   public TopologyManager(final JPPFClient client) {
+    this(client, (TopologyListener[]) null);
+  }
+
+  /**
+   * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
+   * @param client the JPPF client used to discover and monitor the grid topology.
+   * @param listeners a set of listeners to subscribe immediately for topology events.
+   */
+  public TopologyManager(final JPPFClient client, final TopologyListener...listeners) {
     this.refreshHandler = new NodeRefreshHandler(this);
-    refreshHandler.startRefreshTimer();
+    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this);
     this.client = client;
-    this.client.addClientListener(this);
+    if (listeners != null) for (TopologyListener listener: listeners) addTopologyListener(listener);
+    init();
+  }
+
+  /**
+   * Intialize the topology tree.
+   */
+  private void init() {
+    client.addClientListener(this);
+    for (JPPFConnectionPool pool: client.getConnectionPools()) {
+      List<JPPFClientConnection> connections = pool.getConnections(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+      if (connections.isEmpty()) connections = pool.getConnections();
+      if (!connections.isEmpty()) newConnection(new ClientEvent(connections.get(0)));
+    }
   }
 
   /**
@@ -113,6 +160,44 @@ public class TopologyManager implements ClientListener {
   }
 
   /**
+   * Get the drivers currently handled.
+   * @return a list of {@link TopologyNode} instances.
+   */
+  public List<TopologyNode> getNodes() {
+    synchronized(nodeMap) {
+      return new ArrayList<>(nodeMap.values());
+    }
+  }
+
+  /**
+   * Get the driver with the specified uuid.
+   * @param uuid the uuid of the driver to lookup.
+   * @return a {@link TopologyNode} instance.
+   */
+  public TopologyNode getNode(final String uuid) {
+    return nodeMap.get(uuid);
+  }
+
+  /**
+   * Get the peers currently handled.
+   * @return a list of {@link TopologyPeer} instances.
+   */
+  public List<TopologyPeer> getPeers() {
+    synchronized(peerMap) {
+      return new ArrayList<>(peerMap.values());
+    }
+  }
+
+  /**
+   * Get the peer with the specified uuid.
+   * @param uuid the uuid of the driver to lookup.
+   * @return a {@link TopologyPeer} instance.
+   */
+  public TopologyPeer getPeer(final String uuid) {
+    return peerMap.get(uuid);
+  }
+
+  /**
    * Get the number of drivers currently handled.
    * @return the number of drivers.
    */
@@ -129,6 +214,14 @@ public class TopologyManager implements ClientListener {
   }
 
   /**
+   * Get the number of peers currently handled.
+   * @return the number of peers.
+   */
+  public int getPeerCount() {
+    return peerMap.size();
+  }
+
+  /**
    * Get the node with the psecified uuid.
    * @param uuid the uuid of the node to lookup.
    * @return a {@link TopologyNode} instance.
@@ -139,23 +232,27 @@ public class TopologyManager implements ClientListener {
     return node;
   }
 
+  /**
+   * {@inheritDoc}}
+   * @exclude
+   */
   @Override
   public void newConnection(final ClientEvent event) {
     final JPPFClientConnection c = event.getConnection();
-    if (!c.getStatus().isWorkingStatus()) {
-      c.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
-        @Override
-        public void statusChanged(final ClientConnectionStatusEvent event) {
-          if (c.getStatus().isWorkingStatus()) {
-            c.removeClientConnectionStatusListener(this);
-            driverAdded(new TopologyDriver(c));
-          }
-        }
-      });
+    StatusListener listener = new StatusListener();
+    if (c.getStatus().isWorkingStatus()) {
+      TopologyDriver driver = new TopologyDriver(c);
+      if (debugEnabled) log.debug("before adding driver {}", driver);
+      driverAdded(driver);
     }
-    else driverAdded(new TopologyDriver(c));
+    statusListenerMap.put(c, listener);
+    c.addClientConnectionStatusListener(listener);
   }
 
+  /**
+   * {@inheritDoc}}
+   * @exclude
+   */
   @Override
   public void connectionFailed(final ClientEvent event) {
     final JPPFClientConnection c = event.getConnection();
@@ -164,6 +261,8 @@ public class TopologyManager implements ClientListener {
       TopologyDriver driver = driverMap.remove(uuid);
       if (driver != null) driverRemoved(driver);
     }
+    StatusListener listener = (StatusListener) statusListenerMap.remove(c);
+    if (listener != null) c.removeClientConnectionStatusListener(listener);
   }
 
   /**
@@ -190,8 +289,23 @@ public class TopologyManager implements ClientListener {
    */
   void driverAdded(final TopologyDriver driver) {
     if (debugEnabled) log.debug("adding driver {}, uuid={}", driver, driver.getUuid());
-    driverMap.put(driver.getUuid(), driver);
-    TopologyEvent event = new TopologyEvent(this, driver, null, null);
+    TopologyDriver other = null;
+    synchronized(driversLock) {
+      other = driverMap.get(driver.getUuid());
+      if (debugEnabled && (other != null)) log.debug("driver already exists with same uuid: {}", other);
+      if (other == null) {
+        other = driverMap.get(driver.getManagementInfo().toDisplayString());
+        if (debugEnabled && (other != null)) log.debug("driver already exists with same jmx id: {}", other);
+      }
+    }
+    if (other != null) {
+      driverRemoved(other);
+    }
+    synchronized(driversLock) {
+      driverMap.put(driver.getUuid(), driver);
+      driverJmxMap.put(driver.getManagementInfo().toDisplayString(), driver);
+    }
+    TopologyEvent event = new TopologyEvent(this, driver, null);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_ADDED);
   }
 
@@ -201,11 +315,26 @@ public class TopologyManager implements ClientListener {
    */
   void driverRemoved(final TopologyDriver driver) {
     if (debugEnabled) log.debug("removing driver {}", driver);
-    for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) nodeRemoved(driver, (TopologyNode) child);
-    driverMap.remove(driver.getUuid());
-    TopologyEvent event = new TopologyEvent(this, driver, null, null);
-    for (TopologyListener listener: listeners) listener.driverRemoved(event);
+    //if (driverMap.get(driver.getUuid()) == null) return;
+    JPPFClientConnection c = driver.getConnection();
+    ClientConnectionStatusListener listener = statusListenerMap.remove(c);
+    if (listener != null) c.removeClientConnectionStatusListener(listener);
+    for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
+    synchronized(driversLock) {
+      driverMap.remove(driver.getUuid());
+      driverJmxMap.remove(driver.getManagementInfo().toDisplayString());
+    }
+    TopologyEvent event = new TopologyEvent(this, driver, null);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_REMOVED);
+  }
+
+  /**
+   * Notify all listeners that the state of a driver has changed.
+   * @param driver the driver to add.
+   */
+  void driverUpdated(final TopologyDriver driver) {
+    TopologyEvent event = new TopologyEvent(this, driver, null);
+    dispatchEvent(event, TopologyEvent.Type.DRIVER_UPDATED);
   }
 
   /**
@@ -215,10 +344,14 @@ public class TopologyManager implements ClientListener {
    */
   void nodeAdded(final TopologyDriver driver, final TopologyNode node) {
     if (debugEnabled) log.debug(String.format("adding %s %s to driver %s", node.isPeer() ? "peer" : "node", node, driver));
+    if (node.isNode()) {
+      TopologyNode other = getNodeOrPeer(node.getUuid());
+      if (other != null) nodeRemoved((TopologyDriver) other.getParent(), other);
+    }
     driver.add(node);
     if (node.isNode()) nodeMap.put(node.getUuid(), node);
     else peerMap.put(node.getUuid(), (TopologyPeer) node);
-    TopologyEvent event = node.isPeer() ? new TopologyEvent(this, driver, null, (TopologyPeer) node) : new TopologyEvent(this, driver, node, null);
+    TopologyEvent event = new TopologyEvent(this, driver, node);
     dispatchEvent(event, TopologyEvent.Type.NODE_ADDED);
   }
 
@@ -228,11 +361,12 @@ public class TopologyManager implements ClientListener {
    * @param node the node that was removed.
    */
   void nodeRemoved(final TopologyDriver driver, final TopologyNode node) {
-    if (debugEnabled) log.debug("removing node {} from driver {}", node, driver);
+    if (debugEnabled) log.debug(String.format("removing %s %s from driver %s", (node.isNode() ? "node" : "peer"), node, driver));
     driver.remove(node);
+    TopologyEvent event = null;
     if (node.isNode()) nodeMap.remove(node.getUuid());
     else peerMap.remove(node.getUuid());
-    TopologyEvent event = new TopologyEvent(this, driver, node, null);
+    event = new TopologyEvent(this, driver, node);
     dispatchEvent(event, TopologyEvent.Type.NODE_REMOVED);
   }
 
@@ -242,7 +376,7 @@ public class TopologyManager implements ClientListener {
    * @param node the node that was updated, or <code>null</code> if it is a driver that was updated.
    */
   void nodeUpdated(final TopologyDriver driverData, final TopologyNode node) {
-    TopologyEvent event = new TopologyEvent(this, driverData, node, null);
+    TopologyEvent event = new TopologyEvent(this, driverData, node);
     dispatchEvent(event, TopologyEvent.Type.NODE_UPDATED);
   }
 
@@ -254,10 +388,13 @@ public class TopologyManager implements ClientListener {
   private void dispatchEvent(final TopologyEvent event, final TopologyEvent.Type type) {
     Runnable dispatchTask = new Runnable() {
       @Override public void run() {
+        if (log.isTraceEnabled()) log.trace("dispatching event type={} : {}", type, event);
         switch (type) {
           case DRIVER_ADDED: for (TopologyListener listener: listeners) listener.driverAdded(event);
           break;
           case DRIVER_REMOVED: for (TopologyListener listener: listeners) listener.driverRemoved(event);
+          break;
+          case DRIVER_UPDATED: for (TopologyListener listener: listeners) listener.driverUpdated(event);
           break;
           case NODE_ADDED: for (TopologyListener listener: listeners) listener.nodeAdded(event);
           break;
@@ -277,5 +414,29 @@ public class TopologyManager implements ClientListener {
    */
   public JPPFClient getJPPFClient() {
     return client;
+  }
+
+  /**
+   * Listens for the status of a driver connection and updates the tree accordingly.
+   */
+  private class StatusListener implements ClientConnectionStatusListener {
+    @Override
+    public void statusChanged(final ClientConnectionStatusEvent event) {
+      JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
+      JPPFClientConnectionStatus newStatus = c.getStatus();
+      JPPFClientConnectionStatus oldStatus = event.getOldStatus();
+      if (newStatus.isWorkingStatus() && !oldStatus.isWorkingStatus()) {
+        TopologyDriver driver = new TopologyDriver(c);
+        if (debugEnabled) log.debug("before adding driver {}", driver);
+        driverAdded(driver);
+      } else if (!newStatus.isWorkingStatus() && oldStatus.isWorkingStatus()) {
+        String uuid = c.getDriverUuid();
+        TopologyDriver driver = getDriver(uuid);
+        if (driver != null) {
+          for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
+          //driverRemoved(driver);
+        }
+      }
+    }
   }
 }

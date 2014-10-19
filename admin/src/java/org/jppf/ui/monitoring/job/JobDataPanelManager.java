@@ -22,6 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
@@ -50,7 +51,7 @@ class JobDataPanelManager {
    */
   private final ConnectionStatusListener listener = new ConnectionStatusListener();
   /**
-   * 
+   *
    */
   private boolean firstDriverAdded = false;
 
@@ -64,27 +65,25 @@ class JobDataPanelManager {
 
   /**
    * Called to notify that a driver was added.
-   * @param connection a reference to the driver connection.
+   * @param driver a reference to the driver.
    */
-  public void driverAdded(final JPPFClientConnection connection) {
-    if (!connection.getStatus().isWorkingStatus()) return;
-    JMXDriverConnectionWrapper wrapper = connection.getConnectionPool().getJmxConnection();
-    String driverName = connection.getDriverUuid();
-    final int index = driverInsertIndex(driverName);
+  public void addDriver(final TopologyDriver driver) {
+    JMXDriverConnectionWrapper wrapper = driver.getJmx();
+    final int index = driverInsertIndex(driver.getUuid());
     if (index < 0) return;
-    JobData data = new JobData(connection);
+    JobData data = new JobData(driver);
     try {
-      connection.addClientConnectionStatusListener(listener);
-      data.changeNotificationListener(new JobNotificationListener(panel, driverName));
+      driver.getConnection().addClientConnectionStatusListener(listener);
+      data.changeNotificationListener(new JobNotificationListener(panel, driver));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
     final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(data);
-    if (debugEnabled) log.debug("adding driver: " + driverName + " at index " + index);
+    if (debugEnabled) log.debug("adding driver: " + driver.getUuid() + " at index " + index);
     panel.getModel().insertNodeInto(driverNode, panel.getTreeTableRoot(), index);
     if (!firstDriverAdded) {
       firstDriverAdded = true;
-      if (debugEnabled) log.debug("adding first driver: " + driverName + " at index " + index);
+      if (debugEnabled) log.debug("adding first driver: " + driver.getUuid() + " at index " + index);
       Runnable r =  new Runnable() {
         @Override public synchronized void run() {
           try {
@@ -98,7 +97,7 @@ class JobDataPanelManager {
       };
       new Thread(r, "Job tree expansion").start();
     } else {
-      if (debugEnabled) log.debug("additional driver: " + driverName + " at index " + index);
+      if (debugEnabled) log.debug("additional driver: " + driver.getUuid() + " at index " + index);
       JPPFTreeTable treeTable = panel.getTreeTable();
       if (treeTable != null) {
         treeTable.expand(panel.getTreeTableRoot());
@@ -109,109 +108,107 @@ class JobDataPanelManager {
 
   /**
    * Called to notify that a driver was removed.
-   * @param driverName the name of the driver to remove.
+   * @param driverUuid the name of the driver to remove.
    */
-  public void driverRemoved(final String driverName) {
-    final DefaultMutableTreeNode driverNode = findDriver(driverName);
-    if (debugEnabled) log.debug("removing driver: " + driverName);
+  public void removeDriver(final String driverUuid) {
+    final DefaultMutableTreeNode driverNode = findDriver(driverUuid);
+    if (debugEnabled) log.debug("removing driver: " + driverUuid);
     if (driverNode == null) return;
-    try {
-      JobData data = (JobData) driverNode.getUserObject();
-      data.getClientConnection().removeClientConnectionStatusListener(listener);
-      data.changeNotificationListener(null);
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-    }
-    panel.getModel().removeNodeFromParent(driverNode);
+    tearDriverDown(driverNode);
   }
 
   /**
    * Remove all driver nodes from the tree table.
    */
-  public void driverClear() {
+  public void clearDriver() {
     DefaultMutableTreeNode root = panel.getTreeTableRoot();
     if (debugEnabled) log.debug("removing all drivers");
     int n = root.getChildCount();
     if (n <= 0) return;
-    final DefaultMutableTreeNode[] driverNodes = new DefaultMutableTreeNode[n];
-    for (int i = n - 1; i >= 0; i--) {
-      driverNodes[i] = (DefaultMutableTreeNode) root.getChildAt(i);
-      try {
-        JobData data = (JobData) driverNodes[i].getUserObject();
-        data.getClientConnection().removeClientConnectionStatusListener(listener);
-        data.changeNotificationListener(null);
-      } catch (Exception e) {
-        if (debugEnabled) log.debug("while removing: " + e.getMessage(), e);
-      }
+    for (int i = n - 1; i >= 0; i--) tearDriverDown((DefaultMutableTreeNode) root.getChildAt(i));
+  }
+
+  /**
+   * Remmove and cleanup the specified driver.
+   * @param driverNode the driver to remove.
+   */
+  private void tearDriverDown(final DefaultMutableTreeNode driverNode) {
+    if (driverNode == null) return;
+    try {
+      JobData data = (JobData) driverNode.getUserObject();
+      data.close();
+      data.getClientConnection().removeClientConnectionStatusListener(listener);
+      data.changeNotificationListener(null);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug("while removing: " + e.getMessage(), e);
     }
-    for (DefaultMutableTreeNode driverNode: driverNodes) panel.getModel().removeNodeFromParent(driverNode);
+    panel.getModel().removeNodeFromParent(driverNode);
   }
 
   /**
    * Called to notify that a job was submitted to a driver.
-   * @param driverName the name of the driver the job was submitted to.
+   * @param driverUuid the name of the driver the job was submitted to.
    * @param jobInfo    information about the submitted job.
    */
-  public void jobAdded(final String driverName, final JobInformation jobInfo) {
-    final DefaultMutableTreeNode driverNode = findDriver(driverName);
+  public void addJob(final String driverUuid, final JobInformation jobInfo) {
+    final DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
-    JobData data = new JobData(jobInfo);
     JobData driverData = (JobData) driverNode.getUserObject();
-    data.setJmxWrapper(driverData.getJmxWrapper());
+    JobData data = new JobData(driverData.getDriver(), jobInfo);
     final int index = jobInsertIndex(driverNode, jobInfo);
     if (index < 0) return;
     final DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(data);
-    if (debugEnabled) log.debug("adding job: " + jobInfo + " to driver " + driverName + " at index " + index);
+    if (debugEnabled) log.debug("adding job: " + jobInfo + " to driver " + driverUuid + " at index " + index);
     panel.getModel().insertNodeInto(jobNode, driverNode, index);
     if (panel.getTreeTable() != null) panel.getTreeTable().expand(driverNode);
   }
 
   /**
    * Called to notify that a job was removed from a driver.
-   * @param driverName the name of the driver the job was submitted to.
-   * @param jobName    the name of the job.
+   * @param driverUuid the name of the driver the job was submitted to.
+   * @param jobUuid    the name of the job.
    */
-  public void jobRemoved(final String driverName, final String jobName) {
-    DefaultMutableTreeNode driverNode = findDriver(driverName);
+  public void removeJob(final String driverUuid, final String jobUuid) {
+    DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
-    final DefaultMutableTreeNode jobNode = findJob(driverNode, jobName);
+    final DefaultMutableTreeNode jobNode = findJob(driverNode, jobUuid);
+    if (debugEnabled) log.debug("*** jobNode =  " + jobNode);
     if (jobNode == null) return;
-    if (debugEnabled) log.debug("removing job: " + jobName + " from driver " + driverName);
+    if (debugEnabled) log.debug("removing job: " + jobUuid + " from driver " + driverUuid);
     panel.getModel().removeNodeFromParent(jobNode);
-    if (panel.getTreeTable() != null) panel.getTreeTable().repaint();
+    //if (panel.getTreeTable() != null) panel.getTreeTable().repaint();
   }
 
   /**
    * Called to notify that a job was removed from a driver.
-   * @param driverName the name of the driver the job was submitted to.
+   * @param driverUuid the name of the driver the job was submitted to.
    * @param jobInfo    information about the job.
    */
-  public void jobUpdated(final String driverName, final JobInformation jobInfo) {
-    DefaultMutableTreeNode driverNode = findDriver(driverName);
+  public void updateJob(final String driverUuid, final JobInformation jobInfo) {
+    DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
     final DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
-    if (jobNode == null) return;
-    if (debugEnabled) log.debug("updating job: " + jobInfo.getJobName() + " from driver " + driverName);
-    JobData data = new JobData(jobInfo);
     JobData driverData = (JobData) driverNode.getUserObject();
-    data.setJmxWrapper(driverData.getJmxWrapper());
+    if (jobNode == null) return;
+    if (debugEnabled) log.debug("updating job: " + jobInfo.getJobName() + " from driver " + driverUuid);
+    JobData data = new JobData(driverData.getDriver(), jobInfo);
     jobNode.setUserObject(data);
     panel.getModel().changeNode(jobNode);
   }
 
   /**
    * Called to notify that a sub-job was dispatched to a node.
-   * @param driverName the name of the driver the job was submitted to.
+   * @param driverUuid the name of the driver the job was submitted to.
    * @param jobInfo    information about the sub-job.
    * @param nodeInfo   information about the node where the sub-job was dispatched.
    */
-  public void subJobAdded(final String driverName, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo) {
-    DefaultMutableTreeNode driverNode = findDriver(driverName);
+  public void addJobDispatch(final String driverUuid, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo) {
+    DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
     final DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
     if (jobNode == null) return;
     JobData data = new JobData(jobInfo, nodeInfo);
-    final int index = subJobInsertIndex(jobNode, nodeInfo);
+    final int index = jobDispatchInsertIndex(jobNode, nodeInfo);
     if (index < 0) return;
     final DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
     if (debugEnabled) log.debug("sub-job: {} dispatched to node {}:{} (index {})", new Object[] {jobInfo.getJobName(), nodeInfo.getHost(), nodeInfo.getPort(), index});
@@ -221,33 +218,33 @@ class JobDataPanelManager {
 
   /**
    * Called to notify that a sub-job was removed from a node.
-   * @param driverName the name of the driver the job was submitted to.
-   * @param jobName    information about the job.
-   * @param nodeName   information about the node where the sub-job was dispatched.
+   * @param driverUuid the name of the driver the job was submitted to.
+   * @param jobUuid    information about the job.
+   * @param nodeUuid   information about the node where the sub-job was dispatched.
    */
-  public void subJobRemoved(final String driverName, final String jobName, final String nodeName) {
-    DefaultMutableTreeNode driverNode = findDriver(driverName);
+  public void removeJobDispatch(final String driverUuid, final String jobUuid, final String nodeUuid) {
+    DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
-    DefaultMutableTreeNode jobNode = findJob(driverNode, jobName);
+    DefaultMutableTreeNode jobNode = findJob(driverNode, jobUuid);
     if (jobNode == null) return;
-    final DefaultMutableTreeNode subJobNode = findSubJob(jobNode, nodeName);
+    final DefaultMutableTreeNode subJobNode = findJobDispatch(jobNode, nodeUuid);
     if (subJobNode == null) return;
-    if (debugEnabled) log.debug("removing sub-job: " + jobName + " from node " + nodeName);
+    if (debugEnabled) log.debug("removing sub-job: " + jobUuid + " from node " + nodeUuid);
     panel.getModel().removeNodeFromParent(subJobNode);
     if (panel.getTreeTable() != null) panel.getTreeTable().repaint();
   }
 
   /**
    * Find the driver tree node with the specified driver name.
-   * @param driverName name of the driver to find.
+   * @param driverUuid name of the driver to find.
    * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
    */
-  DefaultMutableTreeNode findDriver(final String driverName) {
+  DefaultMutableTreeNode findDriver(final String driverUuid) {
     for (int i = 0; i < panel.getTreeTableRoot().getChildCount(); i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) panel.getTreeTableRoot().getChildAt(i);
       JobData data = (JobData) driverNode.getUserObject();
       String name = data.getClientConnection().getDriverUuid();
-      if (name.equals(driverName)) return driverNode;
+      if (name.equals(driverUuid)) return driverNode;
     }
     return null;
   }
@@ -259,20 +256,20 @@ class JobDataPanelManager {
    * @return a <code>DefaultMutableTreeNode</code> or null if the job could not be found.
    */
   DefaultMutableTreeNode findJob(final DefaultMutableTreeNode driverNode, final JobInformation jobInfo) {
-    return findJob(driverNode, jobInfo.getJobName());
+    return findJob(driverNode, jobInfo.getJobUuid());
   }
 
   /**
    * Find the job with the specified id that was submitted to the specified driver.
    * @param driverNode the driver where the job was submitted.
-   * @param jobName    the name of the job to find.
+   * @param jobUuid    the name of the job to find.
    * @return a <code>DefaultMutableTreeNode</code> or null if the job could not be found.
    */
-  DefaultMutableTreeNode findJob(final DefaultMutableTreeNode driverNode, final String jobName) {
+  DefaultMutableTreeNode findJob(final DefaultMutableTreeNode driverNode, final String jobUuid) {
     for (int i = 0; i < driverNode.getChildCount(); i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       JobData data = (JobData) node.getUserObject();
-      if (data.getJobInformation().getJobName().equals(jobName)) return node;
+      if (data.getJobInformation().getJobUuid().equals(jobUuid)) return node;
     }
     return null;
   }
@@ -280,16 +277,16 @@ class JobDataPanelManager {
   /**
    * Find the sub-job with the specified id that was dispatched to the specified JPPF node.
    * @param jobNode  the job whose sub-job we are looking for.
-   * @param nodeName the name of the node to which the sub-job was dispatched.
+   * @param nodeUuid the name of the node to which the sub-job was dispatched.
    * @return a <code>DefaultMutableTreeNode</code> or null if the sub-job could not be found.
    */
-  DefaultMutableTreeNode findSubJob(final DefaultMutableTreeNode jobNode, final String nodeName) {
-    if (nodeName == null) return null;
+  DefaultMutableTreeNode findJobDispatch(final DefaultMutableTreeNode jobNode, final String nodeUuid) {
+    if (nodeUuid == null) return null;
     for (int i = 0; i < jobNode.getChildCount(); i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
       JobData data = (JobData) node.getUserObject();
       if ((data == null) || (data.getNodeInformation() == null)) return null;
-      if (data.getNodeInformation().toString().equals(nodeName)) return node;
+      if (data.getNodeInformation().toString().equals(nodeUuid)) return node;
     }
     return null;
   }
@@ -297,18 +294,18 @@ class JobDataPanelManager {
   /**
    * Find the position at which to insert a driver,
    * using the sorted lexical order of driver names.
-   * @param driverName the name of the driver to insert.
+   * @param driverUuid the name of the driver to insert.
    * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
    */
-  int driverInsertIndex(final String driverName) {
+  int driverInsertIndex(final String driverUuid) {
     DefaultMutableTreeNode root = panel.getTreeTableRoot();
     int n = root.getChildCount();
     for (int i = 0; i < n; i++) {
       DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) root.getChildAt(i);
       JobData data = (JobData) driverNode.getUserObject();
       String name = data.getClientConnection().getDriverUuid();
-      if (name.equals(driverName)) return -1;
-      else if (driverName.compareTo(name) < 0) return i;
+      if (name.equals(driverUuid)) return -1;
+      else if (driverUuid.compareTo(name) < 0) return i;
     }
     return n;
   }
@@ -321,13 +318,13 @@ class JobDataPanelManager {
    */
   int jobInsertIndex(final DefaultMutableTreeNode driverNode, final JobInformation jobInfo) {
     int n = driverNode.getChildCount();
-    String jobName = jobInfo.getJobName();
+    String jobUuid = jobInfo.getJobUuid();
     for (int i = 0; i < n; i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
       JobData jobData = (JobData) node.getUserObject();
-      String name = jobData.getJobInformation().getJobName();
-      if (jobName.equals(name)) return -1;
-      else if (jobName.compareTo(name) < 0) return i;
+      String name = jobData.getJobInformation().getJobUuid();
+      if (jobUuid.equals(name)) return -1;
+      else if (jobUuid.compareTo(name) < 0) return i;
     }
     return n;
   }
@@ -338,7 +335,7 @@ class JobDataPanelManager {
    * @param nodeInfo information about the subjob to insert.
    * @return the index at which to insert the subjob, or -1 if the subjob is already in the tree.
    */
-  int subJobInsertIndex(final DefaultMutableTreeNode jobNode, final JPPFManagementInfo nodeInfo) {
+  int jobDispatchInsertIndex(final DefaultMutableTreeNode jobNode, final JPPFManagementInfo nodeInfo) {
     int n = jobNode.getChildCount();
     String subJobName = nodeInfo.toString();
     for (int i = 0; i < n; i++) {
@@ -360,9 +357,11 @@ class JobDataPanelManager {
     public void statusChanged(final ClientConnectionStatusEvent event) {
       if (event.getSource() instanceof JPPFClientConnection) {
         JPPFClientConnection c = (JPPFClientConnection) event.getSource();
+        String uuid = c.getDriverUuid();
+        TopologyDriver driver = panel.getTopologyManager().getDriver(uuid);
         JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
-        if (status == JPPFClientConnectionStatus.FAILED) panel.driverRemoved(c);
-        else panel.driverUpdated(c);
+        if (status == JPPFClientConnectionStatus.FAILED) panel.driverRemoved(driver);
+        else panel.updateDriver(driver);
       } else throw new IllegalStateException("Unsupported event source - expected JPPFClientConnection");
     }
   }

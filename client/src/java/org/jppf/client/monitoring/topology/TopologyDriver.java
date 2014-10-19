@@ -20,10 +20,11 @@ package org.jppf.client.monitoring.topology;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.slf4j.*;
 
 /**
@@ -47,30 +48,27 @@ public class TopologyDriver extends AbstractTopologyComponent {
   /**
    * A driver connection.
    */
-  private JPPFClientConnection connection = null;
-  /**
-   * Forwards node management requests via the driver.
-   */
-  private JPPFNodeForwardingMBean forwarder = null;
+  private final JPPFClientConnection connection;
   /**
    * Determines whether this driver copmonent is currently initializing its JMX connection and mbean proxies.
    */
   private AtomicBoolean initializing = new AtomicBoolean(false);
-  /**
-   * Driver diagnostics MBean proxy.
-   */
-  protected DiagnosticsMBean diagnostics;
 
   /**
    * Initialize this topology data as a driver related object.
-   * @param clientConnection a reference to the driver connection.
+   * @param connection a reference to the driver connection.
    */
-  public TopologyDriver(final JPPFClientConnection clientConnection) {
-    this.connection = clientConnection;
-    this.uuid = clientConnection.getDriverUuid();
-    initializeProxies();
+  TopologyDriver(final JPPFClientConnection connection) {
+    super(connection.getDriverUuid());
+    this.connection = connection;
+    JPPFConnectionPool pool = connection.getConnectionPool();
+    this.managementInfo = new JPPFManagementInfo(pool.getDriverHost(), pool.getJmxPort(), pool.getDriverUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
   }
 
+  /**
+   * This method always returns {@code true}.
+   * @return {@code true}.
+   */
   @Override
   public boolean isDriver() {
     return true;
@@ -93,16 +91,9 @@ public class TopologyDriver extends AbstractTopologyComponent {
   }
 
   /**
-   * Set the driver connection.
-   * @param connection a {@link JPPFClientConnection} instance.
-   */
-  public void setConnection(final JPPFClientConnection connection) {
-    this.connection = connection;
-  }
-
-  /**
    * Determine whether the corresponding driver is collapsed in the visualization panel.
    * @return <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
+   * @exclude
    */
   public boolean isCollapsed() {
     return collapsed;
@@ -111,6 +102,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
   /**
    * Specify whether the corresponding driver is collapsed in the visualization panel.
    * @param collapsed <code>true</code> if the driver is collapsed, <code>false</code> otherwise.
+   * @exclude
    */
   public void setCollapsed(final boolean collapsed) {
     this.collapsed = collapsed;
@@ -121,7 +113,29 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * @return an instance of {@link JPPFNodeForwardingMBean}.
    */
   public JPPFNodeForwardingMBean getForwarder() {
-    return forwarder;
+    JMXDriverConnectionWrapper jmx = getJmx();
+    if ((jmx != null) && jmx.isConnected()) {
+      try {
+        return jmx.getNodeForwarder();
+      } catch (Exception ignore) {
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get the proxy to the driver MBean that manages and monitors jobs.
+   * @return an instance of {@link DriverJobManagementMBean}.
+   */
+  public DriverJobManagementMBean getJobManager() {
+    JMXDriverConnectionWrapper jmx = getJmx();
+    if ((jmx != null) && jmx.isConnected()) {
+      try {
+        return jmx.getJobManager();
+      } catch (Exception ignore) {
+      }
+    }
+    return null;
   }
 
   /**
@@ -132,7 +146,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
     JMXDriverConnectionWrapper jmx = getJmx();
     if ((jmx != null) && jmx.isConnected()) {
       try {
-        return jmx.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+        return jmx.getDiagnosticsProxy();
       } catch (Exception ignore) {
       }
     }
@@ -143,52 +157,17 @@ public class TopologyDriver extends AbstractTopologyComponent {
   @Override
   public String toString() {
     JMXDriverConnectionWrapper jmx = getJmx();
-    return (jmx == null) ? "?" : jmx.getDisplayName();
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("connection=").append(connection);
+    sb.append(", managementInfo=").append(managementInfo);
+    sb.append(", uuid=").append(uuid);
+    sb.append(']');
+    //return (jmx == null) ? (managementInfo == null ? "?" : managementInfo.toDisplayString()) : jmx.getDisplayName();
+    return sb.toString();
   }
 
-  /**
-   * Reset the forwarder and diagnostics mbeans. This method should be called when an I/O error occurs
-   * when invoking a method of the driver jmx connection wwrapper.
-   */
-  public void initializeProxies() {
-    if (initializing.compareAndSet(false, true)) {
-      forwarder = null;
-      diagnostics = null;
-      new Thread(new ProxySettingTask(), "@" + id + ":proxies").start();
-    }
-  }
-
-  /**
-   * Initialize the driver proxies in a separate thread.
-   */
-  private class ProxySettingTask implements Runnable {
-    @Override
-    public void run() {
-      if (debugEnabled) log.debug("driverData={}, jmx={}", this, getJmx());
-      try {
-        boolean hasNullProxy = true;
-        while (hasNullProxy) {
-          JMXDriverConnectionWrapper jmx = getJmx();
-          if (jmx != null) {
-            if (getManagementInfo() == null) setManagementInfo(new JPPFManagementInfo(jmx.getHost(), jmx.getPort(), jmx.getId(), JPPFManagementInfo.DRIVER, jmx.isSecure()));
-            try {
-              if (forwarder == null) forwarder = jmx.getNodeForwarder();
-            } catch (Exception ignore) {
-            }
-            try {
-              if (diagnostics == null) diagnostics = jmx.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
-            } catch (Exception ignore) {
-            }
-            hasNullProxy = (forwarder == null) || (diagnostics == null);
-          }
-          try {
-            if (hasNullProxy) Thread.sleep(500L);
-          } catch (InterruptedException ignore) {
-          }
-        }
-      } finally {
-        initializing.set(false);
-      }
-    }
+  @Override
+  public String getDisplayName() {
+    return managementInfo == null ? "?" : managementInfo.toDisplayString();
   }
 }

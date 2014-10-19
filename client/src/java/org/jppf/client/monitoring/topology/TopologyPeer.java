@@ -27,44 +27,30 @@ import org.jppf.management.JPPFManagementInfo;
  * @since 5.0
  */
 public class TopologyPeer extends TopologyNode {
-  /**
-   * The peer driver.
-   */
-  protected String peerUuid;
 
   /**
-   * Initialize this topology data as holding information about a node.
+   * Initialize this topology peer.
    * @param managementInfo information on this peer driver.
-   * @param peerUuid the peer driver uuid.
    */
-  public TopologyPeer(final JPPFManagementInfo managementInfo, final String peerUuid) {
-    super(managementInfo);
-    this.peerUuid = peerUuid;
+  TopologyPeer(final JPPFManagementInfo managementInfo) {
+    super(managementInfo, null);
   }
 
+  /**
+   * This method always returns {@code true}.
+   * @return {@code true}.
+   */
   @Override
   public boolean isPeer() {
     return true;
   }
 
+  /**
+   * This method always returns {@code false}.
+   * @return {@code false}.
+   */
   @Override
   public boolean isNode() {
     return false;
-  }
-
-  /**
-   * Get the uuid of the referenced peer driver.
-   * @return the peer uuid.
-   */
-  public String getPeerUuid() {
-    return peerUuid;
-  }
-
-  /**
-   * Set the uuid of the referenced peer driver.
-   * @param peerUuid the peer uuid.
-   */
-  public void setPeerUuid(final String peerUuid) {
-    this.peerUuid = peerUuid;
   }
 }

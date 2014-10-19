@@ -17,13 +17,16 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the chart configuration view of the admin console.
+-->
 <opt:main name="ChartsConfiguration" type="page" xmlns:opt="http://www.jppf.org/Options.xsd">
 	<property name="label" value="Charts Configuration"/>
 	<property name="scrollable" value="true"/>
   <property name="icon" value="/org/jppf/ui/resources/chart-curve-edit.png"/>
 	<property name="layoutConstraints" value="fill, flowy"/>
   <script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
-  <script language="groovy" source="org/jppf/ui/options/xml/chartsConfig.groovy"/>
+  <script language="groovy" source="org/jppf/ui/options/xml/ChartsConfig.groovy"/>
 	<initializer type="script">
 		<script language="groovy">initMain()</script>
 	</initializer>

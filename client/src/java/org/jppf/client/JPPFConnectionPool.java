@@ -468,7 +468,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
    * @since 5.0
    */
-  public synchronized List<JPPFClientConnection> awaitActiveConnections(final int nbConnections) {
+  public List<JPPFClientConnection> awaitActiveConnections(final int nbConnections) {
     return awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
   }
 
@@ -480,7 +480,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
    * @since 5.0
    */
-  public synchronized List<JPPFClientConnection> awaitWorkingConnections(final int nbConnections) {
+  public List<JPPFClientConnection> awaitWorkingConnections(final int nbConnections) {
     return awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
   }
 
@@ -493,7 +493,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances.
    * @since 5.0
    */
-  public synchronized List<JPPFClientConnection> awaitConnections(final int nbConnections, final JPPFClientConnectionStatus...statuses) {
+  public List<JPPFClientConnection> awaitConnections(final int nbConnections, final JPPFClientConnectionStatus...statuses) {
     return awaitConnections(nbConnections, Long.MAX_VALUE, statuses);
   }
 
@@ -507,7 +507,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  public synchronized List<JPPFClientConnection> awaitConnections(final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+  public List<JPPFClientConnection> awaitConnections(final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
     setMaxSize(nbConnections);
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
@@ -527,7 +527,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of at least {@code nbConnections} {@link JPPFClientConnection} instances.
    * @since 5.0
    */
-  public synchronized List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final boolean connectedOnly) {
+  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final boolean connectedOnly) {
     return jmxPool.awaitJMXConnections(nbConnections, Long.MAX_VALUE, connectedOnly);
   }
 
@@ -540,7 +540,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  public synchronized List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final long timeout, final boolean connectedOnly) {
+  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final long timeout, final boolean connectedOnly) {
     return jmxPool.awaitJMXConnections(nbConnections, timeout, connectedOnly);
   }
 }

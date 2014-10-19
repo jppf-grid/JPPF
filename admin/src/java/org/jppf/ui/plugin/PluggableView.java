@@ -20,15 +20,39 @@ package org.jppf.ui.plugin;
 
 import javax.swing.JComponent;
 
+import org.jppf.client.monitoring.topology.TopologyManager;
+
 /**
  * This is the interface for user-defined view added to the administration console.
  * @author Laurent Cohen
  * @since 5.0
  */
-public interface PluggableView {
+public abstract class PluggableView {
+  /**
+   * The {@link TopologyManager} associated with the administration console.
+   */
+  private TopologyManager topologyManager;
+
   /**
    * Get the GUI component which contains the view.
    * @return a {@link JComponent} instance.
    */
-  JComponent getUIComponent();
+  public abstract JComponent getUIComponent();
+
+  /**
+   * Get the {@link TopologyManager} associated with the administration console.
+   * @return a {@link TopologyManager} object.
+   */
+  public final TopologyManager getTopologyManager() {
+    return topologyManager;
+  }
+
+  /**
+   * Set the {@link TopologyManager} associated with the administration console.
+   * @param topologyManager a {@link TopologyManager} object.
+   * @exclude
+   */
+  final void setTopologyManager(final TopologyManager topologyManager) {
+    this.topologyManager = topologyManager;
+  }
 }

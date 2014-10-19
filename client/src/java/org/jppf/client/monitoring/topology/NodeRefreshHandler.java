@@ -18,9 +18,7 @@
 
 package org.jppf.client.monitoring.topology;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.*;
 
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
@@ -33,8 +31,9 @@ import org.slf4j.*;
  * their attached nodes, for management and monitoring purposes.
  * @author Laurent Cohen
  * @since 5.0
+ * @exclude
  */
-class NodeRefreshHandler {
+class NodeRefreshHandler extends AbstractRefreshHandler {
   /**
    * Logger for this class.
    */
@@ -43,60 +42,20 @@ class NodeRefreshHandler {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Timer used to query the driver management data.
-   */
-  private Timer refreshTimer = null;
-  /**
-   * Interval, in milliseconds, between refreshes from the server.
-   */
-  private long refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.topology", 1000L);
-  /**
-   * Count of refresh invocations.
-   */
-  private AtomicLong refreshCount = new AtomicLong(0L);
-  /**
-   * Determines whether we are currently refreshing.
-   */
-  private AtomicBoolean refreshing = new AtomicBoolean(false);
-  /**
-   * The topology manager to which topology change notifications are to be sent. 
-   */
-  private final TopologyManager manager;
 
   /**
    * Initialize this node handler.
    * @param manager the topology manager.
    */
   public NodeRefreshHandler(final TopologyManager manager) {
-    this.manager = manager;
-    initialize();
-  }
-
-  /**
-   * Initialize this node refresh handler.
-   */
-  private void initialize() {
-    startRefreshTimer();
-  }
-
-  /**
-   * Refresh the tree structure asynchronously (not in the AWT event thread).
-   */
-  public void refresh() {
-    if (refreshing.compareAndSet(false, true)) {
-      try {
-        performRefresh();
-      } finally {
-        refreshing.set(false);
-      }
-    }
+    super(manager, "JPPF Topology Update Timer", JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.topology", 1000L));
   }
 
   /**
    * Refresh the tree structure.
+   * @exclude
    */
-  private synchronized void performRefresh() {
+  protected synchronized void performRefresh() {
     List<TopologyDriver> drivers = manager.getDrivers();
     for (TopologyDriver driver: drivers) {
       refreshNodes(driver);
@@ -110,7 +69,7 @@ class NodeRefreshHandler {
    */
   private void refreshNodes(final TopologyDriver driver) {
     Set<String> knownUuids = new HashSet<>();
-    for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) knownUuids.add(child.getUuid());
+    for (AbstractTopologyComponent child: driver.getChildren()) knownUuids.add(child.getUuid());
     JMXDriverConnectionWrapper wrapper = driver.getJmx();
     if ((wrapper == null) || !wrapper.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
@@ -121,8 +80,10 @@ class NodeRefreshHandler {
       return;
     }
     Map<String, JPPFManagementInfo> actualMap = new HashMap<>();
-    for (JPPFManagementInfo info: nodesInfo) {
-      if (info.getPort() >= 0) actualMap.put(info.getUuid(), info);
+    if (nodesInfo != null) {
+      for (JPPFManagementInfo info: nodesInfo) {
+        if (info.getPort() >= 0) actualMap.put(info.getUuid(), info);
+      }
     }
     List<String> nodesToProcess = new ArrayList<>(knownUuids.size());
     for (String uuid: knownUuids) {
@@ -139,7 +100,7 @@ class NodeRefreshHandler {
       if (!knownUuids.contains(uuid)) {
         if (debugEnabled) log.debug("adding node " + info);
         TopologyNode node = null;
-        node = info.isPeer() ? new TopologyPeer(info, driver.getUuid()) : new TopologyNode(info);
+        node = info.isPeer() ? new TopologyPeer(info) : new TopologyNode(info);
         manager.nodeAdded(driver, node);
       } else {
         TopologyNode node = (TopologyNode) manager.getNodeOrPeer(uuid);
@@ -160,7 +121,7 @@ class NodeRefreshHandler {
   private void refreshNodeStates(final TopologyDriver driver) {
     JPPFNodeForwardingMBean forwarder = driver.getForwarder();
     if (forwarder == null) return;
-    List<AbstractTopologyComponent> children = driver.getChildrenSynchronized();
+    List<AbstractTopologyComponent> children = driver.getChildren();
     // refresh the nodes execution states
     Map<String, TopologyNode> uuidMap = new HashMap<>();
     for (AbstractTopologyComponent child: children) {
@@ -169,9 +130,6 @@ class NodeRefreshHandler {
     Map<String, Object> result = null;
     try {
       result = forwarder.state(new NodeSelector.UuidSelector(uuidMap.keySet()));
-    } catch(IOException e) {
-      log.error("error getting node states for driver " + driver.getUuid() + ", reinitializing the connection", e);
-      driver.initializeProxies();
     } catch(Exception e) {
       log.error("error getting node states for driver " + driver.getUuid(), e);
     }
@@ -202,9 +160,6 @@ class NodeRefreshHandler {
     }
     try {
       result = forwarder.forwardGetAttribute(new NodeSelector.UuidSelector(uuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
-    } catch(IOException e) {
-      log.error("error getting number of slaves for driver " + driver.getUuid() + ", reinitializing the connection", e);
-      driver.initializeProxies();
     } catch(Exception e) {
       log.error("error getting number of slaves for driver " + driver.getUuid(), e);
     }
@@ -226,31 +181,5 @@ class NodeRefreshHandler {
     }
     
     for (TopologyNode node: changedNodes) manager.nodeUpdated(driver, node);
-  }
-
-  /**
-   * Stop the automatic refresh of the nodes state through a timer.
-   */
-  public void stopRefreshTimer() {
-    if (refreshTimer != null) {
-      refreshTimer.cancel();
-      refreshTimer = null;
-    }
-  }
-
-  /**
-   * Start the automatic refresh of the nodes state through a timer.
-   */
-  public void startRefreshTimer() {
-    if (refreshTimer != null) return;
-    if (refreshInterval <= 0L) return;
-    refreshTimer = new Timer("JPPF Topology Update Timer");
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        refresh();
-      }
-    };
-    refreshTimer.schedule(task, 1000L, refreshInterval);
   }
 }

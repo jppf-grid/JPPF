@@ -50,7 +50,6 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
    * @param row the row of the rendered cell.
    * @param column the column of the rendered cell.
    * @return the default table cell renderer.
-   * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {

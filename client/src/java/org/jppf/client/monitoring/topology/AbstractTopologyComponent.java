@@ -25,6 +25,7 @@ import org.jppf.management.diagnostics.HealthSnapshot;
 
 /**
  * Base superclass for components of a JPPF grid topology.
+ * This class proivdes an API to navigate the topology tree and attributes common to all ellements in te tree.
  * @author Laurent Cohen
  * @since 5.0
  */
@@ -40,19 +41,23 @@ public abstract class AbstractTopologyComponent {
   /**
    * The uuid of this component.
    */
-  protected String uuid;
+  protected final String uuid;
   /**
-   * The displayable id of this component.
-   */
-  protected String id;
-  /**
-   * Object describing the current health of a node or driver.
+   * Object describing the current health snapshot of a node or driver.
    */
   protected HealthSnapshot healthSnapshot = new HealthSnapshot();
   /**
-   * Information on the JPPF node.
+   * The management informtation on this topology component.
    */
   protected JPPFManagementInfo managementInfo;
+
+  /**
+   * Initialize this component witht he specified uuid.
+   * @param uuid the uuid assigned to this component.
+   */
+  AbstractTopologyComponent(final String uuid) {
+    this.uuid = uuid;
+  }
 
   /**
    * Get the parent of this compponent.
@@ -66,7 +71,7 @@ public abstract class AbstractTopologyComponent {
    * Set the parent of this compponent.
    * @param parent the parent as a {@link AbstractTopologyComponent} instance.
    */
-  public synchronized void setParent(final AbstractTopologyComponent parent) {
+  synchronized void setParent(final AbstractTopologyComponent parent) {
     this.parent = parent;
   }
 
@@ -79,18 +84,11 @@ public abstract class AbstractTopologyComponent {
   }
 
   /**
-   * Get the children of this component.
-   * @return a list of {@link AbstractTopologyComponent} instance.
-   */
-  public List<AbstractTopologyComponent> getChildren() {
-    return children;
-  }
-
-  /**
    * Get the children of this component in a thread-safe way.
-   * @return a list of {@link AbstractTopologyComponent} instance.
+   * The returned list is a copy of the list of children and can be mainupalted without affect the internal state of this object.
+   * @return a list of {@link AbstractTopologyComponent} instances.
    */
-  public synchronized List<AbstractTopologyComponent> getChildrenSynchronized() {
+  public synchronized List<AbstractTopologyComponent> getChildren() {
     return new ArrayList<>(children);
   }
 
@@ -98,7 +96,7 @@ public abstract class AbstractTopologyComponent {
    * Add a child to this component.
    * @param child the child component to add.
    */
-  public synchronized void add(final AbstractTopologyComponent child) {
+  synchronized void add(final AbstractTopologyComponent child) {
     children.add(child);
     child.setParent(this);
   }
@@ -108,7 +106,7 @@ public abstract class AbstractTopologyComponent {
    * @param child the child component to add.
    * @param index the index at which to insert the child.
    */
-  public synchronized void add(final AbstractTopologyComponent child, final int index) {
+  synchronized void add(final AbstractTopologyComponent child, final int index) {
     children.add(index, child);
     child.setParent(this);
   }
@@ -117,7 +115,7 @@ public abstract class AbstractTopologyComponent {
    * Remove a child from this component.
    * @param child the child component to remove.
    */
-  public synchronized void remove(final AbstractTopologyComponent child) {
+  synchronized void remove(final AbstractTopologyComponent child) {
     children.remove(child);
     child.setParent(null);
   }
@@ -128,22 +126,6 @@ public abstract class AbstractTopologyComponent {
    */
   public synchronized String getUuid() {
     return uuid;
-  }
-
-  /**
-   * Set the connection uuid.
-   * @param uuid the uuid as a string.
-   */
-  public synchronized void setUuid(final String uuid) {
-    this.uuid = uuid;
-  }
-
-  /**
-   * Get the displayable id of this component.
-   * @return the id as a strring.
-   */
-  public synchronized String getId() {
-    return id;
   }
 
   /**
@@ -181,6 +163,7 @@ public abstract class AbstractTopologyComponent {
   /**
    * Refresh the health snapshot state of the driver or node represented by this topology data.
    * @param newSnapshot the new health snapshot fetched from the grid.
+   * @exclude
    */
   public synchronized void refreshHealthSnapshot(final HealthSnapshot newSnapshot) {
     if (isPeer()) return;
@@ -188,7 +171,7 @@ public abstract class AbstractTopologyComponent {
   }
 
   /**
-   * Get the information on a JPPF node.
+   * Get the management informtation on this topology component.
    * @return a {@link JPPFManagementInfo} instance.
    */
   public synchronized JPPFManagementInfo getManagementInfo() {
@@ -196,11 +179,11 @@ public abstract class AbstractTopologyComponent {
   }
 
   /**
-   * Set the information on a JPPF node.
-   * @param info a {@link JPPFManagementInfo} instance.
+   * Get a user-friendly representation of this topology component.
+   * @return a displayable string representing this object.
    */
-  protected synchronized void setManagementInfo(final JPPFManagementInfo info) {
-    this.managementInfo = info;
+  public String getDisplayName() {
+    return toString();
   }
 
   @Override

@@ -27,8 +27,7 @@ import java.util.Map;
  * @param <V> the type of the values that are accumulated.
  * @author Martin Janda
  */
-public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
-{
+public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T> {
   /**
    * Represents map of accumulated changes.
    */
@@ -39,8 +38,7 @@ public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
    * @param type the type of updates.
    * @param value the initial value to change.
    */
-  public JobAccumulatorBranch(final Type type, final T value)
-  {
+  public JobAccumulatorBranch(final Type type, final T value) {
     super(type, value);
   }
 
@@ -48,34 +46,28 @@ public class JobAccumulatorBranch<T, K, V> extends JobAccumulator<T>
    * Get the map of accumulated changes.
    * @return map of accumulated changes by key.
    */
-  public Map<K, V> getMap()
-  {
+  public Map<K, V> getMap() {
     return map;
   }
 
   @Override
-  public boolean equals(final Object o)
-  {
+  public boolean equals(final Object o) {
     if (this == o) return true;
     if (!(o instanceof JobAccumulatorBranch)) return false;
     if (!super.equals(o)) return false;
-
     JobAccumulatorBranch that = (JobAccumulatorBranch) o;
-
     return map.equals(that.map);
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int result = super.hashCode();
     result = 31 * result + map.hashCode();
     return result;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
     sb.append("[type=").append(getType());

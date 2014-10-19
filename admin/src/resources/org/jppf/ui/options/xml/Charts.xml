@@ -17,12 +17,17 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the tabbed pane which contains the user-defined charts and the chart configuration view.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="TabbedChartsPage" type="TabbedPane">
 	<property name="componentConstraints" value="push, grow"/>
 	<property name="layoutConstraints" value="fill"/>
   <property name="bordered" value="false"/>
   <property name="label" value="Charts"/>
   <property name="icon" value="/org/jppf/ui/resources/chart-curve-go.png"/>
-  <import source="file" location="org/jppf/ui/options/xml/ServerChartsPage.xml"/>
-  <import source="file" location="org/jppf/ui/options/xml/ChartsConfigPage.xml"/>
+
+  <import source="file" location="org/jppf/ui/options/xml/ServerCharts.xml"/>
+  <import source="file" location="org/jppf/ui/options/xml/ChartsConfig.xml" pluggableView="ChartsConfig"/>
+
 </opt:main>

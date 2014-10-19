@@ -23,7 +23,6 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.ui.utils.GuiUtils;
@@ -60,12 +59,13 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
         AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
+        renderer.setText(data.getDisplayName());
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
         if (data.isDriver()) {
-          path = (JPPFClientConnectionStatus.ACTIVE.equals(((TopologyDriver) data).getConnection().getStatus())) ? DRIVER_ICON : DRIVER_INACTIVE_ICON;
+          path = ((TopologyDriver) data).getConnection().getStatus().isWorkingStatus() ? DRIVER_ICON : DRIVER_INACTIVE_ICON;
         } else if (data.isNode()) {
           path = data.getManagementInfo().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
         }

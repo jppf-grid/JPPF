@@ -20,19 +20,19 @@ package org.jppf.ui.monitoring.job;
 
 import javax.management.NotificationListener;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClientConnection;
+import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
  * Instances of this class hold the information related to each node in the job data tree table.
  * @author Laurent Cohen
  */
-public class JobData
-{
+public class JobData implements AutoCloseable {
   /**
    * Logger for this class.
    */
@@ -46,78 +46,69 @@ public class JobData
    */
   private JobDataType type = null;
   /**
-   * A driver connection.
+   * A driver to which jobs are submitted.
    */
-  private JPPFClientConnection clientConnection = null;
-  /**
-   * Wrapper holding the connection to the JMX server on a driver.
-   */
-  private JMXDriverConnectionWrapper jmxWrapper = null;
+  private final TopologyDriver driver;
   /**
    * Information on the job or sub-job in a JPPF driver or node.
    */
   private JobInformation jobInformation = null;
   /**
-   * Information on the JPPF node in which part of a job is executing.
+   * Information on the JPPF node where a job is dispatched.
    */
   private JPPFManagementInfo nodeInformation = null;
-  /**
-   * Proxy to the job management mbean.
-   */
-  private DriverJobManagementMBean proxy = null;
   /**
    * Receives notifications from the MBean.
    */
   private NotificationListener notificationListener = null;
-
   /**
-   * Initialize this job data with the specified type.
-   * @param type - the type of this job data object as a <code>JobDataType</code> enum value.
+   * 
    */
-  protected JobData(final JobDataType type)
-  {
-    this.type = type;
-  }
+  private DriverJobManagementMBean jobManager = null;
+  /**
+   * 
+   */
+  private ProxySetting proxySetter;
 
   /**
    * Initialize this job data as a driver related object.
-   * @param clientConnection - a reference to the driver connection.
+   * @param driver a reference to the driver.
    */
-  public JobData(final JPPFClientConnection clientConnection)
-  {
-    this(JobDataType.DRIVER);
-    this.clientConnection = clientConnection;
-    this.jmxWrapper = clientConnection.getConnectionPool().getJmxConnection();
+  public JobData(final TopologyDriver driver) {
+    this.type = JobDataType.DRIVER;
+    this.driver = driver;
+    proxySetter = new ProxySetting();
+    new Thread(proxySetter).start();
   }
 
   /**
    * Initialize this job data as a holding information about a job submitted to a driver.
-   * @param jobInformation - information on the job in a JPPF driver.
+   * @param driver a reference to the driver.
+   * @param jobInformation information on the job in a JPPF driver.
    */
-  public JobData(final JobInformation jobInformation)
-  {
-    this(JobDataType.JOB);
+  public JobData(final TopologyDriver driver, final JobInformation jobInformation) {
+    this.type = JobDataType.JOB;
     this.jobInformation = jobInformation;
+    this.driver = driver;
   }
 
   /**
    * Initialize this job data as a holding information about a sub-job dispatched to a node.
-   * @param jobInformation - information on the job in a JPPF driver.
-   * @param nodeInformation - information on the JPPF node in which part of a job is executing.
+   * @param jobInformation information on the job in a JPPF driver.
+   * @param nodeInformation information on the JPPF node in which part of a job is executing.
    */
-  public JobData(final JobInformation jobInformation, final JPPFManagementInfo nodeInformation)
-  {
-    this(JobDataType.SUB_JOB);
+  public JobData(final JobInformation jobInformation, final JPPFManagementInfo nodeInformation) {
+    this.type = JobDataType.SUB_JOB;
     this.jobInformation = jobInformation;
     this.nodeInformation = nodeInformation;
+    this.driver = null;
   }
 
   /**
    * Get the type of this job data object.
    * @return a <code>JobDataType</code> enum value.
    */
-  public JobDataType getType()
-  {
+  public JobDataType getType() {
     return type;
   }
 
@@ -125,29 +116,15 @@ public class JobData
    * Get the wrapper holding the connection to the JMX server on a driver.
    * @return a <code>JMXDriverConnectionWrapper</code> instance.
    */
-  public JMXDriverConnectionWrapper getJmxWrapper()
-  {
-    if (jmxWrapper == null) {
-      if (clientConnection != null) jmxWrapper = clientConnection.getConnectionPool().getJmxConnection();
-    }
-    return jmxWrapper;
-  }
-
-  /**
-   * Set the wrapper holding the connection to the JMX server on a driver.
-   * @param jmxWrapper a <code>JMXDriverConnectionWrapper</code> instance.
-   */
-  public void setJmxWrapper(final JMXDriverConnectionWrapper jmxWrapper)
-  {
-    this.jmxWrapper = jmxWrapper;
+  public JMXDriverConnectionWrapper getJmxWrapper() {
+    return driver.getJmx();
   }
 
   /**
    * Get the information on the job or sub-job in a JPPF driver or node.
    * @return a <code>JobInformation</code> instance,
    */
-  public JobInformation getJobInformation()
-  {
+  public JobInformation getJobInformation() {
     return jobInformation;
   }
 
@@ -155,48 +132,51 @@ public class JobData
    * Get the information on the JPPF node in which part of a job is executing.
    * @return a <code>NodeManagementInfo</code> instance.
    */
-  public JPPFManagementInfo getNodeInformation()
-  {
+  public JPPFManagementInfo getNodeInformation() {
     return nodeInformation;
   }
 
   /**
    * Get a reference to the proxy to the job management mbean.
-   * @return a DriverJobManagementMBean instance.
+   * @return a {@link DriverJobManagementMBean} instance.
    */
-  public DriverJobManagementMBean getProxy()
-  {
-    if (getJmxWrapper() == null) return null;
-    if (proxy == null)
-    {
-      try
-      {
-        proxy = jmxWrapper.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
-      }
-      catch(Exception e)
-      {
-        String s = ExceptionUtils.getMessage(e);
-        if (debugEnabled) log.debug(s, e);
-        else log.warn(s);
+  public synchronized DriverJobManagementMBean getProxy() {
+    return jobManager;
+  }
+
+  /**
+   * Get a reference to the proxy to the job management mbean.
+   * @return a {@link DriverJobManagementMBean} instance.
+   */
+  private synchronized DriverJobManagementMBean initProxy() {
+    if (jobManager == null) {
+      JMXDriverConnectionWrapper jmx = getJmxWrapper();
+      if ((jmx != null) && jmx.isConnected()) {
+        try {
+          jobManager = jmx.getJobManager();
+          if (notificationListener != null) jobManager.addNotificationListener(notificationListener, null, null);
+        } catch (Exception e) {
+          /*
+          String msg = "{},  error getting the job manager proxy: {}";
+          if (debugEnabled) log.debug(msg, this, ExceptionUtils.getStackTrace(e));
+          else log.warn(msg, this, ExceptionUtils.getMessage(e));
+          */
+        }
       }
     }
-    return proxy;
+    return jobManager;
   }
 
   /**
    * Get a string representation of this object.
    * @return a string representing this object.
-   * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     String s = "";
-    switch(type)
-    {
+    switch(type) {
       case DRIVER:
-        //s = (jmxWrapper == null) ? "unknown" : jmxWrapper.getId();
-        s = (getJmxWrapper() == null) ? "unknown" : jmxWrapper.getDisplayName();
+        s = driver.getDisplayName();
         break;
       case JOB:
         s = jobInformation.getJobName();
@@ -213,8 +193,7 @@ public class JobData
    * Get the MBean notification listener.
    * @return a <code>NotificationListener</code> instance.
    */
-  public NotificationListener getNotificationListener()
-  {
+  public NotificationListener getNotificationListener() {
     return notificationListener;
   }
 
@@ -223,35 +202,52 @@ public class JobData
    * @param listener a <code>NotificationListener</code> instance.
    * @throws Exception if any error occurs.
    */
-  public void changeNotificationListener(final NotificationListener listener) throws Exception
-  {
-    if (notificationListener != null)
-    {
-      try
-      {
-        if (proxy != null) proxy.removeNotificationListener(notificationListener);
-      }
-      catch (Exception e)
-      {
-        String s = ExceptionUtils.getMessage(e);
-        if (debugEnabled) log.debug(s, e);
-        else log.warn(s);
+  public synchronized void changeNotificationListener(final NotificationListener listener) throws Exception {
+    DriverJobManagementMBean proxy = getProxy();
+    if (proxy != null) {
+      if (notificationListener != null) {
+        try {
+          proxy.removeNotificationListener(notificationListener);
+        } catch (Exception e) {
+          String s = ExceptionUtils.getMessage(e);
+          if (debugEnabled) log.debug(s, e);
+          else log.warn(s);
+        }
       }
     }
     notificationListener = listener;
-    if (notificationListener != null)
-    {
-      getProxy();
-      if (proxy != null) proxy.addNotificationListener(notificationListener, null, null);
-    }
+    if ((notificationListener != null) && (proxy != null)) proxy.addNotificationListener(notificationListener, null, null);
   }
 
   /**
    * Get a reference to the driver connection.
    * @return a <code>JPPFClientConnection</code> instance.
    */
-  public JPPFClientConnection getClientConnection()
-  {
-    return clientConnection;
+  public JPPFClientConnection getClientConnection() {
+    return driver.getConnection();
+  }
+
+  /**
+   * Get the driver to which jobs are submitted.
+   * @return a {@link TopologyDriver} object.
+   */
+  public TopologyDriver getDriver() {
+    return driver;
+  }
+
+  /**
+   * 
+   */
+  private class ProxySetting extends ThreadSynchronization implements Runnable {
+    @Override
+    public void run() {
+      while (!isStopped() && (initProxy() == null)) goToSleep(10L);
+      if (debugEnabled) log.debug("proxy initialized for {}", JobData.this);
+    }
+  }
+
+  @Override
+  public void close(){
+    if (proxySetter != null) proxySetter.setStopped(true);
   }
 }

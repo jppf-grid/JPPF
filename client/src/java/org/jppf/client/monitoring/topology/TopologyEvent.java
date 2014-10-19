@@ -21,7 +21,8 @@ package org.jppf.client.monitoring.topology;
 import java.util.EventObject;
 
 /**
- * 
+ * Instances of this class represent topology events, including addition/removal of a driver,
+ * addition/removal/update of a node and addition/removal of a peer driver connected as a node.
  * @author Laurent Cohen
  * @since 5.0
  */
@@ -34,13 +35,10 @@ public class TopologyEvent extends EventObject {
    * Data for the node, if any.
    */
   private final TopologyNode nodeData;
-  /**
-   * Data for the peer, if any.
-   */
-  private final TopologyPeer peerData;
 
   /**
    * The possible types of events.
+   * @exclude
    */
   enum Type {
     /**
@@ -51,6 +49,10 @@ public class TopologyEvent extends EventObject {
      * A driver was removed.
      */
     DRIVER_REMOVED,
+    /**
+     * A driver was updated.
+     */
+    DRIVER_UPDATED,
     /**
      * A node was added.
      */
@@ -70,20 +72,19 @@ public class TopologyEvent extends EventObject {
    * @param source the source of this event.
    * @param driverData the driver data.
    * @param nodeData the node data.
-   * @param peerData the peer data.
+   * @exclude
    */
-  public TopologyEvent(final TopologyManager source, final TopologyDriver driverData, final TopologyNode nodeData, final TopologyPeer peerData) {
+  public TopologyEvent(final TopologyManager source, final TopologyDriver driverData, final TopologyNode nodeData) {
     super(source);
     this.driverData = driverData;
     this.nodeData = nodeData;
-    this.peerData = peerData;
   }
 
   /**
    * Get the driver data.
    * @return a {@link TopologyDriver} instance.
    */
-  public TopologyDriver getDriverData() {
+  public TopologyDriver getDriver() {
     return driverData;
   }
 
@@ -91,16 +92,8 @@ public class TopologyEvent extends EventObject {
    * Get the node data.
    * @return a {@link TopologyNode} instance.
    */
-  public TopologyNode getNodeData() {
+  public TopologyNode getNodeOrPeer() {
     return nodeData;
-  }
-
-  /**
-   * Get the peer data.
-   * @return a {@link TopologyPeer} instance.
-   */
-  public TopologyPeer getPeerData() {
-    return peerData;
   }
 
   /**
@@ -109,5 +102,15 @@ public class TopologyEvent extends EventObject {
    */
   public TopologyManager getTopologyManager() {
     return (TopologyManager) getSource();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("source=").append(getTopologyManager());
+    sb.append(", driver=").append(getDriver());
+    sb.append(", node/peer=").append(getNodeOrPeer());
+    sb.append(']');
+    return sb.toString();
   }
 }

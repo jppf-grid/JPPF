@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the  topology tree view in the admin console.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
   <property name="layoutConstraints" value="flowx, flowy, fill, gap rel, insets 0"/>
   <property name="icon" value="/org/jppf/ui/resources/view-list-tree-4.png"/>
@@ -76,11 +79,8 @@
       <listener type="script">
         <script language="groovy"><![CDATA[
           def b = option.getUIComponent().isSelected();
-          def handler = option.findFirstWithName("/NodeTreeTable").getRefreshHandler();
-          if (handler != null) {
-            if (b) handler.startRefreshTimer();
-            else handler.stopRefreshTimer();
-          }
+          def panel = option.findFirstWithName("/NodeTreeTable");
+          panel.setAutoRefresh(b);
         ]]></script>
       </listener>
     </child>
@@ -88,7 +88,7 @@
     <child name="button.refresh" type="Button">
       <property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
       <listener type="script">
-        <script language="groovy">option.findFirstWithName("/NodeTreeTable").getRefreshHandler().refresh()</script>
+        <script language="groovy">option.findFirstWithName("/NodeTreeTable").refreshTreeTableModel()</script>
       </listener>
     </child>
     

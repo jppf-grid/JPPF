@@ -33,6 +33,10 @@ public class TopologyListenerAdapter implements TopologyListener {
   }
 
   @Override
+  public void driverUpdated(final TopologyEvent event) {
+  }
+
+  @Override
   public void nodeAdded(final TopologyEvent event) {
   }
 

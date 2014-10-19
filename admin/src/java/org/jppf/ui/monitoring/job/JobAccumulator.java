@@ -24,8 +24,7 @@ import org.slf4j.*;
  * @param <T> the type of the values that are changed.
  * @author Martin Janda
  */
-public class JobAccumulator<T>
-{
+public class JobAccumulator<T> {
   /**
    * Logger for this class.
    */
@@ -38,8 +37,7 @@ public class JobAccumulator<T>
   /**
    * The types of changes.
    */
-  public static enum Type
-  {
+  public static enum Type {
     /**
      * A value was added.
      */
@@ -72,10 +70,8 @@ public class JobAccumulator<T>
    * @param type  the type of change performed.
    * @param value the initial value to change.
    */
-  public JobAccumulator(final Type type, final T value)
-  {
+  public JobAccumulator(final Type type, final T value) {
     if (type == null) throw new IllegalArgumentException("changeType is null");
-
     this.type = type;
     this.value = value;
   }
@@ -84,8 +80,7 @@ public class JobAccumulator<T>
    * Get the type of change performed.
    * @return and instance of {@link Type}.
    */
-  public Type getType()
-  {
+  public Type getType() {
     return type;
   }
 
@@ -93,8 +88,7 @@ public class JobAccumulator<T>
    * Get the value to change.
    * @return an instance of the values type.
    */
-  public T getValue()
-  {
+  public T getValue() {
     return value;
   }
 
@@ -103,78 +97,55 @@ public class JobAccumulator<T>
    * @param type the type of change to merge.
    * @return <code>true</code> if the previous change type is <code>ADD</code> and the new one is <code>REMOVE</code>, <code>false</code> otherwise.
    */
-  public boolean mergeChange(final Type type)
-  {
+  public boolean mergeChange(final Type type) {
     return mergeChange(type, value);
   }
 
   /**
    * Merge a change of a different type for a new value.
-   * @param type  the type of change to merge.
-   * @param value the new value to merge.
+   * @param newType  the type of change to merge.
+   * @param newValue the new value to merge.
    * @return <code>true</code> if the previous change type is <code>ADD</code> and the new one is <code>REMOVE</code>, <code>false</code> otherwise.
    */
-  public boolean mergeChange(final Type type, final T value)
-  {
-    if (debugEnabled) log.debug("merging {} into new type {}", this.type, type);
-    Type oldType = this.type;
-    //if (this.type == type && this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
-    if (this.type == type)
-    {
-      if (this.type == Type.REMOVE) return true;
-      //if (this.type == Type.ADD) return true;
-      if (this.type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + type);
+  public boolean mergeChange(final Type newType, final T newValue) {
+    if (debugEnabled) log.debug(String.format("merging %s into new type %s for value %s", this.type, newType, newValue));
+    Type oldType = type;
+    if (type == newType) {
+      if (type == Type.REMOVE) return true;
+      if (type != Type.UPDATE) throw new IllegalStateException("Can't merge type: " + newType);
     }
-    if (this.type == Type.REMOVE && type == Type.ADD)
-    {
-      this.type = Type.UPDATE;
-      this.value = value;
+    if (type == Type.REMOVE && newType == Type.ADD) {
+      type = Type.UPDATE;
+      value = newValue;
       return false;
-    }
-    else
-    {
-      if (this.type.compareTo(type) > 0) throw new IllegalStateException("Can't merge type from " + this.type + " to " + type);
-      this.value = value;
-      if (this.type == Type.ADD && (type == Type.KEEP || type == Type.UPDATE)) return false;
-      this.type = type;
-      return oldType == Type.ADD && this.type == Type.REMOVE;
+    } else {
+      if (type.compareTo(newType) > 0) throw new IllegalStateException("Can't merge type from " + type + " to " + newType);
+      value = newValue;
+      if (type == Type.ADD && (newType == Type.KEEP || newType == Type.UPDATE)) return false;
+      type = newType;
+      return oldType == Type.ADD && type == Type.REMOVE;
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public boolean equals(final Object o)
-  {
+  public boolean equals(final Object o) {
     if (this == o) return true;
     if (!(o instanceof JobAccumulator)) return false;
-
     JobAccumulator that = (JobAccumulator) o;
-
     if (type != that.type) return false;
     if (value != null ? !value.equals(that.value) : that.value != null) return false;
-
     return true;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int result = value != null ? value.hashCode() : 0;
     result = 31 * result + type.hashCode();
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public String toString()
-  {
+  public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("JobAccumulator");
     sb.append("{type=").append(type);

@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the dialog to set the memory usage and CPU load alert thresholds.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="health.thresholds" type="page">
 	<property name="label" value="Update the Memory aznd CPU usage alert thresholds"/>
 	<property name="layoutConstraints" value="flowy"/>

@@ -17,6 +17,9 @@
 	limitations under the License.
 -->
 
+<!--
+  XML descriptor for the dialog to update the priority of a job.
+-->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobPriorityPanel" type="page">
 	<property name="label" value="Update number of threads and priority"/>
 	<property name="layoutConstraints" value="flowy"/>

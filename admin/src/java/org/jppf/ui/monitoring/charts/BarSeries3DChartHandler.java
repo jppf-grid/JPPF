@@ -113,7 +113,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
     ConnectionDataHolder cdh = statsHandler.getCurrentDataHolder();
     if (cdh == null) return config;
     int statsCount = cdh.getDataList().size();
-    if (debugEnabled) log.debug("data holder for {} has {} snapshots", statsHandler.getClientHandler().getCurrentConnection(), statsCount);
+    if (debugEnabled) log.debug("data holder for {} has {} snapshots", statsHandler.getClientHandler().getCurrentDriver(), statsCount);
     int start = Math.max(0, statsHandler.getTickCount() - statsCount);
     int count = 0;
     for (Map<Fields, Double> valueMap: cdh.getDoubleValuesMaps()) {
@@ -151,10 +151,10 @@ public class BarSeries3DChartHandler implements ChartHandler {
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(statsHandler.getTickCount()));
       }
     }
-    //if (ds.getRowCount() > statsHandler.getRolloverPosition())
-    if ((Integer) invokeMethod(ds.getClass(), ds, "getRowCount") > statsHandler.getRolloverPosition()) {
-      //ds.removeRow(0);
-      invokeMethod(ds.getClass(), ds, "removeRow", 0);
+    //if (ds.getColumnCount() > statsHandler.getRolloverPosition())
+    if ((Integer) invokeMethod(ds.getClass(), ds, "getColumnCount") > statsHandler.getRolloverPosition()) {
+      //ds.removeColumn(0);
+      invokeMethod(ds.getClass(), ds, "removeColumn", new Class[] {int.class}, 0);
     }
     return config;
   }

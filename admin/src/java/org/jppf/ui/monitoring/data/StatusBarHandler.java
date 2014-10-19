@@ -38,6 +38,14 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    */
   static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Identifies the field counting the drivers.
+   */
+  private static final int DRIVERS = 1;
+  /**
+   * Identifies the field counting the nodes.
+   */
+  private static final int NODES = 2;
+  /**
    * Number of active servers.
    */
   private AtomicInteger nbServers = new AtomicInteger(0);
@@ -49,6 +57,14 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    * The option holding the status bar UI component.
    */
   private final OptionElement statusBarOption;
+  /**
+   * The option holding the count of drivers.
+   */
+  private final FormattedNumberOption serverField;
+  /**
+   * The option holding the count of nodes.
+   */
+  private final FormattedNumberOption nodeField;
 
   /**
    * Initialize this status bar handler.
@@ -56,26 +72,28 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    */
   public StatusBarHandler(final OptionElement statusBarOption) {
     this.statusBarOption = statusBarOption;
+    this.serverField = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbServers");
+    this.nodeField = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbNodes");
     TopologyManager manager = StatsHandler.getInstance().getTopologyManager();
-    updateStatusBar("/StatusNbServers", manager.getDriverCount());
-    updateStatusBar("/StatusNbNodes", manager.getNodeCount());
+    updateStatusBar(DRIVERS, manager.getDriverCount());
+    updateStatusBar(NODES, manager.getNodeCount());
     manager.addTopologyListener(this);
   }
 
   /**
    * Update the number of active servers or nodes in the status bar.
-   * @param name the name of the field to update.
+   * @param fieldId the id of the field to update.
    * @param n the number of servers to add or subtract.
    */
-  void updateStatusBar(final String name, final int n) {
+  void updateStatusBar(final int fieldId, final int n) {
     try {
-      AtomicInteger nb = "/StatusNbServers".equals(name) ? nbServers : nbNodes;
+      FormattedNumberOption field = (fieldId == DRIVERS) ? serverField : nodeField;
+      AtomicInteger nb = (fieldId == DRIVERS) ? nbServers : nbNodes;
       int newNb = nb.addAndGet(n);
-      if (debugEnabled) log.debug("updating '" + name + "' with value = " + n + ", result = " + newNb);
-      FormattedNumberOption option = (FormattedNumberOption) statusBarOption.findFirstWithName(name);
-      if (option != null) option.setValue(Double.valueOf(newNb));
-    } catch(Throwable t) {
-      log.error(t.getMessage(), t);
+      if (debugEnabled) log.debug("updating '" + field.getName() + "' with value = " + n + ", result = " + newNb);
+      field.setValue(Double.valueOf(newNb));
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 
@@ -83,29 +101,27 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    * Refresh the number of active servers and nodes in the status bar.
    */
   public void refreshStatusBar() {
-    FormattedNumberOption option = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbServers");
-    if (option != null) option.setValue(Double.valueOf(nbServers.get()));
-    option = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbNodes");
-    if (option != null) option.setValue(Double.valueOf(nbNodes.get()));
+    serverField.setValue(Double.valueOf(nbServers.get()));
+    nodeField.setValue(Double.valueOf(nbNodes.get()));
   }
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    updateStatusBar("/StatusNbServers", 1);
+    updateStatusBar(DRIVERS, 1);
   }
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    updateStatusBar("/StatusNbServers", -1);
+    updateStatusBar(DRIVERS, -1);
   }
 
   @Override
   public void nodeAdded(final TopologyEvent event) {
-    if (event.getNodeData() != null) updateStatusBar("/StatusNbNodes", 1);
+    if (event.getNodeOrPeer().isNode()) updateStatusBar(NODES, 1);
   }
 
   @Override
   public void nodeRemoved(final TopologyEvent event) {
-    if (event.getNodeData() != null) updateStatusBar("/StatusNbNodes", -1);
+    if (event.getNodeOrPeer().isNode()) updateStatusBar(NODES, -1);
   }
 }

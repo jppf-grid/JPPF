@@ -111,16 +111,11 @@ public class GraphTopologyHandler implements TopologyListener {
     graphOption.repaintFlag.set(false);
     try {
       for (TopologyDriver driver: manager.getDrivers()) {
-        driverAdded(new TopologyEvent(manager, driver, null, null));
-        for (AbstractTopologyComponent child: driver.getChildrenSynchronized()) {
+        driverAdded(new TopologyEvent(manager, driver, null));
+        for (AbstractTopologyComponent child: driver.getChildren()) {
           TopologyNode node = (TopologyNode) child;
-          if (node.isNode()) {
-            log.debug("adding node " + node + " to driver " + driver);
-            nodeAdded(new TopologyEvent(manager, driver, node, null));
-          } else {
-            log.debug("adding peer " + node + " to driver " + driver);
-            nodeAdded(new TopologyEvent(manager, driver, null, (TopologyPeer) node));
-          }
+          log.debug(String.format("adding %s %s to driver %s", (node.isNode() ? "node" : "peer"), node, driver));
+          nodeAdded(new TopologyEvent(manager, driver, node));
         }
       }
     } finally {
@@ -135,7 +130,7 @@ public class GraphTopologyHandler implements TopologyListener {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriverData();
+        TopologyDriver driver = event.getDriver();
         synchronized(drivers) {
           if (!drivers.containsKey(driver.getUuid())) drivers.put(driver.getUuid(), driver);
           List<TopologyDriver> list = driversAsNodes.get(driver.getUuid());
@@ -159,7 +154,7 @@ public class GraphTopologyHandler implements TopologyListener {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriverData();
+        TopologyDriver driver = event.getDriver();
         synchronized(drivers) {
           drivers.remove(driver.getUuid());
           driversAsNodes.remove(driver.getUuid());
@@ -172,6 +167,14 @@ public class GraphTopologyHandler implements TopologyListener {
     SwingUtilities.invokeLater(r);
   }
 
+  /**
+   * Called when the state information of a driver has changed.
+   * {@inheritDoc}
+   */
+  @Override
+  public void driverUpdated(final TopologyEvent event) {
+  }
+
   @Override
   public void nodeAdded(final TopologyEvent event) {
     SwingUtilities.invokeLater(new NodeAdded(event));
@@ -182,8 +185,8 @@ public class GraphTopologyHandler implements TopologyListener {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriverData();
-        TopologyNode node = event.getNodeData();
+        TopologyDriver driver = event.getDriver();
+        TopologyNode node = event.getNodeOrPeer();
         removeVertex(node);
         graphOption.repaintGraph(graphOption.isAutoLayout());
         if (debugEnabled) log.debug("removed node " + node + " from driver " + driver);
@@ -201,8 +204,8 @@ public class GraphTopologyHandler implements TopologyListener {
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        TopologyDriver driver = event.getDriverData();
-        TopologyNode node = event.getNodeData();
+        TopologyDriver driver = event.getDriver();
+        TopologyNode node = event.getNodeOrPeer();
         if (debugEnabled) log.debug("driver=" + driver + ", node=" + node);
         graphOption.repaintGraph(false);
       }
@@ -319,11 +322,11 @@ public class GraphTopologyHandler implements TopologyListener {
 
     @Override
     public void run() {
-      TopologyDriver driver = event.getDriverData();
-      TopologyNode node = event.getNodeData();
-      TopologyPeer peer = event.getPeerData();
+      TopologyDriver driver = event.getDriver();
+      TopologyNode node = event.getNodeOrPeer();
       synchronized(drivers) {
-        if (peer != null) {
+        if (node.isPeer()) {
+          TopologyPeer peer = node.isPeer() ? (TopologyPeer) node : null;
           TopologyDriver actualDriver = drivers.get(peer.getUuid());
           if (actualDriver != null) insertPeerVertex(driver, actualDriver);
           else {
@@ -334,15 +337,10 @@ public class GraphTopologyHandler implements TopologyListener {
             }
             list.add(driver);
           }
-        } else if (node.isNode()) {
-          insertNodeVertex(driver, node);
-        }
+        } else  insertNodeVertex(driver, node);
       }
       graphOption.repaintGraph(graphOption.isAutoLayout());
-      if (debugEnabled) {
-        if (node != null) log.debug("added node " + node + " to driver " + driver);
-        else log.debug("added peer " + peer + " to driver " + driver);
-      }
+      if (debugEnabled) log.debug(String.format("added %s %s to driver %s ", (node.isNode() ? "node" : "peer"), node, driver));
     }
   };
 }

@@ -18,7 +18,6 @@
 package org.jppf.ui.monitoring.diagnostics;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.*;
 
 import org.jppf.client.monitoring.topology.*;
@@ -77,9 +76,6 @@ public class GCAction extends AbstractTopologyAction {
             DiagnosticsMBean diagnostics = driver.getDiagnostics();
             if (diagnostics == null) continue;
             diagnostics.gc();
-          } catch (IOException e) {
-            driver.initializeProxies();
-            log.error(e.getMessage(), e);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
@@ -93,9 +89,6 @@ public class GCAction extends AbstractTopologyAction {
           if (forwarder == null) continue;
           NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
           forwarder.gc(selector);
-        } catch(IOException e) {
-          entry.getKey().initializeProxies();
-          log.error(e.getMessage(), e);
         } catch (Exception e) {
           log.error(e.getMessage(), e);
         }
