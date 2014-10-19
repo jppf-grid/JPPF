@@ -30,7 +30,7 @@
 	<property name="server"                value="${basedir}/../server"/>
 	<property name="demo"                  value="${basedir}/../demo"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
-  <property name="jmxremote"            value="${basedir}/../jmxxremote"/>
+  <property name="jmxremote"             value="${basedir}/../jmxxremote"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="tests"                 value="${basedir}/../tests"/>
