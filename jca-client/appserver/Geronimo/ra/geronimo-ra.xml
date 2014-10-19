@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<connector xmlns="http://geronimo.apache.org/xml/ns/j2ee/connector-1.2" xmlns:dep="http://geronimo.apache.org/xml/ns/deployment-1.2">
+
+	<dep:environment>
+    <dep:moduleId>
+      <dep:groupId>JPPF</dep:groupId>
+      <dep:artifactId>jca-client</dep:artifactId>
+      <dep:version>2.0</dep:version>
+      <dep:type>rar</dep:type>
+    </dep:moduleId>
+    <dep:export-package>org.jppf.jca.cci</dep:export-package>
+    <dep:export-package>org.jppf.utils</dep:export-package>
+    <dep:export-package>org.jppf.utils.collections</dep:export-package>
+    <dep:export-package>org.jppf.utils.streams</dep:export-package>
+    <dep:export-package>org.jppf.client</dep:export-package>
+    <dep:export-package>org.jppf.client.event</dep:export-package>
+    <dep:export-package>org.jppf.server.protocol</dep:export-package>
+    <dep:export-package>org.jppf.node.protocol</dep:export-package>
+    <dep:export-package>org.jppf.node.policy</dep:export-package>
+    <dep:export-package>org.jppf.task.storage</dep:export-package>
+    <dep:export-package>org.jppf.serialization</dep:export-package>
+    <dep:export-package>org.jppf.client.submission</dep:export-package>
+    <dep:hidden-classes/>
+    <dep:non-overridable-classes/>
+  </dep:environment>
+
+  <resourceadapter>
+    <outbound-resourceadapter>
+      <connection-definition>
+        <connectionfactory-interface>javax.resource.cci.ConnectionFactory</connectionfactory-interface>
+        <connectiondefinition-instance>
+          <name>eis/JPPFConnectionFactory</name>
+          <connectionmanager>
+            <no-transaction/>
+            <single-pool>
+              <max-size>10</max-size>
+              <min-size>0</min-size>
+              <match-one/>
+            </single-pool>
+          </connectionmanager>
+        </connectiondefinition-instance>
+      </connection-definition>
+    </outbound-resourceadapter>
+  </resourceadapter>
+
+</connector>

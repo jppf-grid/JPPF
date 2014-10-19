@@ -1,0 +1,95 @@
+<html>
+
+	<head>
+		<title>JPPF Samples Pack</title>
+		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+		<link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+	</head>
+
+	<body>
+		<div align="center">
+			<div class="gwrapper" align="center">
+
+				<!-- start header -->
+				<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+				<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+					<tr style="height: 80px">
+						<td width="20"></td>
+						<td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+						<td valign="center"><h1>Dense Matrix Multiplication sample</h1></td>
+						<td width="20"></td>
+					</tr>
+				</table>
+				<!-- end header -->
+
+				<!-- start content -->
+				<div align="left" style="margin: 10px">
+					<!-- ${SAMPLE_START_CONTENT} -->
+					<h3>What does the sample do?</h3>
+					This sample performs the multplication of 2 square dense matrices by dividing the operation into as many JPPF tasks as there are rows in each matrix. Each task multiplies a row of the first matrix by the second matrix.
+
+					<h3>How do I run it?</h3>
+					Before running this sample application, you must have a JPPF server and at least one node running.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
+					Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
+
+					<h3>How do I use it?</h3>
+					<p>This sample doesn't have a graphical user interface, however you can modify some of the parameters in the JPPF configuration file:
+					<ol>
+						<li>open the file "<b>config/jppf-client.properties</b>" in a text editor</li>
+						<li>at the end of the file, you will see the following properties:
+<pre class="samples"><font color="green"># the size of the matrices to multiply</font>
+matrix.size = 300
+<font color="green"># number of times the matrix multiplication is performed</font>
+matrix.iterations = 100</pre>
+						</li>
+						<li>"<b>matrix.size</b>" allows you to experiment with different sizes of the matrices</li>
+						<li>"<b>matrix.iterations</b>" is the number of times the matrix multiplication will be performed.
+						As the sample simply prints the time per iteration, this will allow you to have a feel as to how the load-balancing algortihm converges toward a near-optimal performance</li>
+					</ol>
+					<p>It is interesting to experiment with a different number of nodes and load-balancing algorithm, and test their efficiency in your environment.
+
+					<h3>How can I build the sample?</h3>
+					To compile the source code, from a command prompt, type: <b>&quot;ant compile&quot;</b><br>
+					To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;</b>
+
+					<h3>I have additional questions and comments, where can I go?</h3>
+					<p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
+					<a href="javadoc/index.html">API documentation</a>.
+					<p>In addition, There are 2 privileged places you can go to:
+					<ul>
+						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+					</ul>
+					<!-- ${SAMPLE_END_CONTENT} -->
+				</div>
+				<!-- end content -->
+
+				<!-- start footer -->
+				<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+					<tr>
+						<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+						<td align="right">
+							<a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+							<a href="http://sourceforge.net/projects/jppf-project">
+								<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+									alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+							</a>
+						</td>
+						<td style="width: 10px"></td>
+					</tr>
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+				</table>
+				<div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+				<!-- end footer -->
+
+			</div>
+		</div>
+
+	</body>
+
+</html>

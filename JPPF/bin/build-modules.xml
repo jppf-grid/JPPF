@@ -1,0 +1,122 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2014 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF-modules" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                 Package the runtime components for deployment             -->
+  <!-- ========================================================================= -->
+
+  <target name="runtime" depends="rebuild, runtime.driver, runtime.node, runtime.gui, application.template"/>
+
+  <macrodef name="package-module">
+    <attribute name="module"/>
+    <attribute name="zip-prefix" default="@{module}"/>
+    <element name="module-elements" optional="true"/>
+    <sequential>
+      <property name="@{module}.prefix" value="${app.ver}-@{zip-prefix}"/>
+      <property name="runtime.@{module}.file" value="${build}/${@{module}.prefix}.zip"/>
+      <delete file="${runtime.@{module}.file}" quiet="true"/>
+      <zip destfile="${runtime.@{module}.file}">
+        <zipfileset dir="${basedir}" prefix="${@{module}.prefix}">
+          <include name="${license.file}"/>
+        </zipfileset>
+        <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" excludes="**/*.sh,JPPFDriver,JPPFNode"/>
+        <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755"/>
+        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib"     includes="jppf-common-node.jar"/>
+        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-node-src.jar"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.1.jar"/>
+        <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib">
+          <include name="slf4j-api-*.jar"/>
+          <include name="slf4j-${slf4j.bindings}-*.jar"/>
+        </zipfileset>
+        <module-elements/>
+      </zip>
+    </sequential>
+  </macrodef>
+
+  <!-- =========== Application template packaging =========== -->
+
+  <target name="application.template">
+    <package-module module="application-template">
+      <module-elements>
+        <zipfileset dir="${build}" prefix="${application-template.prefix}/lib">
+          <include name="jppf-common.jar"/>
+          <include name="jppf-client.jar"/>
+        </zipfileset>
+        <zipfileset dir="${build}" prefix="${application-template.prefix}/lib-src">
+          <include name="jppf-common-src.jar"/>
+          <include name="jppf-client-src.jar"/>
+        </zipfileset>
+        <zipfileset dir="${application.template}/src" prefix="${application-template.prefix}/src" includes="**/*.*"/>
+        <zipfileset dir="${application.template}/classes" prefix="${application-template.prefix}/classes" includes="**/*.*"/>
+      </module-elements>
+    </package-module>
+  </target>
+
+  <!-- =========== Driver packaging =========== -->
+
+  <target name="runtime.driver">
+    <package-module module="driver">
+      <module-elements>
+        <zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
+        <zipfileset dir="${build}" prefix="${driver.prefix}/lib">
+          <include name="jppf-common.jar"/>
+          <include name="jppf-server.jar"/>
+        </zipfileset>
+        <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src">
+          <include name="jppf-common-src.jar"/>
+          <include name="jppf-server-src.jar"/>
+        </zipfileset>
+      </module-elements>
+    </package-module>
+  </target>
+
+  <!-- =========== Node packaging =========== -->
+
+  <target name="runtime.node">
+    <package-module module="node"/>
+  </target>
+
+  <!-- =========== GUI packaging =========== -->
+
+  <target name="runtime.gui">
+    <package-module module="gui" zip-prefix="admin-ui">
+      <module-elements>
+        <zipfileset dir="${build}" prefix="${gui.prefix}/lib">
+          <include name="jppf-common.jar"/>
+          <include name="jppf-client.jar"/>
+          <include name="jppf-admin.jar"/>
+        </zipfileset>
+        <zipfileset dir="${build}" prefix="${gui.prefix}/lib-src">
+          <include name="jppf-common-src.jar"/>
+          <include name="jppf-client-src.jar"/>
+          <include name="jppf-admin-src.jar"/>
+        </zipfileset>
+        <zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/MigLayout" prefix="${gui.prefix}/lib" includes="*.jar"/>
+        <zipfileset dir="${lib}/Jung" prefix="${gui.prefix}/lib" includes="*.jar"/>
+      </module-elements>
+    </package-module>
+  </target>
+
+</project> 

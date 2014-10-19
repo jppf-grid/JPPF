@@ -1,0 +1,100 @@
+<html>
+
+  <head>
+    <title>Concurrent Jobs demo</title>
+    <meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+    <meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+    <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+  </head>
+
+  <body>
+    <div align="center">
+      <div class="gwrapper" align="center">
+
+        <!-- start header -->
+        <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+          <tr style="height: 80px">
+            <td width="20"></td>
+            <td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+            <td valign="center"><h1>Concurrent Jobs demo</h1></td>
+            <td width="20"></td>
+          </tr>
+        </table>
+        <!-- end header -->
+
+        <!-- start content -->
+        <div align="left" style="margin: 10px">
+          <!-- ${SAMPLE_START_CONTENT} -->
+          <h3>What does the sample do?</h3>
+          <p>This sample demonstrates fully working implementations of the patterns explored in the <a href="http://www.jppf.org/doc/v4/index.php?title=Submitting_multiple_jobs_concurrently"><i>Submitting multiple jobs concurrently</i></a> section of the documentation.
+
+          <h3>How do I run it?</h3>
+          <p><b>1. Grid setup</b>
+          <ul class="samplesList">
+            <li>you will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.</li>
+            <li>start a JPPF administration console</li>
+            <li>once you can see the driver and node in the console's topology view, select the node, then click on the "<a href="http://www.jppf.org/doc/v4/index.php?title=Node_provisioning#Provisioning_with_the_administration_console">node provisioning"</a>
+            (<img src="images/provisioning.png"/>) button. Enter 3 for the number of slave nodes, then click "Ok". You should see 3 additional nodes starting. Lastly, switch to the "Job data" view</li>
+          </ul>
+          <p><b>2. Running the demo</b>
+          <ul class="samplesList">
+            <li>open a command prompt in the JPPF-x.y.z-samples-pack/ConcurrentJobs folder</li>
+            <li>start the demo by entering "run.bat <i>n</i>" on Windows, "./run.sh <i>n</i>" on Linux/Unix or launching the Ant script "ant -Dfn=<i>n</i> run",
+              where <i>n</i> is a function number corresponding to each concurrent job execution pattern, with the possible following values:
+              <ol class="samplesList">
+                <li>for the "job submissions from multiple threads" pattern</li>
+                <li>for the "multiple non-blocking jobs from a single thread" pattern</li>
+                <li>for the "full asynchronous processing" pattern</li>
+                <li>for the "job streaming" pattern</li>
+              </ol>
+            </li>
+            <li>During the demo, the "job data" view of the administration console will show the jobs executing in parallel and how they are distributed among the nodes:<br>
+              <img src="images/monitoring.gif"/></li>
+          </ul>
+
+          <h3>Source files</h3>
+          <ul class="samplesList">
+            <li><a href="src/org/jppf/example/concurrentjobs/ConcurrentJobs.java.html">ConcurrentJobs.java</a>: The entry point for the demo, implements all the concurrent job patterns</li>
+            <li><a href="src/org/jppf/example/concurrentjobs/JobProvider.java.html">JobProvider.java<a/>: provides a stream of jobs based on the data in a text input file</li>
+            <li><a href="src/org/jppf/example/concurrentjobs/MyTask.java.html">MyTask.java</a>: a simple JPPF task implementation used by all execution patterns in the demo</li>
+          </ul>
+
+          <h3>I have additional questions and comments, where can I go?</h3>
+          <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomLoadBalancer/src</b> folder.
+          <p>In addition, There are 2 privileged places you can go to:
+          <ul>
+            <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+            <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+          </ul>
+          <!-- ${SAMPLE_END_CONTENT} -->
+        </div>
+        <!-- end content -->
+
+        <!-- start footer -->
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+          <tr>
+            <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2014 JPPF.org</td>
+            <td align="right">
+              <a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+              <a href="http://sourceforge.net/projects/jppf-project">
+                <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+                  alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+              </a>
+            </td>
+            <td style="width: 10px"></td>
+          </tr>
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+        </table>
+        <div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+        <!-- end footer -->
+
+      </div>
+    </div>
+
+  </body>
+
+</html>
