@@ -21,13 +21,13 @@ package org.jppf.ui.monitoring.node;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.client.JPPFClientConnection;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
+import org.jppf.ui.utils.TreeTableUtils;
 import org.slf4j.*;
 
 /**
@@ -143,10 +143,8 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     actionHandler.putAction("select.nodes", new SelectNodesAction(this));
     actionHandler.updateActions();
     treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
-    Runnable r = new ActionsInitializer(this, "/topology.toolbar");
-    Runnable r2 = new ActionsInitializer(this, "/topology.toolbar.bottom");
-    new Thread(r).start();
-    new Thread(r2).start();
+    new Thread(new ActionsInitializer(this, "/topology.toolbar")).start();
+    new Thread(new ActionsInitializer(this, "/topology.toolbar.bottom")).start();
   }
 
   /**
@@ -157,9 +155,9 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     try {
       if (!driver.getConnection().getStatus().isWorkingStatus()) return;
       String uuid = driver.getUuid();
-      if (findDriver(uuid) != null) return;
+      if (TreeTableUtils.findDriver(treeTableRoot, uuid) != null) return;
       JMXDriverConnectionWrapper jmx = driver.getJmx();
-      int index = driverInsertIndex(uuid);
+      int index = TreeTableUtils.driverInsertIndex(treeTableRoot, driver);
       if (index < 0) return;
       DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);
       if (debugEnabled) log.debug("adding driver: " + driver + " at index " + index);
@@ -180,7 +178,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   private synchronized void removeDriver(final TopologyDriver driverData) {
     if (debugEnabled) log.debug("removing driver: " + driverData);
     String uuid = driverData.getUuid();
-    DefaultMutableTreeNode driverNode = findDriver(uuid);
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findDriver(treeTableRoot, uuid);
     if (driverNode == null) return;
     model.removeNodeFromParent(driverNode);
   }
@@ -192,12 +190,12 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
    */
   private synchronized void addNode(final TopologyDriver driverData, final TopologyNode nodeData) {
     if ((driverData == null) || (nodeData == null)) return;
-    DefaultMutableTreeNode driverNode = findDriver(driverData.getUuid());
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
     if (driverNode == null) return;
     String nodeUuid = nodeData.getUuid();
-    if (findNode(driverNode, nodeUuid) != null) return;
+    if (TreeTableUtils.findNode(driverNode, nodeUuid) != null) return;
     if (debugEnabled) log.debug("attempting to add node={} to driver={}", nodeData, driverData);
-    int index = nodeInsertIndex(driverNode, nodeUuid, nodeData.getManagementInfo().toDisplayString());
+    int index = TreeTableUtils.nodeInsertIndex(driverNode, nodeData);
     if (index < 0) return;
     if (debugEnabled) log.debug("adding node: " + nodeUuid + " at index " + index);
     DefaultMutableTreeNode nodeNode = new DefaultMutableTreeNode(nodeData);
@@ -213,10 +211,10 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   private synchronized void removeNode(final TopologyDriver driverData, final TopologyNode nodeData) {
     if ((driverData == null) || (nodeData == null)) return;
     if (debugEnabled) log.debug("attempting to remove node=" + nodeData + " from driver=" + driverData);
-    DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
     if ((driver == null) || (nodeData == null)) return;
     String nodeUuid = nodeData.getUuid();
-    final DefaultMutableTreeNode node = findNode(driver, nodeUuid);
+    final DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, nodeUuid);
     if (node != null) {
       if (debugEnabled) log.debug("removing node: " + nodeData);
       model.removeNodeFromParent(node);
@@ -251,109 +249,12 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   public synchronized void nodeUpdated(final TopologyEvent event) {
     if (!isAutoRefresh()) return;
     TopologyDriver driverData = event.getDriver();
-    final DefaultMutableTreeNode driverNode = findDriver(driverData.getUuid());
+    final DefaultMutableTreeNode driverNode = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
     if (driverNode == null) return;
     TopologyNode nodeData = event.getNodeOrPeer();
     if (nodeData == null) return;
-    final DefaultMutableTreeNode node = findNode(driverNode, nodeData.getUuid());
+    final DefaultMutableTreeNode node = TreeTableUtils.findNode(driverNode, nodeData.getUuid());
     if (node != null) model.changeNode(node);
-  }
-
-  /**
-   * Find the driver tree node with the specified driver name.
-   * @param driverUuid name of the driver to find.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-   */
-  private DefaultMutableTreeNode findDriver(final String driverUuid) {
-    for (int i=0; i<treeTableRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      TopologyDriver data = (TopologyDriver) driverNode.getUserObject();
-      if (data.getUuid().equals(driverUuid)) return driverNode;
-    }
-    return null;
-  }
-
-  /**
-   * Find the driver tree node with the specified connection.
-   * @param driverConnection the driver connection to find.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-   */
-  private DefaultMutableTreeNode findDriver(final JPPFClientConnection driverConnection) {
-    if (driverConnection == null) return null;
-    for (int i=0; i<treeTableRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      TopologyDriver data = (TopologyDriver) driverNode.getUserObject();
-      if (data.getConnection() == driverConnection) return driverNode;
-    }
-    return null;
-  }
-
-  /**
-   * Find the node tree node with the specified driver name and node information.
-   * @param driverNode name the parent of the node to find.
-   * @param nodeUuid the name of the node to find.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-   */
-  private DefaultMutableTreeNode findNode(final DefaultMutableTreeNode driverNode, final String nodeUuid) {
-    for (int i=0; i<driverNode.getChildCount(); i++) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-      TopologyNode nodeData = (TopologyNode) node.getUserObject();
-      if (nodeUuid.equals(nodeData.getUuid())) return node;
-    }
-    return null;
-  }
-
-  /**
-   * Find the position at which to insert a driver,
-   * using the sorted lexical order of driver names.
-   * @param driverUuid the name of the driver to insert.
-   * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
-   */
-  private int driverInsertIndex(final String driverUuid) {
-    int n = treeTableRoot.getChildCount();
-    for (int i=0; i<n; i++) {
-      DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      TopologyDriver data = (TopologyDriver) driverNode.getUserObject();
-      if (data.getUuid().equals(driverUuid)) return -1;
-      else if (driverUuid.compareTo(data.getUuid()) < 0) return i;
-    }
-    return n;
-  }
-
-  /**
-   * Find the position at which to insert a node, using the sorted lexical order of node names.
-   * @param driverNode name the parent of the node to insert.
-   * @param nodeUuid the uuid of the node to insert.
-   * @param nodeName the name of the node to insert.
-   * @return the index at which to insert the node, or -1 if the node is already in the tree.
-   */
-  private int nodeInsertIndex(final DefaultMutableTreeNode driverNode, final String nodeUuid, final String nodeName) {
-    int n = driverNode.getChildCount();
-    for (int i=0; i<n; i++) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) driverNode.getChildAt(i);
-      TopologyNode nodeData = (TopologyNode) node.getUserObject();
-      if (nodeUuid.equals(nodeData.getUuid())) return -1;
-      else {
-        String name = nodeData.getManagementInfo().toDisplayString();
-        if (nodeName.compareTo(name) < 0) return i;
-      }
-    }
-    return n;
-  }
-
-  /**
-   * Repaint the tree table area.
-   */
-  private void repaintTreeTable() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        if (treeTable != null) {
-          treeTable.invalidate();
-          treeTable.repaint();
-        }
-      }
-    });
   }
 
   /**

@@ -30,6 +30,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
+import org.jppf.ui.utils.TreeTableUtils;
 import org.slf4j.*;
 
 /**
@@ -140,33 +141,32 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     actionHandler.putAction("health.update.thresholds", new ThresholdSettingsAction(this));
     actionHandler.updateActions();
     treeTable.addMouseListener(new JVMHealthTreeTableMouseListener(actionHandler));
-    //
-    Runnable r = new ActionsInitializer(this, "/health.toolbar");
-    new Thread(r).start();
+    new Thread(new ActionsInitializer(this, "/health.toolbar")).start();
   }
 
   @Override
   public synchronized void driverAdded(final TopologyEvent event) {
     if (debugEnabled) log.debug("adding driver " + event.getDriver());
     TopologyDriver driverData = event.getDriver();
-    DefaultMutableTreeNode driver = findDriver(driverData.getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
     if (driver != null) return;
+    int index = TreeTableUtils.driverInsertIndex(treeTableRoot, driverData);
+    if (index < 0) return;
     driver = new DefaultMutableTreeNode(driverData);
-    int n = treeTableRoot.getChildCount();
-    model.insertNodeInto(driver, treeTableRoot, n);
-    if (n == 0) treeTable.expand(treeTableRoot);
+    model.insertNodeInto(driver, treeTableRoot, index);
+    if (index == 0) treeTable.expand(treeTableRoot);
   }
 
   @Override
   public synchronized void driverRemoved(final TopologyEvent event) {
     if (debugEnabled) log.debug("removing driver " + event.getDriver());
-    DefaultMutableTreeNode driver = findDriver(event.getDriver().getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
     if (driver != null) model.removeNodeFromParent(driver);
   }
 
   @Override
   public synchronized void driverUpdated(final TopologyEvent event) {
-    DefaultMutableTreeNode driver = findDriver(event.getDriver().getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
     if (driver != null) model.changeNode(driver);
   }
 
@@ -174,23 +174,24 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
   public synchronized void nodeAdded(final TopologyEvent event) {
     if (debugEnabled) log.debug("adding node " + event.getNodeOrPeer() + " to driver " + event.getDriver());
     if (event.getNodeOrPeer().isPeer()) return;
-    DefaultMutableTreeNode driver = findDriver(event.getDriver().getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
     if (driver == null) return;
-    DefaultMutableTreeNode node = findNode(driver, event.getNodeOrPeer().getUuid());
+    DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, event.getNodeOrPeer().getUuid());
     if (node != null) return;
+    int index = TreeTableUtils.nodeInsertIndex(driver, event.getNodeOrPeer());
+    if (index < 0) return;
     node = new DefaultMutableTreeNode(event.getNodeOrPeer());
-    int n = driver.getChildCount();
-    model.insertNodeInto(node, driver, n);
-    if (n == 0) treeTable.expand(driver);
+    model.insertNodeInto(node, driver, index);
+    if (index == 0) treeTable.expand(driver);
   }
 
   @Override
   public synchronized void nodeRemoved(final TopologyEvent event) {
     if (debugEnabled) log.debug("removing node " + event.getNodeOrPeer() + " from driver " + event.getDriver());
     if (event.getNodeOrPeer().isPeer()) return;
-    DefaultMutableTreeNode driver = findDriver(event.getDriver().getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
     if (driver == null) return;
-    DefaultMutableTreeNode node = findNode(driver, event.getNodeOrPeer().getUuid());
+    DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, event.getNodeOrPeer().getUuid());
     if (node != null) {
       model.removeNodeFromParent(node);
       repaintTreeTable();
@@ -199,40 +200,11 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
 
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
-    DefaultMutableTreeNode driver = findDriver(event.getDriver().getUuid());
+    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
     if (driver != null) {
-      DefaultMutableTreeNode node = findNode(driver, event.getNodeOrPeer().getUuid());
+      DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, event.getNodeOrPeer().getUuid());
       if (node != null) model.changeNode(node);
     }
-  }
-
-  /**
-   * Find the driver tree node with the specified driver name.
-   * @param driverUuid name of the driver to find.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-   */
-  DefaultMutableTreeNode findDriver(final String driverUuid) {
-    for (int i=0; i<treeTableRoot.getChildCount(); i++) {
-      DefaultMutableTreeNode driverNode = (DefaultMutableTreeNode) treeTableRoot.getChildAt(i);
-      TopologyDriver data = (TopologyDriver) driverNode.getUserObject();
-      if (data.getUuid().equals(driverUuid)) return driverNode;
-    }
-    return null;
-  }
-
-  /**
-   * Find the node tree node with the specified driver name and node information.
-   * @param driver name the parent of the node to find.
-   * @param nodeUuid the name of the node to find.
-   * @return a <code>DefaultMutableTreeNode</code> or null if the driver could not be found.
-   */
-  DefaultMutableTreeNode findNode(final DefaultMutableTreeNode driver, final String nodeUuid) {
-    for (int i=0; i<driver.getChildCount(); i++) {
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) driver.getChildAt(i);
-      TopologyNode nodeData = (TopologyNode) node.getUserObject();
-      if (nodeUuid.equals(nodeData.getUuid())) return node;
-    }
-    return null;
   }
 
   /**
