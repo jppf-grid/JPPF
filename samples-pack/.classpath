@@ -21,6 +21,7 @@
 	<classpathentry kind="src" path="NodeConnectionEvents/src"/>
 	<classpathentry kind="src" output="NodeLifeCycle/classes" path="NodeLifeCycle/src"/>
 	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
+	<classpathentry kind="src" output="PluggableView/classes" path="PluggableView/src"/>
 	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
 	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
 	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
