@@ -182,21 +182,23 @@ public class ServerTaskBundleClient
    */
   public synchronized void resultReceived(final Collection<ServerTask> results) {
     if (isCancelled()) return;
-    if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
-    List<ServerTask> tasks = new ArrayList<>(results.size());
-    for (ServerTask task: results) {
-      //if (task.getState() != ServerTask.State.RESULT) {
-      if (task.getState() != TaskState.PENDING) {
-        tasks.add(task);
-        tasksToSendList.add(task);
-        pendingTasksCount.decrementAndGet();
+    boolean shouldFire = false;
+    synchronized (this) {
+      if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
+      List<ServerTask> tasks = new ArrayList<>(results.size());
+      for (ServerTask task: results) {
+        if (task.getState() != TaskState.PENDING) {
+          tasks.add(task);
+          tasksToSendList.add(task);
+          pendingTasksCount.decrementAndGet();
+        }
       }
-      //task.resultReceived(result.second());
+      done = pendingTasksCount.get() <= 0;
+      boolean fire = strategy.sendResults(this, tasks);
+      if (debugEnabled) log.debug("*** done=" + done + ", fire=" + fire + " for " + this);
+      shouldFire = done || fire;
     }
-    done = pendingTasksCount.get() <= 0;
-    boolean fire = strategy.sendResults(this, tasks);
-    if (debugEnabled) log.debug("*** done=" + done + ", fire=" + fire + " for " + this);
-    if (done || fire) fireTasksCompleted();
+    if (shouldFire) fireTasksCompleted();
   }
 
   /**
@@ -204,21 +206,23 @@ public class ServerTaskBundleClient
    * @param tasks the tasks for which an exception was received.
    * @param exception the exception.
    */
-  public synchronized void resultReceived(final Collection<ServerTask> tasks, final Throwable exception)
-  {
+  public synchronized void resultReceived(final Collection<ServerTask> tasks, final Throwable exception) {
     if (isCancelled()) return;
-    if (debugEnabled) log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
-    for (ServerTask task: tasks)
-    {
-      if (task.getState() != TaskState.PENDING) {
-        tasksToSendList.add(task);
-        pendingTasksCount.decrementAndGet();
+    boolean shouldFire = false;
+    synchronized (this) {
+      if (debugEnabled) log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
+      for (ServerTask task: tasks) {
+        if (task.getState() != TaskState.PENDING) {
+          tasksToSendList.add(task);
+          pendingTasksCount.decrementAndGet();
+        }
+        task.resultReceived(exception);
       }
-      task.resultReceived(exception);
+      done = pendingTasksCount.get() <= 0;
+      boolean fire = strategy.sendResults(this, tasks);
+      shouldFire = done || fire;
     }
-    done = pendingTasksCount.get() <= 0;
-    boolean fire = strategy.sendResults(this, tasks);
-    if (done || fire) fireTasksCompleted();
+    if (shouldFire) fireTasksCompleted();
   }
 
   /**
