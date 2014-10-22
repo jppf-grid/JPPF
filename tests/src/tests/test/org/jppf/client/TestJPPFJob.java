@@ -89,7 +89,7 @@ public class TestJPPFJob extends Setup1D1N {
       int nbTasks = 10;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
       ExecutingJobStatusListener statusListener = new ExecutingJobStatusListener();
-      job.getResultCollector().addSubmissionStatusListener(statusListener);
+      job.getResultCollector().addJobStatusListener(statusListener);
       client.submitJob(job);
       statusListener.await();
       boolean cancelled = job.cancel(true);
@@ -118,7 +118,7 @@ public class TestJPPFJob extends Setup1D1N {
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
       ExecutingJobStatusListener statusListener = new ExecutingJobStatusListener();
-      job.getResultCollector().addSubmissionStatusListener(statusListener);
+      job.getResultCollector().addJobStatusListener(statusListener);
       client.submitJob(job);
       statusListener.await();
       boolean cancelled = job.cancel(false);

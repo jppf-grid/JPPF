@@ -25,7 +25,6 @@ import javax.resource.ResourceException;
 import javax.resource.cci.ConnectionFactory;
 
 import org.jppf.client.*;
-import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.jca.cci.*;
 import org.jppf.node.protocol.Task;
 
@@ -102,42 +101,42 @@ public class JPPFHelper
 
   /**
    * Get the status of the specified job.
-   * @param id the job uuid.
+   * @param uuid the job uuid.
    * @return a mapping of jobs to their uuid.
    */
-  public static String getStatus(final String id)
+  public static String getStatus(final String uuid)
   {
-    JPPFJob job = statusMap.get(id);
-    if (job == null) return "no submission with this id";
-    SubmissionStatus status = job.getStatus();
+    JPPFJob job = statusMap.get(uuid);
+    if (job == null) return "no job with this uuid";
+    JobStatus status = job.getStatus();
     return status == null ? "unknown" : status.toString();
   }
 
   /**
    * Get the name of the specified job.
-   * @param id the job uuid.
+   * @param uuid the job uuid.
    * @return a mapping of jobs to their uuid.
    */
-  public static String getJobName(final String id)
+  public static String getJobName(final String uuid)
   {
-    JPPFJob job = statusMap.get(id);
-    if (job == null) return "no submission with this id";
+    JPPFJob job = statusMap.get(uuid);
+    if (job == null) return "no job with this uuid";
     return job.getName();
   }
 
   /**
    * Format the results of the specified job.
-   * @param id the uuid of the job.
+   * @param uuid the uuid of the job.
    * @return the formatted resutls as a string.
    */
-  public static String getMessage(final String id)
+  public static String getMessage(final String uuid)
   {
     JPPFConnection connection = null;
     String msg = null;
-    JPPFJob job = statusMap.remove(id);
-    if (job == null) return "no submission with this id";
+    JPPFJob job = statusMap.remove(uuid);
+    if (job == null) return "no job with this id";
     List<Task<?>> results = job.getAllResults();
-    if (results == null) msg = "submission is not in queue anymore";
+    if (results == null) msg = "job is not in queue anymore";
     else
     {
       StringBuilder sb = new StringBuilder();

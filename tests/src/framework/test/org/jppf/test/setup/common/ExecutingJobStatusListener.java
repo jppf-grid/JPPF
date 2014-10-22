@@ -20,22 +20,22 @@ package test.org.jppf.test.setup.common;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.client.JobStatus;
 import org.jppf.client.event.*;
-import org.jppf.client.submission.SubmissionStatus;
 
 /**
- * Sets a flag to {@code true} when the job status becomes {@link SubmissionStatus#EXECUTING}.
+ * Sets a flag to {@code true} when the job status becomes {@link JobStatus#EXECUTING}.
  * @author Laurent Cohen
  */
-public class ExecutingJobStatusListener implements SubmissionStatusListener {
+public class ExecutingJobStatusListener implements JobStatusListener {
   /**
-   * This flag is set to {@code true} when the job status becomes {@link SubmissionStatus#EXECUTING}.
+   * This flag is set to {@code true} when the job status becomes {@link JobStatus#EXECUTING}.
    */
   private final AtomicBoolean executing = new AtomicBoolean(false);
 
   @Override
-  public void submissionStatusChanged(final SubmissionStatusEvent event) {
-    if (event.getStatus() == SubmissionStatus.EXECUTING) executing.compareAndSet(false, true);
+  public void jobStatusChanged(final JobStatusEvent event) {
+    if (event.getStatus() == JobStatus.EXECUTING) executing.compareAndSet(false, true);
   }
 
   /**

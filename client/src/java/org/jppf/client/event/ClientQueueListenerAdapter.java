@@ -26,7 +26,6 @@ package org.jppf.client.event;
 public class ClientQueueListenerAdapter implements ClientQueueListener {
   @Override
   public void jobAdded(final ClientQueueEvent event) {
-    //event.getClient().getSubmissionManager();
   }
 
   @Override

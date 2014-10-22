@@ -20,46 +20,43 @@ package org.jppf.client.event;
 
 import java.util.EventObject;
 
-import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.client.JobStatus;
 
 
 /**
- * Instances of this class represent a status change notification for a jppf submission.
+ * Instances of this class represent a status change notification for a jppf job.
  * @author Laurent Cohen
  */
-public class SubmissionStatusEvent extends EventObject
-{
+public class JobStatusEvent extends EventObject {
   /**
-   * The status of the submission.
+   * The status of the job.
    */
-  private SubmissionStatus status = null;
+  private JobStatus status = null;
 
   /**
-   * Initialize this event with the specified submission id and status.
-   * @param submissionId the id of the submission whose status has changed.
-   * @param status the new status of the submission.
+   * Initialize this event with the specified job uuid and status.
+   * @param jobUuid the uuid of the job whose status has changed.
+   * @param status the new status of the job.
+   * @exclude
    */
-  public SubmissionStatusEvent(final String submissionId, final SubmissionStatus status)
-  {
-    super(submissionId);
+  public JobStatusEvent(final String jobUuid, final JobStatus status) {
+    super(jobUuid);
     this.status = status;
   }
 
   /**
-   * The status of the submission.
+   * The status of the job.
    * @return a <code>SubmissionStatus</code> typesafe enum value.
    */
-  public SubmissionStatus getStatus()
-  {
+  public JobStatus getStatus() {
     return status;
   }
 
   /**
-   * Get the id of the submission.
-   * @return the submission id as a string.
+   * Get the id of the job.
+   * @return the job id as a string.
    */
-  public String getSubmissionId()
-  {
+  public String getJobUuid() {
     return (String) getSource();
   }
 }

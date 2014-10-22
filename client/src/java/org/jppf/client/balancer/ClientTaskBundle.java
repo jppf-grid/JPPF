@@ -81,7 +81,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
   }
 
   /**
-   * Get the job this submission is for.
+   * Get the job this job is for.
    * @return a {@link JPPFJob} instance.
    */
   public JPPFJob getJob()
@@ -90,7 +90,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
   }
 
   /**
-   * Get the client job this submission is for
+   * Get the client job this job is for
    * @return a {@link ClientJob} instance.
    */
   public ClientJob getClientJob()

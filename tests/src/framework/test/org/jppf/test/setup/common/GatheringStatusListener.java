@@ -20,23 +20,23 @@ package test.org.jppf.test.setup.common;
 
 import java.util.*;
 
+import org.jppf.client.JobStatus;
 import org.jppf.client.event.*;
-import org.jppf.client.submission.SubmissionStatus;
 
 /**
  * A <code>SubmissionStatusListener</code> which collects all the events it receives
  * in a list of statuses.
  * @author Laurent Cohen
  */
-public class GatheringStatusListener implements SubmissionStatusListener
+public class GatheringStatusListener implements JobStatusListener
 {
   /**
    * The statuses collected by this listener over time.
    */
-  private final List<SubmissionStatus> statuses = new ArrayList<>();
+  private final List<JobStatus> statuses = new ArrayList<>();
 
   @Override
-  public void submissionStatusChanged(final SubmissionStatusEvent event)
+  public void jobStatusChanged(final JobStatusEvent event)
   {
     //System.out.println("adding status '" + event.getStatus() + "'");
     statuses.add(event.getStatus());
@@ -46,7 +46,7 @@ public class GatheringStatusListener implements SubmissionStatusListener
    * The statuses collected by this listener over time.
    * @return a list of <code>SubmissionStatus</code> objects.
    */
-  public List<SubmissionStatus> getStatuses()
+  public List<JobStatus> getStatuses()
   {
     return statuses;
   }

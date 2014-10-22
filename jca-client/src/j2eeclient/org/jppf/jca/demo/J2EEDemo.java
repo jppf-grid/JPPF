@@ -20,8 +20,7 @@ package org.jppf.jca.demo;
 
 import java.util.*;
 
-import org.jppf.client.JPPFJob;
-import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.client.*;
 import org.jppf.jca.cci.JPPFConnection;
 import org.jppf.node.protocol.Task;
 
@@ -61,44 +60,6 @@ public class J2EEDemo
       JPPFJob job = new JPPFJob();
       job.add(new DemoTask(duration));
       id = connection.submit(job);
-
-      /*
-			// submit with an execution policy
-			ExecutionPolicy policy = PolicyParser.parsePolicy("ExecutionPolicy.xml");
-			id = connection.submitNonBlocking(policy, list, null, null);
-       */
-
-      /*
-			id = connection.submitNonBlocking(job, new SubmissionStatusListener()
-			{
-				public void submissionStatusChanged(SubmissionStatusEvent event)
-				{
-					System.out.println("*** 1 *** submission ["+event.getSubmissionId()+"] changed to '"+event.getStatus()+"'");
-				}
-			});
-
-			connection.addSubmissionStatusListener(id, new SubmissionStatusListener()
-			{
-				public void submissionStatusChanged(SubmissionStatusEvent event)
-				{
-					String id = event.getSubmissionId();
-					SubmissionStatus status = event.getStatus();
-					switch(status)
-					{
-						case COMPLETE:
-							// process successful completion
-							break;
-						case FAILED:
-							// process failure
-							break;
-						default:
-							System.out.println("submission [" + id +
-								"] changed to '" + status + "'");
-							break;
-					}
-				}
-			});
-       */
     }
     finally
     {
@@ -221,7 +182,7 @@ public class J2EEDemo
   }
 
   /**
-   * Get the map of submissions ids to their corresponding submission status.
+   * Get the map of job uuids to their corresponding job status.
    * @return a map of ids to statuses as strings.
    * @throws Exception if the call to JPPF failed.
    */
@@ -232,10 +193,10 @@ public class J2EEDemo
     try
     {
       connection = JPPFHelper.getConnection(jndiBinding);
-      Collection<String> coll = connection.getAllSubmissionIds();
+      Collection<String> coll = connection.getAllJobIds();
       for (String id: coll)
       {
-        SubmissionStatus status = connection.getSubmissionStatus(id);
+        JobStatus status = connection.getJobStatus(id);
         String s = (status == null) ? "Unknown" : status.toString();
         map.put(id, s);
       }

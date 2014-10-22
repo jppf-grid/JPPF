@@ -24,7 +24,6 @@ import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.event.*;
-import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.*;
 import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
@@ -71,9 +70,9 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   private JPPFMulticastReceiverThread receiverThread = null;
   /**
-   * The submission manager.
+   * The job manager.
    */
-  private SubmissionManager submissionManager;
+  private JobManager jobManager;
   /**
    * Handles the class loaders used for inbound class loading requests from the servers.
    */
@@ -314,14 +313,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     closed.set(true);
     if (debugEnabled) log.debug("unregistering startup classes");
     HookFactory.unregister(JPPFClientStartupSPI.class);
-    if (submissionManager != null) {
+    if (jobManager != null) {
       if (reset) {
-        if (debugEnabled) log.debug("resetting submission manager");
-        submissionManager.reset();
+        if (debugEnabled) log.debug("resetting job manager");
+        jobManager.reset();
       } else {
-        if (debugEnabled) log.debug("closing submission manager");
-        submissionManager.close();
-        submissionManager = null;
+        if (debugEnabled) log.debug("closing job manager");
+        jobManager.close();
+        jobManager = null;
       }
     }
     if (debugEnabled) log.debug("closing broadcast receiver");
@@ -344,8 +343,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @return <code>true</code> if local execution is enabled, <code>false</code> otherwise.
    */
   public boolean isLocalExecutionEnabled() {
-    SubmissionManager submissionManager = getSubmissionManager();
-    return (submissionManager != null) && submissionManager.isLocalExecutionEnabled();
+    JobManager jobManager = getJobManager();
+    return (jobManager != null) && jobManager.isLocalExecutionEnabled();
   }
 
   /**
@@ -353,8 +352,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
    */
   public void setLocalExecutionEnabled(final boolean localExecutionEnabled) {
-    SubmissionManager submissionManager = getSubmissionManager();
-    if (submissionManager != null) submissionManager.setLocalExecutionEnabled(localExecutionEnabled);
+    JobManager jobManager = getJobManager();
+    if (jobManager != null) jobManager.setLocalExecutionEnabled(localExecutionEnabled);
   }
 
   /**
@@ -362,8 +361,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @return true if at least one connection is available, false otherwise.
    */
   public boolean hasAvailableConnection() {
-    SubmissionManager submissionManager = getSubmissionManager();
-    return (submissionManager != null) && submissionManager.hasAvailableConnection();
+    JobManager jobManager = getJobManager();
+    return (jobManager != null) && jobManager.hasAvailableConnection();
   }
 
   /**
@@ -373,11 +372,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
     super.statusChanged(event);
-    SubmissionManager submissionManager = getSubmissionManager();
-    if(submissionManager != null) {
-      ClientConnectionStatusListener listener = submissionManager.getClientConnectionStatusListener();
+    JobManager jobManager = getJobManager();
+    if(jobManager != null) {
+      ClientConnectionStatusListener listener = jobManager.getClientConnectionStatusListener();
       if(listener != null) listener.statusChanged(event);
-      if (submissionManager instanceof ThreadSynchronization) ((ThreadSynchronization) submissionManager).wakeUp();
+      if (jobManager instanceof ThreadSynchronization) ((ThreadSynchronization) jobManager).wakeUp();
     }
   }
 
@@ -391,33 +390,33 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * Get the submission manager for this JPPF client.
-   * @return a <code>JPPFSubmissionManager</code> instance.
+   * Get the job manager for this JPPF client.
+   * @return a <code>JobManager</code> instance.
    * @exclude
    */
-  public SubmissionManager getSubmissionManager() {
+  public JobManager getJobManager() {
     synchronized(this) {
-      if ((submissionManager == null) && !isClosed()) submissionManager = createSubmissionManager();
+      if ((jobManager == null) && !isClosed()) jobManager = createJobManager();
     }
-    return submissionManager;
+    return jobManager;
   }
 
   /**
-   * Set the submission manager for this JPPF client.
-   * @param submissionManager a <code>JPPFSubmissionManager</code> instance.
+   * Set the job manager for this JPPF client.
+   * @param jobManager a <code>JobManager</code> instance.
    * @exclude
    */
-  protected void setSubmissionManager(final SubmissionManager submissionManager) {
+  protected void setJobManager(final JobManager jobManager) {
     synchronized (this) {
-      this.submissionManager = submissionManager;
+      this.jobManager = jobManager;
     }
   }
 
   /**
-   * Create the submission manager for this JPPF client.
-   * @return a <code>JPPFSubmissionManager</code> instance.
+   * Create the job manager for this JPPF client.
+   * @return a <code>JobManager</code> instance.
    */
-  protected abstract SubmissionManager createSubmissionManager();
+  protected abstract JobManager createJobManager();
 
   /**
    * Cancel the job with the specified id.
@@ -429,7 +428,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   public boolean cancelJob(final String jobId) throws Exception {
     if (jobId == null || jobId.isEmpty()) throw new IllegalArgumentException("jobUUID is blank");
     if (debugEnabled) log.debug("request to cancel job with uuid=" + jobId);
-    return getSubmissionManager().cancelJob(jobId);
+    return getJobManager().cancelJob(jobId);
   }
 
   /**
@@ -443,7 +442,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * Register class loader with this submission manager.
+   * Register class loader with this job manager.
    * @param cl a <code>ClassLoader</code> instance.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
    * @return a <code>RegisteredClassLoader</code> instance.
@@ -454,7 +453,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * Unregisters class loader from this submission manager.
+   * Unregisters class loader from this job manager.
    * @param registeredClassLoader a <code>RegisteredClassLoader</code> instance.
    * @exclude
    */

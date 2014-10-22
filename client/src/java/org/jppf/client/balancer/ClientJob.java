@@ -26,7 +26,6 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.JobEvent;
-import org.jppf.client.submission.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -57,9 +56,9 @@ public class ClientJob extends AbstractClientJob {
    */
   private final Map<ClientTaskBundle, ChannelWrapper> bundleMap = new LinkedHashMap<>();
   /**
-   * The status of this submission.
+   * The status of this job.
    */
-  private SubmissionStatus submissionStatus;
+  private JobStatus jobStatus;
   /**
    * The listener that receives notifications of completed tasks.
    */
@@ -124,8 +123,8 @@ public class ClientJob extends AbstractClientJob {
       this.broadcastMap = Collections.emptyMap();
       this.resultCollector = null;
     }
-    SubmissionStatus s = job.getStatus();
-    this.submissionStatus = s == null ? SubmissionStatus.SUBMITTED : s;
+    JobStatus s = job.getStatus();
+    this.jobStatus = s == null ? JobStatus.SUBMITTED : s;
     this.tasks = new ArrayList<>(tasks);
     for (Task<?> result : job.getResults().getAllResults()) {
       if (result != null) taskStateMap.put(result.getPosition(), TaskState.RESULT);
@@ -230,7 +229,7 @@ public class ClientJob extends AbstractClientJob {
     }
     if (empty) {
       updateStatus(NEW, EXECUTING);
-      setSubmissionStatus(SubmissionStatus.EXECUTING);
+      setJobStatus(JobStatus.EXECUTING);
       setExecuting(true);
     }
     job.fireJobEvent(JobEvent.Type.JOB_DISPATCH, channel, bundle.getTasksL());
@@ -369,7 +368,7 @@ public class ClientJob extends AbstractClientJob {
     }
     if (hasPending()) {
       if (exception != null) {
-        setSubmissionStatus(exception instanceof NotSerializableException ? SubmissionStatus.COMPLETE : SubmissionStatus.FAILED);
+        setJobStatus(exception instanceof NotSerializableException ? JobStatus.COMPLETE : JobStatus.FAILED);
       }
       if (empty) setExecuting(false);
       if (requeue && onRequeue != null) {
@@ -384,7 +383,7 @@ public class ClientJob extends AbstractClientJob {
       } finally {
         if (parentJob != null) parentJob.broadcastCompleted(this);
       }
-      setSubmissionStatus(SubmissionStatus.COMPLETE);
+      setJobStatus(JobStatus.COMPLETE);
     }
   }
 
@@ -401,21 +400,21 @@ public class ClientJob extends AbstractClientJob {
   }
 
   /**
-   * Get the status of this submission.
-   * @return a {@link SubmissionStatus} enumerated value.
+   * Get the status of this job.
+   * @return a {@link JobStatus} enumerated value.
    */
-  public SubmissionStatus getSubmissionStatus() {
-    return submissionStatus;
+  public JobStatus getJobStatus() {
+    return jobStatus;
   }
 
   /**
-   * Set the status of this submission.
-   * @param submissionStatus a {@link SubmissionStatus} enumerated value.
+   * Set the status of this job.
+   * @param jobStatus a {@link JobStatus} enumerated value.
    */
-  public void setSubmissionStatus(final SubmissionStatus submissionStatus) {
-    if (this.submissionStatus == submissionStatus) return;
-    this.submissionStatus = submissionStatus;
-    if (resultCollector instanceof SubmissionStatusHandler) ((SubmissionStatusHandler) resultCollector).setStatus(this.submissionStatus);
+  public void setJobStatus(final JobStatus jobStatus) {
+    if (this.jobStatus == jobStatus) return;
+    this.jobStatus = jobStatus;
+    if (resultCollector instanceof JobStatusHandler) ((JobStatusHandler) resultCollector).setStatus(this.jobStatus);
   }
 
   @Override
@@ -482,7 +481,7 @@ public class ClientJob extends AbstractClientJob {
     }
     if (empty) {
       updateStatus(NEW, EXECUTING);
-      setSubmissionStatus(SubmissionStatus.EXECUTING);
+      setJobStatus(JobStatus.EXECUTING);
       setExecuting(true);
     }
   }
@@ -526,7 +525,7 @@ public class ClientJob extends AbstractClientJob {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("job=").append(job);
-    sb.append(", submissionStatus=").append(submissionStatus);
+    sb.append(", jobStatus=").append(jobStatus);
     sb.append(", broadcastUUID=").append(broadcastUUID);
     sb.append(", executing=").append(executing);
     sb.append(", nbTasks=").append(tasks.size());

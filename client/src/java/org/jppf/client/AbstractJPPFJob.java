@@ -30,7 +30,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Instances of this class represent a JPPF submission and hold all the required elements:
+ * Instances of this class represent a JPPF job and hold all the required elements:
  * tasks, execution policy, task listener, data provider, priority, blocking indicator.<br>
  * @author Laurent Cohen
  */

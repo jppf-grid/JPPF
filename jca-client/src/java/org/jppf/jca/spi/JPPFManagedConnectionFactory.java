@@ -25,10 +25,9 @@ import javax.resource.spi.*;
 import javax.security.auth.Subject;
 
 import org.jppf.client.*;
-import org.jppf.client.submission.SubmissionManager;
 import org.jppf.jca.cci.*;
 import org.jppf.jca.util.JPPFAccessorImpl;
-import org.jppf.jca.work.JcaSubmissionManager;
+import org.jppf.jca.work.JcaJobManager;
 import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
@@ -133,14 +132,14 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
     TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
     jppfClient = new JPPFClient(null, config) {
       @Override
-      protected SubmissionManager createSubmissionManager() {
-        SubmissionManager submissionManager = null;
+      protected JobManager createJobManager() {
+        JobManager jobManager = null;
         try {
-          submissionManager = new JcaSubmissionManager(this);
+          jobManager = new JcaJobManager(this);
         } catch (Exception e) {
-          log.error("Can't initialize Submission Manager", e);
+          log.error("Can't initialize Job Manager", e);
         }
-        return submissionManager;
+        return jobManager;
       }
 
       @Override

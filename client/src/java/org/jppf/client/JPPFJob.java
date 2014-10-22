@@ -25,7 +25,6 @@ import java.util.concurrent.*;
 import org.jppf.JPPFException;
 import org.jppf.client.event.*;
 import org.jppf.client.persistence.JobPersistence;
-import org.jppf.client.submission.*;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
@@ -33,7 +32,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * Instances of this class represent a JPPF submission and hold all the required elements:
+ * Instances of this class represent a JPPF job and hold all the required elements:
  * tasks, execution policy, task listener, data provider, priority, blocking indicator.<br>
  * <p>This class also provides the API for handling JPPF-annotated tasks and POJO tasks.
  * <p>All jobs have a name. It can be specified by calling {@link #setName(java.lang.String) setName(String name)}.
@@ -346,11 +345,11 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
 
   /**
    * Get the execution status of this job.
-   * @return a {@link SubmissionStatus} enum value, or {@code null} isd the status could not be determined.
+   * @return a {@link JobStatus} enum value, or {@code null} isd the status could not be determined.
    * @since 4.2
    */
-  public SubmissionStatus getStatus() {
-    if (resultCollector instanceof SubmissionStatusHandler) return ((SubmissionStatusHandler) resultCollector).getStatus();
+  public JobStatus getStatus() {
+    if (resultCollector instanceof JobStatusHandler) return ((JobStatusHandler) resultCollector).getStatus();
     return null;
   }
 
@@ -371,7 +370,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (log.isDebugEnabled()) log.debug("request to cancel {}, client={}", this, client);
-    if (mayInterruptIfRunning || (getStatus() != SubmissionStatus.EXECUTING)) {
+    if (mayInterruptIfRunning || (getStatus() != JobStatus.EXECUTING)) {
       try {
         if (client != null) return client.cancelJob(uuid);
       } catch(Exception e) {

@@ -15,20 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.jppf.client.event;
-
-import java.util.EventListener;
+package org.jppf.client;
 
 /**
- * Listener interface for receiving submission status change notifications.
- * @author Laurent Cohen
+ * The status of a job.
  */
-public interface SubmissionStatusListener extends EventListener
-{
+public enum JobStatus {
   /**
-   * Called when the status of a submission has changed.
-   * @param event the event encapsulating the change of status.
+   * The job was just submitted.
    */
-  void submissionStatusChanged(SubmissionStatusEvent event);
+  SUBMITTED,
+  /**
+   * The job is currently in the job queue (on the client side).
+   */
+  PENDING,
+  /**
+   * The job is being executed.
+   */
+  EXECUTING,
+  /**
+   * The job execution is complete.
+   */
+  COMPLETE,
+  /**
+   * The job execution has failed.
+   */
+  FAILED
 }

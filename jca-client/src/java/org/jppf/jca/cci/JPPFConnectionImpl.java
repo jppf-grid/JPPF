@@ -25,10 +25,9 @@ import javax.resource.cci.*;
 import javax.resource.spi.ConnectionEvent;
 
 import org.jppf.client.*;
-import org.jppf.client.event.SubmissionStatusListener;
-import org.jppf.client.submission.SubmissionStatus;
+import org.jppf.client.event.JobStatusListener;
 import org.jppf.jca.spi.JPPFManagedConnection;
-import org.jppf.jca.work.JcaSubmissionManager;
+import org.jppf.jca.work.JcaJobManager;
 import org.jppf.node.protocol.Task;
 import org.slf4j.*;
 
@@ -109,34 +108,34 @@ public class JPPFConnectionImpl implements JPPFConnection
 
   @Override
   @SuppressWarnings("deprecation")
-  public String submit(final JPPFJob job, final SubmissionStatusListener listener) throws Exception
+  public String submit(final JPPFJob job, final JobStatusListener listener) throws Exception
   {
     job.setBlocking(false);
-    if (listener != null) job.getResultCollector().addSubmissionStatusListener(listener);
+    if (listener != null) job.getResultCollector().addJobStatusListener(listener);
     managedConnection.retrieveJppfClient().submitJob(job);
     return job.getUuid();
   }
 
   @Override
   @SuppressWarnings("deprecation")
-  public void addSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
+  public void addJobStatusListener(final String jobUuid, final JobStatusListener listener)
   {
-    JPPFJob res = getJob(submissionId);
-    if (res != null) res.getResultCollector().addSubmissionStatusListener(listener);
+    JPPFJob res = getJob(jobUuid);
+    if (res != null) res.getResultCollector().addJobStatusListener(listener);
   }
 
   @Override
   @SuppressWarnings("deprecation")
-  public void removeSubmissionStatusListener(final String submissionId, final SubmissionStatusListener listener)
+  public void removeJobStatusListener(final String jobUuid, final JobStatusListener listener)
   {
-    JPPFJob res = getJob(submissionId);
-    if (res != null) res.getResultCollector().removeSubmissionStatusListener(listener);
+    JPPFJob res = getJob(jobUuid);
+    if (res != null) res.getResultCollector().removeJobStatusListener(listener);
   }
 
   @Override
-  public SubmissionStatus getSubmissionStatus(final String submissionId) throws Exception
+  public JobStatus getJobStatus(final String jobUuid) throws Exception
   {
-    JPPFJob res = getJob(submissionId);
+    JPPFJob res = getJob(jobUuid);
     if (res == null) return null;
     return res.getStatus();
   }
@@ -144,43 +143,43 @@ public class JPPFConnectionImpl implements JPPFConnection
   /**
    * Get the results of an execution request.<br>
    * This method should be called only once a call to
-   * {@link #getSubmissionStatus(java.lang.String submissionId) getSubmissionStatus(submissionId)} has returned
-   * either {@link org.jppf.client.submission.SubmissionStatus#COMPLETE COMPLETE} or
-   * {@link org.jppf.client.submission.SubmissionStatus#FAILED FAILED}
-   * @param submissionId the id of the submission for which to get the execution results.
+   * {@link #getJobStatus(java.lang.String) getJobStatus(jobUuid)} has returned
+   * either {@link org.jppf.client.JobStatus#COMPLETE COMPLETE} or
+   * {@link org.jppf.client.JobStatus#FAILED FAILED}
+   * @param jobUuid the id of the job for which to get the execution results.
    * @return the list of resulting JPPF tasks, or null if the execution failed.
    * @throws Exception if an error occurs while submitting the request.
    */
   @Override
-  public List<Task<?>> getResults(final String submissionId) throws Exception
+  public List<Task<?>> getResults(final String jobUuid) throws Exception
   {
-    JcaSubmissionManager mgr = (JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager();
-    JPPFJob res = mgr.peekSubmission(submissionId);
+    JcaJobManager mgr = (JcaJobManager) managedConnection.retrieveJppfClient().getJobManager();
+    JPPFJob res = mgr.peekJob(jobUuid);
     if (res == null) return null;
-    res = mgr.pollSubmission(submissionId);
+    res = mgr.pollJob(jobUuid);
     return res.getAllResults();
   }
 
   /**
-   * Get the submission result with the specified id.
-   * @param submissionId the id of the submission to find.
-   * @return a <code>JPPFSubmissionResult</code> instance, or null if no submission can be found for the specified id.
+   * Get the job result with the specified uuid.
+   * @param jobUuid the id of the job to find.
+   * @return a {@link JPPFJob} instance, or null if no job can be found for the specified uuid.
    */
-  private @SuppressWarnings("deprecation") JPPFJob getJob(final String submissionId)
+  private @SuppressWarnings("deprecation") JPPFJob getJob(final String jobUuid)
   {
-    return ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).peekSubmission(submissionId);
+    return ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).peekJob(jobUuid);
   }
 
   @Override
-  public Collection<String> getAllSubmissionIds()
+  public Collection<String> getAllJobIds()
   {
-    return ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).getAllSubmissionIds();
+    return ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).getAllJobUuids();
   }
 
   @Override
-  public boolean cancelJob(final String submissionId) throws Exception
+  public boolean cancelJob(final String jobUuid) throws Exception
   {
-    return managedConnection.retrieveJppfClient().cancelJob(submissionId);
+    return managedConnection.retrieveJppfClient().cancelJob(jobUuid);
   }
 
   /**
@@ -195,13 +194,13 @@ public class JPPFConnectionImpl implements JPPFConnection
 
   @Override
   @SuppressWarnings("deprecation")
-  public List<Task<?>> awaitResults(final String submissionId) throws Exception
+  public List<Task<?>> awaitResults(final String jobUuid) throws Exception
   {
-    JPPFJob job = getJob(submissionId);
+    JPPFJob job = getJob(jobUuid);
     if (debugEnabled) log.debug("job = " + job);
     if (job == null) return null;
     List<Task<?>> tasks = job.awaitResults();
-    ((JcaSubmissionManager) managedConnection.retrieveJppfClient().getSubmissionManager()).pollSubmission(submissionId);
+    ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).pollJob(jobUuid);
     return tasks;
   }
 

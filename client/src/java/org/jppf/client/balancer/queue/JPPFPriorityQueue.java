@@ -24,9 +24,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.client.balancer.*;
-import org.jppf.client.submission.SubmissionStatus;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
@@ -50,9 +49,9 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The job submission manager
+   * The job manager
    */
-  private final SubmissionManagerClient submissionManager;
+  private final JobManagerClient jobManager;
   /**
    * Handles the schedule of each job that has one.
    */
@@ -68,10 +67,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
 
   /**
    * Initialize this queue.
-   * @param submissionManager reference to submission manager.
+   * @param jobManager reference to job manager.
    */
-  public JPPFPriorityQueue(final SubmissionManagerClient submissionManager) {
-    this.submissionManager = submissionManager;
+  public JPPFPriorityQueue(final JobManagerClient jobManager) {
+    this.jobManager = jobManager;
   }
 
   /**
@@ -102,7 +101,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
             }
           }
         });
-        clientJob.setSubmissionStatus(SubmissionStatus.PENDING);
+        clientJob.setJobStatus(JobStatus.PENDING);
         clientJob.setQueueEntryTime(System.currentTimeMillis());
         clientJob.setJobReceivedTime(clientJob.getQueueEntryTime());
 
@@ -270,7 +269,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    */
   private void processBroadcastJob(final ClientJob bundleWrapper) {
     JPPFJob bundle = bundleWrapper.getJob();
-    List<ChannelWrapper> connections = submissionManager.getAllConnections();
+    List<ChannelWrapper> connections = jobManager.getAllConnections();
     if (connections.isEmpty()) {
       pendingBroadcasts.offer(bundleWrapper);
       return;
@@ -313,7 +312,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
             }
           }
         });
-        bundleWrapper.setSubmissionStatus(SubmissionStatus.PENDING);
+        bundleWrapper.setJobStatus(JobStatus.PENDING);
         bundleWrapper.setQueueEntryTime(System.currentTimeMillis());
         bundleWrapper.setJobReceivedTime(bundleWrapper.getQueueEntryTime());
 
@@ -407,7 +406,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    * This method is normally called from <code>TaskQueueChecker.dispatch()</code>.
    */
   public void processPendingBroadcasts() {
-    if (!submissionManager.hasWorkingConnection()) return;
+    if (!jobManager.hasWorkingConnection()) return;
     ClientJob clientJob;
     while ((clientJob = pendingBroadcasts.poll()) != null) {
       if (debugEnabled) log.debug("queuing job " + clientJob.getJob());

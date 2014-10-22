@@ -16,24 +16,18 @@
  * limitations under the License.
  */
 
-package org.jppf.client.submission;
+package org.jppf.client.event;
 
+import java.util.EventListener;
 
 /**
- * Interface implemented by classes that wish to handle submission statuses.
+ * Listener interface for receiving job status change notifications.
  * @author Laurent Cohen
  */
-public interface SubmissionStatusHandler
-{
+public interface JobStatusListener extends EventListener {
   /**
-   * Get the status of this submission.
-   * @return a {@link SubmissionStatus} enumerated value.
+   * Called when the status of a job has changed.
+   * @param event the event encapsulating the change of status.
    */
-  SubmissionStatus getStatus();
-
-  /**
-   * Set the status of this submission.
-   * @param newStatus a {@link SubmissionStatus} enumerated value.
-   */
-  void setStatus(final SubmissionStatus newStatus);
+  void jobStatusChanged(JobStatusEvent event);
 }

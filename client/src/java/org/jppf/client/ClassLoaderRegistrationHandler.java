@@ -68,7 +68,7 @@ public class ClassLoaderRegistrationHandler implements AutoCloseable {
   }
 
   /**
-   * Register class loader with this submission manager.
+   * Register class loader with this job manager.
    * @param cl a <code>ClassLoader</code> instance.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
    * @return a <code>RegisteredClassLoader</code> instance.
@@ -87,7 +87,7 @@ public class ClassLoaderRegistrationHandler implements AutoCloseable {
   }
 
   /**
-   * Unregisters class loader from this submission manager.
+   * Unregisters class loader from this job manager.
    * @param registeredClassLoader a <code>RegisteredClassLoader</code> instance.
    * @exclude
    */

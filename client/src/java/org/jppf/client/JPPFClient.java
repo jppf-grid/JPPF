@@ -19,10 +19,9 @@ package org.jppf.client;
 
 import java.util.List;
 
-import org.jppf.client.balancer.SubmissionManagerClient;
+import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.debug.Debug;
 import org.jppf.client.event.ClientListener;
-import org.jppf.client.submission.SubmissionManager;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
@@ -105,7 +104,7 @@ public class JPPFClient extends AbstractGenericClient {
     }
     job.client = this;
     if (debugEnabled) log.debug("submitting job {}", job);
-    getSubmissionManager().submitJob(job);
+    getJobManager().submitJob(job);
     if (job.isBlocking()) return job.awaitResults();
     return null;
   }
@@ -115,14 +114,14 @@ public class JPPFClient extends AbstractGenericClient {
    * @exclude
    */
   @Override
-  protected SubmissionManager createSubmissionManager() {
-    SubmissionManager submissionManager = null;
+  protected JobManager createJobManager() {
+    JobManager jobManager = null;
     try {
-      submissionManager = new SubmissionManagerClient(this);
+      jobManager = new JobManagerClient(this);
     } catch (Exception e) {
-      log.error("Can't initialize Submission Manager", e);
+      log.error("Can't initialize job Manager", e);
     }
-    return submissionManager;
+    return jobManager;
   }
 
   /**

@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jppf.client.event.*;
 import org.jppf.client.event.JobEvent.Type;
 import org.jppf.client.persistence.*;
-import org.jppf.client.submission.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -36,7 +35,7 @@ import org.slf4j.*;
  * @author Martin JANDA
  * @exclude
  */
-public class JPPFResultCollector implements SubmissionStatusHandler {
+public class JPPFResultCollector implements JobStatusHandler {
   /**
    * Logger for this class.
    */
@@ -54,13 +53,13 @@ public class JPPFResultCollector implements SubmissionStatusHandler {
    */
   private final JPPFJob job;
   /**
-   * The status of this submission.
+   * The status of this job.
    */
-  private AtomicReference<SubmissionStatus> status = new AtomicReference<>(SubmissionStatus.SUBMITTED);
+  private AtomicReference<JobStatus> status = new AtomicReference<>(JobStatus.SUBMITTED);
   /**
-   * List of listeners registered to receive this submission's status change notifications.
+   * List of listeners registered to receive this job's status change notifications.
    */
-  private final List<SubmissionStatusListener> listeners = new ArrayList<>();
+  private final List<JobStatusListener> listeners = new ArrayList<>();
 
   /**
    * Initialize this collector with the specified job.
@@ -99,12 +98,12 @@ public class JPPFResultCollector implements SubmissionStatusHandler {
   }
 
   @Override
-  public SubmissionStatus getStatus() {
+  public JobStatus getStatus() {
     return status.get();
   }
 
   @Override
-  public void setStatus(final SubmissionStatus newStatus) {
+  public void setStatus(final JobStatus newStatus) {
     if (status.get() != newStatus) {
       if (debugEnabled) log.debug("job [" + job.getUuid() + "] status changing from '" + this.status + "' to '" + newStatus + "'");
       this.status.set(newStatus);
@@ -116,7 +115,7 @@ public class JPPFResultCollector implements SubmissionStatusHandler {
    * Add a listener to the list of status listeners.
    * @param listener the listener to add.
    */
-  public void addSubmissionStatusListener(final SubmissionStatusListener listener) {
+  public void addJobStatusListener(final JobStatusListener listener) {
     synchronized(listeners) {
       if (debugEnabled) log.debug("job [" + job.getUuid() + "] adding status listener " + listener);
       if (listener != null) listeners.add(listener);
@@ -127,7 +126,7 @@ public class JPPFResultCollector implements SubmissionStatusHandler {
    * Remove a listener from the list of status listeners.
    * @param listener the listener to remove.
    */
-  public void removeSubmissionStatusListener(final SubmissionStatusListener listener) {
+  public void removeJobStatusListener(final JobStatusListener listener) {
     synchronized(listeners) {
       if (debugEnabled) log.debug("job [" + job.getUuid() + "] removing status listener " + listener);
       if (listener != null) listeners.remove(listener);
@@ -135,16 +134,16 @@ public class JPPFResultCollector implements SubmissionStatusHandler {
   }
 
   /**
-   * Notify all listeners of a change of status for this submission.
-   * @param newStatus the status for submission event.
+   * Notify all listeners of a change of status for this job.
+   * @param newStatus the status for job event.
    * @exclude
    */
-  protected void fireStatusChangeEvent(final SubmissionStatus newStatus) {
+  protected void fireStatusChangeEvent(final JobStatus newStatus) {
     synchronized(listeners) {
       if (debugEnabled) log.debug("job [" + job.getUuid() + "] fire status changed event for '" + newStatus + "'");
       if (!listeners.isEmpty()) {
-        SubmissionStatusEvent event = new SubmissionStatusEvent(job.getUuid(), newStatus);
-        for (SubmissionStatusListener listener: listeners) listener.submissionStatusChanged(event);
+        JobStatusEvent event = new JobStatusEvent(job.getUuid(), newStatus);
+        for (JobStatusListener listener: listeners) listener.jobStatusChanged(event);
       }
     }
   }

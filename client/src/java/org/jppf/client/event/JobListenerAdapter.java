@@ -22,25 +22,20 @@ package org.jppf.client.event;
  * A convenience class which allows subclassing and implementing only the needed methods of {@link JobListener}.
  * @author Laurent Cohen
  */
-public class JobListenerAdapter implements JobListener
-{
+public class JobListenerAdapter implements JobListener {
   @Override
-  public void jobStarted(final JobEvent event)
-  {
+  public void jobStarted(final JobEvent event) {
   }
 
   @Override
-  public void jobEnded(final JobEvent event)
-  {
+  public void jobEnded(final JobEvent event) {
   }
 
   @Override
-  public void jobDispatched(final JobEvent event)
-  {
+  public void jobDispatched(final JobEvent event) {
   }
 
   @Override
-  public void jobReturned(final JobEvent event)
-  {
+  public void jobReturned(final JobEvent event) {
   }
 }
