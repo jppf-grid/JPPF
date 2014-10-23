@@ -107,6 +107,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Execution status for the node.
    */
   protected ExecutorStatus executionStatus = ExecutorStatus.DISABLED;
+  /**
+   * Whether this context has been closed.
+   */
+  protected final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Initialized abstract node context.
@@ -173,39 +177,41 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
-    if (debugEnabled) log.debug("handling {} for {}", exception == null ? "null" : exception.getClass().getName(), channel);
-    ServerTaskBundleNode tmpBundle = bundle;
-    NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
-    try {
-      if (tmpBundle != null) {
-        server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
-        tmpBundle.taskCompleted(exception);
-      }
-      cleanup(channel);
-      if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
-        boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
-        applyMaxResubmit |= tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
-        if (!applyMaxResubmit) {
-          tmpBundle.resubmit();
-        } else {
-          int count = 0;
-          List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
-          for (ServerTask task: tmpBundle.getTaskList()) {
-            results.add(task.getInitialTask());
-            int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
-            if (task.incResubmitCount() <= max) {
-              task.resubmit();
-              count++;
-            }
-          }
-          if (count > 0) updateStatsUponTaskResubmit(count);
-          tmpBundle.resultsReceived(results);
+    if (closed.compareAndSet(false, true)) {
+      if (debugEnabled) log.debug("handling {} for {}", exception == null ? "null" : exception.getClass().getName(), channel);
+      ServerTaskBundleNode tmpBundle = bundle;
+      NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
+      try {
+        if (tmpBundle != null) {
+          server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+          tmpBundle.taskCompleted(exception);
         }
-        tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
-        updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
+        cleanup(channel);
+        if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
+          boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
+          applyMaxResubmit |= tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
+          if (!applyMaxResubmit) {
+            tmpBundle.resubmit();
+          } else {
+            int count = 0;
+            List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
+            for (ServerTask task: tmpBundle.getTaskList()) {
+              results.add(task.getInitialTask());
+              int max = tmpBundle.getJob().getSLA().getMaxTaskResubmits();
+              if (task.incResubmitCount() <= max) {
+                task.resubmit();
+                count++;
+              }
+            }
+            if (count > 0) updateStatsUponTaskResubmit(count);
+            tmpBundle.resultsReceived(results);
+          }
+          tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
+          updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
+        }
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
       }
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
     }
   }
 
@@ -325,10 +331,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (update && managementInfo != null) managementInfo.setSystemInfo(nodeInfo);
   }
 
-  /**
-   * Get the management information.
-   * @return a {@link JPPFManagementInfo} instance.
-   */
   @Override
   public JPPFManagementInfo getManagementInfo() {
     return managementInfo;
