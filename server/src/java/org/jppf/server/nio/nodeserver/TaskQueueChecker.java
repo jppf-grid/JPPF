@@ -39,7 +39,7 @@ import org.slf4j.*;
  * This class ensures that idle nodes get assigned pending tasks in the queue.
  * @param <C> type of the <code>ExecutorChannel</code>.
  */
-public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchronization implements Runnable {
+public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -243,6 +243,16 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
               nodeBundle = prepareJobDispatch(channel, serverJob);
               removeIdleChannel(channel);
             }
+            if (channel != null && nodeBundle != null) {
+              try {
+                dispatchJobToChannel(channel, nodeBundle);
+                dispatched = true;
+                return true;
+              } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                channel.handleException(channel.getChannel(), e);
+              }
+            }
           }
           if (debugEnabled) log.debug((channel == null) ? "no channel found for bundle " : "channel found for bundle " + channel);
         } catch(Exception e) {
@@ -250,10 +260,6 @@ public class TaskQueueChecker<C extends ExecutorChannel> extends ThreadSynchroni
         } finally {
           queueLock.unlock();
         }
-      }
-      if (channel != null && nodeBundle != null) {
-        dispatchJobToChannel(channel, nodeBundle);
-        dispatched = true;
       }
     } catch (Exception e) {
       log.error("An error occurred while preparing for bundle creation and dispatching.", e);
