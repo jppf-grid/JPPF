@@ -31,7 +31,7 @@ import org.jppf.nio.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -92,7 +92,7 @@ class WaitInitialBundleState extends NodeServerState {
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !offline) {
-        String host = getChannelHost(channel);
+        String host = NetworkUtils.getHostName(getChannelHost(channel));
         int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
         byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;

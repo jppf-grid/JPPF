@@ -145,7 +145,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     int coreThreads = Runtime.getRuntime().availableProcessors();
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
+    //LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
+    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
     if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
@@ -231,18 +232,26 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
-    int size = poolSize > 0 ? poolSize : 1;
-    JPPFConnectionPool pool = new JPPFConnectionPool(this, poolSequence.incrementAndGet(), name, priority, poolSize, ssl, jmxPoolSize);
-    pool.setDriverHost(info.host);
+    final int size = poolSize > 0 ? poolSize : 1;
+    final JPPFConnectionPool pool = new JPPFConnectionPool(this, poolSequence.incrementAndGet(), name, priority, poolSize, ssl, jmxPoolSize);
     pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
     synchronized(pools) {
       pools.putValue(priority, pool);
       pendingPools.add(pool);
     }
-    for (int i=1; i<=size; i++) {
-      if (isClosed()) return;
-      submitNewConnection(info, pool);
-    }
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        String hostName = NetworkUtils.getHostName(info.host);
+        log.info("'{}' was resolved into '{}'", info.host, hostName);
+        pool.setDriverHost(hostName);
+        for (int i=1; i<=size; i++) {
+          if (isClosed()) return;
+          submitNewConnection(info, pool);
+        }
+      }
+    };
+    executor.submit(r);
   }
 
   /**
