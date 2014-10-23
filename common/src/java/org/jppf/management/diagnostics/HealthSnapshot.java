@@ -189,4 +189,32 @@ public class HealthSnapshot implements Serializable
   {
     return StringUtils.padLeft(nf.format(value), ' ', 6);
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    long temp = Double.doubleToLongBits(cpuLoad);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + (deadlocked ? 1231 : 1237);
+    result = prime * result + (int) (heapUsed ^ (heapUsed >>> 32));
+    result = prime * result + liveThreads;
+    result = prime * result + (int) (nonheapUsed ^ (nonheapUsed >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    HealthSnapshot other = (HealthSnapshot) obj;
+    //if (Double.doubleToLongBits(cpuLoad) != Double.doubleToLongBits(other.cpuLoad)) return false;
+    if (cpuLoad != other.cpuLoad) return false;
+    if (deadlocked != other.deadlocked) return false;
+    if (heapUsed != other.heapUsed) return false;
+    if (liveThreads != other.liveThreads) return false;
+    if (nonheapUsed != other.nonheapUsed) return false;
+    return true;
+  }
 }
