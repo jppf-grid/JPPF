@@ -89,7 +89,7 @@ public final class ConcurrentUtils {
    * @throws IllegalArgumentException if the mililis are negative.
    */
   public static boolean awaitCondition(final Condition condition, final long millis) throws IllegalArgumentException {
-    return awaitCondition(condition, millis);
+    return awaitCondition(condition, millis, 0);
   }
 
   /**
