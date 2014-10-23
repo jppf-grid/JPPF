@@ -20,43 +20,34 @@ package test.console;
 
 import javax.swing.*;
 
-import org.jppf.ui.monitoring.UILauncher;
+import org.jppf.ui.console.JPPFAdminConsole;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
- * Test embedding the admin conosle in a user-defined GUI.
+ * Test embedding the admin console in a user-defined GUI.
  * @author Laurent Cohen
  */
 public class EmbeddedConsole {
   /**
    * 
-   * @param args not used.
+   * @param args not used
+   * @throws Exception if any error occurs.
    */
-  public static void main(final String[] args) {
-    try {
-      try {
-        //UIManager.setLookAndFeel(NimbusLookAndFeel.class.getName());
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      } catch(Throwable t) {
-        t.printStackTrace();;
-      }
-      JPanel topPanel = new JPanel();
-      topPanel.setAlignmentX(0f);
-      topPanel.setBorder(BorderFactory.createEtchedBorder());
-      JLabel label = new JLabel("Test JPPF embedded console", GuiUtils.loadIcon("../admin/jppf_splash.gif"), SwingConstants.LEFT);
-      topPanel.add(label);
-      JPanel mainPanel = new JPanel();
-      BoxLayout layout = new BoxLayout(mainPanel, BoxLayout.Y_AXIS);
-      mainPanel.setLayout(layout);
-      mainPanel.add(topPanel);
-      mainPanel.add(UILauncher.loadUI());
-      JFrame frame = new JFrame("Embedded console");
-      frame.setSize(800, 800);
-      frame.add(mainPanel);
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setVisible(true);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  public static void main(final String[] args) throws Exception {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    JPanel mainPanel = new JPanel();
+    // layout the components vetically within a box
+    mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+    // the top component is a label within an image and some text
+    ImageIcon icon = GuiUtils.loadIcon("../admin/jppf_logo.gif");
+    JLabel label = new JLabel("Test JPPF embedded console", icon, SwingConstants.LEFT);
+    mainPanel.add(label);
+    mainPanel.add(JPPFAdminConsole.getAdminConsole());
+    // add the admin console as the bottom componenty
+    JFrame frame = new JFrame("Embedded console");
+    frame.setSize(800, 600);
+    frame.add(mainPanel);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setVisible(true);
   }
 }

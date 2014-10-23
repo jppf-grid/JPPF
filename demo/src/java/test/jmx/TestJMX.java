@@ -87,7 +87,7 @@ public class TestJMX
    */
   private static void perform1() throws Exception
   {
-    DiagnosticsMBean diag = driverJmx.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+    DiagnosticsMBean diag = driverJmx.getDiagnosticsProxy();
     ThreadDump td = diag.threadDump();
     StringWriter sw = new StringWriter();
     HTMLThreadDumpWriter writer = new HTMLThreadDumpWriter(sw, "driver " + driverJmx.getDisplayName());

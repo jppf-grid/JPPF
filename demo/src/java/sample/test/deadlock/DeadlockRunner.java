@@ -61,7 +61,7 @@ public class DeadlockRunner {
     try (JPPFClient client = new JPPFClient();
         JobStreamImpl jobProvider = new JobStreamImpl(concurrencyLimit, nbJobs, tasksPerJob, taskDuration)) {
       ensureSufficientConnections(client, concurrencyLimit);
-      //for (int n: nbSlaves) updateSlaveNodes(client, n);
+      for (int n: nbSlaves) updateSlaveNodes(client, n);
       TimeMarker marker = new TimeMarker().start();
       for (JPPFJob job: jobProvider) {
         if (job != null) client.submitJob(job);

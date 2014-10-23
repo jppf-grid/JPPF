@@ -37,6 +37,7 @@ permission java.lang.RuntimePermission "accessDeclaredMembers";
 permission java.lang.RuntimePermission "getStackTrace";
 permission java.lang.RuntimePermission "modifyThread";
 permission java.lang.RuntimePermission "getProtectionDomain";
+permission java.lang.RuntimePermission "getenv.*";
 
 //------------------------------------------------------------------------------//
 // Security permissions.                                                         //
@@ -70,6 +71,7 @@ permission java.io.FilePermission "jmxconfig/password.properties", "read";
 permission java.util.PropertyPermission "log4j.*", "read";
 permission java.util.PropertyPermission "org.apache.commons.logging.*", "read";
 permission java.util.PropertyPermission "java.*", "read";
+permission java.util.PropertyPermission "*", "read";
 permission java.util.PropertyPermission "line.separator", "read";
 permission java.util.PropertyPermission "os.name", "read";
 
@@ -80,13 +82,18 @@ permission java.util.PropertyPermission "os.name", "read";
 
 permission java.lang.management.ManagementPermission "control";
 permission java.lang.management.ManagementPermission "monitor";
+permission java.io.FilePermission "${java.io.tmpdir}/-" "read,write,delete";
+permission javax.management.MBeanTrustPermission "register";
 
 //------------------------------------------------------------------------------//
 // MBean server permissions.                                                    //
 // Please do not change these permissions. JPPF may not work any more if you do //
 //------------------------------------------------------------------------------//
 
-//permission javax.management.MBeanServerPermission "createMBeanServer";
+permission javax.management.MBeanServerPermission "createMBeanServer";
+permission javax.management.MBeanServerPermission "findMBeanServer";
+permission javax.management.MBeanServerPermission "*";
+permission javax.management.MBeanPermission "*", "*";
 
 //------------------------------------------------------------------------------//
 // Permissions for running the node with the Java Wrapper.                      //

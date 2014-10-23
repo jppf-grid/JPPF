@@ -142,7 +142,7 @@ public class TestDriverRestart {
             }
             try {
               if (diagnostics == null) {
-                diagnostics = jmxWrapper.getProxy(DiagnosticsMBean.MBEAN_NAME_DRIVER, DiagnosticsMBean.class);
+                diagnostics = jmxWrapper.getDiagnosticsProxy();
               }
             } catch (final Exception ignore) {
             }
