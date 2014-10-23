@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="Downloads"}$
 
   <?php
-    $ver1 = "4.2.2";
+    $ver1 = "4.2.3";
     $ver2 = "4.1.3";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
   ?>
