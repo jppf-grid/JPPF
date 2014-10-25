@@ -109,6 +109,7 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     String s = config.getString("jppf.jvm.options");
     jvmOptions.addAll(parseJvmOptions(s).first());
     s = config.getString(NodeProvisioningConstants.SLAVE_JVM_OPTIONS_PROPERTY);
+    jvmOptions.addAll(parseJvmOptions(s).first());
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
     List<String> command = new ArrayList<>();
     command.add(System.getProperty("java.home")+"/bin/java");
@@ -127,6 +128,8 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     if (log.isDebugEnabled()) log.debug("process command for {}:\n{}", name, command);
     ProcessBuilder builder = new ProcessBuilder(command);
     builder.directory(slaveDir);
+    builder.redirectOutput(new File(slaveDir, "system_out.log"));
+    builder.redirectError(new File(slaveDir, "system_err.log"));
     return builder.start();
   }
 
