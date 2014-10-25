@@ -28,6 +28,7 @@ import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
 import org.slf4j.*;
@@ -140,6 +141,12 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       graphMouse.add(myPlugin);
       viewer.setGraphMouse(graphMouse);
       graphComponent.addComponentListener(new ViewerComponentListener());
+      StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
+        @Override
+        public void stateChanged(final ShowIPEvent event) {
+          graphComponent.repaint();
+        }
+      });
     }
   }
 

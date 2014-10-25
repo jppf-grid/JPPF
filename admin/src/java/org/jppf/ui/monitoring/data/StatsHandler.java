@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.data;
 import java.awt.Toolkit;
 import java.awt.datatransfer.*;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
@@ -52,9 +53,13 @@ public final class StatsHandler implements StatsConstants {
    */
   private JPPFStatistics stats = new JPPFStatistics();
   /**
-   * List of listeners registered with this stats formatter.
+   * List of listeners registered with this stats handler.
    */
   private List<StatsHandlerListener> listeners = new ArrayList<>();
+  /**
+   * List of listeners tot he state of og the ShowIP toggle registered with this stats handler.
+   */
+  private List<ShowIPListener> showIPListeners = new CopyOnWriteArrayList<>();
   /**
    * Timer used to query the stats from the server.
    */
@@ -83,6 +88,10 @@ public final class StatsHandler implements StatsConstants {
    * The object which monitors and maintains a representation of the grid topology.
    */
   private final TopologyManager topologyManager;
+  /**
+   * {@code true} to show IP addresses, {@code false} to display host names.
+   */
+  private boolean showIP = false;
 
   /**
    * Get the singleton instance of this class.
@@ -208,6 +217,43 @@ public final class StatsHandler implements StatsConstants {
   public void fireStatsHandlerEvent(final StatsHandlerEvent.Type type) {
     StatsHandlerEvent event = new StatsHandlerEvent(this, type);
     for (StatsHandlerListener listener: listeners) listener.dataUpdated(event);
+  }
+
+  /**
+   * Register a <code>StatsHandlerListener</code> with this stats formatter.
+   * @param listener the listener to register.
+   */
+  public void addShowIPListener(final ShowIPListener listener) {
+    if (listener != null) showIPListeners.add(listener);
+  }
+
+  /**
+   * Unregister a <code>StatsHandlerListener</code> from this stats formatter.
+   * @param listener the listener to unregister.
+   */
+  public void removeShowIPListener(final ShowIPListener listener) {
+    if (listener != null) showIPListeners.remove(listener);
+  }
+
+  /**
+   * Determine whether to show IP addresses or host names.
+   * @return {@code true} to show IP addresses, {@code false} to display host names.
+   */
+  public boolean isShowIP() {
+    return showIP;
+  }
+
+  /**
+   * Specify whether to show IP addresses or host names.
+   * @param showIP {@code true} to show IP addresses, {@code false} to display host names.
+   */
+  public void setShowIP(final boolean showIP) {
+    if (showIP != this.showIP) {
+      boolean oldState = this.showIP;
+      this.showIP = showIP;
+      ShowIPEvent event = new ShowIPEvent(this, oldState);
+      for (ShowIPListener listener: showIPListeners) listener.stateChanged(event);
+    }
   }
 
   /**

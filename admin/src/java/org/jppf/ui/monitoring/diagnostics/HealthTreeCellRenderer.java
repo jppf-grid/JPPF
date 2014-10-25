@@ -25,7 +25,7 @@ import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
-import org.jppf.ui.utils.GuiUtils;
+import org.jppf.ui.utils.*;
 
 /**
  * Renderer used to render the tree nodes (1st column) in the node data panel.
@@ -59,7 +59,7 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
         AbstractTopologyComponent data = (AbstractTopologyComponent) node.getUserObject();
-        renderer.setText(data.getDisplayName());
+        renderer.setText(TreeTableUtils.getDisplayName(data));
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;

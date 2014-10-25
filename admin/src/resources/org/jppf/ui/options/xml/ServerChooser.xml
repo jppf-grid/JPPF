@@ -20,10 +20,10 @@
 <!--
   XML descriptor for the server chooser combo box in the admin console.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ServerChooserPanel" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ServerChooserPanel" type="page" i18n="org.jppf.ui.i18n.JPPFAdminTool">
   <property name="tooltip" value="The list of drivers to connect to"/>
-  <property name="layoutConstraints" value="flowy, fill, insets 2 2 2 2"/>
-  <property name="componentConstraints" value="pushy 0, pushx, h 22!"/>
+  <property name="layoutConstraints" value="flowx, fill, insets 2 2 2 2"/>
+  <property name="componentConstraints" value="pushy 0, pushx, h 25!"/>
 
   <child name="ServerChooser" type="ComboBox">
     <property name="label" value="Server connection"/>
@@ -34,6 +34,22 @@
     </initializer>
     <listener type="script">
       <script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentDriver(option.getValue())</script>
+    </listener>
+  </child>
+
+  <child name="sep" type="ToolbarSeparator"/>
+
+  <child name="show.ip" type="Button">
+    <property name="icon" value="/org/jppf/ui/resources/show_ip.gif"/>
+    <property name="toggle" value="true"/>
+    <initializer type="script">
+      <script language="groovy">option.getUIComponent().setSelected(false)</script>
+    </initializer>
+    <listener type="script">
+      <script language="groovy"><![CDATA[
+        def b = option.getUIComponent().isSelected();
+        StatsHandler.getInstance().setShowIP(b);
+      ]]></script>
     </listener>
   </child>
 

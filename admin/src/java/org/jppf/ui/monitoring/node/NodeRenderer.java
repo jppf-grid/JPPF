@@ -25,19 +25,24 @@ import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
-import org.jppf.ui.utils.GuiUtils;
+import org.jppf.ui.utils.*;
 
 /**
  * Renderer used to render the tree nodes (1st column) in the node data panel.
  * @author Laurent Cohen
  */
-public class NodeRenderer extends AbstractTreeCellRenderer
-{
+public class NodeRenderer extends AbstractTreeCellRenderer {
+  /**
+   * The topology tree view.
+   */
+  private final NodeDataPanel panel;
+
   /**
    * Default constructor.
+   * @param panel the topology tree view.
    */
-  public NodeRenderer()
-  {
+  public NodeRenderer(final NodeDataPanel panel) {
+    this.panel = panel;
     defaultNonSelectionBackground = getBackgroundNonSelectionColor();
     defaultSelectionBackground = getBackgroundSelectionColor();
   }
@@ -66,7 +71,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer
         Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
         Font f = renderer.getFont();
         Font font = getPlainFont(f);
-        renderer.setText(data.getDisplayName());
+        renderer.setText(TreeTableUtils.getDisplayName(data));
         if (data.isDriver()) {
           TopologyDriver driver = (TopologyDriver) data;
           if (driver.getConnection().getStatus().isWorkingStatus()) {

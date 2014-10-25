@@ -62,10 +62,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     if (channel == null) throw new IllegalArgumentException("channel is null");
 
     this.channel = (AbstractJPPFClientConnection) channel;
-    this.uuid = channel.getDriverUuid();
-    priority = channel.getPriority();
+    JPPFConnectionPool pool = channel.getConnectionPool();
+    this.uuid = pool.getDriverUuid();
+    priority = pool.getPriority();
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
-    managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, channel.isSSLEnabled());
+    managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
     managementInfo.setSystemInfo(systemInfo);
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName()));
   }

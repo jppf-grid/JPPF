@@ -72,6 +72,11 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    */
   private String driverHost;
   /**
+   * The host name or address of the remote driver.
+   * @since 4.2
+   */
+  private String driverIPAddress;
+  /**
    * The port to use on the remote driver.
    * @since 4.2
    */
@@ -315,7 +320,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
-   * Get the host name or address of the remote driver.
+   * Get the host name of the remote driver.
    * @return a string representing the host name or ip address.
    * @since 4.2
    */
@@ -324,13 +329,34 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
-   * Set the host name or address of the remote driver.
+   * Set the host name of the remote driver.
    * @param driverHost a string representing the host name or ip address.
    * @since 4.2
    */
   synchronized void setDriverHost(final String driverHost) {
     if ((this.driverHost == null) && (driverHost != null)) {
       this.driverHost = driverHost;
+      jmxPool.hostSet();
+    }
+  }
+
+  /**
+   * Get the ip address of the remote driver.
+   * @return a string representing the host name or ip address.
+   * @since 4.2
+   */
+  public synchronized String getDriverIPAddress() {
+    return driverIPAddress;
+  }
+
+  /**
+   * Set the ip address of the remote driver.
+   * @param ipAddress a string representing the host name or ip address.
+   * @since 4.2
+   */
+  synchronized void setDriverIPAddress(final String ipAddress) {
+    if ((this.driverIPAddress == null) && (ipAddress != null)) {
+      this.driverIPAddress = ipAddress;
       jmxPool.hostSet();
     }
   }

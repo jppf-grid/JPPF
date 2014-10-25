@@ -111,8 +111,8 @@ public final class NetworkUtils {
     return getIPAddresses(new InetAddressFilter() {
       @Override
       public boolean accepts(final InetAddress addr) {
-        return (addr instanceof Inet6Address) && 
-          !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName()));
+        return (addr instanceof Inet6Address) &&
+            !(addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress() || "localhost".equals(addr.getHostName()));
       }
     });
   }
@@ -189,6 +189,21 @@ public final class NetworkUtils {
       return a.getHostName();
     } catch(Exception e) {
       return ip;
+    }
+  }
+
+  /**
+   * Attempt to resolve an IP address or host name into a (host name, ip address) pair.
+   * @param hostOrIP the ip address to resolve.
+   * @return a {@link HostIP} instance.
+   * @since 5.0
+   */
+  public static HostIP getHostIP(final String hostOrIP) {
+    try {
+      InetAddress a = InetAddress.getByName(hostOrIP);
+      return new HostIP(a.getHostName(), a.getHostAddress());
+    } catch(Exception e) {
+      return new HostIP(hostOrIP, hostOrIP);
     }
   }
 

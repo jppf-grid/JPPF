@@ -25,6 +25,7 @@ import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.TreeTableUtils;
@@ -115,11 +116,17 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     treeTable.doLayout();
     treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    treeTable.getTree().setCellRenderer(new NodeRenderer());
+    treeTable.getTree().setCellRenderer(new NodeRenderer(this));
     treeTable.setDefaultRenderer(Object.class, new NodeTableCellRenderer());
     JScrollPane sp = new JScrollPane(treeTable);
     setUIComponent(sp);
     treeTable.expandAll();
+    StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
+      @Override
+      public void stateChanged(final ShowIPEvent event) {
+        treeTable.repaint();
+      }
+    });
   }
 
   /**

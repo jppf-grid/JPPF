@@ -24,8 +24,10 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
-import org.jppf.ui.utils.GuiUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.JPPFConfiguration;
 
 /**
@@ -57,6 +59,7 @@ public class JobRenderer extends AbstractTreeCellRenderer {
         Color backgroundSelected = defaultSelectionBackground;
         switch(data.getType()) {
           case DRIVER:
+            renderer.setText(TreeTableUtils.getDisplayName(data.getDriver()));
             if (JPPFClientConnectionStatus.ACTIVE.equals(data.getClientConnection().getStatus())) {
               path = DRIVER_ICON;
               background = ACTIVE_COLOR;
@@ -74,7 +77,9 @@ public class JobRenderer extends AbstractTreeCellRenderer {
             }
             break;
           case SUB_JOB:
-            path = data.getNodeInformation().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
+            JPPFManagementInfo info = data.getNodeInformation();
+            renderer.setText((StatsHandler.getInstance().isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
+            path = info.isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
             break;
         }
         ImageIcon icon = GuiUtils.loadIcon(path);

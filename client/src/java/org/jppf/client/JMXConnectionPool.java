@@ -139,7 +139,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   synchronized void setPort(final int port) {
     if ((this.port < 0) && (port >= 0)) {
       this.port = port;
-      if (pool.getDriverHost() != null) initializeCoreConnections();
+      if (pool.getDriverIPAddress() != null) initializeCoreConnections();
     }
   }
 
@@ -147,10 +147,13 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    * Initialize all the core connections.
    */
   private void initializeCoreConnections() {
-    for (int i=0; i<coreSize; i++) {
-      JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverHost(), port, pool.isSslEnabled());
-      this.add(jmx);
-      jmx.connect();
+    int n = 0;
+    if ((n = connectionCount()) < coreSize) {
+      for (int i=n; i<coreSize; i++) {
+        JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverIPAddress(), port, pool.isSslEnabled());
+        this.add(jmx);
+        jmx.connect();
+      }
     }
   }
 

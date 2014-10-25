@@ -27,9 +27,9 @@ import javax.swing.*;
 import org.jppf.client.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.ui.monitoring.diagnostics.Thresholds;
-import org.jppf.ui.monitoring.event.StatsHandlerEvent;
+import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
@@ -87,6 +87,12 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     this.statsHandler = statsHandler;
     manager = statsHandler.getTopologyManager();
     manager.addTopologyListener(this);
+    statsHandler.addShowIPListener(new ShowIPListener() {
+      @Override
+      public void stateChanged(final ShowIPEvent event) {
+        if (serverListOption != null) serverListOption.getUIComponent().repaint();
+      }
+    });
     //getJppfClient(null);
   }
 
@@ -231,7 +237,12 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
       @Override
       public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
         DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-        renderer.setText(value == null ? "" : ((TopologyDriver) value).getDisplayName());
+        TopologyDriver driver = (TopologyDriver) value;
+        if (driver != null) {
+          JPPFManagementInfo info = driver.getManagementInfo();
+          if (info != null) renderer.setText((statsHandler.isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
+          else renderer.setText(driver.getDisplayName());
+        }
         return renderer;
       }
     });

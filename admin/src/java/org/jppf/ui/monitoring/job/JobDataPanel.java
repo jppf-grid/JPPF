@@ -32,6 +32,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.*;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorDriver;
 import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorJob;
 import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorNode;
@@ -94,6 +95,12 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
     model = new JobTreeTableModel(treeTableRoot);
     treeTable = new JPPFTreeTable(model);
     treeTable.expand(treeTableRoot);
+    StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
+      @Override
+      public void stateChanged(final ShowIPEvent event) {
+        treeTable.repaint();
+      }
+    });
   }
 
   /**

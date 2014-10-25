@@ -62,7 +62,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
     super(connection.getDriverUuid());
     this.connection = connection;
     JPPFConnectionPool pool = connection.getConnectionPool();
-    this.managementInfo = new JPPFManagementInfo(pool.getDriverHost(), pool.getJmxPort(), pool.getDriverUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
+    this.managementInfo = new JPPFManagementInfo(pool.getDriverHost(), pool.getDriverIPAddress(), pool.getJmxPort(), pool.getDriverUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
   }
 
   /**

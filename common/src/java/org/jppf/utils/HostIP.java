@@ -25,11 +25,11 @@ package org.jppf.utils;
 public class HostIP extends Pair<String, String> {
   /**
    * Initialize this HostIP object with the specified host name and IP address.
-   * @param first the host name.
-   * @param second the corresponding IP address.
+   * @param hostName the host name.
+   * @param ipAddress the corresponding IP address.
    */
-  public HostIP(final String first, final String second) {
-    super(first, second);
+  public HostIP(final String hostName, final String ipAddress) {
+    super(hostName, ipAddress);
   }
 
   /**

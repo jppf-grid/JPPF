@@ -26,8 +26,7 @@ import org.jppf.utils.LocalizationUtils;
  * Abstract tree table model implementation for tree table-based options.
  * @author Laurent Cohen
  */
-public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
-{
+public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel {
   /**
    * Base name for localization bundle lookups.
    */
@@ -37,8 +36,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * Initialize this model with the specified tree root.
    * @param root - the root of the tree.
    */
-  public AbstractJPPFTreeTableModel(final TreeNode root)
-  {
+  public AbstractJPPFTreeTableModel(final TreeNode root) {
     super(root);
   }
 
@@ -50,8 +48,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * @see org.jppf.ui.treetable.AbstractTreeTableModel#isCellEditable(java.lang.Object, int)
    */
   @Override
-  public boolean isCellEditable(final Object node, final int column)
-  {
+  public boolean isCellEditable(final Object node, final int column) {
     //return false;
     return super.isCellEditable(node, column);
   }
@@ -64,8 +61,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * @see org.jppf.ui.treetable.AbstractTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
    */
   @Override
-  public void setValueAt(final Object value, final Object node, final int column)
-  {
+  public void setValueAt(final Object value, final Object node, final int column) {
   }
 
   /**
@@ -76,14 +72,10 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
    */
   @Override
-  public Object getChild(final Object parent, final int index)
-  {
-    try
-    {
+  public Object getChild(final Object parent, final int index) {
+    try {
       return ((TreeNode) parent).getChildAt(index);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       return null;
     }
   }
@@ -95,29 +87,26 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
    */
   @Override
-  public int getChildCount(final Object parent)
-  {
+  public int getChildCount(final Object parent) {
     return ((TreeNode) parent).getChildCount();
   }
 
   /**
    * Insert the specified child into the specified parent's list of children at the specified position.
-   * @param child - the node to insert into the parent.
-   * @param parent - the node into which to insert the child.
-   * @param pos - the position at which to insert the node.
+   * @param child the node to insert into the parent.
+   * @param parent the node into which to insert the child.
+   * @param pos the position at which to insert the node.
    */
-  public void insertNodeInto(final DefaultMutableTreeNode child, final DefaultMutableTreeNode parent, final int pos)
-  {
+  public void insertNodeInto(final DefaultMutableTreeNode child, final DefaultMutableTreeNode parent, final int pos) {
     parent.insert(child, pos);
     fireTreeNodesInserted(parent, parent.getPath(), new int[] { pos }, new Object[] { child } );
   }
 
   /**
    * Remove a node from the tree.
-   * @param node - the node to remove from the parent.
+   * @param node the node to remove from the parent.
    */
-  public void removeNodeFromParent(final DefaultMutableTreeNode node)
-  {
+  public void removeNodeFromParent(final DefaultMutableTreeNode node) {
     DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
     int pos = parent.getIndex(node);
     parent.remove(node);
@@ -126,10 +115,9 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
 
   /**
    * Handle a node update.
-   * @param node - the node to update.
+   * @param node the node to update.
    */
-  public void changeNode(final DefaultMutableTreeNode node)
-  {
+  public void changeNode(final DefaultMutableTreeNode node) {
     DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
     int pos = parent.getIndex(node);
     fireTreeNodesChanged(parent, parent.getPath(), new int[] { pos }, new Object[] { node } );
@@ -139,11 +127,9 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * Determine the class of th specified column.
    * @param column - the column index.
    * @return a <code>Class</code> instance.
-   * @see org.jppf.ui.treetable.AbstractTreeTableModel#getColumnClass(int)
    */
   @Override
-  public Class getColumnClass(final int column)
-  {
+  public Class getColumnClass(final int column) {
     return (column == 0) ? TreeTableModel.class : String.class;
   }
 
@@ -153,8 +139,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel
    * @return a message in the current locale, or the default locale
    * if the localization for the current locale is not found.
    */
-  protected String localize(final String message)
-  {
+  protected String localize(final String message) {
     return LocalizationUtils.getLocalized(BASE, message);
   }
 }

@@ -69,8 +69,7 @@ import org.slf4j.*;
  * @author Philip Milne
  */
 
-public abstract class AbstractTreeTableModel implements TreeTableModel
-{
+public abstract class AbstractTreeTableModel implements TreeTableModel {
   /**
    * Logger for this class.
    */
@@ -93,8 +92,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * Initialize this model with the specified tree root.
    * @param root the root of the tree.
    */
-  public AbstractTreeTableModel(final Object root)
-  {
+  public AbstractTreeTableModel(final Object root) {
     this.root = root;
   }
 
@@ -103,30 +101,24 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
   //
 
   @Override
-  public Object getRoot()
-  {
+  public Object getRoot() {
     return root;
   }
 
   @Override
-  public boolean isLeaf(final Object node)
-  {
+  public boolean isLeaf(final Object node) {
     return getChildCount(node) == 0;
   }
 
   @Override
-  public void valueForPathChanged(final TreePath path, final Object newValue)
-  {
+  public void valueForPathChanged(final TreePath path, final Object newValue) {
   }
 
   @Override
-  public int getIndexOfChild(final Object parent, final Object child)
-  {
+  public int getIndexOfChild(final Object parent, final Object child) {
     // This is not called in the JTree's default mode: use a naive implementation.
-    for (int i = 0; i < getChildCount(parent); i++)
-    {
-      if (getChild(parent, i).equals(child))
-      {
+    for (int i = 0; i < getChildCount(parent); i++) {
+      if (getChild(parent, i).equals(child)) {
         return i;
       }
     }
@@ -134,14 +126,12 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
   }
 
   @Override
-  public void addTreeModelListener(final TreeModelListener l)
-  {
+  public void addTreeModelListener(final TreeModelListener l) {
     listenerList.add(TreeModelListener.class, l);
   }
 
   @Override
-  public void removeTreeModelListener(final TreeModelListener l)
-  {
+  public void removeTreeModelListener(final TreeModelListener l) {
     listenerList.remove(TreeModelListener.class, l);
   }
 
@@ -154,25 +144,19 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * @param children an array of the children that changed.
    * @see EventListenerList
    */
-  protected void fireTreeNodesChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children)
-  {
+  protected void fireTreeNodesChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
     Object[] listeners = listenerList.getListenerList();
     TreeModelEvent event = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
-    for (int i = listeners.length - 2; i >= 0; i -= 2)
-    {
-      if (listeners[i] == TreeModelListener.class)
-      {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
         // Lazily create the event:
         if (event == null) event = new TreeModelEvent(source, path, childIndices, children);
-        try
-        {
+        try {
           ((TreeModelListener) listeners[i + 1]).treeNodesChanged(event);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
         }
       }
@@ -188,17 +172,14 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * @param children an array of the children that were inserted.
    * @see EventListenerList
    */
-  protected void fireTreeNodesInserted(final Object source, final Object[] path, final int[] childIndices, final Object[] children)
-  {
+  protected void fireTreeNodesInserted(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
     Object[] listeners = listenerList.getListenerList();
     TreeModelEvent e = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
-    for (int i = listeners.length - 2; i >= 0; i -= 2)
-    {
-      if (listeners[i] == TreeModelListener.class)
-      {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
         // Lazily create the event:
         if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
         ((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
@@ -215,25 +196,19 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * @param children an array of the children that were removed.
    * @see EventListenerList
    */
-  protected void fireTreeNodesRemoved(final Object source, final Object[] path, final int[] childIndices, final Object[] children)
-  {
+  protected void fireTreeNodesRemoved(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
     Object[] listeners = listenerList.getListenerList();
     TreeModelEvent e = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
-    for (int i = listeners.length - 2; i >= 0; i -= 2)
-    {
-      if (listeners[i] == TreeModelListener.class)
-      {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
         // Lazily create the event:
-        try
-        {
+        try {
           if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
           ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
-        }
-        catch(Exception ex)
-        {
+        } catch(Exception ex) {
           log.error(ex.getMessage(), ex);
         }
       }
@@ -249,17 +224,14 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * @param children an array of the children that changed.
    * @see EventListenerList
    */
-  protected void fireTreeStructureChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children)
-  {
+  protected void fireTreeStructureChanged(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
     // Guaranteed to return a non-null array
     Object[] listeners = listenerList.getListenerList();
     TreeModelEvent e = null;
     // Process the listeners last to first, notifying
     // those that are interested in this event
-    for (int i = listeners.length - 2; i >= 0; i -= 2)
-    {
-      if (listeners[i] == TreeModelListener.class)
-      {
+    for (int i = listeners.length - 2; i >= 0; i -= 2) {
+      if (listeners[i] == TreeModelListener.class) {
         // Lazily create the event:
         if (e == null) e = new TreeModelEvent(source, path, childIndices, children);
         ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
@@ -272,8 +244,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
   //
 
   @Override
-  public Class getColumnClass(final int column)
-  {
+  public Class getColumnClass(final int column) {
     return Object.class;
   }
 
@@ -283,19 +254,16 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public boolean isCellEditable(final Object node, final int column)
-  {
+  public boolean isCellEditable(final Object node, final int column) {
     return getColumnClass(column) == TreeTableModel.class;
   }
 
   @Override
-  public void setValueAt(final Object aValue, final Object node, final int column)
-  {
+  public void setValueAt(final Object aValue, final Object node, final int column) {
   }
 
   @Override
-  public String getColumnTooltip(final int column)
-  {
+  public String getColumnTooltip(final int column) {
     return null;
   }
 
@@ -306,5 +274,4 @@ public abstract class AbstractTreeTableModel implements TreeTableModel
    * getColumnCount() public String getColumnName(Object node, int column) public Object getValueAt(Object node, int
    * column)
    */
-
 }

@@ -487,7 +487,6 @@ public final class StringUtils {
     try {
       return nf.parse(source);
     } catch (ParseException ignore) {
-      //ignore.printStackTrace();
     }
     return null;
   }

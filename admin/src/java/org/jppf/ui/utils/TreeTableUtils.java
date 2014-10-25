@@ -20,6 +20,8 @@ package org.jppf.ui.utils;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.topology.*;
+import org.jppf.management.JPPFManagementInfo;
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 
 /**
@@ -91,5 +93,21 @@ public final class TreeTableUtils {
       if (nodeUuid.equals(nodeData.getUuid())) return node;
     }
     return null;
+  }
+
+  /**
+   * COmpute a display name for the given topology component.
+   * @param comp the ocmponent for which to get a display name.
+   * @return the display name as a string.
+   */
+  public static String getDisplayName(final AbstractTopologyComponent comp) {
+    StatsHandler handler = StatsHandler.getInstance();
+    JPPFManagementInfo info = null;
+    if (comp.isPeer()) {
+      TopologyDriver driver = handler.getTopologyManager().getDriver(comp.getUuid());
+      if (driver != null) info = driver.getManagementInfo();
+    } else info = comp.getManagementInfo();
+    if (info != null) return (handler.isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort();
+    return comp.getDisplayName();
   }
 }

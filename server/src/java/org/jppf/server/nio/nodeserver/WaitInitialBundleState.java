@@ -48,6 +48,10 @@ class WaitInitialBundleState extends NodeServerState {
    * Determines whether DEBUG logging level is enabled.
    */
   protected static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Whether to resolve the nodes' ip addresses into host names.
+   */
+  protected final boolean resolveIPs = JPPFConfiguration.getProperties().getBoolean("org.jppf.resolve.addresses", true);
 
   /**
    * Initialize this state.
@@ -92,7 +96,9 @@ class WaitInitialBundleState extends NodeServerState {
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !offline) {
-        String host = NetworkUtils.getHostName(getChannelHost(channel));
+        //String host = NetworkUtils.getHostName(getChannelHost(channel));
+        String host = getChannelHost(channel);
+        HostIP hostIP = new HostIP(host, host);
         int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
         byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
@@ -102,9 +108,10 @@ class WaitInitialBundleState extends NodeServerState {
           JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
           if (jmxServer != null) host = jmxServer.getManagementHost();
         }
+        if (resolveIPs) hostIP = NetworkUtils.getHostIP(host);
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
-        JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, type, sslEnabled);
+        JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         context.setManagementInfo(info);
       } else server.nodeConnected(context);
