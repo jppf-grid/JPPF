@@ -152,6 +152,8 @@ public class SlaveNodeLauncher implements Runnable {
     if (log.isDebugEnabled()) log.debug("process command for {}:\n{}", name, command);
     ProcessBuilder builder = new ProcessBuilder(command);
     builder.directory(slaveDir);
+    builder.redirectOutput(new File(slaveDir, "system_out.log"));
+    builder.redirectError(new File(slaveDir, "system_err.log"));
     return builder.start();
   }
 

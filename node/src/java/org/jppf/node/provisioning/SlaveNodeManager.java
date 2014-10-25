@@ -170,8 +170,6 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.setBoolean(MASTER_PROPERTY, false);
     props.setBoolean(SLAVE_PROPERTY, true);
-    props.setProperty("jppf.redirect.out", "system_out.log");
-    props.setProperty("jppf.redirect.err", "system_err.log");
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
     }
