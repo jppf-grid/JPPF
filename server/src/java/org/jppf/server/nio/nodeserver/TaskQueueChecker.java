@@ -19,19 +19,19 @@
 package org.jppf.server.nio.nodeserver;
 
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
-import org.jppf.execute.*;
+import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.impl.*;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -80,6 +80,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Holds information about the execution context.
    */
   private final JPPFContext jppfContext;
+  /**
+   * Used to add channels asynchronously to avoid dedlocks.
+   * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-344">JPPF-344 Server deadlock with many slave nodes</a>
+   */
+  private final ExecutorService channelsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ChannelsExecutor"));
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -146,21 +151,16 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
     if (traceEnabled) log.trace("Adding idle channel " + channel);
-    synchronized(idleChannels) {
-      idleChannels.add(channel);
-    }
-    wakeUp();
-    stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
-  }
-
-  /**
-   * Get the list of idle channels.
-   * @return a new copy of the underlying list of idle channels.
-   */
-  public List<C> getIdleChannels() {
-    synchronized (idleChannels) {
-      return new ArrayList<>(idleChannels);
-    }
+    channelsExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        synchronized(idleChannels) {
+          idleChannels.add(channel);
+        }
+        wakeUp();
+        stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+      }
+    });
   }
 
   /**
@@ -176,6 +176,16 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     }
     if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     return channel;
+  }
+
+  /**
+   * Get the list of idle channels.
+   * @return a new copy of the underlying list of idle channels.
+   */
+  public List<C> getIdleChannels() {
+    synchronized (idleChannels) {
+      return new ArrayList<>(idleChannels);
+    }
   }
 
   /**
