@@ -148,21 +148,28 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  void addIdleChannel(final C channel) {
+  private void addIdleChannel(final C channel) {
+    if (traceEnabled) log.trace("Adding idle channel " + channel);
+    if (channel.getChannel().isOpen()) {
+      synchronized(idleChannels) {
+        boolean added = idleChannels.add(channel);
+        if (added) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+      }
+      wakeUp();
+    } else channel.handleException(channel.getChannel(), null);
+  }
+
+  /**
+   * Add a channel to the list of idle channels.
+   * @param channel the channel to add to the list.
+   */
+  void addIdleChannelAsync(final C channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
-    if (traceEnabled) log.trace("Adding idle channel " + channel);
     channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
-        if (channel.getChannel().isOpen()) {
-          boolean added;
-          synchronized(idleChannels) {
-            added = idleChannels.add(channel);
-          }
-          wakeUp();
-          if (added) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
-        } else channel.handleException(channel.getChannel(), null);
+        addIdleChannel(channel);
       }
     });
   }
@@ -173,11 +180,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   void removeIdleChannel(final C channel) {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
-    boolean removed;
     synchronized(idleChannels) {
-      removed = idleChannels.remove(channel);
+      boolean removed = idleChannels.remove(channel);
+      if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     }
-    if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
   }
 
   /**

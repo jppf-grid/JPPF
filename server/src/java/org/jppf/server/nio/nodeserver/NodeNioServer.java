@@ -269,7 +269,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (nodeContext == null || oldStatus == newStatus) return;
 
-    if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannel(nodeContext);
+    if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannelAsync(nodeContext);
     else {
       taskQueueChecker.removeIdleChannel(nodeContext);
       if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
