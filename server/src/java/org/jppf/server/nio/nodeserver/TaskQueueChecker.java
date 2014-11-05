@@ -156,12 +156,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
       @Override
       public void run() {
         if (channel.getChannel().isOpen()) {
-          boolean added;
           synchronized(idleChannels) {
-            added = idleChannels.add(channel);
+            boolean added = idleChannels.add(channel);
+            if (added) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
           }
           wakeUp();
-          if (added) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
         } else channel.handleException(channel.getChannel(), null);
       }
     });
@@ -174,11 +173,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   private C removeIdleChannel(final C channel) {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
-    boolean removed;
     synchronized(idleChannels) {
-      removed = idleChannels.remove(channel);
+      boolean removed = idleChannels.remove(channel);
+      if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     }
-    if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     return channel;
   }
 
