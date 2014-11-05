@@ -166,13 +166,15 @@ public class NodeClassNioServer extends ClassNioServer implements ReaperListener
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
-    try {
-      NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
-      AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
-      if (ctx != null) ctx.handleException(ctx.getChannel(), null);
-    } catch(Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(e.getMessage());
+    if (context.isPeer()) {
+      try {
+        NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
+        AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
+        if (ctx != null) ctx.handleException(ctx.getChannel(), null);
+      } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(e.getMessage());
+      }
     }
   }
 

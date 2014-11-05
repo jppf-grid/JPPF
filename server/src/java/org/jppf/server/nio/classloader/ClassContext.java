@@ -97,7 +97,12 @@ public class ClassContext extends SimpleNioContext<ClassState>
     ClassState oldState = this.state;
     boolean b = super.setState(state);
     if (ClassState.IDLE_PROVIDER.equals(state)) {
-      processRequests();
+      try {
+        processRequests();
+      } catch (Exception e) {
+        if (e instanceof RuntimeException) throw (RuntimeException) e;
+        else throw new IllegalStateException(e);
+      }
       return false;
     } else if (ClassState.IDLE_NODE.equals(state)) {
       synchronized(getChannel()) {
@@ -146,10 +151,6 @@ public class ClassContext extends SimpleNioContext<ClassState>
     if (nioObject == null) {
       byte[] bytes = SerializationUtils.writeInt(id);
       DataLocation dl = new MultipleBuffersLocation(new JPPFBuffer(bytes, 4));
-      /*
-      if (sslHandler == null) nioObject = new PlainNioObject(channel, dl);
-      else nioObject = new SSLNioObject(dl, sslHandler);
-       */
       nioObject = new PlainNioObject(channel, dl);
     }
     boolean b = false;
@@ -193,9 +194,10 @@ public class ClassContext extends SimpleNioContext<ClassState>
   /**
    * Add a new pending request to this resource provider.
    * @param request the request as a <code>SelectionKey</code> instance.
+   * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  public void addRequest(final ResourceRequest request) {
+  public void addRequest(final ResourceRequest request) throws Exception {
     String uuid = request.getResource().getUuidPath().getFirst();
     if (!driver.getClientClassServer().addResourceRequest(uuid, request)) {
       request.setRequestStartTime(System.nanoTime());
@@ -206,8 +208,9 @@ public class ClassContext extends SimpleNioContext<ClassState>
 
   /**
    * Ensure the pending requests are processed.
+   * @throws Exception if any error occurs.
    */
-  private void processRequests() {
+  private void processRequests() throws Exception {
     // if requests are already being processed, no need to do anything
     if (lockRequest.tryLock()) {
       try {

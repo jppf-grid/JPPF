@@ -23,8 +23,10 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.*;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.debug.DebugHelper;
 import org.jppf.server.protocol.results.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -33,8 +35,7 @@ import org.slf4j.*;
  * @author Martin JANDA
  * @exclude
  */
-public class ServerTaskBundleClient
-{
+public class ServerTaskBundleClient {
   /**
    * Logger for this class.
    */
@@ -154,8 +155,7 @@ public class ServerTaskBundleClient
    * Get the job this submission is for.
    * @return a {@link TaskBundle} instance.
    */
-  public TaskBundle getJob()
-  {
+  public TaskBundle getJob() {
     return job;
   }
 
@@ -163,8 +163,7 @@ public class ServerTaskBundleClient
    * Get shared data provider for this task.
    * @return a <code>DataProvider</code> instance.
    */
-  public DataLocation getDataProvider()
-  {
+  public DataLocation getDataProvider() {
     return dataProvider;
   }
 
@@ -172,17 +171,24 @@ public class ServerTaskBundleClient
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<ServerTask> getTaskList()
-  {
+  public List<ServerTask> getTaskList() {
     return taskList;
   }
 
   /**
-   * Called to notify that the contained task received result.
+   * Called to notify that the contained tasks received result.
    * @param results the tasks for which results were received.
    */
   public void resultReceived(final Collection<ServerTask> results) {
-    boolean shouldFire = false;
+    if (JPPFDriver.JPPF_DEBUG) {
+      List<ServerTask> list = DebugHelper.addResults(getUuid(), results);
+      if (list != null) {
+        List<Integer> positions = new ArrayList<>(list.size());
+        for (ServerTask task: list) positions.add(task.getJobPosition());
+        log.warn(String.format("***** duplicate results %s%njob=%s, call stack:%n%s", positions, this, ExceptionUtils.getCallStack()));
+      }
+    }
+    List<ServerTask> completedTasks = null;
     synchronized (this) {
       if (isCancelled()) return;
       if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
@@ -195,11 +201,10 @@ public class ServerTaskBundleClient
         }
       }
       done = pendingTasksCount.get() <= 0;
-      boolean fire = strategy.sendResults(this, tasks);
-      if (debugEnabled) log.debug("*** done=" + done + ", fire=" + fire + " for " + this);
-      shouldFire = done || fire;
+      boolean shouldFire = done || strategy.sendResults(this, tasks);
+      if (shouldFire) completedTasks = getAndClearCompletedTasks();
     }
-    if (shouldFire) fireTasksCompleted();
+    if (completedTasks != null) fireTasksCompleted(completedTasks);
   }
 
   /**
@@ -207,8 +212,8 @@ public class ServerTaskBundleClient
    * @param tasks the tasks for which an exception was received.
    * @param exception the exception.
    */
-  public synchronized void resultReceived(final Collection<ServerTask> tasks, final Throwable exception) {
-    boolean shouldFire = false;
+  public void resultReceived(final Collection<ServerTask> tasks, final Throwable exception) {
+    List<ServerTask> completedTasks = null;
     synchronized (this) {
       if (isCancelled()) return;
       if (debugEnabled) log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
@@ -220,18 +225,17 @@ public class ServerTaskBundleClient
         task.resultReceived(exception);
       }
       done = pendingTasksCount.get() <= 0;
-      boolean fire = strategy.sendResults(this, tasks);
-      shouldFire = done || fire;
+      boolean shouldFire = done || strategy.sendResults(this, tasks);
+      if (shouldFire) completedTasks = getAndClearCompletedTasks();
     }
-    if (shouldFire) fireTasksCompleted();
+    if (completedTasks != null) fireTasksCompleted(completedTasks);
   }
 
   /**
    * Get the job received time.
    * @return the time in milliseconds as a long value.
    */
-  public long getJobReceivedTime()
-  {
+  public long getJobReceivedTime() {
     return jobReceivedTime;
   }
 
@@ -239,24 +243,20 @@ public class ServerTaskBundleClient
    * Set the job received time.
    * @param jobReceivedTime the time in milliseconds as a long value.
    */
-  public void setJobReceivedTime(final long jobReceivedTime)
-  {
+  public void setJobReceivedTime(final long jobReceivedTime) {
     this.jobReceivedTime = jobReceivedTime;
   }
 
   /**
    * Called when this task bundle is cancelled.
    */
-  public void cancel()
-  {
-    synchronized(this)
-    {
-      if (!cancelled && !done)
-      {
+  public void cancel() {
+    List<ServerTask> completedTasks = null;
+    synchronized(this) {
+      if (!cancelled && !done) {
         if (debugEnabled) log.debug("cancelling client job " + this);
         this.cancelled = true;
-        for (ServerTask task: taskList)
-        {
+        for (ServerTask task: taskList) {
           if (task.getState() == TaskState.PENDING) {
             task.cancel();
             tasksToSendList.add(task);
@@ -264,17 +264,27 @@ public class ServerTaskBundleClient
           }
         }
         this.done = true;
+        completedTasks = getAndClearCompletedTasks();
       }
     }
-    fireTasksCompleted();
+    fireTasksCompleted(completedTasks);
+  }
+
+  /**
+   * Make a copy of the tasks to send list, clear the list and return the copy.
+   * @return a list of {@link ServerTask}s.
+   */
+  private synchronized List<ServerTask> getAndClearCompletedTasks() {
+    List<ServerTask> completedTasks = new ArrayList<>(tasksToSendList);
+    tasksToSendList.clear();
+    return completedTasks;
   }
 
   /**
    * Get the cancelled indicator.
    * @return <code>true</code> if job is cancelled, <code>false</code> otherwise.
    */
-  public synchronized boolean isCancelled()
-  {
+  public synchronized boolean isCancelled() {
     return cancelled;
   }
 
@@ -282,8 +292,7 @@ public class ServerTaskBundleClient
    * Get the <code>done</code> indicator.
    * @return <code>true</code> if this client job is done, <code>false</code> otherwise.
    */
-  public synchronized boolean isDone()
-  {
+  public synchronized boolean isDone() {
     return done;
   }
 
@@ -291,8 +300,7 @@ public class ServerTaskBundleClient
    * Extract <code>DataLocation</code> list from contained tasks.
    * @return the list of <code>DataLocation</code> instances.
    */
-  public List<DataLocation> getDataLocationList()
-  {
+  public List<DataLocation> getDataLocationList() {
     List<DataLocation> list = new ArrayList<>(taskList.size());
     for (ServerTask task : taskList) list.add(task.getInitialTask());
     return list;
@@ -302,8 +310,7 @@ public class ServerTaskBundleClient
    * Get the service level agreement between the job and the server.
    * @return an instance of {@link JobSLA}.
    */
-  public JobSLA getSLA()
-  {
+  public JobSLA getSLA() {
     return job.getSLA();
   }
 
@@ -327,18 +334,15 @@ public class ServerTaskBundleClient
    * Get the number of tasks that remain to execute.
    * @return the number of tasks as an int.
    */
-  public int getPendingTasksCount()
-  {
+  public int getPendingTasksCount() {
     return pendingTasksCount.get();
   }
 
   /**
    * Notifies that tasks have been completed.
+   * @param completedTasks the task whose results to send.
    */
-  private void fireTasksCompleted() {
-    List<ServerTask> completedTasks = new ArrayList<>(tasksToSendList);
-    tasksToSendList.clear();
-
+  private void fireTasksCompleted(final List<ServerTask> completedTasks) {
     ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
     if (debugEnabled) log.debug("*** created bundle id=" + bundle.id + " for " + this);
     for (CompletionListener listener : listenerList) listener.taskCompleted(bundle, completedTasks);
@@ -370,8 +374,7 @@ public class ServerTaskBundleClient
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("id=").append(id);
@@ -381,6 +384,14 @@ public class ServerTaskBundleClient
     sb.append(", job=").append(job);
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the unique id for this client bundle.
+   * @return the id as a long value.
+   */
+  public long getId() {
+    return id;
   }
 
   /**
@@ -401,13 +412,5 @@ public class ServerTaskBundleClient
      * @param bundle the bundle that notifies that finished.
      */
     void bundleEnded(final ServerTaskBundleClient bundle);
-  }
-
-  /**
-   * Get the unique id for this client bundle.
-   * @return the id as a long value.
-   */
-  public long getId() {
-    return id;
   }
 }

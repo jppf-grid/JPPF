@@ -28,6 +28,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.submission.SubmissionStatus;
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -138,6 +139,7 @@ public class ServerJob extends AbstractServerJobBase {
    */
   public void resultsReceived(final ServerTaskBundleNode bundle, final Throwable throwable) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
+    if (debugEnabled) log.debug("*** received exception '{}' from {}", ExceptionUtils.getMessage(throwable), bundle);
     CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {

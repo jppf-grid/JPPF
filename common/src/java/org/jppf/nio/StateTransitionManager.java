@@ -117,8 +117,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * Transition the specified channel to the specified state.
    * @param channel the key holding the channel and associated context.
    * @param transition holds the new state of the channel and associated key ops.
+   * @throws Exception if any error occurs.
    */
-  public void transitionChannel(final ChannelWrapper<?> channel, final T transition) {
+  public void transitionChannel(final ChannelWrapper<?> channel, final T transition) throws Exception {
     transitionChannel(channel, transition, false);
   }
 
@@ -128,9 +129,10 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param transition holds the new state of the channel and associated key ops.
    * @param submit specifies whether the transition should be submitted immediately.
    * or if we should wait for the server to submit it.
+   * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) {
+  public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) throws Exception {
     Lock lock = server.getLock();
     lock.lock();
     try {

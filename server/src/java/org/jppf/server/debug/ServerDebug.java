@@ -165,36 +165,47 @@ public class ServerDebug implements ServerDebugMBean
   }
 
   @Override
-  public String dumpQueueDetails()
-  {
+  public String dumpQueueDetails() {
     JPPFDriver.getInstance();
     JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
-    Set<String> set = queue.getAllJobIds();
+    return dumpJobDetails(queue.getAllJobIds());
+  }
+
+  @Override
+  public String dumpQueueDetailsFromPriorityMap() {
+    JPPFDriver.getInstance();
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    return dumpJobDetails(queue.getAllJobIdsFromPriorityMap());
+  }
+
+  /**
+   * 
+   * @param set the set of job uuids. 
+   * @return .
+   */
+  private String dumpJobDetails(final Set<String> set) {
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
     StringBuilder sb = new StringBuilder();
     String hr = StringUtils.padRight("", '-', 80) + '\n';
-    for (String uuid: set)
-    {
+    for (String uuid: set) {
       sb.append(hr);
       ServerJob serverJob = queue.getJob(uuid);
       sb.append(serverJob).append('\n');
       List<ServerTaskBundleClient> bundleList = serverJob.getClientBundles();
       if (bundleList.isEmpty()) sb.append("client bundles: empty\n");
-      else
-      {
+      else {
         sb.append("client bundles:\n");
         for (ServerTaskBundleClient clientBundle: bundleList) sb.append("- ").append(clientBundle).append("\n");
       }
       List<ServerTaskBundleClient> completionBundles = serverJob.getCompletionBundles();
       if (completionBundles.isEmpty()) sb.append("client completion bundles: empty\n");
-      else
-      {
+      else {
         sb.append("client completion bundles:\n");
         for (ServerTaskBundleClient clientBundle: completionBundles) sb.append("- ").append(clientBundle).append("\n");
       }
       Set<ServerTaskBundleNode> dispatchSet = serverJob.getDispatchSet();
       if (dispatchSet.isEmpty()) sb.append("node bundles: empty\n");
-      else
-      {
+      else {
         sb.append("node bundles:\n");
         for (ServerTaskBundleNode nodeBundle: dispatchSet) sb.append("- ").append(nodeBundle).append("\n");
       }
@@ -248,5 +259,18 @@ public class ServerDebug implements ServerDebugMBean
   private Set<ChannelWrapper<?>> acceptorSet()
   {
     return new HashSet<>(driver.getAcceptorServer().getAllConnections());
+  }
+
+  @Override
+  public String taskQueueCheckerChannels() {
+    List<AbstractNodeContext> list = driver.getNodeNioServer().getIdleChannels();
+    StringBuilder sb = new StringBuilder();
+    for (AbstractNodeContext ctx: list) sb.append(ctx).append('\n');
+    return sb.toString();
+  }
+
+  @Override
+  public String showResultsMap() {
+    return DebugHelper.showResults();
   }
 }

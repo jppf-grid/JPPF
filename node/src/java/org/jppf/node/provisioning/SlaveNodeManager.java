@@ -106,7 +106,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
       this.configOverrides = configOverrides;
       for (SlaveNodeLauncher slave: slaves.values()) {
         slave.removeProcessLauncherListener(this);
-        slave.stopProcess();
+        slave.tearDown();
       }
       slaves.clear();
       reservedIds.clear();
@@ -122,7 +122,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
         log.debug("stopping {}", slave.getName());
         reservedIds.remove(id);
         slave.removeProcessLauncherListener(this);
-        slave.stopProcess();
+        slave.tearDown();
       }
     } else {
       // otherwise start the missing number of slaves

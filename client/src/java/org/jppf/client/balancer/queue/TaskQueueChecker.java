@@ -276,9 +276,10 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
    * @param channel        the node channel to dispatch the job to.
    * @param selectedBundle the job to dispatch.
+   * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle) {
+  private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)  throws Exception {
     if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()});
     synchronized (channel.getMonitor()) {
       int size = 1;

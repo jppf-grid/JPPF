@@ -112,7 +112,7 @@ class SendingBundleState extends NodeServerState
   protected NodeTransition processOfflineRequest(final AbstractNodeContext context) throws Exception {
     if (debugEnabled) log.debug("processing offline request, nodeBundle={} for node={}", context.getBundle(), context.getChannel());
     server.getOfflineNodeHandler().addNodeBundle(context.getBundle());
-    context.cleanup(context.getChannel());
+    context.cleanup();
     return null;
   }
 }

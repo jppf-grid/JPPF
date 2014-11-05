@@ -57,14 +57,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   protected static final JPPFDriver driver = JPPFDriver.getInstance();
   /**
-   * Dummy runnable used for bundle execution.
-   */
-  protected static final Runnable NOOP_RUNNABLE = new Runnable() {
-    @Override
-    public void run() {
-    }
-  };
-  /**
    * The task bundle to send or receive.
    */
   protected ServerTaskBundleNode bundle = null;
@@ -152,10 +144,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   /**
-   * Check whether the bundler held by this context is up to date by comparison
-   * with the specified bundler.<br>
-   * If it is not, then it is replaced with a copy of the specified bundler, with a
-   * timestamp taken at creation time.
+   * Check whether the bundler held by this context is up to date by comparison with the specified bundler.<br>
+   * If it is not, then it is replaced with a copy of the specified bundler, with a timestamp taken at creation time.
    * @param serverBundler the bundler to compare with.
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
@@ -163,7 +153,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext) {
     if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
-
     if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp()) {
       if (this.bundler != null) {
         this.bundler.dispose();
@@ -181,7 +170,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
     if (closed.compareAndSet(false, true)) {
-      if (debugEnabled) log.debug("handling {} for {}", exception == null ? "null" : exception.getClass().getName(), channel);
+      if (debugEnabled) log.debug("handling {} for {}", ExceptionUtils.getMessage(exception), channel);
       ServerTaskBundleNode tmpBundle = bundle;
       NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
       try {
@@ -189,13 +178,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
           server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
           tmpBundle.taskCompleted(exception);
         }
-        cleanup(channel);
+        cleanup();
         if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
           boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
           applyMaxResubmit |= tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
-          if (!applyMaxResubmit) {
-            tmpBundle.resubmit();
-          } else {
+          if (debugEnabled) log.debug("applyMaxResubmit={} for {}", applyMaxResubmit, this);
+          if (!applyMaxResubmit) tmpBundle.resubmit();
+          else {
             int count = 0;
             List<DataLocation> results = new ArrayList<>(tmpBundle.getTaskList().size());
             for (ServerTask task: tmpBundle.getTaskList()) {
@@ -206,6 +195,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
                 count++;
               }
             }
+            if (debugEnabled) log.debug("resubmit count={} for {}", count, this);
             if (count > 0) updateStatsUponTaskResubmit(count);
             tmpBundle.resultsReceived(results);
           }
@@ -213,7 +203,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
           updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
         }
       } catch (Exception e) {
-        log.error(e.getMessage(), e);
+        log.error("error in handleException() for " + this + " : " , e);
       }
     }
   }
@@ -227,9 +217,8 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
 
   /**
    * Close and cleanup the resources used by the channel.
-   * @param channel the channel to close.
    */
-  void cleanup(final ChannelWrapper<?> channel) {
+  void cleanup() {
     if (debugEnabled) log.debug("handling cleanup for {}", channel);
     Bundler bundler = getBundler();
     if (bundler != null) {
@@ -382,13 +371,18 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public void close() throws Exception {
     if (debugEnabled) log.debug("closing channel {}", getChannel());
-    getChannel().close();
-    if ((jmxConnection != null) && jmxConnection.isConnected()) {
+    try {
+      getChannel().close();
+    } catch(Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+    }
+    final JMXNodeConnectionWrapper jmx = jmxConnection;
+    jmxConnection = null;
+    if (jmx != null) {
       Runnable r = new Runnable() {
-        @Override
-        public void run() {
+        @Override public void run() {
           try {
-            jmxConnection.close();
+            jmx.close();
           } catch (Exception ignore) {
           }
         }
@@ -409,11 +403,11 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     JPPFManagementInfo info = getManagementInfo();
     if (info == null) jmxConnection = null;
     else {
-      if ((info.getHost() != null) && (info.getPort() >= 0)) {
+      if ((info.getHost() != null) && (info.getPort() >= 0) && channel.isOpen()) {
+        if (debugEnabled) log.debug("establishing JMX connection for {}", info);
         jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
         jmxConnection.addJMXWrapperListener(new JMXWrapperListener() {
-          @Override
-          public void jmxWrapperConnected(final JMXWrapperEvent event) {
+          @Override public void jmxWrapperConnected(final JMXWrapperEvent event) {
             JPPFDriver.getInstance().getNodeNioServer().nodeConnected(AbstractNodeContext.this);
           }
         });
@@ -455,20 +449,13 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public Future<?> submit(final ServerTaskBundleNode nodeBundle) {
+  public Future<?> submit(final ServerTaskBundleNode nodeBundle) throws Exception {
     setBundle(nodeBundle);
+    nodeBundle.setChannel(this);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();
     nodeBundle.checkTaskCount();
-    return createFuture();
-  }
-
-  /**
-   * Get the <code>Runnable</code> that will be called when node context is closed.
-   * @return a <1code>Runnable</code> instance.
-   */
-  public Runnable getOnClose() {
-    return onClose;
+    return new NodeContextFuture(this);
   }
 
   /**
@@ -527,15 +514,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   protected abstract boolean isOffline();
 
   /**
-   * Create a new future for this cotext.
-   * @return a {@link JPFFFuture} instance. 
-   */
-  public Future<?> createFuture() {
-    return new NodeContextFuture(this);
-  }
-
-
-  /**
    * Update the inbound traffic statistics.
    */
   private void updateInStats() {
@@ -562,5 +540,20 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   void updateStatsUponTaskResubmit(final int resubmittedTaskCount) {
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, resubmittedTaskCount);
+  }
+
+  /**
+   * Reset the {@code closed} flag to {@code false}.
+   */
+  void unclose() {
+    closed.set(false);
+  }
+
+  /**
+   * Determine whether this channel has been closed.
+   * @return {@code true} if this channel has been closed, {@code false} otherwise.
+   */
+  public boolean isClosed() {
+    return closed.get();
   }
 }

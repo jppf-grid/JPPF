@@ -31,11 +31,18 @@ class NodeContextFuture extends FutureTask<Object> {
    */
   private final AbstractNodeContext context; 
   /**
+   * Dummy runnable used for bundle execution.
+   */
+  private static final Runnable NOOP_RUNNABLE = new Runnable() {
+    @Override public void run() { }
+  };
+
+  /**
    * Initialize witht he specified runnable and result object.
    * @param context the node context.
    */
   public NodeContextFuture(final AbstractNodeContext context) {
-    super(AbstractNodeContext.NOOP_RUNNABLE, null);
+    super(NOOP_RUNNABLE, null);
     this.context = context;
   }
 

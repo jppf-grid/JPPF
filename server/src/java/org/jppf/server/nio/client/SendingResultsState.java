@@ -23,6 +23,8 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.server.JPPFDriver;
+import org.jppf.server.debug.DebugHelper;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.slf4j.*;
 
@@ -30,8 +32,7 @@ import org.slf4j.*;
  * This class represents the state of waiting for some action.
  * @author Laurent Cohen
  */
-class SendingResultsState extends ClientServerState
-{
+class SendingResultsState extends ClientServerState {
   /**
    * Logger for this class.
    */
@@ -48,8 +49,7 @@ class SendingResultsState extends ClientServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public SendingResultsState(final ClientNioServer server)
-  {
+  public SendingResultsState(final ClientNioServer server) {
     super(server);
   }
 
@@ -61,37 +61,31 @@ class SendingResultsState extends ClientServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     if (channel.isReadable()) throw new ConnectException("client {}" + channel + " has been disconnected");
-
     ClientContext context = (ClientContext) channel.getContext();
     ServerTaskBundleClient clientBundle = context.getBundle();
-    if (clientBundle == null)
-    {
+    if (clientBundle == null) {
       clientBundle = context.pollCompletedBundle();
-      if (clientBundle == null)
-      {
+      if (clientBundle == null) {
         if (debugEnabled) log.debug("*** clientBundle = null for {}", channel);
         return TO_IDLE;
       }
       context.setBundle(clientBundle);
       context.serializeBundle();
     }
-    if (context.writeMessage(channel))
-    {
-      if (debugEnabled) log.debug("*** sent entire bundle {} to client {}", clientBundle, channel);
-      if (debugEnabled) log.debug("*** NbTasksToSend={}, TaskCount={}, CompletedBundlesEmpty={}", new Object[] {context.getNbTasksToSend(), clientBundle.getTaskCount(), context.isCompletedBundlesEmpty()});
+    if (context.writeMessage(channel)) {
+      if (debugEnabled) log.debug("*** sent entire bundle {} to {}", clientBundle, context);
       context.setNbTasksToSend(context.getNbTasksToSend() - clientBundle.getTaskCount());
+      if (debugEnabled) log.debug("*** NbTasksToSend={}, sent tasks count={}, CompletedBundlesEmpty={}", new Object[] {context.getNbTasksToSend(), clientBundle.getTaskCount(), context.isCompletedBundlesEmpty()});
       context.setBundle(null);
       context.setClientMessage(null);
-      if (context.isCompletedBundlesEmpty())
-      {
-        if (context.getNbTasksToSend() <= 0)
-        {
+      if (context.isCompletedBundlesEmpty()) {
+        if (context.getNbTasksToSend() <= 0) {
           if (debugEnabled) log.debug("*** client bundle ended " + context.getInitialBundleWrapper());
           context.jobEnded();
           context.setInitialBundleWrapper(null);
+          if (JPPFDriver.JPPF_DEBUG) DebugHelper.clearResults(clientBundle.getUuid());
           return TO_WAITING_JOB;
         }
         return TO_IDLE;

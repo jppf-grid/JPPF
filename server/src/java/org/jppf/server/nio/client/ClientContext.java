@@ -110,8 +110,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
             if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
             try {
               ClientClassNioServer.closeConnection(classChannel, false);
-            }
-            catch (Exception e2) {
+            } catch (Exception e2) {
               log.error(e2.getMessage(), e2);
             }
             break;
@@ -227,7 +226,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    * @return the number of tasks as an int.
    */
   public int getPendingTasksCount() {
-    if(initialBundleWrapper == null) throw new IllegalStateException("initialBundleWrapper is null");
+    if (initialBundleWrapper == null) throw new IllegalStateException("initialBundleWrapper is null");
     return initialBundleWrapper.getPendingTasksCount();
   }
 
@@ -301,7 +300,10 @@ public class ClientContext extends AbstractNioContext<ClientState> {
 
   @Override
   public String toString() {
-    return new StringBuilder(super.toString()).append(", nbTasksToSend=").append(nbTasksToSend).toString();
+    return new StringBuilder(super.toString())
+      .append(", nbTasksToSend=").append(nbTasksToSend)
+      .append(", completedBundles={").append(completedBundles).append('}')
+      .toString();
   }
 
   /**

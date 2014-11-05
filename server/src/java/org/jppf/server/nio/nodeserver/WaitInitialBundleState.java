@@ -69,7 +69,7 @@ class WaitInitialBundleState extends NodeServerState {
     if (context.readMessage(channel)) {
       BundleResults received = context.deserializeBundle();
       TaskBundle bundle = received.bundle();
-      boolean offline =  (bundle.getParameter(NODE_OFFLINE, false));
+      boolean offline =  bundle.getParameter(NODE_OFFLINE, false);
       if (offline) ((RemoteNodeContext) context).setOffline(true);
       else if (!bundle.isHandshake()) throw new IllegalStateException("handshake bundle expected.");
       if (debugEnabled) log.debug("read bundle for {], bundle={}", channel, bundle);
@@ -87,11 +87,11 @@ class WaitInitialBundleState extends NodeServerState {
       context.setBundler(bundler);
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !bundle.getParameter(NODE_OFFLINE, false)) {
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !offline) {
         String host = getChannelHost(channel);
         int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
-        if (debugEnabled) log.debug(String.format("configuring management for node @ {}:{}, secure="));
+        if (debugEnabled) log.debug(String.format("configuring management for node @ %s:%d, secure=%b", host, port, context.isSsl()));
         byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
         if (channel.isLocal()) {
           type |= JPPFManagementInfo.LOCAL;
@@ -105,6 +105,7 @@ class WaitInitialBundleState extends NodeServerState {
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         context.setManagementInfo(info);
       } else server.nodeConnected(context);
+      server.putConnection(context);
       if (bundle.getParameter(NODE_OFFLINE_OPEN_REQUEST, false)) return processOfflineReopen(received, context);
       return finalizeTransition(context);
     }

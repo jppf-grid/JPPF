@@ -101,19 +101,23 @@ public class SlaveNodeLauncher implements Runnable {
   @Override
   public void run() {
     boolean end = false;
+    Thread hookThread = null;
     try {
-      createShutdownHook();
-      while (!end) {
-        startSocketListener();
-        process = startProcess();
-        fireProcessStarted();
-        int n = process.waitFor();
-        fireProcessStopped();
-        end = onProcessExit(n);
-        if (process != null) process.destroy();
-      }
+      hookThread = createShutdownHook();
+      startSocketListener();
+      process = startProcess();
+      fireProcessStarted();
+      int n = process.waitFor();
+      fireProcessStopped();
+      end = onProcessExit(n);
+      tearDown();
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      try {
+        if (hookThread != null) Runtime.getRuntime().removeShutdownHook(hookThread);
+      } catch (Exception ignore) {
+      }
     }
   }
 
@@ -180,8 +184,15 @@ public class SlaveNodeLauncher implements Runnable {
   /**
    * Forcibly terminate the process.
    */
-  public void stopProcess() {
-    if (process != null) process.destroy();
+  public synchronized void tearDown() {
+    if (process != null) {
+      process.destroy();
+      process = null;
+    }
+    if (processServer != null) {
+      StreamUtils.closeSilent(processServer);
+      processServer = null;
+    }
   }
 
   /**
@@ -212,11 +223,9 @@ public class SlaveNodeLauncher implements Runnable {
         processPort = processServer.getLocalPort();
       }
       Runnable r = new Runnable() {
-        /** Wrapper for the accepted socket. */
-        private SocketWrapper socketClient = null;
-
         @Override
         public void run() {
+          SocketWrapper socketClient = null;
           try {
             socketClient = new BootstrapSocketClient(processServer.accept());
             int n = socketClient.readInt();
@@ -239,15 +248,18 @@ public class SlaveNodeLauncher implements Runnable {
   /**
    * Create a shutdown hook that is run when this JVM terminates.<br>
    * This is normally used to ensure the subprocess is terminated as well.
+   * @return the created shutdown hook.
    */
-  protected void createShutdownHook() {
+  protected Thread createShutdownHook() {
     Runnable hook = new Runnable() {
       @Override
       public void run() {
-        stopProcess();
+        tearDown();
       }
     };
-    Runtime.getRuntime().addShutdownHook(new Thread(hook));
+    Thread hookThread = new Thread(hook);
+    Runtime.getRuntime().addShutdownHook(hookThread);
+    return hookThread;
   }
 
   /**

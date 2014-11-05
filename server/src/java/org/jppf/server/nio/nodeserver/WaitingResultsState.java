@@ -29,6 +29,7 @@ import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -80,8 +81,7 @@ class WaitingResultsState extends NodeServerState {
       TaskBundle newBundle = received.bundle();
       if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + context.getChannel());
       requeue = processResults(context, received);
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       log.error(t.getMessage(), t);
       nodeBundle.resultsReceived(t);
     } finally {
@@ -108,7 +108,7 @@ class WaitingResultsState extends NodeServerState {
     Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     Bundler bundler = context.getBundler();
     if (t != null) {
-      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
+      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
       nodeBundle.resultsReceived(t);
     } else {
       if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());

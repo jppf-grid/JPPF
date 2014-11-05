@@ -158,6 +158,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
+   * Add the specified connection to the list of connections handled by this server.
+   * @param nodeContext the connection to add.
+   */
+  void putConnection(final AbstractNodeContext nodeContext) {
+    allConnections.put(nodeContext.getUuid(), nodeContext);
+  }
+
+  /**
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to add.
    */
@@ -166,9 +174,15 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       if (nodeContext == null) throw new IllegalArgumentException("nodeContext is null");
       if (nodeContext.getChannel() == null) throw new IllegalArgumentException("channel is null");
       if (debugEnabled) log.debug("adding connection {}", nodeContext.getChannel());
-      allConnections.put(nodeContext.getUuid(), nodeContext);
-      nodeContext.addExecutionStatusListener(statusListener);
-      updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
+      ChannelWrapper<?> channel = nodeContext.getChannel();
+      if (channel.isOpen()) {
+        //allConnections.put(nodeContext.getUuid(), nodeContext);
+        if (channel.isOpen()) {
+          nodeContext.addExecutionStatusListener(statusListener);
+          if (channel.isOpen()) updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
+        }
+      }
+      if (!channel.isOpen()) nodeContext.handleException(channel, null);
     } catch(Exception e) {
       if (debugEnabled) log.debug("error adding connection {} : {}", nodeContext, e);
     }
@@ -269,7 +283,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   @Override
-  public void postAccept(final ChannelWrapper channel) {
+  public void postAccept(final ChannelWrapper<?> channel) {
     //statsManager.newNodeConnection();
     driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, 1);
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -488,8 +502,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public void nodeConnected(final AbstractNodeContext channel) {
     JPPFManagementInfo info = channel.getManagementInfo();
-    addConnection(channel);
-    if (info != null) nodeConnectionHandler.fireNodeConnected(info);
+    if (channel.getChannel().isOpen()) {
+      addConnection(channel);
+      if (channel.getChannel().isOpen()) {
+        if (info != null) nodeConnectionHandler.fireNodeConnected(info);
+      }
+    }
+    if (!channel.getChannel().isOpen()) channel.handleException(channel.getChannel(), null);
   }
 
   /**

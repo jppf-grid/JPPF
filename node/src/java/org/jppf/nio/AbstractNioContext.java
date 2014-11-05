@@ -67,6 +67,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Determines whether the connection was opened on an SSL port.
    */
   protected boolean ssl = false;
+  /**
+   * Whether this context is enabled.
+   */
+  protected boolean enabled = true;
 
   @Override
   public S getState()
@@ -217,5 +221,15 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   public void setSsl(final boolean ssl)
   {
     this.ssl = ssl;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled) {
+    this.enabled = enabled;
   }
 }

@@ -122,4 +122,16 @@ public interface NioContext<S extends Enum<S>>
    * @param peer <code>true</code> if the channel is connected to a peer server, <code>false</code> otherwise.
    */
   void setPeer(boolean peer);
+
+  /**
+   * Whether this context is enabled.
+   * @return {@code true} if this context is enabled, {@code false} otherwise.
+   */
+  boolean isEnabled();
+
+  /**
+   * Enable or disable this context.
+   * @param enabled {@code true} to enable this context, {@code false} to disable it.
+   */
+  void setEnabled(boolean enabled);
 }
