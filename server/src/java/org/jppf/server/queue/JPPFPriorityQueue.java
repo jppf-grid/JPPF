@@ -173,7 +173,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   void requeue(final ServerJob job) {
     lock.lock();
     try {
-      if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job not managed");
+      if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job " + job + " not managed");
+      if (debugEnabled) log.debug("requeuing job {}", job);
       priorityMap.putValue(job.getSLA().getPriority(), job);
       sizeMap.putValue(getSize(job), job);
       fireBundleAdded(new QueueEvent<>(this, job, true));
@@ -205,7 +206,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     } finally {
       lock.unlock();
     }
-    if (debugEnabled) log.debug("found " + result.getTaskCount() + " tasks in the job");
+    if (debugEnabled) log.debug("found {} tasks in the job, result={}", result.getTaskCount(), result);
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -result.getTaskCount());
     driver.getStatistics().addValues(JPPFStatisticsHelper.TASK_QUEUE_TIME, System.currentTimeMillis() - serverJob.getQueueEntryTime(), result.getTaskCount());
     return result;
@@ -319,6 +320,21 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       return Collections.unmodifiableSet(jobMap.keySet());
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get the set of ids for all the jobs currently queued or executing.
+   * @return a set of ids as strings.
+   */
+  public Set<String> getAllJobIdsFromPriorityMap() {
+    lock.lock();
+    try {
+      Set<String> set = new HashSet<>();
+      for (ServerJob job: priorityMap.allValues()) set.add(job.getUuid());
+      return set;
     } finally {
       lock.unlock();
     }

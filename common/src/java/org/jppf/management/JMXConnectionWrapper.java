@@ -206,6 +206,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       }
     }
     connected.set(true);
+    wakeUp();
     fireConnected();
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
   }
@@ -216,9 +217,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   @Override
   public void close() throws Exception {
-    if (connectionThread.get() != null) connectionThread.get().close();
+    JMXConnectionThread jct = connectionThread.get();
+    if (jct != null) jct.close();
     connectionThread.set(null);
-    if ((jmxc != null) && isConnected()) jmxc.close();
+    if ((jmxc != null)) jmxc.close();
   }
 
   /**

@@ -109,8 +109,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
             if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
             try {
               ClientClassNioServer.closeConnection(classChannel, false);
-            }
-            catch (Exception e2) {
+            } catch (Exception e2) {
               log.error(e2.getMessage(), e2);
             }
             break;
@@ -300,7 +299,10 @@ public class ClientContext extends AbstractNioContext<ClientState> {
 
   @Override
   public String toString() {
-    return new StringBuilder(super.toString()).append(", nbTasksToSend=").append(nbTasksToSend).toString();
+    return new StringBuilder(super.toString())
+    .append(", nbTasksToSend=").append(nbTasksToSend)
+    .append(", completedBundles={").append(completedBundles).append('}')
+    .toString();
   }
 
   /**

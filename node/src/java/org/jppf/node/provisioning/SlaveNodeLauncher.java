@@ -56,6 +56,14 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    * The classpath for the slave node.
    */
   private final List<String> classpath;
+  /**
+   *
+   */
+  private boolean started = false;
+  /**
+   *
+   */
+  private boolean stopped = false;
 
   /**
    * Initialize this process launcher.
@@ -77,19 +85,29 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
   @Override
   public void run() {
     boolean end = false;
+    Thread hookThread = null;
     try {
-      createShutdownHook();
+      hookThread = createShutdownHook();
       startSocketListener();
-      while (!end) {
+      synchronized(this) {
+        if (isStopped()) return;
         process = startProcess();
+        setStarted(true);
         fireProcessStarted();
-        int n = process.waitFor();
-        fireProcessStopped();
-        end = onProcessExit(n);
-        if (process != null) process.destroy();
       }
+      int n = process.waitFor();
+      fireProcessStopped();
+      end = onProcessExit(n);
+      tearDown();
     } catch (Exception e) {
       e.printStackTrace();
+      fireProcessStopped();
+    } finally {
+      setStarted(false);
+      try {
+        if (hookThread != null) Runtime.getRuntime().removeShutdownHook(hookThread);
+      } catch (Exception ignore) {
+      }
     }
   }
 
@@ -151,5 +169,39 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    */
   public int getId() {
     return id;
+  }
+
+  /**
+   * Determine whether the slave node is started.
+   * @return {@code true} if the slave is started, {@code false} otherwise.
+   */
+  public synchronized boolean isStarted() {
+    return started;
+  }
+
+  /**
+   * Specify whether the slave node is started.
+   * @param started {@code true} if the slave is started, {@code false} otherwise.
+   */
+  public synchronized void setStarted(final boolean started) {
+    this.started = started;
+  }
+
+  /**
+   * Determine whether the slave node is stopped.
+   * @return {@code true} if the slave is stopped, {@code false} otherwise.
+   */
+  @Override
+  public boolean isStopped() {
+    return stopped;
+  }
+
+  /**
+   * Specify whether the slave node is stopped.
+   * @param stopped {@code true} if the slave is stopped, {@code false} otherwise.
+   */
+  @Override
+  public void setStopped(final boolean stopped) {
+    this.stopped = stopped;
   }
 }

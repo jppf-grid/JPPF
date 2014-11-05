@@ -69,15 +69,22 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
-    if ((channel == null) || !channel.isValid())
-    {
+  public String toString() {
+    if ((channel == null) || !channel.isValid()) {
       StringBuilder sb = new StringBuilder(1000);
       sb.append(getClass().getSimpleName());
       sb.append('[');
       sb.append("id=").append(getId());
-      sb.append(", channel=").append(channel);
+      sb.append(", channel=");
+      if (channel == null) sb.append("null");
+      else {
+        if (!channel.isValid() || !isOpen()) sb.append("invalid channel");
+        else {
+          sb.append(channel);
+          sb.append(", readyOps=").append(getReadyOps());
+          sb.append(", interestOps=").append(getInterestOps());
+        }
+      }
       sb.append(", context=").append(getContext());
       sb.append(']');
       return sb.toString();
@@ -93,7 +100,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public int getInterestOps()
   {
-    return channel.interestOps();
+    return channel.isValid() ? channel.interestOps() : -1;
   }
 
   /**
@@ -104,7 +111,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public void setInterestOps(final int keyOps)
   {
-    channel.interestOps(keyOps);
+    if (channel.isValid()) channel.interestOps(keyOps);
   }
 
   /**
@@ -115,7 +122,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public int getReadyOps()
   {
-    return channel.readyOps();
+    return channel.isValid() ? channel.readyOps() : -1;
   }
 
   /**

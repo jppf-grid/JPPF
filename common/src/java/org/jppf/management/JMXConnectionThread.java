@@ -39,6 +39,10 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    * The connection that holds this thread.
    */
   private final JMXConnectionWrapper connectionWrapper;
+  /**
+   * Captures the thread running this instance.
+   */
+  private Thread currentThread = null;
 
   /**
    * Initialize this thread with the specified connection.
@@ -50,14 +54,23 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
 
   @Override
   public void run() {
-    while (!isStopped()) {
-      try {
-        if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
-        connectionWrapper.performConnection();
-        if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
-      } catch(Exception ignored) {
-        if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
-        goToSleep(10L);
+    synchronized(this) {
+      currentThread = Thread.currentThread();
+    }
+    try {
+      while (!isStopped()) {
+        try {
+          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to perform connection attempts");
+          connectionWrapper.performConnection();
+          if (debugEnabled) log.debug(connectionWrapper.getId() + " about to suspend connection attempts");
+        } catch(Exception ignored) {
+          if (debugEnabled) log.debug(connectionWrapper.getId()+ " JMX URL = " + connectionWrapper.getURL(), ignored);
+          goToSleep(10L);
+        }
+      }
+    } finally {
+      synchronized(this) {
+        currentThread = null;
       }
     }
   }
@@ -67,6 +80,9 @@ public class JMXConnectionThread extends ThreadSynchronization implements Runnab
    */
   public synchronized void close() {
     setStopped(true);
-    wakeUp();
+    if (currentThread != null) {
+      currentThread.interrupt();
+      currentThread = null;
+    }
   }
 }

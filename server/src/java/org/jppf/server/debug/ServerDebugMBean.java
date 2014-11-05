@@ -71,8 +71,23 @@ public interface ServerDebugMBean extends Serializable
    */
   String dumpQueueDetails();
   /**
-   * View all debuig info in a formatted string.
-   * @return a string rpesenting all the debug information.
+   * Dump the job queue with fine details of the jobs.
+   * @return a string representing the job queue.
+   */
+  String dumpQueueDetailsFromPriorityMap();
+  /**
+   * View all debug info in a formatted string.
+   * @return a string representing all the debug information.
    */
   String all();
+  /**
+   * View all idle channels held by the {@link TaskQueueChecker}.
+   * @return a string representing the idle channels.
+   */
+  String taskQueueCheckerChannels();
+  /**
+   * Show the multimap of job uuids to the positions of tasks that have completed.
+   * @return a string representation of the multimap.
+   */
+  String showResultsMap();
 }

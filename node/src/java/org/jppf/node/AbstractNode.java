@@ -47,6 +47,10 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    */
   private int taskCount = 0;
   /**
+   * Used to synchronize access to the task count.
+   */
+  private final Object taskCountLock = new Object();
+  /**
    * This node's universal identifier.
    * @exclude
    */
@@ -76,9 +80,11 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * Get the total number of tasks executed.
    * @return the number of tasks as an int.
    */
-  public synchronized int getTaskCount()
+  public int getTaskCount()
   {
-    return taskCount;
+    synchronized(taskCountLock) {
+      return taskCount;
+    }
   }
 
   /**
@@ -86,9 +92,11 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @param taskCount the number of tasks as an int.
    * @exclude
    */
-  public synchronized void setTaskCount(final int taskCount)
+  public void setTaskCount(final int taskCount)
   {
-    this.taskCount = taskCount;
+    synchronized(taskCountLock) {
+      this.taskCount = taskCount;
+    }
   }
 
   /**

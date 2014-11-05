@@ -29,6 +29,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
+import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -78,10 +79,9 @@ class WaitingResultsState extends NodeServerState {
     boolean requeue = false;
     try {
       TaskBundle newBundle = received.bundle();
-      if (debugEnabled) log.debug("*** read bundle " + newBundle + " from node " + context.getChannel());
+      if (debugEnabled) log.debug("read bundle " + newBundle + " from node " + context);
       requeue = processResults(context, received);
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       log.error(t.getMessage(), t);
       nodeBundle.resultsReceived(t);
     } finally {
@@ -108,17 +108,17 @@ class WaitingResultsState extends NodeServerState {
     Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
     Bundler bundler = context.getBundler();
     if (t != null) {
-      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + t);
+      if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
       nodeBundle.resultsReceived(t);
     } else {
-      if (debugEnabled) log.debug("*** received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
+      if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
       Set<Integer> resubmitSet = null;
       int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
-      if (debugEnabled) log.debug("*** resubmitPositions = {} for {}", resubmitPositions, newBundle);
+      if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
       if (resubmitPositions != null) {
         resubmitSet = new HashSet<>();
         for (int n: resubmitPositions) resubmitSet.add(n);
-        if (debugEnabled) log.debug("*** resubmitSet = {} for {}", resubmitSet, newBundle);
+        if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
       }
       boolean anyResubmit = resubmitSet != null;
       int count = 0;

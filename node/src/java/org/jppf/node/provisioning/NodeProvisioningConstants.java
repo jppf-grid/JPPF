@@ -29,9 +29,13 @@ public final class NodeProvisioningConstants {
    */
   public static final String MASTER_PROPERTY = "jppf.node.provisioning.master";
   /**
-   * Name of the property which defines a node as a slave. Vllaue defaults to {@code false}.
+   * Name of the property which defines a node as a slave. Value defaults to {@code false}.
    */
   public static final String SLAVE_PROPERTY = "jppf.node.provisioning.slave";
+  /**
+   * Name of the property which defines the id of a slave node.
+   */
+  public static final String SLAVE_ID_PROPERTY = "jppf.node.provisioning.slave.id";
   /**
    * Name of the property that specifies the path prefix used for the root directory of each slave node.
    * The value of this property defaults to the path slave_nodes/node_", relative to the master's root directory.

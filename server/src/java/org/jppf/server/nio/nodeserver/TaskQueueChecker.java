@@ -28,7 +28,8 @@ import org.jppf.load.balancer.impl.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFContextDriver;
+import org.jppf.server.*;
+import org.jppf.server.debug.DebugHelper;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
@@ -81,7 +82,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   private final JPPFContext jppfContext;
   /**
-   * Used to add channels asynchronously to avoid dedlocks.
+   * Used to add channels asynchronously to avoid deadlocks.
    * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-344">JPPF-344 Server deadlock with many slave nodes</a>
    */
   private final ExecutorService channelsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ChannelsExecutor"));
@@ -91,7 +92,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * @param queue the reference queue to use.
    * @param stats reference to the statistics.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats) {
+  TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats) {
     this.queue = queue;
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
@@ -103,7 +104,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Get the corresponding node's context information.
    * @return a {@link JPPFContext} instance.
    */
-  public JPPFContext getJPPFContext() {
+  JPPFContext getJPPFContext() {
     return jppfContext;
   }
 
@@ -111,7 +112,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Create new instance of default bundler.
    * @return a new {@link Bundler} instance.
    */
-  protected Bundler createDefault() {
+  private Bundler createDefault() {
     FixedSizeProfile profile = new FixedSizeProfile();
     profile.setSize(1);
     return new FixedSizeBundler(profile);
@@ -121,7 +122,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Get the bundler used to schedule tasks for the corresponding node.
    * @return a {@link Bundler} instance.
    */
-  public Bundler getBundler() {
+  Bundler getBundler() {
     return bundler;
   }
 
@@ -129,7 +130,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Set the bundler used to schedule tasks for the corresponding node.
    * @param bundler a {@link Bundler} instance.
    */
-  public void setBundler(final Bundler bundler) {
+  void setBundler(final Bundler bundler) {
     this.bundler = (bundler == null) ? createDefault() : bundler;
   }
 
@@ -137,7 +138,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Get the number of idle channels.
    * @return the size of the underlying list of idle channels.
    */
-  public int getNbIdleChannels() {
+  int getNbIdleChannels() {
     synchronized (idleChannels) {
       return idleChannels.size();
     }
@@ -147,18 +148,21 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Add a channel to the list of idle channels.
    * @param channel the channel to add to the list.
    */
-  public void addIdleChannel(final C channel) {
+  void addIdleChannel(final C channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
     if (traceEnabled) log.trace("Adding idle channel " + channel);
     channelsExecutor.execute(new Runnable() {
       @Override
       public void run() {
-        synchronized(idleChannels) {
-          idleChannels.add(channel);
-        }
-        wakeUp();
-        stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+        if (channel.getChannel().isOpen()) {
+          boolean added;
+          synchronized(idleChannels) {
+            added = idleChannels.add(channel);
+          }
+          wakeUp();
+          if (added) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+        } else channel.handleException(channel.getChannel(), null);
       }
     });
   }
@@ -168,7 +172,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * @param channel the channel to remove from the list.
    * @return a reference to the removed channel.
    */
-  public C removeIdleChannel(final C channel) {
+  private C removeIdleChannel(final C channel) {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     boolean removed;
     synchronized(idleChannels) {
@@ -179,40 +183,32 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
   }
 
   /**
+   * Remove a channel from the list of idle channels.
+   * @param channel the channel to remove from the list.
+   */
+  void removeIdleChannelAsync(final C channel) {
+    channelsExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        removeIdleChannel(channel);
+      }
+    });
+  }
+
+  /**
    * Get the list of idle channels.
    * @return a new copy of the underlying list of idle channels.
    */
-  public List<C> getIdleChannels() {
+  List<C> getIdleChannels() {
     synchronized (idleChannels) {
       return new ArrayList<>(idleChannels);
     }
   }
 
   /**
-   * Return whether any idle channel is available.
-   * @return <code>true</code> when there are no idle channels.
-   */
-  public boolean hasIdleChannel() {
-    synchronized (idleChannels) {
-      return !idleChannels.isEmpty();
-    }
-  }
-
-  /**
-   * Return whether the specified channel is in the set of idle channels.
-   * @param channel the channel to check.
-   * @return <code>true</code> if the channel is in the set of idle channels, <code>false</code> otherwise.
-   */
-  public boolean hasIdleChannel(final C channel) {
-    synchronized (idleChannels) {
-      return idleChannels.contains(channel);
-    }
-  }
-
-  /**
    * Clear the list of idle channels.
    */
-  public void clearIdleChannels() {
+  void clearIdleChannels() {
     synchronized (idleChannels) {
       idleChannels.clear();
     }
@@ -233,7 +229,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Perform the assignment of tasks.
    * @return true if a job was dispatched, false otherwise.
    */
-  public boolean dispatch() {
+  private boolean dispatch() {
     boolean dispatched = false;
     try {
       queue.processPendingBroadcasts();
@@ -249,17 +245,32 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
             ServerJob serverJob = it.next();
             channel = retrieveChannel(serverJob);
             if (channel != null) {
-              nodeBundle = prepareJobDispatch(channel, serverJob);
-              removeIdleChannel(channel);
-            }
-            if (channel != null && nodeBundle != null) {
-              try {
-                dispatchJobToChannel(channel, nodeBundle);
-                dispatched = true;
-                return true;
-              } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                channel.handleException(channel.getChannel(), e);
+              synchronized(channel.getMonitor()) {
+                removeIdleChannel(channel);
+                if (!channel.isEnabled()) {
+                  channel = null;
+                  continue;
+                }
+                nodeBundle = prepareJobDispatch(channel, serverJob);
+                if (JPPFDriver.JPPF_DEBUG) {
+                  List<ServerTask> list = DebugHelper.checkResults(serverJob.getUuid(), nodeBundle.getTaskList());
+                  if (list != null) {
+                    List<Integer> positions = new ArrayList<>(list.size());
+                    for (ServerTask task: list) positions.add(task.getJobPosition());
+                    log.warn(String.format("***** duplicate results for %s, positions : %s, channel=%s", nodeBundle, positions, channel));
+                  }
+                }
+                if (debugEnabled) log.debug("prepareJobDispatch() returned {}", nodeBundle);
+                if (nodeBundle != null) {
+                  try {
+                    dispatchJobToChannel(channel, nodeBundle);
+                    return true;
+                  } catch (Exception e) {
+                    log.error(String.format("%s%nchannel=%s%njob=%s%nstack trace: %s", ExceptionUtils.getMessage(e), channel, nodeBundle, ExceptionUtils.getStackTrace(e)));
+                    channel.unclose();
+                    channel.handleException(channel.getChannel(), e);
+                  }
+                }
               }
             }
           }
@@ -311,9 +322,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
    * @param channel the node channel to dispatch the job to.
    * @param nodeBundle the job to dispatch.
+   * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) {
+  private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) throws Exception {
+    if (debugEnabled) log.debug("dispatching job {} to node {}", nodeBundle, channel);
     synchronized(channel.getMonitor()) {
       Future<?> future = channel.submit(nodeBundle);
       nodeBundle.jobDispatched(channel, future);
@@ -329,38 +342,44 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     ExecutionPolicy policy = bundle.getJob().getSLA().getExecutionPolicy();
     if (debugEnabled && (policy != null)) log.debug("Bundle " + bundle + " has an execution policy:\n" + policy);
     List<C> acceptableChannels = new ArrayList<>(idleChannels.size());
+    List<C> toRemove = new LinkedList<>();
     List<String> uuidPath = bundle.getJob().getUuidPath().getList();
     Iterator<C> iterator = idleChannels.iterator();
     int nbJobChannels = bundle.getNbChannels();
     while (iterator.hasNext()) {
-      C ch = iterator.next();
-      if (ch.getExecutionStatus() != ExecutorStatus.ACTIVE) {
-        if (debugEnabled) log.debug("channel is not opened: " + ch);
-        iterator.remove();
-        continue;
-      }
-      if (!ch.isActive()) continue;
-      if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + ch.getUuid());
-      if (uuidPath.contains(ch.getUuid())) {
-        if (debugEnabled) log.debug("bundle uuid path already contains node " + ch + " : uuidPath=" + uuidPath + ", nodeUuid=" + ch.getUuid());
-        continue;
-      }
-      if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
-      if (policy != null) {
-        JPPFSystemInformation info = ch.getSystemInformation();
-        boolean b = false;
-        try {
-          preparePolicy(policy, bundle, stats, nbJobChannels);
-          b = policy.accepts(info);
-        } catch(Exception ex) {
-          log.error("An error occurred while running the execution policy to determine node participation.", ex);
+      C channel = iterator.next();
+      synchronized(channel.getMonitor()) {
+        if ((channel.getExecutionStatus() != ExecutorStatus.ACTIVE) || !channel.getChannel().isOpen() || channel.isClosed() || !channel.isEnabled()) {
+          if (debugEnabled) log.debug("channel is not opened: " + channel);
+          toRemove.add(channel);
+          continue;
         }
-        if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + ch);
-        if (!b) continue;
+        if (!channel.isActive()) continue;
+        if (debugEnabled) log.debug("uuid path=" + uuidPath + ", node uuid=" + channel.getUuid());
+        if (uuidPath.contains(channel.getUuid())) {
+          if (debugEnabled) log.debug("bundle uuid path already contains node " + channel + " : uuidPath=" + uuidPath + ", nodeUuid=" + channel.getUuid());
+          continue;
+        }
+        if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(channel.getUuid())) continue;
+        if (policy != null) {
+          JPPFSystemInformation info = channel.getSystemInformation();
+          boolean b = false;
+          try {
+            preparePolicy(policy, bundle, stats, nbJobChannels);
+            b = policy.accepts(info);
+          } catch(Exception ex) {
+            log.error("An error occurred while running the execution policy to determine node participation.", ex);
+          }
+          if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + channel);
+          if (!b) continue;
+        }
+        // add a bias toward local node
+        if (channel.isLocal()) return channel;
+        acceptableChannels.add(channel);
       }
-      // add a bias toward local node
-      if (ch.isLocal()) return ch;
-      acceptableChannels.add(ch);
+    }
+    if (!toRemove.isEmpty()) {
+      for (C c: toRemove) removeIdleChannel(c);
     }
     int size = acceptableChannels.size();
     if (debugEnabled) log.debug("found " + size + " acceptable channels");

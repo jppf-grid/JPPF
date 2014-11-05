@@ -22,6 +22,7 @@ import static org.jppf.node.provisioning.NodeProvisioningConstants.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.commons.io.FileUtils;
 import org.jppf.process.*;
@@ -86,6 +87,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * A set of properties overriding those in the master node's configuration.
    */
   private TypedProperties configOverrides = new TypedProperties();
+  /**
+   * Use to sequentialize the provisioning requests.
+   */
+  private ExecutorService executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("SlaveNodeManager"));
 
   /**
    * Initialize this manager.
@@ -94,10 +99,6 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     masterDir = new File(System.getProperty("user.dir"));
     if (debugEnabled) log.debug("masterDir = {}", masterDir);
     computeSlaveClasspath();
-    /*
-    int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
-    if (n > 0) shrinkOrGrowSlaves(n, null);
-    */
   }
 
   /**
@@ -107,23 +108,34 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    * @param configOverrides a set of overrides to the slave's configuration.
    */
-  synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+  void submitProvisioningRequest(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+    executor.submit(new Runnable() {
+      @Override
+      public void run() {
+        shrinkOrGrowSlaves(requestedSlaves, interruptIfRunning, configOverrides);
+      }
+    });
+  }
+
+  /**
+   * Start or stop the required number of slaves to reach the specified number,
+   * using the specified config overrides. If {@code configOverrides} is null, then previous overrides are applied.
+   * @param requestedSlaves the number of slaves to reach.
+   * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
+   * @param configOverrides a set of overrides to the slave's configuration.
+   */
+  private synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
     int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
       if (debugEnabled) log.debug("stopping all processes");
       this.configOverrides = configOverrides;
       for (SlaveNodeLauncher slave: slaves.values()) {
-        /*
-        slave.removeProcessLauncherListener(this);
-        slave.stopProcess();
-        */
-        slave.sendActionCommand(action);
+        synchronized(slave) {
+          if (slave.isStarted()) slave.sendActionCommand(action);
+          else slave.setStopped(true);
+        }
       }
-      /*
-      slaves.clear();
-      reservedIds.clear();
-      */
     }
     int size = slaves.size();
     int diff = size - requestedSlaves;
@@ -134,12 +146,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
         int id = slaves.lastKey();
         SlaveNodeLauncher slave = slaves.remove(id);
         log.debug("stopping {}", slave.getName());
-        /*
-        reservedIds.remove(id);
-        slave.removeProcessLauncherListener(this);
-        slave.stopProcess();
-        */
-        slave.sendActionCommand(action);
+        synchronized(slave) {
+          if (slave.isStarted()) slave.sendActionCommand(action);
+          else slave.setStopped(true);
+        }
       }
     } else {
       // otherwise start the missing number of slaves
@@ -149,8 +159,9 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
         String slaveDirPath = SLAVE_PATH_PREFIX + id;
         try {
           log.debug("starting {}", slaveDirPath);
-          setupSlaveNodeFiles(slaveDirPath, this.configOverrides);
+          setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
           final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
+          slaves.put(slave.getId(), slave);
           slave.addProcessLauncherListener(this);
           new Thread(slave, slaveDirPath).start();
         } catch(Exception e) {
@@ -173,9 +184,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Configuration overrides are applied here.
    * @param slaveDirPath name of the slave node.
    * @param configOverrides the overrides to apply to the slave's configuration.
+   * @param id the id assigned to the slave node.
    * @throws Exception if any error occurs.
    */
-  private void setupSlaveNodeFiles(final String slaveDirPath, final TypedProperties configOverrides) throws Exception {
+  private void setupSlaveNodeFiles(final String slaveDirPath, final TypedProperties configOverrides, final int id) throws Exception {
     File slaveDir = new File(slaveDirPath);
     if (!slaveDir.exists()) slaveDir.mkdirs();
     File slaveConfigSrc = new File(SLAVE_CONFIG_PATH);
@@ -187,6 +199,8 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.setBoolean(MASTER_PROPERTY, false);
     props.setBoolean(SLAVE_PROPERTY, true);
+    props.setInt(SLAVE_ID_PROPERTY, id);
+    //SLAVE_ID_PROPERTY
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
     }
@@ -195,12 +209,18 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   @Override
   public synchronized void processStarted(final ProcessLauncherEvent event) {
     SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
+    if (nbSlaves() <= 0) log.warn("received processStarted() for slave id = {}, but nbSlaves is zero", slave.getId());
+    else if (debugEnabled) log.debug("received processStarted() for slave id = {}", slave.getId());
+    /*
     slaves.put(slave.getId(), slave);
+    */
+    
   }
 
   @Override
   public synchronized void processStopped(final ProcessLauncherEvent event) {
     SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
+    if (debugEnabled) log.debug("received processStopped() for slave id = {}", slave.getId());
     slaves.remove(slave.getId());
     reservedIds.remove(slave.getId());
   }
@@ -239,7 +259,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   }
 
   /**
-   * Get the next available slavez id.
+   * Get the next available slave id.
    * @return the next id as an int value.
    * @since 4.2.2
    */

@@ -154,13 +154,22 @@ public class ServerTaskBundleNode {
   }
 
   /**
+   * Set the node channel onto this job dispatch.
+   * @param channel the node to which the job is dispatched.
+   */
+  public void setChannel(final ExecutorChannel channel) {
+    if (channel == null) throw new IllegalArgumentException("channel is null for " + this);
+    this.channel = channel;
+  }
+
+  /**
    * Called when all or part of a job is dispatched to a node.
    * @param channel the node to which the job is dispatched.
    * @param future  future assigned to bundle execution.
    */
   public void jobDispatched(final ExecutorChannel channel, final Future<?> future) {
-    if (channel == null) throw new IllegalArgumentException("channel is null");
-    if (future == null) throw new IllegalArgumentException("future is null");
+    if (channel == null) throw new IllegalArgumentException("channel is null for " + this);
+    if (future == null) throw new IllegalArgumentException("future is null for " + this);
     this.channel = channel;
     this.future  = future;
     job.jobDispatched(this);
@@ -189,7 +198,8 @@ public class ServerTaskBundleNode {
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
   public void taskCompleted(final Throwable exception) {
-    if (debugEnabled && (exception != null)) log.debug("received exception for " + this + " : " + ExceptionUtils.getStackTrace(exception));
+    if (debugEnabled && (exception != null))
+      log.debug(String.format("received exception for %s : %s%ncall stack:%n%s" , this, ExceptionUtils.getStackTrace(exception), ExceptionUtils.getCallStack()));
     try {
       job.jobReturned(this);
     } finally {
@@ -301,6 +311,7 @@ public class ServerTaskBundleNode {
     sb.append(", taskCount=").append(taskCount);
     sb.append(", cancelled=").append(cancelled);
     sb.append(", requeued=").append(requeued);
+    sb.append(", channel=").append(channel);
     sb.append(']');
     return sb.toString();
   }

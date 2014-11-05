@@ -72,7 +72,12 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
     ClientClassState oldState = this.state;
     boolean b = super.setState(state);
     if (ClientClassState.IDLE_PROVIDER.equals(state)) {
-      processRequests();
+      try {
+        processRequests();
+      } catch (Exception e) {
+        if (e instanceof RuntimeException) throw (RuntimeException) e;
+        else throw new IllegalStateException(e);
+      }
       return false;
     }
     return b;
@@ -81,9 +86,10 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
   /**
    * Add a new pending request to this resource provider.
    * @param request the request as a <code>SelectionKey</code> instance.
+   * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  public void addRequest(final ResourceRequest request) {
+  public void addRequest(final ResourceRequest request) throws Exception {
     String uuid = request.getResource().getUuidPath().getFirst();
     if (!driver.getClientClassServer().addResourceRequest(uuid, request)) {
       request.setRequestStartTime(System.nanoTime());
@@ -94,8 +100,9 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
 
   /**
    * Ensure the pending requests are processed.
+   * @throws Exception if any error occurs.
    */
-  private void processRequests() {
+  private void processRequests() throws Exception {
     // if requests are already being processed, no need to do anything
     if (lockRequest.tryLock()) {
       try {

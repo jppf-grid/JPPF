@@ -88,8 +88,15 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
   /**
    * Forcibly terminate the process.
    */
-  public void stopProcess() {
-    if (process != null) process.destroy();
+  public void tearDown() {
+    if (process != null) {
+      process.destroy();
+      process = null;
+    }
+    if (processServer != null) {
+      StreamUtils.closeSilent(processServer);
+      processServer = null;
+    }
   }
 
   /**
@@ -123,6 +130,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
       thread.start();
     } catch(Exception e) {
       if (processServer != null) StreamUtils.closeSilent(processServer);
+      if (slaveSocketWrapper != null) StreamUtils.closeSilent(slaveSocketWrapper);
     }
     return processPort;
   }
@@ -130,15 +138,18 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
   /**
    * Create a shutdown hook that is run when this JVM terminates.<br>
    * This is normally used to ensure the subprocess is terminated as well.
+   * @return the created shutdown hook.
    */
-  protected void createShutdownHook() {
+  protected Thread createShutdownHook() {
     Runnable hook = new Runnable() {
       @Override
       public void run() {
-        stopProcess();
+        tearDown();
       }
     };
-    Runtime.getRuntime().addShutdownHook(new Thread(hook));
+    Thread hookThread = new Thread(hook);
+    Runtime.getRuntime().addShutdownHook(hookThread);
+    return hookThread;
   }
 
   /**
@@ -183,6 +194,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
     if (log.isDebugEnabled()) log.debug("process [{}:{}] has stopped", getName(), process);
     ProcessLauncherEvent event = new ProcessLauncherEvent(this);
     for (ProcessLauncherListener listener: listeners) listener.processStopped(event);
+    listeners.clear();
   }
 
   /**
@@ -200,7 +212,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * @since 5.0
    * @exclude
    */
-  protected class SlaveSocketWrapper implements Runnable {
+  protected class SlaveSocketWrapper implements Runnable, AutoCloseable {
     /**
      * Wrapper for the accepted socket.
      */
@@ -214,7 +226,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         if (n == -1) throw new EOFException();
       } catch(Exception ioe) {
         if (log.isDebugEnabled()) log.debug(getName(), ioe);
-        if (socketClient != null) StreamUtils.closeSilent(socketClient);
+        close();
       }
     }
 
@@ -228,6 +240,14 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
         socketClient.writeInt(action);
       } catch (Exception e) {
         if (log.isDebugEnabled()) log.debug("could not send command to slave process {} : {}", getName(), ExceptionUtils.getStackTrace(e));
+      }
+    }
+
+    @Override
+    public synchronized void close() {
+      if (socketClient != null) {
+        StreamUtils.closeSilent(socketClient);
+        socketClient = null;
       }
     }
   }

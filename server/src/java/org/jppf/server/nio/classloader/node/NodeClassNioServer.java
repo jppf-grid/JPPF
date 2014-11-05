@@ -25,7 +25,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassNioServer;
-import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -158,8 +158,16 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(e.getMessage());
     }
-    AbstractNodeContext nodeContext = JPPFDriver.getInstance().getNodeNioServer().getConnection(uuid);
-    if (nodeContext != null) nodeContext.handleException(nodeContext.getChannel(), null);
+    if (context.isPeer()) {
+      try {
+        NodeNioServer jobNodeServer = JPPFDriver.getInstance().getNodeNioServer();
+        AbstractNodeContext ctx = jobNodeServer.getConnection(uuid);
+        if (ctx != null) ctx.handleException(ctx.getChannel(), null);
+      } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(e.getMessage());
+      }
+    }
   }
 
   @Override

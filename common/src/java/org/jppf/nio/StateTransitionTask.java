@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @param <T> the type of the transitions to use.
  * @author Laurent Cohen
  */
-public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implements Runnable
-{
+public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implements Runnable {
   /**
    * Logger for this class.
    */
@@ -56,8 +55,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
    * @param channel the channel whose state is changing.
    * @param factory the factory for the server that runs this task.
    */
-  public StateTransitionTask(final ChannelWrapper<?> channel, final NioServerFactory<S, T> factory)
-  {
+  public StateTransitionTask(final ChannelWrapper<?> channel, final NioServerFactory<S, T> factory) {
     this.channel = channel;
     this.factory = factory;
   }
@@ -67,27 +65,32 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
    */
   @Override
   @SuppressWarnings("unchecked")
-  public void run()
-  {
+  public void run() {
     StateTransitionManager<S, T> transitionManager = factory.getServer().getTransitionManager();
     NioContext<S> ctx = (NioContext<S>) channel.getContext();
-    try
-    {
+    try {
       T transition = null;
-      synchronized(channel)
-      {
-        S s = ctx.getState();
-        NioState<T> state = factory.getState(s);
-        if (traceEnabled) log.trace("performing transition to state {} for {}", s, channel);
-        transition = state.performTransition(channel);
-        if (transition != null) transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
-        else if (traceEnabled) log.trace("no further transition from {} for {}", s, channel);
+      synchronized(channel) {
+        try {
+          S s = ctx.getState();
+          NioState<T> state = factory.getState(s);
+          if (traceEnabled) log.trace("performing transition to state {} for {}", s, channel);
+          transition = state.performTransition(channel);
+          if (transition != null) transitionManager.transitionChannel(channel, transition, transitionManager.checkSubmitTransition(channel, transition));
+          else if (traceEnabled) log.trace("no further transition from {} for {}", s, channel);
+        } catch (Exception|Error  e) {
+          ctx.setEnabled(false);
+          throw e;
+        }
       }
-    }
-    catch(Exception|Error e)
-    {
-      if (debugEnabled) log.debug("error on channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
-      else log.warn("error on channel {} : {}", channel, ExceptionUtils.getMessage(e));
+    } catch(Exception|Error e) {
+      try {
+        if (debugEnabled) log.debug("error on channel {} : {}", channel, ExceptionUtils.getStackTrace(e));
+        else log.warn("error on channel {} : {}", channel, ExceptionUtils.getMessage(e));
+      } catch (Exception e2) {
+        if (debugEnabled) log.debug("error on channel: {}", ExceptionUtils.getStackTrace(e));
+        else log.warn("error on channel: {}", ExceptionUtils.getMessage(e));
+      }
       if (e instanceof Exception) ctx.handleException(channel, (Exception) e);
       else throw (Error) e;
     }

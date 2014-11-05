@@ -64,7 +64,7 @@ class WaitingInitialNodeRequestState extends NodeClassServerState {
     if (context.readMessage(wrapper)) {
       JPPFResourceWrapper resource = context.deserializeResource();
       if (debugEnabled) log.debug("read initial request from node " + wrapper);
-      context.setPeer((Boolean) resource.getData("peer", Boolean.FALSE));
+      context.setPeer((Boolean) resource.getData(ResourceIdentifier.PEER, Boolean.FALSE));
       if (debugEnabled) log.debug("initiating node: " + wrapper);
       String uuid = (String) resource.getData(ResourceIdentifier.NODE_UUID);
       if (debugEnabled) log.debug("received node init request for uuid = {}", uuid);

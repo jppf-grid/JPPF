@@ -83,7 +83,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     this.server = server;
     this.factory = server.getFactory();
     this.lock = server.getLock();
-    //executor = Executors.newFixedThreadPool(NioConstants.THREAD_POOL_SIZE, new JPPFThreadFactory(server.getName()));
     executor = initExecutor();
     isNodeServer = server.getIdentifier() == JPPFIdentifiers.NODE_JOB_DATA_CHANNEL;
   }
@@ -115,8 +114,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param interestOps the operations to set on the key.
    */
   private void setInterestOps(final ChannelWrapper<?> channel, final int interestOps) {
-    //lock.lock();
-    obtainLock();
+    lock.lock();
     try {
       server.getSelector().wakeup();
       channel.setInterestOps(interestOps);
@@ -129,8 +127,9 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * Transition the specified channel to the specified state.
    * @param channel the key holding the channel and associated context.
    * @param transition holds the new state of the channel and associated key ops.
+   * @throws Exception if any error occurs.
    */
-  public void transitionChannel(final ChannelWrapper<?> channel, final T transition) {
+  public void transitionChannel(final ChannelWrapper<?> channel, final T transition) throws Exception {
     transitionChannel(channel, transition, false);
   }
 
@@ -140,11 +139,11 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param transition holds the new state of the channel and associated key ops.
    * @param submit specifies whether the transition should be submitted immediately.
    * or if we should wait for the server to submit it.
+   * @throws Exception if any error occurs.
    */
   @SuppressWarnings("unchecked")
-  public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) {
-    //lock.lock();
-    obtainLock();
+  public void transitionChannel(final ChannelWrapper<?> channel, final T transition, final boolean submit) throws Exception {
+    lock.lock();
     try {
       server.getSelector().wakeup();
       synchronized(channel) {
@@ -215,8 +214,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   private ChannelWrapper<?> registerChannel(final SocketChannel channel, final int interestOps, final NioContext context) {
     ChannelWrapper<?> wrapper = null;
     try {
-      //lock.lock();
-      obtainLock();
+      lock.lock();
       try {
         if (channel.isBlocking()) channel.configureBlocking(false);
         SelectionKey key = channel.register(server.getSelector().wakeup(), interestOps, context);
@@ -287,27 +285,8 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     if (globalExecutor == null) {
       int n = NioConstants.THREAD_POOL_SIZE;
       globalExecutor = Executors.newFixedThreadPool(n, new JPPFThreadFactory("JPPF NIO"));
-      //globalExecutor = new ThreadPoolExecutor(n, n, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new JPPFThreadFactory("JPPF NIO"));
-      //globalExecutor = new ThreadPoolExecutor(n, n, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(), new JPPFThreadFactory("JPPF NIO"));
-      //globalExecutor = Executors.newCachedThreadPool(new JPPFThreadFactory("JPPF NIO"));
-      //globalExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(true), new JPPFThreadFactory("JPPF NIO"));
       log.info("globalExecutor={}, maxSize={}", globalExecutor, ((ThreadPoolExecutor) globalExecutor).getMaximumPoolSize());
     }
     return globalExecutor;
-  }
-
-  /**
-   * 
-   */
-  private /*synchronized*/ void obtainLock() {
-    /*
-    try {
-      //while (!lock.tryLock(10L, TimeUnit.MILLISECONDS));
-      while (!lock.tryLock()) wait(5L);
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-    }
-    */
-    lock.lock();
   }
 }

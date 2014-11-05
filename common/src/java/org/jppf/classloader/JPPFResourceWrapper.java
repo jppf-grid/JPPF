@@ -305,7 +305,7 @@ public class JPPFResourceWrapper implements Serializable
    * @param def a default value to return if the key is not found.
    * @return an object value or the specified default if the metadata could not be found.
    */
-  public Object getData(final String key, final Object def) {
+  public Object getData(final ResourceIdentifier key, final Object def) {
     synchronized (dataMap) {
       Object o = dataMap.get(key);
       return o == null ? def : o;

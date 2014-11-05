@@ -251,15 +251,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     while (it.hasNext()) {
       SelectionKey key = it.next();
       it.remove();
+      NioContext context = null;
       try {
         if (!key.isValid()) continue;
         if (key.isAcceptable()) doAccept(key);
         else {
-          NioContext context = (NioContext) key.attachment();
+          context = (NioContext) key.attachment();
           transitionManager.submitTransition(context.getChannel());
         }
       } catch (Exception e) {
         log.error(e.getMessage(), e);
+        if (context != null) context.handleException(context.getChannel(), e);
         if (!(key.channel() instanceof ServerSocketChannel)) {
           try {
             key.channel().close();

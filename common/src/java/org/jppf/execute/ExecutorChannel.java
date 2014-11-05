@@ -74,8 +74,9 @@ public interface ExecutorChannel<T> extends AutoCloseable {
    * Submit bundle for execution on corresponding node.
    * @param bundle the task bundle to submit.
    * @return a {@link JPPFFuture}.
+   * @throws Exception if any error occurs.
    */
-  Future<?> submit(final T bundle);
+  Future<?> submit(final T bundle) throws Exception;
 
   /**
    * Determine whether this channel is local (for an in-JVM node).

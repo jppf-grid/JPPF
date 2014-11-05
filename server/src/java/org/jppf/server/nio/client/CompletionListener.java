@@ -24,6 +24,7 @@ import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -74,7 +75,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
       return;
     }
     if (results.isEmpty()) {
-      if (debugEnabled) log.debug("empty results list");
+      if (debugEnabled) log.debug("empty results list for bundle {}", bundle);
       return;
     }
     if (debugEnabled) log.debug("*** returning " + results.size() + " results for client bundle " + bundle + "(cancelled=" + bundle.isCancelled() + ')');
@@ -88,8 +89,8 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
           try {
             transitionManager.transitionChannel(channel, ClientTransition.TO_SENDING_RESULTS);
           } catch(Exception e) {
-            if (debugEnabled) log.debug(e.getMessage(), e);
-            else log.info(e.getClass().getName() + " : " + e.getMessage());
+            if (debugEnabled) log.debug("error while transitioning {} : {}", channel, ExceptionUtils.getStackTrace(e));
+            else log.info("error while transitioning {} : {}", channel, ExceptionUtils.getMessage(e));
           }
         }
       }
