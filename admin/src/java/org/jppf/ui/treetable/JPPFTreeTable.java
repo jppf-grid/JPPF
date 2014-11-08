@@ -18,6 +18,7 @@
 
 package org.jppf.ui.treetable;
 
+import javax.swing.table.TableColumn;
 import javax.swing.tree.*;
 
 /**
@@ -33,6 +34,10 @@ public class JPPFTreeTable extends JTreeTable
   public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel)
   {
     super(treeTableModel);
+    for (int i=0; i<treeTableModel.getColumnCount(); i++) {
+      TableColumn column = getColumnModel().getColumn(i);
+      column.setIdentifier(Integer.valueOf(i));
+    }
   }
 
   /**
@@ -43,7 +48,11 @@ public class JPPFTreeTable extends JTreeTable
   public TreePath getPathForRow(final int n)
   {
     if (getTree().getRowCount() <= n) return null;
-    return getTree().getPathForRow(n);
+    try {
+      return getTree().getPathForRow(n);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /**

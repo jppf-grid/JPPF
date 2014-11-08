@@ -73,6 +73,9 @@
     <child name="health.select.nodes" type="Button"/>
     <child name="health.select.all" type="Button"/>
 
+    <child name="sep5" type="ToolbarSeparator"/>
+    <child name="health.show.hide" type="Button"/>
+
 	</child>
 	
 

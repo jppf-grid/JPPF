@@ -148,6 +148,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     actionHandler.putAction("node.provisioning", new ProvisioningAction());
     actionHandler.putAction("select.drivers", new SelectDriversAction(this));
     actionHandler.putAction("select.nodes", new SelectNodesAction(this));
+    actionHandler.putAction("node.show.hide", new ShowHideColumnsAction(this));
     actionHandler.updateActions();
     treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
     new Thread(new ActionsInitializer(this, "/topology.toolbar")).start();
@@ -255,13 +256,15 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
     if (!isAutoRefresh()) return;
-    TopologyDriver driverData = event.getDriver();
-    final DefaultMutableTreeNode driverNode = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
-    if (driverNode == null) return;
-    TopologyNode nodeData = event.getNodeOrPeer();
-    if (nodeData == null) return;
-    final DefaultMutableTreeNode node = TreeTableUtils.findNode(driverNode, nodeData.getUuid());
-    if (node != null) model.changeNode(node);
+    if (event.getUpdateType() == TopologyEvent.UpdateType.NODE_STATE) {
+      TopologyDriver driverData = event.getDriver();
+      final DefaultMutableTreeNode driverNode = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
+      if (driverNode == null) return;
+      TopologyNode nodeData = event.getNodeOrPeer();
+      if (nodeData == null) return;
+      final DefaultMutableTreeNode node = TreeTableUtils.findNode(driverNode, nodeData.getUuid());
+      if (node != null) model.changeNode(node);
+    }
   }
 
   /**

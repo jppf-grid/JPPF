@@ -111,6 +111,9 @@
     <child name="select.drivers" type="Button"/>
     <child name="select.nodes" type="Button"/>
 
+    <child name="sep7" type="ToolbarSeparator"/>
+    <child name="node.show.hide" type="Button"/>
+
   </child>
 
 	<!-- ===================================================================== -->

@@ -368,6 +368,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
       actionHandler.putAction("resume.job", new ResumeJobAction());
       actionHandler.putAction("max.nodes.job", new UpdateMaxNodesAction());
       actionHandler.putAction("update.priority.job", new UpdatePriorityAction());
+      actionHandler.putAction("job.show.hide", new ShowHideColumnsAction(this));
       actionHandler.updateActions();
     }
     treeTable.addMouseListener(new JobTreeTableMouseListener(actionHandler));

@@ -84,6 +84,9 @@
 			</listener>
 		</child>
 
+    <child name="sep7" type="ToolbarSeparator"/>
+    <child name="job.show.hide" type="Button"/>
+
 	</child>
 
 	<!-- ===================================================================== -->

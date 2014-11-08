@@ -83,12 +83,12 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
    */
   public void populate() {
     for (TopologyDriver driver: manager.getDrivers()) {
-      driverAdded(new TopologyEvent(manager, driver, null));
+      driverAdded(new TopologyEvent(manager, driver, null, TopologyEvent.UpdateType.TOPOLOGY));
       for (AbstractTopologyComponent child: driver.getChildren()) {
         if (child.isPeer()) continue;
         TopologyNode node = (TopologyNode) child;
         log.debug("adding node " + node+ " to driver " + driver);
-        nodeAdded(new TopologyEvent(manager, driver, node));
+        nodeAdded(new TopologyEvent(manager, driver, node, TopologyEvent.UpdateType.TOPOLOGY));
       }
     }
     treeTable.expandAll();
@@ -146,6 +146,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     actionHandler.putAction("health.select.nodes", new SelectNodesAction(this));
     actionHandler.putAction("health.select.all", new SelectAllAction(this));
     actionHandler.putAction("health.update.thresholds", new ThresholdSettingsAction(this));
+    actionHandler.putAction("health.show.hide", new ShowHideColumnsAction(this));
     actionHandler.updateActions();
     treeTable.addMouseListener(new JVMHealthTreeTableMouseListener(actionHandler));
     new Thread(new ActionsInitializer(this, "/health.toolbar")).start();
@@ -173,8 +174,10 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
 
   @Override
   public synchronized void driverUpdated(final TopologyEvent event) {
-    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
-    if (driver != null) model.changeNode(driver);
+    if (event.getUpdateType() == TopologyEvent.UpdateType.JVM_HEALTH) {
+      DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
+      if (driver != null) model.changeNode(driver);
+    }
   }
 
   @Override
@@ -207,10 +210,12 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
 
   @Override
   public synchronized void nodeUpdated(final TopologyEvent event) {
-    DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
-    if (driver != null) {
-      DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, event.getNodeOrPeer().getUuid());
-      if (node != null) model.changeNode(node);
+    if (event.getUpdateType() == TopologyEvent.UpdateType.JVM_HEALTH) {
+      DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, event.getDriver().getUuid());
+      if (driver != null) {
+        DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, event.getNodeOrPeer().getUuid());
+        if (node != null) model.changeNode(node);
+      }
     }
   }
 
@@ -242,5 +247,21 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
    */
   public Thresholds getThresholds() {
     return StatsHandler.getInstance().getClientHandler().getThresholds();
+  }
+
+  /**
+   * Hide the columns.
+   */
+  public void hideColumns() {
+    hideColumn(3);
+    hideColumn(4);
+  }
+
+  /**
+   * Restore the hidden columns.
+   */
+  public void restoreColumns() {
+    restoreColumn(3);
+    restoreColumn(4);
   }
 }
