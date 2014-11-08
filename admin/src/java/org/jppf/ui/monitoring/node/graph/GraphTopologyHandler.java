@@ -111,11 +111,11 @@ public class GraphTopologyHandler implements TopologyListener {
     graphOption.repaintFlag.set(false);
     try {
       for (TopologyDriver driver: manager.getDrivers()) {
-        driverAdded(new TopologyEvent(manager, driver, null));
+        driverAdded(new TopologyEvent(manager, driver, null, TopologyEvent.UpdateType.TOPOLOGY));
         for (AbstractTopologyComponent child: driver.getChildren()) {
           TopologyNode node = (TopologyNode) child;
           log.debug(String.format("adding %s %s to driver %s", (node.isNode() ? "node" : "peer"), node, driver));
-          nodeAdded(new TopologyEvent(manager, driver, node));
+          nodeAdded(new TopologyEvent(manager, driver, node, TopologyEvent.UpdateType.TOPOLOGY));
         }
       }
     } finally {

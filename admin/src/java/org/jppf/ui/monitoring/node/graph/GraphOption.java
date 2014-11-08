@@ -38,7 +38,8 @@ import edu.uci.ics.jung.visualization.*;
 import edu.uci.ics.jung.visualization.control.*;
 import edu.uci.ics.jung.visualization.decorators.*;
 import edu.uci.ics.jung.visualization.picking.*;
-import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
+import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import edu.uci.ics.jung.visualization.renderers.*;
 
 /**
  * Displays and updates the graph view of the grid topology.
@@ -121,6 +122,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
         renderer.setPreferredSize(d);
       }
       viewer.getRenderContext().setVertexLabelRenderer(renderer);
+      viewer.getRenderer().getVertexLabelRenderer().setPosition(Position.AUTO);
       viewer.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<>(viewer.getPickedVertexState(), viewer.getBackground(), Color.blue));
       viewer.getRenderContext().setVertexDrawPaintTransformer(new ConstantTransformer(null));
       viewer.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(1f)));

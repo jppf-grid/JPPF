@@ -87,7 +87,8 @@ public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Numb
       int i = 0;
       for (TopologyDriver driver : drivers) {
         Point2D coord = transform(driver);
-        double angle = dSize > 1 ? (2d * Math.PI * i) / dSize : 0d;
+        //double angle = dSize > 1 ? (2d * Math.PI * i) / dSize : 0d;
+        double angle = dSize > 1 ? -Math.PI/2d + (2d * Math.PI * i) / dSize : 0d;
         if (dSize == 1) coord.setLocation(width / 2d, height / 2d);
         else coord.setLocation(Math.cos(angle) * radius + width / 2d, Math.sin(angle) * radius + height / 2d);
         Collection<TopologyNode> nodes = getNodes(driver);

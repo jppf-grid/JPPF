@@ -25,6 +25,25 @@
   <property name="layoutConstraints" value="flowx, fill, insets 2 2 2 2"/>
   <property name="componentConstraints" value="pushy 0, pushx, h 25!"/>
 
+  <child name="sep1" type="ToolbarSeparator"/>
+
+  <child name="show.ip" type="Button">
+    <property name="icon" value="/org/jppf/ui/resources/dns1.png"/>
+    <property name="toggle" value="true"/>
+    <initializer type="script">
+      <script language="groovy">option.getUIComponent().setSelected(false)</script>
+    </initializer>
+    <listener type="script">
+      <script language="groovy"><![CDATA[
+        def comp = option.getUIComponent();
+        def b = comp.isSelected();
+        StatsHandler.getInstance().setShowIP(b);
+      ]]></script>
+    </listener>
+  </child>
+
+  <child name="sep2" type="ToolbarSeparator"/>
+
   <child name="ServerChooser" type="ComboBox">
     <property name="label" value="Server connection"/>
     <property name="tooltip" value="The list of drivers to connect to"/>
@@ -34,22 +53,6 @@
     </initializer>
     <listener type="script">
       <script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentDriver(option.getValue())</script>
-    </listener>
-  </child>
-
-  <child name="sep" type="ToolbarSeparator"/>
-
-  <child name="show.ip" type="Button">
-    <property name="icon" value="/org/jppf/ui/resources/show_ip.gif"/>
-    <property name="toggle" value="true"/>
-    <initializer type="script">
-      <script language="groovy">option.getUIComponent().setSelected(false)</script>
-    </initializer>
-    <listener type="script">
-      <script language="groovy"><![CDATA[
-        def b = option.getUIComponent().isSelected();
-        StatsHandler.getInstance().setShowIP(b);
-      ]]></script>
     </listener>
   </child>
 
