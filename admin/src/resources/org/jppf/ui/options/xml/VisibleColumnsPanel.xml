@@ -22,21 +22,22 @@
 -->
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="show.hide.panel" type="page" i18n="org.jppf.ui.i18n.VisibleColumnsPage">
 	<property name="label" value="Show/hide columns"/>
-	<property name="layoutConstraints" value="flowy, fill"/>
+  <!--<property name="layoutConstraints" value="flowy, fill"/>-->
+  <property name="layoutConstraints" value="flowy"/>
 	<property name="componentConstraints" value=""/>
 
   <child name="show.hide.columns" type="page">
     <property name="bordered" value="true"/>
     <property name="scrollable" value="true"/>
     <property name="layoutConstraints" value="flowy, fill, insets 1"/>
-    <property name="componentConstraints" value="grow, push"/>
+    <property name="componentConstraints" value="growx, growy 0"/>
 
   </child>
 
   <!-- OK and Cancel buttons -->
 	<child name="show.hide.buttons" type="page">
 		<property name="layoutConstraints" value="fill"/>
-		<property name="componentConstraints" value="growx 0"/>
+		<property name="componentConstraints" value="growx 0, growy 0"/>
 
     <child name="show.hide.select.all" type="Button"/>
     <child name="show.hide.unselect.all" type="Button"/>
@@ -44,5 +45,10 @@
     <child name="show.hide.close" type="Button"/>
 
 	</child>
+
+  <child name="filler" type="page">
+    <property name="layoutConstraints" value="fill"/>
+    <property name="componentConstraints" value="growy, growx 0, push, w 1, h 1"/>
+  </child>
 
 </opt:main>
