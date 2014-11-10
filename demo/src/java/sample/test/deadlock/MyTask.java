@@ -72,7 +72,7 @@ public class MyTask extends AbstractTask<String> {
         }
       }
       //setResult("execution success for " + message);
-      System.out.println("execution success for "  + getId());
+      //System.out.println("execution success for "  + getId());
     } catch (Exception e) {
       setThrowable(e);
     }
