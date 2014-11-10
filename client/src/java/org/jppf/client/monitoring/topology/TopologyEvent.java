@@ -35,6 +35,10 @@ public class TopologyEvent extends EventObject {
    * Data for the node, if any.
    */
   private final TopologyNode nodeData;
+  /**
+   * The type of update.
+   */
+  private final UpdateType updateType;
 
   /**
    * The possible types of events.
@@ -68,16 +72,37 @@ public class TopologyEvent extends EventObject {
   };
 
   /**
+   * The types of updates for an event
+   * @exclude
+   */
+  public enum UpdateType {
+    /**
+     * Topology update: driver or node has been added or removed.
+     */
+    TOPOLOGY,
+    /**
+     * JVM health snapshot was updated.
+     */
+    JVM_HEALTH,
+    /**
+     * Node state was updated.
+     */
+    NODE_STATE,
+  }
+
+  /**
    * Initialize this event.
    * @param source the source of this event.
    * @param driverData the driver data.
    * @param nodeData the node data.
+   * @param updateType the type of update.
    * @exclude
    */
-  public TopologyEvent(final TopologyManager source, final TopologyDriver driverData, final TopologyNode nodeData) {
+  public TopologyEvent(final TopologyManager source, final TopologyDriver driverData, final TopologyNode nodeData, final UpdateType updateType) {
     super(source);
     this.driverData = driverData;
     this.nodeData = nodeData;
+    this.updateType = updateType;
   }
 
   /**
@@ -112,5 +137,14 @@ public class TopologyEvent extends EventObject {
     sb.append(", node/peer=").append(getNodeOrPeer());
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the type of update.
+   * @return an {@link UpdateType} enum value.
+   * @exclude
+   */
+  public UpdateType getUpdateType() {
+    return updateType;
   }
 }

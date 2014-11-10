@@ -58,7 +58,7 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
         if (log.isTraceEnabled()) log.trace("got driver health snapshot: " + health);
         if ((health != null) && !health.equals(driver.getHealthSnapshot())) {
           driver.refreshHealthSnapshot(health);
-          manager.driverUpdated(driver);
+          manager.driverUpdated(driver, TopologyEvent.UpdateType.JVM_HEALTH);
         }
       } catch (Exception e) {
         log.warn("error getting health snapshot for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
@@ -87,7 +87,7 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
           HealthSnapshot health = (HealthSnapshot) entry.getValue();
           if (!health.equals(node.getHealthSnapshot())) {
             node.refreshHealthSnapshot((HealthSnapshot) entry.getValue());
-            manager.nodeUpdated(driver, node);
+            manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.JVM_HEALTH);
             if (log.isTraceEnabled()) log.trace("got new node health snapshot: " + entry.getValue());
           }
         }

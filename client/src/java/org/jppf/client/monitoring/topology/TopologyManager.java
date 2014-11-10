@@ -305,7 +305,7 @@ public class TopologyManager implements ClientListener {
       driverMap.put(driver.getUuid(), driver);
       driverJmxMap.put(driver.getManagementInfo().toDisplayString(), driver);
     }
-    TopologyEvent event = new TopologyEvent(this, driver, null);
+    TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_ADDED);
   }
 
@@ -324,16 +324,17 @@ public class TopologyManager implements ClientListener {
       driverMap.remove(driver.getUuid());
       driverJmxMap.remove(driver.getManagementInfo().toDisplayString());
     }
-    TopologyEvent event = new TopologyEvent(this, driver, null);
+    TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_REMOVED);
   }
 
   /**
    * Notify all listeners that the state of a driver has changed.
    * @param driver the driver to add.
+   * @param updateType the type of update.
    */
-  void driverUpdated(final TopologyDriver driver) {
-    TopologyEvent event = new TopologyEvent(this, driver, null);
+  void driverUpdated(final TopologyDriver driver, final TopologyEvent.UpdateType updateType) {
+    TopologyEvent event = new TopologyEvent(this, driver, null, updateType);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_UPDATED);
   }
 
@@ -351,7 +352,7 @@ public class TopologyManager implements ClientListener {
     driver.add(node);
     if (node.isNode()) nodeMap.put(node.getUuid(), node);
     else peerMap.put(node.getUuid(), (TopologyPeer) node);
-    TopologyEvent event = new TopologyEvent(this, driver, node);
+    TopologyEvent event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.NODE_ADDED);
   }
 
@@ -366,7 +367,7 @@ public class TopologyManager implements ClientListener {
     TopologyEvent event = null;
     if (node.isNode()) nodeMap.remove(node.getUuid());
     else peerMap.remove(node.getUuid());
-    event = new TopologyEvent(this, driver, node);
+    event = new TopologyEvent(this, driver, node, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.NODE_REMOVED);
   }
 
@@ -374,9 +375,10 @@ public class TopologyManager implements ClientListener {
    * Notify all listeners that a driver was added.
    * @param driverData the driver that was updated or to which the updated node is attached.
    * @param node the node that was updated, or <code>null</code> if it is a driver that was updated.
+   * @param updateType the type of update.
    */
-  void nodeUpdated(final TopologyDriver driverData, final TopologyNode node) {
-    TopologyEvent event = new TopologyEvent(this, driverData, node);
+  void nodeUpdated(final TopologyDriver driverData, final TopologyNode node, final TopologyEvent.UpdateType updateType) {
+    TopologyEvent event = new TopologyEvent(this, driverData, node, updateType);
     dispatchEvent(event, TopologyEvent.Type.NODE_UPDATED);
   }
 

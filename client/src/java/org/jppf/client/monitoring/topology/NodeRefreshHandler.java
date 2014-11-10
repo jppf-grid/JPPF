@@ -107,7 +107,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         if (node != null) {
           if (info.isActive() != node.getManagementInfo().isActive()) {
             node.getManagementInfo().setActive(entry.getValue().isActive());
-            manager.nodeUpdated(driver, node);
+            manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.NODE_STATE);
           }
         }
       }
@@ -180,6 +180,6 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       }
     }
     
-    for (TopologyNode node: changedNodes) manager.nodeUpdated(driver, node);
+    for (TopologyNode node: changedNodes) manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.NODE_STATE);
   }
 }
