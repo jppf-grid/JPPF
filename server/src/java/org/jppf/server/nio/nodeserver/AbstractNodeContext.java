@@ -309,7 +309,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the node system information.
    * @param nodeInfo a {@link JPPFSystemInformation} instance.
    */
-  public void setNodeInfo(final JPPFSystemInformation nodeInfo) {
+  void setNodeInfo(final JPPFSystemInformation nodeInfo) {
     setNodeInfo(nodeInfo, false);
   }
 
@@ -318,7 +318,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param nodeInfo a {@link JPPFSystemInformation} instance.
    * @param update a flag indicates whether update system information in management information.
    */
-  public void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update) {
+  void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update) {
     if (update && debugEnabled) log.debug("updating node information for " + nodeInfo + ", channel=" + channel);
     this.systemInfo = nodeInfo;
     systemInfo.getJppf().setProperty("jppf.channel.local", String.valueOf(channel.isLocal()));
@@ -334,7 +334,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the management information.
    * @param managementInfo a {@link JPPFManagementInfo} instance.
    */
-  public void setManagementInfo(final JPPFManagementInfo managementInfo) {
+  void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
     if (isPeer()) driver.getNodeNioServer().nodeConnected(this);
@@ -551,7 +551,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Determine whether this channel has been closed.
    * @return {@code true} if this channel has been closed, {@code false} otherwise.
    */
-  public boolean isClosed() {
+  boolean isClosed() {
     return closed.get();
   }
 }
