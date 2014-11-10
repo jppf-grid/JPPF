@@ -143,7 +143,7 @@ public class UILauncher {
         e.printStackTrace();
         log.error(e.getMessage(), e);
       }
-      consoleComponent = elt == null ? null : elt.getUIComponent();
+      consoleComponent = (elt == null) ? null : elt.getUIComponent();
     }
     return consoleComponent;
   }
