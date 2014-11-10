@@ -18,12 +18,16 @@
 
 package org.jppf.utils;
 
+import static org.jppf.utils.PropertyType.*;
+
 import java.io.File;
-import java.lang.management.ManagementFactory;
+import java.lang.management.*;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
+
+import javax.management.*;
 
 import org.slf4j.*;
 
@@ -54,6 +58,10 @@ public final class SystemUtils {
    */
   private static TypedProperties network = null;
   /**
+   * A map of the physical RAM information.
+   */
+  private static TypedProperties os = null;
+  /**
    * Windows OS.
    */
   private static final int WINDOWS_OS = 1;
@@ -77,6 +85,20 @@ public final class SystemUtils {
    * Holds and manages the shutdown hooks set on the JVM.
    */
   private static Map<String, Thread> shutdownHooks = new Hashtable<>();
+  /**
+   * The platform MBean server.
+   */
+  private static final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+  /**
+   * The name of the operating system MXBean.
+   */
+  private static ObjectName OS_MXBEAN_NAME = null;
+  static {
+    try {
+      OS_MXBEAN_NAME = new ObjectName("java.lang", "type", "OperatingSystem");
+    } catch (Exception e) {
+    }
+  }
 
   /**
    * Instantiation of this class is not permitted.
@@ -143,6 +165,13 @@ public final class SystemUtils {
       props.setProperty("totalMemory", s);
       s = String.valueOf(Runtime.getRuntime().maxMemory());
       props.setProperty("maxMemory", s);
+      RuntimeMXBean rtMXBean = ManagementFactory.getRuntimeMXBean();
+      s = String.valueOf(rtMXBean.getStartTime());
+      props.setProperty("startTime", s);
+      s = String.valueOf(rtMXBean.getUptime());
+      props.setProperty("uptime", s);
+      s = String.valueOf(rtMXBean.getInputArguments());
+      props.setProperty("inputArgs", s);
     } catch(SecurityException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
@@ -354,5 +383,63 @@ public final class SystemUtils {
     if (pid >= 0) sb = sb.append(" process id: ").append(pid).append(',');
     sb.append(" uuid: ").append(uuid);
     System.out.println(sb.toString());
+  }
+
+  /**
+   * Get the avaialble physical ram information for the local machine.
+   * @return the memory information eelements as a {@link TypedProperties} instance.
+   */
+  public static TypedProperties getOS() {
+    if (os == null) {
+      os = new TypedProperties();
+      try {
+        ObjectName on = new ObjectName("java.lang", "type", "OperatingSystem");
+        capture("TotalPhysicalMemorySize", os, LONG);
+        capture("FreePhysicalMemorySize", os, LONG);
+        capture("TotalSwapSpaceSize", os, LONG);
+        capture("FreeSwapSpaceSize", os, LONG);
+        capture("CommittedVirtualMemorySize", os, LONG);
+        //capture("ProcessCpuLoad", os, DOUBLE);
+        capture("ProcessCpuTime", os, LONG);
+        //capture("SystemCpuLoad", os, DOUBLE);
+        capture("Name", os, STRING);
+        capture("Version", os, STRING);
+        capture("Arch", os, STRING);
+        capture("AvailableProcessors", os, INT);
+        //capture("SystemLoadAverage", os, DOUBLE);
+      } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.info(e.getMessage());
+      }
+    }
+    return os;
+  }
+
+  /**
+   * Capture the specified {@code long} attribute into the specified TypedProperties object.
+   * @param name the attribute name.
+   * @param props the properties holding the attribute and its value.
+   * @param type the type of the attribute.
+   */
+  private static void capture(final String name, final TypedProperties props, final PropertyType type) {
+    Object value = null;
+    try {
+      value = mbeanServer.getAttribute(OS_MXBEAN_NAME, name);
+    } catch(Exception ignore) {
+    }
+    switch(type) {
+      case INT:
+        props.setInt("os." + name, value != null ? (Integer) value : -1);
+        break;
+      case LONG:
+        props.setLong("os." + name, value != null ? (Long) value : -1L);
+        break;
+      case DOUBLE:
+        props.setDouble("os." + name, value != null ? (Double) value : -1d);
+        break;
+      case STRING:
+        props.setString("os." + name, value != null ? (String) value : "");
+        break;
+    }
   }
 }

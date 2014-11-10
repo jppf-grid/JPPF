@@ -28,8 +28,7 @@ import org.jppf.utils.StringUtils;
  * This class represents a snapshot of the JVM health.
  * @author Laurent Cohen
  */
-public class HealthSnapshot implements Serializable
-{
+public class HealthSnapshot implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -59,23 +58,33 @@ public class HealthSnapshot implements Serializable
    */
   int liveThreads = -1;
   /**
-   * The system load.
+   * The process cpu load.
    */
-  double cpuLoad = -1d;
+  double processCpuLoad = -1d;
+  /**
+   * The system cpu load.
+   */
+  double systemCpuLoad = -1d;
+  /**
+   * Ratio of used / max for physical memory.
+   */
+  double ramUsedRatio = -1d;
+  /**
+   * Used physical memory in bytes.
+   */
+  long ramUsed = -1L;
 
   /**
-   * Intiialize this snapshot with default values.
+   * Initialize this snapshot with default values.
    */
-  public HealthSnapshot()
-  {
+  public HealthSnapshot() {
   }
 
   /**
    * Get the ratio of used / max for heap memory.
    * @return the ratio as a double value in the range [0, 1].
    */
-  public double getHeapUsedRatio()
-  {
+  public double getHeapUsedRatio() {
     return heapUsedRatio;
   }
 
@@ -83,8 +92,7 @@ public class HealthSnapshot implements Serializable
    * Get the ratio of used / max for non-heap memory.
    * @return the ratio as a double value in the range [0, 1].
    */
-  public double getNonheapUsedRatio()
-  {
+  public double getNonheapUsedRatio() {
     return nonheapUsedRatio;
   }
 
@@ -92,8 +100,7 @@ public class HealthSnapshot implements Serializable
    * Determine whether a deadlock was detected.
    * @return <code>true</code> if a deadlock was dertected, <code>false</code> otherwise.
    */
-  public boolean isDeadlocked()
-  {
+  public boolean isDeadlocked() {
     return deadlocked;
   }
 
@@ -101,8 +108,7 @@ public class HealthSnapshot implements Serializable
    * Get the used heap memory in bytes.
    * @return the heap used as a long.
    */
-  public long getHeapUsed()
-  {
+  public long getHeapUsed() {
     return heapUsed;
   }
 
@@ -110,8 +116,7 @@ public class HealthSnapshot implements Serializable
    * Get the used non-heap memory in bytes.
    * @return the non-heap used as a long.
    */
-  public long getNonheapUsed()
-  {
+  public long getNonheapUsed() {
     return nonheapUsed;
   }
 
@@ -119,34 +124,63 @@ public class HealthSnapshot implements Serializable
    * Get the number of live threads in the JVM.
    * @return the number of threads as an int.
    */
-  public int getLiveThreads()
-  {
+  public int getLiveThreads() {
     return liveThreads;
   }
 
   /**
-   * Get the cpu load.
-   * @return the cpu load as a double.
+   * Get the cpu load of the current process.
+   * @return the cpu load as a double in the range {@code [0 ... 1]}, or {@code -1d} if it is unknown.
    */
-  public double getCpuLoad()
-  {
-    return cpuLoad;
+  public double getCpuLoad() {
+    return processCpuLoad;
+  }
+
+  /**
+   * Get the cpu load of the system.
+   * @return the cpu load as a double in the range {@code [0 ... 1]}, or {@code -1d} if it is unknown.
+   */
+  public double getSystemCpuLoad() {
+    return systemCpuLoad;
+  }
+
+  /**
+   * Get the ratio of used / max for physical memory.
+   * @return the percentage of used RAM in the range {@code [0 ... 1]}, or {@code -1d} if it is unknown.
+   */
+  public double getRamUsedRatio() {
+    return ramUsedRatio;
+  }
+
+  /**
+   * Get the amount of used physical memory in bytes.
+   * @return the amount of used RAM in bytes, or {@code -1L} if it is unknown.
+   */
+  public long getRamUsed() {
+    return ramUsed;
   }
 
   @Override
-  public String toString()
-  {
-    return "HealthSnapshot [heapUsedRatio=" + heapUsedRatio + ", heapUsed=" + heapUsed + ", nonheapUsedRatio="
-        + nonheapUsedRatio + ", nonheapUsed=" + nonheapUsed + ", deadlocked=" + deadlocked + ", liveThreads="
-        + liveThreads + ", cpuLoad=" + cpuLoad + "]";
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[')
+      .append("heapUsedRatio=").append(heapUsedRatio)
+      .append(", heapUsed=").append(heapUsed)
+      .append(", nonheapUsedRatio=").append( nonheapUsedRatio)
+      .append(", nonheapUsed=").append(nonheapUsed)
+      .append(", deadlocked=").append(deadlocked)
+      .append(", liveThreads=").append(liveThreads)
+      .append(", cpuLoad=").append(processCpuLoad)
+      .append(", systemCpuLoad=").append(systemCpuLoad)
+      .append(", ramUsed=").append(ramUsed)
+      .append(", ramUsedRatio=").append(ramUsedRatio);
+    return sb.append(']').toString();
   }
 
   /**
    * Get this snapshot in an easily readable format, according to the default locale.
    * @return a string representation of this snapshot.
    */
-  public String toFormattedString()
-  {
+  public String toFormattedString() {
     return toFormattedString(Locale.getDefault());
   }
 
@@ -155,8 +189,7 @@ public class HealthSnapshot implements Serializable
    * @param locale the locale to use for formatting.
    * @return a string representation of this snapshot.
    */
-  public String toFormattedString(final Locale locale)
-  {
+  public String toFormattedString(final Locale locale) {
     Locale l = locale == null ? Locale.US : locale;
     NumberFormat nf = NumberFormat.getNumberInstance(l);
     final double mb = 1024d * 1024d;
@@ -166,15 +199,16 @@ public class HealthSnapshot implements Serializable
     nf.setMaximumFractionDigits(1);
     nf.setMinimumFractionDigits(1);
     nf.setMinimumIntegerDigits(1);
-    sb.append("heapUsedRatio=").append(format(100d*heapUsedRatio, nf)).append(" %");
+    sb.append("heapUsedRatio=").append(format2(heapUsedRatio, nf));
     sb.append("; heapUsed=").append(format(heapUsed/mb, nf)).append(" MB");
-    sb.append("; nonheapUsedRatio=").append(format(100d*nonheapUsedRatio, nf)).append(" %");
+    sb.append("; nonheapUsedRatio=").append(format2(nonheapUsedRatio, nf));
     sb.append("; nonheapUsed=").append(format(nonheapUsed/mb, nf)).append(" MB");
     sb.append("; deadlocked=").append(deadlocked);
     sb.append("; liveThreads=").append(liveThreads);
-    sb.append("; cpuLoad=");
-    if (cpuLoad < 0d) sb.append("  n/a ");
-    else sb.append(format(100d*cpuLoad, nf)).append(" %");
+    sb.append("; cpuLoad=").append(format2(processCpuLoad, nf));
+    sb.append("; systemCpuLoad=").append(format2(systemCpuLoad, nf));
+    sb.append("; ramUsedRatio=").append(format2(ramUsedRatio, nf));
+    sb.append("; ramUsed=").append(format(ramUsed/mb, nf)).append(" MB");
     sb.append(']');
     return sb.toString();
   }
@@ -185,21 +219,33 @@ public class HealthSnapshot implements Serializable
    * @param nf the number format to use.
    * @return a formatted string.
    */
-  private String format(final double value, final NumberFormat nf)
-  {
+  private String format(final double value, final NumberFormat nf) {
     return StringUtils.padLeft(nf.format(value), ' ', 6);
+  }
+
+  /**
+   * Format a value that may be unknown, indicated by the value being negative.
+   * @param value the value to format.
+   * @param nf the number format to use.
+   * @return a formatted string.
+   */
+  private String format2(final double value, final NumberFormat nf) {
+    return (value < 0d) ? "  n/a " : new StringBuilder(format(100d * value, nf)).append(" %").toString();
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    long temp = Double.doubleToLongBits(cpuLoad);
+    long temp = Double.doubleToLongBits(processCpuLoad);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(systemCpuLoad);
     result = prime * result + (int) (temp ^ (temp >>> 32));
     result = prime * result + (deadlocked ? 1231 : 1237);
     result = prime * result + (int) (heapUsed ^ (heapUsed >>> 32));
     result = prime * result + liveThreads;
     result = prime * result + (int) (nonheapUsed ^ (nonheapUsed >>> 32));
+    result = prime * result + (int) (ramUsed ^ (heapUsed >>> 32));
     return result;
   }
 
@@ -210,9 +256,11 @@ public class HealthSnapshot implements Serializable
     if (getClass() != obj.getClass()) return false;
     HealthSnapshot other = (HealthSnapshot) obj;
     //if (Double.doubleToLongBits(cpuLoad) != Double.doubleToLongBits(other.cpuLoad)) return false;
-    if (cpuLoad != other.cpuLoad) return false;
+    if (processCpuLoad != other.processCpuLoad) return false;
+    if (systemCpuLoad != other.systemCpuLoad) return false;
     if (deadlocked != other.deadlocked) return false;
     if (heapUsed != other.heapUsed) return false;
+    if (ramUsed != other.ramUsed) return false;
     if (liveThreads != other.liveThreads) return false;
     if (nonheapUsed != other.nonheapUsed) return false;
     return true;

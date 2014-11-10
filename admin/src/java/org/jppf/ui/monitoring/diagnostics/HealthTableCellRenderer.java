@@ -76,13 +76,16 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
       switch(column) {
         case JVMHealthTreeTableModel.HEAP_MEM_MB:
         case JVMHealthTreeTableModel.NON_HEAP_MEM_MB:
+        case JVMHealthTreeTableModel.RAM_MB:
         case JVMHealthTreeTableModel.THREADS:
           alignment = SwingConstants.RIGHT;
           break;
 
         case JVMHealthTreeTableModel.CPU_LOAD:
+        case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
         //case JVMHealthTreeTableModel.DEADLOCK_STATUS:
         case JVMHealthTreeTableModel.HEAP_MEM_PCT:
+        case JVMHealthTreeTableModel.RAM_PCT:
         case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
           alignment = SwingConstants.CENTER;
           break;
@@ -117,8 +120,15 @@ public class HealthTableCellRenderer extends DefaultTableCellRenderer
             case JVMHealthTreeTableModel.NON_HEAP_MEM_PCT:
               computeColor(renderer, table, health.getNonheapUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
               break;
+            case JVMHealthTreeTableModel.RAM_MB:
+            case JVMHealthTreeTableModel.RAM_PCT:
+              computeColor(renderer, table, health.getRamUsedRatio(), selected, Name.MEMORY_WARNING, Name.MEMORY_CRITICAL);
+              break;
             case JVMHealthTreeTableModel.CPU_LOAD:
               computeColor(renderer, table, health.getCpuLoad(), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
+              break;
+            case JVMHealthTreeTableModel.SYSTEM_CPU_LOAD:
+              computeColor(renderer, table, health.getSystemCpuLoad(), selected, Name.CPU_WARNING, Name.CPU_CRITICAL);
               break;
             default:
               renderer.setBackground(selected ? table.getSelectionBackground() : table.getBackground());

@@ -39,33 +39,45 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   private static final String NA = "n/a";
   /**
-   * Column number for the node's url.
+   * Column number for the driver or node's url.
    */
   static final int URL = 0;
   /**
-   * Column number the heap memory usage in percentage.
+   * Column number for the heap memory usage in percentage.
    */
   static final int HEAP_MEM_PCT = 1;
   /**
-   * Column number the heap usage in MB.
+   * Column number for the heap usage in MB.
    */
   static final int HEAP_MEM_MB = 2;
   /**
-   * Column number the non-heap memory usage in percentage.
+   * Column number for the non-heap memory usage in percentage.
    */
   static final int NON_HEAP_MEM_PCT = 3;
   /**
-   * Column number the non-heap memory usage in percentage.
+   * Column number for the non-heap memory usage in percentage.
    */
   static final int NON_HEAP_MEM_MB = 4;
   /**
-   * Column number for the node's last event.
+   * Column number for the RAM usage in percentage.
    */
-  static final int THREADS = 5;
+  static final int RAM_PCT = 5;
+  /**
+   * Column number for the RAM usage in MB.
+   */
+  static final int RAM_MB = 6;
   /**
    * Column number for the node's last event.
    */
-  static final int CPU_LOAD = 6;
+  static final int THREADS = 7;
+  /**
+   * Column number for the process CPU load.
+   */
+  static final int CPU_LOAD = 8;
+  /**
+   * Column number for the process CPU load.
+   */
+  static final int SYSTEM_CPU_LOAD = 9;
   /**
    * A number formatter for the used memory %.
    */
@@ -82,7 +94,7 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
 
   @Override
   public int getColumnCount() {
-    return 7;
+    return 10;
   }
 
   @Override
@@ -93,13 +105,14 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
       if (defNode.getUserObject() instanceof AbstractTopologyComponent) {
         AbstractTopologyComponent info = (AbstractTopologyComponent) defNode.getUserObject();
         HealthSnapshot health = info.getHealthSnapshot();
+        double d = -1d;
         if (health == null) return res;
         switch (column) {
           case URL:
             res = info.toString();
             break;
           case HEAP_MEM_PCT:
-            double d = health.getHeapUsedRatio();
+            d = health.getHeapUsedRatio();
             res = d < 0d ? NA : nf.format(d * 100d) + " %";
             break;
           case HEAP_MEM_MB:
@@ -114,12 +127,24 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
             d = health.getNonheapUsed();
             res = d < 0d ? NA : nf.format(d / MB);
             break;
+          case RAM_PCT:
+            d = health.getRamUsedRatio();
+            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            break;
+          case RAM_MB:
+            d = health.getRamUsed();
+            res = d < 0d ? NA : nf.format(d / MB);
+            break;
           case THREADS:
             int n = health.getLiveThreads();
             res = n < 0 ? NA : Integer.toString(n);
             break;
           case CPU_LOAD:
             d = health.getCpuLoad();
+            res = d < 0d ? NA : nf.format(d * 100d) + " %";
+            break;
+          case SYSTEM_CPU_LOAD:
+            d = health.getSystemCpuLoad();
             res = d < 0d ? NA : nf.format(d * 100d) + " %";
             break;
         }
@@ -149,11 +174,20 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
       case NON_HEAP_MEM_MB:
         res = localize("column.health.nonheap.mb");
         break;
+      case RAM_PCT:
+        res = localize("column.health.ram.pct");
+        break;
+      case RAM_MB:
+        res = localize("column.health.ram.mb");
+        break;
       case THREADS:
         res = localize("column.health.livethreads");
         break;
       case CPU_LOAD:
         res = localize("column.health.cpuload");
+        break;
+      case SYSTEM_CPU_LOAD:
+        res = localize("column.health.systemCpuload");
         break;
     }
     return res;
@@ -190,11 +224,20 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
       case NON_HEAP_MEM_MB:
         res = localize("column.health.nonheap.mb.tooltip");
         break;
+      case RAM_PCT:
+        res = localize("column.health.ram.pct.tooltip");
+        break;
+      case RAM_MB:
+        res = localize("column.health.ram.mb.tooltip");
+        break;
       case THREADS:
         res = localize("column.health.livethreads.tooltip");
         break;
       case CPU_LOAD:
         res = localize("column.health.cpuload.tooltip");
+        break;
+      case SYSTEM_CPU_LOAD:
+        res = localize("column.health.systemCpuload.tooltip");
         break;
     }
     return res;

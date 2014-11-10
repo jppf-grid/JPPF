@@ -195,16 +195,18 @@ public final class StatsFormatter implements StatsConstants {
   public static void stringValues2(final Map<Fields, String> map, final HealthSnapshot snapshot) {
     map.put(HEALTH_HEAP, formatInt(snapshot.getHeapUsed() / MB));
     double d = snapshot.getHeapUsedRatio();
-    if (d < 0d) d = 0d;
-    map.put(HEALTH_HEAP_PCT, formatDouble(100d * d));
+    map.put(HEALTH_HEAP_PCT, formatDouble(d < 0d ? 0d : 100d * d));
     map.put(HEALTH_NON_HEAP, formatInt(snapshot.getNonheapUsed() / MB));
     d = snapshot.getNonheapUsedRatio();
-    if (d < 0d) d = 0d;
-    map.put(HEALTH_NON_HEAP_PCT, formatDouble(100d * d));
+    map.put(HEALTH_NON_HEAP_PCT, formatDouble(d < 0d ? 0d : 100d * d));
+    map.put(HEALTH_RAM, formatInt(snapshot.getRamUsed() / MB));
+    d = snapshot.getRamUsedRatio();
+    map.put(HEALTH_RAM_PCT, formatDouble(d < 0d ? 0d : 100d * d));
     map.put(HEALTH_THREADS, formatInt(snapshot.getLiveThreads()));
     d = snapshot.getCpuLoad();
-    if (d < 0d) d = 0d;
-    map.put(HEALTH_CPU, formatDouble(100d * d));
+    map.put(HEALTH_CPU, formatDouble(d < 0d ? 0d : 100d * d));
+    d = snapshot.getSystemCpuLoad();
+    map.put(HEALTH_SYSTEM_CPU, formatDouble(d < 0d ? 0d : 100d * d));
   }
 
   /**
@@ -321,12 +323,15 @@ public final class StatsFormatter implements StatsConstants {
     map.put(HEALTH_HEAP_PCT, 100d * d);
     map.put(HEALTH_NON_HEAP, (double) snapshot.getNonheapUsed() / MB);
     d = snapshot.getNonheapUsedRatio();
-    if (d < 0d) d = 0d;
-    map.put(HEALTH_NON_HEAP_PCT, 100d * d);
+    map.put(HEALTH_NON_HEAP_PCT, d < 0d ? 0d : 100d * d);
+    map.put(HEALTH_RAM, (double) snapshot.getRamUsed() / MB);
+    d = snapshot.getRamUsedRatio();
+    map.put(HEALTH_RAM_PCT, d < 0d ? 0d : 100d * d);
     map.put(HEALTH_THREADS, (double) snapshot.getLiveThreads());
     d = snapshot.getCpuLoad();
-    if (d < 0d) d = 0d;
-    map.put(HEALTH_CPU, 100d * d);
+    map.put(HEALTH_CPU, d < 0d ? 0d : 100d * d);
+    d = snapshot.getSystemCpuLoad();
+    map.put(HEALTH_SYSTEM_CPU, d < 0d ? 0d : 100d * d);
   }
 
   /**

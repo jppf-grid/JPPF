@@ -36,8 +36,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class JPPFSystemInformation implements PropertiesCollection<String>
-{
+public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * Explicit serialVersionUID.
    */
@@ -74,8 +73,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @param resolveInetAddressesNow if <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
    * otherwise it is different and executed in a separate thread.
    */
-  public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow)
-  {
+  public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow) {
     this.local = local;
     this.resolveInetAddressesNow = resolveInetAddressesNow;
     TypedProperties uuidProps = new TypedProperties();
@@ -94,8 +92,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.SystemUtils#getSystemProperties()
    */
-  public TypedProperties getSystem()
-  {
+  public TypedProperties getSystem() {
     return getProperties("system");
   }
 
@@ -113,8 +110,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.SystemUtils#getRuntimeInformation()
    */
-  public TypedProperties getRuntime()
-  {
+  public TypedProperties getRuntime() {
     return getProperties("runtime");
   }
 
@@ -123,8 +119,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.SystemUtils#getEnvironment()
    */
-  public TypedProperties getEnv()
-  {
+  public TypedProperties getEnv() {
     return getProperties("env");
   }
 
@@ -140,8 +135,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.SystemUtils#getNetwork()
    */
-  public TypedProperties getNetwork()
-  {
+  public TypedProperties getNetwork() {
     return getProperties("network");
   }
 
@@ -150,8 +144,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.JPPFConfiguration
    */
-  public TypedProperties getJppf()
-  {
+  public TypedProperties getJppf() {
     return getProperties("jppf");
   }
 
@@ -171,13 +164,12 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return a <code>TypedProperties</code> instance.
    * @see org.jppf.utils.SystemUtils#getStorageInformation()
    */
-  public TypedProperties getStorage()
-  {
+  public TypedProperties getStorage() {
     return getProperties("storage");
   }
 
   /**
-   * Get the properties object holding the JPPF uuid and evrsion information.
+   * Get the properties object holding the JPPF uuid and version information.
    * The following properties are provided:
    * <ul>
    * <li>"jppf.uuid" : the uuid of the node or driver</li>
@@ -187,9 +179,32 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * </ul>
    * @return a <code>TypedProperties</code> wrapper for the uuid and version information of the corresponding JPPF component.
    */
-  public TypedProperties getUuid()
-  {
+  public TypedProperties getUuid() {
     return getProperties("uuid");
+  }
+
+  /**
+   * Get the properties object holding the operating system information.
+   * The following properties are provided:
+   * <ul>
+   * <li>"os.TotalPhysicalMemorySize" : total physical RAM (long value)</li>
+   * <li>"os.FreePhysicalMemorySize" : available physical RAM (long value)</li>
+   * <li>"os.TotalSwapSpaceSize" : total swap space (long value)</li>
+   * <li>"os.FreeSwapSpaceSize" : available swap space (long value)</li>
+   * <li>"os.CommittedVirtualMemorySize" : total committed virtual memory of the process (long value)</li>
+   * <li>"os.ProcessCpuLoad" : process CPU load (double value in range [0 ... 1])</li>
+   * <li>"os.ProcessCpuTime" : process CPU time (long value)</li>
+   * <li>"os.SystemCpuLoad" : system total CPU load (double value in range [0 ... 1])</li>
+   * <li>"os.Name" : the name of the OS (string value, ex: "Windows 7")</li>
+   * <li>"os.Version" : the OS version (string value, ex: "6.1")</li>
+   * <li>"os.Arch" : the OS architecture (string value, ex: "amd64")</li>
+   * <li>"os.AvailableProcessors" : number of processors available to the OS (int value)</li>
+   * <li>"os.SystemLoadAverage" : average system CPU load over the last minute (double value in the range [0 ... 1], always returns -1 on Windows)</li>
+   * </ul>
+   * @return a <code>TypedProperties</code> wrapper for the operating system information of the corresponding JPPF component.
+   */
+  public TypedProperties getOS() {
+    return getProperties("os");
   }
 
   /**
@@ -197,29 +212,23 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * @return an array of all the sets of properties.
    */
   @Override
-  public TypedProperties[] getPropertiesArray()
-  {
-    synchronized(map)
-    {
+  public TypedProperties[] getPropertiesArray() {
+    synchronized(map) {
       return propertiesArray;
     }
   }
 
   @Override
-  public void addProperties(final String key, final TypedProperties properties)
-  {
-    synchronized(map)
-    {
+  public void addProperties(final String key, final TypedProperties properties) {
+    synchronized(map) {
       map.put(key, properties);
       propertiesArray = map.values().toArray(new TypedProperties[map.size()]);
     }
   }
 
   @Override
-  public TypedProperties getProperties(final String key)
-  {
-    synchronized(map)
-    {
+  public TypedProperties getProperties(final String key) {
+    synchronized(map) {
       return map.get(key);
     }
   }
@@ -228,10 +237,8 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * Populate this system information object.
    * @return this <code>JPPFSystemInformation</code> object.
    */
-  public JPPFSystemInformation populate()
-  {
-    if (traceEnabled)
-    {
+  public JPPFSystemInformation populate() {
+    if (traceEnabled) {
       Exception e = new Exception("call stack for JPPFSystemInformation.populate(" + resolveInetAddressesNow + ")");
       log.trace(e.getMessage(), e);
     }
@@ -250,6 +257,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
     else new Thread(r).start();
     addProperties("storage", SystemUtils.getStorageInformation());
     if (getProperties("uuid") == null) addProperties("uuid", new TypedProperties());
+    addProperties("os", SystemUtils.getOS());
     return this;
   }
 
@@ -258,8 +266,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * This method is provided as a convenience so developers don't have to do the parsing themselves.
    * @return an array on <code>HostIP</code> instances.
    */
-  private HostIP[] parseIPV4Addresses()
-  {
+  private HostIP[] parseIPV4Addresses() {
     return NetworkUtils.parseAddresses(getNetwork().getString("ipv4.addresses"));
   }
 
@@ -268,8 +275,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String>
    * This method is provided as a convenience so developers don't have to do the parsing themselves.
    * @return an array on <code>HostIP</code> instances.
    */
-  private HostIP[] parseIPV6Addresses()
-  {
+  private HostIP[] parseIPV6Addresses() {
     return NetworkUtils.parseAddresses(getNetwork().getString("ipv6.addresses"));
   }
 }

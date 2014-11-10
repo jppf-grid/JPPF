@@ -95,7 +95,6 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   private final String uuid;
   /**
    * The type of component this info is for, must be one of {@link #NODE} or {@link #DRIVER}.
-   * @exclude
    */
   private final byte type;
   /**

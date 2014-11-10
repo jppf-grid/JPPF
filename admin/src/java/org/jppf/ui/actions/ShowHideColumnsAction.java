@@ -68,6 +68,7 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
     if (comp instanceof JScrollPane) columnsPanel = (JComponent) ((JScrollPane) comp).getViewport().getView();
     else columnsPanel = comp;
     TreeTableModel model = treeTableOption.getModel();
+    checkboxes.clear();
     for (int i=0; i<model.getColumnCount(); i++) {
       JCheckBox checkbox = new JCheckBox(model.getColumnName(i));
       if (i == 0) {
@@ -78,32 +79,33 @@ public class ShowHideColumnsAction extends AbstractUpdatableAction {
       columnsPanel.add(checkbox);
     }
 
-    JButton selectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.select.all").getUIComponent();
-    JButton unselectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.unselect.all").getUIComponent();
-    JButton applyBtn = (JButton) thisPanel.findFirstWithName("/show.hide.apply").getUIComponent();
-    JButton closeBtn = (JButton) thisPanel.findFirstWithName("/show.hide.close").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("show.hide.label"), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/table-column-hide.png").getImage());
+    JButton applyBtn = (JButton) thisPanel.findFirstWithName("/show.hide.apply").getUIComponent();
     AbstractAction applyAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         doApply();
       }
     };
+    applyBtn.addActionListener(applyAction);
+    JButton closeBtn = (JButton) thisPanel.findFirstWithName("/show.hide.close").getUIComponent();
     AbstractAction closeAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         dialog.setVisible(false);
         dialog.dispose();
+        checkboxes.clear();
       }
     };
-    applyBtn.addActionListener(applyAction);
     closeBtn.addActionListener(closeAction);
     setOkCancelKeys(thisPanel, applyAction, closeAction);
+    JButton selectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.select.all").getUIComponent();
     selectAllBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         for (JCheckBox checkbox: checkboxes) if (checkbox.isEnabled()) checkbox.setSelected(true);
       }
     });
+    JButton unselectAllBtn = (JButton) thisPanel.findFirstWithName("/show.hide.unselect.all").getUIComponent();
     unselectAllBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

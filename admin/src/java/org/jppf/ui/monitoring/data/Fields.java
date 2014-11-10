@@ -286,15 +286,30 @@ public enum Fields {
    */
   HEALTH_NON_HEAP_PCT,
   /**
+   * Amount of RAM used.
+   * @since 5.0
+   */
+  HEALTH_RAM,
+  /**
+   * Percentage of RAM used.
+   * @since 5.0
+   */
+  HEALTH_RAM_PCT,
+  /**
    * Number of live threads.
    * @since 5.0
    */
   HEALTH_THREADS,
   /**
-   * CPU load.
+   * Process CPU load.
    * @since 5.0
    */
-  HEALTH_CPU;
+  HEALTH_CPU,
+  /**
+   * System CPU load.
+   * @since 5.0
+   */
+  HEALTH_SYSTEM_CPU;
 
   /**
    * The localized name of this enum item.

@@ -280,8 +280,10 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
     switch(field) {
       case HEALTH_HEAP_PCT:
       case HEALTH_NON_HEAP_PCT:
+      case HEALTH_RAM_PCT:
         return getMeterIntervals(Thresholds.Name.MEMORY_WARNING, Thresholds.Name.MEMORY_CRITICAL);
       case HEALTH_CPU:
+      case HEALTH_SYSTEM_CPU:
         return getMeterIntervals(Thresholds.Name.CPU_WARNING, Thresholds.Name.CPU_CRITICAL);
     }
     return StringUtils.ZERO_OBJECT;

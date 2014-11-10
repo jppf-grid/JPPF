@@ -98,7 +98,7 @@ public interface StatsConstants
    * @since 5.0
    */
   Fields[] HEALTH_PROPS = {
-      HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_THREADS, HEALTH_CPU
+      HEALTH_HEAP, HEALTH_HEAP_PCT, HEALTH_NON_HEAP, HEALTH_NON_HEAP_PCT, HEALTH_RAM, HEALTH_RAM_PCT, HEALTH_THREADS, HEALTH_CPU, HEALTH_SYSTEM_CPU
   };
   /**
    * List of all fields displayed in the server stats view.

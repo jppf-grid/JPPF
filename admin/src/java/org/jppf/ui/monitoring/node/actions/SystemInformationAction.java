@@ -74,10 +74,11 @@ public class SystemInformationAction extends AbstractTopologyAction {
     String html = null;
     String toClipboard = null;
     try {
-      JPPFSystemInformation info = retrieveInfo(dataArray[0]);
-      boolean isNode = dataArray[0].isNode();
-      String name = info == null ? "unknown" : (dataArray[0].isDriver() ? dataArray[0].getManagementInfo().toDisplayString() : dataArray[0].toString());
-      String title = "information for " + (isNode ? "node " : "driver ") + name;
+      AbstractTopologyComponent comp = dataArray[0];
+      JPPFSystemInformation info = retrieveInfo(comp);
+      //String name = info == null ? "unknown" : (dataArray[0].isDriver() ? dataArray[0].getManagementInfo().toDisplayString() : dataArray[0].toString());
+      String name = comp.getDisplayName();
+      String title = "information for " + (comp.isNode() ? "node " : "driver ") + name;
       html = formatProperties(info, new HTMLPropertiesTableFormat(title));
       toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
     } catch(Exception e) {
@@ -165,6 +166,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
       format.formatTable(info.getJppf(), "JPPF configuration");
       format.formatTable(info.getNetwork(), "Network configuration");
       format.formatTable(info.getStorage(), "Storage Information");
+      format.formatTable(info.getOS(), "Operating System Information");
     }
     format.end();
     return format.getText();
