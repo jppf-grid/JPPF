@@ -294,7 +294,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether the node is active or inactive.
-   * @return <code>true</code> if the node is active, <code>false</code> if it is inactve.
+   * @return <code>true</code> if the node is active, <code>false</code> if it is inactive.
    */
   public boolean isActive()
   {
@@ -302,9 +302,9 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   }
 
   /**
-   * Specify whether the node is active or inactive.
-   * @param active <code>true</code> if the node is active, <code>false</code> if it is inactve.
-   * @exclude
+   * <p><font color="#840000"><i><b>This method is for internal use only. Invoking it simply sets an internal flag and does not affect the active state of the node</i></b></font>.
+   * <p>Specify whether the node is active or inactive.
+   * @param active <code>true</code> if the node is active, <code>false</code> if it is inactive.
    */
   public void setActive(final boolean active)
   {
