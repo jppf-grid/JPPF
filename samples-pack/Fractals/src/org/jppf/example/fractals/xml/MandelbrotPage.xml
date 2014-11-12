@@ -34,7 +34,7 @@
     <child name="mandelbrot.open" type="FileChooser">
       <property name="icon" value="/icons/open.gif"/>
       <property name="tooltip" value="Open a record file for playback"/>
-      <property name="type" value="1"/>
+      <property name="type" value="open"/>
       <property name="extensions" value="csv;CSV files (*.csv)"/>
       <property name="value" value="./mandelbrot.csv"/>
       <listener type="script">
@@ -45,7 +45,7 @@
     <child name="mandelbrot.save" type="FileChooser">
       <property name="icon" value="/icons/save.gif"/>
       <property name="tooltip" value="Save all current records to a file"/>
-      <property name="type" value="2"/>
+      <property name="type" value="save"/>
       <property name="extensions" value="csv;CSV files (*.csv)|"/>
       <property name="value" value="./mandelbrot.csv"/>
       <listener type="script">
