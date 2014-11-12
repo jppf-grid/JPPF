@@ -18,13 +18,18 @@
 package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
+import java.io.*;
 import java.util.*;
 import java.util.prefs.*;
 
+import org.jppf.ui.monitoring.UILauncher;
+import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
+import org.jppf.ui.monitoring.diagnostics.JVMHealthPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 import org.jppf.ui.plugin.PluggableViewHandler;
+import org.jppf.ui.treetable.AbstractTreeTableOption;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -380,5 +385,69 @@ public final class OptionsHandler {
    */
   public static PluggableViewHandler getPluggableViewHandler() {
     return pluggableViewHandler;
+  }
+
+  /**
+   * Export the UI settings to an XML file.
+   * @param path the path of the XML file to save to.
+   */
+  public static void exportSettings(final String path) {
+    try {
+      savePreferences();
+      if (UILauncher.isEmbedded()) saveMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
+      OptionElement root = pageList.get(0);
+      OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
+      if (elt != null) {
+        JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
+        if (chartBuilder != null) chartBuilder.getStorage().saveAll();
+      }
+      String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
+      JVMHealthPanel panel = null;
+      for (String name: names) {
+        AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
+        if (option != null) option.saveTableColumnsWidth();
+        if ("/health.treetable".equals(name)) panel = (JVMHealthPanel) option;
+      }
+      if (panel != null) panel.saveThresholds();
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    try (OutputStream os = new BufferedOutputStream(new FileOutputStream(path))) {
+      getPreferences().exportSubtree(os); 
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Export the UI settings to an XML file.
+   * @param path the path of the XML file to save to.
+   */
+  public static void importSettings(final String path) {
+    try (InputStream is = new BufferedInputStream(new FileInputStream(path))) {
+      getPreferences().importPreferences(is); 
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+    try {
+      loadPreferences();
+      if (UILauncher.isEmbedded()) loadMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
+      OptionElement root = pageList.get(0);
+      OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
+      if (elt != null) {
+        JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
+        if (chartBuilder != null) chartBuilder.reset();
+      }
+      String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
+      JVMHealthPanel panel = null;
+      for (String name: names) {
+        AbstractTreeTableOption option = (AbstractTreeTableOption) findOptionWithName(root, name);
+        if (option != null) option.setupTableColumns();
+        if ("/health.treetable".equals(name)) panel = (JVMHealthPanel) option;
+      }
+      if (panel != null) panel.loadThresholds();
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
   }
 }

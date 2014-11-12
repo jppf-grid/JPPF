@@ -27,6 +27,30 @@
 
   <child name="sep1" type="ToolbarSeparator"/>
 
+  <child name="settings.import" type="FileChooser">
+    <property name="icon" value="/org/jppf/ui/resources/import.png"/>
+    <property name="tooltip" value="Import UI settings from file"/>
+    <property name="type" value="open"/>
+    <property name="extensions" value="xml;XML files (*.xml)|"/>
+    <property name="value" value="./AdminConsoleSettings.xml"/>
+    <listener type="script">
+      <script language="groovy">OptionsHandler.importSettings(option.getValue())</script>
+    </listener>
+  </child>
+
+  <child name="settings.export" type="FileChooser">
+    <property name="icon" value="/org/jppf/ui/resources/export.png"/>
+    <property name="tooltip" value="Export UI settings to file"/>
+    <property name="type" value="save"/>
+    <property name="extensions" value="xml;XML files (*.xml)|"/>
+    <property name="value" value="./AdminConsoleSettings.xml"/>
+    <listener type="script">
+      <script language="groovy">OptionsHandler.exportSettings(option.getValue())</script>
+    </listener>
+  </child>
+
+  <child name="sep2" type="ToolbarSeparator"/>
+
   <child name="show.ip" type="Button">
     <property name="icon" value="/org/jppf/ui/resources/dns1.png"/>
     <property name="toggle" value="true"/>
@@ -42,7 +66,7 @@
     </listener>
   </child>
 
-  <child name="sep2" type="ToolbarSeparator"/>
+  <child name="sep3" type="ToolbarSeparator"/>
 
   <child name="ServerChooser" type="ComboBox">
     <property name="label" value="Server connection"/>

@@ -84,7 +84,7 @@
 			<property name="tooltip" value="The list of active tabs"/>
 			<property name="scrollable" value="true"/>
 			<property name="bordered" value="true"/>
-			<property name="componentConstraints" value="growx, push"/>
+			<property name="componentConstraints" value="growx, push, w 200"/>
 			<property name="value" value=""/>
 			<property name="selection" value="single"/>
 			<listener type="script">
@@ -130,7 +130,7 @@
 			<property name="selection" value="single"/>
 			<property name="scrollable" value="true"/>
 			<property name="bordered" value="true"/>
-			<property name="componentConstraints" value="growx, push"/>
+			<property name="componentConstraints" value="growx, push, w 200"/>
 			<listener type="script">
 				<script language="groovy">doChartsList()</script>
 			</listener>
@@ -217,7 +217,7 @@
 			<property name="bordered" value="true"/>
 
 			<child name="SaveNewChart" type="Button">
-				<property name="label" value="Save as new"/>
+				<property name="label" value="Save new"/>
 				<property name="tooltip" value="Save the chart configuration as a new chart"/>
 				<listener type="script">
 					<script language="groovy">doSaveNewChart()</script>
@@ -241,7 +241,7 @@
 
     <child name="ChartPreview" type="page">
       <property name="label" value="Preview"/>
-      <property name="componentConstraints" value="width 99%"/>
+      <property name="componentConstraints" value="width 99%, h 250"/>
       <property name="bordered" value="true"/>
       <property name="tooltip" value="Display a preview of the chart with the current configuration parameters"/>
     </child>

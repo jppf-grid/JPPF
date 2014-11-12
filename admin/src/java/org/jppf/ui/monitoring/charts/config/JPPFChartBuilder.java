@@ -18,7 +18,6 @@
 package org.jppf.ui.monitoring.charts.config;
 
 import static org.jppf.ui.monitoring.charts.ChartType.*;
-import static org.jppf.ui.monitoring.data.Fields.*;
 import static org.jppf.utils.ReflectionHelper.*;
 
 import java.awt.Color;
@@ -27,7 +26,7 @@ import java.util.*;
 import javax.swing.*;
 
 import org.jppf.ui.monitoring.charts.*;
-import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
 
@@ -99,9 +98,18 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
       JPanel panel = new JPanel();
       panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
       Object[] charts = (Object[]) cfg.chart;
-      for (Object chart: charts) {
-        //chartPanel = new ChartPanel(chart);
-        JPanel chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass}, chart);
+      for (int i=0; i<charts.length; i++) {
+        Object chart = charts[i];
+        //chartPanel = new ChartPanel(chart, true);
+        JPanel chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass, boolean.class}, chart, true);
+        //chartPanel.setMinimumDrawWidth(0);
+        invokeMethod(chartPanelClass, chartPanel, "setMinimumDrawWidth", new Class[] {int.class}, 0);
+        //chartPanel.setMaximumDrawWidth(Integer.MAX_VALUE);
+        invokeMethod(chartPanelClass, chartPanel, "setMaximumDrawWidth", new Class[] {int.class}, Integer.MAX_VALUE);
+        //chartPanel.setMinimumDrawHeight(0);
+        invokeMethod(chartPanelClass, chartPanel, "setMinimumDrawHeight", new Class[] {int.class}, 0);
+        //chartPanel.setMaximumDrawHeight(Integer.MAX_VALUE);
+        invokeMethod(chartPanelClass, chartPanel, "setMaximumDrawHeight", new Class[] {int.class}, Integer.MAX_VALUE);
         chartPanel.setBackground(Color.WHITE);
         panel.add(chartPanel);
       }
@@ -110,18 +118,10 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
       //cfg.chartPanel = new ChartPanel(cfg.chart);
       cfg.chartPanel = (JPanel) invokeConstructor(chartPanelClass, new Class[] {jfChartClass}, cfg.chart);
     }
+    cfg.chartPanel.setBackground(Color.WHITE);
+    //cfg.chartPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY.brighter()));
+    cfg.chartPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
     return cfg;
-  }
-
-  /**
-   * Remove a tab from the list of tabs.
-   * @param tab the configuration information for the tab to remove.
-   */
-  public void removeTab(final TabConfiguration tab) {
-    remove(tab.panel);
-    tabList.remove(tab);
-    tabMap.remove(tab.name);
-    for (int i=0; i<tabList.size(); i++) tabList.get(i).position = i;
   }
 
   /**
@@ -140,6 +140,36 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
     tabMap.put(tab.name, tab);
     for (int i=0; i<tabList.size(); i++) tabList.get(i).position = i;
     tab.panel.updateUI();
+  }
+
+  /**
+   * Remove a tab from the list of tabs.
+   * @param tab the configuration information for the tab to remove.
+   */
+  public void removeTab(final TabConfiguration tab) {
+    remove(tab.panel);
+    tabList.remove(tab);
+    tabMap.remove(tab.name);
+    for (int i=0; i<tabList.size(); i++) tabList.get(i).position = i;
+  }
+
+  /**
+   * Add a chart to a tab.
+   * @param tab the tab to add a chart to.
+   * @param config the chart to add.
+   */
+  public void addChart(final TabConfiguration tab, final ChartConfiguration config) {
+    createChart(config, false);
+    if (config.position < 0) {
+      config.position = tab.configs.size();
+      tab.configs.add(config);
+      //if (tab.configs.size() > 1) tab.panel.add(Box.createVerticalStrut(10));
+      tab.panel.add(config.chartPanel);
+    } else {
+      tab.configs.add(config.position, config);
+      //if (config.position > 0) tab.panel.add(Box.createVerticalStrut(10));
+      tab.panel.add(config.chartPanel, config.position);
+    }
   }
 
   /**
@@ -207,48 +237,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   public void createInitialCharts()
   {
     storage.loadChartConfigurations();
-    if (tabList.isEmpty()) createDefaultCharts();
-  }
-
-  /**
-   * Create a set of default charts if none is defined.
-   */
-  public void createDefaultCharts() {
-    TabConfiguration network = new TabConfiguration("Network", 0);
-    addTab(network);
-    TabConfiguration plot = new TabConfiguration("Plot Charts", 1);
-    addTab(plot);
-    TabConfiguration bar = new TabConfiguration("Bar Charts", 2);
-    addTab(bar);
-
-    Fields[] fields = { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, AVG_NODE_EXECUTION_TIME, LATEST_NODE_EXECUTION_TIME };
-    addChart(network, new ChartConfiguration("Execution time", CHART_PLOTXY, "ms", 2, fields));
-    fields = new Fields[] { AVG_EXECUTION_TIME, LATEST_EXECUTION_TIME, MAX_EXECUTION_TIME };
-    addChart(bar, new ChartConfiguration("Execution time (bar chart)", CHART_3DBAR, "ms", 2, fields));
-    addChart(plot, new ChartConfiguration("Execution time", CHART_PLOTXY, "ms", 2, fields));
-    fields = new Fields[] { AVG_QUEUE_TIME, LATEST_QUEUE_TIME, MAX_QUEUE_TIME };
-    addChart(bar, new ChartConfiguration("Queue time (bar chart)", CHART_3DBAR, "ms", 2, fields));
-    addChart(plot, new ChartConfiguration("Queue time", CHART_PLOTXY, "ms", 2, fields));
-    fields = new Fields[] { QUEUE_SIZE, MAX_QUEUE_SIZE };
-    addChart(bar, new ChartConfiguration("Queue size (bar chart)", CHART_3DBAR, null, 0, fields));
-    addChart(plot, new ChartConfiguration("Queue size", CHART_PLOTXY, null, 0, fields));
-  }
-
-  /**
-   * Add a chart to a tab.
-   * @param tab the tab to add a chart to.
-   * @param config the chart to add.
-   */
-  public void addChart(final TabConfiguration tab, final ChartConfiguration config) {
-    createChart(config, false);
-    if (config.position < 0) {
-      config.position = tab.configs.size();
-      tab.configs.add(config);
-      tab.panel.add(config.chartPanel);
-    } else {
-      tab.configs.add(config.position, config);
-      tab.panel.add(config.chartPanel, config.position);
-    }
+    if (tabList.isEmpty()) storage.loadDefaultChartConfigurations();
   }
 
   /**
@@ -257,5 +246,23 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
    */
   public PreferencesStorage getStorage() {
     return storage;
+  }
+
+  /**
+   * Remove all chart configurationss and rebuild from the stored preferences.
+   */
+  public void reset() {
+    try {
+      StatsHandler.getInstance().removeStatsHandlerListener(this);
+      List<TabConfiguration> tmpTabs = new ArrayList<>(tabList);
+      for (TabConfiguration tabConfig: tmpTabs) {
+        List<ChartConfiguration> tmpCharts = new ArrayList<>(tabConfig.configs);
+        for (ChartConfiguration chartConfig: tmpCharts) removeChart(tabConfig, chartConfig);
+        removeTab(tabConfig);
+      }
+      createInitialCharts();
+    } finally {
+      StatsHandler.getInstance().addStatsHandlerListener(this);
+    }
   }
 }

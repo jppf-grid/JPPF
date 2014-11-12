@@ -38,6 +38,9 @@
   <!-- Server Chooser Panel -->
   <import source="file" location="org/jppf/ui/options/xml/ServerChooser.xml" pluggableView="ServerChooser"/>
 
+  <!-- Settings import / export -->
+  <!-- <import source="file" location="org/jppf/ui/options/xml/SettingActions.xml" pluggableView="Settings"/> -->
+
   <!-- Main tabbed pane -->
   <import source="file" location="org/jppf/ui/options/xml/MainTabbedPane.xml" pluggableView="Main"/>
 

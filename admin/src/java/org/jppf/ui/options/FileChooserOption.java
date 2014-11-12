@@ -32,8 +32,7 @@ import org.jppf.ui.utils.GuiUtils;
  * chooser dialog.
  * @author Laurent Cohen
  */
-public class FileChooserOption extends AbstractOption
-{
+public class FileChooserOption extends AbstractOption {
   /**
    * The file chooser is for opening files.
    */
@@ -66,8 +65,7 @@ public class FileChooserOption extends AbstractOption
   /**
    * Default constructor.
    */
-  public FileChooserOption()
-  {
+  public FileChooserOption() {
   }
 
   /**
@@ -78,8 +76,7 @@ public class FileChooserOption extends AbstractOption
    * @param value the initially selected value of this component.
    * @param dialogType determines the type of file chooser dialog, either open or save.
    */
-  public FileChooserOption(final String name, final String label, final String tooltip, final String value, final int dialogType)
-  {
+  public FileChooserOption(final String name, final String label, final String tooltip, final String value, final int dialogType) {
     this.name = name;
     this.label = label;
     setToolTipText(tooltip);
@@ -90,27 +87,19 @@ public class FileChooserOption extends AbstractOption
 
   /**
    * Create the UI components for this option.
-   * @see org.jppf.ui.options.AbstractOptionElement#createUI()
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     button = new JButton();
     if ((label != null) && !"".equals(label.trim())) button.setText(label);
-    if (iconPath != null)
-    {
+    if (iconPath != null) {
       ImageIcon icon = GuiUtils.loadIcon(iconPath);
       if (icon != null) button.setIcon(icon);
     }
-    if ((toolTipText != null) && !"".equals(toolTipText.trim()))
-    {
-      button.setToolTipText(toolTipText);
-    }
-    button.addActionListener(new ActionListener()
-    {
+    if ((toolTipText != null) && !"".equals(toolTipText.trim())) button.setToolTipText(toolTipText);
+    button.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent event)
-      {
+      public void actionPerformed(final ActionEvent event) {
         doChooseFile();
       }
     });
@@ -120,43 +109,34 @@ public class FileChooserOption extends AbstractOption
   /**
    * Define a selection listener that will forward changes to the chosen file name
    * to all value change listeners that registered with this option.
-   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
   }
 
   /**
    * Enable or disable this option.
    * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.OptionElement#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
     if (button != null) button.setEnabled(enabled);
   }
 
   /**
    * Select a file using a chooser dialog and according to this option's specifications.
    */
-  public void doChooseFile()
-  {
+  public void doChooseFile() {
     String val = (String) value;
-    if ((val == null) || "".equals(val.trim()))
-    {
-      val = System.getProperty("user.dir");
-      //value = val;
-    }
-    JFileChooser chooser = new JFileChooser(val);
+    if ((val == null) || "".equals(val.trim())) val = System.getProperty("user.dir");
+    JFileChooser chooser = new JFileChooser(new File(val).getParent());
     chooser.setDialogType(dialogType == OPEN ? JFileChooser.OPEN_DIALOG : JFileChooser.SAVE_DIALOG);
+    if ((toolTipText != null) && !"".equals(toolTipText.trim())) chooser.setDialogTitle(toolTipText);
     for (FileFilter filter: filters) chooser.addChoosableFileFilter(filter);
     int result = -1;
     if (OPEN == dialogType) result = chooser.showOpenDialog(button);
     else result = chooser.showSaveDialog(button);
-    if (result == JFileChooser.APPROVE_OPTION)
-    {
+    if (result == JFileChooser.APPROVE_OPTION) {
       value = chooser.getSelectedFile().getAbsolutePath();
       fireValueChanged();
     }
@@ -166,8 +146,7 @@ public class FileChooserOption extends AbstractOption
    * Get the type of the file chooser dialog.
    * @return the type as an int value.
    */
-  public int getDialogType()
-  {
+  public int getDialogType() {
     return dialogType;
   }
 
@@ -175,8 +154,7 @@ public class FileChooserOption extends AbstractOption
    * Set the type of the file chooser dialog.
    * @param dialogType the type as an int value.
    */
-  public void setDialogType(final int dialogType)
-  {
+  public void setDialogType(final int dialogType) {
     this.dialogType = dialogType;
   }
 
@@ -185,8 +163,7 @@ public class FileChooserOption extends AbstractOption
    * @return the extensions as a string.
    * @see #setExtensions(java.lang.String)
    */
-  public String getExtensions()
-  {
+  public String getExtensions() {
     return extensions;
   }
 
@@ -195,23 +172,18 @@ public class FileChooserOption extends AbstractOption
    * @param extensions the extensions as a string with the format
    * <i>ext1</i>; <i>desc1</i> | ... | <i>extN</i>; <i>descN</i>.
    */
-  public void setExtensions(final String extensions)
-  {
+  public void setExtensions(final String extensions) {
     filters.clear();
-    if ((extensions == null) || "".equals(extensions.trim()))
-      this.extensions = DEFAULT_EXTENSIONS;
-    else
-    {
+    if ((extensions == null) || "".equals(extensions.trim())) this.extensions = DEFAULT_EXTENSIONS;
+    else {
       this.extensions = extensions;
       String[] rawExt = extensions.split("\\|");
-      for (String s: rawExt)
-      {
+      for (String s: rawExt) {
         String ext = "";
         String desc = "";
         int idx = s.indexOf(';');
         if (idx < 0) ext = s.trim();
-        else
-        {
+        else {
           ext = s.substring(0, idx).trim();
           desc = s.substring(idx + 1).trim();
         }
@@ -223,8 +195,7 @@ public class FileChooserOption extends AbstractOption
   /**
    * A file filter corresponding to a file extension.
    */
-  private static class Filter extends FileFilter
-  {
+  private static class Filter extends FileFilter {
     /**
      * The file extension this filter accepts.
      */
@@ -239,8 +210,7 @@ public class FileChooserOption extends AbstractOption
      * @param ext the extensions of the file to allow.
      * @param desc the description shown in the file chooser dialog.
      */
-    public Filter(final String ext, final String desc)
-    {
+    public Filter(final String ext, final String desc) {
       this.ext = (ext == null) ? "*" : ext.trim();
       this.desc = (desc == null) ? "" : desc.trim();
     }
@@ -249,11 +219,9 @@ public class FileChooserOption extends AbstractOption
      * Determines whether a file can be selected.
      * @param f the file to lookup.
      * @return true if the file is accepted, false otherwise.
-     * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
      */
     @Override
-    public boolean accept(final File f)
-    {
+    public boolean accept(final File f) {
       if (f == null) return false;
       if (f.isDirectory()) return true;
       if ("*".equals(ext)) return true;
@@ -266,11 +234,9 @@ public class FileChooserOption extends AbstractOption
     /**
      * Get the description for this filter.
      * @return the description as a string.
-     * @see javax.swing.filechooser.FileFilter#getDescription()
      */
     @Override
-    public String getDescription()
-    {
+    public String getDescription() {
       return desc;
     }
   }

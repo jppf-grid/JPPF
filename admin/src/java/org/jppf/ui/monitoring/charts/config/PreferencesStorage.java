@@ -19,12 +19,14 @@ package org.jppf.ui.monitoring.charts.config;
 
 import static org.jppf.ui.monitoring.charts.ChartType.CHART_PLOTXY;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.prefs.*;
 
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.Fields;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.utils.FileUtils;
 import org.slf4j.*;
 
 /**
@@ -32,8 +34,7 @@ import org.slf4j.*;
  * preferences, using the preferences mechanism.
  * @author Laurent Cohen
  */
-public class PreferencesStorage
-{
+public class PreferencesStorage {
   /**
    * Logger for this class.
    */
@@ -51,32 +52,26 @@ public class PreferencesStorage
    * Initialize this preferences storage with a specified chart builder.
    * @param chartBuilder the chart builder from which to get the charts.
    */
-  public PreferencesStorage(final JPPFChartBuilder chartBuilder)
-  {
+  public PreferencesStorage(final JPPFChartBuilder chartBuilder) {
     this.chartBuilder = chartBuilder;
   }
 
   /**
    * Load all chart configurations from the preferences tree, and create the corresponding charts.
    */
-  public void loadChartConfigurations()
-  {
+  public void loadChartConfigurations() {
     Preferences pref = CHART_CONFIG_PREFERENCES;
     String[] tabChildrenNames = null;
-    try
-    {
+    try {
       tabChildrenNames = pref.childrenNames();
-    }
-    catch(BackingStoreException e)
-    {
+    } catch(BackingStoreException e) {
       log.error(e.getMessage(), e);
       return;
     }
     if ((tabChildrenNames == null) || (tabChildrenNames.length <= 0)) return;
     TabConfiguration[] tabs = new TabConfiguration[tabChildrenNames.length];
     int cnt = 0;
-    for (String s: tabChildrenNames)
-    {
+    for (String s: tabChildrenNames) {
       Preferences child = pref.node(s);
       TabConfiguration tab = new TabConfiguration();
       tab.name = child.get("name", "Tab"+cnt);
@@ -88,15 +83,13 @@ public class PreferencesStorage
     }
     Arrays.sort(tabs, new Comparator<TabConfiguration>() {
       @Override
-      public int compare(final TabConfiguration o1, final TabConfiguration o2)
-      {
+      public int compare(final TabConfiguration o1, final TabConfiguration o2) {
         if (o1 == o2) return 0;
         if (o1 == null) return -1;
         if (o2 == null) return 1;
         return Integer.valueOf(o1.position).compareTo(o2.position);
       }
     });
-
     for (TabConfiguration tab: tabs) {
       chartBuilder.addTab(tab);
       for (ChartConfiguration config : tab.configs) {
@@ -107,28 +100,35 @@ public class PreferencesStorage
   }
 
   /**
+   * Load all chart configurations from the preferences tree, and create the corresponding charts.
+   */
+  public void loadDefaultChartConfigurations() {
+    try (InputStream is =  FileUtils.getFileInputStream("ui-default-charts-settings.xml")) {
+      CHART_CONFIG_PREFERENCES.importPreferences(is);
+      loadChartConfigurations();
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  /**
    * Load the chart configurations for a tab from a specified tab preferences node.
    * @param tabNode the tab preferences node that contains the chart configuration nodes.
    * @return an array of <code>ChartConfiguration</code> instances.
    */
-  public ChartConfiguration[] loadTabCharts(final Preferences tabNode)
-  {
+  public ChartConfiguration[] loadTabCharts(final Preferences tabNode) {
     ChartConfiguration[] result = new ChartConfiguration[0];
     String[] tabChildrenNames = null;
-    try
-    {
+    try {
       tabChildrenNames = tabNode.childrenNames();
-    }
-    catch(BackingStoreException e)
-    {
+    } catch(BackingStoreException e) {
       log.error(e.getMessage(), e);
       return result;
     }
     if ((tabChildrenNames == null) || (tabChildrenNames.length <= 0)) return result;
     result = new ChartConfiguration[tabChildrenNames.length];
     int cnt = 0;
-    for (String s: tabChildrenNames)
-    {
+    for (String s: tabChildrenNames) {
       Preferences child = tabNode.node(s);
       ChartConfiguration config = loadChartConfiguration(child);
       result[cnt] = config;
@@ -136,8 +136,7 @@ public class PreferencesStorage
     }
     Arrays.sort(result, new Comparator<ChartConfiguration>() {
       @Override
-      public int compare(final ChartConfiguration o1, final ChartConfiguration o2)
-      {
+      public int compare(final ChartConfiguration o1, final ChartConfiguration o2) {
         if (o1 == o2) return 0;
         if (o1 == null) return -1;
         if (o2 == null) return 1;
@@ -152,8 +151,7 @@ public class PreferencesStorage
    * @param child the preferences node to load the configuration from.
    * @return a <code>ChartConfiguration</code> instance.
    */
-  public ChartConfiguration loadChartConfiguration(final Preferences child)
-  {
+  public ChartConfiguration loadChartConfiguration(final Preferences child) {
     ChartConfiguration config = new ChartConfiguration();
     config.name = child.get("name", "");
     config.precision = child.getInt("precision", 0);
@@ -167,12 +165,9 @@ public class PreferencesStorage
     }
     config.fields = list.toArray(new Fields[list.size()]);
     String type = child.get("type", CHART_PLOTXY.name());
-    try
-    {
+    try {
       config.type = ChartType.valueOf(type);
-    }
-    catch(IllegalArgumentException e)
-    {
+    } catch(IllegalArgumentException e) {
       log.error(e.getMessage(), e);
     }
     if (config.type == null) config.type = CHART_PLOTXY;
@@ -184,19 +179,13 @@ public class PreferencesStorage
    * @param name the name of the field to find.
    * @return a <code>Fields</code>, or null if the field could not be found.
    */
-  private static Fields lookupEnum(final String name)
-  {
+  private static Fields lookupEnum(final String name) {
     Fields field = null;
-    try
-    {
+    try {
       field = Fields.valueOf(name);
-    }
-    catch (IllegalArgumentException e)
-    {
-      for (Fields f: Fields.values())
-      {
-        if (name.equals(f.toString()))
-        {
+    } catch (IllegalArgumentException e) {
+      for (Fields f: Fields.values()) {
+        if (name.equals(f.toString())) {
           field = f;
           break;
         }
@@ -208,27 +197,21 @@ public class PreferencesStorage
   /**
    * Save all tabs and charts configurations in the user preferences.
    */
-  public void saveAll()
-  {
+  public void saveAll() {
     removeAllSaved();
     int cnt = 0;
-    for (TabConfiguration tab: chartBuilder.getTabList())
-    {
+    for (TabConfiguration tab: chartBuilder.getTabList()) {
       tab.position = cnt++;
       saveTabConfiguration(tab);
       int chartCnt = 0;
-      for (ChartConfiguration config: tab.configs)
-      {
+      for (ChartConfiguration config: tab.configs) {
         config.position = chartCnt++;
         saveChartConfiguration(tab, config);
       }
     }
-    try
-    {
+    try {
       CHART_CONFIG_PREFERENCES.flush();
-    }
-    catch(BackingStoreException e)
-    {
+    } catch(BackingStoreException e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -237,8 +220,7 @@ public class PreferencesStorage
    * Save a specified tab configuration in the preferences tree.
    * @param tab the tab to save.
    */
-  public void saveTabConfiguration(final TabConfiguration tab)
-  {
+  public void saveTabConfiguration(final TabConfiguration tab) {
     String tabNodeName = "TabConfiguration"+tab.position;
     Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName);
     pref.put("name", tab.name);
@@ -250,8 +232,7 @@ public class PreferencesStorage
    * @param tab the tab into which to save the configuration.
    * @param config the configuration to save.
    */
-  public void saveChartConfiguration(final TabConfiguration tab, final ChartConfiguration config)
-  {
+  public void saveChartConfiguration(final TabConfiguration tab, final ChartConfiguration config) {
     String tabNodeName = "TabConfiguration"+tab.position;
     String nodeName = "ChartConfiguration"+config.position;
     Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName + '/' + nodeName);
@@ -260,8 +241,7 @@ public class PreferencesStorage
     if (config.unit != null ) pref.put("unit", config.unit);
     pref.put("type", config.type.name());
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<config.fields.length; i++)
-    {
+    for (int i=0; i<config.fields.length; i++) {
       if (i > 0) sb.append('|');
       sb.append(config.fields[i].name());
     }
@@ -272,15 +252,11 @@ public class PreferencesStorage
   /**
    * Remove all tabs and charts configurations from the user preferences.
    */
-  public void removeAllSaved()
-  {
-    try
-    {
+  public void removeAllSaved() {
+    try {
       String[] names = CHART_CONFIG_PREFERENCES.childrenNames();
       for (String name: names) CHART_CONFIG_PREFERENCES.node(name).removeNode();
-    }
-    catch(BackingStoreException e)
-    {
+    } catch(BackingStoreException e) {
       log.error(e.getMessage(), e);
     }
   }

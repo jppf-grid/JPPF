@@ -50,6 +50,11 @@ public class UILauncher {
    * The splash screen window.
    */
   private static JPPFSplash splash = null;
+  /**
+   * Whether the admin conosle is embedded within another application.
+   * @since 5.0
+   */
+  private static boolean embedded = false;
 
   /**
    * Start this UI.
@@ -82,7 +87,7 @@ public class UILauncher {
       }
       boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
       if (showSplash) (splash = new JPPFSplash("The management console is starting ...")).start();
-      loadUI(args[0], args[1], true);
+      loadUI(args[0], args[1], true, -1);
       if (showSplash) splash.stop();
       Frame[] frames = Frame.getFrames();
       for (final Frame f: frames) {
@@ -106,7 +111,31 @@ public class UILauncher {
    * @since 5.0
    */
   public static JComponent loadAdminConsole() {
-    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", false);
+    embedded = true;
+    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", false, -1);
+  }
+
+  /**
+   * Reload the UI to take new preferences into account.
+   * @return the root {@link JComponent} of the admin console.
+   * @since 5.0
+   */
+  public synchronized static JComponent reloadUI() {
+    int idx = -1;
+    if (consoleComponent == null) {
+      Frame frame = OptionsHandler.getMainWindow();
+      if (frame != null) {
+        for (int i=0; i<frame.getComponentCount(); i++) {
+          if (frame.getComponent(i) == consoleComponent) {
+            idx = i;
+            break;
+          }
+        }
+        frame.remove(consoleComponent);
+        consoleComponent = null;
+      }
+    }
+    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", !embedded, idx);
   }
 
   /**
@@ -114,10 +143,11 @@ public class UILauncher {
    * @param src the path tot he XML docuemnt to load
    * @param type the type of the path: url or file.
    * @param createFrame determines whether the main application frame should alsd be created and initialized.
+   * @param idx the index at which to insert the admin console in the main frame. A negative value measn insert at the end.
    * @return the root {@link JComponent} of the admin console.
    * @since 5.0
    */
-  private synchronized static JComponent loadUI(final String src, final String type, final boolean createFrame) {
+  private synchronized static JComponent loadUI(final String src, final String type, final boolean createFrame, final int idx) {
     if (consoleComponent == null) {
       OptionElement elt = null;
       try {
@@ -125,18 +155,26 @@ public class UILauncher {
         else elt = OptionsHandler.addPageFromXml(src);
         OptionsHandler.loadPreferences();
         OptionsHandler.getBuilder().triggerInitialEvents(elt);
+        Frame frame = OptionsHandler.getMainWindow();
         if (createFrame) {
-          JFrame frame = new JFrame(elt.getLabel());
-          OptionsHandler.setMainWindow(frame);
-          DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
-          frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
-          frame.addWindowListener(new WindowClosingListener());
+          if (frame == null) {
+            frame = new JFrame(elt.getLabel());
+            OptionsHandler.setMainWindow(frame);
+            DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
+            frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
+            frame.addWindowListener(new WindowClosingListener());
+          }
           StatsHandler.getInstance();
-          frame.getContentPane().add(elt.getUIComponent());
+          if (idx >= 0) frame.add(elt.getUIComponent(), idx);
+          else frame.add(elt.getUIComponent());
           OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
         } else {
-          JComponent comp = elt.getUIComponent();
-          comp.addHierarchyListener(new MainFrameObserver(elt));
+          if (idx < 0) {
+            JComponent comp = elt.getUIComponent();
+            comp.addHierarchyListener(new MainFrameObserver(elt));
+          } else {
+            frame.add(elt.getUIComponent(), idx);
+          }
         }
         OptionsHandler.getPluggableViewHandler().installViews();
       } catch (Exception e) {
@@ -197,5 +235,14 @@ public class UILauncher {
       }
       return null;
     }
+  }
+
+  /**
+   * Determine whether the admin conosle is embedded within another application.
+   * @return {@code true} if the console is embedded, {@code false} otherwise.
+   * @since 5.0
+   */
+  public static boolean isEmbedded() {
+    return embedded;
   }
 }
