@@ -502,7 +502,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   public void setActive(final boolean active) {
     this.active.set(active);
-    if (managementInfo != null) managementInfo.setActive(active);
+    if (managementInfo != null) managementInfo.setIsActive(active);
   }
 
   /**

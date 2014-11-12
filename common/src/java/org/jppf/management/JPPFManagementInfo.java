@@ -314,7 +314,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @param active <code>true</code> if the node is active, <code>false</code> if it is inactve.
    * @exclude
    */
-  public void setActive(final boolean active) {
+  public void setIsActive(final boolean active) {
     this.active = active;
   }
 
