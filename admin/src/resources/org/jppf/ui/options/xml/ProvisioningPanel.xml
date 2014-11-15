@@ -84,11 +84,16 @@
 		<property name="componentConstraints" value="growx 0"/>
 		<property name="tooltip" value="Validate or cancel the updates"/>
 
-		<child name="provisioningOK" type="Button">
-			<property name="label" value="OK"/>
-			<property name="tooltip" value="perform the provisioning operation"/>
-		</child>
-
+    <child name="provisioningOK" type="Button">
+      <property name="label" value="OK"/>
+      <property name="tooltip" value="perform the provisioning operation"/>
+    </child>
+    <!--
+    <child name="provisioningApply" type="Button">
+      <property name="label" value="Apply"/>
+      <property name="tooltip" value="perform the provisioning operation"/>
+    </child>
+    -->
 		<child name="provisioningCancel" type="Button">
 			<property name="label" value="Cancel"/>
 			<property name="tooltip" value="Close this dialog without applying any settings"/>

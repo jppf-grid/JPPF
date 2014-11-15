@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
+import org.jppf.node.policy.*;
 
 /**
  * Instances of this class provide a stream of JPPF jobs, based on the data contained in a text file.
@@ -58,6 +59,10 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
    * A counter for the total number of submitted tasks.
    */
   private int taskCount = 0;
+  /**
+   * 
+   */
+  private final ExecutionPolicy slavePolicy = new Equal("jppf.node.provisioning.slave", true);
 
   /**
    * Initialize this job provider.
@@ -116,6 +121,7 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
     }
     job.setBlocking(false);
     job.addJobListener(this);
+    //job.getSLA().setExecutionPolicy(slavePolicy);
     currentNbJobs++;
     return job;
   }

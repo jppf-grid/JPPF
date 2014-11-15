@@ -43,7 +43,11 @@ public class JPPFTreeTable extends JTreeTable
   public TreePath getPathForRow(final int n)
   {
     if (getTree().getRowCount() <= n) return null;
-    return getTree().getPathForRow(n);
+    try {
+      return getTree().getPathForRow(n);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /**

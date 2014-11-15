@@ -19,11 +19,16 @@
 package sample.test.deadlock;
 
 import org.jppf.node.protocol.AbstractTask;
+import org.slf4j.*;
 
 /**
  * A simple task used in the demo.
  */
 public class MyTask extends AbstractTask<String> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(MyTask.class);
   /**
    * A string message to transform and set as result of this task.
    */
@@ -32,6 +37,10 @@ public class MyTask extends AbstractTask<String> {
    * How long this task will sleep to simulate code execution.
    */
   private final long duration;
+  /**
+   * Whether to simulate CPU usage.
+   */
+  private final boolean useCPU;
 
   /**
    * Initialize this task.
@@ -39,25 +48,46 @@ public class MyTask extends AbstractTask<String> {
    * @param duration how long this task will sleep to simulate code execution.
    */
   public MyTask(final String message, final long duration) {
+    this(message, duration, false);
+  }
+
+  /**
+   * Initialize this task.
+   * @param duration how long this task will sleep to simulate code execution.
+   * @param useCPU whether to simulate CPU usage.
+   */
+  public MyTask(final long duration, final boolean useCPU) {
+    this(null, duration, useCPU);
+  }
+
+  /**
+   * Initialize this task.
+   * @param message a string message to transform and set as result of this task.
+   * @param duration how long this task will sleep to simulate code execution.
+   * @param useCPU whether to simulate CPU usage.
+   */
+  public MyTask(final String message, final long duration, final boolean useCPU) {
     this.message = message;
     this.duration = duration;
+    this.useCPU = useCPU;
   }
 
   @Override
   public void run() {
+    //System.out.println("starting execution for "  + getId());
     try {
-      // wait for the specified time, to simulate actual execution
-      //if (duration > 0) Thread.sleep(duration);
-      long taskStart = System.currentTimeMillis();
-      for (long elapsed = 0L; elapsed < duration; elapsed = System.currentTimeMillis() - taskStart) {
-        String s = "";
-        for (int i=0; i<10; i++) s += "A10";
+      if (!useCPU) {
+        if (duration > 0L) Thread.sleep(duration);
+        //log.info(getId());
+      } else {
+        long taskStart = System.currentTimeMillis();
+        for (long elapsed = 0L; elapsed < duration; elapsed = System.currentTimeMillis() - taskStart) {
+          String s = "";
+          for (int i=0; i<10; i++) s += "A10";
+        }
       }
-      /*
-      System.out.println("before System.exit(1)");
-      System.exit(1);
-      */
-      setResult("execution success for " + message);
+      //setResult("execution success for " + message);
+      //System.out.println("execution success for "  + getId());
     } catch (Exception e) {
       setThrowable(e);
     }

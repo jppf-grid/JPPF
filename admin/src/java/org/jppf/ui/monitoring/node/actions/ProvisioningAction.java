@@ -102,8 +102,6 @@ public class ProvisioningAction extends AbstractTopologyAction {
     OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
     TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
 
-    JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
-    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
     final JFrame frame = new JFrame(localize("provisioning.frame.caption"));
     frame.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/weather-overcast.png").getImage());
     AbstractAction okAction = new AbstractAction() {
@@ -113,6 +111,8 @@ public class ProvisioningAction extends AbstractTopologyAction {
         doOK();
       }
     };
+    JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
+    okBtn.addActionListener(okAction);
     AbstractAction cancelAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
         TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
@@ -121,9 +121,18 @@ public class ProvisioningAction extends AbstractTopologyAction {
         frame.dispose();
       }
     };
-    okBtn.addActionListener(okAction);
+    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
     cancelBtn.addActionListener(cancelAction);
     setOkCancelKeys(thisPanel, okAction, cancelAction);
+    /*
+    AbstractAction applyAction = new AbstractAction() {
+      @Override public void actionPerformed(final ActionEvent event) {
+        doOK();
+      }
+    };
+    JButton applyBtn = (JButton) thisPanel.findFirstWithName("/provisioningApply").getUIComponent();
+    applyBtn.addActionListener(applyAction);
+    */
     frame.getContentPane().add(thisPanel.getUIComponent());
     frame.pack();
     frame.setLocationRelativeTo(null);

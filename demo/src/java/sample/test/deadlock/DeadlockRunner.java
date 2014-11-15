@@ -21,17 +21,26 @@ package sample.test.deadlock;
 import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * An illustration of the patterns for submitting multiple jobs in parallel.
  */
 public class DeadlockRunner {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ProvisioningThread.class);
+  /**
+   *
+   */
+  private static JMXDriverConnectionWrapper jmx = null;
 
   /**
    * Entry point for this demo.
@@ -55,14 +64,24 @@ public class DeadlockRunner {
     int nbJobs = config.getInt("deadlock.nbJobs", 10);
     int tasksPerJob = config.getInt("deadlock.tasksPerJob", 10);
     long taskDuration = config.getLong("deadlock.taskDuration", 10L);
+    long waitTime = config.getLong("deadlock.waitTime", 1000L);
     System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", concurrencyLimit, nbJobs, tasksPerJob, taskDuration);
-    try (JPPFClient jppfClient = new JPPFClient();
-         JobProvider jobProvider = new JobProvider(concurrencyLimit, nbJobs, tasksPerJob, taskDuration)) {
-      ensureSufficientConnections(jppfClient, concurrencyLimit);
-      for (JPPFJob job: jobProvider) {
-        if (job != null) jppfClient.submitJob(job);
+    try (JPPFClient client = new JPPFClient();
+        JobProvider jobProvider = new JobProvider(concurrencyLimit, nbJobs, tasksPerJob, taskDuration)) {
+      ensureSufficientConnections(client, concurrencyLimit);
+      ProvisioningThread pt = new ProvisioningThread(client, waitTime);
+      MasterNodeMonitoringThread mnmt = new MasterNodeMonitoringThread(client, 5000L, pt);
+      try {
+        new Thread(pt, "ProvisioningThread").start();
+        new Thread(mnmt, "MasterNodeMonitoringThread").start();
+        for (JPPFJob job: jobProvider) {
+          if (job != null) client.submitJob(job);
+        }
+        while (jobProvider.hasPendingJob()) Thread.sleep(10L);
+      } finally {
+        pt.setStopped(true);
+        mnmt.setStopped(true);
       }
-      while (jobProvider.hasPendingJob()) Thread.sleep(10L);
       System.out.printf("*** executed a total of %d jobs and %d tasks\n", jobProvider.getJobCount(), jobProvider.getTaskCount());
     } catch (Exception e) {
       e.printStackTrace();
@@ -85,16 +104,16 @@ public class DeadlockRunner {
 
   /**
    * Ensure that the JPPF client has the specified number of connections.
-   * @param jppfClient the jppf client.
+   * @param client the jppf client.
    * @param nbConnections the desried number of connections.
    * @throws Exception if any error occurs.
    */
-  private static void ensureSufficientConnections(final JPPFClient jppfClient, final int nbConnections) throws Exception {
+  private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {
     JPPFConnectionPool pool = null;
-    while ((pool = jppfClient.getConnectionPool()) == null) Thread.sleep(10L);
+    while ((pool = client.getConnectionPool()) == null) Thread.sleep(10L);
     pool.setMaxSize(nbConnections);
     while (pool.connectionCount(JPPFClientConnectionStatus.ACTIVE) < nbConnections) Thread.sleep(10L);
-    updateSlaveNodes(jppfClient, nbConnections - 1);
+    //updateSlaveNodes(jppfClient, nbConnections - 1);
   }
 
   /**
@@ -110,5 +129,25 @@ public class DeadlockRunner {
     NodeSelector masterSelector = new NodeSelector.ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     // request that <nbSlaves> slave nodes be provisioned
     forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", params, new String[] {int.class.getName(), TypedProperties.class.getName()});
+  }
+
+  /**
+   * Get a JMX connectionf rom the specified client.
+   * @param client the client ot get the connection from.
+   * @return a {@link JMXDriverConnectionWrapper} instance.
+   * @throws Exception if any error occurs.
+   */
+  static synchronized JMXDriverConnectionWrapper getJmxConnection(final JPPFClient client) throws Exception {
+    if (jmx == null) {
+      JPPFConnectionPool pool = null;
+      log.info("getting pool");
+      List<JPPFConnectionPool> list = null;
+      while ((list = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)).isEmpty()) Thread.sleep(1L);
+      pool = list.get(0);
+      log.info("getting jmx connection");
+      while ((jmx = pool.getJmxConnection()) == null)  Thread.sleep(1L);
+      while (!jmx.isConnected()) Thread.sleep(1L);
+    }
+    return jmx;
   }
 }
