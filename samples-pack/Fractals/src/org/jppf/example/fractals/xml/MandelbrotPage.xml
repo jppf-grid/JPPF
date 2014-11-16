@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  JPPF.
+   Copyright (C) 2005-2014 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="MandelbrotSet" type="page">
+  <property name="label" value="Mandelbrot Set"/>
+  <property name="layoutConstraints" value="fill, flowy"/>
+  <property name="detachable" value="false"/>
+  <script language="groovy" source="org/jppf/example/fractals/xml/mandelbrot.groovy"/>
+
+  <!-- ===================================================================== -->
+  <!--         Toolbar                                                       -->
+  <!-- ===================================================================== -->
+
+  <child name="mandelbrot.toolbar" type="page">
+    <property name="componentConstraints" value="gap rel"/>
+    <property name="layoutConstraints" value="insets 4 2 0 2"/>
+
+    <child name="mandelbrot.open" type="FileChooser">
+      <property name="icon" value="/icons/open.gif"/>
+      <property name="tooltip" value="Open a record file for playback"/>
+      <property name="type" value="1"/>
+      <property name="extensions" value="csv;CSV files (*.csv)"/>
+      <property name="value" value="./mandelbrot.csv"/>
+      <listener type="script">
+        <script language="groovy">RunnerFactory.getRunner("mandelbrot").loadRecords(option.getValue())</script>
+      </listener>
+    </child>
+  
+    <child name="mandelbrot.save" type="FileChooser">
+      <property name="icon" value="/icons/save.gif"/>
+      <property name="tooltip" value="Save all current records to a file"/>
+      <property name="type" value="2"/>
+      <property name="extensions" value="csv;CSV files (*.csv)|"/>
+      <property name="value" value="./mandelbrot.csv"/>
+      <listener type="script">
+        <script language="groovy">RunnerFactory.getRunner("mandelbrot").saveRecords(option.getValue())></script>
+      </listener>
+    </child>
+  
+    <child name="sep1" type="ToolbarSeparator">
+      <property name="text" value=" | "/>
+    </child>
+
+    <child name="mandelbrot.record" type="Button">
+      <property name="icon" value="/icons/record.gif"/>
+      <property name="toggle" value="true"/>
+      <property name="tooltip" value="Start/stop recording for later retrieval and replay"/>
+      <listener type="script">
+        <script language="groovy"><![CDATA[
+          def recording = RunnerFactory.getRunner("mandelbrot").isRecording();
+          RunnerFactory.getRunner("mandelbrot").setRecording(!recording);
+        ]]></script>
+      </listener>
+    </child>
+  
+    <child name="mandelbrot.replay" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/start.gif"/>
+      <property name="tooltip" value="Replay the currently recorded configurations"/>
+      <listener type="script">
+        <script language="groovy">RunnerFactory.getRunner("mandelbrot").replay()</script>
+      </listener>
+    </child>
+
+    <child name="mandelbrot.clear" type="Button">
+      <property name="icon" value="/icons/trash.gif"/>
+      <property name="tooltip" value="Clear all records"/>
+      <listener type="script">
+        <script language="groovy">RunnerFactory.getRunner("mandelbrot").clearRecords()</script>
+      </listener>
+    </child>
+
+    <child name="sep2" type="ToolbarSeparator">
+      <property name="text" value=" | "/>
+    </child>
+
+    <child name="mandelbrotZoomIn" type="Button">
+      <property name="icon" value="/icons/zoomIn.gif"/>
+      <property name="tooltip" value="Zoom-in the image by the current zoom factor"/>
+      <property name="width" value="20"/>
+      <property name="height" value="20"/>
+      <listener type="script">
+        <script language="groovy">zoom(true)</script>
+      </listener>
+    </child>
+
+    <child name="mandelbrotZoomOut" type="Button">
+      <property name="icon" value="/icons/zoomOut.gif"/>
+      <property name="tooltip" value="Zoom-out the image by the inverse of the current zoom factor"/>
+      <property name="width" value="20"/>
+      <property name="height" value="20"/>
+      <listener type="script">
+        <script language="groovy">zoom(false)</script>
+      </listener>
+    </child>
+
+    <child name="mandelbrotZoomFactor" type="SpinnerNumber">
+      <property name="label" value=" Zoom factor"/>
+      <property name="tooltip" value="Specify by how much to zoom in or out on mouse clicks or with the zoom buttons"/>
+      <property name="value" value="2"/>
+      <property name="minValue" value="1"/>
+      <property name="maxValue" value="100"/>
+      <property name="persistent" value="true"/>
+    </child>
+
+    <child name="filler" type="page">
+      <property name="layoutConstraints" value="fill"/>
+      <property name="componentConstraints" value="growx, pushx"/>
+    </child>
+
+  </child>
+
+  <!-- ===================================================================== -->
+  <!--         Mandelbrot algorithm configuration parameters                 -->
+  <!-- ===================================================================== -->
+
+  <child name="MandelbrotConfig" type="page">
+    <property name="layoutConstraints" value="fillx"/>
+
+    <child name="ButtonPanel" type="page">
+      <property name="bordered" value="true"/>
+      <property name="layoutConstraints" value="flowy, fill"/>
+
+      <child name="computeMandelbrot" type="Button">
+        <property name="label" value="Compute"/>
+        <property name="tooltip" value="Compute an image for the Mandelbrot set according to the parameters entered on this page"/>
+        <listener type="script">
+          <script language="groovy">computeMandelbrot(createConfig())</script>
+        </listener>
+      </child>
+
+      <child name="resetMandelbrot" type="Button">
+        <property name="label" value="Reset Default"/>
+        <property name="tooltip" value="Reset to the default values"/>
+        <listener type="script">
+          <script language="groovy"><![CDATA[
+            applyConfig(-0.5d, 0d, 3d, 100L)
+            computeMandelbrot(createConfig())
+          ]]></script>
+        </listener>
+      </child>
+
+    </child>
+
+    <child name="centerXYPanel" type="page">
+      <property name="layoutConstraints" value="flowy, fill"/>
+      <property name="bordered" value="true"/>
+
+      <child name="centerX" type="FormattedNumber">
+        <property name="label" value="center X"/>
+        <property name="tooltip" value="X coordinate of the image center"/>
+        <property name="value" value="-0.7"/>
+        <!--
+        <property name="pattern" value="0.###############"/>
+        -->
+        <property name="pattern" value="0.###############E0###"/>
+        <property name="orientation" value="horizontal"/>
+        <property name="persistent" value="true"/>
+      </child>
+  
+      <child name="centerY" type="FormattedNumber">
+        <property name="label" value="center Y"/>
+        <property name="tooltip" value="Y coordinate of the image center"/>
+        <property name="value" value="0.0"/>
+        <!--
+        <property name="pattern" value="0.###############"/>
+        -->
+        <property name="pattern" value="0.###############E0###"/>
+        <property name="orientation" value="horizontal"/>
+        <property name="persistent" value="true"/>
+      </child>
+
+    </child>
+
+    <child name="otherPanel" type="page">
+      <property name="layoutConstraints" value="flowy, fill"/>
+      <property name="bordered" value="true"/>
+
+      <child name="diameter" type="FormattedNumber">
+        <property name="label" value="diameter"/>
+        <property name="tooltip" value="Diameter of the area in which the Mandelbrot set is computed"/>
+        <property name="value" value="3.0769"/>
+        <!--
+        <property name="pattern" value="0.###############"/>
+        -->
+        <property name="pattern" value="0.###############E0###"/>
+        <property name="orientation" value="horizontal"/>
+        <property name="persistent" value="true"/>
+      </child>
+  
+      <child name="iterations" type="SpinnerNumber">
+        <property name="label" value="iterations"/>
+        <property name="tooltip" value="Maximum number of iterations for escaping the Mandelbrot set"/>
+        <property name="value" value="100"/>
+        <property name="minValue" value="1"/>
+        <property name="maxValue" value="1000000"/>
+        <property name="persistent" value="true"/>
+      </child>
+
+    </child>
+
+    <child name="filler" type="page">
+      <property name="layoutConstraints" value="fill"/>
+      <property name="componentConstraints" value="growx, pushx"/>
+    </child>
+
+  </child>
+
+  <!-- ===================================================================== -->
+  <!--                        Image area                                     -->
+  <!-- ===================================================================== -->
+
+  <child name="mandelbrot.bottom" type="page">
+    <property name="layoutConstraints" value="fillx"/>
+    <property name="componentConstraints" value="grow, push"/>
+
+    <child name="mandelbrotImage" type="Java">
+      <property name="class" value="org.jppf.example.fractals.ImagePanel"/>
+      <!--
+      <property name="layoutConstraints" value="fill"/>
+      <property name="componentConstraints" value="grow, push"/>
+      -->
+      <initializer type="script">
+        <script language="groovy"><![CDATA[
+          RunnerFactory.createRunner("mandelbrot", true);
+          def comp = option.getUIComponent();
+          comp.setImage("data/mandelbrot.png");
+          comp.repaint();
+        ]]></script>
+      </initializer>
+      <mouselistener type="script">
+        <script language="groovy">onMouseClicked(event)</script>
+      </mouselistener>
+    </child>
+
+    <child name="filler" type="page"/>
+
+  </child>
+
+  <child name="filler" type="page"/>
+
+</opt:main>

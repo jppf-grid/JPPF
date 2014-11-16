@@ -1,0 +1,135 @@
+<html>
+
+	<head>
+		<title>Initialization Hook sample</title>
+		<meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+		<meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+		<meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+		<link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+	</head>
+
+	<body>
+		<div align="center">
+			<div class="gwrapper" align="center">
+
+				<!-- start header -->
+				<div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+				<table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+					<tr style="height: 80px">
+						<td width="20"></td>
+						<td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+						<td valign="center"><h1>Initialization Hook sample</h1></td>
+						<td width="20"></td>
+					</tr>
+				</table>
+				<!-- end header -->
+
+				<!-- start content -->
+				<div align="left" style="margin: 10px">
+					<!-- ${SAMPLE_START_CONTENT} -->
+					<h3>What does the sample do?</h3>
+					<p>This sample demonstrates the use of a node initialization hook to implement a failover mechanism for the connection to the server.
+					The hook reads a list of JPPF server addresses from the node configuration, and uses these addresses in the configured order.
+					<p>The failover is performed as follows:
+					<ol class="samplesList">
+						<li>At node startup time, read the list of servers and store it in memory</li>
+						<li>Use the first server in the list and attempt to connect</li>
+						<li>When the connection fails, the <a href="http://www.jppf.org/doc/v4/index.php?title=Node_configuration#Recovery_and_failover">recovery mechanism</a> will attempt to reconnect to the current server</li>
+						<li>If the recovery fails, the current server is put at the end of the list and we get back to step 2</li>
+					</ol>
+
+					<h3>How do I run it?</h3>
+					Before running this sample, you need to install at least two JPPF server and at least one node.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+					<p>For convenience, this sample provides 2 configurations for the servers, which you will find in <b>InitializationHook/config/driver1</b> and <b>InitializationHook/config/driver2</b>.
+					Additionally, a node configuration is provided in <b>InitializationHook/config/node</b>.<br/>
+					Once you have installed the 2 servers and at least one node, perform the following steps:
+					<ol class="samplesList">
+						<li>Open a command prompt in JPPF-x.y-samples-pack/InitializationHook</li>
+						<li>Build the sample: type "<b>ant jar</b>"; this will create a file named <b>InitializationHook.jar</b></li>
+						<li>Copy InitializationHook.jar in the "lib" folder of the JPPF node installation, to add it to the node's classpath.</li>
+						<li>Replace the node's configuration with the one provided in this sample</li>
+						<li>Replace the servers configurations with those provided in this sample</li>
+						<li>Start the two drivers</li>
+						<li>Start the node. Upon startup you should see the following messages in the node's console:
+<pre class="samples">*** found 3 servers ***
+  registered server localhost:11111
+  registered server localhost:11121
+  registered server localhost:11131</pre>
+  					</li>
+						<li>Kill the first driver (the one listening to port 11111), the node console will display the following:
+<pre class="samples">Attempting connection to the node server at localhost:11111
+SocketInitializer.initializeSocket(): Could not reconnect to the remote server
+Attempting connection to the class server at localhost:11121
+Reconnected to the class server
+JPPF Node management initialized
+Attempting connection to the node server at localhost:11121
+Reconnected to the node server
+Node successfully initialized</pre>
+						The first two lines show the node trying to reconnect to the same driver, and failing to do so. This is the built-in connection recovery mechanism.
+						The next lines show the node connecting to the second driver (port 11121), this is our failover mechanism taking place.
+						</li>
+						<li>Now, start the first driver again, and kill the second driver (port 11121), and you should see the following:
+<pre class="samples">Attempting connection to the node server at localhost:11121
+SocketInitializer.initializeSocket(): Could not reconnect to the remote server
+Attempting connection to the class server at localhost:11131
+Attempting connection to the class server at localhost:11111
+Reconnected to the class server
+JPPF Node management initialized
+Attempting connection to the node server at localhost:11111
+Reconnected to the node server
+Node successfully initialized</pre>
+						In the same way as previously, we first see the node attempting to recover the broken connection.
+						Then our failover mechanism attempts to connect to a driver listening to port 11131. Since we never started this driver, the connection attempt fails.
+						The last lines show the node connecting to the first driver again. The failover mechanism browses the configured servers as if they were in a ring.
+						</li>
+					</ol>
+
+					<h3>Related source files</h3>
+					<ul class="samplesList">
+						<li><a href="src/org/jppf/example/initializationhook/DiscoveryHook.java.html">DiscoveryHook.java</a> : this is the implementation of our connection failover mechainsm, via a node initialization hook.</li>
+						<li><a href="config/driver1/jppf-driver.properties">driver1/jppf-driver.properties</a> : the configuration of the first driver</li>
+						<li><a href="config/driver2/jppf-driver.properties">driver2/jppf-driver.properties</a> : the configuration of the second driver</li>
+						<li><a href="config/node/jppf-node.properties">node/jppf-node.properties</a> : the configuration of the node</li>
+					</ul>
+
+					<h3>What features of JPPF are demonstrated?</h3>
+					The main feature demonstrated is detailed in the JPPF documentation, in the
+					<a href="http://www.jppf.org/doc/v4/index.php?title=Node_initialization_hooks">Node Initialization Hooks</a> section.
+
+					<h3>I have additional questions and comments, where can I go?</h3>
+					<p>There are 2 privileged places you can go to:
+					<ul class="samplesList">
+						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+						<li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
+					</ul>
+					<!-- ${SAMPLE_END_CONTENT} -->
+				</div>
+				<!-- end content -->
+
+				<!-- start footer -->
+				<table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+					<tr>
+						<td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+						<td align="right">
+							<a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+							<a href="http://sourceforge.net/projects/jppf-project">
+								<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+									alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+							</a>
+						</td>
+						<td style="width: 10px"></td>
+					</tr>
+					<tr><td colspan="*" style="height: 10px"></td></tr>
+				</table>
+				<div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+				<!-- end footer -->
+
+			</div>
+		</div>
+
+	</body>
+
+</html>

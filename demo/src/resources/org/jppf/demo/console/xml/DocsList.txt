@@ -1,0 +1,4 @@
+org/jppf/demo/console/xml/JPPFDemoConsole.xml
+org/jppf/demo/console/xml/MatrixPage.xml
+org/jppf/demo/console/xml/LongTaskPage.xml
+org/jppf/demo/console/xml/FrameworkConfigPage.xml
