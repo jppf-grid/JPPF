@@ -104,7 +104,8 @@
 		<property name="label" value="Server Messages"/>
 		<property name="tooltip" value="Feedback messages received from the server"/>
     <property name="bordered" value="true"/>
-    <property name="value" value=""/>
+    <property name="scrollable" value="true"/>
+    <property name="timestamp.format" value="[yyyy-MM-dd HH:mm:ss.SSS]"/>
 		<property name="componentConstraints" value="grow, pushx, pushy 1"/>
 	</child>
 
