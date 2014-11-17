@@ -99,7 +99,7 @@ public class ConsoleLoader {
   private static void startWithCheckNoDownload() throws Exception {
     boolean present = checkChartClassesAvailable();
     String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present ? "" : "NoCharts") + ".xml";
-    UILauncher.main(xmlPath, "file");
+    ConsoleLauncher.main(xmlPath, "file");
   }
 
   /**
@@ -139,7 +139,7 @@ public class ConsoleLoader {
       Thread.currentThread().setContextClassLoader(consoleClassLoader);
     }
     String xmlPath = "org/jppf/ui/options/xml/JPPFAdminTool" + (present || available ? "" : "NoCharts") + ".xml";
-    UILauncher.main(xmlPath, "file");
+    ConsoleLauncher.main(xmlPath, "file");
   }
 
   /**

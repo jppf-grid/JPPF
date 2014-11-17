@@ -35,13 +35,8 @@
 			importPackage(Packages.org.jppf.ui.options.xml);
 			importPackage(Packages.org.jppf.example.jaligner);
 
-			var comp = option.getUIComponent();
-			var frame = new JFrame(option.getLabel());
-			frame.addWindowListener(new org.jppf.example.jaligner.WindowClosingListener());
-			var BASE = "org.jppf.samples.i18n.SequenceAlignment";
-			frame.getContentPane().add(option.getUIComponent());
-			frame.setSize(820, 700);
-			frame.setVisible(true);
+			var frame = OptionsHandler.getMainWindow();
+			//frame.setSize(820, 700);
 		]]></script>
 	</initializer>
 

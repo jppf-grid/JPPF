@@ -20,7 +20,7 @@ package org.jppf.ui.console;
 
 import javax.swing.JComponent;
 
-import org.jppf.ui.monitoring.UILauncher;
+import org.jppf.ui.monitoring.ConsoleLauncher;
 
 /**
  * This class provides an API to launch the JPPF admininstration console
@@ -34,7 +34,7 @@ public class JPPFAdminConsole {
    * @param args the command-line arguments are not used.
    */
   public static void main(final String[] args) {
-    UILauncher.main("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file");
+    ConsoleLauncher.main("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file");
   }
 
   /**
@@ -43,6 +43,6 @@ public class JPPFAdminConsole {
    * @return a {@link JComponent} enclosing the JPPF administration console.
    */
   public static JComponent getAdminConsole() {
-    return UILauncher.loadAdminConsole();
+    return ConsoleLauncher.loadAdminConsole();
   }
 }

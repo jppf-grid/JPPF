@@ -18,7 +18,7 @@
 
 package org.jppf.example.jaligner;
 
-import java.util.*;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -29,12 +29,11 @@ import org.slf4j.*;
 /**
  * Result collector that updates the progress bar's value during the computation.
  */
-public class AlignmentResultCollector extends JobListenerAdapter
-{
+public class AlignmentJobListener extends JobListenerAdapter {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AlignmentResultCollector.class);
+  private static Logger log = LoggerFactory.getLogger(AlignmentJobListener.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -47,22 +46,12 @@ public class AlignmentResultCollector extends JobListenerAdapter
    * Count of results not yet received.
    */
   private int pendingCount = 0;
-  /**
-   * A map containing the resulting tasks, ordered by ascending position in the
-   * submitted list of tasks.
-   */
-  private Map<Integer, Task<?>> resultMap = new TreeMap<>();
-  /**
-   * The list of final results.
-   */
-  private List<Task<?>> results = null;
 
   /**
    * Initialize this collector with a specified number of tasks.
    * @param count the count of submitted tasks.
    */
-  public AlignmentResultCollector(final int count)
-  {
+  public AlignmentJobListener(final int count) {
     this.pendingCount = count;
     this.initialCount = count;
   }
@@ -72,53 +61,16 @@ public class AlignmentResultCollector extends JobListenerAdapter
    * @param event a notification of completion for a set of submitted tasks.
    */
   @Override
-  public synchronized void jobReturned(final JobEvent event)
-  {
+  public synchronized void jobReturned(final JobEvent event) {
     List<Task<?>> tasks = event.getJobTasks();
     if (debugEnabled) log.debug("Received results for " + tasks.size() + " tasks");
-    for (Task<?> task: tasks) resultMap.put(task.getPosition(), task);
     pendingCount -= tasks.size();
-    notify();
     final int n = (100 * (initialCount-pendingCount)) / initialCount;
-    SwingUtilities.invokeLater(new Runnable()
-    {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         SequenceAlignmentRunner.updateProgress(n);
       }
     });
-  }
-
-  /**
-   * Wait until all results of a request have been collected.
-   * @return the list of resulting tasks.
-   */
-  public synchronized List<Task<?>> awaitResults()
-  {
-    while (pendingCount > 0)
-    {
-      try
-      {
-        wait();
-      }
-      catch(InterruptedException e)
-      {
-        e.printStackTrace();
-      }
-    }
-    results = new ArrayList<>();
-    for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet()) results.add(entry.getValue());
-    resultMap.clear();
-    return results;
-  }
-
-  /**
-   * Get the list of final results.
-   * @return a list of results as tasks, or null if not all tasks have been executed.
-   */
-  public List<Task<?>> getResults()
-  {
-    return results;
   }
 }

@@ -18,23 +18,16 @@
 -->
 
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFFractals" type="page">
-	<property name="label" value="JPPF Fractals Generation"/>
+  <property name="label" value="JPPF Fractals Generation"/>
+  <property name="icon" value="/icons/mandelbrot-icon.png"/>
   <script language="groovy" source="org/jppf/example/fractals/xml/imports.groovy"/>
 	<initializer type="script">
 		<script language="groovy"><![CDATA[
-			def frame = new JFrame(option.getLabel());
-      frame.setIconImage(GuiUtils.loadIcon("/icons/mandelbrot-icon.png").getImage());
-			frame.addWindowListener(new WindowClosingListener());
-			def comp = option.findFirstWithName("/Tabs").getUIComponent();
-			comp.setSelectedIndex(0);
-			OptionsHandler.loadPreferences();
+      def frame = OptionsHandler.getMainWindow();
 			def jppfConfig = JPPFConfiguration.getProperties();
       def width = jppfConfig.getInt("image.width", 800);
       def height = jppfConfig.getInt("image.height", 600);
-			frame.getContentPane().add(option.getUIComponent());
 			frame.setSize(width + 120, height + 163);
-			frame.setVisible(true);
-			//frame.pack();
 		]]></script>
 	</initializer>
 

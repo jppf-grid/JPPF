@@ -17,11 +17,14 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.Frame;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.jppf.ui.options.OptionElement;
+import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.options.*;
+import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.options.event.WindowClosingListener;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.*;
@@ -34,11 +37,11 @@ import org.slf4j.*;
  * and switching the color scheme (skin) for the whole UI.
  * @author Laurent Cohen
  */
-public class UILauncher {
+public class ConsoleLauncher {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(UILauncher.class);
+  static Logger log = LoggerFactory.getLogger(ConsoleLauncher.class);
   /**
    * The unique instance of the embedded admin console.
    */
@@ -109,6 +112,39 @@ public class UILauncher {
   }
 
   /**
+   * Load the UI from the default XML descriptor.
+   * @return the root {@link JComponent} of the admin console.
+   * @since 5.0
+   */
+  public static JComponent loadAdminConsole() {
+    embedded = true;
+    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", false, -1);
+  }
+
+  /**
+   * Reload the UI to take new preferences into account.
+   * @return the root {@link JComponent} of the admin console.
+   * @since 5.0
+   */
+  public synchronized static JComponent reloadUI() {
+    int idx = -1;
+    if (consoleComponent == null) {
+      Frame frame = OptionsHandler.getMainWindow();
+      if (frame != null) {
+        for (int i=0; i<frame.getComponentCount(); i++) {
+          if (frame.getComponent(i) == consoleComponent) {
+            idx = i;
+            break;
+          }
+        }
+        frame.remove(consoleComponent);
+        consoleComponent = null;
+      }
+    }
+    return loadUI("org/jppf/ui/options/xml/JPPFAdminTool.xml", "file", !embedded, idx);
+  }
+
+  /**
    * Load the UI from the specified path to an XML descriptor.
    * @param src the path tot he XML docuemnt to load
    * @param type the type of the path: url or file.
@@ -121,19 +157,32 @@ public class UILauncher {
     if (consoleComponent == null) {
       OptionElement elt = null;
       try {
-        Frame frame = new JFrame();
-        OptionsHandler.setMainWindow(frame);
-        frame.addWindowListener(new WindowClosingListener());
         if ("url".equalsIgnoreCase(type)) elt = OptionsHandler.addPageFromURL(src, null);
         else elt = OptionsHandler.addPageFromXml(src);
         OptionsHandler.loadPreferences();
         OptionsHandler.getBuilder().triggerInitialEvents(elt);
-        frame.setTitle(elt.getLabel());
-        String iconPath = elt.getIconPath();
-        frame.setIconImage(GuiUtils.loadIcon(iconPath != null ? iconPath : GuiUtils.JPPF_ICON).getImage());
-        if (idx >= 0) frame.add(elt.getUIComponent(), idx);
-        else frame.add(elt.getUIComponent());
-        OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node(elt.getName()));
+        Frame frame = OptionsHandler.getMainWindow();
+        if (createFrame) {
+          if (frame == null) {
+            frame = new JFrame(elt.getLabel());
+            OptionsHandler.setMainWindow(frame);
+            DockingManager.getInstance().setMainView(frame, (OptionContainer) elt);
+            frame.setIconImage(GuiUtils.loadIcon(GuiUtils.JPPF_ICON).getImage());
+            frame.addWindowListener(new WindowClosingListener());
+          }
+          StatsHandler.getInstance();
+          if (idx >= 0) frame.add(elt.getUIComponent(), idx);
+          else frame.add(elt.getUIComponent());
+          OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
+        } else {
+          if (idx < 0) {
+            JComponent comp = elt.getUIComponent();
+            comp.addHierarchyListener(new MainFrameObserver(elt));
+          } else {
+            frame.add(elt.getUIComponent(), idx);
+          }
+        }
+        OptionsHandler.getPluggableViewHandler().installViews();
       } catch (Exception e) {
         e.printStackTrace();
         log.error(e.getMessage(), e);
@@ -141,6 +190,57 @@ public class UILauncher {
       consoleComponent = (elt == null) ? null : elt.getUIComponent();
     }
     return consoleComponent;
+  }
+
+  /**
+   * Listens for hierarchy events to find out when the component is finally linked to a frame.
+   * @since 5.0
+   */
+  private final static class MainFrameObserver implements HierarchyListener {
+    /**
+     * Set to true whenever the application main frame is found.
+     */
+    private boolean frameFound = false;
+    /**
+     * Contains the root UI component of the admin console.
+     */
+    private final OptionElement uiRoot;
+
+    /**
+     * Initiialize this observer with the specified UI root.
+     * @param uiRoot contains the root UI component of the admin console.
+     */
+    private MainFrameObserver(final OptionElement uiRoot) {
+      this.uiRoot = uiRoot;
+    }
+
+    @Override
+    public void hierarchyChanged(final HierarchyEvent event) {
+      if (frameFound) return;
+      long flags = event.getChangeFlags();
+      Frame frame = getTopFrame(event.getChanged());
+      if (frame != null) {
+        frameFound = true;
+        //System.out.println("found frame = " + frame);
+        OptionsHandler.setMainWindow(frame);
+        DockingManager.getInstance().setMainView(frame, (OptionContainer) uiRoot);
+      }
+    }
+
+    /**
+     * Get the frame, if any, at the top of the specified components hierarchy.
+     * @param comp the component for which to lookup the hierarchy.
+     * @return the top {@link Frame}, or {@code null} if there is no frame in the hierarchy.
+     */
+    private Frame getTopFrame(final Component comp) {
+      if (comp instanceof Frame) return (Frame) comp;
+      else if (comp != null) {
+        Component tmp = comp;
+        while (tmp.getParent() != null) tmp = tmp.getParent();
+        if (tmp instanceof Frame) return (Frame) tmp;
+      }
+      return null;
+    }
   }
 
   /**

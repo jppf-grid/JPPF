@@ -47,7 +47,7 @@ public final class StatsHandler implements StatsConstants {
   /**
    * Singleton instance of this class.
    */
-  private static StatsHandler instance = new StatsHandler();
+  private static StatsHandler instance = null;
   /**
    * The object holding the current statistics values.
    */
@@ -98,7 +98,16 @@ public final class StatsHandler implements StatsConstants {
    * @return a <code>StatsHandler</code> instance.
    */
   public static StatsHandler getInstance() {
+    if (instance == null) instance = new StatsHandler();
     return instance;
+  }
+
+  /**
+   * Determine whether an instance of this class was created.
+   * @return {@code true} if an instance was created, {@code false} otherwise.
+   */
+  public static boolean hasInstance() {
+    return instance != null;
   }
 
   /**

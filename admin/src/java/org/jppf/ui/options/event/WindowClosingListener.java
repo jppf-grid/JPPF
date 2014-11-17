@@ -31,32 +31,26 @@ import org.jppf.ui.options.xml.OptionsPageBuilder;
  * This class performs cleanup and preferences storing actions when the admin console is closed.
  * @author Laurent Cohen
  */
-public class WindowClosingListener extends WindowAdapter
-{
+public class WindowClosingListener extends WindowAdapter {
   /**
    * Process the closing of the main frame.
    * @param event the event we're interested in.
    * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
    */
   @Override
-  public void windowClosing(final WindowEvent event)
-  {
-    StatsHandler.getInstance().getClientHandler().close();
+  public void windowClosing(final WindowEvent event) {
+    if (StatsHandler.hasInstance()) StatsHandler.getInstance().getClientHandler().close();
     Preferences pref = OptionsHandler.getPreferences();
     List<OptionElement> list = OptionsHandler.getPageList();
-    if (!list.isEmpty())
-    {
+    if (!list.isEmpty()) {
       OptionElement elt = list.get(0);
       OptionsPageBuilder builder = new OptionsPageBuilder();
       builder.triggerFinalEvents(elt);
     }
 
-    try
-    {
+    try {
       pref.flush();
-    }
-    catch(BackingStoreException e)
-    {
+    } catch(BackingStoreException e) {
     }
 
     System.exit(0);

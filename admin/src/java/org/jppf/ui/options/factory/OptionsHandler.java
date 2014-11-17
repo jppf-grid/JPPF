@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 import java.util.prefs.*;
 
-import org.jppf.ui.monitoring.UILauncher;
+import org.jppf.ui.monitoring.ConsoleLauncher;
 import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.monitoring.diagnostics.JVMHealthPanel;
 import org.jppf.ui.options.*;
@@ -394,7 +394,7 @@ public final class OptionsHandler {
   public static void exportSettings(final String path) {
     try {
       savePreferences();
-      if (UILauncher.isEmbedded()) saveMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
+      if (ConsoleLauncher.isEmbedded()) saveMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
       OptionElement root = pageList.get(0);
       OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
       if (elt != null) {
@@ -431,7 +431,7 @@ public final class OptionsHandler {
     }
     try {
       loadPreferences();
-      if (UILauncher.isEmbedded()) loadMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
+      if (ConsoleLauncher.isEmbedded()) loadMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
       OptionElement root = pageList.get(0);
       OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
       if (elt != null) {
