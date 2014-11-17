@@ -17,10 +17,17 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.Document;
 
+import org.jppf.ui.monitoring.diagnostics.ThreadDumpAction;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
@@ -36,21 +43,27 @@ public class TextAreaOption extends AbstractOption {
    * Determines whether the text area is editable.
    */
   private boolean editable = false;
+  /**
+   * Format of an optional timestamp displayed before the message.
+   */
+  private String timestampFormat = null;
+  /**
+   * The date format if specified.
+   */
+  private SimpleDateFormat dateFormat = null;
 
   /**
-   * Constructor provided as a convenience to facilitate the creation of
-   * option elements through reflexion.
+   * Constructor provided as a convenience to facilitate the creation of option elements through reflexion.
    */
   public TextAreaOption() {
-    //this.bordered = true;
   }
 
   /**
    * Initialize this text area option with the specified parameters.
-   * @param name - this component's name.
-   * @param label - the label displayed with the text area.
-   * @param tooltip - the tooltip associated with the text area.
-   * @param value - the initial value of this component.
+   * @param name this component's name.
+   * @param label the label displayed with the text area.
+   * @param tooltip the tooltip associated with the text area.
+   * @param value the initial value of this component.
    */
   public TextAreaOption(final String name, final String label, final String tooltip, final String value) {
     this.name = name;
@@ -70,6 +83,7 @@ public class TextAreaOption extends AbstractOption {
     textArea.setBorder(BorderFactory.createEmptyBorder());
     if (toolTipText != null) textArea.setToolTipText(toolTipText);
     textArea.setEditable(editable);
+    textArea.addMouseListener(new EditorMouseListener());
     //if (!bordered) textArea.setBorder(BorderFactory.createEmptyBorder());
     //textArea.setOpaque(false);
     if (scrollable) {
@@ -90,7 +104,6 @@ public class TextAreaOption extends AbstractOption {
   /**
    * Get the current value for this option.
    * @return a <code>String</code> instance.
-   * @see org.jppf.ui.options.AbstractOption#getValue()
    */
   @Override
   public Object getValue() {
@@ -101,34 +114,45 @@ public class TextAreaOption extends AbstractOption {
   /**
    * Set the current value for this option.
    * @param value a <code>String</code> instance.
-   * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
    */
   @Override
   public void setValue(final Object value) {
     this.value = value;
-    textArea.setText((String) TextAreaOption.this.value);
-    /*
-    SwingUtilities.invokeLater( new Runnable() {
-      @Override
-      public void run() {
-        textArea.setText((String) TextAreaOption.this.value);
-      }
-    });
-    */
+    if ((value == null) || "".equals(value)) textArea.setText((String) value);
+    else {
+      StringBuilder sb = new StringBuilder();
+      if (dateFormat != null) sb.append(dateFormat.format(new Date())).append(' ');
+      sb.append(this.value);
+      textArea.setText(sb.toString());
+      textArea.setCaretPosition(textArea.getDocument().getLength());
+    }
   }
 
   /**
    * Set the current value for this option.
    * @param value a <code>String</code> instance.
-   * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
    */
   public void append(final String value) {
+    if ((value == null) || "".equals(value)) return;
+    final StringBuilder sb = new StringBuilder();
+    if ((this.value != null) && !"".equals(this.value)) sb.append('\n');
+    if (dateFormat != null) sb.append(dateFormat.format(new Date())).append(' ');
+    sb.append(value);
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        textArea.append(value);
+        textArea.append(sb.toString());
+        textArea.setCaretPosition(textArea.getDocument().getLength());
+        TextAreaOption.this.value = TextAreaOption.this.textArea.getText();
       }
     });
+  }
+
+  /**
+   * Clear the text.
+   */
+  private void clear() {
+    setValue("");
   }
 
   /**
@@ -173,10 +197,6 @@ public class TextAreaOption extends AbstractOption {
     if (textArea != null) textArea.setEditable(editable);
   }
 
-  /**
-   * Enable or disable this option.
-   * @param enabled true to enable this option, false to disable it.
-   */
   @Override
   public void setEnabled(final boolean enabled) {
     textArea.setEnabled(enabled);
@@ -188,5 +208,70 @@ public class TextAreaOption extends AbstractOption {
    */
   public JTextArea getTextArea() {
     return textArea;
+  }
+
+  /**
+   * Get the format of an optional timestamp displayed before the message.
+   * @return the format as a string.
+   */
+  public String getTimestampFormat() {
+    return timestampFormat;
+  }
+
+  /**
+   * Set the format of an optional timestamp displayed before the message.
+   * @param timestampFormat the format as a string.
+   */
+  public void setTimestampFormat(final String timestampFormat) {
+    if (timestampFormat != null) {
+      this.timestampFormat = timestampFormat;
+      dateFormat = new SimpleDateFormat(this.timestampFormat);
+    }
+  }
+
+  /**
+   * 
+   */
+  private class EditorMouseListener extends MouseAdapter {
+    /**
+     * The string to copy to the clipboard.
+     */
+    private String text;
+
+    /**
+     * Processes right-click events to display popup menus.
+     * @param event the mouse event to process.
+     */
+    @Override
+    public void mousePressed(final MouseEvent event) {
+      Component comp = event.getComponent();
+      int x = event.getX();
+      int y = event.getY();
+      int button = event.getButton();
+      if (button == MouseEvent.BUTTON3) {
+        JPopupMenu menu = new JPopupMenu();
+        AbstractAction clipboardAction = new AbstractAction() {
+          @Override
+          public void actionPerformed(final ActionEvent e) {
+            try {
+              Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+              clip.setContents(new StringSelection(textArea.getText()), null);
+            } catch (Exception e2) {
+            }
+          }
+        };
+        clipboardAction.putValue(ThreadDumpAction.NAME, "Copy to clipboard");
+        AbstractAction clearAction = new AbstractAction() {
+          @Override
+          public void actionPerformed(final ActionEvent e) {
+            clear();
+          }
+        };
+        clearAction.putValue(ThreadDumpAction.NAME, "Clear");
+        menu.add(new JMenuItem(clearAction));
+        menu.add(new JMenuItem(clipboardAction));
+        menu.show(event.getComponent(), x, y);
+      }
+    }
   }
 }
