@@ -180,6 +180,7 @@ public class OptionElementFactory {
     option.setEventsEnabled(false);
     builder.initCommonOptionAttributes(option, desc);
     option.setEditable(desc.getBoolean("editable", false));
+    option.setTimestampFormat(desc.getProperty("timestamp.format", null));
     option.createUI();
     option.setEventsEnabled(true);
     return option;
