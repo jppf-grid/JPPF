@@ -84,6 +84,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
     switch (getStatus()) {
       case ACTIVE:
         return ExecutorStatus.ACTIVE;
+      case CLOSED:
       case FAILED:
         return ExecutorStatus.FAILED;
       case EXECUTING:

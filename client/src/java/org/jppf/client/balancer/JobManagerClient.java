@@ -262,10 +262,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (newStatus == JPPFClientConnectionStatus.ACTIVE) taskQueueChecker.addIdleChannel(wrapper);
     else {
       taskQueueChecker.removeIdleChannel(wrapper);
-      if(newStatus == JPPFClientConnectionStatus.FAILED || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
+      if(newStatus.isTerminatedStatus() || newStatus == JPPFClientConnectionStatus.DISCONNECTED) queue.cancelBroadcastJobs(wrapper.getUuid());
     }
-    boolean bNew = (newStatus == JPPFClientConnectionStatus.ACTIVE) || (newStatus == JPPFClientConnectionStatus.EXECUTING);
-    boolean bOld = (oldStatus == JPPFClientConnectionStatus.ACTIVE) || (oldStatus == JPPFClientConnectionStatus.EXECUTING);
+    boolean bNew = newStatus.isWorkingStatus();
+    boolean bOld = oldStatus.isWorkingStatus();
     if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
     else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
   }

@@ -210,7 +210,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   @Override
   public void statusChanged(final ClientConnectionStatusEvent event) {
     JPPFClientConnection c = (JPPFClientConnection) event.getClientConnectionStatusHandler();
-    if (c.getStatus() == JPPFClientConnectionStatus.FAILED) connectionFailed(c);
+    if (c.getStatus().isTerminatedStatus()) connectionFailed(c);
   }
 
   /**

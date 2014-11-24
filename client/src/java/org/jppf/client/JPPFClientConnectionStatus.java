@@ -48,9 +48,13 @@ public enum JPPFClientConnectionStatus {
    */
   EXECUTING,
   /**
-   * The connection was closed or failed to connect to the driver and no further attempt will be made.
+   * The connection failed to (re)connect to the driver and no further attempt will be made.
    */
-  FAILED;
+  FAILED,
+  /**
+   * The connection was closed by the application.
+   */
+  CLOSED;
 
   /**
    * Determine whether this status is one of those specified as input.
@@ -66,10 +70,18 @@ public enum JPPFClientConnectionStatus {
   }
 
   /**
-   * Determine whether this status a working status.
+   * Determine whether this status a working status, that is if it is either {@link #ACTIVE} or {@link #EXECUTING}.
    * @return {@code true} if this status is a working status, {@code false} otherwise.
    */
   public boolean isWorkingStatus() {
     return isOneOf(ACTIVE, EXECUTING);
+  }
+
+  /**
+   * Determine whether this status a working status, that is if it is either {@link #FAILED} or {@link #CLOSED}.
+   * @return {@code true} if this status is a working status, {@code false} otherwise.
+   */
+  public boolean isTerminatedStatus() {
+    return isOneOf(FAILED, CLOSED);
   }
 }

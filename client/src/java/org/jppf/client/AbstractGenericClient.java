@@ -300,7 +300,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   @Override
   protected void connectionFailed(final JPPFClientConnection connection) {
-    if (debugEnabled) log.debug("Connection [" + connection.getName() + "] failed");
+    if (debugEnabled) log.debug("Connection [" + connection.getName() + "] {}", connection.getStatus());
     if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
     connection.close();
     removeClientConnection(connection);

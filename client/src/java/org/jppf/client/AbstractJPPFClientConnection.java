@@ -185,7 +185,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
    * @exclude
    */
   protected void processStatusChanged(final JPPFClientConnectionStatus delegateStatus, final JPPFClientConnectionStatus taskConnectionStatus) {
-    if (delegateStatus == FAILED) setStatus(FAILED);
+    if (delegateStatus.isTerminatedStatus()) setStatus(delegateStatus);
     else if (delegateStatus == ACTIVE) {
       if ((taskConnectionStatus == ACTIVE) && (this.getStatus() != ACTIVE)) setStatus(ACTIVE);
       else if (taskConnectionStatus != this.getStatus()) setStatus(taskConnectionStatus);
@@ -227,7 +227,7 @@ public abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnect
   @Override
   public void close() {
     if (!closed.compareAndSet(false, true)) return;
-    setStatus(FAILED);
+    setStatus(CLOSED);
     if (debugEnabled) log.debug("closing connection " + toDebugString());
     List<JPPFJob> list = null;
     listeners.clear();
