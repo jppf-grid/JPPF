@@ -18,6 +18,7 @@
 package org.jppf.process;
 
 import java.io.*;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -36,7 +37,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class ProcessLauncher extends AbstractProcessLauncher implements ProcessWrapperEventListener, IdleStateListener {
+public class ProcessLauncher extends AbstractProcessLauncher implements IdleStateListener {
   /**
    * Logger for this class.
    */
@@ -121,7 +122,6 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   public void startProcess() throws Exception {
     stoppedOnBusyState.set(false);
     process = buildProcess();
-    createProcessWrapper(process);
     if (debugEnabled) log.debug("started driver process [" + process + ']');
   }
 
@@ -157,19 +157,9 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     command.add(Integer.toString(processPort));
     if (debugEnabled) log.debug("process command:\n" + command);
     ProcessBuilder builder = new ProcessBuilder(command);
+    builder.redirectError(Redirect.INHERIT);
+    builder.redirectOutput(Redirect.INHERIT);
     return builder.start();
-  }
-
-  /**
-   * Create a process wrapper around the specified process, to capture its console output
-   * and prevent it from blocking.
-   * @param p the process whose output is to be captured.
-   * @return a <code>ProcessWrapper</code> instance.
-   */
-  protected ProcessWrapper createProcessWrapper(final Process p) {
-    ProcessWrapper wrapper = new ProcessWrapper(process);
-    wrapper.addListener(this);
-    return wrapper;
   }
 
   /**
@@ -217,24 +207,6 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
       log.error(e.getMessage(), e);
     }
     return sb.toString();
-  }
-
-  /**
-   * Notification that the process has written to its error stream.
-   * @param event encapsulate the error stream's content.
-   */
-  @Override
-  public void errorStreamAltered(final ProcessWrapperEvent event) {
-    System.err.print(event.getContent());
-  }
-
-  /**
-   * Notification that the process has written to its output stream.
-   * @param event encapsulate the output stream's content.
-   */
-  @Override
-  public void outputStreamAltered(final ProcessWrapperEvent event) {
-    System.out.print(event.getContent());
   }
 
   @Override
