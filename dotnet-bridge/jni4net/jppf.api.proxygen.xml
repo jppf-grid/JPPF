@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright (C) 2009 by Pavel Savara
+This file is part of tools for jni4net - bridge between Java and .NET
+http://jni4net.sourceforge.net/
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<jni4net-proxygen xmlns="http://jni4net.sf.net/@jni4net.version@/toolConfig.xsd">
+  <!-- Location where .java files will be generated into. It's relative or absolute path. -->
+  <TargetDirJvm>@outdir@/java/src</TargetDirJvm>
+  <!-- Location where .cs files will be generated into. It's relative or absolute path. -->
+  <TargetDirClr>@outdir@/cs</TargetDirClr>
+  <!--
+  <Debug>true</Debug>
+  <Verbose>true</Verbose>
+  -->
+
+	<!--<AssemblyReference Assembly="jni4net/jppf.api.dll" Generate="true"/>-->
+  <AssemblyReference Assembly="@jni4net.home@/lib/jni4net.n-@jni4net.version@.dll"/>
+	  
+  <!-- List of class paths (.jar files or directories) which define known classes for generator-->
+  <!--<ClassPath Path="BridgeTo.NET.jar"/>-->
+  <ClassPath Path="classes"/>
+  <ClassPath Path="../common/classes"/>
+  <ClassPath Path="../node/classes"/>
+  <ClassPath Path="../client/classes"/>
+  <ClassPath Path="../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.1.jar"/>
+  <ClassPath Path="../JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
+  <ClassPath Path="@jni4net.home@/lib/jni4net.j-@jni4net.version@.jar"/>
+    
+  <!-- List of Java classes which should have proxy generated -->
+  <JavaClass TypeName="java.lang.AutoCloseable"/>
+  <JavaClass TypeName="java.util.EventObject"/>
+  <JavaClass TypeName="java.util.concurrent.Callable"/>
+  <JavaClass TypeName="javax.management.NotificationEmitter"/>
+  <JavaClass TypeName="javax.management.Notification"/>
+  <JavaClass TypeName="javax.management.NotificationListener"/>
+  <JavaClass TypeName="javax.management.MBeanNotificationInfo"/>
+  <JavaClass TypeName="javax.management.NotificationBroadcaster"/>
+
+  <JavaClass TypeName="org.jppf.client.JPPFClient"/>
+  <JavaClass TypeName="org.jppf.client.AbstractGenericClient"/>
+  <JavaClass TypeName="org.jppf.client.AbstractJPPFClient"/>
+  <JavaClass TypeName="org.jppf.client.AbstractJPPFJob"/>
+  <JavaClass TypeName="org.jppf.client.JPPFConnectionPool"/>
+  <JavaClass TypeName="org.jppf.client.Operator"/>
+  <JavaClass TypeName="org.jppf.client.JPPFClientConnection"/>
+  <JavaClass TypeName="org.jppf.client.JPPFClientConnectionStatus"/>
+  <JavaClass TypeName="org.jppf.client.JobStatus"/>
+  <JavaClass TypeName="org.jppf.client.event.JobListener"/>
+  <JavaClass TypeName="org.jppf.client.event.JobEvent"/>
+  <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusHandler"/>
+  <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusListener"/>
+  <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusEvent"/>
+  <!--
+  <JavaClass TypeName="org.jppf.client.event."/>
+  <JavaClass TypeName="org.jppf.client."/>
+  -->
+  
+  <JavaClass TypeName="org.jppf.client.JPPFJob"/>
+  <JavaClass TypeName="org.jppf.client.JobResults"/>
+  <JavaClass TypeName="org.jppf.execute.ExecutorChannel"/>
+  <JavaClass TypeName="org.jppf.queue.QueueListener"/>
+  <JavaClass TypeName="org.jppf.location.Location"/>
+  <JavaClass TypeName="org.jppf.location.LocationEvent"/>
+  <JavaClass TypeName="org.jppf.location.LocationEventListener"/>
+
+  <JavaClass TypeName="org.jppf.management.TaskInformation"/>
+  <JavaClass TypeName="org.jppf.management.JMXConnectionWrapper"/>
+  <JavaClass TypeName="org.jppf.management.JMXNodeConnectionWrapper"/>
+  <JavaClass TypeName="org.jppf.management.JMXDriverConnectionWrapper"/>
+  <JavaClass TypeName="org.jppf.management.JPPFDriverAdminMBean"/>
+  <JavaClass TypeName="org.jppf.management.JPPFNodeAdminMBean"/>
+  <JavaClass TypeName="org.jppf.management.JPPFNodeTaskMonitorMBean"/>
+  <JavaClass TypeName="org.jppf.management.JPPFManagementInfo"/>
+  <JavaClass TypeName="org.jppf.management.JPPFNodeState"/>
+  <JavaClass TypeName="org.jppf.management.NodeSelector"/>
+  <JavaClass TypeName="org.jppf.management.ExecutionPolicySelector"/>
+  <JavaClass TypeName="org.jppf.management.AllNodesSelector"/>
+  <JavaClass TypeName="org.jppf.management.UuidSelector"/>
+  <JavaClass TypeName="org.jppf.management.TaskExecutionNotification"/>
+  <JavaClass TypeName="org.jppf.management.TaskInformation"/>
+  <JavaClass TypeName="org.jppf.management.JPPFNodeMaintenanceMBean"/>
+  <JavaClass TypeName="org.jppf.management.JPPFAdminMBean"/>
+  <JavaClass TypeName="org.jppf.management.JPPFSystemInformation"/>
+  <JavaClass TypeName="org.jppf.management.forwarding.JPPFNodeForwardingMBean"/>
+  <JavaClass TypeName="org.jppf.management.forwarding.JPPFNodeForwardingNotification"/>
+  <JavaClass TypeName="org.jppf.server.job.management.DriverJobManagementMBean"/>
+  <JavaClass TypeName="org.jppf.server.job.management.NodeJobInformation"/>
+
+  <JavaClass TypeName="org.jppf.node.event.TaskExecutionEvent"/>
+  <JavaClass TypeName="org.jppf.node.event.TaskExecutionListener"/>
+  
+  <JavaClass TypeName="org.jppf.node.policy.AtLeast"/>
+  <JavaClass TypeName="org.jppf.node.policy.AtMost"/>
+  <JavaClass TypeName="org.jppf.node.policy.BetweenEE"/>
+  <JavaClass TypeName="org.jppf.node.policy.BetweenEI"/>
+  <JavaClass TypeName="org.jppf.node.policy.BetweenIE"/>
+  <JavaClass TypeName="org.jppf.node.policy.BetweenII"/>
+  <JavaClass TypeName="org.jppf.node.policy.Contains"/>
+  <JavaClass TypeName="org.jppf.node.policy.CustomPolicy"/>
+  <JavaClass TypeName="org.jppf.node.policy.Equal"/>
+  <JavaClass TypeName="org.jppf.node.policy.ExecutionPolicy"/>
+  <JavaClass TypeName="org.jppf.node.policy.IsInIPv4Subnet"/>
+  <JavaClass TypeName="org.jppf.node.policy.IsInIPv6Subnet"/>
+  <JavaClass TypeName="org.jppf.node.policy.LessThan"/>
+  <JavaClass TypeName="org.jppf.node.policy.MoreThan"/>
+  <JavaClass TypeName="org.jppf.node.policy.OneOf"/>
+  <JavaClass TypeName="org.jppf.node.policy.PolicyBuilder"/>
+  <JavaClass TypeName="org.jppf.node.policy.PolicyContext"/>
+  <JavaClass TypeName="org.jppf.node.policy.PolicyDescriptor"/>
+  <JavaClass TypeName="org.jppf.node.policy.PolicyParser"/>
+  <JavaClass TypeName="org.jppf.node.policy.PolicyRuleTest"/>
+  <JavaClass TypeName="org.jppf.node.policy.Preference"/>
+  <JavaClass TypeName="org.jppf.node.policy.RegExp"/>
+  <JavaClass TypeName="org.jppf.node.policy.ScriptedPolicy"/>
+
+  <JavaClass TypeName="org.jppf.node.provisioning.JPPFNodeProvisioningMBean"/>
+
+  <JavaClass TypeName="org.jppf.node.protocol.AbstractTask" SyncInterface="true"/>
+  <JavaClass TypeName="org.jppf.node.protocol.ClassPath"/>
+  <JavaClass TypeName="org.jppf.node.protocol.ClassPathElement"/>
+  <JavaClass TypeName="org.jppf.node.protocol.DataProvider"/>
+  <JavaClass TypeName="org.jppf.node.protocol.JPPFDistributedJob"/>
+  <JavaClass TypeName="org.jppf.node.protocol.JobClientSLA"/>
+  <JavaClass TypeName="org.jppf.node.protocol.JobCommonSLA"/>
+  <JavaClass TypeName="org.jppf.node.protocol.JobMetadata"/>
+  <JavaClass TypeName="org.jppf.node.protocol.JobSLA"/>
+  <JavaClass TypeName="org.jppf.node.protocol.Task" SyncInterface="true"/>
+  <JavaClass TypeName="org.jppf.node.protocol.TaskBundle"/>
+  <JavaClass TypeName="org.jppf.node.protocol.TaskExecutionDispatcher"/>
+  <JavaClass TypeName="org.jppf.scheduling.JPPFSchedule"/>
+  <JavaClass TypeName="org.jppf.utils.JPPFCallable"/>
+  <JavaClass TypeName="org.jppf.utils.PropertiesCollection"/>
+  <JavaClass TypeName="org.jppf.utils.TraversalList"/>
+  <JavaClass TypeName="org.jppf.utils.TypedProperties"/>
+  <JavaClass TypeName="org.jppf.utils.PropertiesCollection"/>
+  <JavaClass TypeName="org.jppf.utils.collections.Metadata"/>
+  <JavaClass TypeName="org.jppf.utils.stats.JPPFSnapshot"/>
+  <JavaClass TypeName="org.jppf.utils.stats.JPPFStatistics"/>
+  <JavaClass TypeName="org.jppf.utils.stats.JPPFStatisticsEvent"/>
+  <JavaClass TypeName="org.jppf.utils.stats.JPPFStatisticsListener"/>
+
+  <JavaClass TypeName="org.jppf.dotnet.demo.JavaDemoTask"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetTaskWrapper" MergeJavaSource="true"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetJobListenerWrapper" MergeJavaSource="true"/>
+
+</jni4net-proxygen>

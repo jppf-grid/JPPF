@@ -47,12 +47,12 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   public boolean isNodeAccepted(final AbstractNodeContext node, final NodeSelector selector)
   {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof NodeSelector.AllNodesSelector) return true;
+    if (selector instanceof AllNodesSelector) return true;
     if (node.isPeer()) return false;
-    else if (selector instanceof NodeSelector.UuidSelector)
-      return ((NodeSelector.UuidSelector) selector).getUuids().contains(node.getUuid());
-    else if (selector instanceof NodeSelector.ExecutionPolicySelector) {
-      ExecutionPolicy policy = ((NodeSelector.ExecutionPolicySelector) selector).getPolicy();
+    else if (selector instanceof UuidSelector)
+      return ((UuidSelector) selector).getUuids().contains(node.getUuid());
+    else if (selector instanceof ExecutionPolicySelector) {
+      ExecutionPolicy policy = ((ExecutionPolicySelector) selector).getPolicy();
       TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
       return policy.accepts(node.getSystemInformation());
     }
@@ -76,7 +76,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   public Set<AbstractNodeContext> getChannels(final NodeSelector selector)
   {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof NodeSelector.AllNodesSelector)
+    if (selector instanceof AllNodesSelector)
     {
       Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
       Set<AbstractNodeContext> result = new HashSet<>();
@@ -87,10 +87,10 @@ public class NodeSelectionHelper implements NodeSelectionProvider
       }
       return result;
     }
-    else if (selector instanceof NodeSelector.UuidSelector)
-      return getChannels(new HashSet<>(((NodeSelector.UuidSelector) selector).getUuids()));
-    else if (selector instanceof NodeSelector.ExecutionPolicySelector)
-      return getChannels(((NodeSelector.ExecutionPolicySelector) selector).getPolicy());
+    else if (selector instanceof UuidSelector)
+      return getChannels(new HashSet<>(((UuidSelector) selector).getUuids()));
+    else if (selector instanceof ExecutionPolicySelector)
+      return getChannels(((ExecutionPolicySelector) selector).getPolicy());
     throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
   }
 

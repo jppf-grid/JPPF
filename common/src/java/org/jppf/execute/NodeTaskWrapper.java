@@ -20,7 +20,7 @@ package org.jppf.execute;
 import java.util.concurrent.Future;
 
 import org.jppf.JPPFReconnectionNotification;
-import org.jppf.node.protocol.Task;
+import org.jppf.node.protocol.*;
 import org.jppf.scheduling.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -109,6 +109,13 @@ public class NodeTaskWrapper implements Runnable {
     if (task instanceof Future) {
       Future future = (Future) task;
       if (!future.isDone()) future.cancel(true);
+    } else if (task instanceof CancellationHandler) {
+      try {
+        ((CancellationHandler) task).doCancelAction();
+      } catch (Throwable t) {
+        if (task.getThrowable() == null) task.setThrowable(t);
+        if (traceEnabled) log.trace("throwable raised in doCancelAction()", t);
+      }
     }
   }
 
@@ -121,6 +128,13 @@ public class NodeTaskWrapper implements Runnable {
     if (task instanceof Future) {
       Future future = (Future) task;
       if (!future.isDone()) future.cancel(true);
+    } else if (task instanceof TimeoutHandler) {
+      try {
+        ((TimeoutHandler) task).doTimeoutAction();
+      } catch (Throwable t) {
+        if (task.getThrowable() == null) task.setThrowable(t);
+        if (traceEnabled) log.trace("throwable raised in doCancelAction()", t);
+      }
     }
   }
 
@@ -146,6 +160,7 @@ public class NodeTaskWrapper implements Runnable {
     } catch(Throwable t) {
       task.setThrowable(t);
       if (t instanceof UnsatisfiedLinkError) task.setResult(ExceptionUtils.getStackTrace(t));
+      if (traceEnabled) log.trace(t.getMessage(), t);
     } finally {
       Thread.currentThread().setContextClassLoader(oldCl);
       try {
@@ -218,6 +233,10 @@ public class NodeTaskWrapper implements Runnable {
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("task=").append(task);
+    if (task.getTaskObject() != task) {
+      sb.append(", taskObject=").append(task.getTaskObject());
+      if (task.getTaskObject() != null) sb.append(", taskObject class=").append(task.getTaskObject().getClass());
+    }
     sb.append(", cancelled=").append(cancelled);
     sb.append(", callOnCancel=").append(callOnCancel);
     sb.append(", timeout=").append(timeout);

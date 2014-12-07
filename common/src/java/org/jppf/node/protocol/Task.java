@@ -43,10 +43,17 @@ public interface Task<T> extends Runnable, Serializable {
 
   /**
    * Get the Throwable that was raised by this task's execution.
-   * @return a <code>Exception</code> instance, or {@code null} if no exception was raised.
+   * @return a <code>Throwable</code> instance, or {@code null} if no exception was raised.
    * @since 4.0
    */
   Throwable getThrowable();
+
+  /**
+   * Get the {@code Throwable} that was raised by this task's execution, wrapped in an Exception.
+   * @return a <code>Exception</code> instance, or {@code null} if no exception was raised.
+   * @since 5.0
+   */
+  Exception getException();
 
   /**
    * Sets the Throwable that was raised by this task's execution in the <code>run()</code> method.

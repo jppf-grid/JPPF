@@ -51,7 +51,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
    */
   private static final String[] FORWARDING_LISTENER_SIGNATURE = {NodeSelector.class.getName(), String.class.getName()};
   /**
-   * 
+   *
    */
   private static Map<String, Map<String, ListenerWrapper>> listeners = new HashMap<>();
 
@@ -333,6 +333,61 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
       }
     }
     invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "unregisterForwardingNotificationListener", new Object[] {listenerID}, new String[] {String.class.getName()});
+  }
+
+  /**
+   * Invoke a method on the specified MBean of all nodes attached to the driver.
+   * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
+   * @param name the name of the MBean.
+   * @param methodName the name of the method to invoke.
+   * @param params the method parameter values.
+   * @param signature the types of the method parameters.
+   * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node. Each result may be an exception.
+   * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
+   * @throws Exception if the invocation failed.
+   */
+  public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
+    return getNodeForwarder().forwardInvoke(selector, name, methodName, params, signature);
+  }
+
+  /**
+   * Convenience method to invoke an MBean method that has no parameter.
+   * <br/>This is equivalent to calling <code>forwardInvoke(selector, name, methodName, (Object[]) null, (String[]) null)</code>.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param name the name of the node MBean to invoke.
+   * @param methodName the name of the method to invoke.
+   * @return a mapping of node uuids to the result of invoking the MBean method on the corresponding node. Each result may be an exception.
+   * <br/>Additionally, each result may be <code>null</code>, in particular if the invoked method has a <code>void</code> return type.
+   * @throws Exception if the invocation failed.
+   */
+  public Map<String, Object> forwardInvoke(final NodeSelector selector, final String name, final String methodName) throws Exception {
+    return getNodeForwarder().forwardInvoke(selector, name, methodName);
+  }
+
+  /**
+   * Get the value of an attribute of the specified MBean for each specified node.
+   * @param selector a filter on the nodes attached tot he driver, determines the nodes to which this method applies.
+   * @param name the name of the MBean to invoke for each node.
+   * @param attribute the name of the MBean attribute to read.
+   * @return a mapping of node uuids to the result of getting the MBean attribute on the corresponding node. Each result may be an exception.
+   * @throws Exception if the invocation failed.
+   */
+  public Map<String, Object> forwardGetAttribute(final NodeSelector selector, final String name, final String attribute) throws Exception {
+    return getNodeForwarder().forwardGetAttribute(selector, name, attribute);
+  }
+
+  /**
+   * Set the value of an attribute of the specified MBean on the specified nodes attached to the driver.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param name the name of the MBean to invoke for each node.
+   * @param attribute the name of the MBean attribute to set.
+   * @param value the value to set on the attribute.
+   * @return a mapping of node uuids to an eventual exception resulting from setting the MBean attribute on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if the invocation failed.
+   */
+  public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
+    return getNodeForwarder().forwardSetAttribute(selector, name, attribute, value);
   }
 
   /**

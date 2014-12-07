@@ -43,7 +43,7 @@ import org.jppf.utils.JPPFCallable;
  * @author Laurent Cohen
  * @since 4.0
  */
-public abstract class AbstractTask<T> implements Task<T> {
+public class AbstractTask<T> implements Task<T> {
   /**
    * Explicit serialVersionUID.
    */
@@ -89,6 +89,12 @@ public abstract class AbstractTask<T> implements Task<T> {
    * The max number of times a task can resubmit itself.
    */
   private transient int maxResubmits = -1;
+
+  /**
+   *
+   */
+  public AbstractTask() {
+  }
 
   @Override
   public T getResult() {
@@ -193,26 +199,26 @@ public abstract class AbstractTask<T> implements Task<T> {
   @SuppressWarnings("unchecked")
   public <V> V compute(final JPPFCallable<V> callable) throws Exception {
     try {
-    V result = null;
-    if (isInNode()) {
-      ClassLoader cl = callable.getClass().getClassLoader();
-      Class<?> clClass = cl.getClass();
-      Method m = null;
-      try {
-        m = clClass.getMethod("computeCallable", JPPFCallable.class);
-      } catch(Exception e) {
-        throw new JPPFException("the task class loader cannot send a computation request to the client, method 'computeCallable' is missing");
-      }
-      result = (V) m.invoke(cl, callable);
-      /*
+      V result = null;
+      if (isInNode()) {
+        ClassLoader cl = callable.getClass().getClassLoader();
+        Class<?> clClass = cl.getClass();
+        Method m = null;
+        try {
+          m = clClass.getMethod("computeCallable", JPPFCallable.class);
+        } catch(Exception e) {
+          throw new JPPFException("the task class loader cannot send a computation request to the client, method 'computeCallable' is missing");
+        }
+        result = (V) m.invoke(cl, callable);
+        /*
       if (cl instanceof AbstractJPPFClassLoader) {
         AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
         result = loader.computeCallable(callable);
       }
-      */
-    }
-    else result = callable.call();
-    return result;
+         */
+      }
+      else result = callable.call();
+      return result;
     } catch(InvocationTargetException e) {
       Throwable t = e.getCause();
       throw (t instanceof Exception) ? (Exception) t: e;
@@ -271,5 +277,18 @@ public abstract class AbstractTask<T> implements Task<T> {
     Object o = getTaskObject();
     if (o == null) o = this;
     return o.getClass().getClassLoader();
+  }
+
+  @Override
+  public Exception getException() {
+    Throwable t = getThrowable();
+    if (t != null) {
+      return (t instanceof Exception) ? (Exception) t : new Exception(t);
+    }
+    return null;
+  }
+
+  @Override
+  public void run() {
   }
 }

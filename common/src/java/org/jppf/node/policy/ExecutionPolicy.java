@@ -74,6 +74,15 @@ public abstract class ExecutionPolicy implements Serializable {
 
   /**
    * Create an execution policy that is a logical "AND" combination of this policy and the one specified as operand.
+   * @param rule the rule to combine this one with.
+   * @return an execution policy that combines the this policy with the operand in an "AND" operation.
+   */
+  public ExecutionPolicy and(final ExecutionPolicy rule) {
+    return and(new ExecutionPolicy[] {rule});
+  }
+
+  /**
+   * Create an execution policy that is a logical "AND" combination of this policy and those specified as operands.
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the operand in an "AND" operation.
    */
@@ -82,13 +91,30 @@ public abstract class ExecutionPolicy implements Serializable {
   }
 
   /**
-   * Create an execution policy that is a logical "AND" combination of this policy
-   * and the engations those specified as argument.
+   * Create an execution policy that is a logical "NOT" combination of this policy and the negations of the one specified as argument.
+   * @param rule the rule to combine this one with.
+   * @return an execution policy that combines the this policy with the operand in an "AND" operation.
+   */
+  public ExecutionPolicy andNot(final ExecutionPolicy rule) {
+    return andNot(new ExecutionPolicy[] {rule});
+  }
+
+  /**
+   * Create an execution policy that is a logical "AND" combination of this policy and the negations of those specified as argumens.
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the operand in an "AND" operation.
    */
   public ExecutionPolicy andNot(final ExecutionPolicy...rules) {
     return new AndRule(makeNotRuleArray(this, rules));
+  }
+
+  /**
+   * Create an execution policy that is a logical "OR" combination of this policy and the one specified as operand.
+   * @param rule the rule to combine this one with.
+   * @return an execution policy that combines the this policy with the operand in an "OR" operation.
+   */
+  public ExecutionPolicy or(final ExecutionPolicy rule) {
+    return or(new ExecutionPolicy[] {rule});
   }
 
   /**
@@ -101,8 +127,16 @@ public abstract class ExecutionPolicy implements Serializable {
   }
 
   /**
-   * Create an execution policy that is a logical "OR" combination of this policy
-   * and the engations those specified as argument.
+   * Create an execution policy that is a logical "OR" combination of this policy and the negations of the one specified as argument.
+   * @param rule rules to combine this one with.
+   * @return an execution policy that combines the this policy with the negated operand in an "OR NOT" operation.
+   */
+  public ExecutionPolicy orNot(final ExecutionPolicy rule) {
+    return orNot(new ExecutionPolicy[] {rule});
+  }
+
+  /**
+   * Create an execution policy that is a logical "OR" combination of this policy and the negations of those specified as arguments.
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the negated operand in an "OR NOT" operation.
    */
@@ -111,7 +145,16 @@ public abstract class ExecutionPolicy implements Serializable {
   }
 
   /**
-   * Create an execution policy that is a logical "XOR" combination of the 2 policies specified as operands.
+   * Create an execution policy that is a logical "XOR" combination of this policy and the one specified as operand.
+   * @param rule the rule to combine this one with.
+   * @return an execution policy that combines the this policy with the operand in an "XOR" operation.
+   */
+  public ExecutionPolicy xor(final ExecutionPolicy rule) {
+    return xor(new ExecutionPolicy[] {rule});
+  }
+
+  /**
+   * Create an execution policy that is a logical "XOR" combination of the this policy and those specified as operands.
    * @param rules rules to combine this one with.
    * @return an execution policy that combines the this policy with the operand in an "XOR" operation.
    */
@@ -126,7 +169,6 @@ public abstract class ExecutionPolicy implements Serializable {
   public ExecutionPolicy not() {
     return new NotRule(this);
   }
-
 
   /**
    * Get the children of this rule.

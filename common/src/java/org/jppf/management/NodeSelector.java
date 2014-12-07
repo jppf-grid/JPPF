@@ -27,105 +27,69 @@ import org.jppf.node.policy.ExecutionPolicy;
  * Marker interface for selecting nodes when using the {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean JPPFNodeForwardingMBean} methods.
  * @author Laurent Cohen
  */
-public interface NodeSelector extends Serializable
-{
+public interface NodeSelector extends Serializable {
   /**
    * Constant for a selector which accepts all nodes.
    */
-  NodeSelector ALL_NODES = new AllNodesSelector();
+  NodeSelector ALL_NODES = new org.jppf.management.AllNodesSelector();
 
   /**
    * Selects all nodes.
+   * @deprecated use {@link org.jppf.management.AllNodesSelector} instead.
    */
-  public final static class AllNodesSelector implements NodeSelector
-  {
+  public static class AllNodesSelector extends org.jppf.management.AllNodesSelector {
     /**
      * Explicit serialVersionUID.
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Default constructor.
-     */
-    public AllNodesSelector()
-    {
-    }
   }
 
   /**
    * Selects nodes based on an {@link ExecutionPolicy}.
+   * @deprecated use {@link org.jppf.management.ExecutionPolicySelector} instead.
    */
-  public final static class ExecutionPolicySelector implements NodeSelector
-  {
+  public static class ExecutionPolicySelector extends org.jppf.management.ExecutionPolicySelector {
     /**
      * Explicit serialVersionUID.
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * The execution policy to use to select the nodes.
-     */
-    private final ExecutionPolicy policy;
-
-    /**
      * Initialize this selector with the specified execution policy.
      * @param policy the execution policy to use to select the nodes.
+     * @deprecated use {@link org.jppf.management.ExecutionPolicySelector} instead.
      */
-    public ExecutionPolicySelector(final ExecutionPolicy policy)
-    {
-      this.policy = policy;
-    }
-
-    /**
-     * Get the execution policy to use to select the nodes.
-     * @return an {@link ExecutionPolicy}.
-     */
-    public ExecutionPolicy getPolicy()
-    {
-      return policy;
+    public ExecutionPolicySelector(final ExecutionPolicy policy) {
+      super(policy);
     }
   }
 
   /**
    * Selects nodes based on their uuids.
+   * @deprecated use {@link org.jppf.management.UuidSelector} instead.
    */
-  public final static class UuidSelector implements NodeSelector
-  {
+  public static class UuidSelector extends org.jppf.management.UuidSelector {
     /**
      * Explicit serialVersionUID.
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * The list of uuids of the nodes to select. This list is immutable.
-     */
-    private final Collection<String> uuids;
-
-    /**
      * Initialize this selector with the specified list of node UUIDs.
      * @param uuids the uuids of the nodes to select.
+     * @deprecated use {@link org.jppf.management.UuidSelector} instead.
      */
-    public UuidSelector(final Collection<String> uuids)
-    {
-      this.uuids = (uuids == null) ? Collections.<String>emptyList() : new ArrayList<>(uuids);
+    public UuidSelector(final Collection<String> uuids) {
+      super(uuids);
     }
 
     /**
      * Initialize this selector with the specified array of node UUIDs.
      * @param uuids the uuids of the nodes to select.
+     * @deprecated use {@link org.jppf.management.UuidSelector} instead.
      */
-    public UuidSelector(final String...uuids)
-    {
-      this.uuids = (uuids == null) ? Collections.<String>emptyList() : Arrays.asList(uuids);
-    }
-
-    /**
-     * Get the list of uuids of the nodes to select. This list is immutable.
-     * @return a collection of uuids as strings.
-     */
-    public Collection<String> getUuids()
-    {
-      return uuids;
+    public UuidSelector(final String...uuids) {
+      super(uuids);
     }
   }
 }
