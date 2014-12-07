@@ -27,13 +27,10 @@ import javax.management.Notification;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
-import org.jppf.management.NodeSelector.AllNodesSelector;
-import org.jppf.management.NodeSelector.ExecutionPolicySelector;
-import org.jppf.management.NodeSelector.UuidSelector;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.Equal;
 import org.jppf.test.addons.mbeans.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.collections.CollectionUtils;
 import org.junit.Test;
 

@@ -129,7 +129,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     }
     Map<String, Object> result = null;
     try {
-      result = forwarder.state(new NodeSelector.UuidSelector(uuidMap.keySet()));
+      result = forwarder.state(new UuidSelector(uuidMap.keySet()));
     } catch(Exception e) {
       log.error("error getting node states for driver " + driver.getUuid(), e);
     }
@@ -159,7 +159,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       }
     }
     try {
-      result = forwarder.forwardGetAttribute(new NodeSelector.UuidSelector(uuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
+      result = forwarder.forwardGetAttribute(new UuidSelector(uuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
     } catch(Exception e) {
       log.error("error getting number of slaves for driver " + driver.getUuid(), e);
     }

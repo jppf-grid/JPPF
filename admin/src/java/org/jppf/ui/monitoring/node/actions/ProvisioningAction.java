@@ -153,7 +153,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
       @Override public void run() {
         for (Map.Entry<TopologyDriver, Collection<String>> en: map.entrySet()) {
           TopologyDriver parent = en.getKey();
-          NodeSelector selector = new NodeSelector.UuidSelector(en.getValue());
+          NodeSelector selector = new UuidSelector(en.getValue());
           try {
             Map<String, Object> result = parent.getForwarder().forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
             printForwardingRequestErrors(result);

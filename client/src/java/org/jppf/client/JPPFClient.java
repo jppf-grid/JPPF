@@ -104,6 +104,12 @@ public class JPPFClient extends AbstractGenericClient {
     }
     job.client = this;
     if (debugEnabled) log.debug("submitting job {}", job);
+    if (log.isTraceEnabled()) {
+      for (Task<?> task: job) {
+        log.trace(String.format("task %s, position=%d, taskObject=%s, taskObject class=%s", task, task.getPosition(), task.getTaskObject(),
+            (task.getTaskObject() != null) ? task.getTaskObject().getClass() : null));
+      }
+    }
     getJobManager().submitJob(job);
     if (job.isBlocking()) return job.awaitResults();
     return null;

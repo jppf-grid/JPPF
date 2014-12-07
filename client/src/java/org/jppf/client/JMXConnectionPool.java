@@ -160,18 +160,20 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   /**
    * Wait for the specified number of connections to be in one of the specified state, or the
    * specified timeout to expire, whichever happens first.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
    * @param connected the possible statuses of the connections to wait for.
    * @return a list of {@link JMXDriverConnectionWrapper} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final long timeout, final boolean connected) {
+  List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connected) {
+    final Operator op = operator == null ? Operator.EQUAL : operator;
     setMaxSize(nbConnections);
     final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
-        return ref.set(getConnections(connected)).size() == nbConnections;
+        return op.evaluate(ref.set(getConnections(connected)).size(), nbConnections);
       }
     }, timeout);
     return ref.get();

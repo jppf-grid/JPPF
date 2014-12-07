@@ -422,7 +422,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
           if (jobNotif.getEventType() == JobEventType.JOB_DISPATCHED) {
             try {
               Thread.sleep(500L);
-              forwarder.forwardInvoke(new NodeSelector.UuidSelector("n1"), JPPFNodeAdminMBean.MBEAN_NAME, "restart");
+              forwarder.forwardInvoke(new UuidSelector("n1"), JPPFNodeAdminMBean.MBEAN_NAME, "restart");
             } catch (Exception ignore) {
               //ignore.printStackTrace();
             }

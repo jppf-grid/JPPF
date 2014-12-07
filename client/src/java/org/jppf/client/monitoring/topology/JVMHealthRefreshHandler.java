@@ -72,7 +72,7 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
       }
       Map<String, Object> result = null;
       try {
-        result = driver.getForwarder().healthSnapshot(new NodeSelector.UuidSelector(new HashSet<>(uuidMap.keySet())));
+        result = driver.getForwarder().healthSnapshot(new UuidSelector(new HashSet<>(uuidMap.keySet())));
       } catch(Exception e) {
         log.warn("error getting nodes health for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
       }

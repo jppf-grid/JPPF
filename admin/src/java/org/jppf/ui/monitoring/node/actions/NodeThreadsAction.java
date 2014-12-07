@@ -23,7 +23,7 @@ import java.util.*;
 import javax.swing.*;
 
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
@@ -146,7 +146,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
           try {
             JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
-            NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
+            NodeSelector selector = new UuidSelector(entry.getValue());
             forwarder.updateThreadPoolSize(selector, nbThreads);
             forwarder.updateThreadsPriority(selector, priority);
           } catch (Exception e) {

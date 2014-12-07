@@ -204,7 +204,7 @@ public class TemplateApplicationRunner {
     }
 
     // wait until all desired connections are available (ACTIVE status)
-    pool.awaitActiveConnections(numberOfConnections);
+    pool.awaitActiveConnections(Operator.AT_LEAST, numberOfConnections);
   }
 
   /**

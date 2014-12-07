@@ -76,7 +76,7 @@ public class ToggleNodeActiveAction extends AbstractTopologyAction
           try {
             JMXDriverConnectionWrapper driverJmx = entry.getKey().getJmx();
             if (driverJmx == null) continue;
-            NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
+            NodeSelector selector = new UuidSelector(entry.getValue());
             driverJmx.toggleActiveState(selector);
           } catch (Exception e) {
             log.error(e.getMessage(), e);

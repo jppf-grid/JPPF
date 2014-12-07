@@ -21,7 +21,7 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
@@ -87,7 +87,7 @@ public class GCAction extends AbstractTopologyAction {
         try {
           JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
           if (forwarder == null) continue;
-          NodeSelector selector = new NodeSelector.UuidSelector(entry.getValue());
+          NodeSelector selector = new UuidSelector(entry.getValue());
           forwarder.gc(selector);
         } catch (Exception e) {
           log.error(e.getMessage(), e);

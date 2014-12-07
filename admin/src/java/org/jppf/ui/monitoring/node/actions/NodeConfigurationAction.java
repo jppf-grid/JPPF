@@ -133,7 +133,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
           AbstractTopologyComponent data = dataArray[0];
           parent = (TopologyDriver) data.getParent();
           if (parent == null) return;
-          parent.getForwarder().updateConfiguration(new NodeSelector.UuidSelector(data.getUuid()), map, b);
+          parent.getForwarder().updateConfiguration(new UuidSelector(data.getUuid()), map, b);
         } catch(Exception e) {
           log.error(e.getMessage(), e);
         }
@@ -152,7 +152,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
       AbstractTopologyComponent data = dataArray[0];
       TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent == null) return "could not get the parent driver for the selected node";
-      Map<String, Object> result = parent.getForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
+      Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
       if (result == null) return "could not retrieve system information for the selected node";
       Object o = result.get(data.getUuid());
       if (o == null) return "could not retrieve system information for the selected node";

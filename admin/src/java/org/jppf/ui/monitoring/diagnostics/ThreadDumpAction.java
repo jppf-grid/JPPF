@@ -121,7 +121,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
     try {
       if (data.isNode()) {
         TopologyDriver parent = (TopologyDriver) data.getParent();
-        Map<String, Object> result = parent.getForwarder().threadDump(new NodeSelector.UuidSelector(data.getUuid()));
+        Map<String, Object> result = parent.getForwarder().threadDump(new UuidSelector(data.getUuid()));
         Object o = result.get(data.getUuid());
         if (o instanceof ThreadDump) info = (ThreadDump) o;
       }

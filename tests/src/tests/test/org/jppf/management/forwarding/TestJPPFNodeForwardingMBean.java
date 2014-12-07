@@ -23,11 +23,9 @@ import static org.junit.Assert.*;
 import java.util.*;
 
 import org.jppf.classloader.DelegationModel;
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.management.*;
-import org.jppf.management.NodeSelector.AllNodesSelector;
-import org.jppf.management.NodeSelector.ExecutionPolicySelector;
-import org.jppf.management.NodeSelector.UuidSelector;
+import org.jppf.management.ExecutionPolicySelector;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;

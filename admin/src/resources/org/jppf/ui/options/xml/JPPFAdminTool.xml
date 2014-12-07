@@ -32,7 +32,7 @@
     </script>
 	</initializer>
 	<finalizer type="script">
-		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));</script>
+		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences());</script>
 	</finalizer>
 
   <!-- Server Chooser Panel -->

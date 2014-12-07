@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 import java.io.InputStream;
 import java.util.*;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.node.policy.*;
@@ -299,7 +299,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
       assertEquals(2, executedOnUuids.size());
       executedOnUuids.clear();
       // deactivate one node and make sure the job is only executed on the other node
-      selector = new NodeSelector.UuidSelector(nodeUuids[1]);
+      selector = new UuidSelector(nodeUuids[1]);
       driver.toggleActiveState(selector);
       job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName() + "-2", true, false, nbTasks, LifeCycleTask.class, 0L);
       results = client.submitJob(job);

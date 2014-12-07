@@ -130,7 +130,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
     try {
       if (data.isNode()) {
         TopologyDriver parent = (TopologyDriver) data.getParent();
-        Map<String, Object> result = parent.getForwarder().systemInformation(new NodeSelector.UuidSelector(data.getUuid()));
+        Map<String, Object> result = parent.getForwarder().systemInformation(new UuidSelector(data.getUuid()));
         Object o = result.get(data.getUuid());
         if (o instanceof JPPFSystemInformation) info = (JPPFSystemInformation) o;
       } else {

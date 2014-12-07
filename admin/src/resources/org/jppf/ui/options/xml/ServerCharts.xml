@@ -28,9 +28,12 @@
 
 	<child name="ChartsBuilder" type="Java">
     <property name="class" value="org.jppf.ui.monitoring.charts.config.JPPFChartBuilder"/>
-	  <finalizer type="script">
-			<script language="groovy">option.getUIComponent().getStorage().saveAll();</script>
-		</finalizer>
+    <initializer type="script">
+      <script language="groovy">option.getUIComponent().createInitialCharts();</script>
+    </initializer>
+    <finalizer type="script">
+      <script language="groovy">option.getUIComponent().getStorage().saveAll();</script>
+    </finalizer>
 	</child>
 
 </opt:main>

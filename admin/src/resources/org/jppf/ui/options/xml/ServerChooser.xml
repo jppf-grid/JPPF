@@ -31,7 +31,7 @@
     <property name="icon" value="/org/jppf/ui/resources/import.png"/>
     <property name="tooltip" value="Import UI settings from file"/>
     <property name="type" value="open"/>
-    <property name="extensions" value="xml;XML files (*.xml)|"/>
+    <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
     <property name="value" value="./AdminConsoleSettings.xml"/>
     <listener type="script">
       <script language="groovy">OptionsHandler.importSettings(option.getValue())</script>
@@ -42,7 +42,7 @@
     <property name="icon" value="/org/jppf/ui/resources/export.png"/>
     <property name="tooltip" value="Export UI settings to file"/>
     <property name="type" value="save"/>
-    <property name="extensions" value="xml;XML files (*.xml)|"/>
+    <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
     <property name="value" value="./AdminConsoleSettings.xml"/>
     <listener type="script">
       <script language="groovy">OptionsHandler.exportSettings(option.getValue())</script>

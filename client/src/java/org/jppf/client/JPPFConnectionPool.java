@@ -490,55 +490,60 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * Wait for the specified number of connections to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status.
    * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE)}.
    * This method will create or close connections as needed to reach the desired number of connections.
-   * @param nbConnections the number of connections to wait for.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
+   * @param nbConnections the expected number of connections to wait for.
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitActiveConnections(final int nbConnections) {
-    return awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
+  public List<JPPFClientConnection> awaitActiveConnections(final Operator operator, final int nbConnections) {
+    return awaitConnections(operator, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE);
   }
 
   /**
    * Wait for the specified number of connections to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
    * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
    * This method will create or close connections as needed to reach the desired number of connections.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitWorkingConnections(final int nbConnections) {
-    return awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+  public List<JPPFClientConnection> awaitWorkingConnections(final Operator operator, final int nbConnections) {
+    return awaitConnections(operator, nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
   }
 
   /**
    * Wait for the specified number of connections to be in one of the specified states.
    * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFstatuses)}.
    * This method will create or close connections as needed to reach the desired number of connections.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param statuses the possible statuses of the connections to wait for.
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitConnections(final int nbConnections, final JPPFClientConnectionStatus...statuses) {
-    return awaitConnections(nbConnections, Long.MAX_VALUE, statuses);
+  public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final JPPFClientConnectionStatus...statuses) {
+    return awaitConnections(operator, nbConnections, Long.MAX_VALUE, statuses);
   }
 
   /**
    * Wait for the specified number of connections to be in one of the specified states, or the specified timeout to expire, whichever happens first.
    * This method will increase or decrease the number of connections in this pool as needed.
    * This method will create or close connections as needed to reach the desired number of connections.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
    * @param statuses the possible statuses of the connections to wait for.
    * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  public List<JPPFClientConnection> awaitConnections(final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+  public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    final Operator op = operator == null ? Operator.EQUAL : operator;
     setMaxSize(nbConnections);
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
-        return ref.set(getConnections(statuses)).size() == nbConnections;
+        return op.evaluate(ref.set(getConnections(statuses)).size(), nbConnections);
       }
     }, timeout);
     return ref.get();
@@ -548,25 +553,27 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * Wait for the specified number of JMX connections to be in the specified state.
    * This is a shorthand for {@code awaitJMXConnections(nbConnections, Long.MAX_VALUE, connectedOnly)}.
    * This method will create or close JMX connections as needed to reach the desired number of connections.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param connectedOnly .
    * @return a list of at least {@code nbConnections} {@link JPPFClientConnection} instances.
    * @since 5.0
    */
-  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final boolean connectedOnly) {
-    return jmxPool.awaitJMXConnections(nbConnections, Long.MAX_VALUE, connectedOnly);
+  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final boolean connectedOnly) {
+    return jmxPool.awaitJMXConnections(operator, nbConnections, Long.MAX_VALUE, connectedOnly);
   }
 
   /**
    * Wait for the specified number of JMX connections to be in the specified state, or the specified timeout to expire, whichever happens first.
    * This method will create or close JMX connections as needed to reach the desired number of connections.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
    * @param connectedOnly the possible statuses of the connections to wait for.
    * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
-  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final int nbConnections, final long timeout, final boolean connectedOnly) {
-    return jmxPool.awaitJMXConnections(nbConnections, timeout, connectedOnly);
+  public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connectedOnly) {
+    return jmxPool.awaitJMXConnections(operator, nbConnections, timeout, connectedOnly);
   }
 }
