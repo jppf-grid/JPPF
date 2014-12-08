@@ -69,7 +69,7 @@ public class DriverConnectionManager implements AutoCloseable {
     this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
-    this.masterSelector = new NodeSelector.ExecutionPolicySelector(masterPolicy);
+    this.masterSelector = new ExecutionPolicySelector(masterPolicy);
   }
 
   /**
