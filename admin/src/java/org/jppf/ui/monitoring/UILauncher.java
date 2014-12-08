@@ -56,7 +56,7 @@ public class UILauncher {
    * .
    * @since 5.0
    */
-  private static boolean adminConsole = true;
+  private static boolean adminConsole = false;
 
   /**
    * Start this UI.
@@ -90,7 +90,7 @@ public class UILauncher {
       }
       boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
       if (showSplash) (splash = new JPPFSplash("The management console is starting ...")).start();
-      loadUI(args[0], args[1], true, -1);
+      loadUI(args[0], args[1]);
       if (showSplash) splash.stop();
       Frame[] frames = Frame.getFrames();
       for (final Frame f: frames) {
@@ -112,12 +112,10 @@ public class UILauncher {
    * Load the UI from the specified path to an XML descriptor.
    * @param src the path tot he XML docuemnt to load
    * @param type the type of the path: url or file.
-   * @param createFrame determines whether the main application frame should alsd be created and initialized.
-   * @param idx the index at which to insert the admin console in the main frame. A negative value measn insert at the end.
    * @return the root {@link JComponent} of the admin console.
    * @since 5.0
    */
-  private synchronized static JComponent loadUI(final String src, final String type, final boolean createFrame, final int idx) {
+  private synchronized static JComponent loadUI(final String src, final String type) {
     if (consoleComponent == null) {
       OptionElement elt = null;
       try {
@@ -131,8 +129,7 @@ public class UILauncher {
         frame.setTitle(elt.getLabel());
         String iconPath = elt.getIconPath();
         frame.setIconImage(GuiUtils.loadIcon(iconPath != null ? iconPath : GuiUtils.JPPF_ICON).getImage());
-        if (idx >= 0) frame.add(elt.getUIComponent(), idx);
-        else frame.add(elt.getUIComponent());
+        frame.add(elt.getUIComponent());
         OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node(elt.getName()));
       } catch (Exception e) {
         e.printStackTrace();

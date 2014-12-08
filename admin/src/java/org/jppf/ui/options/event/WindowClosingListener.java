@@ -19,7 +19,6 @@
 package org.jppf.ui.options.event;
 
 import java.awt.event.*;
-import java.util.List;
 import java.util.prefs.*;
 
 import org.jppf.ui.monitoring.data.StatsHandler;
@@ -35,20 +34,18 @@ public class WindowClosingListener extends WindowAdapter {
   /**
    * Process the closing of the main frame.
    * @param event the event we're interested in.
-   * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
    */
   @Override
   public void windowClosing(final WindowEvent event) {
     if (StatsHandler.hasInstance()) StatsHandler.getInstance().getClientHandler().close();
-    Preferences pref = OptionsHandler.getPreferences();
-    List<OptionElement> list = OptionsHandler.getPageList();
-    if (!list.isEmpty()) {
-      OptionElement elt = list.get(0);
+    OptionElement elt = OptionsHandler.getTopPage();
+    if (elt != null) {
       OptionsPageBuilder builder = new OptionsPageBuilder();
       builder.triggerFinalEvents(elt);
     }
 
     try {
+      Preferences pref = OptionsHandler.getPreferences();
       pref.flush();
     } catch(BackingStoreException e) {
     }

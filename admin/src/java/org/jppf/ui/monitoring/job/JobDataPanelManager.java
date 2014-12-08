@@ -360,7 +360,7 @@ class JobDataPanelManager {
         String uuid = c.getDriverUuid();
         TopologyDriver driver = panel.getTopologyManager().getDriver(uuid);
         JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
-        if (status == JPPFClientConnectionStatus.FAILED) panel.driverRemoved(driver);
+        if (status.isTerminatedStatus()) panel.driverRemoved(driver);
         else panel.updateDriver(driver);
       } else throw new IllegalStateException("Unsupported event source - expected JPPFClientConnection");
     }

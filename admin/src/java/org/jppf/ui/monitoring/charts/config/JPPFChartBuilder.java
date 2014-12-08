@@ -59,7 +59,7 @@ public class JPPFChartBuilder extends JTabbedPane implements StatsHandlerListene
   public JPPFChartBuilder() {
     storage = new PreferencesStorage(this);
     initHandlerMap();
-    createInitialCharts();
+    //createInitialCharts();
     StatsHandler.getInstance().addStatsHandlerListener(this);
   }
 

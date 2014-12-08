@@ -161,6 +161,7 @@ public class ConsoleLauncher {
         else elt = OptionsHandler.addPageFromXml(src);
         OptionsHandler.loadPreferences();
         OptionsHandler.getBuilder().triggerInitialEvents(elt);
+        System.out.println("loaded pages: " + OptionsHandler.getPageList());
         Frame frame = OptionsHandler.getMainWindow();
         if (createFrame) {
           if (frame == null) {
@@ -173,7 +174,7 @@ public class ConsoleLauncher {
           StatsHandler.getInstance();
           if (idx >= 0) frame.add(elt.getUIComponent(), idx);
           else frame.add(elt.getUIComponent());
-          OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node("JPPFAdminTool"));
+          OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences());
         } else {
           if (idx < 0) {
             JComponent comp = elt.getUIComponent();

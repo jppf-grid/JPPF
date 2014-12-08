@@ -130,6 +130,7 @@ public class FileChooserOption extends AbstractOption {
     String val = (String) value;
     if ((val == null) || "".equals(val.trim())) val = System.getProperty("user.dir");
     JFileChooser chooser = new JFileChooser(new File(val).getParent());
+    chooser.setAcceptAllFileFilterUsed(false);
     chooser.setDialogType(dialogType == OPEN ? JFileChooser.OPEN_DIALOG : JFileChooser.SAVE_DIALOG);
     if ((toolTipText != null) && !"".equals(toolTipText.trim())) chooser.setDialogTitle(toolTipText);
     for (FileFilter filter: filters) chooser.addChoosableFileFilter(filter);
@@ -175,21 +176,30 @@ public class FileChooserOption extends AbstractOption {
   public void setExtensions(final String extensions) {
     filters.clear();
     if ((extensions == null) || "".equals(extensions.trim())) this.extensions = DEFAULT_EXTENSIONS;
-    else {
-      this.extensions = extensions;
+    else this.extensions = extensions;
+    /*else*/ {
       String[] rawExt = extensions.split("\\|");
       for (String s: rawExt) {
-        String ext = "";
-        String desc = "";
-        int idx = s.indexOf(';');
-        if (idx < 0) ext = s.trim();
-        else {
-          ext = s.substring(0, idx).trim();
-          desc = s.substring(idx + 1).trim();
-        }
-        filters.add(new Filter(ext, desc));
+        filters.add(parseFilter(s));
       }
     }
+  }
+
+  /**
+   * Parse an extension descriptor.
+   * @param source the descriptor string.
+   * @return a {@link Filter} instance.
+   */
+  private Filter parseFilter(final String source) {
+    String ext = "";
+    String desc = "";
+    int idx = source.indexOf(';');
+    if (idx < 0) ext = source.trim();
+    else {
+      ext = source.substring(0, idx).trim();
+      desc = source.substring(idx + 1).trim();
+    }
+    return new Filter(ext, desc);
   }
 
   /**

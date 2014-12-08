@@ -40,9 +40,9 @@ public class PreferencesStorage {
    */
   private static Logger log = LoggerFactory.getLogger(PreferencesStorage.class);
   /**
-   * The root of the preferences subtree in which the chart configurations are saved.
+   * The name of the root of the preferences subtree in which the chart configurations are saved.
    */
-  private static Preferences CHART_CONFIG_PREFERENCES = OptionsHandler.getPreferences().node("TabConfigurations");
+  private static final String CHART_CONFIG_PREFERENCES_NAME = "TabConfigurations";
   /**
    * 
    */
@@ -60,7 +60,7 @@ public class PreferencesStorage {
    * Load all chart configurations from the preferences tree, and create the corresponding charts.
    */
   public void loadChartConfigurations() {
-    Preferences pref = CHART_CONFIG_PREFERENCES;
+    Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
     String[] tabChildrenNames = null;
     try {
       tabChildrenNames = pref.childrenNames();
@@ -74,7 +74,7 @@ public class PreferencesStorage {
     for (String s: tabChildrenNames) {
       Preferences child = pref.node(s);
       TabConfiguration tab = new TabConfiguration();
-      tab.name = child.get("name", "Tab"+cnt);
+      tab.name = child.get("name", "Tab" + cnt);
       tab.position = child.getInt("position", -1);
       ChartConfiguration[] configs = loadTabCharts(child);
       tab.configs.addAll(Arrays.asList(configs));
@@ -104,7 +104,8 @@ public class PreferencesStorage {
    */
   public void loadDefaultChartConfigurations() {
     try (InputStream is =  FileUtils.getFileInputStream("ui-default-charts-settings.xml")) {
-      CHART_CONFIG_PREFERENCES.importPreferences(is);
+      Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+      pref.importPreferences(is);
       loadChartConfigurations();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -210,7 +211,8 @@ public class PreferencesStorage {
       }
     }
     try {
-      CHART_CONFIG_PREFERENCES.flush();
+      Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+      pref.flush();
     } catch(BackingStoreException e) {
       log.error(e.getMessage(), e);
     }
@@ -221,8 +223,8 @@ public class PreferencesStorage {
    * @param tab the tab to save.
    */
   public void saveTabConfiguration(final TabConfiguration tab) {
-    String tabNodeName = "TabConfiguration"+tab.position;
-    Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName);
+    String tabNodeName = "TabConfiguration" + tab.position;
+    Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME).node(tabNodeName);
     pref.put("name", tab.name);
     pref.putInt("position", tab.position);
   }
@@ -233,9 +235,9 @@ public class PreferencesStorage {
    * @param config the configuration to save.
    */
   public void saveChartConfiguration(final TabConfiguration tab, final ChartConfiguration config) {
-    String tabNodeName = "TabConfiguration"+tab.position;
-    String nodeName = "ChartConfiguration"+config.position;
-    Preferences pref = CHART_CONFIG_PREFERENCES.node(tabNodeName + '/' + nodeName);
+    String tabNodeName = "TabConfiguration" + tab.position;
+    String nodeName = "ChartConfiguration" + config.position;
+    Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME).node(tabNodeName + '/' + nodeName);
     pref.put("name", config.name);
     pref.putInt("precision", config.precision);
     if (config.unit != null ) pref.put("unit", config.unit);
@@ -254,8 +256,9 @@ public class PreferencesStorage {
    */
   public void removeAllSaved() {
     try {
-      String[] names = CHART_CONFIG_PREFERENCES.childrenNames();
-      for (String name: names) CHART_CONFIG_PREFERENCES.node(name).removeNode();
+      Preferences pref = OptionsHandler.getPreferences().node(CHART_CONFIG_PREFERENCES_NAME);
+      String[] names = pref.childrenNames();
+      for (String name: names) pref.node(name).removeNode();
     } catch(BackingStoreException e) {
       log.error(e.getMessage(), e);
     }

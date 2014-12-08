@@ -27,6 +27,7 @@ import org.jppf.ui.monitoring.charts.config.JPPFChartBuilder;
 import org.jppf.ui.monitoring.diagnostics.JVMHealthPanel;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.docking.DockingManager;
+import org.jppf.ui.options.event.ValueChangeEvent;
 import org.jppf.ui.options.xml.OptionsPageBuilder;
 import org.jppf.ui.plugin.PluggableViewHandler;
 import org.jppf.ui.treetable.AbstractTreeTableOption;
@@ -89,12 +90,21 @@ public final class OptionsHandler {
   }
 
   /**
+   * Retrieve the first loaded page.
+   * @return an <code>OptionsPage</code> instance.
+   */
+  public static synchronized OptionElement getTopPage() {
+    return pageList.isEmpty() ? null : pageList.get(0);
+  }
+
+  /**
    * Add a page to the list of pages managed by this handler.
    * @param page an <code>OptionsPage</code> instance.
    * @return the page that was added.
    */
   public static synchronized OptionElement addPage(final OptionElement page) {
     if (page != null) {
+      if (pageList.isEmpty()) setPreferences(JPPF_PREFERENCES.node(page.getName()));
       pageList.add(page);
       try {
         pageMap.put(page.getName(), page);
@@ -174,7 +184,8 @@ public final class OptionsHandler {
     try {
       for (OptionElement elt: pageList) {
         OptionNode node = buildPersistenceGraph(elt);
-        savePreferences(node, getPreferences());
+        //savePreferences(node, getPreferences());
+        savePreferences(node, JPPF_PREFERENCES);
       }
       getPreferences().flush();
     } catch(Exception e) {
@@ -203,7 +214,8 @@ public final class OptionsHandler {
   public static void loadPreferences() {
     for (OptionElement elt: pageList) {
       OptionNode node = buildPersistenceGraph(elt);
-      loadPreferences(node, getPreferences());
+      //loadPreferences(node, getPreferences());
+      loadPreferences(node, JPPF_PREFERENCES);
     }
   }
 
@@ -394,7 +406,7 @@ public final class OptionsHandler {
   public static void exportSettings(final String path) {
     try {
       savePreferences();
-      if (ConsoleLauncher.isEmbedded()) saveMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
+      if (ConsoleLauncher.isEmbedded()) saveMainWindowAttributes(getPreferences());
       OptionElement root = pageList.get(0);
       OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
       if (elt != null) {
@@ -431,12 +443,14 @@ public final class OptionsHandler {
     }
     try {
       loadPreferences();
-      if (ConsoleLauncher.isEmbedded()) loadMainWindowAttributes(getPreferences().node("JPPFAdminTool"));
+      if (!ConsoleLauncher.isEmbedded()) loadMainWindowAttributes(getPreferences());
       OptionElement root = pageList.get(0);
       OptionElement elt = findOptionWithName(root, "/ChartsBuilder");
       if (elt != null) {
         JPPFChartBuilder chartBuilder = (JPPFChartBuilder) elt.getUIComponent();
         if (chartBuilder != null) chartBuilder.reset();
+        OptionElement chartConfigPage = findOptionWithName(root, "/ChartsConfiguration");
+        chartConfigPage.getInitializer().valueChanged(new ValueChangeEvent(chartConfigPage));
       }
       String[] names = { "/health.treetable", "/NodeTreeTable", "/JobTreetable" };
       JVMHealthPanel panel = null;
