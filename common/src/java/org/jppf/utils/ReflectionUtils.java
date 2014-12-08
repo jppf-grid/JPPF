@@ -91,6 +91,19 @@ public class ReflectionUtils {
   }
 
   /**
+   * Get the name of an MBean attribute based on a getter or setter method.
+   * @param meth the method to analyse.
+   * @return the name of an MBean attribute following the {@code javax.management} coventions,
+   * or {@code null} if the input method is not a setter or getter.
+   */
+  public static String getMBeanAttributeName(final Method meth) {
+    String name = meth.getName();
+    if (name.startsWith("is")) return name.substring(2);
+    else if (name.startsWith("get") || name.startsWith("set")) return name.substring(3);
+    return null;
+  }
+
+  /**
    * Determines whether a method is a getter (accessor), according to Sun's naming conventions.
    * @param meth the method to analyse.
    * @return {@code true} if the method is a getter, {@code false} otherwise.
