@@ -168,7 +168,7 @@
 					<property name="icon" value="/org/jppf/ui/resources/open.gif"/>
 					<property name="tooltip" value="Specify the database file"/>
 					<property name="value" value="data/ecoli.aa"/>
-					<property name="extensions" value="*; All Files (*.*)"/>
+					<property name="extensions" value="*; All files (*.*)"/>
 					<property name="orientation" value="vertical"/>
 					<property name="type" value="open"/>
 					<property name="persistent" value="true"/>

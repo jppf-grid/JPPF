@@ -17,7 +17,7 @@
 	limitations under the License.
 -->
 
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFFractalsMain" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFSequenceAlignment" type="page">
 	<property name="label" value="JPPF Sequence Alignment"/>
 	<initializer type="script">
 		<script language="javascript"><![CDATA[
