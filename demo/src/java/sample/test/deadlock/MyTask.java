@@ -60,7 +60,7 @@ public class MyTask extends AbstractTask<String> {
 
   @Override
   public void run() {
-    System.out.println("starting execution for "  + getId());
+    //System.out.println("starting execution for "  + getId());
     try {
       if (!useCPU) {
         if (duration > 0L) Thread.sleep(duration);

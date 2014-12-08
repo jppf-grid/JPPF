@@ -106,7 +106,7 @@ public class TestJMX
   {
     Thread.sleep(500L);
     NodeNotificationListener listener = new NodeNotificationListener();
-    String listenerID = driverJmx.registerForwardingNotificationListener(new NodeSelector.AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
+    String listenerID = driverJmx.registerForwardingNotificationListener(new AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
     JPPFJob job = new JPPFJob();
     for (int i=0; i<5; i++) job.add(new LongTask(100L)).setId(String.valueOf(i+1));
     List<Task<?>> results = client.submitJob(job);

@@ -54,7 +54,7 @@ public class NodeProvisioningRunner {
 
       // create a node selector that only selects master nodes
       ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
-      NodeSelector masterSelector = new NodeSelector.ExecutionPolicySelector(masterPolicy);
+      NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
       
       // specify configuration overrides for the new slave nodes
       TypedProperties overrides = new TypedProperties();

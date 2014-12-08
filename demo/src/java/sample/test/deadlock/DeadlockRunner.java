@@ -76,8 +76,8 @@ public class DeadlockRunner {
       MasterNodeMonitoringThread mnmt = new MasterNodeMonitoringThread(client, 5000L, pt);
       //for (int n: nbSlaves) updateSlaveNodes(client, n);
       try {
-        new Thread(pt, "ProvisioningThread").start();
-        new Thread(mnmt, "MasterNodeMonitoringThread").start();
+        //new Thread(pt, "ProvisioningThread").start();
+        //new Thread(mnmt, "MasterNodeMonitoringThread").start();
         TimeMarker marker = new TimeMarker().start();
         for (JPPFJob job: jobProvider) {
           if (job != null) client.submitJob(job);
@@ -133,7 +133,7 @@ public class DeadlockRunner {
    */
   private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {
     System.out.printf("ensuring %d connections ...\n", nbConnections);
-    client.awaitActiveConnectionPool().awaitActiveConnections(nbConnections);
+    client.awaitActiveConnectionPool().awaitActiveConnections(Operator.AT_LEAST, nbConnections);
   }
 
   /**
@@ -150,7 +150,7 @@ public class DeadlockRunner {
     String mbeanName = JPPFNodeProvisioningMBean.MBEAN_NAME;
     Object[] params = { nbSlaves, null };
     String[] sig = new String[] {int.class.getName(), TypedProperties.class.getName()};
-    NodeSelector masterSelector = new NodeSelector.ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+    NodeSelector masterSelector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     // request that <nbSlaves> slave nodes be provisioned
     TimeMarker marker = new TimeMarker().start();
     forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", params, sig);
@@ -167,7 +167,7 @@ public class DeadlockRunner {
     System.out.println("requesting node shutdown ...");
     JMXDriverConnectionWrapper jmx = client.getConnectionPool().getJmxConnection();
     JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-    NodeSelector selector = new NodeSelector.ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
+    NodeSelector selector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     forwarder.forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "shutdown", new Object[] {false}, new String[] {Boolean.class.getName()});
   }
 
@@ -180,7 +180,7 @@ public class DeadlockRunner {
   static synchronized JMXDriverConnectionWrapper getJmxConnection(final JPPFClient client) throws Exception {
     if (jmx == null) {
       JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-      jmx = pool.awaitJMXConnections(2, true).get(0);
+      jmx = pool.awaitJMXConnections(Operator.AT_LEAST, 2, true).get(0);
     }
     return jmx;
   }

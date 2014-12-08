@@ -61,7 +61,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
     log.info("starting ProvisioningThread, waitTime={}", waitTime);
     JPPFNodeForwardingMBean forwarder = null;
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
-    NodeSelector masterSelector = new NodeSelector.ExecutionPolicySelector(masterPolicy);
+    NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
     String[] sig = { int.class.getName() };
     while (!isStopped()) {
       if (forwarder == null) {
