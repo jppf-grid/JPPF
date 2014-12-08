@@ -116,7 +116,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
       }
       Bundler bundler = factory.createBundler(algorithm, props);
       server.setBundler(bundler);
-      return localize("load.balancing.updated");
+      return localize("load.balancing.updated") + " (" + algorithm + ")";
     } catch(Exception e) {
       log.error(e.getMessage(), e);
       return "Error : " + e.getMessage();
