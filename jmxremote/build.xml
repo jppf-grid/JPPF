@@ -126,7 +126,7 @@
     >
       <arg value="-J-Xmx512m"/>
       <packageset dir="${src.dir}"/>
-      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api/"/>
       <link href="http://junit.sourceforge.net/javadoc"/>
       <link href="http://xstream.codehaus.org/javadoc"/>
       <doctitle><![CDATA[JPPF-jmxremote_optional v${version.number}]]></doctitle>
