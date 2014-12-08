@@ -142,4 +142,16 @@ public final class StreamUtils {
     System.out.println(message);
     System.in.read();
   }
+
+  /**
+   * Display a message and wait until the specified key is pressed.
+   * @param c the character to wait for.
+   * @param message the message to dispplay.
+   * @throws Exception if any I/O error occurs.
+   */
+  public static void waitKeyPressed(final char c, final String message) throws Exception {
+    System.out.println(message);
+    char c2 = 0;
+    while ((c2 = (char) System.in.read()) != c);
+  }
 }
