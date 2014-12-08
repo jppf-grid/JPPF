@@ -11,6 +11,7 @@ using org.jppf.node.protocol;
 using org.jppf.dotnet;
 using org.jppf.scheduling;
 using org.jppf.management;
+using org.jppf.management.generated;
 using org.jppf.management.forwarding;
 using org.jppf.node.provisioning;
 
@@ -91,9 +92,10 @@ namespace org.jppf.dotnet.demo {
       ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true).and(new Equal("jppf.dotnet.bridge.initialized", true));
       NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
       java.lang.Object[] parameters = { new java.lang.Integer(nbNodes), null };
-      string[] sig = { "int", "org.jppf.utils.TypedProperties" };
+      java.lang.String[] sig = { new java.lang.String("int"), new java.lang.String("org.jppf.utils.TypedProperties") };
       string mbeanName = "org.jppf:name=provisioning,type=node";
-      jmx.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", parameters, sig);
+      JPPFNodeForwardingMBean proxy = new JPPFNodeForwardingMBeanStaticProxy(jmx);
+      proxy.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", parameters, sig);
       //Console.WriteLine("there are " + n + " nodes");
     }
   }

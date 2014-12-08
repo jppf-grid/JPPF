@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import org.jppf.management.*;
-import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.management.spi.JPPFMBeanProvider;
 import org.jppf.utils.*;
 
 /**
@@ -50,11 +50,15 @@ public class MBeanStaticProxyGenerator {
   /**
    * Holds the generated file header.
    */
-  private String fileHeader = "";
+  private static final String FILE_HEADER = initFileHeader();
   /**
    * The name of the generated class.
    */
   private String className;
+  /**
+   * The object name of the MBean.
+   */
+  private String mbeanName;
   /**
    * The name of the package in which the class is generated.
    */
@@ -74,32 +78,36 @@ public class MBeanStaticProxyGenerator {
 
   /**
    * Generate the static proxy source code for the specified interface.
+   * @param className the name of the generated class.
+   * @param mbeanName the object name of the MBean.
    * @param interfaceName the name of the MBean interface for which to generate the proxy code.
    * @param targetPackage the name of the package in which the class is generated.
    * @return the genenrated source code.
    * @throws Exception if any error occurs.
    */
-  public String generateSource(final String interfaceName, final String targetPackage) throws Exception {
-    return generateSource(Class.forName(interfaceName), targetPackage);
+  public String generateSource(final String className, final String mbeanName, final String interfaceName, final String targetPackage) throws Exception {
+    return generateSource(className, mbeanName, Class.forName(interfaceName), targetPackage);
   }
 
   /**
    * Generate the static proxy source code for the specified interface.
+   * @param className the name of the generated class.
+   * @param mbeanName the object name of the MBean.
    * @param inf the MBean interface for which to generate the proxy code.
    * @param targetPackage the name of the package in which the class is generated.
    * @return the geenrated source code.
    * @throws Exception if any error occurs.
    */
-  public String generateSource(final Class<?> inf, final String targetPackage) throws Exception {
+  public String generateSource(final String className, final String mbeanName, final Class<?> inf, final String targetPackage) throws Exception {
+    this.className = className;
+    this.mbeanName = mbeanName;
     this.inf = inf;
     this.targetPackage = targetPackage;
+
     code = new StringBuilder();
     imports = new StringBuilder();
-    fileHeader = "";
     importSet.clear();
 
-    className = this.inf.getSimpleName() + CLASS_NAME_SUFFIX;
-    generateFileHeader();
     generateClassHeader();
     generateConstructor();
     Method[] methods = inf.getMethods();
@@ -114,18 +122,7 @@ public class MBeanStaticProxyGenerator {
     generateImports();
     String pkg = "package " + targetPackage + ";\n\n";
 
-    return new StringBuilder(fileHeader).append(pkg).append(imports).append(code).toString();
-  }
-
-  /**
-   * Generate the file header, not including the imports.
-   * @throws Exception if any error occurs.
-   */
-  private void generateFileHeader() throws Exception {
-    InputStream is = getClass().getResourceAsStream("JavaSourceHeader.txt");
-    fileHeader = FileUtils.readTextFile(new BufferedReader(new InputStreamReader(is)));
-    int year = Calendar.getInstance().get(Calendar.YEAR);
-    fileHeader = fileHeader.replace("@current_year@", Integer.toString(year));
+    return new StringBuilder(FILE_HEADER).append(pkg).append(imports).append(code).toString();
   }
 
   /**
@@ -144,6 +141,7 @@ public class MBeanStaticProxyGenerator {
   private void generateClassHeader() throws Exception {
     printIndent().println("/**");
     printIndent().print(  " * Generated static proxy for the {@link ").print(inf.getName()).println("} MBean interface.");
+    printIndent().println(" * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java");
     printIndent().println(" */");
     importSet.add(AbstractMBeanStaticProxy.class.getName());
     importSet.add(JMXConnectionWrapper.class.getName());
@@ -169,13 +167,12 @@ public class MBeanStaticProxyGenerator {
    */
   private void generateConstructor() throws Exception {
     printIndent().println("/**");
-    printIndent().println(" * Initialize this mbean static proxy.");
+    printIndent().println(" * Initialize this MBean static proxy.");
     printIndent().println(" * @param connection the JMX connection used to invoke remote MBean methods.");
-    printIndent().println(" * @param mbeanName the object name of the mbean for which this object is a proxy.");
     printIndent().println(" */");
-    printIndent().print("public ").print(className).println("(final JMXConnectionWrapper connection, final String mbeanName) {");
+    printIndent().print("public ").print(className).println("(final JMXConnectionWrapper connection) {");
     indentLevel++;
-    printIndent().println("super(connection, mbeanName);");
+    printIndent().print("super(connection, \"").print(mbeanName).println("\");");
     indentLevel--;
     printIndent().println("}");
   }
@@ -253,7 +250,7 @@ public class MBeanStaticProxyGenerator {
    * @throws Exception if any error occurs.
    */
   private void generateSetAttribute(final Method m) throws Exception {
-    printIndent().print("setAttribute(\"").print(ReflectionUtils.getMBeanAttributeName(m)).print("\", param0);");
+    printIndent().print("setAttribute(\"").print(ReflectionUtils.getMBeanAttributeName(m)).println("\", param0);");
   }
 
   /**
@@ -325,10 +322,65 @@ public class MBeanStaticProxyGenerator {
   public static void main(final String[] args) {
     try {
       MBeanStaticProxyGenerator gen = new MBeanStaticProxyGenerator();
-      String s = gen.generateSource(DriverJobManagementMBean.class, "org.jppf.management.generated");
+      File dir = new File("../common/src/java/org/jppf/management/generated");
+      String destPackage = "org.jppf.management.generated";
+      List<Pair<String, String>> mbeansInfo = findMBeanInformation("org.jppf.management.spi.JPPFNodeMBeanProvider");
+      mbeansInfo.addAll(findMBeanInformation("org.jppf.management.spi.JPPFDriverMBeanProvider"));
+      System.out.println("found the following mbeans:");
+      for (Pair<String, String> pair: mbeansInfo) System.out.println("  " + pair);
+      for (Pair<String, String> pair: mbeansInfo) {
+        System.out.print("generating proxy for " + pair + " ...");
+        int idx = pair.first().lastIndexOf('.');
+        String simpleName = pair.first().substring(idx + 1);
+        String generatedClassName = null;
+        if ("DiagnosticsMBean".equals(simpleName)) generatedClassName = (pair.second().contains("node") ? "Node" : "Driver") + simpleName;
+        else generatedClassName = simpleName;
+        generatedClassName = generatedClassName + CLASS_NAME_SUFFIX;
+        String sourceCode = gen.generateSource(generatedClassName, pair.second(), pair.first(), destPackage);
+        FileUtils.writeTextFile(new File(dir, generatedClassName + ".java"), sourceCode);
+        System.out.println(" done");
+      }
+      /*
+      String s = gen.generateSource("DriverJobManagementMBeanStaticProxy", DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class, "org.jppf.management.generated");
       System.out.println(s);
+      */
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  /**
+   * Find the MBean interface name and object name from the corresponding MBean providers declared as services via SPI.
+   * @param classname the name of the class of the providers to lookup.
+   * @return a list of string pairs describing each MBean's interface name and object name, in that order.
+   * @throws Exception if any error occurs.
+   */
+  private static List<Pair<String, String>> findMBeanInformation(final String classname) throws Exception {
+    Class<?> c = Class.forName(classname);
+    ServiceFinder finder = new ServiceFinder();
+    List<?> providers = finder.findProviders(c);
+    List<Pair<String, String>> result = new ArrayList<>(providers.size());
+    for (Object o: providers) {
+      JPPFMBeanProvider provider = (JPPFMBeanProvider) o;
+      result.add(new Pair<>(provider.getMBeanInterfaceName(), provider.getMBeanName()));
+    }
+    return result;
+  }
+
+  /**
+   * Compute the file header.
+   * @return a string with the stanadard JPPF source file header.
+   */
+  private static String initFileHeader() {
+    try {
+      InputStream is = MBeanStaticProxyGenerator.class.getResourceAsStream("JavaSourceHeader.txt");
+      String fileHeader = FileUtils.readTextFile(new BufferedReader(new InputStreamReader(is)));
+      int year = Calendar.getInstance().get(Calendar.YEAR);
+      return fileHeader.replace("@current_year@", Integer.toString(year));
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

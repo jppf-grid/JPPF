@@ -100,6 +100,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.server.job.management.DriverJobManagementMBean"/>
   <JavaClass TypeName="org.jppf.server.job.management.NodeJobInformation"/>
 
+  <JavaClass TypeName="org.jppf.management.generated.DriverDiagnosticsMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.DriverJobManagementMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFDriverAdminMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeAdminMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeForwardingMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeMaintenanceMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeProvisioningMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeTaskMonitorMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.NodeDiagnosticsMBeanStaticProxy"/>
+
   <JavaClass TypeName="org.jppf.node.event.TaskExecutionEvent"/>
   <JavaClass TypeName="org.jppf.node.event.TaskExecutionListener"/>
   

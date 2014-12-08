@@ -5,6 +5,6 @@
     <additional-data name="protect-config-file" value="false"/>
   </local-check-config>
   <fileset name="all" enabled="true" check-config-name="JPPF Checks" local="true">
-    <file-match-pattern match-pattern=".java" include-pattern="true"/>
+    <file-match-pattern match-pattern=".\.java" include-pattern="true"/>
   </fileset>
 </fileset-config>

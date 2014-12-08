@@ -1,0 +1,178 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2014 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.jppf.management.generated;
+
+import java.util.Map;
+import javax.management.MBeanNotificationInfo;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
+import org.jppf.classloader.DelegationModel;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.management.NodeSelector;
+import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+
+/**
+ * Generated static proxy for the {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean} MBean interface.
+ * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
+ */
+public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy implements JPPFNodeForwardingMBean {
+  /**
+   * Initialize this MBean static proxy.
+   * @param connection the JMX connection used to invoke remote MBean methods.
+   */
+  public JPPFNodeForwardingMBeanStaticProxy(final JMXConnectionWrapper connection) {
+    super(connection, "org.jppf:name=nodeForwarding,type=driver");
+  }
+
+  @Override
+  public Map shutdown(final NodeSelector param0, final Boolean param1) {
+    return (Map) invoke("shutdown", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
+  }
+
+  @Override
+  public Map shutdown(final NodeSelector param0) {
+    return (Map) invoke("shutdown", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map gc(final NodeSelector param0) {
+    return (Map) invoke("gc", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map state(final NodeSelector param0) {
+    return (Map) invoke("state", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map updateThreadPoolSize(final NodeSelector param0, final Integer param1) {
+    return (Map) invoke("updateThreadPoolSize", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Integer" });
+  }
+
+  @Override
+  public Map updateThreadsPriority(final NodeSelector param0, final Integer param1) {
+    return (Map) invoke("updateThreadsPriority", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Integer" });
+  }
+
+  @Override
+  public Map resetTaskCounter(final NodeSelector param0) {
+    return (Map) invoke("resetTaskCounter", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map setTaskCounter(final NodeSelector param0, final Integer param1) {
+    return (Map) invoke("setTaskCounter", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Integer" });
+  }
+
+  @Override
+  public Map updateConfiguration(final NodeSelector param0, final Map param1, final Boolean param2) {
+    return (Map) invoke("updateConfiguration", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.util.Map", "java.lang.Boolean" });
+  }
+
+  @Override
+  public Map getDelegationModel(final NodeSelector param0) {
+    return (Map) invoke("getDelegationModel", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map setDelegationModel(final NodeSelector param0, final DelegationModel param1) {
+    return (Map) invoke("setDelegationModel", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "org.jppf.classloader.DelegationModel" });
+  }
+
+  @Override
+  public Map systemInformation(final NodeSelector param0) {
+    return (Map) invoke("systemInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map healthSnapshot(final NodeSelector param0) {
+    return (Map) invoke("healthSnapshot", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public String registerForwardingNotificationListener(final NodeSelector param0, final String param1) {
+    return (String) invoke("registerForwardingNotificationListener", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String" });
+  }
+
+  @Override
+  public void unregisterForwardingNotificationListener(final String param0) {
+    invoke("unregisterForwardingNotificationListener", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public Map forwardGetAttribute(final NodeSelector param0, final String param1, final String param2) {
+    return (Map) invoke("forwardGetAttribute", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String" });
+  }
+
+  @Override
+  public Map forwardSetAttribute(final NodeSelector param0, final String param1, final String param2, final Object param3) {
+    return (Map) invoke("forwardSetAttribute", new Object[] { param0, param1, param2, param3 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String", "java.lang.Object" });
+  }
+
+  @Override
+  public Map threadDump(final NodeSelector param0) {
+    return (Map) invoke("threadDump", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map restart(final NodeSelector param0, final Boolean param1) {
+    return (Map) invoke("restart", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
+  }
+
+  @Override
+  public Map restart(final NodeSelector param0) {
+    return (Map) invoke("restart", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map cancelJob(final NodeSelector param0, final String param1, final Boolean param2) {
+    return (Map) invoke("cancelJob", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public Map forwardInvoke(final NodeSelector param0, final String param1, final String param2) {
+    return (Map) invoke("forwardInvoke", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String" });
+  }
+
+  @Override
+  public Map forwardInvoke(final NodeSelector param0, final String param1, final String param2, final Object[] param3, final String[] param4) {
+    return (Map) invoke("forwardInvoke", new Object[] { param0, param1, param2, param3, param4 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String", "[Ljava.lang.Object;", "[Ljava.lang.String;" });
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
+    invoke("removeNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener param0) {
+    invoke("removeNotificationListener", new Object[] { param0 }, new String[] { "javax.management.NotificationListener" });
+  }
+
+  @Override
+  public void addNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
+    invoke("addNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
+  }
+
+  @Override
+  public MBeanNotificationInfo[] getNotificationInfo() {
+    return (MBeanNotificationInfo[]) getAttribute("NotificationInfo");
+  }
+}
