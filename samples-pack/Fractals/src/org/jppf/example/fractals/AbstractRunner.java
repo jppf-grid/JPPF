@@ -59,6 +59,10 @@ public abstract class AbstractRunner {
    */
   protected boolean uiMode;
   /**
+   * The panel holding the image in the UI.
+   */
+  protected ImagePanel imagePanel;
+  /**
    * The name associated to this runner, corresponds to the type of fractals.
    */
   protected final String name;
@@ -73,7 +77,7 @@ public abstract class AbstractRunner {
   /**
    * Counting semaphore used to block threads wanting to submit a job, when there are more than a given number.
    */
-  protected final Semaphore semaphore;
+  protected Semaphore semaphore;
   /**
    * Count of submitted jobs.
    */
@@ -196,7 +200,7 @@ public abstract class AbstractRunner {
           panel.setVisible(true);
         }
       });
-      */
+       */
     }
     if (JPPFConfiguration.getProperties().getBoolean("jppf.fractals.autosave.enabled", true)) saveImage(image, "png", "data/" + name + ".png");
     if (uiMode) hideWaitWindow();
@@ -346,8 +350,24 @@ public abstract class AbstractRunner {
       try {
         BufferedImage image = null;
         try {
+          long start = System.currentTimeMillis();
           image = computeFractal(id, config);
-          if (wait > 0L) Thread.sleep(wait);
+          long elapsed = System.currentTimeMillis() - start;
+          if (wait > 0L) {
+            Thread.sleep(Math.max(1L, wait - elapsed));
+            final ImagePanel panel = getImagePanel();
+            final BufferedImage img = image;
+            if (panel != null) {
+              log.info("updating image id=" + id);
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                  panel.setImage(img);
+                  panel.repaint();
+                }
+              });
+            }
+          }
         } catch(Exception e) {
           log.error(e.getMessage(), e);
         }
@@ -402,17 +422,20 @@ public abstract class AbstractRunner {
    */
   public void replay() {
     boolean temp = recording;
+    Semaphore oldSemaphore = semaphore;
     try {
       recording = false;
+      semaphore = new Semaphore(records.size());
       for (AbstractFractalConfiguration config: records) {
         try {
-          submitExecution(0, config, 2000L);
+          final Future<GeneratedImage> future = submitExecution(0, config, 2000L);
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
     } finally {
       recording = temp;
+      semaphore = oldSemaphore;
     }
   }
 
@@ -432,7 +455,7 @@ public abstract class AbstractRunner {
       FileUtils.writeTextFile(filename, sb.toString());
     } catch (Exception e) {
       e.printStackTrace();
-      
+
     }
   }
 
@@ -441,4 +464,20 @@ public abstract class AbstractRunner {
    * @param filename the name of the file.
    */
   public abstract void loadRecords(final String filename);
+
+  /**
+   * Get the panel holding the image in the UI.
+   * @return an {@link ImagePanel} instance.
+   */
+  public ImagePanel getImagePanel() {
+    return imagePanel;
+  }
+
+  /**
+   * Set the panel holding the image in the UI.
+   * @param imagePanel an {@link ImagePanel} instance.
+   */
+  public void setImagePanel(final ImagePanel imagePanel) {
+    this.imagePanel = imagePanel;
+  }
 }
