@@ -72,8 +72,8 @@
         doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
         <arg value="-J-Xmx512m"/>
         <packageset dir="@{module}/src/java"/>
-        <link href="http://download.oracle.com/javase/6/docs/api/"/>
-        <link href="http://docs.oracle.com/javaee/6/api/"/>
+        <link href="https://docs.oracle.com/javase/7/docs/api/"/>
+        <link href="https://docs.oracle.com/javaee/6/api/"/>
         <link href="http://xstream.codehaus.org/javadoc"/>
         <link href="http://www.jppf.org/api-3"/>
         <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
