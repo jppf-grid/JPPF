@@ -18,6 +18,6 @@
 
 /**
  * Classes supporting usage, loading and storage of the JPPF configuration.
- * jfgjdfh@exclude
+ * @exclude
  */
 package org.jppf.utils.configuration;
