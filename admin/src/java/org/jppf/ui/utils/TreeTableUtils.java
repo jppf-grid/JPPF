@@ -20,8 +20,9 @@ package org.jppf.ui.utils;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 
 
 /**
@@ -109,5 +110,15 @@ public final class TreeTableUtils {
     } else info = comp.getManagementInfo();
     if (info != null) return (handler.isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort();
     return comp.getDisplayName();
+  }
+
+  /**
+   * Get the path to an icon for the node given its state.
+   * @param info represents the the node.
+   * @return the path to an icon.
+   */
+  public static String getNodeIconPath(final JPPFManagementInfo info) {
+    if (info.isMasterNode()) return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_MASTER_DOTNET_ICON : AbstractTreeCellRenderer.NODE_MASTER_ICON;
+    return info.isDotnetCapable() ? AbstractTreeCellRenderer.NODE_DOTNET_ICON : AbstractTreeCellRenderer.NODE_ICON;
   }
 }

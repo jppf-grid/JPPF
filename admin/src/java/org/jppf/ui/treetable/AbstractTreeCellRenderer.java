@@ -47,14 +47,21 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    */
   public static final String DRIVER_INACTIVE_ICON = RESOURCES + "mainframe_inactive.gif";
   /**
-   * Path to the icon used for a node.
+   * Path to the icon used for a non-master node.
    */
-  //public static final String NODE_ICON = RESOURCES + "buggi_server.gif";
-  public static final String NODE_ICON = RESOURCES + "computer-server.png";
+  public static final String NODE_ICON = RESOURCES + "node.png";
   /**
    * Path to the icon used for a master node.
    */
-  public static final String NODE_MASTER_ICON = RESOURCES + "computer-server_database.png";
+  public static final String NODE_MASTER_ICON = RESOURCES + "node-master.png";
+  /**
+   * Path to the icon used for a non-master node with .Net bridge.
+   */
+  public static final String NODE_DOTNET_ICON = RESOURCES + "node-dotnet.png";
+  /**
+   * Path to the icon used for a master node with .Net bridge.
+   */
+  public static final String NODE_MASTER_DOTNET_ICON = RESOURCES + "node-master-dotnet.png";
   /**
    * Path to the icon used for a job.
    */

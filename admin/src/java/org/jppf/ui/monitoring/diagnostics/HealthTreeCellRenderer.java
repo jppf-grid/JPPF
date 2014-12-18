@@ -67,7 +67,7 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
         if (data.isDriver()) {
           path = ((TopologyDriver) data).getConnection().getStatus().isWorkingStatus() ? DRIVER_ICON : DRIVER_INACTIVE_ICON;
         } else if (data.isNode()) {
-          path = data.getManagementInfo().isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
+          path = TreeTableUtils.getNodeIconPath(data.getManagementInfo());
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);

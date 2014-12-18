@@ -79,7 +79,7 @@ public class JobRenderer extends AbstractTreeCellRenderer {
           case SUB_JOB:
             JPPFManagementInfo info = data.getNodeInformation();
             renderer.setText((StatsHandler.getInstance().isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
-            path = info.isMasterNode() ? NODE_MASTER_ICON : NODE_ICON;
+            path = TreeTableUtils.getNodeIconPath(info);
             break;
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
