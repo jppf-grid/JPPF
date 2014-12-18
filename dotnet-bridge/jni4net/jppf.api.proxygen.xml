@@ -44,11 +44,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="java.lang.AutoCloseable"/>
   <JavaClass TypeName="java.util.EventObject"/>
   <JavaClass TypeName="java.util.concurrent.Callable"/>
-  <JavaClass TypeName="javax.management.NotificationEmitter"/>
   <JavaClass TypeName="javax.management.Notification"/>
   <JavaClass TypeName="javax.management.NotificationListener"/>
+  <JavaClass TypeName="javax.management.NotificationFilter"/>
   <JavaClass TypeName="javax.management.MBeanNotificationInfo"/>
   <JavaClass TypeName="javax.management.NotificationBroadcaster"/>
+  <JavaClass TypeName="javax.management.NotificationEmitter"/>
 
   <JavaClass TypeName="org.jppf.client.JPPFClient"/>
   <JavaClass TypeName="org.jppf.client.AbstractGenericClient"/>
@@ -95,16 +96,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.management.JPPFNodeMaintenanceMBean"/>
   <JavaClass TypeName="org.jppf.management.JPPFAdminMBean"/>
   <JavaClass TypeName="org.jppf.management.JPPFSystemInformation"/>
+  <JavaClass TypeName="org.jppf.management.AbstractMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.forwarding.JPPFNodeForwardingMBean"/>
   <JavaClass TypeName="org.jppf.management.forwarding.JPPFNodeForwardingNotification"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.DiagnosticsMBean"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.HealthSnapshot"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.ThreadDumpWriter"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.AbstractThreadDumpWriter"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.HTMLThreadDumpWriter"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.TextThreadDumpWriter"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.LockInformation"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.MemoryInformation"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.MemoryUsageInformation"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.ThreadInformation"/>
+  <JavaClass TypeName="org.jppf.management.diagnostics.ThreadDump"/>
   <JavaClass TypeName="org.jppf.server.job.management.DriverJobManagementMBean"/>
   <JavaClass TypeName="org.jppf.server.job.management.NodeJobInformation"/>
+  <JavaClass TypeName="org.jppf.job.JobNotification"/>
+  <JavaClass TypeName="org.jppf.job.JobInformation"/>
+  <JavaClass TypeName="org.jppf.job.JobEventType"/>
 
-  <JavaClass TypeName="org.jppf.management.generated.DriverDiagnosticsMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeForwardingMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.generated.DriverJobManagementMBeanStaticProxy"/>
+  <JavaClass TypeName="org.jppf.management.generated.DriverDiagnosticsMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.generated.JPPFDriverAdminMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.generated.JPPFNodeAdminMBeanStaticProxy"/>
-  <JavaClass TypeName="org.jppf.management.generated.JPPFNodeForwardingMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.generated.JPPFNodeMaintenanceMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.generated.JPPFNodeProvisioningMBeanStaticProxy"/>
   <JavaClass TypeName="org.jppf.management.generated.JPPFNodeTaskMonitorMBeanStaticProxy"/>
@@ -166,5 +182,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.dotnet.demo.JavaDemoTask"/>
   <JavaClass TypeName="org.jppf.dotnet.DotnetTaskWrapper" MergeJavaSource="true"/>
   <JavaClass TypeName="org.jppf.dotnet.DotnetJobListenerWrapper" MergeJavaSource="true"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetNotificationListenerWrapper" MergeJavaSource="true"/>
 
 </jni4net-proxygen>

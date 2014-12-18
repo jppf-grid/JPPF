@@ -40,5 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  
   <ClrType TypeName="org.jppf.dotnet.DotnetSerializer"/>
   <ClrType TypeName="org.jppf.dotnet.DotnetJobEventDispatcher" SyncInterface="true" MergeJavaSource="true"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetNotificationDispatcher"/>
 
 </jni4net-proxygen>

@@ -10,6 +10,8 @@ using org.jppf.node.policy;
 using org.jppf.node.protocol;
 using org.jppf.dotnet;
 using org.jppf.scheduling;
+using javax.management;
+using org.jppf.job;
 using org.jppf.management;
 using org.jppf.management.generated;
 using org.jppf.management.forwarding;
@@ -21,7 +23,6 @@ namespace org.jppf.dotnet.demo {
       JPPFClient client = null;
       try {
         JPPFDotnet.Init(false); // init the bridge with verbose/quiet mode
-        Console.WriteLine("Init() done");
         client = new JPPFClient();
         PrintNbNodes(client);
         ProvisionNodes(client, 3);
@@ -32,8 +33,7 @@ namespace org.jppf.dotnet.demo {
         job.add(new MyDotnetTask(1000), true); // .Net task
         // this .Net task will time out after 1.5 second
         job.add(new MyDotnetTask(3000), true).setTimeoutSchedule(new JPPFSchedule(1500));
-        job.add(new JavaDemoTask(), null); // proxy to Java task
-        //job.addJobListener(new MyJobListener());
+        // add a job listner that prints job events to the console
         job.addJobListener(new MyJobListener());
         Console.WriteLine("created job");
         java.util.List results = client.submitJob(job);
@@ -48,18 +48,10 @@ namespace org.jppf.dotnet.demo {
             }
             else if (dotnetTask.Result != null) Console.WriteLine("got result for task " + dotnetTask + " : " + dotnetTask.Result);
             else Console.WriteLine("no result or exception for task " + dotnetTask);
-          } else { // if Java task
-            if (task.getException() != null) Console.WriteLine("got throwable for task " + task + " : " + task.getException());
-            else if (task.getResult() != null) Console.WriteLine("got result for task " + task + " : " + task.getResult());
-            else Console.WriteLine("no result or exception for task " + task);
           }
         }
-        client.close();
       } catch (Exception e) {
         Console.WriteLine("" + e);
-        //Console.WriteLine(e.StackTrace);
-      } finally {
-        if (client != null) client.close();
       }
 
       Console.WriteLine("Please press ESC to terminate");
@@ -67,6 +59,7 @@ namespace org.jppf.dotnet.demo {
         while (!Console.KeyAvailable) {
         }
       } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+      if (client != null) client.close();
     }
 
     /// <summary>Print the number of nodes connected to the server</summary>
@@ -94,41 +87,80 @@ namespace org.jppf.dotnet.demo {
       java.lang.Object[] parameters = { new java.lang.Integer(nbNodes), null };
       java.lang.String[] sig = { new java.lang.String("int"), new java.lang.String("org.jppf.utils.TypedProperties") };
       string mbeanName = "org.jppf:name=provisioning,type=node";
-      JPPFNodeForwardingMBean proxy = new JPPFNodeForwardingMBeanStaticProxy(jmx);
+      JPPFNodeForwardingMBeanStaticProxy proxy = new JPPFNodeForwardingMBeanStaticProxy(jmx);
       proxy.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", parameters, sig);
-      //Console.WriteLine("there are " + n + " nodes");
+      java.util.Map map = proxy.forwardInvoke(masterSelector, "org.jppf:name=admin,type=node", "state");
+      int n = map.size();
+      Console.WriteLine("there are " + n + " node states");
+      java.util.Iterator it = map.keySet().iterator();
+      while (it.hasNext()) {
+        java.lang.String uuid = (java.lang.String) it.next();
+        object value = map.get(uuid);
+        JPPFNodeState state = value as JPPFNodeState;
+        if (state != null) {
+          Console.WriteLine("node " + uuid + " has " + state.getThreadPoolSize() + " processing threads, full state = " + state);
+        } else {
+          Console.WriteLine("node " + uuid + " raised an exception:" + value);
+          //e.printStackTrace();
+        }
+      }
+      //proxy.AddNotificationListener(new MyNotificationListener(), "handback for MyNotificationListener");
+      AbstractMBeanStaticProxy jobProxy = new DriverJobManagementMBeanStaticProxy(jmx);
+      jobProxy.AddNotificationListener(new MyNotificationListener(), "handback for MyNotificationListener");
     }
   }
 
+  /// <summary>This job listener implementation prints events to the console</summary>
   class MyJobListener : BaseDotnetJobListener {
     public MyJobListener() {
     }
 
     /// <summary>Job started notification</summary>
-    public override void JobStarted(DotnetJobEvent jobEvent) {
+    public override void JobStarted(JobEvent jobEvent) {
       WriteEvent(jobEvent, "started");
     }
 
-    /// <summary>Job started notification</summary>
-    public override void JobEnded(DotnetJobEvent jobEvent) {
+    /// <summary>Job end notification</summary>
+    public override void JobEnded(JobEvent jobEvent) {
       WriteEvent(jobEvent, "ended");
     }
 
-    /// <summary>Job started notification</summary>
-    public override void JobDispatched(DotnetJobEvent jobEvent) {
+    /// <summary>Job dispatched notification</summary>
+    public override void JobDispatched(JobEvent jobEvent) {
       WriteEvent(jobEvent, "dispatched");
     }
 
-    /// <summary>Job started notification</summary>
-    public override void JobReturned(DotnetJobEvent jobEvent) {
+    /// <summary>Job returned notification</summary>
+    public override void JobReturned(JobEvent jobEvent) {
       WriteEvent(jobEvent, "returned");
     }
 
-    /// <summary>Job started notification</summary>
-    public void WriteEvent(DotnetJobEvent jobEvent, string type) {
-      JPPFJob job = jobEvent.Job;
-      IList<Task> tasks = jobEvent.Tasks;
-      Console.WriteLine("[.Net] Job '" + job.getName() + "' " + type + (tasks != null ? " with " + tasks.Count + " tasks" : ""));
+    /// <summary>Print the psecified job event ot the console.</summary>
+    /// <param name="jobEvent">the job event to print</param>
+    /// <param name="type">the type of event</param>
+    public void WriteEvent(JobEvent jobEvent, string type) {
+      JPPFJob job = jobEvent.getJob();
+      java.util.List tasks = jobEvent.getJobTasks();
+      Console.WriteLine("[.Net] Job '" + job.getName() + "' " + type + (tasks != null ? " with " + tasks.size() + " tasks" : ""));
+    }
+  }
+
+  /// <summary>This job listener implementation prints events to the console</summary>
+  class MyNotificationListener : BaseDotnetNotificationListener {
+    public MyNotificationListener() {
+    }
+
+    /// <summary>handle notification</summary>
+    public override void HandleNotification(Notification notification, object handback) {
+      JobNotification notif = notification as JobNotification;
+      if (notif != null) {
+        JobEventType type = notif.getEventType();
+        int n = notif.getJobInformation().getTaskCount();
+        if (type != JobEventType.JOB_UPDATED) {
+          Console.WriteLine("[.Net] MyNotificationListener job '" + notif.getJobInformation().getJobName() + "' received " +  type + " notification" +
+            (n > 0 ? " for " + n + " tasks" : "") + ", handback = " + (handback != null ? "" + handback : "null"));
+        }
+      }
     }
   }
 }

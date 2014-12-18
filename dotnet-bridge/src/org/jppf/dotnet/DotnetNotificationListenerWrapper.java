@@ -20,7 +20,8 @@ package org.jppf.dotnet;
 
 import java.lang.reflect.Method;
 
-import org.jppf.client.event.*;
+import javax.management.*;
+
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -30,11 +31,11 @@ import org.slf4j.*;
  * @since 5.0
  * @exclude
  */
-public class DotnetJobListenerWrapper implements JobListener {
+public class DotnetNotificationListenerWrapper implements NotificationListener {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(DotnetJobListenerWrapper.class);
+  private static Logger log = LoggerFactory.getLogger(DotnetNotificationListenerWrapper.class);
   /**
    * A proxy to a .Net job listener.
    */
@@ -44,45 +45,30 @@ public class DotnetJobListenerWrapper implements JobListener {
    * Initialize this wrapper with the specified proxy to a .Net job listener.
    * @param dotnetListener a proxy to a .Net job listener.
    */
-  public DotnetJobListenerWrapper(final system.Object dotnetListener) {
+  public DotnetNotificationListenerWrapper(final system.Object dotnetListener) {
     if (dotnetListener == null) throw new IllegalArgumentException(".Net listener cannot be null");
     //System.out.printf("Creating job listener with dotnetListener=%s, class=%s%n", dotnetListener, dotnetListener.getClass());
     this.dotnetListener = dotnetListener;
+    if (log.isDebugEnabled()) log.debug("initializing with listener = {}", this.dotnetListener);
   }
+
 
   @Override
-  public void jobStarted(final JobEvent event) {
-    delegate(event, "JobStarted");
-  }
-
-  @Override
-  public void jobEnded(final JobEvent event) {
-    delegate(event, "JobEnded");
-  }
-
-  @Override
-  public void jobDispatched(final JobEvent event) {
-    delegate(event, "JobDispatched");
-  }
-
-  @Override
-  public void jobReturned(final JobEvent event) {
-    delegate(event, "JobReturned");
-  }
-
-  /**
-   * Delegate the specified event to the specified .Net method
-   * @param event the event to send.
-   * @param method name the name of the method to invoke on the proxy to the .Net listener.
-   */
-  private void delegate(final JobEvent event, final String methodName) {
+  public void handleNotification(final Notification notification, final Object handback) {
+    if (log.isDebugEnabled()) log.debug("received notification {}", notification);
     if (dotnetListener == null) return;
     try {
       Class<?> clazz = dotnetListener.getClass();
-      Method m = clazz.getMethod(methodName, Object.class);
-      m.invoke(dotnetListener, event);
+      /*
+      System.out.println("[Java] notification dispatcher class = " + clazz.getName());
+      for (Method m: clazz.getDeclaredMethods()) {
+        if ("HandleNotification".equals(m.getName())) System.out.println("found method HandleNotification: " + m);
+      }
+      */
+      Method m = clazz.getMethod("HandleNotification", Object.class);
+      m.invoke(dotnetListener, notification);
     } catch (Exception e) {
-      log.error("error invoking {}() : {}", methodName, ExceptionUtils.getStackTrace(e));
+      log.error("error invoking {}() : {}", "HandleNotification", ExceptionUtils.getStackTrace(e));
     }
   }
 }

@@ -18,9 +18,6 @@
 
 package org.jppf.management.generated;
 
-import javax.management.MBeanNotificationInfo;
-import javax.management.NotificationFilter;
-import javax.management.NotificationListener;
 import org.jppf.job.JobInformation;
 import org.jppf.management.AbstractMBeanStaticProxy;
 import org.jppf.management.JMXConnectionWrapper;
@@ -78,25 +75,5 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   @Override
   public String[] getAllJobIds() {
     return (String[]) getAttribute("AllJobIds");
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
-    invoke("removeNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener param0) {
-    invoke("removeNotificationListener", new Object[] { param0 }, new String[] { "javax.management.NotificationListener" });
-  }
-
-  @Override
-  public void addNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
-    invoke("addNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
-  }
-
-  @Override
-  public MBeanNotificationInfo[] getNotificationInfo() {
-    return (MBeanNotificationInfo[]) getAttribute("NotificationInfo");
   }
 }

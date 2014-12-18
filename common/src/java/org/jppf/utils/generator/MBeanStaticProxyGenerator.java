@@ -112,6 +112,7 @@ public class MBeanStaticProxyGenerator {
     generateConstructor();
     Method[] methods = inf.getMethods();
     for (Method m: methods) {
+      if (StringUtils.isOneOf(m.getName(), false, "addNotificationListener", "removeNotificationListener", "getNotificationInfo")) continue;
       generateMethodHeader(m);
       if (ReflectionUtils.isGetter(m)) generateGetAttribute(m);
       else if (ReflectionUtils.isSetter(m)) generateSetAttribute(m);
@@ -251,6 +252,25 @@ public class MBeanStaticProxyGenerator {
    */
   private void generateSetAttribute(final Method m) throws Exception {
     printIndent().print("setAttribute(\"").print(ReflectionUtils.getMBeanAttributeName(m)).println("\", param0);");
+  }
+
+  /**
+   * Generate the code for calling the same method in the superclass.
+   * @param m the MBean interface method to generate the code for.
+   * @throws Exception if any error occurs.
+   */
+  private void generateSuperCall(final Method m) throws Exception {
+    printIndent();
+    if (m.getReturnType() != void.class) print("return (").print(m.getReturnType().getSimpleName()).print(") ");
+    print(" super.").print(m.getName()).print("(");
+    Class<?>[] types = m.getParameterTypes();
+    if (types.length > 0) {
+      for (int i=0; i<types.length; i++) {
+        if (i > 0) print(", ");
+        print("param" + i);
+      }
+    }
+    println(");");
   }
 
   /**

@@ -18,6 +18,8 @@
 
 package org.jppf.management;
 
+import javax.management.*;
+
 import org.slf4j.*;
 
 /**
@@ -28,11 +30,11 @@ public class AbstractMBeanStaticProxy {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
+  protected static Logger log = LoggerFactory.getLogger(JMXConnectionWrapper.class);
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  protected static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The JMX connection used to invoke remote MBean methods.
    */
@@ -64,7 +66,7 @@ public class AbstractMBeanStaticProxy {
     try {
       result = connection.invoke(mbeanName, methodName, params, signature);
     } catch(Exception e) {
-      if (debugEnabled) log.debug(connection.getId() + " : error while invoking the JMX connection", e);
+      if (debugEnabled) log.debug(connection.getId() + " : error while invoking a method with the JMX connection", e);
     }
     return result;
   }
@@ -79,7 +81,7 @@ public class AbstractMBeanStaticProxy {
     try {
       result = connection.getAttribute(mbeanName, attribute);
     } catch(Exception e) {
-      if (debugEnabled) log.debug(connection.getId() + " : error while invoking the JMX connection", e);
+      if (debugEnabled) log.debug(connection.getId() + " : error while getting an attribute with the JMX connection", e);
     }
     return result;
   }
@@ -93,7 +95,60 @@ public class AbstractMBeanStaticProxy {
     try {
       connection.setAttribute(mbeanName, attribute, value);
     } catch(Exception e) {
-      if (debugEnabled) log.debug(connection.getId() + " : error while invoking the JMX connection", e);
+      if (debugEnabled) log.debug(connection.getId() + " : error while setting an attribute with the JMX connection", e);
     }
+  }
+
+  /**
+   * Register a notification listener with the MBean.
+   * @param listener the listener to register.
+   * @param filter an optional filter, may be {@code null}.
+   * @param handback a handback object.
+   */
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    try {
+      connection.addNotificationListener(mbeanName, listener, filter, handback);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error while adding notification filter", e);
+    }
+  }
+
+  /**
+   * Unregister a notification listener from the MBean.
+   * @param listener the listener to unregister.
+   */
+  public void removeNotificationListener(final NotificationListener listener) {
+    try {
+      connection.removeNotificationListener(mbeanName, listener, null, null);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error while removing notification filter", e);
+    }
+  }
+
+  /**
+   * Unregister a notification listener from the MBean.
+   * @param listener the listener to unregister.
+   * @param filter an optional filter, may be {@code null}.
+   * @param handback a handback object.
+   */
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    try {
+      connection.removeNotificationListener(mbeanName, listener, filter, handback);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error while removing notification filter", e);
+    }
+  }
+
+  /**
+   * Get the MBean otification information.
+   * @return an array of {@link MBeanNotificationInfo} instances.
+   */
+  public MBeanNotificationInfo[] getNotificationInfo() {
+    try {
+      return connection.getNotificationInfo(mbeanName);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error getting MBeanNotificationInfo[]", e);
+    }
+    return new MBeanNotificationInfo[0];
   }
 }

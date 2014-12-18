@@ -19,9 +19,6 @@
 package org.jppf.management.generated;
 
 import java.util.Map;
-import javax.management.MBeanNotificationInfo;
-import javax.management.NotificationFilter;
-import javax.management.NotificationListener;
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.AbstractMBeanStaticProxy;
 import org.jppf.management.JMXConnectionWrapper;
@@ -127,11 +124,6 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
-  public Map threadDump(final NodeSelector param0) {
-    return (Map) invoke("threadDump", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
   public Map restart(final NodeSelector param0, final Boolean param1) {
     return (Map) invoke("restart", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
   }
@@ -139,6 +131,11 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   @Override
   public Map restart(final NodeSelector param0) {
     return (Map) invoke("restart", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map threadDump(final NodeSelector param0) {
+    return (Map) invoke("threadDump", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
@@ -154,25 +151,5 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   @Override
   public Map forwardInvoke(final NodeSelector param0, final String param1, final String param2, final Object[] param3, final String[] param4) {
     return (Map) invoke("forwardInvoke", new Object[] { param0, param1, param2, param3, param4 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String", "[Ljava.lang.Object;", "[Ljava.lang.String;" });
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
-    invoke("removeNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener param0) {
-    invoke("removeNotificationListener", new Object[] { param0 }, new String[] { "javax.management.NotificationListener" });
-  }
-
-  @Override
-  public void addNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
-    invoke("addNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
-  }
-
-  @Override
-  public MBeanNotificationInfo[] getNotificationInfo() {
-    return (MBeanNotificationInfo[]) getAttribute("NotificationInfo");
   }
 }

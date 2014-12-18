@@ -59,13 +59,13 @@ public class NodeDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
-  public Boolean hasDeadlock() {
-    return (Boolean) invoke("hasDeadlock", (Object[]) null, (String[]) null);
+  public ThreadDump threadDump() {
+    return (ThreadDump) invoke("threadDump", (Object[]) null, (String[]) null);
   }
 
   @Override
-  public ThreadDump threadDump() {
-    return (ThreadDump) invoke("threadDump", (Object[]) null, (String[]) null);
+  public Boolean hasDeadlock() {
+    return (Boolean) invoke("hasDeadlock", (Object[]) null, (String[]) null);
   }
 
   @Override

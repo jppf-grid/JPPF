@@ -18,9 +18,6 @@
 
 package org.jppf.management.generated;
 
-import javax.management.MBeanNotificationInfo;
-import javax.management.NotificationFilter;
-import javax.management.NotificationListener;
 import org.jppf.management.AbstractMBeanStaticProxy;
 import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.management.JPPFNodeTaskMonitorMBean;
@@ -66,25 +63,5 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
   @Override
   public Long getTotalTaskElapsedTime() {
     return (Long) getAttribute("TotalTaskElapsedTime");
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
-    invoke("removeNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
-  }
-
-  @Override
-  public void removeNotificationListener(final NotificationListener param0) {
-    invoke("removeNotificationListener", new Object[] { param0 }, new String[] { "javax.management.NotificationListener" });
-  }
-
-  @Override
-  public void addNotificationListener(final NotificationListener param0, final NotificationFilter param1, final Object param2) {
-    invoke("addNotificationListener", new Object[] { param0, param1, param2 }, new String[] { "javax.management.NotificationListener", "javax.management.NotificationFilter", "java.lang.Object" });
-  }
-
-  @Override
-  public MBeanNotificationInfo[] getNotificationInfo() {
-    return (MBeanNotificationInfo[]) getAttribute("NotificationInfo");
   }
 }
