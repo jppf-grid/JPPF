@@ -29,6 +29,7 @@
 	<property name="node"                  value="${basedir}/../node"/>
 	<property name="server"                value="${basedir}/../server"/>
 	<property name="demo"                  value="${basedir}/../demo"/>
+  <property name="dotnet-bridge"         value="${basedir}/../dotnet-bridge"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
   <property name="jmxremote"             value="${basedir}/../jmxxremote"/>
 	<property name="application.template"  value="${basedir}/../application-template"/>
@@ -100,6 +101,12 @@
   </target>
 
   <target name="clean.all" depends="clean.deploy">
+    <delete quiet="true">
+      <fileset dir="${build}">
+        <include name="*.zip"/>
+        <exclude name="*${app.ver}*.zip"/>
+      </fileset>
+    </delete>
     <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
@@ -161,7 +168,7 @@
   <!-- build the whole JPPF distribution without javadoc -->
   <target name="deploy.nojavadoc"   depends="deploy.nojavadoc.noinstaller, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-	<target name="deploy.nojavadoc.noinstaller" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, tests.build, user.guide, doc" description=""/>
+	<target name="deploy.nojavadoc.noinstaller" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, tests.build, user.guide, doc" description=""/>
 
 	<import file="build-compile-jar.xml"/>
 	<import file="build-modules.xml"/>
@@ -172,6 +179,7 @@
   <import file="build-docs.xml"/>
   <import file="build-tests.xml"/>
   <import file="build-maven.xml"/>
+  <import file="build-dotnet.xml"/>
   <import file="build-utils.xml"/>
 	
   <!-- ========================================================================= -->
@@ -210,6 +218,7 @@
 			<zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
+      <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log"/>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
       <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
         <exclude name="**/*.log"/>
