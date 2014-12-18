@@ -28,7 +28,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.ExecutionManager;
 import org.jppf.management.*;
 import org.jppf.management.spi.*;
-import org.jppf.node.*;
+import org.jppf.node.NodeRunner;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
@@ -67,6 +67,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Determines whether JMX management and monitoring is enabled for this node.
    */
   private boolean jmxEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
+  /**
+   * Determines whether this node can execute .Net tasks.
+   */
+  private final boolean dotnetCapable = JPPFConfiguration.getProperties().getBoolean("jppf.dotnet.bridge.initialized", false);
   /**
    * Action executed when the node exits the main loop, in its {@link #run() run()} method.
    */
@@ -537,5 +541,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   private boolean checkStopped() {
     if (isStopped()) throw new IllegalStateException("this node is shutting down");
     return false;
+  }
+
+  @Override
+  public boolean isDotnetCapable() {
+    return dotnetCapable;
   }
 }

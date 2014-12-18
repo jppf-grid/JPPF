@@ -40,31 +40,37 @@ public interface Node extends Runnable
 
   /**
    * Determine whether this node is local to another component.
-   * @return <code>true</code> if this node is local, <code>false</code> otherwise.
+   * @return {@code true} if this node is local, {@code false} otherwise.
    */
   boolean isLocal();
 
   /**
    * Reset the current task class loader if any is present (i.e. if a job is being executed), without reconnecting to the server.
-   * @return the newly created class loader, or <code>null</code> if none could be created at this time. 
+   * @return the newly created class loader, or {@code null} if none could be created at this time. 
    */
   AbstractJPPFClassLoader resetTaskClassLoader();
 
   /**
    * Determine whether this node is running in offline mode.
-   * @return <code>true</code> if this node is offline, <code>false</code> otherwise.
+   * @return {@code true} if this node is offline, {@code false} otherwise.
    */
   boolean isOffline();
 
   /**
    * Determine whether this node is a 'master' node for the provisioning features.
-   * @return <code>true</code> if this node is a master, <code>false</code> otherwise.
+   * @return {@code true} if this node is a master, {@code false} otherwise.
    */
   boolean isMasterNode();
 
   /**
    * Determine whether this node is a 'slave' node for the provisioning features.
-   * @return <code>true</code> if this node is a slave, <code>false</code> otherwise.
+   * @return {@code true} if this node is a slave, {@code false} otherwise.
    */
   boolean isSlaveNode();
+
+  /**
+   * Determine whether this node can execute .Net tasks.
+   * @return {@code true} if this node can execute .Net tasks, {@code false} otherwise.
+   */
+  boolean isDotnetCapable();
 }

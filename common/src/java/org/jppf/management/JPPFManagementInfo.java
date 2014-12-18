@@ -38,40 +38,44 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * DRIVER information type.
    * @exclude
    */
-  public static final byte DRIVER = 0;
+  public static final int DRIVER = 0;
   /**
    * Node information type.
    * @exclude
    */
-  public static final byte NODE = 1;
+  public static final int NODE = 1;
   /**
    * Peer driver information type.
    * @exclude
    */
-  public static final byte PEER = 2;
+  public static final int PEER = 2;
   /*
-   * Extended attributes must have their 0-3 bits set to 0.
+   * Extended attributes must have their 0-15 bits set to 0.
    */
   /**
    * Information that the node is a master node for the provisioning feature.
    */
-  public static final byte MASTER = 0x10;
+  public static final int MASTER = 0x10000;
   /**
    * Information that the node is a slave node for the provisioning feature.
    */
-  public static final byte SLAVE = 0x20;
+  public static final int SLAVE = 0x20000;
   /**
    * Information that node is local on DRIVER or CLIENT. Value of this constant can be changed in future!
    */
-  public static final byte LOCAL = 0x40;
+  public static final int LOCAL = 0x40000;
   /**
-   * Mask for elimination extended type attributes.
+   * Information that node is initialized with a .Net bridge and can execute .Net tasks. Value of this constant can be changed in future!
    */
-  protected static final byte TYPE_MASK = 0x0F;
+  public static final int DOTNET = 0x80000;
+  /**
+   * Mask for elimination extended type attributes (bits 16-31).
+   */
+  protected static final int TYPE_MASK = 0xFFFF;
   /**
    * Maps type values to readable strings.
    */
-  private static final Map<Byte, String> typeMap = new HashMap<Byte, String>() {{
+  private static final Map<Integer, String> typeMap = new HashMap<Integer, String>() {{
     put(DRIVER, "driver");
     put(NODE, "node");
     put(PEER, "peer");
@@ -96,7 +100,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * The type of component this info is for, must be one of {@link #NODE} or {@link #DRIVER}.
    */
-  private final byte type;
+  private final int type;
   /**
    * Determines whether communication with the node or driver should be secure, i.e. via SSL/TLS.
    */
@@ -153,7 +157,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     this.ipAddress = hostIP.ipAddress();
     this.port = port;
     this.uuid = uuid;
-    this.type = (byte) type;
+    this.type = type;
     this.secure = secure;
   }
 
@@ -299,6 +303,14 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    */
   public boolean isLocal() {
     return (type & LOCAL) == LOCAL;
+  }
+
+  /**
+   * Determine whether this information represents a node than can execute .Net tasks.
+   * @return <code>true</code> if the node is .Net-capable.
+   */
+  public boolean isDotnetCapable() {
+    return (type & DOTNET) == DOTNET;
   }
 
   /**

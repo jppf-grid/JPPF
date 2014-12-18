@@ -102,6 +102,10 @@ public enum  BundleParameter
    */
   NODE_PROVISIONING_SLAVE,
   /**
+   * Marker to indicate whether a node can execute .Net tasks.
+   */
+  NODE_DOTNET_CAPABLE,
+  /**
    * An array of boolean flags indicating whther the task raised an error during serilaization or deserialization.
    */
   ERROR_MARKERS,

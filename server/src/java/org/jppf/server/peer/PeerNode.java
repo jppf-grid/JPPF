@@ -299,4 +299,9 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   public boolean isSlaveNode() {
     return false;
   }
+
+  @Override
+  public boolean isDotnetCapable() {
+    return false;
+  }
 }

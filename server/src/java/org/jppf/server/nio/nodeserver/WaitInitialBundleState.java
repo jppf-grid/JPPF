@@ -101,7 +101,7 @@ class WaitInitialBundleState extends NodeServerState {
         HostIP hostIP = new HostIP(host, host);
         int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
-        byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
+        int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
         if (channel.isLocal()) {
           type |= JPPFManagementInfo.LOCAL;
           DriverInitializer initializer = JPPFDriver.getInstance().getInitializer();
@@ -111,6 +111,7 @@ class WaitInitialBundleState extends NodeServerState {
         if (resolveIPs) hostIP = NetworkUtils.getHostIP(host);
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
+        if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
         if (debugEnabled) log.debug(String.format("configuring management for node @ %s:%d, secure=%b", host, port, context.isSsl()));
         JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
         if (systemInfo != null) info.setSystemInfo(systemInfo);

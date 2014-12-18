@@ -29,7 +29,7 @@ import org.jppf.utils.LocalizationUtils;
  */
 public class JPPFNodeState implements Serializable {
   /**
-   * Base name for the localizationr esource bundles.
+   * Base name for the localization resource bundles.
    */
   private static final String I18N = "org.jppf.server.i18n.messages";
 
@@ -54,9 +54,10 @@ public class JPPFNodeState implements Serializable {
      * The name to display.
      */
     private final String displayName;
+
     /**
-     * Initialize this enum element witht he specified localized display name.
-     * @param msg the display name ot localize.
+     * Initialize this enum element with the specified localized display name.
+     * @param msg the display name or localize.
      */
     private ConnectionState(final String msg) {
       displayName = LocalizationUtils.getLocalized(I18N, msg);
@@ -89,8 +90,9 @@ public class JPPFNodeState implements Serializable {
      * The name to display.
      */
     private final String displayName;
+
     /**
-     * Initialize this enum element witht he specified localized display name.
+     * Initialize this enum element with the specified localized display name.
      * @param msg the display name ot localize.
      */
     private ExecutionState(final String msg) {
@@ -131,7 +133,6 @@ public class JPPFNodeState implements Serializable {
    * Priority of the threads in the pool.
    */
   private int threadPriority = -1;
-  //private int threadPriority = Thread.NORM_PRIORITY;
 
   /**
    * Get the number of tasks executed by the node.
