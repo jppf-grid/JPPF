@@ -165,9 +165,6 @@ public class JPPFDriver {
     initializer.initRecoveryServer();
 
     initializer.initJmxServer();
-    if (isManagementEnabled(config)) initializer.registerProviderMBeans();
-    HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
-    initializer.getNodeConnectionEventHandler().loadListeners();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
     int[] sslPorts = extractValidPorts(info.sslServerPorts);
@@ -176,6 +173,10 @@ public class JPPFDriver {
     nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL));
     clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL));
     nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL));
+    if (isManagementEnabled(config)) initializer.registerProviderMBeans();
+    HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
+    initializer.getNodeConnectionEventHandler().loadListeners();
+
     acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts));
 
     if (config.getBoolean("jppf.local.node.enabled", false)) {
