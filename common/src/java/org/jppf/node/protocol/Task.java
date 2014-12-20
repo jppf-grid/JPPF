@@ -28,7 +28,7 @@ import org.jppf.utils.JPPFCallable;
  * @param <T> the type of results produced by the task.
  * @author Laurent Cohen
  */
-public interface Task<T> extends Runnable, Serializable {
+public interface Task<T> extends Runnable, Serializable, Interruptibility {
   /**
    * Get the result of the task execution.
    * @return the task result.

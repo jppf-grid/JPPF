@@ -349,6 +349,33 @@ public class TestJPPFTask extends Setup1D1N1C {
   }
 
   /**
+   * Test the thread of task with its interruptible flag set to {@code false} is effectively not interrupted.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000)
+  public void testUninterruptibleTask() throws Exception {
+    int nbTasks = 1;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 1000L, false);
+    try {
+      client.setLocalExecutionEnabled(true);
+      job.getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
+      client.submitJob(job);
+      Thread.sleep(500L);
+      job.cancel();
+      List<Task<?>> results = job.awaitResults();
+      assertNotNull(results);
+      assertEquals(results.size(), nbTasks);
+      LifeCycleTask task = (LifeCycleTask) results.get(0);
+      assertNotNull(task);
+      assertTrue(task.isCancelled());
+      assertNull(task.getThrowable());
+      assertFalse(task.isInterrupted());
+    } finally {
+      client.setLocalExecutionEnabled(false);
+    }
+  }
+
+  /**
    * A simple Task which calls its <code>compute()</code> method.
    */
   public static class MyComputeCallableTask extends AbstractTask<Object> {

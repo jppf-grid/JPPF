@@ -123,8 +123,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
    * @param poolSize the initial pool size.
    * @return an instance of {@link ThreadManager}.
    */
-  protected static ThreadManager createThreadManager(final TypedProperties config, final int poolSize)
-  {
+  protected static ThreadManager createThreadManager(final TypedProperties config, final int poolSize) {
     ThreadManager result = null;
     String s = config.getString("jppf.thread.manager.class", "default");
     if (!"default".equalsIgnoreCase(s) && !"org.jppf.server.node.ThreadManagerThreadPool".equals(s) && s != null) {
@@ -215,8 +214,8 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     Future<?> future = taskWrapper.getFuture();
     if (!future.isDone()) {
       if (debugEnabled) log.debug("calling future.cancel(true) for task = " + taskWrapper);
-      if (taskWrapper != null) taskWrapper.cancel(callOnCancel);
-      future.cancel(true);
+      taskWrapper.cancel(callOnCancel);
+      future.cancel(taskWrapper.getTask().isInterruptible());
       taskWrapper.cancelTimeoutAction();
       taskEnded(taskWrapper);
     }

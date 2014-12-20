@@ -291,4 +291,9 @@ public class AbstractTask<T> implements Task<T> {
   @Override
   public void run() {
   }
+
+  @Override
+  public boolean isInterruptible() {
+    return true;
+  }
 }

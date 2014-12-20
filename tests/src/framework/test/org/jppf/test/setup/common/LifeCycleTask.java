@@ -26,8 +26,7 @@ import org.slf4j.*;
  * A simple JPPF task for unit-testing the task life cycle.
  * @author Laurent Cohen
  */
-public class LifeCycleTask extends AbstractTask<String>
-{
+public class LifeCycleTask extends AbstractTask<String> {
   /**
    * Explicit serialVersionUID.
    */
@@ -68,26 +67,41 @@ public class LifeCycleTask extends AbstractTask<String>
    * The uuid of the node this task executes on.
    */
   protected String nodeUuid = null;
+  /**
+   * Whether this task can be interrupted upon cancellation or timeout.
+   */
+  protected boolean interruptible = true;
+  /**
+   * Whether the thread running this task was interrupted upon cancellation or timeout.
+   */
+  protected boolean interrupted = false;
 
   /**
    * Initialize this task.
    */
-  public LifeCycleTask()
-  {
+  public LifeCycleTask() {
   }
 
   /**
    * Initialize this task.
    * @param duration specifies the duration of this task.
    */
-  public LifeCycleTask(final long duration)
-  {
+  public LifeCycleTask(final long duration) {
     this.duration = duration;
   }
 
+  /**
+   * Initialize this task.
+   * @param duration specifies the duration of this task.
+   * @param interruptible whether this task can be interrupted upon cancellation or timeout.
+   */
+  public LifeCycleTask(final long duration, final boolean interruptible) {
+    this.duration = duration;
+    this.interruptible = interruptible;
+  }
+
   @Override
-  public void run()
-  {
+  public void run() {
     // System.nanoTime() has a different origin on different JVM instances
     // so this value can't be used to compute the start time.
     long nanoStart = System.nanoTime();
@@ -95,15 +109,12 @@ public class LifeCycleTask extends AbstractTask<String>
     //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);
     start *= ONE_MILLION;
     
-    try
-    {
+    try {
       executedInNode = isInNode();
       TypedProperties config = JPPFConfiguration.getProperties();
-      synchronized(config)
-      {
+      synchronized(config) {
         nodeUuid = config.getString("jppf.node.uuid");
-        if (nodeUuid == null)
-        {
+        if (nodeUuid == null) {
           nodeUuid = new JPPFUuid().toString();
           config.setProperty("jppf.node.uuid", nodeUuid);
         }
@@ -111,28 +122,22 @@ public class LifeCycleTask extends AbstractTask<String>
       if (duration > 0L) Thread.sleep(duration);
       setResult(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE);
       displayTask("successful");
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       setThrowable(e);
       //e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       elapsed = System.nanoTime() - nanoStart;
     }
   }
 
   @Override
-  public void onCancel()
-  {
+  public void onCancel() {
     cancelled = true;
     displayTask("cancelled");
   }
 
   @Override
-  public void onTimeout()
-  {
+  public void onTimeout() {
     timedout = true;
     displayTask("timed out");
   }
@@ -141,8 +146,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Log or display a message showing the execution status and elapsed of this task.
    * @param message a short message describing the life cycle status.
    */
-  private void displayTask(final String message)
-  {
+  private void displayTask(final String message) {
     log.debug("displaying task " + this + " (" + message + ')');
   }
 
@@ -150,8 +154,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Determine whether this task was cancelled.
    * @return <code>true</code> if the task was cancelled, <code>false</code> otherwise.
    */
-  public boolean isCancelled()
-  {
+  public boolean isCancelled() {
     return cancelled;
   }
 
@@ -159,8 +162,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Determine whether this task timed out.
    * @return <code>true</code> if the task timed out, <code>false</code> otherwise.
    */
-  public boolean isTimedout()
-  {
+  public boolean isTimedout() {
     return timedout;
   }
 
@@ -168,14 +170,12 @@ public class LifeCycleTask extends AbstractTask<String>
    * Determine whether this task was executed in a node or in the client's local executor.
    * @return <code>true</code> if this task was executed in a node, <code>false</code> otherwise.
    */
-  public boolean isExecutedInNode()
-  {
+  public boolean isExecutedInNode() {
     return executedInNode;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("id=").append(getId());
     sb.append(", duration=").append(duration);
@@ -193,8 +193,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Get the task's execution start time.
    * @return the start time in nanoseconds.
    */
-  public double getStart()
-  {
+  public double getStart() {
     return start;
   }
 
@@ -202,8 +201,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Get the time elapsed between the task execution start its completion.
    * @return the elapsed time in nanoseconds.
    */
-  public double getElapsed()
-  {
+  public double getElapsed() {
     return elapsed;
   }
 
@@ -211,8 +209,28 @@ public class LifeCycleTask extends AbstractTask<String>
    * Get the uuid of the node this task executes on.
    * @return the uuid as a string.
    */
-  public String getNodeUuid()
-  {
+  public String getNodeUuid() {
     return nodeUuid;
+  }
+
+  @Override
+  public boolean isInterruptible() {
+    return interruptible;
+  }
+
+  /**
+   * Specify whether this task can be interrupted upon cancellation or timeout.
+   * @param interruptible {@code true} to mark the task as interruptible, false otherwise.
+   */
+  public void setInterruptible(final boolean interruptible) {
+    this.interruptible = interruptible;
+  }
+
+  /**
+   * Determine whether the thread running this task was interrupted upon cancellation or timeout.
+   * @return {@code true} if the thread was interrupted, {@code false} otherwise.
+   */
+  public boolean isInterrupted() {
+    return interrupted;
   }
 }
