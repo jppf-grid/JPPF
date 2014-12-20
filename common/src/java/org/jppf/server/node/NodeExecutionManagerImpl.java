@@ -236,8 +236,10 @@ public class NodeExecutionManagerImpl implements NodeExecutionManager
     Future<?> future = taskWrapper.getFuture();
     if (!future.isDone()) {
       if (debugEnabled) log.debug("calling future.cancel(true) for task = " + taskWrapper);
-      if (taskWrapper != null) taskWrapper.cancel(callOnCancel);
-      future.cancel(true);
+      taskWrapper.cancel(callOnCancel);
+      Task<?> task = taskWrapper.getTask();
+      boolean interrupt = task instanceof Interruptibility ? ((Interruptibility) task).isInterruptible() : true;
+      future.cancel(interrupt);
       taskWrapper.cancelTimeoutAction();
       taskEnded(taskWrapper);
     }

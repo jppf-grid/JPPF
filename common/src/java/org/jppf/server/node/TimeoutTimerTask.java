@@ -19,14 +19,15 @@ package org.jppf.server.node;
 
 import java.util.concurrent.Future;
 
+import org.jppf.node.protocol.*;
+
 /**
  * Instances of this class are scheduled by a timer to execute one time, check
  * whether the corresponding JPPF task timeout has been reached, and abort the
  * task if necessary.
  * @exclude
  */
-public class TimeoutTimerTask implements Runnable
-{
+public class TimeoutTimerTask implements Runnable {
   /**
    * The task to cancel.
    */
@@ -36,20 +37,19 @@ public class TimeoutTimerTask implements Runnable
    * Initialize this timer task with the specified future.
    * @param taskWrapper the task to cancel.
    */
-  public TimeoutTimerTask(final NodeTaskWrapper taskWrapper)
-  {
+  public TimeoutTimerTask(final NodeTaskWrapper taskWrapper) {
     if (taskWrapper == null) throw new IllegalArgumentException("taskWrapper is null");
     this.taskWrapper = taskWrapper;
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     Future<?> future = taskWrapper.getFuture();
-    if (!future.isDone())
-    {
+    if (!future.isDone()) {
       taskWrapper.timeout();
-      future.cancel(true);
+      Task<?> task = taskWrapper.getTask();
+      boolean interrupt = task instanceof Interruptibility ? ((Interruptibility) task).isInterruptible() : true;
+      future.cancel(interrupt);
     }
   }
 }
