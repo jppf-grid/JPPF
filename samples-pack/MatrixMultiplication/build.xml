@@ -106,7 +106,7 @@
 			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
 			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
 			<packageset dir="${src.dir}"/>
-      <link href="http://docs.oracle.com/javase/7/docs/api"/>
+      <link href="https://docs.oracle.com/javase/7/docs/api"/>
       <link href="http://www.jppf.org/api"/>
 			<doctitle><![CDATA[JPPF - Matrix Multiplication Sample]]></doctitle>
 			<header>

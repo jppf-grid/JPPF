@@ -115,8 +115,8 @@
 			<packageset dir="${admin}/src/java"/>
 			<packageset dir="${jca-client}/src/java"/>
 			<packageset dir="${jca-client}/src/j2eeclient"/>
-			<link href="http://docs.oracle.com/javase/7/docs/api/"/>
-			<link href="http://docs.oracle.com/javaee/6/api/"/>
+			<link href="https://docs.oracle.com/javase/7/docs/api/"/>
+			<link href="https://docs.oracle.com/javaee/6/api/"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
 			<link href="http://xstream.codehaus.org/javadoc"/>
 			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>

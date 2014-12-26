@@ -335,8 +335,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @since 4.2
    */
   public SubmissionStatus getStatus() {
-    if (resultsListener instanceof SubmissionStatusHandler) return ((SubmissionStatusHandler) resultsListener).getStatus();
-    return null;
+    return  (resultsListener instanceof SubmissionStatusHandler) ? ((SubmissionStatusHandler) resultsListener).getStatus() : null;
   }
 
   /**

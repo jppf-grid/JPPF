@@ -41,9 +41,8 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * The collector that receives the results from the server.
+   * The job that holds the task.
    */
-  //private final FutureResultCollector collector;
   private final JPPFJob job;
   /**
    * The position of the task in the job.
@@ -152,16 +151,6 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
   public Task<?> getTask() {
     return job.getResults().getResultTask(position);
   }
-
-  /**
-   * Get the collector that receives the results from the server.
-   * @return a {@link FutureResultCollector} instance.
-   */
-  /*
-  FutureResultCollector getCollector() {
-    return collector;
-  }
-  */
 
   /**
    * Get the position of the task in the job.
