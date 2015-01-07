@@ -91,9 +91,25 @@
     <pack name="JPPF_Application_Template" required="no" preselected="yes">
       <description>A fully working JPPF template application to use as a starting point</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-application-template" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template">
-      	<include name="**/*.*"/>
+        <include name="**/*.*"/>
       </fileset>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Dotnet" required="no" preselected="yes">
+      <description>A fully working .Net JPPF demo application</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-dotnet">
+        <include name="**/*.*"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Node_Dotnet" required="no" preselected="yes">
+      <description>A .Net-enabled JPPF node distribution</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node">
+        <include name="**/*.*"/>
+        <include name="JPPFNode"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/JPPFNode" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_User_Guide" required="no" preselected="yes">
       <description>Full user guide in PDF format</description>
