@@ -36,6 +36,14 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
     super(connection, "org.jppf:name=provisioning,type=node");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=provisioning,type=node";
+  }
+
   @Override
   public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
     invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });

@@ -18,11 +18,8 @@
 
 package org.jppf.dotnet;
 
-import java.lang.reflect.Method;
-
 import javax.management.*;
 
-import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
 /**
@@ -31,44 +28,25 @@ import org.slf4j.*;
  * @since 5.0
  * @exclude
  */
-public class DotnetNotificationListenerWrapper implements NotificationListener {
+public class DotnetNotificationListenerWrapper extends AbstractDotnetListenerWrapper implements NotificationListener {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(DotnetNotificationListenerWrapper.class);
-  /**
-   * A proxy to a .Net job listener.
-   */
-  private Object dotnetListener;
 
   /**
    * Initialize this wrapper with the specified proxy to a .Net job listener.
    * @param dotnetListener a proxy to a .Net job listener.
    */
   public DotnetNotificationListenerWrapper(final system.Object dotnetListener) {
-    if (dotnetListener == null) throw new IllegalArgumentException(".Net listener cannot be null");
-    //System.out.printf("Creating job listener with dotnetListener=%s, class=%s%n", dotnetListener, dotnetListener.getClass());
-    this.dotnetListener = dotnetListener;
-    if (log.isDebugEnabled()) log.debug("initializing with listener = {}", this.dotnetListener);
+    super(dotnetListener, "HandleNotification");
+    if (log.isDebugEnabled()) log.debug("initializing with listener = {}", dotnetListener);
   }
 
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     if (log.isDebugEnabled()) log.debug("received notification {}", notification);
-    if (dotnetListener == null) return;
-    try {
-      Class<?> clazz = dotnetListener.getClass();
-      /*
-      System.out.println("[Java] notification dispatcher class = " + clazz.getName());
-      for (Method m: clazz.getDeclaredMethods()) {
-        if ("HandleNotification".equals(m.getName())) System.out.println("found method HandleNotification: " + m);
-      }
-      */
-      Method m = clazz.getMethod("HandleNotification", Object.class);
-      m.invoke(dotnetListener, notification);
-    } catch (Exception e) {
-      log.error("error invoking {}() : {}", "HandleNotification", ExceptionUtils.getStackTrace(e));
-    }
+    delegate(notification, "HandleNotification");
   }
 }

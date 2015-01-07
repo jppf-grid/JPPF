@@ -251,12 +251,20 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     ExecutionInfo info = taskWrapper.getExecutionInfo();
     long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
     Task task = taskWrapper.getTask();
-    taskNotificationDispatcher.fireTaskEnded(task, getCurrentJobId(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
+    taskNotificationDispatcher.fireTaskEnded(task, getCurrentJobId(), getCurrentJobName(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
   }
 
   @Override
   public String getCurrentJobId() {
     return (bundle != null) ? bundle.getUuid() : null;
+  }
+
+  /**
+   * Get the job name.
+   * @return the name as a string.
+   */
+  public String getCurrentJobName() {
+    return (bundle != null) ? bundle.getName() : null;
   }
 
   @Override
@@ -340,8 +348,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
   }
 
   @Override
-  public TaskExecutionDispatcher getTaskNotificationDispatcher()
-  {
+  public TaskExecutionDispatcher getTaskNotificationDispatcher() {
     return taskNotificationDispatcher;
   }
 }

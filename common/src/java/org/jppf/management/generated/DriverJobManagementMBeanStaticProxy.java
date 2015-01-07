@@ -37,6 +37,14 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
     super(connection, "org.jppf:name=jobManagement,type=driver");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=jobManagement,type=driver";
+  }
+
   @Override
   public void updateMaxNodes(final String param0, final Integer param1) {
     invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });

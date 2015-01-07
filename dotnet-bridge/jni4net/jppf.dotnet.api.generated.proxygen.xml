@@ -39,7 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <AssemblyReference Assembly="@jni4net.home@/lib/jni4net.n-@jni4net.version@.dll"/>
  
   <ClrType TypeName="org.jppf.dotnet.DotnetSerializer"/>
-  <ClrType TypeName="org.jppf.dotnet.DotnetJobEventDispatcher" SyncInterface="true" MergeJavaSource="true"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetJobEventDispatcher"/>
   <ClrType TypeName="org.jppf.dotnet.DotnetNotificationDispatcher"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetTopologyEventDispatcher"/>
 
 </jni4net-proxygen>

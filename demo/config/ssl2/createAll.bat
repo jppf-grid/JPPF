@@ -22,3 +22,4 @@ call createUpdateTruststore driver node
 rem create driver trust store with client and node certificates
 call createUpdateTruststore node   driver
 call createUpdateTruststore client driver
+call createUpdateTruststore driver driver

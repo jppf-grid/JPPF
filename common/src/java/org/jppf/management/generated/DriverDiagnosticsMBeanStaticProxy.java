@@ -38,19 +38,17 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
     super(connection, "org.jppf:name=diagnostics,type=driver");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=diagnostics,type=driver";
+  }
+
   @Override
   public void gc() {
     invoke("gc", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public MemoryInformation memoryInformation() {
-    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public HealthSnapshot healthSnapshot() {
-    return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
   }
 
   @Override
@@ -76,5 +74,15 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
   @Override
   public Double cpuLoad() {
     return (Double) invoke("cpuLoad", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public MemoryInformation memoryInformation() {
+    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public HealthSnapshot healthSnapshot() {
+    return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
   }
 }

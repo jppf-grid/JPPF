@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <AssemblyReference Assembly="@jni4net.home@/lib/jni4net.n-@jni4net.version@.dll"/>
 	  
   <!-- List of class paths (.jar files or directories) which define known classes for generator-->
-  <!--<ClassPath Path="BridgeTo.NET.jar"/>-->
   <ClassPath Path="classes"/>
   <ClassPath Path="../common/classes"/>
   <ClassPath Path="../node/classes"/>
@@ -44,6 +43,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="java.lang.AutoCloseable"/>
   <JavaClass TypeName="java.util.EventObject"/>
   <JavaClass TypeName="java.util.concurrent.Callable"/>
+  <JavaClass TypeName="java.util.concurrent.Future"/>
+  <JavaClass TypeName="java.util.concurrent.ExecutorService"/>
+  <JavaClass TypeName="java.util.concurrent.Executor"/>
+  <JavaClass TypeName="java.util.concurrent.TimeUnit"/>
   <JavaClass TypeName="javax.management.Notification"/>
   <JavaClass TypeName="javax.management.NotificationListener"/>
   <JavaClass TypeName="javax.management.NotificationFilter"/>
@@ -60,18 +63,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.client.JPPFClientConnection"/>
   <JavaClass TypeName="org.jppf.client.JPPFClientConnectionStatus"/>
   <JavaClass TypeName="org.jppf.client.JobStatus"/>
+  <JavaClass TypeName="org.jppf.client.JPPFJob"/>
+  <JavaClass TypeName="org.jppf.client.JobResults"/>
   <JavaClass TypeName="org.jppf.client.event.JobListener"/>
   <JavaClass TypeName="org.jppf.client.event.JobEvent"/>
   <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusHandler"/>
   <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusListener"/>
   <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusEvent"/>
-  <!--
-  <JavaClass TypeName="org.jppf.client.event."/>
-  <JavaClass TypeName="org.jppf.client."/>
-  -->
+  <JavaClass TypeName="org.jppf.client.concurrent.JPPFExecutorService"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.JPPFCompletionService"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.AbstractJPPFTaskFuture"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.JPPFTaskFuture"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.ExecutorServiceConfiguration"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.ExecutorServiceConfigurationImpl"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.JobConfiguration"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.JobConfigurationImpl"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.TaskConfiguration"/>
+  <JavaClass TypeName="org.jppf.client.concurrent.TaskConfigurationImpl"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.AbstractRefreshHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.AbstractTopologyComponent"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.JVMHealthRefreshHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.NodeRefreshHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyDriver"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyEvent"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyListener"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyListenerAdapter"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyManager"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyNode"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyNodeStatus"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyPeer"/>
   
-  <JavaClass TypeName="org.jppf.client.JPPFJob"/>
-  <JavaClass TypeName="org.jppf.client.JobResults"/>
   <JavaClass TypeName="org.jppf.execute.ExecutorChannel"/>
   <JavaClass TypeName="org.jppf.queue.QueueListener"/>
   <JavaClass TypeName="org.jppf.location.Location"/>
@@ -159,6 +180,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.node.protocol.ClassPath"/>
   <JavaClass TypeName="org.jppf.node.protocol.ClassPathElement"/>
   <JavaClass TypeName="org.jppf.node.protocol.DataProvider"/>
+  <JavaClass TypeName="org.jppf.node.protocol.Interruptibility"/>
   <JavaClass TypeName="org.jppf.node.protocol.JPPFDistributedJob"/>
   <JavaClass TypeName="org.jppf.node.protocol.JobClientSLA"/>
   <JavaClass TypeName="org.jppf.node.protocol.JobCommonSLA"/>
@@ -180,8 +202,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.utils.stats.JPPFStatisticsListener"/>
 
   <JavaClass TypeName="org.jppf.dotnet.demo.JavaDemoTask"/>
-  <JavaClass TypeName="org.jppf.dotnet.DotnetTaskWrapper" MergeJavaSource="true"/>
-  <JavaClass TypeName="org.jppf.dotnet.DotnetJobListenerWrapper" MergeJavaSource="true"/>
-  <JavaClass TypeName="org.jppf.dotnet.DotnetNotificationListenerWrapper" MergeJavaSource="true"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetTaskWrapper"/>
+  <JavaClass TypeName="org.jppf.dotnet.AbstractDotnetListenerWrapper"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetJobListenerWrapper"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetNotificationListenerWrapper"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetTopologyListenerWrapper"/>
 
 </jni4net-proxygen>

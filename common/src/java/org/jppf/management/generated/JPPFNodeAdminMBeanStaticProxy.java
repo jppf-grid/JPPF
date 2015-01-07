@@ -39,6 +39,14 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
     super(connection, "org.jppf:name=admin,type=node");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=admin,type=node";
+  }
+
   @Override
   public void shutdown(final Boolean param0) {
     invoke("shutdown", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
@@ -52,6 +60,21 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   @Override
   public JPPFNodeState state() {
     return (JPPFNodeState) invoke("state", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void cancelJob(final String param0, final Boolean param1) {
+    invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void restart() {
+    invoke("restart", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void restart(final Boolean param0) {
+    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
   }
 
   @Override
@@ -87,21 +110,6 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   @Override
   public void setDelegationModel(final DelegationModel param0) {
     setAttribute("DelegationModel", param0);
-  }
-
-  @Override
-  public void restart() {
-    invoke("restart", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public void restart(final Boolean param0) {
-    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
-  }
-
-  @Override
-  public void cancelJob(final String param0, final Boolean param1) {
-    invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
   }
 
   @Override

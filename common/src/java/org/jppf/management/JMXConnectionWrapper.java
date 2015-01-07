@@ -460,6 +460,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     mbeanConnection.get().removeNotificationListener(new ObjectName(mBeanName), listener, filter, handback);
   }
 
+  /**
+   * Get the {@link MBeanNotificationInfo} descriptors for the specified MBean.
+   * @param mBeanName the name of the MBean.
+   * @return a an array of {@link MBeanNotificationInfo}, which is empty if the MBean does not implement {@link NotificationBroadcaster}.
+   * @throws Exception if any error occurs.
+   */
+  public MBeanNotificationInfo[] getNotificationInfo(final String mBeanName) throws Exception {
+    return mbeanConnection.get().getMBeanInfo(new ObjectName(mBeanName)).getNotifications();
+  }
+
   @Override
   public JPPFSystemInformation systemInformation() throws Exception {
     throw new JPPFException("this method is not implemented");

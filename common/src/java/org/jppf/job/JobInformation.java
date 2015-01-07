@@ -23,10 +23,7 @@ import org.jppf.node.protocol.TaskBundle;
 import org.jppf.utils.ReflectionUtils;
 
 /**
- * Instances of this class group tasks from the same client together, so they are sent to the same node,
- * avoiding unnecessary transport overhead.<br>
- * The goal is to provide a performance enhancement through an adaptive bundling of tasks originating from the same client.
- * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
+ * Instances of this class provide information about the state of a job being processed by a driver. 
  * @author Laurent Cohen
  */
 public class JobInformation implements Serializable

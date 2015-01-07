@@ -35,6 +35,14 @@ public class JPPFNodeMaintenanceMBeanStaticProxy extends AbstractMBeanStaticProx
     super(connection, "org.jppf:name=node.maintenance,type=node");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=node.maintenance,type=node";
+  }
+
   @Override
   public void requestResourceCacheReset() {
     invoke("requestResourceCacheReset", (Object[]) null, (String[]) null);

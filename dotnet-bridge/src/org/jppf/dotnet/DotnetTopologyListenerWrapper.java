@@ -18,7 +18,7 @@
 
 package org.jppf.dotnet;
 
-import org.jppf.client.event.*;
+import org.jppf.client.monitoring.topology.*;
 
 /**
  * This class wraps a .Net job listener to which job event notifications are delegated.
@@ -26,33 +26,42 @@ import org.jppf.client.event.*;
  * @since 5.0
  * @exclude
  */
-public class DotnetJobListenerWrapper extends AbstractDotnetListenerWrapper implements JobListener {
+public class DotnetTopologyListenerWrapper extends AbstractDotnetListenerWrapper implements TopologyListener {
   /**
    * Initialize this wrapper with the specified proxy to a .Net job listener.
    * @param dotnetListener a proxy to a .Net job listener.
    */
-  public DotnetJobListenerWrapper(final system.Object dotnetListener) {
-    super(dotnetListener, "JobStarted", "JobEnded", "JobDispatched", "JobReturned");
-    //System.out.printf("Creating job listener with dotnetListener=%s, class=%s%n", dotnetListener, dotnetListener.getClass());
+  public DotnetTopologyListenerWrapper(final system.Object dotnetListener) {
+    super(dotnetListener, "DriverAdded", "DriverRemoved", "DriverUpdated", "NodeAdded", "NodeRemoved", "NodeUpdated");
   }
 
   @Override
-  public void jobStarted(final JobEvent event) {
-    delegate(event, "JobStarted");
+  public void driverAdded(TopologyEvent event) {
+    delegate(event, "DriverAdded");
   }
 
   @Override
-  public void jobEnded(final JobEvent event) {
-    delegate(event, "JobEnded");
+  public void driverRemoved(TopologyEvent event) {
+    delegate(event, "DriverRemoved");
   }
 
   @Override
-  public void jobDispatched(final JobEvent event) {
-    delegate(event, "JobDispatched");
+  public void driverUpdated(TopologyEvent event) {
+    delegate(event, "DriverUpdated");
   }
 
   @Override
-  public void jobReturned(final JobEvent event) {
-    delegate(event, "JobReturned");
+  public void nodeAdded(TopologyEvent event) {
+    delegate(event, "NodeAdded");
+  }
+
+  @Override
+  public void nodeRemoved(TopologyEvent event) {
+    delegate(event, "NodeRemoved");
+  }
+
+  @Override
+  public void nodeUpdated(TopologyEvent event) {
+    delegate(event, "NodeUpdated");
   }
 }

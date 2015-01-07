@@ -33,40 +33,46 @@ public class TaskInformation implements Serializable
   /**
    * The task id.
    */
-  private String id = null;
+  private final String id;
   /**
    * The id of the job this task belongs to.
    */
-  private String jobId = null;
+  private final String jobId;
+  /**
+   * The name of the job this task belongs to.
+   */
+  private final String jobName;
   /**
    * The cpu time taken by the task.
    */
-  private long cpuTime = 0L;
+  private final long cpuTime;
   /**
    * The wall clock time taken by the task.
    */
-  private long elapsedTime = 0L;
+  private final long elapsedTime;
   /**
    * Determines whether the task had an exception.
    */
-  private boolean error = false;
+  private final boolean error;
   /**
    * Timestamp for the creation of this event.
    */
-  private long timestamp = System.currentTimeMillis();
+  private final long timestamp = System.currentTimeMillis();
 
   /**
    * Initialize this event object with the specified task.
    * @param id the task id.
    * @param jobId the id of the job this task belongs to.
+   * @param jobName the name of the job this task belongs to.
    * @param cpuTime the cpu time taken by the task.
    * @param elapsedTime the wall clock time taken by the task.
    * @param error determines whether the task had an exception.
    */
-  public TaskInformation(final String id, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
+  public TaskInformation(final String id, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error)
   {
     this.id = id;
     this.jobId = jobId;
+    this.jobName = jobName;
     this.cpuTime = cpuTime;
     this.elapsedTime = elapsedTime;
     this.error = error;
@@ -88,6 +94,15 @@ public class TaskInformation implements Serializable
   public String getJobId()
   {
     return jobId;
+  }
+
+  /**
+   * Get the name of the job this task belongs to.
+   * @return the job name as a string.
+   */
+  public String getJobName()
+  {
+    return jobName;
   }
 
   /**

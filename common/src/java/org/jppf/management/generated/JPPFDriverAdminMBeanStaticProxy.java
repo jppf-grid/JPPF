@@ -42,6 +42,14 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
     super(connection, "org.jppf:name=admin,type=driver");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=admin,type=driver";
+  }
+
   @Override
   public Collection nodesInformation() {
     return (Collection) invoke("nodesInformation", (Object[]) null, (String[]) null);

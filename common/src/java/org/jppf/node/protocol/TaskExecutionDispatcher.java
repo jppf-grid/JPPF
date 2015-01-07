@@ -77,12 +77,13 @@ public class TaskExecutionDispatcher {
    * Fire an event to notify that a task has ended its execution.
    * @param task the JPPF task from which the event originates.
    * @param jobId the id of the job this task belongs to.
+   * @param jobName the name of the job this task belongs to.
    * @param cpuTime the cpu time taken by the task.
    * @param elapsedTime the wall clock time taken by the task.
    * @param error determines whether the task had an exception.
    */
-  public void fireTaskEnded(final Task<?> task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error) {
-    TaskExecutionEvent event = new TaskExecutionEvent(task, jobId, cpuTime, elapsedTime, error);
+  public void fireTaskEnded(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error) {
+    TaskExecutionEvent event = new TaskExecutionEvent(task, jobId, jobName, cpuTime, elapsedTime, error);
     executor.submit(new NotificationTask(event));
   }
 
@@ -93,7 +94,9 @@ public class TaskExecutionDispatcher {
    * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
    */
   public void fireTaskNotification(final Task<?> task, final Object userObject, final boolean sendViaJmx) {
-    TaskExecutionEvent event = new TaskExecutionEvent(task, bundle == null ? null : bundle.getUuid(), userObject, sendViaJmx);
+    TaskExecutionEvent event = null;
+    if (bundle == null) event = new TaskExecutionEvent(task, null, null, userObject, sendViaJmx);
+    else event = new TaskExecutionEvent(task, bundle.getUuid(), bundle.getName(), userObject, sendViaJmx);
     executor.submit(new NotificationTask(event));
   }
 

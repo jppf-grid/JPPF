@@ -110,6 +110,7 @@ public class MBeanStaticProxyGenerator {
 
     generateClassHeader();
     generateConstructor();
+    generateGetMBeanName();
     Method[] methods = inf.getMethods();
     for (Method m: methods) {
       if (StringUtils.isOneOf(m.getName(), false, "addNotificationListener", "removeNotificationListener", "getNotificationInfo")) continue;
@@ -271,6 +272,23 @@ public class MBeanStaticProxyGenerator {
       }
     }
     println(");");
+  }
+
+  /**
+   * Generate the code for calling the same method in the superclass.
+   * @throws Exception if any error occurs.
+   */
+  private void generateGetMBeanName() throws Exception {
+    printNewLine();
+    printIndent().println("/**");
+    printIndent().println(" * Get the JMX object name for this MBean static proxy.");
+    printIndent().println(" * @return the object name as a string.");
+    printIndent().println(" */");
+    printIndent().println("public static final String getMBeanName() {");
+    indentLevel++;
+    printIndent().print("return \"").print(mbeanName).println("\";");
+    indentLevel--;
+    printIndent().println("}");
   }
 
   /**

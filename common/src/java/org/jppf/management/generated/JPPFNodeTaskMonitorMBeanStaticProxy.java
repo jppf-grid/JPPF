@@ -35,6 +35,14 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
     super(connection, "org.jppf:name=task.monitor,type=node");
   }
 
+  /**
+   * Get the JMX object name for this MBean static proxy.
+   * @return the object name as a string.
+   */
+  public static final String getMBeanName() {
+    return "org.jppf:name=task.monitor,type=node";
+  }
+
   @Override
   public void reset() {
     invoke("reset", (Object[]) null, (String[]) null);

@@ -1,3 +1,21 @@
+/*
+ * JPPF.
+ * Copyright (C) 2005-2014 JPPF Team.
+ * http://www.jppf.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 using System;
 using System.Collections.Generic;
 using org.jppf.client;
@@ -11,22 +29,23 @@ namespace org.jppf.dotnet {
     public BaseDotnetJobListener() {
     }
 
-    /// <summary>Job started notification</summary>
-    /// <param name="jobEvent">encapsulates the vent</param>
+    /// <summary>Called when the job is submitted or re-submitted</summary>
+    /// <param name="jobEvent">encapsulates the event</param>
     public virtual void JobStarted(JobEvent jobEvent) {
     }
 
-    /// <summary>Job started notification</summary>
-    /// <param name="jobEvent">encapsulates the vent</param>
+    /// <summary>Called when the job has completed</summary>
+    /// <param name="jobEvent">encapsulates the event</param>
     public virtual void JobEnded(JobEvent jobEvent) {
     }
 
-    /// <summary>Job started notification</summary>
+    /// <summary>Called when a set of tasks is dispatched to the server</summary>
+    /// <param name="jobEvent">encapsulates the event</param>
     public virtual void JobDispatched(JobEvent jobEvent) {
     }
 
-    /// <summary>Job started notification</summary>
-    /// <param name="jobEvent">encapsulates the vent</param>
+    /// <summary>Called when a set of tasks returns from the server</summary>
+    /// <param name="jobEvent">encapsulates the event</param>
     public virtual void JobReturned(JobEvent jobEvent) {
     }
   }

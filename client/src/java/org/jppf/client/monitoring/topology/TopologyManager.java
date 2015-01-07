@@ -118,6 +118,15 @@ public class TopologyManager implements ClientListener {
   /**
    * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
    * @param client the JPPF client used to discover and monitor the grid topology.
+   * @param listener a listener to subscribe immediately for topology events.
+   */
+  public TopologyManager(final JPPFClient client, final TopologyListener listener) {
+    this(client, new TopologyListener[] { listener });
+  }
+
+  /**
+   * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
+   * @param client the JPPF client used to discover and monitor the grid topology.
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final JPPFClient client, final TopologyListener...listeners) {

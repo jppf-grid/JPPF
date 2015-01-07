@@ -51,14 +51,15 @@ public class TaskExecutionEvent extends EventObject
    * This constructor is used by the JPPF node when sending task completion notifications.
    * @param task the JPPF task from which the event originates.
    * @param jobId the id of the job this task belongs to.
+   * @param jobName the name of the job this task belongs to.
    * @param cpuTime the cpu time taken by the task.
    * @param elapsedTime the wall clock time taken by the task.
    * @param error determines whether the task had an exception.
    */
-  public TaskExecutionEvent(final Task<?> task, final String jobId, final long cpuTime, final long elapsedTime, final boolean error)
+  public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error)
   {
     super(task);
-    this.taskInformation = new TaskInformation(task.getId(), jobId, cpuTime, elapsedTime, error);
+    this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, cpuTime, elapsedTime, error);
     this.userObject = null;
     this.sendViaJmx = true;
     taskCompletion = true;
@@ -69,14 +70,15 @@ public class TaskExecutionEvent extends EventObject
    * This constructor is used when sending user-ddefined notifications from the tasks.
    * @param task the JPPF task from which the event originates.
    * @param jobId the id of the job this task belongs to.
+   * @param jobName the name of the job this task belongs to.
    * @param userObject a user-defined object to send as part of the notification.
    * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
    * @since 4.0
    */
-  public TaskExecutionEvent(final Task<?> task, final String jobId, final Object userObject, final boolean sendViaJmx)
+  public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final Object userObject, final boolean sendViaJmx)
   {
     super(task);
-    this.taskInformation = new TaskInformation(task.getId(), jobId, -1, -1, false);
+    this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, -1, -1, false);
     this.userObject = userObject;
     this.sendViaJmx = sendViaJmx;
     taskCompletion = false;
