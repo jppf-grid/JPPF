@@ -42,6 +42,7 @@
         <zipfileset dir="${dotnet-bridge}/build" prefix="${dotnet-bridge.prefix}" includes="JPPFDotnetDemo.exe,*.dll"/>
         <zipfileset dir="${dotnet-bridge}/build" prefix="${dotnet-bridge.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib" includes="jppf-client.jar"/>
+        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib-src" includes="jppf-client-src.jar"/>
         <zipfileset dir="${dotnet-bridge}/jni4net/cs" prefix="${dotnet-bridge.prefix}/src" includes="jppf.dotnet.demo.tasks/**/*.*,jppf.dotnet.demo/**/*.*"/>
       </module-elements>
     </package-module>
@@ -54,8 +55,8 @@
     <unzip src="${build}/${app.ver}-node.zip" dest="${build}/temp">
       <patternset><exclude name="**/jppf-node.properties"/></patternset>
     </unzip>
-    <copy todir="${build}/temp/${app.ver}-node/config">
-      <fileset dir="${basedir}/config/dotnet-bridge/config/node" includes="*.properties"/>
+    <copy todir="${build}/temp/${app.ver}-node/config" overwrite="true">
+      <fileset dir="${basedir}/config/dotnet-bridge/config/node" includes="*.properties,*.conf"/>
     </copy>
     <zip destfile="${dotnet.node.dist.file}">
       <zipfileset dir="${build}/temp/${app.ver}-node" prefix="${app.ver}-node-dotnet" includes="**/*.*"/>
