@@ -63,14 +63,17 @@ namespace org.jppf.dotnet.demo {
         JPPFDotnet.Init(false);
         // initialize the JPPF client
         client = new JPPFClient();
-        SubmitWithExecutor(client);
+        // uncomment to test an executor service
+        //SubmitWithExecutor(client);
+        // uncomment to test a completion service
+        //SubmitWithCompletionService(client);
         // initialize a topology manager and register a listener for topology events
         manager = new TopologyManager(client);
         manager.AddTopologyListener(new MyTopologyListener());
         // print the number of nodes connected to the server
         PrintNbNodes(client);
         // provision a slave node for each .Net-capable master node
-        ProvisionNodes(client, 1);
+        //ProvisionNodes(client, 1);
         // subscribe to job notifications emitted by the JPPF server
         RegisterJobNotificationListener(client);
         // subscribe to task completion notifications emitted by the JPPF nodes
