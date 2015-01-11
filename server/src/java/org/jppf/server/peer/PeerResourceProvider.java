@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2014 JPPF Team.
+ * Copyright (C) 2005-2015 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,7 +120,8 @@ class PeerResourceProvider {
       context.setPeer(true);
       SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
+      //ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
+      ChannelWrapper<?> channel = server.accept(socketChannel, null, secure);
       if (debugEnabled) log.debug("registered class server channel " + channel);
       if (secure) context.setSsl(true);
       server.getTransitionManager().transitionChannel(channel, ClientClassTransition.TO_SENDING_PEER_CHANNEL_IDENTIFIER);

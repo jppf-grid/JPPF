@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2014 JPPF Team.
+ * Copyright (C) 2005-2015 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,7 +78,7 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper> 
 
   @Override
   public void init() throws Exception {
-    if (debugEnabled) log.debug(name + " initializing socket client");
+    if (debugEnabled) log.debug(name + " initializing socket client with secure=" + secure + ", connectionInfo=" + connectionInfo);
     lock.lock();
     try {
       boolean mustInit = false;
@@ -94,7 +94,10 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper> 
         if (debugEnabled) log.debug(name + " sending channel identifier");
         channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
         System.out.println("Reconnected to " + name);
-        if (secure) channel = SSLHelper.createSSLClientConnection(channel);
+        if (secure) {
+          if (debugEnabled) log.debug(name + " SSL connection");
+          channel = SSLHelper.createSSLClientConnection(channel);
+        }
       }
     } finally {
       lock.unlock();

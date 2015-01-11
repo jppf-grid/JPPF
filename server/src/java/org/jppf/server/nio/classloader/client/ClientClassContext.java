@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2014 JPPF Team.
+ * Copyright (C) 2005-2015 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -245,7 +245,12 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
+    try {
+      sb.append("channel=").append(channel.getClass().getSimpleName());
+    } catch(Exception e) {
+      sb.append("???[");
+    }
+    sb.append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
     sb.append(", resource=").append(resource == null ? "null" : resource.getName());
     sb.append(", pendingRequests=").append(getNbPendingRequests());
