@@ -17,6 +17,6 @@
  */
 
 /**
- * Unit tests for JPPF grids with SSL enabled.
+ * Unit tests for the distributed class loader features.
  */
-package test.org.jppf.ssl;
+package test.org.jppf.node.classloader;
