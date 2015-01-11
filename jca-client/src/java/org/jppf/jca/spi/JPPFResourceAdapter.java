@@ -88,4 +88,14 @@ public class JPPFResourceAdapter implements ResourceAdapter, Serializable
   {
     return null;
   }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return super.equals(obj);
+  }
 }

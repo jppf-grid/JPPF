@@ -42,7 +42,8 @@
 	
   <property name="was"           value="Websphere"/>
 	<property name="jboss"         value="JBoss"/>
-	<property name="jboss7"        value="JBoss-7"/>
+  <property name="jboss7"        value="JBoss-7"/>
+  <property name="wildfly8"      value="Wildfly-8"/>
 	<property name="sunas"         value="Glassfish"/>
 	<property name="weblogic"      value="Weblogic"/>
 	<property name="geronimo"      value="Geronimo"/>
@@ -182,6 +183,7 @@
 		<echo message="creating the EAR files..."/>
     <build.ear appserver="${jboss}"/>
     <build.ear appserver="${jboss7}"/>
+    <build.ear appserver="${wildfly8}"/>
     <build.ear appserver="${sunas}"/>
     <build.ear appserver="${was}"/>
     <build.ear appserver="${weblogic}"/>
@@ -255,6 +257,7 @@
 		<echo message="creating the RAR files..."/>
     <rar appserver="${jboss}" logging="log4j12"/>
     <rar appserver="${jboss7}"/>
+    <rar appserver="${wildfly8}"/>
     <rar appserver="${sunas}"/>
     <rar appserver="${was}"/>
     <rar appserver="${weblogic}"/>
