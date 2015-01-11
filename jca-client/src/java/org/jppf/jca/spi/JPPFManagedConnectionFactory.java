@@ -130,7 +130,8 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   {
     this.configurationSource = configurationSource;
     log.info("Starting JPPF managed connection factory");
-    TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
+    TypedProperties config = new JPPFConfigurationParser(configurationSource).parse();
+    if (debugEnabled) log.debug("Initializing JPPF client with config=" + config);
     jppfClient = new JPPFClient(null, config) {
       @Override
       protected SubmissionManager createSubmissionManager() {
@@ -148,7 +149,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
         return AbstractJPPFClient.JCA_SERIALIZATION_HELPER;
       }
     };
-    if (log.isDebugEnabled()) log.debug("Starting JPPF resource adapter: jppf client=" + jppfClient);
+    if (debugEnabled) log.debug("Starting JPPF resource adapter: jppf client=" + jppfClient);
     log.info("JPPF connection factory started");
   }
 
