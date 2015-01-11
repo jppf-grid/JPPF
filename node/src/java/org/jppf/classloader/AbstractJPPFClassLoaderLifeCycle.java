@@ -52,6 +52,10 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    */
   private static final AtomicInteger INSTANCE_COUNT = new AtomicInteger(0);
   /**
+   * Whether resources should be looked up in the file system if not found in the classpath.
+   */
+  private static final boolean FILE_LOOKUP = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.file.lookup", true);
+  /**
    * Determines whether this class loader should handle dynamic class updating.
    * @exclude
    */
@@ -148,6 +152,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
     if (!isRemoteClassLoadingDisabled()) {
       try {
         if (debugEnabled) log.debug(build(this, " loading remote definition for resource [", map.get("name"), "]"));
+        map.put(ResourceIdentifier.FILE_LOOKUP_ALLOWED, FILE_LOOKUP);
         resource = connection.loadResource(map, dynamic, requestUuid, uuidPath);
         if (debugEnabled) log.debug(build(this, " remote definition for resource [", map.get("name") + "] ", resource.getDefinition()==null ? "not " : "", "found"));
       } catch(IOException e) {
@@ -384,7 +389,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
   }
 
   /**
-   * Get the reosurce cache handled by this class loader.
+   * Get the resource cache handled by this class loader.
    * @return an instance of {@link ResourceCache}.
    * @exclude
    */

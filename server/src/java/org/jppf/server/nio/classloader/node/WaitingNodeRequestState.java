@@ -29,7 +29,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.utils.TraversalList;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -45,6 +45,10 @@ class WaitingNodeRequestState extends NodeClassServerState {
    * Determines whether DEBUG logging level is enabled.
    */
   private static final boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Whether resources should be looked up in the file system if not found in the classpath.
+   */
+  private static final boolean FILE_LOOKUP = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.file.lookup", true);
   /**
    * 
    */
@@ -121,13 +125,14 @@ class WaitingNodeRequestState extends NodeClassServerState {
     TraversalList<String> uuidPath = resource.getUuidPath();
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
+      boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
       if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
-        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null);
+        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null, fileLookup);
         if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));
         if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
       } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
         String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, names);
+        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, fileLookup, names);
         resource.setData(ResourceIdentifier.RESOURCE_MAP, map);
       } else {
         if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();
@@ -135,7 +140,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
         boolean alreadyInCache = (b != null);
         if (debugEnabled) log.debug(build("resource ", alreadyInCache ? "" : "not ", "found [", name, "] in cache for node: ", channel));
         if (!alreadyInCache) {
-          b = server.getResourceProvider().getResource(name);
+          b = server.getResourceProvider().getResource(name, fileLookup);
           if (debugEnabled) log.debug(build("resource ", b == null ? "not " : "", "found [", name, "] in the driver's classpath for node: ", channel));
         }
         if ((b != null) || !resource.isDynamic()) {

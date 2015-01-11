@@ -51,6 +51,7 @@
 
   <path id="tests.classpath">
     <pathelement location="${tests.classes}/config"/>
+    <pathelement location="${basedir}/test-resources/client1"/>
     <pathelement location="${framework.classes}"/>
     <pathelement location="${tests.classes}"/>
     <pathelement location="${addons.classes}"/>

@@ -77,4 +77,8 @@ public enum ResourceIdentifier
    * Unique id of a client connection.
    */
   CONNECTION_UUID,
+  /**
+   * Whether lookups of resource in the file system are allowed.
+   */
+  FILE_LOOKUP_ALLOWED,
 }

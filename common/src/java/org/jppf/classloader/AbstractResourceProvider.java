@@ -52,12 +52,12 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
   }
 
   @Override
-  public byte[] getResource(final String resName) {
-    return getResource(resName, null);
+  public byte[] getResource(final String resName, final boolean lookupInFileSystem) {
+    return getResource(resName, null, lookupInFileSystem);
   }
 
   @Override
-  public byte[] getResource(final String resName, final ClassLoader classloader) {
+  public byte[] getResource(final String resName, final ClassLoader classloader, final boolean lookupInFileSystem) {
     ClassLoader cl = resolveClassLoader(classloader);
     InputStream is = null;
     try {
@@ -70,7 +70,7 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
       } else {
         is = cl.getResourceAsStream(resName);
       }
-      if ((is == null) && JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
+      if ((is == null) && lookupInFileSystem) {
         File file = new File(resName);
         if (file.exists()) is = new BufferedInputStream(new FileInputStream(file));
       }
@@ -113,15 +113,16 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
   }
 
   @Override
-  public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classloader) {
+  public List<byte[]> getMultipleResourcesAsBytes(final String name, final ClassLoader classloader, final boolean lookupInFileSystem) {
     ClassLoader cl = resolveClassLoader(classloader);
+    if (debugEnabled) log.debug(String.format("before lookup: name=%s, resolved classloader=%s, lookupInFileSystem=%b", name, cl, lookupInFileSystem));
     List<byte[]> result = null;
     try {
       Enumeration<URL> urlEnum = cl.getResources(name);
       if ((urlEnum != null) && urlEnum.hasMoreElements()) {
         while (urlEnum.hasMoreElements()) {
           URL url = urlEnum.nextElement();
-          if ((urlEnum != null) && urlEnum.hasMoreElements()) {
+          if (url != null) {
             InputStream is = url.openStream();
             byte[] b = StreamUtils.getInputStreamAsByte(is);
             if (result == null) result = new ArrayList<>();
@@ -140,7 +141,7 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
     catch(Exception e) {
       log.error(e.getMessage(), e);
     }
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.classloader.lookup.file", true)) {
+    if (lookupInFileSystem) {
       try {
         File file = new File(name);
         if (file.exists()) {
@@ -152,15 +153,16 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
         log.error(e.getMessage(), e);
       }
     }
+    if (debugEnabled) log.debug(String.format("after lookup: result for %s is %s", name, result));
     return result;
   }
 
   @Override
-  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader classloader, final String...names) {
+  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader classloader, final boolean lookupInFileSystem, final String...names) {
     ClassLoader cl = resolveClassLoader(classloader);
     Map<String, List<byte[]>> result = new HashMap<>();
     for (String name: names) {
-      List<byte[]> resources = getMultipleResourcesAsBytes(name, cl);
+      List<byte[]> resources = getMultipleResourcesAsBytes(name, cl, lookupInFileSystem);
       if (resources != null) result.put(name, resources);
     }
     return result;

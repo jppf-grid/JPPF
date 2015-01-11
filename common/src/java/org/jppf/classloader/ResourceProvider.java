@@ -35,17 +35,19 @@ public interface ResourceProvider {
    * This method simply calls {@link #getResource(java.lang.String, java.lang.ClassLoader) getResource(String, ClassLoader)}
    * with a null class loader.
    * @param resName the name of the resource to find.
+   * @param lookupInFileSystem whether resources should be looked up in the file system if not found in the classpath.
    * @return the content of the resource as an array of bytes.
    */
-  byte[] getResource(String resName);
+  byte[] getResource(String resName, boolean lookupInFileSystem);
 
   /**
    * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
    * @param resName the name of the resource to find.
    * @param classloader the class loader to use to load the request resource.
+   * @param lookupInFileSystem whether resources should be looked up in the file system if not found in the classpath.
    * @return the content of the resource as an array of bytes.
    */
-  byte[] getResource(String resName, ClassLoader classloader);
+  byte[] getResource(String resName, ClassLoader classloader, boolean lookupInFileSystem);
 
   /**
    * Compute a callable sent through the JPPF class loader.
@@ -58,17 +60,19 @@ public interface ResourceProvider {
    * Get all resources associated with the specified resource name.
    * @param name the name of the resources to look for.
    * @param classloader the class loader used to load the resources.
+   * @param lookupInFileSystem whether resources should be looked up in the file system if not found in the classpath.
    * @return the content of all found resources as a list of byte arrays.
    */
-  List<byte[]> getMultipleResourcesAsBytes(String name, ClassLoader classloader);
+  List<byte[]> getMultipleResourcesAsBytes(String name, ClassLoader classloader, boolean lookupInFileSystem);
 
   /**
    * Get all resources associated with each specified resource name.
    * @param classloader the class loader used to load the resources.
+   * @param lookupInFileSystem whether resources should be looked up in the file system if not found in the classpath.
    * @param names the names of all the resources to look for.
    * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
    */
-  Map<String, List<byte[]>> getMultipleResourcesAsBytes(ClassLoader classloader, String... names);
+  Map<String, List<byte[]>> getMultipleResourcesAsBytes(ClassLoader classloader, boolean lookupInFileSystem, String... names);
 
   /**
    * Factory class for {@link ResourceProvider} implementations.

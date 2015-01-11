@@ -42,6 +42,10 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Whether resources should be looked up in the file system if not found in the classpath.
+   */
+  private static final boolean FILE_LOOKUP = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.file.lookup", true);
+  /**
    * Indicates whether this socket handler should be terminated and stop processing.
    */
   protected boolean stop = false;
@@ -154,18 +158,19 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     ClassLoader cl = getClassLoader(resource.getRequestUuid());
     //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
     if (debugEnabled) log.debug(formattedName + " using classloader=" + cl);
+    boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
     if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
-      List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+      List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl, fileLookup);
       if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
     } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
       String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-      Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+      Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, fileLookup, names);
       resource.setData(ResourceIdentifier.RESOURCE_MAP, result);
     } else {
       byte[] b;
       byte[] callable = resource.getCallable();
       if (callable != null) b = resourceProvider.computeCallable(callable);
-      else b = resourceProvider.getResource(name, cl);
+      else b = resourceProvider.getResource(name, cl, fileLookup);
       if (b == null) found = false;
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);
