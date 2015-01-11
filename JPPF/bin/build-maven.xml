@@ -1,6 +1,6 @@
 <!--
   JPPF
-  Copyright (C) 2005-2014 JPPF Team. 
+  Copyright (C) 2005-2015 JPPF Team. 
   http://www.jppf.org
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,7 +81,7 @@
             <a href="http://www.jppf.org" target="_top"><img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>
           </td></tr></table>]]>
         </header>
-        <bottom><![CDATA[<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2014 JPPF Team.</i></font>]]></bottom>
+        <bottom><![CDATA[<font face="Arial" size=2 color="#C0C0C0"><i>Copyright &copy; 2005-2015 JPPF Team.</i></font>]]></bottom>
       </javadoc>
       <copy todir="${maven.dist.javadoc}/resources" overwrite="true">
         <fileset dir="${bin}">
