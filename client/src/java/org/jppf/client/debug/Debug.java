@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2014 JPPF Team.
+ * Copyright (C) 2005-2015 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,6 +67,7 @@ public class Debug implements DebugMBean {
       ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
       MBeanServer server = ManagementFactory.getPlatformMBeanServer();
       server.registerMBean(mbean, name);
+      //System.out.println("registered client debug mbean: " + name);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -80,7 +81,7 @@ public class Debug implements DebugMBean {
     try {
       ObjectName name = new ObjectName(DebugMBean.MBEAN_NAME_PREFIX + client.getUuid());
       MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      server.unregisterMBean(name);
+      if (server.isRegistered(name)) server.unregisterMBean(name);
     } catch (Exception e) {
       e.printStackTrace();
     }
