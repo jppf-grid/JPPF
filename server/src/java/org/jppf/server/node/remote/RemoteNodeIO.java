@@ -20,6 +20,7 @@ package org.jppf.server.node.remote;
 
 import static org.jppf.server.protocol.BundleParameter.NODE_EXCEPTION_PARAM;
 
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -111,12 +112,13 @@ public class RemoteNodeIO extends AbstractNodeIO {
   @Override
   protected void sendResults(final TaskBundle bundle, final List<Task<?>> tasks) throws Exception {
     if (debugEnabled) log.debug("writing results for " + bundle);
+    SocketWrapper socketWrapper = getSocketWrapper();
+    if (socketWrapper == null) throw new SocketException("no connection to the server");
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizeBundleData(bundle, tasks);
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
     for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
-    SocketWrapper socketWrapper = getSocketWrapper();
     OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
     int count = 0;
     for (Future<DataLocation> f: futureList) {
