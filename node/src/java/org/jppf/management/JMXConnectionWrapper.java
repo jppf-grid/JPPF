@@ -57,6 +57,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public static String CONNECTION_NAME_PREFIX = "jmx@";
   /**
+   * The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout.
+   */
+  private static final long CONNECTION_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.management.connection.timeout", 60_000L);
+  /**
    * URL of the MBean server, in a JMX-compliant format.
    */
   protected JMXServiceURL url = null;
@@ -111,7 +115,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * The list of listeners to this connection wrapper.
    */
-  private final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>(); 
+  private final List<JMXWrapperListener> listeners = new CopyOnWriteArrayList<>();
+  /**
+   * The time at which connection attempts started.
+   */
+  private long connectionStart = 0L;
 
   /**
    * Initialize a local connection (same JVM) to the MBean server.
@@ -166,6 +174,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
           connectionThread.set(jct);
           Thread t = new Thread(jct, CONNECTION_NAME_PREFIX + getId());
           t.setDaemon(true);
+          connectionStart = System.currentTimeMillis();
           t.start();
         }
       }
@@ -192,6 +201,15 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   void performConnection() throws Exception {
     connected.set(false);
+    long elapsed;
+    synchronized(this) {
+      elapsed = System.currentTimeMillis() - connectionStart;
+    }
+    if ((CONNECTION_TIMEOUT > 0L) && (elapsed >= CONNECTION_TIMEOUT)) {
+      fireTimeout();
+      close();
+      return;
+    }
     synchronized(connectionLock) {
       if (jmxc == null) jmxc = JMXConnectorFactory.newJMXConnector(url, env);
       jmxc.connect();
@@ -206,7 +224,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       }
     }
     connected.set(true);
-    //wakeUp();
     fireConnected();
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
   }
@@ -216,6 +233,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the connection could not be closed.
    */
   public void close() throws Exception {
+    listeners.clear();
     JMXConnectionThread jct = connectionThread.get();
     if (jct != null) jct.close();
     connectionThread.set(null);
@@ -333,7 +351,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void setHost(final String host) {
     this.host = host;
-    //this.idString = this.host + ':' + this.port;
     this.displayName = this.host + ':' + this.port;
   }
 
@@ -474,7 +491,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('[');
-    //sb.append(", idString=").append( idString);
     sb.append("url=").append( url);
     sb.append(", connected=").append( connected);
     sb.append(", local=").append( local);
@@ -505,5 +521,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   protected void fireConnected() {
     JMXWrapperEvent event = new JMXWrapperEvent(this);
     for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
+  }
+
+  /**
+   * Notify all listeners that the connection could not be established before reaching the timeout.
+   */
+  protected void fireTimeout() {
+    JMXWrapperEvent event = new JMXWrapperEvent(this);
+    for (JMXWrapperListener listener: listeners) listener.jmxWrapperTimeout(event);
   }
 }
