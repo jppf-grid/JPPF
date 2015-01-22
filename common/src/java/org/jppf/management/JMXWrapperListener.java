@@ -26,8 +26,13 @@ import java.util.EventListener;
  */
 public interface JMXWrapperListener extends EventListener {
   /**
-   * Notifiy listeners that a JMX connection wrapper successfully connected to the remote JMX server.
+   * Notify listeners that a JMX connection wrapper successfully connected to the remote JMX server.
    * @param event the event encapsulating the connection.
    */
   void jmxWrapperConnected(JMXWrapperEvent event);
+  /**
+   * Notify listeners that a JMX connection wrapper failed to connect before the timeout specified in the configuration.
+   * @param event the event encapsulating the connection.
+   */
+  void jmxWrapperTimeout(JMXWrapperEvent event);
 }

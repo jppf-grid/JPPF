@@ -404,9 +404,17 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       if ((info.getHost() != null) && (info.getPort() >= 0) && channel.isOpen()) {
         if (debugEnabled) log.debug("establishing JMX connection for {}", info);
         jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
+        final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
         jmxConnection.addJMXWrapperListener(new JMXWrapperListener() {
           @Override public void jmxWrapperConnected(final JMXWrapperEvent event) {
-            JPPFDriver.getInstance().getNodeNioServer().nodeConnected(AbstractNodeContext.this);
+            server.nodeConnected(AbstractNodeContext.this);
+          }
+
+          @Override
+          public void jmxWrapperTimeout(final JMXWrapperEvent event) {
+            if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}", AbstractNodeContext.this);
+            jmxConnection = null;
+            server.nodeConnected(AbstractNodeContext.this);
           }
         });
         jmxConnection.connect();
@@ -492,6 +500,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Determine whether the node is active or inactive.
    * @return <code>true</code> if the node is active, <code>false</code> if it is inactive.
    */
+  @Override
   public boolean isActive() {
     return active.get();
   }
