@@ -181,6 +181,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
           tmpBundle.taskCompleted(exception);
         }
         cleanup();
+        boolean callTaskCompleted = true;
         if ((tmpBundle != null) && !tmpBundle.getJob().isHandshake()) {
           boolean applyMaxResubmit = tmpBundle.getJob().getMetadata().getParameter("jppf.job.applyMaxResubmitOnNodeError", false);
           applyMaxResubmit |= tmpBundle.getJob().getSLA().isApplyMaxResubmitsUponNodeError();
@@ -200,8 +201,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
             if (debugEnabled) log.debug("resubmit count={} for {}", count, this);
             if (count > 0) updateStatsUponTaskResubmit(count);
             tmpBundle.resultsReceived(results);
+            callTaskCompleted = false;
           }
-          tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
+          if (callTaskCompleted) tmpBundle.getClientJob().taskCompleted(tmpBundle, exception);
           updateStatsUponTaskResubmit(tmpBundle.getTaskCount());
         }
       } catch (Exception e) {
