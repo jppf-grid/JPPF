@@ -110,10 +110,11 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param cl classloader used for serialization.
    * @param header the task bundle to send to the driver.
    * @param job the job to execute remotely.
+   * @return a list of tasks that couldn't be serialized, possibly empty.
    * @throws Exception if an error occurs while sending the request.
    * @exclude
    */
-  public void sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
+  public List<Task<?>> sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
@@ -126,27 +127,26 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     Task<?>[] tasks = prepareTasksToSend(header, job);
 
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
-    boolean hasNotSerializableException = false;
     IOHelper.sendData(socketClient, header, ser);
     try {
       IOHelper.sendData(socketClient, job.getDataProvider(), ser);
     } catch(NotSerializableException e) {
-      hasNotSerializableException = true;
       log.error("error serializing data provider for {} : {}\nthe job will be cancelled", job, ExceptionUtils.getStackTrace(e));
       IOHelper.sendData(socketClient, null, ser);
     }
+    List<Task<?>> notSerializableTasks = new ArrayList<>(tasks.length);
     for (Task<?> task : tasks) {
       try {
         IOHelper.sendData(socketClient, task, ser);
       } catch(NotSerializableException e) {
-        hasNotSerializableException = true;
         log.error("error serializing task {} for {} : {}", new Object[] { task, job, ExceptionUtils.getStackTrace(e) });
-        Task<?> t = new JPPFExceptionResult(e, task);
-        t.setPosition(task.getPosition());
-        IOHelper.sendData(socketClient, t, ser);
+        task.setThrowable(e);
+        IOHelper.sendNullData(socketClient);
+        notSerializableTasks.add(task);
       }
     }
     socketClient.flush();
+    return notSerializableTasks;
   }
 
   /**
@@ -254,8 +254,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       try {
         for (int i = 0; i < count; i++) {
           Task<?> task = (Task<?>) IOHelper.unwrappedData(socketClient, ser);
-          if ((positions != null) && (i < positions.length)) task.setPosition(positions[i]);
-          taskList.add(task);
+          if (task != null) {
+            if ((positions != null) && (i < positions.length)) task.setPosition(positions[i]);
+            taskList.add(task);
+          }
         }
       } finally {
         if (SEQUENTIAL_DESERIALIZATION) lock.unlock();

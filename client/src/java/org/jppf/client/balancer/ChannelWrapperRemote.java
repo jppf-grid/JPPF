@@ -215,7 +215,8 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           TaskBundle bundle = createBundle(newJob);
           bundle.setUuid(registeredClassLoader.getUuid());
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
-          connection.sendTasks(classLoader, bundle, newJob);
+          List<Task<?>> notSerializableTasks = connection.sendTasks(classLoader, bundle, newJob);
+          if (!notSerializableTasks.isEmpty()) clientBundle.resultsReceived(notSerializableTasks);
           while (count < tasks.size()) {
             List<Task<?>> results = connection.receiveResults(classLoader);
             int n = results.size();

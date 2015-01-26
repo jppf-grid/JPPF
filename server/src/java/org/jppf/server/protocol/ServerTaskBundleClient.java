@@ -68,6 +68,10 @@ public class ServerTaskBundleClient {
    */
   private final List<ServerTask> tasksToSendList = new LinkedList<>();
   /**
+   * The tasks to be executed by the node.
+   */
+  private final List<ServerTask> nullTasks = new LinkedList<>();
+  /**
    * The count of pending tasks.
    */
   private final AtomicInteger pendingTasksCount = new AtomicInteger();
@@ -121,9 +125,15 @@ public class ServerTaskBundleClient {
       int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
       int maxResubmitCount = (maxResubmits == null) || (index > maxResubmits.length - 1) ? -1 : maxResubmits[index];
       if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
-      this.taskList.add(new ServerTask(this, dataLocation, pos, maxResubmitCount));
+      ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
+      if (dataLocation == null) {
+        nullTasks.add(task);
+        task.resultReceived(task.getInitialTask());
+      } else {
+        this.taskList.add(task);
+      }
     }
-    this.pendingTasksCount.set(this.taskList.size());
+    this.pendingTasksCount.set(this.taskList.size() + nullTasks.size());
     this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
   }
 
@@ -172,6 +182,16 @@ public class ServerTaskBundleClient {
   public List<ServerTask> getTaskList()
   {
     return taskList;
+  }
+
+  /**
+   * Send back the null tasks immediately.
+   */
+  public void handleNullTasks() {
+    if (!nullTasks.isEmpty()) {
+      resultReceived(nullTasks);
+      nullTasks.clear();
+    }
   }
 
   /**

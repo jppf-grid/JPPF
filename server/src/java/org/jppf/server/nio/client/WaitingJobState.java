@@ -77,6 +77,7 @@ class WaitingJobState extends ClientServerState
       if (debugEnabled) log.debug("uuid path=" + header.getUuidPath());
       clientBundle.addCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
       context.setInitialBundleWrapper(clientBundle);
+      clientBundle.handleNullTasks();
       JPPFDriver.getQueue().addBundle(clientBundle);
 
       // there is nothing left to do, so this instance will wait for a task bundle

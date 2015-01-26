@@ -117,6 +117,7 @@ public final class IOHelper {
    */
   public static DataLocation readData(final InputSource source) throws Exception {
     int n = source.readInt();
+    if (n == 0) return null;
     if (traceEnabled) log.trace("read data size = " + nf.format(n));
     DataLocation dl = createDataLocationMemorySensitive(n);
     dl.transferFrom(source, true);
@@ -194,6 +195,7 @@ public final class IOHelper {
     //if (traceEnabled) log.trace("unwrapping from network connection");
     InputSource sis = new SocketWrapperInputSource(socketWrapper);
     DataLocation dl = IOHelper.readData(sis);
+    if (dl == null) return null;
     Object o = unwrappedData(dl, ser);
     if (traceEnabled) log.trace("unwrapping from network connection, serialized size=" + dl.getSize() + " : object=" + o);
     return o;
@@ -292,6 +294,16 @@ public final class IOHelper {
     socketWrapper.writeInt(dl.getSize());
     OutputDestination od = new SocketWrapperOutputDestination(socketWrapper);
     dl.transferTo(od, true);
+  }
+
+  /**
+   * Send a null object to the server.
+   * @param socketWrapper the socket client used to send data to the server.
+   * @throws Exception if any error occurs.
+   */
+  public static void sendNullData(final SocketWrapper socketWrapper) throws Exception {
+    if (traceEnabled) log.trace("sending object with serialized size=0");
+    socketWrapper.writeInt(0);
   }
 
   /**

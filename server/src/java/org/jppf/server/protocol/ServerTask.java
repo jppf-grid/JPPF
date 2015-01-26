@@ -18,7 +18,7 @@
 
 package org.jppf.server.protocol;
 
-import org.jppf.io.DataLocation;
+import org.jppf.io.*;
 import org.jppf.node.protocol.TaskState;
 import org.slf4j.*;
 
@@ -86,9 +86,8 @@ public class ServerTask {
    */
   public ServerTask(final ServerTaskBundleClient bundle, final DataLocation initialTask, final int jobPosition, final int maxResubmits) {
     if (bundle == null) throw new IllegalArgumentException("bundle is null");
-    if (initialTask == null) throw new IllegalArgumentException("dataLocation is null");
     this.bundle = bundle;
-    this.initialTask = initialTask;
+    this.initialTask = initialTask == null ? new MultipleBuffersLocation(0) : initialTask;
     this.jobPosition = jobPosition;
     this.maxResubmits = maxResubmits;
   }
