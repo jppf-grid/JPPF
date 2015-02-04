@@ -53,7 +53,7 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
 
   @Override
   public byte[] getResource(final String resName, final boolean lookupInFileSystem) {
-    return getResource(resName, null, lookupInFileSystem);
+    return getResource(resName, (ClassLoader) null, lookupInFileSystem);
   }
 
   @Override
@@ -81,9 +81,19 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
-
-    if (debugEnabled) log.debug("resource [" + resName + "] not found");
+    if (debugEnabled) log.debug("resource [{}] not found for class laoder {}", resName, classloader);
     return null;
+  }
+
+  @Override
+  public byte[] getResource(final String resName, final Collection<ClassLoader> classLoaders, final boolean lookupInFileSystem) {
+    if ((classLoaders == null) || classLoaders.isEmpty()) return getResource(resName, (ClassLoader) null, lookupInFileSystem);
+    byte[] result = null;
+    for (ClassLoader cl: classLoaders) {
+      result = getResource(resName, cl, lookupInFileSystem);
+      if (result != null) break;
+    }
+    return result;
   }
 
   @Override
@@ -158,11 +168,33 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
   }
 
   @Override
+  public List<byte[]> getMultipleResourcesAsBytes(final String name, final Collection<ClassLoader> classLoaders, final boolean lookupInFileSystem) {
+    if ((classLoaders == null) || classLoaders.isEmpty()) return getMultipleResourcesAsBytes(name, (ClassLoader) null, lookupInFileSystem);
+    List<byte[]> result = new ArrayList<>();
+    for (ClassLoader cl: classLoaders) {
+      result = getMultipleResourcesAsBytes(name, cl, lookupInFileSystem);
+      if ((result != null) && !result.isEmpty()) break;
+    }
+    return result;
+  }
+
+  @Override
   public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final ClassLoader classloader, final boolean lookupInFileSystem, final String...names) {
     ClassLoader cl = resolveClassLoader(classloader);
     Map<String, List<byte[]>> result = new HashMap<>();
     for (String name: names) {
       List<byte[]> resources = getMultipleResourcesAsBytes(name, cl, lookupInFileSystem);
+      if (resources != null) result.put(name, resources);
+    }
+    return result;
+  }
+
+
+  @Override
+  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final Collection<ClassLoader> classLoaders, final boolean lookupInFileSystem, final String...names) {
+    Map<String, List<byte[]>> result = new HashMap<>();
+    for (String name: names) {
+      List<byte[]> resources = getMultipleResourcesAsBytes(name, classLoaders, lookupInFileSystem);
       if (resources != null) result.put(name, resources);
     }
     return result;

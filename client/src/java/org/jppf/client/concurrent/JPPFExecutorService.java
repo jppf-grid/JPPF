@@ -67,7 +67,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   /**
    * The {@link JPPFClient} to which tasks executions are delegated.
    */
-  private JPPFClient client = null;
+  JPPFClient client = null;
   /**
    * Maintains a list of the jobs submitted by this executor.
    */

@@ -17,10 +17,9 @@
  */
 package org.jppf.client;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.balancer.*;
 import org.jppf.client.balancer.queue.JPPFPriorityQueue;
 import org.jppf.client.event.*;
@@ -232,6 +231,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
+    if (debugEnabled) log.debug("new connection: {}", name);
     Runnable r = new Runnable() {
       @Override public void run() {
         final int size = poolSize > 0 ? poolSize : 1;
@@ -444,31 +444,30 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   /**
    * Get a class loader associated with a job.
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
-   * @return a <code>RegisteredClassLoader</code> instance.
+   * @return a {@code Collection} of {@code RegisteredClassLoader} instances.
    * @exclude
    */
-  public RegisteredClassLoader getRegisteredClassLoader(final String uuid) {
-    return classLoaderRegistrationHandler.getRegisteredClassLoader(uuid);
+  public Collection<ClassLoader> getRegisteredClassLoaders(final String uuid) {
+    return classLoaderRegistrationHandler.getRegisteredClassLoaders(uuid);
   }
 
   /**
-   * Register class loader with this job manager.
-   * @param cl a <code>ClassLoader</code> instance.
-   * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
+   * Register a class loader for the specified job uuid.
+   * @param cl the <code>ClassLoader</code> instance to register.
+   * @param uuid the uuid of the job for which the class loader is registered.
    * @return a <code>RegisteredClassLoader</code> instance.
-   * @exclude
    */
-  public RegisteredClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
+  public ClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
     return classLoaderRegistrationHandler.registerClassLoader(cl, uuid);
   }
 
   /**
-   * Unregisters class loader from this job manager.
-   * @param registeredClassLoader a <code>RegisteredClassLoader</code> instance.
+   * Unregisters the class loader associated with the specified job uuid.
+   * @param uuid the uuid of the job the class loaders are associated with.
    * @exclude
    */
-  protected void unregisterClassLoader(final RegisteredClassLoader registeredClassLoader) {
-    classLoaderRegistrationHandler.unregister(registeredClassLoader);
+  public void unregisterClassLoaders(final String uuid) {
+    classLoaderRegistrationHandler.unregister(uuid);
   }
 
   /**

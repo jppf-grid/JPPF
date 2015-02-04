@@ -29,8 +29,7 @@ import org.jppf.node.protocol.*;
  * @author Laurent Cohen
  * @exclude
  */
-abstract class AbstractJobConfiguration implements JobConfiguration
-{
+abstract class AbstractJobConfiguration implements JobConfiguration {
   /**
    * The service level agreement between the job and the server.
    */
@@ -55,12 +54,15 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * The list of listeners to register with the job.
    */
   private List<JobListener> listeners = new LinkedList<>();
+  /**
+   * A list of class loaders used to load the classes needed to run the jobs.
+   */
+  protected final List<ClassLoader> classLoaders = new ArrayList<>();
 
   /**
    * Default constructor.
    */
-  protected AbstractJobConfiguration()
-  {
+  protected AbstractJobConfiguration() {
   }
 
   /**
@@ -69,16 +71,14 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * @param metadata the metadata configuration to use.
    * @param persistenceManager the persistence manager to use.
    */
-  AbstractJobConfiguration(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager)
-  {
+  AbstractJobConfiguration(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager) {
     this.jobSLA = sla;
     this.jobMetadata = metadata;
     this.persistenceManager = persistenceManager;
   }
 
   @Override
-  public JobSLA getSLA()
-  {
+  public JobSLA getSLA() {
     return jobSLA;
   }
 
@@ -86,14 +86,12 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * Get the service level agreement between the job and the server.
    * @param jobSLA an instance of <code>JPPFJobSLA</code>.
    */
-  public void setSLA(final JobSLA jobSLA)
-  {
+  public void setSLA(final JobSLA jobSLA) {
     this.jobSLA = jobSLA;
   }
 
   @Override
-  public JobClientSLA getClientSLA()
-  {
+  public JobClientSLA getClientSLA() {
     return jobClientSLA;
   }
 
@@ -101,14 +99,12 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * Get the service level agreement between the job and the server.
    * @param jobClientSLA an instance of <code>JPPFJobSLA</code>.
    */
-  public void setClientSLA(final JobClientSLA jobClientSLA)
-  {
+  public void setClientSLA(final JobClientSLA jobClientSLA) {
     this.jobClientSLA = jobClientSLA;
   }
 
   @Override
-  public JobMetadata getMetadata()
-  {
+  public JobMetadata getMetadata() {
     return jobMetadata;
   }
 
@@ -116,60 +112,54 @@ abstract class AbstractJobConfiguration implements JobConfiguration
    * Set this job's metadata.
    * @param jobMetadata a {@link JPPFJobMetadata} instance.
    */
-  public void setMetadata(final JobMetadata jobMetadata)
-  {
+  public void setMetadata(final JobMetadata jobMetadata) {
     this.jobMetadata = jobMetadata;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> JobPersistence<T> getPersistenceManager()
-  {
+  public <T> JobPersistence<T> getPersistenceManager() {
     return (JobPersistence<T>) persistenceManager;
   }
 
   @Override
-  public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager)
-  {
+  public <T> void setPersistenceManager(final JobPersistence<T> persistenceManager) {
     this.persistenceManager = persistenceManager;
   }
 
   @Override
-  public DataProvider getDataProvider()
-  {
+  public DataProvider getDataProvider() {
     return dataProvider;
   }
 
   @Override
-  public void setDataProvider(final DataProvider dataProvider)
-  {
+  public void setDataProvider(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
   }
 
   @Override
-  public void addJobListener(final JobListener listener)
-  {
-    synchronized(listeners)
-    {
+  public void addJobListener(final JobListener listener) {
+    synchronized(listeners) {
       listeners.add(listener);
     }
   }
 
   @Override
-  public void removeJobListener(final JobListener listener)
-  {
-    synchronized(listeners)
-    {
+  public void removeJobListener(final JobListener listener) {
+    synchronized(listeners) {
       listeners.remove(listener);
     }
   }
 
   @Override
-  public List<JobListener> getAllJobListeners()
-  {
-    synchronized(listeners)
-    {
+  public List<JobListener> getAllJobListeners() {
+    synchronized(listeners) {
       return listeners;
     }
+  }
+
+  @Override
+  public List<ClassLoader> getClassLoaders() {
+    return classLoaders;
   }
 }

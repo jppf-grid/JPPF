@@ -34,8 +34,7 @@ import org.jppf.node.protocol.*;
  * </ul>
  * @author Laurent Cohen
  */
-public interface JobConfiguration
-{
+public interface JobConfiguration {
   /**
    * Get the service level agreement between the job and the server.
    * @return an instance of {@link JobSLA}.
@@ -97,4 +96,10 @@ public interface JobConfiguration
    * @return a list of {@link JobListener} instances.
    */
   List<JobListener> getAllJobListeners();
+
+  /**
+   * Get all the class loaders added to this job configuration. 
+   * @return a list of {@link ClassLoader} instances.
+   */
+  List<ClassLoader> getClassLoaders();
 }

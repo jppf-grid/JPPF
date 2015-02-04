@@ -127,12 +127,12 @@ class WaitingNodeRequestState extends NodeClassServerState {
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
       boolean fileLookup = (Boolean) resource.getData(ResourceIdentifier.FILE_LOOKUP_ALLOWED, true) && FILE_LOOKUP;
       if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
-        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null, fileLookup);
+        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, (ClassLoader) null, fileLookup);
         if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));
         if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
       } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
         String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, fileLookup, names);
+        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes((ClassLoader) null, fileLookup, names);
         resource.setData(ResourceIdentifier.RESOURCE_MAP, map);
       } else {
         if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();
