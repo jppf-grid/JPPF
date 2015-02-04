@@ -90,4 +90,14 @@ public interface ServerDebugMBean extends Serializable
    * @return a string representation of the multimap.
    */
   String showResultsMap();
+  /**
+   * Get the current count of job life cycle notifications.
+   * @return the count as an int.
+   */
+  int getJobNotifCount();
+  /**
+   * Get the peak count of job life cycle notifications.
+   * @return the count as an int.
+   */
+  int getJobNotifPeak();
 }

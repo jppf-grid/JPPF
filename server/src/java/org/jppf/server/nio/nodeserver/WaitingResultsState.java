@@ -23,6 +23,7 @@ import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 
 import java.util.*;
 
+import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.ChannelWrapper;
@@ -83,6 +84,7 @@ class WaitingResultsState extends NodeServerState {
       requeue = processResults(context, received);
     } catch (Throwable t) {
       log.error(t.getMessage(), t);
+      nodeBundle.setJobReturnReason(JobReturnReason.DRIVER_PROCESSING_ERROR);
       nodeBundle.resultsReceived(t);
     } finally {
       context.setBundle(null);
@@ -109,9 +111,11 @@ class WaitingResultsState extends NodeServerState {
     Bundler bundler = context.getBundler();
     if (t != null) {
       if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
+      nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
       nodeBundle.resultsReceived(t);
     } else {
       if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
+      nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
       Set<Integer> resubmitSet = null;
       int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
       if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);

@@ -59,7 +59,7 @@ public class TaskExecutionEvent extends EventObject
   public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error)
   {
     super(task);
-    this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, cpuTime, elapsedTime, error);
+    this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, cpuTime, elapsedTime, error, task.getPosition());
     this.userObject = null;
     this.sendViaJmx = true;
     taskCompletion = true;
@@ -78,7 +78,7 @@ public class TaskExecutionEvent extends EventObject
   public TaskExecutionEvent(final Task<?> task, final String jobId, final String jobName, final Object userObject, final boolean sendViaJmx)
   {
     super(task);
-    this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, -1, -1, false);
+    this.taskInformation = new TaskInformation(task.getId(), jobId, jobName, -1, -1, false, task.getPosition());
     this.userObject = userObject;
     this.sendViaJmx = sendViaJmx;
     taskCompletion = false;

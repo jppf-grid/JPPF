@@ -21,6 +21,7 @@ package org.jppf.server.nio.nodeserver;
 import java.util.List;
 
 import org.jppf.io.DataLocation;
+import org.jppf.job.JobReturnReason;
 import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -73,6 +74,7 @@ public class NodeDispatchTimeoutAction implements Runnable {
       String jobUuid = nodeBundle.getJob().getUuid();
       if (context == null) {
         server.getOfflineNodeHandler().removeNodeBundle(jobUuid, nodeBundle.getId());
+        nodeBundle.setJobReturnReason(JobReturnReason.DISPATCH_TIMEOUT);
         nodeBundle.taskCompleted(null);
         nodeBundle.resultsReceived((List<DataLocation>) null);
       } else {

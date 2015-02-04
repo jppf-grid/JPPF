@@ -28,19 +28,19 @@ public enum TaskState {
    */
   PENDING,
   /**
-   * Task is to be resubmitted following a dispatch expiration.
+   * Task is to be resubmitted.
    */
   RESUBMIT,
   /**
-   * Exception was received for task.
+   * An exception was received for the task.
    */
   EXCEPTION,
   /**
-   * Result was received for task.
+   * A result was received for task.
    */
   RESULT,
   /**
-   * Task is cancelled.
+   * The task is cancelled.
    */
   CANCELLED
 }

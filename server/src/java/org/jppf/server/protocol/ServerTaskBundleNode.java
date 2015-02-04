@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.io.DataLocation;
+import org.jppf.job.JobReturnReason;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -97,6 +98,10 @@ public class ServerTaskBundleNode {
    * The number of tasks in this node bundle.
    */
   private final int taskCount;
+  /**
+   * The reason why the task results are reeived.
+   */
+  private JobReturnReason jobReturnReason = null;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -363,5 +368,21 @@ public class ServerTaskBundleNode {
   public static String makeKey(final String jobUuid, final long bundleId)
   {
     return new StringBuilder(jobUuid).append('|').append(bundleId).toString();
+  }
+
+  /**
+   * Get the reason why the task results are reeived.
+   * @return a {@link JobReturnReason} enum value.
+   */
+  public JobReturnReason getJobReturnReason() {
+    return jobReturnReason;
+  }
+
+  /**
+   * Set the reason why the task results are reeived.
+   * @param jobReturnReason a {@link JobReturnReason} enum value.
+   */
+  public void setJobReturnReason(final JobReturnReason jobReturnReason) {
+    this.jobReturnReason = jobReturnReason;
   }
 }

@@ -24,8 +24,7 @@ import java.io.Serializable;
  * Instances of this class encapsulate runtime information on tasks executed by a node.
  * @author Laurent Cohen
  */
-public class TaskInformation implements Serializable
-{
+public class TaskInformation implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -58,6 +57,11 @@ public class TaskInformation implements Serializable
    * Timestamp for the creation of this event.
    */
   private final long timestamp = System.currentTimeMillis();
+  /**
+   * The position of the task in the job to which it belongs.
+   * @since 5.0
+   */
+  private final int jobPosition;
 
   /**
    * Initialize this event object with the specified task.
@@ -67,23 +71,24 @@ public class TaskInformation implements Serializable
    * @param cpuTime the cpu time taken by the task.
    * @param elapsedTime the wall clock time taken by the task.
    * @param error determines whether the task had an exception.
+   * @param jobPosition the position of the task in the job to which it belongs..
+   * @exclude
    */
-  public TaskInformation(final String id, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error)
-  {
+  public TaskInformation(final String id, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error, final int jobPosition) {
     this.id = id;
     this.jobId = jobId;
     this.jobName = jobName;
     this.cpuTime = cpuTime;
     this.elapsedTime = elapsedTime;
     this.error = error;
+    this.jobPosition = jobPosition;
   }
 
   /**
    * Get the task id.
    * @return the id as a string.
    */
-  public String getId()
-  {
+  public String getId() {
     return id;
   }
 
@@ -91,8 +96,7 @@ public class TaskInformation implements Serializable
    * Get the id of the job this task belongs to.
    * @return the job id as a string.
    */
-  public String getJobId()
-  {
+  public String getJobId() {
     return jobId;
   }
 
@@ -100,8 +104,7 @@ public class TaskInformation implements Serializable
    * Get the name of the job this task belongs to.
    * @return the job name as a string.
    */
-  public String getJobName()
-  {
+  public String getJobName() {
     return jobName;
   }
 
@@ -109,8 +112,7 @@ public class TaskInformation implements Serializable
    * Get the cpu time taken by the task.
    * @return the cpu time in milliseconds.
    */
-  public long getCpuTime()
-  {
+  public long getCpuTime() {
     return cpuTime;
   }
 
@@ -118,8 +120,7 @@ public class TaskInformation implements Serializable
    * Get the wall clock time taken by the task.
    * @return the elapsed time in milliseconds.
    */
-  public long getElapsedTime()
-  {
+  public long getElapsedTime() {
     return elapsedTime;
   }
 
@@ -127,8 +128,7 @@ public class TaskInformation implements Serializable
    * Determines whether the task had an exception.
    * @return true if the task had an exception, false otherwise.
    */
-  public boolean hasError()
-  {
+  public boolean hasError() {
     return error;
   }
 
@@ -136,14 +136,21 @@ public class TaskInformation implements Serializable
    * Get the timestamp for the creation of this event.
    * @return the timestamp as a long value.
    */
-  public long getTimestamp()
-  {
+  public long getTimestamp() {
     return timestamp;
   }
 
+  /**
+   * Get the position of the task in the job to which it belongs.
+   * @return the position of the task in its job as an int value.
+   * @since 5.0
+   */
+  public int getJobPosition() {
+    return jobPosition;
+  }
+
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName());
     sb.append('[');
     sb.append("taskId=").append(id);

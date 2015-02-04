@@ -59,7 +59,7 @@ public class ServerTask {
   /**
    * The exception thrown during execution.
    */
-  private Throwable exception;
+  private Throwable throwable;
   /**
    * The state of this task.
    */
@@ -133,11 +133,11 @@ public class ServerTask {
   }
 
   /**
-   * Get the exception raised during this task execution.
-   * @return a <code>Throwable</code> instance, or null if no exception was raised.
+   * Get the eventual throwable raised during the processing of this task in the driver.
+   * @return a {@code Throwable} instance, or null if no exception was raised.
    */
-  public Throwable getException() {
-    return exception;
+  public Throwable getThrowable() {
+    return throwable;
   }
 
   /**
@@ -165,7 +165,7 @@ public class ServerTask {
   public void resultReceived(final DataLocation result) {
     if (result == null) throw new IllegalArgumentException("result is null");
     this.result = result;
-    this.exception = null;
+    this.throwable = null;
     this.state = (result == initialTask) ? TaskState.CANCELLED : TaskState.RESULT;
   }
 
@@ -184,7 +184,7 @@ public class ServerTask {
   public void resultReceived(final Throwable exception) {
     if (exception == null) throw new IllegalArgumentException("exception is null");
     this.result = null;
-    this.exception = exception;
+    this.throwable = exception;
     this.state = TaskState.EXCEPTION;
   }
 
@@ -197,7 +197,7 @@ public class ServerTask {
     sb.append(", expirationCount=").append(expirationCount);
     sb.append(", dataLocation=").append(initialTask);
     sb.append(", result=").append(result);
-    sb.append(", exception=").append(exception);
+    sb.append(", exception=").append(throwable);
     sb.append('}');
     return sb.toString();
   }
@@ -216,6 +216,14 @@ public class ServerTask {
    */
   public int incExpirationCount() {
     return ++expirationCount;
+  }
+
+  /**
+   * Get the number of times a dispatch of this task has expired.
+   * @return the new number of expirations as an int.
+   */
+  public int getExpirationCount() {
+    return expirationCount;
   }
 
   /**

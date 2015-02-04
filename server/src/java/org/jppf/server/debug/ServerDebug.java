@@ -31,22 +31,19 @@ import org.jppf.utils.StringUtils;
  * 
  * @author Laurent Cohen
  */
-public class ServerDebug implements ServerDebugMBean
-{
+public class ServerDebug implements ServerDebugMBean {
   /**
    * 
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
 
   @Override
-  public String clientClassLoaderChannels()
-  {
+  public String clientClassLoaderChannels() {
     return classLoaderChannels(clientClassLoaderSet());
   }
 
   @Override
-  public String nodeClassLoaderChannels()
-  {
+  public String nodeClassLoaderChannels() {
     return classLoaderChannels(nodeClassLoaderSet());
   }
 
@@ -55,35 +52,29 @@ public class ServerDebug implements ServerDebugMBean
    * @param set the set of channels to get a string representation of.
    * @return the channels as as an array of strings.
    */
-  private String classLoaderChannels(final Set<ChannelWrapper<?>> set)
-  {
+  private String classLoaderChannels(final Set<ChannelWrapper<?>> set) {
     StringBuilder sb = new StringBuilder();
-    synchronized(set)
-    {
+    synchronized(set) {
       for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
     }
     return sb.toString();
   }
 
   @Override
-  public String nodeDataChannels()
-  {
+  public String nodeDataChannels() {
     return viewChannels(nodeSet());
   }
 
   @Override
-  public String clientDataChannels()
-  {
+  public String clientDataChannels() {
     return viewChannels(clientSet());
   }
 
   @Override
-  public String nodeMessages()
-  {
+  public String nodeMessages() {
     Set<ChannelWrapper<?>> set = new HashSet<>(nodeSet());
     StringBuilder sb = new StringBuilder();
-    for (ChannelWrapper<?> ch: set)
-    {
+    for (ChannelWrapper<?> ch: set) {
       long id = ch.getId();
       AbstractNodeContext ctx = (AbstractNodeContext) ch.getContext();
       String s = ctx.getMessage() == null ? "null" : ctx.getMessage().toString();
@@ -93,8 +84,7 @@ public class ServerDebug implements ServerDebugMBean
   }
 
   @Override
-  public String all()
-  {
+  public String all() {
     StringBuilder sb = new StringBuilder();
     sb.append("jobs in queue:").append('\n');
     sb.append(dumpQueueDetails()).append('\n');
@@ -114,11 +104,9 @@ public class ServerDebug implements ServerDebugMBean
    * @param set the set to view.
    * @return an array of state strings for each channel.
    */
-  private String viewChannels(final Set<ChannelWrapper<?>> set)
-  {
+  private String viewChannels(final Set<ChannelWrapper<?>> set) {
     StringBuilder sb = new StringBuilder();
-    synchronized(set)
-    {
+    synchronized(set) {
       for (ChannelWrapper<?> channel: set) sb.append(channel.toString()).append('\n');
     }
     return sb.toString();
@@ -139,8 +127,7 @@ public class ServerDebug implements ServerDebugMBean
   }
 
   @Override
-  public String allChannels()
-  {
+  public String allChannels() {
     StringBuilder sb = new StringBuilder();
     sb.append("node class loader channels:").append('\n');
     sb.append(nodeClassLoaderChannels()).append('\n');
@@ -154,8 +141,7 @@ public class ServerDebug implements ServerDebugMBean
   }
 
   @Override
-  public String dumpQueue()
-  {
+  public String dumpQueue() {
     JPPFDriver.getInstance();
     JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
     Set<String> set = queue.getAllJobIds();
@@ -217,8 +203,7 @@ public class ServerDebug implements ServerDebugMBean
    * Get the set of client class loader connections.
    * @return a set of {@link ChannelWrapper} instances.
    */
-  private Set<ChannelWrapper<?>> clientClassLoaderSet()
-  {
+  private Set<ChannelWrapper<?>> clientClassLoaderSet() {
     return new HashSet<>(driver.getClientClassServer().getAllConnections());
   }
 
@@ -226,8 +211,7 @@ public class ServerDebug implements ServerDebugMBean
    * Get the set of client class loader connections.
    * @return a set of {@link ChannelWrapper} instances.
    */
-  private Set<ChannelWrapper<?>> nodeClassLoaderSet()
-  {
+  private Set<ChannelWrapper<?>> nodeClassLoaderSet() {
     return new HashSet<>(driver.getNodeClassServer().getAllConnections());
   }
 
@@ -235,8 +219,7 @@ public class ServerDebug implements ServerDebugMBean
    * Get the set of client class loader connections.
    * @return a set of {@link ChannelWrapper} instances.
    */
-  private Set<ChannelWrapper<?>> nodeSet()
-  {
+  private Set<ChannelWrapper<?>> nodeSet() {
     List<AbstractNodeContext> list = driver.getNodeNioServer().getAllChannels();
     Set<ChannelWrapper<?>> set = new HashSet<>();
     for (AbstractNodeContext ctx: list) set.add(ctx.getChannel());
@@ -247,8 +230,7 @@ public class ServerDebug implements ServerDebugMBean
    * Get the set of client class loader connections.
    * @return a set of {@link ChannelWrapper} instances.
    */
-  private Set<ChannelWrapper<?>> clientSet()
-  {
+  private Set<ChannelWrapper<?>> clientSet() {
     return new HashSet<>(driver.getClientNioServer().getAllConnections());
   }
 
@@ -256,8 +238,7 @@ public class ServerDebug implements ServerDebugMBean
    * Get the set of client class loader connections.
    * @return a set of {@link ChannelWrapper} instances.
    */
-  private Set<ChannelWrapper<?>> acceptorSet()
-  {
+  private Set<ChannelWrapper<?>> acceptorSet() {
     return new HashSet<>(driver.getAcceptorServer().getAllConnections());
   }
 
@@ -272,5 +253,15 @@ public class ServerDebug implements ServerDebugMBean
   @Override
   public String showResultsMap() {
     return DebugHelper.showResults();
+  }
+
+  @Override
+  public int getJobNotifCount() {
+    return driver.getJobManager().getNotifCount();
+  }
+
+  @Override
+  public int getJobNotifPeak() {
+    return driver.getJobManager().getNotifMax();
   }
 }

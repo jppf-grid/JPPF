@@ -335,7 +335,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
    * @return a string representing the type.
    */
   private String typeToString() {
-    byte b = (byte) (type & TYPE_MASK);
+    int b = (type & TYPE_MASK);
     StringBuilder sb = new StringBuilder();
     String s = typeMap.get(b);
     sb.append(s == null ? "?" : s);

@@ -59,7 +59,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   public DriverJobManagement()
   {
-    getJobManager().addJobListener(new JobEventNotifier());
+    getJobManager().addJobManagerListener(new JobEventNotifier());
   }
 
   /**

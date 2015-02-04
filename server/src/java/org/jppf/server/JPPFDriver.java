@@ -25,6 +25,7 @@ import org.jppf.*;
 import org.jppf.classloader.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
+import org.jppf.job.TaskReturnManager;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.NioServer;
@@ -160,10 +161,8 @@ public class JPPFDriver {
   @SuppressWarnings("unchecked")
   public void run() throws Exception {
     JPPFConnectionInformation info = initializer.getConnectionInformation();
-
     initializer.registerDebugMBean();
     initializer.initRecoveryServer();
-
     initializer.initJmxServer();
 
     RecoveryServer recoveryServer = initializer.getRecoveryServer();
@@ -173,6 +172,7 @@ public class JPPFDriver {
     nodeClassServer = startServer(recoveryServer, new NodeClassNioServer(this, useSSL));
     clientNioServer = startServer(recoveryServer, new ClientNioServer(this, useSSL));
     nodeNioServer = startServer(recoveryServer, new NodeNioServer(this, taskQueue, useSSL));
+    jobManager.loadTaskReturnListeners();
     if (isManagementEnabled(config)) initializer.registerProviderMBeans();
     HookFactory.registerSPIMultipleHook(JPPFDriverStartupSPI.class, null, null).invoke("run");
     initializer.getNodeConnectionEventHandler().loadListeners();
@@ -190,9 +190,7 @@ public class JPPFDriver {
       nodeNioServer.initLocalChannel(localNodeChannel);
       new Thread(localNode, "Local node").start();
     }
-
     initializer.initBroadcaster();
-    //initializer.initPeers(nodeClassServer);
     initializer.initPeers(clientClassServer);
     System.out.println("JPPF Driver initialization complete");
   }
@@ -262,6 +260,7 @@ public class JPPFDriver {
   /**
    * Determines whether this server has initiated a shutdown, in which case it does not accept connections anymore.
    * @return true if a shutdown is initiated, false otherwise.
+   * @exclude
    */
   public boolean isShuttingDown() {
     return shuttingDown;
@@ -290,13 +289,11 @@ public class JPPFDriver {
   public void initiateShutdownRestart(final long shutdownDelay, final boolean restart, final long restartDelay) {
     log.info("Scheduling server shutdown in " + shutdownDelay + " ms");
     shuttingDown = true;
-
     if (acceptorServer != null) acceptorServer.shutdown();
     if (clientClassServer != null) clientClassServer.shutdown();
     if (nodeClassServer != null) nodeClassServer.shutdown();
     if (nodeNioServer != null) nodeNioServer.shutdown();
     if (clientNioServer != null) clientNioServer.shutdown();
-
     Timer timer = new Timer();
     ShutdownRestartTask task = new ShutdownRestartTask(timer, restart, restartDelay, this);
     timer.schedule(task, (shutdownDelay <= 0L) ? 0L : shutdownDelay);
@@ -321,6 +318,15 @@ public class JPPFDriver {
    * @exclude
    */
   public JPPFJobManager getJobManager() {
+    return jobManager;
+  }
+
+  /**
+   * Get the object which manages the registration and unregistration of job
+   * dispatch listeners and notifies these listeners of job dispatch events.
+   * @return an instance of {@link TaskReturnManager}.
+   */
+  public TaskReturnManager getTaskReturnManager() {
     return jobManager;
   }
 
@@ -384,17 +390,15 @@ public class JPPFDriver {
       sb.append(name);
       sb.append(" initialized");
     }
-    if (ports != null || sslPorts != null) {
-      if ((ports != null) && (ports.length > 0)) {
-        sb.append("\n-  accepting plain connections on port");
-        if (ports.length > 1) sb.append('s');
-        for (int n: ports) sb.append(' ').append(n);
-      }
-      if ((sslPorts != null) && (sslPorts.length > 0)) {
-        sb.append("\n- accepting secure connections on port");
-        if (sslPorts.length > 1) sb.append('s');
-        for (int n: sslPorts) sb.append(' ').append(n);
-      }
+    if ((ports != null) && (ports.length > 0)) {
+      sb.append("\n-  accepting plain connections on port");
+      if (ports.length > 1) sb.append('s');
+      for (int n: ports) sb.append(' ').append(n);
+    }
+    if ((sslPorts != null) && (sslPorts.length > 0)) {
+      sb.append("\n- accepting secure connections on port");
+      if (sslPorts.length > 1) sb.append('s');
+      for (int n: sslPorts) sb.append(' ').append(n);
     }
     System.out.println(sb.toString());
   }

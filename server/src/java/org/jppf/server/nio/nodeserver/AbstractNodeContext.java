@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.execute.*;
 import org.jppf.io.*;
+import org.jppf.job.JobReturnReason;
 import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.nio.*;
@@ -178,6 +179,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       try {
         if (tmpBundle != null) {
           server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(tmpBundle));
+          tmpBundle.setJobReturnReason(JobReturnReason.NODE_CHANNEL_ERROR);
           tmpBundle.taskCompleted(exception);
         }
         cleanup();
