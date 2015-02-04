@@ -26,13 +26,11 @@ import org.jppf.node.protocol.*;
  * 
  * @author Laurent Cohen
  */
-class JobConfigurationImpl extends AbstractJobConfiguration
-{
+class JobConfigurationImpl extends AbstractJobConfiguration {
   /**
    * Default constructor.
    */
-  JobConfigurationImpl()
-  {
+  JobConfigurationImpl() {
     super();
   }
 
@@ -42,8 +40,7 @@ class JobConfigurationImpl extends AbstractJobConfiguration
    * @param metadata the metadata configuration to use.
    * @param persistenceManager the persistence manager to use.
    */
-  JobConfigurationImpl(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager)
-  {
+  JobConfigurationImpl(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager) {
     this.jobSLA = sla;
     this.jobMetadata = metadata;
     this.persistenceManager = persistenceManager;
@@ -53,10 +50,8 @@ class JobConfigurationImpl extends AbstractJobConfiguration
    * Copy constructor.
    * @param config the configuration from which ot initialize this job configuration.
    */
-  JobConfigurationImpl(final JobConfiguration config)
-  {
+  JobConfigurationImpl(final JobConfiguration config) {
     this(config.getSLA(), config.getMetadata(), config.getPersistenceManager());
-    this.setClientSLA(config.getClientSLA());
     this.setClientSLA(config.getClientSLA());
     for (JobListener listener: config.getAllJobListeners()) this.addJobListener(listener);
   }

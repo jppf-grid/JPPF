@@ -122,6 +122,7 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   public AbstractJPPFJob(final String jobUuid) {
     this.uuid = (jobUuid == null) ? JPPFUuid.normalUUID() : jobUuid;
     name = (jobUuid == null) ? this.uuid : jobUuid;
+    results.job = this;
   }
 
   /**

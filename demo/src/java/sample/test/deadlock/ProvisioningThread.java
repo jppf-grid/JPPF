@@ -18,9 +18,9 @@
 
 package sample.test.deadlock;
 
-import java.util.*;
+import java.util.Map;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;
@@ -29,7 +29,7 @@ import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class ProvisioningThread extends ThreadSynchronization implements Runnable {
@@ -38,22 +38,28 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
    */
   private static Logger log = LoggerFactory.getLogger(ProvisioningThread.class);
   /**
-   * 
+   *
    */
   private final JPPFClient client;
   /**
-   * 
+   *
    */
   private final long waitTime;
-
   /**
    * 
+   */
+  private final int nbSlaves;
+
+  /**
+   *
    * @param client the JPPF client.
    * @param waitTime .
+   * @param nbSlaves .
    */
-  public ProvisioningThread(final JPPFClient client, final long waitTime) {
+  public ProvisioningThread(final JPPFClient client, final long waitTime, final int nbSlaves) {
     this.client = client;
     this.waitTime = waitTime;
+    this.nbSlaves = nbSlaves;
   }
 
   @Override
@@ -79,7 +85,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       goToSleep(1000L);
       if (isStopped()) break;
       try {
-        Map<String, Object> map = forwarder.forwardInvoke(masterSelector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] {40}, sig);
+        Map<String, Object> map = forwarder.forwardInvoke(masterSelector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] {nbSlaves}, sig);
         for (Map.Entry<String, Object> entry: map.entrySet()) {
           if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
         }

@@ -360,6 +360,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
       job.setPersistenceManager(jc.getPersistenceManager());
       job.setDataProvider(jc.getDataProvider());
       for (JobListener listener: jc.getAllJobListeners()) job.addJobListener(listener);
+      for (ClassLoader cl: jc.getClassLoaders()) executor.client.registerClassLoader(cl, job.getUuid());
     }
   }
 

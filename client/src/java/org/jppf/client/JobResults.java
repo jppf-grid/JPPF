@@ -53,6 +53,16 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * ordered by ascending position in the submitted list of tasks.
    */
   private final SortedMap<Integer, Task<?>> resultMap = new TreeMap<>();
+  /**
+   * The job which owns this results object.
+   */
+  transient AbstractJPPFJob job;
+
+  /**
+   * Default constructor.
+   */
+  public JobResults() {
+  }
 
   /**
    * Get the current number of received results.
@@ -106,7 +116,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
     {
       int pos = task.getPosition();
       if (traceEnabled) log.debug("adding result at positon {}", pos);
-      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
+      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result for job {}", new Object[] { pos, tasks.size(), job});
       resultMap.put(pos, task);
     }
     wakeUp();
@@ -123,7 +133,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
     {
       int pos = task.getPosition();
       if (traceEnabled) log.debug("adding result at positon {}", pos);
-      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
+      if (hasResult(pos)) log.warn("position {} (out of {}) already has a result for job {}", new Object[] { pos, tasks.size(), job});
       resultMap.put(pos, task);
     }
     //wakeUp();

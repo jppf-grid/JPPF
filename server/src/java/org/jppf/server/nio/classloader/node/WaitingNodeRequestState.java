@@ -120,12 +120,12 @@ class WaitingNodeRequestState extends ClassServerState {
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
       if (resource.getData(ResourceIdentifier.MULTIPLE) != null) {
-        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, null);
+        List<byte[]> list = server.getResourceProvider().getMultipleResourcesAsBytes(name, (ClassLoader) null);
         if (debugEnabled) log.debug(build("multiple resources ", list != null ? "" : "not ", "found [", name, "] in driver's classpath for node: ", channel));
         if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
       } else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null) {
         String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes(null, names);
+        Map<String, List<byte[]>> map = server.getResourceProvider().getMultipleResourcesAsBytes((ClassLoader) null, names);
         resource.setData(ResourceIdentifier.RESOURCE_MAP, map);
       } else {
         if ((uuid == null) && !resource.isDynamic()) uuid = driver.getUuid();

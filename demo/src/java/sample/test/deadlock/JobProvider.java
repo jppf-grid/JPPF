@@ -25,6 +25,7 @@ import java.util.*;
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
 import org.jppf.node.policy.*;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Instances of this class provide a stream of JPPF jobs, based on the data contained in a text file.
@@ -48,6 +49,10 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
    */
   private final long taskDuration;
   /**
+   * The size of each task.
+   */
+  private final int dataSize;
+  /**
    * The number of jobs to submit.
    */
   private final int nbJobs;
@@ -63,6 +68,10 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
    * 
    */
   private final ExecutionPolicy slavePolicy = new Equal("jppf.node.provisioning.slave", true);
+  /**
+   * Whether the tasks should simulate CPU usage.
+   */
+  private final boolean useCPU = JPPFConfiguration.getProperties().getBoolean("deadlock.useCPU", false);
 
   /**
    * Initialize this job provider.
@@ -70,13 +79,15 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
    * @param nbJobs the number of jobs to submit.
    * @param tasksPerJob the maximum number of tasks in each job.
    * @param taskDuration the duration of each task.
+   * @param dataSize size of the dummy data.
    */
-  public JobProvider(final int concurrencyLimit, final int nbJobs, final int tasksPerJob, final long taskDuration) {
+  public JobProvider(final int concurrencyLimit, final int nbJobs, final int tasksPerJob, final long taskDuration, final int dataSize) {
     this.concurrencyLimit = concurrencyLimit;
     this.nbJobs = nbJobs;
     this.tasksPerJob = tasksPerJob;
     this.taskDuration = taskDuration;
     this.currentNbJobs = 0;
+    this.dataSize = dataSize;
   }
 
   // implementation of Iterator<JPPFJob>
@@ -111,7 +122,7 @@ public class JobProvider extends JobListenerAdapter implements Iterable<JPPFJob>
     try {
       for (int i=1; i<=tasksPerJob; i++) {
         String message = "this is task " + i;
-        MyTask task = new MyTask(message, taskDuration);
+        MyTask task = new MyTask(message, taskDuration, useCPU, dataSize);
         //TaskWithDates task = new TaskWithDates();
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
         taskCount++;

@@ -41,6 +41,10 @@ public class MyTask extends AbstractTask<String> {
    * Whether to simulate CPU usage.
    */
   private final boolean useCPU;
+  /**
+   * Some dummy data to simulate a specified memory footprint.
+   */
+  private final byte[] dummyData;
 
   /**
    * Initialize this task.
@@ -67,9 +71,21 @@ public class MyTask extends AbstractTask<String> {
    * @param useCPU whether to simulate CPU usage.
    */
   public MyTask(final String message, final long duration, final boolean useCPU) {
+    this(message, duration, useCPU, -1);
+  }
+
+  /**
+   * Initialize this task.
+   * @param message a string message to transform and set as result of this task.
+   * @param duration how long this task will sleep to simulate code execution.
+   * @param useCPU whether to simulate CPU usage.
+   * @param dataSize size of the dummy data.
+   */
+  public MyTask(final String message, final long duration, final boolean useCPU, final int dataSize) {
     this.message = message;
     this.duration = duration;
     this.useCPU = useCPU;
+    dummyData = dataSize < 0 ? null : new byte[dataSize];
   }
 
   @Override

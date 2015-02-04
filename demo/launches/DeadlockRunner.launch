@@ -41,6 +41,6 @@
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="sample.test.deadlock.DeadlockRunner"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx512m -Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -Djava.util.logging.config.file=config/logging-client.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx4g -Djppf.config=jppf-client.properties -Dlog4j.configuration=log4j-client.properties -Djava.util.logging.config.file=config/logging-client.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 </launchConfiguration>

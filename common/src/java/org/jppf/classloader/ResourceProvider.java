@@ -58,7 +58,7 @@ public class ResourceProvider {
    * @return the content of the resource as an array of bytes.
    */
   public byte[] getResource(final String resName) {
-    return getResource(resName, null);
+    return getResource(resName, (ClassLoader) null);
   }
 
   /**
@@ -94,8 +94,24 @@ public class ResourceProvider {
       log.error(e.getMessage(), e);
     }
 
-    if (debugEnabled) log.debug("resource [" + resName + "] not found");
+    if (debugEnabled) log.debug("resource [{}] not found for class laoder {}", resName, classLoader);
     return null;
+  }
+
+  /**
+   * Get a resource as an array of byte using a call to <b>ClassLoader#getResource()</b>.
+   * @param resName the name of the resource to find.
+   * @param classLoaders the set of class loaders available to use to load the requested resource.
+   * @return the content of the resource as an array of bytes.
+   */
+  public byte[] getResource(final String resName, final Collection<ClassLoader> classLoaders) {
+    if ((classLoaders == null) || classLoaders.isEmpty()) return getResource(resName, (ClassLoader) null);
+    byte[] result = null;
+    for (ClassLoader cl: classLoaders) {
+      result = getResource(resName, cl);
+      if (result != null) break;
+    }
+    return result;
   }
 
   /**
@@ -179,6 +195,22 @@ public class ResourceProvider {
   }
 
   /**
+   * Get all resources associated with the specified resource name.
+   * @param name the name of the resources to look for.
+   * @param classLoaders the set of class loaders available to load the resources.
+   * @return the content of all found resources as a list of byte arrays.
+   */
+  public List<byte[]> getMultipleResourcesAsBytes(final String name, final Collection<ClassLoader> classLoaders) {
+    if ((classLoaders == null) || classLoaders.isEmpty()) return getMultipleResourcesAsBytes(name, (ClassLoader) null);
+    List<byte[]> result = new ArrayList<>();
+    for (ClassLoader cl: classLoaders) {
+      result = getMultipleResourcesAsBytes(name, cl);
+      if ((result != null) && !result.isEmpty()) break;
+    }
+    return result;
+  }
+
+  /**
    * Get all resources associated with each specified resource name.
    * @param cl the class loader used to load the resources.
    * @param names the names of all the resources to look for.
@@ -188,6 +220,21 @@ public class ResourceProvider {
     Map<String, List<byte[]>> result = new HashMap<>();
     for (String name: names) {
       List<byte[]> resources = getMultipleResourcesAsBytes(name, cl);
+      if (resources != null) result.put(name, resources);
+    }
+    return result;
+  }
+
+  /**
+   * Get all resources associated with each specified resource name.
+   * @param classLoaders the set of class loader available to load the resources.
+   * @param names the names of all the resources to look for.
+   * @return A mapping of each resource names with a list of the byte content of corresponding resources in the classpath.
+   */
+  public Map<String, List<byte[]>> getMultipleResourcesAsBytes(final Collection<ClassLoader> classLoaders, final String...names) {
+    Map<String, List<byte[]>> result = new HashMap<>();
+    for (String name: names) {
+      List<byte[]> resources = getMultipleResourcesAsBytes(name, classLoaders);
       if (resources != null) result.put(name, resources);
     }
     return result;

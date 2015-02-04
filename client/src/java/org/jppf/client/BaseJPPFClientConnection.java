@@ -337,7 +337,6 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Get the name assigned to this client connection.
    * @return the name as a string.
-   * @see org.jppf.client.JPPFClientConnection#getName()
    */
   @Override
   public String getName() {

@@ -21,7 +21,6 @@ package org.jppf.client;
 import java.util.*;
 
 import org.jppf.classloader.*;
-import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.IOHelper;
 import org.jppf.utils.JPPFIdentifiers;
@@ -162,18 +161,18 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     JPPFResourceWrapper resource = readResource();
     String name = resource.getName();
     if (debugEnabled) log.debug(formattedName + " resource requested: " + resource);
-    ClassLoader cl = getClassLoader(resource.getRequestUuid());
+    Collection<ClassLoader> loaders = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoaders(resource.getRequestUuid());
     //if (debugEnabled) log.debug('[' + this.getName() + "] resource requested: " + name + " using classloader=" + cl);
-    if (debugEnabled) log.debug(formattedName + " using classloader=" + cl);
+    if (debugEnabled) log.debug(formattedName + " using classloaders=" + loaders);
     if (resource.getData(ResourceIdentifier.MULTIPLE) != null)
     {
-      List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, cl);
+      List<byte[]> list = resourceProvider.getMultipleResourcesAsBytes(name, loaders);
       if (list != null) resource.setData(ResourceIdentifier.RESOURCE_LIST, list);
     }
     else if (resource.getData(ResourceIdentifier.MULTIPLE_NAMES) != null)
     {
       String[] names = (String[]) resource.getData(ResourceIdentifier.MULTIPLE_NAMES);
-      Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(cl, names);
+      Map<String, List<byte[]>> result = resourceProvider.getMultipleResourcesAsBytes(loaders, names);
       resource.setData(ResourceIdentifier.RESOURCE_MAP, result);
     }
     else
@@ -181,7 +180,7 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
       byte[] b;
       byte[] callable = resource.getCallable();
       if (callable != null) b = resourceProvider.computeCallable(callable);
-      else b = resourceProvider.getResource(name, cl);
+      else b = resourceProvider.getResource(name, loaders);
       if (b == null) found = false;
       if (callable == null) resource.setDefinition(b);
       else resource.setCallable(b);
@@ -193,19 +192,6 @@ public abstract class AbstractClassServerDelegate extends AbstractClientConnecti
     }
     resource.setState(JPPFResourceWrapper.State.PROVIDER_RESPONSE);
     writeResource(resource);
-  }
-
-
-  /**
-   * Retrieve the class loader to use from the client.
-   * @param uuid the uuid of the request from which the class loader was obtained.
-   * @return a <code>ClassLoader</code> instance, or null if none could be found.
-   */
-  protected ClassLoader getClassLoader(final String uuid)
-  {
-    //return ((AbstractJPPFClientConnection) owner).getClient().getRequestClassLoader(uuid);
-    RegisteredClassLoader rcl = ((AbstractJPPFClientConnection) owner).getClient().getRegisteredClassLoader(uuid);
-    return rcl.getClassLoader();
   }
 
   /**

@@ -109,6 +109,7 @@ public class JPPFResultCollector implements TaskResultListener, SubmissionStatus
     }
     job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, tasks);
     if (job.unexecutedTaskCount() <= 0) job.fireJobEvent(Type.JOB_END, null, tasks);
+    job.client.unregisterClassLoaders(job.getUuid());
     jobResults.wakeUp();
     notifyAll();
   }

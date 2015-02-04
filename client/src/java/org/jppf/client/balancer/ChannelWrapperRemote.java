@@ -19,12 +19,11 @@
 package org.jppf.client.balancer;
 
 import java.io.NotSerializableException;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.ClassLoaderRegistrationHandler.RegisteredClassLoader;
 import org.jppf.client.event.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
@@ -203,21 +202,22 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     public void run() {
       Exception exception = null;
       List<Task<?>> tasks = this.clientBundle.getTasksL();
-      RegisteredClassLoader registeredClassLoader = null;
+      AbstractGenericClient client = connection.getClient();
+      String uuid = clientBundle.getClientJob().getUuid();
       try {
         long start = System.nanoTime();
         int count = 0;
         boolean completed = false;
         JPPFJob newJob = createNewJob(clientBundle, tasks);
-        ClassLoader classLoader = getClassLoader(newJob);
-        registeredClassLoader = connection.getClient().registerClassLoader(classLoader, newJob.getUuid());
+        Collection<ClassLoader> loaders = registerClassLoaders(newJob);
         while (!completed) {
           TaskBundle bundle = createBundle(newJob);
-          bundle.setUuid(registeredClassLoader.getUuid());
+          bundle.setUuid(uuid);
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
-          connection.sendTasks(classLoader, bundle, newJob);
+          ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
+          connection.sendTasks(cl, bundle, newJob);
           while (count < tasks.size()) {
-            List<Task<?>> results = connection.receiveResults(classLoader);
+            List<Task<?>> results = connection.receiveResults(cl);
             int n = results.size();
             count += n;
             if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));
@@ -240,7 +240,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         reconnect();
       } finally {
         try {
-          if (registeredClassLoader != null) registeredClassLoader.dispose();
           clientBundle.taskCompleted(exception);
           clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
           if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
@@ -252,7 +251,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
 
     /**
      * Create a new job based on the initial one.
-     * @param job   initial job.
+     * @param job initial job.
      * @param tasks the tasks to execute.
      * @return a new {@link JPPFJob} with the same characteristics as the initial one, except for the tasks.
      * @throws Exception if any error occurs.
@@ -288,15 +287,25 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     /**
      * Return class loader for the specified job.
      * @param job the job used to determine class loader.
-     * @return a <code>ClassLoader</code> instance or <code>null</code> when job has no tasks.
+     * @return a list of ClassLoader instances, possibly empty.
      */
-    private ClassLoader getClassLoader(final JPPFJob job) {
+    private Collection<ClassLoader> registerClassLoaders(final JPPFJob job) {
       if (job == null) throw new IllegalArgumentException("job is null");
-      if (job.getJobTasks().isEmpty()) return null;
-      Task<?> task = job.getJobTasks().get(0);
-      if (task == null) return null;
-      Object o = task.getTaskObject();
-      return (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
+      Set<ClassLoader> result = new HashSet<>();
+      if (!job.getJobTasks().isEmpty()) {
+        AbstractGenericClient client = connection.getClient();
+        for (Task<?> task: job.getJobTasks()) {
+          if (task != null) {
+            Object o = task.getTaskObject();
+            ClassLoader cl = (o != null) ? o.getClass().getClassLoader() : task.getClass().getClassLoader();
+            if ((cl != null) && !result.contains(cl)) {
+              client.registerClassLoader(cl, job.getUuid());
+              result.add(cl);
+            }
+          }
+        }
+      }
+      return result;
     }
   }
 }
