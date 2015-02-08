@@ -35,6 +35,7 @@
     <property name="dotnet.node.dist.file" value="${build}/${app.ver}-node-dotnet.zip"/>
   </target>
 
+  <!-- package the .Net client -->
   <target name="dotnet.package" if="csc.present">
     <package-module module="dotnet-bridge" zip-prefix="dotnet">
       <module-elements>
@@ -48,6 +49,7 @@
     </package-module>
   </target>
 
+  <!-- package a .Net-capable node -->
   <target name="dotnet.package.node" if="dotnet.node.dist.ready">
     <delete file="${dotnet.node.dist.file}" quiet="true"/>
     <delete quiet="true" dir="${build}/temp"/>
@@ -59,7 +61,7 @@
       <fileset dir="${basedir}/config/dotnet-bridge/config/node" includes="*.properties,*.conf"/>
     </copy>
     <zip destfile="${dotnet.node.dist.file}">
-      <zipfileset dir="${build}/temp/${app.ver}-node" prefix="${app.ver}-node-dotnet" includes="**/*.*"/>
+      <zipfileset dir="${build}/temp/${app.ver}-node" prefix="${app.ver}-node-dotnet" includes="**/*.*,**/JPPFNode"/>
       <zipfileset dir="${dotnet-bridge}/build" prefix="${app.ver}-node-dotnet/lib" includes="*.dll,*.jar"/>
       <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib" includes="jppf-client.jar"/>
       <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib-src" includes="jppf-client-src.jar"/>
@@ -67,6 +69,7 @@
     <delete quiet="true" dir="${build}/temp"/>
   </target>
 
+  <!-- build the .Net bridge -->
   <target name="dotnet.build" if="csc.present">
     <ant antfile="${dotnet-bridge}/build.xml" target="build" inheritall="false"/>
     <delete quiet="true" dir="${home}/csdoc-5"/>

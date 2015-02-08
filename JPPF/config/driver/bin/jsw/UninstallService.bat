@@ -31,7 +31,7 @@ rem
 rem Find the application home.
 rem
 rem %~dp0 is location of current script under NT
-set _REALPATH=%~dp0
+set _REALPATH=%~dp0..\..\
 
 rem Decide on the wrapper binary.
 set _WRAPPER_BASE=wrapper
@@ -54,7 +54,7 @@ rem
 :conf
 set _WRAPPER_CONF="%~f1"
 if not %_WRAPPER_CONF%=="" goto startup
-set _WRAPPER_CONF="%_REALPATH%config/wrapper-node.conf"
+set _WRAPPER_CONF="config\wrapper-driver.conf"
 
 rem
 rem Uninstall the Wrapper as an NT service.
@@ -63,4 +63,3 @@ rem
 "%_WRAPPER_EXE%" -r %_WRAPPER_CONF%
 if not errorlevel 1 goto :eof
 pause
-

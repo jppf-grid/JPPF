@@ -162,13 +162,15 @@
   <!-- build binary and souurce jars from scratch -->
 	<target name="rebuild" depends="clean.all, build" description=""/>
   <!-- build the whole JPPF distribution -->
-  <target name="deploy"             depends="deploy.nojavadoc.noinstaller, javadoc, installer" description=""/>
+  <target name="deploy"             depends="deploy.base, javadoc, installer" description=""/>
   <!-- build the whole JPPF distribution without web installer -->
-  <target name="deploy.noinstaller" depends="deploy.nojavadoc.noinstaller, javadoc"            description=""/>
+  <target name="deploy.noinstaller" depends="deploy.base, javadoc"            description=""/>
   <!-- build the whole JPPF distribution without javadoc -->
-  <target name="deploy.nojavadoc"   depends="deploy.nojavadoc.noinstaller, installer"          description=""/>
+  <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-	<target name="deploy.nojavadoc.noinstaller" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, tests.build, user.guide, doc" description=""/>
+	<target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, tests.build, user.guide, doc" description="deploy without building the javadoc nor the installer"/>
+  <!-- build the whole JPPF distribution with local web installer -->
+  <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
 
 	<import file="build-compile-jar.xml"/>
 	<import file="build-modules.xml"/>
@@ -250,7 +252,7 @@
 
   <!--
   -->
-  <target name="unzip.to.temp" depends="deploy.nojavadoc.noinstaller">
+  <target name="unzip.to.temp" depends="deploy.base">
     <property name="temp" value="${basedir}/../../temp"/>
     <delete dir="${temp}" quiet="true" includes="**/*.*" excludes="*.bat"/>
     <unzip dest="${temp}">

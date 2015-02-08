@@ -153,11 +153,19 @@
 	</target>
 
 	<target name="javadoc.package" description="Package the javadoc for deployment on the web site">
-    <delete file="${docs}/api5.tar.gz" quiet="true"/>
-		<tar destfile="${docs}/api5.tar.gz" compression="gzip">
-			<tarfileset prefix="api-5" dir="${javadoc}" includes="**/*.*, package-list"/>
-		</tar>
+    <code.doc.tgz dir="api-5"/>
+    <code.doc.tgz dir="csdoc-5"/>
 	</target>
+
+  <macrodef name="code.doc.tgz">
+    <attribute name="dir"/>
+    <sequential>
+      <delete file="${docs}/@{dir}.tar.gz" quiet="true"/>
+      <tar destfile="${docs}/@{dir}.tar.gz" compression="gzip">
+        <tarfileset prefix="@{dir}" dir="${home}/@{dir}" includes="**/*.*, package-list"/>
+      </tar>
+    </sequential>
+  </macrodef>
 
 	<path id="doclet.classpath">
 		<pathelement location="${java.home}/lib/tools.jar"/>

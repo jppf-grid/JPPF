@@ -67,19 +67,20 @@
       <description>The JPPF server librairies and launch scripts</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-driver" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver">
       	<include name="**/*.*"/>
-        <include name="JPPFDriver"/>
+        <include name="bin/jsw/JPPFDriver"/>
       </fileset>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/startDriver.sh" stage="never" os="unix"/>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/JPPFDriver" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/bin/jsw/JPPFDriver" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Node" required="no" preselected="yes">
       <description>The JPPF node librairies and launch scripts</description>
       <fileset dir="./build/@{app.ver}/@{app.ver}-node" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node">
         <include name="**/*.*"/>
-        <include name="JPPFNode"/>
+        <include name="bin/jsw/JPPFNode"/>
       </fileset>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/startNode.sh" stage="never" os="unix"/>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/JPPFNode" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/screensaver.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/bin/jsw/JPPFNode" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Console" required="no" preselected="yes">
       <description>The JPPF administration and monitoring console librairies and launch scripts</description>
@@ -100,16 +101,16 @@
       <fileset dir="./build/@{app.ver}/@{app.ver}-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-dotnet">
         <include name="**/*.*"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Node_Dotnet" required="no" preselected="yes">
       <description>A .Net-enabled JPPF node distribution</description>
-      <fileset dir="./build/@{app.ver}/@{app.ver}-node-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node">
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet">
         <include name="**/*.*"/>
-        <include name="JPPFNode"/>
+        <include name="bin/jsw/JPPFNode"/>
       </fileset>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/startNode.sh" stage="never" os="unix"/>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/JPPFNode" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/screensaver.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/bin/jsw/JPPFNode" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_User_Guide" required="no" preselected="yes">
       <description>Full user guide in PDF format</description>
@@ -128,8 +129,13 @@
       <fileset dir="./build/@{app.ver}/@{app.ver}-samples-pack" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack">
       	<include name="**/*.*"/>
       </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/AdaptiveGrid/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ConcurrentJobs/run.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/DataDependency/run.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ExtendedClassLoading/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ForkJoinNodeExecutor/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FractalMovieGenerator/config/node/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FractalMovieGenerator/run.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Fractals/run.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FTPServer/run.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/GPU/run.sh" stage="never" os="unix"/>
@@ -140,8 +146,8 @@
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/startH2.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/stopH2.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/SequenceAlignment/run.sh" stage="never" os="unix"/>
-      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/TaskNotifications/run.sh" stage="never" os="unix"/>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/WebSearchEngine/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/WordCount/run.sh" stage="never" os="unix"/>
     </pack>
     <pack name="J2EE_Connector" required="no" preselected="no">
       <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>
