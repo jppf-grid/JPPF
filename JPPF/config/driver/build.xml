@@ -1,0 +1,55 @@
+<!--
+	JPPF
+	Copyright (C) 2005-2014 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name='JPPF-Driver' default="run" basedir=".">
+
+	<!-- ========================================================================= -->
+	<!--                          Property definitions                             -->
+	<!-- ========================================================================= -->
+
+	<property name="lib.dir" value="${basedir}/lib"/>
+	<property name="config.dir" value="${basedir}/config"/>
+
+	<!-- ========================================================================= -->
+	<!--                           Classpath definitions                           -->
+	<!-- ========================================================================= -->
+
+  <path id="run.classpath">
+		<pathelement location="${config.dir}"/>
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
+  </path>
+
+	<!-- ========================================================================= -->
+	<!--                     Run the driver                                        -->
+	<!-- ========================================================================= -->
+
+	<target name="run">
+		<echo message="starting the JPPF driver"/>
+		<java fork="yes" classname="org.jppf.server.DriverLauncher" classpathref="run.classpath">
+			<!--<jvmarg value="-server"/>-->
+			<jvmarg value="-Xmx32m"/>
+			<jvmarg value="-Djppf.config=jppf-driver.properties"/>
+			<jvmarg value="-Dlog4j.configuration=log4j-driver.properties"/>
+			<jvmarg value="-Djava.util.logging.config.file=config/logging-driver.properties" />
+		</java>       
+	</target>
+
+	<!-- for compatibility with previous versions -->
+	<target name="run.driver" depends="run"/>
+
+</project> 
