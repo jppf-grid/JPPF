@@ -196,7 +196,7 @@ if (!$ref_url)
         <td align="center" style="font-size: 9pt; color: #6D78B6">
           <a href="http://sourceforge.net/donate/index.php?group_id=135654"><img src="http://images.sourceforge.net/images/project-support.jpg" width="88" height="32" border="0" alt="Support This Project" /></a>
         </td>
-        <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2014 JPPF.org</td>
+        <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2015 JPPF.org</td>
         <td align="center" valign="center">
           <!-- Google+ button -->
           <!--

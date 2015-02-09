@@ -161,7 +161,30 @@ else
 				</div>
 				<div class="jppf_content">
   <?php
-    $ver1 = "4.2.5";
+    $ver1 = "5.0";
+    $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
+  ?>
+  <a name="<?php echo $ver1 ?>"></a>
+  <h1>JPPF <?php echo $ver1 ?></h1>
+  <h3>Installer</h3>
+  <a href="/download/jppf_ws-5.0.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+  <h3>Deployable module binaries</h3>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node.zip/download'; ?>">JPPF node distribution</a><br>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
+  <h3>Source code and documentation</h3>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
+  User Guide: <a href="/doc/v4">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
+  API documentation: <a href="/api">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip/download'; ?>">download</a><p>
+  <h3>Connectors and add-ons</h3>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+  <h3>Samples and tutorials</h3>
+  <a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
+  Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
+  <hr>
+  <?php
+    $ver1 = "4.2.6";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
   ?>
   <a name="<?php echo $ver1 ?>"></a>
@@ -187,11 +210,7 @@ else
   All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
   <hr>
   <h3>Feeling curious or adventurous about JPPF's latest advances?</h3>
-  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable"><b>Try our latest (unstable) version - last update: 9/13/2014 JPPF 5.0 alpha</b></a>.
-  <!--
-  <p><span style="background-color: orange; padding: 5px; border: 1px solid black"><b><i>Warning: this is not recommended for production environments</b></i></span>
-  <p><span style="background-color: #FF4000; padding: 5px; border 1px solid black"><b><i>Warning: this is not recommended for production environments</b></i></span>
-  -->
+  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf 5.0 beta"><b>Try our latest (unstable) version - last update: 9/13/2014 JPPF 5.0 beta</b></a>.
   <p>
   <div align="center" style="background-color: yellow; padding: 5px"><b><i>This is not recommended for production environments</b></i></div>
 </div>
@@ -204,7 +223,7 @@ else
         <td align="center" style="font-size: 9pt; color: #6D78B6">
           <a href="http://sourceforge.net/donate/index.php?group_id=135654"><img src="http://images.sourceforge.net/images/project-support.jpg" width="88" height="32" border="0" alt="Support This Project" /></a>
         </td>
-        <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2014 JPPF.org</td>
+        <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2015 JPPF.org</td>
         <td align="center" valign="center">
           <!-- Google+ button -->
           <!--
