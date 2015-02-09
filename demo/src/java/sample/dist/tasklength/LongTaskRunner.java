@@ -83,6 +83,8 @@ public class LongTaskRunner {
       JPPFJob job = new JPPFJob();
       job.setName("Long task iteration " + iter);
       for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
+      job.getSLA().setMaxTaskResubmits(0);
+      job.getSLA().setApplyMaxResubmitsUponNodeError(true);
       // submit the tasks for execution
       List<Task<?>> results = jppfClient.submitJob(job);
       for (Task task: results) {

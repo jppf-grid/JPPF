@@ -252,7 +252,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * Cancel this job.
    * @param mayInterruptIfRunning <code>true</code> if the job may be interrupted.
-   * @return <code>true</code> if the job was effectively cncelled, <code>false</code> if it was already cancelled previously.
+   * @return <code>true</code> if the job was effectively cancelled, <code>false</code> if it was already cancelled previously.
    */
   public boolean cancel(final boolean mayInterruptIfRunning) {
     if (debugEnabled) log.debug("request to cancel {}", this);

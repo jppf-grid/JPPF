@@ -195,8 +195,10 @@ public class ServerTask {
     sb.append("state=").append(getState());
     sb.append(", jobPosition=").append(jobPosition);
     sb.append(", expirationCount=").append(expirationCount);
-    sb.append(", dataLocation=").append(initialTask);
-    sb.append(", result=").append(result);
+    sb.append(", resubmitCount=").append(resubmitCount);
+    sb.append(", maxResubmits=").append(maxResubmits);
+    //sb.append(", dataLocation=").append(initialTask);
+    //sb.append(", result=").append(result);
     sb.append(", exception=").append(exception);
     sb.append('}');
     return sb.toString();

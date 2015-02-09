@@ -45,6 +45,10 @@ public class ServerTaskBundleClient {
    */
   private static boolean debugEnabled = log.isDebugEnabled();
   /**
+   * Determines whether trace-level logging is enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
+  /**
    * Count of instances of this class.
    */
   private static final AtomicLong INSTANCE_COUNT = new AtomicLong(0L);
@@ -192,6 +196,11 @@ public class ServerTaskBundleClient {
     synchronized (this) {
       if (isCancelled()) return;
       if (debugEnabled) log.debug("*** received " + results.size() + " tasks for " + this);
+      if (traceEnabled) {
+        StringBuilder sb = new StringBuilder();
+        for (ServerTask task: results) sb.append("\n  ").append(task);
+        log.trace("tasks: {}", sb);
+      }
       List<ServerTask> tasks = new ArrayList<>(results.size());
       for (ServerTask task: results) {
         if (task.getState() != TaskState.PENDING) {
@@ -216,7 +225,9 @@ public class ServerTaskBundleClient {
     List<ServerTask> completedTasks = null;
     synchronized (this) {
       if (isCancelled()) return;
-      if (debugEnabled) log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
+      if (debugEnabled) {
+        log.debug("*** received exception [" + ExceptionUtils.getMessage(exception) + "] for " + this);
+      }
       for (ServerTask task: tasks) {
         if (task.getState() != TaskState.PENDING) {
           tasksToSendList.add(task);
