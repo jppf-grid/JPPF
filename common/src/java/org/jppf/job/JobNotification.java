@@ -24,7 +24,6 @@ import javax.management.*;
 
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.ReflectionUtils;
 
 /**
  * Instances of this class represent events emitted by a JPPFJobManager.
@@ -103,7 +102,16 @@ public class JobNotification extends Notification
   @Override
   public String toString()
   {
-    return ReflectionUtils.dumpObject(this, ", ", true, false);
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("eventType=").append(eventType);
+    sb.append(", jobInfo=").append(jobInfo);
+    sb.append(", nodeInfo=").append(nodeInfo);
+    sb.append(", objectName=").append(getSource());
+    sb.append(", sequenceNumber=").append(getSequenceNumber());
+    sb.append(", timeStamp=").append(getTimeStamp());
+    sb.append(", objectName=").append(getSource());
+    sb.append(']');
+    return sb.toString();
   }
 
   /**

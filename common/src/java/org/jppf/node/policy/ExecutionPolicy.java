@@ -42,7 +42,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * Stores the XML representation of this object.
    * Used to avoid doing it more than once.
    */
-  String computedToString = null;
+  transient String computedToString = null;
   /**
    * The children of this rule.
    * @exclude

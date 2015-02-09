@@ -63,21 +63,29 @@ public class DeadlockRunner {
   public void jobStreaming() {
     TypedProperties config = JPPFConfiguration.getProperties();
     int concurrencyLimit = config.getInt("deadlock.concurrencyLimit", 4);
-    int[] nbSlaves = StringUtils.parseIntValues(config.getString("deadlock.nbSlaves", "0"));
+    int clientConnections = config.getInt("deadlock.clientConnections", concurrencyLimit);
+    int slaves = config.getInt("deadlock.slaveNodes", 0);
+    if (slaves < 0) slaves = 0;
     int nbJobs = config.getInt("deadlock.nbJobs", 10);
     int tasksPerJob = config.getInt("deadlock.tasksPerJob", 10);
     long taskDuration = config.getLong("deadlock.taskDuration", 10L);
     long waitTime = config.getLong("deadlock.waitTime", 15000L);
+    boolean simulateNodeCrashes = config.getBoolean("deadlock.simulateNodeCrashes", false);
     System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", concurrencyLimit, nbJobs, tasksPerJob, taskDuration);
-    try (JPPFClient client = new JPPFClient();
-        JobStreamImpl jobProvider = new JobStreamImpl(concurrencyLimit, nbJobs, tasksPerJob, taskDuration)) {
-      ensureSufficientConnections(client, concurrencyLimit);
-      ProvisioningThread pt = new ProvisioningThread(client, waitTime);
-      MasterNodeMonitoringThread mnmt = new MasterNodeMonitoringThread(client, 5000L, pt);
-      //for (int n: nbSlaves) updateSlaveNodes(client, n);
+    ProvisioningThread pt = null;
+    MasterNodeMonitoringThread mnmt = null;
+    try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(concurrencyLimit, nbJobs, tasksPerJob, taskDuration)) {
+      ensureSufficientConnections(client, clientConnections);
+      updateSlaveNodes(client, slaves);
+      if (simulateNodeCrashes) {
+        pt = new ProvisioningThread(client, waitTime);
+        mnmt = new MasterNodeMonitoringThread(client, 5000L, pt);
+      }
       try {
-        //new Thread(pt, "ProvisioningThread").start();
-        //new Thread(mnmt, "MasterNodeMonitoringThread").start();
+        if (simulateNodeCrashes) {
+          new Thread(pt, "ProvisioningThread").start();
+          new Thread(mnmt, "MasterNodeMonitoringThread").start();
+        }
         TimeMarker marker = new TimeMarker().start();
         for (JPPFJob job: jobProvider) {
           if (job != null) client.submitJob(job);
@@ -86,8 +94,10 @@ public class DeadlockRunner {
         while (jobProvider.hasPendingJob()) Thread.sleep(10L);
         System.out.printf("*** executed a total of %,d jobs and %,d tasks in %s\n", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
       } finally {
-        pt.setStopped(true);
-        mnmt.setStopped(true);
+        if (simulateNodeCrashes) {
+          pt.setStopped(true);
+          mnmt.setStopped(true);
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -128,7 +138,7 @@ public class DeadlockRunner {
   /**
    * Ensure that the JPPF client has the specified number of connections.
    * @param client the jppf client.
-   * @param nbConnections the desried number of connections.
+   * @param nbConnections the desired number of connections.
    * @throws Exception if any error occurs.
    */
   private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {

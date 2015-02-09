@@ -20,7 +20,6 @@ package org.jppf.job;
 import java.io.Serializable;
 
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.utils.ReflectionUtils;
 
 /**
  * Instances of this class provide information about the state of a job being processed by a driver. 
@@ -250,6 +249,16 @@ public class JobInformation implements Serializable
   @Override
   public String toString()
   {
-    return ReflectionUtils.dumpObject(this);
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("jobUuid=").append(jobUuid);
+    sb.append(", jobName=").append(jobName);
+    sb.append(", taskCount=").append(taskCount);
+    sb.append(", initialTaskCount=").append(initialTaskCount);
+    sb.append(", priority=").append(priority);
+    sb.append(", suspended=").append(suspended);
+    sb.append(", pending=").append(pending);
+    sb.append(", maxNodes=").append(maxNodes);
+    sb.append(']');
+    return sb.toString();
   }
 }

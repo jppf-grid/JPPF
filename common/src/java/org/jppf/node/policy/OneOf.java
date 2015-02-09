@@ -25,8 +25,7 @@ import org.jppf.utils.PropertiesCollection;
  * The test applies to numeric and string values only.
  * @author Laurent Cohen
  */
-public class OneOf extends ExecutionPolicy
-{
+public class OneOf extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -53,8 +52,7 @@ public class OneOf extends ExecutionPolicy
    * @param propertyName the name of the property to compare.
    * @param values the values to compare with.
    */
-  public OneOf(final String propertyName, final double...values)
-  {
+  public OneOf(final String propertyName, final double...values) {
     this.propertyName = propertyName;
     this.numberValues = values;
   }
@@ -65,8 +63,7 @@ public class OneOf extends ExecutionPolicy
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param values the values to compare with.
    */
-  public OneOf(final String propertyName, final boolean ignoreCase, final String...values)
-  {
+  public OneOf(final String propertyName, final boolean ignoreCase, final String...values) {
     this.propertyName = propertyName;
     this.stringValues = values;
     this.ignoreCase = ignoreCase;
@@ -78,31 +75,22 @@ public class OneOf extends ExecutionPolicy
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info)
-  {
-    try
-    {
+  public boolean accepts(final PropertiesCollection info) {
+    try {
       String s = getProperty(info, propertyName);
-      if (numberValues != null)
-      {
+      if (numberValues != null) {
         double value = Double.valueOf(s);
         for (double d: numberValues) if (d == value) return true;
-      }
-      else if (stringValues != null)
-      {
-        for (String value: stringValues)
-        {
+      } else if (stringValues != null) {
+        for (String value: stringValues) {
           if ((value == null) && (s == null)) return true;
-          else if ((value != null) && (s != null))
-          {
+          else if ((value != null) && (s != null)) {
             if (!ignoreCase && s.equals(value)) return true;
             else if (ignoreCase && s.equalsIgnoreCase(value)) return true;
           }
         }
       }
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
     }
     return false;
   }

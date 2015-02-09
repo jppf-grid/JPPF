@@ -65,7 +65,7 @@ public class MetadataImpl implements Metadata
   @Override
   public String toString()
   {
-    return new StringBuilder().append(getClass().getSimpleName()).append(parameters).toString();
+    return new StringBuilder(getClass().getSimpleName()).append(parameters).toString();
   }
 
   @Override

@@ -43,6 +43,10 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
    * Whether the tasks should simulate CPU usage.
    */
   private final boolean useCPU = JPPFConfiguration.getProperties().getBoolean("deadlock.useCPU", false);
+  /**
+   * 
+   */
+  private final int dataSize = JPPFConfiguration.getProperties().getInt("deadlock.dataSize", -1);
 
   /**
    * Initialize this job provider.
@@ -70,7 +74,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
     try {
       for (int i=1; i<=tasksPerJob; i++) {
         String message = "this is task " + i;
-        MyTask task = new MyTask(message, taskDuration, useCPU);
+        MyTask task = new MyTask(message, taskDuration, useCPU, dataSize);
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
       }
     } catch(Exception e) {
