@@ -198,7 +198,7 @@ public class ServerTaskBundleClient {
    * Called to notify that the contained task received result.
    * @param results the tasks for which results were received.
    */
-  public synchronized void resultReceived(final Collection<ServerTask> results) {
+  public void resultReceived(final Collection<ServerTask> results) {
     if (JPPFDriver.JPPF_DEBUG) {
       List<ServerTask> list = DebugHelper.addResults(getUuid(), results);
       if (list != null) {
