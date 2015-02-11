@@ -34,12 +34,23 @@ import org.jppf.ui.treetable.JPPFTreeTable;
  * Table cell renderer used to render the alignment of cell values in the table.
  * @author Laurent Cohen
  */
-public class NodeTableCellRenderer extends DefaultTableCellRenderer
-{
+public class NodeTableCellRenderer extends DefaultTableCellRenderer {
   /**
    * The insets for this renderer.
    */
   private Border border = BorderFactory.createEmptyBorder(0, 2, 0, 2);
+  /**
+   * The panel which holds the tree table.
+   */
+  private final NodeDataPanel panel;
+
+  /**
+   * Initialize this renderer.
+   * @param panel he panel which holds the tree table.
+   */
+  public NodeTableCellRenderer(final NodeDataPanel panel) {
+    this.panel = panel;
+  }
 
   /**
    * Returns the default table cell renderer.
@@ -54,42 +65,42 @@ public class NodeTableCellRenderer extends DefaultTableCellRenderer
   @Override
   public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
     DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    if (column >= 0) {
-      int alignment = SwingConstants.LEFT;
-      switch(column) {
-        case NodeTreeTableModel.NB_TASKS:
-        case NodeTreeTableModel.NB_SLAVES:
-          alignment = SwingConstants.RIGHT;
-          break;
+    int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
+    if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return renderer;
+    int alignment = SwingConstants.LEFT;
+    switch(actualCol) {
+      case NodeTreeTableModel.NB_TASKS:
+      case NodeTreeTableModel.NB_SLAVES:
+        alignment = SwingConstants.RIGHT;
+        break;
 
-        case NodeTreeTableModel.NODE_THREADS:
-          alignment = SwingConstants.CENTER;
-          break;
-      }
-      JPPFTreeTable treeTable = (JPPFTreeTable) table;
-      TreePath path = treeTable.getPathForRow(row);
-      if (path != null) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object o = node.getUserObject();
-        if (o instanceof AbstractTopologyComponent) {
-          AbstractTopologyComponent data = (AbstractTopologyComponent) o;
-          if (data.isNode()) {
-            if (((TopologyNode) data).getStatus() == TopologyNodeStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
-            else {
-              if (!data.getManagementInfo().isActive())
-                renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
-              else renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-              renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-            }
-          } else {
-            renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+      case NodeTreeTableModel.NODE_THREADS:
+        alignment = SwingConstants.CENTER;
+        break;
+    }
+    JPPFTreeTable treeTable = (JPPFTreeTable) table;
+    TreePath path = treeTable.getPathForRow(row);
+    if (path != null) {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+      Object o = node.getUserObject();
+      if (o instanceof AbstractTopologyComponent) {
+        AbstractTopologyComponent data = (AbstractTopologyComponent) o;
+        if (data.isNode()) {
+          if (((TopologyNode) data).getStatus() == TopologyNodeStatus.DOWN) renderer.setForeground(UNMANAGED_COLOR);
+          else {
+            if (!data.getManagementInfo().isActive())
+              renderer.setBackground(isSelected ? INACTIVE_SELECTION_COLOR : SUSPENDED_COLOR);
+            else renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
           }
+        } else {
+          renderer.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+          renderer.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
         }
       }
-      renderer.setHorizontalAlignment(alignment);
-      renderer.setBorder(border);
     }
+    renderer.setHorizontalAlignment(alignment);
+    renderer.setBorder(border);
     return renderer;
   }
 }

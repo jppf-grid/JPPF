@@ -30,6 +30,19 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class JobTableCellRenderer extends DefaultTableCellRenderer
 {
   /**
+   * The panel which holds the tree table.
+   */
+  private final JobDataPanel panel;
+
+  /**
+   * Initialize this renderer.
+   * @param panel he panel which holds the tree table.
+   */
+  public JobTableCellRenderer(final JobDataPanel panel) {
+    this.panel = panel;
+  }
+
+  /**
    * Returns the default table cell renderer.
    * @param table the JTable to which this renderer applies.
    * @param value the value of the rendered cell.
@@ -41,26 +54,22 @@ public class JobTableCellRenderer extends DefaultTableCellRenderer
    * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
    */
   @Override
-  public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus,
-      final int row, final int column)
-  {
+  public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
     DefaultTableCellRenderer renderer =  (DefaultTableCellRenderer) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-    if (column != 0)
-    {
+    int actualCol = (Integer) table.getColumnModel().getColumn(column).getIdentifier();
+    if ((actualCol < 0) || panel.isColumnHidden(actualCol)) return renderer;
       int alignment = SwingConstants.LEFT;
-      switch(column)
-      {
-        case JobTreeTableModel.INITIAL_TASK_COUNT:
-        case JobTreeTableModel.TASK_COUNT:
-        case JobTreeTableModel.PRIORITY:
-          alignment = SwingConstants.RIGHT;
-          break;
-        case JobTreeTableModel.MAX_NODES:
-          alignment = "\u221E".equals(value) ? SwingConstants.CENTER : SwingConstants.RIGHT;
-          break;
-      }
-      renderer.setHorizontalAlignment(alignment);
+    switch(actualCol) {
+      case JobTreeTableModel.INITIAL_TASK_COUNT:
+      case JobTreeTableModel.TASK_COUNT:
+      case JobTreeTableModel.PRIORITY:
+        alignment = SwingConstants.RIGHT;
+        break;
+      case JobTreeTableModel.MAX_NODES:
+        alignment = "\u221E".equals(value) ? SwingConstants.CENTER : SwingConstants.RIGHT;
+        break;
     }
+    renderer.setHorizontalAlignment(alignment);
     return renderer;
   }
 }

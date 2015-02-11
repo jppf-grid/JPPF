@@ -166,7 +166,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
     treeTable.doLayout();
     treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     treeTable.getTree().setCellRenderer(new JobRenderer());
-    treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer());
+    treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer(this));
     JScrollPane sp = new JScrollPane(treeTable);
     setUIComponent(sp);
     treeTable.setVisible(true);
