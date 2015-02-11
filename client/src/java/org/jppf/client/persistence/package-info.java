@@ -18,5 +18,6 @@
 
 /**
  * Classes for an API that enables persistence of jobs and their state.
+ * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.persistence;

@@ -18,5 +18,6 @@
 
 /**
  * Utilities pertaining to the client APIs.
+ * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.utils;

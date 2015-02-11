@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting submission of tasks via executor services as specified in <code>java.util.concurrent</code>.
+ * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.concurrent;

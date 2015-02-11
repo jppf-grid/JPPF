@@ -18,5 +18,6 @@
 
 /**
  * Support for event handling in the JPPF client.
+ * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client.event;

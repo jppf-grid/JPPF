@@ -18,5 +18,6 @@
 
 /**
  * Support for networking in JPPF.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.net;

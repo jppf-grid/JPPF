@@ -18,6 +18,7 @@
 
 /**
  * Classes supporting the provisioning on the master node side.
+ * <p>Found in: <b>jppf-common.jar, jppf-node.jar</b>
  * @since 4.1
  */
 package org.jppf.node.provisioning;

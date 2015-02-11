@@ -18,6 +18,7 @@
 
 /**
  * Support for a screen saver associated with a node.
+ * <p>Found in: <b>jppf-node.jar</b>
  * @since 4.0
  */
 package org.jppf.node.screensaver;

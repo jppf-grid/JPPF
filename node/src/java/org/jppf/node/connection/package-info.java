@@ -18,6 +18,7 @@
 
 /**
  * Bootstrap classes for launching a node.
+ * <p>Found in: <b>jppf-node.jar</b>
  * @since 4.1
  */
 package org.jppf.node.connection;

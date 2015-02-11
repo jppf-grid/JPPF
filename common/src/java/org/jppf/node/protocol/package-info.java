@@ -21,5 +21,6 @@
  * Classes in this package build a transport-independant layer, to provide a unified interface
  * for all tyes of I/O (network socket or channel-based, file or in-memory I/O).
  * They also abstract the notion of secure vs. non-secure communications.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.node.protocol;

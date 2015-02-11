@@ -18,5 +18,6 @@
 
 /**
  * Support for the clients connecting to the JPPF driver.
+ * <p>Found in: <b>jppf-client.jar</b> 
  */
 package org.jppf.client;

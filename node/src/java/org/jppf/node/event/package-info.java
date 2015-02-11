@@ -18,5 +18,6 @@
 
 /**
  * Support classes for node event notifications.
+ * <p>Found in: <b>jppf-common.jar, jppf-node.jar</b>
  */
 package org.jppf.node.event;

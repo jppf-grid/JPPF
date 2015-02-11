@@ -18,5 +18,6 @@
 
 /**
  * Utility and helper classes used throughout the JPPF code.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.utils;

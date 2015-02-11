@@ -18,6 +18,6 @@
 
 /**
  * Support for service provider interface, to provide pluggable startup classes for nodes and drivers.
-*/
+ * <p>Found in: <b>jppf-common.jar</b>
+ */
 package org.jppf.startup;
-

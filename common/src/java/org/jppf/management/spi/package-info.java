@@ -18,5 +18,6 @@
 
 /**
  * Support for service provider interface, to provide pluggable management beans, including user-defined ones.
+ * <p>Found in: <b>jppf-common.jar, jppf-node.jar, jppf-server.jar</b>
  */
 package org.jppf.management.spi;

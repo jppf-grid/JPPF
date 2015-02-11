@@ -18,5 +18,6 @@
 
 /**
  * Support for the JMX-based management of JPPF components.
- */
+  * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b> 
+*/
 package org.jppf.management;

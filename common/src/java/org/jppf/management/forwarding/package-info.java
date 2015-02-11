@@ -17,6 +17,7 @@
  */
 
 /**
- * Support for the JMX-based management of JPPF components.
+ * Support for the forwarding of node JMX requests and notifications via the driver.
+ * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b>
  */
 package org.jppf.management.forwarding;

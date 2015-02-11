@@ -19,5 +19,6 @@
 /**
  * Support for modification of the node's configuration before it connects to the driver.<br/>
  * This allows for custom server discovery and failover schemes. 
+ * <p>Found in: <b>jppf-node.jar</b>
  */
 package org.jppf.node.initialization;

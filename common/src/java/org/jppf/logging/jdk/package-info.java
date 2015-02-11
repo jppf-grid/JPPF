@@ -18,5 +18,6 @@
 
 /**
  * Support for the extensions to the JDK logging facilities.
+ * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.logging.jdk;

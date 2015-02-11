@@ -18,6 +18,7 @@
 
 /**
  * Base classes used throughout the framework.
+ * <p>Found in: <b>jppf-common.jar, jppf-node.jar</b> 
  */
 package org.jppf;
 

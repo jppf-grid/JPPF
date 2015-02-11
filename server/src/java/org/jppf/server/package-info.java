@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the core functionality of the JPPF asynchronous communication model.
+ * <p>Found in: <b>jppf-server.jar</b>
  */
 package org.jppf.server;

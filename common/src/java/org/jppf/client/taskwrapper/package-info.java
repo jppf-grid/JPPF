@@ -18,5 +18,6 @@
 
 /**
  * API used for JPPF-annotated tasks and POJO tasks.
+ * <p>Found in: <b>jppf-common.jar, jppf-node.jar</b> 
  */
 package org.jppf.client.taskwrapper;

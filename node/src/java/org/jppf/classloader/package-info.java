@@ -18,6 +18,7 @@
 
 /**
  * Support for the JPPF distributed class loader framework.
+ * <p>Found in: <b>jppf-node.jar</b>
  */
 package org.jppf.classloader;
 

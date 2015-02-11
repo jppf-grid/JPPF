@@ -17,6 +17,7 @@
  */
 
 /**
- * Support for the JMX-based management of JPPF components.
+ * Generated code for static MBean proxies.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.management.generated;

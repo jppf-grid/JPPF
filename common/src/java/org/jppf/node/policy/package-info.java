@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the application of execution policy to task bundles and nodes.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.node.policy;

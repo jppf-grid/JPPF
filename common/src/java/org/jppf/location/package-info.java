@@ -18,5 +18,6 @@
 
 /**
  * Interfaces supporting the data transported between components of the communication model.
+ * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.location;

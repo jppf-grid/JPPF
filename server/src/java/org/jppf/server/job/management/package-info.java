@@ -18,5 +18,6 @@
 
 /**
  * Support for job management mbeans in the server.
+ * <p>Found in: <b>jppf-common.jar, jppf-server.jar</b>
  */
 package org.jppf.server.job.management;

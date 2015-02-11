@@ -18,5 +18,6 @@
 
 /**
  * Classes for SSL configuration.
+ * <p>Found in: <b>jppf-common.jar</b>
  */
 package org.jppf.ssl;

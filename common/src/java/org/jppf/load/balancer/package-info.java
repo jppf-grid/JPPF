@@ -18,5 +18,6 @@
 
 /**
  * Classes supporting the load-balancing of tasks distribution to the nodes.
+ * <p>Found in: <b>jppf-common.jar</b> 
  */
 package org.jppf.load.balancer;
