@@ -22,15 +22,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.Notification;
 
-import org.jppf.utils.*;
-
 /**
  * Instances of this notification class wrap any JMX notification received from a node.
  * They provide additional information to allow users to know from which node and which MBean the notification was emitted.
  * @author Laurent Cohen
  */
-public class JPPFNodeForwardingNotification extends Notification
-{
+public class JPPFNodeForwardingNotification extends Notification {
   /**
    * Internal notification sequence number.
    */
@@ -54,8 +51,7 @@ public class JPPFNodeForwardingNotification extends Notification
    * @param nodeUuid the uuid of the originating node.
    * @param mBeanName name of the originating MBean in the node.
    */
-  public JPPFNodeForwardingNotification(final Notification notification, final String nodeUuid, final String mBeanName)
-  {
+  public JPPFNodeForwardingNotification(final Notification notification, final String nodeUuid, final String mBeanName) {
     super("NodeForwardingNotification", JPPFNodeForwardingMBean.MBEAN_NAME, sequence.incrementAndGet());
     this.notification = notification;
     this.nodeUuid = nodeUuid;
@@ -66,8 +62,7 @@ public class JPPFNodeForwardingNotification extends Notification
    * Get the notification forwarded from the node.
    * @return an instance of <code>Notification</code>.
    */
-  public Notification getNotification()
-  {
+  public Notification getNotification() {
     return notification;
   }
 
@@ -75,8 +70,7 @@ public class JPPFNodeForwardingNotification extends Notification
    * Get the uuid of the originating node.
    * @return the node uuid as a string.
    */
-  public String getNodeUuid()
-  {
+  public String getNodeUuid() {
     return nodeUuid;
   }
 
@@ -84,14 +78,20 @@ public class JPPFNodeForwardingNotification extends Notification
    * Get the name of the originating MBean in the node.
    * @return the MBean name as a string.
    */
-  public String getMBeanName()
-  {
+  public String getMBeanName() {
     return mBeanName;
   }
 
   @Override
-  public String toString()
-  {
-    return ReflectionUtils.dumpObject(this, "nodeUuid", "mBeanName", "notification");
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("type").append(getType());
+    sb.append(", source").append(getSource());
+    sb.append(", mBeanName").append(mBeanName);
+    sb.append(", nodeUuid").append(nodeUuid);
+    sb.append(", sequenceNumber").append(getSequenceNumber());
+    sb.append(", timeStamp").append(getTimeStamp());
+    sb.append(", notification").append(notification);
+    return sb.toString();
   }
 }
