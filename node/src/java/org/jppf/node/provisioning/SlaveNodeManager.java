@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.io.FileUtils;
+import org.jppf.node.NodeRunner;
 import org.jppf.process.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -145,6 +146,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       for (int i=requestedSlaves; i<size; i++) {
         int id = slaves.lastKey();
         SlaveNodeLauncher slave = slaves.remove(id);
+        //SlaveNodeLauncher slave = slaves.get(id);
         log.debug("stopping {}", slave.getName());
         synchronized(slave) {
           if (slave.isStarted()) slave.sendActionCommand(action);
@@ -165,7 +167,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
           slave.addProcessLauncherListener(this);
           new Thread(slave, slaveDirPath).start();
         } catch(Exception e) {
-          log.error("error trying to start '{}' : {}", slaveDirPath, e);
+          log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
         }
       }
     }
@@ -195,11 +197,13 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     if (!slaveConfigDest.exists()) slaveConfigDest.mkdirs();
     if (slaveConfigSrc.exists()) FileUtils.copyDirectory(slaveConfigSrc, slaveConfigDest);
     // get the JPPF config, apply the overrides, then save it to the slave's folder
-    TypedProperties props = new TypedProperties(JPPFConfiguration.getProperties());
+    TypedProperties config = JPPFConfiguration.getProperties();
+    TypedProperties props = new TypedProperties(config);
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.setBoolean(MASTER_PROPERTY, false);
     props.setBoolean(SLAVE_PROPERTY, true);
     props.setInt(SLAVE_ID_PROPERTY, id);
+    props.setString(MASTER_UUID_PROPERTY, NodeRunner.getUuid());
     //SLAVE_ID_PROPERTY
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
