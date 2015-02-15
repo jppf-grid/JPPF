@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 
 import org.apache.commons.io.FileUtils;
+import org.jppf.node.NodeRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -170,6 +171,7 @@ public final class SlaveNodeManager implements SlaveNodeLauncherListener {
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
     props.setBoolean(MASTER_PROPERTY, false);
     props.setBoolean(SLAVE_PROPERTY, true);
+    props.setString(MASTER_UUID_PROPERTY, NodeRunner.getUuid());
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
     }

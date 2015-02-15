@@ -29,6 +29,11 @@ public final class NodeProvisioningConstants {
    */
   public static final String MASTER_PROPERTY = "jppf.node.provisioning.master";
   /**
+   * Name of the property which defines the uuid of the master in a given slave's configuration.
+   * This can be used to correlate a slave and its master.
+   */
+  public static final String MASTER_UUID_PROPERTY = "jppf.node.provisioning.master.uuid";
+  /**
    * Name of the property which defines a node as a slave. Vllaue defaults to {@code false}.
    */
   public static final String SLAVE_PROPERTY = "jppf.node.provisioning.slave";
