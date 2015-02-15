@@ -87,57 +87,39 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     return (Integer) invoke(MBEAN_NAME, "nbNodes");
   }
 
-  /**
-   * Request the JMX connection information for all the nodes attached to the server.
-   * @return a collection of <code>NodeManagementInfo</code> instances.
-   * @throws Exception if any error occurs.
-   */
+  @Override
+  public Integer nbNodes(final NodeSelector selector) throws Exception {
+    return (Integer) invoke(MBEAN_NAME, "nbNodes", new Object[] { selector }, new String[] {NodeSelector.class.getName()});
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> nodesInformation() throws Exception {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation");
   }
 
-  /**
-   * Get the latest statistics snapshot from the JPPF driver.
-   * @return a <code>JPPFStatistics</code> instance.
-   * @throws Exception if any error occurs.
-   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector) throws Exception {
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation", new Object[] { selector }, new String[] {NodeSelector.class.getName()});
+  }
+
   @Override
   public JPPFStatistics statistics() throws Exception {
     JPPFStatistics stats = (JPPFStatistics) invoke(MBEAN_NAME, "statistics");
     return stats;
   }
 
-  /**
-   * Perform a shutdown or restart of the server.
-   * @param shutdownDelay the delay before shutting down the server, once the command is received.
-   * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.
-   * @return an acknowledgement message.
-   * @throws Exception if any error occurs.
-   */
   @Override
   public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception {
     return (String) invoke(MBEAN_NAME, "restartShutdown", new Object[] {shutdownDelay, restartDelay}, new String[] {Long.class.getName(), Long.class.getName()});
   }
 
-  /**
-   * Change the bundle size tuning settings.
-   * @param algorithm the name opf the load-balancing algorithm to set.
-   * @param parameters the algorithm's parameters.
-   * @return an acknowledgement or error message.
-   * @throws Exception if an error occurred while updating the settings.
-   */
   @Override
   public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception {
     return (String) invoke(MBEAN_NAME, "changeLoadBalancerSettings", new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
   }
 
-  /**
-   * Obtain the current load-balancing settings.
-   * @return an instance of <code>LoadBalancingInformation</code>.
-   * @throws Exception if any error occurs.
-   */
   @Override
   public LoadBalancingInformation loadBalancerInformation() throws Exception {
     return (LoadBalancingInformation) invoke(MBEAN_NAME, "loadBalancerInformation");
@@ -242,9 +224,20 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
+  public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
+    return (Integer) invoke(MBEAN_NAME, "nbIdleNodes", new Object[] { selector }, new String[] {NodeSelector.class.getName()});
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception {
     return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation");
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Collection<JPPFManagementInfo> idleNodesInformation(final NodeSelector selector) throws Exception {
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "idleNodesInformation", new Object[] { selector }, new String[] {NodeSelector.class.getName()});
   }
 
   @Override

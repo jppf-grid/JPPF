@@ -28,8 +28,7 @@ import org.jppf.utils.stats.JPPFStatistics;
  * MBean interface for the management of a JPPF driver.
  * @author Laurent Cohen
  */
-public interface JPPFDriverAdminMBean extends JPPFAdminMBean
-{
+public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Name of the driver's admin MBean.
    */
@@ -44,17 +43,36 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
 
   /**
    * Get the number of nodes attached to the driver.
+   * Note that this method is equivalent to calling {@link #nbNodes(NodeSelector)} with a {@code null} selector.
    * @return the number of nodes.
    * @throws Exception if any error occurs.
    */
   Integer nbNodes() throws Exception;
 
   /**
+   * Get the number of nodes attached to the driver that satisfy the specified selector.
+   * @param selector specifies which nodes shouyld be counted. If null, then {@link NodeSelector#ALL_NODES} will be used.
+   * @return the number of nodes.
+   * @throws Exception if any error occurs.
+   * @since 5.0
+   */
+  Integer nbNodes(NodeSelector selector) throws Exception;
+
+  /**
    * Request the JMX connection information for all the nodes attached to the server.
+   * Note that this method is equivalent to calling {@link #nodesInformation(NodeSelector)} with a {@code null} selector.
    * @return a collection of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> nodesInformation() throws Exception;
+
+  /**
+   * Request the JMX connection information for all the nodes attached to the server which satisfy the specified selector.
+   * @param selector specifies which nodes shouyld be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @throws Exception if any error occurs.
+   */
+  Collection<JPPFManagementInfo> nodesInformation(NodeSelector selector) throws Exception;
 
   /**
    * Perform a shutdown or restart of the server.
@@ -93,22 +111,45 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean
    * @param policy the execution policy to check against the nodes.
    * @return the number of nodes that match the execution policy, or 0 if no node matches it.
    * @throws Exception if any error occurs.
+   * @deprecated use {@link #nbNodes(NodeSelector)} instead, as in this example:<br>
+   * <pre>
+   * JPPFDriverAdminMBean proxy = ...;
+   * int nbNodes = proxy.nbNodes(new ExecutionPolicySelector(policy));</pre>
    */
   Integer matchingNodes(ExecutionPolicy policy) throws Exception;
 
   /**
    * Get the number of nodes currently idle.
+   * Note that this method is equivalent to calling {@link #nbIdleNodes(NodeSelector)} with a {@code null} selector.
    * @return the number of idle nodes.
    * @throws Exception if any error occurs.
    */
   Integer nbIdleNodes() throws Exception;
 
   /**
+   * Get the number of idle nodes attached to the driver that satisfy the specified selector.
+   * @param selector specifies which nodes should be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @return the number of nodes.
+   * @throws Exception if any error occurs.
+   * @since 5.0
+   */
+  Integer nbIdleNodes(NodeSelector selector) throws Exception;
+
+  /**
    * Request the JMX connection information for all the idle nodes attached to the server.
+   * Note that this method is equivalent to calling {@link #idleNodesInformation(NodeSelector)} with a {@code null} selector.
    * @return a collection of <code>NodeManagementInfo</code> instances.
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> idleNodesInformation() throws Exception;
+
+  /**
+   * Request the JMX connection information for all the idle nodes attached to the server which satisfy the specified selector.
+   * @param selector specifies which nodes shouyld be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @throws Exception if any error occurs.
+   */
+  Collection<JPPFManagementInfo> idleNodesInformation(NodeSelector selector) throws Exception;
 
   /**
    * Toggle the activate state of the specified nodes. Nodes in 'active' state will be deactivated, nodes in 'inactive' state will be activated.

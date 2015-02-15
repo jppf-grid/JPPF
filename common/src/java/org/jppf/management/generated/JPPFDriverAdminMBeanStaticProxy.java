@@ -56,6 +56,11 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
+  public Collection nodesInformation(final NodeSelector param0) {
+    return (Collection) invoke("nodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
   public String restartShutdown(final Long param0, final Long param1) {
     return (String) invoke("restartShutdown", new Object[] { param0, param1 }, new String[] { "java.lang.Long", "java.lang.Long" });
   }
@@ -81,6 +86,11 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
+  public Collection idleNodesInformation(final NodeSelector param0) {
+    return (Collection) invoke("idleNodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
   public void toggleActiveState(final NodeSelector param0) {
     invoke("toggleActiveState", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
@@ -101,6 +111,11 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
+  public Integer nbNodes(final NodeSelector param0) {
+    return (Integer) invoke("nbNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
   public Integer nbNodes() {
     return (Integer) invoke("nbNodes", (Object[]) null, (String[]) null);
   }
@@ -108,6 +123,11 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   @Override
   public Integer matchingNodes(final ExecutionPolicy param0) {
     return (Integer) invoke("matchingNodes", new Object[] { param0 }, new String[] { "org.jppf.node.policy.ExecutionPolicy" });
+  }
+
+  @Override
+  public Integer nbIdleNodes(final NodeSelector param0) {
+    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
