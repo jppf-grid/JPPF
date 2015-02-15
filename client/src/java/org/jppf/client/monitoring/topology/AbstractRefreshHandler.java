@@ -119,7 +119,7 @@ abstract class AbstractRefreshHandler {
   public void startRefreshTimer() {
     if (refreshTimer != null) return;
     if (refreshInterval <= 0L) return;
-    refreshTimer = new Timer(name == null ? "RefreshHandler Timer" : name);
+    refreshTimer = new Timer(name == null ? "RefreshHandler Timer" : name, true);
     TimerTask task = new TimerTask() {
       @Override
       public void run() {
