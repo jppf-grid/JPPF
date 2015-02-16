@@ -77,8 +77,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbNodes(final NodeSelector selector) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    return nodes.size();
+    Collection<JPPFManagementInfo> nodes = nodesInformation(selector);
+    return nodes == null ? -1 : nodes.size();
   }
 
   @Override
@@ -94,6 +94,40 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
       for (AbstractNodeContext context : nodes) {
         JPPFManagementInfo info = context.getManagementInfo();
         if (info != null) list.add(info);
+      }
+      return list;
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+      return null;
+    }
+  }
+
+  @Override
+  public Integer nbIdleNodes() throws Exception {
+    return nbIdleNodes(null);
+  }
+
+  @Override
+  public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
+    Collection<JPPFManagementInfo> nodes = idleNodesInformation(selector);
+    return nodes == null ? -1 : nodes.size();
+  }
+
+  @Override
+  public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception {
+    return idleNodesInformation(null);
+  }
+
+  @Override
+  public Collection<JPPFManagementInfo> idleNodesInformation(final NodeSelector selector) {
+    try {
+      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+      List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
+      for (AbstractNodeContext context : nodes) {
+          if (getNodeNioServer().isIdle(context.getChannel())) {
+          JPPFManagementInfo info = context.getManagementInfo();
+          if (info != null) list.add(info);
+        }
       }
       return list;
     } catch(Exception e) {
@@ -231,40 +265,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
     }
     if (debugEnabled) log.debug("matching nodes = " + count);
     return count;
-  }
-
-  @Override
-  public Integer nbIdleNodes() throws Exception {
-    return nbIdleNodes(null);
-  }
-
-  @Override
-  public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
-    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-    return nodes.size();
-  }
-
-  @Override
-  public Collection<JPPFManagementInfo> idleNodesInformation() throws Exception {
-    return idleNodesInformation(null);
-  }
-
-  @Override
-  public Collection<JPPFManagementInfo> idleNodesInformation(final NodeSelector selector) {
-    try {
-      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
-      List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
-      for (AbstractNodeContext context : nodes) {
-          if (getNodeNioServer().isIdle(context.getChannel())) {
-          JPPFManagementInfo info = context.getManagementInfo();
-          if (info != null) list.add(info);
-        }
-      }
-      return list;
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-      return null;
-    }
   }
 
   /**

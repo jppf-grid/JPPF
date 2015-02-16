@@ -30,24 +30,18 @@ import org.junit.runner.notification.Failure;
  * 
  * @author Laurent Cohen
  */
-public class TextResultRenderer extends AbstractTestResultRenderer
-{
+public class TextResultRenderer extends AbstractTestResultRenderer {
   /**
    * Initialize this renderer witht he specified results.
    * @param result the results to render.
    */
-  public TextResultRenderer(final ResultHolder result)
-  {
+  public TextResultRenderer(final ResultHolder result) {
     super(result);
     this.indent = "  ";
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void render()
-  {
+  public void render() {
     renderHeader();
     renderBody();
   }
@@ -55,8 +49,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer
   /**
    * Render the header
    */
-  private void renderHeader()
-  {
+  private void renderHeader() {
     header.append("\nTotal tests: ").append(result.getTestsCount());
     header.append(", successful: ").append(result.getSuccessCount());
     header.append(", failed: ").append(result.getFailureCount());
@@ -71,31 +64,25 @@ public class TextResultRenderer extends AbstractTestResultRenderer
   /**
    * Render the header
    */
-  private void renderBody()
-  {
-    if (!result.getExceptions().isEmpty())
-    {
+  private void renderBody() {
+    if (!result.getExceptions().isEmpty()) {
       body.append("The following exceptions occurred before the test run:\n\n");
       for (ExceptionHolder exh: result.getExceptions()) renderException(exh);
     }
     body.append("Tests results:\n\n");
-    for (String className: result.getClasses())
-    {
+    for (String className: result.getClasses()) {
       body.append("class ").append(className).append('\n');
       incIndentation();
       List<Failure> failures = result.getFailures().get(className);
-      if (failures != null)
-      {
+      if (failures != null) {
         for (Failure failure: failures) renderFailure(failure);
       }
       List<Description> descriptions = result.getSuccesses().get(className);
-      if (descriptions != null)
-      {
+      if (descriptions != null) {
         for (Description d: descriptions) renderDescription(d, "OK");
       }
       descriptions = result.getIngored().get(className);
-      if (descriptions != null)
-      {
+      if (descriptions != null) {
         for (Description d: descriptions) renderDescription(d, "Ignored");
       }
       decIndentation();
@@ -106,8 +93,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer
    * Render an exception.
    * @param exh the object holding the exception.
    */
-  private void renderException(final ExceptionHolder exh)
-  {
+  private void renderException(final ExceptionHolder exh) {
     body.append(getIndentation()).append(exh.getClassName()).append('\n');
     incIndentation();
     String s = ExceptionUtils.getStackTrace(exh.getThrowable());
@@ -119,11 +105,9 @@ public class TextResultRenderer extends AbstractTestResultRenderer
    * Render the specified failure.
    * @param failure the failure to render.
    */
-  private void renderFailure(final Failure failure)
-  {
+  private void renderFailure(final Failure failure) {
     renderDescription(failure.getDescription(), "Failure");
-    if (failure.getException() != null)
-    {
+    if (failure.getException() != null) {
       incIndentation();
       String s = ExceptionUtils.getStackTrace(failure.getException());
       body.append(indent(s, getIndentation())).append("\n");
@@ -136,8 +120,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer
    * @param desc the description to render.
    * @param type either "OK", "ignored" or "Failure".
    */
-  private void renderDescription(final Description desc, final String type)
-  {
+  private void renderDescription(final Description desc, final String type) {
     body.append(getIndentation()).append(desc.getMethodName()).append("() : ").append(type).append('\n');
   }
 
@@ -149,35 +132,27 @@ public class TextResultRenderer extends AbstractTestResultRenderer
    * @param indentation the indentation to use.
    * @return the indented string.
    */
-  private String indent(final String source, final String indentation)
-  {
+  private String indent(final String source, final String indentation) {
     if (source == null) throw new IllegalArgumentException("source can't be null");
     if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = null;
-    try
-    {
+    try {
       reader = new BufferedReader(new StringReader(source));
       String s;
-      while ((s = reader.readLine()) != null)
-      {
+      while ((s = reader.readLine()) != null) {
         if (s.indexOf("at org.junit.Assert") >= 0) continue;
         sb.append(indentation).append(s).append('\n');
       }
       //boolean endsWithNewline = false;
       //if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
-      while (true)
-      {
+      while (true) {
         char c = sb.charAt(sb.length()-1);
         if ((c == '\n') || (c == '\r')) sb.deleteCharAt(sb.length()-1);
         else break;
       }
-    }
-    catch(Exception e)
-    {
-    }
-    finally
-    {
+    } catch(Exception e) {
+    } finally {
       if (reader != null) StreamUtils.closeSilent(reader);
     }
     return sb.toString();

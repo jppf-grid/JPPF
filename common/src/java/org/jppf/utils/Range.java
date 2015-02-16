@@ -113,7 +113,9 @@ public class Range<T extends Comparable<T>> {
    */
   public boolean intersects(final Range<T> other, final boolean includeBounds) {
     if (other == null) return false;
-    return other.isValueInRange(lower, includeBounds) || other.isValueInRange(upper, includeBounds) || includes(other);
+    //return other.isValueInRange(lower, includeBounds) || other.isValueInRange(upper, includeBounds) || includes(other);
+    return other.isValueInRange(lower, includeBounds) || other.isValueInRange(upper, includeBounds) || includes(other)
+        || isValueInRange(other.getLower(), includeBounds) || isValueInRange(other.getUpper(), includeBounds) || other.includes(this);
   }
 
   /**

@@ -121,6 +121,28 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
   }
 
   /**
+   * Test getting idle nodes information from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testIdleNodesInformation() throws Exception
+  {
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
+    assertNotNull(driver);
+    Thread.sleep(500L);
+    Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
+    assertNotNull(coll);
+    assertEquals(2, coll.size());
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
+    client.submitJob(job);
+    Thread.sleep(500L);
+    coll = driver.idleNodesInformation();
+    assertEquals(1, coll.size());
+    job.awaitResults();
+    while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
+  }
+
+  /**
    * Test getting the number of nodes attached to the server.
    * @throws Exception if any error occurs.
    */
@@ -131,6 +153,28 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertNotNull(driver);
     int n = driver.nbNodes();
     assertEquals(2, n);
+  }
+
+  /**
+   * Test getting the number of idle nodes from the server.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=10000L)
+  public void testNbIdleNodes() throws Exception
+  {
+    int nbNodes = 2;
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
+    assertNotNull(driver);
+    Thread.sleep(500L);
+    int n = driver.nbIdleNodes();
+    assertEquals(nbNodes, n);
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
+    client.submitJob(job);
+    Thread.sleep(1000L);
+    n = driver.nbIdleNodes();
+    assertEquals(nbNodes - 1, n);
+    job.awaitResults();
+    while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
   /**
@@ -222,50 +266,6 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C
     assertEquals(nbNodes, n);
     n = driver.matchingNodes(new Equal("jppf.node.uuid", false, "n1"));
     assertEquals(1, n);
-  }
-
-  /**
-   * Test getting idle nodes information from the server.
-   * @throws Exception if any error occurs.
-   */
-  @Test(timeout=10000L)
-  public void testIdleNodesInformation() throws Exception
-  {
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    Thread.sleep(500L);
-    Collection<JPPFManagementInfo> coll = driver.idleNodesInformation();
-    assertNotNull(coll);
-    assertEquals(2, coll.size());
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submitJob(job);
-    Thread.sleep(500L);
-    coll = driver.idleNodesInformation();
-    assertEquals(1, coll.size());
-    job.awaitResults();
-    while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
-  }
-
-  /**
-   * Test getting the number of idle nodes from the server.
-   * @throws Exception if any error occurs.
-   */
-  @Test(timeout=10000L)
-  public void testNbIdleNodes() throws Exception
-  {
-    int nbNodes = 2;
-    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
-    assertNotNull(driver);
-    Thread.sleep(500L);
-    int n = driver.nbIdleNodes();
-    assertEquals(nbNodes, n);
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 2000L);
-    client.submitJob(job);
-    Thread.sleep(500L);
-    n = driver.nbIdleNodes();
-    assertEquals(nbNodes - 1, n);
-    job.awaitResults();
-    while (driver.nbIdleNodes() < 2) Thread.sleep(100L);
   }
 
   /**

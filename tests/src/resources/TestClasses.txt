@@ -1,4 +1,5 @@
 test.org.jppf.classloader.TestAbstractJPPFClassLoader
+test.org.jppf.classloader.TestResourceLookup
 test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
 test.org.jppf.client.concurrent.TestJPPFCompletionService
 test.org.jppf.client.concurrent.TestJPPFExecutorService

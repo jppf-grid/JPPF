@@ -52,6 +52,16 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
   }
 
   @Override
+  public MemoryInformation memoryInformation() {
+    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public HealthSnapshot healthSnapshot() {
+    return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
+  }
+
+  @Override
   public String[] threadNames() {
     return (String[]) invoke("threadNames", (Object[]) null, (String[]) null);
   }
@@ -74,15 +84,5 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
   @Override
   public Double cpuLoad() {
     return (Double) invoke("cpuLoad", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public MemoryInformation memoryInformation() {
-    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public HealthSnapshot healthSnapshot() {
-    return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
   }
 }

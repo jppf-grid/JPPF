@@ -103,18 +103,25 @@ public class TestPreferencePolicy extends Setup1D2N1C {
    * Test that the preference for node 1, then node 2 is applied properly on 2 concurrent jobs, with a policy parsed from an XML document.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  @Test(timeout=15000)
   public void testTrueXMLPolicy() throws Exception {
-    ExecutionPolicy policy = PolicyParser.parsePolicy(validTrueXML);
-    assertTrue(policy instanceof Preference);
-    testTruePolicy(ReflectionUtils.getCurrentClassAndMethod(), policy);
+    try {
+      ExecutionPolicy policy = PolicyParser.parsePolicy(validTrueXML);
+      assertTrue(policy instanceof Preference);
+      testTruePolicy(ReflectionUtils.getCurrentClassAndMethod(), policy);
+    } catch(Throwable t) {
+      t.printStackTrace();
+      if (t instanceof Exception) throw (Exception) t;
+      else if (t instanceof Error) throw (Error) t;
+      throw new RuntimeException(t);
+    }
   }
 
   /**
    * Test that the preference for node 1, then node 2 is applied properly on 2 concurrent jobs, with a policy built using a Java constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  @Test(timeout=15000)
   public void testTrueJavaPolicy() throws Exception {
     testTruePolicy(ReflectionUtils.getCurrentClassAndMethod(), new Preference(new Equal("jppf.node.uuid", true, "n1"), new Equal("jppf.node.uuid", true, "n2")));
   }
@@ -130,6 +137,7 @@ public class TestPreferencePolicy extends Setup1D2N1C {
     while ((pool = client.getConnectionPool()) == null) Thread.sleep(10L);
     try {
       pool.setMaxSize(2);
+      pool.awaitActiveConnections(Operator.AT_LEAST, 2);
       int nbTasks = 1;
       JPPFJob job1 = BaseTestHelper.createJob(name + " 1", false, false, nbTasks, LifeCycleTask.class, 3000L);
       job1.getSLA().setExecutionPolicy(policy);
@@ -148,6 +156,7 @@ public class TestPreferencePolicy extends Setup1D2N1C {
       LifeCycleTask task2 = (LifeCycleTask) results2.get(0);
       assertNotNull(task2.getResult());
       assertFalse(task1.getNodeUuid().equals(task2.getNodeUuid()));
+      //assertNotSame(task1.getNodeUuid(), task2.getNodeUuid());
     } finally {
       pool.setMaxSize(1);
     }
