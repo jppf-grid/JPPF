@@ -1,6 +1,7 @@
 <?php $currentPage="Download" ?>
 $template{name="about-page-header" title="Downloads"}$
 
+  <!--
   <?php
     $ver1 = "5.0";
     $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
@@ -30,6 +31,7 @@ $template{name="about-page-header" title="Downloads"}$
   Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
 
   <hr>
+  -->
 
   <?php
     $ver1 = "4.2.6";
@@ -67,7 +69,7 @@ $template{name="about-page-header" title="Downloads"}$
   <hr>
 
   <h3>Feeling curious or adventurous about JPPF's latest advances?</h3>
-  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf 5.0 beta"><b>Try our latest (unstable) version - last update: 9/13/2014 JPPF 5.0 beta</b></a>.
+  <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf 5.0 rc1"><b>Try our latest (unstable) version - last update: 2/12/2015 JPPF 5.0 RC1</b></a>.
   <p>
   <div align="center" style="background-color: yellow; padding: 5px"><b><i>This is not recommended for production environments</b></i></div>
 
