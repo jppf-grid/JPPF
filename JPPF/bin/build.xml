@@ -139,8 +139,8 @@
     <tstamp>
       <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
     </tstamp>
-    <!-- Write thebuild and version information to a resource file -->
-    <!-- The resource file will be part of the corresponding jar   -->
+    <!-- Write the build and version information to a resource file -->
+    <!-- The resource file will be part of the corresponding jar    -->
     <propertyfile file="${common}/src/resources/META-INF/jppf-version.properties">
       <entry key="version.number" type="string" value="${version.number}"/>
       <entry key="build.number" type="string" value="${build.number}"/>
