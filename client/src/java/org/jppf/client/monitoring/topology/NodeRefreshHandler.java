@@ -141,8 +141,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (entry.getValue() instanceof Exception) {
         node.setStatus(TopologyNodeStatus.DOWN);
         log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
-      }
-      else if (entry.getValue() instanceof JPPFNodeState) {
+      } else if (entry.getValue() instanceof JPPFNodeState) {
         JPPFNodeState oldState = (JPPFNodeState) entry.getValue();
         if (!oldState.equals(node.getNodeState())) {
           changedNodes.add(node);
@@ -170,8 +169,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (entry.getValue() instanceof Exception) {
         node.setStatus(TopologyNodeStatus.DOWN);
         log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
-      }
-      else if (entry.getValue() instanceof Integer) {
+      } else if (entry.getValue() instanceof Integer) {
         int n = (Integer) entry.getValue();
         if (n != node.getNbSlaveNodes()) {
           changedNodes.add(node);

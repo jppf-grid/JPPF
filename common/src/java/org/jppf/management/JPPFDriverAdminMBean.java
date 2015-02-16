@@ -44,7 +44,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of nodes attached to the driver.
    * Note that this method is equivalent to calling {@link #nbNodes(NodeSelector)} with a {@code null} selector.
-   * @return the number of nodes.
+   * @return the number of nodes, or -1 if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
   Integer nbNodes() throws Exception;
@@ -52,7 +52,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of nodes attached to the driver that satisfy the specified selector.
    * @param selector specifies which nodes shouyld be counted. If null, then {@link NodeSelector#ALL_NODES} will be used.
-   * @return the number of nodes.
+   * @return the number of nodes, or -1 if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    * @since 5.0
    */
@@ -61,7 +61,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Request the JMX connection information for all the nodes attached to the server.
    * Note that this method is equivalent to calling {@link #nodesInformation(NodeSelector)} with a {@code null} selector.
-   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> nodesInformation() throws Exception;
@@ -69,7 +69,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Request the JMX connection information for all the nodes attached to the server which satisfy the specified selector.
    * @param selector specifies which nodes shouyld be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
-   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> nodesInformation(NodeSelector selector) throws Exception;
@@ -121,7 +121,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of nodes currently idle.
    * Note that this method is equivalent to calling {@link #nbIdleNodes(NodeSelector)} with a {@code null} selector.
-   * @return the number of idle nodes.
+   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
   Integer nbIdleNodes() throws Exception;
@@ -129,7 +129,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Get the number of idle nodes attached to the driver that satisfy the specified selector.
    * @param selector specifies which nodes should be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
-   * @return the number of nodes.
+   * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    * @since 5.0
    */
@@ -138,7 +138,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Request the JMX connection information for all the idle nodes attached to the server.
    * Note that this method is equivalent to calling {@link #idleNodesInformation(NodeSelector)} with a {@code null} selector.
-   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> idleNodesInformation() throws Exception;
@@ -146,7 +146,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   /**
    * Request the JMX connection information for all the idle nodes attached to the server which satisfy the specified selector.
    * @param selector specifies which nodes shouyld be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
-   * @return a collection of <code>NodeManagementInfo</code> instances.
+   * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
   Collection<JPPFManagementInfo> idleNodesInformation(NodeSelector selector) throws Exception;

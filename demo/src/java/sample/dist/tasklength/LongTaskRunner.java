@@ -34,8 +34,7 @@ import org.slf4j.*;
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class LongTaskRunner
-{
+public class LongTaskRunner {
   /**
    * Logger for this class.
    */
@@ -52,69 +51,23 @@ public class LongTaskRunner
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       jppfClient = new JPPFClient();
       TypedProperties props = JPPFConfiguration.getProperties();
       int length = props.getInt("longtask.length");
       int nbTask = props.getInt("longtask.number");
       int iterations = props.getInt("longtask.iterations");
       print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
-      //perform(nbTask, length, iterations);
-      performAsync(nbTask, length, iterations);
+      perform(nbTask, length, iterations);
+      //performAsync(nbTask, length, iterations);
       //perform3(nbTask, length, iterations);
       //perform4();
       //perform5();
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
-    }
-  }
-
-  /**
-   * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
-   * @param nbTasks the number of tasks to send at each iteration.
-   * @param length the executionlength of each task.
-   * @param iterations the number of times the the tasks will be sent.
-   * @throws Throwable if an error is raised during the execution.
-   */
-  private static void perform(final int nbTasks, final int length, final int iterations) throws Throwable
-  {
-    try
-    {
-      // perform "iteration" times
-      long totalTime = 0L;
-      for (int iter=1; iter<=iterations; iter++)
-      {
-        long start = System.currentTimeMillis();
-        JPPFJob job = new JPPFJob();
-        job.setName("Long task iteration " + iter);
-        for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
-        // submit the tasks for execution
-        List<Task<?>> results = jppfClient.submitJob(job);
-        for (Task task: results)
-        {
-          Throwable e = task.getThrowable();
-          if (e != null) throw e;
-        }
-        long elapsed = System.currentTimeMillis() - start;
-        print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
-        totalTime += elapsed;
-      }
-      print("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
-      //JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
-      //print("End statistics :\n"+stats.toString());
-    }
-    catch(Exception e)
-    {
-      throw new JPPFException(e.getMessage(), e);
     }
   }
 
@@ -125,19 +78,46 @@ public class LongTaskRunner
    * @param iterations the number of times the the tasks will be sent.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void performAsync(final int nbTasks, final int length, final int iterations) throws Exception
-  {
-    try
-    {
+  private static void perform(final int nbTasks, final int length, final int iterations) throws Exception {
+    // perform "iteration" times
+    long totalTime = 0L;
+    for (int iter=1; iter<=iterations; iter++) {
+      long start = System.currentTimeMillis();
+      JPPFJob job = new JPPFJob();
+      job.setName("Long task iteration " + iter);
+      for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
+      // submit the tasks for execution
+      List<Task<?>> results = jppfClient.submitJob(job);
+      for (Task task: results) {
+        Throwable e = task.getThrowable();
+        if (e != null) {
+          if (e instanceof Exception) throw (Exception) e;
+          else throw new JPPFException(e);
+        }
+      }
+      long elapsed = System.currentTimeMillis() - start;
+      print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
+      totalTime += elapsed;
+    }
+    print("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
+  }
+
+  /**
+   * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
+   * @param nbTasks the number of tasks to send at each iteration.
+   * @param length the executionlength of each task.
+   * @param iterations the number of times the the tasks will be sent.
+   * @throws Exception if an error is raised during the execution.
+   */
+  private static void performAsync(final int nbTasks, final int length, final int iterations) throws Exception {
+    try {
       // perform "iteration" times
       long totalTime = 0L;
-      for (int iter=1; iter<=iterations; iter++)
-      {
+      for (int iter=1; iter<=iterations; iter++) {
         long start = System.currentTimeMillis();
         JPPFJob job = new JPPFJob();
         job.setName("Long task iteration " + iter);
-        for (int i=0; i<nbTasks; i++)
-        {
+        for (int i=0; i<nbTasks; i++) {
           //JPPFTask task = new LongTask(length, false);
           Task<?> task = new PrintTask();
           task.setId("" + iter + ':' + (i+1));
@@ -156,9 +136,7 @@ public class LongTaskRunner
       print("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
       //JPPFStats stats = ((JPPFClientConnectionImpl) jppfClient.getClientConnection()).getJmxConnection().statistics();
       //print("End statistics :\n"+stats.toString());
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }
@@ -170,23 +148,18 @@ public class LongTaskRunner
    * @param iterations the number of times the the tasks will be sent.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform2(final int nbTasks, final int length, final int iterations) throws Exception
-  {
-
+  private static void perform2(final int nbTasks, final int length, final int iterations) throws Exception {
     JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
     //executor.setBatchSize(50);
     //executor.setBatchTimeout(1000L);
-
     long totalTime = System.currentTimeMillis();
     List<Future<?>> futureList = new ArrayList<>();
-    for (int i=0; i<nbTasks; i++)
-    {
+    for (int i=0; i<nbTasks; i++) {
       LongTask task = new LongTask(length, false);
       task.setId("" + (i+1));
       futureList.add(executor.submit(task));
     }
-    for (Future<?> f: futureList)
-    {
+    for (Future<?> f: futureList) {
       f.get();
       Task t = ((JPPFTaskFuture<?>) f).getTask();
       if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
@@ -206,24 +179,20 @@ public class LongTaskRunner
    */
   private static void perform3(final int nbTasks, final int length, final int iterations) throws Exception
   {
-
     JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
     //executor.setBatchSize(50);
     //executor.setBatchTimeout(1000L);
     long totalTime = 0L;
-    for (int iter=0; iter<iterations; iter++)
-    {
+    for (int iter=0; iter<iterations; iter++) {
       long iterTime = System.currentTimeMillis();
       List<JPPFTaskCallable> tasks = new ArrayList<>();
-      for (int i=0; i<nbTasks; i++)
-      {
+      for (int i=0; i<nbTasks; i++) {
         LongTask task = new LongTask(length, false);
         task.setId("" + (i+1));
         tasks.add(new JPPFTaskCallable(task));
       }
       List<Future<Object>> futureList = executor.invokeAll(tasks);
-      for (Future<?> f: futureList)
-      {
+      for (Future<?> f: futureList) {
         f.get();
         Task t = ((JPPFTaskFuture<?>) f).getTask();
         if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
@@ -241,8 +210,7 @@ public class LongTaskRunner
    * Print a message tot he log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     log.info(msg);
     System.out.println(msg);
   }
@@ -250,8 +218,7 @@ public class LongTaskRunner
   /**
    * A <code>Callable</code> wrapper around a <code>JPPFTask</code>.
    */
-  public static class JPPFTaskCallable extends AbstractTask<Object> implements JPPFCallable<Object>
-  {
+  public static class JPPFTaskCallable extends AbstractTask<Object> implements JPPFCallable<Object> {
     /**
      * The task to run.
      */
@@ -261,28 +228,19 @@ public class LongTaskRunner
      * Initialize this callable with the specified jppf task.
      * @param task a <code>JPPFTask</code> instance.
      */
-    public JPPFTaskCallable(final AbstractTask task)
-    {
+    public JPPFTaskCallable(final AbstractTask task) {
       this.task = task;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void run()
-    {
+    public void run() {
       task.run();
       setResult(task.getResult());
       setThrowable(task.getThrowable());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Object call() throws Exception
-    {
+    public Object call() throws Exception {
       run();
       return getResult();
     }
@@ -292,8 +250,7 @@ public class LongTaskRunner
    * This test submits a job and suspends, then resumes it using the management APIs.
    * @throws Throwable if an error is raised during the execution.
    */
-  private static void perform4() throws Throwable
-  {
+  private static void perform4() throws Throwable {
     //System.out.println("\n********** job suspend/resume test **********");
     print("\n********** driver restart test **********");
     print("getting the jmx connection");
@@ -323,8 +280,7 @@ public class LongTaskRunner
     print("restarting the driver");
     restartDriver();
     List<Task<?>> results = job.awaitResults();
-    for (Task t: results)
-    {
+    for (Task t: results) {
       Throwable e = task.getThrowable();
       if (e != null) throw e;
       else print("result for task " + t.getId() + " : " + t.getResult());
@@ -337,8 +293,7 @@ public class LongTaskRunner
    * This test submits a job and suspends, then resumes it using the management APIs.
    * @throws Throwable if an error is raised during the execution.
    */
-  private static void perform5() throws Throwable
-  {
+  private static void perform5() throws Throwable {
     System.out.println("\n********** job cancel test **********");
     long start = System.currentTimeMillis();
     JPPFJob job = new JPPFJob();
@@ -348,8 +303,6 @@ public class LongTaskRunner
     job.add(task);
     job.setBlocking(false);
     jppfClient.submitJob(job);
-    /*
-     */
     DriverJobManagementMBean jobManager = getJobManagement();
     Thread.sleep(3000L);
     System.out.println("cancelling the first job");
@@ -360,8 +313,7 @@ public class LongTaskRunner
     System.out.println("submitting the second job");
     jppfClient.submitJob(job);
     results = job.awaitResults();
-    for (Task t: results)
-    {
+    for (Task t: results) {
       Throwable e = task.getThrowable();
       if (e != null) throw e;
       else System.out.println("result for task " + t.getId() + " : " + t.getResult());
@@ -375,8 +327,7 @@ public class LongTaskRunner
    * @return an instance of {@link DriverJobManagementMBean}.
    * @throws Exception if any error occurs.
    */
-  private static DriverJobManagementMBean getJobManagement() throws Exception
-  {
+  private static DriverJobManagementMBean getJobManagement() throws Exception {
     return getJmxConnection().getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
 
@@ -384,10 +335,8 @@ public class LongTaskRunner
    * Get the jmx connection to the driver.
    * @return a {@link JMXDriverConnectionWrapper} instance.
    */
-  private static JMXDriverConnectionWrapper getJmxConnection()
-  {
-    if (jmx == null)
-    {
+  private static JMXDriverConnectionWrapper getJmxConnection() {
+    if (jmx == null) {
       JPPFClientConnection c = jppfClient.getClientConnection();
       jmx = c.getConnectionPool().getJmxConnection();
       boolean b = jmx.isConnected();
@@ -400,20 +349,14 @@ public class LongTaskRunner
    * Restart the driver.
    * @throws Exception if any error occurs.
    */
-  private static void restartDriver() throws Exception
-  {
-    Runnable r = new Runnable()
-    {
+  private static void restartDriver() throws Exception {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        try
-        {
+      public void run() {
+        try {
           String s = getJmxConnection().restartShutdown(100L, 2000L);
           System.out.println("response for restart: " + s);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           e.printStackTrace();
         }
       }
@@ -425,15 +368,12 @@ public class LongTaskRunner
   /**
    * A task that prints a lot of messages to the console.
    */
-  private static class PrintTask extends AbstractTask<String>
-  {
+  private static class PrintTask extends AbstractTask<String> {
     @Override
-    public void run()
-    {
+    public void run() {
       long start = System.currentTimeMillis();
       int sum = 0;
-      for (int i=0; i<1*1000*1000; i++)
-      {
+      for (int i=0; i<1*1000*1000; i++) {
         System.out.println("printing " + i);
         if (Thread.currentThread().isInterrupted()) break;
         //sum += 1;
@@ -443,8 +383,7 @@ public class LongTaskRunner
     }
 
     @Override
-    public void onCancel()
-    {
+    public void onCancel() {
       System.err.println("*** task cancelled ***");
     }
   }

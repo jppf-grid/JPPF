@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
+import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.location.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
@@ -103,6 +104,7 @@ public class MatrixRunner {
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
       while (!jppfClient.hasAvailableConnection()) Thread.sleep(1L);
+      TopologyManager mgr = new TopologyManager(jppfClient);
 
       // initialize the 2 matrices to multiply
       Matrix a = new Matrix(size);
