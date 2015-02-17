@@ -74,7 +74,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     if ((wrapper == null) || !wrapper.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
     try {
-      nodesInfo = wrapper.nodesInformation();
+      nodesInfo = wrapper.nodesInformation(null, true);
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       return;

@@ -111,8 +111,8 @@ class WaitInitialBundleState extends NodeServerState {
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
-        if (debugEnabled) log.debug(String.format("configuring management for node @ %s:%d, secure=%b", host, port, context.isSsl()));
         JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
+        if (debugEnabled) log.debug(String.format("configuring management for node %s", info));
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         context.setManagementInfo(info);
       } else server.nodeConnected(context);

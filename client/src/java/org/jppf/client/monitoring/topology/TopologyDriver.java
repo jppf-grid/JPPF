@@ -153,7 +153,6 @@ public class TopologyDriver extends AbstractTopologyComponent {
     return null;
   }
 
-
   @Override
   public String toString() {
     JMXDriverConnectionWrapper jmx = getJmx();

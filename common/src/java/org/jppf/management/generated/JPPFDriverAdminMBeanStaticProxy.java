@@ -51,61 +51,6 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
-  public Collection nodesInformation() {
-    return (Collection) invoke("nodesInformation", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Collection nodesInformation(final NodeSelector param0) {
-    return (Collection) invoke("nodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public String restartShutdown(final Long param0, final Long param1) {
-    return (String) invoke("restartShutdown", new Object[] { param0, param1 }, new String[] { "java.lang.Long", "java.lang.Long" });
-  }
-
-  @Override
-  public String changeLoadBalancerSettings(final String param0, final Map param1) {
-    return (String) invoke("changeLoadBalancerSettings", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.util.Map" });
-  }
-
-  @Override
-  public LoadBalancingInformation loadBalancerInformation() {
-    return (LoadBalancingInformation) invoke("loadBalancerInformation", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public void resetStatistics() {
-    invoke("resetStatistics", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Collection idleNodesInformation() {
-    return (Collection) invoke("idleNodesInformation", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Collection idleNodesInformation(final NodeSelector param0) {
-    return (Collection) invoke("idleNodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public void toggleActiveState(final NodeSelector param0) {
-    invoke("toggleActiveState", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public void setBroadcasting(final boolean param0) {
-    setAttribute("Broadcasting", param0);
-  }
-
-  @Override
-  public boolean getBroadcasting() {
-    return (boolean) getAttribute("Broadcasting");
-  }
-
-  @Override
   public JPPFStatistics statistics() {
     return (JPPFStatistics) invoke("statistics", (Object[]) null, (String[]) null);
   }
@@ -133,6 +78,66 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   @Override
   public Integer nbIdleNodes() {
     return (Integer) invoke("nbIdleNodes", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Collection nodesInformation() {
+    return (Collection) invoke("nodesInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Collection nodesInformation(final NodeSelector param0) {
+    return (Collection) invoke("nodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Collection nodesInformation(final NodeSelector param0, final boolean param1) {
+    return (Collection) invoke("nodesInformation", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "boolean" });
+  }
+
+  @Override
+  public String restartShutdown(final Long param0, final Long param1) {
+    return (String) invoke("restartShutdown", new Object[] { param0, param1 }, new String[] { "java.lang.Long", "java.lang.Long" });
+  }
+
+  @Override
+  public String changeLoadBalancerSettings(final String param0, final Map param1) {
+    return (String) invoke("changeLoadBalancerSettings", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.util.Map" });
+  }
+
+  @Override
+  public LoadBalancingInformation loadBalancerInformation() {
+    return (LoadBalancingInformation) invoke("loadBalancerInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void resetStatistics() {
+    invoke("resetStatistics", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Collection idleNodesInformation(final NodeSelector param0) {
+    return (Collection) invoke("idleNodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Collection idleNodesInformation() {
+    return (Collection) invoke("idleNodesInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void toggleActiveState(final NodeSelector param0) {
+    invoke("toggleActiveState", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public void setBroadcasting(final boolean param0) {
+    setAttribute("Broadcasting", param0);
+  }
+
+  @Override
+  public boolean getBroadcasting() {
+    return (boolean) getAttribute("Broadcasting");
   }
 
   @Override

@@ -73,39 +73,44 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    * @param selector the node selector used as a filter.
    * @return a set of {@link AbstractNodeContext} instances.
    */
-  public Set<AbstractNodeContext> getChannels(final NodeSelector selector)
-  {
+  public Set<AbstractNodeContext> getChannels(final NodeSelector selector) {
+    return getChannels(selector, false);
+  }
+
+  /**
+   * Get a set of channels based on a NodeSelector.
+   * @param selector the node selector used as a filter.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @return a set of {@link AbstractNodeContext} instances.
+   */
+  public Set<AbstractNodeContext> getChannels(final NodeSelector selector, final boolean includePeers) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof AllNodesSelector)
-    {
+    if (selector instanceof AllNodesSelector) {
       Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
       Set<AbstractNodeContext> result = new HashSet<>();
-      for (AbstractNodeContext ctx: fullSet)
-      {
-        if (!hasWorkingJmxConnection(ctx)) continue;
-        result.add(ctx);
+      for (AbstractNodeContext ctx: fullSet) {
+        if (hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) result.add(ctx);
       }
       return result;
     }
     else if (selector instanceof UuidSelector)
-      return getChannels(new HashSet<>(((UuidSelector) selector).getUuids()));
+      return getChannels(new HashSet<>(((UuidSelector) selector).getUuids()), includePeers);
     else if (selector instanceof ExecutionPolicySelector)
-      return getChannels(((ExecutionPolicySelector) selector).getPolicy());
+      return getChannels(((ExecutionPolicySelector) selector).getPolicy(), includePeers);
     throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
   }
 
   /**
    * Get the available channels with the specified node uuids.
    * @param uuids the node uuids for which we want a channel reference.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
-  private Set<AbstractNodeContext> getChannels(final Set<String> uuids)
-  {
+  private Set<AbstractNodeContext> getChannels(final Set<String> uuids, final boolean includePeers) {
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-    for (AbstractNodeContext context: allChannels)
-    {
-      if (!hasWorkingJmxConnection(context)) continue;
+    for (AbstractNodeContext context: allChannels) {
+      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
       if (uuids.contains(context.getUuid())) result.add(context);
     }
     return result;
@@ -114,16 +119,15 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   /**
    * Get the available channels for the specified nodes.
    * @param policy an execution to match against the nodes.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
-  private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy)
-  {
+  private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy, final boolean includePeers) {
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (AbstractNodeContext context: allChannels)
-    {
-      if (!hasWorkingJmxConnection(context)) continue;
+    for (AbstractNodeContext context: allChannels) {
+      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
       JPPFSystemInformation info = context.getSystemInformation();
       if (info == null) continue;
       if (policy.accepts(info)) result.add(context);

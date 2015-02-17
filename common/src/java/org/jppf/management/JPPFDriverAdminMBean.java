@@ -75,6 +75,15 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
   Collection<JPPFManagementInfo> nodesInformation(NodeSelector selector) throws Exception;
 
   /**
+   * Request the JMX connection information for all the nodes attached to the server which satisfy the specified selector.
+   * @param selector specifies which nodes shouyld be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
+   * @throws Exception if any error occurs.
+   */
+  Collection<JPPFManagementInfo> nodesInformation(NodeSelector selector, final boolean includePeers) throws Exception;
+
+  /**
    * Perform a shutdown or restart of the server.
    * @param shutdownDelay the delay before shutting down the server, once the command is received.
    * @param restartDelay the delay before restarting, once the server is shutdown. If it is < 0, no restart occurs.

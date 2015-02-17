@@ -105,6 +105,12 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector, final boolean includePeers) throws Exception {
+    return (Collection<JPPFManagementInfo>) invoke(MBEAN_NAME, "nodesInformation", new Object[] { selector, includePeers }, new String[] {NodeSelector.class.getName(), boolean.class.getName()});
+  }
+
+  @Override
   public JPPFStatistics statistics() throws Exception {
     JPPFStatistics stats = (JPPFStatistics) invoke(MBEAN_NAME, "statistics");
     return stats;

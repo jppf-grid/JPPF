@@ -88,8 +88,13 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector) {
+    return nodesInformation(selector, false);
+  }
+
+  @Override
+  public Collection<JPPFManagementInfo> nodesInformation(final NodeSelector selector, final boolean includePeers) {
     try {
-      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+      Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector, includePeers);
       List<JPPFManagementInfo> list = new ArrayList<>(nodes.size());
       for (AbstractNodeContext context : nodes) {
         JPPFManagementInfo info = context.getManagementInfo();

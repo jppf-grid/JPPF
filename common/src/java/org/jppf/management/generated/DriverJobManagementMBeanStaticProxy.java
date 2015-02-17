@@ -46,26 +46,6 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public void updateMaxNodes(final String param0, final Integer param1) {
-    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
-  }
-
-  @Override
-  public JobInformation getJobInformation(final String param0) {
-    return (JobInformation) invoke("getJobInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
-  }
-
-  @Override
-  public NodeJobInformation[] getNodeInformation(final String param0) {
-    return (NodeJobInformation[]) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
-  }
-
-  @Override
-  public void updatePriority(final String param0, final Integer param1) {
-    invoke("updatePriority", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
-  }
-
-  @Override
   public void cancelJob(final String param0) {
     invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
@@ -83,5 +63,25 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   @Override
   public String[] getAllJobIds() {
     return (String[]) getAttribute("AllJobIds");
+  }
+
+  @Override
+  public void updateMaxNodes(final String param0, final Integer param1) {
+    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
+  }
+
+  @Override
+  public JobInformation getJobInformation(final String param0) {
+    return (JobInformation) invoke("getJobInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public NodeJobInformation[] getNodeInformation(final String param0) {
+    return (NodeJobInformation[]) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public void updatePriority(final String param0, final Integer param1) {
+    invoke("updatePriority", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
   }
 }

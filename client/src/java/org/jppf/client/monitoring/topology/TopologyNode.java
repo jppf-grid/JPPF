@@ -119,4 +119,15 @@ public class TopologyNode extends AbstractTopologyComponent {
   public void setNbSlaveNodes(final int nbSlaveNodes) {
     this.nbSlaveNodes = nbSlaveNodes;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("managementInfo=").append(managementInfo);
+    sb.append(", uuid=").append(uuid);
+    sb.append(", nodeState=").append(nodeState);
+    sb.append(']');
+    //return (jmx == null) ? (managementInfo == null ? "?" : managementInfo.toDisplayString()) : jmx.getDisplayName();
+    return sb.toString();
+  }
 }
