@@ -67,6 +67,10 @@ public class AccumulatorHelper {
    * The period of the refreshing thread.
    */
   final int period = JPPFConfiguration.getProperties().getInt("jppf.gui.publish.period", 1000 / 30);
+  /**
+   * Whether auto-refresh is on or off.
+   */
+  private boolean autoRefresh = false;
 
   /**
    * Initialize this hleper with the spsecified job panel.
@@ -83,6 +87,7 @@ public class AccumulatorHelper {
    */
   protected void publish() {
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
+    //if (!isAutoRefresh()) return;
     Map<String, AccumulatorDriver> map = getMap();
     boolean changed = false;
     for (Map.Entry<String, AccumulatorDriver> driverEntry : map.entrySet()) {
@@ -188,8 +193,9 @@ public class AccumulatorHelper {
   /**
    * Start the timer.
    */
-  synchronized void setup() {
+  public synchronized void setup() {
     if (debugEnabled) log.debug("setup invoked");
+    autoRefresh = true;
     if (timer == null) timer = new Timer("accumulator timer");
     timerTask = new MyTimerTask();
     //timer.schedule(timerTask, period, period);
@@ -199,11 +205,20 @@ public class AccumulatorHelper {
   /**
    * Clear the map of accumalator drivers and stop the timer.
    */
-  synchronized void cleanup() {
+  public synchronized void cleanup() {
     if (debugEnabled) log.debug("cleanup invoked");
+    autoRefresh = false;
     if (timerTask != null) timerTask.cancel();
     if (timer != null) timer.purge();
     accumulatorMap.clear();
+  }
+
+  /**
+   * Determine whether auto-refresh is on or off.
+   * @return {@code true} if auto-refresh is on, {@code false} otherwise.
+   */
+  synchronized boolean isAutoRefresh() {
+    return autoRefresh;
   }
 
   /**

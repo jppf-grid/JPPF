@@ -444,7 +444,8 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
         accumulatorHelper.cleanup();
         panelManager.clearDriver();
         populateTreeTableModel();
-        accumulatorHelper.setup();
+        //accumulatorHelper.setup();
+        accumulatorHelper.publish();
         refreshUI();
       }
     }
@@ -491,5 +492,13 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
    */
   TopologyManager getTopologyManager() {
     return topologyManager;
+  }
+
+  /**
+   * Get the accumulator for driver and job state change notifications.
+   * @return an instance of {@link AccumulatorHelper}.
+   */
+  public AccumulatorHelper getAccumulator() {
+    return accumulatorHelper;
   }
 }

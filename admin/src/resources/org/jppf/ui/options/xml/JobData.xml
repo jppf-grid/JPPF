@@ -44,21 +44,23 @@
 		<child name="update.priority.job" type="Button"/>
 
 		<child name="sep2" type="ToolbarSeparator"/>
-		<child name="job.refresh.toggle" type="Boolean">
-			<property name="label" value="Auto refresh"/>
+		<child name="job.refresh.toggle" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/synch.gif"/>
+      <property name="toggle" value="true"/>
 			<property name="tooltip" value="Toggles between automatic and manual refresh of the tree structure"/>
 			<property name="value" value="true"/>
 			<property name="persistent" value="true"/>
-			<!--
+      <initializer type="script">
+        <script language="groovy">option.getUIComponent().setSelected(true)</script>
+      </initializer>
 			<listener type="script">
 				<script language="groovy"><![CDATA[
-					def b = option.getValue().booleanValue();
-					def handler = option.findFirstWithName("/Treetable").getHandler();
-					if (b) handler.startRefreshDriverTimer();
-					else handler.stopRefreshDriverTimer();
+          def b = option.getUIComponent().isSelected();
+					def handler = option.findFirstWithName("/JobTreetable").getAccumulator();
+					if (b) handler.setup();
+					else handler.cleanup();
 				]]></script>
 			</listener>
-			-->
 		</child>
 
 		<child name="job.button.refresh" type="Button">
