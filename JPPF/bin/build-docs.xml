@@ -60,10 +60,10 @@
 		<java fork="yes" classname="org.jppf.utils.ThumbnailGenerator" classpathref="run.classpath">
 			<jvmarg value="-Xmx128m" />
 			<arg value="${home}/screenshots"/>
-			<arg value="72"/>
-			<arg value="72"/>
+			<arg value="64"/>
+			<arg value="64"/>
 			<arg value="${home}/doc-source/templates"/>
-			<arg value="9"/>
+			<arg value="10"/>
 		</java>
 	</target>
 
