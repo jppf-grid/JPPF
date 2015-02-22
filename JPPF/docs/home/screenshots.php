@@ -226,16 +226,21 @@ else
 									<img src="screenshots/_th_Docking-2.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=Docking-3.gif&shotTitle=Docking 3">
 									<img src="screenshots/_th_Docking-3.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=DriverSystemInformation.gif&shotTitle=Driver System Information">
 									<img src="screenshots/_th_DriverSystemInformation.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=EmbeddedConsole.gif&shotTitle=Embedded Console">
+									<img src="screenshots/_th_EmbeddedConsole.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
@@ -246,6 +251,11 @@ else
 							<td align="center">
 								<a href="screenshots.php?screenshot=FractalsSample.gif&shotTitle=Fractals Sample">
 									<img src="screenshots/_th_FractalsSample.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=GraphView.gif&shotTitle=Graph View">
+									<img src="screenshots/_th_GraphView.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
@@ -286,6 +296,11 @@ else
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=NodeProvisioning.gif&shotTitle=Node Provisioning">
+									<img src="screenshots/_th_NodeProvisioning.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=NodeSystemInformation.gif&shotTitle=Node System Information">
 									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
 								</a>
@@ -311,6 +326,23 @@ else
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=PluggableAndHiddenViews-01.gif&shotTitle=Pluggable And Hidden Views 01">
+									<img src="screenshots/_th_PluggableAndHiddenViews-01.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=PluggableAndHiddenViews-02.gif&shotTitle=Pluggable And Hidden Views 02">
+									<img src="screenshots/_th_PluggableAndHiddenViews-02.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+						</tr>
+						<tr>
+							<td align="center">
+								<a href="screenshots.php?screenshot=PluggableView.gif&shotTitle=Pluggable View">
+									<img src="screenshots/_th_PluggableView.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif&shotTitle=Protein Sequence Alignment">
 									<img src="screenshots/_th_ProteinSequenceAlignment.jpg" border="0" alt="screenshot"/>
 								</a>
@@ -320,26 +352,19 @@ else
 									<img src="screenshots/_th_RuntimeMonitoring.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01">
 									<img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=ServerStats-02.gif&shotTitle=Server Stats 02">
+									<img src="screenshots/_th_ServerStats-02.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=Topology-01.gif&shotTitle=Topology 01">
 									<img src="screenshots/_th_Topology-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-GraphView-02.gif&shotTitle=Topology  Graph View 02">
-									<img src="screenshots/_th_Topology-GraphView-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-GraphView.gif&shotTitle=Topology  Graph View">
-									<img src="screenshots/_th_Topology-GraphView.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
