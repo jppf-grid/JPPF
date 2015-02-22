@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public class ThreadManagerThreadPool extends AbstractThreadManager
-{
+public class ThreadManagerThreadPool extends AbstractThreadManager {
   /**
    * Logger for this class.
    */
@@ -51,43 +50,33 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
    * Initialized thread manager.
    * @param poolSize the initial size of the thread pool.
    */
-  public ThreadManagerThreadPool(final int poolSize)
-  {
+  public ThreadManagerThreadPool(final int poolSize) {
     super();
     threadFactory = new JPPFThreadFactory(THREAD_NAME_PREFIX, CpuTimeCollector.isCpuTimeEnabled());
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
-    threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory)
-    {
+    threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory) {
       @Override
-      protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value)
-      {
+      protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, final T value) {
         RunnableFuture<T> future = super.newTaskFor(runnable, value);
-        if (runnable instanceof NodeTaskWrapper)
-        {
-          ((NodeTaskWrapper) runnable).setFuture(future);
-        }
+        if (runnable instanceof NodeTaskWrapper) ((NodeTaskWrapper) runnable).setFuture(future);
         return future;
       }
     };
   }
 
   @Override
-  protected long[] getThreadIds()
-  {
+  protected long[] getThreadIds() {
     return threadFactory.getThreadIDs();
   }
 
   @Override
-  public ExecutorService getExecutorService()
-  {
+  public ExecutorService getExecutorService() {
     return threadPool;
   }
 
   @Override
-  public void setPoolSize(final int size)
-  {
-    if (size <= 0)
-    {
+  public void setPoolSize(final int size) {
+    if (size <= 0) {
       log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
       return;
     }
@@ -95,39 +84,32 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
     if (n == size) return;
 
     ThreadPoolExecutor tpe = threadPool;
-    if (size > tpe.getCorePoolSize())
-    {
+    if (size > tpe.getCorePoolSize()) {
       tpe.setMaximumPoolSize(size);
       tpe.setCorePoolSize(size);
-    }
-    else if (size < tpe.getCorePoolSize())
-    {
+    } else if (size < tpe.getCorePoolSize()) {
       tpe.setCorePoolSize(size);
       tpe.setMaximumPoolSize(size);
     }
   }
 
   @Override
-  public int getPoolSize()
-  {
+  public int getPoolSize() {
     return threadPool.getMaximumPoolSize();
   }
 
   @Override
-  public int getPriority()
-  {
+  public int getPriority() {
     return threadFactory.getPriority();
   }
 
   @Override
-  public void setPriority(final int priority)
-  {
+  public void setPriority(final int priority) {
     threadFactory.updatePriority(priority);
   }
 
   @Override
-  public UsedClassLoader useClassLoader(final ClassLoader classLoader)
-  {
+  public UsedClassLoader useClassLoader(final ClassLoader classLoader) {
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader != null) Thread.currentThread().setContextClassLoader(classLoader);
     return new UsedClassLoaderThread(classLoader, oldClassLoader);
@@ -136,8 +118,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
   /**
    * Helper class that implements used class loader for thread pool thread manager.
    */
-  private static final class UsedClassLoaderThread extends UsedClassLoader
-  {
+  private static final class UsedClassLoaderThread extends UsedClassLoader {
     /**
      * An original <code>ClassLoader</code> instance.
      */
@@ -148,16 +129,13 @@ public class ThreadManagerThreadPool extends AbstractThreadManager
      * @param classLoader a <code>ClassLoader</code> instance.
      * @param oldClassLoader an original <code>ClassLoader</code> instance that will be restored when dispose is called.
      */
-    private UsedClassLoaderThread(final ClassLoader classLoader, final ClassLoader oldClassLoader)
-    {
+    private UsedClassLoaderThread(final ClassLoader classLoader, final ClassLoader oldClassLoader) {
       super(classLoader);
-
       this.oldClassLoader = oldClassLoader;
     }
 
     @Override
-    public void dispose()
-    {
+    public void dispose() {
       if (getClassLoader() != null) Thread.currentThread().setContextClassLoader(oldClassLoader);
     }
   }

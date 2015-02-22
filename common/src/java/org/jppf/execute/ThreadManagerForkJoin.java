@@ -28,8 +28,7 @@ import org.slf4j.*;
  * This class manages the fork join pool for the node's execution manager.
  * @author Martin JANDA
  */
-public class ThreadManagerForkJoin extends AbstractThreadManager
-{
+public class ThreadManagerForkJoin extends AbstractThreadManager {
   /**
    * Logger for this class.
    */
@@ -51,8 +50,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
    * Initialized thread manager.
    * @param poolSize the initial size of the thread pool.
    */
-  public ThreadManagerForkJoin(final int poolSize)
-  {
+  public ThreadManagerForkJoin(final int poolSize) {
     this.threadFactory = new FJThreadFactory(THREAD_NAME_PREFIX, CpuTimeCollector.isCpuTimeEnabled());
     threadPool = new ForkJoinPool(poolSize, threadFactory, new Thread.UncaughtExceptionHandler() {
       @Override
@@ -74,48 +72,40 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
   }
 
   @Override
-  protected long[] getThreadIds()
-  {
+  protected long[] getThreadIds() {
     return threadFactory.getThreadIDs();
   }
 
   @Override
-  public ExecutorService getExecutorService()
-  {
+  public ExecutorService getExecutorService() {
     return threadPool;
   }
 
   @Override
-  public void setPoolSize(final int size)
-  {
-    if (size <= 0)
-    {
+  public void setPoolSize(final int size) {
+    if (size <= 0) {
       log.warn("ignored attempt to set the thread pool size to 0 or less: " + size);
       return;
     }
   }
 
   @Override
-  public int getPoolSize()
-  {
+  public int getPoolSize() {
     return threadPool.getParallelism();
   }
 
   @Override
-  public int getPriority()
-  {
+  public int getPriority() {
     return threadFactory.getPriority();
   }
 
   @Override
-  public void setPriority(final int priority)
-  {
+  public void setPriority(final int priority) {
     threadFactory.setPriority(priority);
   }
 
   @Override
-  public UsedClassLoader useClassLoader(final ClassLoader classLoader)
-  {
+  public UsedClassLoader useClassLoader(final ClassLoader classLoader) {
     return threadFactory.useClassLoader(classLoader);
   }
 
@@ -160,8 +150,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * Initialize this thread factory with the specified name.
      * @param name the name used as prefix for the constructed threads name.
      */
-    public FJThreadFactory(final String name)
-    {
+    public FJThreadFactory(final String name) {
       this(name, false, Thread.NORM_PRIORITY);
     }
 
@@ -170,8 +159,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param name the name used as prefix for the constructed threads name.
      * @param priority priority assigned to the threads created by this factory.
      */
-    public FJThreadFactory(final String name, final int priority)
-    {
+    public FJThreadFactory(final String name, final int priority) {
       this(name, false, priority);
     }
 
@@ -180,8 +168,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param name the name used as prefix for the constructed threads name.
      * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
      */
-    public FJThreadFactory(final String name, final boolean monitoringEnabled)
-    {
+    public FJThreadFactory(final String name, final boolean monitoringEnabled) {
       this(name, monitoringEnabled, Thread.NORM_PRIORITY);
     }
 
@@ -191,25 +178,20 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param monitoringEnabled determines whether the threads created by this factory can be monitored.
      * @param priority priority assigned to the threads created by this factory.
      */
-    public FJThreadFactory(final String name, final boolean monitoringEnabled, final int priority)
-    {
+    public FJThreadFactory(final String name, final boolean monitoringEnabled, final int priority) {
       this.name = name == null ? "JPPFThreadFactory" : name;
       this.priority = priority;
       threadGroup = new ThreadGroup(this.name + " thread group");
       threadGroup.setMaxPriority(Thread.MAX_PRIORITY);
-      if (monitoringEnabled)
-        threadIDs = new ArrayList<>();
-      else
-        threadIDs = null;
+      if (monitoringEnabled) threadIDs = new ArrayList<>();
+      else threadIDs = null;
     }
 
     @Override
-    public synchronized ForkJoinWorkerThread newThread(final ForkJoinPool pool)
-    {
+    public synchronized ForkJoinWorkerThread newThread(final ForkJoinPool pool) {
       ForkJoinWorkerThread thread = new ForkJoinWorkerThread(pool) {
         @Override
-        protected void onTermination(final Throwable exception)
-        {
+        protected void onTermination(final Throwable exception) {
           try {
             terminate(this, exception);
           } finally {
@@ -217,7 +199,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
           }
         }
       };
-      if(threadIDs != null) threadIDs.add(thread.getId());
+      if (threadIDs != null) threadIDs.add(thread.getId());
       threadList.add(thread);
       thread.setPriority(priority);
       return thread;
@@ -229,12 +211,12 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param exception the exception of unrecoverable error or {@code null}
      */
     protected synchronized void terminate(final Thread thread, final Throwable exception) {
-      if(threadIDs != null) {
+      if (threadIDs != null) {
         long threadID = thread.getId();
         threadIDs.remove(threadID);
         terminatedInfo.add(computeExecutionInfo(threadID));
       }
-      if(exception != null) {
+      if (exception != null) {
         System.out.printf("Thread [%d:%s] terminated with exception: %s%n", thread.getId(), thread.getName(), exception);
         exception.printStackTrace(System.out);
       }
@@ -245,15 +227,11 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * Get the ids of the monitored threads.
      * @return a list of long values.
      */
-    public synchronized long[] getThreadIDs()
-    {
-      if(threadIDs == null || threadIDs.isEmpty())
-        return new long[0];
+    public synchronized long[] getThreadIDs() {
+      if (threadIDs == null || threadIDs.isEmpty()) return new long[0];
       long[] ids = new long[threadIDs.size()];
       int dstIndex = 0;
-      for (Long id : threadIDs) {
-        ids[dstIndex++] = id;
-      }
+      for (Long id : threadIDs) ids[dstIndex++] = id;
       return ids;
     }
 
@@ -261,13 +239,9 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * Update the priority of all threads created by this factory.
      * @param priority the new priority to set.
      */
-    public synchronized void setPriority(final int priority)
-    {
+    public synchronized void setPriority(final int priority) {
       if ((priority < Thread.MIN_PRIORITY) || (priority > Thread.MAX_PRIORITY) || (this.priority == priority)) return;
-      for (Thread thread : threadList)
-      {
-        thread.setPriority(priority);
-      }
+      for (Thread thread : threadList) thread.setPriority(priority);
       this.priority = priority;
     }
 
@@ -275,8 +249,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * Get the priority assigned to the threads created by this factory.
      * @return the priority as an int value.
      */
-    public synchronized int getPriority()
-    {
+    public synchronized int getPriority() {
       return priority;
     }
 
@@ -293,21 +266,13 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param classLoader a <code>ClassLoader</code> instance.
      * @return a <code>UsedClassLoader</code> instance. Never return <code>null</code>.
      */
-    public synchronized UsedClassLoader useClassLoader(final ClassLoader classLoader)
-    {
-      if (usedClassLoaders.isEmpty())
-      {
+    public synchronized UsedClassLoader useClassLoader(final ClassLoader classLoader) {
+      if (usedClassLoaders.isEmpty()) {
         this.classLoader = classLoader;
-        for (Thread thread : threadList)
-        {
-          thread.setContextClassLoader(classLoader);
-        }
-      }
-      else if (this.classLoader != classLoader)
-      {
+        for (Thread thread : threadList) thread.setContextClassLoader(classLoader);
+      } else if (this.classLoader != classLoader) {
         throw new IllegalStateException("Already used different classLoader");
       }
-
       FJUsedClassLoader usedClassLoader = new FJUsedClassLoader(classLoader, this);
       usedClassLoaders.add(usedClassLoader);
       return usedClassLoader;
@@ -317,16 +282,11 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * Disposes used class loaderer from this thread factory.
      * @param usedClassLoader a <code>FJUsedClassLoader</code> instance.
      */
-    protected synchronized void dispose(final FJUsedClassLoader usedClassLoader)
-    {
+    protected synchronized void dispose(final FJUsedClassLoader usedClassLoader) {
       if (usedClassLoader == null) throw new IllegalArgumentException("usedClassLoader is null");
-
-      if (usedClassLoaders.remove(usedClassLoader))
-      {
+      if (usedClassLoaders.remove(usedClassLoader)) {
         if (usedClassLoaders.isEmpty()) this.classLoader = null;
-      }
-      else
-      {
+      } else {
         throw new IllegalStateException("UsedClassLoader already disposed");
       }
     }
@@ -335,8 +295,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
   /**
    * Helper class that implements used class loader for fork join thread manager.
    */
-  private static final class FJUsedClassLoader extends UsedClassLoader
-  {
+  private static final class FJUsedClassLoader extends UsedClassLoader {
     /**
      * The thread factory that has registered this UsedClassLoader.
      */
@@ -347,18 +306,14 @@ public class ThreadManagerForkJoin extends AbstractThreadManager
      * @param classLoader a <code>ClassLoader</code> instance.
      * @param threadFactory a <code>FJThreadFactory</code> instance.
      */
-    private FJUsedClassLoader(final ClassLoader classLoader, final FJThreadFactory threadFactory)
-    {
+    private FJUsedClassLoader(final ClassLoader classLoader, final FJThreadFactory threadFactory) {
       super(classLoader);
-
       if (threadFactory == null) throw new IllegalArgumentException("threadFactory is null");
-
       this.threadFactory = threadFactory;
     }
 
     @Override
-    public void dispose()
-    {
+    public void dispose() {
       threadFactory.dispose(this);
     }
   }

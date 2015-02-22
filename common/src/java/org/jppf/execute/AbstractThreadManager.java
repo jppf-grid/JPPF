@@ -23,8 +23,7 @@ package org.jppf.execute;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-public abstract class AbstractThreadManager implements ThreadManager
-{
+public abstract class AbstractThreadManager implements ThreadManager {
   /**
    * Prefix used for the names of the threads created by the executor.
    */
@@ -33,13 +32,11 @@ public abstract class AbstractThreadManager implements ThreadManager
   /**
    * Initialize this execution manager with the specified node.
    */
-  protected AbstractThreadManager()
-  {
+  protected AbstractThreadManager() {
   }
 
   @Override
-  public ExecutionInfo computeExecutionInfo()
-  {
+  public ExecutionInfo computeExecutionInfo() {
     ExecutionInfo info = new ExecutionInfo();
     long[] ids = getThreadIds();
     for (long id: ids) info.add(computeExecutionInfo(id));
@@ -47,8 +44,7 @@ public abstract class AbstractThreadManager implements ThreadManager
   }
 
   @Override
-  public ExecutionInfo computeExecutionInfo(final long threadID)
-  {
+  public ExecutionInfo computeExecutionInfo(final long threadID) {
     return CpuTimeCollector.computeExecutionInfo(threadID);
   }
 
@@ -59,14 +55,12 @@ public abstract class AbstractThreadManager implements ThreadManager
   protected abstract long[] getThreadIds();
 
   @Override
-  public long getCpuTime(final long threadId)
-  {
+  public long getCpuTime(final long threadId) {
     return CpuTimeCollector.getCpuTime(threadId);
   }
 
   @Override
-  public boolean isCpuTimeEnabled()
-  {
+  public boolean isCpuTimeEnabled() {
     return CpuTimeCollector.isCpuTimeEnabled();
   }
 }
