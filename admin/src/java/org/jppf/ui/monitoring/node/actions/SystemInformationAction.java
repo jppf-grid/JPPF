@@ -28,6 +28,7 @@ import org.jppf.management.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.ui.utils.TreeTableUtils;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -76,8 +77,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
     try {
       AbstractTopologyComponent comp = dataArray[0];
       JPPFSystemInformation info = retrieveInfo(comp);
-      //String name = info == null ? "unknown" : (dataArray[0].isDriver() ? dataArray[0].getManagementInfo().toDisplayString() : dataArray[0].toString());
-      String name = comp.getDisplayName();
+      String name = TreeTableUtils.getDisplayName(comp);
       String title = "information for " + (comp.isNode() ? "node " : "driver ") + name;
       html = formatProperties(info, new HTMLPropertiesTableFormat(title));
       toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
@@ -86,7 +86,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
       html = toClipboard.replace("\n", "<br>");
     }
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "System Information", false);
-    //dialog.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+    //dialog.getRootPane().setWindowDecorationStyle(JRootPane.WARNING_DIALOG);
     dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.addWindowListener(new WindowAdapter() {

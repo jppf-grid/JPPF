@@ -49,7 +49,7 @@
     <child name="restart.node.deferred" type="Button">
       <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green_yellow.gif"/>
     </child>
-    <child name="sep3.5" type="ToolbarSeparator"/>
+    <!---<child name="sep3.5" type="ToolbarSeparator"/>-->
     <child name="shutdown.node" type="Button">
       <property name="icon" value="/org/jppf/ui/resources/traffic_light_red.gif"/>
     </child>

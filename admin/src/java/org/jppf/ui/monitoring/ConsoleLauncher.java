@@ -161,7 +161,7 @@ public class ConsoleLauncher {
         else elt = OptionsHandler.addPageFromXml(src);
         OptionsHandler.loadPreferences();
         OptionsHandler.getBuilder().triggerInitialEvents(elt);
-        System.out.println("loaded pages: " + OptionsHandler.getPageList());
+        //System.out.println("loaded pages: " + OptionsHandler.getPageList());
         Frame frame = OptionsHandler.getMainWindow();
         if (createFrame) {
           if (frame == null) {

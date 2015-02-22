@@ -29,6 +29,7 @@ import org.jppf.management.diagnostics.*;
 import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.ui.utils.TreeTableUtils;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -69,7 +70,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
     try {
       ThreadDump info = retrieveThreadDump(dataArray[0]);
       boolean isNode = dataArray[0].isNode();
-      title = "Thread dump for " + (isNode ? "node " : "driver ") + dataArray[0];
+      title = "Thread dump for " + (isNode ? "node " : "driver ") + TreeTableUtils.getDisplayName(dataArray[0]);
       if (info == null) s = "<p><b>No thread dump was generated</b>";
       else s = HTMLThreadDumpWriter.printToString(info, title);
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), title, false);

@@ -349,8 +349,8 @@ public class OptionElementFactory {
    * @throws Exception if an error was raised while building the option.
    */
   public Option buildToolbarSeparator(final OptionDescriptor desc) throws Exception {
-    int width = desc.getInt("width", 1);
-    int height = desc.getInt("height", 1);
+    int width = desc.getInt("width", 5);
+    int height = desc.getInt("height", 5);
     String text = desc.getString("text", " ");
     return new ToolbarSeparatorOption(text, width, height);
   }
