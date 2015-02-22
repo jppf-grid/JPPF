@@ -164,7 +164,7 @@ public class ConfigurationHelper {
   public static TypedProperties loadAndResolve(final Reader reader) throws IOException {
     TypedProperties props = new TypedProperties();
     new PropertiesLoader().load(props, reader);
-    props = new SubstitutionsHandler(props).resolve();
+    props = new SubstitutionsHandler().resolve(props);
     new ScriptHandler().process(props);
     return props;
   }

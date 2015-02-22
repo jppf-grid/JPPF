@@ -18,124 +18,220 @@
 
 package org.jppf.utils.configuration;
 
-import java.util.*;
+import java.util.Set;
+import java.util.regex.*;
 
 import org.jppf.utils.TypedProperties;
-import org.jppf.utils.collections.*;
+import org.slf4j.*;
 
 /**
  * Handles property substitutions in a properties file, that is resolve all
  * references of the following form in properties values:
- * <pre>property.name = ${other.property.name}</pre>
+ * <pre> property.name = ${other.property.name}
+ * some.property.name = ${env.&lt;environment_variable_name&gt;}
+ * other.property.name = ${sys.&lt;system_property_name&gt;}</pre>
  * @author Laurent Cohen
  */
 public class SubstitutionsHandler {
   /**
-   * Start of a value substitution.
+   * Logger for this class.
    */
-  private static final String SUBST_START ="${";
+  private static Logger log = LoggerFactory.getLogger(SubstitutionsHandler.class);
   /**
-   * Stop of a value substitution.
+   * Determines whether debug log statements are enabled.
    */
-  private static final String SUBST_STOP = "}";
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Determines whether trace log statements are enabled.
+   */
+  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Prefix for references to environment variables.
    */
   private static final String ENV_PREFIX ="env.";
   /**
-   * The properties object in which to resolve substitutions.
+   * Provider for environment variables.
    */
-  private final TypedProperties props;
+  private static final PropertyProvider ENV_PROVIDER = new PropertyProvider("env.", "System.getEnv()") {
+    @Override public String getValue(final String key) {
+      return System.getenv(key);
+    }
+  };
   /**
-   * Mapping of properties whose resolution other properties depend on.
+   * Provider for system properties.
    */
-  private final CollectionMap<String, String> dependedOnMap = new SetHashMap<>();
+  private static final PropertyProvider SYS_PROVIDER = new PropertyProvider("sys.", "System.getProperties()") {
+    @Override public String getValue(final String key) {
+      return System.getProperty(key);
+    }
+  };
   /**
-   * Mapping of properties to the properties they depend on.
+   * The known property providers.
    */
-  private final CollectionMap<String, String> dependenciesMap = new SetHashMap<>();
+  private static final PropertyProvider[] PROPERTY_PROVIDERS = { ENV_PROVIDER, SYS_PROVIDER };
+  /**
+   * The regex pattern for identifying substitutable property references. This pattern uses explicit reluctant quantifiers, as opposed
+   * to the default greedy quantifiers, to avoid problems when multiple property references are found in a single property value.
+   */
+  private static final Pattern SUBST_PATTERN = Pattern.compile("(?:\\$\\{){1}?(.*?)\\}+?");
   /**
    * Stores the properties whose values are fully resolved.
    */
-  private TypedProperties resolved = new TypedProperties();
+  private final TypedProperties resolvedProps = new TypedProperties();
+  /**
+   * Number of properties resolved at each iteration, used as a
+   * stop conidition for the resolution loop.
+   */
+  private int resolutionCount;
+  /**
+   *
+   */
+  private Matcher matcher = null;
 
   /**
-   * Initialize this substitution handler with the specified unresolved properties.
-   * @param props the properties where substitutions must be resolved.
+   * Initialize this substitution handler.
    */
-  public SubstitutionsHandler(final TypedProperties props) {
-    this.props = props;
+  public SubstitutionsHandler() {
   }
 
   /**
-   * Resolve the substitutions.
+   * Resolve the substitutions in the input {@link TypedProperties} object.
+   * This method actually changes the property values in the input, i.e. it mutates the input {@link TypedProperties} object.
+   * @param props the properties where substitutions must be resolved.
    * @return TypedProperties object in which substitutions have been resolved whenever possible.
    */
-  public TypedProperties resolve() {
-    for (Map.Entry<Object, Object> entry: props.entrySet()) {
-      if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
-      String key = (String) entry.getKey();
-      String value = (String) entry.getValue();
-      if (value == null) continue;
-      boolean found = true;
-      int pos = 0;
-      while (found) {
-        int idx1 = value.indexOf(SUBST_START, pos);
-        if (idx1 < 0) break;
-        pos = idx1 + SUBST_START.length();
-        int idx2 = value.indexOf(SUBST_STOP, pos);
-        if (idx2 < 0) break;
-        String name = value.substring(pos, idx2);
-        if (name.startsWith(ENV_PREFIX)) {
-          String envVar = name.substring(ENV_PREFIX.length());
-          String resolvedValue = System.getenv(envVar);
-          if (resolvedValue == null) resolvedValue = "";
-          value = value.replace(SUBST_START + name + SUBST_STOP, resolvedValue);
-        } else dependenciesMap.putValue(key, name);
-        pos = idx2 + SUBST_STOP.length() + 1;
+  public TypedProperties resolve(final TypedProperties props) {
+    int i = 0;
+    if (traceEnabled) log.trace("starting substitution handling");
+    Set<String> set = props.stringPropertyNames();
+    resolutionCount = 1;
+    while (resolutionCount > 0) {
+      resolutionCount = 0;
+      i++;
+      for (String key: set) {
+        String value = evaluateProp(key, props.getProperty(key));
+        props.setProperty(key, value);
       }
-      if (dependenciesMap.containsKey(key)) {
-        Set<String> toRemove = new HashSet<>();
-        for (String dep: dependenciesMap.getValues(key)) {
-          if (resolved.containsKey(dep)) {
-            String resolvedValue = resolved.getProperty(dep);
-            value = value.replace(SUBST_START + dep + SUBST_STOP, resolvedValue);
-            toRemove.add(dep);
-          }
-        }
-        for (String dep: toRemove) dependenciesMap.removeValue(key, dep);
-      }
-      if (dependenciesMap.containsKey(key)) {
-        for (String dep: dependenciesMap.getValues(key)) dependedOnMap.putValue(dep, key);
-      } else {
-        resolved.setProperty(key, value);
-        propagateResolution(key, value);
-      }
+      if (traceEnabled) log.trace("iteration {} : resolutionCount = {}", i, resolutionCount);
     }
-    // add the unresolved properties
-    for (String unresolvedProp: dependenciesMap.keySet()) resolved.put(unresolvedProp, props.getProperty(unresolvedProp));
-    return resolved;
+    resolvedProps.clear();
+    return props;
   }
 
   /**
-   * Recursively propagate the resolution of a property value to the properties that depend on it.
-   * @param key the name of the resolved property.
-   * @param resolvedValue the resolved value of the property.
+   * Resolve the substitutions for the specified property.
+   * @param key the name of the property.
+   * @param value the current value of the property.
+   * @return the new value of the property after 0 or more substitutions have been handled.
    */
-  private void propagateResolution(final String key, final String resolvedValue) {
-    if (!dependedOnMap.containsKey(key)) return;
-    Map<String, String> toPropagate = new HashMap<>();
-    for (String dependent: dependedOnMap.getValues(key)) {
-      if (!dependenciesMap.containsKey(dependent)) continue;
-      String value = props.getProperty(dependent);
-      if (value != null) props.setProperty(dependent, value = value.replace(SUBST_START + key + SUBST_STOP, resolvedValue));
-      dependenciesMap.removeValue(dependent, key);
-      if (!dependenciesMap.containsKey(dependent)) toPropagate.put(dependent, value);
+  private String evaluateProp(final String key, final String value) {
+    matcher = SUBST_PATTERN.matcher(value);
+    StringBuilder sb = new StringBuilder();
+    int pos = 0;
+    int matches = 0;
+    int resolvedRefCount = 0;
+    if (traceEnabled) log.trace("evaluating [key={}, value={}]", key, value);
+    while (matcher.find()) {
+      matches++;
+      String resolvedValue = null;
+      sb.append(value.substring(pos, matcher.start()));
+      String name = matcher.group(1);
+      if (traceEnabled) log.trace("  found match [name={}]", name);
+      if (name == null) name = "";
+      boolean done = false;
+      for (PropertyProvider provider: PROPERTY_PROVIDERS) {
+        if (name.startsWith(provider.prefix)) {
+          resolvedRefCount += resolveSpecialProperty(provider, name, value, sb);
+          done = true;
+          break;
+        }
+      }
+      if (!done) {
+        if (resolvedProps.containsKey(name)) {
+          resolvedValue = resolvedProps.getProperty(name);
+          if (!"".equals(name.trim())) resolvedRefCount++;
+          if (traceEnabled) log.trace("  property already resolved [name={}, value={}]", name, resolvedValue);
+        } else {
+          resolvedValue = value.substring(matcher.start(), matcher.end());
+          if ("".equals(name.trim())) {
+            if (traceEnabled) log.trace("  empty property name [name={}]", name);
+            resolvedRefCount++;
+            resolvedProps.put(name, resolvedValue);
+          } else {
+            if (traceEnabled) log.trace("  unresolved property [name={}, value={}]", name, resolvedValue);
+          }
+        }
+        sb.append(resolvedValue);
+      }
+      pos = matcher.end();
     }
-    dependedOnMap.removeKey(key);
-    for (Map.Entry<String, String> entry: toPropagate.entrySet()) {
-      resolved.setProperty(entry.getKey(), entry.getValue());
-      propagateResolution(entry.getKey(), entry.getValue());
+    if (pos < value.length()) sb.append(value.substring(pos, value.length()));
+    String s = sb.toString();
+    if (resolvedRefCount > 0) resolutionCount++;
+    if ((matches <= 0) || (resolvedRefCount >= matches)) resolvedProps.put(key, s);
+    if (traceEnabled) log.trace("final value [key={}, value={}]", key, s);
+    return s;
+  }
+
+  /**
+   *
+   * @param provider used to lookup the property or variable name.
+   * @param name the name of the property or variables to look for.
+   * @param value the raw, unresolved value.
+   * @param valueBuilder an appendable string for the property value being computed.
+   * @return 0 if the variable or property had already been resolved previously, 1 otherwise.
+   */
+  private int resolveSpecialProperty(final PropertyProvider provider, final String name, final String value, final StringBuilder valueBuilder) {
+    String resolvedValue = null;
+    int resolvedRefCount = 0;
+    if (resolvedProps.containsKey(name)) {
+      resolvedValue = resolvedProps.getProperty(name);
+      if (traceEnabled) log.trace(String.format("  property from %s already resolved [name=%s, value=%s]", provider.mapName, name, resolvedValue));
+    } else {
+      resolvedRefCount++;
+      String var = name.substring(provider.prefix.length());
+      if (var == null) var = "";
+      if (!"".equals(var)) resolvedValue = provider.getValue(var);
+      if (resolvedValue != null) {
+        if (traceEnabled) log.trace(String.format("  got property from %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
+      } else {
+        resolvedValue = value.substring(matcher.start(), matcher.end());
+        if (traceEnabled) log.trace(String.format("  property not found in %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
+      }
+      resolvedProps.put(name, resolvedValue);
     }
+    valueBuilder.append(resolvedValue);
+    return resolvedRefCount;
+  }
+
+  /**
+   * A provider for properties or variables to substitute in the configuration.
+   */
+  private static abstract class PropertyProvider {
+    /**
+     * The prefix of the properties to substitute.
+     */
+    public final String prefix;
+    /**
+     * Only used in trace logging.
+     */
+    public final String mapName;
+
+    /**
+     *Initialize this provider.
+     * @param prefix the prefix of the properties to substitute.
+     * @param mapName only used in trace logging.
+     */
+    PropertyProvider(final String prefix, final String mapName) {
+      this.prefix = prefix;
+      this.mapName = mapName;
+    }
+
+    /**
+     * Get the value for the spciefied key.
+     * @param key the name of the property or variable to lookup^.
+     * @return the vakue for th espeicifed key or {@code null} if the value could not be found.
+     */
+    public abstract String getValue(final String key);
   }
 }

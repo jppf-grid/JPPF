@@ -57,7 +57,7 @@ public class RegexRunner {
     config.setString("prop.5", "hello $script{ return '${prop.0} ' + (2 + 3) }$ world");
     config.setString("prop.6", "hello $script{ return thisProperties.getString('prop.0') + (2 + 3) }$ universe");
     TypedProperties oldProps = new TypedProperties(config);
-    config = new SubstitutionsHandler(config).resolve();
+    config = new SubstitutionsHandler().resolve(config);
     ScriptHandler sh = new ScriptHandler();
     sh.process(config);
     for (String key: oldProps.stringPropertyNames()) {

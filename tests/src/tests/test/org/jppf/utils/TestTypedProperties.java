@@ -185,6 +185,27 @@ public class TestTypedProperties {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=5000L)
+  public void testSubstitutions2() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = one\n");
+    sb.append("prop.2 = two\n");
+    sb.append("prop.3 = three\n");
+    sb.append("prop.4 = ${prop.1}-${prop.2}-${prop.3}-four\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.4", "one-two-three-four");
+      checkProperty(props, "prop.3", "three");
+      checkProperty(props, "prop.2", "two");
+      checkProperty(props, "prop.1", "one");
+    }
+  }
+
+  /**
+   * Test that property substitutions are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
   public void testUnresolvedSubstitutions() throws Exception {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = 1/${prop.2}\n");
@@ -237,13 +258,68 @@ public class TestTypedProperties {
   @Test(timeout=5000L)
   public void testUnresolvedEnvironmentVariableSubstitution() throws Exception {
     StringBuilder sb = new StringBuilder();
-    sb.append("prop.1 = 1/${env.This_is_my_undefined_environment_variable}\n");
+    String undef = "${env.This_is_my_undefined_environment_variable}";
+    sb.append("prop.1 = 1/" + undef + "\n");
     sb.append("prop.2 = 2-${prop.1}\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = ConfigurationHelper.loadAndResolve(r);
       System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
-      checkProperty(props, "prop.1", "1/");
-      checkProperty(props, "prop.2", "2-1/");
+      checkProperty(props, "prop.1", "1/" + undef);
+      checkProperty(props, "prop.2", "2-1/" + undef);
+    }
+  }
+
+  /**
+   * Test that substitutions of system properties references are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testSystemPropertySubstitution() throws Exception {
+    String value = "sys.value";
+    System.setProperty("test", value);
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${sys.test}\n");
+    sb.append("prop.2 = 2-${prop.1}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/" + value);
+      checkProperty(props, "prop.2", "2-1/" + value);
+    }
+  }
+
+  /**
+   * Test that substitutions of system properties references are handled properly when the environment variable name is empty (after trimming).
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testEmptySystemPropertyNameSubstitution() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = 1/${sys.  }\n");
+    sb.append("prop.2 = 2-${prop.1}-${sys.}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/${sys.  }");
+      checkProperty(props, "prop.2", "2-1/${sys.  }-${sys.}");
+    }
+  }
+
+  /**
+   * Test that substitutions of undefined system properties references are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testUnresolvedSystemPropertySubstitution() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    String undef = "${sys.This_is_my_undefined_system_property}";
+    sb.append("prop.1 = 1/" + undef + "\n");
+    sb.append("prop.2 = 2-${prop.1}\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = ConfigurationHelper.loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.1", "1/" + undef);
+      checkProperty(props, "prop.2", "2-1/" + undef);
     }
   }
 
