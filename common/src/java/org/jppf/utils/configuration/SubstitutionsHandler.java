@@ -18,7 +18,7 @@
 
 package org.jppf.utils.configuration;
 
-import java.util.*;
+import java.util.Set;
 import java.util.regex.*;
 
 import org.jppf.utils.TypedProperties;
@@ -49,8 +49,28 @@ public class SubstitutionsHandler {
    */
   private static final String ENV_PREFIX ="env.";
   /**
-   * The regex pattern for identifying scripted property values. This pattern uses explicit reluctant quantifiers, as opposed
-   * to the default greedy quantifiers, to avoid problems when multiple property references are found in a single property value. 
+   * Provider for environment variables.
+   */
+  private static final PropertyProvider ENV_PROVIDER = new PropertyProvider("env.", "System.getEnv()") {
+    @Override public String getValue(final String key) {
+      return System.getenv(key);
+    }
+  };
+  /**
+   * Provider for system properties.
+   */
+  private static final PropertyProvider SYS_PROVIDER = new PropertyProvider("sys.", "System.getProperties()") {
+    @Override public String getValue(final String key) {
+      return System.getProperty(key);
+    }
+  };
+  /**
+   * The known property providers.
+   */
+  private static final PropertyProvider[] PROPERTY_PROVIDERS = { ENV_PROVIDER, SYS_PROVIDER };
+  /**
+   * The regex pattern for identifying substitutable property references. This pattern uses explicit reluctant quantifiers, as opposed
+   * to the default greedy quantifiers, to avoid problems when multiple property references are found in a single property value.
    */
   private static final Pattern SUBST_PATTERN = Pattern.compile("(?:\\$\\{){1}?(.*?)\\}+?");
   /**
@@ -62,6 +82,10 @@ public class SubstitutionsHandler {
    * stop conidition for the resolution loop.
    */
   private int resolutionCount;
+  /**
+   *
+   */
+  private Matcher matcher = null;
 
   /**
    * Initialize this substitution handler.
@@ -84,7 +108,7 @@ public class SubstitutionsHandler {
       resolutionCount = 0;
       i++;
       for (String key: set) {
-        String value = evaluateProp(key, (String) props.getProperty(key));
+        String value = evaluateProp(key, props.getProperty(key));
         props.setProperty(key, value);
       }
       if (traceEnabled) log.trace("iteration {} : resolutionCount = {}", i, resolutionCount);
@@ -100,7 +124,7 @@ public class SubstitutionsHandler {
    * @return the new value of the property after 0 or more substitutions have been handled.
    */
   private String evaluateProp(final String key, final String value) {
-    Matcher matcher = SUBST_PATTERN.matcher(value);
+    matcher = SUBST_PATTERN.matcher(value);
     StringBuilder sb = new StringBuilder();
     int pos = 0;
     int matches = 0;
@@ -113,25 +137,15 @@ public class SubstitutionsHandler {
       String name = matcher.group(1);
       if (traceEnabled) log.trace("  found match [name={}]", name);
       if (name == null) name = "";
-      if (name.startsWith(ENV_PREFIX)) {
-        if (resolvedProps.containsKey(name)) {
-          resolvedValue = resolvedProps.getProperty(name);
-          if (traceEnabled) log.trace("  env var already resolved [name={}, value={}]", name, resolvedValue);
-        } else {
-          resolvedRefCount++;
-          String envVar = name.substring(ENV_PREFIX.length());
-          if (envVar == null) envVar = "";
-          resolvedValue = System.getenv(envVar);
-          if (resolvedValue != null) {
-            if (traceEnabled) log.trace("  got env var from System.getenv() : [envVar={}, value={}]", envVar, resolvedValue);
-          } else {
-            resolvedValue = value.substring(matcher.start(), matcher.end());
-            if (traceEnabled) log.trace("  env var not found in System.getenv() : [envVar={}, value={}]", envVar, resolvedValue);
-          }
-          resolvedProps.put(name, resolvedValue);
+      boolean done = false;
+      for (PropertyProvider provider: PROPERTY_PROVIDERS) {
+        if (name.startsWith(provider.prefix)) {
+          resolvedRefCount += resolveSpecialProperty(provider, name, value, sb);
+          done = true;
+          break;
         }
-        sb.append(resolvedValue);
-      } else {
+      }
+      if (!done) {
         if (resolvedProps.containsKey(name)) {
           resolvedValue = resolvedProps.getProperty(name);
           if (!"".equals(name.trim())) resolvedRefCount++;
@@ -156,5 +170,67 @@ public class SubstitutionsHandler {
     if ((matches <= 0) || (resolvedRefCount >= matches)) resolvedProps.put(key, s);
     if (traceEnabled) log.trace("final value [key={}, value={}]", key, s);
     return s;
+  }
+
+  /**
+   *
+   * @param provider used to lookup the property or variable name.
+   * @param name the name of the property or variables to look for.
+   * @param value the raw, unresolved value.
+   * @param valueBuilder an appendable string for the property value being computed.
+   * @return 0 if the variable or property had already been resolved previously, 1 otherwise.
+   */
+  private int resolveSpecialProperty(final PropertyProvider provider, final String name, final String value, final StringBuilder valueBuilder) {
+    String resolvedValue = null;
+    int resolvedRefCount = 0;
+    if (resolvedProps.containsKey(name)) {
+      resolvedValue = resolvedProps.getProperty(name);
+      if (traceEnabled) log.trace(String.format("  property from %s already resolved [name=%s, value=%s]", provider.mapName, name, resolvedValue));
+    } else {
+      resolvedRefCount++;
+      String var = name.substring(provider.prefix.length());
+      if (var == null) var = "";
+      if (!"".equals(var)) resolvedValue = provider.getValue(var);
+      if (resolvedValue != null) {
+        if (traceEnabled) log.trace(String.format("  got property from %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
+      } else {
+        resolvedValue = value.substring(matcher.start(), matcher.end());
+        if (traceEnabled) log.trace(String.format("  property not found in %s : [envVar=%s, value=%s]", provider.mapName, var, resolvedValue));
+      }
+      resolvedProps.put(name, resolvedValue);
+    }
+    valueBuilder.append(resolvedValue);
+    return resolvedRefCount;
+  }
+
+  /**
+   * A provider for properties or variables to substitute in the configuration.
+   */
+  private static abstract class PropertyProvider {
+    /**
+     * The prefix of the properties to substitute.
+     */
+    public final String prefix;
+    /**
+     * Only used in trace logging.
+     */
+    public final String mapName;
+
+    /**
+     *Initialize this provider.
+     * @param prefix the prefix of the properties to substitute.
+     * @param mapName only used in trace logging.
+     */
+    PropertyProvider(final String prefix, final String mapName) {
+      this.prefix = prefix;
+      this.mapName = mapName;
+    }
+
+    /**
+     * Get the value for the spciefied key.
+     * @param key the name of the property or variable to lookup^.
+     * @return the vakue for th espeicifed key or {@code null} if the value could not be found.
+     */
+    public abstract String getValue(final String key);
   }
 }
