@@ -20,7 +20,6 @@ package sample.test.deadlock;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.utils.AbstractJPPFJobStream;
-import org.jppf.utils.JPPFConfiguration;
 
 /**
  *
@@ -28,43 +27,22 @@ import org.jppf.utils.JPPFConfiguration;
  */
 public class JobStreamImpl extends AbstractJPPFJobStream {
   /**
-   * The maximum number of tasks in each job.
-   */
-  private final int tasksPerJob;
-  /**
-   * The duration of each task.
-   */
-  private final long taskDuration;
-  /**
-   * The number of jobs to submit.
-   */
-  private final int nbJobs;
-  /**
-   * Whether the tasks should simulate CPU usage.
-   */
-  private final boolean useCPU = JPPFConfiguration.getProperties().getBoolean("deadlock.useCPU", false);
-  /**
    * 
    */
-  private final int dataSize = JPPFConfiguration.getProperties().getInt("deadlock.dataSize", -1);
+  private final RunOptions options;
 
   /**
    * Initialize this job provider.
-   * @param concurrencyLimit the maximum number of jobs submitted concurrently.
-   * @param nbJobs the number of jobs to submit.
-   * @param tasksPerJob the maximum number of tasks in each job.
-   * @param taskDuration the duration of each task.
+   * @param options the maximum number of jobs submitted concurrently.
    */
-  public JobStreamImpl(final int concurrencyLimit, final int nbJobs, final int tasksPerJob, final long taskDuration) {
-    super(concurrencyLimit);
-    this.nbJobs = nbJobs;
-    this.tasksPerJob = tasksPerJob;
-    this.taskDuration = taskDuration;
+  public JobStreamImpl(final RunOptions options) {
+    super(options.concurrencyLimit);
+    this.options = options;
   }
 
   @Override
   public boolean hasNext() {
-    return getJobCount() < nbJobs;
+    return getJobCount() < options.nbJobs;
   }
 
   @Override
@@ -72,9 +50,9 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
     JPPFJob job = new JPPFJob();
     job.setName("streaming job " + getJobCount());
     try {
-      for (int i=1; i<=tasksPerJob; i++) {
+      for (int i=1; i<=options.tasksPerJob; i++) {
         String message = "this is task " + i;
-        MyTask task = new MyTask(message, taskDuration, useCPU, dataSize);
+        MyTask task = new MyTask(message, options.taskDuration, options.useCPU, options.dataSize);
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
       }
     } catch(Exception e) {
@@ -82,8 +60,6 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
     }
     return job;
   }
-
-  // implementation of Closeable
 
   @Override
   public void close() {

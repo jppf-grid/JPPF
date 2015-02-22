@@ -61,40 +61,40 @@ public class DeadlockRunner {
    * Execute a stream of non-blocking jobs from a single thread, process the results asynchronously.
    */
   public void jobStreaming() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int concurrencyLimit = config.getInt("deadlock.concurrencyLimit", 4);
-    int clientConnections = config.getInt("deadlock.clientConnections", concurrencyLimit);
-    int slaves = config.getInt("deadlock.slaveNodes", 0);
-    if (slaves < 0) slaves = 0;
-    int nbJobs = config.getInt("deadlock.nbJobs", 10);
-    int tasksPerJob = config.getInt("deadlock.tasksPerJob", 10);
-    long taskDuration = config.getLong("deadlock.taskDuration", 10L);
-    long waitTime = config.getLong("deadlock.waitTime", 15000L);
-    boolean simulateNodeCrashes = config.getBoolean("deadlock.simulateNodeCrashes", false);
-    System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", concurrencyLimit, nbJobs, tasksPerJob, taskDuration);
+    RunOptions ro = new RunOptions();
+    System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
-    try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(concurrencyLimit, nbJobs, tasksPerJob, taskDuration)) {
-      ensureSufficientConnections(client, clientConnections);
-      updateSlaveNodes(client, slaves);
-      if (simulateNodeCrashes) {
-        pt = new ProvisioningThread(client, waitTime);
+    try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
+      ensureSufficientConnections(client, ro.clientConnections);
+      if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
+      if (ro.simulateNodeCrashes) {
+        pt = new ProvisioningThread(client, ro.waitTime);
         mnmt = new MasterNodeMonitoringThread(client, 5000L, pt);
       }
       try {
-        if (simulateNodeCrashes) {
+        if (ro.simulateNodeCrashes) {
           new Thread(pt, "ProvisioningThread").start();
           new Thread(mnmt, "MasterNodeMonitoringThread").start();
         }
         TimeMarker marker = new TimeMarker().start();
+        int count = 0;
         for (JPPFJob job: jobProvider) {
           if (job != null) client.submitJob(job);
+          if (count == ro.triggerNodeDeadlockAfter) {
+            JPPFJob deadlockingJob = new JPPFJob();
+            deadlockingJob.setName("deadlock trigger job");
+            deadlockingJob.setBlocking(false);
+            deadlockingJob.add(new DeadlockingTask());
+            client.submitJob(deadlockingJob);
+          }
+          count++;
           //requestNodeShutdown(client);
         }
         while (jobProvider.hasPendingJob()) Thread.sleep(10L);
         System.out.printf("*** executed a total of %,d jobs and %,d tasks in %s\n", jobProvider.getJobCount(), jobProvider.getTaskCount(), marker.stop().getLastElapsedAsString());
       } finally {
-        if (simulateNodeCrashes) {
+        if (ro.simulateNodeCrashes) {
           pt.setStopped(true);
           mnmt.setStopped(true);
         }
@@ -193,5 +193,18 @@ public class DeadlockRunner {
       jmx = pool.awaitJMXConnections(Operator.AT_LEAST, 2, true).get(0);
     }
     return jmx;
+  }
+
+  /**
+   * Submit a job with a single task wich triggers a deadlock int he node where it executes.
+   * @param client the client which submits the job.
+   * @throws Exception if any error occurs.
+   */
+  private static void submitDeadlockingJob(final JPPFClient client) throws Exception {
+    JPPFJob job = new JPPFJob();
+    job.setName("Deadlocking job");
+    job.setBlocking(false);
+    job.add(new DeadlockingTask());
+    client.submitJob(job);
   }
 }
