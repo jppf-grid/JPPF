@@ -143,6 +143,7 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "jmxremote/" + BaseSetup.JMX_REMOTE_JAR);
+    addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");
   }
 
   /**
@@ -164,6 +165,7 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "jmxremote/" + BaseSetup.JMX_REMOTE_JAR);
+    addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");
     updateJvmOptionsFromConfig();
   }
 
