@@ -56,7 +56,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   private static final String SLAVE_CONFIG_PATH = JPPFConfiguration.getProperties().getString(SLAVE_CONFIG_PATH_PROPERTY, "config");
   /**
-   * The directpry where the slave's config files are located, relative to its root folder.
+   * The directory where the slave's config files are located, relative to its root folder.
    */
   static final String SLAVE_LOCAL_CONFIG_DIR = "config";
   /**
@@ -126,6 +126,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @param configOverrides a set of overrides to the slave's configuration.
    */
   private synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+    if (debugEnabled) log.debug(String.format("provisioning request for %d slaves, interruptIfRunning=%b, configOverrides=%s", requestedSlaves, interruptIfRunning, configOverrides));
     int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
@@ -160,7 +161,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
         int id = reserveNextAvailableId();
         String slaveDirPath = SLAVE_PATH_PREFIX + id;
         try {
-          log.debug("starting {}", slaveDirPath);
+          log.debug("starting slave at {}", slaveDirPath);
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
           final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
           slaves.put(slave.getId(), slave);
@@ -168,6 +169,9 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
           new Thread(slave, slaveDirPath).start();
         } catch(Exception e) {
           log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
+        } catch(Error e) {
+          log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
+          throw e;
         }
       }
     }
@@ -195,7 +199,12 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     File slaveConfigSrc = new File(SLAVE_CONFIG_PATH);
     File slaveConfigDest = new File(slaveDir, SLAVE_LOCAL_CONFIG_DIR);
     if (!slaveConfigDest.exists()) slaveConfigDest.mkdirs();
-    if (slaveConfigSrc.exists()) FileUtils.copyDirectory(slaveConfigSrc, slaveConfigDest);
+    if (slaveConfigSrc.exists()) {
+      FileUtils.copyDirectory(slaveConfigSrc, slaveConfigDest);
+      if (debugEnabled) log.debug("copied files from {} to {}", slaveConfigSrc, slaveConfigDest);
+    } else {
+      if (debugEnabled) log.debug("config source dir '{}' does not exist", slaveConfigSrc);
+    }
     // get the JPPF config, apply the overrides, then save it to the slave's folder
     TypedProperties config = JPPFConfiguration.getProperties();
     TypedProperties props = new TypedProperties(config);
