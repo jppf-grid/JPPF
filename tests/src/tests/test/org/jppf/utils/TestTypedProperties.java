@@ -180,6 +180,27 @@ public class TestTypedProperties {
   }
 
   /**
+   * Test that property substitutions are handled properly.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout=5000L)
+  public void testSubstitutions2() throws Exception {
+    StringBuilder sb = new StringBuilder();
+    sb.append("prop.1 = one\n");
+    sb.append("prop.2 = two\n");
+    sb.append("prop.3 = three\n");
+    sb.append("prop.4 = ${prop.1}-${prop.2}-${prop.3}-four\n");
+    try (Reader r = new StringReader(sb.toString())) {
+      TypedProperties props = new TypedProperties().loadAndResolve(r);
+      System.out.println(ReflectionUtils.getCurrentMethodName() + ": resolved properties: " + props);
+      checkProperty(props, "prop.4", "one-two-three-four");
+      checkProperty(props, "prop.3", "three");
+      checkProperty(props, "prop.2", "two");
+      checkProperty(props, "prop.1", "one");
+    }
+  }
+
+  /**
    * Test that property substitutions are handled properly when the property name to substitute is empty (after trimming).
    * @throws Exception if any error occurs.
    */
