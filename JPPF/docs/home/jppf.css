@@ -24,8 +24,8 @@ div { margin: 0px; padding; 0px; }
 .gwrapper { width: 900px; max-width: 900px; background: white; }
 .sidebar  { width:  90px; float: left; padding-left: 0px; background-color: white; }
 .jppf_content { width: 766px; float: right; padding-left: 15px; padding-right: 5px; margin-bottom: 5px; background-color: white; }
-.column_right { width: 340px; float: right; }
-.column_left  { width: 386px; float: left; padding-left: 20px; padding-right: 0px }
+.column_right { width: 363px; float: right; }
+.column_left  { width: 363px; float: left; padding-left: 20px; padding-right: 0px }
 .jppfheader { background: #E8EAFD; }
 .jppffooter { background: #E8EAFD; border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6; border-top: 8px solid #6D78B6; margin: 0px; }
 .headerMenuItem, .headerMenuItem2 { font-famil: Arial, Helvetica, sans-serif }
