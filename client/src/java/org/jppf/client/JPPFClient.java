@@ -17,7 +17,7 @@
  */
 package org.jppf.client;
 
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.debug.Debug;
@@ -171,7 +171,8 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   /**
-   * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
+   * Wait until there is at least one connection pool with at least one connection in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE}
+   * or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
    * This is a shorthand for {@code awaitConnectionPool(Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
    * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
    * @since 5.0
@@ -217,6 +218,61 @@ public class JPPFClient extends AbstractGenericClient {
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {
         return !ref.setSynchronized(findConnectionPools(statuses), pools).isEmpty();
+      }
+    }, timeout);
+    return ref.get();
+  }
+
+  /**
+   * Wait until there is at least one connection pool where the number of connections with the specified statuses
+   * satisfy the specified condition, or until the specified timeout expires, whichever happens first.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
+   * @param expectedConnections the expected number of connections to wait for.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param statuses the possible statuses of the connections in the pools to wait for.
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
+   * @since 5.0
+   */
+  public List<JPPFConnectionPool> awaitConnectionPools(final Operator operator, final int expectedConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
+    final ConnectionPoolFilter<JPPFConnectionPool> filter = new ConnectionPoolFilter<JPPFConnectionPool>() {
+      @Override
+      public boolean accepts(final JPPFConnectionPool pool) {
+        List<JPPFClientConnection> list = pool.getConnections(statuses);
+        return operator.evaluate(list.size(), expectedConnections);
+      }
+    };
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        List<JPPFConnectionPool> result = new ArrayList<>();
+        List<JPPFConnectionPool> temp = findConnectionPools(statuses);
+        for (JPPFConnectionPool pool: temp) {
+          if (filter.accepts(pool)) result.add(pool);
+        }
+        return !ref.setSynchronized(result, pools).isEmpty();
+      }
+    }, timeout);
+    return ref.get();
+  }
+
+  /**
+   * Wait until there is at least one connection pool where the number of connections that pass the specified filter
+   * satisfy the specified condition, or until the specified timeout expires, whichever happens first.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param filter an implementation of the {@link ConnectionPoolFilter} interface. A {@code null} value is interpreted as no filter (all pools are accepted).
+   * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
+   * @since 5.0
+   */
+  public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final ConnectionPoolFilter filter) {
+    final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        List<JPPFConnectionPool> result = new ArrayList<>();
+        List<JPPFConnectionPool> temp = getConnectionPools();
+        for (JPPFConnectionPool pool: temp) {
+          if (filter.accepts(pool)) result.add(pool);
+        }
+        return !ref.setSynchronized(result, pools).isEmpty();
       }
     }, timeout);
     return ref.get();
