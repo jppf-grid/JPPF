@@ -61,7 +61,7 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
           manager.driverUpdated(driver, TopologyEvent.UpdateType.JVM_HEALTH);
         }
       } catch (Exception e) {
-        log.warn("error getting health snapshot for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
+        if (debugEnabled) log.debug("error getting health snapshot for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
       }
       if ((driver.getChildCount() <= 0) || (driver.getForwarder() == null)) continue;
       Map<String, TopologyNode> uuidMap = new HashMap<>();
@@ -74,7 +74,7 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
       try {
         result = driver.getForwarder().healthSnapshot(new UuidSelector(new HashSet<>(uuidMap.keySet())));
       } catch(Exception e) {
-        log.warn("error getting nodes health for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
+        if (debugEnabled) log.debug("error getting nodes health for driver {} : {}" + driver, ExceptionUtils.getMessage(e));
       }
       if (result == null) continue;
       for (Map.Entry<String, Object> entry: result.entrySet()) {
@@ -82,7 +82,7 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
         if (node == null) continue;
         if (entry.getValue() instanceof Exception) {
           node.setStatus(TopologyNodeStatus.DOWN);
-          log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
+          if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
         } else if (entry.getValue() instanceof HealthSnapshot) {
           HealthSnapshot health = (HealthSnapshot) entry.getValue();
           if (!health.equals(node.getHealthSnapshot())) {

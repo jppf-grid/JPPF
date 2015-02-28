@@ -140,7 +140,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (node == null) continue;
       if (entry.getValue() instanceof Exception) {
         node.setStatus(TopologyNodeStatus.DOWN);
-        log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
+        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
       } else if (entry.getValue() instanceof JPPFNodeState) {
         JPPFNodeState oldState = (JPPFNodeState) entry.getValue();
         if (!oldState.equals(node.getNodeState())) {
@@ -160,7 +160,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     try {
       result = forwarder.forwardGetAttribute(new UuidSelector(uuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
     } catch(Exception e) {
-      log.error("error getting number of slaves for driver " + driver.getUuid(), e);
+      if (debugEnabled) log.debug("error getting number of slaves for driver " + driver.getUuid(), e);
     }
     if (result == null) return;
     for (Map.Entry<String, Object> entry: result.entrySet()) {
@@ -168,7 +168,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (node == null) continue;
       if (entry.getValue() instanceof Exception) {
         node.setStatus(TopologyNodeStatus.DOWN);
-        log.warn("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
+        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
       } else if (entry.getValue() instanceof Integer) {
         int n = (Integer) entry.getValue();
         if (n != node.getNbSlaveNodes()) {
