@@ -74,18 +74,19 @@ public class SystemInformationAction extends AbstractTopologyAction {
   public void actionPerformed(final ActionEvent event) {
     String html = null;
     String toClipboard = null;
+    String title = "System information";
     try {
       AbstractTopologyComponent comp = dataArray[0];
       JPPFSystemInformation info = retrieveInfo(comp);
       String name = TreeTableUtils.getDisplayName(comp);
-      String title = "information for " + (comp.isNode() ? "node " : "driver ") + name;
+      title = "System information for " + (comp.isNode() ? "node " : "driver ") + name;
       html = formatProperties(info, new HTMLPropertiesTableFormat(title));
       toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
     } catch(Exception e) {
       toClipboard = ExceptionUtils.getStackTrace(e);
       html = toClipboard.replace("\n", "<br>");
     }
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "System Information", false);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), title, false);
     //dialog.getRootPane().setWindowDecorationStyle(JRootPane.WARNING_DIALOG);
     dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);

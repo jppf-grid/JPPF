@@ -28,7 +28,7 @@ import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.utils.GuiUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -89,9 +89,10 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
     textArea.setValue(getPropertiesAsString());
 
+    AbstractTopologyComponent data = dataArray[0];
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration",false);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration of node " + TreeTableUtils.getDisplayName(data),false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override
