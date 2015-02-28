@@ -210,12 +210,6 @@ public class AbstractTask<T> implements Task<T> {
           throw new JPPFException("the task class loader cannot send a computation request to the client, method 'computeCallable' is missing");
         }
         result = (V) m.invoke(cl, callable);
-        /*
-      if (cl instanceof AbstractJPPFClassLoader) {
-        AbstractJPPFClassLoader loader = (AbstractJPPFClassLoader) cl;
-        result = loader.computeCallable(callable);
-      }
-         */
       }
       else result = callable.call();
       return result;
