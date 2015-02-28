@@ -555,7 +555,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * This method will create or close JMX connections as needed to reach the desired number of connections.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
-   * @param connectedOnly .
+   * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
    * @return a list of at least {@code nbConnections} {@link JPPFClientConnection} instances.
    * @since 5.0
    */
@@ -569,7 +569,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
-   * @param connectedOnly the possible statuses of the connections to wait for.
+   * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
    * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
