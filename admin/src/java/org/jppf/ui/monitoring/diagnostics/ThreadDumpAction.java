@@ -66,7 +66,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
   @Override
   public void actionPerformed(final ActionEvent event) {
     String s = null;
-    String title = "";
+    String title = "Thread dump";
     try {
       ThreadDump info = retrieveThreadDump(dataArray[0]);
       boolean isNode = dataArray[0].isNode();

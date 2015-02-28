@@ -17,6 +17,7 @@
  */
 package org.jppf.ui.options;
 
+import java.awt.HeadlessException;
 import java.awt.event.*;
 import java.io.File;
 import java.util.*;
@@ -61,6 +62,10 @@ public class FileChooserOption extends AbstractOption {
    * The list of filters used to control what files can be selected.
    */
   private List<Filter> filters = new ArrayList<>();
+  /**
+   * The icon set on this component.
+   */
+  private ImageIcon icon = null;
 
   /**
    * Default constructor.
@@ -93,7 +98,7 @@ public class FileChooserOption extends AbstractOption {
     button = new JButton();
     if ((label != null) && !"".equals(label.trim())) button.setText(label);
     if (iconPath != null) {
-      ImageIcon icon = GuiUtils.loadIcon(iconPath);
+      icon = GuiUtils.loadIcon(iconPath);
       if (icon != null) button.setIcon(icon);
     }
     if ((toolTipText != null) && !"".equals(toolTipText.trim())) button.setToolTipText(toolTipText);
@@ -129,9 +134,17 @@ public class FileChooserOption extends AbstractOption {
   public void doChooseFile() {
     String val = (String) value;
     if ((val == null) || "".equals(val.trim())) val = System.getProperty("user.dir");
-    JFileChooser chooser = new JFileChooser(new File(val).getParent());
+    JFileChooser chooser = new JFileChooser(new File(val).getParent()) {
+      @Override
+      protected JDialog createDialog(final java.awt.Component parent) throws HeadlessException {
+        JDialog dialog = super.createDialog(parent);
+        if (icon != null) dialog.setIconImage(icon.getImage());
+        return dialog;
+      }
+    };
     chooser.setAcceptAllFileFilterUsed(false);
     chooser.setDialogType(dialogType == OPEN ? JFileChooser.OPEN_DIALOG : JFileChooser.SAVE_DIALOG);
+    //chooser.setI
     if ((toolTipText != null) && !"".equals(toolTipText.trim())) chooser.setDialogTitle(toolTipText);
     for (FileFilter filter: filters) chooser.addChoosableFileFilter(filter);
     int result = -1;
