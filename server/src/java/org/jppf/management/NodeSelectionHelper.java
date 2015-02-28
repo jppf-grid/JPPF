@@ -123,6 +123,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
   private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy, final boolean includePeers) {
+    if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);

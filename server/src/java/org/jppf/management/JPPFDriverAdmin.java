@@ -242,34 +242,13 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
     return driver.getSystemInformation();
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #nbNodes(NodeSelector)} with an {@link ExecutionPolicySelector} instead.
+   */
   @Override
   public Integer matchingNodes(final ExecutionPolicy policy) throws Exception {
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-
-    if (debugEnabled) log.debug("Testing policy against " + allChannels.size() + " nodes:\n" + policy );
-    if (policy == null) return allChannels.size();
-
-    int count = 0;
-    TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (AbstractNodeContext context : allChannels) {
-      JPPFManagementInfo mgtInfo = context.getManagementInfo();
-      boolean match = false;
-      if (mgtInfo == null) match = true;
-      else {
-        JPPFSystemInformation info = context.getSystemInformation();
-        try {
-          match = policy.accepts(info);
-        } catch(Exception e) {
-          String msg = "An error occurred while checking node " + mgtInfo + " against execution policy " + policy;
-          if (debugEnabled) log.debug(msg, e);
-          else log.warn(msg);
-        }
-        if (match) count++;
-        if (debugEnabled) log.debug("testing against " + mgtInfo + " returns " + match);
-      }
-    }
-    if (debugEnabled) log.debug("matching nodes = " + count);
-    return count;
+    return nbNodes(new ExecutionPolicySelector(policy));
   }
 
   /**
