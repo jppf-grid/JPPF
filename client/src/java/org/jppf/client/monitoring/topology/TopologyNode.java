@@ -27,6 +27,10 @@ import org.jppf.management.*;
  */
 public class TopologyNode extends AbstractTopologyComponent {
   /**
+   * EMpty state used when no state can be determined.
+   */
+  private static final JPPFNodeState EMPTY_STATE = new JPPFNodeState();
+  /**
    * Object describing the current state of a node.
    */
   private JPPFNodeState nodeState = null;
@@ -44,7 +48,7 @@ public class TopologyNode extends AbstractTopologyComponent {
    * @param nodeInformation information on the JPPF node.
    */
   TopologyNode(final JPPFManagementInfo nodeInformation) {
-    this(nodeInformation, new JPPFNodeState());
+    this(nodeInformation, EMPTY_STATE);
   }
 
   /**
@@ -56,6 +60,16 @@ public class TopologyNode extends AbstractTopologyComponent {
     super(nodeInformation.getUuid());
     this.managementInfo = nodeInformation;
     this.nodeState = nodeState;
+  }
+
+  /**
+   * Initialize this topology data as holding information about a node.
+   * @param uuid the node uuid.
+   */
+  TopologyNode(final String uuid) {
+    super(uuid);
+    this.managementInfo = null;
+    this.nodeState = EMPTY_STATE;
   }
 
   /**

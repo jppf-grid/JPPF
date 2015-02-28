@@ -33,7 +33,8 @@ public abstract class AbstractTopologyComponent {
   /**
    * The children of this component.
    */
-  protected final List<AbstractTopologyComponent> children = new ArrayList<>();
+  protected final Map<String, AbstractTopologyComponent> children = new HashMap<>();
+  //protected final List<AbstractTopologyComponent> children = new ArrayList<>();
   /**
    * The parent of this component.
    */
@@ -76,6 +77,15 @@ public abstract class AbstractTopologyComponent {
   }
 
   /**
+   * Get the child with the specified uuid.
+   * @param uuid the uuid of the child to look for.
+   * @return a {@link AbstractTopologyComponent} or {@code null} if there is no child with this uuid.
+   */
+  public synchronized AbstractTopologyComponent getChild(final String uuid) {
+    return children.get(uuid);
+  }
+
+  /**
    * Get the number of children of this topology component.
    * @return the number of children.
    */
@@ -89,7 +99,7 @@ public abstract class AbstractTopologyComponent {
    * @return a list of {@link AbstractTopologyComponent} instances.
    */
   public synchronized List<AbstractTopologyComponent> getChildren() {
-    return new ArrayList<>(children);
+    return new ArrayList<>(children.values());
   }
 
   /**
@@ -97,17 +107,7 @@ public abstract class AbstractTopologyComponent {
    * @param child the child component to add.
    */
   synchronized void add(final AbstractTopologyComponent child) {
-    children.add(child);
-    child.setParent(this);
-  }
-
-  /**
-   * Add a child to this component.
-   * @param child the child component to add.
-   * @param index the index at which to insert the child.
-   */
-  synchronized void add(final AbstractTopologyComponent child, final int index) {
-    children.add(index, child);
+    children.put(child.getUuid(), child);
     child.setParent(this);
   }
 
@@ -116,7 +116,7 @@ public abstract class AbstractTopologyComponent {
    * @param child the child component to remove.
    */
   synchronized void remove(final AbstractTopologyComponent child) {
-    children.remove(child);
+    children.remove(child.getUuid());
     child.setParent(null);
   }
 

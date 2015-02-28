@@ -211,7 +211,7 @@ public class JobData implements AutoCloseable {
         } catch (Exception e) {
           String s = ExceptionUtils.getMessage(e);
           if (debugEnabled) log.debug(s, e);
-          else log.warn(s);
+          //else log.warn(s);
         }
       }
     }

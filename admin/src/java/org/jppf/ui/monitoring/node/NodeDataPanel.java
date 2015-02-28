@@ -220,7 +220,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     if ((driverData == null) || (nodeData == null)) return;
     if (debugEnabled) log.debug("attempting to remove node=" + nodeData + " from driver=" + driverData);
     DefaultMutableTreeNode driver = TreeTableUtils.findDriver(treeTableRoot, driverData.getUuid());
-    if ((driver == null) || (nodeData == null)) return;
+    if (driver == null) return;
     String nodeUuid = nodeData.getUuid();
     final DefaultMutableTreeNode node = TreeTableUtils.findNode(driver, nodeUuid);
     if (node != null) {

@@ -90,7 +90,9 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
       if (!actualMap.containsKey(uuid)) nodesToProcess.add(uuid);
     }
     for (String uuid: nodesToProcess) {
-      TopologyNode node = manager.getNodeOrPeer(uuid);
+      //TopologyNode node = manager.getNodeOrPeer(uuid);
+      TopologyNode node = (TopologyNode) driver.getChild(uuid);
+      //if (node == null) node = new TopologyNode(uuid);
       if (debugEnabled) log.debug("removing node " + node);
       if (node != null) manager.nodeRemoved(driver, node);
     }
