@@ -214,12 +214,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
 
   /**
    * Perform the assignment of tasks.
-   * @see Runnable#run()
    */
   @Override
   public void run() {
     while (!isStopped()) {
-      if (!dispatch()) goToSleep(1L);
+      if (!dispatch()) goToSleep(1000L);
     }
   }
 
