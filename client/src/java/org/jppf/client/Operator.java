@@ -32,6 +32,13 @@ public enum Operator {
     public boolean evaluate(final long actual, final long expected) { return actual == expected; }
   },
   /**
+   * The number of connections is different from the expected number.
+   */
+  NOT_EQUAL {
+    @Override
+    public boolean evaluate(final long actual, final long expected) { return actual != expected; }
+  },
+  /**
    * The number of connections is at least to the expected number.
    */
   AT_LEAST {
