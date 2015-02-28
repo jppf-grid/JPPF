@@ -126,8 +126,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
     List<String> idList = getNodeIds();
     nodeSelector = new NodeSelector(tradeList, idList);
     for (Trade t: tradeList) {
-      for (String marketDataId: t.getDataDependencies())
-      {
+      for (String marketDataId: t.getDataDependencies()) {
         Set<String> tradeSet = dataToTradeMap.get(marketDataId);
         if (tradeSet == null) {
           tradeSet = new HashSet<>();
@@ -144,11 +143,9 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
    * @throws Exception if any error occurs.
    */
   protected List<String> getNodeIds() throws Exception {
-    JPPFClientConnection c = jppfClient.getClientConnection();
-    JMXDriverConnectionWrapper driver = c.getConnectionPool().getJmxConnection();
-    while (!driver.isConnected()) Thread.sleep(1L);
+    JMXDriverConnectionWrapper driver = jppfClient.awaitWorkingConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     Collection<JPPFManagementInfo> nodesInfo = driver.nodesInformation();
-    List<String> idList = new ArrayList<>();
+    List<String> idList = new ArrayList<>(nodesInfo.size());
     for (JPPFManagementInfo info: nodesInfo) idList.add(info.getUuid());
     return idList;
   }

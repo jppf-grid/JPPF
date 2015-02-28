@@ -50,7 +50,7 @@ public class WordCountRunner {
       System.out.printf(Locale.US, "Processing '%s' with %,d articles per task, %,d tasks per job, nb channels = %d, max concurrent jobs = %d%n",
           params.dataFile, params.nbArticles, params.nbTasks, params.nbChannels, params.jobCapacity);
       JPPFConnectionPool pool = client.awaitActiveConnectionPool();
-      // set the pool size to the desried number of connections
+      // set the pool size to the desired number of connections
       pool.setMaxSize(params.nbChannels);
       marker = new TimeMarker().start();
       // read the wikipedia file and build jobs according to the configuration parameters

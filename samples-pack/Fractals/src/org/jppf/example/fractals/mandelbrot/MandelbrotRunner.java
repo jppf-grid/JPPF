@@ -31,8 +31,7 @@ import org.slf4j.*;
  * Runner class for the Mandelbrot fractals sample application.
  * @author Laurent Cohen
  */
-public class MandelbrotRunner extends AbstractRunner
-{
+public class MandelbrotRunner extends AbstractRunner {
   /**
    * Logger for this class.
    */

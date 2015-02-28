@@ -136,8 +136,7 @@ public abstract class AbstractRunner {
    * @return a future which returns a {@link BufferedImage} as the computation result.
    * @throws Exception if an error is raised during the execution.
    */
-  public Future<GeneratedImage> submitExecution(final AbstractFractalConfiguration config) throws Exception
-  {
+  public Future<GeneratedImage> submitExecution(final AbstractFractalConfiguration config) throws Exception {
     return submitExecution(0, config, 0L);
   }
 
@@ -148,8 +147,7 @@ public abstract class AbstractRunner {
    * @return a future which returns a {@link BufferedImage} as the computation result.
    * @throws Exception if an error is raised during the execution.
    */
-  public Future<GeneratedImage> submitExecution(final int id, final AbstractFractalConfiguration config) throws Exception
-  {
+  public Future<GeneratedImage> submitExecution(final int id, final AbstractFractalConfiguration config) throws Exception {
     return submitExecution(id, config, 0L);
   }
 

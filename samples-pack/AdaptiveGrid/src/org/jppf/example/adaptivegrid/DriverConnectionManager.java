@@ -55,17 +55,15 @@ public class DriverConnectionManager implements AutoCloseable {
    * @throws Exception if any error occurs.
    */
   public DriverConnectionManager(final JPPFClient client, final String poolName) throws Exception {
-    JPPFConnectionPool tmpPool;
-    // wait until the connection pool is created by the client
-    while ((tmpPool = client.findConnectionPool(poolName)) == null) Thread.sleep(20L);
-    this.connectionPool = tmpPool;
-    // wait until the connection pool has at least one active connection to the driver
-    while (this.connectionPool.connectionCount(JPPFClientConnectionStatus.ACTIVE) <= 0) Thread.sleep(20L);
-    // wait until the at least one JMX connection wrapper is created
-    JMXDriverConnectionWrapper jmx = null;
-    while ((jmx = connectionPool.getJmxConnection()) == null) Thread.sleep(20L);
-    // wait until the JMX connection is established
-    while (!jmx.isConnected()) Thread.sleep(20L);
+    // wait until there is a connection pool with the expected name and at least one active connection to the driver
+    connectionPool = client.awaitConnectionPools(Long.MAX_VALUE, new ConnectionPoolFilter<JPPFConnectionPool>() {
+      @Override
+      public boolean accepts(final JPPFConnectionPool pool) {
+        return poolName.equals(pool.getName()) && (pool.connectionCount(JPPFClientConnectionStatus.ACTIVE) > 0);
+      }
+    }).get(0);
+    // wait until at least one JMX connection wrapper is established
+    JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
