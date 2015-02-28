@@ -244,6 +244,11 @@ else
 								</a>
 							</td>
 							<td align="center">
+								<a href="screenshots.php?screenshot=ExportConsoleSettings.gif&shotTitle=Export Console Settings">
+									<img src="screenshots/_th_ExportConsoleSettings.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
 								<a href="screenshots.php?screenshot=FractalsSample-2.gif&shotTitle=Fractals Sample 2">
 									<img src="screenshots/_th_FractalsSample-2.jpg" border="0" alt="screenshot"/>
 								</a>
@@ -264,8 +269,8 @@ else
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=LoadBalancerSettings-01.gif&shotTitle=Load Balancer Settings 01">
-									<img src="screenshots/_th_LoadBalancerSettings-01.jpg" border="0" alt="screenshot"/>
+								<a href="screenshots.php?screenshot=LoadBalancerSettings.gif&shotTitle=Load Balancer Settings">
+									<img src="screenshots/_th_LoadBalancerSettings.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
@@ -278,21 +283,16 @@ else
 									<img src="screenshots/_th_ManyJobs-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
+						</tr>
+						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ManyJobs-02.gif&shotTitle=Many Jobs 02">
 									<img src="screenshots/_th_ManyJobs-02.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
-						</tr>
-						<tr>
 							<td align="center">
 								<a href="screenshots.php?screenshot=ManyJobs-03.gif&shotTitle=Many Jobs 03">
 									<img src="screenshots/_th_ManyJobs-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=MaxtrixSample-01.gif&shotTitle=Maxtrix Sample 01">
-									<img src="screenshots/_th_MaxtrixSample-01.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 							<td align="center">
@@ -363,11 +363,6 @@ else
 								</a>
 							</td>
 							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-01.gif&shotTitle=Topology 01">
-									<img src="screenshots/_th_Topology-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
 								<a href="screenshots.php?screenshot=Topology-Health.gif&shotTitle=Topology  Health">
 									<img src="screenshots/_th_Topology-Health.jpg" border="0" alt="screenshot"/>
 								</a>
@@ -380,6 +375,11 @@ else
 							<td align="center">
 								<a href="screenshots.php?screenshot=UpdateNodeConfiguration.gif&shotTitle=Update Node Configuration">
 									<img src="screenshots/_th_UpdateNodeConfiguration.jpg" border="0" alt="screenshot"/>
+								</a>
+							</td>
+							<td align="center">
+								<a href="screenshots.php?screenshot=VisibleColumns.gif&shotTitle=Visible Columns">
+									<img src="screenshots/_th_VisibleColumns.jpg" border="0" alt="screenshot"/>
 								</a>
 							</td>
 						</tr>

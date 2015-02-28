@@ -206,11 +206,11 @@ else
     <a name="feat09"></a>
     <h4>.Net and J2EE integration</h4>
     <p>Specialized client implementations bring JPPF grids to the <a href="/doc/v5/index.php?title=.Net_Bridge">.Net</a> and <a href="/doc/v5/index.php?title=J2EE_Connector">J2EE</a> worlds. Write your jobs in any .Net language and execute them on .Net-enabled JPPF nodes.
-    Use JPPF services from J2E enterprise applications or wrap them as Web or REST services. Make interoperability an operational reality.
+    Use JPPF services from JEE enterprise applications or wrap them as Web or REST services. Make interoperability an operational reality.
     <a name="feat10"></a>
     <h4>Customization</h4>
     <p>Whenever your specialized needs go beyond what is available out-of-the-box, JPPF provides many <a href="/doc/v5/index.php?title=Extending_and_Customizing_JPPF">extension points, addons and plugins</a> which allow you to tailor, extend and customize the behavior of any of its components.
-    Make JPPF your grid computing solution, without eever being stuck because of missing features.
+    Make JPPF your grid computing solution, without ever being stuck because of missing features.
   </div>
 </div>
 				</td>

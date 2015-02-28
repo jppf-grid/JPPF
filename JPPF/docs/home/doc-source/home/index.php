@@ -25,7 +25,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   </div>
   <script>anim_main2();</script>
   <div style="margin: 15px; ">
-    <br/><h2 align="center"><i>New</i>: JPPF 4.2 is here, <a href="/release_notes.php?version=4.2">check it out!</a></h2>
+    <br/><h2 align="center"><i>New</i>: JPPF 5.0 is here, <a href="/release_notes.php?version=4.2">check it out!</a></h2>
     <p style="text-align: center; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
   </div>
 
@@ -48,7 +48,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
       <li>exceptional level of service and reliability</li>
       <li>full, comprehensive documentation</li>
       <li>broad set of fully documented end-to-end demos</li>
-      <li>flexible open-source licensing with the <a href="/license.php"><b>Apache License v2.0</b></a></li>
+      <li>flexible licensing with the <a href="/license.php"><b>Apache License v2.0</b></a></li>
     </ul>
 
     <h3>Contribute</h3>

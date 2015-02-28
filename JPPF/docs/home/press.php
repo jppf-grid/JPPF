@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="4.2" ?>
+<?php $jppfVersion="5.0" ?>
 <html>
 	  <head>
     <title>JPPF Press Kit
@@ -175,34 +175,49 @@ else
   <br>
   <a name="original_release"></a>
 <h3>Press release: JPPF <?php echo $jppfVersion ?></h3>
-<p><b>Simplification of the client APIs</b>
+<p><b>.Net integration</b>: the main focus of this release, the <a href="/doc/v5/index.php?title=.Net_Bridge">.Net bridge</a> for JPPF brings JPPF grids to the .Net world.
 <ul class="samplesList">
-  <li><a href="/doc/v4/index.php?title=Dealing_with_jobs#Cancelling_a_job">Cancelling</a> a job, as well as <a href="/doc/v4/index.php?title=Dealing_with_jobs#Job_execution_results">getting or monitoring</a> its results can now be done from the job itself, in a much simpler way</li>
-  <li>Consequently, the <a href="/api/index.html?org/jppf/client/event/TaskResultListener.html">TaskResultListener</a> API and its <a href="/api/index.html?org/jppf/client/JPPFResultCollector.html">JPPFResultCollector</a> implementation
-  are now deprecated and superseded by the <a href="/doc/v4/index.php?title=Jobs_runtime_behavior,_recovery_and_failover#Job_lifecycle_notifications:_JobListener">job listeners</a> API</li>
-  <li><a href="/api/index.html?org/jppf/client/JPPFJob.html">JPPFJob</a> now implements <a href="http://docs.oracle.com/javase/7/docs/api/index.html?java/util/concurrent/Future.html">Future&lt;List&lt;Task&lt;?&gt;&gt;&gt;</a></li>
+  <li>Submit pure .Net workloads and execute them on .Net-capable JPPF nodes</li>
+  <li>The .Net <a href="/doc/v5/index.php?title=Using_the_JPPF_.Net_API">client API</a> is almost identical to the Java API</li>
+  <li>Includes full <a href="/doc/v5/index.php?title=Management_and_monitoring_from_.Net">grid management and monitoring features</a></li>
+  <li>.Net and Java clients can mix freely in the same grid</li>
 </ul>
-<p><b>Greater focus on connections pools</b>
+<p><b>Administration console extensions</b>:
 <ul class="samplesList">
-  <li>Each <a href="/doc/v4/index.php?title=Connection_pools">connection pool</a> now manages an associated dynamic <a href="/doc/v4/index.php?title=Connection_pools#Associated_JMX_connection_pool">pool of JMX connections</a>,
-  instead of having one JMX connection per JPPF connection. This results in much less threads created on the client and server sides and increases scalability</li>
-  <li>The <a href="/doc/v4/index.php?title=Connection_pools#The_JPPFConnectionPool_class">JPPFConnectionPool</a> API has been greatly enriched, for an easier and more powerful handling of its capabilities</li>
-  <li>Similarly, the API to <a href="/doc/v4/index.php?title=Connection_pools#Exploring_the_connection_pools">explore connections pools</a> is now broader and more flexible</li>
+  <li>new extension point: add your own <a href="/doc/v5/index.php?title=Pluggable_views">pluggable view</a> to the administration tool.
+  A new sample <a href="/samples-pack/PluggableView/Readme.php">"topology event log"</a> is provided to showcase this feature.</li>
+  <li>any built-in view <a href="/doc/v5/index.php?title=Hiding_built-in_views">can be hidden</a> at will</li>
+  <li>the administration console can be <a href="/doc/v5/index.php?title=Embedding_the_administration_console">embedded</a> in any other Swing application</li>
+  <li>the columns in all tree views can now be <a href="/screenshots.php?screenshot=VisibleColumns.gif&shotTitle=Visible Columns">switched from visible to hidden</a> on demand</li>
+  <li>ability to <a href="/screenshots.php?screenshot=ExportConsoleSettings.gif&shotTitle=Export Console Settings">import/export the console settings</a>, including window size and location, value of persistent fields, tree columns' hidden state and width, charts definitions</li>
+  <li>new <a href="/screenshots.php?screenshot=Charts-02.gif&shotTitle=Charts 02">charts types and fields</a> are now available for built-in and user-defined charts</li>
+  <li>the console was refactored to use more consistent code and APIs. In particular, it is now based on the new <a href="/doc/v5/index.php?title=Grid_topology_monitoring">grid topology monitoring</a> API</li>
 </ul>
-<p><b>Emphasis on submitting jobs concurrently</b>
+<p><b>New APIs</b>:
 <ul class="samplesList">
-  <li>a <a href="/doc/v4/index.php?title=Submitting_multiple_jobs_concurrently">new section of the documentation</a> is dedicated to parallel job execution</li>
-  <li>a new <a href="/samples-pack/ConcurrentJobs/Readme.php">dedicated sample</a> illustrates the patterns explored in the documentation</li>
+  <li>A new <a href="/doc/v5/index.php?title=Grid_topology_monitoring">grid topology monitoring</a> API was added, enabling developers to programmatically browse the JPPF topology and receive notifications of any change. This is also the API the administration console is based on</li>
+  <li>New and convenient methods were added to easily explore the client <a href="/doc/v5/index.php?title=Connection_pools#Exploring_the_connections_in_a_pool">connections pools</a> and obtain connection objects</li>
+  <li>Execution policies now have access to <a href="/doc/v5/index.php?title=Execution_Policies#Execution_policy_context">contextual information</a> during their evaluation</li>
+  <li>Connection pools defined in the configuration can now <a href="/doc/v5/index.php?title=Configuring_SSL/TLS_communications#In_the_clients">indivdually specify</a> whether secure connections should be used</li>
+  <li>A <a href="/doc/v5/index.php?title=Submitting_multiple_jobs_concurrently#The_AbstractJPPFJobStream_helper_class">new helper class</a> is provided to facilitate the implemetntation of job streaming patterns</li>
 </ul>
-<p><b>New execution policies</b>
+<p><b>Server extensions and improvements</b>:
 <ul class="samplesList">
-  <li>The new <a href="/doc/v4/index.php?title=Execution_Policy_Elements#IsInIPv4Subnet">IsInIPv4Subnew</a> policy filters nodes based on their membership in one or more IPv4 subnets</li>
-  <li>The <a href="/doc/v4/index.php?title=Execution_Policy_Elements#IsInIPv6Subnet">IsInIPv6Subnet</a> policy plays the same role for IPv6 addresses</li>
+  <li>It is now possible to <a href="/doc/v5/index.php?title=Receiving_the_status_of_tasks_returning_from_the_nodes">receive the status of tasks</a> returning from the nodes with fine details</li>
+  <li>The thread pool management was refactored, resulting in many less threads created and increased scalability</li>
 </ul>
-<p><b>Control of tasks resubmmission</b>
-<p>The maximum number of times a task can schedule itself for resubmission is now configurable at the <a href="/doc/v4/index.php?title=Task_objects#Resubmitting_a_task">task level</a>, in addition to the job level.
-<p><b>Tutorial updates</b>
-<p>The <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">JPPF tutorial</a> was updated to account for the greatest and latest features.
+<p><b>Management and monitoring</b>:
+<ul class="samplesList">
+  <li>server monitoring: all MBean methods getting information on the nodes now accept a NodeSelector parameter to provide fine-grained filtering</li>
+  <li>server management: <a href="/doc/v5/index.php?title=Server_management#Driver_UDP_broadcasting_state">server broadcasting</a> can now be remotely enabled or disabled on-demand</li>
+  <li>nodes reprovisioning requests, as well as shutdown and restart requests, can now be deferred until the nodes are idle</li>
+</ul>
+<p><b>Deployment</b>:
+<ul class="samplesList">
+  <li>Servers and nodes can now be <a href="/doc/v5/index.php?title=Drivers_and_nodes_as_services#Windows_services_with_Apache.27s_commons-daemon">installed as Windows services</a> without having to download a third-party library</li>
+  <li>Nodes in "idle host" mode (aka CPU scavenging) can now be configured to stop <a href="/doc/v5/index.php?title=Nodes_in_%22Idle_Host%22_mode">only when the current tasks are complete</a></li>
+</ul>
+<p><b>Refactoring of distribution packaging</b>: the JPPF jar files were <a href="/doc/v5/index.php?title=Changes_in_JPPF_5.0#New_packaging">refactored</a> to adopt a more meaningful naming and a consistent distribution of the code.
 <a name="features"></a>
   <h3>Features</h3>
   <div class="u_link" style="margin-left: 10px">
