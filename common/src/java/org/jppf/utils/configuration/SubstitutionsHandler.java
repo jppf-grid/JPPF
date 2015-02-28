@@ -28,7 +28,8 @@ import org.slf4j.*;
  * Handles property substitutions in a properties file, that is resolve all
  * references of the following form in properties values:
  * <pre> property.name = ${other.property.name}
- * some.property.name = ${env.&lt;environment_variable_name&gt;}</pre>
+ * some.property.name = ${env.&lt;environment_variable_name&gt;}
+ * other.property.name = ${sys.&lt;system_property_name&gt;}</pre>
  * @author Laurent Cohen
  */
 public class SubstitutionsHandler {
