@@ -69,6 +69,21 @@ else
 ?>
 								<td style="width: 1px"></td>
               <?php
+if ($currentPage == "Features")
+{
+?>
+<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
+<?php
+}
+else
+{
+?>
+<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
+<?php
+}
+?>
+								<td style="width: 1px"></td>
+              <?php
 if ($currentPage == "Download")
 {
 ?>
@@ -87,13 +102,13 @@ else
 if ($currentPage == "Documentation")
 {
 ?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc" class="headerMenuItem2">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
 <?php
 }
 else
 {
 ?>
-<td class="headerMenuItem">&nbsp;<a href="/doc" class="headerMenuItem">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
 <?php
 }
 ?>
@@ -151,7 +166,7 @@ else
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -174,7 +189,10 @@ else
   </div>
   <br>
   <a name="original_release"></a>
-<h3>Press release: JPPF <?php echo $jppfVersion ?></h3>
+<!-- ============================== -->
+<!-- start version-specific content -->
+<!-- ============================== -->
+<h3><img src="images/icons/news.png" class="titleWithIcon"/>Press release: JPPF <?php echo $jppfVersion ?></h3>
 <p><b>.Net integration</b>: the main focus of this release, the <a href="/doc/v5/index.php?title=.Net_Bridge">.Net bridge</a> for JPPF brings JPPF grids to the .Net world.
 <ul class="samplesList">
   <li>Submit pure .Net workloads and execute them on .Net-capable JPPF nodes</li>
@@ -218,28 +236,28 @@ else
   <li>Nodes in "idle host" mode (aka CPU scavenging) can now be configured to stop <a href="/doc/v5/index.php?title=Nodes_in_%22Idle_Host%22_mode">only when the current tasks are complete</a></li>
 </ul>
 <p><b>Refactoring of distribution packaging</b>: the JPPF jar files were <a href="/doc/v5/index.php?title=Changes_in_JPPF_5.0#New_packaging">refactored</a> to adopt a more meaningful naming and a consistent distribution of the code.
+<!-- ============================== -->
+<!-- end version-specific content   -->
+<!-- ============================== -->
 <a name="features"></a>
-  <h3>Features</h3>
+  <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Features</h3>
   <div class="u_link" style="margin-left: 10px">
     <a href="release_notes.php?version=<?php echo $jppfVersion ?>">Release notes</a>: see everything that's new in JPPF <?php echo $jppfVersion ?><br>
-    <a href="features.php">Full features list</a><br>
+    Our <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.<br>
   </div>
   <a name="downloads"></a>
-  <h3>Downloads</h3>
+  <h3><img src="images/icons/download.png" class="titleWithIcon"/>Downloads</h3>
   All files can be found from our <a href="/downloads.php">downloads page</a>.<br>
-  <!--
-  A <a href="/download/jppf_ws.jnlp">web installer</a> allows you to select and download only the specific modules you want to install (requires Java Web Start 1.5 or later).
-  -->
   <a name="documentation"></a>
-  <h3>Documentation</h3>
-  The JPPF documentation can be found <a href="/doc/v4">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
+  <h3><img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation</h3>
+  The JPPF documentation can be found <a href="/doc/v5">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
   <a name="license"></a>
-  <h3>License</h3>
+  <h3><img src="images/icons/document-sign.png" class="titleWithIcon"/>License</h3>
   JPPF is released under the terms of the <a href="/license.php">Apachache v2.0</a> license.
   This <a href="http://www.opensource.org">OSI-approved</a> open source license is friendly to individuals, businesses, governments and academia, for commercial and non-commercial purposes.
   It does not restrict the use of JPPF with commercial and proprietary applications.
   <a name="contacts"></a>
-  <h3>Contacts</h3>
+  <h3><img src="images/icons/contact.png" class="titleWithIcon"/>Contacts</h3>
   For any press inquiry, please refer to our <a href="/contacts.php">contacts</a> page.
 </div>
 </div>

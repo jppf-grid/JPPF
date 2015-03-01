@@ -1,9 +1,28 @@
 <?php $currentPage="Press" ?>
 <?php $jppfVersion="5.0" ?>
 $template{name="about-page-header" title="Press Kit"}$
-$template{name="press-header"}$
 
-<h3>Press release: JPPF <?php echo $jppfVersion ?></h3>
+<div align="justify">
+
+  <h1>JPPF Press Kit</h1>
+
+  <h3>Content</h3>
+  <div class="u_link" style="margin-left: 10px">
+    <a href="/release_notes.php?version=<?php echo $jppfVersion ?>">Text of the original release</a><br>
+    <a href="#features">Features</a><br>
+    <a href="#downloads">Where to download</a><br>
+    <a href="#documentation">Documentation</a><br>
+    <a href="#license">License</a><br>
+    <a href="#contacts">Contacts</a><br>
+  </div>
+
+  <br>
+  <a name="original_release"></a>
+
+<!-- ============================== -->
+<!-- start version-specific content -->
+<!-- ============================== -->
+$template{name="title-with-icon" img="images/icons/news.png" title="Press release: JPPF <?php echo $jppfVersion ?>" heading="h3"}$
 
 <p><b>.Net integration</b>: the main focus of this release, the <a href="/doc/v5/index.php?title=.Net_Bridge">.Net bridge</a> for JPPF brings JPPF grids to the .Net world.
 <ul class="samplesList">
@@ -54,6 +73,36 @@ $template{name="press-header"}$
 </ul>
 
 <p><b>Refactoring of distribution packaging</b>: the JPPF jar files were <a href="/doc/v5/index.php?title=Changes_in_JPPF_5.0#New_packaging">refactored</a> to adopt a more meaningful naming and a consistent distribution of the code.
+<!-- ============================== -->
+<!-- end version-specific content   -->
+<!-- ============================== -->
 
-$template{name="press-footer"}$
+<a name="features"></a>
+  $template{name="title-with-icon" img="images/icons/view-list.png" title="Features" heading="h3"}$
+  <div class="u_link" style="margin-left: 10px">
+    <a href="release_notes.php?version=<?php echo $jppfVersion ?>">Release notes</a>: see everything that's new in JPPF <?php echo $jppfVersion ?><br>
+    Our <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.<br>
+  </div>
+
+  <a name="downloads"></a>
+  $template{name="title-with-icon" img="images/icons/download.png" title="Downloads" heading="h3"}$
+  All files can be found from our <a href="/downloads.php">downloads page</a>.<br>
+
+  <a name="documentation"></a>
+  $template{name="title-with-icon" img="images/icons/documentation.png" title="Documentation" heading="h3"}$
+
+  The JPPF documentation can be found <a href="/doc/v5">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
+
+  <a name="license"></a>
+  $template{name="title-with-icon" img="images/icons/document-sign.png" title="License" heading="h3"}$
+  JPPF is released under the terms of the <a href="/license.php">Apachache v2.0</a> license.
+  This <a href="http://www.opensource.org">OSI-approved</a> open source license is friendly to individuals, businesses, governments and academia, for commercial and non-commercial purposes.
+  It does not restrict the use of JPPF with commercial and proprietary applications.
+
+  <a name="contacts"></a>
+  $template{name="title-with-icon" img="images/icons/contact.png" title="Contacts" heading="h3"}$
+  For any press inquiry, please refer to our <a href="/contacts.php">contacts</a> page.
+
+</div>
+
 $template{name="about-page-footer"}$

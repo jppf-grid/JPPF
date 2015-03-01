@@ -68,6 +68,21 @@ else
 ?>
 								<td style="width: 1px"></td>
               <?php
+if ($currentPage == "Features")
+{
+?>
+<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
+<?php
+}
+else
+{
+?>
+<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
+<?php
+}
+?>
+								<td style="width: 1px"></td>
+              <?php
 if ($currentPage == "Download")
 {
 ?>
@@ -86,13 +101,13 @@ else
 if ($currentPage == "Documentation")
 {
 ?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc" class="headerMenuItem2">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
 <?php
 }
 else
 {
 ?>
-<td class="headerMenuItem">&nbsp;<a href="/doc" class="headerMenuItem">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
 <?php
 }
 ?>
@@ -150,7 +165,7 @@ else
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -160,20 +175,25 @@ else
         <br/>
 				</div>
 				<div class="jppf_content">
+  <h1 align="center">About</h1>
 	<div align="justify">
-		<h3>What it is</h3>
-		Simply put, JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
+    <h3><img src="images/icons/help.png" class="titleWithIcon"/>What it is</h3>
+		<p>Simply put, JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
 		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
-		<h3>How it works</h3>
+    <h3><img src="images/icons/how.png" class="titleWithIcon"/>How it works</h3>
 		<p>There are 2 aspects to this:
-		<p><i>Dividing an application into smaller parts that can be executed independantly and in parallel.</i>
-		<br>JPPF provides facilities that make this effort a lot easier, faster and much less painful than without them.
-		The result is a JPPF object called a "job", itself made of smaller independant parts called "tasks".
-		<p><i>Executing the application on the JPPF Grid.</i>
-		<br>A JPPF Grid is made of a server, to which any number of execution nodes are attached. A node is a JPPF software component that is generally installed and running on a separate machine.
-		This is commonly called a master/slave architecture, where the work is distributed by the server (aka "master") to the nodes (aka "slaves").
-		In JPPF terms, a unit of work is called a "job", and its constituting "tasks" are distributed by the server among the nodes for parallel execution.
-		<h3>Advantages</h3>
+    <p><i><b>Dividing an application into smaller parts that can be executed independently and in parallel.</b></i>
+    <br>JPPF provides facilities that make this effort a lot easier, faster and much less painful than without them.
+    The result is a JPPF object called a "job", itself made of smaller independent parts called "tasks".
+    <p><i><b>Executing the application on the JPPF Grid.</b></i>
+    <br>The simplest possible JPPF Grid is made of a server, to which any number of execution nodes are attached. A node is a JPPF software component that is generally installed and running on a separate machine.
+    This is commonly called a master/slave architecture, where the work is distributed by the server (aka "master") to the nodes (aka "slaves").
+    In JPPF terms, a unit of work is called a "job", and its constituting "tasks" are distributed by the server among the nodes for parallel execution.
+    <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Powered by the community</h3>
+    <p>With over 10 years of active development, JPPF boasts an architecture with a proven record of reliability, performance and scalability.
+    A project committed to its community, it demonstrates an outstanding support to its users and engages in a continuous conversation with them.
+    Every question, issue report or feature request turns into a contribution which, in the end, benefits the whole community.
+    <h3><img src="images/icons/default.png" class="titleWithIcon"/>Advantages</h3>
 		<p>Chief among JPPF benefits is its ease of installation, use and deployment. There is no need to spend days to write a "Hello World" application. A couple of minutes, up to a couple of hours at most, will suffice.
 		Deploying JPPF components over a cluster is as simple as copying files over FTP or any network file system.
 		JPPF allows developers to focus on their core software development, instead of wasting time on the complexities of parallel and distributed processing.
@@ -183,32 +203,10 @@ else
 		<p>Another benefit of JPPF is a simplified, almost immediate, deployment process of your application on the grid.
 		Even though your aplication will be run on many nodes at once, you only need to deploy it in a single location.
 		By extending the Java class loading mechanism, JPPF removes most of the deployment burden from the application's life cycle, dramatically shortening the time-to-market and time-to-production.
-		<h3>Outstanding features</h3>
-		<p>There is a lot more to JPPF than running and deploying your applications on the grid.
-		The features are so numerous that we have dedicated a separate page to enumerate them fully.
-		For a complete list of what JPPF has to offer, please consult our <a href="features.php">full features list</a>.
-		<p><b>Comprehensive, easy to use APIs.</b><br>
-		Passing from a single-threaded application model to a grid-based parallel model can be a daunting task.
-		JPPF facilitates this work by providing developers with a set of APIs that are simple, can be learned quickly and require a minimal or no modification of the existing code.
-		<p><b>No configuration usage.</b><br>
-		In most environments, JPPF can be deployed without any additional configuration burden. Nodes and application clients will automatically dicover the servers on the network.
-		The server will automatically adapt to workload changes and optimize the throughput. Required code and libraries will be automatically deployed where they are needed.
-		<p><b>Dynamic grid scaling and self-repair.</b><br>
-		The JPPF grid is fault-tolerant, meaning that the failure of a node, or even a server, does not compromise the jobs currently executing or scheduled.
-		In most cases, the performance degradation will be barely noticeable, as JPPF automatically adapts to topology and workload changes.
-		Furthermore, nodes and servers can be dynamically started and will be automatically recognized, allowing JPPF to function in "crunch mode".
-		In addition to this, lll JPPF components benefit from automatic recovery functionalities.
-		<p><b>Job-level SLA.</b><br>
-		Each job submitted to the JPPF grid runs within limits defined by its own SLA (service level agreement).
-		This allows to specify the characteristics (i.e. available memory, processors, disk space, operating systems, etc.) of the nodes a job can run on, as well as how many nodes it can run on.
-		As many functionalities in JPPF, this one can be dynamically adjusted, manually or automatically.
-		<p><b>Management and monitoring.</b><br>
-		Full-fledged management and monitoring features are provided out of the box: server and nodes status monitoring, detailed statistics and events, remote administration, job-level real-time monitoring and management, charts, cpu utilization (for billing).
-		These functionalities are available via a graphical user interface as well as from the JPPF APIs.
-		<p><b>Integration with leading application and web servers.</b><br>
-		By complying with the Java Connector Architecture 1.5 specification, JPPF integrates seamlessly with and completes the offering of leading J2EE application servers:
-		JBoss<sup>&reg;</sup>, Glassfish<sup>&reg;</sup>, IBM Websphere<sup>&reg;</sup>, Oracle Weblogic<sup>&reg;</sup>, Oracle OC4J<sup>&reg;</sup>.
-		JPPF also integrates with GigaSpaces eXtreme Application Platform<sup>&reg;</sup> and Apache Tomcat web server<sup>&reg;</sup>
+    <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Outstanding features</h3>
+    <p>There is a lot more to JPPF than running and deploying your applications on the grid: scalability, security, fault tolerance, load-balancing, job scheduling, monitoring and management of the grid, integration with popular platforms and frameworks,
+    extensions and customization, etc. The <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.
+    <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc/v5">full fledged documentation</a>.
 	</div>
 	<br>
 </div>

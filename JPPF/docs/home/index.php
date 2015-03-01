@@ -68,6 +68,21 @@ else
 ?>
 								<td style="width: 1px"></td>
               <?php
+if ($currentPage == "Features")
+{
+?>
+<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
+<?php
+}
+else
+{
+?>
+<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
+<?php
+}
+?>
+								<td style="width: 1px"></td>
+              <?php
 if ($currentPage == "Download")
 {
 ?>
@@ -86,13 +101,13 @@ else
 if ($currentPage == "Documentation")
 {
 ?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc" class="headerMenuItem2">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
 <?php
 }
 else
 {
 ?>
-<td class="headerMenuItem">&nbsp;<a href="/doc" class="headerMenuItem">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
 <?php
 }
 ?>
@@ -150,7 +165,7 @@ else
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -164,7 +179,6 @@ else
   <script src="scripts/tabs.min.js"></script>
   <script src="scripts/tabs.slideshow.min.js"></script>
   <script src="scripts/jppf.js"></script>
-  <!--<div style="vertical-align: middle; height: 250px; width: 750px; background-image: url('/images/test1.gif'); background-repeat: no-repeat; background-attachment: scroll">-->
   <div style="vertical-align: middle; height: 150px; width: 750px;">
     <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px;">
       <div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
@@ -184,14 +198,15 @@ else
     <a href="#"></a>
   </div>
   <script>anim_main2();</script>
-  <div style="margin: 15px; ">
-    <br/><h2 align="center"><i>New</i>: JPPF 5.0 is here, <a href="/release_notes.php?version=4.2">check it out!</a></h2>
-    <p style="text-align: center; font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
+  <div style="margin: 15px;" align="center">
+    <br/>
+    <h2><i>New</i>: JPPF 5.0 is here, <a href='/release_notes.php?version=5.0'>check it out!</a></h2>
+    <p style="font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
   </div>
   <div class="column_left">
-    <h3>Getting started</h3>
+    <h3><img src="images/icons/getting-started.png" class="titleWithIcon"/>Getting started</h3>
     Take an easy start with our <a href="/doc/v3/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a>
-    <h3>Easy and powerful</h3>
+    <h3><img src="images/icons/easy.png" class="titleWithIcon"/>Easy and powerful</h3>
     <ul class="samplesList">
       <li>a JPPF grid can be up and running in minutes</li>
       <li>dynamically scalable on-demand</li>
@@ -207,7 +222,7 @@ else
       <li>broad set of fully documented end-to-end demos</li>
       <li>flexible licensing with the <a href="/license.php"><b>Apache License v2.0</b></a></li>
     </ul>
-    <h3>Contribute</h3>
+    <h3><img src="images/icons/contribute.png" class="titleWithIcon"/>Contribute</h3>
     <b>Browse our <a href="/doc" target=_top>documentation</a></b><br>
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
@@ -222,7 +237,7 @@ else
       $query = 'SELECT * FROM news ORDER BY date DESC';
       $result = mysql_query($query) or die('Query failed: ' . mysql_error());
     ?>
-    <h3>Latest Releases</h3>
+    <h3><img src="images/icons/news.png" class="titleWithIcon"/>Latest Releases</h3>
     <?php
       for ($i=1; $i<=3; $i++)
       {
@@ -241,12 +256,12 @@ else
       &nbsp;&nbsp;<a href="/news.php"><b style="color: #6D78B6">All News</b></a>
     </div>
     <p><b>Follow us on <a href="http://www.twitter.com/jppfgrid"><img src="http://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
-    <h3>Our users say</h3>
+    <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Our users say</h3>
     <a href="quotes.php" style="text-decoration: none">... JPPF turned out to be a high-performance framework, which is flexible and nevertheless easy to learn. Even the support by the community is outstanding ...</a>
     <p><a href="quotes.php" style="text-decoration: none">... we have found the framework to be extremely powerful and easy to work with...</a>
     <p><a href="quotes.php" style="text-decoration: none">... The ability to adapt our existing technology without having to redesign or rethink entire processes is fantastic ...</a>
     <br>
-    <h3>Did you know ...</h3>
+    <h3><img src="images/icons/help-hint.png" class="titleWithIcon"/>Did you know ...</h3>
     That you can turn JPPF into a full-fledged P2P Grid?
     Read about it <a href="http://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a>
   </div>

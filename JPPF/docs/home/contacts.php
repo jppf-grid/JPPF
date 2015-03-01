@@ -68,6 +68,21 @@ else
 ?>
 								<td style="width: 1px"></td>
               <?php
+if ($currentPage == "Features")
+{
+?>
+<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
+<?php
+}
+else
+{
+?>
+<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
+<?php
+}
+?>
+								<td style="width: 1px"></td>
+              <?php
 if ($currentPage == "Download")
 {
 ?>
@@ -86,13 +101,13 @@ else
 if ($currentPage == "Documentation")
 {
 ?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc" class="headerMenuItem2">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
 <?php
 }
 else
 {
 ?>
-<td class="headerMenuItem">&nbsp;<a href="/doc" class="headerMenuItem">Documentation</a>&nbsp;</td>
+<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
 <?php
 }
 ?>
@@ -150,7 +165,7 @@ else
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=4.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -160,47 +175,46 @@ else
         <br/>
 				</div>
 				<div class="jppf_content">
+<h1 align="center">JPPF Contacts</h1>
   <table border="0" cellpadding="0" cellspacing="10">
     <tr>
-      <td width="200"><b>Contact</b></td>
-      <td width="100"><b>Country</b></td>
-      <td><b>Spoken Languages</b></td>
+      <td colspan="*"><h4><img src="images/icons/engineering.png" class="titleWithIcon"/>Project administrator</h4>
+</td>
     </tr>
-    <tr><td><br><b><u>Project administrator</u></b><br></td><td/><td/></tr>
     <tr>
       <td>
         Laurent Cohen<br>
         <a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
         +33 2 32 35 13 12<br>
-        <!-- Skype: <a href="callto://${skype}">${skype}</a><br> -->
         Evreux, France<br>
       </td>
-      <td valign="top">France</td>
-      <td valign="top">English, French</td>
+      <td valign="top">lives in France, speaks English and French</td>
     </tr>
-    <tr><td><br><b><u>Community manager</u></b><br></td><td/><td/></tr>
+    <tr>
+      <td colspan="*"><h4><img src="images/icons/personal2.png" class="titleWithIcon"/>Community manager</h4>
+</td>
+    </tr>
     <tr>
       <td>
         Laurent Cohen<br>
         <a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
         +33 2 32 35 13 12<br>
-        <!-- Skype: <a href="callto://${skype}">${skype}</a><br> -->
         Evreux, France<br>
       </td>
-      <td valign="top">France</td>
-      <td valign="top">English, French</td>
+      <td valign="top">lives in France, speaks English and French</td>
     </tr>
-    <tr><td><br><b><u>Press contact</u></b><br></td><td/><td/></tr>
+    <tr>
+      <td colspan="*"><h4><img src="images/icons/news.png" class="titleWithIcon"/>Press contact</h4>
+</td>
+    </tr>
     <tr>
       <td>
         Laurent Cohen<br>
         <a href="mailto:laurent.cohen@jppf.org">laurent.cohen@jppf.org</a><br>
         +33 2 32 35 13 12<br>
-        <!-- Skype: <a href="callto://${skype}">${skype}</a><br> -->
         Evreux, France<br>
       </td>
-      <td valign="top">France</td>
-      <td valign="top">English, French</td>
+      <td valign="top">lives in France, speaks English and French</td>
     </tr>
   </table>
   <br>
