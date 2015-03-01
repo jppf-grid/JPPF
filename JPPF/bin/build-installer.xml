@@ -83,11 +83,11 @@
       <delete dir="${web.installer.dir}/jar_dir" quiet="true"/>
   
   		<!-- Sign the web installer jars for use with JNLP -->
-  		<echo message="java.home = ${java.home}"/>
+  		<echoprop name="java.home"/>
   		<condition property="jdk.bin" value="${java.home}/../bin" else="${java.home}/bin">
   			<contains string="${java.home}" substring="jre" casesensitive="false"/>
   		</condition>
-  		<echo message="jdk.bin = ${jdk.bin}"/>
+  		<echoprop name="jdk.bin"/>
   		<exec executable="${jdk.bin}/jarsigner">
   			<arg value="-keystore"/>
   			<arg value="${bin}\security\jppf.keystore"/>

@@ -148,6 +148,22 @@
     </propertyfile>
 	</target>
 
+  <!-- ========================================================================= -->
+  <!--  Macrodef utilities                                                       -->
+  <!-- ========================================================================= -->
+
+  <!--
+    Display the name and value of a property in the form "name = value".
+    Parameters:
+      - propname: the name of the property to display to the output console
+  -->
+  <macrodef name="echoprop">
+  <attribute name="name"/>
+    <sequential>
+      <echo message="@{name} = ${@{name}}"/>
+    </sequential>
+  </macrodef>
+
 	<!-- ========================================================================= -->
 	<!--                           Build the application                           -->
 	<!-- ========================================================================= -->

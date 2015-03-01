@@ -29,8 +29,10 @@
     <attribute name="zip-prefix" default="@{module}"/>
     <element name="module-elements" optional="true"/>
     <sequential>
+      <local name="@{module}.prefix"/>
       <property name="@{module}.prefix" value="${app.ver}-@{zip-prefix}"/>
-      <echo message="@{module}.prefix = ${@{module}.prefix}"/>
+      <echoprop name="@{module}.prefix"/>
+      <local name="runtime.@{module}.file"/>
       <property name="runtime.@{module}.file" value="${build}/${@{module}.prefix}.zip"/>
       <delete file="${runtime.@{module}.file}" quiet="true"/>
       <zip destfile="${runtime.@{module}.file}">
