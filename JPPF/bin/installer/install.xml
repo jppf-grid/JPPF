@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+
+  <info>
+		<appname>@{ant.project.name}</appname>
+		<appversion>@{version.number}</appversion>
+		<authors>
+			<author name="The JPPF Team" email=""/>
+		</authors>
+		<!--<url>http://www.jppf.org</url>-->
+		<url>@{installer.url}</url>
+		<javaversion>1.5</javaversion>
+		<webdir>@{installer.url}download/@{version.number}</webdir>
+    <run-privileged condition="izpack.windowsinstall"/>
+  </info>
+
+	<guiprefs width="600" height="400" resizable="yes">
+		<modifier key="useButtonIcons" value="no"/>
+	  <modifier key="useLabelIcons" value="no"/>
+	  <modifier key="labelGap" value="2"/>
+	  <modifier key="layoutAnchor" value="NORTHWEST"/>
+	  <modifier key="useHeadingPanel" value="yes"/>
+	  <modifier key="useHeadingForSummary" value="yes"/>
+	  <modifier key="headingImageOnLeft" value="yes"/>
+	  <modifier key="headingLineCount" value="1"/>
+	  <modifier key="headingFontSize" value="1.5"/>
+	  <modifier key="headingBackgroundColor" value="0x00ffffff"/>
+	  <modifier key="headingPanelCounter" value="text"/>
+	  <modifier key="headingPanelCounterPos" value="inHeading"/>
+    <laf name="looks" decorate.frames="yes" decorate.dialogs="yes">
+    	<os family="mac"/>
+    	<os family="unix"/>
+    	<os family="windows"/>
+    </laf>
+	</guiprefs>
+
+  <locale>
+		<langpack iso3="eng"/>
+  </locale>
+
+  <resources>
+    <res id="LicencePanel.licence" src="LICENSE.txt"/>
+    <!--<res id="InfoPanel.info" src="readme.txt"/>-->
+		<res id="Heading.image" src="docs/home/images/logo1.gif" />
+		<res id="CustomLangpack.xml_eng" src="@{installer}/eng.xml"/>
+  </resources>
+
+  <panels>
+    <panel classname="HelloPanel"/>
+    <!--<panel classname="InfoPanel"/>-->
+    <panel classname="LicencePanel"/>
+    <panel classname="TargetPanel"/>
+    <panel classname="PacksPanel"/>
+    <panel classname="InstallPanel"/>
+    <panel classname="FinishPanel"/>
+  </panels>
+
+  <packs>
+    <pack name="Full_sources" required="no" preselected="no">
+      <description>All JPPF modules with their source code</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-full-src" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-full-src">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Driver" required="no" preselected="yes">
+      <description>The JPPF server librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-driver" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver">
+      	<include name="**/*.*"/>
+        <include name="bin/jsw/JPPFDriver"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/startDriver.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-driver/bin/jsw/JPPFDriver" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Node" required="no" preselected="yes">
+      <description>The JPPF node librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node">
+        <include name="**/*.*"/>
+        <include name="bin/jsw/JPPFNode"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/screensaver.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node/bin/jsw/JPPFNode" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Console" required="no" preselected="yes">
+      <description>The JPPF administration and monitoring console librairies and launch scripts</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-admin-ui" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui">
+      	<include name="**/*.*"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-admin-ui/startConsole.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Application_Template" required="no" preselected="yes">
+      <description>A fully working JPPF template application to use as a starting point</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-application-template" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template">
+        <include name="**/*.*"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Dotnet" required="no" preselected="yes">
+      <description>A fully working .Net JPPF demo application</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-dotnet">
+        <include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Node_Dotnet" required="no" preselected="yes">
+      <description>A .Net-enabled JPPF node distribution</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node-dotnet" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet">
+        <include name="**/*.*"/>
+        <include name="bin/jsw/JPPFNode"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/screensaver.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-dotnet/bin/jsw/JPPFNode" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_User_Guide" required="no" preselected="yes">
+      <description>Full user guide in PDF format</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-User-Guide" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-User-Guide">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_API" required="no" preselected="no">
+      <description>Full Javadoc (source code documentation) in HTML format</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-api" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-api">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="Samples_Pack" required="no" preselected="no">
+      <description>A set of full-fledged applications using JPPF</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-samples-pack" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack">
+      	<include name="**/*.*"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/AdaptiveGrid/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ConcurrentJobs/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/DataDependency/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ExtendedClassLoading/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/ForkJoinNodeExecutor/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FractalMovieGenerator/config/node/startNode.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FractalMovieGenerator/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Fractals/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/FTPServer/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/GPU/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/JobRecovery/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/KryoSerializer/build.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/MatrixMultiplication/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/Nbody/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/startH2.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/NodeLifeCycle/db/stopH2.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/SequenceAlignment/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/WebSearchEngine/run.sh" stage="never" os="unix"/>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-samples-pack/WordCount/run.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="J2EE_Connector" required="no" preselected="no">
+      <description>A JCA resource adapter that allows J2EE applications to use a JPPF grid</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-j2ee-connector" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-j2ee-connector">
+      	<include name="**/*.*"/>
+      </fileset>
+    </pack>
+
+  </packs>
+
+</installation>
