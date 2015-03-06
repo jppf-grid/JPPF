@@ -11,7 +11,7 @@
 		<!--<url>http://www.jppf.org</url>-->
 		<url>@{installer.url}</url>
 		<javaversion>1.5</javaversion>
-		<webdir>@{installer.url}download/@{version.number}</webdir>
+    <webdir>http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20@{version.number}/web_installer</webdir>
     <run-privileged condition="izpack.windowsinstall"/>
   </info>
 
