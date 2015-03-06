@@ -12,8 +12,12 @@ $template{name="about-page-header" title="Downloads"}$
       <div style="border-bottom: solid 1px #9B9DFD">
       $template{name="title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h2"}$
       </div>
-      <h3>Installer</h3>
-      <a href="/download/jppf_ws-5.0.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+      <h3>Web Installer</h3>
+      <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
+      <ul class="samplesList" style="margin-top: 0pt">
+        <li>double-clicking the downloaded file</li>
+        <li>typing "<b>java -jar <?php echo 'JPPF-' . $ver1 . '-Web-Installer.jar'; ?></b>"</li>
+      </ul>
 
       <h3>Deployable module binaries</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
@@ -47,7 +51,7 @@ $template{name="about-page-header" title="Downloads"}$
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div style="border: solid 1px #9B9DFD; border-radius: 10px; padding: 5px">
       <?php
-        $ver1 = "4.2.6";
+        $ver1 = "4.2.7";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -56,8 +60,12 @@ $template{name="about-page-header" title="Downloads"}$
       $template{name="title-with-icon" img="images/icons/download.png" title="JPPF <?php echo $ver1 ?>" heading="h2"}$
       </div>
 
-      <h3>Installer</h3>
-      <a href="/download/jppf_ws-4.2.jnlp">Start the web installer by clicking here</a> (requires Java Web Start 1.5 or later)<br>
+      <h3>Web Installer</h3>
+      <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
+      <ul class="samplesList" style="margin-top: 0pt">
+        <li>double-clicking the downloaded file</li>
+        <li>typing "<b>java -jar <?php echo 'JPPF-' . $ver1 . '-Web-Installer.jar'; ?></b>"</li>
+      </ul>
 
       <h3>Deployable module binaries</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
