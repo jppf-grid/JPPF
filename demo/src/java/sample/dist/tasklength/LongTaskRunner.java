@@ -59,7 +59,7 @@ public class LongTaskRunner {
       int length = props.getInt("longtask.length");
       int nbTask = props.getInt("longtask.number");
       int iterations = props.getInt("longtask.iterations");
-      print("Running Long Task demo with "+nbTask+" tasks of length = "+length+" ms for "+iterations+" iterations");
+      print("Running Long Task demo with "+ nbTask + " tasks of length = " + length + " ms for " + iterations + " iterations");
       perform(nbTask, length, iterations);
     } catch(Exception e) {
       e.printStackTrace();
@@ -83,8 +83,8 @@ public class LongTaskRunner {
       JPPFJob job = new JPPFJob();
       job.setName("Long task iteration " + iter);
       for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
-      job.getSLA().setMaxTaskResubmits(0);
-      job.getSLA().setApplyMaxResubmitsUponNodeError(true);
+      //job.getSLA().setMaxTaskResubmits(0);
+      //job.getSLA().setApplyMaxResubmitsUponNodeError(true);
       // submit the tasks for execution
       List<Task<?>> results = jppfClient.submitJob(job);
       for (Task task: results) {

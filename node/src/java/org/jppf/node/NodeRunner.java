@@ -184,7 +184,7 @@ public class NodeRunner {
   }
 
   /**
-   * Restore the configuration from the sna^shot taken at startup time.
+   * Restore the configuration from the snapshot taken at startup time.
    */
   public static void restoreInitialConfig() {
     TypedProperties config = JPPFConfiguration.getProperties();
@@ -375,6 +375,7 @@ public class NodeRunner {
    * @return a uuid as a string.
    */
   public static String getUuid() {
+    //System.out.println("getUuid() with value = " + uuid + " called from :\n" + ExceptionUtils.getCallStack());
     return uuid;
   }
 
