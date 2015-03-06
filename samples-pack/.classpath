@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="AdaptiveGrid/classes" path="AdaptiveGrid/src"/>
+	<classpathentry kind="src" output="ConcurrentJobs/classes" path="ConcurrentJobs/src"/>
+	<classpathentry kind="src" output="CustomLoadBalancer/classes" path="CustomLoadBalancer/src"/>
+	<classpathentry kind="src" output="CustomMBeans/classes" path="CustomMBeans/src"/>
+	<classpathentry kind="src" output="DataDependency/classes" path="DataDependency/src"/>
+	<classpathentry kind="src" output="DataEncryption/classes" path="DataEncryption/src"/>
+	<classpathentry kind="src" output="ExtendedClassLoading/classes" path="ExtendedClassLoading/src"/>
+	<classpathentry kind="src" output="ExtendedClassLoading/classes2" path="ExtendedClassLoading/src2"/>
+	<classpathentry kind="src" output="ForkJoinNodeExecutor/classes" path="ForkJoinNodeExecutor/src"/>
+	<classpathentry kind="src" output="FractalMovieGenerator/classes" path="FractalMovieGenerator/src"/>
+	<classpathentry kind="src" output="Fractals/classes" path="Fractals/src"/>
+	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
+	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
+	<classpathentry kind="src" output="IdleSystem/classes" path="IdleSystem/src"/>
+	<classpathentry kind="src" output="InitializationHook/classes" path="InitializationHook/src"/>
+	<classpathentry kind="src" path="JobRecovery/src"/>
+	<classpathentry kind="src" output="KryoSerializer/classes" path="KryoSerializer/src"/>
+	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
+	<classpathentry kind="src" output="Nbody/classes" path="Nbody/src"/>
+	<classpathentry kind="src" path="NodeConnectionEvents/src"/>
+	<classpathentry kind="src" output="NodeLifeCycle/classes" path="NodeLifeCycle/src"/>
+	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>
+	<classpathentry kind="src" output="SequenceAlignment/classes" path="SequenceAlignment/src"/>
+	<classpathentry kind="src" output="StartupClasses/classes" path="StartupClasses/src"/>
+	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/java"/>
+	<classpathentry kind="src" output="TomcatPort/classes" path="TomcatPort/src/resources"/>
+	<classpathentry kind="src" output="WebSearchEngine/classes" path="WebSearchEngine/src"/>
+	<classpathentry kind="src" output="WordCount/classes" path="WordCount/src"/>
+	<classpathentry kind="src" output="WordCount/classes-client" path="WordCount/src-client"/>
+	<classpathentry kind="lib" path="shared/lib/jaligner.jar"/>
+	<classpathentry kind="lib" path="shared/lib/crawler-1.0.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/lucene-core-2.2.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/lucene-demos-2.2.0.jar"/>
+	<classpathentry kind="lib" path="shared/lib/lucene-memory-2.2.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="shared/lib/miglayout-3.7-swing.jar"/>
+	<classpathentry kind="lib" path="shared/lib/groovy-all-1.6.5.jar"/>
+	<classpathentry kind="lib" path="shared/lib/looks-2.2.2.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-dbcp-1.4.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="shared/lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="IdleSystem/lib/jna.jar"/>
+	<classpathentry kind="lib" path="IdleSystem/lib/platform.jar"/>
+	<classpathentry kind="lib" path="shared/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="NodeLifeCycle/lib/geronimo-jta_1.1_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="NodeLifeCycle/lib/transactions-essentials-all.jar" sourcepath="C:/ftp/dev/Database/Atomikos/AtomikosTransactionsEssentials-3.7.0M5/sources"/>
+	<classpathentry kind="lib" path="shared/lib/commons-pool-1.5.2.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/commons-net-2.2.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/ftplet-api-1.0.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/ftpserver-core-1.0.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/mina-core-2.0.2.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/spring-beans-2.5.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/spring-context-2.5.5.jar"/>
+	<classpathentry kind="lib" path="FTPServer/lib/spring-core-2.5.5.jar"/>
+	<classpathentry kind="lib" path="shared/lib/hazelcast-1.9.3.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/admin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/node"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/server"/>
+	<classpathentry kind="lib" path="GPU/lib/aparapi.jar"/>
+	<classpathentry kind="lib" path="FractalMovieGenerator/lib/monte-cc.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-2.22-all.jar"/>
+	<classpathentry kind="lib" path="KryoSerializer/lib/kryo-serializers-0.26.jar"/>
+	<classpathentry kind="lib" path="shared/lib/commons-io-2.4.jar"/>
+	<classpathentry kind="output" path="JobRecovery/classes"/>
+</classpath>

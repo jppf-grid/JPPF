@@ -1,0 +1,130 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2014 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="TomcatPort" default="build" basedir=".">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <property name="lib.dir"         value="${basedir}/../shared/lib"/>
+  <property name="classes.dir"     value="${basedir}/classes"/>  
+  <property name="src.dir"         value="${basedir}/src/java"/>
+  <property name="build.dir"       value="${basedir}/build"/>
+  <property name="docroot.dir"     value="${basedir}/src/resources"/>
+  <property name="web.inf.dir"     value="${docroot.dir}/WEB-INF"/>
+  <property name="war.prefix"      value="jppftest"/>
+  <property name="war.file"        value="${war.prefix}.war"/>
+  <property name="tomcat.home"     value="C:/Tools/apache/apache-tomcat-7.0.0"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="project.classpath">
+    <pathelement location="${classes.dir}"/>
+    <fileset dir="${lib.dir}">
+      <include name="jppf-common-node.jar"/>
+      <include name="jppf-common.jar"/>
+      <include name="jppf-client.jar"/>
+      <include name="commons-logging-1.1.jar"/>
+      <include name="slf4j-api-1.6.1.jar"/>
+      <include name="slf4j-jdk14-1.6.1.jar"/>
+      <include name="jppf-jmxremote_optional-1.1.jar"/>
+    </fileset>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                                    Clean                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete dir="${classes.dir}" quiet="true"/>
+    <delete dir="${build.dir}" quiet="true"/>
+  </target>               
+
+  <!-- ========================================================================= -->
+  <!--                                    Init                                   -->
+  <!-- ========================================================================= -->
+
+  <target name="init" depends="clean" description="Initialize ressources">
+     <mkdir dir="${classes.dir}"/>
+     <mkdir dir="${build.dir}"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                         Build everything                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="init, clean, compile, build.war"/>
+
+  <!-- ========================================================================= -->
+  <!--                Deploy the war file to ${tomcat.home}/webapps              -->
+  <!-- ========================================================================= -->
+
+  <target name="deploy" depends="deploy.war.tomcat"/>
+
+  <!-- ========================================================================= -->
+  <!--                         Compile the application                           -->
+  <!-- ========================================================================= -->
+
+  <target name="compile" depends="init">
+    <echo message="compiling the project..."/>
+    <javac srcdir="" destdir="${classes.dir}"
+      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="project.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${src.dir}"/>
+    </javac>
+    <copy todir="${classes.dir}">
+      <fileset dir="${src.dir}">
+        <exclude name="**/*.java"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                     Generate the EAR files                                -->
+  <!-- ========================================================================= -->
+
+  <target name="build.war">
+    <war warfile="${build.dir}/${war.file}" webxml="${web.inf.dir}/web.xml">
+      <zipfileset dir="${docroot.dir}" includes="**/*.*"/>
+      <lib dir="${lib.dir}">
+        <include name="jppf-common-node.jar"/>
+        <include name="jppf-common.jar"/>
+        <include name="jppf-client.jar"/>
+        <include name="commons-logging-1.1.jar"/>
+        <include name="slf4j-api-1.6.1.jar"/>
+	      <include name="jppf-jmxremote_optional-1.1.jar"/>
+      </lib>
+      <lib dir="${basedir}/lib">
+        <include name="slf4j-jdk14-1.6.1.jar"/>
+      </lib>
+      <classes dir="${classes.dir}"/>
+    </war>
+  </target>
+
+  <!--
+  -->
+  <target name="deploy.war.tomcat">
+    <delete dir="${tomcat.home}/webapps/${war.prefix}" quiet="true"/>
+    <copy todir="${tomcat.home}/webapps" file="${build.dir}/${war.file}"/>
+  </target>
+</project> 
+
