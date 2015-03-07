@@ -55,6 +55,10 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
    */
   static final int NB_SLAVES = 5;
   /**
+   * Column number for the node's number of provisioned slaves.
+   */
+  static final int PENDING_ACTION = 6;
+  /**
    * 
    */
   static NumberFormat nf = createNumberFormat();
@@ -68,23 +72,11 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
     BASE = "org.jppf.ui.i18n.NodeDataPage";
   }
 
-  /**
-   * Get the number of columns in the table.
-   * @return the number of columns as an int.
-   * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
-   */
   @Override
   public int getColumnCount() {
-    return 6;
+    return 7;
   }
 
-  /**
-   * Returns which object is displayed in this column.
-   * @param node the node for which to get a value.
-   * @param column the column from which to set a value.
-   * @return the value from the specified node and column.
-   * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
-   */
   @Override
   public Object getValueAt(final Object node, final int column) {
     Object res = "";
@@ -127,44 +119,36 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
               } else res = "";
             }
             break;
+          case PENDING_ACTION:
+            if (isNode) res = ((TopologyNode) info).getPendingAction();
+            break;
         }
       } else {
-        if (column == 0)res = defNode.getUserObject().toString();
+        if (column == 0) res = defNode.getUserObject().toString();
       }
     }
     return res;
   }
 
-  /**
-   * What the TableHeader displays when the Table is in a JScrollPane.
-   * @param column the index of the column for which to get a title.
-   * @return the column title as a string.
-   * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
-   */
   @Override
-  public String getColumnName(final int column) {
-    String res = "";
+  protected String getBaseColumnName(final int column) {
     switch (column) {
       case NODE_URL:
-        res = localize("column.node.url");
-        break;
+        return "column.node.url";
       case NODE_THREADS:
-        res = localize("column.node.threads");
-        break;
+        return "column.node.threads";
       case NODE_STATUS:
-        res = localize("column.node.status");
-        break;
+        return "column.node.status";
       case EXECUTION_STATUS:
-        res = localize("column.node.execution.status");
-        break;
+        return "column.node.execution.status";
       case NB_TASKS:
-        res = localize("column.nb.tasks");
-        break;
+        return "column.nb.tasks";
       case NB_SLAVES:
-        res = localize("column.nb.slaves");
-        break;
+        return "column.nb.slaves";
+      case PENDING_ACTION:
+        return "column.pending";
     }
-    return res;
+    return "";
   }
 
   /**

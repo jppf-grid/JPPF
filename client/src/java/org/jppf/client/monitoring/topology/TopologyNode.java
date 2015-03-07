@@ -42,6 +42,10 @@ public class TopologyNode extends AbstractTopologyComponent {
    * The status of the node.
    */
   private TopologyNodeStatus status = TopologyNodeStatus.UP;
+  /**
+   * The currently pending action forthis node, if any.
+   */
+  private String pendingAction = "None";
 
   /**
    * Initialize this topology data as holding information about a node.
@@ -143,5 +147,21 @@ public class TopologyNode extends AbstractTopologyComponent {
     sb.append(']');
     //return (jmx == null) ? (managementInfo == null ? "?" : managementInfo.toDisplayString()) : jmx.getDisplayName();
     return sb.toString();
+  }
+
+  /**
+   * Get the currently pending action forthis node, if any.
+   * @return the pending action as a string.
+   */
+  public String getPendingAction() {
+    return pendingAction;
+  }
+
+  /**
+   * Set the currently pending action for this node.
+   * @param pendingAction the pending action as a string.
+   */
+  public void setPendingAction(final String pendingAction) {
+    this.pendingAction = pendingAction;
   }
 }

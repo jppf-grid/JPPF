@@ -34,8 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFNodeAdmin implements JPPFNodeAdminMBean
-{
+public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   /**
    * Explicit serialVersionUID.
    */
@@ -61,8 +60,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Initialize this node management bean with the specified node.
    * @param node the node whose state is monitored.
    */
-  public JPPFNodeAdmin(final JPPFNode node)
-  {
+  public JPPFNodeAdmin(final JPPFNode node) {
     if (debugEnabled) log.debug("instantiating JPPFNodeAdmin");
     this.node = node;
     node.setNodeAdmin(this);
@@ -78,8 +76,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public JPPFNodeState state() throws Exception
-  {
+  public JPPFNodeState state() throws Exception {
     JPPFNodeState ns = nodeState.copy();
     if (log.isTraceEnabled()) log.trace("nn threads = " + ns.getThreadPoolSize());
     return ns;
@@ -91,8 +88,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public void updateThreadPoolSize(final Integer size) throws Exception
-  {
+  public void updateThreadPoolSize(final Integer size) throws Exception {
     if (debugEnabled) log.debug("node request to change thread pool size to " + size);
     node.getExecutionManager().setThreadPoolSize(size);
     nodeState.setThreadPoolSize(size);
@@ -105,8 +101,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public JPPFSystemInformation systemInformation() throws Exception
-  {
+  public JPPFSystemInformation systemInformation() throws Exception {
     JPPFSystemInformation info = node.getSystemInformation();
     ExecutionInfo nei = node.getExecutionManager().getThreadManager().computeExecutionInfo();
     info.getRuntime().setProperty("cpuTime", nei == null ? "-1" : Long.toString(nei.cpuTime / 1000000L));
@@ -162,21 +157,22 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    */
   private void shutdownOrRestart(final boolean interrupt, final boolean restart) {
     if (node.isLocal()) return;
-    if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
-      String s = restart ? "Restart" : "Shutdown";
-      System.out.println(s + " requested");
-      log.info("node {} requested", s);
-      if (interrupt || !node.isExecuting()) {
+    String s = restart ? "restart" : "shutdown";
+    if (interrupt || !node.isExecuting()) {
+      if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
+        System.out.println(s + " requested");
+        log.info("node {} requested", s);
         Runnable r = new Runnable() {
           @Override
           public void run() {
             node.shutdown(restart);
           }
         };
-        new Thread(r, "Node" + s).start();
-      } else {
-        node.requestShutdown(restart);
+        new Thread(r, "Node " + s).start();
       }
+    } else {
+      log.info("deferred node {} requested", s);
+      node.requestShutdown(restart);
     }
   }
 
@@ -185,8 +181,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public void resetTaskCounter() throws Exception
-  {
+  public void resetTaskCounter() throws Exception {
     if (debugEnabled) log.debug("node task counter reset requested");
     setTaskCounter(0);
   }
@@ -197,8 +192,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public synchronized void setTaskCounter(final Integer n) throws Exception
-  {
+  public synchronized void setTaskCounter(final Integer n) throws Exception {
     if (debugEnabled) log.debug("node tasks counter reset to " + n + " requested");
     node.setTaskCount(n);
     nodeState.setNbTasksExecuted(n);
@@ -210,8 +204,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public void updateThreadsPriority(final Integer newPriority) throws Exception
-  {
+  public void updateThreadsPriority(final Integer newPriority) throws Exception {
     if (debugEnabled) log.debug("node threads priority reset to " + newPriority + " requested");
     node.getExecutionManager().updateThreadsPriority(newPriority);
     nodeState.setThreadPriority(newPriority);
@@ -224,8 +217,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception
-  {
+  public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception {
     if (config == null) return;
     if (debugEnabled) log.debug("node request to change configuration");
     // we don't allow the node uuid to be overriden
@@ -256,26 +248,22 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * @throws Exception if any error occurs.
    */
   @Override
-  public void cancelJob(final String jobId, final Boolean requeue) throws Exception
-  {
+  public void cancelJob(final String jobId, final Boolean requeue) throws Exception {
     if (debugEnabled) log.debug("Request to cancel jobId = '" + jobId + "', requeue = " + requeue);
     if (jobId == null) return;
-    if (jobId.equals(node.getExecutionManager().getCurrentJobId()))
-    {
+    if (jobId.equals(node.getExecutionManager().getCurrentJobId())) {
       node.getExecutionManager().setJobCancelled(true);
       node.getExecutionManager().cancelAllTasks(true, requeue);
     }
   }
 
   @Override
-  public DelegationModel getDelegationModel() throws Exception
-  {
+  public DelegationModel getDelegationModel() throws Exception {
     return AbstractJPPFClassLoader.getDelegationModel();
   }
 
   @Override
-  public void setDelegationModel(final DelegationModel model) throws Exception
-  {
+  public void setDelegationModel(final DelegationModel model) throws Exception {
     if (model != null) AbstractJPPFClassLoader.setDelegationModel(model);
   }
 
@@ -283,8 +271,19 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean
    * Get the current state of the node
    * @return a {@link JPPFNodeState} instance.
    */
-  synchronized JPPFNodeState getNodeState()
-  {
+  synchronized JPPFNodeState getNodeState() {
     return nodeState;
+  }
+
+  @Override
+  public NodePendingAction pendingAction() {
+    if (!node.isShutdownRequested()) return NodePendingAction.NONE;
+    return node.isRestart() ? NodePendingAction.RESTART : NodePendingAction.SHUTDOWN;
+  }
+
+  @Override
+  public boolean cancelPendingAction() {
+    log.info("cancelPendingAction() requested");
+    return node.cancelShutdownRequest();
   }
 }

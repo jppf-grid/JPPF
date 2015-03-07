@@ -156,41 +156,30 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
   }
 
   @Override
-  public String getColumnName(final int column) {
-    String res = "";
+  public String getBaseColumnName(final int column) {
     switch (column) {
       case URL:
-        res = localize("column.health.url");
-        break;
+        return "column.health.url";
       case HEAP_MEM_PCT:
-        res = localize("column.health.heap.pct");
-        break;
+        return "column.health.heap.pct";
       case HEAP_MEM_MB:
-        res = localize("column.health.heap.mb");
-        break;
+        return "column.health.heap.mb";
       case NON_HEAP_MEM_PCT:
-        res = localize("column.health.nonheap.pct");
-        break;
+        return "column.health.nonheap.pct";
       case NON_HEAP_MEM_MB:
-        res = localize("column.health.nonheap.mb");
-        break;
+        return "column.health.nonheap.mb";
       case RAM_PCT:
-        res = localize("column.health.ram.pct");
-        break;
+        return "column.health.ram.pct";
       case RAM_MB:
-        res = localize("column.health.ram.mb");
-        break;
+        return "column.health.ram.mb";
       case THREADS:
-        res = localize("column.health.livethreads");
-        break;
+        return "column.health.livethreads";
       case CPU_LOAD:
-        res = localize("column.health.cpuload");
-        break;
+        return "column.health.cpuload";
       case SYSTEM_CPU_LOAD:
-        res = localize("column.health.systemCpuload");
-        break;
+        return "column.health.systemCpuload";
     }
-    return res;
+    return "";
   }
 
   /**
@@ -203,43 +192,5 @@ public class JVMHealthTreeTableModel extends AbstractJPPFTreeTableModel {
     nf.setMaximumFractionDigits(1);
     nf.setMinimumFractionDigits(1);
     return nf;
-  }
-
-  @Override
-  public String getColumnTooltip(final int column) {
-    String res = "";
-    switch (column) {
-      case URL:
-        res = localize("column.health.url.tooltip");
-        break;
-      case HEAP_MEM_PCT:
-        res = localize("column.health.heap.pct.tooltip");
-        break;
-      case HEAP_MEM_MB:
-        res = localize("column.health.heap.mb.tooltip");
-        break;
-      case NON_HEAP_MEM_PCT:
-        res = localize("column.health.nonheap.pct.tooltip");
-        break;
-      case NON_HEAP_MEM_MB:
-        res = localize("column.health.nonheap.mb.tooltip");
-        break;
-      case RAM_PCT:
-        res = localize("column.health.ram.pct.tooltip");
-        break;
-      case RAM_MB:
-        res = localize("column.health.ram.mb.tooltip");
-        break;
-      case THREADS:
-        res = localize("column.health.livethreads.tooltip");
-        break;
-      case CPU_LOAD:
-        res = localize("column.health.cpuload.tooltip");
-        break;
-      case SYSTEM_CPU_LOAD:
-        res = localize("column.health.systemCpuload.tooltip");
-        break;
-    }
-    return res;
   }
 }

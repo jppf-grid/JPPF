@@ -18,6 +18,7 @@
 
 package org.jppf.client.monitoring.topology;
 
+import java.io.IOException;
 import java.util.*;
 
 import org.jppf.management.*;
@@ -151,14 +152,26 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         }
       }
     }
-    // refresh the nodes provisioning states
-    uuidMap.clear();
-    for (AbstractTopologyComponent child: children) {
+    refreshProvisioningStates(driver, forwarder, changedNodes);
+    refreshPendingActions(driver, forwarder, changedNodes);
+    for (TopologyNode node: changedNodes) manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.NODE_STATE);
+  }
+
+  /**
+   * Refresh the provisioning state of the master nodes attached to the specified driver.
+   * @param driver the driver for which to refresh the nodes.
+   * @param forwarder used to forward the request to get the number of slaves to the nodes.
+   * @param changedNodes collects the nodes for which an update occurred.
+   */
+  private void refreshProvisioningStates(final TopologyDriver driver, final JPPFNodeForwardingMBean forwarder, final Set<TopologyNode> changedNodes) {
+    Map<String, TopologyNode> uuidMap = new HashMap<>();
+    for (AbstractTopologyComponent child: driver.getChildren()) {
       if (child.isNode()) {
         TopologyNode node = (TopologyNode) child;
         if (node.getManagementInfo().isMasterNode()) uuidMap.put(child.getUuid(), (TopologyNode) child);
       }
     }
+    Map<String, Object> result = null;
     try {
       result = forwarder.forwardGetAttribute(new UuidSelector(uuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
     } catch(Exception e) {
@@ -172,6 +185,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         node.setStatus(TopologyNodeStatus.DOWN);
         if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
       } else if (entry.getValue() instanceof Integer) {
+        node.setStatus(TopologyNodeStatus.UP);
         int n = (Integer) entry.getValue();
         if (n != node.getNbSlaveNodes()) {
           changedNodes.add(node);
@@ -179,7 +193,40 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         }
       }
     }
-    
-    for (TopologyNode node: changedNodes) manager.nodeUpdated(driver, node, TopologyEvent.UpdateType.NODE_STATE);
+  }
+
+  /**
+   * Refresh the provisioning state of the master nodes attached to the specified driver.
+   * @param driver the driver for which to refresh the nodes.
+   * @param forwarder used to forward the request to get the number of slaves to the nodes.
+   * @param changedNodes collects the nodes for which an update occurred.
+   */
+  private void refreshPendingActions(final TopologyDriver driver, final JPPFNodeForwardingMBean forwarder, final Set<TopologyNode> changedNodes) {
+    Map<String, TopologyNode> uuidMap = new HashMap<>();
+    for (AbstractTopologyComponent child: driver.getChildren()) {
+      if (child.isNode()) uuidMap.put(child.getUuid(), (TopologyNode) child); 
+    }
+    Map<String, Object> result = null;
+    try {
+      result = forwarder.forwardInvoke(new UuidSelector(uuidMap.keySet()), JPPFNodeAdminMBean.MBEAN_NAME, "pendingAction");
+    } catch(Exception e) {
+      if (debugEnabled) log.debug("error getting number of slaves for driver " + driver.getUuid(), e);
+    }
+    if (result == null) return;
+    for (Map.Entry<String, Object> entry: result.entrySet()) {
+      TopologyNode node = uuidMap.get(entry.getKey());
+      if (node == null) continue;
+      if (entry.getValue() instanceof IOException) {
+        node.setStatus(TopologyNodeStatus.DOWN);
+        if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
+      } else if (entry.getValue() instanceof Enum) {
+        node.setStatus(TopologyNodeStatus.UP);
+        String action = ((Enum) entry.getValue()).toString();
+        if (!action.equals(node.getPendingAction())) {
+          changedNodes.add(node);
+          node.setPendingAction(action);
+        }
+      }
+    }
   }
 }

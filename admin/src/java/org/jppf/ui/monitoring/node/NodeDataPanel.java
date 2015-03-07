@@ -149,6 +149,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     actionHandler.putAction("select.drivers", new SelectDriversAction(this));
     actionHandler.putAction("select.nodes", new SelectNodesAction(this));
     actionHandler.putAction("node.show.hide", new ShowHideColumnsAction(this));
+    actionHandler.putAction("cancel.deferred.action", new CancelDeferredAction());
     actionHandler.updateActions();
     treeTable.addMouseListener(new NodeTreeTableMouseListener(actionHandler));
     new Thread(new ActionsInitializer(this, "/topology.toolbar")).start();

@@ -29,34 +29,21 @@ import org.slf4j.*;
 /**
  * This action stops a node.
  */
-public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
+public class CancelDeferredAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ShutdownOrRestartNodeAction.class);
+  private static Logger log = LoggerFactory.getLogger(CancelDeferredAction.class);
   /**
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Whether to restart the nodes or to shut them down.
-   */
-  private final boolean restart;
-  /**
-   * Whether to restart/shutdown immediately or wait until each node are idle.
-   */
-  private final boolean interruptIfRunning;
 
   /**
    * Initialize this action.
-   * @param restart whether to restart the nodes or to shut them down.
-   * @param interruptIfRunning whether to restart/shutdown immediately or wait until each node are idle.
-   * @param name the name of the corresponding UI element.
    */
-  public ShutdownOrRestartNodeAction(final boolean restart, final boolean interruptIfRunning, final String name) {
-    this.restart = restart;
-    this.interruptIfRunning = interruptIfRunning;
-    if (name != null) setupNameAndTooltip(name);
+  public CancelDeferredAction() {
+    setupNameAndTooltip("cancel.deferred.action");
   }
 
   /**
@@ -83,10 +70,9 @@ public class ShutdownOrRestartNodeAction extends AbstractTopologyAction {
           try {
             JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;
-            if (debugEnabled) log.debug(String.format("invoking %s with interrupt=%b for the nodes: %s", (restart ? "restart()" : "shutdown()"), interruptIfRunning, entry.getValue()));
             NodeSelector selector = new UuidSelector(entry.getValue());
-            if (restart) forwarder.restart(selector, interruptIfRunning);
-            else forwarder.shutdown(selector, interruptIfRunning);
+            if (debugEnabled) log.debug("invoking cancelPendingAction() for the nodes: " + entry.getValue());
+            forwarder.forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "cancelPendingAction");
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }

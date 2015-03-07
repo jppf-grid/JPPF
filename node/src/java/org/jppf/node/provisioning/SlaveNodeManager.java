@@ -70,7 +70,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   /**
    * A mapping of the slave processes to their internal name.
    */
-  private final SortedMap<Integer, SlaveNodeLauncher> slaves = new TreeMap<>();
+  private final TreeMap<Integer, SlaveNodeLauncher> slaves = new TreeMap<>();
   /**
    * The set of already reserved slave ids.
    * @since 4.2.2
@@ -141,13 +141,13 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     }
     int size = slaves.size();
     int diff = size - requestedSlaves;
+    int id =  -1;
     // if running slaves > requested ones, stop those not needed 
     if (diff > 0) {
       log.debug("stopping " + diff + " processes");
       for (int i=requestedSlaves; i<size; i++) {
-        int id = slaves.lastKey();
-        SlaveNodeLauncher slave = slaves.remove(id);
-        //SlaveNodeLauncher slave = slaves.get(id);
+        id = (id < 0) ? slaves.lastKey() : slaves.lowerKey(id);
+        SlaveNodeLauncher slave = slaves.get(id);
         log.debug("stopping {}", slave.getName());
         synchronized(slave) {
           if (slave.isStarted()) slave.sendActionCommand(action);
@@ -158,7 +158,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
       // otherwise start the missing number of slaves
       if (debugEnabled) log.debug("starting " + -diff + " processes");
       for (int i=size; i<requestedSlaves; i++) {
-        int id = reserveNextAvailableId();
+        id = reserveNextAvailableId();
         String slaveDirPath = SLAVE_PATH_PREFIX + id;
         try {
           log.debug("starting slave at {}", slaveDirPath);

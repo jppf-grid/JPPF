@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -202,5 +203,25 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   @Override
   public DiagnosticsMBean getDiagnosticsProxy() throws Exception {
     return getProxy(DiagnosticsMBean.MBEAN_NAME_NODE, DiagnosticsMBean.class);
+  }
+
+  @Override
+  public NodePendingAction pendingAction() {
+    try {
+      return (NodePendingAction) invoke(JPPFNodeAdminMBean.MBEAN_NAME,  "pendingAction");
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
+    }
+    return null;
+  }
+
+  @Override
+  public boolean cancelPendingAction() {
+    try {
+      return (Boolean) invoke(JPPFNodeAdminMBean.MBEAN_NAME,  "hasPendingAction");
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
+    }
+    return false;
   }
 }

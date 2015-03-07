@@ -141,6 +141,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * Request that the node be shut down or restarted when it is no longer executing tasks.
    * @param restart {@code true} to restart the node, {@code false} to shut it down.
    * @since 5.0
+   * @exclude
    */
   public void requestShutdown(final boolean restart) {
     if (shutdownRequestFlag.compareAndSet(false, true)) {
@@ -149,11 +150,22 @@ public abstract class AbstractCommonNode extends AbstractNode {
   }
 
   /**
+   * Cancel a previous deferred shutdown or restart request, if any.
+   * @return {@code true} if the node has a pending action and it was cancelled, {@code false} otherwise.
+   * @since 5.0
+   * @exclude
+   */
+  public boolean cancelShutdownRequest() {
+    return shutdownRequestFlag.compareAndSet(true, false);
+  }
+
+  /**
    * Determine whether a node shurdown or restart was requested..
    * @return {@code true} if a shudown or restart was requested, {@code false} otherwise.
    * @since 5.0
+   * @exclude
    */
-  protected boolean isShutdownRequested() {
+  public boolean isShutdownRequested() {
     return shutdownRequestFlag.get();
   }
 
@@ -161,8 +173,9 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * Determine whether a restart or shutdown was requested.
    * @return {@code true} if a restart was requested, false if a {@code shutdown} was requested.
    * @since 5.0
+   * @exclude
    */
-  protected boolean isRestart() {
+  public boolean isRestart() {
     return restart.get();
   }
 
@@ -170,6 +183,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * Determine whether the node is currently processing tasks.
    * @return {@code true} if the node is processing tasks, {@code false} otherwise.
    * @since 5.0
+   * @exclude
    */
   public boolean isExecuting() {
     return executing;
@@ -179,6 +193,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * Specifiy whether the node is currently processing tasks.
    * @param executing {@code true} to specify that the node is processing tasks, {@code false} otherwise.
    * @since 5.0
+   * @exclude
    */
   public void setExecuting(final boolean executing) {
     this.executing = executing;
