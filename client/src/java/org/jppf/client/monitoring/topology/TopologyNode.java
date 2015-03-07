@@ -144,4 +144,12 @@ public class TopologyNode extends AbstractTopologyComponent {
     //return (jmx == null) ? (managementInfo == null ? "?" : managementInfo.toDisplayString()) : jmx.getDisplayName();
     return sb.toString();
   }
+
+  /**
+   * Get the currently pending action forthis node, if any.
+   * @return the pending action as a {@link NodePendingAction} enum element.
+   */
+  public NodePendingAction getPendingAction() {
+    return (nodeState == null) ? null : nodeState.getPendingAction();
+  }
 }

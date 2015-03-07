@@ -25,6 +25,7 @@ import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.management.JPPFNodeAdminMBean;
 import org.jppf.management.JPPFNodeState;
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.NodePendingAction;
 
 /**
  * Generated static proxy for the {@link org.jppf.management.JPPFNodeAdminMBean} MBean interface.
@@ -48,13 +49,13 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
-  public void shutdown(final Boolean param0) {
-    invoke("shutdown", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
+  public void shutdown() {
+    invoke("shutdown", (Object[]) null, (String[]) null);
   }
 
   @Override
-  public void shutdown() {
-    invoke("shutdown", (Object[]) null, (String[]) null);
+  public void shutdown(final Boolean param0) {
+    invoke("shutdown", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
   }
 
   @Override
@@ -98,8 +99,18 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
+  public boolean cancelPendingAction() {
+    return (boolean) invoke("cancelPendingAction", (Object[]) null, (String[]) null);
+  }
+
+  @Override
   public void cancelJob(final String param0, final Boolean param1) {
     invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void restart(final Boolean param0) {
+    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
   }
 
   @Override
@@ -108,8 +119,8 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
-  public void restart(final Boolean param0) {
-    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
+  public NodePendingAction pendingAction() {
+    return (NodePendingAction) invoke("pendingAction", (Object[]) null, (String[]) null);
   }
 
   @Override

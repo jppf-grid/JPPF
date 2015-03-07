@@ -45,8 +45,8 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public int getNbSlaves() {
-    return (int) getAttribute("NbSlaves");
+  public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
+    invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });
   }
 
   @Override
@@ -55,8 +55,8 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
-    invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });
+  public void provisionSlaveNodes(final int param0) {
+    invoke("provisionSlaveNodes", new Object[] { param0 }, new String[] { "int" });
   }
 
   @Override
@@ -65,7 +65,7 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public void provisionSlaveNodes(final int param0) {
-    invoke("provisionSlaveNodes", new Object[] { param0 }, new String[] { "int" });
+  public int getNbSlaves() {
+    return (int) getAttribute("NbSlaves");
   }
 }

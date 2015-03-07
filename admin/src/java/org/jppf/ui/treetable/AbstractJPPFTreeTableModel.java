@@ -34,7 +34,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
 
   /**
    * Initialize this model with the specified tree root.
-   * @param root - the root of the tree.
+   * @param root the root of the tree.
    */
   public AbstractJPPFTreeTableModel(final TreeNode root) {
     super(root);
@@ -45,11 +45,9 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param node not used.
    * @param column not used.
    * @return true if the cell can be edited, false otherwise.
-   * @see org.jppf.ui.treetable.AbstractTreeTableModel#isCellEditable(java.lang.Object, int)
    */
   @Override
   public boolean isCellEditable(final Object node, final int column) {
-    //return false;
     return super.isCellEditable(node, column);
   }
 
@@ -58,7 +56,6 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param value not used.
    * @param node not used.
    * @param column not used.
-   * @see org.jppf.ui.treetable.AbstractTreeTableModel#setValueAt(java.lang.Object, java.lang.Object, int)
    */
   @Override
   public void setValueAt(final Object value, final Object node, final int column) {
@@ -69,7 +66,6 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @param parent the parent to get the child from.
    * @param index the index at which to get the child
    * @return the child node, or null if the index is not valid.
-   * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
    */
   @Override
   public Object getChild(final Object parent, final int index) {
@@ -84,7 +80,6 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * Get the number of children for the specified node.
    * @param parent the node for which to get the number of children.
    * @return the number of children as an int.
-   * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
    */
   @Override
   public int getChildCount(final Object parent) {
@@ -136,10 +131,32 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
   /**
    * Get a localized message given its unique name and the current locale.
    * @param message the unique name of the localized message.
-   * @return a message in the current locale, or the default locale
-   * if the localization for the current locale is not found.
+   * @return a message in the current locale, or the default locale if the localization for the current locale is not found.
    */
   protected String localize(final String message) {
     return LocalizationUtils.getLocalized(BASE, message);
   }
+
+  @Override
+  public String getColumnName(final int column) {
+    if ((column >= 0) && (column <= getColumnCount())) {
+      return localize(getBaseColumnName(column));
+    }
+    return "";
+  }
+
+  @Override
+  public String getColumnTooltip(final int column) {
+    if ((column >= 0) && (column <= getColumnCount())) {
+      return localize(getBaseColumnName(column) + ".tooltip");
+    }
+    return "";
+  }
+
+  /**
+   * Get the non-localized name of the specified column.
+   * @param column the index of the column for which to get a name.
+   * @return the column name as a string.
+   */
+  protected abstract String getBaseColumnName(final int column);
 }

@@ -29,8 +29,7 @@ import org.jppf.utils.collections.*;
  * Abstract superclass for all actions in the topology panel.
  * @author Laurent Cohen
  */
-public abstract class AbstractTopologyAction extends AbstractUpdatableAction
-{
+public abstract class AbstractTopologyAction extends AbstractUpdatableAction {
   /**
    * Constant for an empty <code>TopologyData</code> array.
    */
@@ -43,8 +42,7 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
   /**
    * Initialize this action.
    */
-  protected AbstractTopologyAction()
-  {
+  protected AbstractTopologyAction() {
     BASE = "org.jppf.ui.i18n.NodeDataPage";
   }
 
@@ -53,15 +51,12 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
    * @param selectedElements a list of objects.
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     List<AbstractTopologyComponent> list = new ArrayList<>();
-    for (Object o: selectedElements)
-    {
+    for (Object o: selectedElements) {
       AbstractTopologyComponent data = (AbstractTopologyComponent) o;
-      if (data.isNode())
-      {
+      if (data.isNode()) {
         JPPFManagementInfo info = ((TopologyNode) data).getManagementInfo();
         if (info != null) list.add(data);
       }
@@ -73,11 +68,9 @@ public abstract class AbstractTopologyAction extends AbstractUpdatableAction
    * Get a mapping of driver node forwarder MBeans to corresponding selected nodes.
    * @return a mapping of driver uuids to lists of node uuid values.
    */
-  protected CollectionMap<TopologyDriver, String> getDriverMap()
-  {
+  protected CollectionMap<TopologyDriver, String> getDriverMap() {
     CollectionMap<TopologyDriver, String> map = new ArrayListHashMap<>();
-    for (AbstractTopologyComponent data: dataArray)
-    {
+    for (AbstractTopologyComponent data: dataArray) {
       if (!data.isNode()) continue;
       TopologyDriver parent = (TopologyDriver) data.getParent();
       if (parent != null) map.putValue(parent, data.getUuid());

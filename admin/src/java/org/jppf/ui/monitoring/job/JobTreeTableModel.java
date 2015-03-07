@@ -61,23 +61,11 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
     BASE = "org.jppf.ui.i18n.JobDataPage";
   }
 
-  /**
-   * Get the number of columns in the table.
-   * @return the number of columns as an int.
-   * @see org.jppf.ui.treetable.TreeTableModel#getColumnCount()
-   */
   @Override
   public int getColumnCount() {
     return 6;
   }
 
-  /**
-   * Returns which object is displayed in this column.
-   * @param node - the node for which to get a value.
-   * @param column - the column from which to set a value.
-   * @return the value from the specified node and column.
-   * @see org.jppf.ui.treetable.TreeTableModel#getValueAt(java.lang.Object, int)
-   */
   @Override
   public Object getValueAt(final Object node, final int column) {
     Object res = "";
@@ -122,36 +110,22 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
     return res;
   }
 
-  /**
-   * What the TableHeader displays when the Table is in a JScrollPane.
-   * @param column the index of the column for which to get a title.
-   * @return the column title as a string.
-   * @see org.jppf.ui.treetable.TreeTableModel#getColumnName(int)
-   */
   @Override
-  public String getColumnName(final int column) {
-    String res = "";
+  public String getBaseColumnName(final int column) {
     switch (column) {
       case NODE_URL:
-        //res = localize("column.node.url");
-        res = "Driver / Job / Node";
-        break;
+        return "column.job.url";
       case TASK_COUNT:
-        res = localize("job.current.task.count");
-        break;
+        return "column.job.current.task.count";
       case JOB_STATE:
-        res = localize("job.state");
-        break;
+        return "column.job.state";
       case INITIAL_TASK_COUNT:
-        res = localize("job.initial.task.count");
-        break;
+        return "column.job.initial.task.count";
       case PRIORITY:
-        res = localize("job.priority");
-        break;
+        return "column.job.priority";
       case MAX_NODES:
-        res = localize("job.max.nodes");
-        break;
+        return "column.job.max.nodes";
     }
-    return res;
+    return "";
   }
 }

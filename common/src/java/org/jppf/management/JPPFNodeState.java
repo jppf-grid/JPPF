@@ -133,6 +133,10 @@ public class JPPFNodeState implements Serializable {
    * Priority of the threads in the pool.
    */
   private int threadPriority = -1;
+  /**
+   * The current pending action for the node.
+   */
+  private NodePendingAction pendingAction = NodePendingAction.NONE;
 
   /**
    * Get the number of tasks executed by the node.
@@ -230,6 +234,23 @@ public class JPPFNodeState implements Serializable {
     this.threadPriority = threadPriority;
   }
 
+
+  /**
+   * Get the current pending action for the node.
+   * @return a {@link NodePendingAction} enum element.
+   */
+  public synchronized NodePendingAction getPendingAction() {
+    return pendingAction;
+  }
+
+  /**
+   * Set the current pending action for the node.
+   * @param pendingAction a {@link NodePendingAction} enum element.
+   */
+  public synchronized void setPendingAction(final NodePendingAction pendingAction) {
+    this.pendingAction = pendingAction != null ? pendingAction : NodePendingAction.NONE;
+  }
+
   /**
    * Make a copy of this node state.
    * @return a <code>JPPFNodeState</code> instance.
@@ -242,6 +263,7 @@ public class JPPFNodeState implements Serializable {
     s.setThreadPoolSize(getThreadPoolSize());
     s.setThreadPriority(getThreadPriority());
     s.setCpuTime(getCpuTime());
+    s.setPendingAction(getPendingAction());
     return s;
   }
 
@@ -255,6 +277,7 @@ public class JPPFNodeState implements Serializable {
     sb.append(", executionStatus=").append(executionStatus);
     sb.append(", connectionStatus=").append(connectionStatus);
     sb.append(", cpuTime=").append(cpuTime);
+    sb.append(", pendingAction=").append(pendingAction);
     sb.append(']');
     return sb.toString();
   }
@@ -269,6 +292,7 @@ public class JPPFNodeState implements Serializable {
     result = prime * result + ((connectionStatus == null) ? 0 : connectionStatus.hashCode());
     result = prime * result + threadPoolSize;
     result = prime * result + threadPriority;
+    result = prime * result + ((pendingAction == null) ? 0 : pendingAction.hashCode());
     return result;
   }
 
@@ -284,6 +308,7 @@ public class JPPFNodeState implements Serializable {
     if (connectionStatus != other.connectionStatus) return false;
     if (threadPoolSize != other.threadPoolSize) return false;
     if (threadPriority != other.threadPriority) return false;
+    if (pendingAction != other.pendingAction) return false;
     return true;
   }
 }
