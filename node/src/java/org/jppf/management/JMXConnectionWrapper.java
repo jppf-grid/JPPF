@@ -188,6 +188,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void connectAndWait(final long timeout) {
     if (isConnected()) return;
+    //long start = System.currentTimeMillis();
     long start = System.currentTimeMillis();
     long max = timeout > 0 ? timeout : Long.MAX_VALUE;
     connect();
@@ -200,7 +201,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the connection could not be established.
    */
   void performConnection() throws Exception {
-    connected.set(false);
+    connected.compareAndSet(true, false);
     long elapsed;
     synchronized(this) {
       elapsed = System.currentTimeMillis() - connectionStart;
@@ -224,6 +225,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       }
     }
     connected.set(true);
+    wakeUp();
     fireConnected();
     if (debugEnabled) log.debug(getId() + " JMX connection successfully established");
   }
