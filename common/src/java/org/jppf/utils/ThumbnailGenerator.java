@@ -66,7 +66,7 @@ public class ThumbnailGenerator {
   /**
    * Mapping of image files to their corresponding thumbnail.
    */
-  private Map<File, File> fileMap = new TreeMap<>();
+  private Map<File, ImageAttributes> fileMap = new TreeMap<>();
 
   /**
    * Initialize this thumbnail generator with the specified root dir, width and height.
@@ -122,10 +122,12 @@ public class ThumbnailGenerator {
    * @throws Exception if an error is raised while generating the thumbnails.
    */
   private void generateThumbnails() throws Exception {
-    for (Map.Entry<File, File> entry: fileMap.entrySet()) {
+    for (Map.Entry<File, ImageAttributes> entry: fileMap.entrySet()) {
       BufferedImage img = ImageIO.read(entry.getKey());
+      ImageAttributes attrs = entry.getValue();
+      attrs.height = img.getHeight();
       BufferedImage thumbnail = scale(img);
-      ImageIO.write(thumbnail, "jpeg", entry.getValue());
+      ImageIO.write(thumbnail, "jpeg", attrs.thumbnailFile);
     }
   }
 
@@ -137,20 +139,24 @@ public class ThumbnailGenerator {
     StringBuilder sb = new StringBuilder();
     int count = 0;
     String indent = "\t\t\t\t\t";
-    sb.append(indent).append("<table align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\">\n");
-    for (Map.Entry<File, File> entry: fileMap.entrySet()) {
-      if (count % rowLength == 0)
-      {
+    sb.append(indent).append("<table align=\"center\" border=\"0\" cellspacing=\"0\" cellpadding=\"4\">\n");
+    for (Map.Entry<File, ImageAttributes> entry: fileMap.entrySet()) {
+      if (count % rowLength == 0) {
         if (count > 0) sb.append(indent).append("\t</tr>\n");
         sb.append(indent).append("\t<tr>\n");
       }
+      ImageAttributes attrs = entry.getValue();
       String name1 = entry.getKey().getName();
-      String name2 = entry.getValue().getName();
+      String name2 = attrs.thumbnailFile.getName();
       // $template{name="shots-row" image="popup1.gif" thumbnail="popup1.jpg"}$
       sb.append(indent).append("\t\t$template{name=\"shots_cell\" image=\"");
       sb.append(name1);
       sb.append("\" thumbnail=\"");
       sb.append(name2);
+      sb.append("\" height=\"");
+      sb.append(attrs.height + 60);
+      sb.append("\" picnum=\"");
+      sb.append(count);
       sb.append("\" shot_title=\"");
       sb.append(titleFromFilename(name1));
       sb.append("\"}$\n");
@@ -178,7 +184,9 @@ public class ThumbnailGenerator {
       s += '/' + TH_PREFIX + file.getName();
       int idx = s.lastIndexOf('.');
       s = s.substring(0, idx+1) + "jpg";
-      fileMap.put(file, new File(s));
+      ImageAttributes attrs = new ImageAttributes();
+      attrs.thumbnailFile = new File(s);
+      fileMap.put(file, attrs);
     }
   }
 
@@ -269,5 +277,19 @@ public class ThumbnailGenerator {
     {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * 
+   */
+  public static class ImageAttributes {
+    /**
+     * 
+     */
+    public File thumbnailFile;
+    /**
+     * 
+     */
+    public int height;
   }
 }
