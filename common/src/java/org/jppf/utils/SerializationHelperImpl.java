@@ -27,6 +27,10 @@ import org.jppf.classloader.*;
 public class SerializationHelperImpl implements SerializationHelper
 {
   /**
+   * If <code>true</code>, force loading of the object serializer class from the remote peer.
+   */
+  private static final boolean remoteLoad = JPPFConfiguration.getProperties().getBoolean("jppf.remote.load.serializer", true);
+  /**
    * Used to serialize and deserialize objects to and from object streams.
    */
   protected ObjectSerializer serializer = null;
@@ -42,7 +46,6 @@ public class SerializationHelperImpl implements SerializationHelper
    * Get the object serializer for this helper.
    * @return an <code>ObjectSerializer</code> instance.
    * @throws Exception if the object serializer could not be instantiated.
-   * @see org.jppf.utils.SerializationHelper#getSerializer()
    */
   @Override
   public ObjectSerializer getSerializer() throws Exception
@@ -50,20 +53,17 @@ public class SerializationHelperImpl implements SerializationHelper
     if (serializer == null)
     {
       ClassLoader cl = getClass().getClassLoader();
-      if (cl instanceof AbstractJPPFClassLoader)
+      if ((cl instanceof AbstractJPPFClassLoader) && remoteLoad)
       {
-        serializer = (ObjectSerializer)
-        ((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+        serializer = (ObjectSerializer) ((AbstractJPPFClassLoader) cl).loadJPPFClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
       }
       else if (cl instanceof NonDelegatingClassLoader)
       {
-        serializer = (ObjectSerializer)
-        ((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
+        serializer = (ObjectSerializer) ((NonDelegatingClassLoader) cl).loadClassDirect("org.jppf.utils.ObjectSerializerImpl").newInstance();
       }
       else
       {
-        serializer = (ObjectSerializer)
-        cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
+        serializer = (ObjectSerializer) cl.loadClass("org.jppf.utils.ObjectSerializerImpl").newInstance();
       }
     }
     return serializer;

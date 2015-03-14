@@ -70,8 +70,15 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
     if (!isChannelValid())
     {
       ClientContext context = (ClientContext) channel.getContext();
-      context.getInitialBundleWrapper().removeCompletionListener(this);
-      context.cancelJobOnClose();
+      if (context != null)
+      {
+        ServerTaskBundleClient clientBundle = context.getInitialBundleWrapper();
+        if (clientBundle != null)
+        {
+          clientBundle.removeCompletionListener(this);
+        }
+        context.cancelJobOnClose();
+      }
       return;
     }
     if (results.isEmpty())
