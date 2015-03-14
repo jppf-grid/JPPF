@@ -111,8 +111,7 @@ limitations under the License.
     <attribute name="jar" default="@{module}"/>
     <sequential>
       <jar jarfile="${build}/jppf-@{jar}.jar" index="true">
-        <fileset dir="${basedir}/../@{module}/classes"/>
-        <fileset file="${bin}/build.number"/>
+        <fileset dir="${basedir}/../@{module}/classes" excludes="**/package-info.class"/>
         <manifest>
           <attribute name="JPPF-Version" value="${version.number}"/>
           <attribute name="JPPF-Build" value="${build.number}"/>
