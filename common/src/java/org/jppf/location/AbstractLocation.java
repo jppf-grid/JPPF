@@ -29,8 +29,7 @@ import org.jppf.utils.streams.*;
  * @param <T> the type of this location.
  * @author Laurent Cohen
  */
-public abstract class AbstractLocation<T> implements Location<T>
-{
+public abstract class AbstractLocation<T> implements Location<T> {
   /**
    * The path for this location.
    */
@@ -49,35 +48,30 @@ public abstract class AbstractLocation<T> implements Location<T>
    * Initialize this location with the specified type and path.
    * @param path the path for this location.
    */
-  public AbstractLocation(final T path)
-  {
+  public AbstractLocation(final T path) {
     this.path = path;
   }
 
   @Override
-  public T getPath()
-  {
+  public T getPath() {
     return path;
   }
 
   @Override
-  public Location copyTo(final Location<?> location) throws Exception
-  {
+  public Location copyTo(final Location<?> location) throws Exception {
     copyStream(getInputStream(), location.getOutputStream(), eventsEnabled);
     return location;
   }
 
   @Override
-  public byte[] toByteArray() throws Exception
-  {
+  public byte[] toByteArray() throws Exception {
     JPPFByteArrayOutputStream os = new JPPFByteArrayOutputStream();
     copyStream(getInputStream(), os, false);
     return os.toByteArray();
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("path=").append(path);
@@ -86,16 +80,14 @@ public abstract class AbstractLocation<T> implements Location<T>
   }
 
   @Override
-  public void addLocationEventListener(final LocationEventListener listener)
-  {
+  public void addLocationEventListener(final LocationEventListener listener) {
     if (listener == null) throw new NullPointerException("null listener not accepted");
     listeners.add(listener);
     if (!eventsEnabled) eventsEnabled = true;
   }
 
   @Override
-  public void removeLocationEventListener(final LocationEventListener listener)
-  {
+  public void removeLocationEventListener(final LocationEventListener listener) {
     if (listener == null) throw new IllegalArgumentException("null listener not accepted");
     listeners.remove(listener);
     if (listeners.isEmpty()) eventsEnabled = false;
@@ -105,8 +97,7 @@ public abstract class AbstractLocation<T> implements Location<T>
    * Notify all listeners that a data transfer has occurred.
    * @param n the size of the data that was transferred.
    */
-  protected void fireLocationEvent(final long n)
-  {
+  protected void fireLocationEvent(final long n) {
     if (listeners.isEmpty()) return;
     LocationEvent event = new LocationEvent(this, n);
     for (LocationEventListener l: listeners) l.dataTransferred(event);
@@ -119,8 +110,7 @@ public abstract class AbstractLocation<T> implements Location<T>
    * @param withEvt if <code>true</code>, then {@link LocationEvent}s will be generated during the transfer.
    * @throws IOException if an I/O error occurs.
    */
-  private void copyStream(final InputStream is, final OutputStream os, final boolean withEvt) throws IOException
-  {
+  private void copyStream(final InputStream is, final OutputStream os, final boolean withEvt) throws IOException {
     OutputStream tmpos = !withEvt ? os : new NotifyingOutputStream(os, new NotifyingStreamCallback() {
       @Override
       public void bytesNotification(final long length) throws IOException {

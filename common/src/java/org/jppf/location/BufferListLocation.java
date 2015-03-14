@@ -29,8 +29,7 @@ import org.jppf.utils.streams.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class BufferListLocation extends AbstractLocation<List<JPPFBuffer>>
-{
+public class BufferListLocation extends AbstractLocation<List<JPPFBuffer>> {
   /**
    * The size of the data.
    */
@@ -40,27 +39,23 @@ public class BufferListLocation extends AbstractLocation<List<JPPFBuffer>>
    * Initialize this location.
    * @param path the lis of buffers containing the data.
    */
-  public BufferListLocation(final List<JPPFBuffer> path)
-  {
+  public BufferListLocation(final List<JPPFBuffer> path) {
     super(path);
     for (JPPFBuffer buffer: path) length += buffer.length; 
   }
 
   @Override
-  public InputStream getInputStream() throws Exception
-  {
+  public InputStream getInputStream() throws Exception {
     return new MultipleBuffersInputStream(path);
   }
 
   @Override
-  public OutputStream getOutputStream() throws Exception
-  {
+  public OutputStream getOutputStream() throws Exception {
     return new MultipleBuffersOutputStream(path);
   }
 
   @Override
-  public long size()
-  {
+  public long size() {
     return length;
   }
 }
