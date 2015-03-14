@@ -31,7 +31,7 @@ public final class ConcurrentUtils {
   }
 
   /**
-   * Wait until the specified condition is fulfilled, or the timeout exires, which ever happens first.
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
    * The specified monitor may be notified at any time during the execution of this method, at which time it will check the condition again.
    * @param monitor the monitor to wait for.
    * @param condition the condition to check.
@@ -54,7 +54,7 @@ public final class ConcurrentUtils {
   }
 
   /**
-   * Wait until the specified condition is fulfilled, or the timeout exires, which ever happens first.
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
    * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
    * @param condition the condition to check.
    * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
@@ -73,16 +73,16 @@ public final class ConcurrentUtils {
       if (timeout < 0L) timeout = Long.MAX_VALUE;
     }
     long start = System.nanoTime();
-    ThreadSynchronization lock = new ThreadSynchronization() { };
+    ThreadSynchronization monitor = new ThreadSynchronization() { };
     boolean fulfilled = false;
     while (!(fulfilled = condition.evaluate()) && (System.nanoTime() - start < timeout)) {
-      lock.goToSleep(1L);
+      monitor.goToSleep(1L);
     }
     return fulfilled;
   }
 
   /**
-   * Wait until the specified condition is fulfilled, or the timeout exires, which ever happens first.
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
    * @param condition the condition to check.
    * @param millis the timeout in milliseconds. A value of zero means an infinite timeout.
    * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
