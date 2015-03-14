@@ -28,8 +28,11 @@ import org.jppf.utils.JPPFConfiguration;
  * Renderer used to render the tree nodes in the node data panel.
  * @author Laurent Cohen
  */
-public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
-{
+public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer {
+  /**
+   * The possibl boolean values.
+   */
+  public static final boolean[] BOOL_VALUES = { false, true };
   /**
    * Is tree nodes highlighting enabled?
    */
@@ -51,6 +54,22 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    */
   public static final String NODE_ICON = RESOURCES + "node.png";
   /**
+   * Path to the marker icon used for a master node.
+   */
+  public static final String MARKER_MASTER_ICON = RESOURCES + "marker-master.gif";
+  /**
+   * Path to the marker icon used for a .Net-capable node.
+   */
+  public static final String MARKER_DOTNET_ICON = RESOURCES + "marker-dotnet.gif";
+  /**
+   * Path to the marker icon used for a node that has a pending shutdown.
+   */
+  public static final String MARKER_PENDING_SHUTDOWN_ICON = RESOURCES + "marker-pending-shutdown.gif";
+  /**
+   * Path to the marker icon used for a node that has a pending restart.
+   */
+  public static final String MARKER_PENDING_RESTART_ICON = RESOURCES + "marker-pending-restart.gif";
+  /**
    * Path to the icon used for a master node.
    */
   public static final String NODE_MASTER_ICON = RESOURCES + "node-master.png";
@@ -70,14 +89,6 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    * Crititcal icon.
    */
   public static final String CRITICAL_ICON = RESOURCES + "critical2.gif";
-  /**
-   * Happy smiley.
-   */
-  public static final String HAPPY_ICON = RESOURCES + "happy.gif";
-  /**
-   * Unhappy smiley.
-   */
-  public static final String UNHAPPY_ICON = RESOURCES + "unhappy.gif";
   /**
    * Highlighting color for active driver connections.
    */
@@ -142,8 +153,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
   /**
    * Default constructor.
    */
-  public AbstractTreeCellRenderer()
-  {
+  public AbstractTreeCellRenderer() {
     defaultNonSelectionBackground = getBackgroundNonSelectionColor();
     defaultSelectionBackground = getBackgroundSelectionColor();
     defaultSelectionForeground = getTextSelectionColor();
@@ -156,10 +166,8 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    * @param font the font to base the result on.
    * @return a {@link Font} instance.
    */
-  public static Font getPlainFont(final Font font)
-  {
-    if (plainFont == null)
-    {
+  public static Font getPlainFont(final Font font) {
+    if (plainFont == null) {
       plainFont = new Font(font.getName(), Font.PLAIN, font.getSize());
     }
     return plainFont;
@@ -170,10 +178,8 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    * @param font the font to base the result on.
    * @return a {@link Font} instance.
    */
-  public static Font getItalicFont(final Font font)
-  {
-    if (italicFont == null)
-    {
+  public static Font getItalicFont(final Font font) {
+    if (italicFont == null) {
       italicFont = new Font(font.getName(), Font.ITALIC, font.getSize());
     }
     return italicFont;
@@ -184,10 +190,8 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    * @param font the font to base the result on.
    * @return a {@link Font} instance.
    */
-  public static Font getBoldFont(final Font font)
-  {
-    if (boldFont == null)
-    {
+  public static Font getBoldFont(final Font font) {
+    if (boldFont == null) {
       boldFont = new Font(font.getName(), Font.BOLD, font.getSize());
     }
     return boldFont;
@@ -198,11 +202,9 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer
    * @param font the font to base the result on.
    * @return a {@link Font} instance.
    */
-  public static Font getBoldItalicFont(final Font font)
-  {
-    if (boldItalicFont == null)
-    {
-      boldItalicFont = new Font(font.getName(), Font.BOLD|Font.ITALIC, font.getSize());
+  public static Font getBoldItalicFont(final Font font) {
+    if (boldItalicFont == null) {
+      boldItalicFont = new Font(font.getName(), Font.BOLD | Font.ITALIC, font.getSize());
     }
     return boldItalicFont;
   }

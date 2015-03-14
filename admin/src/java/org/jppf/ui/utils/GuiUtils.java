@@ -18,6 +18,7 @@
 package org.jppf.ui.utils;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
@@ -25,14 +26,16 @@ import java.util.regex.Pattern;
 
 import javax.swing.*;
 
+import org.jppf.client.monitoring.topology.TopologyNode;
+import org.jppf.management.*;
+import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.slf4j.*;
 
 /**
  * Collection of GUI utility methods.
  * @author Laurent Cohen
  */
-public final class GuiUtils
-{
+public final class GuiUtils {
   /**
    * Logger for this class.
    */
@@ -58,18 +61,19 @@ public final class GuiUtils
    */
   private static final String[] REPLACEMENTS = { "Exec", "exec", "Max", "Min", "Avg", "Cumul" };
   /**
-   * 
+   *
    */
   private static Map<String, String> shortenerMap = createShortener();
+  static {
+    GuiUtils.initNodeIcons();
+  }
 
   /**
    * Create a chartPanel with a box layout with the specified orientation.
-   * @param orientation the box orientation, one of {@link javax.swing.BoxLayout#Y_AXIS BoxLayout.Y_AXIS} or
-   * {@link javax.swing.BoxLayout#X_AXIS BoxLayout.X_AXIS}.
+   * @param orientation the box orientation, one of {@link javax.swing.BoxLayout#Y_AXIS BoxLayout.Y_AXIS} or {@link javax.swing.BoxLayout#X_AXIS BoxLayout.X_AXIS}.
    * @return a <code>JPanel</code> instance.
    */
-  public static JPanel createBoxPanel(final int orientation)
-  {
+  public static JPanel createBoxPanel(final int orientation) {
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, orientation));
     return panel;
@@ -79,19 +83,17 @@ public final class GuiUtils
    * Load and cache an icon from the file system or classpath.
    * @param path the path to the icon.
    * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
-   * could not be loaded.
+   *         could not be loaded.
    */
-  public static ImageIcon loadIcon(final String path)
-  {
+  public static ImageIcon loadIcon(final String path) {
     return loadIcon(path, true);
   }
 
   /**
    * Load and cache an icon from the file system or classpath.
-   * @param path - the path to the icon.
-   * @param useCache - specifies whether the icon should be retrieved from and/or put in the icon cache.
-   * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon
-   * could not be loaded.
+   * @param path the path to the icon.
+   * @param useCache specifies whether the icon should be retrieved from and/or put in the icon cache.
+   * @return the loaded icon as an <code>ImageIcon</code> instance, or null if the icon could not be loaded.
    */
   public static ImageIcon loadIcon(final String path, final boolean useCache) {
     ImageIcon icon = null;
@@ -107,10 +109,113 @@ public final class GuiUtils
       if (url == null) return null;
       icon = new ImageIcon(url);
       if (useCache) iconMap.put(path, icon);
-    } catch(Exception e) {
+    } catch (Exception e) {
       log.warn(e.getMessage(), e);
     }
     return icon;
+  }
+
+  /**
+   * Put the specified icon in the cache wiht the specified path.
+   * @param path the cache key for the icon.
+   * @param icon the icon to cache.
+   */
+  public static void cacheIcon(final String path, final ImageIcon icon) {
+    iconMap.put(path, icon);
+  }
+
+  /**
+   * Create a copy of the specified image.
+   * @param source the image to copy.
+   * @return the copy of the image as a {@link BufferedImage} object.
+   */
+  private static Image imageCopy(final Image source) {
+    /*
+    ColorModel cm = source.getColorModel();
+    boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+    WritableRaster raster = source.copyData(source.getRaster().createCompatibleWritableRaster());
+    return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    */
+    //return source.getScaledInstance(-1, -1, Image.SCALE_DEFAULT);
+    BufferedImage copy = new BufferedImage(source.getWidth(null), source.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR);
+    copy.getGraphics().drawImage(source, 0, 0, null);
+    return copy;
+  }
+
+  /**
+   * Merge the specified images into one.All images are assumed to be of the same size.
+   * @param source the source image, upon which all others will overwrite.
+   * @param toMerge the images that overwrite the source, int he specified order.
+   * @return a new ImageIcon whose image is the result of merging all specified images.
+   */
+  public static ImageIcon mergeIcons(final String source, final String...toMerge) {
+    ImageIcon sourceIco = loadIcon(source);
+    Image resImg = imageCopy(sourceIco.getImage());
+    for (String s: toMerge) {
+      Graphics g = resImg.getGraphics();
+      ImageIcon ico = loadIcon(s);
+      g.drawImage(ico.getImage(), 0, 0, null);
+      g.dispose();
+    }
+    
+    return new ImageIcon(resImg);
+  }
+
+  /**
+   * Initialize the possible icons for the nodes.
+   */
+  public static void initNodeIcons() {
+    for (boolean master: AbstractTreeCellRenderer.BOOL_VALUES) {
+      for (boolean dotnet: AbstractTreeCellRenderer.BOOL_VALUES) {
+        for (NodePendingAction action: NodePendingAction.class.getEnumConstants()) {
+          StringBuilder sb = new StringBuilder("node");
+          java.util.List<String> iconsToMerge = new ArrayList<>();
+          if (master) {
+            sb.append("-master");
+            iconsToMerge.add(AbstractTreeCellRenderer.MARKER_MASTER_ICON);
+          }
+          if (dotnet) {
+            sb.append("-dotnet");
+            iconsToMerge.add(AbstractTreeCellRenderer.MARKER_DOTNET_ICON);
+          }
+          switch(action) {
+            case SHUTDOWN:
+              sb.append("-pending-shutdown");
+              iconsToMerge.add(AbstractTreeCellRenderer.MARKER_PENDING_SHUTDOWN_ICON);
+              break;
+            case RESTART:
+              iconsToMerge.add(AbstractTreeCellRenderer.MARKER_PENDING_RESTART_ICON);
+              sb.append("-pending-restart");
+              break;
+          }
+          ImageIcon img = mergeIcons(AbstractTreeCellRenderer.NODE_ICON, iconsToMerge.toArray(new String[iconsToMerge.size()]));
+          cacheIcon(sb.toString(), img);
+        }
+      }
+    }
+  }
+
+  /**
+   * Compute the cache key for the specified node, to determine which icon to dispaly.
+   * @param node the node for which to compute the key.
+   * @return the icon cache key as a string.
+   */
+  public static String computeNodeIconKey(final TopologyNode node) {
+    StringBuilder sb = new StringBuilder("node");
+    JPPFManagementInfo info = node.getManagementInfo();
+    if (info != null) {
+      if (info.isMasterNode()) sb.append("-master");
+      if (info.isDotnetCapable()) sb.append("-dotnet");
+      switch(node.getPendingAction()) {
+        case SHUTDOWN:
+          sb.append("-pending-shutdown");
+          break;
+        case RESTART:
+          sb.append("-pending-restart");
+          break;
+      }
+    }
+    return sb.toString();
   }
 
   /**
@@ -120,8 +225,7 @@ public final class GuiUtils
    * @param height the component's height.
    * @return a <code>JComponent</code> instance.
    */
-  public static JComponent createFiller(final int width, final int height)
-  {
+  public static JComponent createFiller(final int width, final int height) {
     JPanel filler = new JPanel();
     Dimension d = new Dimension(width, height);
     filler.setMinimumSize(d);
@@ -131,13 +235,12 @@ public final class GuiUtils
   }
 
   /**
-   * Format a possibly multi-line text into a a string that can be properly displayed as a tooltip..
+   * Format a possibly multi-line text into a a string that can be properly displayed as a tooltip.
    * @param tooltip the non-formatted text of the tooltip.
    * @return the input text if it does not contain any line break, otherwise the input text wrapped in
    * &lt;html&gt; ... &lt;/html&gt; tags, with the line breaks transformed into &lt;br&gt; tags.
    */
-  public static String formatToolTipText(final String tooltip)
-  {
+  public static String formatToolTipText(final String tooltip) {
     if (tooltip == null) return null;
     String s = TOOLTIP_PATTERN.matcher(tooltip).replaceAll("<br>");
     return "<html>" + s + "</html>";
@@ -148,8 +251,7 @@ public final class GuiUtils
    * @param comp the component whose frame to retrieve.
    * @return a {@link Frame} instance if it can be found, null otherwise.
    */
-  public static Frame getTopFrame(final Component comp)
-  {
+  public static Frame getTopFrame(final Component comp) {
     Component tmp = SwingUtilities.getRoot(comp);
     return (tmp instanceof Frame) ? (Frame) tmp : null;
   }
@@ -159,17 +261,15 @@ public final class GuiUtils
    * @param key the string to shorten.
    * @return the string with its keywords replaced.
    */
-  public static String shortenLabel(final String key)
-  {
+  public static String shortenLabel(final String key) {
     String[] words = key.split("\\s");
     StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (String word: words)
-    {
+    for (String word : words) {
       String result = shortenerMap.get(word);
       if (result == null) result = word;
       sb.append(result);
-      if ((count < words.length-1) && !"".equals(result)) sb.append(' ');
+      if ((count < words.length - 1) && !"".equals(result)) sb.append(' ');
       count++;
     }
     return sb.toString();
@@ -179,8 +279,7 @@ public final class GuiUtils
    * Create a map to shorten labels in the charts.
    * @return a map of keyword to shorter replacements.
    */
-  private static Map<String, String> createShortener()
-  {
+  private static Map<String, String> createShortener() {
     Map<String, String> map = new HashMap<>();
     map.put("Execution", "Exec");
     map.put("execution", "exec");
@@ -204,9 +303,7 @@ public final class GuiUtils
    * @param r the <code>Runnable</code> to execute.
    * @param name the thread name.
    */
-  public static void runAction(final Runnable r, final String name)
-  {
+  public static void runAction(final Runnable r, final String name) {
     new Thread(r, name).start();
   }
-
 }

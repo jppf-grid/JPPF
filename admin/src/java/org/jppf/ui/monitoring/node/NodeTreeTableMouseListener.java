@@ -57,6 +57,7 @@ public class NodeTreeTableMouseListener extends AbstractTopologyMouseListener {
     addItem(menu, "restart.node.deferred", p);
     addItem(menu, "shutdown.node", p);
     addItem(menu, "shutdown.node.deferred", p);
+    addItem(menu, "cancel.deferred.action", p);
     menu.addSeparator();
     addItem(menu, "toggle.active", p);
     addItem(menu, "node.provisioning", p);
