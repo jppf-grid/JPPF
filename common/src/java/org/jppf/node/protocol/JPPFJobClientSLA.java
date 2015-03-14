@@ -21,48 +21,43 @@ package org.jppf.node.protocol;
 import org.jppf.node.policy.ExecutionPolicy;
 
 /**
- * This class represents the Service Level Agreement Between a JPPF job and a server.
+ * This class represents the Service Level Agreement Between a JPPF job and a JPPF client for local execution of the job.
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA
-{
+public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
   /**
    * The maximum number of nodes this job can run on.
-   * The default value is set to <code>1</code> to preserve backward compatibility, by emulating the behavior of previous versions.  
+   * The default value is set to <code>1</code> to preserve backward compatibility, by emulating the behavior of previous versions.
    */
   private int maxChannels = 1;
 
   /**
    * Default constructor.
    */
-  public JPPFJobClientSLA()
-  {
+  public JPPFJobClientSLA() {
   }
 
   /**
    * Initialize this job SLA with the specified execution policy.
    * @param policy the tasks execution policy.
    */
-  public JPPFJobClientSLA(final ExecutionPolicy policy)
-  {
+  public JPPFJobClientSLA(final ExecutionPolicy policy) {
     super(policy);
   }
 
   @Override
-  public int getMaxChannels()
-  {
+  public int getMaxChannels() {
     return maxChannels;
   }
 
   @Override
-  public void setMaxChannels(final int maxChannels)
-  {
+  public void setMaxChannels(final int maxChannels) {
     this.maxChannels = maxChannels > 0 ? maxChannels : Integer.MAX_VALUE;
   }
 
@@ -70,8 +65,7 @@ public class JPPFJobClientSLA extends AbstractCommonSLA implements JobClientSLA
    * Create a copy of this job SLA.
    * @return a {@link JPPFJobClientSLA} instance.
    */
-  public JPPFJobClientSLA copy()
-  {
+  public JPPFJobClientSLA copy() {
     JPPFJobClientSLA sla = new JPPFJobClientSLA();
     copyTo(sla);
     sla.setMaxChannels(maxChannels);

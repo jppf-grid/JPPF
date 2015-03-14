@@ -27,8 +27,7 @@ import org.jppf.location.Location;
  * A container for class path elements.
  * @author Laurent Cohen
  */
-public interface ClassPath extends Serializable, Iterable<ClassPathElement>
-{
+public interface ClassPath extends Serializable, Iterable<ClassPathElement> {
   /**
    * Add the specified element to this classpath.
    * @param element the classpath element to add.

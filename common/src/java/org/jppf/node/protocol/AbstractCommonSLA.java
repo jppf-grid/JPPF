@@ -27,8 +27,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractCommonSLA implements JobCommonSLA
-{
+public abstract class AbstractCommonSLA implements JobCommonSLA {
   /**
    * Explicit serialVersionUID.
    */
@@ -49,52 +48,44 @@ public abstract class AbstractCommonSLA implements JobCommonSLA
   /**
    * Default constructor.
    */
-  public AbstractCommonSLA()
-  {
+  public AbstractCommonSLA() {
   }
 
   /**
    * Initialize this job SLA with the specified execution policy.
    * @param policy the tasks execution policy.
    */
-  public AbstractCommonSLA(final ExecutionPolicy policy)
-  {
+  public AbstractCommonSLA(final ExecutionPolicy policy) {
     this.executionPolicy = policy;
   }
 
   @Override
-  public ExecutionPolicy getExecutionPolicy()
-  {
+  public ExecutionPolicy getExecutionPolicy() {
     return executionPolicy;
   }
 
   @Override
-  public void setExecutionPolicy(final ExecutionPolicy executionPolicy)
-  {
+  public void setExecutionPolicy(final ExecutionPolicy executionPolicy) {
     this.executionPolicy = executionPolicy;
   }
 
   @Override
-  public JPPFSchedule getJobSchedule()
-  {
+  public JPPFSchedule getJobSchedule() {
     return jobSchedule;
   }
 
   @Override
-  public void setJobSchedule(final JPPFSchedule jobSchedule)
-  {
+  public void setJobSchedule(final JPPFSchedule jobSchedule) {
     this.jobSchedule = jobSchedule;
   }
 
   @Override
-  public JPPFSchedule getJobExpirationSchedule()
-  {
+  public JPPFSchedule getJobExpirationSchedule() {
     return jobExpirationSchedule;
   }
 
   @Override
-  public void setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule)
-  {
+  public void setJobExpirationSchedule(final JPPFSchedule jobExpirationSchedule) {
     this.jobExpirationSchedule = jobExpirationSchedule;
   }
 
@@ -103,8 +94,7 @@ public abstract class AbstractCommonSLA implements JobCommonSLA
    * @param sla a {@link AbstractCommonSLA} into which to copy the attributes of this instance.
    * @return a {@link AbstractCommonSLA} instance.
    */
-  protected AbstractCommonSLA copyTo(final AbstractCommonSLA sla)
-  {
+  protected AbstractCommonSLA copyTo(final AbstractCommonSLA sla) {
     sla.setExecutionPolicy(executionPolicy);
     sla.setJobExpirationSchedule(jobExpirationSchedule);
     sla.setJobSchedule(jobSchedule);

@@ -27,8 +27,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
-{
+public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   /**
    * Explicit serialVersionUID.
    */
@@ -86,16 +85,14 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   /**
    * Default constructor.
    */
-  public JPPFJobSLA()
-  {
+  public JPPFJobSLA() {
   }
 
   /**
    * Initialize this job SLA with the specified execution policy.
    * @param policy the tasks execution policy.
    */
-  public JPPFJobSLA(final ExecutionPolicy policy)
-  {
+  public JPPFJobSLA(final ExecutionPolicy policy) {
     this(policy, 0, Integer.MAX_VALUE, false);
   }
 
@@ -104,8 +101,7 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * @param policy the tasks execution policy.
    * @param priority the priority of this job.
    */
-  public JPPFJobSLA(final ExecutionPolicy policy, final int priority)
-  {
+  public JPPFJobSLA(final ExecutionPolicy policy, final int priority) {
     this(policy, priority, Integer.MAX_VALUE, false);
   }
 
@@ -116,8 +112,7 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * @param maxNodes the maximum number of nodes this job can run on. A value <= 0 means no limit on the number of nodes.
    * @param suspended determines whether this job is initially suspended.
    */
-  public JPPFJobSLA(final ExecutionPolicy policy, final int priority, final int maxNodes, final boolean suspended)
-  {
+  public JPPFJobSLA(final ExecutionPolicy policy, final int priority, final int maxNodes, final boolean suspended) {
     this.executionPolicy = policy;
     this.priority = priority;
     this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
@@ -125,62 +120,52 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   }
 
   @Override
-  public int getPriority()
-  {
+  public int getPriority() {
     return priority;
   }
 
   @Override
-  public void setPriority(final int priority)
-  {
+  public void setPriority(final int priority) {
     this.priority = priority;
   }
 
   @Override
-  public int getMaxNodes()
-  {
+  public int getMaxNodes() {
     return maxNodes;
   }
 
   @Override
-  public void setMaxNodes(final int maxNodes)
-  {
+  public void setMaxNodes(final int maxNodes) {
     this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
   }
 
   @Override
-  public boolean isSuspended()
-  {
+  public boolean isSuspended() {
     return suspended;
   }
 
   @Override
-  public void setSuspended(final boolean suspended)
-  {
+  public void setSuspended(final boolean suspended) {
     this.suspended = suspended;
   }
 
   @Override
-  public boolean isBroadcastJob()
-  {
+  public boolean isBroadcastJob() {
     return broadcastJob;
   }
 
   @Override
-  public void setBroadcastJob(final boolean broadcastJob)
-  {
+  public void setBroadcastJob(final boolean broadcastJob) {
     this.broadcastJob = broadcastJob;
   }
 
   @Override
-  public boolean isCancelUponClientDisconnect()
-  {
+  public boolean isCancelUponClientDisconnect() {
     return cancelUponClientDisconnect;
   }
 
   @Override
-  public void setCancelUponClientDisconnect(final boolean cancelUponClientDisconnect)
-  {
+  public void setCancelUponClientDisconnect(final boolean cancelUponClientDisconnect) {
     this.cancelUponClientDisconnect = cancelUponClientDisconnect;
   }
 
@@ -188,8 +173,7 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
    * Create a copy of this job SLA.
    * @return a {@link JPPFJobSLA} instance.
    */
-  public JPPFJobSLA copy()
-  {
+  public JPPFJobSLA copy() {
     JPPFJobSLA sla = new JPPFJobSLA();
     copyTo(sla);
     sla.setBroadcastJob(broadcastJob);
@@ -204,51 +188,43 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA
   }
 
   @Override
-  public String getResultsStrategy()
-  {
+  public String getResultsStrategy() {
     return resultsStrategy;
   }
 
   @Override
-  public void setResultsStrategy(final String name)
-  {
+  public void setResultsStrategy(final String name) {
     this.resultsStrategy = name;
   }
 
   @Override
-  public ClassPath getClassPath()
-  {
+  public ClassPath getClassPath() {
     return classPath;
   }
 
   @Override
-  public void setClassPath(final ClassPath classpath)
-  {
+  public void setClassPath(final ClassPath classpath) {
     if (classpath == null) throw new IllegalArgumentException("classpath cannot be null");
     this.classPath = classpath;
   }
 
   @Override
-  public JPPFSchedule getDispatchExpirationSchedule()
-  {
+  public JPPFSchedule getDispatchExpirationSchedule() {
     return dispatchExpirationSchedule;
   }
 
   @Override
-  public void setDispatchExpirationSchedule(final JPPFSchedule dispatchExpirationSchedule)
-  {
+  public void setDispatchExpirationSchedule(final JPPFSchedule dispatchExpirationSchedule) {
     this.dispatchExpirationSchedule = dispatchExpirationSchedule;
   }
 
   @Override
-  public int getMaxDispatchExpirations()
-  {
+  public int getMaxDispatchExpirations() {
     return maxDispatchExpirations;
   }
 
   @Override
-  public void setMaxDispatchExpirations(final int maxDispatchExpirations)
-  {
+  public void setMaxDispatchExpirations(final int maxDispatchExpirations) {
     this.maxDispatchExpirations = maxDispatchExpirations;
   }
 
