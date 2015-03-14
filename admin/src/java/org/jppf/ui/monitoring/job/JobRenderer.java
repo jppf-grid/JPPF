@@ -24,6 +24,7 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 import org.jppf.client.JPPFClientConnectionStatus;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
@@ -79,7 +80,10 @@ public class JobRenderer extends AbstractTreeCellRenderer {
           case SUB_JOB:
             JPPFManagementInfo info = data.getNodeInformation();
             renderer.setText((StatsHandler.getInstance().isShowIP() ? info.getIpAddress() : info.getHost()) + ":" + info.getPort());
-            path = TreeTableUtils.getNodeIconPath(info);
+            TopologyManager mgr = StatsHandler.getInstance().getTopologyManager();
+            TopologyNode nodeData = mgr.getNode(info.getUuid());
+            if (nodeData != null) path = GuiUtils.computeNodeIconKey(nodeData);
+            else path = AbstractTreeCellRenderer.NODE_ICON;
             break;
         }
         ImageIcon icon = GuiUtils.loadIcon(path);

@@ -96,6 +96,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
     menu.add(createMenuItem(actionHandler.getAction("graph.restart.node.deferred"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.shutdown.node.deferred"), point));
+    menu.add(createMenuItem(actionHandler.getAction("graph.cancel.deferred.action"), point));
     menu.addSeparator();
     menu.add(createMenuItem(actionHandler.getAction("graph.toggle.active"), point));
     menu.add(createMenuItem(actionHandler.getAction("graph.node.provisioning"), point));

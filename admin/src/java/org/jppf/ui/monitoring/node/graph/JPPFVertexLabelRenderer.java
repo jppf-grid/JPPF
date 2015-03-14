@@ -95,7 +95,7 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
         font = boldItalicFont;
       }
     } else {
-      path = TreeTableUtils.getNodeIconPath(data.getManagementInfo());
+      path = GuiUtils.computeNodeIconKey((TopologyNode) data);
       if (((TopologyNode) data).getStatus() != TopologyNodeStatus.UP) {
         background = AbstractTreeCellRenderer.INACTIVE_COLOR;
         backgroundSelected = AbstractTreeCellRenderer.INACTIVE_SELECTION_COLOR;

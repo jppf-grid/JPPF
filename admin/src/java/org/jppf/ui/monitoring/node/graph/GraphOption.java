@@ -213,6 +213,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       actionHandler.putAction("graph.restart.node.deferred", new ShutdownOrRestartNodeAction(true, false, "restart.node.deferred"));
       actionHandler.putAction("graph.shutdown.node", new ShutdownOrRestartNodeAction(false, true, "shutdown.node"));
       actionHandler.putAction("graph.shutdown.node.deferred", new ShutdownOrRestartNodeAction(false, false, "shutdown.node.deferred"));
+      actionHandler.putAction("graph.cancel.deferred.action", new CancelDeferredAction());
       actionHandler.putAction("graph.toggle.active", new ToggleNodeActiveAction());
       actionHandler.putAction("graph.node.provisioning", new ProvisioningAction());
       actionHandler.putAction("graph.select.drivers", new SelectGraphDriversAction(this));
@@ -268,6 +269,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
     sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
     sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
     if (node.getManagementInfo().isMasterNode()) sb.append(" | Slaves: ").append(node.getNbSlaveNodes());
+    sb.append("<br>");
+    sb.append("Pending action: ").append(node.getPendingAction());
     sb.append("</html>");
     return sb.toString();
   }

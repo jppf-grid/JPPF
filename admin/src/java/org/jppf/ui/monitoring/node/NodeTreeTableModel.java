@@ -121,6 +121,7 @@ public class NodeTreeTableModel extends AbstractJPPFTreeTableModel {
             break;
           case PENDING_ACTION:
             if (isNode) res = ((TopologyNode) info).getPendingAction();
+            if (res == null) res = "None";
             break;
         }
       } else {

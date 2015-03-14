@@ -90,7 +90,7 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
           foreground = DIMMED_FOREGROUND;
         } else if (data.isNode()) {
           TopologyNode nodeData = (TopologyNode) data;
-          path = TreeTableUtils.getNodeIconPath(nodeData.getManagementInfo());
+          path = GuiUtils.computeNodeIconKey(nodeData);
           if (!TopologyNodeStatus.UP.equals(nodeData.getStatus())) {
             background = INACTIVE_COLOR;
             backgroundSelected = INACTIVE_SELECTION_COLOR;
