@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.location.*;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
 import org.junit.*;

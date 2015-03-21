@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 import org.jppf.client.concurrent.JPPFExecutorService;
 import org.junit.*;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.Setup1D1N1C;
 import test.org.jppf.test.setup.common.*;
 
 /**

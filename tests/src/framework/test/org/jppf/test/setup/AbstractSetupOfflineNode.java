@@ -21,7 +21,7 @@ package test.org.jppf.test.setup;
 import java.util.*;
 
 import org.jppf.client.JPPFClient;
-import org.junit.*;
+import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.BaseSetup.Configuration;
 

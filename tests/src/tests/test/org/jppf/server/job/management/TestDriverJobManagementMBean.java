@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.junit.Test;

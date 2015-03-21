@@ -22,7 +22,7 @@ import java.lang.reflect.Constructor;
 import java.util.concurrent.Callable;
 
 import org.jppf.JPPFError;
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
 
 /**

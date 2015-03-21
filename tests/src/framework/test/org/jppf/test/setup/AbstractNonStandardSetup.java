@@ -26,7 +26,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;

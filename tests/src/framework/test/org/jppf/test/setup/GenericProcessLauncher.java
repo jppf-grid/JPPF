@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.socket.*;
 import org.jppf.process.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -42,7 +42,7 @@ public class GenericProcessLauncher implements Runnable {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * System path separator.
    */
