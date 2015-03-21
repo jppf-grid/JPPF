@@ -19,7 +19,7 @@
 package test.driver.restart;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;

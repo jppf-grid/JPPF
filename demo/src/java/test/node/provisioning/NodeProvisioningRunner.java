@@ -23,10 +23,10 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 
 import sample.dist.tasklength.LongTask;
 

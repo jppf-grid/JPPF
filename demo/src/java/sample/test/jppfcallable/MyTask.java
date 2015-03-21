@@ -19,7 +19,7 @@
 package sample.test.jppfcallable;
 
 import org.jppf.node.protocol.AbstractTask;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 
@@ -35,7 +35,7 @@ public class MyTask extends AbstractTask<String>
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Duration of the callable.
    */
