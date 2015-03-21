@@ -25,6 +25,7 @@ import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -39,7 +40,7 @@ public class GCAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this action.

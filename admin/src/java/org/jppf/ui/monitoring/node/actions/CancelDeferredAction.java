@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -37,7 +38,7 @@ public class CancelDeferredAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this action.

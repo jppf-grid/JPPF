@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.options.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public class StatusBarHandler extends TopologyListenerAdapter {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = log.isDebugEnabled();
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Identifies the field counting the drivers.
    */

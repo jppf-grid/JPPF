@@ -18,7 +18,7 @@
 package org.jppf.ui.monitoring.diagnostics;
 
 import java.awt.Color;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.util.*;
 
 import javax.swing.*;
@@ -28,6 +28,7 @@ import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -42,7 +43,7 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the "OK" button was pressed.
    */

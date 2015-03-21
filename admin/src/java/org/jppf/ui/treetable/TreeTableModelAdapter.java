@@ -56,6 +56,7 @@ import javax.swing.event.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.*;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -75,7 +76,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The underlying JTree.
    */

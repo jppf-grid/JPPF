@@ -17,8 +17,7 @@
  */
 package org.jppf.ui.monitoring.job;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Instances of this class represent changes made to the branch in tree table.

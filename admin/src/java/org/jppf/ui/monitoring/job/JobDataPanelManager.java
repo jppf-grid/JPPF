@@ -26,6 +26,7 @@ import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -41,7 +42,7 @@ class JobDataPanelManager {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = log.isDebugEnabled();
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The job data panel holding this manager.
    */

@@ -21,7 +21,7 @@ package org.jppf.ui.monitoring.job;
 import javax.swing.tree.*;
 
 import org.jppf.job.JobInformation;
-import org.jppf.ui.treetable.*;
+import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
 /**
  * Tree table model for the tree table.

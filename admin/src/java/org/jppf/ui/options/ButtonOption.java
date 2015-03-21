@@ -22,6 +22,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -37,7 +38,7 @@ public class ButtonOption extends AbstractOption
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
    */

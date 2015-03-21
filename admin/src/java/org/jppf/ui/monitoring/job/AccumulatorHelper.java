@@ -26,7 +26,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,7 +42,7 @@ public class AccumulatorHelper {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Map that accumulates changes between TreeTable updates.
    */

@@ -31,6 +31,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -57,7 +58,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The graph visualization component.
    */

@@ -20,7 +20,7 @@ package org.jppf.ui.utils;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.*;
+import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 

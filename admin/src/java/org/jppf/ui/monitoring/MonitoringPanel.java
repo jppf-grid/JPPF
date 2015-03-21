@@ -17,7 +17,7 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.*;
+import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 

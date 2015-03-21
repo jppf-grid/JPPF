@@ -30,7 +30,7 @@ import org.jppf.ui.actions.EditorMouseListener;
 import org.jppf.ui.monitoring.node.actions.AbstractTopologyAction;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.TreeTableUtils;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -44,7 +44,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this action.

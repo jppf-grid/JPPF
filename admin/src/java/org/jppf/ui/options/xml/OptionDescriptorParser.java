@@ -25,7 +25,7 @@ import javax.xml.parsers.*;
 import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
 import org.jppf.ui.options.xml.OptionDescriptor.ListenerDescriptor;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
@@ -43,7 +43,7 @@ public class OptionDescriptorParser {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The DOM parser used to build the descriptor tree.
    */

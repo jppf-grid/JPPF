@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import org.jppf.ui.monitoring.job.JobData;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -35,7 +36,7 @@ public class CancelJobAction extends AbstractJobAction
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this action.

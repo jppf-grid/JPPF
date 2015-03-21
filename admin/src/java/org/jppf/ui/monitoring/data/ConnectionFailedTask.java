@@ -23,7 +23,7 @@ import javax.swing.JComboBox;
 import org.jppf.client.JPPFClientConnection;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.ui.options.ComboBoxOption;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -37,7 +37,7 @@ class ConnectionFailedTask extends ThreadSynchronization implements Runnable {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The new connection that was created.
    */

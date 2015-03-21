@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The stats formatter that provides the data.
    */

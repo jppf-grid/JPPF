@@ -38,7 +38,7 @@ import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorJob;
 import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorNode;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -54,7 +54,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The object that manages updates to and navigation within the tree table.
    */

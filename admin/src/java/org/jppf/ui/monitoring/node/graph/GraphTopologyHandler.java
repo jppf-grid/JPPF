@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
@@ -46,7 +47,7 @@ public class GraphTopologyHandler implements TopologyListener {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The underlying graph that keeps track of all drivers and nodes.
    */

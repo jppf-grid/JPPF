@@ -45,7 +45,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  protected static boolean debugEnabled = log.isDebugEnabled();
+  protected static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the "OK" button was pressed.
    */

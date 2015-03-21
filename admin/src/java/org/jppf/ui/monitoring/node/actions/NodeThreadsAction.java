@@ -28,6 +28,7 @@ import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
@@ -43,7 +44,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the "OK" button was pressed.
    */

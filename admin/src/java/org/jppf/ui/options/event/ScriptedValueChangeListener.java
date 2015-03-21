@@ -24,7 +24,7 @@ import javax.swing.tree.TreePath;
 import org.jppf.scripting.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,7 +40,7 @@ public class ScriptedValueChangeListener implements ValueChangeListener
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Name of the scripting language to use.
    */

@@ -25,6 +25,7 @@ import javax.swing.*;
 
 import org.jppf.ui.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -41,7 +42,7 @@ public class JobTreeTableMouseListener extends MouseAdapter
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The object that handles toolbar and menu actions.
    */

@@ -24,6 +24,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.jppf.ui.options.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +40,7 @@ public class DebugMouseListener extends MouseAdapter {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The option to debug.
    */

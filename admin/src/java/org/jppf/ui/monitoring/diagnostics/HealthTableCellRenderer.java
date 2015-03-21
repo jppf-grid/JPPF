@@ -24,7 +24,7 @@ import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.*;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;

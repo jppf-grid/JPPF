@@ -43,7 +43,7 @@ public final class StatsHandler implements StatsConstants {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Singleton instance of this class.
    */

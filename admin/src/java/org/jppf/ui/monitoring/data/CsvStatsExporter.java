@@ -22,7 +22,7 @@ import static org.jppf.ui.monitoring.data.StatsConstants.*;
 
 import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.LocalizationUtils;
 
 /**
  * Utility class to export the latest server statistics snapshot to CSV format.

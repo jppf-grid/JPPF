@@ -29,6 +29,7 @@ import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -43,7 +44,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = log.isDebugEnabled();
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Manages the topology updates.
    */

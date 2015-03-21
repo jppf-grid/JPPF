@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.data;
 
 import java.util.TimerTask;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 
 /**

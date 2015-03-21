@@ -59,6 +59,7 @@ package org.jppf.ui.treetable;
 import javax.swing.event.*;
 import javax.swing.tree.TreePath;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -77,7 +78,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The tree root.
    */

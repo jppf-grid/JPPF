@@ -26,6 +26,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.monitoring.job.JobData;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +40,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the "OK" button was pressed.
    */

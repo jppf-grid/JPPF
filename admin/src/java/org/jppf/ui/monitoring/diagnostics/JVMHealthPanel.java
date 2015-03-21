@@ -32,6 +32,7 @@ import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
 import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -46,7 +47,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = log.isDebugEnabled();
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Manages the topology updates.
    */
