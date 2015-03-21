@@ -67,10 +67,9 @@
 
 package com.sun.jmx.remote.socket;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+
 import javax.security.auth.Subject;
 
 /**
