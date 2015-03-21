@@ -21,7 +21,7 @@ package org.jppf.test.scenario.resubmit;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.test.scenario.AbstractScenarioRunner;

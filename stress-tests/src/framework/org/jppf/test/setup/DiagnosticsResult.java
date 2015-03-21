@@ -18,7 +18,7 @@
 
 package org.jppf.test.setup;
 
-import org.jppf.management.diagnostics.*;
+import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.utils.Pair;
 
 /**

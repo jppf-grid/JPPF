@@ -20,7 +20,7 @@ package org.jppf.test.setup;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;

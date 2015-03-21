@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.test.scenario.ScenarioConfiguration;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
@@ -39,7 +39,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
