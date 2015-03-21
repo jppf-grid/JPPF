@@ -54,6 +54,10 @@ public class RunOptions {
    */
   public final long taskDuration = config.getLong("deadlock.taskDuration", 10L);
   /**
+   * Duration of each task in nanos.
+   */
+  public final int taskDurationNanos = config.getInt("deadlock.taskDurationNanos", 0);
+  /**
    * Time interval in ms for un-provisioning of the slave nodes, when simulating node crashes
    */
   public final long waitTime = config.getLong("deadlock.waitTime", 15000L);

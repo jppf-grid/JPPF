@@ -18,9 +18,9 @@
 
 package sample.test.deadlock;
 
-import java.util.*;
+import java.util.Map;
 
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;

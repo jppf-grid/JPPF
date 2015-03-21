@@ -52,7 +52,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
     try {
       for (int i=1; i<=options.tasksPerJob; i++) {
         String message = "this is task " + i;
-        MyTask task = new MyTask(message, options.taskDuration, options.useCPU, options.dataSize);
+        MyTask task = new MyTask(message, options);
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
       }
     } catch(Exception e) {
