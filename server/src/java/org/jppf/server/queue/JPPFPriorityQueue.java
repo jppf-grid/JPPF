@@ -18,7 +18,7 @@
 
 package org.jppf.server.queue;
 
-import static org.jppf.utils.collections.CollectionUtils.*;
+import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -30,12 +30,12 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
-import org.jppf.server.*;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -52,7 +52,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The driver.
    */

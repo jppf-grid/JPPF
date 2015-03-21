@@ -21,7 +21,7 @@ import org.jppf.execute.ExecutorChannel;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerJob;
 
 /**
  * Instances of this class are submitted into an event queue and generate actual

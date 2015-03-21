@@ -20,6 +20,7 @@ package org.jppf.server.node.local;
 
 import org.jppf.node.AbstractNodeConnection;
 import org.jppf.server.nio.nodeserver.LocalNodeChannel;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public class LocalNodeConnection extends AbstractNodeConnection<LocalNodeChannel
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this connection with the specified serializer.

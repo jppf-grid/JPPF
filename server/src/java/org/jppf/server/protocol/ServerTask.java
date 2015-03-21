@@ -20,6 +20,7 @@ package org.jppf.server.protocol;
 
 import org.jppf.io.*;
 import org.jppf.node.protocol.TaskState;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -35,7 +36,7 @@ public class ServerTask {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace-level logging is enabled.
    */

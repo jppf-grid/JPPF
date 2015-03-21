@@ -28,6 +28,7 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -42,7 +43,7 @@ public class LocalNodeIO extends AbstractNodeIO {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The I/O channel for this node.
    */

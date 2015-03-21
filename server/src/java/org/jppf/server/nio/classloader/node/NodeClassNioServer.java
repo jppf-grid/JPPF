@@ -41,7 +41,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether TRACE logging level is enabled.
    */

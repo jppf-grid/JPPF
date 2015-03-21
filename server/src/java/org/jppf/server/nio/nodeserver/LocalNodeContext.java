@@ -20,6 +20,7 @@ package org.jppf.server.nio.nodeserver;
 
 import org.jppf.nio.*;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 
@@ -36,7 +37,7 @@ public class LocalNodeContext extends AbstractNodeContext
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Default constructor.

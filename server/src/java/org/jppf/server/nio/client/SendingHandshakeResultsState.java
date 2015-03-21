@@ -24,6 +24,7 @@ import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.protocol.ServerTaskBundleClient;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +40,7 @@ class SendingHandshakeResultsState extends ClientServerState
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether TRACE logging level is enabled.
    */

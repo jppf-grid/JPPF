@@ -20,6 +20,7 @@ package org.jppf.server.peer;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 
@@ -37,7 +38,7 @@ public class JPPFPeerInitializer extends Thread {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Name of the peer in the configuration file.
    */

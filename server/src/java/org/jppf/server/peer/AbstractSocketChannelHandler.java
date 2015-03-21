@@ -21,6 +21,7 @@ import java.net.ConnectException;
 
 import org.jppf.comm.socket.*;
 import org.jppf.server.nio.classloader.ClassNioServer;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public abstract class AbstractSocketChannelHandler {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The NioServer to which the channel is registered.
    */

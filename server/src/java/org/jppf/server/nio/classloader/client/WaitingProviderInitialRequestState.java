@@ -22,7 +22,7 @@ import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 
 import org.jppf.classloader.*;
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -37,7 +37,7 @@ class WaitingProviderInitialRequestState extends ClientClassServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether management features are enabled for this driver.
    */

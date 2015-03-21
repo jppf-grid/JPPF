@@ -30,7 +30,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -46,7 +46,7 @@ class WaitingResultsState extends NodeServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this state.

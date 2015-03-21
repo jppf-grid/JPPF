@@ -47,7 +47,7 @@ class WaitInitialBundleState extends NodeServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  protected static final boolean debugEnabled = log.isDebugEnabled();
+  protected static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Whether to resolve the nodes' ip addresses into host names.
    */

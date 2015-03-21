@@ -23,6 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 
 import org.jppf.nio.NioState;
 import org.jppf.server.JPPFDriver;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ public abstract class NodeClassServerState extends NioState<NodeClassTransition>
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The server that handles this state.
    */

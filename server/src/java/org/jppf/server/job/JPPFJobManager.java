@@ -46,7 +46,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of jobs to the nodes they are executing on.
    */

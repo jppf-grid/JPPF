@@ -22,6 +22,7 @@ import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.ClassCache;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ class WaitingPeerInitiationResponseState extends ClientClassServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The class cache.
    */

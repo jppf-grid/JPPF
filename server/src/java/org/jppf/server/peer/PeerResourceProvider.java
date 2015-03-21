@@ -29,6 +29,7 @@ import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.ssl.SSLHelper;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -44,7 +45,7 @@ class PeerResourceProvider {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether ssl is enabled for peer-to-peer cpmmunication between servers.
    */

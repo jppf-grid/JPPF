@@ -24,6 +24,7 @@ import static org.jppf.utils.StringUtils.build;
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -39,7 +40,7 @@ class SendingNodeResponseState extends NodeClassServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this state with a specified NioServer.

@@ -24,6 +24,7 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.node.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ public abstract class AbstractServerJob {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Count of instances of this class.
    */

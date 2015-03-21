@@ -23,7 +23,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import org.jppf.classloader.*;
 import org.jppf.io.*;
 import org.jppf.nio.*;
-import org.jppf.serialization.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.JPPFDriver;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -41,7 +41,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The resource read from or written to the associated channel.
    */

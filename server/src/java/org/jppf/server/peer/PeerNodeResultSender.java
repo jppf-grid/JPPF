@@ -24,7 +24,7 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.SerializationHelperImpl;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -41,7 +41,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener 
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Output destination wrapping all write operations on the socket client.
    */

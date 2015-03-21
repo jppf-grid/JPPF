@@ -26,7 +26,7 @@ import org.jppf.execute.ExecutionInfo;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -46,7 +46,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The latest event that occurred within a task.
    */

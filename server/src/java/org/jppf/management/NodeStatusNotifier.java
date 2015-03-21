@@ -19,7 +19,7 @@
 package org.jppf.management;
 
 import org.jppf.node.event.*;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -37,7 +37,7 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Base name used for localization lookups.
    */

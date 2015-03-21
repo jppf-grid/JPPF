@@ -25,7 +25,7 @@ import javax.management.*;
 
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -45,7 +45,7 @@ class ForwardingNotificationDispatcher
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Constant for an empty array of event listeners.
    */

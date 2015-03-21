@@ -81,7 +81,7 @@ public interface ServerDebugMBean extends Serializable
    */
   String all();
   /**
-   * View all idle channels held by the {@link TaskQueueChecker}.
+   * View all idle channels held by the {@link org.jppf.server.nio.nodeserver.TaskQueueChecker}.
    * @return a string representing the idle channels.
    */
   String taskQueueCheckerChannels();

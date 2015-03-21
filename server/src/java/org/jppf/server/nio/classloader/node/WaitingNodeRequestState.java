@@ -44,7 +44,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */

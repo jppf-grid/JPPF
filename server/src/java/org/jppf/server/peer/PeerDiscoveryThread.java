@@ -37,7 +37,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */

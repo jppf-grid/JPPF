@@ -18,7 +18,7 @@
 
 package org.jppf.server.node.local;
 
-import org.jppf.classloader.*;
+import org.jppf.classloader.LocalClassLoaderConnection;
 import org.jppf.server.node.*;
 
 /**

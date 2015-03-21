@@ -23,7 +23,7 @@ import java.nio.channels.*;
 import org.jppf.JPPFException;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.JPPFIdentifiers;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -39,7 +39,7 @@ class IdentifyingPeerState extends AcceptorServerState
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Reference to the driver.
    */

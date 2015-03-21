@@ -47,7 +47,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether TRACE logging level is enabled.
    */

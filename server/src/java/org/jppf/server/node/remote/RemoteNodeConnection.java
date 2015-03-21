@@ -41,7 +41,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
@@ -79,14 +79,16 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
       channel.setPort(connectionInfo.getPort());
       channel.setSerializer(serializer);
       if (debugEnabled) log.debug("end socket client initialization");
-      if (!NodeRunner.isOffline()) System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
+      //if (!NodeRunner.isOffline())
+        System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
       socketInitializer.initializeSocket(channel);
       if (!socketInitializer.isSuccessful())
       {
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("the JPPF node job channel could not reconnect to the driver", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       }
-      if (!NodeRunner.isOffline()) System.out.println("Reconnected to the node server");
+      //if (!NodeRunner.isOffline())
+        System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
       if (connectionInfo.isSecure()) channel = SSLHelper.createSSLClientConnection(channel);

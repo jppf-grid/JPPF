@@ -28,7 +28,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.NodeJobInformation;
 import org.jppf.server.submission.SubmissionStatus;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -46,7 +46,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace-level logging is enabled.
    */

@@ -21,6 +21,7 @@ package org.jppf.server.nio.classloader;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -37,7 +38,7 @@ public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> exten
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether TRACE logging level is enabled.
    */

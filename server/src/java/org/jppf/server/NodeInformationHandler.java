@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.management.*;
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ public class NodeInformationHandler
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * A list of objects containing the information required to connect to the nodes JMX servers.
    */

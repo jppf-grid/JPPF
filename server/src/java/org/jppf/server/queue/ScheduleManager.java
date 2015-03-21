@@ -22,6 +22,7 @@ import java.text.ParseException;
 
 import org.jppf.scheduling.*;
 import org.jppf.server.protocol.ServerJob;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ class ScheduleManager
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Handles the schedule of each job that has one.
    */

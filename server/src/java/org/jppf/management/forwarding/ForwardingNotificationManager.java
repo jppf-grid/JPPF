@@ -26,6 +26,7 @@ import javax.management.ListenerNotFoundException;
 import org.jppf.management.*;
 import org.jppf.server.event.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -48,7 +49,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Reference to the MBean which forwards the notifications.
    */

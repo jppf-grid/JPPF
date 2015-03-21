@@ -46,7 +46,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Base name used for localization lookups.
    */

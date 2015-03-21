@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 import javax.management.*;
 
 import org.jppf.node.event.*;
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,7 +40,7 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The mbean object name sent with the notifications.
    */

@@ -48,7 +48,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of pending resource requests for a resource provider.
    */

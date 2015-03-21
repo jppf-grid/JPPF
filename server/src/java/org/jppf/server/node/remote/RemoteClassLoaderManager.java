@@ -25,14 +25,14 @@ import java.util.concurrent.Callable;
 import org.jppf.classloader.*;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
  * Concrete implementation of {@link AbstractClassLoaderManager} for a remote node.
  * @author Laurent Cohen
  */
-public class RemoteClassLoaderManager extends AbstractClassLoaderManager
-{
+public class RemoteClassLoaderManager extends AbstractClassLoaderManager {
   /**
    * Logger for this class.
    */
@@ -40,7 +40,7 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The node that holds this class loader manager.
    */
@@ -50,38 +50,30 @@ public class RemoteClassLoaderManager extends AbstractClassLoaderManager
    * Initialize this class loader manager with the specified node.
    * @param node the node that holds this class loader manager.
    */
-  RemoteClassLoaderManager(final JPPFNode node)
-  {
+  RemoteClassLoaderManager(final JPPFNode node) {
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = (JPPFRemoteNode) node;
   }
 
   @Override
-  protected AbstractJPPFClassLoader createClassLoader()
-  {
+  protected AbstractJPPFClassLoader createClassLoader() {
     if (debugEnabled) log.debug("Initializing classloader");
     return NodeRunner.getJPPFClassLoader();
   }
 
   @Override
-  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception
-  {
+  protected JPPFContainer newJPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader cl) throws Exception {
     return new JPPFRemoteContainer((RemoteNodeConnection) node.getNodeConnection(), uuidPath, cl);
   }
 
   @Override
-  protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath)
-  {
-    return new Callable<AbstractJPPFClassLoader>()
-    {
+  protected Callable<AbstractJPPFClassLoader> newClassLoaderCreator(final List<String> uuidPath, final Object...params) {
+    return new Callable<AbstractJPPFClassLoader>() {
       @Override
-      public AbstractJPPFClassLoader call()
-      {
-        PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>()
-        {
+      public AbstractJPPFClassLoader call() {
+        PrivilegedAction<AbstractJPPFClassLoader> pa = new PrivilegedAction<AbstractJPPFClassLoader>() {
           @Override
-          public AbstractJPPFClassLoader run()
-          {
+          public AbstractJPPFClassLoader run() {
             AbstractJPPFClassLoader parent = getClassLoader();
             return new JPPFClassLoader(parent.getConnection(), parent, uuidPath);
           }

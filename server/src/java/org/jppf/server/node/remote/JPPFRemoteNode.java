@@ -17,107 +17,23 @@
  */
 package org.jppf.server.node.remote;
 
-import org.jppf.comm.recovery.*;
 import org.jppf.node.connection.DriverConnectionInfo;
-import org.jppf.server.node.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
  * Instances of this class encapsulate execution nodes.
  * @author Laurent Cohen
  */
-public class JPPFRemoteNode extends JPPFNode implements ClientConnectionListener
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JPPFRemoteNode.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-  /**
-   * Connection to the recovery server.
-   */
-  private ClientConnection recoveryConnection = null;
-  /**
-   * Determines whether SSL is enabled.
-   */
-  private boolean sslEnabled = false;
-  /**
-   * Server connection information.
-   */
-  private final DriverConnectionInfo connectionInfo;
-
+public class JPPFRemoteNode extends AbstractRemoteNode {
   /**
    * Default constructor.
    * @param connectionInfo the server connection information.
    */
-  public JPPFRemoteNode(final DriverConnectionInfo connectionInfo)
-  {
-    super();
-    this.connectionInfo = connectionInfo;
+  public JPPFRemoteNode(final DriverConnectionInfo connectionInfo) {
+    super(connectionInfo);
+  }
+
+  @Override
+  protected void initClassLoaderManager() {
     classLoaderManager = new RemoteClassLoaderManager(this);
-  }
-
-  @Override
-  public void initDataChannel() throws Exception
-  {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
-    if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
-    if (config.getBoolean("jppf.recovery.enabled", false))
-    {
-      if (recoveryConnection == null)
-      {
-        if (debugEnabled) log.debug("Initializing recovery");
-        recoveryConnection = new ClientConnection(uuid, connectionInfo.getHost(), connectionInfo.getRecoveryPort());
-        recoveryConnection.addClientConnectionListener(this);
-        new Thread(recoveryConnection, "reaper client connection").start();
-      }
-    }
-  }
-
-  @Override
-  public void closeDataChannel() throws Exception
-  {
-    if (debugEnabled) log.debug("closing data channel: nodeConnection=" + nodeConnection + ", recoveryConnection=" + recoveryConnection);
-    if (nodeConnection != null) nodeConnection.close();
-    if (recoveryConnection != null)
-    {
-      ClientConnection tmp = recoveryConnection;
-      if (tmp != null)
-      {
-        recoveryConnection = null;
-        tmp.close();
-      }
-    }
-  }
-
-  @Override
-  public void clientConnectionFailed(final ClientConnectionEvent event)
-  {
-    try
-    {
-      if (debugEnabled) log.debug("recovery connection failed, attempting to reconnect this node");
-      closeDataChannel();
-    }
-    catch(Exception e)
-    {
-      log.error(e.getMessage(), e);
-    }
-  }
-
-  @Override
-  protected NodeConnectionChecker createConnectionChecker()
-  {
-    return new RemoteNodeConnectionChecker(this);
-  }
-
-  @Override
-  public boolean isLocal()
-  {
-    return false;
   }
 }

@@ -26,6 +26,7 @@ import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.debug.DebugHelper;
 import org.jppf.server.protocol.ServerTaskBundleClient;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -40,7 +41,7 @@ class SendingResultsState extends ClientServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether TRACE logging level is enabled.
    */

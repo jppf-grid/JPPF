@@ -23,6 +23,7 @@ import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -37,7 +38,7 @@ public class SendingProviderInitialResponseState extends ClientClassServerState 
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this state with a specified NioServer.

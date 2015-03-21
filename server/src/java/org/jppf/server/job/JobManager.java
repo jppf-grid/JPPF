@@ -17,10 +17,10 @@
  */
 package org.jppf.server.job;
 
+import java.util.Set;
+
 import org.jppf.job.JobManagerListener;
 import org.jppf.server.protocol.ServerJob;
-
-import java.util.Set;
 
 /**
  * Interface for job manager that handles states and monitor the jobs throughout their processing within the JPPF.

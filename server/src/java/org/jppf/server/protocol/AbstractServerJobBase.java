@@ -24,6 +24,7 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.submission.SubmissionStatus;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -40,7 +41,7 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of the tasks.
    */

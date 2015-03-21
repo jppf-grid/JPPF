@@ -26,7 +26,8 @@ import org.jppf.management.JMXServer;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerTaskBundleClient;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -42,7 +43,7 @@ class WaitingHandshakeState extends ClientServerState
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this state.

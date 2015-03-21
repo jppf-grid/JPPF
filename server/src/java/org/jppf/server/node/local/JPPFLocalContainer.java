@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
-import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.nio.nodeserver.LocalNodeMessage;
 import org.jppf.server.node.JPPFContainer;
 import org.slf4j.*;
 

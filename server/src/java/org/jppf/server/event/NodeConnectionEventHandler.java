@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,7 +40,7 @@ public class NodeConnectionEventHandler
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of node connection listeners.
    */

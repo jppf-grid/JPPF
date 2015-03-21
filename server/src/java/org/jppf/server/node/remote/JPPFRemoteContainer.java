@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
 import org.jppf.server.node.JPPFContainer;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -32,8 +33,7 @@ import org.slf4j.*;
  * a client application, a provides the methods to enable the transport, serialization and deserialization of these classes.
  * @author Laurent Cohen
  */
-public class JPPFRemoteContainer extends JPPFContainer
-{
+public class JPPFRemoteContainer extends JPPFContainer {
   /**
    * Logger for this class.
    */
@@ -41,7 +41,7 @@ public class JPPFRemoteContainer extends JPPFContainer
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -58,8 +58,7 @@ public class JPPFRemoteContainer extends JPPFContainer
    * @param classLoader the class loader for this container.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFRemoteContainer(final RemoteNodeConnection nodeConnection, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
-  {
+  public JPPFRemoteContainer(final RemoteNodeConnection nodeConnection, final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception {
     super(uuidPath, classLoader);
     this.nodeConnection = nodeConnection;
     //init();
@@ -74,32 +73,26 @@ public class JPPFRemoteContainer extends JPPFContainer
    * @throws Throwable if an error occurs while deserializing.
    */
   @Override
-  public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Throwable
-  {
+  public int deserializeObjects(final List<Object> list, final int count, final ExecutorService executor) throws Throwable {
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    try
-    {
+    try {
       Thread.currentThread().setContextClassLoader(classLoader);
       List<Future<Object>> futureList = new ArrayList<>(count);
       InputSource is = new SocketWrapperInputSource(nodeConnection.getChannel());
-      for (int i=0; i<count; i++)
-      {
+      for (int i = 0; i < count; i++) {
         DataLocation dl = IOHelper.readData(is);
         if (traceEnabled) log.trace("i = " + i + ", read data size = " + dl.getSize());
         futureList.add(executor.submit(new ObjectDeserializationTask(dl, i)));
       }
       Throwable t = null;
-      for (Future<Object> f: futureList)
-      {
+      for (Future<Object> f : futureList) {
         Object o = f.get();
         if ((o instanceof Throwable) && (t == null)) t = (Throwable) o;
         if (t == null) list.add(o);
       }
       if (t != null) throw t;
       return 0;
-    }
-    finally
-    {
+    } finally {
       Thread.currentThread().setContextClassLoader(cl);
     }
   }
@@ -108,8 +101,7 @@ public class JPPFRemoteContainer extends JPPFContainer
    * The node connection wrapper.
    * @param nodeConnection the node connection to set.
    */
-  public void setNodeConnection(final RemoteNodeConnection nodeConnection)
-  {
+  public void setNodeConnection(final RemoteNodeConnection nodeConnection) {
     this.nodeConnection = nodeConnection;
   }
 }

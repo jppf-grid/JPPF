@@ -22,8 +22,8 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.server.node.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.server.node.AbstractNodeConnectionChecker;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,11 +40,11 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The node for which to check the connection.
    */
-  private JPPFRemoteNode node = null;
+  private AbstractRemoteNode node = null;
   /**
    * The socket connection.
    */
@@ -62,7 +62,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
    * Initialize this checker <ith the specified node.
    * @param node the node for which to check the connection.
    */
-  public RemoteNodeConnectionChecker(final JPPFRemoteNode node)
+  public RemoteNodeConnectionChecker(final AbstractRemoteNode node)
   {
     this.node = node;
     this.socketWrapper = ((RemoteNodeConnection) node.getNodeConnection()).getChannel();

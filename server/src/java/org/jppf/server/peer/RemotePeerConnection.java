@@ -42,7 +42,7 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper> 
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */

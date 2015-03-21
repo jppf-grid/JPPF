@@ -23,6 +23,7 @@ import static org.jppf.server.nio.client.ClientTransition.TO_IDLE;
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ class IdleState extends ClientServerState
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Initialize this state.
    * @param server the server that handles this state.

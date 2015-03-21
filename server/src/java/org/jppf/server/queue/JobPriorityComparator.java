@@ -18,9 +18,9 @@
 
 package org.jppf.server.queue;
 
-import org.jppf.server.protocol.ServerJob;
-
 import java.util.Comparator;
+
+import org.jppf.server.protocol.ServerJob;
 
 /**
  * A Comparator which compare CLientJob objects in descending order of their priority.

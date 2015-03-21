@@ -23,7 +23,7 @@ import java.util.List;
 import org.jppf.io.DataLocation;
 import org.jppf.job.JobReturnReason;
 import org.jppf.server.protocol.ServerTaskBundleNode;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -38,7 +38,7 @@ public class NodeDispatchTimeoutAction implements Runnable {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The server handling the node to which the bundle was sent.
    */

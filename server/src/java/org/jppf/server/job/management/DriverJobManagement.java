@@ -27,6 +27,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -44,7 +45,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Reference to the driver's job manager.
    */

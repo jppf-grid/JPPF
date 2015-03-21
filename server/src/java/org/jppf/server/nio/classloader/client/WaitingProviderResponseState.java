@@ -23,6 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -38,7 +39,7 @@ class WaitingProviderResponseState extends ClientClassServerState {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The class cache.
    */
