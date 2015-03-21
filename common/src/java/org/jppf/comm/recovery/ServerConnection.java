@@ -21,7 +21,7 @@ package org.jppf.comm.recovery;
 import java.net.Socket;
 
 import org.jppf.comm.socket.*;
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,7 +42,7 @@ public class ServerConnection extends AbstractRecoveryConnection
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this connection with the specified socket.

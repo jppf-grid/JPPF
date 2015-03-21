@@ -42,7 +42,7 @@ public final class PermissionsFactory
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Encapsulates the set of all permissions granted to a node.
    */

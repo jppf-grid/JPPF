@@ -20,6 +20,7 @@ package org.jppf.load.balancer.impl;
 import java.util.*;
 
 import org.jppf.load.balancer.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -42,7 +43,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
    * towards a good solution.

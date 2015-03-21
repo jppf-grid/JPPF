@@ -18,11 +18,11 @@
 
 package org.jppf.load.balancer.impl;
 
-import org.jppf.load.balancer.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.jppf.load.balancer.*;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.*;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
@@ -39,7 +39,7 @@ public class AutotunedDelegatingBundler extends AbstractBundler
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The global bundler to which bundle size calculations are delegated.
    */

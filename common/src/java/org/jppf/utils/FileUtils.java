@@ -427,6 +427,16 @@ public final class FileUtils {
    * @return true if the folder and all contained files and subfolders were deleted, false otherwise.
    */
   public static boolean deletePath(final File path) {
+    return deletePath(path, false);
+  }
+
+  /**
+   * Delete the specified path, recursively if this is a directory.
+   * @param path the path to delete.
+   * @param childrenOnly when {@code true} only delete the children of the specified path, if it is a directory.
+   * @return true if the folder and all contained files and subfolders were deleted, false otherwise.
+   */
+  public static boolean deletePath(final File path, final boolean childrenOnly) {
     if ((path == null) || !path.exists()) return false;
     boolean success = true;
     try {
@@ -438,7 +448,9 @@ public final class FileUtils {
           }
         }
       }
-      if (!path.delete()) success = false;
+      if (!childrenOnly) {
+        if (!path.delete()) success = false;
+      }
     } catch (Exception e) {
       success = false;
     }

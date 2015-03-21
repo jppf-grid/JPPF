@@ -21,7 +21,7 @@ package org.jppf.process;
 import java.io.EOFException;
 import java.net.Socket;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -38,7 +38,7 @@ public class LauncherListener extends Thread {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The port on which to listen for the launcher signals.
    */

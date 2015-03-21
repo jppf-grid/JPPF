@@ -18,8 +18,7 @@
 
 package org.jppf.management.generated;
 
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.TypedProperties;
 

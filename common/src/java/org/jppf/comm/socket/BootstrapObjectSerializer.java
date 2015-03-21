@@ -21,7 +21,7 @@ package org.jppf.comm.socket;
 import java.io.*;
 
 import org.jppf.serialization.*;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.streams.JPPFByteArrayOutputStream;
 
 /**

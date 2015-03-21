@@ -21,7 +21,7 @@ package org.jppf.serialization;
 import java.io.*;
 
 import org.jppf.JPPFError;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -65,7 +65,7 @@ public interface JPPFSerialization {
     /**
      * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
      */
-    private static boolean debugEnabled = log.isDebugEnabled();
+    private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
     /**
      * The serialization to use.
      */

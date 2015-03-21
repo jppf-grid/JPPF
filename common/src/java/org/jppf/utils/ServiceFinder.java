@@ -38,7 +38,7 @@ public class ServiceFinder {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.

@@ -21,7 +21,7 @@ package org.jppf.execute;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -36,7 +36,7 @@ public class ThreadManagerForkJoin extends AbstractThreadManager {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The thread pool that really processes the tasks
    */

@@ -21,6 +21,7 @@ package org.jppf.security;
 import java.security.*;
 import java.util.*;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public class JPPFPermissions extends PermissionCollection
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of permissions in this collection.
    */

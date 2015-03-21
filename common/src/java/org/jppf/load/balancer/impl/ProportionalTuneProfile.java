@@ -38,7 +38,7 @@ public class ProportionalTuneProfile extends AbstractAutoTuneProfile
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * A default profile with default parameter values.
    */

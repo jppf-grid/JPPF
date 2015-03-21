@@ -19,6 +19,7 @@ package org.jppf.scripting;
 
 import java.util.*;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -33,7 +34,7 @@ public final class ScriptRunnerFactory {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of languages to associated pool of engines.
    */

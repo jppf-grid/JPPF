@@ -22,7 +22,7 @@ import java.util.*;
 
 import javax.management.*;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.hooks.*;
 import org.slf4j.*;
 
@@ -39,7 +39,7 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Keeps a list of MBeans registered with the MBean server.
    */
@@ -57,8 +57,8 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
    * @param server the MBean server on which to register.
    * @throws Exception if the registration failed.
    */
-  public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final MBeanServer server, final Object...createParams) throws Exception {
-    this.server = server;
+  public JPPFMBeanProviderManager(final Class<S> clazz, final ClassLoader cl, final Object server, final Object...createParams) throws Exception {
+    this.server = (MBeanServer) server;
     ClassLoader tmp = Thread.currentThread().getContextClassLoader();
     ClassLoader loader = cl == null ? tmp : cl;
     if (loader == null) loader = getClass().getClassLoader();

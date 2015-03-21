@@ -19,7 +19,7 @@
 package org.jppf.management;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
 
 import org.jppf.node.policy.ExecutionPolicy;
 

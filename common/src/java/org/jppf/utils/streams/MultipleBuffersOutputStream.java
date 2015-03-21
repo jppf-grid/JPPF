@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.io.IO;
-import org.jppf.utils.JPPFBuffer;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -39,7 +39,7 @@ public class MultipleBuffersOutputStream extends OutputStream
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */

@@ -19,7 +19,7 @@
 package org.jppf.utils;
 
 import java.io.Closeable;
-import java.util.*;
+import java.util.Collection;
 
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -38,7 +38,7 @@ public class CloseableHandler
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Name for the set of driver closeables.
    */

@@ -19,13 +19,9 @@
 package org.jppf.management.generated;
 
 import java.util.Map;
+
 import org.jppf.classloader.DelegationModel;
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.management.JPPFNodeAdminMBean;
-import org.jppf.management.JPPFNodeState;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.management.NodePendingAction;
+import org.jppf.management.*;
 
 /**
  * Generated static proxy for the {@link org.jppf.management.JPPFNodeAdminMBean} MBean interface.

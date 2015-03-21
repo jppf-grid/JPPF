@@ -18,7 +18,7 @@
 
 package org.jppf.comm.discovery;
 
-import java.io.*;
+import java.io.Closeable;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -40,7 +40,7 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The UDP sockets to broadcast to, each bound to a different network interface.
    */

@@ -39,7 +39,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace-level logging is enabled.
    */

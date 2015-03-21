@@ -41,7 +41,7 @@ public class JPPFBundlerFactory
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * This enum defines the available default load balancing configurations.
    * @exclude

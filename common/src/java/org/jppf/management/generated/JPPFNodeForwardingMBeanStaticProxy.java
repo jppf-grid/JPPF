@@ -19,10 +19,9 @@
 package org.jppf.management.generated;
 
 import java.util.Map;
+
 import org.jppf.classloader.DelegationModel;
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.management.NodeSelector;
+import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 
 /**

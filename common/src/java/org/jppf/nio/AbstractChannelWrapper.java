@@ -20,7 +20,7 @@ package org.jppf.nio;
 
 import static java.nio.channels.SelectionKey.*;
 
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.ThreadSynchronization;
 

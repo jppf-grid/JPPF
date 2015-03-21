@@ -20,7 +20,7 @@ package org.jppf.node.policy;
 import java.net.*;
 import java.util.*;
 
-import org.jppf.net.*;
+import org.jppf.net.IPv6AddressNetmask;
 import org.jppf.utils.*;
 import org.slf4j.*;
 

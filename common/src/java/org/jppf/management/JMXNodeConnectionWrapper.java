@@ -38,7 +38,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize a local connection to the MBean server.

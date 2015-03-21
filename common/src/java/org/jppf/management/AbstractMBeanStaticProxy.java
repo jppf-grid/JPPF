@@ -20,6 +20,7 @@ package org.jppf.management;
 
 import javax.management.*;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -34,7 +35,7 @@ public class AbstractMBeanStaticProxy {
   /**
    * Determines whether debug log statements are enabled.
    */
-  protected static boolean debugEnabled = log.isDebugEnabled();
+  protected static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The JMX connection used to invoke remote MBean methods.
    */
@@ -145,7 +146,7 @@ public class AbstractMBeanStaticProxy {
    */
   public MBeanNotificationInfo[] getNotificationInfo() {
     try {
-      return connection.getNotificationInfo(mbeanName);
+      return (MBeanNotificationInfo[]) connection.getNotificationInfo(mbeanName);
     } catch (Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error getting MBeanNotificationInfo[]", e);
     }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 import javax.script.*;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
 import org.slf4j.*;
 
@@ -38,7 +38,7 @@ public class ScriptRunnerImpl implements ScriptRunner {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Map of precompiled scripts.
    */

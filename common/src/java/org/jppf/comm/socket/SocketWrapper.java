@@ -21,7 +21,7 @@ import java.io.*;
 import java.net.Socket;
 
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * This interface is common to all classes wrapping an underlying socket connections.<br>

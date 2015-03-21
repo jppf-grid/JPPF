@@ -20,6 +20,7 @@ package org.jppf.utils.pooling;
 
 import java.nio.ByteBuffer;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public class DirectBufferPool
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * 
    */

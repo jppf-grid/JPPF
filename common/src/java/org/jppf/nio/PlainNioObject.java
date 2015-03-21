@@ -21,6 +21,7 @@ package org.jppf.nio;
 import java.nio.channels.SocketChannel;
 
 import org.jppf.io.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public class PlainNioObject extends AbstractNioObject
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Where to read the data from (a socket channel)
    */

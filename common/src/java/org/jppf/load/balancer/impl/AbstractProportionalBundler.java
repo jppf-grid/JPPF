@@ -21,6 +21,7 @@ package org.jppf.load.balancer.impl;
 import java.util.*;
 
 import org.jppf.load.balancer.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -45,7 +46,7 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether debugging level is set for logging.
    */

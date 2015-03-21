@@ -21,7 +21,7 @@ package org.jppf.utils.configuration;
 import java.util.Set;
 import java.util.regex.*;
 
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,7 +40,7 @@ public class SubstitutionsHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace log statements are enabled.
    */

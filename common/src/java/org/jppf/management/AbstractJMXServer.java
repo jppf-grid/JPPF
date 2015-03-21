@@ -23,6 +23,7 @@ import java.util.concurrent.locks.*;
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -40,7 +41,7 @@ public abstract class AbstractJMXServer implements JMXServer
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to synchronize lookup for available port.
    */

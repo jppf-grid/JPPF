@@ -23,7 +23,7 @@ import static org.jppf.node.idle.IdleState.*;
 import java.util.*;
 
 import org.jppf.JPPFError;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -38,7 +38,7 @@ class IdleDetectionTask extends TimerTask {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The time of inactivity after which the system is considered idle, in milliseconds.
    */

@@ -19,7 +19,7 @@
 package org.jppf.process;
 
 /**
- * Interface for handling actions received from a {@link Launcher Listener}.
+ * Interface for handling actions received from a {@link LauncherListener}.
  * @author Laurent Cohen
  * @since 5.0
  * @exclude

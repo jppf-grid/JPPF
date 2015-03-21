@@ -21,7 +21,7 @@ package org.jppf.comm.recovery;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -38,7 +38,7 @@ public class Reaper
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Size of the reaper thread pool.
    */

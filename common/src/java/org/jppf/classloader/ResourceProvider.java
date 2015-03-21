@@ -116,7 +116,7 @@ public interface ResourceProvider {
     /**
      * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
      */
-    private static boolean debugEnabled = log.isDebugEnabled();
+    private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
     /**
      * Construct a resource provider based on the JPPF configuration.
      * @return an {@link AbstractResourceProvider} implementation.

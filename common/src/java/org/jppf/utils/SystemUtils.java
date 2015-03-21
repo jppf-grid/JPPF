@@ -21,13 +21,11 @@ package org.jppf.utils;
 import static org.jppf.utils.PropertyType.*;
 
 import java.io.File;
-import java.lang.management.*;
+//import java.lang.management.*;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
-
-import javax.management.*;
 
 import org.slf4j.*;
 
@@ -40,11 +38,12 @@ public final class SystemUtils {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NetworkUtils.class);
+  private static Logger log = LoggerFactory.getLogger(SystemUtils.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  //private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = true;
   /**
    * Singleton holding the unchanging system properties.
    */
@@ -85,20 +84,6 @@ public final class SystemUtils {
    * Holds and manages the shutdown hooks set on the JVM.
    */
   private static Map<String, Thread> shutdownHooks = new Hashtable<>();
-  /**
-   * The platform MBean server.
-   */
-  private static final MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-  /**
-   * The name of the operating system MXBean.
-   */
-  private static ObjectName OS_MXBEAN_NAME = null;
-  static {
-    try {
-      OS_MXBEAN_NAME = new ObjectName("java.lang", "type", "OperatingSystem");
-    } catch (Exception e) {
-    }
-  }
 
   /**
    * Instantiation of this class is not permitted.
@@ -165,14 +150,17 @@ public final class SystemUtils {
       props.setProperty("totalMemory", s);
       s = String.valueOf(Runtime.getRuntime().maxMemory());
       props.setProperty("maxMemory", s);
-      RuntimeMXBean rtMXBean = ManagementFactory.getRuntimeMXBean();
-      s = String.valueOf(rtMXBean.getStartTime());
-      props.setProperty("startTime", s);
-      s = String.valueOf(rtMXBean.getUptime());
-      props.setProperty("uptime", s);
-      s = String.valueOf(rtMXBean.getInputArguments());
-      props.setProperty("inputArgs", s);
-    } catch(SecurityException e) {
+      if (ManagementUtils.isManagementAvailable()) {
+        Object mbeanServer = ManagementUtils.getPlatformServer();
+        String mbeanName = "java.lang:type=Runtime";
+        s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "StartTime"));
+        props.setProperty("startTime", s);
+        s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "Uptime"));
+        props.setProperty("uptime", s);
+        s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "InputArguments"));
+        props.setProperty("inputArgs", s);
+      }
+    } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
     }
@@ -336,18 +324,26 @@ public final class SystemUtils {
   public static int getPID() {
     int pid = -1;
     // we expect the name to be in '<pid>@hostname' format - this is JVM dependent
-    String name = ManagementFactory.getRuntimeMXBean().getName();
-    int idx = name.indexOf('@');
-    if (idx >= 0) {
-      String sub = name.substring(0, idx);
-      try {
-        pid = Integer.valueOf(sub);
-        if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
-      } catch (Exception e) {
-        String msg = "could not parse '" + sub +"' into a valid integer pid : " + ExceptionUtils.getMessage(e);
-        if (debugEnabled) log.debug(msg, e);
-        else log.warn(msg);
+    //String name = ManagementFactory.getRuntimeMXBean().getName();
+    try {
+      if (ManagementUtils.isManagementAvailable()) {
+        String name = String.valueOf(ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=Runtime", "Name"));
+        int idx = name.indexOf('@');
+        if (idx >= 0) {
+          String sub = name.substring(0, idx);
+          try {
+            pid = Integer.valueOf(sub);
+            if (debugEnabled) log.debug("process name=" + name + ", pid=" + pid);
+          } catch (Exception e) {
+            String msg = "could not parse '" + sub +"' into a valid integer pid : " + ExceptionUtils.getMessage(e);
+            if (debugEnabled) log.debug(msg, e);
+            else log.warn(msg);
+          }
+        }
       }
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      else log.warn(e.getMessage());
     }
     return pid;
   }
@@ -361,7 +357,6 @@ public final class SystemUtils {
     shutdownHooks.put(key, hook);
     Runtime.getRuntime().addShutdownHook(hook);
   }
-
 
   /**
    * Add the specified shutdown hook with the specified key.
@@ -386,30 +381,31 @@ public final class SystemUtils {
   }
 
   /**
-   * Get the avaialble physical ram information for the local machine.
+   * Get the available physical ram information for the local machine.
    * @return the memory information eelements as a {@link TypedProperties} instance.
    */
   public static TypedProperties getOS() {
     if (os == null) {
       os = new TypedProperties();
-      try {
-        ObjectName on = new ObjectName("java.lang", "type", "OperatingSystem");
-        capture("TotalPhysicalMemorySize", os, LONG);
-        capture("FreePhysicalMemorySize", os, LONG);
-        capture("TotalSwapSpaceSize", os, LONG);
-        capture("FreeSwapSpaceSize", os, LONG);
-        capture("CommittedVirtualMemorySize", os, LONG);
-        //capture("ProcessCpuLoad", os, DOUBLE);
-        capture("ProcessCpuTime", os, LONG);
-        //capture("SystemCpuLoad", os, DOUBLE);
-        capture("Name", os, STRING);
-        capture("Version", os, STRING);
-        capture("Arch", os, STRING);
-        capture("AvailableProcessors", os, INT);
-        //capture("SystemLoadAverage", os, DOUBLE);
-      } catch(Exception e) {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.info(e.getMessage());
+      if (ManagementUtils.isManagementAvailable()) {
+        try {
+          capture("TotalPhysicalMemorySize", os, LONG);
+          capture("FreePhysicalMemorySize", os, LONG);
+          capture("TotalSwapSpaceSize", os, LONG);
+          capture("FreeSwapSpaceSize", os, LONG);
+          capture("CommittedVirtualMemorySize", os, LONG);
+          //capture("ProcessCpuLoad", os, DOUBLE);
+          capture("ProcessCpuTime", os, LONG);
+          //capture("SystemCpuLoad", os, DOUBLE);
+          capture("Name", os, STRING);
+          capture("Version", os, STRING);
+          capture("Arch", os, STRING);
+          capture("AvailableProcessors", os, INT);
+          //capture("SystemLoadAverage", os, DOUBLE);
+        } catch(Exception e) {
+          if (debugEnabled) log.debug(e.getMessage(), e);
+          else log.info(e.getMessage());
+        }
       }
     }
     return os;
@@ -422,10 +418,12 @@ public final class SystemUtils {
    * @param type the type of the attribute.
    */
   private static void capture(final String name, final TypedProperties props, final PropertyType type) {
+    if (!ManagementUtils.isManagementAvailable()) return;
     Object value = null;
     try {
-      value = mbeanServer.getAttribute(OS_MXBEAN_NAME, name);
+      value = ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=OperatingSystem", name);
     } catch(Exception ignore) {
+      return;
     }
     switch(type) {
       case INT:

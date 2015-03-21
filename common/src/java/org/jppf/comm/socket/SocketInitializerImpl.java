@@ -36,7 +36,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */

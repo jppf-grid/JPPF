@@ -29,7 +29,7 @@ import javax.net.ssl.*;
 
 import org.jppf.io.IO;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.JPPFIdentifiers;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -54,7 +54,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * the selector of all socket channels open with providers or nodes.
    */

@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.scripting.*;
-import org.jppf.utils.*;
+import org.jppf.utils.FileUtils;
 
 /**
  * A task implementation which executes a script in a specified JSR 223 ({@code javax.script} APIs) script language.

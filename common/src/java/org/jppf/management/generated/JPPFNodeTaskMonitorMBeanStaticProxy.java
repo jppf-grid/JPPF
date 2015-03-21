@@ -18,9 +18,7 @@
 
 package org.jppf.management.generated;
 
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.management.JPPFNodeTaskMonitorMBean;
+import org.jppf.management.*;
 
 /**
  * Generated static proxy for the {@link org.jppf.management.JPPFNodeTaskMonitorMBean} MBean interface.

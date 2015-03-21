@@ -19,7 +19,7 @@
 package org.jppf.node.policy;
 
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.utils.PropertiesCollection;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -35,7 +35,7 @@ public class PolicyRuleTest extends ExecutionPolicy
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Determines whether this policy accepts the specified node.

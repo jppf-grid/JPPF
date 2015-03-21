@@ -22,7 +22,7 @@ import java.net.*;
 
 import org.jppf.JPPFException;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 
 /**
  * This class provides a simple API to transfer objects over a TCP socket connection.

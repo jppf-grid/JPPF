@@ -41,7 +41,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The interval between two computations in milliseconds.
    * Taken from the value of configuration property "jppf.cpu.load.compuation.interval".

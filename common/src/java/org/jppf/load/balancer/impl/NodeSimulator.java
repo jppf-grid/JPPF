@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.load.balancer.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ public class NodeSimulator
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * 
    */

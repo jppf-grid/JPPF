@@ -20,7 +20,7 @@ package org.jppf.execute;
 
 import java.util.concurrent.*;
 
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -36,7 +36,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The thread pool that really processes the tasks
    */
@@ -52,7 +52,7 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
    */
   public ThreadManagerThreadPool(final int poolSize) {
     super();
-    threadFactory = new JPPFThreadFactory(THREAD_NAME_PREFIX, CpuTimeCollector.isCpuTimeEnabled());
+    threadFactory = new JPPFThreadFactory(THREAD_NAME_PREFIX, isCpuTimeEnabled());
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     threadPool = new ThreadPoolExecutor(poolSize, poolSize, Long.MAX_VALUE, TimeUnit.MICROSECONDS, queue, threadFactory) {
       @Override

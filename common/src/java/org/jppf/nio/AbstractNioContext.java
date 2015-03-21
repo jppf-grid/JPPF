@@ -18,6 +18,7 @@
 
 package org.jppf.nio;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -34,7 +35,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The current state of the channel this context is associated with.
    */

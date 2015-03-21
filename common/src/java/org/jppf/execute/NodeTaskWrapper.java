@@ -86,17 +86,23 @@ public class NodeTaskWrapper implements Runnable {
    * The class loader that was used to load the task class.
    */
   private final ClassLoader taskClassLoader;
+  /**
+   * Whether cpu time is supported/enabled.
+   */
+  private final boolean cpuTimeEnabled;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
    * @param task the task to execute within a try/catch block.
    * @param taskClassLoader the class loader that was used to load the task class.
    * @param timeoutHandler handles the timeout for this task.
+   * @param cpuTimeEnabled whether cpu time is supported/enabled.
    */
-  public NodeTaskWrapper(final Task task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler) {
+  public NodeTaskWrapper(final Task task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler, final boolean cpuTimeEnabled) {
     this.task = task;
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
+    this.cpuTimeEnabled = cpuTimeEnabled;
   }
 
   /**

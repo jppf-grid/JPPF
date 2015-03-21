@@ -18,38 +18,26 @@
 
 package org.jppf.execute;
 
-import java.lang.management.*;
+import org.jppf.utils.ManagementUtils;
 
 /**
  * 
  * @author Laurent Cohen
  * @exclude
  */
-public class CpuTimeCollector
-{
-  /**
-   * The platform MBean used to gather statistics about the JVM threads.
-   */
-  protected static ThreadMXBean threadMXBean = null;
+public class CpuTimeCollector {
   /**
    * Determines whether the thread cpu time measurement is supported and enabled.
    */
-  protected static boolean cpuTimeEnabled = false;
-  static
-  {
-    threadMXBean = ManagementFactory.getThreadMXBean();
-    cpuTimeEnabled = threadMXBean.isThreadCpuTimeSupported();
-    if (cpuTimeEnabled) threadMXBean.setThreadCpuTimeEnabled(true);
-  }
+  protected static boolean cpuTimeEnabled = ManagementUtils.isCpuTimeEnabled();
 
   /**
    * Computes the CPU time used by thread identified by threadID.
    * @param threadID the thread ID.
    * @return a <code>NodeExecutionInfo</code> instance.
    */
-  public static ExecutionInfo computeExecutionInfo(final long threadID)
-  {
-    return (!cpuTimeEnabled) ? new ExecutionInfo() : new ExecutionInfo(threadMXBean.getThreadCpuTime(threadID), threadMXBean.getThreadUserTime(threadID));
+  public static ExecutionInfo computeExecutionInfo(final long threadID) {
+    return (!cpuTimeEnabled) ? new ExecutionInfo() : new ExecutionInfo(ManagementUtils.getThreadCpuTime(threadID), ManagementUtils.getThreadUserTime(threadID));
   }
 
   /**
@@ -57,17 +45,15 @@ public class CpuTimeCollector
    * @param threadId the id of the thread to the cpu time from.
    * @return the cpu time as a long value.
    */
-  public static long getCpuTime(final long threadId)
-  {
-    return cpuTimeEnabled ? threadMXBean.getThreadCpuTime(threadId) : -1L;
+  public static long getCpuTime(final long threadId) {
+    return cpuTimeEnabled ? ManagementUtils.getThreadCpuTime(threadId) : -1L;
   }
 
   /**
    * Determines whether the thread cpu time measurement is supported and enabled.
    * @return true is cpu time measurement is enabled, false otherwise.
    */
-  public static boolean isCpuTimeEnabled()
-  {
+  public static boolean isCpuTimeEnabled() {
     return cpuTimeEnabled;
   }
 }

@@ -24,7 +24,7 @@ import java.nio.channels.SocketChannel;
 
 import org.jppf.io.IO;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
 /**

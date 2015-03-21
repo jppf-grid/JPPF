@@ -28,6 +28,7 @@ import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.job.management.*;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -45,7 +46,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Signature of the method that registers a node forwarding listener.
    */

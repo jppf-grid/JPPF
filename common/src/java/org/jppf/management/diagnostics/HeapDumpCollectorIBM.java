@@ -21,6 +21,7 @@ package org.jppf.management.diagnostics;
 import java.lang.reflect.Method;
 
 import org.jppf.JPPFException;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -37,7 +38,7 @@ public class HeapDumpCollectorIBM implements HeapDumpCollector
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The method to invoke to get a heap dump.
    */

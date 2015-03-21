@@ -20,7 +20,7 @@ package org.jppf.data.transform;
 
 import java.io.*;
 
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.jppf.utils.streams.*;
 import org.slf4j.*;
 
@@ -41,7 +41,7 @@ public class JPPFDataTransformFactory
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The transform class specified in the configuration.
    */

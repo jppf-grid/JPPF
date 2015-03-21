@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.jppf.io.*;
 import org.jppf.serialization.SerializationUtils;
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -39,7 +40,7 @@ public abstract class AbstractNioMessage implements NioMessage {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The current count of bytes sent or received.
    */

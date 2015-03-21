@@ -18,6 +18,7 @@
 package org.jppf.load.balancer.impl;
 
 import org.jppf.load.balancer.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -41,7 +42,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
   /**
    * Determines whether debugging level is set for logging.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace level is set for logging.
    */

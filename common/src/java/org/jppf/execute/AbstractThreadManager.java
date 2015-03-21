@@ -28,6 +28,10 @@ public abstract class AbstractThreadManager implements ThreadManager {
    * Prefix used for the names of the threads created by the executor.
    */
   public static final String THREAD_NAME_PREFIX = "Processing";
+  /**
+   * Determines whether CPU time measurement is supported for the current JVM.
+   */
+  private final static boolean cpuTimeEnabled = determineCpuTimeEnabled();
 
   /**
    * Initialize this execution manager with the specified node.
@@ -61,6 +65,18 @@ public abstract class AbstractThreadManager implements ThreadManager {
 
   @Override
   public boolean isCpuTimeEnabled() {
-    return CpuTimeCollector.isCpuTimeEnabled();
+    return cpuTimeEnabled;
+  }
+
+  /**
+   * Determine whether CPU time measurement is supported for the current JVM.
+   * @return {@code true} if CPU time measurement is supported, {@code false} otherwise.
+   */
+  private static boolean determineCpuTimeEnabled() {
+    try {
+      return CpuTimeCollector.isCpuTimeEnabled();
+    } catch(Exception|NoClassDefFoundError e) {
+      return false;
+    }
   }
 }

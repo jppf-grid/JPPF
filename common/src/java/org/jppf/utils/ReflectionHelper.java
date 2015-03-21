@@ -36,7 +36,7 @@ public final class ReflectionHelper {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Invoke a method using reflection.

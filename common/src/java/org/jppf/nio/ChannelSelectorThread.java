@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -34,7 +34,7 @@ public class ChannelSelectorThread extends ThreadSynchronization implements Runn
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The channel selector associated with this thread.
    */

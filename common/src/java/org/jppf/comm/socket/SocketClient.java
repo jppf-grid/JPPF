@@ -21,7 +21,7 @@ import java.net.Socket;
 
 import org.jppf.JPPFException;
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFBuffer;
 import org.slf4j.*;
 
 /**

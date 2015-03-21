@@ -45,7 +45,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Timer managing the tasks timeout.
    */
@@ -162,7 +162,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
         for (Task task : taskList) {
           if (!(task instanceof JPPFExceptionResult)) {
             if (task instanceof AbstractTask) ((AbstractTask) task).setExecutionDispatcher(taskNotificationDispatcher);
-            NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler);
+            NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler, threadManager.isCpuTimeEnabled());
             taskWrapperList.add(taskWrapper);
             Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
             count++;

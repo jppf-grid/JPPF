@@ -19,10 +19,8 @@
 package org.jppf.management.generated;
 
 import org.jppf.job.JobInformation;
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.server.job.management.NodeJobInformation;
+import org.jppf.management.*;
+import org.jppf.server.job.management.*;
 
 /**
  * Generated static proxy for the {@link org.jppf.server.job.management.DriverJobManagementMBean} MBean interface.

@@ -38,7 +38,7 @@ public class ScriptedPolicy extends ExecutionPolicy {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The script language to use.
    */

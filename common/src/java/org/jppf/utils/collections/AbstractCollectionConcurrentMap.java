@@ -19,7 +19,7 @@
 package org.jppf.utils.collections;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A {@link ConcurrentHashMap} whose values are {@link Collection} instances (specialized in concrete subclasses).

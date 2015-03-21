@@ -43,7 +43,7 @@ public class JMXMPServer extends AbstractJMXServer {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * An ordered set of configuration properties to use for looking up the desired management port.
    */

@@ -38,7 +38,7 @@ public class FileReplacer {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private boolean debugEnabled = log.isDebugEnabled();
+  private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   //private boolean debugEnabled = true;
   /**
    * File containing the content to replace.

@@ -37,7 +37,7 @@ public class IdleDetector implements Runnable {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * A timer that runs a periodic task that determines whether the computer is idle or not.
    */

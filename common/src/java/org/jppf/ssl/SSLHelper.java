@@ -46,7 +46,7 @@ public final class SSLHelper {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of identifiers to corresponding SSL configuration.
    */

@@ -18,7 +18,7 @@
 
 package org.jppf.doc;
 
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 import org.jppf.JPPFException;

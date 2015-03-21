@@ -18,12 +18,8 @@
 
 package org.jppf.management.generated;
 
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.management.diagnostics.DiagnosticsMBean;
-import org.jppf.management.diagnostics.HealthSnapshot;
-import org.jppf.management.diagnostics.MemoryInformation;
-import org.jppf.management.diagnostics.ThreadDump;
+import org.jppf.management.*;
+import org.jppf.management.diagnostics.*;
 
 /**
  * Generated static proxy for the {@link org.jppf.management.diagnostics.DiagnosticsMBean} MBean interface.

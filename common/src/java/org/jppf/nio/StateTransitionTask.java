@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -36,7 +36,7 @@ public class StateTransitionTask<S extends Enum<S>, T extends Enum<T>> implement
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether TRACE logging level is enabled.
    */
