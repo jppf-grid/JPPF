@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Initialization Hook sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					<p>This sample demonstrates the use of a node initialization hook to implement a failover mechanism for the connection to the server.
@@ -80,6 +80,6 @@ Node successfully initialized</pre>
 						<li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

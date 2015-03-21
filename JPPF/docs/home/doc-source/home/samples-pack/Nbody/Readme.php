@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Parallel N-body Sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					<p>This sample is a parallel implementation of the <a href="http://en.wikipedia.org/wiki/N-body_problem" alt="N_body on Wikipedia">N-body problem</a> for simulating the motion of anti-protons trapped in a magnetic field.<br>
@@ -45,6 +45,6 @@ nbody.bodies.per.task = 25
 						<li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

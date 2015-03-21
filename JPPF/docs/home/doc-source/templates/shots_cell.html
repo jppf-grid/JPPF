@@ -1,13 +1,6 @@
-#-----------------------------------#
-#         template start            #
-#-----------------------------------#
-
 <td align="center">
-								<a href="screenshots.php?screenshot=${image}&shotTitle=${shot_title}">
-									<img src="screenshots/${thumbnail}" border="0" alt="screenshot"/>
-								</a>
-							</td>
-
-#-----------------------------------#
-#          template end             #
-#-----------------------------------#
+  <a name="pic_${picnum}"></a>
+  <a href="screenshots.php?screenshot=${image}&shotTitle=${shot_title}&height=${height}&picnum=${picnum}" target="_parent">
+    <img src="screenshots/${thumbnail}" border="0" alt="screenshot"/>
+  </a>
+</td>

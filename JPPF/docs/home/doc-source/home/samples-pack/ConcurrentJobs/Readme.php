@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Concurrent Jobs demo"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h3>What does the sample do?</h3>
           <p>This sample demonstrates fully working implementations of the patterns explored in the <a href="http://www.jppf.org/doc/v4/index.php?title=Submitting_multiple_jobs_concurrently"><i>Submitting multiple jobs concurrently</i></a> section of the documentation.
@@ -45,6 +45,6 @@ $template{name="samples-page-header" title="Concurrent Jobs demo"}$
             <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

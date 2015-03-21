@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Data Dependency sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					<p>This sample simulates near real-time updates of a portfolio, based on simulated "live" events from financial markets.
@@ -133,6 +133,6 @@ snapshotInterval = 3250</pre>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

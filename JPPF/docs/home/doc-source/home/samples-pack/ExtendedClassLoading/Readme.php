@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Extended Class Loading sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h4 style="margin: 0px">Quick navigation</h4>
           <table border="0" cellspacing="2px">
@@ -162,6 +162,6 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
             <li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

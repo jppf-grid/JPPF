@@ -3,9 +3,8 @@
 $template{name="about-page-header" title="Press Kit"}$
 
 <div align="justify">
-
   <h1>JPPF Press Kit</h1>
-
+  <div class="blockWithHighlightedTitle">
   <h3>Content</h3>
   <div class="u_link" style="margin-left: 10px">
     <a href="/release_notes.php?version=<?php echo $jppfVersion ?>">Text of the original release</a><br>
@@ -15,8 +14,10 @@ $template{name="about-page-header" title="Press Kit"}$
     <a href="#license">License</a><br>
     <a href="#contacts">Contacts</a><br>
   </div>
-
   <br>
+  </div>
+
+  <br><div class="blockWithHighlightedTitle">
   <a name="original_release"></a>
 
 <!-- ============================== -->
@@ -76,32 +77,58 @@ $template{name="title-with-icon" img="images/icons/news.png" title="Press releas
 <!-- ============================== -->
 <!-- end version-specific content   -->
 <!-- ============================== -->
-
-<a name="features"></a>
-  $template{name="title-with-icon" img="images/icons/view-list.png" title="Features" heading="h3"}$
-  <div class="u_link" style="margin-left: 10px">
-    <a href="release_notes.php?version=<?php echo $jppfVersion ?>">Release notes</a>: see everything that's new in JPPF <?php echo $jppfVersion ?><br>
-    Our <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.<br>
+  <br>
   </div>
 
-  <a name="downloads"></a>
-  $template{name="title-with-icon" img="images/icons/download.png" title="Downloads" heading="h3"}$
-  All files can be found from our <a href="/downloads.php">downloads page</a>.<br>
+  <div class="column_left" style="text-align: justify">
 
-  <a name="documentation"></a>
-  $template{name="title-with-icon" img="images/icons/documentation.png" title="Documentation" heading="h3"}$
+    <br><div class="blockWithHighlightedTitle">
+    <a name="features"></a>
+    $template{name="title-with-icon" img="images/icons/view-list.png" title="Features" heading="h3"}$
+    <div class="u_link" style="margin-left: 10px">
+      <a href="release_notes.php?version=<?php echo $jppfVersion ?>">Release notes</a>: see everything that's new in JPPF <?php echo $jppfVersion ?><br>
+      Our <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.<br>
+    </div>
+    <br>
+    </div>
+    <br>
 
-  The JPPF documentation can be found <a href="/doc/v5">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
+    <br><div class="blockWithHighlightedTitle">
+    <a name="license"></a>
+    $template{name="title-with-icon" img="images/icons/document-sign.png" title="License" heading="h3"}$
+    <p>JPPF is released under the terms of the <a href="/license.php">Apachache v2.0</a> license.
+    This <a href="http://www.opensource.org">OSI-approved</a> open source license is friendly to individuals, businesses, governments and academia, for commercial and non-commercial purposes.
+    It does not restrict the use of JPPF with commercial and proprietary applications.
+    <br>
+    </div>
 
-  <a name="license"></a>
-  $template{name="title-with-icon" img="images/icons/document-sign.png" title="License" heading="h3"}$
-  JPPF is released under the terms of the <a href="/license.php">Apachache v2.0</a> license.
-  This <a href="http://www.opensource.org">OSI-approved</a> open source license is friendly to individuals, businesses, governments and academia, for commercial and non-commercial purposes.
-  It does not restrict the use of JPPF with commercial and proprietary applications.
+  </div>
 
-  <a name="contacts"></a>
-  $template{name="title-with-icon" img="images/icons/contact.png" title="Contacts" heading="h3"}$
-  For any press inquiry, please refer to our <a href="/contacts.php">contacts</a> page.
+  <div class="column_right" style="text-align: justify">
+
+    <br><div class="blockWithHighlightedTitle">
+    <a name="downloads"></a>
+    $template{name="title-with-icon" img="images/icons/download.png" title="Downloads" heading="h3"}$
+    All files can be found from our <a href="/downloads.php">downloads page</a>.<br>
+    <br>
+    </div>
+
+    <br><div class="blockWithHighlightedTitle">
+    <a name="documentation"></a>
+    $template{name="title-with-icon" img="images/icons/documentation.png" title="Documentation" heading="h3"}$
+    <p>The JPPF documentation can be found <a href="/doc/v5">online</a>. You may also read it offline as <a href="/documents/JPPF-User-Guide.pdf">a PDF document</a>.
+    <br>
+    </div>
+
+    <br><div class="blockWithHighlightedTitle">
+    <a name="contacts"></a>
+    $template{name="title-with-icon" img="images/icons/contact.png" title="Contacts" heading="h3"}$
+    <p>For any press inquiry, please refer to our <a href="/contacts.php">contacts</a> page.
+    <br>
+    </div>
+    <br>
+
+  </div>
 
 </div>
 

@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Pluggable View Demo"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h3>What does the sample do?</h3>
           This sample demonstrates a <a href="">pluggable view</a> integrated into the JPPF administration and monitoring tool. The view shows a log of events occurring in the JPPF grid topology.
@@ -52,6 +52,6 @@ jppf.admin.console.view.MyView.autoselect = true</pre>
             <li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

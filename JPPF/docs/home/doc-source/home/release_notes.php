@@ -6,9 +6,8 @@ $link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
 mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
 
 $version = $_REQUEST["version"];
-if (!$version)
-{
-	$version = "1.9.1";
+if (!$version) {
+	$version = "5.0";
 }
 // Performing SQL query
 $query = "SELECT * FROM news WHERE version = '" . $version . "'";
@@ -17,11 +16,10 @@ $line = mysql_fetch_array($result, MYSQL_ASSOC);
 $title = "JPPF " . $version . " Release Notes";
 ?>
 $template{name="about-page-header" title="<?php printf('%s', $title); ?>"}$
-	<h1>
-	<?php	printf('%s JPPF %s release notes', date("n/j/Y", strtotime($line["date"])), $version); ?>
-	</h1>
-	<p>
-	<?php printf("%s", $line["content"]);?>
+  <h1><?php printf('%s JPPF %s release notes', date("n/j/Y", strtotime($line["date"])), $version); ?></h1>
+  <div class="blockWithHighlightedTitle">
+	<p><?php printf("%s", $line["content"]);?>
+  </div>
 	<br>
 <?php
 // Free resultset

@@ -1,12 +1,8 @@
-    <tr>
-      <td colspan="*">$template{name="title-with-icon" img="${img}" title="${title}" heading="h4"}$</td>
-    </tr>
-    <tr>
-      <td>
-        ${contact_name}<br>
-        <a href="mailto:${mail}">${mail}</a><br>
-        ${phone}<br>
-        ${location}, ${country}<br>
-      </td>
-      <td valign="top">lives in ${country}, speaks ${languages}</td>
-    </tr>
+<div class="blockWithHighlightedTitle" style="padding-left: 5px; padding-right: 5px">
+$template{name="title-with-icon" img="${img}" title="${title}" heading="h3"}$
+<p>${contact_name}<br>
+<a href="mailto:${mail}">${mail}</a><br>
+${phone}<br>
+${location}, ${country}<br>
+lives in ${country}, speaks ${languages}
+<br></div>

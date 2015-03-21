@@ -13,16 +13,13 @@
 		<div align="center">
 		<div class="gwrapper" align="center">
 			<?php
-    if (!isset($currentPage))
-    {
+    if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
-      if (($currentPage == NULL) || ($currentPage == ""))
-      {
+      if (($currentPage == NULL) || ($currentPage == "")) {
         $currentPage = "Home";
       }
     }
-    if ($currentPage != "Forums")
-    {
+    if ($currentPage != "Forums") {
     ?>
     <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
     <?php
@@ -30,108 +27,36 @@
     ?>
     <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
       <tr style="height: 80px">
-        <td width="20"></td>
-        <td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+        <td width="15"></td>
+        <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
+        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
             <tr>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
               <td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Home")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "About")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Features")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Download")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Documentation")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Forums")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+              <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "About") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/about.php" class="<?php echo $cl; ?>">About</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Features") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/features.php" class="<?php echo $cl; ?>">Features</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Download") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/downloads.php" class="<?php echo $cl; ?>">Download</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/doc/v5" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
+<td style="width: 1px"></td>
             </tr>
           </table>
         </td>
-        <td width="20"></td>
+        <td width="15"></td>
       </tr>
     </table>
 			<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
@@ -167,7 +92,7 @@ else
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -175,12 +100,14 @@ else
         <br/>
 				</div>
 				<div class="jppf_content">
-  <p><a href="http://www.debeka.de/" class="quoteTitle">Debeka-Gruppe, Koblenz, Germany</a><br>
+  <br><div class="blockWithHighlightedTitle">
+  <p><a href="http://www.debeka.de/" class="quoteTitle">Debeka-Gruppe, Koblenz, Germany</a>
   <p align="justify">In divison "life insurance mathematics" we apply JPPF in order to spread complex calculations on our wide portfolio of life insurance contracts to numerous nodes and consequently to operate those calculations more rapidly.
   <p align="justify">In doing so, JPPF has turned out to be a high-performance framework, which is flexible and nevertheless easy to learn. Even the support by the community is outstanding, so that we will further use JPPF in the future.
   <p align="justify">With its manifold offering in insurance and financial services, the Debeka Group belongs to the top 10 class of insurance and building-savings in Germany and provides insurance-coverage for all private households.
   <p>Boris Klug, Debeka
-  <hr>
+  </div>
+  <br><div class="blockWithHighlightedTitle">
   <p><a href="http://www.sandia.gov/" class="quoteTitle">Sandia National Laboratories</a>
   <p align="justify">We have been using the JPPF since December 2007, and we have found the framework to be extremely powerful and easy to work with.
   The JPPF distributed framework has enabled us to create and maintain a network of over 140 processors for use in computationally intensive applications.
@@ -188,7 +115,8 @@ else
   The very responsive JPPF support team and user forums have been a crucial resource for answering our system related configuration issues. JPPF is a very powerful package!
   <p>Glenn Barker
   <p>Sandia National Laboratories
-  <hr>
+  </div>
+  <br><div class="blockWithHighlightedTitle">
   <p><a href="http://www.networkedinsights.com" class="quoteTitle">Networked Insights, Inc.</a>
   <p align="justify">We use JPPF on small clusters with up to 20 nodes to handle computationally expensive, non-recurring tasks that include statistical analysis, basic linguistic analysis, genetic algorithms for neural networks and classifier training.
   Not only is JPPF easy to setup and use, but the task-oriented design is very powerful yet approachable and easy to understand.
@@ -198,7 +126,8 @@ else
   Overall, we have found JPPF to be a very practical and valuable tool in our toolbox.
   <p>Sean Laurent
   <br>Networked Insights, Inc.
-  <hr>
+  </div>
+  <br><div class="blockWithHighlightedTitle">
   <p><a href="/private/Bob_Reynders-2.pdf" class="quoteTitle">Bob Reynders, graduation thesis</a>
   <p align="justify">During my work I used the JPPF framework to create a distributed computing environment for the existing Eclipse RCP application.
   To distribute existing code I always went through the process of isolating the task from other code so that it would be able to run on a separate environment.
@@ -206,11 +135,13 @@ else
   To gain optimal performance and solve class loading issues the entire framework was embedded in the [...] OSGi runtime.
   [...] JPPF is a solid framework built for transparent distributed computing in Java. It can provide many topologies through simple settings in the configuration file.
   [...] JPPF is very mature in the creation of topologies because of the driver principle. It is a framework that is designed to create topologies.
-  <hr>
+  </div>
+  <br><div class="blockWithHighlightedTitle">
   <p><a href="http://sourceforge.net/projects/djhack/" class="quoteTitle">Distributed Java HAsh craCKer</a>
   <p align="justify">JPPF has been the main framework used for the development of Distributed Java Hash Cracker project, a program designed to make brute force attacks. DJHACK carries out intensive mathematical calculations. Thanks to the ease of use of JPPF, it has been really easy to develop a distributed environment for this application. Through scalability, granularity in the configuration, and traffic monitoring tools provided by this framework, a robust and complete application has been developed. But this would not have been possible without the collaboration of JPPF developers, who have been able, through the forum, to resolve all doubts and questions that have been sent during the application development.
   <p>For all this, I can only say that JPPF is the framework for excellence in parallel computing.
   <p>Unai G&#243;mez Velasco
+  </div><br>
 </div>
 				</td>
 				</tr>

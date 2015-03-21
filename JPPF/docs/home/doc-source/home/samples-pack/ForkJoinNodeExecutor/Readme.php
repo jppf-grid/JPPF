@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Fibonacci Fork/Join sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h3>What does the sample do?</h3>
           This demo demonstrates a node add-on which replaces the standard node processing thread pool with a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ForkJoinPool.html">fork/join thread pool</a>.
@@ -46,6 +46,6 @@ fib.fj.N = 10</pre>
             <li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

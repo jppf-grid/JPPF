@@ -13,16 +13,13 @@
 		<div align="center">
 		<div class="gwrapper" align="center">
 			<?php
-    if (!isset($currentPage))
-    {
+    if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
-      if (($currentPage == NULL) || ($currentPage == ""))
-      {
+      if (($currentPage == NULL) || ($currentPage == "")) {
         $currentPage = "Home";
       }
     }
-    if ($currentPage != "Forums")
-    {
+    if ($currentPage != "Forums") {
     ?>
     <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
     <?php
@@ -30,108 +27,36 @@
     ?>
     <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
       <tr style="height: 80px">
-        <td width="20"></td>
-        <td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+        <td width="15"></td>
+        <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
+        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
             <tr>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
               <td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Home")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "About")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Features")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Download")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Documentation")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Forums")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+              <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "About") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/about.php" class="<?php echo $cl; ?>">About</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Features") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/features.php" class="<?php echo $cl; ?>">Features</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Download") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/downloads.php" class="<?php echo $cl; ?>">Download</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/doc/v5" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
+<td style="width: 1px"></td>
             </tr>
           </table>
         </td>
-        <td width="20"></td>
+        <td width="15"></td>
       </tr>
     </table>
 			<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
@@ -167,7 +92,7 @@ else
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -177,9 +102,12 @@ else
 				<div class="jppf_content">
   <h1 align="center">About</h1>
 	<div align="justify">
+    <div class="blockWithHighlightedTitle">
     <h3><img src="images/icons/help.png" class="titleWithIcon"/>What it is</h3>
 		<p>Simply put, JPPF enables applications with large processing power requirements to be run on any number of computers, in order to dramatically reduce their processing time.
 		This is done by splitting an application into smaller parts that can be executed simultaneously on different machines.
+    <br></div>
+    <br><div class="blockWithHighlightedTitle">
     <h3><img src="images/icons/how.png" class="titleWithIcon"/>How it works</h3>
 		<p>There are 2 aspects to this:
     <p><i><b>Dividing an application into smaller parts that can be executed independently and in parallel.</b></i>
@@ -189,10 +117,14 @@ else
     <br>The simplest possible JPPF Grid is made of a server, to which any number of execution nodes are attached. A node is a JPPF software component that is generally installed and running on a separate machine.
     This is commonly called a master/slave architecture, where the work is distributed by the server (aka "master") to the nodes (aka "slaves").
     In JPPF terms, a unit of work is called a "job", and its constituting "tasks" are distributed by the server among the nodes for parallel execution.
+    <br></div>
+    <br><div class="blockWithHighlightedTitle">
     <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Powered by the community</h3>
     <p>With over 10 years of active development, JPPF boasts an architecture with a proven record of reliability, performance and scalability.
     A project committed to its community, it demonstrates an outstanding support to its users and engages in a continuous conversation with them.
     Every question, issue report or feature request turns into a contribution which, in the end, benefits the whole community.
+    <br></div>
+    <br><div class="blockWithHighlightedTitle">
     <h3><img src="images/icons/default.png" class="titleWithIcon"/>Advantages</h3>
 		<p>Chief among JPPF benefits is its ease of installation, use and deployment. There is no need to spend days to write a "Hello World" application. A couple of minutes, up to a couple of hours at most, will suffice.
 		Deploying JPPF components over a cluster is as simple as copying files over FTP or any network file system.
@@ -203,10 +135,13 @@ else
 		<p>Another benefit of JPPF is a simplified, almost immediate, deployment process of your application on the grid.
 		Even though your aplication will be run on many nodes at once, you only need to deploy it in a single location.
 		By extending the Java class loading mechanism, JPPF removes most of the deployment burden from the application's life cycle, dramatically shortening the time-to-market and time-to-production.
+    <br></div>
+    <br><div class="blockWithHighlightedTitle">
     <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Outstanding features</h3>
     <p>There is a lot more to JPPF than running and deploying your applications on the grid: scalability, security, fault tolerance, load-balancing, job scheduling, monitoring and management of the grid, integration with popular platforms and frameworks,
     extensions and customization, etc. The <a href="features.php">features page</a> provides a comprenhensive overview of what JPPF has to offer.
     <p>For a complete list of everything you can do with JPPF, we invite you to consult our <a href="/doc/v5">full fledged documentation</a>.
+    <br></div>
 	</div>
 	<br>
 </div>

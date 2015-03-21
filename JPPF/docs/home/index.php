@@ -13,16 +13,13 @@
 		<div align="center">
 		<div class="gwrapper" align="center">
 			<?php
-    if (!isset($currentPage))
-    {
+    if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
-      if (($currentPage == NULL) || ($currentPage == ""))
-      {
+      if (($currentPage == NULL) || ($currentPage == "")) {
         $currentPage = "Home";
       }
     }
-    if ($currentPage != "Forums")
-    {
+    if ($currentPage != "Forums") {
     ?>
     <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
     <?php
@@ -30,108 +27,36 @@
     ?>
     <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
       <tr style="height: 80px">
-        <td width="20"></td>
-        <td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+        <td width="15"></td>
+        <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
+        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
             <tr>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
               <td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Home")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "About")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Features")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Download")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Documentation")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Forums")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+              <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "About") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/about.php" class="<?php echo $cl; ?>">About</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Features") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/features.php" class="<?php echo $cl; ?>">Features</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Download") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/downloads.php" class="<?php echo $cl; ?>">Download</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/doc/v5" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
+<td style="width: 1px"></td>
             </tr>
           </table>
         </td>
-        <td width="20"></td>
+        <td width="15"></td>
       </tr>
     </table>
 			<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
@@ -167,7 +92,7 @@ else
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -179,8 +104,10 @@ else
   <script src="scripts/tabs.min.js"></script>
   <script src="scripts/tabs.slideshow.min.js"></script>
   <script src="scripts/jppf.js"></script>
-  <div style="vertical-align: middle; height: 150px; width: 750px;">
-    <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px;">
+  <br>
+  <div class="blockWithHighlightedTitle" style="height: 163px">
+  <div style="vertical-align: middle; height: 150px; width: 750px">
+    <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px">
       <div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
       <div><img src="/images/anim/Animation_02.gif" border="0" alt="JPPF"/></div>
       <div><img src="/images/anim/Animation_03.gif" border="0" alt="JPPF"/></div>
@@ -188,6 +115,7 @@ else
       <div><img src="/images/anim/Animation_05.gif" border="0" alt="JPPF"/></div>
       <div><img src="/images/anim/Animation_06.gif" border="0" alt="JPPF"/></div>
     </div>
+  </div>
   </div>
   <div id="slidetabs" align="center">
     <a href="#"></a>
@@ -198,14 +126,17 @@ else
     <a href="#"></a>
   </div>
   <script>anim_main2();</script>
-  <div style="margin: 15px;" align="center">
+  <div align="center">
     <br/>
     <h2><i>New</i>: JPPF 5.0 is here, <a href='/release_notes.php?version=5.0'>check it out!</a></h2>
     <p style="font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
   </div>
   <div class="column_left">
+    <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/getting-started.png" class="titleWithIcon"/>Getting started</h3>
-    Take an easy start with our <a href="/doc/v3/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a>
+    Take an easy start with our <a href="/doc/v3/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
+    </div>
+    <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/easy.png" class="titleWithIcon"/>Easy and powerful</h3>
     <ul class="samplesList">
       <li>a JPPF grid can be up and running in minutes</li>
@@ -222,12 +153,15 @@ else
       <li>broad set of fully documented end-to-end demos</li>
       <li>flexible licensing with the <a href="/license.php"><b>Apache License v2.0</b></a></li>
     </ul>
+    </div>
+    <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/contribute.png" class="titleWithIcon"/>Contribute</h3>
     <b>Browse our <a href="/doc" target=_top>documentation</a></b><br>
     <b>Find support, share your ideas, in our <a href="./forums" target=_top>discussion forums</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/find/saved_search/1/search/1" target=_top>bugs database</a></b><br>
     <b>Browse and contribute to our <a href="/tracker/tbg/jppf/issues/wishlist" target=_top>feature requests database</a></b><br>
-    <b>Gain insight and provide feedback in the <a href="http://www.jroller.com/jppf/" target=_top>JPPF blog</a></b>
+    <b>Gain insight and provide feedback in the <a href="http://www.jroller.com/jppf/" target=_top>JPPF blog</a></b><br><br>
+    </div><br>
   </div>
   <div class="column_right">
     <?php
@@ -237,10 +171,10 @@ else
       $query = 'SELECT * FROM news ORDER BY date DESC';
       $result = mysql_query($query) or die('Query failed: ' . mysql_error());
     ?>
+    <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/news.png" class="titleWithIcon"/>Latest Releases</h3>
     <?php
-      for ($i=1; $i<=3; $i++)
-      {
+      for ($i=1; $i<=3; $i++) {
         $line = mysql_fetch_array($result, MYSQL_ASSOC);
         printf("<a href='news.php#news%d' style='font-size: 10pt'><span style='white-space: nowrap'>%s %s</span></a><br>", $i, date("n/j/Y", strtotime($line["date"])), $line["title"]);
       }
@@ -256,14 +190,19 @@ else
       &nbsp;&nbsp;<a href="/news.php"><b style="color: #6D78B6">All News</b></a>
     </div>
     <p><b>Follow us on <a href="http://www.twitter.com/jppfgrid"><img src="http://twitter-badges.s3.amazonaws.com/twitter-c.png" alt="Follow JPPF on Twitter" border="0"/></a></b>
+    </div>
+    <br><div align="justify" class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/personal2.png" class="titleWithIcon"/>Our users say</h3>
     <a href="quotes.php" style="text-decoration: none">... JPPF turned out to be a high-performance framework, which is flexible and nevertheless easy to learn. Even the support by the community is outstanding ...</a>
     <p><a href="quotes.php" style="text-decoration: none">... we have found the framework to be extremely powerful and easy to work with...</a>
     <p><a href="quotes.php" style="text-decoration: none">... The ability to adapt our existing technology without having to redesign or rethink entire processes is fantastic ...</a>
     <br>
+    </div>
+    <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/help-hint.png" class="titleWithIcon"/>Did you know ...</h3>
     That you can turn JPPF into a full-fledged P2P Grid?
-    Read about it <a href="http://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a>
+    Read about it <a href="http://www.jroller.com/jppf/entry/master_worker_or_p2p_grid"><b>here</b></a><br><br>
+    </div>
   </div>
 </div>
 				</td>

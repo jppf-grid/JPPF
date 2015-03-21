@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Web Crawler and Search Engine sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					This sample application performs as a web search engine. It takes a search query and performs the search starting from a specified URL.<br>
@@ -60,6 +60,6 @@ $template{name="samples-page-header" title="Web Crawler and Search Engine sample
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

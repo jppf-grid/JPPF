@@ -1,22 +1,3 @@
-#-----------------------------------#
-#         template start            #
-#-----------------------------------#
-<?php
-if ($currentPage == "${label}")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="${url}" class="headerMenuItem2">${label}</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="${url}" class="headerMenuItem">${label}</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-
-#-----------------------------------#
-#          template end             #
-#-----------------------------------#
+<?php $cl = (($currentPage == "${label}") ? "headerMenuItem2" : "headerMenuItem") . " " . "${class}"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="${url}" class="<?php echo $cl; ?>">${label}</a>&nbsp;</td>
+<td style="width: 1px"></td>

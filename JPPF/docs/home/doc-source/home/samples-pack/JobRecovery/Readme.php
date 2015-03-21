@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Job Recovery example"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					This sample demonstrates how the state of a JPPF job can be persisted on the client side, then recovered after a client crash.<br/>
@@ -49,6 +49,6 @@ loaded job 'the_job_uuid' from persistence store ...</pre>
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

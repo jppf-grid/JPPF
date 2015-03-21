@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Adaptive Grid demo"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h3>What does the sample do?</h3>
           <p>This sample dmeonstrates how a JPPF Grid can be grown or shrunk dynamically based on the current workload.
@@ -62,6 +62,6 @@ taskDuration = 1500
             <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

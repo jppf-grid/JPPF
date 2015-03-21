@@ -13,16 +13,13 @@
 		<div align="center">
 		<div class="gwrapper" align="center">
 			<?php
-    if (!isset($currentPage))
-    {
+    if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
-      if (($currentPage == NULL) || ($currentPage == ""))
-      {
+      if (($currentPage == NULL) || ($currentPage == "")) {
         $currentPage = "Home";
       }
     }
-    if ($currentPage != "Forums")
-    {
+    if ($currentPage != "Forums") {
     ?>
     <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
     <?php
@@ -30,108 +27,36 @@
     ?>
     <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
       <tr style="height: 80px">
-        <td width="20"></td>
-        <td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+        <td width="15"></td>
+        <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
+        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
             <tr>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
               <td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Home")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "About")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Features")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Download")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Documentation")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Forums")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+              <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "About") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/about.php" class="<?php echo $cl; ?>">About</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Features") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/features.php" class="<?php echo $cl; ?>">Features</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Download") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/downloads.php" class="<?php echo $cl; ?>">Download</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/doc/v5" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
+<td style="width: 1px"></td>
             </tr>
           </table>
         </td>
-        <td width="20"></td>
+        <td width="15"></td>
       </tr>
     </table>
 			<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
@@ -167,7 +92,7 @@ else
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -177,15 +102,60 @@ else
 				<div class="jppf_content">
   <h1 align="center">Downloads</h1>
   <div class="column_left" style="text-align: justify; padding: 0px">
-    <div style="border: solid 1px #9B9DFD; border-radius: 10px; padding: 5px">
+    <div class="blockWithHighlightedTitle">
       <?php
         $ver1 = "5.0";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
-      <div style="border-bottom: solid 1px #9B9DFD">
-      <h2><img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
-      </div>
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h2>&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
+</div>
+      <!--<div class="blockWithHighlightedTitleContent">-->
+        <h3>Web Installer</h3>
+        <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
+        <ul class="samplesList" style="margin-top: 0pt">
+          <li>double-clicking the downloaded file</li>
+          <li>typing "<b>java -jar <?php echo 'JPPF-' . $ver1 . '-Web-Installer.jar'; ?></b>"</li>
+        </ul>
+        <h3>Deployable module binaries</h3>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node.zip/download'; ?>">JPPF node distribution</a><br>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
+        <h3>Deployable .Net binaries</h3>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-dotnet.zip/download'; ?>">JPPF .Net demo application</a><br>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-dotnet.zip/download'; ?>">JPPF .Net-enabled node distribution</a><br>
+        <h3>Source code and documentation</h3>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
+        User Guide: <a href="/doc/v4">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
+        API documentation: <a href="/api">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip/download'; ?>">download</a><p>
+        <h3>Connectors and add-ons</h3>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+        <h3>Samples and tutorials</h3>
+        <a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
+        Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
+      <!--</div>-->
+    </div>
+    <br>
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h3>&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>All JPPF releases</h3>
+</div>
+      <br>All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
+    </div>
+    <br>
+  </div>
+  <div class="column_right" style="text-align: justify; padding: 0px;">
+    <div class="blockWithHighlightedTitle">
+      <?php
+        $ver1 = "4.2.7";
+        $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
+      ?>
+      <a name="<?php echo $ver1 ?>"></a>
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h2>&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
+</div>
       <h3>Web Installer</h3>
       <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
       <ul class="samplesList" style="margin-top: 0pt">
@@ -197,9 +167,6 @@ else
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node.zip/download'; ?>">JPPF node distribution</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
-      <h3>Deployable .Net binaries</h3>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-dotnet.zip/download'; ?>">JPPF .Net demo application</a><br>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-dotnet.zip/download'; ?>">JPPF .Net-enabled node distribution</a><br>
       <h3>Source code and documentation</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
       User Guide: <a href="/doc/v4">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
@@ -211,49 +178,15 @@ else
       Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
     </div>
     <br>
-    <div style="border: solid 1px #9B9DFD; border-radius: 10px; padding: 5px">
-      <h3><img src="images/icons/folder-download.png" class="titleWithIcon"/>All JPPF releases</h3>
-      All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
-    </div>
-  </div>
-  <div class="column_right" style="text-align: justify; padding: 0px;">
-    <div style="border: solid 1px #9B9DFD; border-radius: 10px; padding: 5px">
-      <?php
-        $ver1 = "4.2.7";
-        $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
-      ?>
-      <a name="<?php echo $ver1 ?>"></a>
-      <div style="border-bottom: solid 1px #9B9DFD">
-      <h2><img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
-      </div>
-      <h3>Web Installer</h3>
-      <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
-      <ul class="samplesList" style="margin-top: 0pt">
-        <li>double-clicking the downloaded file</li>
-        <li>typing "<b>java -jar <?php echo 'JPPF-' . $ver1 . '-Web-Installer.jar'; ?></b>"</li>
-      </ul>
-      <h3>Deployable module binaries</h3>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node.zip/download'; ?>">JPPF node distribution</a><br>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-application-template.zip/download'; ?>">JPPF application template</a> (fully working, fully commented, to use as a starting point).<p>
-      <h3>Source code and documentation</h3>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
-      User Guide: <a href="/doc/v4">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
-      API documentation: <a href="/api">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip/download'; ?>">download</a><p>
-      <h3>Connectors and add-ons</h3>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
-      <h3>Samples and tutorials</h3>
-      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-      Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
-    </div>
-    <br><br>
-    <div style="border: solid 1px #9B9DFD; border-radius: 10px; padding: 5px">
-      <h3><img src="images/icons/curious2.png" class="titleWithIcon"/>Feeling curious or adventurous?</h3>
-      <b>Try our latest (unstable) version</b><br>last update: <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf 5.0 rc1" style="font-weight: 900">2/12/2015 JPPF 5.0 RC1</a>.
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h3>&nbsp;<img src="images/icons/curious2.png" class="titleWithIcon"/>Feeling curious or adventurous?</h3>
+</div>
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf 5.0 rc1" style="font-weight: 900">2/12/2015 JPPF 5.0 RC1</a>.
       <p>
-      <div align="center" style="background-color: yellow; padding: 5px; margin: 5px; border-radius: 10px"><b><i>Not recommended for production environments</b></i></div>
+      <div align="center" style="background-color: yellow; padding: 5px; margin: 5px; border-radius: 10px"><b><i>Not recommended for production environments</b></i></div><br>
     </div>
+    <br>
   </div>
 </div>
 				</td>

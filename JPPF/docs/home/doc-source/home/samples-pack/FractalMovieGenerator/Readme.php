@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Generation of Mandelbrot Fractal Movies"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h3>What does the sample do?</h3>
           This sample demonstrates a JPPF grid based on a volunteer computing model.
@@ -77,6 +77,6 @@ jppf.fractals.dispatch.max.timeouts = 1</pre>
             <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

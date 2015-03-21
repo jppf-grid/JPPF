@@ -17,28 +17,34 @@ $template{name="about-page-header" title="Patches"}$
   $readme = preg_replace('@\n@', '<br/>', $line['readme']);
   $readme = preg_replace('@(^ )+@', '&nbsp;', $readme);
 ?>
+  <br><div class="blockWithHighlightedTitle">
   <h1>JPPF <?php echo $jppf_ver ?> patch <?php echo $patch_number ?></h1>
-  <h3>Download:</h3>
+  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+
 <?php
-  $port = ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'];
+  $downloadLink = "<a href='/private/patch/" . $patch_url . "'>" . $patch_url . "</a>";
 ?>
-  <a href="<?php echo '/private/patch/' . $patch_url ?>"><?php echo $patch_url ?></a>
-  <h3>Description (included readme.txt):</h3>
+  $template{name="title-with-icon" img="images/icons/download.png" title="Download: <?php echo $downloadLink ?>" heading="h3"}$
+
+  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  $template{name="title-with-icon" img="images/icons/view-list.png" title="Description (included readme.txt):" heading="h3"}$
   <?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
-  <h3>Fixed bugs:</h3>
+
+  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  $template{name="title-with-icon" img="images/icons/bug.png" title="Fixed bugs:" heading="h3"}$
   <ul class="samplesList">
 <?php
   mysql_free_result($result);
   $query = "SELECT * FROM patch_bugs where jppf_version = '" . $jppf_ver . "' AND patch_number = '" . $patch_number . "'";
   $result = mysql_query($query) or die('Query failed: ' . mysql_error());
-  while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
-  {
+  while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 ?>
     <li><a href="<?php echo $line['bug_url'] ?>"><?php echo $line['bug_id'] ?>&nbsp;<?php echo $line['bug_title'] ?></a></li>
 <?php
   }
 ?>
   </ul>
+  </div><br>
 <?php
   // Free resultset
   mysql_free_result($result);

@@ -13,16 +13,13 @@
 		<div align="center">
 		<div class="gwrapper" align="center">
 			<?php
-    if (!isset($currentPage))
-    {
+    if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
-      if (($currentPage == NULL) || ($currentPage == ""))
-      {
+      if (($currentPage == NULL) || ($currentPage == "")) {
         $currentPage = "Home";
       }
     }
-    if ($currentPage != "Forums")
-    {
+    if ($currentPage != "Forums") {
     ?>
     <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
     <?php
@@ -30,108 +27,36 @@
     ?>
     <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
       <tr style="height: 80px">
-        <td width="20"></td>
-        <td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+        <td width="15"></td>
+        <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
+        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
             <tr>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
               <td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Home")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "About")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Features")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Download")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Documentation")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Forums")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+              <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "About") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/about.php" class="<?php echo $cl; ?>">About</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Features") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/features.php" class="<?php echo $cl; ?>">Features</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Download") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/downloads.php" class="<?php echo $cl; ?>">Download</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/doc/v5" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
+<td style="width: 1px"></td>
             </tr>
           </table>
         </td>
-        <td width="20"></td>
+        <td width="15"></td>
       </tr>
     </table>
 			<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
@@ -167,7 +92,7 @@ else
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -177,48 +102,64 @@ else
 				<div class="jppf_content">
 <?php
   // Connecting, selecting database
-  $link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
-     or die('Could not connect: ' . mysql_error());
+  $link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den') or die('Could not connect: ' . mysql_error());
   mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
   // Performing SQL query
   $query = 'SELECT DISTINCT jppf_version FROM patch ORDER BY jppf_version DESC';
   $result = mysql_query($query) or die('Query failed: ' . mysql_error());
 ?>
-  <h1 align="center">JPPF Patches</h1>
+  <table width="100%" border="0"><tr>
+  <td align="left"><h1>JPPF Patches</h1></td>
 <?php
   $versions = array();
-  while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
-  {
+  while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
     $versions[] = $line["jppf_version"];
   }
   mysql_free_result($result);
-  foreach ($versions as $jppf_ver)
-  {
 ?>
-    <div style="margin: 10px">
-    <h2>JPPF <?php echo $jppf_ver ?></h2>
-    <table width="100%" border="1" cellspacing="0" cellpadding="7">
+  <script>
+    function jumpToVersion(id) {
+      window.location.hash = '#' + id;
+    }
+  </script>
+  <td align="right" class="version_select"><i>Jump to version:</i>
+  <select name="version_select" class="version_select">
+<?php
+  foreach ($versions as $ver) {
+?>
+  <option value="<?php echo $ver ?>" onclick="jumpToVersion('<?php echo $ver ?>')"> <?php echo $ver ?> </option>
+<?php
+  }
+?>
+  </select></td>
+  </tr></table>
+<?php
+  foreach ($versions as $jppf_ver) {
+?>
+    <div class="blockWithHighlightedTitle" style="padding: 0px">
+    <a name="<?php echo $jppf_ver ?>"></a>
+    <h2>&nbsp;JPPF <?php echo $jppf_ver ?></h2>
 <?php
     $query = "SELECT * FROM patch where jppf_version = '" . $jppf_ver . "' ORDER BY patch_number ASC";
     $result = mysql_query($query) or die('Query failed: ' . mysql_error());
     //if (false)
-    while ($line = mysql_fetch_array($result, MYSQL_ASSOC))
-    {
+    while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 ?>
+    <!--<div style="background-color: white; border-radius: 10px">-->
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-top: solid 1px #6D78B6; margin_left: -5px; margin-right: -8px">
     <tr>
-      <td valign="top" width="80px"><a href="patch_info.php?patch_id=<?php echo $line['id'] ?>"><b>patch <?php echo $line['patch_number'] ?></b></a></td>
+      <td valign="top" width="80px" class="patch_cell" style="border-right: solid 1px #6D78B6"><a href="patch_info.php?patch_id=<?php echo $line['id'] ?>"><b>patch <?php echo $line['patch_number'] ?></b></a></td>
 <?php
       $port = ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'];
 ?>
-      <td><b>Download:</b> <a href="<?php echo '/private/patch/' . $line['patch_url'] ?>"><?php echo $line['patch_url'] ?></a><br/>
+      <td class="patch_cell"><b>Download:</b> <a href="<?php echo '/private/patch/' . $line['patch_url'] ?>"><?php echo $line['patch_url'] ?></a><br/>
       <b>Bugs:</b>
       <ul class="samplesList" style="margin-top: 0px; margin-bottom: 0px">
 <?php
       $patch_number = $line["patch_number"];
       $query2 = "SELECT * FROM patch_bugs where jppf_version = '" . $jppf_ver . "' AND patch_number = '" . $patch_number . "'";
       $result2 = mysql_query($query2) or die('Query failed: ' . mysql_error());
-      while ($line2 = mysql_fetch_array($result2, MYSQL_ASSOC))
-      {
+      while ($line2 = mysql_fetch_array($result2, MYSQL_ASSOC)) {
 ?>
         <li><a href="<?php echo $line2['bug_url'] ?>"><?php echo $line2['bug_id'] ?>&nbsp;<?php echo $line2['bug_title'] ?></a></li>
 <?php
@@ -228,11 +169,13 @@ else
       </ul>
       </td>
     </tr>
+    </table>
+    <!--</div>-->
 <?php
     }
 ?>
-    </table>
     </div>
+    <br>
 <?php
     // Free resultset
     mysql_free_result($result);

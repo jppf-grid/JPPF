@@ -13,16 +13,13 @@
 		<div align="center">
 		<div class="gwrapper" align="center">
 			<?php
-    if (!isset($currentPage))
-    {
+    if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
-      if (($currentPage == NULL) || ($currentPage == ""))
-      {
+      if (($currentPage == NULL) || ($currentPage == "")) {
         $currentPage = "Home";
       }
     }
-    if ($currentPage != "Forums")
-    {
+    if ($currentPage != "Forums") {
     ?>
     <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="/images/frame_top.gif"/></div>
     <?php
@@ -30,108 +27,36 @@
     ?>
     <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6">
       <tr style="height: 80px">
-        <td width="20"></td>
-        <td width="400" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+        <td width="15"></td>
+        <td width="191" align="left" valign="center"><a href="/"><img src="/images/logo2.gif" border="0" alt="JPPF" style="box-shadow: 4px 4px 4px #6D78B6;"/></a></td>
+        <td width="130" align="center"><h3 class="header_slogan">The open source<br>grid computing<br>solution</h3></td>
+        <td width="80"></td>
         <td align="right">
           <table border="0" cellspacing="0" cellpadding="0" style="height: 30px; background-color:transparent;">
             <tr>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Home") echo "btn_start.gif"; else echo "btn_active_start.gif"; ?>') repeat-x scroll left bottom; width: 9px"></td>
               <td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Home")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/index.php" class="headerMenuItem2">Home</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/index.php" class="headerMenuItem">Home</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "About")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/about.php" class="headerMenuItem2">About</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/about.php" class="headerMenuItem">About</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Features")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/features.php" class="headerMenuItem2">Features</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/features.php" class="headerMenuItem">Features</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Download")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/downloads.php" class="headerMenuItem2">Download</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/downloads.php" class="headerMenuItem">Download</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Documentation")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/doc/v5" class="headerMenuItem2">Documentation</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/doc/v5" class="headerMenuItem">Documentation</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <?php
-if ($currentPage == "Forums")
-{
-?>
-<td class="headerMenuItem2">&nbsp;<a href="/forums" class="headerMenuItem2">Forums</a>&nbsp;</td>
-<?php
-}
-else
-{
-?>
-<td class="headerMenuItem">&nbsp;<a href="/forums" class="headerMenuItem">Forums</a>&nbsp;</td>
-<?php
-}
-?>
-								<td style="width: 1px"></td>
-              <td style="background: transparent url('/images/buttons/<?php if ($currentPage == "Forums") echo "btn_end.gif"; else echo "btn_active_end.gif"; ?>') repeat-x scroll right bottom; width: 9px"></td>
+              <?php $cl = (($currentPage == "Home") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_start"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/index.php" class="<?php echo $cl; ?>">Home</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "About") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/about.php" class="<?php echo $cl; ?>">About</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Features") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/features.php" class="<?php echo $cl; ?>">Features</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Download") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/downloads.php" class="<?php echo $cl; ?>">Download</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Documentation") ? "headerMenuItem2" : "headerMenuItem") . " " . ""; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/doc/v5" class="<?php echo $cl; ?>">Documentation</a>&nbsp;</td>
+<td style="width: 1px"></td>
+              <?php $cl = (($currentPage == "Forums") ? "headerMenuItem2" : "headerMenuItem") . " " . "header_item_end"; ?>
+<td class="<?php echo $cl; ?>">&nbsp;<a href="/forums" class="<?php echo $cl; ?>">Forums</a>&nbsp;</td>
+<td style="width: 1px"></td>
             </tr>
           </table>
         </td>
-        <td width="20"></td>
+        <td width="15"></td>
       </tr>
     </table>
 			<table border="0" cellspacing="0" cellpadding="5" width="100%px" style="border: 1px solid #6D78B6; border-top: 8px solid #6D78B6;">
@@ -167,7 +92,7 @@ else
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
         <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
-        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
+        <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
         <hr/>
         <?php if ($currentPage == "Contacts") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/contacts.php" class="<?php echo $itemClass; ?>">&raquo; Contacts</a><br></div>
@@ -177,249 +102,33 @@ else
 				<div class="jppf_content">
 <?php
 	$screenshot = $_REQUEST["screenshot"];
-	if (($screenshot == NULL) || ($screenshot == ""))
-	{
+	if (($screenshot == NULL) || ($screenshot == "")) {
 		$screenshot = 'AlertThresholds.gif
 ';
 	}
 	$shot_title = $_REQUEST["shotTitle"];
-	if (($shot_title == NULL) || ($shot_title == ""))
-	{
-		//$shot_title = "Screenshot";
+	if (($shot_title == NULL) || ($shot_title == "")) {
 		$shot_title = 'Alert Thresholds
 ';
 	}
+  $pic_height = $_REQUEST["height"];
+  if (($pic_height == NULL) || ($pic_height == "")) {
+    $pic_height = '800';
+  }
+  $picnum = $_REQUEST["picnum"];
+  if (($picnum == NULL) || ($picnum == "")) {
+    $picnum = '0';
+  }
 ?>
-	<div align="center">
-		<table border="0" cellspacing="0" cellpadding="0" width="80%">
-			<tr>
-				<td>
-										<table align="center" border="0" cellspacing="0" cellpadding="5">
-						<tr>
-							<td align="center">
-								<a href="screenshots.php?screenshot=AlertThresholds.gif&shotTitle=Alert Thresholds">
-									<img src="screenshots/_th_AlertThresholds.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-01.gif&shotTitle=Charts 01">
-									<img src="screenshots/_th_Charts-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-02.gif&shotTitle=Charts 02">
-									<img src="screenshots/_th_Charts-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-03.gif&shotTitle=Charts 03">
-									<img src="screenshots/_th_Charts-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Charts-04.gif&shotTitle=Charts 04">
-									<img src="screenshots/_th_Charts-04.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ChartsConfiguration-01.gif&shotTitle=Charts Configuration 01">
-									<img src="screenshots/_th_ChartsConfiguration-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=DeadlockMonitoring.gif&shotTitle=Deadlock Monitoring">
-									<img src="screenshots/_th_DeadlockMonitoring.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Docking-1.gif&shotTitle=Docking 1">
-									<img src="screenshots/_th_Docking-1.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Docking-2.gif&shotTitle=Docking 2">
-									<img src="screenshots/_th_Docking-2.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Docking-3.gif&shotTitle=Docking 3">
-									<img src="screenshots/_th_Docking-3.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<a href="screenshots.php?screenshot=DriverSystemInformation.gif&shotTitle=Driver System Information">
-									<img src="screenshots/_th_DriverSystemInformation.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=EmbeddedConsole.gif&shotTitle=Embedded Console">
-									<img src="screenshots/_th_EmbeddedConsole.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ExportConsoleSettings.gif&shotTitle=Export Console Settings">
-									<img src="screenshots/_th_ExportConsoleSettings.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=FractalsSample-2.gif&shotTitle=Fractals Sample 2">
-									<img src="screenshots/_th_FractalsSample-2.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=FractalsSample.gif&shotTitle=Fractals Sample">
-									<img src="screenshots/_th_FractalsSample.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=GraphView.gif&shotTitle=Graph View">
-									<img src="screenshots/_th_GraphView.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=JobPriority.gif&shotTitle=Job Priority">
-									<img src="screenshots/_th_JobPriority.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=LoadBalancerSettings.gif&shotTitle=Load Balancer Settings">
-									<img src="screenshots/_th_LoadBalancerSettings.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=MandelbrotNode.gif&shotTitle=Mandelbrot Node">
-									<img src="screenshots/_th_MandelbrotNode.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-01.gif&shotTitle=Many Jobs 01">
-									<img src="screenshots/_th_ManyJobs-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-02.gif&shotTitle=Many Jobs 02">
-									<img src="screenshots/_th_ManyJobs-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ManyJobs-03.gif&shotTitle=Many Jobs 03">
-									<img src="screenshots/_th_ManyJobs-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeProvisioning.gif&shotTitle=Node Provisioning">
-									<img src="screenshots/_th_NodeProvisioning.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeSystemInformation.gif&shotTitle=Node System Information">
-									<img src="screenshots/_th_NodeSystemInformation.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeThreads-01.gif&shotTitle=Node Threads 01">
-									<img src="screenshots/_th_NodeThreads-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-01.gif&shotTitle=Node Tray Addon 01">
-									<img src="screenshots/_th_NodeTrayAddon-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-02.gif&shotTitle=Node Tray Addon 02">
-									<img src="screenshots/_th_NodeTrayAddon-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=NodeTrayAddon-03.gif&shotTitle=Node Tray Addon 03">
-									<img src="screenshots/_th_NodeTrayAddon-03.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=PluggableAndHiddenViews-01.gif&shotTitle=Pluggable And Hidden Views 01">
-									<img src="screenshots/_th_PluggableAndHiddenViews-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=PluggableAndHiddenViews-02.gif&shotTitle=Pluggable And Hidden Views 02">
-									<img src="screenshots/_th_PluggableAndHiddenViews-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-						<tr>
-							<td align="center">
-								<a href="screenshots.php?screenshot=PluggableView.gif&shotTitle=Pluggable View">
-									<img src="screenshots/_th_PluggableView.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ProteinSequenceAlignment.gif&shotTitle=Protein Sequence Alignment">
-									<img src="screenshots/_th_ProteinSequenceAlignment.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=RuntimeMonitoring.gif&shotTitle=Runtime Monitoring">
-									<img src="screenshots/_th_RuntimeMonitoring.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01">
-									<img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=ServerStats-02.gif&shotTitle=Server Stats 02">
-									<img src="screenshots/_th_ServerStats-02.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Topologies.gif&shotTitle=Topologies">
-									<img src="screenshots/_th_Topologies.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-Health.gif&shotTitle=Topology  Health">
-									<img src="screenshots/_th_Topology-Health.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=Topology-TreeView.gif&shotTitle=Topology  Tree View">
-									<img src="screenshots/_th_Topology-TreeView.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=UpdateNodeConfiguration.gif&shotTitle=Update Node Configuration">
-									<img src="screenshots/_th_UpdateNodeConfiguration.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-							<td align="center">
-								<a href="screenshots.php?screenshot=VisibleColumns.gif&shotTitle=Visible Columns">
-									<img src="screenshots/_th_VisibleColumns.jpg" border="0" alt="screenshot"/>
-								</a>
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-		<br>
-				<div>
-					<h3 align="center"><?php echo $shot_title; ?></h3>
-				<div  style="margin: 1px">
-				<br>
-				<img src="screenshots/<?php echo $screenshot; ?>" border="0" alt="screenshot"/>
-				</div>
-				</div>
-		<table border="0" cellspacing="0" cellpadding="0">
-			<tr><td align="center">
-			</td></tr>
-		</table>
-	</div>
+<div align="center">
+  <br>
+  <div align="center" class="blockWithHighlightedTitle" style="padding-top: 5px; padding-bottom: 5px">
+    <iframe src="/screenshots_thumbs.php?picnum=<?php echo $picnum; ?>" height="153px" width="100%" frameborder="0" id="thumbs_frame"></iframe><br>
+  </div>
+  <br>
+  <iframe src="/screenshots_picture.php?screenshot=<?php echo $screenshot ?>&shotTitle=<?php echo $shot_title; ?>" width="100%" height="<?php echo $pic_height; ?>" frameborder="0" name="pic" scrolling="no"></iframe><br>
+  <br>
+</div>
 </div>
 				</td>
 				</tr>

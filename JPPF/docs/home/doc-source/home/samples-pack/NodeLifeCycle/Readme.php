@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Node Life Cycle sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					This sample illustrates how node life cycle events can be used to control distributed transactions within a node.
@@ -79,6 +79,6 @@ $template{name="samples-page-header" title="Node Life Cycle sample"}$
 						<li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

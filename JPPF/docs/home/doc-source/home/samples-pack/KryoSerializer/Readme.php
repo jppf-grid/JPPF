@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="Kryo Serialization sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
           <h3>What does the sample do?</h3>
           This sample provides an implementation of a <a href="http://www.jppf.org/doc/v4/index.php?title=Specifying_alternate_serialization_schemes">custom serialization scheme</a> which uses the <a href="https://github.com/EsotericSoftware/kryo">Kryo</a> library for serializing and deserializing Java objects.
@@ -31,6 +31,6 @@ jppf.object.serialization.class = org.jppf.serialization.kryo.KryoSerialization<
             <li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
           </ul>
           
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$

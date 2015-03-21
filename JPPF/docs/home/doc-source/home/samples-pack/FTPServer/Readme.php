@@ -1,7 +1,7 @@
 <?php $currentPage="Samples" ?>
 $template{name="samples-page-header" title="FTP Server Sample"}$
 
-<div align="justify">
+<div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
 					<h3>What does the sample do?</h3>
 					<p>This sample illustrates how to embed an FTP server within a JPPF driver, and how to use a FTP client from a JPPF task to upload or download files as needed.
@@ -38,6 +38,6 @@ $template{name="samples-page-header" title="FTP Server Sample"}$
 						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
 					</ul>
 					
-</div>
+</div><br>
 
 $template{name="about-page-footer"}$
