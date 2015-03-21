@@ -19,7 +19,7 @@
 package org.jppf.jca.serialization;
 
 import org.jppf.serialization.ObjectSerializer;
-import org.jppf.utils.*;
+import org.jppf.utils.SerializationHelperImpl;
 
 /**
  * 

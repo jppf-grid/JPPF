@@ -29,6 +29,7 @@ import org.jppf.client.event.JobStatusListener;
 import org.jppf.jca.spi.JPPFManagedConnection;
 import org.jppf.jca.work.JcaJobManager;
 import org.jppf.node.protocol.Task;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -45,7 +46,7 @@ public class JPPFConnectionImpl implements JPPFConnection
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The associated managed connection.
    */

@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.JobStatusListener;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +40,7 @@ public class JcaJobManager extends JobManagerClient {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of jobs to their uuid.
    */

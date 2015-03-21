@@ -18,9 +18,9 @@
 
 package org.jppf.jca.serialization;
 
-import java.io.*;
+import java.io.InputStream;
 
-import org.jppf.serialization.*;
+import org.jppf.serialization.JPPFSerialization;
 import org.jppf.utils.ObjectSerializerImpl;
 
 /**

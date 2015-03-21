@@ -28,7 +28,7 @@ import org.jppf.client.*;
 import org.jppf.jca.cci.*;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.JcaJobManager;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 
@@ -49,7 +49,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Defines how the configuration is to be located.<br>
    * This property is defined in the format "<i>type</i>|<i>path</i>", where <i>type</i> can be one of:<br>
