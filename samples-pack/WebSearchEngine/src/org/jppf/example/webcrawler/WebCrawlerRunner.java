@@ -21,20 +21,15 @@ package org.jppf.example.webcrawler;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import javax.swing.*;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.ui.options.AbstractOption;
-import org.jppf.ui.options.Option;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jppf.ui.options.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 
 /**
@@ -51,7 +46,7 @@ public class WebCrawlerRunner
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The JPPF client.
    */

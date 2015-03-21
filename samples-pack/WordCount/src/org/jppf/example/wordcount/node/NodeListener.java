@@ -18,7 +18,7 @@
 
 package org.jppf.example.wordcount.node;
 
-import java.io.*;
+import java.io.BufferedReader;
 import java.util.*;
 
 import org.jppf.node.event.*;

@@ -20,8 +20,7 @@ package org.jppf.example.fractals;
 
 import java.io.Serializable;
 
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 
 /**
  * Instances of this class represent the set of parameters for the Mandelbrot algorithm, based on

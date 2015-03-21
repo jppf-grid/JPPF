@@ -19,6 +19,7 @@
 package org.jppf.example.datadependency;
 
 import org.jppf.example.datadependency.simulation.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 import com.hazelcast.core.Hazelcast;
@@ -36,7 +37,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Default constructor.

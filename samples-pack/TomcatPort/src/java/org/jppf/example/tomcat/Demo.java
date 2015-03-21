@@ -20,8 +20,7 @@ package org.jppf.example.tomcat;
 
 import java.util.List;
 
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 
 /**

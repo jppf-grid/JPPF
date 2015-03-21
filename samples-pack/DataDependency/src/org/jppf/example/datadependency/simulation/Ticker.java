@@ -38,7 +38,7 @@ public class Ticker extends ThreadSynchronization implements Runnable {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Market data to use.
    */

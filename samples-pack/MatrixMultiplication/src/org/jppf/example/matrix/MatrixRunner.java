@@ -20,15 +20,12 @@ package org.jppf.example.matrix;
 import java.util.List;
 
 import org.jppf.JPPFException;
-import org.jppf.client.JPPFClient;
-import org.jppf.client.JPPFJob;
-import org.jppf.node.policy.ExecutionPolicy;
-import org.jppf.node.policy.PolicyParser;
+import org.jppf.client.*;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatistics;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * Runner class for the square matrix multiplication demo.

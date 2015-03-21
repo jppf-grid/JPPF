@@ -25,6 +25,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 import com.torunski.crawler.Crawler;
@@ -46,7 +47,7 @@ public class CrawlerTest
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Server to crawl.
    */

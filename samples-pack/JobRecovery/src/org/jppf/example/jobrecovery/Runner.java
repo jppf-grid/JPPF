@@ -18,17 +18,14 @@
 
 package org.jppf.example.jobrecovery;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.client.persistence.DefaultFilePersistenceManager;
-import org.jppf.client.persistence.JobPersistence;
+import org.jppf.client.persistence.*;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.ExceptionUtils;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 
 /**

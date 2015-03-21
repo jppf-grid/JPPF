@@ -22,9 +22,9 @@ import java.net.URL;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.example.extendedclassloading.*;
+import org.jppf.example.extendedclassloading.ClassPath;
 import org.jppf.node.event.*;
-import org.jppf.node.protocol.JPPFDistributedJob;
-import org.jppf.node.protocol.JobMetadata;
+import org.jppf.node.protocol.*;
 import org.slf4j.*;
 
 /**

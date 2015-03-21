@@ -18,8 +18,7 @@
 
 package org.jppf.example.jaligner;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
 import org.jppf.ui.options.factory.OptionsHandler;
 

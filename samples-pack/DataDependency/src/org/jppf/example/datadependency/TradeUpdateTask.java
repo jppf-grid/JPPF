@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.startup.DataDependencyStartup;
 import org.jppf.node.protocol.AbstractTask;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ public class TradeUpdateTask extends AbstractTask<String>
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The id of the trade to recompute
    */

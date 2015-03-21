@@ -25,6 +25,7 @@ import javax.crypto.*;
 
 import org.jppf.data.transform.JPPFDataTransform;
 import org.jppf.example.dataencryption.helper.Helper;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -40,7 +41,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Secret (symmetric) key used for encryption and decryption.
    */

@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.example.datadependency.model.MarketData;
 import org.jppf.example.datadependency.simulation.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 import com.hazelcast.core.Hazelcast;
@@ -39,7 +40,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used to synchronize access to pending updates.
    */

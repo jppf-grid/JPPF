@@ -19,22 +19,17 @@
 package org.jppf.example.datadependency;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.client.*;
-import org.jppf.example.datadependency.model.MarketData;
-import org.jppf.example.datadependency.model.Trade;
+import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.policy.Equal;
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.management.*;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 /**
  * 
@@ -48,7 +43,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
   /**
    * Debug enabled flag.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The JPPF client, handles all communications with the server.
    */
