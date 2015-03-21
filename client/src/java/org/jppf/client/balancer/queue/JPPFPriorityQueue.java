@@ -18,7 +18,7 @@
 
 package org.jppf.client.balancer.queue;
 
-import static org.jppf.utils.collections.CollectionUtils.*;
+import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.text.ParseException;
 import java.util.*;
@@ -31,7 +31,7 @@ import org.jppf.management.JPPFManagementInfo;
 import org.jppf.node.protocol.*;
 import org.jppf.queue.*;
 import org.jppf.scheduling.*;
-import org.jppf.utils.JPPFUuid;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -47,7 +47,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The job manager
    */

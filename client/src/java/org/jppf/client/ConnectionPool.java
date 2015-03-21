@@ -18,7 +18,7 @@
 
 package org.jppf.client;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Interface for pools of connections with a core size (minimum number of connections in the pool)

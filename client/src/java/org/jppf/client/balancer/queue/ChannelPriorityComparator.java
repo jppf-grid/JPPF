@@ -20,7 +20,7 @@ package org.jppf.client.balancer.queue;
 
 import java.util.Comparator;
 
-import org.jppf.client.balancer.*;
+import org.jppf.client.balancer.ChannelWrapper;
 
 /**
  * A Comparator which compare ChannelWrapper objects in descending order of their priority.

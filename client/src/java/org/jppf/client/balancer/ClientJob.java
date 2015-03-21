@@ -27,7 +27,7 @@ import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.JobEvent;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,7 +42,7 @@ public class ClientJob extends AbstractClientJob {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of the tasks.
    */

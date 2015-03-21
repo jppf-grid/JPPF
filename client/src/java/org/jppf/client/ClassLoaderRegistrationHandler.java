@@ -20,6 +20,7 @@ package org.jppf.client;
 
 import java.util.*;
 
+import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -37,7 +38,7 @@ public class ClassLoaderRegistrationHandler implements AutoCloseable {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of registered class loaders.
    */

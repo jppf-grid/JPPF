@@ -43,7 +43,7 @@ public class JPPFClient extends AbstractGenericClient {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this client with an automatically generated application UUID.

@@ -39,7 +39,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this connection with the specified owner.

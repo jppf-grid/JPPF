@@ -19,6 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import org.jppf.client.balancer.ClientJob;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -33,7 +34,7 @@ class JobScheduleAction implements Runnable
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The bundle wrapper encapsulating the job.
    */

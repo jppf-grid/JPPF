@@ -22,7 +22,7 @@ import java.util.*;
 
 import org.jppf.execute.AbstractExecutionManager;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -41,7 +41,7 @@ public class ClientExecutionManager extends AbstractExecutionManager
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this execution manager.

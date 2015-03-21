@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.ssl.SSLHelper;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -44,7 +44,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The socket client uses to communicate over a socket connection.
    */

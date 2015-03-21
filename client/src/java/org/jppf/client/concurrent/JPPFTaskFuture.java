@@ -22,7 +22,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -39,7 +39,7 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The collector that contains the task.
    */

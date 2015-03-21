@@ -18,8 +18,8 @@
 
 package org.jppf.client.balancer;
 
-import static org.jppf.utils.StringUtils.build;
 import static org.jppf.client.balancer.ClientJobStatus.*;
+import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,8 +28,9 @@ import org.jppf.client.JPPFJob;
 import org.jppf.client.event.JobEvent;
 import org.jppf.execute.ExecutorChannel;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.policy.*;
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -44,7 +45,7 @@ public abstract class AbstractClientJob {
   /**
    * Determines whether DEBUG logging level is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether DEBUG logging level is enabled.
    */

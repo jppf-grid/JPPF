@@ -25,6 +25,7 @@ import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -40,7 +41,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the corresponding driver is collapsed in the visualization panel.
    */

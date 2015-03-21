@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -42,7 +42,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace-level logging is enabled.
    */

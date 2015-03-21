@@ -43,7 +43,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The task execution manager for this wrapper.
    */

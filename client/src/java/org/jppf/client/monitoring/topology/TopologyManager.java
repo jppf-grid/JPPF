@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.utils.JPPFThreadFactory;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -43,7 +43,7 @@ public class TopologyManager implements ClientListener {
   /**
    * Determines whether debug log statements are enabled.
    */
-  static boolean debugEnabled = log.isDebugEnabled();
+  static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of driver uuids to the corresponding {@link TopologyDriver} objects.
    */

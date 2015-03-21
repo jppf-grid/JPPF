@@ -21,6 +21,7 @@ package org.jppf.client.monitoring.topology;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,7 +39,7 @@ abstract class AbstractRefreshHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Timer used to query the driver management data.
    */

@@ -25,7 +25,7 @@ import org.jppf.client.event.*;
 import org.jppf.client.event.JobEvent.Type;
 import org.jppf.client.persistence.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -43,7 +43,7 @@ public class JPPFResultCollector implements JobStatusHandler {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * A map containing the resulting tasks, ordered by ascending position in the submitted list of tasks.
    */

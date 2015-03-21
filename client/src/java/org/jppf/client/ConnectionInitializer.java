@@ -18,6 +18,7 @@
 
 package org.jppf.client;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -32,7 +33,7 @@ class ConnectionInitializer implements Runnable
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The client connection to initialize.
    */

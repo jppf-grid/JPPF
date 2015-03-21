@@ -20,7 +20,7 @@ package org.jppf.client;
 
 import java.util.*;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The core size of this pool, that is, the minimum number of connections always present.
    */

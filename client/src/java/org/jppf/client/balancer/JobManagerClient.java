@@ -29,7 +29,7 @@ import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
-import org.jppf.utils.ThreadSynchronization;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -48,7 +48,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * A reference to the tasks queue.
    */

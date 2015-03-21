@@ -19,7 +19,7 @@
 package org.jppf.client;
 
 import org.jppf.client.event.ClientConnectionStatusHandler;
-import org.jppf.management.*;
+import org.jppf.management.JPPFSystemInformation;
 
 /**
  * Interface for a client connection to a JPPF driver.

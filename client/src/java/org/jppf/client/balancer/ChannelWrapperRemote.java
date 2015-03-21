@@ -43,7 +43,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The channel to the driver to use.
    */
