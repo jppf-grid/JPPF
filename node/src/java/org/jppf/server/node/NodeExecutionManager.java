@@ -22,10 +22,10 @@ import java.util.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.AbstractExecutionManager;
-import org.jppf.node.*;
+import org.jppf.node.NodeInternal;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -43,7 +43,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The node that uses this execution manager.
    */

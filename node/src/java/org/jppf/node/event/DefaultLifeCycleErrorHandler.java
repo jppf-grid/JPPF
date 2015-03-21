@@ -38,7 +38,7 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * If <code>true</code> (the default), then {@link Error}s caught in the listeners methods will be propagated, otherwise they will be just logged.
    */

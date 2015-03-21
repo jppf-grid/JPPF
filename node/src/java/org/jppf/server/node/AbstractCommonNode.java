@@ -25,7 +25,7 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.JMXServer;
 import org.jppf.node.AbstractNode;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -40,7 +40,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Manages the class loaders and how they are used.
    * @exclude

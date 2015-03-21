@@ -19,14 +19,14 @@ package org.jppf.classloader;
 
 import java.util.List;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
  * JPPF class loader implementation for remote standalone nodes.
  * @author Laurent Cohen
  */
-public class JPPFClassLoader extends AbstractJPPFClassLoader
-{
+public class JPPFClassLoader extends AbstractJPPFClassLoader {
   /**
    * Logger for this class.
    */
@@ -34,15 +34,14 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this class loader with a parent class loader.
    * @param connection the connection to the driver.
    * @param parent a ClassLoader instance.
    */
-  public JPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent)
-  {
+  public JPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent) {
     super(connection, parent);
     init();
   }
@@ -53,8 +52,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * @param parent a ClassLoader instance.
    * @param uuidPath unique identifier for the submitting application.
    */
-  public JPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath)
-  {
+  public JPPFClassLoader(final ClassLoaderConnection connection, final ClassLoader parent, final List<String> uuidPath) {
     super(connection, parent, uuidPath);
   }
 
@@ -63,16 +61,11 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * @exclude
    */
   @Override
-  void reset()
-  {
-    if (!isOffline())
-    {
-      try
-      {
+  void reset() {
+    if (!isOffline()) {
+      try {
         connection.reset();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -83,14 +76,10 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader
    * @see org.jppf.classloader.AbstractJPPFClassLoader#close()
    */
   @Override
-  public void close()
-  {
-    try
-    {
+  public void close() {
+    try {
       if (!dynamic && !isOffline()) connection.close();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
     super.close();

@@ -42,47 +42,52 @@ public class JobClassPathHandler extends NodeLifeCycleListenerAdapter {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
+    Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     Node node = event.getNode();
     if (!node.isOffline()) return;
-    if (log.isTraceEnabled()) log.trace(StringUtils.printClassLoaderHierarchy(event.getTaskClassLoader()));
     ClassPath classpath = event.getJob().getSLA().getClassPath();
-    AbstractJPPFClassLoader cl = event.getTaskClassLoader();
-    if ((classpath != null) && (classpath.isForceClassLoaderReset() || !classpath.isEmpty())) cl = node.resetTaskClassLoader();
-    if ((classpath != null) && !classpath.isEmpty()) {
-      for (ClassPathElement elt: classpath) {
-        boolean validated = false;
-        try {
-          validated = elt.validate();
-        } catch (Throwable t) {
-          String format = "exception occurred during validation of classpath element '{}' : {}";
-          if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(t));
-          else log.warn(format, elt, ExceptionUtils.getMessage(t));
+    if (node.isAndroid()) {
+      node.resetTaskClassLoader(classpath);
+    } else {
+      if (log.isTraceEnabled()) log.trace(StringUtils.printClassLoaderHierarchy(event.getTaskClassLoader()));
+      AbstractJPPFClassLoader cl = event.getTaskClassLoader();
+      if ((classpath != null) && (classpath.isForceClassLoaderReset() || !classpath.isEmpty())) cl = node.resetTaskClassLoader();
+      if ((classpath != null) && !classpath.isEmpty()) {
+        for (ClassPathElement elt: classpath) {
+          boolean validated = false;
+          try {
+            validated = elt.validate();
+          } catch (Throwable t) {
+            String format = "exception occurred during validation of classpath element '{}' : {}";
+            if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(t));
+            else log.warn(format, elt, ExceptionUtils.getMessage(t));
+          }
+          if (!validated) continue;
+          URL url = null;
+          Location local = elt.getLocalLocation();
+          Location remote = elt.getRemoteLocation();
+          try {
+            if (remote != local) local.copyTo(remote);
+            if (remote instanceof MemoryLocation) {
+              cl.getResourceCache().registerResource(elt.getName(), remote);
+              url = cl.getResourceCache().getResourceURL(elt.getName());
+            } else if (remote instanceof FileLocation) {
+              File file = new File(((FileLocation) remote).getPath());
+              if (file.exists()) url = file.toURI().toURL();
+            } else if (remote instanceof URLLocation) url = ((URLLocation) remote).getPath();
+          } catch (Exception e) {
+            String format = "exception occurred during processing of classpath element '{}' : {}";
+            if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(e));
+            else log.warn(format, elt, ExceptionUtils.getMessage(e));
+          }
+          if (url != null) cl.addURL(url);
         }
-        if (!validated) continue;
-        URL url = null;
-        Location local = elt.getLocalLocation();
-        Location remote = elt.getRemoteLocation();
-        try {
-          if (remote != local) local.copyTo(remote);
-          if (remote instanceof MemoryLocation) {
-            cl.getResourceCache().registerResource(elt.getName(), remote);
-            url = cl.getResourceCache().getResourceURL(elt.getName());
-          } else if (remote instanceof FileLocation) {
-            File file = new File(((FileLocation) remote).getPath());
-            if (file.exists()) url = file.toURI().toURL();
-          } else if (remote instanceof URLLocation) url = ((URLLocation) remote).getPath();
-        } catch (Exception e) {
-          String format = "exception occurred during processing of classpath element '{}' : {}";
-          if (debugEnabled) log.debug(format, elt, ExceptionUtils.getStackTrace(e));
-          else log.warn(format, elt, ExceptionUtils.getMessage(e));
-        }
-        if (url != null) cl.addURL(url);
+        classpath.clear();
       }
-      classpath.clear();
     }
   }
 }

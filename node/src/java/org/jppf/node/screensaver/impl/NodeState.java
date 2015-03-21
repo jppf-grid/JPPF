@@ -17,7 +17,7 @@
  */
 package org.jppf.node.screensaver.impl;
 
-import org.jppf.node.event.*;
+import org.jppf.node.event.NodeLifeCycleEvent;
 import org.jppf.node.screensaver.*;
 
 /**

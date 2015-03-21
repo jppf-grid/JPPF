@@ -23,14 +23,13 @@ import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.management.*;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.serialization.*;
-import org.jppf.utils.*;
+import org.jppf.utils.ThreadSynchronization;
 
 /**
  * Abstract implementation of the {@link Node} interface.
  * @author Laurent Cohen
  */
-public abstract class AbstractNode extends ThreadSynchronization implements NodeInternal
-{
+public abstract class AbstractNode extends ThreadSynchronization implements NodeInternal {
   /**
    * Utility for deserialization and serialization.
    * @exclude
@@ -71,8 +70,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @exclude
    */
   @Override
-  public NodeConnection<?> getNodeConnection()
-  {
+  public NodeConnection<?> getNodeConnection() {
     return nodeConnection;
   }
 
@@ -80,9 +78,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * Get the total number of tasks executed.
    * @return the number of tasks as an int.
    */
-  public int getTaskCount()
-  {
-    synchronized(taskCountLock) {
+  public int getTaskCount() {
+    synchronized (taskCountLock) {
       return taskCount;
     }
   }
@@ -92,9 +89,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @param taskCount the number of tasks as an int.
    * @exclude
    */
-  public void setTaskCount(final int taskCount)
-  {
-    synchronized(taskCountLock) {
+  public void setTaskCount(final int taskCount) {
+    synchronized (taskCountLock) {
       this.taskCount = taskCount;
     }
   }
@@ -104,8 +100,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @return a <code>SerializationHelper</code> instance.
    * @exclude
    */
-  public SerializationHelper getHelper()
-  {
+  public SerializationHelper getHelper() {
     return helper;
   }
 
@@ -116,26 +111,23 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * @exclude
    */
   @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler()
-  {
+  public LifeCycleEventHandler getLifeCycleEventHandler() {
     return null;
   }
 
   /**
    * {@inheritDoc}
-   * <p>This implementation throws a <code>JPPFUnsupportedOperationException</code>.
-   * It is up to subclasses to implement it.
+   * <p>
+   * This implementation throws a <code>JPPFUnsupportedOperationException</code>. It is up to subclasses to implement it.
    * @exclude
    */
   @Override
-  public JMXServer getJmxServer() throws Exception
-  {
+  public JMXServer getJmxServer() throws Exception {
     throw new JPPFUnsupportedOperationException("getJmxServer() is not supported on this type of node");
   }
 
   @Override
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
@@ -143,25 +135,27 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
    * Update the current system information.
    * @exclude
    */
-  protected void updateSystemInformation()
-  {
+  protected void updateSystemInformation() {
     this.systemInformation = new JPPFSystemInformation(uuid, isLocal(), true);
   }
 
   @Override
-  public JPPFSystemInformation getSystemInformation()
-  {
+  public JPPFSystemInformation getSystemInformation() {
     return systemInformation;
   }
 
   /**
    * This implementation does nothing.
-   * @return <code>null</code>.
+   * {@inheritDoc}}
    * @exclude
    */
   @Override
-  public AbstractJPPFClassLoader resetTaskClassLoader()
-  {
+  public AbstractJPPFClassLoader resetTaskClassLoader(final Object...params) {
     return null;
+  }
+
+  @Override
+  public boolean isAndroid() {
+    return false;
   }
 }

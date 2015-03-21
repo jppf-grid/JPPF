@@ -42,7 +42,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines the class loading delegation model to use.
    */
@@ -173,10 +173,8 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    */
   @SuppressWarnings("unchecked")
   public <V> V computeCallable(final JPPFCallable<V> callable) throws Exception {
-    V result = null;
     Object returned = null;
     Class clazz = loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
-    ClassLoader cl = clazz.getClassLoader();
     ObjectSerializer ser = (ObjectSerializer) clazz.newInstance();
     byte[] bytes = ser.serialize(callable).getBuffer();
     bytes = computeRemoteData(bytes);

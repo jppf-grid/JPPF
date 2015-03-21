@@ -23,7 +23,7 @@ import java.text.NumberFormat;
 import javax.swing.*;
 
 import org.jppf.node.screensaver.ScreenSaverMain;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * This class displays the connection status, execution status and number of tasks for a node.

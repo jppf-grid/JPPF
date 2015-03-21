@@ -40,7 +40,7 @@ public final class JPPFLeakPrevention {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Name of the system thread group.
    */

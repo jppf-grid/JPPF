@@ -22,7 +22,7 @@ import java.io.*;
 import java.net.*;
 import java.util.List;
 
-import org.jppf.classloader.resource.*;
+import org.jppf.classloader.resource.ResourceCache;
 import org.jppf.location.Location;
 
 /**

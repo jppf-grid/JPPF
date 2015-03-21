@@ -45,7 +45,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether this class loader should handle dynamic class updating.
    * @exclude
@@ -59,7 +59,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * Determines whether this class loader should handle dynamic class updating.
    * @exclude
    */
-  protected final boolean dynamic;
+  protected boolean dynamic;
   /**
    * The unique identifier for the submitting application.
    * @exclude
@@ -353,7 +353,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
     if (debugEnabled) log.debug("closing classloader " + this);
     try {
       super.close();
-    } catch (IOException e) {
+    } catch (IOException|NoSuchMethodError e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }

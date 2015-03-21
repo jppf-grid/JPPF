@@ -18,10 +18,7 @@
 package org.jppf.server.node;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.List;
-
-import javax.management.*;
 
 import org.jppf.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
@@ -52,7 +49,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The task execution manager for this node.
    * @exclude
@@ -274,8 +271,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("start node initialization");
     initHelper();
     try {
-      MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      if (!server.isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME))) registerProviderMBeans();
+      if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) registerProviderMBeans();
+      //MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+      //if (!server.isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME))) registerProviderMBeans();
     } catch (Exception e) {
       log.error("Error registering the MBeans", e);
     }
@@ -439,8 +437,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   @SuppressWarnings("unchecked")
   private void registerProviderMBeans() throws Exception {
     ClassLoader cl = getClass().getClassLoader();
-    MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, server, this);
+    //MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+    if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, ManagementUtils.getPlatformServer(), this);
   }
 
   /**
@@ -498,13 +496,13 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   @Override
-  public AbstractJPPFClassLoader resetTaskClassLoader() {
+  public AbstractJPPFClassLoader resetTaskClassLoader(final Object...params) {
     TaskBundle bundle = executionManager.getBundle();
     if (bundle == null) return null;
     try {
       List<String> uuidPath = bundle.getUuidPath().getList();
-      boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath).getClassLoader().isRemoteClassLoadingDisabled();
-      AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath);
+      boolean remoteClassLoadingDisabled = classLoaderManager.getContainer(uuidPath, params).getClassLoader().isRemoteClassLoadingDisabled();
+      AbstractJPPFClassLoader newCL = classLoaderManager.resetClassLoader(uuidPath, params);
       newCL.setRemoteClassLoadingDisabled(remoteClassLoadingDisabled);
       return newCL;
     } catch (Exception e) {

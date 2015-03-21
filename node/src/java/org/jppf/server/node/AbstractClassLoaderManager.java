@@ -39,7 +39,7 @@ public abstract class AbstractClassLoaderManager {
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static final boolean debugEnabled = log.isDebugEnabled();
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Maximum number of containers kept by this node's cache.
    */
@@ -112,15 +112,16 @@ public abstract class AbstractClassLoaderManager {
   /**
    * Get a reference to the JPPF container associated with an application uuid.
    * @param uuidPath the uuid path containing the key to the container.
+   * @param params a (possibly empty) set of arbitrary parameters to propagate to the class loader.
    * @return a <code>JPPFContainer</code> instance.
    * @throws Exception if an error occurs while getting the container.
    */
-  public synchronized JPPFContainer getContainer(final List<String> uuidPath) throws Exception {
+  public synchronized JPPFContainer getContainer(final List<String> uuidPath, final Object...params) throws Exception {
     String uuid = uuidPath.get(0);
     JPPFContainer container = containerMap.get(uuid);
     if (container == null) {
       if (debugEnabled) log.debug("Creating new container for appuuid=" + uuid);
-      AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath);
+      AbstractJPPFClassLoader cl = newClientClassLoader(uuidPath, params);
       container = newJPPFContainer(uuidPath, cl);
       if (containerList.size() >= maxContainers) {
         JPPFContainer toRemove = containerList.removeFirst();
@@ -141,14 +142,15 @@ public abstract class AbstractClassLoaderManager {
   /**
    * Create a new client class loader instance for the specified uuid path.
    * @param uuidPath the uuid path uniquely identifying the client.
+   * @param params a (possibly empty) set of arbitrary parameters to propagate to the class loader.
    * @return a {@link AbstractJPPFClassLoader} instance or <code>null</code> if the class laoder could not be created.
    */
-  protected AbstractJPPFClassLoader newClientClassLoader(final List<String> uuidPath) {
+  protected AbstractJPPFClassLoader newClientClassLoader(final List<String> uuidPath, final Object...params) {
     return AccessController.doPrivileged(new PrivilegedAction<AbstractJPPFClassLoader>() {
       @Override
       public AbstractJPPFClassLoader run() {
         try {
-          return newClassLoaderCreator(uuidPath).call();
+          return newClassLoaderCreator(uuidPath, params).call();
         } catch(Exception e) {
           log.error(e.getMessage(), e);
         }
@@ -194,9 +196,10 @@ public abstract class AbstractClassLoaderManager {
   /**
    * Instantiate the callback used to create the class loader in each {@link JPPFContainer}.
    * @param uuidPath the uuid path containing the key to the container.
+   * @param params a (possibly empty) set of arbitrary parameters to propagate to the class loader.
    * @return a {@link Callable} instance.
    */
-  protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath);
+  protected abstract Callable<AbstractJPPFClassLoader> newClassLoaderCreator(List<String> uuidPath, final Object...params);
 
   /**
    * Clear the resource caches of all class loaders managed by this object.
@@ -212,14 +215,15 @@ public abstract class AbstractClassLoaderManager {
   /**
    * Reset the class loader specified by its uuid path.
    * @param uuidPath uuid path of the class loader to reset.
+   * @param params a (possibly empty) set of arbitrary parameters to propagate to the class loader.
    * @return the new created class loader istance.
    * @throws Exception if any error occurs.
    */
-  public AbstractJPPFClassLoader resetClassLoader(final List<String> uuidPath) throws Exception {
+  public AbstractJPPFClassLoader resetClassLoader(final List<String> uuidPath, final Object...params) throws Exception {
     JPPFContainer cont = getContainer(uuidPath);
     AbstractJPPFClassLoader oldCL = cont.getClassLoader();
     String requestUuid = oldCL.getRequestUuid();
-    AbstractJPPFClassLoader newCL = newClientClassLoader(cont.uuidPath);
+    AbstractJPPFClassLoader newCL = newClientClassLoader(cont.uuidPath, params);
     newCL.setRequestUuid(requestUuid);
     cont.setClassLoader(newCL);
     oldCL.close();

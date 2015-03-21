@@ -52,7 +52,7 @@ public class NodeRunner {
   /**
    * Determines whether debug-level logging is enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The ClassLoader used for loading the classes of the framework.
    */
@@ -102,6 +102,10 @@ public class NodeRunner {
    * 
    */
   private static LauncherListener launcherListener = null;
+  /**
+   * 
+   */
+  private static boolean ANDROID = JPPFConfiguration.getProperties().getBoolean("jppf.node.android", false);
 
   /**
    * Run a node as a standalone application.
@@ -110,7 +114,7 @@ public class NodeRunner {
   public static void main(final String...args) {
     node = null;
     try {
-      new JmxMessageNotifier(); // initialize the jmx logger
+      if (!ANDROID) new JmxMessageNotifier(); // initialize the jmx logger
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if (debugEnabled) log.debug("launching the JPPF node");
       VersionUtils.logVersionInformation("node", uuid);
@@ -181,7 +185,8 @@ public class NodeRunner {
     SystemUtils.printPidAndUuid("node", uuid);
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     setSecurity();
-    String className = "org.jppf.server.node.remote.JPPFRemoteNode";
+    //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
+    String className = JPPFConfiguration.getProperties().getString("jppf.node.class", "org.jppf.server.node.remote.JPPFRemoteNode");
     Class<?> clazz = getJPPFClassLoader().loadClass(className);
     Constructor c = clazz.getConstructor(DriverConnectionInfo.class);
     JPPFNode node = (JPPFNode) c.newInstance(currentConnectionInfo);

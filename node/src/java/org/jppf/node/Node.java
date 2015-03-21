@@ -46,9 +46,10 @@ public interface Node extends Runnable
 
   /**
    * Reset the current task class loader if any is present (i.e. if a job is being executed), without reconnecting to the server.
+   * @param params a (possibly empty) set of arbitrary parameters to propagate to the class loader.
    * @return the newly created class loader, or {@code null} if none could be created at this time. 
    */
-  AbstractJPPFClassLoader resetTaskClassLoader();
+  AbstractJPPFClassLoader resetTaskClassLoader(final Object...params);
 
   /**
    * Determine whether this node is running in offline mode.
@@ -73,4 +74,10 @@ public interface Node extends Runnable
    * @return {@code true} if this node can execute .Net tasks, {@code false} otherwise.
    */
   boolean isDotnetCapable();
+
+  /**
+   * Determine whether this node is an Android node.
+   * @return {@code true} if this node runs on Androis, {@code false} otherwise.
+   */
+  boolean isAndroid();
 }

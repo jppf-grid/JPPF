@@ -21,10 +21,11 @@ package org.jppf.node;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
- * Abstract impelementation of {@link ClassLoaderConnection}.
+ * Abstract impelementation of {@link org.jppf.classloader.ClassLoaderConnection}.
  * @param <C> the type of communication channel used by this connection.
  * @author Laurent Cohen
  * @exclude
@@ -37,7 +38,7 @@ public abstract class AbstractNodeConnection<C> implements NodeConnection<C> {
   /**
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The channel used to communicate witht he driver.
    */

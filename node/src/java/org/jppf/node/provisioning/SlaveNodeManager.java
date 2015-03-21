@@ -44,7 +44,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = log.isDebugEnabled();
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Path prefix used for the root directory of each slave node.
    * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
