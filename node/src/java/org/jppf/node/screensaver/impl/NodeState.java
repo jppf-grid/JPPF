@@ -60,7 +60,7 @@ public class NodeState extends NodeIntegrationAdapter {
   }
 
   @Override
-  public void setScreenSaver(final JPPFScreenSaver screensaver) {
+  public void setUiComponent(final JPPFScreenSaver screensaver) {
     this.nodePanel = ((JPPFScreenSaverImpl) screensaver).getNodePanel();
   }
 }

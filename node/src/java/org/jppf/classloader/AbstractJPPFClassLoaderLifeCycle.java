@@ -355,7 +355,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
       super.close();
     } catch (IOException|NoSuchMethodError e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.warn(ExceptionUtils.getMessage(e));
+      else if (!isOffline()) log.warn(ExceptionUtils.getMessage(e));
     }
   }
 

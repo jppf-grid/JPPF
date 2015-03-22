@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-package org.jppf.node.screensaver;
+package org.jppf.node.event;
 
-import org.jppf.node.event.*;
 
 /**
  * An abstract adapter class for receiving node events. The methods in this class are empty.
  * This class exists as convenience, to be overriden for creating listener objects, instead of
  * implementing the {@link NodeLifeCycleListener} and {@link TaskExecutionListener} interfaces.
+ * @param <C> the type of UI component to dispatch events to.
  * @author Laurent Cohen
- * @since 4.0
+ * @since 5.1
  */
-public abstract class NodeIntegrationAdapter extends org.jppf.node.event.NodeIntegrationAdapter<JPPFScreenSaver> {
+public abstract class NodeIntegrationAdapter<C> extends NodeLifeCycleListenerAdapter implements NodeIntegration<C> {
   @Override
   public void taskExecuted(final TaskExecutionEvent event) {
   }
@@ -36,11 +36,7 @@ public abstract class NodeIntegrationAdapter extends org.jppf.node.event.NodeInt
   public void taskNotification(final TaskExecutionEvent event) {
   }
 
-  /**
-   * Set the screen saver to which events will be dispatched.
-   * @param screensaver ainstance of a class implementing the {@link JPPFScreenSaver} interface.
-   * @deprecated use {@link #setUiComponent(JPPFScreenSaver)} instead.
-   */
-  public void setScreenSaver(final JPPFScreenSaver screensaver) {
+  @Override
+  public void setUiComponent(final C uiCOmponent) {
   }
 }

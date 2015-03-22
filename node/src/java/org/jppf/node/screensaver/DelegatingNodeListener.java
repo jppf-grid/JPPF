@@ -46,7 +46,7 @@ public class DelegatingNodeListener implements NodeLifeCycleListener {
         if (name != null) {
           Class<?> clazz = Class.forName(name, true, getClass().getClassLoader());
           delegate = (NodeIntegration) clazz.newInstance();
-          delegate.setScreenSaver(ssm.getScreenSaver());
+          delegate.setUiComponent(ssm.getScreenSaver());
         }
       }
     } catch (Exception e) {

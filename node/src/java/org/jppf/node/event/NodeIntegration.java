@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package org.jppf.node.screensaver;
+package org.jppf.node.event;
 
 
 /**
- * This interface groups two other interfaces, from which the screen saver can receive notifications from the node.
+ * This interface groups two other interfaces, from which an external can receive notifications from the node.
+ * @param <C> the type of UI component to dispatch events to.
  * @author Laurent Cohen
- * @since 4.0
+ * @since 5.1
  */
-public interface NodeIntegration extends org.jppf.node.event.NodeIntegration<JPPFScreenSaver> {
+public interface NodeIntegration<C> extends NodeLifeCycleListener, TaskExecutionListener {
   /**
-   * Provide a reference to the screen saver.
-   * @param screensaver a {@link JPPFScreenSaver} instance.
-   * @since 5.1
+   * Provide a reference to the UI component which uses the event notifications.
+   * @param uiComponent the uiComponent to which events are dispatched.
    */
-  void setUiComponent(JPPFScreenSaver screensaver);
-
-  /**
-   * Provide a reference to the screen saver.
-   * @param screensaver a {@link JPPFScreenSaver} instance.
-   * @deprecated use {@link #setUiComponent(JPPFScreenSaver)} instead.
-   */
-  void setScreenSaver(JPPFScreenSaver screensaver);
+  void setUiComponent(C uiComponent);
 }

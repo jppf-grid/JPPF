@@ -195,7 +195,7 @@ public class NodeRunner {
   }
 
   /**
-   * Restore the configuration from the sna^shot taken at startup time.
+   * Restore the configuration from the snapshot taken at startup time.
    */
   public static void restoreInitialConfig() {
     TypedProperties config = JPPFConfiguration.getProperties();
