@@ -158,10 +158,11 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
   private void shutdownOrRestart(final boolean interrupt, final boolean restart) {
     if (node.isLocal()) return;
     String s = restart ? "restart" : "shutdown";
+    String msg = String.format("%s node %s requested", (interrupt ? "immediate" : "deferred"), s);
+    System.out.println(msg);
+    log.info(msg);
     if (interrupt || !node.isExecuting()) {
       if (NodeRunner.getShuttingDown().compareAndSet(false, true)) {
-        System.out.println(s + " requested");
-        log.info("node {} requested", s);
         Runnable r = new Runnable() {
           @Override
           public void run() {
@@ -171,7 +172,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
         new Thread(r, "Node " + s).start();
       }
     } else {
-      log.info("deferred node {} requested", s);
       node.requestShutdown(restart);
     }
   }
