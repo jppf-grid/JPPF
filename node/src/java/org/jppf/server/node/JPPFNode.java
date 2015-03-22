@@ -166,12 +166,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
     while (!checkStopped()) {
-      if (isShutdownRequested()) shutdown(isRestart());
       clearResourceCachesIfRequested();
-      try {
-        processNextJob();
-      } finally {
-        setExecuting(false);
+      if (isShutdownRequested()) shutdown(isRestart());
+      else {
+        try {
+          processNextJob();
+        } finally {
+          setExecuting(false);
+        }
       }
     }
     if (debugEnabled) log.debug("End of node secondary loop");

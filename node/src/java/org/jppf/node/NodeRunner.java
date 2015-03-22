@@ -28,7 +28,6 @@ import org.jppf.classloader.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.node.connection.*;
 import org.jppf.node.initialization.InitializationHook;
-import org.jppf.node.provisioning.ShutdownRestartNodeProtocolHandler;
 import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;

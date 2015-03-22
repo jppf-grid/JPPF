@@ -50,6 +50,10 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    */
   private final String mainClass;
   /**
+   * Either "node" or "driver".
+   */
+  private final String jppfType;
+  /**
    * Determines whether the process was stopped because the system went into "busy state".
    */
   private final AtomicBoolean stoppedOnBusyState = new AtomicBoolean(false);
@@ -69,6 +73,10 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    * Detects system idle state changes.
    */
   private IdleDetector idleDetector = null;
+  /**
+   * Whether the node is configured for immediate shutdown.
+   */
+  private boolean idleModeImmediateShutdown = true;
 
   /**
    * Initialize this process launcher.
@@ -78,6 +86,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   public ProcessLauncher(final String mainClass, final boolean idleModeSupported) {
     if (mainClass == null) throw new IllegalArgumentException("the main class name cannot be null");
     this.mainClass = mainClass;
+    jppfType = mainClass.toLowerCase().contains("driver") ? "driver" : "node";
     this.idleModeSupported = idleModeSupported;
     int idx = mainClass.lastIndexOf('.');
     this.name = (idx < 0) ? mainClass : mainClass.substring(idx);
@@ -91,18 +100,21 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     if (idleModeSupported) {
       TypedProperties config = JPPFConfiguration.getProperties();
       idleMode = config.getBoolean("jppf.idle.mode.enabled", false);
+      idleModeImmediateShutdown = config.getBoolean("jppf.idle.interruptIfRunning", true);
     }
     boolean end = false;
     try {
       createShutdownHook();
-      startSocketListener();
       if (idleMode) {
         idleDetector = new IdleDetector(this);
-        System.out.println("Node running in \"Idle Host\" mode");
+        System.out.printf("Node running in \"Idle Host\" mode with %s shutdown%n", (idleModeImmediateShutdown ? "immediate" : "deferred"));
         idleDetector.run();
       }
       while (!end) {
-        if (idleMode) while (!idle.get()) goToSleep();
+        startSocketListener();
+        if (idleMode) {
+          while (!idle.get()) goToSleep();
+        }
         startProcess();
         int n = process.waitFor();
         end = onProcessExit(n);
@@ -122,7 +134,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     stoppedOnBusyState.set(false);
     process = buildProcess();
     createProcessWrapper(process);
-    if (debugEnabled) log.debug("started driver process [" + process + ']');
+    if (debugEnabled) log.debug("started {} process [{}]", jppfType, process);
   }
 
   /**

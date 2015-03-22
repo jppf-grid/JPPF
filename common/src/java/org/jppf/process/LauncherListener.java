@@ -18,7 +18,7 @@
 
 package org.jppf.process;
 
-import java.io.EOFException;
+import java.io.*;
 import java.net.Socket;
 
 import org.jppf.utils.*;
@@ -77,9 +77,12 @@ public class LauncherListener extends Thread {
   public void run() {
     try {
       Socket s = new Socket("localhost", port);
+      DataInputStream dis = new DataInputStream(s.getInputStream());
+      if (debugEnabled) log.debug("launcher listener initialized on port {}", port);
       while (true) {
-        int n = s.getInputStream().read();
+        int n = dis.readInt();
         if (n == -1) throw new EOFException("eof");
+        if (debugEnabled) log.debug("received command code {} from controling process", ProcessCommands.getCommandName(n));
         LauncherListenerProtocolHandler ah = getActionHandler();
         if (ah != null) ah.performAction(n);
       }

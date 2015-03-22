@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-package org.jppf.node.provisioning;
+package org.jppf.node;
 
 import org.jppf.management.JPPFNodeAdminMBean;
 import org.jppf.process.*;
 import org.jppf.server.node.JPPFNode;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.*;
 
 /**
  * The protocol handler which executes commands sent to a slave node by its master node.
@@ -28,6 +30,14 @@ import org.jppf.server.node.JPPFNode;
  * @since 5.0
  */
 public class ShutdownRestartNodeProtocolHandler implements LauncherListenerProtocolHandler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ShutdownRestartNodeProtocolHandler.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The node to send requests to.
    */
@@ -47,6 +57,7 @@ public class ShutdownRestartNodeProtocolHandler implements LauncherListenerProto
     JPPFNodeAdminMBean mbean = node.getNodeAdmin();
     if (mbean == null) return;
     try {
+      if (debugEnabled) log.debug("processing {} command code", ProcessCommands.getCommandName(actionCode));
       switch(actionCode) {
         case ProcessCommands.RESTART_INTERRUPT:
           mbean.restart(true);

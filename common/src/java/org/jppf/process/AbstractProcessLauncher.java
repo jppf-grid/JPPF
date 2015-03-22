@@ -235,6 +235,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
      * @param action the code of the action command to send.
      */
     protected void sendActionCommand(final int action) {
+      if (log.isDebugEnabled()) log.debug("{} sending command {} to slave process", getName(), action);
       if (socketClient == null) return;
       try {
         socketClient.writeInt(action);
