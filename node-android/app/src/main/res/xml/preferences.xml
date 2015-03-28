@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <EditTextPreference android:defaultValue=""
+    android:hint="@string/pref_servers_hint"
+    android:key="pref_servers"
+    android:summary="@string/pref_servers_sum"
+    android:title="@string/pref_servers_title"/>
+
+  <EditTextPreference android:defaultValue="1"
+    android:key="pref_threads"
+    android:numeric="integer"
+    android:summary="@string/pref_threads_sum"
+    android:title="@string/pref_threads_title"/>
+
+</PreferenceScreen>

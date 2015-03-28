@@ -18,14 +18,15 @@
 package org.jppf.android;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
-import org.jppf.classloader.AbstractJPPFClassLoader;
+import org.jppf.android.activities.SettingsFragment;
 import org.jppf.node.NodeRunner;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.TypedProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,15 +35,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class AndroidHelper {
   /**
-   * Logger for this class.
+   * Tag used for logging.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractJPPFClassLoader.class);
+  private final static String LOG_TAG = AndroidHelper.class.getSimpleName();
   /**
-   * A global application object.
+   * A global context object.
    */
-  public static Context context = null;
+  private static Context context = null;
   private static final AtomicBoolean nodeLaunched = new AtomicBoolean(false);
 
+  /**
+   * Start the node.
+   * @param ctxt a global context that can be used by the node.
+   */
   public static void launchNode(Context ctxt) {
     if (nodeLaunched.compareAndSet(false, true)) {
       context = ctxt;
@@ -56,16 +61,43 @@ public class AndroidHelper {
     }
   }
 
+  public static Context getContext() {
+    return context;
+  }
+
   private static void launch0() {
     TypedProperties config = JPPFConfiguration.getProperties();
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    String[] keys = { SettingsFragment.SERVERS_KEY, SettingsFragment.THREADS_KEY };
+    for (String key: keys) changeConfigFromPrefs(prefs, key);
     config.setBoolean("jppf.node.android", true);
     config.setBoolean("jppf.node.offline", true);
     config.setBoolean("jppf.discovery.enabled", false);
-    //config.setString("jppf.server.port", "10.0.2.2");
-    config.setString("jppf.server.host", "192.168.1.24");
-    config.setInt("jppf.server.port", 11111);
-    config.setInt("jppf.processing.threads", 1);
+    config.setString("jppf.server.connection.strategy", AndroidNodeConnectionStrategy.class.getName());
     config.setString("jppf.node.class", "org.jppf.server.node.android.JPPFAndroidNode");
     NodeRunner.main("noLauncher");
+  }
+
+  public static void changeConfigFromPrefs(final SharedPreferences prefs, final String key) {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    switch(key) {
+      case SettingsFragment.SERVERS_KEY:
+        String value = prefs.getString(key, "");
+        Log.d(LOG_TAG, String.format("preference %s changed to %s", key, value));
+        String[] servers = value.split("\\s");
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (String s: servers) {
+          if (count > 0) sb.append(" ");
+          sb.append(s);
+          count++;
+        }
+        config.setString("jppf.node.android.connections", sb.toString());
+        break;
+
+      case SettingsFragment.THREADS_KEY:
+        config.setString("jppf.processing.threads", prefs.getString(key, "1"));
+        break;
+    }
   }
 }
