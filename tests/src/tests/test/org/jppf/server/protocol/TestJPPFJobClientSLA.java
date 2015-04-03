@@ -230,7 +230,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
    * Test that a job is only executed on one channel at a time, either local or remote.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout=15000)
   public void testJobMaxChannelsClient() throws Exception {
     try {
       configure(true, true, 1);
@@ -252,6 +252,9 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
             r1.intersects(r2, false) && !t1.getNodeUuid().equals(t2.getNodeUuid()));
         }
       }
+    } catch(Exception|Error e) {
+      e.printStackTrace();
+      throw e;
     } finally {
       reset();
     }

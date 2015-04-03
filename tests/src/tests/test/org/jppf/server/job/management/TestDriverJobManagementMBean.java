@@ -100,7 +100,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     int nbTasks = 2;
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
-    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L);
     job.getSLA().setSuspended(true);
     client.submitJob(job);
     Thread.sleep(1500L);
