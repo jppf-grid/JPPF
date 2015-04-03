@@ -1,0 +1,121 @@
+<html>
+
+  <head>
+    <title>Generation of Mandelbrot Fractals</title>
+    <meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+    <meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+    <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+  </head>
+
+  <body>
+    <div align="center">
+      <div class="gwrapper" align="center">
+
+        <!-- start header -->
+        <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+          <tr style="height: 80px">
+            <td width="20"></td>
+            <td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+            <td valign="center"><h1>Generation of Mandelbrot Fractals</h1></td>
+            <td width="20"></td>
+          </tr>
+        </table>
+        <!-- end header -->
+
+        <!-- start content -->
+        <div align="left" style="margin: 10px">
+          <!-- ${SAMPLE_START_CONTENT} -->
+          <h3>What does the sample do?</h3>
+          This sample generates <a href="http://en.wikipedia.org/wiki/Mandelbrot_set">Mandelbrot fractals</a> images by submitting the computation
+          to a JPPF grid.
+
+          <h3>How do I run it?</h3>
+          Before running this sample application, you must have a JPPF server and at least one node running.<br>
+          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+          Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.
+
+          <h3>How do I use it?</h3>
+          <p>The GUI provides many options and a lot of interactivity.
+
+          <h4 style="font-style: italic; font-weight: bolder">Generating Mandelbrot images</h4>
+          <p>The &quot;Compute&quot; button submits the image generation for processing by JPPF.
+          <p>The image generation is governed by a set of 4 parameters:
+          <ul class="samplesList">
+            <li>center X: the X coordinate of the center of the image</li>
+            <li>center Y: the Y coordinate of the center of the image</li>
+            <li>diameter: this determines the range of possible values of both X and Y axis</li>
+            <li>iterations: the maximum number of iterations of the algorithm, before considering that a point &quot;escapes&quot; the Mandelbrot set</li>
+          </ul>
+          <i>Tip: modifying the cordinates of the center is equivalent to a "pan" functionality<br>
+          Tip: modifying the diameter provides, in effect, a zooming capability</i>
+          <p>You can interact with the image using the mouse:
+          <ul class="samplesList">
+            <li>a left click will zoom-in by the value of the zoom factor, and move the center to the selected point</li>
+            <li>a right click will zoom-out by the value of the zoom factor, and move the center to the selected point</li>
+          </ul>
+          <p>In the toolbar, the <img src="src/icons/zoomIn.gif" border="0" alt="zoom-in"/> and <img src="src/icons/zoomOut.gif" border="0" alt="zoom-out"/>
+          buttons provide a static zoom functionality (they do not move the center).<br>
+          <i>Tip: setting the zoom factor to 1 and clicking left or right in the image is equivalent to panning with the mouse.</i>
+          <p>Additionally, the dimensions of the image can be set in the <b>config/jppf-client.properties</b> configuration file:
+<pre Class="samples">
+<font color="green"># width of the generated images in pixels</font>
+image.width = 800
+<font color="green"># height of the generated images in pixels</font>
+image.height = 600</pre>
+
+          <h4 style="font-style: italic; font-weight: bolder">Recording and replaying parameters sets</h4>
+          The sample allows recording multiple sets of parameters (x, y, diameter and iterations) so they can be replayed later, and eventually saved and loaded as CSV files.
+          The saved files can also be reused by the <a href="../FractalMovieGenerator/Readme.html">Mandelbrot movie generator sample</a>.
+          <p>The possible actions are:
+          <ul class="samplesList">
+            <li><img src="src/icons/record.gif" border="0" alt="record"/> toggle recording: this switches from recording mode "off" to "on" and vice versa. When recording is on, any newly generated image will have its parameters added to the record set</li>
+            <li><img src="src/icons/start.gif" border="0" alt="replay"/> replay: replays the current set of records as a slide show, with 2 seconds between images</li>
+            <li><img src="src/icons/trash.gif" border="0" alt="clear"/> clear: this removes all records from the current set, which therefore becomes empty</li>
+            <li><img src="src/icons/open.gif" border="0" alt="open"/> open: open a previously saved CSV file containng a set of records</li>
+            <li><img src="src/icons/save.gif" border="0" alt="save"/> save: save the current record set to a CSV file</li>
+          </ul>
+
+          <h3>How can I build the sample?</h3>
+          To compile the source code, from a command prompt, type: <b>&quot;ant compile&quot;</b><br>
+          To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;</b>
+
+          <h3>I have additional questions and comments, where can I go?</h3>
+          <p>If you need more insight into the code of this demo, you can consult the source, or have a look at the
+          <a href="javadoc/index.html">API documentation</a>.
+          <p>In addition, There are 2 privileged places you can go to:
+          <ul class="samplesList">
+            <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+            <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+          </ul>
+          <!-- ${SAMPLE_END_CONTENT} -->
+        </div>
+        <!-- end content -->
+
+        <!-- start footer -->
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+          <tr>
+            <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2013 JPPF.org</td>
+            <td align="right">
+              <a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+              <a href="http://sourceforge.net/projects/jppf-project">
+                <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+                  alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+              </a>
+            </td>
+            <td style="width: 10px"></td>
+          </tr>
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+        </table>
+        <div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+        <!-- end footer -->
+
+      </div>
+    </div>
+
+  </body>
+
+</html>
