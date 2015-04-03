@@ -45,7 +45,7 @@ public class TopologyNode extends AbstractTopologyComponent {
   /**
    * The currently pending action forthis node, if any.
    */
-  private String pendingAction = "None";
+  private Enum pendingAction = null;
 
   /**
    * Initialize this topology data as holding information about a node.
@@ -153,7 +153,7 @@ public class TopologyNode extends AbstractTopologyComponent {
    * Get the currently pending action forthis node, if any.
    * @return the pending action as a string.
    */
-  public String getPendingAction() {
+  public Enum getPendingAction() {
     return pendingAction;
   }
 
@@ -161,7 +161,7 @@ public class TopologyNode extends AbstractTopologyComponent {
    * Set the currently pending action for this node.
    * @param pendingAction the pending action as a string.
    */
-  public void setPendingAction(final String pendingAction) {
+  public void setPendingAction(final Enum pendingAction) {
     this.pendingAction = pendingAction;
   }
 }

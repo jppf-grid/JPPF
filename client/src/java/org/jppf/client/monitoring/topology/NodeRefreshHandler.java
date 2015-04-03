@@ -221,8 +221,8 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         if (debugEnabled) log.debug("exception raised for node " + entry.getKey() + " : " + ExceptionUtils.getMessage((Exception) entry.getValue()));
       } else if (entry.getValue() instanceof Enum) {
         node.setStatus(TopologyNodeStatus.UP);
-        String action = ((Enum) entry.getValue()).toString();
-        if (!action.equals(node.getPendingAction())) {
+        Enum action = (Enum) entry.getValue();
+        if (action != node.getPendingAction()) {
           changedNodes.add(node);
           node.setPendingAction(action);
         }
