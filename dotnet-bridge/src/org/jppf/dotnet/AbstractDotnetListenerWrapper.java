@@ -68,7 +68,7 @@ public class AbstractDotnetListenerWrapper {
   /**
    * Delegate the specified event to the specified .Net method
    * @param event the event to send.
-   * @param method name the name of the method to invoke on the proxy to the .Net listener.
+   * @param methodName the name of the method to invoke on the proxy to the .Net listener.
    */
   protected void delegate(final Object event, final String methodName) {
     if (dotnetDispatcher == null) return;

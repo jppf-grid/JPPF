@@ -36,32 +36,32 @@ public class DotnetTopologyListenerWrapper extends AbstractDotnetListenerWrapper
   }
 
   @Override
-  public void driverAdded(TopologyEvent event) {
+  public void driverAdded(final TopologyEvent event) {
     delegate(event, "DriverAdded");
   }
 
   @Override
-  public void driverRemoved(TopologyEvent event) {
+  public void driverRemoved(final TopologyEvent event) {
     delegate(event, "DriverRemoved");
   }
 
   @Override
-  public void driverUpdated(TopologyEvent event) {
+  public void driverUpdated(final TopologyEvent event) {
     delegate(event, "DriverUpdated");
   }
 
   @Override
-  public void nodeAdded(TopologyEvent event) {
+  public void nodeAdded(final TopologyEvent event) {
     delegate(event, "NodeAdded");
   }
 
   @Override
-  public void nodeRemoved(TopologyEvent event) {
+  public void nodeRemoved(final TopologyEvent event) {
     delegate(event, "NodeRemoved");
   }
 
   @Override
-  public void nodeUpdated(TopologyEvent event) {
+  public void nodeUpdated(final TopologyEvent event) {
     delegate(event, "NodeUpdated");
   }
 }
