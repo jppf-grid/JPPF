@@ -196,7 +196,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
     if (debugEnabled) log.debug("removing connection {}", nodeContext.getChannel());
     try {
-      taskQueueChecker.removeIdleChannel(nodeContext);
+      taskQueueChecker.removeIdleChannelAsync(nodeContext);
       updateConnectionStatus(nodeContext, nodeContext.getExecutionStatus(), ExecutorStatus.DISABLED);
     } catch(Exception e) {
       if (debugEnabled) log.debug("error removing connection {} : {}", nodeContext, e);
@@ -271,7 +271,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
     if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannelAsync(nodeContext);
     else {
-      taskQueueChecker.removeIdleChannel(nodeContext);
+      taskQueueChecker.removeIdleChannelAsync(nodeContext);
       if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
     }
     queue.updateWorkingConnections(oldStatus, newStatus);

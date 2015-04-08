@@ -178,12 +178,25 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Remove a channel from the list of idle channels.
    * @param channel the channel to remove from the list.
    */
-  void removeIdleChannel(final C channel) {
+  private void removeIdleChannel(final C channel) {
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     synchronized(idleChannels) {
       boolean removed = idleChannels.remove(channel);
       if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
     }
+  }
+
+  /**
+   * Remove a channel from the list of idle channels.
+   * @param channel the channel to remove from the list.
+   */
+  void removeIdleChannelAsync(final C channel) {
+    channelsExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        removeIdleChannel(channel);
+      }
+    });
   }
 
   /**
