@@ -76,69 +76,39 @@ import javax.security.auth.Subject;
 
 import com.sun.jmx.remote.opt.util.*;
 
-/**
- * 
- */
+/** */
 public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageConnection {
-  /**
-   * 
-   */
+  /** */
   private static final int UNCONNECTED = 1;
-  /**
-   * 
-   */
+  /** */
   private static final int CONNECTING = 2;
-  /**
-   * 
-   */
+  /** */
   private static final int CONNECTED = 3;
-  /**
-   * 
-   */
+  /** */
   private static final int FAILED = 4;
-  /**
-   * 
-   */
+  /** */
   private static final int TERMINATED = 5;
-  /**
-   * 
-   */
+  /** */
   private int state = UNCONNECTED;
   /**
    * This lock used to ensures no concurrent writes
    */
   private transient int[] connectionLock = new int[0];
-  /**
-   * 
-   */
+  /** */
   private transient MessageConnection connection;
-  /**
-   * 
-   */
+  /** */
   private transient SynchroCallback callback;
-  /**
-   * 
-   */
+  /** */
   private transient ClientAdmin clientAdmin = null;
-  /**
-   * 
-   */
+  /** */
   private transient ServerAdmin serverAdmin = null;
-  /**
-   * 
-   */
+  /** */
   private transient Subject subject = null;
-  /**
-   * 
-   */
+  /** */
   private Map<String, ?> env;
-  /**
-   * 
-   */
+  /** */
   private transient MessageReader reader;
-  /**
-   * 
-   */
+  /** */
   private transient long wtimeout;
   /**
    * Maps message id to ResponseMsgWrapper, locked at itself when the map is updated. A ResponseMsgWrapper is used to wait for response for given request. Sychronizing on it to do wait/notify
@@ -156,13 +126,9 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
    * Used to control access to the state variable, including ensuring that only one thread manages state transitions.
    */
   private int[] stateLock = new int[0];
-  /**
-   * 
-   */
+  /** */
   private long waitConnectedState;
-  /**
-   * 
-   */
+  /** */
   private final ClassLogger logger = new ClassLogger("javax.management.remote.misc", "SynchroMessageConnectionImpl");
 
   /**
@@ -184,8 +150,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     synchronized (stateLock) {
       if (state == UNCONNECTED) {
         if (logger.traceOn()) logger.trace("connect", "Establishing the connection.");
-        // first time to connect, need to merge env parameters
-        // with the one passed to the constructor.
+        // first time to connect, need to merge env parameters with the one passed to the constructor.
         Map<String, Object> newEnv = new HashMap<>();
         if (this.env != null) newEnv.putAll(this.env);
         if (env != null) newEnv.putAll(env);
@@ -198,8 +163,6 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         connection = clientAdmin.connectionOpen(connection);
         this.env = newEnv;
         reader = new MessageReader();
-        //threads = new ThreadService(0, 1);
-        //threads.handoff(reader);
         ThreadService.getShared().handoff(reader);
         state = CONNECTED;
         stateLock.notifyAll();
@@ -213,9 +176,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         stateLock.notifyAll();
         // should stop the old reader for cleaning
         if (reader != null) reader.stop();
-        // Attention: lock order:
-        // stateLock before connectionLock
-        // reconnect. forbid all other requests
+        // Attention: lock order: stateLock before connectionLock reconnect. forbid all other requests
         synchronized (connectionLock) {
           connection.connect(this.env);
           connection = clientAdmin.connectionOpen(connection);
@@ -226,8 +187,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           logger.trace("connect", s);
         }
         final ConnectionClosedException ce = new ConnectionClosedException("The connection has been closed by the server.");
-        // Attention: lock order:
-        // stateLock before waitingList before ResponseMsgWrapper
+        // Attention: lock order: stateLock before waitingList before ResponseMsgWrapper
         synchronized (waitingList) {
           for (Long id: waitingList.keySet()) {
             ResponseMsgWrapper rm = waitingList.get(id);
@@ -246,10 +206,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         //threads.handoff(reader);
         ThreadService.getShared().handoff(reader);
         stateLock.notifyAll();
-      } else {
-        // is someone else calling connect()?
-        checkState();
-      }
+      } else checkState(); // is someone else calling connect()?
     }
     if (logger.traceOn()) logger.trace("connect", "Done");
   }
@@ -292,31 +249,29 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       if (logger.traceOn()) logger.trace("sendWithReturn", "Send a MBeanServerRequestMessage.");
       final Long id = new Long(((MBeanServerRequestMessage) msg).getMessageId());
       // When receiving CloseMessage, it is possible that the server closes itself by timeout, so we will do reconnection and then wakeup all
-      // threads which are waiting a response by a ConnectionClosedException , to ask them to try once time again, the flag "retried" is specified
-      // here to tell whether the retried has done.
-      // Note: if a ConnectionClosedException is thrown by the server, that exception will be received by ClientIntermediary and it will
-      // inform the ClientCommunicationAdmin before doing retry.
+      // threads which are waiting a response by a ConnectionClosedException , to ask them to try once time again, the flag "retried" is specified here to tell whether the retried has done.
+      // Note: if a ConnectionClosedException is thrown by the server, that exception will be received by ClientIntermediary and it will inform the ClientCommunicationAdmin before doing retry.
       boolean retried = false;
       while (true) {
         ResponseMsgWrapper mwrapper = new ResponseMsgWrapper();
         synchronized (waitingList) {
           waitingList.put(id, mwrapper);
         }
-        // send out the msg
-        synchronized (connectionLock) {
+        synchronized (connectionLock) { // send out the msg
           connection.writeMessage(msg);
         }
         long remainingTime = wtimeout;
         final long startTime = System.currentTimeMillis();
-        synchronized (mwrapper) {
-          while (!mwrapper.got && remainingTime > 0) {
+        boolean got = false;
+        while (!got && (remainingTime > 0)) {
+          synchronized(mwrapper) { got = mwrapper.got; }
+          if (!got) {
             try {
-              mwrapper.wait(remainingTime);
+              checkState();
+              synchronized(mwrapper) { mwrapper.wait(1000L); }
             } catch (InterruptedException ie) {
-              // OK. This is a user thread, so it is possible that the user wants to stop waiting.
-              break;
+              break; // OK. This is a user thread, so it is possible that the user wants to stop waiting.
             }
-            remainingTime = wtimeout - (System.currentTimeMillis() - startTime);
           }
         }
         synchronized (waitingList) {
@@ -381,8 +336,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
 
   @Override
   public String getConnectionId() {
-    // at client side, only clientAdmin can know connectionId
-    // when it receives HandshakeEndMessage from its server.
+    // at client side, only clientAdmin can know connectionId when it receives HandshakeEndMessage from its server.
     return clientAdmin.getConnectionId();
   }
 
@@ -394,22 +348,16 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     return connection;
   }
 
-  /**
-   * 
-   */
+  /** */
   private class MessageReader implements Runnable {
-    /**
-     * 
-     */
+    /** */
     private Thread executingThread;
     /**
      * This flag is used to ensure that we interrupt the executingThread only when it is running in this MessageReader object.
      */
     private boolean executingThreadInterrupted = false;
 
-    /**
-     * 
-     */
+    /** */
     public MessageReader() {
     }
 
@@ -466,9 +414,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       if (logger.traceOn()) logger.trace("MessageReader-run", "ended.");
     }
 
-    /**
-     * 
-     */
+    /** */
     public void stop() {
       if (logger.traceOn()) logger.trace("MessageReader-terminated", "be called.");
       synchronized (stateLock) {
@@ -491,22 +437,14 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   private static class ResponseMsgWrapper {
-    /**
-     * 
-     */
+    /** */
     public boolean got = false;
-    /**
-     * 
-     */
+    /** */
     public Object msg = null;
 
-    /**
-     * 
-     */
+    /** */
     public ResponseMsgWrapper() {
     }
 
@@ -520,13 +458,9 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   private class RemoteJob implements Runnable {
-    /**
-     * 
-     */
+    /** */
     private Message msg;
 
     /**
