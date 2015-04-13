@@ -37,6 +37,6 @@ public abstract class NodeIntegrationAdapter<C> extends NodeLifeCycleListenerAda
   }
 
   @Override
-  public void setUiComponent(final C uiCOmponent) {
+  public void setUiComponent(final C uiComponent) {
   }
 }

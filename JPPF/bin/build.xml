@@ -26,7 +26,8 @@
 	<property name="common"                value="${basedir}/../common"/>
 	<property name="admin"                 value="${basedir}/../admin"/>
 	<property name="client"                value="${basedir}/../client"/>
-	<property name="node"                  value="${basedir}/../node"/>
+  <property name="node"                  value="${basedir}/../node"/>
+  <property name="node.android"          value="${basedir}/../node-android"/>
 	<property name="server"                value="${basedir}/../server"/>
 	<property name="demo"                  value="${basedir}/../demo"/>
   <property name="dotnet-bridge"         value="${basedir}/../dotnet-bridge"/>
@@ -184,7 +185,8 @@
   <!-- build the whole JPPF distribution without javadoc -->
   <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
   <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
-	<target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, tests.build, user.guide, doc" description="deploy without building the javadoc nor the installer"/>
+	<target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, tests.build, user.guide, doc"
+    description="deploy without building the javadoc nor the installer"/>
   <!-- build the whole JPPF distribution with local web installer -->
   <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
 

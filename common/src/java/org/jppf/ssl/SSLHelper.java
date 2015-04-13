@@ -99,6 +99,7 @@ public final class SSLHelper {
    * @throws Exception if any error occurs.
    */
   private static SSLContext getSSLContext(final String trustStorePropertyPrefix) throws Exception {
+    try {
     if (sslConfig == null) loadSSLProperties();
     char[] keyPwd = getPassword("jppf.ssl.keystore.password");
     KeyStore keyStore = getStore("jppf.ssl.keystore", keyPwd);
@@ -117,6 +118,9 @@ public final class SSLHelper {
     SSLContext sslContext = SSLContext.getInstance(sslConfig.getString("jppf.ssl.context.protocol"));
     sslContext.init(kmf == null ? null : kmf.getKeyManagers(), tmf == null ? null : tmf.getTrustManagers(), null);
     return sslContext;
+    } catch(Exception e) {
+      throw (e instanceof SSLConfigurationException) ? e : new SSLConfigurationException(e);
+    }
   }
 
   /**
@@ -183,28 +187,18 @@ public final class SSLHelper {
   }
 
   /**
-   * Create and load a keystore from the specified file.
-   * @param filename the name of the keystore file.
-   * @param pwd the key store password.
-   * @return a {@link KeyStore} instance.
-   * @throws Exception if any error occurs.
-   */
-  private static KeyStore getKeyOrTrustStore(final String filename, final char[] pwd) throws Exception {
-    return getKeyOrTrustStore(new FileStoreSource(filename).call(), pwd);
-  }
-
-  /**
    * Create and load a keystore from the specified input stream.
    * @param is the input stream from which to load the store.
    * @param pwd the store password.
+   * @param storeType the typr of keystore to use, e.g. JKS, PKCS12, BCKS etc.
    * @return a {@link KeyStore} instance.
    * @throws Exception if any error occurs.
    */
-  private static KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd) throws Exception {
+  private static KeyStore getKeyOrTrustStore(final InputStream is, final char[] pwd, final String storeType) throws Exception {
     if (is == null) return null;
     KeyStore ks = null;
     try {
-      ks = KeyStore.getInstance(KeyStore.getDefaultType());
+      ks = KeyStore.getInstance(storeType);
       ks.load(is, pwd);
     } finally {
       StreamUtils.close(is, log);
@@ -222,7 +216,6 @@ public final class SSLHelper {
     String s = sslConfig.getString(baseProperty, null);
     if (s != null) return s.toCharArray();
     s = sslConfig.getString(baseProperty + ".source", null);
-    //return (char[]) callSource(s);
     return (char[]) callSource(s);
   }
 
@@ -234,12 +227,11 @@ public final class SSLHelper {
    * @throws Exception if any error occurs.
    */
   private static KeyStore getStore(final String baseProperty, final char[] pwd) throws Exception {
+    String storeType = sslConfig.getString(baseProperty + ".type", KeyStore.getDefaultType());
     String s = sslConfig.getString(baseProperty + ".file", null);
-    if (s != null) return getKeyOrTrustStore(s, pwd);
+    if (s != null) return getKeyOrTrustStore(new FileStoreSource(s).call(), pwd, storeType);
     s = sslConfig.getString(baseProperty + ".source", null);
-    //InputStream is = (InputStream) callSource(s);
-    InputStream is = callSource(s);
-    return getKeyOrTrustStore(is, pwd);
+    return getKeyOrTrustStore((InputStream) callSource(s), pwd, storeType);
   }
 
   /**
@@ -290,6 +282,7 @@ public final class SSLHelper {
       if (is == null) throw new SSLConfigurationException("could not load the SSL configuration '" + source + "'");
       try {
         sslConfig.load(is);
+        log.info("loaded SSL properties: " + sslConfig);
         if (debugEnabled) log.debug("successfully loaded the SSL configuration from '{}'", source);
       } finally {
         StreamUtils.closeSilent(is);
