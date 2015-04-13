@@ -15,22 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.android.activities;
+package org.jppf.android;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.os.Bundle;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
-public class SettingsActivity extends Activity {
+/**
+ * The source for the SSL ocnfiguration properties.
+ * @author Laurent Cohen
+ */
+public class SSLConfigSource implements Callable<InputStream> {
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    // Display the fragment as the main content.
-    FragmentManager fragmentManager = getFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    SettingsFragment fragment = new SettingsFragment();
-    transaction.replace(android.R.id.content, fragment);
-    transaction.commit();
+  public InputStream call() throws Exception {
+    byte[] bytes = null;
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      AndroidHelper.getSSLConfig().store(baos, null);
+      bytes = baos.toByteArray();
+    }
+    return new ByteArrayInputStream(bytes);
   }
 }

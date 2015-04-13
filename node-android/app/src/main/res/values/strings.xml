@@ -1,11 +1,13 @@
 <resources>
   <string name="app_name">JPPF Android Node</string>
 
-  <string name="hello_world">Hello world!</string>
   <string name="title_activity_main">JPPF Android Node</string>
-  <string name="title_activity_settings">SettingsActivity</string>
+  <string name="title_activity_settings">Configuration</string>
 
   <string name="action_settings">Settings</string>
+
+  <string name="pref_server_connection_title">Server connection</string>
+  <string name="pref_server_connection_sum">Server connectivity settings</string>
 
   <string name="pref_servers_title">Servers</string>
   <string name="pref_servers_sum">Servers to connect to, 1 per line</string>
@@ -13,5 +15,49 @@
 
   <string name="pref_threads_title">Threads</string>
   <string name="pref_threads_sum">Number of processing threads</string>
+
+  <string name="pref_security_title">Security</string>
+  <string name="pref_security_sum">SSL/TLS configuration</string>
+
+  <string name="pref_key_store_location_title">Key store location</string>
+  <string name="pref_key_store_location_sum">Location of server public/private key store</string>
+  <string name="pref_key_store_password_title">Key store password</string>
+  <string name="pref_key_store_password_sum">Password for the server public/private key store</string>
+
+  <string name="pref_trust_store_location_title">Trust store location</string>
+  <string name="pref_trust_store_location_sum">Location of server certificate store</string>
+  <string name="pref_trust_store_password_title">Trust store password</string>
+  <string name="pref_trust_store_password_sum">Password for the server certificate store</string>
+
+  <string name="pref_ssl_context_protocol_title">SSL context protocol</string>
+  <string name="pref_ssl_context_protocol_sum">Protocol value for SSLContext.getProtocol()</string>
+  <string name="pref_ssl_context_protocol_default">Default</string>
+  <string-array name="pref_ssl_context_protocol_values">
+    <item>Default</item>
+    <item>SSL</item>
+    <item>SSLv3</item>
+    <item>TLS</item>
+    <item>TLSv1</item>
+    <item>TLSv1.1</item>
+    <item>TLSv1.2</item>
+  </string-array>
+
+  <string name="pref_ssl_engine_protocol_title">SSL engine protocols</string>
+  <string name="pref_ssl_engine_protocol_sum">Protocol value for SSLEngine.getEnabledProtocols()</string>
+  <string-array name="pref_ssl_engine_protocol_values">
+    <item>SSLv2Hello</item>
+    <item>SSLv3</item>
+    <item>TLSv1</item>
+  </string-array>
+  <string-array name="pref_ssl_engine_protocol_default">
+    <item>SSLv2Hello</item>
+    <item>SSLv3</item>
+  </string-array>
+
+  <string name="pref_enabled_cipher_suites_title">Enabled cypher suites</string>
+  <string name="pref_enabled_cipher_suites_sum">The set of enabled cypher suites</string>
+
+  <string-array name="pref_empty_array">
+  </string-array>
 
 </resources>

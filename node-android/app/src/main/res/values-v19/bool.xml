@@ -1,0 +1,3 @@
+<resources>
+  <bool name="atLeastKitKat">true</bool>
+</resources>

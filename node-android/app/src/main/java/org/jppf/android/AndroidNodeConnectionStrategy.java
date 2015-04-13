@@ -41,7 +41,7 @@ public class AndroidNodeConnectionStrategy implements DriverConnectionStrategy {
   /**
    * Whether to use secure connections.
    */
-  private final static boolean SECURE = false;
+  private final static boolean SECURE = true;
   /**
    * The list of available connection settings.
    */

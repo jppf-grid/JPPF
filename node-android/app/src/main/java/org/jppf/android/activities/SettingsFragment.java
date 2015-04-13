@@ -17,15 +17,32 @@
  */
 package org.jppf.android.activities;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.MultiSelectListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import org.jppf.android.AndroidHelper;
+import org.jppf.android.PreferenceUtils;
 import org.jppf.android.R;
-import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.TypedProperties;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * This class manages the settings screen and updates the JPPF configuration whenever a preference changes.
@@ -37,35 +54,134 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
    */
   private final static String LOG_TAG = SettingsFragment.class.getSimpleName();
   /**
-   * The key name for the server connections preference.
+   * The set of default enabled cipher suites.
    */
-  public static final String SERVERS_KEY = "pref_servers";
+  private final static Set<String> ENABLED_CIPHER_SUITES = new HashSet<>();
   /**
-   * The key name for the processing threads preference.
+   * The set of supported cipher suites.
    */
-  public static final String THREADS_KEY = "pref_threads";
+  private final static Set<String> SUPPORTED_CIPHER_SUITES = new HashSet<>();
+  /**
+   * The current key being modified (for prefs linked to a file chooser).
+   */
+  private Preference currentPref = null;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    // Load the preferences from an XML resource
-    addPreferencesFromResource(R.xml.preferences);
+    Log.v(LOG_TAG, "onCreate()");
+    try {
+      super.onCreate(savedInstanceState);
+      // Load the preferences from an XML resource
+      addPreferencesFromResource(R.xml.preferences);
+      String[] pickerKeys = { PreferenceUtils.TRUST_STORE_LOCATION_KEY, PreferenceUtils.KEY_STORE_LOCATION_KEY };
+      for (String key: pickerKeys) {
+        FilechoserEditTextPreference picker = (FilechoserEditTextPreference) findPreference(key);
+        picker.setFragment(this);
+      }
+      PreferenceScreen pref = (PreferenceScreen) findPreference("pref_security");
+      //pref.get
+      if (SUPPORTED_CIPHER_SUITES.isEmpty()) {
+        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        ENABLED_CIPHER_SUITES.addAll(Arrays.asList(ssf.getDefaultCipherSuites()));
+        Log.d(LOG_TAG, "enabled cipher suite: " + ENABLED_CIPHER_SUITES);
+        SUPPORTED_CIPHER_SUITES.addAll(Arrays.asList(ssf.getSupportedCipherSuites()));
+        Log.d(LOG_TAG, "supported cipher suite: " + SUPPORTED_CIPHER_SUITES);
+      }
+      MultiSelectListPreference ciphersPref = (MultiSelectListPreference) findPreference(PreferenceUtils.ENABLED_CIPHER_SUITES_KEY);
+      ciphersPref.setDefaultValue(ENABLED_CIPHER_SUITES.toArray(new String[ENABLED_CIPHER_SUITES.size()]));
+      ciphersPref.setEntryValues(SUPPORTED_CIPHER_SUITES.toArray(new String[SUPPORTED_CIPHER_SUITES.size()]));
+      ciphersPref.setEntries(SUPPORTED_CIPHER_SUITES.toArray(new String[SUPPORTED_CIPHER_SUITES.size()]));
+    } catch(Throwable t) {
+      t.printStackTrace();
+    }
   }
 
   @Override
   public void onResume() {
     super.onResume();
+    Log.v(LOG_TAG, "onResume()");
     getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
   }
 
   @Override
   public void onPause() {
     super.onPause();
+    Log.v(LOG_TAG, "onPause()");
     getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
   }
 
   @Override
   public void onSharedPreferenceChanged(final SharedPreferences prefs, final String key) {
     AndroidHelper.changeConfigFromPrefs(prefs, key);
+  }
+
+  @Override
+  public void onActivityResult(final int requestCode, final int resultCode, final Intent resultData) {
+    //super.onActivityResult(requestCode, resultCode, resultData);
+    Log.v(LOG_TAG, String.format("onActivityResult(requestCode=%d, resultCode=%d, resultData=%s)", requestCode, resultCode, resultData));
+    if ((requestCode == PreferenceUtils.READ_REQUEST_CODE) && (resultCode == Activity.RESULT_OK)) {
+      if (resultData != null) {
+        Uri uri = resultData.getData();
+        Log.v(LOG_TAG, "Uri: " + uri);
+        Preference pref = currentPref;
+        currentPref = null;
+        if (pref instanceof FilechoserEditTextPreference) ((FilechoserEditTextPreference) pref).onValueChanged(uri.toString());
+      }
+    }
+  }
+
+  @Override
+  public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+    try {
+      super.onPreferenceTreeClick(preferenceScreen, preference);
+      // If the user has clicked on a preference screen, set up the action bar
+      if (preference instanceof PreferenceScreen) initializeActionBar((PreferenceScreen) preference);
+      Log.d(LOG_TAG, "clicked on preference " + preference);
+    } catch(Throwable t) {
+      t.printStackTrace();
+    }
+    return false;
+  }
+
+  /**
+   * Sets up the action bar for an {@link PreferenceScreen}.
+   * @param preferenceScreen the preference screen on which to set the action bar.
+   */
+  public static void initializeActionBar(PreferenceScreen preferenceScreen) {
+    final Dialog dialog = preferenceScreen.getDialog();
+    if (dialog != null) {
+      dialog.getActionBar().setDisplayHomeAsUpEnabled(true);
+      View homeBtn = dialog.findViewById(android.R.id.home);
+      if (homeBtn != null) {
+        View.OnClickListener dismissDialogClickListener = new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            dialog.dismiss();
+          }
+        };
+        ViewParent homeBtnContainer = homeBtn.getParent();
+        if (homeBtnContainer instanceof FrameLayout) {
+          ViewGroup containerParent = (ViewGroup) homeBtnContainer.getParent();
+          if (containerParent instanceof LinearLayout) containerParent.setOnClickListener(dismissDialogClickListener);
+          else ((FrameLayout) homeBtnContainer).setOnClickListener(dismissDialogClickListener);
+        } else  homeBtn.setOnClickListener(dismissDialogClickListener);
+      }
+    }
+  }
+
+  /**
+   * Initiiate the file picker for the specified preference.
+   * @param pref the preference whose value will be the uri of the selected file, if any.
+   */
+  public void startFileChooser(Preference pref) {
+    Log.d(LOG_TAG, "startFileChooser(Preference)");
+    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType("*/*");
+    String value = pref.getSharedPreferences().getString(pref.getKey(), null);
+    Log.d(LOG_TAG, "startFileChooser() value = " + value);
+    //if ((value != null) && !"".equals(value.trim())) intent.setData(Uri.parse(value));
+    currentPref = pref;
+    startActivityForResult(intent, PreferenceUtils.READ_REQUEST_CODE);
   }
 }

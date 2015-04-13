@@ -1,16 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <EditTextPreference android:defaultValue=""
-    android:hint="@string/pref_servers_hint"
-    android:key="pref_servers"
-    android:summary="@string/pref_servers_sum"
-    android:title="@string/pref_servers_title"/>
-
   <EditTextPreference android:defaultValue="1"
     android:key="pref_threads"
     android:numeric="integer"
     android:summary="@string/pref_threads_sum"
     android:title="@string/pref_threads_title"/>
+
+  <PreferenceCategory android:title="@string/pref_server_connection_title" android:summary="@string/pref_server_connection_sum" android:key="pref_server_connection">
+    <EditTextPreference android:defaultValue=""
+      android:hint="@string/pref_servers_hint"
+      android:key="pref_servers"
+      android:summary="@string/pref_servers_sum"
+      android:title="@string/pref_servers_title"/>
+  </PreferenceCategory>
+
+  <PreferenceScreen android:key="pref_security"
+    android:icon="@android:drawable/ic_menu_more"
+    android:title="@string/pref_security_title"
+    android:summary="@string/pref_security_sum"
+    android:persistent="false">
+
+    <org.jppf.android.activities.FilechoserEditTextPreference android:defaultValue=""
+      android:key="pref_trust_store_location"
+      android:summary="@string/pref_trust_store_location_sum"
+      android:title="@string/pref_trust_store_location_title"
+      android:persistent="true"
+    />
+
+    <EditTextPreference android:defaultValue=""
+      android:key="pref_trust_store_password"
+      android:summary="@string/pref_trust_store_password_sum"
+      android:title="@string/pref_trust_store_password_title"
+      android:password="true"
+      android:singleLine="true"
+    />
+
+    <org.jppf.android.activities.FilechoserEditTextPreference android:defaultValue=""
+      android:key="pref_key_store_location"
+      android:summary="@string/pref_key_store_location_sum"
+      android:title="@string/pref_key_store_location_title"
+      android:persistent="true"
+    />
+
+    <EditTextPreference android:defaultValue=""
+      android:key="pref_key_store_password"
+      android:summary="@string/pref_key_store_password_sum"
+      android:title="@string/pref_key_store_password_title"
+      android:password="true"
+      android:singleLine="true"
+    />
+
+    <MultiSelectListPreference
+      android:key="pref_ssl_engine_protocol"
+      android:entries="@array/pref_ssl_engine_protocol_values"
+      android:entryValues="@array/pref_ssl_engine_protocol_values"
+      android:defaultValue="@array/pref_ssl_engine_protocol_default"
+      android:summary="@string/pref_ssl_engine_protocol_sum"
+      android:title="@string/pref_ssl_engine_protocol_title"
+    />
+
+    <ListPreference
+      android:key="pref_ssl_context_protocol"
+      android:entries="@array/pref_ssl_context_protocol_values"
+      android:entryValues="@array/pref_ssl_context_protocol_values"
+      android:defaultValue="@string/pref_ssl_context_protocol_default"
+      android:summary="@string/pref_ssl_context_protocol_sum"
+      android:title="@string/pref_ssl_context_protocol_title"
+    />
+
+    <!--
+      SSLSocketFactory.getDefault().getDefaultCipherSuites()
+      SSLSocketFactory.getDefault().getSupportedCipherSuites()
+    -->
+    <MultiSelectListPreference
+      android:key="pref_enabled_cipher_suites"
+      android:defaultValue="@array/pref_empty_array"
+      android:entries="@array/pref_empty_array"
+      android:entryValues="@array/pref_empty_array"
+      android:summary="@string/pref_enabled_cipher_suites_sum"
+      android:title="@string/pref_enabled_cipher_suites_title"
+    />
+
+  </PreferenceScreen>
 
 </PreferenceScreen>
