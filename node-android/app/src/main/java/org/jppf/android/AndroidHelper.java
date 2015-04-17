@@ -25,15 +25,12 @@ import android.util.Log;
 
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.android.JPPFAndroidNode;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.TypedProperties;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.net.ssl.SSLContext;
 
 /**
  * Utility methods for launching a node and managing its configuration.
@@ -63,6 +60,22 @@ public class AndroidHelper {
   }
 
   /**
+   * Get the context used by the node.
+   * @return a {@link Context} object.
+   */
+  public static Context getContext() {
+    return context;
+  }
+
+  /**
+   * Get the SSL/TLS configuration.
+   * @return the ocnfiguration as a {@link TypedProperties) object.
+   */
+  public static TypedProperties getSSLConfig() {
+    return sslConfig;
+  }
+
+  /**
    * Start the node in a separate thread.
    * @param ctxt a global context that can be used by the node.
    */
@@ -77,22 +90,6 @@ public class AndroidHelper {
         }
       }.execute();
     }
-  }
-
-  /**
-   * Get the context used by the node.
-   * @return a {@link Context} object.
-   */
-  public static Context getContext() {
-    return context;
-  }
-
-  /**
-   * Get the SSL/TLS configuration.
-   * @return the ocnfiguration as a {@link TypedProperties) object.
-   */
-  public static TypedProperties getSSLConfig() {
-    return sslConfig;
   }
 
   /**
@@ -116,11 +113,9 @@ public class AndroidHelper {
       config.setString("jppf.node.class", JPPFAndroidNode.class.getName());
       config.setString("jppf.ssl.configuration.source", SSLConfigSource.class.getName());
       config.setBoolean("jppf.ssl.enabled", true);
-      //SSLContext sslCOntext = SSLHelper.getSSLContext();
       NodeRunner.main("noLauncher");
     } catch(Exception e) {
-      Log.d(LOG_TAG, "exception in launch0() : ", e);
-      //e.printStackTrace();
+      Log.e(LOG_TAG, "exception in launch0() : ", e);
     }
   }
 

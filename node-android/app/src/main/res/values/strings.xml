@@ -33,7 +33,7 @@
   <string name="pref_ssl_context_protocol_sum">Protocol value for SSLContext.getProtocol()</string>
   <string name="pref_ssl_context_protocol_default">Default</string>
   <string-array name="pref_ssl_context_protocol_values">
-    <item>Default</item>
+    <!--<item>Default</item>-->
     <item>SSL</item>
     <item>SSLv3</item>
     <item>TLS</item>

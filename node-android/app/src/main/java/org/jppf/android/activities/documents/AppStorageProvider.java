@@ -176,7 +176,7 @@ public class AppStorageProvider extends DocumentsProvider {
     if (type == null) type = child.isDirectory() ? Document.MIME_TYPE_DIR : "application/octet-stream";
     int flags = child.isDirectory()
       ? /*Document.FLAG_DIR_PREFERS_GRID |*/ Document.FLAG_DIR_PREFERS_LAST_MODIFIED | Document.FLAG_DIR_SUPPORTS_CREATE
-      : Document.FLAG_SUPPORTS_WRITE;
+      : /*Document.FLAG_SUPPORTS_WRITE*/ 0;
     row.add(Document.COLUMN_FLAGS, flags);
     row.add(Document.COLUMN_DISPLAY_NAME, child.getName());
     row.add(Document.COLUMN_DOCUMENT_ID, getDocumentId(child));

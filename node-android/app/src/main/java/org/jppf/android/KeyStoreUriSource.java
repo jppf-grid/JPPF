@@ -24,7 +24,6 @@ import org.jppf.android.activities.SettingsFragment;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.concurrent.Callable;
 
 /**
@@ -43,7 +42,6 @@ public class KeyStoreUriSource implements Callable<InputStream> {
    * @param args only the first arg is used and must contain a non-encoded URI.
    */
   public KeyStoreUriSource(String...args) {
-    //uri = Uri.parse(PreferenceUtils.encodeURL(args[0]));
     uri = Uri.parse(args[0]);
   }
 

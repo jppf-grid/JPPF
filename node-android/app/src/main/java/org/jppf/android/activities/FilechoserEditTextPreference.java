@@ -28,8 +28,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.jppf.android.PreferenceUtils;
-
 /**
  * A preference widget which captures the Uri for a file accessible via the
  * <a href="http://developer.android.com/guide/topics/providers/document-provider.html">Storage Access Framework</a>.
@@ -114,6 +112,6 @@ public class FilechoserEditTextPreference extends DialogPreference {
    */
   void onValueChanged(String value) {
     Log.d(LOG_TAG, "onValueChanged('" + value + "')");
-    editText.setText(PreferenceUtils.decodeURL(value));
+    editText.setText(value);
   }
 }

@@ -123,6 +123,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
       if (resultData != null) {
         Uri uri = resultData.getData();
         Log.v(LOG_TAG, "Uri: " + uri);
+        final int takeFlags = resultData.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        getActivity().getContentResolver().takePersistableUriPermission(uri, takeFlags);
         Preference pref = currentPref;
         currentPref = null;
         if (pref instanceof FilechoserEditTextPreference) ((FilechoserEditTextPreference) pref).onValueChanged(uri.toString());
@@ -180,7 +182,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     intent.setType("*/*");
     String value = pref.getSharedPreferences().getString(pref.getKey(), null);
     Log.d(LOG_TAG, "startFileChooser() value = " + value);
-    //if ((value != null) && !"".equals(value.trim())) intent.setData(Uri.parse(value));
     currentPref = pref;
     startActivityForResult(intent, PreferenceUtils.READ_REQUEST_CODE);
   }
