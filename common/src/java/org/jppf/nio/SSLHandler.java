@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
@@ -33,8 +33,7 @@ import org.slf4j.*;
  * Wrapper for an {@link SSLEngine} and an associated channel.
  * @exclude
  */
-public class SSLHandler
-{
+public class SSLHandler {
   /**
    * Logger for this class.
    */
@@ -89,12 +88,11 @@ public class SSLHandler
 
   /**
    * Instantiate this SSLHandler with the specified channel and SSL engine.
-   * @param channel the channel from which data is read or to which data is written. 
+   * @param channel the channel from which data is read or to which data is written.
    * @param sslEngine performs the SSL-related operations before sending data/after receiving data.
    * @throws Exception if any error occurs.
    */
-  public SSLHandler(final ChannelWrapper<?> channel, final SSLEngine sslEngine) throws Exception
-  {
+  public SSLHandler(final ChannelWrapper<?> channel, final SSLEngine sslEngine) throws Exception {
     this.channel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
     this.sslEngine = sslEngine;
     SSLSession session = sslEngine.getSession();
@@ -110,28 +108,24 @@ public class SSLHandler
    * @return the number of bytes read from the application receive buffer.
    * @throws Exception if any error occurs.
    */
-  public int read() throws Exception
-  {
+  public int read() throws Exception {
     channelReadCount = 0L;
     int sslCount = 0;
     int count = applicationReceiveBuffer.position();
-    do
-    {
+    do {
       flush();
       if (sslEngine.isInboundDone()) return count > 0 ? count : -1;
       int readCount = doRead();
       channelReceiveBuffer.flip();
       sslEngineResult = sslEngine.unwrap(channelReceiveBuffer, applicationReceiveBuffer);
       channelReceiveBuffer.compact();
-      switch (sslEngineResult.getStatus())
-      {
+      switch (sslEngineResult.getStatus()) {
         case BUFFER_UNDERFLOW:
           if (traceEnabled) log.trace("reading into netRecv=" + channelReceiveBuffer);
           sslCount = doRead();
           if (traceEnabled) log.trace("sslCount=" + sslCount + ", channelReceiveBuffer=" + channelReceiveBuffer);
           if (sslCount == 0) return count;
-          if (sslCount == -1)
-          {
+          if (sslCount == -1) {
             if (traceEnabled) log.trace("reached EOF, closing inbound");
             sslEngine.closeInbound();
           }
@@ -150,8 +144,7 @@ public class SSLHandler
       }
       while (processHandshake());
       count = applicationReceiveBuffer.position();
-    }
-    while (count == 0);
+    } while (count == 0);
     if (sslEngine.isInboundDone()) count = -1;
     return count;
   }
@@ -161,22 +154,19 @@ public class SSLHandler
    * @return the number of bytes consumed from the application.
    * @throws Exception if any error occurs.
    */
-  public int write() throws Exception
-  {
+  public int write() throws Exception {
     if (traceEnabled) log.trace("position=" + applicationSendBuffer.position());
     channelWriteCount = 0L;
     int remaining = applicationSendBuffer.position();
     int writeCount = 0;
     if ((remaining > 0) && (flush() > 0)) return 0;
-    while (remaining > 0)
-    {
+    while (remaining > 0) {
       if (traceEnabled) log.trace("before flip/wrap/compact " + printSendBuffers() + " count=" + remaining);
       applicationSendBuffer.flip();
       sslEngineResult = sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
       applicationSendBuffer.compact();
       if (traceEnabled) log.trace("after  flip/wrap/compact " + printSendBuffers());
-      switch (sslEngineResult.getStatus())
-      {
+      switch (sslEngineResult.getStatus()) {
         case BUFFER_UNDERFLOW:
           if (traceEnabled) log.trace("write", new BufferUnderflowException());
           throw new BufferUnderflowException();
@@ -207,8 +197,7 @@ public class SSLHandler
    * @return the number of bytes flushed.
    * @throws IOException if any error occurs.
    */
-  public int flush() throws IOException
-  {
+  public int flush() throws IOException {
     channelSendBuffer.flip();
     int n = channel.write(channelSendBuffer);
     if (n > 0) channelWriteCount += n;
@@ -221,25 +210,31 @@ public class SSLHandler
    * @return the number of bytes read.
    * @throws IOException if any error occurs.
    */
-  private int doRead()  throws IOException
-  {
+  private int doRead() throws IOException {
     int n = channel.read(channelReceiveBuffer);
     if (n > 0) channelReadCount += n;
+    else if (n < 0) throw new EOFException("EOF reading inbound stream");
     return n;
+  }
+
+  /**
+   * Check whether the channel is valid.
+   * @return {@code true} if this channel is valid, {@code false} otherwise.
+   * @throws Exception if any error occurs.
+   */
+  private boolean checkChannel() throws Exception {
+    return channel.isOpen() && channel.isConnected() && channel.isRegistered();
   }
 
   /**
    * Close the underlying channel and SSL engine.
    * @throws Exception if any error occurs.
    */
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
     if (!sslEngine.isInboundDone() && !channel.isBlocking()) read();
-    while (channelSendBuffer.position() > 0)
-    {
+    while (channelSendBuffer.position() > 0) {
       int n = flush();
-      if (n == 0)
-      {
+      if (n == 0) {
         log.error("unable to flush remaining " + channelSendBuffer.remaining() + " bytes");
         break;
       }
@@ -257,8 +252,7 @@ public class SSLHandler
    * 
    * @throws Exception if any error occurs.
    */
-  private void processEngineResult() throws Exception
-  {
+  private void processEngineResult() throws Exception {
     while (processEngineResultStatus() && processHandshake()) continue;
   }
 
@@ -267,11 +261,10 @@ public class SSLHandler
    * @return <code>true</code> if handshaking is still ongoing, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  private boolean processHandshake() throws Exception
-  {
+  private boolean processHandshake() throws Exception {
+    if (!checkChannel()) throw new IOException("invalid state for channel" + channel);
     int count;
-    switch (sslEngine.getHandshakeStatus())
-    {
+    switch (sslEngine.getHandshakeStatus()) {
       case NOT_HANDSHAKING:
       case FINISHED:
         return false;
@@ -284,8 +277,7 @@ public class SSLHandler
         applicationSendBuffer.flip();
         sslEngineResult = sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
         applicationSendBuffer.compact();
-        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW)
-        {
+        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_OVERFLOW) {
           count = flush();
           return count > 0;
         }
@@ -295,8 +287,7 @@ public class SSLHandler
         channelReceiveBuffer.flip();
         sslEngineResult = sslEngine.unwrap(channelReceiveBuffer, applicationReceiveBuffer);
         channelReceiveBuffer.compact();
-        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW)
-        {
+        if (sslEngineResult.getStatus() == SSLEngineResult.Status.BUFFER_UNDERFLOW) {
           if (sslEngine.isInboundDone()) count = -1;
           else count = doRead();
           if (traceEnabled) log.trace("readCount=" + count);
@@ -315,12 +306,10 @@ public class SSLHandler
    * @return true if a full SSL packet was read or written, false otherwise.
    * @throws Exception if any error occurs.
    */
-  boolean processEngineResultStatus() throws Exception
-  {
+  boolean processEngineResultStatus() throws Exception {
     int count;
     if (traceEnabled) log.trace("sslEngineResult=" + sslEngineResult);
-    switch (sslEngineResult.getStatus())
-    {
+    switch (sslEngineResult.getStatus()) {
       case OK:
         return true;
 
@@ -328,8 +317,7 @@ public class SSLHandler
         return sslEngineResult.getHandshakeStatus() != SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
 
       case BUFFER_OVERFLOW:
-        switch (sslEngineResult.getHandshakeStatus())
-        {
+        switch (sslEngineResult.getHandshakeStatus()) {
           case NEED_WRAP:
             flush();
             return channelSendBuffer.position() == 0;
@@ -357,23 +345,17 @@ public class SSLHandler
   /**
    * Run delegated tasks for the handshake.
    */
-  private void performDelegatedTasks()
-  {
+  private void performDelegatedTasks() {
     Runnable delegatedTask;
     List<Future<?>> futures = new ArrayList<>();
-    while ((delegatedTask = sslEngine.getDelegatedTask()) != null)
-    {
+    while ((delegatedTask = sslEngine.getDelegatedTask()) != null) {
       if (traceEnabled) log.trace("running delegated task " + delegatedTask);
       futures.add(executor.submit(delegatedTask));
     }
-    for (Future<?> f: futures)
-    {
-      try
-      {
+    for (Future<?> f : futures) {
+      try {
         f.get();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         if (traceEnabled) log.trace(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }
@@ -384,8 +366,7 @@ public class SSLHandler
    * Get the application receive buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  public ByteBuffer getApplicationReceiveBuffer()
-  {
+  public ByteBuffer getApplicationReceiveBuffer() {
     return applicationReceiveBuffer;
   }
 
@@ -393,8 +374,7 @@ public class SSLHandler
    * Get the application send buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  public ByteBuffer getApplicationSendBuffer()
-  {
+  public ByteBuffer getApplicationSendBuffer() {
     return applicationSendBuffer;
   }
 
@@ -402,16 +382,15 @@ public class SSLHandler
    * Get the channel receive buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  public ByteBuffer getChannelReceiveBuffer()
-  {
+  public ByteBuffer getChannelReceiveBuffer() {
     return channelReceiveBuffer;
   }
+
   /**
    * Get the channel send buffer.
    * @return a {@link ByteBuffer} instance.
    */
-  public ByteBuffer getChannelSendBuffer()
-  {
+  public ByteBuffer getChannelSendBuffer() {
     return channelSendBuffer;
   }
 
@@ -420,8 +399,7 @@ public class SSLHandler
    * @return the resulting {@link SSLEngineResult}.
    * @throws Exception if any error occurs.
    */
-  private SSLEngineResult doWrap() throws Exception
-  {
+  private SSLEngineResult doWrap() throws Exception {
     return sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
   }
 
@@ -430,8 +408,7 @@ public class SSLHandler
    * This method is intended for logging and debugging purposes.
    * @return a string representation of the buffers states.
    */
-  private String printBuffers()
-  {
+  private String printBuffers() {
     StringBuilder sb = new StringBuilder();
     sb.append("applicationSendBuffer=").append(applicationSendBuffer);
     sb.append(", channelSendBuffer=").append(channelSendBuffer);
@@ -439,14 +416,13 @@ public class SSLHandler
     sb.append(", channelReceiveBuffer=").append(channelReceiveBuffer);
     return sb.toString();
   }
-  
+
   /**
    * Print the state of all send buffers to a string.
    * This method is intended for logging and debugging purposes.
    * @return a string representation of the send buffers states.
    */
-  private String printSendBuffers()
-  {
+  private String printSendBuffers() {
     StringBuilder sb = new StringBuilder();
     sb.append("applicationSendBuffer=").append(applicationSendBuffer);
     sb.append(", channelSendBuffer=").append(channelSendBuffer);
@@ -457,8 +433,7 @@ public class SSLHandler
    * Get the count of bytes read from the channel.
    * @return the byte count as a long value.
    */
-  public long getChannelReadCount()
-  {
+  public long getChannelReadCount() {
     return channelReadCount;
   }
 
@@ -466,8 +441,7 @@ public class SSLHandler
    * Get the count of bytes written to the channel.
    * @return the byte count as a long value.
    */
-  public long getChannelWriteCount()
-  {
+  public long getChannelWriteCount() {
     return channelWriteCount;
   }
 

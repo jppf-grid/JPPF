@@ -32,8 +32,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
-{
+public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> {
   /**
    * Logger for this class.
    */
@@ -60,18 +59,15 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
    * @param connectionInfo the server connection information.
    * @param serializer the serializer to use.
    */
-  public RemoteNodeConnection(final DriverConnectionInfo connectionInfo, final ObjectSerializer serializer)
-  {
+  public RemoteNodeConnection(final DriverConnectionInfo connectionInfo, final ObjectSerializer serializer) {
     this.connectionInfo = connectionInfo;
     this.serializer = serializer;
   }
 
   @Override
-  public void init() throws Exception
-  {
+  public void init() throws Exception {
     lock.lock();
-    try
-    {
+    try {
       if (debugEnabled) log.debug("Initializing socket");
       TypedProperties config = JPPFConfiguration.getProperties();
       channel = new SocketClient();
@@ -80,41 +76,33 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper>
       channel.setSerializer(serializer);
       if (debugEnabled) log.debug("end socket client initialization");
       //if (!NodeRunner.isOffline())
-        System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
+      System.out.println("Attempting connection to the node server at " + connectionInfo.getHost() + ':' + connectionInfo.getPort());
       socketInitializer.initializeSocket(channel);
-      if (!socketInitializer.isSuccessful())
-      {
+      if (!socketInitializer.isSuccessful()) {
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("the JPPF node job channel could not reconnect to the driver", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       }
       //if (!NodeRunner.isOffline())
-        System.out.println("Reconnected to the node server");
+      System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");
       channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
       if (connectionInfo.isSecure()) channel = SSLHelper.createSSLClientConnection(channel);
       if (debugEnabled) log.debug("end socket initializer");
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
     lock.lock();
-    try
-    {
-      if (channel != null)
-      {
+    try {
+      if (channel != null) {
         SocketWrapper tmp = channel;
         channel = null;
         tmp.close();
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }

@@ -30,8 +30,7 @@ import org.slf4j.*;
  * This class represents the state of sending the initial hand-shaking data to a newly connected node.
  * @author Laurent Cohen
  */
-class SendInitialBundleState extends NodeServerState
-{
+class SendInitialBundleState extends NodeServerState {
   /**
    * Logger for this class.
    */
@@ -44,8 +43,7 @@ class SendInitialBundleState extends NodeServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public SendInitialBundleState(final NodeNioServer server)
-  {
+  public SendInitialBundleState(final NodeNioServer server) {
     super(server);
   }
 
@@ -58,20 +56,16 @@ class SendInitialBundleState extends NodeServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     //if (debugEnabled) log.debug("exec() for " + getRemoteHost(channel));
-    if (channel.isReadable() && !channel.isLocal()) throw new ConnectException("node " + channel + " has been disconnected");
-
+    if (!channel.isOpen() || (channel.isReadable() && !channel.isLocal())) throw new ConnectException("node " + channel + " has been disconnected");
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    if (context.getMessage() == null)
-    {
+    if (context.getMessage() == null) {
       if (debugEnabled) log.debug("serializing initial bundle for " + channel);
       context.setBundle(server.getInitialBundle());
       context.serializeBundle(channel);
     }
-    if (context.writeMessage(channel))
-    {
+    if (context.writeMessage(channel)) {
       if (debugEnabled) log.debug("sent handshake job for channel id = {}", context.getChannel().getId());
       if (debugEnabled) log.debug("sent entire initial bundle for " + channel);
       context.setMessage(null);

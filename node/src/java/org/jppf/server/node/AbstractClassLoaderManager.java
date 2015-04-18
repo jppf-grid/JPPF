@@ -103,6 +103,8 @@ public abstract class AbstractClassLoaderManager {
     if (classLoader != null) {
       try {
         classLoader.close();
+      } catch(Throwable t) {
+        log.error(t.getMessage(), t);
       } finally {
         classLoader = null;
       }

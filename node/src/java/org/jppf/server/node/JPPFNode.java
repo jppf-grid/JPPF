@@ -31,6 +31,7 @@ import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.*;
 import org.jppf.serialization.*;
+import org.jppf.ssl.SSLConfigurationException;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
@@ -133,8 +134,9 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
           initialized = true;
         }
         perform();
-      } catch(SecurityException e) {
+      } catch(SecurityException|SSLConfigurationException e) {
         if (checkConnection) connectionChecker.stop();
+        if (!isStopped()) reset(true);
         throw new JPPFError(e);
       } catch(IOException e) {
         log.error(e.getMessage(), e);
@@ -274,8 +276,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     initHelper();
     try {
       if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) registerProviderMBeans();
-      //MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-      //if (!server.isRegistered(new ObjectName(JPPFNodeAdminMBean.MBEAN_NAME))) registerProviderMBeans();
     } catch (Exception e) {
       log.error("Error registering the MBeans", e);
     }
@@ -330,12 +330,10 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if (debugEnabled) log.debug("Initializing serializer");
     Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.ObjectSerializerImpl");
     if (debugEnabled) log.debug("Loaded serializer class " + c);
-    Object o = c.newInstance();
-    serializer = (ObjectSerializer) o;
+    serializer = (ObjectSerializer) c.newInstance();
     c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
     if (debugEnabled) log.debug("Loaded helper class " + c);
-    o = c.newInstance();
-    helper = (SerializationHelper) o;
+    helper = (SerializationHelper) c.newInstance();
     if (debugEnabled) log.debug("Serializer initialized");
   }
 
@@ -401,6 +399,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   private void reset(final boolean stopJmx) {
     if (debugEnabled) log.debug("resetting with stopJmx=" + stopJmx);
+    System.out.println("resetting with stopJmx=" + stopJmx);
     lifeCycleEventHandler.fireNodeEnding();
     lifeCycleEventHandler.removeAllListeners();
     setNodeAdmin(null);
