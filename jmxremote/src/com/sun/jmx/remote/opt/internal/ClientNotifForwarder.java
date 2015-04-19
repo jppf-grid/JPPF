@@ -77,32 +77,23 @@ import com.sun.jmx.remote.opt.util.*;
  *
  */
 public abstract class ClientNotifForwarder {
-  /**
-   */
+  /** */
   private final ClassLoader defaultClassLoader;
-  /**
-   */
+  /** */
   private final Map<Integer, ListenerInfo> infoList = new HashMap<>();
-  /**
-   */
+  /** */
   private long clientSequenceNumber = -1;
-  /**
-   */
+  /** */
   private final int maxNotifications;
-  /**
-   */
+  /** */
   private final long timeout;
-  /**
-   */
+  /** */
   private NotifFetcher notifFetcher;
-  /**
-   */
+  /** */
   private Integer mbeanRemovedNotifID = null;
-  /**
-   */
+  /** */
   private Thread currentFetchThread;
-  /**
-   */
+  /** */
   private boolean inited = false;
   /**
    * This state means that a thread is being created for fetching and forwarding notifications.
@@ -124,16 +115,14 @@ public abstract class ClientNotifForwarder {
    * This state means that this object is terminated and no more thread will be created for fetching notifications.
    */
   private static final int TERMINATED = 4;
-  /**
-   */
+  /** */
   private int state = STOPPED;
   /**
    * This variable is used to tell whether a connector (RMIConnector or ClientIntermediary) is doing reconnection. This variable will be set to true by the method <code>preReconnection</code>, and set
    * fase by <code>postReconnection</code>. When beingReconnected == true, no thread will be created for fetching notifications.
    */
   private boolean beingReconnected = false;
-  /**
-   */
+  /** */
   private static final ClassLogger logger = new ClassLogger("javax.management.remote.misc", "ClientNotifForwarder");
 
   /**
@@ -448,10 +437,7 @@ public abstract class ClientNotifForwarder {
         logger.trace("NotifFetcher.fetchNotifs", e);
         return fetchOneNotif();
       } catch (IOException ioe) {
-        if (!shouldStop()) {
-          logger.error("NotifFetcher-run", "Failed to fetch notification, " + "stopping thread. Error is: " + ioe, ioe);
-          logger.debug("NotifFetcher-run", ioe);
-        }
+        if (!shouldStop()) logger.debug("NotifFetcher-run", ioe);
         return null; // no more fetching
       }
     }
