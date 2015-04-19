@@ -448,10 +448,7 @@ public abstract class ClientNotifForwarder {
         logger.trace("NotifFetcher.fetchNotifs", e);
         return fetchOneNotif();
       } catch (IOException ioe) {
-        if (!shouldStop()) {
-          logger.error("NotifFetcher-run", "Failed to fetch notification, " + "stopping thread. Error is: " + ioe, ioe);
-          logger.debug("NotifFetcher-run", ioe);
-        }
+        if (!shouldStop()) logger.debug("NotifFetcher-run", ioe);
         return null; // no more fetching
       }
     }
