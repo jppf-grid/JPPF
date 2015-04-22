@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
@@ -225,6 +225,7 @@ public class SSLHandler
   {
     int n = channel.read(channelReceiveBuffer);
     if (n > 0) channelReadCount += n;
+    else if (n < 0) throw new EOFException("EOF reading inbound stream");
     return n;
   }
 
@@ -259,7 +260,7 @@ public class SSLHandler
    */
   private void processEngineResult() throws Exception
   {
-    while (processEngineResultStatus() && processHandshake()) continue;
+    while (processEngineResultStatus() && processHandshake());
   }
 
   /**
