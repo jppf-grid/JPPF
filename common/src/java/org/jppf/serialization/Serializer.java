@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class Serializer
-{
+class Serializer {
   /**
    * The stream header ('JPPF' in ascii).
    */
@@ -94,8 +93,7 @@ class Serializer
    * @param out the stream to which the serialized data is written.
    * @throws IOException if an error occurs while writing the header.
    */
-  Serializer(final ObjectOutputStream out) throws IOException
-  {
+  Serializer(final ObjectOutputStream out) throws IOException {
     this.out = out;
     out.write(HEADER);
   }
@@ -105,20 +103,15 @@ class Serializer
    * @param obj the object to write.
    * @throws Exception if any error occurs.
    */
-  void writeObject(final Object obj) throws Exception
-  {
+  void writeObject(final Object obj) throws Exception {
     if (obj == null) out.writeByte(NULL_OBJECT_HEADER);
     else if (obj instanceof Class) writeClassObject((Class) obj);
-    else
-    {
+    else {
       Integer handle = caches.objectHandleMap.get(obj);
-      if (handle == null)
-      {
+      if (handle == null) {
         handle = caches.newObjectHandle(obj);
         writeObject(obj, handle);
-      }
-      else
-      {
+      } else {
         out.writeByte(OBJECT_HEADER);
         out.writeInt(handle);
       }
@@ -131,8 +124,7 @@ class Serializer
    * @param handle the object's handle
    * @throws Exception if any error occurs.
    */
-  private void writeObject(final Object obj, final int handle) throws Exception
-  {
+  private void writeObject(final Object obj, final int handle) throws Exception {
     Map<Class<?>, ClassDescriptor> map = new HashMap<>();
     ClassDescriptor cd = caches.getClassDescriptor(obj.getClass(), map);
     currentObject = obj;
@@ -144,8 +136,7 @@ class Serializer
     out.writeInt(cd.handle);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
     if (cd.array) writeArray(obj, cd);
-    else if (cd.enumType)
-    {
+    else if (cd.enumType) {
       String name = ((Enum) obj).name();
       writeObject(name);
     }
@@ -157,8 +148,7 @@ class Serializer
    * @param obj the object to write.
    * @throws Exception if any error occurs.
    */
-  private void writeClassObject(final Class obj) throws Exception
-  {
+  private void writeClassObject(final Class obj) throws Exception {
     Map<Class<?>, ClassDescriptor> map = new HashMap<>();
     ClassDescriptor cd = caches.getClassDescriptor(obj, map);
     currentObject = obj;
@@ -174,30 +164,23 @@ class Serializer
    * @param cd the object's class descriptor.
    * @throws Exception if any error occurs.
    */
-  void writeFields(final Object obj, final ClassDescriptor cd) throws Exception
-  {
+  void writeFields(final Object obj, final ClassDescriptor cd) throws Exception {
     ClassDescriptor tmpDesc = cd;
     Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
-    while (tmpDesc != null)
-    {
+    while (tmpDesc != null) {
       stack.addFirst(tmpDesc);
       tmpDesc = tmpDesc.superClass;
     }
-    for (ClassDescriptor desc: stack)
-    {
-      if (desc.hasWriteObject)
-      {
+    for (ClassDescriptor desc: stack) {
+      if (desc.hasWriteObject) {
         Method m = SerializationReflectionHelper.getWriteObjectMethod(desc.clazz);
         if (!m.isAccessible()) m.setAccessible(true);
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
-        try
-        {
+        try {
           tmpDesc = currentClassDescriptor;
           currentClassDescriptor = desc;
           m.invoke(obj, out);
-        }
-        finally
-        {
+        } finally {
           currentClassDescriptor = tmpDesc;
         }
       }
@@ -212,18 +195,15 @@ class Serializer
    * @param cd the object's class descriptor.
    * @throws Exception if any error occurs.
    */
-  void writeDeclaredFields(final Object obj, final ClassDescriptor cd) throws Exception
-  {
+  void writeDeclaredFields(final Object obj, final ClassDescriptor cd) throws Exception {
     for (int i=0; i<cd.fields.length; i++)
     {
       FieldDescriptor fd = cd.fields[i];
       //if (traceEnabled) try { log.trace("writing field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
       if (!fd.field.isAccessible()) fd.field.setAccessible(true);
       Object val = fd.field.get(obj);
-      if (fd.type.primitive)
-      {
-        switch(fd.type.signature.charAt(0))
-        {
+      if (fd.type.primitive) {
+        switch(fd.type.signature.charAt(0)) {
           case 'B': out.write((Integer) val); break;
           case 'S': out.writeShort((Short) val); break;
           case 'I': out.writeInt((Integer) val); break;
@@ -233,9 +213,7 @@ class Serializer
           case 'C': out.writeChar((Integer) val); break;
           case 'Z': out.writeBoolean((Boolean) val); break;
         }
-      }
-      else if (fd.type.enumType)
-      {
+      } else if (fd.type.enumType) {
         String name = (val == null) ? null : ((Enum) val).name();
         writeObject(name);
       }
@@ -249,15 +227,12 @@ class Serializer
    * @param cd the array's class descriptor.
    * @throws Exception if any error occurs.
    */
-  private void writeArray(final Object obj, final ClassDescriptor cd) throws Exception
-  {
+  private void writeArray(final Object obj, final ClassDescriptor cd) throws Exception {
     int n = Array.getLength(obj);
     out.writeInt(n);
     ClassDescriptor eltDesc = cd.componentType;
-    if (eltDesc.primitive)
-    {
-      switch(eltDesc.signature.charAt(0))
-      {
+    if (eltDesc.primitive) {
+      switch(eltDesc.signature.charAt(0)) {
         case 'B': out.write((byte[]) obj, 0, n); break;
         case 'S': writeShortArray((short[]) obj); break;
         case 'I': writeIntArray((int[]) obj); break;
@@ -267,20 +242,14 @@ class Serializer
         case 'C': writeCharArray((char[]) obj); break;
         case 'Z': writeBooleanArray((boolean[]) obj); break;
       }
-    }
-    else if (eltDesc.enumType)
-    {
-      for (int i=0; i<n; i++)
-      {
+    } else if (eltDesc.enumType) {
+      for (int i=0; i<n; i++) {
         Object val = Array.get(obj, i);
         String name = (val == null) ? null : ((Enum) val).name();
         writeObject(name);
       }
-    }
-    else
-    {
-      for (int i=0; i<n; i++)
-      {
+    } else {
+      for (int i=0; i<n; i++) {
         Object val = Array.get(obj, i);
         writeObject(val);
       }
@@ -292,8 +261,7 @@ class Serializer
    * @param map a class to descriptor association map.
    * @throws IOException if any error occurs.
    */
-  private void writeClassDescriptors(final Map<Class<?>, ClassDescriptor> map) throws IOException
-  {
+  private void writeClassDescriptors(final Map<Class<?>, ClassDescriptor> map) throws IOException {
     if (map.isEmpty()) return;
     out.writeByte(CLASS_HEADER);
     out.writeInt(map.size());
@@ -305,10 +273,8 @@ class Serializer
    * @param array the array of boolean values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeBooleanArray(final boolean[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeBooleanArray(final boolean[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length, array.length - count);
       for (int i=0; i<n; i++) SerializationUtils.writeBoolean(array[count+i], buf, i);
       out.write(buf, 0, n);
@@ -321,10 +287,8 @@ class Serializer
    * @param array the array of char values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeCharArray(final char[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeCharArray(final char[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length / 2, array.length - count);
       for (int i=0; i<n; i++) SerializationUtils.writeChar(array[count+i], buf, 2*i);
       out.write(buf, 0, 2*n);
@@ -337,10 +301,8 @@ class Serializer
    * @param array the array of char values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeShortArray(final short[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeShortArray(final short[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length / 2, array.length - count);
       for (int i=0; i<n; i++) SerializationUtils.writeShort(array[count+i], buf, 2*i);
       out.write(buf, 0, 2*n);
@@ -353,10 +315,8 @@ class Serializer
    * @param array the array of int values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeIntArray(final int[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeIntArray(final int[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length / 4, array.length - count);
       for (int i=0; i<n; i++) SerializationUtils.writeInt(array[count+i], buf, 4*i);
       out.write(buf, 0, 4*n);
@@ -369,10 +329,8 @@ class Serializer
    * @param array the array of long values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeLongArray(final long[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeLongArray(final long[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length / 8, array.length - count);
       for (int i=0; i<n; i++) SerializationUtils.writeLong(array[count+i], buf, 8*i);
       out.write(buf, 0, 8*n);
@@ -385,12 +343,9 @@ class Serializer
    * @param array the array of float values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeFloatArray(final float[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeFloatArray(final float[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length / 4, array.length - count);
-
       for (int i=0; i<n; i++) SerializationUtils.writeInt(Float.floatToIntBits(array[count+i]), buf, 4*i);
       out.write(buf, 0, 4*n);
       count += n;
@@ -402,10 +357,8 @@ class Serializer
    * @param array the array of double values to write.
    * @throws Exception if any error occurs.
    */
-  private void writeDoubleArray(final double[] array) throws Exception
-  {
-    for (int count=0; count < array.length;)
-    {
+  private void writeDoubleArray(final double[] array) throws Exception {
+    for (int count=0; count < array.length;) {
       int n = Math.min(buf.length / 8, array.length - count);
       for (int i=0; i<n; i++) SerializationUtils.writeLong(Double.doubleToLongBits(array[count+i]), buf, 8*i);
       out.write(buf, 0, 8*n);

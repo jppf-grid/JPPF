@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class DeserializationCaches
-{
+class DeserializationCaches {
   /**
    * Logger for this class.
    */
@@ -46,12 +45,10 @@ class DeserializationCaches
   /**
    * Default constructor.
    */
-  DeserializationCaches()
-  {
+  DeserializationCaches() {
     Set<Map.Entry<Class<?>, ClassDescriptor>> entries = SerializationCaches.globalTypesMap.entrySet();
     List<ClassDescriptor> list = new ArrayList<>(entries.size());
-    for (Map.Entry<Class<?>, ClassDescriptor> entry: entries)
-    {
+    for (Map.Entry<Class<?>, ClassDescriptor> entry: entries) {
       ClassDescriptor cd = entry.getValue();
       ClassDescriptor cd2 = new ClassDescriptor();
       cd2.signature = cd.signature;
@@ -63,11 +60,9 @@ class DeserializationCaches
       cd2.handle = cd.handle;
       if (cd.superClass != null) cd2.superClassHandle = cd.superClass.handle;
       if (cd.componentType != null) cd2.componentTypeHandle = cd.componentType.handle;
-      if (cd.fields.length > 0)
-      {
+      if (cd.fields.length > 0) {
         cd2.fields = new FieldDescriptor[cd.fields.length];
-        for (int i=0; i<cd.fields.length; i++)
-        {
+        for (int i=0; i<cd.fields.length; i++) {
           FieldDescriptor fd = cd.fields[i];
           FieldDescriptor fd2 = new FieldDescriptor();
           fd2.name = fd.name;
@@ -78,12 +73,9 @@ class DeserializationCaches
       handleToDescriptorMap.put(cd2.handle, cd2);
       list.add(cd2);
     }
-    try
-    {
+    try {
       initializeDescriptorClasses(list, getClass().getClassLoader());
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -93,8 +85,7 @@ class DeserializationCaches
    * @param handle the handle to lookup.
    * @return a {@link ClassDescriptor} instance.
    */
-  ClassDescriptor getDescriptor(final int handle)
-  {
+  ClassDescriptor getDescriptor(final int handle) {
     return handleToDescriptorMap.get(handle);
   }
 
@@ -104,27 +95,21 @@ class DeserializationCaches
    * @param classloader used to load the classes.
    * @throws Exception if any error occurs.
    */
-  void initializeDescriptorClasses(final Collection<ClassDescriptor> list, final ClassLoader classloader) throws Exception
-  {
-    for (ClassDescriptor cd: list)
-    {
+  void initializeDescriptorClasses(final Collection<ClassDescriptor> list, final ClassLoader classloader) throws Exception {
+    for (ClassDescriptor cd: list) {
       if (cd.clazz != null) continue;
-      if (cd.array)
-      {
+      if (cd.array) {
         List<ClassDescriptor> types = new ArrayList<>();
         ClassDescriptor tmp = cd;
-        while (tmp != null)
-        {
+        while (tmp != null) {
           types.add(tmp);
           tmp = tmp.array ? getDescriptor(tmp.componentTypeHandle) : null;
         }
-        for (int i=types.size()-1; i>=0; i--)
-        {
+        for (int i=types.size()-1; i>=0; i--) {
           tmp = types.get(i);
           if (tmp.clazz != null) continue;
           if (!tmp.array) tmp.clazz = SerializationReflectionHelper.getNonArrayTypeFromSignature(tmp.signature, classloader);
-          else
-          {
+          else {
             Class<?> clazz = types.get(i+1).clazz;
             Object array = Array.newInstance(clazz, 0);
             tmp.clazz = array.getClass();
