@@ -194,18 +194,19 @@ public class JPPFBundlerFactory
     ClassLoader currentCL = getClass().getClassLoader();
     if (debugEnabled) log.debug("oldCL=" + oldCL + ", currentCL=" + currentCL);
     final boolean isDiff = (oldCL != currentCL);
-    try {
-      if (isDiff) Thread.currentThread().setContextClassLoader(currentCL);
-      Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class);
+    ClassLoader[] loaders = (isDiff) ? new ClassLoader[] { currentCL, oldCL } : new ClassLoader[] { oldCL };
+    for (ClassLoader cl: loaders) {
+      Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, cl);
       while (it.hasNext()) {
         JPPFBundlerProvider provider = it.next();
         map.put(provider.getAlgorithmName(), provider);
         if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
       }
       if (debugEnabled) log.debug("found " + map.size() + " load-balancing algorithms in the classpath");
-      providerMap = map;
-    } finally {
-      if (isDiff) Thread.currentThread().setContextClassLoader(oldCL);
+      if (!map.isEmpty()) {
+        providerMap = map;
+        break;
+      }
     }
   }
 
