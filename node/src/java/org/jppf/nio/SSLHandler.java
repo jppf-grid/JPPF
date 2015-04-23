@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
@@ -221,10 +221,11 @@ public class SSLHandler
    * @return the number of bytes read.
    * @throws IOException if any error occurs.
    */
-  private int doRead()  throws IOException
+  private int doRead() throws IOException
   {
     int n = channel.read(channelReceiveBuffer);
     if (n > 0) channelReadCount += n;
+    else if (n < 0) throw new EOFException("EOF reading inbound stream");
     return n;
   }
 
