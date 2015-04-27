@@ -55,6 +55,7 @@ public class Bar3DChartHandler implements ChartHandler {
   public ChartConfiguration createChart(final ChartConfiguration config)
   {
     Object ds = createDataset(config);
+    if (ds == null) return null;
     //JFreeChart chart = ChartFactory.createBarChart3D(null, null, config.name, ds, PlotOrientation.HORIZONTAL, false, true, false);
     Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createBarChart3D",
         config.name, null, null, ds, getField(getClass0("org.jfree.chart.plot.PlotOrientation"), null, "HORIZONTAL"), false, true, false);
@@ -129,6 +130,7 @@ public class Bar3DChartHandler implements ChartHandler {
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
     //((DefaultCategoryDataset) config.dataset).clear();
+    if (config.dataset == null) return config;
     invokeMethod(config.dataset.getClass(), config.dataset, "clear");
     return updateDataset(config);
   }
@@ -142,6 +144,7 @@ public class Bar3DChartHandler implements ChartHandler {
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
     Object ds = config.dataset;
+    if (ds == null) return config;
     Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
       for (Fields key: config.fields) {

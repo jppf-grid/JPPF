@@ -73,10 +73,20 @@ public class StackedAreaChartHandler implements ChartHandler {
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
   private Object createDataset(final ChartConfiguration config) {
+    Object ds = newDataset(config);
+    populateDataset(config);
+    return ds;
+  }
+
+  /**
+   * Create a new empty dataset for this chart handler.
+   * @param config the configuration holding the new dataset.
+   * @return the dataset.
+   */
+  private Object newDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
     Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
-    populateDataset(config);
     return ds;
   }
 
@@ -87,6 +97,7 @@ public class StackedAreaChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
+    if (config.dataset == null) newDataset(config);
     Object ds = config.dataset;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");

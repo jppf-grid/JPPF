@@ -122,6 +122,7 @@ public class DifferenceChartHandler implements ChartHandler
     int len = config.fields.length;
     if (len < 2) return config;
     Object ds = config.dataset;
+    if (ds == null) return config;
     //List list = ds.getSeries();
     List list = (List) invokeMethod(ds.getClass(), ds, "getSeries");
     for (Object o: list)
@@ -155,6 +156,7 @@ public class DifferenceChartHandler implements ChartHandler
   public ChartConfiguration updateDataset(final ChartConfiguration config)
   {
     Object ds = config.dataset;
+    if (ds == null) return config;
     Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null)
     {

@@ -197,6 +197,11 @@ public class OptionsPageBuilder {
         triggerLifeCycleEvents(child, initial);
       }
     }
+    if ((elt instanceof AbstractOptionElement) && initial) {
+      OptionProperties op = (OptionProperties) elt;
+      JComponent comp = op.getUIComponent();
+      if (comp != null) comp.setName(elt.getStringPath());
+    }
   }
 
   /**
@@ -314,6 +319,10 @@ public class OptionsPageBuilder {
     else if ("import".equalsIgnoreCase(desc.type)) list.addAll(f.loadImport(desc));
     else if ("Java".equalsIgnoreCase(desc.type)) list.add(f.buildJavaOption(desc));
     else if ("Custom".equalsIgnoreCase(desc.type)) list.add(f.buildCustomOption(desc));
+    for (OptionElement element: list) {
+      JComponent comp = element.getUIComponent();
+      comp.setName(element.getStringPath());
+    }
     return list;
   }
 
