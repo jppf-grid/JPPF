@@ -236,7 +236,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           checkState();
           try {
             notifLock.wait();
-          } catch (InterruptedException ire) {
+          } catch (InterruptedException ire) {   
             InterruptedIOException iioe = new InterruptedIOException(ire.toString());
             EnvHelp.initCause(iioe, ire);
             throw iioe;
@@ -260,10 +260,9 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         synchronized (connectionLock) { // send out the msg
           connection.writeMessage(msg);
         }
-        long remainingTime = wtimeout;
         final long startTime = System.currentTimeMillis();
         boolean got = false;
-        while (!got && (remainingTime > 0)) {
+        while (!got && (wtimeout > System.currentTimeMillis() - startTime)) {
           synchronized(mwrapper) { got = mwrapper.got; }
           if (!got) {
             try {
