@@ -247,7 +247,7 @@
 	<!-- ==================================================================== -->
 	<!-- To generate a RAR file, use the following parameter:                 -->
 	<!--                                                                      -->
-	<!-- "appserver" = name of the appserver for which the ear is build       -->
+	<!-- "appserver" = name of the appserver for which the rar is build       -->
 	<!--                                                                      -->
 	<!-- the value is one of the application properties defined at the top of --> 
 	<!-- this file                                                            -->
@@ -303,6 +303,7 @@
         <zipfileset dir="${build.dir}/@{appserver}">
           <include name="*.*"/>
           <exclude name="ra.xml"/>
+          <exclude name="jndi.properties"/>
           <exclude name="commons-logging.properties"/>
         </zipfileset>
         <zipfileset dir="${build.dir}/@{appserver}/ra" prefix="META-INF">
