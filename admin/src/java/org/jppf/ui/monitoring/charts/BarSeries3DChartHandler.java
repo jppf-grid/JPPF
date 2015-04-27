@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.jppf.ui.monitoring.charts.config.ChartConfiguration;
 import org.jppf.ui.monitoring.data.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -39,7 +38,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * The stats formatter that provides the data.
    */
@@ -94,10 +93,20 @@ public class BarSeries3DChartHandler implements ChartHandler {
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
   private Object createDataset(final ChartConfiguration config) {
+    Object ds = newDataset(config);
+    populateDataset(config);
+    return ds;
+  }
+
+  /**
+   * Create a new empty dataset for this chart handler.
+   * @param config the configuration holding the new dataset.
+   * @return the dataset.
+   */
+  private Object newDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
     Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
-    populateDataset(config);
     return ds;
   }
 
@@ -108,6 +117,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
+    if (config.dataset == null) newDataset(config);
     Object ds = config.dataset;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");
@@ -124,15 +134,6 @@ public class BarSeries3DChartHandler implements ChartHandler {
         invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(count + start));
       }
     }
-    /*
-    for (int j=0; j<statsCount; j++) {
-      Map<Fields, Double> valueMap = statsHandler.getDoubleValues(j);
-      for (Fields key: config.fields) {
-        //ds.setValue(valueMap.get(key), key, Integer.valueOf(j + start));
-        invokeMethod(ds.getClass(), ds, "setValue", valueMap.get(key), key, Integer.valueOf(j + start));
-      }
-    }
-    */
     return config;
   }
 
@@ -144,6 +145,7 @@ public class BarSeries3DChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration updateDataset(final ChartConfiguration config) {
+    if (config.dataset == null) newDataset(config);
     Object ds = config.dataset;
     Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {

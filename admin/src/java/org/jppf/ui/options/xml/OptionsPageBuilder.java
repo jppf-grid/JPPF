@@ -197,6 +197,11 @@ public class OptionsPageBuilder {
         triggerLifeCycleEvents(child, initial);
       }
     }
+    if ((elt instanceof AbstractOptionElement) && initial) {
+      OptionProperties op = (OptionProperties) elt;
+      JComponent comp = op.getUIComponent();
+      if (comp != null) comp.setName(elt.getStringPath());
+    }
   }
 
   /**

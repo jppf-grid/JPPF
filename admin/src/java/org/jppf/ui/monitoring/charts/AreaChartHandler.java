@@ -80,10 +80,20 @@ public class AreaChartHandler implements ChartHandler {
    * @return a <code>DefaultCategoryDataset</code> instance.
    */
   private Object createDataset(final ChartConfiguration config) {
+    Object ds = newDataset(config);
+    populateDataset(config);
+    return ds;
+  }
+
+  /**
+   * Create a new empty dataset for this chart handler.
+   * @param config the configuration holding the new dataset.
+   * @return the dataset.
+   */
+  private Object newDataset(final ChartConfiguration config) {
     //DefaultCategoryDataset ds = new DefaultCategoryDataset();
     Object ds = newInstance("org.jfree.data.category.DefaultCategoryDataset");
     config.dataset = ds;
-    populateDataset(config);
     return ds;
   }
 
@@ -94,7 +104,9 @@ public class AreaChartHandler implements ChartHandler {
    */
   @Override
   public ChartConfiguration populateDataset(final ChartConfiguration config) {
+    if (config.dataset == null) newDataset(config);
     Object ds = config.dataset;
+    if (ds == null) return config;
     //ds.clear();
     invokeMethod(ds.getClass(), ds, "clear");
     int start = Math.max(0, statsHandler.getTickCount() - statsHandler.getStatsCount());
@@ -115,9 +127,10 @@ public class AreaChartHandler implements ChartHandler {
    * @see org.jppf.ui.monitoring.charts.ChartHandler#updateDataset(org.jppf.ui.monitoring.charts.config.ChartConfiguration)
    */
   @Override
-  public ChartConfiguration updateDataset(final ChartConfiguration config)
-  {
+  public ChartConfiguration updateDataset(final ChartConfiguration config) {
+    if (config.dataset == null) newDataset(config);
     Object ds = config.dataset;
+    if (ds == null) return config;
     Map<Fields, Double> valueMap = statsHandler.getLatestDoubleValues();
     if (valueMap != null) {
       for (Fields key: config.fields) {

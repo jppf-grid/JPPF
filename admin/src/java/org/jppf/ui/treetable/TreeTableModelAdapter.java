@@ -82,10 +82,6 @@ public class TreeTableModelAdapter extends AbstractTableModel {
    */
   JTree tree;
   /**
-   * The underlying JTable.
-   */
-  JTable table;
-  /**
    * An empty tree path array.
    */
   private static final TreePath[] ZERO_PATH = new TreePath[0];

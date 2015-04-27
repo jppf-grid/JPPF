@@ -28,7 +28,7 @@ import org.jppf.ui.options.docking.DockingManager;
 import org.jppf.ui.options.event.WindowClosingListener;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.*;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -67,6 +67,7 @@ public class ConsoleLauncher {
    */
   public static void main(final String...args) {
     try {
+      Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if ((args  == null) || (args.length < 2)) throw new IllegalArgumentException("Usage: UILauncher page_location location_source");
       String[] laf = { "com.jgoodies.looks.windows.WindowsLookAndFeel", "com.jgoodies.looks.plastic.PlasticLookAndFeel",
           "com.jgoodies.looks.plastic.Plastic3DLookAndFeel", "com.jgoodies.looks.plastic.PlasticXPLookAndFeel" };
@@ -161,7 +162,6 @@ public class ConsoleLauncher {
         else elt = OptionsHandler.addPageFromXml(src);
         OptionsHandler.loadPreferences();
         OptionsHandler.getBuilder().triggerInitialEvents(elt);
-        //System.out.println("loaded pages: " + OptionsHandler.getPageList());
         Frame frame = OptionsHandler.getMainWindow();
         if (createFrame) {
           if (frame == null) {
@@ -222,7 +222,6 @@ public class ConsoleLauncher {
       Frame frame = getTopFrame(event.getChanged());
       if (frame != null) {
         frameFound = true;
-        //System.out.println("found frame = " + frame);
         OptionsHandler.setMainWindow(frame);
         DockingManager.getInstance().setMainView(frame, (OptionContainer) uiRoot);
       }
