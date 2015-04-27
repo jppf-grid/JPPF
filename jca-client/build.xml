@@ -304,6 +304,7 @@
         <zipfileset dir="${build.dir}/@{appserver}">
           <include name="*.*"/>
           <exclude name="ra.xml"/>
+          <exclude name="jndi.properties"/>
           <exclude name="commons-logging.properties"/>
         </zipfileset>
         <zipfileset dir="${build.dir}/@{appserver}/ra" prefix="META-INF">
