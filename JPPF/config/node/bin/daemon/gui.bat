@@ -1,3 +1,3 @@
 @echo off
 set JPPF_COMP=Node
-start JPPF%COMP%Monitor.exe //MS//JPPF%COMP%
+start JPPF%JPPF_COMP%Monitor.exe //MS//JPPF%JPPF_COMP%
