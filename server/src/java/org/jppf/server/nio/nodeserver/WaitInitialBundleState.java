@@ -148,20 +148,31 @@ class WaitInitialBundleState extends NodeServerState {
       InetAddress addr = InetAddress.getByName(host);
       ip = addr.getHostAddress();
       if (host.equals(ip)) host = addr.getHostName();
-      if (!host.equals(ip)) return new HostIP(host, ip);
+      if (!host.equals(ip)) {
+        if (log.isTraceEnabled()) log.trace("resolved host from reverse DNS lookup: host={}, ip={}", host, ip);
+        return new HostIP(host, ip);
+      }
     } catch (UnknownHostException ignore) {
     }
     // if host couldn't be resolved via reverse DNS lookup
     JPPFSystemInformation info = ((AbstractNodeContext) channel.getContext()).getSystemInformation();
     if (info != null) {
       for (HostIP hostIP: info.parseIPV4Addresses()) {
-        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) return hostIP;
+        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) {
+          if (log.isTraceEnabled()) log.trace("resolved host from system info: {}", hostIP);
+          return hostIP;
+        }
       }
       for (HostIP hostIP: info.parseIPV6Addresses()) {
-        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) return hostIP;
+        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) {
+          if (log.isTraceEnabled()) log.trace("resolved host from system info: {}", hostIP);
+          return hostIP;
+        }
       }
     }
-    return (resolveIPs) ? NetworkUtils.getHostIP(host) : new HostIP(host, host);
+    HostIP hostIP = resolveIPs ? NetworkUtils.getHostIP(host) : new HostIP(host, host);
+    if (log.isTraceEnabled()) log.trace("{}: {}", (resolveIPs ? "resolved host from NetworkUtils.getHostIP()" : "unresolved host"), hostIP);
+    return hostIP;
   }
 
   /**
