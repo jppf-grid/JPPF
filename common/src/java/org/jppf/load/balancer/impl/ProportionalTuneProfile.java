@@ -29,7 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ProportionalTuneProfile extends AbstractAutoTuneProfile
+public class ProportionalTuneProfile implements LoadBalancingProfile
 {
   /**
    * Logger for this class.

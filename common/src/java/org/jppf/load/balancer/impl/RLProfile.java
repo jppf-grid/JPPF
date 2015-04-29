@@ -26,7 +26,7 @@ import org.jppf.utils.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class RLProfile extends AbstractAutoTuneProfile
+public class RLProfile implements LoadBalancingProfile
 {
   /**
    * The maximum size of the performance samples cache.

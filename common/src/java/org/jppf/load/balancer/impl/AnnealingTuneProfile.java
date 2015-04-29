@@ -35,7 +35,7 @@ import org.jppf.utils.*;
  * @author Domingos Creado
  * @exclude
  */
-public class AnnealingTuneProfile extends AbstractAutoTuneProfile
+public class AnnealingTuneProfile implements LoadBalancingProfile
 {
   /**
    * A default profile with default parameter values.
