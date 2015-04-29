@@ -22,7 +22,7 @@ import static org.jppf.node.protocol.BundleParameter.*;
 import static org.jppf.server.nio.nodeserver.NodeTransition.*;
 import static org.jppf.utils.StringUtils.build;
 
-import java.net.InetSocketAddress;
+import java.net.*;
 import java.nio.channels.SocketChannel;
 
 import org.jppf.load.balancer.*;
@@ -98,7 +98,6 @@ class WaitInitialBundleState extends NodeServerState {
       int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !offline && (port >= 0)) {
         String host = getChannelHost(channel);
-        HostIP hostIP = new HostIP(host, host);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
         int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
         if (channel.isLocal()) {
@@ -107,7 +106,7 @@ class WaitInitialBundleState extends NodeServerState {
           JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
           if (jmxServer != null) host = jmxServer.getManagementHost();
         }
-        if (resolveIPs) hostIP = NetworkUtils.getHostIP(host);
+        HostIP hostIP = resolveHost(channel);
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
@@ -133,6 +132,36 @@ class WaitInitialBundleState extends NodeServerState {
     context.setMessage(null);
     context.setBundle(null);
     return context.isPeer() ? TO_IDLE_PEER : TO_IDLE;
+  }
+
+  /**
+   * Resolve the host name for the specified channel.
+   * @param channel the channel from which to get the host information.
+   * @return a representation of the host name/ip address pair.
+   * @throws Exception if any error occurs.
+   * @since 5.0.2
+   */
+  private HostIP resolveHost(final ChannelWrapper<?> channel) throws Exception {
+    String host = getChannelHost(channel);
+    String ip = host;
+    try {
+      InetAddress addr = InetAddress.getByName(host);
+      ip = addr.getHostAddress();
+      if (host.equals(ip)) host = addr.getHostName();
+      if (!host.equals(ip)) return new HostIP(host, ip);
+    } catch (UnknownHostException ignore) {
+    }
+    // if host couldn't be resolved via reverse DNS lookup
+    JPPFSystemInformation info = ((AbstractNodeContext) channel.getContext()).getSystemInformation();
+    if (info != null) {
+      for (HostIP hostIP: info.parseIPV4Addresses()) {
+        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) return hostIP;
+      }
+      for (HostIP hostIP: info.parseIPV6Addresses()) {
+        if (host.equals(hostIP.hostName()) || host.equals(hostIP.ipAddress())) return hostIP;
+      }
+    }
+    return (resolveIPs) ? NetworkUtils.getHostIP(host) : new HostIP(host, host);
   }
 
   /**
