@@ -88,7 +88,7 @@ public interface SocketWrapper extends Closeable
   /**
    * Read <code>len</code> bytes from a TCP connection into a byte array, starting
    * at position <code>offset</code> in that array.
-   * This method blocks until at least one byte of data is received.
+   * This method blocks until all {@code len} bytes of data are received.
    * @param data an array of bytes into which the data is stored.
    * @param offset the position where to start storing data read from the socket.
    * @param len the length of data to read.
@@ -96,6 +96,17 @@ public interface SocketWrapper extends Closeable
    * @throws Exception if the underlying input stream throws an exception.
    */
   int read(byte[] data, int offset, int len) throws Exception;
+
+  /**
+   * Read bytes from a TCP connection into a byte array, starting at position <code>offset</code> in that array.
+   * This method blocks until at least one byte of data is received.
+   * @param data an array of bytes into which the data is stored.
+   * @param offset the position where to start storing data read from the socket.
+   * @param len the maximum length of data to read.
+   * @return the number of bytes actually read or -1 if the end of stream was reached.
+   * @throws Exception if the underlying input stream throws an exception.
+   */
+  int readPartial(byte[] data, int offset, int len) throws Exception;
 
   /**
    * Read an int value from a socket connection.

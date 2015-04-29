@@ -232,6 +232,14 @@ public class SocketChannelClient implements SocketWrapper
     return count;
   }
 
+  @Override
+  public int readPartial(final byte[] data, final int offset, final int len) throws Exception
+  {
+    ByteBuffer byteBuffer = ByteBuffer.wrap(data, offset, len);
+    int n = channel.read(byteBuffer);
+    return n;
+  }
+
   /**
    * Read an int value from a socket connection.
    * @return n the value to read from the socket, or -1 if end of stream was reached.

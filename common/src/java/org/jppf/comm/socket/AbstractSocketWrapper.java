@@ -245,6 +245,15 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
     return count;
   }
 
+  @Override
+  public int readPartial(final byte[] data, final int offset, final int len) throws IOException
+  {
+    checkOpened();
+    int n = dis.read(data, offset, len);
+    updateSocketTimestamp();
+    return n;
+  }
+
   /**
    * Read an int value from a socket connection.
    * @return n the value to read from the socket, or -1 if end of stream was reached.
