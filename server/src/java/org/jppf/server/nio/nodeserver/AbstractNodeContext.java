@@ -342,7 +342,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
     if (isPeer()) driver.getNodeNioServer().nodeConnected(this);
-    else  if ((managementInfo.getHost() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
+    else  if ((managementInfo.getIpAddress() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
   }
 
   @Override
@@ -405,9 +405,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     JPPFManagementInfo info = getManagementInfo();
     if (info == null) jmxConnection = null;
     else {
-      if ((info.getHost() != null) && (info.getPort() >= 0) && channel.isOpen()) {
+      if ((info.getIpAddress() != null) && (info.getPort() >= 0) && channel.isOpen()) {
         if (debugEnabled) log.debug("establishing JMX connection for {}", info);
-        jmxConnection = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
+        jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
         final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
         jmxConnection.addJMXWrapperListener(new JMXWrapperListener() {
           @Override public void jmxWrapperConnected(final JMXWrapperEvent event) {
