@@ -265,8 +265,9 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * Parse the list of IP v4 addresses contained in this JPPFSystemInformation instance.<br>
    * This method is provided as a convenience so developers don't have to do the parsing themselves.
    * @return an array on <code>HostIP</code> instances.
+   * @exclude
    */
-  private HostIP[] parseIPV4Addresses() {
+  public HostIP[] parseIPV4Addresses() {
     return NetworkUtils.parseAddresses(getNetwork().getString("ipv4.addresses"));
   }
 
@@ -274,8 +275,9 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * Parse the list of IP v6 addresses contained in this JPPFSystemInformation instance.<br>
    * This method is provided as a convenience so developers don't have to do the parsing themselves.
    * @return an array on <code>HostIP</code> instances.
+   * @exclude
    */
-  private HostIP[] parseIPV6Addresses() {
+  public HostIP[] parseIPV6Addresses() {
     return NetworkUtils.parseAddresses(getNetwork().getString("ipv6.addresses"));
   }
 }
