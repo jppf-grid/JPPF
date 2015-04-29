@@ -195,7 +195,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public void jobStatusChanged(final AbstractServerJob source, final SubmissionStatus oldValue, final SubmissionStatus newValue) {
-    jobUpdated(source);
+    //jobUpdated(source);
   }
 
   /**
