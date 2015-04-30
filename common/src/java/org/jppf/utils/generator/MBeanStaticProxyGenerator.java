@@ -410,9 +410,9 @@ public class MBeanStaticProxyGenerator {
    * @return a string with the stanadard JPPF source file header.
    */
   private static String initFileHeader() {
-    try {
-      InputStream is = MBeanStaticProxyGenerator.class.getResourceAsStream("JavaSourceHeader.txt");
-      String fileHeader = FileUtils.readTextFile(new BufferedReader(new InputStreamReader(is)));
+    String dir = "../common/src/java/" + MBeanStaticProxyGenerator.class.getPackage().getName().replace(".", "/");
+    try (Reader reader = new BufferedReader(new FileReader(dir + "/JavaSourceHeader.txt"))) {
+      String fileHeader = FileUtils.readTextFile(reader);
       int year = Calendar.getInstance().get(Calendar.YEAR);
       return fileHeader.replace("@current_year@", Integer.toString(year));
     } catch (RuntimeException e) {

@@ -18,10 +18,14 @@
 
 package org.jppf.management.generated;
 
-import java.util.*;
-
+import java.util.Collection;
+import java.util.Map;
 import org.jppf.load.balancer.LoadBalancingInformation;
-import org.jppf.management.*;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.management.JPPFDriverAdminMBean;
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.NodeSelector;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.utils.stats.JPPFStatistics;
 
@@ -97,6 +101,16 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
+  public Map getActiveState(final NodeSelector param0) {
+    return (Map) invoke("getActiveState", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public void setActiveState(final NodeSelector param0, final boolean param1) {
+    invoke("setActiveState", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "boolean" });
+  }
+
+  @Override
   public void setBroadcasting(final boolean param0) {
     setAttribute("Broadcasting", param0);
   }
@@ -107,8 +121,13 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
-  public JPPFStatistics statistics() {
-    return (JPPFStatistics) invoke("statistics", (Object[]) null, (String[]) null);
+  public Integer nbIdleNodes() {
+    return (Integer) invoke("nbIdleNodes", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Integer nbIdleNodes(final NodeSelector param0) {
+    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
@@ -127,13 +146,8 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
-  public Integer nbIdleNodes(final NodeSelector param0) {
-    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public Integer nbIdleNodes() {
-    return (Integer) invoke("nbIdleNodes", (Object[]) null, (String[]) null);
+  public JPPFStatistics statistics() {
+    return (JPPFStatistics) invoke("statistics", (Object[]) null, (String[]) null);
   }
 
   @Override

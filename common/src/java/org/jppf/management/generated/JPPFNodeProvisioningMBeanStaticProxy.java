@@ -18,7 +18,8 @@
 
 package org.jppf.management.generated;
 
-import org.jppf.management.*;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.TypedProperties;
 
@@ -44,8 +45,8 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
-    invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });
+  public int getNbSlaves() {
+    return (int) getAttribute("NbSlaves");
   }
 
   @Override
@@ -54,8 +55,8 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public void provisionSlaveNodes(final int param0) {
-    invoke("provisionSlaveNodes", new Object[] { param0 }, new String[] { "int" });
+  public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
+    invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });
   }
 
   @Override
@@ -64,7 +65,7 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public int getNbSlaves() {
-    return (int) getAttribute("NbSlaves");
+  public void provisionSlaveNodes(final int param0) {
+    invoke("provisionSlaveNodes", new Object[] { param0 }, new String[] { "int" });
   }
 }

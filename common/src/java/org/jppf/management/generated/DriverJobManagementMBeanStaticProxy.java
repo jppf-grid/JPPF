@@ -19,8 +19,10 @@
 package org.jppf.management.generated;
 
 import org.jppf.job.JobInformation;
-import org.jppf.management.*;
-import org.jppf.server.job.management.*;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.server.job.management.NodeJobInformation;
 
 /**
  * Generated static proxy for the {@link org.jppf.server.job.management.DriverJobManagementMBean} MBean interface.
@@ -44,6 +46,11 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
+  public void cancelJob(final String param0) {
+    invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
   public void updateMaxNodes(final String param0, final Integer param1) {
     invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
   }
@@ -64,18 +71,13 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public void cancelJob(final String param0) {
-    invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
+  public void resumeJob(final String param0) {
+    invoke("resumeJob", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
 
   @Override
   public void suspendJob(final String param0, final Boolean param1) {
     invoke("suspendJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
-  }
-
-  @Override
-  public void resumeJob(final String param0) {
-    invoke("resumeJob", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
 
   @Override

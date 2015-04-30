@@ -19,9 +19,10 @@
 package org.jppf.management.generated;
 
 import java.util.Map;
-
 import org.jppf.classloader.DelegationModel;
-import org.jppf.management.*;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.management.NodeSelector;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 
 /**
@@ -46,13 +47,13 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
-  public Map shutdown(final NodeSelector param0, final Boolean param1) {
-    return (Map) invoke("shutdown", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
+  public Map shutdown(final NodeSelector param0) {
+    return (Map) invoke("shutdown", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
-  public Map shutdown(final NodeSelector param0) {
-    return (Map) invoke("shutdown", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  public Map shutdown(final NodeSelector param0, final Boolean param1) {
+    return (Map) invoke("shutdown", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
   }
 
   @Override
@@ -63,6 +64,26 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   @Override
   public Map state(final NodeSelector param0) {
     return (Map) invoke("state", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map cancelJob(final NodeSelector param0, final String param1, final Boolean param2) {
+    return (Map) invoke("cancelJob", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public Map restart(final NodeSelector param0) {
+    return (Map) invoke("restart", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map restart(final NodeSelector param0, final Boolean param1) {
+    return (Map) invoke("restart", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
+  }
+
+  @Override
+  public Map threadDump(final NodeSelector param0) {
+    return (Map) invoke("threadDump", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
@@ -106,6 +127,16 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
+  public String registerForwardingNotificationListener(final NodeSelector param0, final String param1) {
+    return (String) invoke("registerForwardingNotificationListener", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String" });
+  }
+
+  @Override
+  public void unregisterForwardingNotificationListener(final String param0) {
+    invoke("unregisterForwardingNotificationListener", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
   public Map healthSnapshot(final NodeSelector param0) {
     return (Map) invoke("healthSnapshot", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
@@ -121,42 +152,12 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
-  public Map cancelJob(final NodeSelector param0, final String param1, final Boolean param2) {
-    return (Map) invoke("cancelJob", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.Boolean" });
-  }
-
-  @Override
-  public Map restart(final NodeSelector param0, final Boolean param1) {
-    return (Map) invoke("restart", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
-  }
-
-  @Override
-  public Map restart(final NodeSelector param0) {
-    return (Map) invoke("restart", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public Map threadDump(final NodeSelector param0) {
-    return (Map) invoke("threadDump", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public Map forwardInvoke(final NodeSelector param0, final String param1, final String param2, final Object[] param3, final String[] param4) {
-    return (Map) invoke("forwardInvoke", new Object[] { param0, param1, param2, param3, param4 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String", "[Ljava.lang.Object;", "[Ljava.lang.String;" });
-  }
-
-  @Override
   public Map forwardInvoke(final NodeSelector param0, final String param1, final String param2) {
     return (Map) invoke("forwardInvoke", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String" });
   }
 
   @Override
-  public String registerForwardingNotificationListener(final NodeSelector param0, final String param1) {
-    return (String) invoke("registerForwardingNotificationListener", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String" });
-  }
-
-  @Override
-  public void unregisterForwardingNotificationListener(final String param0) {
-    invoke("unregisterForwardingNotificationListener", new Object[] { param0 }, new String[] { "java.lang.String" });
+  public Map forwardInvoke(final NodeSelector param0, final String param1, final String param2, final Object[] param3, final String[] param4) {
+    return (Map) invoke("forwardInvoke", new Object[] { param0, param1, param2, param3, param4 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String", "[Ljava.lang.Object;", "[Ljava.lang.String;" });
   }
 }

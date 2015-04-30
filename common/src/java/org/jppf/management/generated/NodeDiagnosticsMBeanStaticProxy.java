@@ -18,8 +18,12 @@
 
 package org.jppf.management.generated;
 
-import org.jppf.management.*;
-import org.jppf.management.diagnostics.*;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.management.diagnostics.DiagnosticsMBean;
+import org.jppf.management.diagnostics.HealthSnapshot;
+import org.jppf.management.diagnostics.MemoryInformation;
+import org.jppf.management.diagnostics.ThreadDump;
 
 /**
  * Generated static proxy for the {@link org.jppf.management.diagnostics.DiagnosticsMBean} MBean interface.
@@ -48,16 +52,6 @@ public class NodeDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
-  public MemoryInformation memoryInformation() {
-    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public HealthSnapshot healthSnapshot() {
-    return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
-  }
-
-  @Override
   public String[] threadNames() {
     return (String[]) invoke("threadNames", (Object[]) null, (String[]) null);
   }
@@ -80,5 +74,15 @@ public class NodeDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy im
   @Override
   public Double cpuLoad() {
     return (Double) invoke("cpuLoad", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public MemoryInformation memoryInformation() {
+    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public HealthSnapshot healthSnapshot() {
+    return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
   }
 }
