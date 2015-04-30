@@ -219,6 +219,10 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation");
   }
 
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #nbNodes(NodeSelector)} with an {@link ExecutionPolicySelector} instead.
+   */
   @Override
   public Integer matchingNodes(final ExecutionPolicy policy) throws Exception {
     return (Integer) invoke(MBEAN_NAME, "matchingNodes", new Object[] { policy }, new String[] { ExecutionPolicy.class.getName() });
@@ -249,6 +253,17 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public void toggleActiveState(final NodeSelector selector) throws Exception {
     invoke(MBEAN_NAME, "toggleActiveState", new Object[] {selector}, new String[] {NodeSelector.class.getName()});
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Map<String, Boolean> getActiveState(final NodeSelector selector) throws Exception {
+    return (Map<String, Boolean>) invoke(MBEAN_NAME, "getActiveState", new Object[] {selector}, new String[] {NodeSelector.class.getName()});
+  }
+
+  @Override
+  public void setActiveState(final NodeSelector selector, final boolean active) throws Exception {
+    invoke(MBEAN_NAME, "setActiveState", new Object[] {selector, active}, new String[] {NodeSelector.class.getName(), boolean.class.getName()});
   }
 
   @Override

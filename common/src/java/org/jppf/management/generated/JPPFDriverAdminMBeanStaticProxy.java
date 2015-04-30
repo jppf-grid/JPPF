@@ -71,23 +71,23 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
-  public Integer nbIdleNodes(final NodeSelector param0) {
-    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
   public Integer nbIdleNodes() {
     return (Integer) invoke("nbIdleNodes", (Object[]) null, (String[]) null);
   }
 
   @Override
-  public Collection nodesInformation() {
-    return (Collection) invoke("nodesInformation", (Object[]) null, (String[]) null);
+  public Integer nbIdleNodes(final NodeSelector param0) {
+    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
   public Collection nodesInformation(final NodeSelector param0) {
     return (Collection) invoke("nodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Collection nodesInformation() {
+    return (Collection) invoke("nodesInformation", (Object[]) null, (String[]) null);
   }
 
   @Override
@@ -128,6 +128,16 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   @Override
   public void toggleActiveState(final NodeSelector param0) {
     invoke("toggleActiveState", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Map getActiveState(final NodeSelector param0) {
+    return (Map) invoke("getActiveState", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public void setActiveState(final NodeSelector param0, final boolean param1) {
+    invoke("setActiveState", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "boolean" });
   }
 
   @Override

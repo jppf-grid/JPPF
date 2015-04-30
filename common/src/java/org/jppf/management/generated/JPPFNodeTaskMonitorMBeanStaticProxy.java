@@ -49,18 +49,13 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public Integer getTotalTasksExecuted() {
-    return (Integer) getAttribute("TotalTasksExecuted");
+  public Integer getTotalTasksSucessfull() {
+    return (Integer) getAttribute("TotalTasksSucessfull");
   }
 
   @Override
   public Integer getTotalTasksInError() {
     return (Integer) getAttribute("TotalTasksInError");
-  }
-
-  @Override
-  public Integer getTotalTasksSucessfull() {
-    return (Integer) getAttribute("TotalTasksSucessfull");
   }
 
   @Override
@@ -71,5 +66,10 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
   @Override
   public Long getTotalTaskElapsedTime() {
     return (Long) getAttribute("TotalTaskElapsedTime");
+  }
+
+  @Override
+  public Integer getTotalTasksExecuted() {
+    return (Integer) getAttribute("TotalTasksExecuted");
   }
 }

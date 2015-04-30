@@ -43,7 +43,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
 
   /**
    * Get the number of nodes attached to the driver.
-   * Note that this method is equivalent to calling {@link #nbNodes(NodeSelector)} with a {@code null} selector.
+   * Note that this method is equivalent to calling {@link #nbNodes(NodeSelector) nbNodes(null)}.
    * @return the number of nodes, or -1 if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
@@ -60,7 +60,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
 
   /**
    * Request the JMX connection information for all the nodes attached to the server.
-   * Note that this method is equivalent to calling {@link #nodesInformation(NodeSelector)} with a {@code null} selector.
+   * Note that this method is equivalent to calling {@link #nodesInformation(NodeSelector, boolean) nodesInformation(null, false)}.
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
@@ -68,6 +68,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
 
   /**
    * Request the JMX connection information for all the nodes attached to the server which satisfy the specified selector.
+   * Note that this method is equivalent to calling {@link #nodesInformation(NodeSelector, boolean) nodesInformation(selector, false)}.
    * @param selector specifies which nodes shouyld be counted. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
@@ -129,7 +130,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
 
   /**
    * Get the number of nodes currently idle.
-   * Note that this method is equivalent to calling {@link #nbIdleNodes(NodeSelector)} with a {@code null} selector.
+   * Note that this method is equivalent to calling {@link #nbIdleNodes(NodeSelector) nbIdleNodes(null)}.
    * @return the number of idle nodes, or -1 if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
@@ -146,7 +147,7 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
 
   /**
    * Request the JMX connection information for all the idle nodes attached to the server.
-   * Note that this method is equivalent to calling {@link #idleNodesInformation(NodeSelector)} with a {@code null} selector.
+   * Note that this method is equivalent to calling {@link #idleNodesInformation(NodeSelector) idleNodesInformation(null)}.
    * @return a collection of {@link JPPFManagementInfo} instances, or {@code null} if information on the nodes could not be retrieved.
    * @throws Exception if any error occurs.
    */
@@ -162,10 +163,26 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
 
   /**
    * Toggle the activate state of the specified nodes. Nodes in 'active' state will be deactivated, nodes in 'inactive' state will be activated.
-   * @param selector determines which nodes will be activated or deactivated.
+   * @param selector determines which nodes will be activated or deactivated.  If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
    * @throws Exception if any error occurs.
    */
   void toggleActiveState(NodeSelector selector) throws Exception;
+
+  /**
+   * Get the active states of the nodes specified vith a {@link NodeSelector}.
+   * @param selector specifies for which nodes to retrieve the active states. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @return a mmaping of node uuids to their active state.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Boolean> getActiveState(NodeSelector selector) throws Exception;
+
+  /**
+   * Set the active state of the specified nodes.
+   * @param selector determines which nodes will be activated or deactivated. If {@code null}, then {@link NodeSelector#ALL_NODES} will be used.
+   * @param active specifies the activer state to set on the selected nodes.
+   * @throws Exception if any error occurs.
+   */
+  void setActiveState(NodeSelector selector, boolean active) throws Exception;
 
   /**
    * Activate or deactivate the broadcasting of the driver's connection information.
