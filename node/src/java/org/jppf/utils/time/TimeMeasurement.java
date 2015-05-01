@@ -23,11 +23,14 @@ package org.jppf.utils.time;
  * @author Laurent Cohen
  */
 public interface TimeMeasurement {
-
   /**
    * Get the latest time measure in nanoseconds.
    * @return the latest time measure in nanos.
    */
-  long getNanoTime();
+  long nanoTime();
 
+  /**
+   * Perform a warmup of the time measurement instance, to increase the probability of consistent measurements.
+   */
+  void warmUp();
 }

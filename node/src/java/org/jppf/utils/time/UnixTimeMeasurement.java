@@ -20,7 +20,7 @@ package org.jppf.utils.time;
 
 import java.util.*;
 
-import org.jppf.utils.time.UnixTimeMeasurement.CLIB.TIMESPEC;
+import org.jppf.utils.time.UnixTimeMeasurement.LIBRT.TIMESPEC;
 
 import com.sun.jna.*;
 import com.sun.jna.ptr.IntByReference;
@@ -33,17 +33,17 @@ public class UnixTimeMeasurement implements TimeMeasurement {
   /**
    * Definition (incomplete) of the Xext library.
    */
-  public interface CLIB extends Library {
+  public interface LIBRT extends Library {
     /**
      * Instance of the Xss library bindings.
      */
-    CLIB INSTANCE = (CLIB) Native.loadLibrary(null, CLIB.class);
+    LIBRT INSTANCE = (LIBRT) Native.loadLibrary("librt", LIBRT.class);
 
     /**
      * Access a process CPU-time clock
      * @param pid the pid of the process.
      * @param clock_id an int value sent by reference which will hold the result.
-     * @return 0 upon successful completion, non-zero otherwise. 
+     * @return 0 upon successful completion, non-zero otherwise.
      */
     int clock_getcpuclockid(int pid, IntByReference clock_id);
 
@@ -51,7 +51,7 @@ public class UnixTimeMeasurement implements TimeMeasurement {
      * Get the wall clock.
      * @param clock_id id of the lcok to access.
      * @param timespec holds the results.
-     * @return 0 upon successful completion, non-zero otherwise. 
+     * @return 0 upon successful completion, non-zero otherwise.
      */
     int clock_gettime(int clock_id, TIMESPEC timespec);
 
@@ -76,10 +76,6 @@ public class UnixTimeMeasurement implements TimeMeasurement {
   }
 
   /**
-   * Singleton instance of this class.
-   */
-  private static final TimeMeasurement instance = new UnixTimeMeasurement();
-  /**
    * Interval in nanos between two clock ticks.
    * Computed from a call to {@code QueryPerformanceFrequency()}.
    */
@@ -87,7 +83,7 @@ public class UnixTimeMeasurement implements TimeMeasurement {
   static {
     try {
       IntByReference clock_id = new IntByReference();
-      int result = CLIB.INSTANCE.clock_getcpuclockid(0, clock_id);
+      int result = LIBRT.INSTANCE.clock_getcpuclockid(0, clock_id);
       clockID = clock_id.getValue();
       System.out.printf("clock_id = %,d%n", clockID);
     } catch (Throwable t) {
@@ -100,17 +96,19 @@ public class UnixTimeMeasurement implements TimeMeasurement {
   private TIMESPEC ref = new TIMESPEC();
 
   @Override
-  public long getNanoTime() {
-    CLIB.INSTANCE.clock_gettime(clockID, ref);
-    return 1_000_000_000 * ref.seconds + ref.nanos;
+  public long nanoTime() {
+    LIBRT.INSTANCE.clock_gettime(clockID, ref);
+    return 1_000_000_000L * ref.seconds + ref.nanos;
   }
 
-  /**
-   * Get the latest time measure in nanoseconds.
-   * @return the latest time measure in nanos.
-   */
-  public static long nanoTime() {
-    return instance.getNanoTime();
+  @Override
+  public void warmUp() {
+    long start = nanoTime();
+    for (int i=0; i<20_000; i++) {
+      long tmp = nanoTime();
+    }
+    long elapsed = nanoTime() - start;
+    System.out.printf("warmup time = %,d ns%n", elapsed);
   }
 
   /**
@@ -119,18 +117,14 @@ public class UnixTimeMeasurement implements TimeMeasurement {
    */
   public static void main(final String[] args) {
     try {
+      TimeMeasurement tm = new UnixTimeMeasurement();
       // warmup
-      long start = UnixTimeMeasurement.nanoTime();
-      for (int i=0; i<10000; i++) {
-        long tmp = UnixTimeMeasurement.nanoTime();
-      }
-      long elapsed = UnixTimeMeasurement.nanoTime() - start;
-      System.out.printf("warmup time = %,d ns%n", elapsed);
+      tm.warmUp();
       int nbMeasures = 11;
       long times[] = new long[nbMeasures];
-      start = UnixTimeMeasurement.nanoTime();
-      for (int i=0; i<nbMeasures; i++) times[i] = UnixTimeMeasurement.nanoTime();
-      for (int i=1; i<nbMeasures; i++) System.out.printf("duration %2d = %,8d ns%n", i, (times[i] - times[i-1]));
+      long start = tm.nanoTime();
+      for (int i=0; i<nbMeasures; i++) times[i] = tm.nanoTime();
+      for (int i=1; i<nbMeasures; i++) System.out.printf("duration %2d = %,10d ns%n", i, (times[i] - times[i-1]));
 
     } catch (Exception e) {
       e.printStackTrace();

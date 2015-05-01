@@ -51,10 +51,6 @@ public class WindowsTimeMeasurement implements TimeMeasurement {
   }
 
   /**
-   * Singleton instance of this class.
-   */
-  private static final TimeMeasurement instance = new WindowsTimeMeasurement();
-  /**
    * Interval in nanos between two clock ticks.
    * Computed from a call to {@code QueryPerformanceFrequency()}.
    */
@@ -75,17 +71,19 @@ public class WindowsTimeMeasurement implements TimeMeasurement {
   private LongByReference ref = new LongByReference();
 
   @Override
-  public long getNanoTime() {
+  public long nanoTime() {
     Kernel32.INSTANCE.QueryPerformanceCounter(ref);
     return tickInterval * ref.getValue();
   }
 
-  /**
-   * Get the latest time measure in nanoseconds.
-   * @return the latest time measure in nanos.
-   */
-  public static long nanoTime() {
-    return instance.getNanoTime();
+  @Override
+  public void warmUp() {
+    long start = nanoTime();
+    for (int i=0; i<20_000; i++) {
+      long tmp = nanoTime();
+    }
+    long elapsed = nanoTime() - start;
+    System.out.printf("warmup time = %,d ns%n", elapsed);
   }
 
   /**
@@ -94,17 +92,12 @@ public class WindowsTimeMeasurement implements TimeMeasurement {
    */
   public static void main(final String[] args) {
     try {
-      // warmup
-      long start = WindowsTimeMeasurement.nanoTime();
-      for (int i=0; i<10000; i++) {
-        long tmp = WindowsTimeMeasurement.nanoTime();
-      }
-      long elapsed = WindowsTimeMeasurement.nanoTime() - start;
-      System.out.printf("warmup time = %,d ns%n", elapsed);
+      TimeMeasurement tm = new WindowsTimeMeasurement();
+      tm.warmUp();
       int nbMeasures = 11;
       long times[] = new long[nbMeasures];
-      start = WindowsTimeMeasurement.nanoTime();
-      for (int i=0; i<nbMeasures; i++) times[i] = WindowsTimeMeasurement.nanoTime();
+      long start = tm.nanoTime();
+      for (int i=0; i<nbMeasures; i++) times[i] = tm.nanoTime();
       for (int i=1; i<nbMeasures; i++) System.out.printf("duration %2d = %,8d ns%n", i, (times[i] - times[i-1]));
       
     } catch (Exception e) {
