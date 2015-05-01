@@ -21,5 +21,7 @@ call createUpdateTruststore driver node
 
 rem create driver trust store with node certificate
 call createUpdateTruststore node driver
+call createUpdateTruststore driver driver
 rem create driver_client trust store with client certificate
 call createUpdateTruststore client driver_client
+call createUpdateTruststore driver driver_client

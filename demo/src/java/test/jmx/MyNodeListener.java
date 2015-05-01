@@ -24,7 +24,7 @@ import org.jppf.node.event.*;
  * 
  * @author Laurent Cohen
  */
-public class MyNodeListener implements NodeLifeCycleListener {
+public class MyNodeListener extends NodeLifeCycleListenerAdapter {
 
   /**
    * singleton instance for easy access from the tasks.
