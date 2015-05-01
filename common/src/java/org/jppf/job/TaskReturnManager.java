@@ -22,6 +22,7 @@ package org.jppf.job;
  * Implementations of this interface manage the registration and unregistration
  * of task return listeners and notify these listeners of task return events.
  * @author Laurent Cohen
+ * @deprecated use {@link JobTasksListenerManager} instead.
  */
 public interface TaskReturnManager {
   /**

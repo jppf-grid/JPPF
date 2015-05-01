@@ -19,15 +19,21 @@
 package org.jppf.job;
 
 /**
- * Listener interface for classes that wish to listen to job return events in the driver.
+ * Implementations of this interface manage the registration and unregistration
+ * of {@link JobTasksListener job tasks listeners} and notify these listeners of job tasks events.
  * @author Laurent Cohen
- * @since 5.0
- * @deprecated use {@link JobTasksListener} instead.
  */
-public interface TaskReturnListener {
+@SuppressWarnings("deprecation")
+public interface JobTasksListenerManager extends TaskReturnManager {
   /**
-   * Called when a job dispatch returns from a node.
-   * @param event encapsulates information on the job dispatch.
+   * Add a listener to the list of job tasks listeners.
+   * @param listener the listener to add to the list.
    */
-  void tasksReturned(TaskReturnEvent event);
+  void addJobTasksListener(final JobTasksListener listener);
+
+  /**
+   * Remove a listener from the list of job tasks listeners.
+   * @param listener the listener to remove from the list.
+   */
+  void removeJobTasksListener(final JobTasksListener listener);
 }

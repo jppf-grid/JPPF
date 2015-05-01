@@ -38,7 +38,7 @@ import org.slf4j.*;
  * Instances of this class manage and monitor the jobs throughout their processing within the JPPF driver.
  * @author Laurent Cohen
  */
-public class JPPFJobManager implements ServerJobChangeListener, JobNotificationEmitter, TaskReturnManager {
+public class JPPFJobManager implements ServerJobChangeListener, JobNotificationEmitter, JobTasksListenerManager {
   /**
    * Logger for this class.
    */
@@ -62,7 +62,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * The list of registered job dispatch listeners.
    */
-  private final List<TaskReturnListener> taskReturnListeners = new CopyOnWriteArrayList<>();
+  private final List<JobTasksListener> taskReturnListeners = new CopyOnWriteArrayList<>();
   /**
    * Reference to the driver.
    */
@@ -137,6 +137,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     }
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : added node " + channel);
     submitEvent(JobEventType.JOB_DISPATCHED, bundle, channel);
+    fireJobTasksEvent(channel, nodeBundle, true);
   }
 
   @Override
@@ -149,7 +150,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       } else if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     }
     submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
-    fireTaskReturnEvent(channel, nodeBundle);
+    fireJobTasksEvent(channel, nodeBundle, false);
   }
 
   /**
@@ -280,18 +281,38 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   /**
    * Add a listener to the list of dispatch listeners.
    * @param listener the listener to add to the list.
+   * @deprecated use {@link #addJobTasksListener(JobTasksListener)} instead.
    */
   @Override
   public void addTaskReturnListener(final TaskReturnListener listener) {
+    if (listener != null) taskReturnListeners.add(new DelegatingJobTasksListener(listener));
+  }
+
+  /**
+   * Remove a listener from the list of dispatch listeners.
+   * @param listener the listener to remove from the list.
+   * @deprecated use {@link #removeJobTasksListener(JobTasksListener)} instead.
+   */
+  @Override
+  public void removeTaskReturnListener(final TaskReturnListener listener) {
+    if (listener != null) taskReturnListeners.remove(new DelegatingJobTasksListener(listener));
+  }
+
+  /**
+   * Add a listener to the list of dispatch listeners.
+   * @param listener the listener to add to the list.
+   */
+  @Override
+  public void addJobTasksListener(final JobTasksListener listener) {
     taskReturnListeners.add(listener);
   }
 
   /**
-   * Reeove a listener from the list of dispatch listeners.
+   * Remove a listener from the list of dispatch listeners.
    * @param listener the listener to remove from the list.
    */
   @Override
-  public void removeTaskReturnListener(final TaskReturnListener listener) {
+  public void removeJobTasksListener(final JobTasksListener listener) {
     taskReturnListeners.remove(listener);
   }
 
@@ -299,11 +320,15 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * Fire a job dispatch event.
    * @param channel the node to which the job is dispatched.
    * @param nodeBundle the task bundle returned from the node.
+   * @param isDispatch whether this is a dispatch event notification.
    */
-  private void fireTaskReturnEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle) {
+  private void fireJobTasksEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle, final boolean isDispatch) {
     if (!taskReturnListeners.isEmpty()) {
-      TaskReturnEvent event = createTaskReturnEvent(channel, nodeBundle);
-      for (TaskReturnListener listener: taskReturnListeners) listener.tasksReturned(event);
+      JobTasksEvent event = createJobTasksEvent(channel, nodeBundle);
+      for (JobTasksListener listener: taskReturnListeners) {
+        if (isDispatch) listener.tasksDispatched(event);
+        else listener.tasksReturned(event);
+      }
     }
   }
 
@@ -313,21 +338,24 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param nodeBundle the task bundle returned from the node.
    * @return an instance of {@link TaskReturnEvent}.
    */
-  private TaskReturnEvent createTaskReturnEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle) {
+  private JobTasksEvent createJobTasksEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle) {
     List<ServerTask> tasks = nodeBundle.getTaskList();
     List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
     for (ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(
-      task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount()));
+        task.getJobPosition(), task.getThrowable(), task.getExpirationCount(), task.getMaxResubmits(), task.getTaskResubmitCount()));
     TaskBundle job = nodeBundle.getJob();
-    return new TaskReturnEvent(job.getUuid(), job.getName(), taskInfos, nodeBundle.getJobReturnReason(), channel.getManagementInfo());
+    return new JobTasksEvent(job.getUuid(), job.getName(), taskInfos, nodeBundle.getJobReturnReason(), channel.getManagementInfo());
   }
 
   /**
    * Load all the dispatch listeners defined in the classpath with SPI.
    */
+  @SuppressWarnings("deprecation")
   public void loadTaskReturnListeners() {
     List<TaskReturnListener> list = new ServiceFinder().findProviders(TaskReturnListener.class);
-    for (TaskReturnListener listener: list) addTaskReturnListener(listener);
+    for (TaskReturnListener listener: list) addJobTasksListener(new DelegatingJobTasksListener(listener));
+    List<JobTasksListener> list2 = new ServiceFinder().findProviders(JobTasksListener.class);
+    for (JobTasksListener listener: list2) addJobTasksListener(listener);
   }
 
   /**
@@ -352,5 +380,40 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   private void incNotifCount() {
     int n = notifCount.incrementAndGet();
     if (n > notifMax.get()) notifMax.set(n);
+  }
+
+  /**
+   * Delegates {@link JobTasksEvent} notifications to an old, deprecated {@link TaskReturnListener}.
+   */
+  @SuppressWarnings("deprecation")
+  private static class DelegatingJobTasksListener implements JobTasksListener {
+    /**
+     * The listener to delegate to.
+     */
+    private final TaskReturnListener delegate;
+
+    /**
+     * Initialize with a listener to delegate to.
+     * @param delegate the listener to delegate to.
+     */
+    DelegatingJobTasksListener(final TaskReturnListener delegate) {
+      if (delegate == null) throw new IllegalArgumentException("delegate can't be null");
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void tasksDispatched(final JobTasksEvent event) {
+    }
+
+    @Override
+    public void tasksReturned(final JobTasksEvent event) {
+      delegate.tasksReturned(event);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (!(obj instanceof DelegatingJobTasksListener)) return false;
+      return delegate.equals(((DelegatingJobTasksListener) obj).delegate);
+    }
   }
 }

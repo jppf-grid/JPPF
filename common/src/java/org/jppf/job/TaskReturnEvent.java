@@ -26,6 +26,7 @@ import org.jppf.management.JPPFManagementInfo;
  * Instances of this class encapsulate information on job dispatches to nodes.
  * @author Laurent Cohen
  * @since 5.0
+ * @deprecated {@link JobTasksEvent} should be used instead, in conjunction with {@link JobTasksListener}s.
  */
 public class TaskReturnEvent extends EventObject {
   /**

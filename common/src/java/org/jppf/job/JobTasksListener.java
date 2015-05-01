@@ -18,16 +18,22 @@
 
 package org.jppf.job;
 
+import java.util.EventListener;
+
 /**
- * Listener interface for classes that wish to listen to job return events in the driver.
+ * Listener interface for classes that wish to receive notifications of job tasks dispatched or returned in the driver.
  * @author Laurent Cohen
- * @since 5.0
- * @deprecated use {@link JobTasksListener} instead.
  */
-public interface TaskReturnListener {
+public interface JobTasksListener extends EventListener {
+  /**
+   * Called when a set of tasks from a job is dispatched to a node.
+   * @param event encapsulates information on the job dispatch.
+   */
+  void tasksDispatched(JobTasksEvent event);
+
   /**
    * Called when a job dispatch returns from a node.
    * @param event encapsulates information on the job dispatch.
    */
-  void tasksReturned(TaskReturnEvent event);
+  void tasksReturned(JobTasksEvent event);
 }
