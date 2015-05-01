@@ -28,7 +28,7 @@ import org.jppf.utils.TypedProperties;
  * @author Laurent Cohen
  * @exclude
  */
-public class DelegatingNodeListener implements NodeLifeCycleListener {
+public class DelegatingNodeListener extends NodeLifeCycleListenerAdapter {
   /**
    * The node life cycle listner to delegate events to.
    */

@@ -43,5 +43,9 @@ public enum NodeLifeCycleEventType
   /**
    * After a job processing is complete.
    */
-  JOB_ENDING
+  JOB_ENDING,
+  /**
+   * <i>After</i> the node has sent the results of a job to the server, and <i>before</i> it receives the next job.
+   */
+  BEFORE_NEXT_JOB
 }

@@ -22,30 +22,28 @@ package org.jppf.node.event;
  * Convenience class that can be used when not all methods of {@link NodeLifeCycleListener} need to be implemented.
  * @author Laurent Cohen
  */
-public class NodeLifeCycleListenerAdapter implements NodeLifeCycleListener
-{
+public class NodeLifeCycleListenerAdapter implements NodeLifeCycleListener {
   @Override
-  public void nodeStarting(final NodeLifeCycleEvent event)
-  {
+  public void nodeStarting(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void nodeEnding(final NodeLifeCycleEvent event)
-  {
+  public void nodeEnding(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
-  {
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void jobStarting(final NodeLifeCycleEvent event)
-  {
+  public void jobStarting(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void jobEnding(final NodeLifeCycleEvent event)
-  {
+  public void jobEnding(final NodeLifeCycleEvent event) {
+  }
+
+  @Override
+  public void beforeNextJob(final NodeLifeCycleEvent event) {
   }
 }

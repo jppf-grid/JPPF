@@ -24,8 +24,7 @@ import java.util.EventListener;
  * Interface for all listeners to the node's life cycle events.
  * @author Laurent Cohen
  */
-public interface NodeLifeCycleListener extends EventListener
-{
+public interface NodeLifeCycleListener extends EventListener {
   /**
    * Called when the node has finished initializing, and before it starts processing jobs.
    * @param event encapsulates information about the node.
@@ -39,8 +38,8 @@ public interface NodeLifeCycleListener extends EventListener
   void nodeEnding(NodeLifeCycleEvent event);
 
   /**
-   * Called when the node has loaded a job header and before the <code>DataProvider</code> or any of the tasks has been loaded.
-   * <br>Note that <code>event.getTasks()</code> will return <code>null</code> at this point.
+   * Called when the node has loaded a job header and before the {@code DataProvider} or any of the tasks have been loaded.
+   * <p>Note that {@code event.getTasks()} and {@code event.getDataProvider()} will return {@code null} at this point.
    * @param event encapsulates information about the job.
    */
   void jobHeaderLoaded(NodeLifeCycleEvent event);
@@ -56,4 +55,12 @@ public interface NodeLifeCycleListener extends EventListener
    * @param event encapsulates information about the job.
    */
   void jobEnding(NodeLifeCycleEvent event);
+
+  /**
+   * Called <i>after</i> the node has sent the results of a job to the server, and <i>before</i> it receives the next job.
+   * It is guranteed that the node is idle when this method is called.
+   * <p>Note that {@code event.getJob()}, {@code event.getTasks()}, {@code event.getTaskClassLoader()} and {@code event.getDataProvider()} will return {@code null} at this point.
+   * @param event encapsulates information about the job.
+   */
+  void beforeNextJob(NodeLifeCycleEvent event);
 }

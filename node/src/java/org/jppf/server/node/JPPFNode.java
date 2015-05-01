@@ -263,6 +263,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     if ((taskList != null) && (!taskList.isEmpty())) {
       if (!isJmxEnabled()) setTaskCount(getTaskCount() + taskList.size());
     }
+    if (!bundle.isHandshake()) lifeCycleEventHandler.fireBeforeNextJob();
   }
 
   /**

@@ -176,6 +176,20 @@ public class LifeCycleEventHandler {
   }
 
   /**
+   * Notify all listeners that the node is between jobs.
+   */
+  public void fireBeforeNextJob() {
+    NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, BEFORE_NEXT_JOB, null, null, null, null);
+    for (NodeLifeCycleListener listener : listeners) {
+      try {
+        listener.beforeNextJob(event);
+      } catch(Throwable t) {
+        handleError(listener, event, t);
+      }
+    }
+  }
+
+  /**
    * Load all listener instances found in the class path via a service definition.
    */
   public void loadListeners() {

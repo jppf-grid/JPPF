@@ -29,8 +29,7 @@ import org.slf4j.*;
  * The default node life cycle error handler, used when the life cycle listener implementation does not implement {@link NodeLifeCycleErrorHandler}.
  * @author Laurent Cohen
  */
-public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler
-{
+public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler {
   /**
    * Logger for this class.
    */
@@ -50,14 +49,14 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler
 
   /**
    * {@inheritDoc}
-   * <p>This method logs the uncaught throwable, with a level of detail based on the configured logging level.
-   * If debug level is enabled, then the full stack trace will be logged, otherwise only the throwable class and its message will be logged.
-   * <p>if the value of the boolean configuration property &quot;jppf.node.listener.errors.propagate&quot; is true, and if the throwable is an {@link Error},
-   * then it will be propagated up the call stack.
+   * <p>
+   * This method logs the uncaught throwable, with a level of detail based on the configured logging level. If debug level is enabled, then the full stack trace will be logged, otherwise only the
+   * throwable class and its message will be logged.
+   * <p>
+   * if the value of the boolean configuration property &quot;jppf.node.listener.errors.propagate&quot; is true, and if the throwable is an {@link Error}, then it will be propagated up the call stack.
    */
   @Override
-  public void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t)
-  {
+  public void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
     String s = StringUtils.build("error executing ", methodsNamesMap.get(event.getType()), " on an instance of ", listener.getClass(), ", event=", event, ", listener=", listener, " : ");
     if (debugEnabled) log.debug(s, t);
     else log.error(s + ExceptionUtils.getMessage(t));
@@ -68,14 +67,14 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler
    * Generate a mapping of event type to listener method name.
    * @return a map of {@link NodeLifeCycleEventType} to associated strings.
    */
-  private static Map<NodeLifeCycleEventType, String> generateMethodsNamesMap()
-  {
+  private static Map<NodeLifeCycleEventType, String> generateMethodsNamesMap() {
     Map<NodeLifeCycleEventType, String> map = new HashMap<>();
     map.put(NODE_STARTING, "nodeStarting()");
     map.put(NODE_ENDING, "nodeEnding()");
     map.put(JOB_HEADER_LOADED, "jobHeaderLoaded()");
     map.put(JOB_STARTING, "jobStarting()");
     map.put(JOB_ENDING, "jobEnding()");
+    map.put(BEFORE_NEXT_JOB, "beforeNextJob()");
     return Collections.unmodifiableMap(map);
   }
 }
