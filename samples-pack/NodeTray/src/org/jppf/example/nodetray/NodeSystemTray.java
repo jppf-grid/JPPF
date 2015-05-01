@@ -36,7 +36,7 @@ import org.slf4j.*;
  * and changes the icon accordingly.
  * @author Laurent Cohen
  */
-public class NodeSystemTray implements NodeLifeCycleListener
+public class NodeSystemTray extends NodeLifeCycleListenerAdapter
 {
   /**
    * Logger for this class.

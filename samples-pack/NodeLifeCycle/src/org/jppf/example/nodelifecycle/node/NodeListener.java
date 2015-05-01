@@ -41,7 +41,7 @@ import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
  * rolled back. If the node crashes suddenly, rollback will be performed at its next startup.
  * @author Laurent Cohen
  */
-public class NodeListener implements NodeLifeCycleListener
+public class NodeListener extends NodeLifeCycleListenerAdapter
 {
   /**
    * Logger for this class.

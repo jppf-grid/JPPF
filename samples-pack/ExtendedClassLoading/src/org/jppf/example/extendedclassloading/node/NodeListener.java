@@ -32,7 +32,7 @@ import org.slf4j.*;
  * based on the metadata provided by the jobs.
  * @author Laurent Cohen
  */
-public class NodeListener implements NodeLifeCycleListener {
+public class NodeListener extends NodeLifeCycleListenerAdapter {
   /**
    * Logger for this class.
    */
