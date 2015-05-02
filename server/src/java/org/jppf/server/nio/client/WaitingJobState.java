@@ -30,8 +30,7 @@ import org.slf4j.*;
  * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
-class WaitingJobState extends ClientServerState
-{
+class WaitingJobState extends ClientServerState {
   /**
    * Logger for this class.
    */
@@ -45,8 +44,7 @@ class WaitingJobState extends ClientServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public WaitingJobState(final ClientNioServer server)
-  {
+  public WaitingJobState(final ClientNioServer server) {
     super(server);
   }
 
@@ -58,12 +56,10 @@ class WaitingJobState extends ClientServerState
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     ClientContext context = (ClientContext) channel.getContext();
     if (context.getClientMessage() == null) context.setClientMessage(context.newMessage());
-    if (context.readMessage(channel))
-    {
+    if (context.readMessage(channel)) {
       ServerTaskBundleClient clientBundle = context.deserializeBundle();
       TaskBundle header = clientBundle.getJob();
       boolean closeCommand = header.getParameter(BundleParameter.CLOSE_COMMAND, false);
@@ -95,14 +91,11 @@ class WaitingJobState extends ClientServerState
    * @param channel the channel.
    * @return a <code>null</code> transition.
    */
-  private ClientTransition closeChannel(final ChannelWrapper<?> channel)
-  {
-    try
-    {
+  private ClientTransition closeChannel(final ChannelWrapper<?> channel) {
+    if (debugEnabled) log.debug("handling close command for channel {}" + channel);
+    try {
       channel.getContext().handleException(channel, null);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug("exception while trying to close the channel {}" + channel);
     }
     return null;
