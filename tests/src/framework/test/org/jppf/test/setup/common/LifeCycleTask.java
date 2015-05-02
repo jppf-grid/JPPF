@@ -147,7 +147,7 @@ public class LifeCycleTask extends AbstractTask<String> {
    * @param message a short message describing the life cycle status.
    */
   private void displayTask(final String message) {
-    log.debug("displaying task " + this + " (" + message + ')');
+    log.info("displaying task " + this + " (" + message + ')');
   }
 
   /**

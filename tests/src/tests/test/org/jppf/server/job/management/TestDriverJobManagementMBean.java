@@ -36,8 +36,7 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-public class TestDriverJobManagementMBean extends Setup1D1N1C
-{
+public class TestDriverJobManagementMBean extends Setup1D1N1C {
   /**
    * A "short" duration for this test.
    */
@@ -51,9 +50,8 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
    * We test a job with 1 task, and attempt to cancel it after it has completed.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=15000L)
-  public void testCancelJob() throws Exception
-  {
+  @Test(timeout = 15000L)
+  public void testCancelJob() throws Exception {
     int nbTasks = 10;
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
     client.submitJob(job);
@@ -65,8 +63,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
     assertEquals(results.size(), nbTasks);
     assertNotNull(results.get(0));
     int count = 0;
-    for (Task<?> t: results)
-    {
+    for (Task<?> t : results) {
       if (t.getResult() == null) count++;
     }
     assertEquals(nbTasks, count);
@@ -76,9 +73,8 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
    * We test a job with 1 task, and attempt to cancel it after it has completed.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000L)
-  public void testCancelJobAfterCompletion() throws Exception
-  {
+  @Test(timeout = 10000L)
+  public void testCancelJobAfterCompletion() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, 1, LifeCycleTask.class, TIME_SHORT);
     List<Task<?>> results = client.submitJob(job);
     assertEquals(1, results.size());
@@ -94,18 +90,17 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C
    * See <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-126">JPPF-126 Job cancelled from the admin console may get stuck in the server queue</a>.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000L)
-  public void testResumeAndCancelSuspendedJob() throws Exception
-  {
+  @Test(timeout = 10000L)
+  public void testResumeAndCancelSuspendedJob() throws Exception {
     int nbTasks = 2;
     DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
     assertNotNull(proxy);
-    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+    JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3500L);
     job.getSLA().setSuspended(true);
     client.submitJob(job);
     Thread.sleep(1500L);
     proxy.resumeJob(job.getUuid());
-    Thread.sleep(500L);
+    Thread.sleep(1000L);
     proxy.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
     assertEquals(nbTasks, results.size());
