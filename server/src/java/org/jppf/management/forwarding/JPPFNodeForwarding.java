@@ -285,7 +285,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
           task = new GetAttributeTask(node, mbeanName, memberName);
           break;
         case SET_ATTRIBUTE:
-          task = new SetAttributeTask(node, mbeanName, memberName, (Object[]) otherParams[0]);
+          task = new SetAttributeTask(node, mbeanName, memberName, otherParams[0]);
           break;
         default:
           continue;
@@ -294,7 +294,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     }
     for (Future<Pair<String, Object>> f: futures) {
       Pair<String, Object> result = f.get();
-      map.put(result.first(), result.second());
+      if (result != null) map.put(result.first(), result.second());
     }
     return map;
   }
@@ -363,7 +363,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
       JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
       wrapper.setAttribute(mbeanName, memberName, value);
       if (debugEnabled) log.debug("set attribute '" + memberName + "' on node " + uuid);
-      return new Pair<>(uuid, null);
+      return null;
     }
   }
 

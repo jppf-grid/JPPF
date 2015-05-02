@@ -36,8 +36,7 @@ import test.org.jppf.test.setup.BaseSetup;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-public abstract class AbstractTestJPPFNodeForwardingMBean
-{
+public abstract class AbstractTestJPPFNodeForwardingMBean {
   /**
    * Connection to the driver's JMX server.
    */
@@ -64,30 +63,23 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     int nbNodes = 2;
     client = BaseSetup.setup(2);
-    for (int i=1; i<=nbNodes; i++) allNodes.add("n" + i);
+    for (int i = 1; i <= nbNodes; i++) allNodes.add("n" + i);
     driverJmx = BaseSetup.getJMXConnection(client);
     nodeForwarder = driverJmx.getNodeForwarder();
     boolean ready = false;
     NodeSelector selector = new AllNodesSelector();
     String[] array = new String[nbNodes];
-    while (!ready)
-    {
-      try
-      {
+    while (!ready) {
+      try {
         Map<String, Object> result = nodeForwarder.state(selector);
         checkNodes(result, JPPFNodeState.class, allNodes.toArray(array));
         ready = true;
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         Thread.sleep(100L);
-      }
-      catch (AssertionError e)
-      {
+      } catch (AssertionError e) {
         Thread.sleep(100L);
       }
     }
@@ -98,8 +90,7 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass
-  public static void cleanup() throws Exception
-  {
+  public static void cleanup() throws Exception {
     BaseSetup.cleanup();
   }
 
@@ -110,13 +101,11 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
    * @param expectedNodes the list of expectd nodes.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkNodes(final Map<String, Object> result, final Class<?> expectedClass, final String...expectedNodes) throws Exception
-  {
+  protected static void checkNodes(final Map<String, Object> result, final Class<?> expectedClass, final String... expectedNodes) throws Exception {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
-    for (String uuid: expectedNodes)
-    {
+    for (String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
       Object value = result.get(uuid);
       assertNotNull(value);
@@ -129,10 +118,9 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
    * @param result the result map to chek.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkEmpty(final Map<String, Object> result) throws Exception
-  {
+  protected static void checkEmpty(final Map<String, Object> result) throws Exception {
     assertNotNull(result);
-    assertTrue(result.isEmpty());
+    assertTrue("result should be empty but contains " + result, result.isEmpty());
   }
 
   /**
@@ -141,13 +129,11 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
    * @param expectedNodes the list of expectd nodes.
    * @throws Exception if any error occurs or the check fails.
    */
-  protected static void checkNoException(final Map<String, Object> result, final String...expectedNodes) throws Exception
-  {
+  protected static void checkNoException(final Map<String, Object> result, final String... expectedNodes) throws Exception {
     assertNotNull(result);
     assertFalse(result.isEmpty());
     assertEquals(expectedNodes.length, result.size());
-    for (String uuid: expectedNodes)
-    {
+    for (String uuid : expectedNodes) {
       assertTrue(result.containsKey(uuid));
       Object value = result.get(uuid);
       assertFalse(value instanceof Exception);
@@ -158,22 +144,19 @@ public abstract class AbstractTestJPPFNodeForwardingMBean
    * Test getting and setting load-balancer information in the server.
    * @throws Exception if any error occurs.
    */
-  public static void configureLoadBalancer() throws Exception
-  {
-      oldLbi = driverJmx.loadBalancerInformation();
-      TypedProperties newConfig = new TypedProperties();
-      newConfig.setProperty("size", "1");
-      driverJmx.changeLoadBalancerSettings("manual", newConfig);
+  public static void configureLoadBalancer() throws Exception {
+    oldLbi = driverJmx.loadBalancerInformation();
+    TypedProperties newConfig = new TypedProperties();
+    newConfig.setProperty("size", "1");
+    driverJmx.changeLoadBalancerSettings("manual", newConfig);
   }
 
   /**
    * Test getting and setting load-balancer information in the server.
    * @throws Exception if any error occurs.
    */
-  public static void resetLoadBalancer() throws Exception
-  {
-    if (oldLbi != null)
-    {
+  public static void resetLoadBalancer() throws Exception {
+    if (oldLbi != null) {
       driverJmx.changeLoadBalancerSettings(oldLbi.getAlgorithm(), oldLbi.getParameters());
       oldLbi = null;
     }
