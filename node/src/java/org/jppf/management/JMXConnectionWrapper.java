@@ -188,7 +188,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void connectAndWait(final long timeout) {
     if (isConnected()) return;
-    //long start = System.currentTimeMillis();
     long start = System.currentTimeMillis();
     long max = timeout > 0 ? timeout : Long.MAX_VALUE;
     connect();
