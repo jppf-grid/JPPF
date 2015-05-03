@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2015 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="LongTask" type="page">
+
+	<property name="label" value="Long task demos"/>
+	<property name="scrollable" value="false"/>
+	<property name="orientation" value="vertical"/>
+	<property name="bordered" value="false"/>
+	<property name="main" value="true"/>
+	<property name="tooltip" value="Run the long task multiplication demos"/>
+	<script language="javascript"><![CDATA[
+		importPackage(Packages.org.jppf.utils);
+		importPackage(Packages.org.jppf.ui.options);
+		importPackage(Packages.org.jppf.ui.options.event);
+		importPackage(Packages.org.jppf.demo.console);
+		importPackage(Packages.javax.swing);
+	]]></script>
+	<script language="javascript"><![CDATA[
+		BASE = "org.jppf.demo.console.i18n.MatrixPage";
+	]]></script>
+
+	<!-- ===================================================================== -->
+	<!--                   Top Panels                                          -->
+	<!-- ===================================================================== -->
+	
+	<child name="LongTaskPage" type="page">
+
+		<property name="label" value="Long task demo configuration page"/>
+		<property name="scrollable" value="false"/>
+		<property name="orientation" value="horizontal"/>
+		<property name="bordered" value="false"/>
+		<property name="main" value="false"/>
+
+		<!-- ===================================================================== -->
+		<!--          configuration parameters area                                -->
+		<!-- ===================================================================== -->
+	
+		<child name="LongTask" type="page">
+	
+			<property name="label" value="Long task demos"/>
+			<property name="scrollable" value="false"/>
+			<property name="orientation" value="vertical"/>
+			<property name="bordered" value="true"/>
+			<property name="main" value="false"/>
+			<initializer type="script">
+				<script language="javascript"><![CDATA[
+					option.findFirstWithName("/RunLongTaskDemo").setEnabled(true);
+					option.findFirstWithName("/CancelLongTaskDemo").setEnabled(false);
+				]]></script>
+			</initializer>
+
+	
+			<child name="LongTaskActions" type="page">
+				<property name="label" value="Actions"/>
+				<property name="scrollable" value="false"/>
+				<property name="orientation" value="horizontal"/>
+				<property name="bordered" value="false"/>
+				<property name="main" value="false"/>
+		
+				<child name="RunLongTaskDemo" type="Button">
+					<property name="label" value="Run the Demo"/>
+					<property name="tooltip" value="Run the long task  demonstration"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+							option.findFirstWithName("/RunLongTaskDemo").setEnabled(false);
+							option.findFirstWithName("/CancelLongTaskDemo").setEnabled(true);
+							var page = OptionsHandler.getPage("ConfigPage");
+							var nbNodes = page.findFirstWithName("/NbNodes").getValue().intValue();
+							var poolSize = page.findFirstWithName("/NbConnections").getValue().intValue();
+							var blocking = option.findFirstWithName("/LTBlocking").getValue().booleanValue();
+							var length = option.findFirstWithName("/LongTaskLength").getValue().intValue();
+							var size = option.findFirstWithName("/NbTasks").getValue().intValue();
+							var nbIter = option.findFirstWithName("/LTNbIterations").getValue().intValue();
+							var area = option.findFirstWithName("/msgTextLongTask");
+							area.setValue("");
+							var helper = ConsoleHelper.getInstance().configureLongTask(length, size, nbIter, blocking, poolSize, nbNodes, area);
+							helper.start();
+						]]></script>
+					</listener>
+				</child>
+
+				<child name="CancelLongTaskDemo" type="Button">
+					<property name="label" value="Cancel"/>
+					<property name="tooltip" value="Cancel and stop the long task demonstration"/>
+					<listener type="script">
+						<script language="javascript"><![CDATA[
+							option.findFirstWithName("/RunLongTaskDemo").setEnabled(true);
+							option.findFirstWithName("/CancelLongTaskDemo").setEnabled(false);
+							var helper = ConsoleHelper.getInstance();
+							helper.stop();
+						]]></script>
+					</listener>
+				</child>
+
+			</child>
+
+			<child name="LTBlocking" type="Boolean">
+				<property name="label" value="Blocking submission"/>
+				<property name="tooltip" value="Determines whether the tasks submissions should be performed in blocking mode"/>
+				<property name="value" value="true"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="LongTaskLength" type="SpinnerNumber">
+				<property name="label" value="Task length"/>
+				<property name="tooltip" value="Length in milliseconds of each task"/>
+				<property name="value" value="300"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="30000"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="NbTasks" type="SpinnerNumber">
+				<property name="label" value="Number of tasks"/>
+				<property name="tooltip" value="Numbber of tasks to run at each iteration"/>
+				<property name="value" value="300"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="3000"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+			<child name="LTNbIterations" type="SpinnerNumber">
+				<property name="label" value="Number of iterations"/>
+				<property name="tooltip" value="Number of iterations"/>
+				<property name="value" value="20"/>
+				<property name="minValue" value="1"/>
+				<property name="maxValue" value="1000"/>
+				<property name="persistent" value="true"/>
+			</child>
+	
+		</child>
+
+	</child>
+
+	<!-- ===================================================================== -->
+	<!--                   Messages area                                       -->
+	<!-- ===================================================================== -->
+
+	<child name="msgTextLongTask" type="TextArea">
+		<property name="label" value="Server Messages"/>
+		<property name="tooltip" value="Console messages"/>
+		<property name="value" value=""/>
+		<property name="scrollable" value="true"/>
+	</child>
+
+</opt:main>
