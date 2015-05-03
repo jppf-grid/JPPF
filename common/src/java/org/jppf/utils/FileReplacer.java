@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class FileReplacer
-{
+public class FileReplacer {
   /**
    * Logger for this class.
    */
@@ -40,7 +39,6 @@ public class FileReplacer
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private boolean debugEnabled = log.isDebugEnabled();
-  //private boolean debugEnabled = true;
   /**
    * File containing the content to replace.
    */
@@ -80,12 +78,10 @@ public class FileReplacer
    * @param regex if true, then interpret the source as a regular expressison.
    * @throws Exception if an error occurs while performing the replacements.
    */
-  public void replace(final String rootDir, final String srcFile, final String destFile, final String ext, final boolean searchOnly, final boolean regex) throws Exception
-  {
+  public void replace(final String rootDir, final String srcFile, final String destFile, final String ext, final boolean searchOnly, final boolean regex) throws Exception {
     src = FileUtils.readTextFile(srcFile);
     dest = FileUtils.readTextFile(destFile);
-    if (src.endsWith("\n") && dest.endsWith("\n"))
-    {
+    if (src.endsWith("\n") && dest.endsWith("\n")) {
       src = src.substring(0, src.length() - 1);
       dest = dest.substring(0, dest.length() - 1);
     }
@@ -98,8 +94,8 @@ public class FileReplacer
     nbReplacements = 0;
     if (f.isDirectory()) replaceFolder(f);
     else replaceFile(f);
-    log.info("Total number of occurrences found: " + nbReplacements);
-    log.info("Total number of files" + (searchOnly ? " that would have been" : "") + " changed: " + nbFilesChanged);
+    print("Total number of occurrences found: " + nbReplacements);
+    print("Total number of files" + (searchOnly ? " that would have been" : "") + " changed: " + nbFilesChanged);
   }
 
   /**
@@ -107,14 +103,12 @@ public class FileReplacer
    * @param folder the process to visit.
    * @throws Exception if an error occurs while processing the folder.
    */
-  private void replaceFolder(final File folder) throws Exception
-  {
+  private void replaceFolder(final File folder) throws Exception {
     if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
     File[] fileList = folder.listFiles(filter);
     List<File> folders = new ArrayList<>();
     List<File> files = new ArrayList<>();
-    for (File f: fileList)
-    {
+    for (File f: fileList) {
       if (f.isDirectory()) folders.add(f);
       else files.add(f);
     }
@@ -128,24 +122,20 @@ public class FileReplacer
    * @param file the file to process.
    * @throws Exception if an error occurs while processing the folder.
    */
-  private void replaceFile(final File file) throws Exception
-  {
+  private void replaceFile(final File file) throws Exception {
     String content = FileUtils.readTextFile(file.getPath());
     Matcher matcher = pattern.matcher(content);
     boolean b = true;
     int nbFound = 0;
     int start = 0;
-    while (b)
-    {
+    while (b) {
       b = matcher.find(start);
-      if (b)
-      {
+      if (b) {
         nbFound++;
         start = matcher.end();
       }
     }
-    if (nbFound > 0)
-    {
+    if (nbFound > 0) {
       nbFilesChanged++;
       nbReplacements += nbFound;
       log.info("Found "+nbFound+" occurrence" + (nbFound > 1 ? "s" : "") + " of the sequence in file '" + file + '\'');
@@ -157,6 +147,15 @@ public class FileReplacer
   }
 
   /**
+   * Print the specified message to the log and to {@code System.out}.
+   * @param message the message to print.
+   */
+  private void print(final String message) {
+    System.out.println(message);
+    log.info(message);
+  }
+
+  /**
    * Main entry point.
    * <p>The arguments must be specified as follows:<br/>
    * args[0] : the file containing the text to search for<br/>
@@ -165,17 +164,13 @@ public class FileReplacer
    * args[3] : true to indicate that the replacements should only be simulated (i.e changes preview), false to really perform the replacements.
    * @param args defines the text search, the text to replace it with, the file extensions to process, and whether changes are only simulated.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String...args) {
+    try {
       Arguments a = parseArguments(args);
       System.out.println("using " + a);
       FileReplacer replacer = new FileReplacer();
       replacer.replace(a.root, a.in, a.out, a.exts, a.searchOnly, a.regex);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
     }
   }
@@ -184,8 +179,7 @@ public class FileReplacer
    * Encapsulates the command-line arguments.
    * @exclude
    */
-  public static class Arguments
-  {
+  public static class Arguments {
     /**
      * The input file containing the the text or expression to match.
      */
@@ -212,8 +206,7 @@ public class FileReplacer
     public boolean regex = false;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
       return "Arguments[in=" + in + ", out=" + out + ", root=" + root + ", exts=" + exts + ", searchOnly=" + searchOnly + ", regex=" + regex + "]";
     }
   }
@@ -224,11 +217,9 @@ public class FileReplacer
    * @return an <code>Arguments</code> instance.
    * @throws Exception if any erorr occurs.
    */
-  private static Arguments parseArguments(final String...args) throws Exception
-  {
+  private static Arguments parseArguments(final String...args) throws Exception {
     Arguments ag = new Arguments();
-    for (int i=0; i<args.length; i++)
-    {
+    for (int i=0; i<args.length; i++) {
       if ("-i".equals(args[i])) ag.in = args[++i];
       else if ("-o".equals(args[i])) ag.out = args[++i];
       else if ("-f".equals(args[i])) ag.root = args[++i];
@@ -243,8 +234,7 @@ public class FileReplacer
    * File filter based on a set of extensions.
    * @exclude
    */
-  public static class ReplacerFilter implements FileFilter
-  {
+  public static class ReplacerFilter implements FileFilter {
     /**
      * The list of file extensions to process.
      */
@@ -254,8 +244,7 @@ public class FileReplacer
      * Initializer this filter with the specified set of file extensions.
      * @param ext a comma-separated list of file extensions to process.
      */
-    public ReplacerFilter(final String ext)
-    {
+    public ReplacerFilter(final String ext) {
       String s = (ext == null) ? "" : ext;
       extensions = s.split(",");
       for (int i=0; i<extensions.length; i++) extensions[i] = extensions[i].trim();
@@ -265,11 +254,9 @@ public class FileReplacer
      * Tests whether or not the specified abstract pathname should be included in a pathname list.
      * @param file the abstract pathname to be tested
      * @return true if and only if pathname  should be included.
-     * @see java.io.FileFilter#accept(java.io.File)
      */
     @Override
-    public boolean accept(final File file)
-    {
+    public boolean accept(final File file) {
       if (file.isDirectory()) return true;
       String ext = FileUtils.getFileExtension(file);
       if (ext == null) return false;

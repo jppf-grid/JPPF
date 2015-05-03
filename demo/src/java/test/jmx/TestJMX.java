@@ -62,6 +62,12 @@ public class TestJMX
     JPPFNodeForwardingMBean forwarder = null;
     try
     {
+      JMXDriverConnectionWrapper driver = new JMXDriverConnectionWrapper("192.168.1.24", 11191, false);
+      long start = System.currentTimeMillis();
+      driver.connectAndWait(10000L);
+      long elapsed = System.currentTimeMillis() - start;
+      System.out.printf("waited %,d ms%n", elapsed);
+      /*
       client = new JPPFClient();
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       JPPFClientConnection conn = client.getClientConnection();
@@ -70,6 +76,7 @@ public class TestJMX
       while (!driverJmx.isConnected()) Thread.sleep(10L);
 
       perform3();
+      */
     }
     catch(Throwable e)
     {

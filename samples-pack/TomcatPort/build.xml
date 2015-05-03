@@ -45,7 +45,7 @@
       <include name="commons-logging-1.1.jar"/>
       <include name="slf4j-api-1.6.1.jar"/>
       <include name="slf4j-jdk14-1.6.1.jar"/>
-      <include name="jppf-jmxremote_optional-1.1.jar"/>
+      <include name="jppf-jmxremote_optional-1.1.1.jar"/>
     </fileset>
   </path>
 
@@ -111,7 +111,7 @@
         <include name="jppf-client.jar"/>
         <include name="commons-logging-1.1.jar"/>
         <include name="slf4j-api-1.6.1.jar"/>
-	      <include name="jppf-jmxremote_optional-1.1.jar"/>
+	      <include name="jppf-jmxremote_optional-1.1.1.jar"/>
       </lib>
       <lib dir="${basedir}/lib">
         <include name="slf4j-jdk14-1.6.1.jar"/>

@@ -18,7 +18,7 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.utils.FileReplacer"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-f C:/Workspaces/JPPF-b4.2/samples-pack -i C:/Workspaces/temp/in.txt -o C:/Workspaces/temp/out.txt -e html,php,properties,xml,xsd,java,txt,groovy,js -p"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-f C:/Workspaces/JPPF-b4.2 -i C:/Workspaces/temp/in.txt -o C:/Workspaces/temp/out.txt -e properties,launch,config,xml,conf -p"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="demo"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dlog4j.configuration=log4j-client.properties -server -Xmx256m"/>
 </launchConfiguration>
