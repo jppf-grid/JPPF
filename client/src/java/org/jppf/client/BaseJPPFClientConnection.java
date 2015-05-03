@@ -114,7 +114,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    * @exclude
    */
-  public List<Task<?>> sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
+  synchronized public List<Task<?>> sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
@@ -182,7 +182,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    * @exclude
    */
-  public TaskBundle sendHandshakeJob() throws Exception {
+  synchronized TaskBundle sendHandshakeJob() throws Exception {
     TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
@@ -206,7 +206,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    * @exclude
    */
-  public void sendCloseConnectionCommand() throws Exception {
+  synchronized void sendCloseConnectionCommand() throws Exception {
     TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
