@@ -95,8 +95,8 @@ public class FileReplacer {
     nbReplacements = 0;
     if (f.isDirectory()) replaceFolder(f);
     else replaceFile(f);
-    log.info("Total number of occurrences found: " + nbReplacements);
-    log.info("Total number of files" + (searchOnly ? " that would have been" : "") + " changed: " + nbFilesChanged);
+    print("Total number of occurrences found: " + nbReplacements);
+    print("Total number of files" + (searchOnly ? " that would have been" : "") + " changed: " + nbFilesChanged);
   }
 
   /**
@@ -175,7 +175,7 @@ public class FileReplacer {
    * @param message the message to print.
    */
   private static void print(final String message) {
-    //log.info(message);
+    log.info(message);
     System.out.println(message);
   }
 
