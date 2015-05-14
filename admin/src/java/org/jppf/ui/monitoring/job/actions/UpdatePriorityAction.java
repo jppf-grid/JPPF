@@ -121,8 +121,7 @@ public class UpdatePriorityAction extends AbstractJobAction {
   /**
    * Perform the action.
    */
-  private void doOK()
-  {
+  private void doOK() {
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
     priority = ((Number) priorityOption.getValue()).intValue();
     Runnable r = new Runnable() {
@@ -138,6 +137,6 @@ public class UpdatePriorityAction extends AbstractJobAction {
         }
       }
     };
-    new Thread(r).start();
+    runAction(r);
   }
 }

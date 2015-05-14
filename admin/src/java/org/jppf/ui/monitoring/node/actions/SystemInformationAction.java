@@ -72,21 +72,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    String html = null;
-    String toClipboard = null;
-    String title = "System information";
-    try {
-      AbstractTopologyComponent comp = dataArray[0];
-      JPPFSystemInformation info = retrieveInfo(comp);
-      String name = TreeTableUtils.getDisplayName(comp);
-      title = "System information for " + (comp.isNode() ? "node " : "driver ") + name;
-      html = formatProperties(info, new HTMLPropertiesTableFormat(title));
-      toClipboard = formatProperties(info, new TextPropertiesTableFormat(title));
-    } catch(Exception e) {
-      toClipboard = ExceptionUtils.getStackTrace(e);
-      html = toClipboard.replace("\n", "<br>");
-    }
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), title, false);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "System information", false);
     //dialog.getRootPane().setWindowDecorationStyle(JRootPane.WARNING_DIALOG);
     dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -97,7 +83,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
         dialog.dispose();
       }
     });
-    JEditorPane editor = new JEditorPane("text/html", html);
+    final JEditorPane editor = new JEditorPane("text/html", "retrieving information ...");
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     editor.setEditable(false);
@@ -117,8 +103,8 @@ public class SystemInformationAction extends AbstractTopologyAction {
     dialog.setLocationRelativeTo(null);
     dialog.setLocation(location);
     dialog.setSize(600, 600);
-    editor.addMouseListener(new EditorMouseListener(toClipboard));
     dialog.setVisible(true);
+    runAction(new AsyncRunnable(dialog, editor));
   }
 
   /**
@@ -172,4 +158,59 @@ public class SystemInformationAction extends AbstractTopologyAction {
     format.end();
     return format.getText();
   }
+
+  /**
+   * This class asynchronously retrieves the node or driver information and displays it int he dialog.
+   */
+  private class AsyncRunnable implements Runnable {
+    /**
+     * The dialog containing the editor component.
+     */
+    private final JDialog dialog;
+    /**
+     * The editor whose text is th node information.
+     */
+    private final JEditorPane editor;
+    
+    /**
+     * Initialize this asynchronous task.
+     * @param dialog the dialog containing the editor component.
+     * @param editor the editor whose text is th node information.
+     */
+    public AsyncRunnable(final JDialog dialog, final JEditorPane editor) {
+      this.dialog = dialog;
+      this.editor = editor;
+    }
+
+    @Override
+    public void run() {
+      final StringBuilder html = new StringBuilder();
+      final StringBuilder toClipboard = new StringBuilder();
+      final StringBuilder title = new StringBuilder("System information");
+      try {
+        AbstractTopologyComponent comp = dataArray[0];
+        JPPFSystemInformation info = retrieveInfo(comp);
+        String name = TreeTableUtils.getDisplayName(comp);
+        title.append(" for ").append(comp.isNode() ? "node " : "driver ").append(name);
+        html.append(formatProperties(info, new HTMLPropertiesTableFormat(title.toString())));
+        toClipboard.append(formatProperties(info, new TextPropertiesTableFormat(title.toString())));
+      } catch(Exception e) {
+        toClipboard.append(ExceptionUtils.getStackTrace(e));
+        html.append(toClipboard.toString().replace("\n", "<br>"));
+      }
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          try {
+          dialog.setTitle(title.toString());
+          editor.setText(html.toString());
+          editor.setCaretPosition(0);
+          editor.addMouseListener(new EditorMouseListener(toClipboard.toString()));
+          } catch(Exception e) {
+            if (debugEnabled) log.debug("exception while setting system information dialog data: ", e);
+          }
+        }
+      });
+    }
+  };
 }

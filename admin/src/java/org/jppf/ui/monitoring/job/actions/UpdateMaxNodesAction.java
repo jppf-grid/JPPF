@@ -140,6 +140,6 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
         }
       }
     };
-    new Thread(r).start();
+    runAction(r);
   }
 }

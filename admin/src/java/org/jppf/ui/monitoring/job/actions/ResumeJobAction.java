@@ -68,7 +68,7 @@ public class ResumeJobAction extends AbstractJobAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    new Thread(new Runnable() {
+    Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JobData data: jobDataArray) {
@@ -79,6 +79,7 @@ public class ResumeJobAction extends AbstractJobAction {
           }
         }
       }
-    }).start();
+    };
+    runAction(r);
   }
 }
