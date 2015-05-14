@@ -151,6 +151,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
       env.put("jmx.remote.x.server.max.threads", 1);
       env.put("jmx.remote.x.client.connection.check.period", 0);
+      env.put("jmx.remote.x.request.timeout", JPPFConfiguration.getProperties().getLong("jppf.jmx.request.timeout", Long.MAX_VALUE));
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
