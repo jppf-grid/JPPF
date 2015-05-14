@@ -21,7 +21,6 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import org.jppf.ui.monitoring.job.JobData;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -35,7 +34,7 @@ public class ResumeJobAction extends AbstractJobAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this action.
@@ -69,7 +68,7 @@ public class ResumeJobAction extends AbstractJobAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
-    new Thread(new Runnable() {
+    Runnable r = new Runnable() {
       @Override
       public void run() {
         for (JobData data: jobDataArray) {
@@ -80,6 +79,7 @@ public class ResumeJobAction extends AbstractJobAction {
           }
         }
       }
-    }).start();
+    };
+    runAction(r);
   }
 }

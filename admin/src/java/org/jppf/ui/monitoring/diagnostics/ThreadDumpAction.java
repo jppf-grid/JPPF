@@ -44,7 +44,7 @@ public class ThreadDumpAction extends AbstractTopologyAction {
   /**
    * Determines whether debug log statements are enabled.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this action.
@@ -65,15 +65,8 @@ public class ThreadDumpAction extends AbstractTopologyAction {
 
   @Override
   public void actionPerformed(final ActionEvent event) {
-    String s = null;
-    String title = "Thread dump";
     try {
-      ThreadDump info = retrieveThreadDump(dataArray[0]);
-      boolean isNode = dataArray[0].isNode();
-      title = "Thread dump for " + (isNode ? "node " : "driver ") + TreeTableUtils.getDisplayName(dataArray[0]);
-      if (info == null) s = "<p><b>No thread dump was generated</b>";
-      else s = HTMLThreadDumpWriter.printToString(info, title);
-      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), title, false);
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Thread dump", false);
       dialog.setIconImage(((ImageIcon) getValue(SMALL_ICON)).getImage());
       dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
       //frame.get
@@ -86,9 +79,8 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       });
       JEditorPane editor = new JEditorPane("text/html", "");
       editor.setBackground(Color.WHITE);
-      editor.setText(s);
+      editor.setText("retrieving thread dump information ...");
       editor.setCaretPosition(0);
-      editor.addMouseListener(new EditorMouseListener(TextThreadDumpWriter.printToString(info, title)));
       AbstractButton btn = (AbstractButton) event.getSource();
       if (btn.isShowing()) location = btn.getLocationOnScreen();
       editor.setEditable(false);
@@ -107,8 +99,9 @@ public class ThreadDumpAction extends AbstractTopologyAction {
       dialog.setLocation(location);
       dialog.setSize(600, 600);
       dialog.setVisible(true);
+      runAction(new AsyncRunnable(dialog, editor));
     } catch(Exception e) {
-      s = ExceptionUtils.getStackTrace(e).replace("\n", "<br>");
+      if (debugEnabled) log.debug(e.getMessage(), e);
     }
   }
 
@@ -132,4 +125,61 @@ public class ThreadDumpAction extends AbstractTopologyAction {
     }
     return info;
   }
+
+  /**
+   * This class asynchronously retrieves the node or driver information and displays it int he dialog.
+   */
+  private class AsyncRunnable implements Runnable {
+    /**
+     * The dialog containing the editor component.
+     */
+    private final JDialog dialog;
+    /**
+     * The editor whose text is th node information.
+     */
+    private final JEditorPane editor;
+    
+    /**
+     * Initialize this asynchronous task.
+     * @param dialog the dialog containing the editor component.
+     * @param editor the editor whose text is th node information.
+     */
+    public AsyncRunnable(final JDialog dialog, final JEditorPane editor) {
+      this.dialog = dialog;
+      this.editor = editor;
+    }
+
+    @Override
+    public void run() {
+      final StringBuilder html = new StringBuilder();
+      final StringBuilder toClipboard = new StringBuilder();
+      final StringBuilder title = new StringBuilder("Thread dump");
+      try {
+        ThreadDump info = retrieveThreadDump(dataArray[0]);
+        boolean isNode = dataArray[0].isNode();
+        title.append(" for ").append(isNode ? "node " : "driver ").append(TreeTableUtils.getDisplayName(dataArray[0]));
+        if (info == null) html.append("<p><b>No thread dump was generated</b>");
+        else {
+          html.append(HTMLThreadDumpWriter.printToString(info, title.toString()));
+          toClipboard.append(TextThreadDumpWriter.printToString(info, title.toString()));
+        }
+      } catch(Exception e) {
+        toClipboard.append(ExceptionUtils.getStackTrace(e));
+        html.append(toClipboard.toString().replace("\n", "<br>"));
+      }
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          try {
+          dialog.setTitle(title.toString());
+          editor.setText(html.toString());
+          editor.setCaretPosition(0);
+          editor.addMouseListener(new EditorMouseListener(toClipboard.toString()));
+          } catch(Exception e) {
+            if (debugEnabled) log.debug("exception while setting thread dump dialog data: ", e);
+          }
+        }
+      });
+    }
+  };
 }
