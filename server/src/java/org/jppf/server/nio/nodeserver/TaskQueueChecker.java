@@ -25,9 +25,10 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.impl.*;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
+import org.jppf.node.provisioning.NodeProvisioningConstants;
 import org.jppf.server.*;
 import org.jppf.server.debug.DebugHelper;
 import org.jppf.server.protocol.*;
@@ -370,6 +371,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
           if (debugEnabled) log.debug("rule execution is *" + b + "* for jobUuid=" + bundle.getUuid() + " on local channel=" + channel);
           if (!b) continue;
         }
+        if (!checkMaxNodeGroups(channel, bundle)) continue;
         // add a bias toward local node
         if (channel.isLocal()) return channel;
         acceptableChannels.add(channel);
@@ -400,16 +402,57 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * Check if the job state allows it to be dispatched on another node.
    * There are two cases when this method will return false: when the job is suspended and
    * when the job is already executing on its maximum allowed number of nodes.
-   * @param bundle the bundle from which to get the job information.
+   * @param job encapsulates the job information.
    * @return true if the job can be dispatched to at least one more node, false otherwise.
    */
-  private static boolean checkJobState(final ServerJob bundle) {
-    if (bundle.isCancelled()) return false;
-    JobSLA sla = bundle.getJob().getSLA();
-    if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {bundle.getName(), sla.isSuspended(), bundle.isPending(), bundle.isJobExpired()});
-    if (sla.isSuspended() || bundle.isPending() || bundle.isJobExpired()) return false;
-    if (debugEnabled) log.debug("current nodes = " + bundle.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
-    return bundle.getNbChannels() < sla.getMaxNodes();
+  private boolean checkJobState(final ServerJob job) {
+    if (job.isCancelled()) return false;
+    JobSLA sla = job.getJob().getSLA();
+    if (debugEnabled) log.debug("job '{}', suspended={}, pending={}, expired={}", new Object[] {job.getName(), sla.isSuspended(), job.isPending(), job.isJobExpired()});
+    if (sla.isSuspended() || job.isPending() || job.isJobExpired()) return false;
+    if (debugEnabled) log.debug("current nodes = " + job.getNbChannels() + ", maxNodes = " + sla.getMaxNodes());
+    return job.getNbChannels() < sla.getMaxNodes();
+  }
+
+  /**
+   * Check if the job state allows it to be dispatched to a specific master/slaves group of nodes.
+   * @param currentNode the node currently being evaluated.
+   * @param job the bundle from which to get the job information.
+   * @return true if the job can be dispatched to at least one more node, false otherwise.
+   */
+  private boolean checkMaxNodeGroups(final C currentNode, final ServerJob job) {
+    JPPFManagementInfo currentInfo = currentNode.getManagementInfo();
+    String currentMasterUuid = getMasterUuid(currentInfo);
+    if (currentMasterUuid == null) return true;
+    int maxNodeGroups = job.getJob().getSLA().getMaxMasterNodeGroupss();
+    if ((maxNodeGroups == Integer.MAX_VALUE) || (maxNodeGroups <= 0)) return true;
+    Set<ServerTaskBundleNode> nodes = job.getDispatchSet();
+    Set<String> masterUuids = new HashSet<>();
+    masterUuids.add(currentMasterUuid); 
+    for (ServerTaskBundleNode node: nodes) {
+      AbstractNodeContext ctx = (AbstractNodeContext) node.getChannel();
+      JPPFManagementInfo info = ctx.getManagementInfo();
+      String uuid = getMasterUuid(info);
+      if (uuid != null) {
+        if (!masterUuids.contains(uuid)) masterUuids.add(uuid);
+        if (masterUuids.size() > maxNodeGroups) return false; 
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Get the master node uuid for a node that is either a master or a slave.
+   * @param info represents the node information.
+   * @return the corresponding master uuid.
+   */
+  private String getMasterUuid(final JPPFManagementInfo info) {
+    if (info.isMasterNode()) return info.getUuid();
+    else if (info.isSlaveNode()) {
+      JPPFSystemInformation systemInfo = info.getSystemInfo();
+      if (systemInfo != null) return systemInfo.getJppf().getString(NodeProvisioningConstants.MASTER_UUID_PROPERTY);
+    }
+    return null;
   }
 
   /**

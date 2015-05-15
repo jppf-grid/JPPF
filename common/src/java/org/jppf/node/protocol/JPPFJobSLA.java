@@ -37,6 +37,11 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
    */
   private int maxNodes = Integer.MAX_VALUE;
   /**
+   * The maximum number of groups of master/slave nodes the job can be executed on at any given time.
+   * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
+   */
+  private int maxMasterNodeGroups = Integer.MAX_VALUE;
+  /**
    * The priority of this job, used by the server to prioritize queued jobs.
    */
   protected int priority = 0;
@@ -137,6 +142,16 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   @Override
   public void setMaxNodes(final int maxNodes) {
     this.maxNodes = maxNodes > 0 ? maxNodes : Integer.MAX_VALUE;
+  }
+
+  @Override
+  public int getMaxMasterNodeGroupss() {
+    return maxMasterNodeGroups;
+  }
+
+  @Override
+  public void setMaxMasterNodeGroups(final int maxMasterNodeGroups) {
+    this.maxMasterNodeGroups = maxMasterNodeGroups;
   }
 
   @Override

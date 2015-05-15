@@ -53,6 +53,20 @@ public interface JobSLA extends JobCommonSLA
   void setMaxNodes(int maxNodes);
 
   /**
+   * Get the maximum number of groups of master/slaves nodes the job can be executed on at any given time.
+   * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
+   * @return the number of nodes as an int value.
+   */
+  int getMaxMasterNodeGroupss();
+
+  /**
+   * Set the maximum number of groups of master/slaves nodes the job can be executed on at any given time.
+   * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
+   * @param maxMasterNodeGroups the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+   */
+  void setMaxMasterNodeGroups(int maxMasterNodeGroups);
+
+  /**
    * Determine whether this job is initially suspended.
    * @return true if the job is suspended, false otherwise.
    */
