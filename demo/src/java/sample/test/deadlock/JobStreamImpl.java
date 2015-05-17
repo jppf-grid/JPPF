@@ -49,6 +49,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
   protected JPPFJob createNextJob() {
     JPPFJob job = new JPPFJob();
     job.setName("streaming job " + getJobCount());
+    if (options.jobCreationCallback != null) options.jobCreationCallback.jobCreated(job);
     try {
       for (int i=1; i<=options.tasksPerJob; i++) {
         String message = "this is task " + i;

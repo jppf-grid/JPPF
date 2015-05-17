@@ -38,10 +38,9 @@ public class DeadlockRunner {
    */
   private static Logger log = LoggerFactory.getLogger(ProvisioningThread.class);
   /**
-  *
-  */
+   *
+   */
   private static JMXDriverConnectionWrapper jmx = null;
-  //private static JPPFConnectionPool pool = null;
 
   /**
    * Entry point for this demo.
@@ -62,6 +61,12 @@ public class DeadlockRunner {
    */
   public void jobStreaming() {
     RunOptions ro = new RunOptions();
+    ro.jobCreationCallback = new JobCreationCallback() {
+      @Override
+      public void jobCreated(final JPPFJob job) {
+        job.getSLA().setMaxNodeProvisioningGroups(1);
+      }
+    };
     System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
@@ -105,7 +110,7 @@ public class DeadlockRunner {
   }
 
   /**
-   * 
+   *
    */
   public void testNodes() {
     TypedProperties config = JPPFConfiguration.getProperties();
