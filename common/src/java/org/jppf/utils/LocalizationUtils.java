@@ -74,20 +74,18 @@ public final class LocalizationUtils {
    * @param key the key for the localized value to lookup.
    * @param def the default value to return if no localized string could be found.
    * @return the name localized through the default locale information, or the key itself if it could not be localized.
-   * @see java.util.ResourceBundle
    */
   public static String getLocalized(final String baseName, final String key, final String def) {
     return getLocalized(baseName, key, def, Locale.getDefault());
   }
 
   /**
-   * Get a localized property value for th especified locale.
+   * Get a localized property value for the specified locale.
    * @param baseName the base name to use, in combination with the default locale, to lookup the appropriate resource bundle.
    * @param key the key for the localized value to lookup.
    * @param def the default value to return if no localized string could be found.
    * @param locale the locale for which to lookup a localized value.
    * @return the name localized through the default locale information, or the key itself if it could not be localized.
-   * @see java.util.ResourceBundle
    */
   public static String getLocalized(final String baseName, final String key, final String def, final Locale locale) {
     if (baseName == null) return def;
