@@ -422,6 +422,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   private boolean checkMaxNodeGroups(final C currentNode, final ServerJob job) {
     JPPFManagementInfo currentInfo = currentNode.getManagementInfo();
+    if (currentInfo == null) return true;
     String currentMasterUuid = getMasterUuid(currentInfo);
     if (currentMasterUuid == null) return true;
     int maxNodeGroups = job.getJob().getSLA().getMaxNodeProvisioningGroupss();
