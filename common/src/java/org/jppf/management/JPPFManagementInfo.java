@@ -209,6 +209,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     sb.append(", type=").append(typeToString());
     sb.append(", local=").append(isLocal());
     sb.append(", secure=").append(secure);
+    sb.append(", active=").append(active);
     sb.append(", uuid=").append(uuid);
     sb.append(']');
     return sb.toString();
@@ -342,6 +343,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     if (isMasterNode()) sb.append("|MASTER");
     if (isSlaveNode()) sb.append("|SLAVE");
     if (isLocal()) sb.append("|LOCAL");
+    if (isDotnetCapable()) sb.append("|DOTNET");
     return sb.toString();
   }
 
