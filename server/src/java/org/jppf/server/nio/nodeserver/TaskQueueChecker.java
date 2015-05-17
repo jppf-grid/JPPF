@@ -424,7 +424,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     JPPFManagementInfo currentInfo = currentNode.getManagementInfo();
     String currentMasterUuid = getMasterUuid(currentInfo);
     if (currentMasterUuid == null) return true;
-    int maxNodeGroups = job.getJob().getSLA().getMaxMasterNodeGroupss();
+    int maxNodeGroups = job.getJob().getSLA().getMaxNodeProvisioningGroupss();
     if ((maxNodeGroups == Integer.MAX_VALUE) || (maxNodeGroups <= 0)) return true;
     Set<ServerTaskBundleNode> nodes = job.getDispatchSet();
     Set<String> masterUuids = new HashSet<>();

@@ -26,8 +26,7 @@ import org.jppf.scheduling.JPPFSchedule;
  * It determines the state, conditions and order in which a job will be executed.
  * @author Laurent Cohen
  */
-public interface JobSLA extends JobCommonSLA
-{
+public interface JobSLA extends JobCommonSLA {
   /**
    * Get the priority of this job.
    * @return the priority as an int.
@@ -56,15 +55,18 @@ public interface JobSLA extends JobCommonSLA
    * Get the maximum number of groups of master/slaves nodes the job can be executed on at any given time.
    * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
    * @return the number of nodes as an int value.
+   * @since 5.1
    */
-  int getMaxMasterNodeGroupss();
+  int getMaxNodeProvisioningGroupss();
 
   /**
    * Set the maximum number of groups of master/slaves nodes the job can be executed on at any given time.
    * <p>This setting means that the job can only be executed on at most {@code maxMasterNodeGroups} master nodes and all their slaves.
-   * @param maxMasterNodeGroups the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+   * @param maxNodeProvisioningGroups the number of nodes as an int value. A value <= 0 means no limit on the number of nodes.
+   * Any value <= 0 will be ignored.
+   * @since 5.1
    */
-  void setMaxMasterNodeGroups(int maxMasterNodeGroups);
+  void setMaxNodeProvisioningGroups(int maxNodeProvisioningGroups);
 
   /**
    * Determine whether this job is initially suspended.
