@@ -1,11 +1,5 @@
 apply plugin: 'com.android.application'
 
-repositories {
-  flatDir {
-    dirs 'aars'
-  }
-}
-
 android {
   compileSdkVersion 19
   buildToolsVersion "21.1.2"
@@ -14,7 +8,7 @@ android {
     minSdkVersion 19
     targetSdkVersion 19
     versionCode 1
-    versionName "1.0"
+    versionName "5.1"
   }
   signingConfigs {
     release {
@@ -51,10 +45,4 @@ android {
 
 dependencies {
   compile fileTree(include: ['*.jar'], dir: 'libs')
-  //compile 'com.android.support:appcompat-v7:21.0.3'
-  compile files('libs/jppf-common.jar')
-  compile files('libs/slf4j-android-1.6.1-RC1.jar')
-  compile files('libs/jppf-server.jar')
-  compile files('libs/slf4j-android-1.7.10.jar')
-  compile files('libs/slf4j-api-1.7.10.jar')
 }

@@ -71,9 +71,9 @@ public class AndroidClassLoader extends AbstractJPPFClassLoader {
   private static DexClassLoader createDexClassLoader(final ClassLoader parent, ClassPath classpath) {
     StringBuilder pathBuilder = new StringBuilder();
     int count = 0;
-    File inDir = AndroidHelper.getContext().getDir(DEX_IN_DIR, Context.MODE_PRIVATE);
+    File inDir = AndroidHelper.getActivity().getDir(DEX_IN_DIR, Context.MODE_PRIVATE);
     FileUtils.deletePath(inDir, true);
-    File outDir = AndroidHelper.getContext().getDir(DEX_OUT_DIR, Context.MODE_PRIVATE);
+    File outDir = AndroidHelper.getActivity().getDir(DEX_OUT_DIR, Context.MODE_PRIVATE);
     FileUtils.deletePath(outDir, true);
     if (classpath != null) {
       for (ClassPathElement element: classpath) {

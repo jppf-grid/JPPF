@@ -1,34 +1,58 @@
 <resources>
   <string name="app_name">JPPF Android Node</string>
 
+  <!-- ===================================================== -->
+  <!-- main screen                                           -->
+  <!-- ===================================================== -->
+
   <string name="title_activity_main">JPPF Android Node</string>
   <string name="title_activity_settings">Configuration</string>
 
+  <string name="execution_state_executing">executing</string>
+  <string name="execution_state_idle">executing</string>
+  <string name="node_state_online">online</string>
+  <string name="node_state_offline">online</string>
+
+  <string name="node_state_label">Connection</string>
+  <string name="execution_state_label">Execution</string>
+  <string name="current_job_label">Current job</string>
+  <string name="current_tasks_label">Current tasks</string>
+  <string name="total_tasks_label">Total tasks</string>
+
   <string name="action_settings">Settings</string>
 
+  <!-- ===================================================== -->
+  <!-- preferences                                           -->
+  <!-- ===================================================== -->
+
+  <!-- preferences: server connections configuration -->
   <string name="pref_server_connection_title">Server connection</string>
   <string name="pref_server_connection_sum">Server connectivity settings</string>
-
   <string name="pref_servers_title">Servers</string>
   <string name="pref_servers_sum">Servers to connect to, 1 per line</string>
   <string name="pref_servers_hint">my.host1.com:port1\n1.2.3.4:port2</string>
 
+  <!-- preferences: processing threads configuration -->
   <string name="pref_threads_title">Threads</string>
   <string name="pref_threads_sum">Number of processing threads</string>
 
+  <!-- preferences: security subscreen -->
   <string name="pref_security_title">Security</string>
   <string name="pref_security_sum">SSL/TLS configuration</string>
 
+  <!-- preferences: key store location and password configuration -->
   <string name="pref_key_store_location_title">Key store location</string>
   <string name="pref_key_store_location_sum">Location of server public/private key store</string>
   <string name="pref_key_store_password_title">Key store password</string>
   <string name="pref_key_store_password_sum">Password for the server public/private key store</string>
 
+  <!-- preferences: trust store location and password configuration -->
   <string name="pref_trust_store_location_title">Trust store location</string>
   <string name="pref_trust_store_location_sum">Location of server certificate store</string>
   <string name="pref_trust_store_password_title">Trust store password</string>
   <string name="pref_trust_store_password_sum">Password for the server certificate store</string>
 
+  <!-- preferences: SSLContext protocol configuration -->
   <string name="pref_ssl_context_protocol_title">SSL context protocol</string>
   <string name="pref_ssl_context_protocol_sum">Protocol value for SSLContext.getProtocol()</string>
   <string name="pref_ssl_context_protocol_default">Default</string>
@@ -42,6 +66,7 @@
     <item>TLSv1.2</item>
   </string-array>
 
+  <!-- preferences: SSLEngine protocols configuration -->
   <string name="pref_ssl_engine_protocol_title">SSL engine protocols</string>
   <string name="pref_ssl_engine_protocol_sum">Protocol value for SSLEngine.getEnabledProtocols()</string>
   <string-array name="pref_ssl_engine_protocol_values">
@@ -50,14 +75,21 @@
     <item>TLSv1</item>
   </string-array>
   <string-array name="pref_ssl_engine_protocol_default">
-    <item>SSLv2Hello</item>
+    <!--<item>SSLv2Hello</item>-->
     <item>SSLv3</item>
   </string-array>
 
+  <!-- preferences: enabled cipher suites configuration -->
   <string name="pref_enabled_cipher_suites_title">Enabled cypher suites</string>
   <string name="pref_enabled_cipher_suites_sum">The set of enabled cypher suites</string>
 
+  <!-- ===================================================== -->
+  <!-- useful constants                                      -->
+  <!-- ===================================================== -->
+
   <string-array name="pref_empty_array">
   </string-array>
+
+  <string name="empty_string"></string>
 
 </resources>

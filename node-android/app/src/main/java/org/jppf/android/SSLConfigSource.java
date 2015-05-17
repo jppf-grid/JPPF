@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.concurrent.Callable;
 
 /**
- * The source for the SSL ocnfiguration properties.
+ * The source for the SSL configuration properties.
  * @author Laurent Cohen
  */
 public class SSLConfigSource implements Callable<InputStream> {

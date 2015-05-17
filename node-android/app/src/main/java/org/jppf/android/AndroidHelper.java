@@ -23,6 +23,7 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.jppf.android.activities.MainActivity;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.android.JPPFAndroidNode;
 import org.jppf.utils.JPPFConfiguration;
@@ -41,9 +42,9 @@ public class AndroidHelper {
    */
   private final static String LOG_TAG = AndroidHelper.class.getSimpleName();
   /**
-   * A global context object.
+   * A global activity object.
    */
-  private static Context context = null;
+  private static MainActivity activity = null;
   /**
    *Determines whther the node is currently running.
    */
@@ -60,11 +61,11 @@ public class AndroidHelper {
   }
 
   /**
-   * Get the context used by the node.
+   * Get the activity used by the node.
    * @return a {@link Context} object.
    */
-  public static Context getContext() {
-    return context;
+  public static MainActivity getActivity() {
+    return activity;
   }
 
   /**
@@ -77,11 +78,11 @@ public class AndroidHelper {
 
   /**
    * Start the node in a separate thread.
-   * @param ctxt a global context that can be used by the node.
+   * @param act a global activity that can be used by the node.
    */
-  public static void launchNode(Context ctxt) {
+  public static void launchNode(MainActivity act) {
     if (nodeLaunched.compareAndSet(false, true)) {
-      context = ctxt;
+      activity = act;
       new AsyncTask<Void, Void, Boolean>() {
         @Override
         protected Boolean doInBackground(final Void... params) {
@@ -97,8 +98,20 @@ public class AndroidHelper {
    */
   private static void launch0() {
     try {
+      changeConfigFromPrefs();
+      NodeRunner.main("noLauncher");
+    } catch(Exception e) {
+      Log.e(LOG_TAG, "exception in launch0() : ", e);
+    }
+  }
+
+  /**
+   * Set the configuration and start the node in the current thread.
+   */
+  public static void changeConfigFromPrefs() {
+    try {
       TypedProperties config = JPPFConfiguration.getProperties();
-      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
       String[] keys = {
         PreferenceUtils.SERVERS_KEY, PreferenceUtils.THREADS_KEY, PreferenceUtils.KEY_STORE_LOCATION_KEY, PreferenceUtils.KEY_STORE_PASSWORD_KEY,
         PreferenceUtils.TRUST_STORE_LOCATION_KEY, PreferenceUtils.TRUST_STORE_PASSWORD_KEY, PreferenceUtils.SSL_CONTEXT_PROTOCOL_KEY,
@@ -113,9 +126,8 @@ public class AndroidHelper {
       config.setString("jppf.node.class", JPPFAndroidNode.class.getName());
       config.setString("jppf.ssl.configuration.source", SSLConfigSource.class.getName());
       config.setBoolean("jppf.ssl.enabled", true);
-      NodeRunner.main("noLauncher");
     } catch(Exception e) {
-      Log.e(LOG_TAG, "exception in launch0() : ", e);
+      Log.e(LOG_TAG, "exception in changeConfigFromPrefs() : ", e);
     }
   }
 

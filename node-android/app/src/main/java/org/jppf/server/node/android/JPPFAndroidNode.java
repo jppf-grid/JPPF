@@ -17,6 +17,9 @@
  */
 package org.jppf.server.node.android;
 
+import org.jppf.android.AndroidHelper;
+import org.jppf.android.activities.MainActivity;
+import org.jppf.android.activities.NodeEventHandler;
 import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.server.node.remote.AbstractRemoteNode;
 
@@ -32,6 +35,15 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
    */
   public JPPFAndroidNode(DriverConnectionInfo connectionInfo) {
     super(connectionInfo);
+  }
+
+  @Override
+  public void initDataChannel() throws Exception {
+    super.initDataChannel();
+    MainActivity act = AndroidHelper.getActivity();
+    NodeEventHandler handler = new NodeEventHandler();
+    handler.setUiComponent(act);
+    lifeCycleEventHandler.addNodeLifeCycleListener(handler);
   }
 
   @Override

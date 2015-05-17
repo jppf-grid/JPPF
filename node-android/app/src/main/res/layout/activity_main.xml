@@ -1,13 +1,27 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:paddingBottom="@dimen/activity_vertical_margin"
-  android:paddingLeft="@dimen/activity_horizontal_margin"
-  android:paddingRight="@dimen/activity_horizontal_margin"
-  android:paddingTop="@dimen/activity_vertical_margin"
-  tools:context="org.jppf.android.activities.MainActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+  android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content"
+  android:padding="4dp" tools:context="org.jppf.android.activities.MainActivity">
 
-  <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:icon="@android:drawable/ic_menu_preferences" android:text="@string/app_name"/>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="match_parent" android:padding="4dp">
 
-</RelativeLayout>
+    <TextView android:text="@string/node_state_label"      android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/execution_state_label" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/current_job_label"     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/current_tasks_label"   android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/total_tasks_label"     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+  </LinearLayout>
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:padding="4dp">
+
+    <TextView android:id="@+id/node_state"      android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/execution_state" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/current_job"     android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/current_tasks"   android:layout_width="match_parent" android:layout_height="wrap_content" android:textAlignment="textEnd"/>
+    <TextView android:id="@+id/total_tasks"     android:layout_width="match_parent" android:layout_height="wrap_content" android:textAlignment="viewEnd"/>
+
+  </LinearLayout>
+
+</LinearLayout>

@@ -39,8 +39,8 @@ import org.jppf.android.PreferenceUtils;
 import org.jppf.android.R;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -56,11 +56,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
   /**
    * The set of default enabled cipher suites.
    */
-  private final static Set<String> ENABLED_CIPHER_SUITES = new HashSet<>();
+  private final static Set<String> ENABLED_CIPHER_SUITES = new TreeSet<>();
   /**
    * The set of supported cipher suites.
    */
-  private final static Set<String> SUPPORTED_CIPHER_SUITES = new HashSet<>();
+  private final static Set<String> SUPPORTED_CIPHER_SUITES = new TreeSet<>();
   /**
    * The current key being modified (for prefs linked to a file chooser).
    */
@@ -79,13 +79,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         picker.setFragment(this);
       }
       PreferenceScreen pref = (PreferenceScreen) findPreference("pref_security");
-      //pref.get
       if (SUPPORTED_CIPHER_SUITES.isEmpty()) {
         SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         ENABLED_CIPHER_SUITES.addAll(Arrays.asList(ssf.getDefaultCipherSuites()));
-        Log.d(LOG_TAG, "enabled cipher suite: " + ENABLED_CIPHER_SUITES);
+        Log.d(LOG_TAG, "enabled cipher suites: " + ENABLED_CIPHER_SUITES);
         SUPPORTED_CIPHER_SUITES.addAll(Arrays.asList(ssf.getSupportedCipherSuites()));
-        Log.d(LOG_TAG, "supported cipher suite: " + SUPPORTED_CIPHER_SUITES);
+        Log.d(LOG_TAG, "supported cipher suites: " + SUPPORTED_CIPHER_SUITES);
       }
       MultiSelectListPreference ciphersPref = (MultiSelectListPreference) findPreference(PreferenceUtils.ENABLED_CIPHER_SUITES_KEY);
       ciphersPref.setDefaultValue(ENABLED_CIPHER_SUITES.toArray(new String[ENABLED_CIPHER_SUITES.size()]));
@@ -149,7 +148,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
    * Sets up the action bar for an {@link PreferenceScreen}.
    * @param preferenceScreen the preference screen on which to set the action bar.
    */
-  public static void initializeActionBar(PreferenceScreen preferenceScreen) {
+  private static void initializeActionBar(PreferenceScreen preferenceScreen) {
     final Dialog dialog = preferenceScreen.getDialog();
     if (dialog != null) {
       dialog.getActionBar().setDisplayHomeAsUpEnabled(true);

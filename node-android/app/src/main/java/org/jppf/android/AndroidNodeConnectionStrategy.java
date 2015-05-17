@@ -53,6 +53,13 @@ public class AndroidNodeConnectionStrategy implements DriverConnectionStrategy {
 
   @Override
   public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
+    switch(context.getReason()) {
+      case JOB_CHANNEL_INIT_ERROR:
+        JPPFConfiguration.reset();
+        AndroidHelper.changeConfigFromPrefs();
+        //SSLHelper.resetConfig();
+        break;
+    }
     List<DriverConnectionInfo> list = fetchConnections();
     if (!connections.equals(list)) {
       connections = list;

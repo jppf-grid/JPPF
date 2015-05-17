@@ -27,6 +27,9 @@ import android.view.MenuItem;
 import org.jppf.android.AndroidHelper;
 import org.jppf.android.R;
 
+/**
+ * Main activity for this app. Provides a main screen updated with the node activity and a settings button to configure the node.
+ */
 public class MainActivity extends Activity {
   private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -41,7 +44,7 @@ public class MainActivity extends Activity {
     });
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    AndroidHelper.launchNode(getApplicationContext());
+    AndroidHelper.launchNode(this);
   }
 
   @Override

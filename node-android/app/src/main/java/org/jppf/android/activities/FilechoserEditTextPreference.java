@@ -59,7 +59,8 @@ public class FilechoserEditTextPreference extends DialogPreference {
     button.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(final View v) {
-        chooseFile();
+        Log.d(LOG_TAG, "in chooseFile()");
+        fragment.startFileChooser(FilechoserEditTextPreference.this);
       }
     });
     layout.setOrientation(LinearLayout.VERTICAL);
@@ -86,7 +87,6 @@ public class FilechoserEditTextPreference extends DialogPreference {
     ((ViewGroup) editText.getParent()).removeView(editText);
     ((ViewGroup) button.getParent()).removeView(button);
     ((ViewGroup) layout.getParent()).removeView(layout);
-
     notifyChanged();
   }
 
@@ -96,14 +96,6 @@ public class FilechoserEditTextPreference extends DialogPreference {
    */
   void setFragment(SettingsFragment fragment) {
     this.fragment = fragment;
-  }
-
-  /**
-   * Start the file picker.
-   */
-  private void chooseFile() {
-    Log.d(LOG_TAG, "in chooseFile()");
-    fragment.startFileChooser(this);
   }
 
   /**
