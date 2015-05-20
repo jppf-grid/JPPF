@@ -21,13 +21,12 @@ package org.jppf.utils;
 import static org.jppf.utils.PropertyType.*;
 
 import java.io.File;
-//import java.lang.management.*;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.security.*;
 import java.util.*;
 
 import org.slf4j.*;
+//import java.lang.management.*;
 
 /**
  * Collection of utility methods used as a convenience for retrieving
@@ -169,30 +168,17 @@ public final class SystemUtils {
   }
 
   /**
-   * Get storage information about each file system root available on the current host.
-   * This method first checks that the Java version is 1.6 or later, then populates
-   * a <code>TypedProperties</code> object with root name, free space, total space and usable space
-   * information for each root.
-   * <p>If the Java version is before 1.6, only the root name is retrieved.
-   * An example root name would be &quot;C:\&quot; for a Windows system and &quot;/&quot; for a Unix system.
+   * Get storage information about the file system roots available on the current host.
+   * This method populates a {@link TypedProperties} object with root name, free space,
+   * total space and usable space information for each root.
+   * <p>An example root name would be &quot;C:\&quot; for a Windows system and &quot;/&quot; for a Unix system.
    * @return TypedProperties object with storage information.
    */
   public static synchronized TypedProperties getStorageInformation() {
     TypedProperties props = new TypedProperties();
     File[] roots = File.listRoots();
+    props.setInt("host.roots.number", roots == null ? 0 : roots.length);
     if ((roots == null) || (roots.length <= 0)) return props;
-    boolean atLeastJdk16 = true;
-    Method usableSpaceMethod = null;
-    Method freeSpaceMethod = null;
-    Method totalSpaceMethod = null;
-    try {
-      usableSpaceMethod = File.class.getMethod("getUsableSpace");
-      freeSpaceMethod = File.class.getMethod("getFreeSpace");
-      totalSpaceMethod = File.class.getMethod("getTotalSpace");
-    } catch (Exception e) {
-      atLeastJdk16 = false;
-    }
-    props.setProperty("host.roots.number", String.valueOf(roots.length));
     StringBuilder sb = new StringBuilder();
     for (int i=0; i<roots.length; i++) {
       try {
@@ -201,16 +187,12 @@ public final class SystemUtils {
         sb.append(s);
         String prefix = "root." + i;
         props.setProperty(prefix + ".name", s);
-        if (!atLeastJdk16) continue;
-        long space = (Long) totalSpaceMethod.invoke(roots[i]);
-        props.setProperty(prefix + ".space.total", Long.toString(space));
-        space = (Long) freeSpaceMethod.invoke(roots[i]);
-        props.setProperty(prefix + ".space.free", Long.toString(space));
-        space = (Long) usableSpaceMethod.invoke(roots[i]);
-        props.setProperty(prefix + ".space.usable", Long.toString(space));
+        props.setLong(prefix + ".space.total", roots[i].getTotalSpace());
+        props.setLong(prefix + ".space.free", roots[i].getFreeSpace());
+        props.setLong(prefix + ".space.usable", roots[i].getUsableSpace());
       } catch(Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
-        else log.info(e.getMessage());
+        else log.warn(e.getMessage());
       }
     }
     props.setProperty("host.roots.names", sb.toString());
