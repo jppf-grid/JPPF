@@ -139,20 +139,15 @@ public final class SystemUtils {
    */
   public static TypedProperties getRuntimeInformation() {
     TypedProperties props = new TypedProperties();
-    String s = null;
     try {
-      s = String.valueOf(Runtime.getRuntime().availableProcessors());
-      props.setProperty("availableProcessors", s);
-      s = String.valueOf(Runtime.getRuntime().freeMemory());
-      props.setProperty("freeMemory", s);
-      s = String.valueOf(Runtime.getRuntime().totalMemory());
-      props.setProperty("totalMemory", s);
-      s = String.valueOf(Runtime.getRuntime().maxMemory());
-      props.setProperty("maxMemory", s);
+      props.setInt("availableProcessors", Runtime.getRuntime().availableProcessors());
+      props.setLong("freeMemory", Runtime.getRuntime().freeMemory());
+      props.setLong("totalMemory", Runtime.getRuntime().totalMemory());
+      props.setLong("maxMemory", Runtime.getRuntime().maxMemory());
       if (ManagementUtils.isManagementAvailable()) {
         Object mbeanServer = ManagementUtils.getPlatformServer();
         String mbeanName = "java.lang:type=Runtime";
-        s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "StartTime"));
+        String s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "StartTime"));
         props.setProperty("startTime", s);
         s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "Uptime"));
         props.setProperty("uptime", s);
