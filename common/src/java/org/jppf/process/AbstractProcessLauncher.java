@@ -74,11 +74,41 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
     List<String> cpElements = new ArrayList<>();
     Pair<List<String>, List<String>> result = new Pair<>(jvmOptions, cpElements);
     if (s != null) {
-      String[] options = s.split("\\s");
+      if (log.isDebugEnabled()) log.debug("options = " + s);
+      List<String> list = new ArrayList<>();
+      String source = s.trim();
+      boolean end = false;
+      int pos = 0;
+      String rep = "_-_";
+      StringBuilder sb = new StringBuilder();
+      while (pos < source.length()) {
+        int idx = source.indexOf("\"", pos);
+        if (idx >= 0) {
+          sb.append(source.substring(pos, idx));
+          int idx2 = source.indexOf("\"", idx + 1);
+          if (idx2 >= 0) {
+            sb.append(source.substring(idx, idx2 + 1).replaceAll("\\s", rep));
+            pos = idx2 + 1;
+          } else {
+            sb.append(source.substring(idx).replaceAll("\\s", rep));
+            break;
+          }
+        } else {
+          sb.append(source.substring(pos));
+          break;
+        }
+      }
+      String[] options = sb.toString().split("\\s");
+      for (int i=0; i<options.length; i++) options[i] = options[i].replaceAll(rep, " ").replace("\\", "\\\\")/*.replaceAll("\"", "\\\"")*/;
+      if (log.isDebugEnabled()) {
+        StringBuilder sb2 = new StringBuilder("options after split =");
+        for (String option: options) sb2.append('\n').append(option);
+        log.debug(sb2.toString());
+      }
       int count = 0;
       while (count < options.length) {
         String option = options[count++];
-        if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options[count++]);
+        if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options[count++]/*.replace("\\", "/")*/);
         else jvmOptions.add(option);
       }
     }
