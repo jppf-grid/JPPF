@@ -145,6 +145,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   private Process buildProcess() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
     String s = config.getString("jppf.jvm.options");
+    if (debugEnabled) log.debug("jppf.jvm.options=" + s);
     Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
     List<String> jvmOptions = parsed.first();
     List<String> cpElements = parsed.second();
@@ -202,6 +203,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
       System.out.println("\nerror output:\n" + s);
       log.info("error output:\n" + s);
     }
+    System.out.println("process exited with code " + n);
     return (n != 2) && !stoppedOnBusyState.get();
   }
 
