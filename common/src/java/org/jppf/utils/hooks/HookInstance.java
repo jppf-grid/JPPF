@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @param <E> the type of th ehook's interface.
  * @author Laurent Cohen
  */
-public class HookInstance<E>
-{
+public class HookInstance<E> {
   /**
    * Logger for this class.
    */
@@ -53,8 +52,7 @@ public class HookInstance<E>
    * Initialize this hook with the specified method and instance.
    * @param instance the hook instance on which to invoke the method.
    */
-  public HookInstance(final E instance)
-  {
+  public HookInstance(final E instance) {
     this.instance = instance;
   }
 
@@ -64,22 +62,17 @@ public class HookInstance<E>
    * @param parameters the parmeters to use in the method invocation.
    * @return the return value of th emethod, or <code>null</code> if the method does not return anything.
    */
-  public Object invoke(final String methodName, final Object...parameters)
-  {
+  public Object invoke(final String methodName, final Object...parameters) {
     int nbArgs = (parameters == null) ? 0 : parameters.length;
-    try
-    {
+    try {
       String key = methodName + ':' + nbArgs;
       Method method = methodCache.get(key);
-      if (method == null)
-      {
+      if (method == null) {
         method = ReflectionHelper.findMethod(instance.getClass(), methodName, nbArgs);
         methodCache.put(key, method);
       }
       return method.invoke(instance, parameters);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       String format = "failed to invoke '{}()' with params={} on {} with exception={}";
       Object[] params = new Object[] {methodName, nbArgs == 0 ? "{}" : Arrays.asList(parameters), this, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e)};
       if (debugEnabled) log.debug(format, params);
@@ -91,14 +84,12 @@ public class HookInstance<E>
   /**
    * Cleanup this hook instance and release its resources.
    */
-  public void dispose()
-  {
+  public void dispose() {
     methodCache.clear();
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return new StringBuilder(getClass().getSimpleName()).append('[').append("instance=").append(instance).append(']').toString();
   }
 
