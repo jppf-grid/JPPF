@@ -17,30 +17,50 @@
  */
 package org.jppf.android.activities;
 
-import android.app.Activity;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.TextView;
 
 import org.jppf.android.R;
 import org.jppf.node.NodeInternal;
-import org.jppf.node.event.NodeIntegrationAdapter;
 import org.jppf.node.event.NodeLifeCycleEvent;
 import org.jppf.node.event.TaskExecutionEvent;
+import org.jppf.server.node.android.AndroidNodeIntegrationAdapter;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * .
  * @author Laurent Cohen
+ * @since 5.1
  */
-public class NodeEventHandler extends NodeIntegrationAdapter<Activity> {
+public class NodeEventHandler extends AndroidNodeIntegrationAdapter {
   /**
-   * An activity holding the UI to update.
+   * Log tag for this class.
    */
-  private Activity activity = null;
+  private final static String LOG_TAG = NodeEventHandler.class.getSimpleName();
+  /**
+   * Atomic counter for the number of tasks executed by the node.
+   */
   private static AtomicLong totalTasks = new AtomicLong(0);
+  /**
+   *
+   */
+  private View view = null;
+
+  public NodeEventHandler() {
+    Log.v(LOG_TAG, "in NodeEventHandler()");
+  }
 
   @Override
-  public void taskNotification(final TaskExecutionEvent event) {
+  public View getContentView() {
+    Log.v(LOG_TAG, "in getContentView() : view = " + view + ", activity = " + activity + ", this = " + this);
+    if ((view == null) && (activity != null)) {
+      LayoutInflater inflater = activity.getLayoutInflater();
+      view = inflater.inflate(R.layout.activity_main_default, null, false);
+    }
+    return view;
   }
 
   @Override
@@ -49,65 +69,59 @@ public class NodeEventHandler extends NodeIntegrationAdapter<Activity> {
   }
 
   @Override
-  public void setUiComponent(final Activity uiComponent) {
-    this.activity = uiComponent;
-  }
-
-  @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {
+    Log.v(LOG_TAG, "nodeStarting()");
     ((NodeInternal) event.getNode()).getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(this);
-    if (activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          setViewText(R.id.node_state, "online");
-          setViewText(R.id.execution_state, activity.getString(R.string.execution_state_idle));
-          setViewText(R.id.total_tasks, String.format("%,6d", totalTasks.get()));
-          setViewText(R.id.current_tasks, String.format("%,6d", 0));
-        }
-      });
-    }
+    if (activity != null) activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setViewText(R.id.current_job, "N/A");
+        setViewText(R.id.node_state, activity.getString(R.string.node_state_online));
+        setViewText(R.id.execution_state, activity.getString(R.string.execution_state_idle));
+        setViewText(R.id.total_tasks, String.format("%,6d", totalTasks.get()));
+        setViewText(R.id.current_tasks, String.format("%,6d", 0));
+      }
+    });
   }
 
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event) {
+    Log.v(LOG_TAG, "nodeEnding()");
     ((NodeInternal) event.getNode()).getExecutionManager().getTaskNotificationDispatcher().removeTaskExecutionListener(this);
-    if (activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          setViewText(R.id.node_state, "offline");
-        }
-      });
-    }
+    if (activity != null) activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setViewText(R.id.node_state, activity.getString(R.string.node_state_offline));
+      }
+    });
   }
 
   @Override
   public void jobStarting(final NodeLifeCycleEvent event) {
-    if (activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          setViewText(R.id.current_job, event.getJob().getName());
-          setViewText(R.id.execution_state, activity.getString(R.string.execution_state_executing));
-          setViewText(R.id.current_tasks, String.format("%,6d", event.getTasks().size()));
-          setViewText(R.id.total_tasks, String.format("%,6d", totalTasks.get()));
-        }
-      });
-    }
+    Log.v(LOG_TAG, "starting job '" + event.getJob().getName() + "'");
+    if (activity != null) activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setViewText(R.id.current_job, event.getJob().getName());
+        setViewText(R.id.node_state, activity.getString(R.string.node_state_offline));
+        setViewText(R.id.execution_state, activity.getString(R.string.execution_state_executing));
+        setViewText(R.id.current_tasks, String.format("%,6d", event.getTasks().size()));
+        setViewText(R.id.total_tasks, String.format("%,6d", totalTasks.get()));
+      }
+    });
   }
 
   @Override
   public void jobEnding(final NodeLifeCycleEvent event) {
-    if (activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          setViewText(R.id.execution_state, activity.getString(R.string.execution_state_idle));
-          setViewText(R.id.total_tasks, String.format("%,6d", totalTasks.get()));
-        }
-      });
-    }
+    Log.v(LOG_TAG, "ending job '" + event.getJob().getName() + "'");
+    if (activity != null) activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setViewText(R.id.node_state, activity.getString(R.string.node_state_online));
+        setViewText(R.id.execution_state, activity.getString(R.string.execution_state_idle));
+        setViewText(R.id.total_tasks, String.format("%,6d", totalTasks.get()));
+      }
+    });
   }
 
   /**

@@ -31,19 +31,25 @@ import org.jppf.android.R;
  * Main activity for this app. Provides a main screen updated with the node activity and a settings button to configure the node.
  */
 public class MainActivity extends Activity {
+  /**
+   * Log tag for this class.
+   */
   private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-      @Override
-      public void uncaughtException(final Thread thread, final Throwable ex) {
-        System.err.print("uncaught exception in thread " + thread + ": ");
-        ex.printStackTrace();
-      }
-    });
     super.onCreate(savedInstanceState);
+    AndroidHelper.setUncaughtExceptionHandler();
+    AndroidHelper.setDefaultUncaughtExceptionHandler();
     setContentView(R.layout.activity_main);
+    Log.v(LOG_TAG, "onCreate(), thread = " + Thread.currentThread());
+    /*
+    LayoutInflater inflater = getLayoutInflater();
+    ViewGroup mainLayout = (ViewGroup) findViewById(R.id.main_layout);
+    //View defLayout = (View) inflater.inflate(R.layout.activity_main_default, null, false);
+    View root = inflater.inflate(R.layout.activity_main_default, mainLayout, true);
+    //mainLayout.addView(defLayout);
+    */
     AndroidHelper.launchNode(this);
   }
 
@@ -57,9 +63,9 @@ public class MainActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
-    Log.d(LOG_TAG, "onOptionsItemSelected() id = " + id);
+    //Log.v(LOG_TAG, "onOptionsItemSelected() id = " + id);
     if (id == R.id.action_settings) {
-      Log.d(LOG_TAG, "onOptionsItemSelected() showing the settings screen");
+      //Log.v(LOG_TAG, "onOptionsItemSelected() showing the settings screen");
       Intent intent = new Intent(this, SettingsActivity.class);
       startActivity(intent);
       return false;

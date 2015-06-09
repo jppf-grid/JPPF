@@ -17,8 +17,9 @@
  */
 package org.jppf.server.node.android;
 
+import android.app.Activity;
+
 import org.jppf.android.AndroidHelper;
-import org.jppf.android.activities.MainActivity;
 import org.jppf.android.activities.NodeEventHandler;
 import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.server.node.remote.AbstractRemoteNode;
@@ -29,6 +30,8 @@ import org.jppf.server.node.remote.AbstractRemoteNode;
  * @since 5.1
  */
 public class JPPFAndroidNode extends AbstractRemoteNode {
+  private static DelegatingNodeEventHandler handler = null;
+
   /**
    * Initialize this node.
    * @param connectionInfo the server connection information.
@@ -40,9 +43,7 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
   @Override
   public void initDataChannel() throws Exception {
     super.initDataChannel();
-    MainActivity act = AndroidHelper.getActivity();
-    NodeEventHandler handler = new NodeEventHandler();
-    handler.setUiComponent(act);
+    if (handler == null) handler = new DelegatingNodeEventHandler(AndroidHelper.getActivity());
     lifeCycleEventHandler.addNodeLifeCycleListener(handler);
   }
 

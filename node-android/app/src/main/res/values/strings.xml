@@ -9,9 +9,9 @@
   <string name="title_activity_settings">Configuration</string>
 
   <string name="execution_state_executing">executing</string>
-  <string name="execution_state_idle">executing</string>
+  <string name="execution_state_idle">idle</string>
   <string name="node_state_online">online</string>
-  <string name="node_state_offline">online</string>
+  <string name="node_state_offline">offline</string>
 
   <string name="node_state_label">Connection</string>
   <string name="execution_state_label">Execution</string>
@@ -70,7 +70,7 @@
   <string name="pref_ssl_engine_protocol_title">SSL engine protocols</string>
   <string name="pref_ssl_engine_protocol_sum">Protocol value for SSLEngine.getEnabledProtocols()</string>
   <string-array name="pref_ssl_engine_protocol_values">
-    <item>SSLv2Hello</item>
+    <!--<item>SSLv2Hello</item>-->
     <item>SSLv3</item>
     <item>TLSv1</item>
   </string-array>

@@ -84,7 +84,7 @@ public class AppStorageProvider extends DocumentsProvider {
     } catch(Exception e) {
       root_path = rootDir.getAbsolutePath();
     }
-    Log.d(LOG_TAG, "rootDir dir = " + rootDir);
+    Log.v(LOG_TAG, "rootDir dir = " + rootDir);
     return true;
   }
 

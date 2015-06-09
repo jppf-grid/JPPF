@@ -59,7 +59,7 @@ public class FilechoserEditTextPreference extends DialogPreference {
     button.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(final View v) {
-        Log.d(LOG_TAG, "in chooseFile()");
+        Log.v(LOG_TAG, "in chooseFile()");
         fragment.startFileChooser(FilechoserEditTextPreference.this);
       }
     });
@@ -103,7 +103,7 @@ public class FilechoserEditTextPreference extends DialogPreference {
    * @param value the new value for this preference.
    */
   void onValueChanged(String value) {
-    Log.d(LOG_TAG, "onValueChanged('" + value + "')");
+    Log.v(LOG_TAG, "onValueChanged('" + value + "')");
     editText.setText(value);
   }
 }

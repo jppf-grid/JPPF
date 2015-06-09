@@ -17,6 +17,7 @@
  */
 package org.jppf.android;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -44,7 +45,7 @@ public class AndroidHelper {
   /**
    * A global activity object.
    */
-  private static MainActivity activity = null;
+  private static Activity activity = null;
   /**
    *Determines whther the node is currently running.
    */
@@ -53,6 +54,14 @@ public class AndroidHelper {
    * The SSL/TLS configuration.
    */
   private static final TypedProperties sslConfig = new TypedProperties();
+  private static final Thread.UncaughtExceptionHandler ueh = new Thread.UncaughtExceptionHandler() {
+    @Override
+    public void uncaughtException(final Thread thread, final Throwable ex) {
+      //System.err.print("uncaught exception in thread " + thread + ": ");
+      //ex.printStackTrace();
+      Log.e(LOG_TAG, "uncaught exception in thread " + thread + " : ", ex);
+    }
+  };
 
   /**
    * Instantiation of this class is not permitted.
@@ -64,7 +73,7 @@ public class AndroidHelper {
    * Get the activity used by the node.
    * @return a {@link Context} object.
    */
-  public static MainActivity getActivity() {
+  public static Activity getActivity() {
     return activity;
   }
 
@@ -98,6 +107,7 @@ public class AndroidHelper {
    */
   private static void launch0() {
     try {
+      setUncaughtExceptionHandler();
       changeConfigFromPrefs();
       NodeRunner.main("noLauncher");
     } catch(Exception e) {
@@ -212,5 +222,13 @@ public class AndroidHelper {
     String value = s + prefValue;
     sslConfig.setString(configKey, value);
     Log.d(LOG_TAG, "set SSL preperty: " + configKey + " = " + value);
+  }
+
+  public static void setUncaughtExceptionHandler() {
+    Thread.currentThread().setUncaughtExceptionHandler(ueh);
+  }
+
+  public static void setDefaultUncaughtExceptionHandler() {
+    Thread.setDefaultUncaughtExceptionHandler(ueh);
   }
 }

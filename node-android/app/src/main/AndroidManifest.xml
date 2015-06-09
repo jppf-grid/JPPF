@@ -18,15 +18,29 @@
       <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="org.jppf.android.activities.MainActivity"/>
     </activity>
 
-    <provider android:name=".activities.documents.AppStorageProvider"
+    <provider android:name="org.jppf.android.activities.documents.AppStorageProvider"
       android:authorities="org.jppf.android.documents"
-      android:grantUriPermissions="true" android:exported="true"
+      android:grantUriPermissions="true"
+      android:exported="true"
       android:permission="android.permission.MANAGE_DOCUMENTS"
       android:enabled="@bool/atLeastKitKat">
       <intent-filter>
         <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
       </intent-filter>
     </provider>
+
+    <!--
+    <provider android:name=".activities.documents.AppStorageProvider"
+      android:authorities="org.jppf.android.documents"
+      android:grantUriPermissions="true"
+      android:exported="true"
+      android:permission="android.permission.MANAGE_DOCUMENTS"
+      android:enabled="@bool/atLeastKitKat">
+      <intent-filter>
+        <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+      </intent-filter>
+    </provider>
+    -->
 
   </application>
 

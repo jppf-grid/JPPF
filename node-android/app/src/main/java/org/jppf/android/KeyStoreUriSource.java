@@ -47,7 +47,7 @@ public class KeyStoreUriSource implements Callable<InputStream> {
 
   @Override
   public InputStream call() throws Exception {
-    Log.d(LOG_TAG, "getting stream from uri = " + uri);
+    //Log.v(LOG_TAG, "getting stream from uri = " + uri);
     InputStream is = AndroidHelper.getActivity().getContentResolver().openInputStream(uri);
     return (is instanceof BufferedInputStream) ? is : new BufferedInputStream(is);
   }

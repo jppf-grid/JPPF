@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal"
+  android:id="@+id/main_layout_default" android:layout_width="match_parent" android:layout_height="match_parent" >
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+    android:layout_width="wrap_content" android:layout_height="match_parent" android:padding="4dp">
+    <TextView android:text="@string/node_state_label"      android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/execution_state_label" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/current_job_label"     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/current_tasks_label"   android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/total_tasks_label"     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+    android:layout_width="wrap_content" android:layout_height="match_parent" android:padding="4dp">
+    <TextView android:id="@+id/node_state"                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/execution_state"            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/current_job"                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/current_tasks"              android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/total_tasks"                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+</LinearLayout>
