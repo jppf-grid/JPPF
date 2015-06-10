@@ -19,7 +19,7 @@
 package org.jppf.client.balancer.queue;
 
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 
 import org.jppf.client.*;
@@ -72,6 +72,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * Holds information about the execution context.
    */
   private final JPPFContext jppfContext;
+  /**
+   * Used to add channels asynchronously to avoid deadlocks.
+   * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-398">JPPF-398 Deadlock in the client</a>
+   */
+  private final ExecutorService channelsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ChannelsExecutor"));
 
   /**
    * Initialize this task queue checker with the specified node server.
@@ -135,14 +140,16 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   public void addIdleChannel(final ChannelWrapper channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (channel.getExecutionStatus() != ExecutorStatus.ACTIVE) throw new IllegalStateException("channel is not active: " + channel);
-
-    if (traceEnabled) log.trace("Adding idle channel " + channel);
-    int count;
-    synchronized (idleChannels) {
-      idleChannels.putValue(channel.getPriority(), channel);
-      count = idleChannels.size();
-    }
-    wakeUp();
+    channelsExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        if (traceEnabled) log.trace("Adding idle channel " + channel);
+        synchronized (idleChannels) {
+          idleChannels.putValue(channel.getPriority(), channel);
+        }
+        wakeUp();
+      }
+    });
   }
 
   /**
@@ -161,12 +168,15 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @return a reference to the removed channel.
    */
   public ChannelWrapper removeIdleChannel(final ChannelWrapper channel) {
-    if (traceEnabled) log.trace("Removing idle channel " + channel);
-    int count;
-    synchronized (idleChannels) {
-      idleChannels.removeValue(channel.getPriority(), channel);
-      count = idleChannels.size();
-    }
+    channelsExecutor.execute(new Runnable() {
+      @Override
+      public void run() {
+        if (traceEnabled) log.trace("Removing idle channel " + channel);
+        synchronized (idleChannels) {
+          idleChannels.removeValue(channel.getPriority(), channel);
+        }
+      }
+    });
     return channel;
   }
 
