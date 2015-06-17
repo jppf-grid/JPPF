@@ -117,9 +117,7 @@ class ApplicationConnection extends JPPFConnection
 	 * <li>recompose the tasks results in the same order as they were received</li>
 	 * <li><send results back to the client/li>
 	 * </ul>
-	 * 
 	 * @throws Exception if an error is raised while processing an execution request.
-	 * @see org.jppf.server.app.JPPFConnection#perform()
 	 */
 	public void perform() throws Exception
 	{
@@ -175,25 +173,27 @@ class ApplicationConnection extends JPPFConnection
 		header.getUuidPath().add(driver.getUuid());
 		header.setCompletionListener(resultSender);
 		currentJobId = header.getJobUuid();
-		JPPFDriver.getQueue().addBundle(headerWrapper);
-		if (count > 0)
-		{
-			totalTaskCount += count;
-			if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
-			resultSender.run(count);
-		}
-		else resultSender.sendPartialResults(headerWrapper);
-		if ("TemlateJobId_5".equals(header.getId()))
-		{
-		  boolean breakpoint = true;
-		}
+    if (count > 0)
+    {
+      totalTaskCount += count;
+      if (debugEnabled) log.debug("Queued " + totalTaskCount + " tasks");
+      resultSender.run(count, new Runnable() {
+        @Override
+        public void run() {
+          JPPFDriver.getQueue().addBundle(headerWrapper);
+        }
+      });
+    }
+    else
+    {
+      JPPFDriver.getQueue().addBundle(headerWrapper);
+      resultSender.sendPartialResults(headerWrapper);
+    }
 		jobEnded();
-		return;
 	}
 
 	/**
 	 * Close this application connection.
-	 * @see org.jppf.server.app.JPPFConnection#close()
 	 */
 	public void close()
 	{
@@ -260,7 +260,6 @@ class ApplicationConnection extends JPPFConnection
 	/**
 	 * Get a string representation of this connection.
 	 * @return a string representation of this connection.
-	 * @see org.jppf.server.app.JPPFConnection#toString()
 	 */
 	public String toString()
 	{

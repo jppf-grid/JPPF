@@ -57,10 +57,11 @@ class PeerNodeResultSender extends AbstractResultSender
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
+	 * @param r not used here.
 	 * @throws Exception if handing of the results fails.
-	 * @see org.jppf.server.AbstractResultSender#waitForExecution()
 	 */
-	public synchronized void waitForExecution() throws Exception
+	@Override
+	public synchronized void waitForExecution(Runnable r) throws Exception
 	{
 		long start = System.nanoTime();
 		while (getPendingTasksCount() > 0)

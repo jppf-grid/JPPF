@@ -176,7 +176,7 @@ class PeerNode extends AbstractMonitoredNode
 				bundle.getUuidPath().add(driver.getUuid());
 				bundle.setCompletionListener(resultSender);
 				JPPFDriver.getQueue().addBundle(bundleWrapper);
-				resultSender.run(n);
+				resultSender.run(n, null);
 				//resultSender.sendPartialResults(bundleWrapper);
 				setTaskCount(getTaskCount() + n);
 				if (debugEnabled) log.debug(getName() + "tasks executed: "+getTaskCount());

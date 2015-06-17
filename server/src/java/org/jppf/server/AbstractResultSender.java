@@ -77,14 +77,16 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 	/**
 	 * Wait for executed task bundles and send them back to the client.
 	 * @param count the number of tasks that must be executed.
+	 * @param r an action to execute before releasing the calling thread's lock on this object.
 	 * @throws Exception if an error occurs while sending one or more task bundles.
 	 */
-	public void run(int count) throws Exception
+	public void run(int count, Runnable r) throws Exception
 	{
+	  //Thread.sleep(10L);
 		if (debugEnabled) log.debug("Pending tasks: "+count);
 		setResultList(new ArrayList<BundleWrapper>());
 		setPendingTasksCount(count);
-		waitForExecution();
+		waitForExecution(r);
 	}
 
 	/**
@@ -97,10 +99,12 @@ public abstract class AbstractResultSender implements TaskCompletionListener
 
 	/**
 	 * This method waits until all tasks of a request have been completed.
+   * @param r an action to execute before releasing the calling thread's lock on this object.
 	 * @throws Exception if handing of the results fails.
 	 */
-	public synchronized void waitForExecution() throws Exception
+	public synchronized void waitForExecution(Runnable r) throws Exception
 	{
+	  if (r != null) r.run();
 		while (getPendingTasksCount() > 0)
 		{
 			try
