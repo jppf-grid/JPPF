@@ -18,8 +18,6 @@
 
 package org.jppf.client;
 
-import static org.jppf.client.JPPFClientConnectionStatus.EXECUTING;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,7 +55,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * The JPPF client which holds this pool.
    */
-  private final AbstractGenericClient client;
+  private final JPPFClient client;
   /**
    * Determines whether the pool is for SSL connections.
    */
@@ -68,32 +66,26 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   private final AtomicInteger sequence = new AtomicInteger(0);
   /**
    * The host name or address of the remote driver.
-   * @since 4.2
    */
   private String driverHost;
   /**
    * The host name or address of the remote driver.
-   * @since 4.2
    */
   private String driverIPAddress;
   /**
    * The port to use on the remote driver.
-   * @since 4.2
    */
   private int driverPort = -1;
   /**
    * The uuid of the remote driver.
-   * @since 4.2
    */
   private String driverUuid;
   /**
    * Represents the system information.
-   * @since 4.2
    */
   private JPPFSystemInformation systemInfo;
   /**
    * The pool of JMX connections.
-   * @since 4.2
    */
   private final JMXConnectionPool jmxPool;
 
@@ -103,19 +95,18 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param id the id of this pool.
    * @param name name assigned to this pool.
    * @param priority the priority of the connectios in this pool.
-   * @param coreSize the core size of this pool.
+   * @param size the core size of this pool.
    * @param sslEnabled determines whether the pool is for SSL connections.
-   * @param jmxCoreSize the core size of the JMX connections pool.
-   * @exclude
+   * @param jmxPoolSize the core size of the JMX connections pool.
    */
-  JPPFConnectionPool(final AbstractGenericClient client, final int id, final String name, final int priority, final int coreSize, final boolean sslEnabled, final int jmxCoreSize) {
-    super(coreSize);
+  JPPFConnectionPool(final JPPFClient client, final int id, final String name, final int priority, final int size, final boolean sslEnabled, final int jmxPoolSize) {
+    super(size);
     this.client = client;
     this.id = id;
     this.priority = priority;
     this.name = name;
     this.sslEnabled = sslEnabled;
-    jmxPool = new JMXConnectionPool(this, jmxCoreSize);
+    jmxPool = new JMXConnectionPool(this, jmxPoolSize);
   }
 
   @Override
@@ -139,7 +130,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     if ((statuses == null) || (statuses.length <= 0)) return connections.size();
     int count = 0;
     for (JPPFClientConnection c: connections) {
-      if (connectionMatchesStatus(c, statuses)) count++;
+      if (connectionHasStatus(c, true, statuses)) count++;
     }
     return count;
   }
@@ -187,10 +178,8 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Set the uuid of the driver to which connections in this pool are connected.
    * @param uuid the driver uuid as a string.
-   * @since 4.2
-   * @exclude
    */
-  public synchronized void setDriverUuid(final String uuid) {
+  synchronized void setDriverUuid(final String uuid) {
     if (this.driverUuid == null) this.driverUuid = uuid;
   }
 
@@ -198,8 +187,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * Compares this connection pool with another, based on their respective priorities.
    * <p>This comparison defines an ordering of connection pools by their <b><i>descending</i></b> priority.
    * @param other the other connection pool to compare with.
-   * @return -1 if this pool's priority is greater than the other pool's, 0 if the priorities are equal,
-   * +1 if this pool's priority is less than the other pool's.
+   * @return -1 if this pool's priority is greater than the other pool's, 0 if the priorities are equal, +1 if this pool's priority is less than the other pool's.
    */
   @Override
   public int compareTo(final JPPFConnectionPool other) {
@@ -221,24 +209,24 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   @Override
-  public synchronized int setMaxSize(final int maxSize) {
-    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.maxSize);
-    if ((maxSize < coreSize) || (maxSize == this.maxSize)) return this.maxSize;
-    int diff = maxSize - this.maxSize;
+  public synchronized int setSize(final int maxSize) {
+    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.size);
+    if (maxSize == this.size) return this.size;
+    int diff = maxSize - this.size;
     int size = connectionCount();
     if (diff < 0) {
       int actual = 0;
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
         JPPFClientConnection c = connections.get(i);
-        if (!coreConnections.contains(c) && connectionDoesNotMatchStatus(c, EXECUTING)) {
+        if (connectionHasStatus(c, false, JPPFClientConnectionStatus.EXECUTING)) {
           if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
           c.close();
           remove(c);
           actual++;
         }
       }
-      this.maxSize -= actual;
+      this.size -= actual;
     } else {
       JPPFClientConnection c = connections.get(0);
       JPPFConnectionInformation info = new JPPFConnectionInformation();
@@ -248,9 +236,9 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
       else info.serverPorts = ports;
       info.uuid = driverUuid;
       for (int i=0; i<diff; i++) client.submitNewConnection(info, this);
-      this.maxSize += diff;
+      this.size += diff;
     }
-    return this.maxSize;
+    return this.size;
   }
 
   /**
@@ -262,39 +250,25 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   public synchronized List<JPPFClientConnection> getConnections(final JPPFClientConnectionStatus...statuses) {
     List<JPPFClientConnection> list = new ArrayList<>(connections.size());
     for (JPPFClientConnection c: connections) {
-      if (connectionMatchesStatus(c, statuses)) list.add(c);
+      if (connectionHasStatus(c, true, statuses)) list.add(c);
     }
     return list;
   }
 
   /**
-   * Check whether the status of the specified connection is one of the specified statuses.
+   * Check whether the status of the specified connection is or isn't one of the specified statuses.
    * @param connection the connection to check.
-   * @param statuses an array of {@link JPPFClientConnectionStatus} values to check against.
-   * @return {@code true} if the connection status is one of the specified statuses, {@code false} otherwise.
-   */
-  boolean connectionMatchesStatus(final JPPFClientConnection connection, final JPPFClientConnectionStatus...statuses) {
-    if ((connection == null) || (statuses == null)) return false;
-    JPPFClientConnectionStatus status = connection.getStatus();
-    for (JPPFClientConnectionStatus s: statuses) {
-      if (status == s) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Check whether the status of the specified connection is none of the specified statuses.
-   * @param connection the connection to check.
+   * @param has whether to check if the connection has one of the statuses, or if it doesn't.
    * @param statuses an array of {@link JPPFClientConnectionStatus} values to check against.
    * @return {@code true} if the connection status is not one of the specified statuses, {@code false} otherwise.
    */
-  boolean connectionDoesNotMatchStatus(final JPPFClientConnection connection, final JPPFClientConnectionStatus...statuses) {
-    if ((connection == null) || (statuses == null)) return true;
+  boolean connectionHasStatus(final JPPFClientConnection connection, final boolean has, final JPPFClientConnectionStatus...statuses) {
+    if ((connection == null) || (statuses == null)) return !has;
     JPPFClientConnectionStatus status = connection.getStatus();
     for (JPPFClientConnectionStatus s: statuses) {
-      if (status == s) return false;
+      if (status == s) return has;
     }
-    return true;
+    return !has;
   }
 
   @Override
@@ -302,9 +276,10 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
     sb.append(", id=").append(id);
-    sb.append(", coreSize=").append(coreSize);
-    sb.append(", maxSize=").append(maxSize);
+    sb.append(", maxSize=").append(size);
     sb.append(", priority=").append(priority);
+    sb.append(", driverHost=").append(driverHost);
+    sb.append(", driverPort=").append(driverPort);
     sb.append(", sslEnabled=").append(sslEnabled);
     sb.append(", client=").append(client);
     sb.append(']');
@@ -331,7 +306,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Set the host name of the remote driver.
    * @param driverHost a string representing the host name or ip address.
-   * @since 4.2
    */
   synchronized void setDriverHost(final String driverHost) {
     if ((this.driverHost == null) && (driverHost != null)) {
@@ -352,7 +326,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Set the ip address of the remote driver.
    * @param ipAddress a string representing the host name or ip address.
-   * @since 4.2
    */
   synchronized void setDriverIPAddress(final String ipAddress) {
     if ((this.driverIPAddress == null) && (ipAddress != null)) {
@@ -373,7 +346,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Set the port to use on the remote driver.
    * @param driverPort the port number as an int.
-   * @since 4.2
    */
   synchronized void setDriverPort(final int driverPort) {
     if (this.driverPort < 0) this.driverPort = driverPort;
@@ -381,10 +353,10 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
 
   /**
    * Get the JPPF client which holds this pool.
-   * @return a {@link AbstractGenericClient} instance.
+   * @return a {@link JPPFClient} instance.
    * @since 4.2
    */
-  public AbstractGenericClient getClient() {
+  public JPPFClient getClient() {
     return client;
   }
 
@@ -400,7 +372,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Set the driver's system information.
    * @param systemInfo an instance of {@link JPPFSystemInformation}.
-   * @since 4.2
    */
   synchronized void setSystemInfo(final JPPFSystemInformation systemInfo) {
     this.systemInfo = systemInfo;
@@ -418,7 +389,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Set the jmx port to use on the remote driver.
    * @param jmxPort the jmx port number as an int.
-   * @since 4.2
    */
   void setJmxPort(final int jmxPort) {
     jmxPool.setPort(jmxPort);
@@ -444,21 +414,12 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
-   * Get the core size of the associated JMX connection pool.
-   * @return the JMX pool core size.
-   * @since 4.2
-   */
-  public int getJMXPoolCoreSize() {
-    return jmxPool.getCoreSize();
-  }
-
-  /**
    * Get the current maximum size of the associated JMX connection pool.
    * @return the JMX pool maximum size.
    * @since 4.2
    */
   public int getJMXPoolMaxSize() {
-    return maxSize;
+    return size;
   }
 
   /**
@@ -468,7 +429,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @since 4.2
    */
   public int setJMXPoolMaxSize(final int maxSize) {
-    return jmxPool.setMaxSize(maxSize);
+    return jmxPool.setSize(maxSize);
   }
 
   /**
@@ -539,7 +500,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    */
   public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
     final Operator op = operator == null ? Operator.EQUAL : operator;
-    setMaxSize(nbConnections);
+    setSize(nbConnections);
     final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {

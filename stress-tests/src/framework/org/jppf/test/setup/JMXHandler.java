@@ -35,13 +35,13 @@ public class JMXHandler {
   /**
    * The JPPF client from which fetch the JMX connections.
    */
-  private final AbstractGenericClient client;
+  private final JPPFClient client;
 
   /**
    * Initialize this jmx handler with the specified JPPF client.
    * @param client the JPPF client from which fetch the JMX connections.
    */
-  public JMXHandler(final AbstractGenericClient client) {
+  public JMXHandler(final JPPFClient client) {
     this.client = client;
   }
 
@@ -53,21 +53,21 @@ public class JMXHandler {
    */
   public void checkDriverAndNodesInitialized(final int nbDrivers, final int nbNodes) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<>();
+    Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
     while (!allConnected) {
-      List<JPPFClientConnection> list = client.getAllConnections();
+      List<JPPFConnectionPool> list = client.getConnectionPools();
       if (list != null) {
-        for (JPPFClientConnection c: list) {
+        for (JPPFConnectionPool c: list) {
           // since all the drivers are local to the same host, we can differentiate them with their port number
-          if (!connectionMap.containsKey(c.getPort())) connectionMap.put(c.getPort(), c);
+          if (!connectionMap.containsKey(c.getDriverPort())) connectionMap.put(c.getDriverPort(), c);
         }
       }
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
-    for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet()) {
-      JMXDriverConnectionWrapper wrapper = entry.getValue().getConnectionPool().getJmxConnection();
+    for (Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
+      JMXDriverConnectionWrapper wrapper = entry.getValue().getJmxConnection();
       String url = wrapper.getURL().toString();
       if (!wrapperMap.containsKey(url)) {
         while (!wrapper.isConnected()) wrapper.connectAndWait(10L);

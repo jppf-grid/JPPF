@@ -47,7 +47,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
    * @param host the host to connect to.
    * @param port the port to connect to on the host.
    */
-  public TaskServerConnectionHandler(final JPPFClientConnection owner, final String host, final int port) {
+  TaskServerConnectionHandler(final JPPFClientConnection owner, final String host, final int port) {
     super(owner, owner.getName() + " - TasksServer");
     this.host = host;
     this.port = port;

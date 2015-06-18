@@ -47,7 +47,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   /**
    * The channel to the driver to use.
    */
-  private final AbstractJPPFClientConnection channel;
+  private final JPPFClientConnectionImpl channel;
   /**
    * Unique identifier of the client.
    */
@@ -60,7 +60,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   public ChannelWrapperRemote(final JPPFClientConnection channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
 
-    this.channel = (AbstractJPPFClientConnection) channel;
+    this.channel = (JPPFClientConnectionImpl) channel;
     JPPFConnectionPool pool = channel.getConnectionPool();
     this.uuid = pool.getDriverUuid();
     priority = pool.getPriority();
@@ -184,7 +184,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     /**
      * The connection to the driver to use.
      */
-    private final AbstractJPPFClientConnection connection;
+    private final JPPFClientConnectionImpl connection;
 
     /**
      * Initialize this runnable for remote execution.
@@ -192,7 +192,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      * @param clientBundle     the execution to perform.
      * @param connection the connection to the driver to use.
      */
-    public RemoteRunnable(final Bundler bundler, final ClientTaskBundle clientBundle, final AbstractJPPFClientConnection connection) {
+    public RemoteRunnable(final Bundler bundler, final ClientTaskBundle clientBundle, final JPPFClientConnectionImpl connection) {
       this.bundler = bundler;
       this.clientBundle = clientBundle;
       this.connection = connection;
@@ -202,7 +202,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     public void run() {
       Exception exception = null;
       List<Task<?>> tasks = this.clientBundle.getTasksL();
-      AbstractGenericClient client = connection.getClient();
+      JPPFClient client = connection.getClient();
       String uuid = clientBundle.getClientJob().getUuid();
       try {
         long start = System.nanoTime();
@@ -297,7 +297,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
       if (job == null) throw new IllegalArgumentException("job is null");
       Set<ClassLoader> result = new HashSet<>();
       if (!job.getJobTasks().isEmpty()) {
-        AbstractGenericClient client = connection.getClient();
+        JPPFClient client = connection.getClient();
         for (Task<?> task: job.getJobTasks()) {
           if (task != null) {
             Object o = task.getTaskObject();

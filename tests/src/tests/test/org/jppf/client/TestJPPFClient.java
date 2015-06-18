@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
+import org.jppf.client.event.*;
 import org.jppf.execute.AbstractThreadManager;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
@@ -41,8 +42,7 @@ import test.org.jppf.test.setup.common.*;
  * Unit tests for <code>JPPFClient</code>.
  * @author Laurent Cohen
  */
-public class TestJPPFClient extends Setup1D1N
-{
+public class TestJPPFClient extends Setup1D1N {
   /**
    * Logger for this class.
    */
@@ -239,7 +239,7 @@ public class TestJPPFClient extends Setup1D1N
    */
   @Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception {
-    
+
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
       List<Task<?>> results = client.submitJob(job);
@@ -258,7 +258,7 @@ public class TestJPPFClient extends Setup1D1N
    * This relates to the bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-131">JPPF-131 JPPF client does not release JMX thread upon connection failure</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout=15000)
+  @Test(timeout=20000)
   public void testNoJMXConnectionThreadsLeak() throws Exception {
     String name = Thread.currentThread().getName();
     MyClient client = null;
@@ -270,21 +270,34 @@ public class TestJPPFClient extends Setup1D1N
       config.setInt("jppf.reconnect.initial.delay", 1);
       config.setInt("jppf.reconnect.max.time", maxReconnect);
       config.setBoolean("jppf.discovery.enabled", false);
-      config.setProperty("jppf.drivers", "driver1");
-      config.setProperty("driver1.jppf.server.host", "localhost");
-      config.setInt("driver1.jppf.server.port", 11101);
-      config.setInt("driver1.jppf.pool.size", poolSize);
-      config.setInt("driver1.jppf.management.port", 11201);
-      client = new MyClient();
+      config.setProperty("jppf.drivers", "test");
+      config.setProperty("test.jppf.server.host", "localhost");
+      config.setInt("test.jppf.server.port", 11101);
+      config.setInt("test.jppf.pool.size", poolSize);
+      config.setInt("test.jppf.management.port", 11201);
+      ConnectionPoolListener listener = new ConnectionPoolListenerAdapter() {
+        @Override public void connectionAdded(final ConnectionPoolEvent event) {
+          TestUtils.printf(log, "connectionAdded(%s) : connectionCount = %d", event .getConnection(), event.getConnectionPool().getClient().getAllConnectionsCount());
+        }
+        @Override public void connectionRemoved(final ConnectionPoolEvent event) {
+          TestUtils.printf(log, "connectionRemoved(%s) : connectionCount = %d", event.getConnection(), event.getConnectionPool().getClient().getAllConnectionsCount());
+        }
+        @Override public void connectionPoolAdded(final ConnectionPoolEvent event) {
+          TestUtils.printf(log, "connectionPoolAdded() : added pool %s", event.getConnectionPool());
+        }
+        @Override public void connectionPoolRemoved(final ConnectionPoolEvent event) {
+          TestUtils.printf(log, "connectionPoolRemoved() : removed pool %s, call stack:%n%s", event.getConnectionPool(), ExceptionUtils.getCallStack());
+        }
+      };
+      client = new MyClient(listener);
       waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
-      restartDriver(client, poolSize, 1000L * maxReconnect + 1500L);
+      restartDriver(client, poolSize, 1_000L * maxReconnect + 1500L);
       String[] threads = threadNames("^" + JMXConnectionWrapper.CONNECTION_NAME_PREFIX + ".*");
       assertEquals(0, threads.length);
     } catch(Exception e) {
       e.printStackTrace();
       throw e;
     } finally {
-      System.out.println("connections: " + client.getAllConnections());
       if (client != null) client.close();
       JPPFConfiguration.reset();
       Thread.currentThread().setName(name);
@@ -300,7 +313,9 @@ public class TestJPPFClient extends Setup1D1N
    */
   private void restartDriver(final MyClient client, final int poolSize, final long restartDelay) throws Exception {
     JMXDriverConnectionWrapper jmx = getJmxConnection(client);
+    TestUtils.printf(log, "***** restarting driver with restartDelay = %d ms *****", restartDelay);
     jmx.restartShutdown(100L, restartDelay);
+    TestUtils.printf(log, "***** driver restart requested *****", restartDelay);
     waitForNbConnections(client, 0, JPPFClientConnectionStatus.ACTIVE);
     waitForNbConnections(client, 0, null);
     Runnable r = new Runnable() {
@@ -321,14 +336,10 @@ public class TestJPPFClient extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   private void waitForNbConnections(final JPPFClient client, final int nbConnections, final JPPFClientConnectionStatus status) throws Exception {
-    int count = -1;
-    while (count != nbConnections) {
-      count = 0;
-      Thread.sleep(50L);
-      List<JPPFClientConnection> list = client.getAllConnections();
-      for (JPPFClientConnection conn: list) {
-        if ((status == null) || (conn.getStatus() == status)) count++;
-      }
+    if (status != null) client.awaitConnectionPools(Operator.EQUAL, nbConnections, 0L, status);
+    else {
+      int n = -1;
+      while ((n = client.getAllConnectionsCount()) != nbConnections) Thread.sleep(1L);
     }
     if (nbConnections > 0) getJmxConnection(client);
   }
@@ -340,16 +351,7 @@ public class TestJPPFClient extends Setup1D1N
    * @throws Exception if any error occurs.
    */
   private JMXDriverConnectionWrapper getJmxConnection(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper jmx = null;
-    while (jmx == null) {
-      try {
-        jmx = client.getClientConnection().getConnectionPool().getJmxConnection();
-        while (!jmx.isConnected()) Thread.sleep(10L);
-      } catch (Exception e) {
-        Thread.sleep(10L);
-      }
-    }
-    return jmx;
+    return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 
   /**
@@ -384,8 +386,8 @@ public class TestJPPFClient extends Setup1D1N
         AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader) getTaskClassLoader();
         if (cl != ajcl2) {
           throw new IllegalStateException("thread context class loader and task class loader do not match:\n" +
-            "thread context class loader = " + cl + "\n" +
-            "task class loader = " + ajcl2);
+              "thread context class loader = " + cl + "\n" +
+              "task class loader = " + ajcl2);
         }
         if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
       }
@@ -394,9 +396,17 @@ public class TestJPPFClient extends Setup1D1N
   }
 
   /**
-   * 
+   *
    */
   public static class MyClient extends JPPFClient {
+    /**
+     *
+     * @param listener .
+     */
+    public MyClient(final ConnectionPoolListener listener) {
+      super(listener);
+    }
+
     @Override
     public void initRemotePools(final TypedProperties props) {
       super.initRemotePools(props);

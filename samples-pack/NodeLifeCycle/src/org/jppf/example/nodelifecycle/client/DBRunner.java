@@ -116,11 +116,7 @@ public class DBRunner
   {
     if (jmxNode == null)
     {
-      JPPFClientConnection c = null;
-      while ((c = jppfClient.getClientConnection()) == null) Thread.sleep(10L);
-      JMXDriverConnectionWrapper jmxDriver = null;
-      while ((jmxDriver = c.getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
-      while (!jmxDriver.isConnected()) Thread.sleep(10L);
+      JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
       JPPFManagementInfo info = nodesInfo.iterator().next();
       jmxNode = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());

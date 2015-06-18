@@ -104,7 +104,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @param client JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
-  public JobManagerClient(final AbstractGenericClient client) throws Exception {
+  public JobManagerClient(final JPPFClient client) throws Exception {
     if (client == null) throw new IllegalArgumentException("client is null");
     this.localEnabled = client.getConfig().getBoolean("jppf.local.execution.enabled", false);
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
@@ -119,20 +119,18 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     });
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
     this.queue.addQueueListener(client);
-    client.addClientListener(new ClientListener() {
+    client.addConnectionPoolListener(new ConnectionPoolListenerAdapter() {
       @Override
-      public void newConnection(final ClientEvent event) {
+      public void connectionAdded(final ConnectionPoolEvent event) {
         addConnection(event.getConnection());
       }
 
       @Override
-      public void connectionFailed(final ClientEvent event) {
+      public void connectionRemoved(final ConnectionPoolEvent event) {
         removeConnection(event.getConnection());
       }
     });
     updateLocalExecution(this.localEnabled);
-    List<JPPFClientConnection> connections = client.getAllConnections();
-    for (JPPFClientConnection connection : connections) addConnection(connection);
   }
 
   /**
@@ -231,8 +229,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
         wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(connection.getHost(), jmx != null ? jmx.getPort() : -1,
-          jmx != null ? jmx.getId() : (connection.getDriverUuid() != null ? connection.getDriverUuid() : "?"),
-          JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+            jmx != null ? jmx.getId() : (connection.getDriverUuid() != null ? connection.getDriverUuid() : "?"),
+                JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }

@@ -101,7 +101,7 @@ public class MatrixRunner {
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
       {
-        JPPFStatistics stats = jppfClient.getClientConnection().getConnectionPool().getJmxConnection().statistics();
+        JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
         output("End statistics :\n" + stats.toString());
       }
     } catch(Exception e) {

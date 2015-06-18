@@ -49,9 +49,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
    * @param name configuration name for this local client.
    * @param info the connection properties for this connection.
    * @param pool the connection pool this connection belongs to.
-   * @exclude
    */
-  public JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
+  JPPFClientConnectionImpl(final JPPFClient client, final String uuid, final String name, final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
     super(pool);
     if (client.isClosed()) {
       if (debugEnabled) log.debug("error: initializing connection {} while client is closed", name);
@@ -78,14 +77,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
         log.warn("attempting to init closed " + getClass().getSimpleName() + ", aborting");
         return;
       }
-      /*
-      try {
-        host = InetAddress.getByName(host).getHostName();
-        displayName = name + '[' + host + ':' + port + ']';
-      } catch (UnknownHostException e) {
-        displayName = name;
-      }
-      */
       delegate = new ClassServerDelegateImpl(this, pool.getClient().getUuid(), getHost(), getPort());
       delegate.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
         @Override
@@ -119,9 +110,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
   /**
    * Connect to the driver.
    * @throws Exception if connection failed.
-   * @exclude
    */
-  protected void connect() throws Exception {
+  void connect() throws Exception {
     delegate.init();
     if (!delegate.isClosed()) {
       new Thread(delegate, delegate.getName()).start();
@@ -129,12 +119,8 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
-  protected SocketInitializer createSocketInitializer() {
+  SocketInitializer createSocketInitializer() {
     return new SocketInitializerImpl();
   }
 }

@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.debug.Debug;
-import org.jppf.client.event.ClientListener;
+import org.jppf.client.event.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
@@ -54,10 +54,52 @@ public class JPPFClient extends AbstractGenericClient {
   }
 
   /**
+   * Initialize this client with the specified application UUID.
+   * @param uuid the unique identifier for this local client.
+   */
+  public JPPFClient(final String uuid) {
+    super(uuid, JPPFConfiguration.getProperties());
+    Debug.register(this);
+  }
+
+  /**
+   * Initialize this client with an automatically generated application UUID.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @deprecated use {@link #JPPFClient(ConnectionPoolListener[])} instead.
+   */
+  public JPPFClient(final ClientListener... listeners) {
+    super(null, JPPFConfiguration.getProperties(), toDelegation(listeners));
+    Debug.register(this);
+  }
+
+  /**
+   * Initialize this client with the specified application UUID and new connection listeners.
+   * @param uuid the unique identifier for this local client.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @deprecated use {@link #JPPFClient(String, ConnectionPoolListener[])} instead.
+   */
+  public JPPFClient(final String uuid, final ClientListener... listeners) {
+    super(uuid, JPPFConfiguration.getProperties(), toDelegation(listeners));
+    Debug.register(this);
+  }
+
+  /**
+   * Initialize this client with the specified application UUID and new connection listeners.
+   * @param uuid the unique identifier for this local client.
+   * @param config the JPPF configuration to use for this client.
+   * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @deprecated use {@link #JPPFClient(String, TypedProperties, ConnectionPoolListener[])} instead.
+   */
+  public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners) {
+    super(uuid, config, toDelegation(listeners));
+    Debug.register(this);
+  }
+
+  /**
    * Initialize this client with an automatically generated application UUID.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final ClientListener... listeners) {
+  public JPPFClient(final ConnectionPoolListener... listeners) {
     super(null, JPPFConfiguration.getProperties(), listeners);
     Debug.register(this);
   }
@@ -67,7 +109,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @param uuid the unique identifier for this local client.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public JPPFClient(final String uuid, final ClientListener... listeners) {
+  public JPPFClient(final String uuid, final ConnectionPoolListener... listeners) {
     super(uuid, JPPFConfiguration.getProperties(), listeners);
     Debug.register(this);
   }
@@ -77,18 +119,15 @@ public class JPPFClient extends AbstractGenericClient {
    * @param uuid the unique identifier for this local client.
    * @param config the JPPF configuration to use for this client.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
+   * @exclude
    */
-  public JPPFClient(final String uuid, final TypedProperties config, final ClientListener... listeners) {
+  public JPPFClient(final String uuid, final TypedProperties config, final ConnectionPoolListener... listeners) {
     super(uuid, config, listeners);
     Debug.register(this);
   }
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
-  protected AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
+  AbstractJPPFClientConnection createConnection(final String uuid, final String name, final JPPFConnectionInformation info, final JPPFConnectionPool pool) {
     return new JPPFClientConnectionImpl(this, uuid, name, info, pool);
   }
 
@@ -195,7 +234,7 @@ public class JPPFClient extends AbstractGenericClient {
   /**
    * Wait until at least one connection pool with at least one connection in one of the specified statuses,
    * or until the specified timeout to expire, whichever happens first.
-   * @param timeout the maximum time to wait, in milliseconds.
+   * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
    * @param statuses the possible statuses of the connections in the pools to wait for.
    * @return a {@link JPPFConnectionPool} instance, or null if no pool has a connection in the one of the desird statuses.
    * @since 5.0
@@ -208,7 +247,7 @@ public class JPPFClient extends AbstractGenericClient {
   /**
    * Wait until at least one connection pool with at least one connection in one of the specified statuses,
    * or until the specified timeout to expire, whichever happens first.
-   * @param timeout the maximum time to wait, in milliseconds.
+   * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
    * @param statuses the possible statuses of the connections in the pools to wait for.
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
    * @since 5.0
@@ -228,7 +267,7 @@ public class JPPFClient extends AbstractGenericClient {
    * satisfy the specified condition, or until the specified timeout expires, whichever happens first.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param expectedConnections the expected number of connections to wait for.
-   * @param timeout the maximum time to wait, in milliseconds.
+   * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
    * @param statuses the possible statuses of the connections in the pools to wait for.
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
    * @since 5.0
@@ -249,16 +288,17 @@ public class JPPFClient extends AbstractGenericClient {
         for (JPPFConnectionPool pool: temp) {
           if (filter.accepts(pool)) result.add(pool);
         }
-        return !ref.setSynchronized(result, pools).isEmpty();
+        boolean empty = ref.setSynchronized(result, pools).isEmpty();
+        return !empty || (empty && (expectedConnections <= 0));
       }
     }, timeout);
     return ref.get();
   }
 
   /**
-   * Wait until there is at least one connection pool where the number of connections that pass the specified filter
-   * satisfy the specified condition, or until the specified timeout expires, whichever happens first.
-   * @param timeout the maximum time to wait, in milliseconds.
+   * Wait until there is at least one connection pool where at least one connections passes the specified filter,
+   * or until the specified timeout expires, whichever happens first.
+   * @param timeout the maximum time to wait, in milliseconds. A value of zero means an infinite timeout.
    * @param filter an implementation of the {@link ConnectionPoolFilter} interface. A {@code null} value is interpreted as no filter (all pools are accepted).
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
    * @since 5.0
@@ -282,5 +322,18 @@ public class JPPFClient extends AbstractGenericClient {
   public void close() {
     Debug.unregister(this);
     super.close();
+  }
+
+  /**
+   * Convert the specified client listeners into {@link ClientListenerDelegation} instances.
+   * @param listeners the array of listners to convert.
+   * @return an array of {@link ClientListenerDelegation} instances, possibly empty but never null.
+   */
+  @SuppressWarnings("deprecation")
+  private static ConnectionPoolListener[] toDelegation(final ClientListener[] listeners) {
+    if ((listeners == null) || (listeners.length <= 0)) return new ConnectionPoolListener[0];
+    ConnectionPoolListener[] clds = new ConnectionPoolListener[listeners.length];
+    for (int i=0; i<listeners.length; i++) clds[i] = new ClientListenerDelegation(listeners[i]);
+    return clds;
   }
 }

@@ -25,14 +25,7 @@ import org.jppf.management.JPPFSystemInformation;
  * Interface for a client connection to a JPPF driver.
  * @author Laurent Cohen
  */
-public interface JPPFClientConnection extends ClientConnectionStatusHandler, AutoCloseable
-{
-  /**
-   * Initialize this client connection.
-   * @exclude
-   */
-  void init();
-
+public interface JPPFClientConnection extends ClientConnectionStatusHandler, AutoCloseable {
   /**
    * Get the priority assigned to this connection.
    * @return a priority as an int value.

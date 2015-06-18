@@ -37,9 +37,8 @@ import org.slf4j.*;
 /**
  * Instances of this class represent connections to remote JPPF drivers.
  * @author Laurent Cohen
- * @exclude
  */
-public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
+abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Logger for this class.
    */
@@ -92,9 +91,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Initialize this connection with a parent pool.
    * @param pool the connection pool this connection belongs to.
-   * @exclude
    */
-  protected BaseJPPFClientConnection(final JPPFConnectionPool pool) {
+  BaseJPPFClientConnection(final JPPFConnectionPool pool) {
     this.pool = pool;
   }
 
@@ -102,8 +100,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * Initialize this client connection.
    * @exclude
    */
-  @Override
-  public abstract void init();
+  abstract void init();
 
   /**
    * Send tasks to the server for execution.
@@ -180,9 +177,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * Send a handshake job to the server.
    * @return a JPPFTaskBundlesent by the server in response to the handshake job.
    * @throws Exception if an error occurs while sending the request.
-   * @exclude
    */
-  public TaskBundle sendHandshakeJob() throws Exception {
+  TaskBundle sendHandshakeJob() throws Exception {
     TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
@@ -204,9 +200,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Send a close command job to the server.
    * @throws Exception if an error occurs while sending the request.
-   * @exclude
    */
-  public void sendCloseConnectionCommand() throws Exception {
+  void sendCloseConnectionCommand() throws Exception {
     TaskBundle header = new JPPFTaskBundle();
     ObjectSerializer ser = new ObjectSerializerImpl();
     TraversalList<String> uuidPath = new TraversalList<>();
@@ -232,10 +227,9 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
-   * @exclude
    */
   @SuppressWarnings("unchecked")
-  protected Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
+  private Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
     List<Task<?>> taskList = new LinkedList<>();
     TaskBundle bundle = null;
     ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
@@ -300,9 +294,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
-   * @exclude
    */
-  protected SerializationHelper makeHelper(final String helperClassName) throws Exception {
+  SerializationHelper makeHelper(final String helperClassName) throws Exception {
     return makeHelper(null, helperClassName);
   }
 
@@ -312,9 +305,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
-   * @exclude
    */
-  protected SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
+  SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
     ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
     Class clazz = null;
     for (ClassLoader cl: clArray) {
@@ -342,9 +334,8 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Create a socket initializer.
    * @return an instance of a class implementing <code>SocketInitializer</code>.
-   * @exclude
    */
-  protected abstract SocketInitializer createSocketInitializer();
+  abstract SocketInitializer createSocketInitializer();
 
   /**
    * Get the handler for the connection to the task server.
@@ -356,19 +347,10 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   }
 
   /**
-   * Get the class server delegate that loads local classes onto remote nodes
-   * @return a {@link ClassServerDelegate} instance.
-   * @exclude
-   */
-  public ClassServerDelegate getDelegate() {
-    return delegate;
-  }
-
-  /**
    * Get the JPPF client that owns this connection.
    * @return an <code>AbstractGenericClient</code> instance.
    */
-  public AbstractGenericClient getClient() {
+  public JPPFClient getClient() {
     return pool.getClient();
   }
 

@@ -128,7 +128,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
-      JPPFStatistics stats = jppfClient.getClientConnection().getConnectionPool().getJmxConnection().statistics();
+      JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)

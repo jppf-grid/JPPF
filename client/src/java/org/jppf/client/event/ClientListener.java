@@ -24,9 +24,9 @@ import java.util.EventListener;
  * Listener interface for receiving notifications when  a new connection to a server
  * is established and when an existing connections fails and is removed from the client. 
  * @author Laurent Cohen
+ * @deprecated use {@link ConnectionPoolListener} instead.
  */
-public interface ClientListener extends EventListener
-{
+public interface ClientListener extends EventListener {
   /**
    * Notify this listener that a new driver connection was created.
    * @param event the event to notify this listener of.

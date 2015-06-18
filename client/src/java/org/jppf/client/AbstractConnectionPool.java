@@ -39,13 +39,9 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The core size of this pool, that is, the minimum number of connections always present.
-   */
-  int coreSize;
-  /**
    * The max size of this pool.
    */
-  int maxSize;
+  int size;
   /**
    * Index of the last used connection in this pool.
    */
@@ -54,19 +50,14 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
    * List of connection objects handled by this poool.
    */
   final List<E> connections = new ArrayList<>();
-  /**
-   * The connection objects in the core set.
-   */
-  final Set<E> coreConnections = new HashSet<>();
 
   /**
    * Initialize this pool with the specfiied core size.
-   * @param coreSize the minimum number of connections in this pool.
+   * @param size the minimum number of connections in this pool.
    */
-  protected AbstractConnectionPool(final int coreSize) {
-    if (coreSize < 1) throw new IllegalArgumentException("the pool size should be >= 1, but it is " + coreSize);
-    this.coreSize = coreSize;
-    this.maxSize = coreSize;
+  protected AbstractConnectionPool(final int size) {
+    if (size < 1) throw new IllegalArgumentException("the pool size should be >= 1, but it is " + size);
+    this.size = size;
   }
 
   /**
@@ -76,7 +67,6 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   @Override
   public synchronized boolean add(final E connection) {
     if (debugEnabled) log.debug("adding {} to {}", connection, this);
-    if (connectionCount() < coreSize) coreConnections.add(connection);
     return connections.add(connection);
   }
 
@@ -116,16 +106,6 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   }
 
   @Override
-  public int getCoreSize() {
-    return coreSize;
-  }
-
-  @Override
-  public synchronized int getMaxSize() {
-    return maxSize;
-  }
-
-  @Override
   public synchronized List<E> getConnections() {
     return new ArrayList<>(connections);
   }
@@ -133,6 +113,29 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
   @Override
   public synchronized Iterator<E> iterator() {
     return connections.iterator();
+  }
+
+  @Override
+  public synchronized int getSize() {
+    return size;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #getSize()} instead.
+   */
+  @Override
+  public int getMaxSize() {
+    return getSize();
+  }
+
+  /**
+   * {@inheritDoc}
+   * @deprecated use {@link #setSize(int)} instead.
+   */
+  @Override
+  public int setMaxSize(final int size) {
+    return setSize(size);
   }
 
   @Override
@@ -148,16 +151,13 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
       }
     }
     this.connections.clear();
-    coreConnections.clear();
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
-    sb.append("coreSize=").append(coreSize);
-    sb.append(", maxSize=").append(maxSize);
+    sb.append(", maxSize=").append(size);
     sb.append(", connectionCount=").append(connectionCount());
-    sb.append(", coreConnections=").append(coreConnections.size());
     sb.append(']');
     return sb.toString();
   }

@@ -82,7 +82,7 @@ public class JmxLogging {
    */
   public static void initJmxLogging() throws Exception {
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
-    JMXDriverConnectionWrapper jmxDriver = client.getClientConnection().getConnectionPool().getJmxConnection();
+    JMXDriverConnectionWrapper jmxDriver = client.getConnectionPool().getJmxConnection();
     Collection<JPPFManagementInfo> coll = jmxDriver.nodesInformation();
     jmxNodes = new JMXNodeConnectionWrapper[coll.size()];
     int count = 0;

@@ -51,7 +51,7 @@ public class WordCountRunner {
           params.dataFile, params.nbArticles, params.nbTasks, params.nbChannels, params.jobCapacity);
       JPPFConnectionPool pool = client.awaitActiveConnectionPool();
       // set the pool size to the desired number of connections
-      pool.setMaxSize(params.nbChannels);
+      pool.setSize(params.nbChannels);
       marker = new TimeMarker().start();
       // read the wikipedia file and build jobs according to the configuration parameters
       for (JPPFJob job:  jobProvider) {

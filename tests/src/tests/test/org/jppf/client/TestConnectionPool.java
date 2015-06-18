@@ -97,7 +97,7 @@ public class TestConnectionPool extends Setup1D1N
     {
       configure(0);
       client = BaseSetup.createClient(null, false);
-      while (client.getAllConnections().size() < 2) Thread.sleep(10L);
+      while (client.getAllConnectionsCount() < 2) Thread.sleep(10L);
       int nbTasks = 100;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       // default max channels is 1 for backward compatibility with previous versions of the client.

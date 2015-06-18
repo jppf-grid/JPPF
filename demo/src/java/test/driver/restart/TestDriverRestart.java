@@ -79,12 +79,7 @@ public class TestDriverRestart {
    */
   public static JMXDriverConnectionWrapper getJmxWrapper() {
     try {
-      JPPFClientConnection c = null;
-      while ((c = client.getClientConnection(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)) == null) Thread.sleep(10L);
-      JMXDriverConnectionWrapper jmx = null;
-      while ((jmx = c.getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
-      while (!jmx.isConnected()) Thread.sleep(10L);
-      return jmx;
+      return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     } catch(Exception e) {
       e.printStackTrace();
       return null;

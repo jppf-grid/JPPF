@@ -200,7 +200,7 @@ public class TemplateApplicationRunner {
     // if the pool doesn't have the expected number of connections, change its size
     if (pool.getConnections().size() != numberOfConnections) {
       // set the pool size to the desired number of connections
-      pool.setMaxSize(numberOfConnections);
+      pool.setSize(numberOfConnections);
     }
 
     // wait until all desired connections are available (ACTIVE status)

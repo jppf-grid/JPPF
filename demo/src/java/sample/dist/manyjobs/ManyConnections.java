@@ -17,9 +17,7 @@
  */
 package sample.dist.manyjobs;
 
-import java.util.List;
-
-import org.jppf.client.*;
+import org.jppf.client.JPPFClient;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -52,14 +50,10 @@ public class ManyConnections
       long start = System.nanoTime();
       jppfClient = new JPPFClient();
       //Thread.sleep(1000);
-      List<JPPFClientConnection> list = jppfClient.getAllConnections();
-      while ((list == null) || (list.size() < 50))
-      {
-        Thread.sleep(10L);
-        list = jppfClient.getAllConnections();
-      }
+      int count = 0;
+      while ((count = jppfClient.getAllConnectionsCount()) < 50) Thread.sleep(10L);
       long elapsed = System.nanoTime() - start;
-      print("found " + list.size() + " connections in " + (elapsed/1000000) + " ms");
+      print("found " + count + " connections in " + (elapsed/1000000) + " ms");
     }
     catch(Exception e)
     {

@@ -45,7 +45,7 @@ public class TestJobListener extends Setup1D1N {
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 1</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testJobListenerSingleLocalConnection() throws Exception {
     try {
       configure(false, true, 1);
@@ -65,7 +65,7 @@ public class TestJobListener extends Setup1D1N {
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 2</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testJobListenerMultipleRemoteConnections() throws Exception {
     try {
       configure(true, false, 2);

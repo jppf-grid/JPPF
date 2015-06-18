@@ -44,7 +44,7 @@ public class ClientQueueEvent extends EventObject {
    * @param job the job this event is for.
    * @param queue the job queue which emitted this event.
    */
-  public ClientQueueEvent(final AbstractGenericClient client, final JPPFJob job, final JPPFPriorityQueue queue) {
+  public ClientQueueEvent(final JPPFClient client, final JPPFJob job, final JPPFPriorityQueue queue) {
     super(client);
     this.job = job;
     this.queue = queue;

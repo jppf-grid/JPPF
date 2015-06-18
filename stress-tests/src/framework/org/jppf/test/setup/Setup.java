@@ -20,7 +20,8 @@ package org.jppf.test.setup;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.client.JPPFClient;
+import org.jppf.client.*;
+import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.test.scenario.ScenarioConfiguration;
@@ -59,7 +60,7 @@ public class Setup
    */
   private JMXHandler jmxHandler = null;
   /**
-   * 
+   *
    */
   private AtomicInteger clientCount = new AtomicInteger(0);
 
@@ -90,10 +91,7 @@ public class Setup
    */
   public JMXDriverConnectionWrapper getDriverManagementProxy() throws Exception
   {
-    JMXDriverConnectionWrapper driver = null;
-    while ((driver = client.getClientConnection().getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
-    while (!driver.isConnected()) Thread.sleep(10L);
-    return driver;
+    return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 
   /**
@@ -117,7 +115,7 @@ public class Setup
     for (int i=0; i<nbNodes; i++)
     {
       nodes[i] = new RestartableNodeProcessLauncher(i+1, config);
-      new Thread(nodes[i], nodes[i].getName() + "process launcher").start(); 
+      new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
     if (config.isStartClient())
     {
@@ -132,17 +130,27 @@ public class Setup
    * Create a client with the specified uuid.
    * @param uuid if null, let the client generate its uuid.
    * @param reset if <code>true</code>, the JPPF ocnfiguration is reloaded.
+   * @param listener an optional {@link ConnectionPoolListener}.
    * @return a <code>JPPFClient</code> instance.
    * @throws Exception if any error occurs.
    */
-  public JPPFClient createClient(final String uuid, final boolean reset) throws Exception
-  {
+  public JPPFClient createClient(final String uuid, final boolean reset, final ConnectionPoolListener listener) throws Exception {
     if (reset) JPPFConfiguration.reset();
-    client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
-    //System.out.println("waiting for available client connection");
+    client = (uuid == null) ? new JPPFClient(listener) : new JPPFClient(uuid, listener);
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
     jmxHandler = new JMXHandler(client);
     return client;
+  }
+
+  /**
+   * Create a client with the specified uuid.
+   * @param uuid if null, let the client generate its uuid.
+   * @param reset if <code>true</code>, the JPPF ocnfiguration is reloaded.
+   * @return a <code>JPPFClient</code> instance.
+   * @throws Exception if any error occurs.
+   */
+  public JPPFClient createClient(final String uuid, final boolean reset) throws Exception {
+    return createClient(uuid, reset, null);
   }
 
   /**

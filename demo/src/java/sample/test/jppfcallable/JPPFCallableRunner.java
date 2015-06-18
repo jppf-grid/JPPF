@@ -154,12 +154,7 @@ public class JPPFCallableRunner {
    * @throws Exception if any error occurs.
    */
   private static JMXDriverConnectionWrapper getDriverJmx() throws Exception {
-    JPPFClientConnection c;
-    while ((c = jppfClient.getClientConnection()) == null) Thread.sleep(10L);
-    JMXDriverConnectionWrapper jmx;
-    while ((jmx = c.getConnectionPool().getJmxConnection()) == null) Thread.sleep(10L);
-    while (!jmx.isConnected()) Thread.sleep(10L);
-    return jmx;
+    return jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 
   /**

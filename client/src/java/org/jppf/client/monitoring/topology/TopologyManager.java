@@ -31,7 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @since 5.0
  */
-public class TopologyManager implements ClientListener {
+public class TopologyManager extends ConnectionPoolListenerAdapter {
   /**
    * The drivers in the topology.
    */
@@ -141,11 +141,12 @@ public class TopologyManager implements ClientListener {
    * Intialize the topology tree.
    */
   private void init() {
-    client.addClientListener(this);
+    client.addConnectionPoolListener(this);
     for (JPPFConnectionPool pool: client.getConnectionPools()) {
       List<JPPFClientConnection> connections = pool.getConnections(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
       if (connections.isEmpty()) connections = pool.getConnections();
-      if (!connections.isEmpty()) newConnection(new ClientEvent(connections.get(0)));
+      JPPFClientConnection c = connections.get(0);
+      if (!connections.isEmpty()) connectionAdded(new ConnectionPoolEvent(c.getConnectionPool(), c));
     }
   }
 
@@ -246,7 +247,7 @@ public class TopologyManager implements ClientListener {
    * @exclude
    */
   @Override
-  public void newConnection(final ClientEvent event) {
+  public void connectionAdded(final ConnectionPoolEvent event) {
     final JPPFClientConnection c = event.getConnection();
     StatusListener listener = new StatusListener();
     if (c.getStatus().isWorkingStatus()) {
@@ -263,7 +264,7 @@ public class TopologyManager implements ClientListener {
    * @exclude
    */
   @Override
-  public void connectionFailed(final ClientEvent event) {
+  public void connectionRemoved(final ConnectionPoolEvent event) {
     final JPPFClientConnection c = event.getConnection();
     String uuid = c.getDriverUuid();
     if (uuid != null) {

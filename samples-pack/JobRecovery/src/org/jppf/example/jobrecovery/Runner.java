@@ -138,11 +138,8 @@ public class Runner
    */
   private static int configureDriver() throws Exception
   {
-    // wait until the client is fully connected
-    while (!client.hasAvailableConnection()) Thread.sleep(10L);
     // get a connection to the driver's JMX server
-    JPPFClientConnection c = client.getClientConnection();
-    JMXDriverConnectionWrapper jmxDriver = c.getConnectionPool().getJmxConnection();
+    JMXDriverConnectionWrapper jmxDriver = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     // obtain the current load-balancing settings
     LoadBalancingInformation lbi = jmxDriver.loadBalancerInformation();
     if (lbi == null) return 1;

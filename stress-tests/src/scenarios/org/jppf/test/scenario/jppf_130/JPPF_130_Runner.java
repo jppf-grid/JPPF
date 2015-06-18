@@ -32,66 +32,56 @@ import org.slf4j.*;
  * bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-130">JPPF-130</a>.
  * @author Laurent Cohen
  */
-public class JPPF_130_Runner extends AbstractScenarioRunner
-{
+public class JPPF_130_Runner extends AbstractScenarioRunner {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPF_130_Runner.class);
 
   @Override
-  public void run()
-  {
+  public void run() {
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
-    List<JPPFClientConnection> list = getSetup().getClient().getAllConnections();
-    MyConnectionListener listener = new MyConnectionListener();
-    try
-    {
+    final MyConnectionListener listener = new MyConnectionListener();
+    ConnectionPoolListener poolListener = new ConnectionPoolListenerAdapter() {
+      @Override
+      public void connectionAdded(final ConnectionPoolEvent event) {
+        event.getConnection().addClientConnectionStatusListener(listener);
+      }
+    };
+    try {
+      JPPFClient client = getSetup().createClient(null, true, poolListener);
       TypedProperties config = getConfiguration().getProperties();
       int nbTasks = config.getInt("nbTasks", 1);
       int nbIter = config.getInt("nbJobs", 1);
       int nbLookups = config.getInt("nbLookups", 1);
       print("running demo with " + nbIter + " iterations, " + nbTasks + " tasks per iteration");
-      for (JPPFClientConnection c: list) c.addClientConnectionStatusListener(listener);
-      for (int n=0; n<nbIter; n++)
-      {
+      for (int n=0; n<nbIter; n++) {
         long start = System.nanoTime();
-        try
-        {
+        try {
           JPPFJob job = new JPPFJob("job_" + n);
           job.getClientSLA().setMaxChannels(10);
           job.setName("ruleset job_" + n);
           for (int i=0; i<nbTasks; i++) job.add(new JPPF_130_Task(nbLookups));
           job.setBlocking(false);
-          getSetup().getClient().submitJob(job);
+          client.submitJob(job);
           List<Task<?>> results = job.awaitResults();
-          for (Task<?> task: results)
-          {
+          for (Task<?> task: results) {
             Throwable t = task.getThrowable();
-            if (t != null)
-            {
+            if (t != null) {
               if (t instanceof Exception) throw (Exception) t;
               else if (t instanceof Error) throw (Error) t;
               throw new RuntimeException(t);
             }
           }
-        }
-        finally
-        {
+        } finally {
           long elapsed = System.nanoTime() - start;
-          print("Iteration #" + (n+1) + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
+          print("Iteration #" + (n+1) + " performed in " + StringUtils.toStringDuration(elapsed/1_000_000L));
         }
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       //e.printStackTrace();
       if (e instanceof RuntimeException) throw (RuntimeException) e;
       throw new RuntimeException(e);
-    }
-    finally
-    {
-      for (JPPFClientConnection c: list) c.removeClientConnectionStatusListener(listener);
     }
   }
 
@@ -99,24 +89,16 @@ public class JPPF_130_Runner extends AbstractScenarioRunner
    * The symptom of the problem is that a class loader client channel gets disconnected.
    * This translates to an invalid status change on the corresponding client connection.
    */
-  private class MyConnectionListener implements ClientConnectionStatusListener
-  {
+  private class MyConnectionListener implements ClientConnectionStatusListener {
     @Override
-    public void statusChanged(final ClientConnectionStatusEvent event)
-    {
+    public void statusChanged(final ClientConnectionStatusEvent event) {
       JPPFClientConnectionStatus status = event.getClientConnectionStatusHandler().getStatus();
-      if ((status != JPPFClientConnectionStatus.ACTIVE) && (status != JPPFClientConnectionStatus.EXECUTING))
-      {
-        try
-        {
+      if ((status != JPPFClientConnectionStatus.ACTIVE) && (status != JPPFClientConnectionStatus.EXECUTING)) {
+        try {
           getSetup().cleanup();
-        }
-        catch(Exception e)
-        {
+        } catch(Exception e) {
           e.printStackTrace();
-        }
-        finally
-        {
+        } finally {
           String msg = "\n***** Detected client disconnection - Exiting immediately *****";
           log.error(msg);
           System.err.println(msg);
@@ -132,8 +114,7 @@ public class JPPF_130_Runner extends AbstractScenarioRunner
    * Print the specified message to both the log and <code>System.out</code>.
    * @param msg the message to rpint.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     System.out.println(msg);
     log.info(msg);
   }

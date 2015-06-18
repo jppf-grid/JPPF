@@ -28,13 +28,12 @@ import org.slf4j.*;
  * Handles the class loaders used for inbound class loading requests from the servers.
  * @author Laurent Cohen
  * @since 4.1
- * @exclude
  */
-public class ClassLoaderRegistrationHandler implements AutoCloseable {
+class ClassLoaderRegistrationHandler implements AutoCloseable {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(AbstractGenericClient.class);
+  private static Logger log = LoggerFactory.getLogger(ClassLoaderRegistrationHandler.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -49,7 +48,7 @@ public class ClassLoaderRegistrationHandler implements AutoCloseable {
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
    * @return a <code>RegisteredClassLoader</code> instance.
    */
-  public Collection<ClassLoader> getRegisteredClassLoaders(final String uuid) {
+  Collection<ClassLoader> getRegisteredClassLoaders(final String uuid) {
     if (uuid == null) throw new IllegalArgumentException("uuid is null");
     synchronized (classLoaderRegistrations) {
       Collection<ClassLoader> c = classLoaderRegistrations.getValues(uuid);
@@ -77,7 +76,7 @@ public class ClassLoaderRegistrationHandler implements AutoCloseable {
    * @param uuid unique id assigned to classLoader. Added as temporary fix for problems hanging jobs.
    * @return theresgistered class loader.
    */
-  public ClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
+  ClassLoader registerClassLoader(final ClassLoader cl, final String uuid) {
     if (cl == null) throw new IllegalArgumentException("cl is null");
     if (uuid == null) throw new IllegalArgumentException("uuid is null");
     synchronized (classLoaderRegistrations) {
@@ -91,7 +90,7 @@ public class ClassLoaderRegistrationHandler implements AutoCloseable {
    * Unregisters the class loader associated with the specified job uuid.
    * @param uuid the uuid of the job the class loaders are associated with.
    */
-  protected void unregister(final String uuid) {
+  void unregister(final String uuid) {
     if (uuid == null) throw new IllegalArgumentException("registeredClassLoader is null");
     if (debugEnabled) log.debug("unregistering {}", uuid);
     synchronized (classLoaderRegistrations) {

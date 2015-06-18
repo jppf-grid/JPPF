@@ -45,13 +45,15 @@ public class Debug implements DebugMBean {
 
   @Override
   public String allConnections() {
-    List<JPPFClientConnection> all = client.getAllConnections();
+    List<JPPFConnectionPool> all = client.getConnectionPools();
     StringBuilder sb = new StringBuilder();
     int count = 0;
-    for (JPPFClientConnection c: all) {
-      if (count > 0) sb.append('\n');
-      sb.append(c.toString());
-      count++;
+    for (JPPFConnectionPool pool: all) {
+      for (JPPFClientConnection c: pool.getConnections()) {
+        if (count > 0) sb.append('\n');
+        sb.append(pool.toString());
+        count++;
+      }
     }
     return sb.toString();
   }

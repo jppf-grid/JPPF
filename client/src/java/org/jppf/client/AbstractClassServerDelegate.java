@@ -29,9 +29,8 @@ import org.slf4j.*;
 /**
  * Abstract implementation of the client end of the JPPF distributed class loader.
  * @author Laurent Cohen
- * @exclude
  */
-public abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate, Thread.UncaughtExceptionHandler {
+abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandler implements ClassServerDelegate, Thread.UncaughtExceptionHandler {
   /**
    * Logger for this class.
    */

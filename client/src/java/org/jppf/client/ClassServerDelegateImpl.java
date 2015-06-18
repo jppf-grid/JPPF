@@ -31,9 +31,8 @@ import org.slf4j.*;
  * to dynamically load classes from the JVM that run's the class server.
  * @author Laurent Cohen
  * @author Domingos Creado
- * @exclude
  */
-public class ClassServerDelegateImpl extends AbstractClassServerDelegate {
+class ClassServerDelegateImpl extends AbstractClassServerDelegate {
   /**
    * Logger for this class.
    */
@@ -51,7 +50,7 @@ public class ClassServerDelegateImpl extends AbstractClassServerDelegate {
    * @param port the TCP port the class server is listening to.
    * @throws Exception if the connection could not be opened.
    */
-  public ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception {
+  ClassServerDelegateImpl(final JPPFClientConnection owner, final String uuid, final String host, final int port) throws Exception {
     super(owner);
     this.clientUuid = uuid;
     this.host = host;

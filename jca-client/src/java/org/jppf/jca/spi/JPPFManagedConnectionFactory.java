@@ -25,6 +25,7 @@ import javax.resource.spi.*;
 import javax.security.auth.Subject;
 
 import org.jppf.client.*;
+import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.jca.cci.*;
 import org.jppf.jca.util.JPPFAccessorImpl;
 import org.jppf.jca.work.JcaJobManager;
@@ -131,7 +132,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
     log.info("Starting JPPF managed connection factory");
     TypedProperties config = new JPPFConfigurationParser(configurationSource).parse();
     if (debugEnabled) log.debug("Initializing JPPF client with config=" + config);
-    jppfClient = new JPPFClient(null, config) {
+    jppfClient = new JPPFClient(null, config, (ConnectionPoolListener[]) null) {
       @Override
       protected JobManager createJobManager() {
         JobManager jobManager = null;

@@ -26,7 +26,7 @@ import org.jppf.comm.socket.SocketWrapper;
  * @author Laurent Cohen
  * @author Jeff Rosen
  */
-public interface ClientConnectionHandler extends ClientConnectionStatusHandler, AutoCloseable
+interface ClientConnectionHandler extends ClientConnectionStatusHandler, AutoCloseable
 {
   /**
    * Initialize the connection.

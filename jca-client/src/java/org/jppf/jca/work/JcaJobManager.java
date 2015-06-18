@@ -52,7 +52,7 @@ public class JcaJobManager extends JobManagerClient {
    * @param client the JPPF client that manages connections to the JPPF drivers.
    * @throws Exception if any error occurs.
    */
-  public JcaJobManager(final AbstractGenericClient client) throws Exception {
+  public JcaJobManager(final JPPFClient client) throws Exception {
     super(client);
   }
 

@@ -67,7 +67,7 @@ public class BaseSetup {
    * @throws Exception if the proxy could not be obtained.
    */
   public static DriverJobManagementMBean getJobManagementProxy(final JPPFClient client) throws Exception {
-    return getJMXConnection(client).getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+    return getJMXConnection(client).getJobManager();
   }
 
   /**
@@ -77,13 +77,7 @@ public class BaseSetup {
    * @throws Exception if a JMX connection could not be obtained.
    */
   public static JMXDriverConnectionWrapper getJMXConnection(final JPPFClient client) throws Exception {
-    List<JPPFConnectionPool> pools = null;
-    while ((pools = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)).isEmpty()) Thread.sleep(10L);
-    JPPFConnectionPool pool = pools.get(0);
-    JMXDriverConnectionWrapper jmx = null;
-    while ((jmx = pool.getJmxConnection()) == null) Thread.sleep(10L);
-    while (!jmx.isConnected()) jmx.connectAndWait(10L);
-    return jmx;
+    return client.awaitWorkingConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 
   /**
@@ -153,6 +147,7 @@ public class BaseSetup {
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes, final Configuration config) throws Exception {
     System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (createClient ? " and 1 client" : ""));
+    Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++) {
@@ -263,23 +258,23 @@ public class BaseSetup {
    */
   public static void checkDriverAndNodesInitialized(final JPPFClient client, final int nbDrivers, final int nbNodes) throws Exception {
     if (client == null) throw new IllegalArgumentException("client cannot be null");
-    Map<Integer, JPPFClientConnection> connectionMap = new HashMap<>();
+    Map<Integer, JPPFConnectionPool> connectionMap = new HashMap<>();
     boolean allConnected = false;
     while (!allConnected) {
-      List<JPPFClientConnection> list = client.getAllConnections();
+      List<JPPFConnectionPool> list = client.getConnectionPools();
       if (list != null) {
-        for (JPPFClientConnection c: list) {
-          if (!connectionMap.containsKey(c.getPort())) connectionMap.put(c.getPort(), c);
+        for (JPPFConnectionPool pool: list) {
+          if (!connectionMap.containsKey(pool.getDriverPort())) connectionMap.put(pool.getDriverPort(), pool);
         }
       }
       if (connectionMap.size() < nbDrivers) Thread.sleep(10L);
       else allConnected = true;
     }
     Map<JMXServiceURL, JMXDriverConnectionWrapper> wrapperMap = new HashMap<>();
-    for (Map.Entry<Integer, JPPFClientConnection> entry: connectionMap.entrySet()) {
-      JMXDriverConnectionWrapper wrapper = entry.getValue().getConnectionPool().getJmxConnection();
+    for (Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
+      JMXDriverConnectionWrapper wrapper = entry.getValue().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       if (!wrapperMap.containsKey(wrapper.getURL())) {
-        while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
+        //while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
         wrapperMap.put(wrapper.getURL(), wrapper);
       }
     }

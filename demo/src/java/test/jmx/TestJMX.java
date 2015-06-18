@@ -33,13 +33,11 @@ import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
 
-
 /**
  * 
  * @author Laurent Cohen
  */
-public class TestJMX
-{
+public class TestJMX {
   /**
    * Logger for this class.
    */
@@ -57,26 +55,17 @@ public class TestJMX
    * Entry point.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String... args) {
     JPPFNodeForwardingMBean forwarder = null;
-    try
-    {
+    try {
       client = new JPPFClient();
-      while (!client.hasAvailableConnection()) Thread.sleep(10L);
-      JPPFClientConnection conn = client.getClientConnection();
-      driverJmx = conn.getConnectionPool().getJmxConnection();
+      driverJmx = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       System.out.println("waiting till jmx is connected ...");
       while (!driverJmx.isConnected()) Thread.sleep(10L);
-
       perform3();
-    }
-    catch(Throwable e)
-    {
+    } catch (Throwable e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
     }
   }
@@ -85,8 +74,7 @@ public class TestJMX
    * Test diagnostics.
    * @throws Exception if any error occurs.
    */
-  private static void perform1() throws Exception
-  {
+  private static void perform1() throws Exception {
     DiagnosticsMBean diag = driverJmx.getDiagnosticsProxy();
     ThreadDump td = diag.threadDump();
     StringWriter sw = new StringWriter();
@@ -102,13 +90,12 @@ public class TestJMX
    * Test notification forwarding.
    * @throws Exception if any error occurs.
    */
-  private static void perform2() throws Exception
-  {
+  private static void perform2() throws Exception {
     Thread.sleep(500L);
     NodeNotificationListener listener = new NodeNotificationListener();
     String listenerID = driverJmx.registerForwardingNotificationListener(new AllNodesSelector(), JPPFNodeTaskMonitorMBean.MBEAN_NAME, listener, null, "testing");
     JPPFJob job = new JPPFJob();
-    for (int i=0; i<5; i++) job.add(new LongTask(100L)).setId(String.valueOf(i+1));
+    for (int i = 0; i < 5; i++) job.add(new LongTask(100L)).setId(String.valueOf(i + 1));
     List<Task<?>> results = client.submitJob(job);
     Thread.sleep(500L);
     driverJmx.unregisterForwardingNotificationListener(listenerID);
@@ -119,19 +106,16 @@ public class TestJMX
    * Test cancelling tasks from node listener.
    * @throws Exception if any error occurs.
    */
-  private static void perform3() throws Exception
-  {
+  private static void perform3() throws Exception {
     int nbJobs = 10;
     int nbTasks = 100;
-    for (int i=0; i<nbJobs;i++)
-    {
+    for (int i = 0; i < nbJobs; i++) {
       JPPFJob job = new JPPFJob();
-      job.setName("job" + (i+1));
-      for (int j=0; j<nbTasks; j++)
-      {
+      job.setName("job" + (i + 1));
+      for (int j = 0; j < nbTasks; j++) {
         Task<String> task = new LongTask(100L);
         task.setTimeoutSchedule(new JPPFSchedule(50L));
-        job.add(task).setId(String.valueOf(j+1));
+        job.add(task).setId(String.valueOf(j + 1));
       }
       List<Task<?>> results = client.submitJob(job);
       output(job.getName() + " : received " + results.size() + " results");
@@ -142,8 +126,7 @@ public class TestJMX
    * Prints qnd logs the specified ;essqge.
    * @param message ;essqge to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }
@@ -151,8 +134,7 @@ public class TestJMX
   /**
    * 
    */
-  public static class NodeNotificationListener implements NotificationListener
-  {
+  public static class NodeNotificationListener implements NotificationListener {
     /**
      * The task information received as notifications from the node.
      */
@@ -163,17 +145,13 @@ public class TestJMX
     public Exception exception = null;
 
     @Override
-    public void handleNotification(final Notification notification, final Object handback)
-    {
-      try
-      {
+    public void handleNotification(final Notification notification, final Object handback) {
+      try {
         System.out.println("received notification " + notification);
         JPPFNodeForwardingNotification notif = (JPPFNodeForwardingNotification) notification;
         System.out.println("nodeUuid=" + notif.getNodeUuid() + ", mBeanName='" + notif.getMBeanName() + "', inner notification=" + notif.getNotification());
         notifs.add(notification);
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         if (exception == null) exception = e;
       }
     }

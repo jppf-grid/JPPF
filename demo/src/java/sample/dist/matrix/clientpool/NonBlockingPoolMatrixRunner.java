@@ -126,7 +126,7 @@ public class NonBlockingPoolMatrixRunner
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
       System.out.println("Average iteration time: " + StringUtils.toStringDuration(totalTime/iterations));
-      JPPFStatistics stats = jppfClient.getClientConnection().getConnectionPool().getJmxConnection().statistics();
+      JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
       if (stats != null) System.out.println("End statistics :\n"+stats.toString());
     }
     catch(Exception e)

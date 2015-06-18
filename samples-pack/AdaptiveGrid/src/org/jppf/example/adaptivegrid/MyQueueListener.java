@@ -86,11 +86,11 @@ public class MyQueueListener implements ClientQueueListener {
 
     // Adjust the connection pool size
     int newPoolSize = computePoolSize(queueSize);
-    if ((newPoolSize > pool.getCoreSize()) && (newPoolSize < maxAllowedPoolSize)) {
+    if (newPoolSize < maxAllowedPoolSize) {
       int currentPoolSize = manager.getConnectionPool().connectionCount();
       if (newPoolSize != currentPoolSize) {
         System.out.printf("%screasing the number of server connections to %d\n", (newPoolSize > currentPoolSize) ? "in" : "de", newPoolSize);
-        pool.setMaxSize(newPoolSize);
+        pool.setSize(newPoolSize);
       }
     }
 

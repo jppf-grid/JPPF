@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 
 import javax.resource.ResourceException;
 
-import org.jppf.client.AbstractGenericClient;
+import org.jppf.client.*;
 
 /**
  * Utility class used to provide access to JPPF components.
@@ -33,7 +33,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
   /**
    * The JPPF client used to submit tasks.
    */
-  protected transient AbstractGenericClient jppfClient = null;
+  protected transient JPPFClient jppfClient = null;
   /**
    * The log writer for this object.
    */
@@ -51,7 +51,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
    * @return an <code>AbstractGenericClient</code> instance.
    */
   @Override
-  public AbstractGenericClient retrieveJppfClient()
+  public JPPFClient retrieveJppfClient()
   {
     return jppfClient;
   }
@@ -61,7 +61,7 @@ public abstract class JPPFAccessorImpl implements JPPFAccessor
    * @param jppfClient an <code>AbstractGenericClient</code> instance.
    */
   @Override
-  public void assignJppfClient(final AbstractGenericClient jppfClient)
+  public void assignJppfClient(final JPPFClient jppfClient)
   {
     this.jppfClient = jppfClient;
   }

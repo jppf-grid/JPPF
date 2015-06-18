@@ -51,10 +51,10 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   /**
    * Initialize this pool witht he psecified core size.
    * @param pool the associated client connection pool.
-   * @param coreSize the pool core size.
+   * @param size the pool core size.
    */
-  public JMXConnectionPool(final JPPFConnectionPool pool, final int coreSize) {
-    super(coreSize);
+  public JMXConnectionPool(final JPPFConnectionPool pool, final int size) {
+    super(size);
     this.pool = pool;
   }
 
@@ -85,43 +85,41 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   }
 
   @Override
-  public synchronized int setMaxSize(final int maxSize) {
-    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.maxSize);
-    if ((maxSize < coreSize) || (maxSize == this.maxSize)) return this.maxSize;
-    int diff = maxSize - this.maxSize;
+  public synchronized int setSize(final int maxSize) {
+    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.size);
+    if (maxSize == this.size) return this.size;
+    int diff = maxSize - this.size;
     int size = connectionCount();
     if (diff < 0) {
       int actual = 0;
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
         JMXDriverConnectionWrapper c = connections.get(i);
-        if (!coreConnections.contains(c)) {
-          if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
-          try {
-            c.close();
-          } catch(Exception ignore) {
-          }
-          remove(c);
-          actual++;
+        if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
+        try {
+          c.close();
+        } catch(Exception ignore) {
         }
+        remove(c);
+        actual++;
       }
-      this.maxSize -= actual;
+      this.size -= actual;
     } else {
       for (int i=0; i<diff; i++) {
         JMXDriverConnectionWrapper c = new JMXDriverConnectionWrapper(pool.getDriverHost(), port, pool.isSslEnabled());
         this.add(c);
         c.connect();
       }
-      this.maxSize += diff;
+      this.size += diff;
     }
-    return this.maxSize;
+    return this.size;
   }
 
   /**
    * Callback invoked when the driver host is set on the enclosing {@link JPPFConnectionPool}.
    */
   synchronized void hostSet() {
-    if (getPort() >= 0) initializeCoreConnections();
+    if (getPort() >= 0) initializeConnections();
   }
 
   /**
@@ -139,17 +137,17 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   synchronized void setPort(final int port) {
     if ((this.port < 0) && (port >= 0)) {
       this.port = port;
-      if (pool.getDriverIPAddress() != null) initializeCoreConnections();
+      if (pool.getDriverIPAddress() != null) initializeConnections();
     }
   }
 
   /**
    * Initialize all the core connections.
    */
-  private void initializeCoreConnections() {
+  private void initializeConnections() {
     int n = 0;
-    if ((n = connectionCount()) < coreSize) {
-      for (int i=n; i<coreSize; i++) {
+    if ((n = connectionCount()) < size) {
+      for (int i=n; i<size; i++) {
         JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverIPAddress(), port, pool.isSslEnabled());
         this.add(jmx);
         jmx.connect();
@@ -169,7 +167,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    */
   List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connected) {
     final Operator op = operator == null ? Operator.EQUAL : operator;
-    setMaxSize(nbConnections);
+    setSize(nbConnections);
     final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {

@@ -30,46 +30,35 @@ import org.jppf.client.event.*;
  * Runner for the hello world application.
  * @author Laurent Cohen
  */
-public class ClientTest
-{
+public class ClientTest {
   /**
    * Entry point.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String... args) {
     JPPFClient client = null;
-    try
-    {
-      ClientListener listener = new ClientListener()
-      {
+    try {
+      ConnectionPoolListener listener = new ConnectionPoolListenerAdapter() {
         @Override
-        public void newConnection(final ClientEvent event)
-        {
+        public void connectionAdded(final ConnectionPoolEvent event) {
           System.out.println("newConnection: " + event);
         }
 
         @Override
-        public void connectionFailed(final ClientEvent event)
-        {
+        public void connectionRemoved(final ConnectionPoolEvent event) {
           System.out.println("connectionFailed: " + event);
         }
       };
-      //client = new JPPFClient(UUID.randomUUID().toString(), listener);
       client = new JPPFClient(UUID.randomUUID().toString());
-      client.addClientListener(listener);
-      int sizeInit = client.getAllConnections().size();
+      client.addConnectionPoolListener(listener);
+      int sizeInit = client.getAllConnectionsCount();
       System.out.println("sizeInit = " + sizeInit);
       Thread.sleep(5000L);
-      int sizeDone = client.getAllConnections().size();
+      int sizeDone = client.getAllConnectionsCount();
       System.out.println("sizeDone = " + sizeDone);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
     }
   }
@@ -80,7 +69,7 @@ public class ClientTest
    */
   public static void testHTML() throws Exception {
     HTMLDocument doc = new HTMLDocument();
-    try ( Reader reader = new FileReader("C:/temp/MyFile.html")) {
+    try (Reader reader = new FileReader("C:/temp/MyFile.html")) {
       HTMLEditorKit kit = new HTMLEditorKit();
       kit.read(reader, doc, 0);
     }

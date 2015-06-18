@@ -56,7 +56,7 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
       executor = Executors.newFixedThreadPool(nbNodes, new JPPFThreadFactory("NodeRestart"));
       int iterations = config.getInt("iterations", 10);
       output("performing test with " + nbNodes + " nodes, for " + iterations + " iterations");
-      JMXDriverConnectionWrapper jmxDriver = getSetup().getClient().getClientConnection().getConnectionPool().getJmxConnection();
+      JMXDriverConnectionWrapper jmxDriver = getSetup().getClient().getConnectionPool().getJmxConnection();
       for (int i=1; i<=iterations; i++)
       {
         long start = System.nanoTime();

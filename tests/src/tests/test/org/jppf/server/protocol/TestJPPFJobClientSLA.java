@@ -266,6 +266,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
     try {
       configure(true, true, 1);
       BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
+      client.awaitActiveConnectionPool();
       int nbTasks = Math.max(2*Runtime.getRuntime().availableProcessors(), 10);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 500L);
       job.getClientSLA().setMaxChannels(2);

@@ -25,8 +25,7 @@ import org.jppf.client.JPPFClientConnectionStatus;
  * and notify others about status changes.
  * @author Laurent Cohen
  */
-public interface ClientConnectionStatusHandler
-{
+public interface ClientConnectionStatusHandler {
   /**
    * Get the status of this connection.
    * @return a <code>JPPFClientConnectionStatus</code> enumerated value.
@@ -36,6 +35,7 @@ public interface ClientConnectionStatusHandler
   /**
    * Set the status of this connection.
    * @param status  a <code>JPPFClientConnectionStatus</code> enumerated value.
+   * @exclude
    */
   void setStatus(JPPFClientConnectionStatus status);
 

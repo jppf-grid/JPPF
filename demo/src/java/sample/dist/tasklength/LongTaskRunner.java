@@ -337,10 +337,7 @@ public class LongTaskRunner {
    */
   private static JMXDriverConnectionWrapper getJmxConnection() {
     if (jmx == null) {
-      JPPFClientConnection c = jppfClient.getClientConnection();
-      jmx = c.getConnectionPool().getJmxConnection();
-      boolean b = jmx.isConnected();
-      if (!b) jmx.connect();
+      jmx = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     }
     return jmx;
   }

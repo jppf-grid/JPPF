@@ -136,7 +136,7 @@ public class TestPreferencePolicy extends Setup1D2N1C {
     JPPFConnectionPool pool = null;
     while ((pool = client.getConnectionPool()) == null) Thread.sleep(10L);
     try {
-      pool.setMaxSize(2);
+      pool.setSize(2);
       pool.awaitActiveConnections(Operator.AT_LEAST, 2);
       int nbTasks = 1;
       JPPFJob job1 = BaseTestHelper.createJob(name + " 1", false, false, nbTasks, LifeCycleTask.class, 3000L);
@@ -158,7 +158,7 @@ public class TestPreferencePolicy extends Setup1D2N1C {
       assertFalse(task1.getNodeUuid().equals(task2.getNodeUuid()));
       //assertNotSame(task1.getNodeUuid(), task2.getNodeUuid());
     } finally {
-      pool.setMaxSize(1);
+      pool.setSize(1);
     }
   }
 

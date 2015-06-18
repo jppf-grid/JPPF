@@ -87,10 +87,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param configuration the object holding the JPPF configuration.
    * @param listeners the listeners to add to this JPPF client to receive notifications of new connections.
    */
-  public AbstractGenericClient(final String uuid, final TypedProperties configuration, final ClientListener... listeners) {
+  public AbstractGenericClient(final String uuid, final TypedProperties configuration, final ConnectionPoolListener... listeners) {
     super(uuid);
     this.classLoaderRegistrationHandler = new ClassLoaderRegistrationHandler();
-    for (ClientListener listener : listeners) addClientListener(listener);
+    for (ConnectionPoolListener listener : listeners) addConnectionPoolListener(listener);
     init(configuration);
   }
 
@@ -107,6 +107,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
+    if (jobManager == null) jobManager = createJobManager();
+    System.out.println("jobManager = " + jobManager);
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -172,7 +174,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
             if (info.hasValidPort(ssl)) {
               int poolSize = ch.getInt("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
               int jmxPoolSize = ch.getInt("jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
-              newConnection(name, info, priority, poolSize, ssl, jmxPoolSize);
+              newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
             } else {
               String type = ssl ? "secure" : "plain";
               String msg = String.format("this client cannot fulfill a %s connection request to %s:%d because the host does not expose that port as a %s port",
@@ -211,7 +213,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
             ConfigurationHelper ch = new ConfigurationHelper(config);
             int poolSize = ch.getInt(name + ".jppf.pool.size", 1, 1, Integer.MAX_VALUE);
             int jmxPoolSize = ch.getInt(name + ".jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
-            newConnection(name, info, priority, poolSize, ssl, jmxPoolSize);
+            newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
           }
         }
       }
@@ -221,7 +223,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   }
 
   /**
-   * Called when a new connection pool is read from the configuration (as opposed to discovered from the network).
+   * Called when a new connection pool is read from the configuration.
    * @param name the name assigned to the connection pool.
    * @param info the information required for the connection to connect to the driver.
    * @param priority the priority assigned to the connection.
@@ -230,17 +232,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param jmxPoolSize the core size of the JMX connections pool.
    * @exclude
    */
-  protected void newConnection(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
+  protected void newConnectionPool(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
     if (debugEnabled) log.debug("new connection: {}", name);
+    final int size = poolSize > 0 ? poolSize : 1;
     Runnable r = new Runnable() {
       @Override public void run() {
-        final int size = poolSize > 0 ? poolSize : 1;
-        final JPPFConnectionPool pool = new JPPFConnectionPool(AbstractGenericClient.this, poolSequence.incrementAndGet(), name, priority, poolSize, ssl, jmxPoolSize);
+        final JPPFConnectionPool pool = new JPPFConnectionPool((JPPFClient) AbstractGenericClient.this, poolSequence.incrementAndGet(), name, priority, size, ssl, jmxPoolSize);
         pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
         synchronized(pools) {
           pools.putValue(priority, pool);
           pendingPools.add(pool);
         }
+        fireConnectionPoolAdded(pool);
         HostIP hostIP = new HostIP(info.host, info.host);
         if (JPPFConfiguration.getProperties().getBoolean("org.jppf.resolve.addresses", true)) hostIP = NetworkUtils.getHostIP(info.host);
         if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
@@ -273,23 +276,18 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param info the driver connection information.
    * @param pool id of the connection pool the connection belongs to.
    * @return an instance of a subclass of {@link AbstractJPPFClientConnection}.
-   * @exclude
    */
-  protected abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final JPPFConnectionPool pool);
+  abstract AbstractJPPFClientConnection createConnection(String uuid, String name, JPPFConnectionInformation info, final JPPFConnectionPool pool);
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
-  public void newConnection(final JPPFClientConnection c) {
+  void newConnection(final AbstractJPPFClientConnection c) {
     if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);
     c.setStatus(JPPFClientConnectionStatus.NEW);
-    pendingConnections.add(c);
+    //pendingConnections.add(c);
     executor.submit(new ConnectionInitializer(c));
-    fireNewConnection(c);
+    fireConnectionAdded(c);
     if (debugEnabled) log.debug("end of connection [" + c.getName() + "] created");
   }
 
@@ -304,7 +302,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
     connection.close();
     removeClientConnection(connection);
-    fireConnectionFailed(connection);
+    fireConnectionRemoved(connection);
   }
 
   @Override
@@ -405,28 +403,14 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   public JobManager getJobManager() {
-    synchronized(this) {
-      if ((jobManager == null) && !isClosed()) jobManager = createJobManager();
-    }
     return jobManager;
-  }
-
-  /**
-   * Set the job manager for this JPPF client.
-   * @param jobManager a <code>JobManager</code> instance.
-   * @exclude
-   */
-  protected void setJobManager(final JobManager jobManager) {
-    synchronized (this) {
-      this.jobManager = jobManager;
-    }
   }
 
   /**
    * Create the job manager for this JPPF client.
    * @return a <code>JobManager</code> instance.
    */
-  protected abstract JobManager createJobManager();
+  abstract JobManager createJobManager();
 
   /**
    * Cancel the job with the specified id.
@@ -496,7 +480,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @since 4.1
    */
   protected void fireQueueEvent(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> qEvent, final boolean jobAdded) {
-    ClientQueueEvent event = new ClientQueueEvent(this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
+    ClientQueueEvent event = new ClientQueueEvent((JPPFClient) this, qEvent.getBundleWrapper().getJob(), (JPPFPriorityQueue) qEvent.getQueue());
     if (jobAdded) {
       for (ClientQueueListener listener: queueListeners) listener.jobAdded(event);
     } else {

@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 
 import javax.resource.ResourceException;
 
-import org.jppf.client.AbstractGenericClient;
+import org.jppf.client.JPPFClient;
 
 /**
  * Utility interface used for accessing common attributes of the j2ee connector objects.
@@ -35,13 +35,13 @@ public interface JPPFAccessor
    * Get the JPPF client used to submit tasks.
    * @return an <code>AbstractGenericClient</code> instance.
    */
-  AbstractGenericClient retrieveJppfClient();
+  JPPFClient retrieveJppfClient();
 
   /**
    * Set the JPPF client used to submit tasks.
    * @param jppfClient an <code>AbstractGenericClient</code> instance.
    */
-  void assignJppfClient(AbstractGenericClient jppfClient);
+  void assignJppfClient(JPPFClient jppfClient);
 
   /**
    * Get the log writer for this object.

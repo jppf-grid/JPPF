@@ -55,7 +55,7 @@ public class NodeProvisioningRunner {
    */
   public static void main(final String[] args) {
     try (JPPFClient client = new JPPFClient()) {
-      JPPFConnectionPool pool = client.awaitActiveConnectionPool();
+      JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
       

@@ -21,8 +21,7 @@ package org.jppf.client;
 import java.util.List;
 
 /**
- * Interface for pools of connections with a core size (minimum number of connections in the pool)
- * and a maximum size which can be dynamically updated.
+ * Interface for pools of connections with a maximum size which can be dynamically updated.
  * @param <E> the type of the connections in the pool.
  * @author Laurent Cohen
  * @since 4.2
@@ -71,25 +70,34 @@ public interface ConnectionPool<E extends AutoCloseable> extends Iterable<E>, Au
   int connectionCount();
 
   /**
-   * Get the core size of this connection pool.
-   * @return the core size as an int value.
-   */
-  int getCoreSize();
-
-  /**
    * Get the maximum size of this connection pool.
    * @return the max size as an int.
+   * @deprecated use {@link #getSize()} instead.
    */
   int getMaxSize();
 
   /**
    * Set the maximum size of this connection pool, starting or stopping connections as needed.
-   * <p>If {@code maxSize} if less than or equal to {@link #getCoreSize()}, then this method has no effect.
+   * <p>If any connection to be stopped is currently executing a job, then it will not be stopped.
+   * @param maxSize the max size as an int.
+   * @return the new maximum pool size.
+   * @deprecated use {@link #setSize(int)} instead.
+   */
+  int setMaxSize(int maxSize);
+
+  /**
+   * Get the maximum size of this connection pool.
+   * @return the max size as an int.
+   */
+  int getSize();
+
+  /**
+   * Set the size of this connection pool, starting or stopping connections as needed.
    * <p>If any connection to be stopped is currently executing a job, then it will not be stopped.
    * @param maxSize the max size as an int.
    * @return the new maximum pool size.
    */
-  int setMaxSize(int maxSize);
+  int setSize(int maxSize);
 
   /**
    * Get a list of connections held by this pool. The returned list is independent from this pool,
