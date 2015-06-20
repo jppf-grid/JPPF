@@ -17,10 +17,7 @@
  */
 package org.jppf.server.node.android;
 
-import android.app.Activity;
-
 import org.jppf.android.AndroidHelper;
-import org.jppf.android.activities.NodeEventHandler;
 import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.server.node.remote.AbstractRemoteNode;
 

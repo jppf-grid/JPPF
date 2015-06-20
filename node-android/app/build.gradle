@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "21.1.2"
+  buildToolsVersion "22.0.1"
   defaultConfig {
     applicationId "org.jppf.android"
     minSdkVersion 19
@@ -46,4 +46,5 @@ android {
 
 dependencies {
   compile fileTree(include: ['*.jar'], dir: 'libs')
+  compile project(":org.jppf.android.events")
 }

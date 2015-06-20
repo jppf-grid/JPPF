@@ -113,13 +113,11 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
         e.printStackTrace();
       }
     }
-    if (adapter != null) {
-      setDelegate(adapter);
-    }
+    if (adapter != null) setDelegate(adapter);
   }
 
   /**
-   *
+   * Remove the previous view if any, and set the new view if possible.
    */
   private void resetUI() {
     final ViewGroup group = (ViewGroup) activity.findViewById(R.id.main_layout);
@@ -148,10 +146,18 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
     if (adapter != null) adapter.jobEnding(event);
   }
 
+  /**
+   * Get the adapter to delegate notifications to.
+   * @return an instance of {@link AndroidNodeIntegrationAdapter}.
+   */
   synchronized AndroidNodeIntegrationAdapter getDelegate() {
     return delegate;
   }
 
+  /**
+   * Set the adapter to delegate notifications to.
+   * @param delegate an instance of {@link AndroidNodeIntegrationAdapter}.
+   */
   synchronized void setDelegate(final AndroidNodeIntegrationAdapter delegate) {
     Log.v(LOG_TAG, String.format("setDelegate() : delegate=%s, view=%s, activity=%s", delegate, view, activity));
     if ((delegate != null) && (delegate != this.delegate)) {

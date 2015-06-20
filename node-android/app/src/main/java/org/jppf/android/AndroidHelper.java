@@ -151,7 +151,7 @@ public class AndroidHelper {
     switch(key) {
       case PreferenceUtils.SERVERS_KEY:
         String value = prefs.getString(key, "");
-        Log.d(LOG_TAG, String.format("preference %s changed to %s", key, value));
+        Log.v(LOG_TAG, String.format("preference %s changed to %s", key, value));
         String[] servers = value.split("\\s");
         StringBuilder sb = new StringBuilder();
         int count = 0;
@@ -221,7 +221,7 @@ public class AndroidHelper {
     }
     String value = s + prefValue;
     sslConfig.setString(configKey, value);
-    Log.d(LOG_TAG, "set SSL preperty: " + configKey + " = " + value);
+    Log.v(LOG_TAG, "set SSL property: " + configKey + " = " + value);
   }
 
   public static void setUncaughtExceptionHandler() {
