@@ -50,19 +50,6 @@ public final class IOHelper {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * Ratio of free memory / requested allocation size threshold that triggers disk overflow.
-   */
-  private static final double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);
-  /**
-   * Whether to trigger a garbage collection whenever disk overflow is triggered.
-   */
-  private static final boolean GC_ON_DISK_OVERFLOW = JPPFConfiguration.getProperties().getBoolean("jppf.gc.on.disk.overflow", true);
-  /**
-   * The available heap threshold above which it is unlikely that memory fragmentation will cause object allocations to fail,
-   * i.e. when there is enough free memory but not enough <i><b>contiguous</b></i> free memory. Default value is 32 MB.  
-   */
-  private static final long LOW_MEMORY_THRESHOLD = JPPFConfiguration.getProperties().getLong("jppf.low.memory.threshold", 32L) * 1024L * 1024L;
-  /**
    * Lock used to check if there is sufficient free memory to read an object, AND reserve the memory, in a single atomic operation. 
    */
   private static final Lock lock = new ReentrantLock();
@@ -73,11 +60,15 @@ public final class IOHelper {
   /**
    * A number formatter for debugging and tracing purposes.
    */
-  private static final NumberFormat nf = createNumberFormat();
+  private static final NumberFormat nf;
+  static {
+    nf = NumberFormat.getNumberInstance(Locale.US);
+    nf.setGroupingUsed(true);
+  }
   /**
    * Default serilaizer to use when none is specified.
    */
-  private static final ObjectSerializer defaultSerializer = createDefaultSerializer();
+  private static final ObjectSerializer defaultSerializer = new ObjectSerializerImpl();
 
   /**
    * Instantiation of this class is not permitted.
@@ -161,7 +152,7 @@ public final class IOHelper {
         log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
       }
       boolean b = fitsInMemory0(size);
-      if (!b && GC_ON_DISK_OVERFLOW) {
+      if (!b && IO.GC_ON_DISK_OVERFLOW) {
         if (debugEnabled) log.debug("triggering GC to avoid disk overflow, requested size={}", size);
         System.gc();
         b = fitsInMemory0(size);
@@ -181,7 +172,7 @@ public final class IOHelper {
   private static boolean fitsInMemory0(final int size) {
     long freeMem = SystemUtils.maxFreeHeap() - footprint.get();
     //if (traceEnabled) log.trace("free mem / requested size / footprint : {} / {} / {}", new Object[] { nf.format(freeMem), nf.format(size), nf.format(footprint.get())});
-    return ((long) (FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > LOW_MEMORY_THRESHOLD);
+    return ((long) (IO.FREE_MEM_TO_SIZE_RATIO * size) < freeMem) && (freeMem > IO.LOW_MEMORY_THRESHOLD);
   }
 
   /**
@@ -371,32 +362,5 @@ public final class IOHelper {
     }
     else dl = new FileDataLocation(file);
     return dl;
-  }
-
-  /**
-   * Create a number formatter for debugging purposes.
-   * @return a {@link NumberFormat} instance.
-   */
-  private static NumberFormat createNumberFormat() {
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
-    nf.setGroupingUsed(true);
-    return nf;
-  }
-
-  /**
-   * Create a default serilaizer to use when none is specifed.
-   * @return an instance of ObjectSerializer, or null if none could be created.
-   */
-  private static ObjectSerializer createDefaultSerializer() {
-    String name = "org.jppf.utils.ObjectSerializerImpl";
-    try {
-      Class<?> c = Class.forName(name);
-      if (debugEnabled) log.debug("Loaded serializer class " + c);
-      Object o = c.newInstance();
-      return (ObjectSerializer) o;
-    } catch(Exception e) {
-      if (debugEnabled) log.debug("Could not load serializer class {}", name);
-      return null;
-    }
   }
 }

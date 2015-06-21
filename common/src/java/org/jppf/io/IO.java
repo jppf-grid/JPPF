@@ -65,4 +65,17 @@ public interface IO extends Closeable {
    * A bounded pool of temporary buffers for reading/writing lengths, geenrally from/to a stream.
    */
   AbstractBoundedObjectPoolQueue<byte[]> LENGTH_BUFFER_POOL = new BoundedByteArrayPool(LENGTH_BUFFER_POOL_SIZE, 4);
+  /**
+   * Ratio of free memory / requested allocation size threshold that triggers disk overflow.
+   */
+  double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);
+  /**
+   * Whether to trigger a garbage collection whenever disk overflow is triggered.
+   */
+  boolean GC_ON_DISK_OVERFLOW = JPPFConfiguration.getProperties().getBoolean("jppf.gc.on.disk.overflow", true);
+  /**
+   * The available heap threshold above which it is unlikely that memory fragmentation will cause object allocations to fail,
+   * i.e. when there is enough free memory but not enough <i><b>contiguous</b></i> free memory. Default value is 32 MB.  
+   */
+  long LOW_MEMORY_THRESHOLD = JPPFConfiguration.getProperties().getLong("jppf.low.memory.threshold", 32L) * 1024L * 1024L;
 }
