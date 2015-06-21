@@ -34,8 +34,8 @@
         <exclude name="META-INF/services/org.jppf.node.initialization.InitializationHook"/>
       </zipfileset>
     </jar>
-    <checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>
-    <copy toDir="${node-android}/app/libs">
+    <!--<checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>-->
+    <copy toDir="${node-android}/org.jppf.android.events/libs">
       <fileset dir="${build}" includes="jppf-common.jar,jppf-node-android.jar,jppf-server.jar"/>
     </copy>
   </target>
@@ -53,6 +53,7 @@
       <arg value="assemble"/>
     </exec>
     <copy file="${node-android}/app/build/outputs/apk/app-release.apk" tofile="${build}/JPPF-${version.number}-AndroidNode.apk"/>
+    <copy file="${node-android}/org.jppf.android.events/build/outputs/aar/org.jppf.android.events-release.aar" tofile="${build}/JPPF-${version.number}-AndroidNodeEvents.aar"/>
   </target>
   
   <!-- ========================================================================= -->

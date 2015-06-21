@@ -240,6 +240,7 @@
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
       <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log"/>
+      <zipfileset dir="${node-android}" prefix="${zip.prefix}/node-android" excludes="**/build/**/*.*"/>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
       <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
         <exclude name="**/*.log"/>
