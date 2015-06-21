@@ -78,6 +78,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     this.resolveInetAddressesNow = resolveInetAddressesNow;
     TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
+    uuidProps.setInt("jppf.pid", SystemUtils.getPID());
     VersionUtils.Version v = VersionUtils.getVersion();
     uuidProps.setProperty("jppf.version.number", v.getVersionNumber());
     uuidProps.setProperty("jppf.build.number", v.getBuildNumber());
