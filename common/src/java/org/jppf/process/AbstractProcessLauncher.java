@@ -219,12 +219,13 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
 
   /**
    * Notify all listeners that the process has stopped.
+   * @param clearListeners {@code true} to remove all listeners, {@code false} to keep them.
    */
-  protected void fireProcessStopped() {
+  protected void fireProcessStopped(final boolean clearListeners) {
     if (log.isDebugEnabled()) log.debug("process [{}:{}] has stopped", getName(), process);
     ProcessLauncherEvent event = new ProcessLauncherEvent(this);
     for (ProcessLauncherListener listener: listeners) listener.processStopped(event);
-    listeners.clear();
+    if (clearListeners) listeners.clear();
   }
 
   /**

@@ -224,18 +224,16 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     if (nbSlaves() <= 0) log.warn("received processStarted() for slave id = {}, but nbSlaves is zero", slave.getId());
     else if (debugEnabled) log.debug("received processStarted() for slave id = {}", slave.getId());
-    /*
-    slaves.put(slave.getId(), slave);
-    */
-    
   }
 
   @Override
   public synchronized void processStopped(final ProcessLauncherEvent event) {
     SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     if (debugEnabled) log.debug("received processStopped() for slave id = {}", slave.getId());
-    slaves.remove(slave.getId());
-    reservedIds.remove(slave.getId());
+    if (slave.exitCode != 2) {
+      slaves.remove(slave.getId());
+      reservedIds.remove(slave.getId());
+    } else new Thread(slave, slave.getName()).start();
   }
 
   /**

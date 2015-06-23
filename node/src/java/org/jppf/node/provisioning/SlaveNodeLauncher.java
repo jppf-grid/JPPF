@@ -64,6 +64,10 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
    *
    */
   private boolean stopped = false;
+  /**
+   * Captures the exit code of the slave node process.
+   */
+  int exitCode = -1;
 
   /**
    * Initialize this process launcher.
@@ -95,13 +99,13 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
         setStarted(true);
         fireProcessStarted();
       }
-      int n = process.waitFor();
-      fireProcessStopped();
-      end = onProcessExit(n);
+      exitCode = process.waitFor();
+      fireProcessStopped(false);
+      end = onProcessExit(exitCode);
       tearDown();
     } catch (Exception e) {
       e.printStackTrace();
-      fireProcessStopped();
+      fireProcessStopped(false);
     } finally {
       setStarted(false);
       try {
