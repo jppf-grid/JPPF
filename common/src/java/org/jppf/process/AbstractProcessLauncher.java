@@ -63,6 +63,10 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * Name given to this process, also used as root installation directory.
    */
   protected String name;
+  /**
+   * If {@code false} then process is to be restarted.
+   */
+  protected boolean end = true;
 
   /**
    * Parse the specified String as a list of JVM options.
@@ -74,7 +78,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
     List<String> cpElements = new ArrayList<>();
     Pair<List<String>, List<String>> result = new Pair<>(jvmOptions, cpElements);
     if (s != null) {
-      if (log.isDebugEnabled()) log.debug("options = " + s);
+      if (log.isTraceEnabled()) log.trace("options = " + s);
       List<String> list = new ArrayList<>();
       String source = s.trim();
       boolean end = false;
@@ -100,10 +104,10 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
       }
       String[] options = sb.toString().split("\\s");
       for (int i=0; i<options.length; i++) options[i] = options[i].replaceAll(rep, " ").replace("\\", "\\\\")/*.replaceAll("\"", "\\\"")*/;
-      if (log.isDebugEnabled()) {
+      if (log.isTraceEnabled()) {
         StringBuilder sb2 = new StringBuilder("options after split =");
         for (String option: options) sb2.append('\n').append(option);
-        log.debug(sb2.toString());
+        log.trace(sb2.toString());
       }
       int count = 0;
       while (count < options.length) {
@@ -219,12 +223,13 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
 
   /**
    * Notify all listeners that the process has stopped.
+   * @param clearListeners {@code true} to remove all listeners, {@code false} to keep them.
    */
-  protected void fireProcessStopped() {
+  protected void fireProcessStopped(final boolean clearListeners) {
     if (log.isDebugEnabled()) log.debug("process [{}:{}] has stopped", getName(), process);
     ProcessLauncherEvent event = new ProcessLauncherEvent(this);
     for (ProcessLauncherListener listener: listeners) listener.processStopped(event);
-    listeners.clear();
+    if (clearListeners) listeners.clear();
   }
 
   /**
