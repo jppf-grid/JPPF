@@ -29,13 +29,11 @@ import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
 
-
 /**
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class JobPriorityRunner
-{
+public class JobPriorityRunner {
   /**
    * Logger for this class.
    */
@@ -48,26 +46,21 @@ public class JobPriorityRunner
    * JMX connection to the driver.
    */
   private static JMXDriverConnectionWrapper jmx = null;
+
   /**
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       TypedProperties props = JPPFConfiguration.getProperties();
       props.setProperty("jppf.discovery.enabled", "true");
       props.setProperty("jppf.pool.size", "2");
       jppfClient = new JPPFClient();
       perform();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -76,10 +69,8 @@ public class JobPriorityRunner
    * Perform the test using <code>JPPFClient.submit(JPPFJob)</code> to submit the tasks.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform() throws Exception
-  {
-    try
-    {
+  private static void perform() throws Exception {
+    try {
       DriverJobManagementMBean jobMgt = getJobManagement();
       long start = System.currentTimeMillis();
       JPPFJob job1 = createJob("job 1", 1, 10, 1000);
@@ -95,9 +86,7 @@ public class JobPriorityRunner
       // submit the tasks for execution
       long elapsed = System.currentTimeMillis() - start;
       print("elapsed time: " + StringUtils.toStringDuration(elapsed));
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       throw new JPPFException(e.getMessage(), e);
     }
   }
@@ -111,15 +100,13 @@ public class JobPriorityRunner
    * @return the created job.
    * @throws Exception if an error is raised during the job creation.
    */
-  private static JPPFJob createJob(final String name, final int priority, final int nbTasks, final int length) throws Exception
-  {
+  private static JPPFJob createJob(final String name, final int priority, final int nbTasks, final int length) throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName(name);
     job.getSLA().setPriority(priority);
-    for (int i=0; i<nbTasks; i++)
-    {
+    for (int i = 0; i < nbTasks; i++) {
       LongTask task = new LongTask(length, false);
-      task.setId("" + (i+1));
+      task.setId("" + (i + 1));
       job.add(task);
     }
     job.setBlocking(false);
@@ -130,8 +117,7 @@ public class JobPriorityRunner
    * Print a message tot he log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     log.info(msg);
     System.out.println(msg);
   }
@@ -141,8 +127,7 @@ public class JobPriorityRunner
    * @return an instance of {@link DriverJobManagementMBean}.
    * @throws Exception if any error occurs.
    */
-  private static DriverJobManagementMBean getJobManagement() throws Exception
-  {
+  private static DriverJobManagementMBean getJobManagement() throws Exception {
     return getJmxConnection().getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
   }
 
@@ -151,20 +136,17 @@ public class JobPriorityRunner
    * @return a {@link JMXDriverConnectionWrapper} instance.
    * @throws Exception if any error occurs.
    */
-  private static JMXDriverConnectionWrapper getJmxConnection() throws Exception
-  {
-    if (jmx == null)
-    {
-      /*
-			while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
-			JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
-			jmx = c.getJmxConnection();
-			boolean b = jmx.isConnected();
-			if (!b) jmx.connect();
-       */
+  private static JMXDriverConnectionWrapper getJmxConnection() throws Exception {
+    if (jmx == null) {
+      /*while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
+       * JPPFClientConnectionImpl c = (JPPFClientConnectionImpl) jppfClient.getClientConnection();
+       * jmx = c.getJmxConnection();
+       * boolean b = jmx.isConnected();
+       * if (!b) jmx.connect(); */
       jmx = new JMXDriverConnectionWrapper("localhost", 11198);
       jmx.connect();
-      while (!jmx.isConnected()) Thread.sleep(10L);
+      while (!jmx.isConnected())
+        Thread.sleep(10L);
     }
     return jmx;
   }
@@ -173,20 +155,14 @@ public class JobPriorityRunner
    * Restart the driver.
    * @throws Exception if any error occurs.
    */
-  private static void restartDriver() throws Exception
-  {
-    Runnable r = new Runnable()
-    {
+  private static void restartDriver() throws Exception {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        try
-        {
+      public void run() {
+        try {
           String s = getJmxConnection().restartShutdown(100L, 2000L);
           System.out.println("response for restart: " + s);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           e.printStackTrace();
         }
       }
@@ -198,8 +174,7 @@ public class JobPriorityRunner
   /**
    * 
    */
-  private static class JobRunner extends Thread
-  {
+  private static class JobRunner extends Thread {
     /**
      * The job to execute.
      */
@@ -209,8 +184,7 @@ public class JobPriorityRunner
      * Initialize this job runner.
      * @param job the job to execute.
      */
-    public JobRunner(final JPPFJob job)
-    {
+    public JobRunner(final JPPFJob job) {
       this.job = job;
     }
 
@@ -218,15 +192,12 @@ public class JobPriorityRunner
      * {@inheritDoc}
      */
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         jppfClient.submitJob(job);
         List<Task<?>> results = job.awaitResults();
         print("job '" + job.getName() + "' complete");
-        for (Task task: results)
-        {
+        for (Task task : results) {
           StringBuilder sb = new StringBuilder();
           sb.append("results for task [").append(job.getName()).append("] ").append(task.getId()).append(" : ");
           Throwable e = task.getThrowable();
@@ -234,9 +205,7 @@ public class JobPriorityRunner
           else sb.append(task.getResult());
           print(sb.toString());
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }

@@ -249,7 +249,8 @@ public class JPPFClient extends AbstractGenericClient {
         for (JPPFConnectionPool pool: temp) {
           if (filter.accepts(pool)) result.add(pool);
         }
-        return !ref.setSynchronized(result, pools).isEmpty();
+        boolean empty = ref.setSynchronized(result, pools).isEmpty();
+        return !empty || (empty && (expectedConnections <= 0));
       }
     }, timeout);
     return ref.get();
