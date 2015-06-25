@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  JPPF.
+   Copyright (C) 2005-2015 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!--
+  XML descriptor for the server chooser combo box in the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ServerChooserPanel" type="page" i18n="org.jppf.ui.i18n.JPPFAdminTool">
+  <property name="tooltip" value="The list of drivers to connect to"/>
+  <property name="layoutConstraints" value="flowx, fill, insets 2 2 2 2"/>
+  <property name="componentConstraints" value="pushy 0, pushx, h 25!"/>
+
+  <child name="sep1" type="ToolbarSeparator"/>
+
+  <child name="settings.import" type="FileChooser">
+    <property name="icon" value="/org/jppf/ui/resources/import.png"/>
+    <property name="tooltip" value="Import UI settings from file"/>
+    <property name="type" value="open"/>
+    <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
+    <property name="value" value="./AdminConsoleSettings.xml"/>
+    <listener type="script">
+      <script language="groovy">OptionsHandler.importSettings(option.getValue())</script>
+    </listener>
+  </child>
+
+  <child name="settings.export" type="FileChooser">
+    <property name="icon" value="/org/jppf/ui/resources/export.png"/>
+    <property name="tooltip" value="Export UI settings to file"/>
+    <property name="type" value="save"/>
+    <property name="extensions" value="xml;XML files (*.xml)|*;All files (*.*)"/>
+    <property name="value" value="./AdminConsoleSettings.xml"/>
+    <listener type="script">
+      <script language="groovy">OptionsHandler.exportSettings(option.getValue())</script>
+    </listener>
+  </child>
+
+  <child name="sep2" type="ToolbarSeparator"/>
+
+  <child name="show.ip" type="Button">
+    <property name="icon" value="/org/jppf/ui/resources/dns1.png"/>
+    <property name="toggle" value="true"/>
+    <initializer type="script">
+      <script language="groovy">option.getUIComponent().setSelected(false)</script>
+    </initializer>
+    <listener type="script">
+      <script language="groovy"><![CDATA[
+        def comp = option.getUIComponent();
+        def b = comp.isSelected();
+        StatsHandler.getInstance().setShowIP(b);
+      ]]></script>
+    </listener>
+  </child>
+
+  <child name="sep3" type="ToolbarSeparator"/>
+
+  <child name="ServerChooser" type="ComboBox">
+    <property name="label" value="Server connection"/>
+    <property name="tooltip" value="The list of drivers to connect to"/>
+    <property name="value" value=""/>
+    <initializer type="script">
+      <script language="groovy">StatsHandler.getInstance().getClientHandler().setServerListOption(option)</script>
+    </initializer>
+    <listener type="script">
+      <script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentDriver(option.getValue())</script>
+    </listener>
+  </child>
+
+</opt:main>
