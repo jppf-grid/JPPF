@@ -21,9 +21,9 @@ package org.jppf.ui.monitoring.job;
 import javax.management.NotificationListener;
 
 import org.jppf.client.JPPFClientConnection;
-import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.job.JobInformation;
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -56,7 +56,8 @@ public class JobData implements AutoCloseable {
   /**
    * Information on the JPPF node where a job is dispatched.
    */
-  private JPPFManagementInfo nodeInformation = null;
+  //private JPPFManagementInfo nodeInformation = null;
+  private TopologyNode node = null;
   /**
    * Receives notifications from the MBean.
    */
@@ -95,12 +96,13 @@ public class JobData implements AutoCloseable {
   /**
    * Initialize this job data as a holding information about a sub-job dispatched to a node.
    * @param jobInformation information on the job in a JPPF driver.
-   * @param nodeInformation information on the JPPF node in which part of a job is executing.
+   * @param node information on the JPPF node in which part of a job is executing.
    */
-  public JobData(final JobInformation jobInformation, final JPPFManagementInfo nodeInformation) {
+  public JobData(final JobInformation jobInformation, final TopologyNode node) {
     this.type = JobDataType.SUB_JOB;
     this.jobInformation = jobInformation;
-    this.nodeInformation = nodeInformation;
+    //this.nodeInformation = nodeInformation;
+    this.node = node;
     this.driver = null;
   }
 
@@ -132,8 +134,8 @@ public class JobData implements AutoCloseable {
    * Get the information on the JPPF node in which part of a job is executing.
    * @return a <code>NodeManagementInfo</code> instance.
    */
-  public JPPFManagementInfo getNodeInformation() {
-    return nodeInformation;
+  public TopologyNode getNodeInformation() {
+    return node;
   }
 
   /**
@@ -182,8 +184,8 @@ public class JobData implements AutoCloseable {
         s = jobInformation.getJobName();
         break;
       case SUB_JOB:
-        if (nodeInformation == null) s = "no information";
-        else s = nodeInformation.getHost() + ':' + nodeInformation.getPort();
+        if (node == null) s = "no information";
+        else s = node.getDisplayName();
         break;
     }
     return s;

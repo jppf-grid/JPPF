@@ -23,9 +23,8 @@ import java.util.*;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.job.JobInformation;
-import org.jppf.management.JPPFManagementInfo;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -285,7 +284,7 @@ public class AccumulatorHelper {
   /**
    * Definition of an update accumulator for a sub-job.
    */
-  static class AccumulatorNode extends JobAccumulator<JPPFManagementInfo> {
+  static class AccumulatorNode extends JobAccumulator<TopologyNode> {
     /**
      * Information about the job.
      */
@@ -297,7 +296,7 @@ public class AccumulatorHelper {
      * @param jobInfo Information about the job.
      * @param value a {@link JPPFManagementInfo} instance.
      */
-    AccumulatorNode(final Type type, final JobInformation jobInfo, final JPPFManagementInfo value) {
+    AccumulatorNode(final Type type, final JobInformation jobInfo, final TopologyNode value) {
       super(type, value);
       this.jobInfo = jobInfo;
     }

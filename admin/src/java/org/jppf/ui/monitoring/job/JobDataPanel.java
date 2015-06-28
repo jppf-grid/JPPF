@@ -78,12 +78,10 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
   public JobDataPanel() {
     BASE = "org.jppf.ui.i18n.JobDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
+    this.topologyManager = StatsHandler.getInstance().getTopologyManager();
     panelManager = new JobDataPanelManager(this);
     accumulatorHelper = new AccumulatorHelper(this);
     createTreeTableModel();
-    //StatsHandler.getInstance().getClientHandler().getJppfClient(this);
-    this.topologyManager = StatsHandler.getInstance().getTopologyManager();
-    populateTreeTableModel();
     topologyManager.addTopologyListener(this);
   }
 
@@ -93,8 +91,27 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
   private void createTreeTableModel() {
     treeTableRoot = new DefaultMutableTreeNode(localize("job.tree.root.name"));
     model = new JobTreeTableModel(treeTableRoot);
+    populateTreeTableModel();
+  }
+
+  /**
+   * Create, initialize and layout the GUI components displayed in this panel.
+   */
+  @Override
+  public void createUI() {
     treeTable = new JPPFTreeTable(model);
-    treeTable.expand(treeTableRoot);
+    treeTable.getTree().setLargeModel(true);
+    treeTable.getTree().setRootVisible(false);
+    treeTable.getTree().setShowsRootHandles(true);
+    treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+    treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+    treeTable.doLayout();
+    treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+    treeTable.getTree().setCellRenderer(new JobRenderer());
+    treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer(this));
+    JScrollPane sp = new JScrollPane(treeTable);
+    setUIComponent(sp);
+    treeTable.expandAll();
     StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {
       @Override
       public void stateChanged(final ShowIPEvent event) {
@@ -145,32 +162,12 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
         panelManager.addJob(driverUuid, jobInfo);
         try {
           NodeJobInformation[] subJobInfo = proxy.getNodeInformation(id);
-          for (NodeJobInformation nji : subJobInfo) panelManager.addJobDispatch(driverUuid, nji.jobInfo, nji.nodeInfo);
+          for (NodeJobInformation nji : subJobInfo) panelManager.addJobDispatch(driverUuid, nji.jobInfo, topologyManager.getNode(nji.nodeInfo.getUuid()));
         } catch (Exception e) {
           if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
         }
       }
     }
-  }
-
-  /**
-   * Create, initialize and layout the GUI components displayed in this panel.
-   */
-  @Override
-  public void createUI() {
-    treeTable.getTree().setLargeModel(true);
-    treeTable.getTree().setRootVisible(false);
-    treeTable.getTree().setShowsRootHandles(true);
-    treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
-    treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-    treeTable.doLayout();
-    treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    treeTable.getTree().setCellRenderer(new JobRenderer());
-    treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer(this));
-    JScrollPane sp = new JScrollPane(treeTable);
-    setUIComponent(sp);
-    treeTable.setVisible(true);
-    treeTable.expandAll();
   }
 
   /**
@@ -307,19 +304,18 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
    * @param jobInfo    information about the sub-job.
    * @param nodeInfo   information about the node where the sub-job was dispatched.
    */
-  public void addDispatch(final String driverUuid, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo) {
-    String nodeName = nodeInfo.toString();
+  public void addDispatch(final String driverUuid, final JobInformation jobInfo, final TopologyNode nodeInfo) {
     if (debugEnabled) log.debug("driver " + driverUuid + ": adding sub-job " + jobInfo + " to node " + nodeInfo);
     synchronized(accumulatorHelper) {
       AccumulatorJob job = accumulatorHelper.getAccumulatorJob(driverUuid, jobInfo);
       Map<String, AccumulatorNode> nodeMap = job.getMap();
-      AccumulatorNode node = nodeMap.get(nodeName);
+      AccumulatorNode node = nodeMap.get(nodeInfo.getUuid());
       if (node == null) {
         node = new AccumulatorNode(JobAccumulator.Type.ADD, jobInfo, nodeInfo);
-        nodeMap.put(nodeName, node);
+        nodeMap.put(nodeInfo.getUuid(), node);
       } else {
         boolean remove = node.mergeChange(JobAccumulator.Type.ADD);
-        if (remove) nodeMap.remove(nodeName);
+        if (remove) nodeMap.remove(nodeInfo.getUuid());
       }
     }
   }
@@ -330,19 +326,19 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
    * @param jobInfo    information about the job.
    * @param nodeInfo   information about the node where the sub-job was dispatched.
    */
-  public void removeDispatch(final String driverUuid, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo) {
-    String nodeName = nodeInfo.toString();
+  public void removeDispatch(final String driverUuid, final JobInformation jobInfo, final TopologyNode nodeInfo) {
+    //String nodeName = nodeInfo.getUuid();
     if (debugEnabled) log.debug("driver " + driverUuid + ": removing sub-job " + jobInfo + " from node " + nodeInfo);
     synchronized(accumulatorHelper) {
       AccumulatorJob job = accumulatorHelper.getAccumulatorJob(driverUuid, jobInfo);
       Map<String, AccumulatorNode> nodeMap = job.getMap();
-      AccumulatorNode node = nodeMap.get(nodeName);
+      AccumulatorNode node = nodeMap.get(nodeInfo.getUuid());
       if (node == null) {
         node = new AccumulatorNode(JobAccumulator.Type.REMOVE, jobInfo, nodeInfo);
-        nodeMap.put(nodeName, node);
+        nodeMap.put(nodeInfo.getUuid(), node);
       } else {
         boolean remove = node.mergeChange(JobAccumulator.Type.REMOVE);
-        if (remove) nodeMap.remove(nodeName);
+        if (remove) nodeMap.remove(nodeInfo.getUuid());
       }
     }
   }
@@ -351,9 +347,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
    * Refreshes the tree table display.
    */
   public void refreshUI() {
-    treeTable.invalidate();
-    treeTable.doLayout();
-    treeTable.updateUI();
+    treeTable.repaint();
   }
 
   /**
@@ -424,13 +418,27 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
           updateJob(uuid, jobInfo);
           break;
         case JOB_DISPATCHED:
-          addDispatch(uuid, jobInfo, nodeInfo);
+          addDispatch(uuid, jobInfo, getOrCreateTopologyNode(nodeInfo));
           break;
         case JOB_RETURNED:
-          removeDispatch(uuid, jobInfo, nodeInfo);
+          removeDispatch(uuid, jobInfo, getOrCreateTopologyNode(nodeInfo));
           break;
       }
     }
+  }
+
+  /**
+   * 
+   * @param nodeInfo .
+   * @return .
+   */
+  private TopologyNode getOrCreateTopologyNode(final JPPFManagementInfo nodeInfo) {
+    TopologyNode node = null;
+    if (nodeInfo != null) {
+      node = topologyManager.getNode(nodeInfo.getUuid());
+      if (node == null) node = new TopologyNode(nodeInfo);
+    }
+    return node;
   }
 
   /**

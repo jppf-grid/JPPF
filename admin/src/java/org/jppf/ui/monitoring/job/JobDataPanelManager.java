@@ -22,7 +22,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.client.monitoring.topology.TopologyDriver;
+import org.jppf.client.monitoring.topology.*;
 import org.jppf.job.JobInformation;
 import org.jppf.management.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
@@ -203,7 +203,7 @@ class JobDataPanelManager {
    * @param jobInfo    information about the sub-job.
    * @param nodeInfo   information about the node where the sub-job was dispatched.
    */
-  public void addJobDispatch(final String driverUuid, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo) {
+  public void addJobDispatch(final String driverUuid, final JobInformation jobInfo, final TopologyNode nodeInfo) {
     DefaultMutableTreeNode driverNode = findDriver(driverUuid);
     if (driverNode == null) return;
     final DefaultMutableTreeNode jobNode = findJob(driverNode, jobInfo);
@@ -212,7 +212,7 @@ class JobDataPanelManager {
     final int index = jobDispatchInsertIndex(jobNode, nodeInfo);
     if (index < 0) return;
     final DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(data);
-    if (debugEnabled) log.debug("sub-job: {} dispatched to node {}:{} (index {})", new Object[] {jobInfo.getJobName(), nodeInfo.getHost(), nodeInfo.getPort(), index});
+    if (debugEnabled) log.debug("sub-job: {} dispatched to node {} (index {})", new Object[] {jobInfo.getJobName(), nodeInfo, index});
     panel.getModel().insertNodeInto(subJobNode, jobNode, index);
     if (panel.getTreeTable() != null) panel.getTreeTable().expand(jobNode);
   }
@@ -287,7 +287,7 @@ class JobDataPanelManager {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
       JobData data = (JobData) node.getUserObject();
       if ((data == null) || (data.getNodeInformation() == null)) return null;
-      if (data.getNodeInformation().toString().equals(nodeUuid)) return node;
+      if (data.getNodeInformation().getUuid().equals(nodeUuid)) return node;
     }
     return null;
   }
@@ -314,7 +314,7 @@ class JobDataPanelManager {
   /**
    * Find the position at which to insert a job, using the sorted lexical order of job names.
    * @param driverNode name the parent tree node of the job to insert.
-   * @param jobInfo    information about the job to insert.
+   * @param jobInfo information about the job to insert.
    * @return the index at which to insert the job, or -1 if the job is already in the tree.
    */
   int jobInsertIndex(final DefaultMutableTreeNode driverNode, final JobInformation jobInfo) {
@@ -336,14 +336,15 @@ class JobDataPanelManager {
    * @param nodeInfo information about the subjob to insert.
    * @return the index at which to insert the subjob, or -1 if the subjob is already in the tree.
    */
-  int jobDispatchInsertIndex(final DefaultMutableTreeNode jobNode, final JPPFManagementInfo nodeInfo) {
+  int jobDispatchInsertIndex(final DefaultMutableTreeNode jobNode, final TopologyNode nodeInfo) {
     int n = jobNode.getChildCount();
-    String subJobName = nodeInfo.toString();
+    //String subJobName = nodeInfo.getUuid();
+    String subJobName = nodeInfo.getDisplayName();
     for (int i = 0; i < n; i++) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) jobNode.getChildAt(i);
       JobData jobData = (JobData) node.getUserObject();
       if ((jobData == null) || (jobData.getNodeInformation() == null)) continue;
-      String name = jobData.getNodeInformation().toString();
+      String name = jobData.getNodeInformation().getDisplayName();
       if (subJobName.equals(name))  return -1;
       else if (subJobName.compareTo(name) < 0) return i;
     }

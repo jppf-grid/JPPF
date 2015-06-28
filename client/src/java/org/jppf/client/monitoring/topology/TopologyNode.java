@@ -46,8 +46,9 @@ public class TopologyNode extends AbstractTopologyComponent {
   /**
    * Initialize this topology data as holding information about a node.
    * @param nodeInformation information on the JPPF node.
+   * @exclude
    */
-  TopologyNode(final JPPFManagementInfo nodeInformation) {
+  public TopologyNode(final JPPFManagementInfo nodeInformation) {
     this(nodeInformation, EMPTY_STATE);
   }
 
