@@ -103,12 +103,11 @@ public class NodeRenderer extends AbstractTreeCellRenderer {
         if (font != null) setFont(font);
         ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);
-        if (highlightingEnabled) {
-          renderer.setBackgroundNonSelectionColor(background);
-          renderer.setBackgroundSelectionColor(backgroundSelected);
-          renderer.setBackground(sel ? backgroundSelected : background);
-          renderer.setForeground(foreground);
-        }
+        renderer.setBackgroundNonSelectionColor(background);
+        renderer.setBackgroundSelectionColor(backgroundSelected);
+        renderer.setBorderSelectionColor(backgroundSelected);
+        renderer.setBackground(sel ? backgroundSelected : background);
+        renderer.setForeground(foreground);
       }
     }
     return renderer;

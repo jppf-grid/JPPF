@@ -63,7 +63,6 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
-        Color foreground = sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND;
         if (data.isDriver()) {
           path = ((TopologyDriver) data).getConnection().getStatus().isWorkingStatus() ? DRIVER_ICON : DRIVER_INACTIVE_ICON;
         } else if (data.isNode()) {
@@ -74,7 +73,7 @@ public class HealthTreeCellRenderer extends AbstractTreeCellRenderer {
         renderer.setBackgroundNonSelectionColor(background);
         renderer.setBackgroundSelectionColor(backgroundSelected);
         renderer.setBackground(sel ? backgroundSelected : background);
-        renderer.setForeground(foreground);
+        renderer.setForeground(sel ? DEFAULT_SELECTION_FOREGROUND : DEFAULT_FOREGROUND);
       }
     }
     return renderer;

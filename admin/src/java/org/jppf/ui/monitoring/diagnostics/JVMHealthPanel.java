@@ -102,7 +102,6 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     treeTable.getTree().setLargeModel(true);
     treeTable.getTree().setRootVisible(false);
     treeTable.getTree().setShowsRootHandles(true);
-    treeTable.expandAll();
     treeTable.getColumnModel().getColumn(0).setPreferredWidth(300);
     treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     treeTable.doLayout();

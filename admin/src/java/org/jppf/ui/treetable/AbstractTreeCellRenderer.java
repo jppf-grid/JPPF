@@ -22,8 +22,6 @@ import java.awt.*;
 
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.jppf.utils.JPPFConfiguration;
-
 /**
  * Renderer used to render the tree nodes in the node data panel.
  * @author Laurent Cohen
@@ -33,10 +31,6 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer {
    * The possibl boolean values.
    */
   public static final boolean[] BOOL_VALUES = { false, true };
-  /**
-   * Is tree nodes highlighting enabled?
-   */
-  public static boolean highlightingEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.state.highlighting.enabled", true);
   /**
    * Path to the location of the icon files.
    */
@@ -86,7 +80,7 @@ public abstract class AbstractTreeCellRenderer extends DefaultTreeCellRenderer {
    */
   public static final String JOB_ICON = RESOURCES + "rack.gif";
   /**
-   * Crititcal icon.
+   * Critical icon.
    */
   public static final String CRITICAL_ICON = RESOURCES + "critical2.gif";
   /**

@@ -64,9 +64,9 @@ import org.slf4j.*;
 /**
  * This example shows how to create a simple JTreeTable component, by using a JTree as a renderer (and editor) for the
  * cells in a particular column in the JTable.
- * 
+ *
  * @version 1.2 10/27/98
- * 
+ *
  * @author Philip Milne
  * @author Scott Violet
  */
@@ -184,10 +184,12 @@ public class JTreeTable extends JTable {
      */
     public TreeTableCellRenderer(final TreeModel model) {
       super(model);
+      setUI(new CustomTreeUI(JTreeTable.this));
+      setOpaque(false);
     }
 
     /**
-     * updateUI is overridden to set the colors of the Tree's renderer to match that of the table.
+     * Overridden to set the colors of the Tree's renderer to match that of the table.
      */
     @Override
     public void updateUI() {
@@ -300,7 +302,7 @@ public class JTreeTable extends JTable {
      */
     protected boolean updatingListSelectionModel;
     /**
-     * 
+     *
      */
     protected boolean updatingTreeSelectionModel;
 
@@ -414,7 +416,7 @@ public class JTreeTable extends JTable {
     }
 
     /**
-     * 
+     *
      */
     class TreeSelectionHandler implements TreeSelectionListener {
       @Override
