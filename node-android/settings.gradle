@@ -1,1 +1,1 @@
-include ':app', ':org.jppf.android.events'
+include ':app', ':events'

@@ -46,5 +46,5 @@ android {
 
 dependencies {
   compile fileTree(include: ['*.jar'], dir: 'libs')
-  compile project(":org.jppf.android.events")
+  compile project(":events")
 }
