@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.jppf.node.NodeRunner;
 import org.jppf.process.*;
 import org.jppf.utils.*;
+import org.jppf.utils.ConcurrentUtils.Condition;
 import org.slf4j.*;
 
 /**
@@ -64,6 +65,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   static final String SLAVE_LOCAL_CONFIG_FILE = "jppf-node.properties";
   /**
+   * Max timeout in millis for checking the fulfillment of a provisioning request.
+   */
+  static final long REQUEST_CHECK_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.provisioning.request.check.timeout", 15_000L);
+  /**
    * Singleton instance of this class.
    */
   static final SlaveNodeManager INSTANCE = new SlaveNodeManager();
@@ -98,7 +103,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   private SlaveNodeManager() {
     masterDir = new File(System.getProperty("user.dir"));
-    if (debugEnabled) log.debug("masterDir = {}", masterDir);
+    if (debugEnabled) log.debug("masterDir = {}, request check timeout = {} ms", masterDir, REQUEST_CHECK_TIMEOUT);
     computeSlaveClasspath();
   }
 
@@ -110,6 +115,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @param configOverrides a set of overrides to the slave's configuration.
    */
   void submitProvisioningRequest(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+    if (requestedSlaves < 0) return;
     executor.submit(new Runnable() {
       @Override
       public void run() {
@@ -125,33 +131,44 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
    * @param configOverrides a set of overrides to the slave's configuration.
    */
-  private synchronized void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
+  private void shrinkOrGrowSlaves(final int requestedSlaves, final boolean interruptIfRunning, final TypedProperties configOverrides) {
     if (debugEnabled) log.debug(String.format("provisioning request for %d slaves, interruptIfRunning=%b, configOverrides=%s", requestedSlaves, interruptIfRunning, configOverrides));
     int action = interruptIfRunning ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
     // if new config overides, stop all the slaves and restart new ones
     if (configOverrides != null) {
       if (debugEnabled) log.debug("stopping all processes");
       this.configOverrides = configOverrides;
-      for (SlaveNodeLauncher slave: slaves.values()) {
-        synchronized(slave) {
-          if (slave.isStarted()) slave.sendActionCommand(action);
-          else slave.setStopped(true);
+      synchronized(slaves) {
+        for (SlaveNodeLauncher slave: slaves.values()) {
+          synchronized(slave) {
+            if (slave.isStarted()) slave.sendActionCommand(action);
+            else {
+              slave.setStopped(true);
+              removeSlave(slave);
+            }
+          }
         }
       }
     }
-    int size = slaves.size();
+    int size = nbSlaves();
     int diff = size - requestedSlaves;
     // if running slaves > requested ones, stop those not needed
     int id = -1;
     if (diff > 0) {
       log.debug("stopping " + diff + " processes");
       for (int i=requestedSlaves; i<size; i++) {
-        id = (id < 0) ? slaves.lastKey() : slaves.lowerKey(id);
-        SlaveNodeLauncher slave = slaves.get(id);
+        SlaveNodeLauncher slave = null;
+        synchronized(slaves) {
+          id = (id < 0) ? slaves.lastKey() : slaves.lowerKey(id);
+          slave = slaves.get(id);
+        }
         log.debug("stopping {}", slave.getName());
         synchronized(slave) {
           if (slave.isStarted()) slave.sendActionCommand(action);
-          else slave.setStopped(true);
+          else {
+            slave.setStopped(true);
+            removeSlave(slave);
+          }
         }
       }
     } else {
@@ -164,16 +181,23 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
           log.debug("starting slave at {}", slaveDirPath);
           setupSlaveNodeFiles(slaveDirPath, this.configOverrides, id);
           final SlaveNodeLauncher slave = new SlaveNodeLauncher(id, slaveDirPath, slaveClasspath);
-          slaves.put(slave.getId(), slave);
           slave.addProcessLauncherListener(this);
           new Thread(slave, slaveDirPath).start();
-        } catch(Exception e) {
+        } catch(Exception|Error e) {
           log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
-        } catch(Error e) {
-          log.error("error trying to start '{}' : {}", slaveDirPath, ExceptionUtils.getStackTrace(e));
-          throw e;
+          if (e instanceof Error) throw (Error) e;
         }
       }
+    }
+    if (REQUEST_CHECK_TIMEOUT > 0) {
+      long start = System.nanoTime();
+      boolean check = ConcurrentUtils.awaitCondition(new Condition() {
+        @Override public boolean evaluate() {
+          return nbSlaves() == requestedSlaves;
+        }
+      }, REQUEST_CHECK_TIMEOUT);
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      if (debugEnabled) log.debug(String.format("fullfilment check for provisioning request for %d slaves %s after %,d ms", requestedSlaves, (check ? "succeeded" : "timed out"), elapsed));
     }
   }
 
@@ -181,8 +205,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Get the number of running slave nodes.
    * @return the number of slaves as an int.
    */
-  public synchronized int nbSlaves() {
-    return slaves.size();
+  public int nbSlaves() {
+    synchronized(slaves) {
+      return slaves.size();
+    }
   }
 
   /**
@@ -213,29 +239,27 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     props.setBoolean(SLAVE_PROPERTY, true);
     props.setInt(SLAVE_ID_PROPERTY, id);
     props.setString(MASTER_UUID_PROPERTY, NodeRunner.getUuid());
-    //SLAVE_ID_PROPERTY
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
     }
   }
 
   @Override
-  public synchronized void processStarted(final ProcessLauncherEvent event) {
+  public void processStarted(final ProcessLauncherEvent event) {
     SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
+    synchronized(slaves) {
+      slaves.put(slave.getId(), slave);
+    }
     if (nbSlaves() <= 0) log.warn("received processStarted() for slave id = {}, but nbSlaves is zero", slave.getId());
     else if (debugEnabled) log.debug("received processStarted() for slave id = {}", slave.getId());
   }
 
   @Override
-  public synchronized void processStopped(final ProcessLauncherEvent event) {
+  public void processStopped(final ProcessLauncherEvent event) {
     SlaveNodeLauncher slave = (SlaveNodeLauncher) event.getProcessLauncher();
     if (debugEnabled) log.debug("received processStopped() for slave id = {}, exitCode = {}", slave.getId(), slave.exitCode);
-    if (slave.exitCode != 2) {
-      slaves.remove(slave.getId());
-      reservedIds.remove(slave.getId());
-    } else {
-      new Thread(slave, slave.getName()).start();
-    }
+    if (slave.exitCode != 2) removeSlave(slave);
+    else new Thread(slave, slave.getName()).start();
   }
 
   /**
@@ -267,7 +291,9 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   private int nextAvailableId() {
     int count = 0;
-    while (reservedIds.contains(count)) count++;
+    synchronized(reservedIds) {
+      while (reservedIds.contains(count)) count++;
+    }
     return count;
   }
 
@@ -276,9 +302,24 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * @return the next id as an int value.
    * @since 4.2.2
    */
-  private synchronized int reserveNextAvailableId() {
+  private int reserveNextAvailableId() {
     int count = nextAvailableId();
-    reservedIds.add(count);
+    synchronized(reservedIds) {
+      reservedIds.add(count);
+    }
     return count;
+  }
+
+  /**
+   * Remove the specified slave.
+   * @param slave the slave to remove.
+   */
+  private void removeSlave(final SlaveNodeLauncher slave) {
+    synchronized(slaves) {
+      slaves.remove(slave.getId());
+    }
+    synchronized(reservedIds) {
+      reservedIds.remove(slave.getId());
+    }
   }
 }
