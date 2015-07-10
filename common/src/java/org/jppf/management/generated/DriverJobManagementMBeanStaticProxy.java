@@ -18,7 +18,9 @@
 
 package org.jppf.management.generated;
 
+import java.util.Map;
 import org.jppf.job.JobInformation;
+import org.jppf.job.JobSelector;
 import org.jppf.management.AbstractMBeanStaticProxy;
 import org.jppf.management.JMXConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
@@ -46,8 +48,43 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
+  public String[] getAllJobIds() {
+    return (String[]) getAttribute("AllJobIds");
+  }
+
+  @Override
+  public void resumeJobs(final JobSelector param0) {
+    invoke("resumeJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  }
+
+  @Override
+  public void suspendJob(final String param0, final Boolean param1) {
+    invoke("suspendJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void cancelJobs(final JobSelector param0) {
+    invoke("cancelJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  }
+
+  @Override
+  public void suspendJobs(final JobSelector param0, final Boolean param1) {
+    invoke("suspendJobs", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void resumeJob(final String param0) {
+    invoke("resumeJob", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
   public void cancelJob(final String param0) {
     invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public void updateMaxNodes(final JobSelector param0, final Integer param1) {
+    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Integer" });
   }
 
   @Override
@@ -56,8 +93,23 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
+  public String[] getAllJobUuids() {
+    return (String[]) getAttribute("AllJobUuids");
+  }
+
+  @Override
+  public JobInformation[] getJobInformation(final JobSelector param0) {
+    return (JobInformation[]) invoke("getJobInformation", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  }
+
+  @Override
   public JobInformation getJobInformation(final String param0) {
     return (JobInformation) invoke("getJobInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public Map getNodeInformation(final JobSelector param0) {
+    return (Map) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
   }
 
   @Override
@@ -71,17 +123,7 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public void resumeJob(final String param0) {
-    invoke("resumeJob", new Object[] { param0 }, new String[] { "java.lang.String" });
-  }
-
-  @Override
-  public void suspendJob(final String param0, final Boolean param1) {
-    invoke("suspendJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
-  }
-
-  @Override
-  public String[] getAllJobIds() {
-    return (String[]) getAttribute("AllJobIds");
+  public void updatePriority(final JobSelector param0, final Integer param1) {
+    invoke("updatePriority", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Integer" });
   }
 }

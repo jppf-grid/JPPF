@@ -29,8 +29,7 @@ import org.jppf.server.job.management.DriverJobManagementMBean;
  * Instances of this class represent events emitted by a JPPFJobManager.
  * @author Laurent Cohen
  */
-public class JobNotification extends Notification
-{
+public class JobNotification extends Notification {
   /**
    * Explicit serialVersionUID.
    */
@@ -58,14 +57,15 @@ public class JobNotification extends Notification
 
   /**
    * Initialize this event with the specified job and node information.
+   * @param driverUuid the type of this job event.
    * @param eventType the type of this job event.
    * @param jobInfo information about the job.
    * @param nodeInfo information about the node.
    * @param timestamp the creation timestamp for this event.
    */
-  public JobNotification(final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp)
-  {
+  public JobNotification(final String driverUuid, final JobEventType eventType, final JobInformation jobInfo, final JPPFManagementInfo nodeInfo, final long timestamp) {
     super("jobEvent", SOURCE, INSTANCE_COUNT.incrementAndGet());
+    setUserData(driverUuid);
     this.eventType = eventType;
     this.jobInfo = jobInfo;
     this.nodeInfo = nodeInfo;
@@ -76,8 +76,7 @@ public class JobNotification extends Notification
    * Get the information about the job.
    * @return a <code>JobInformation</code> instance.
    */
-  public JobInformation getJobInformation()
-  {
+  public JobInformation getJobInformation() {
     return jobInfo;
   }
 
@@ -85,8 +84,7 @@ public class JobNotification extends Notification
    * Get the information about the node.
    * @return a <code>NodeManagementInfo</code> instance.
    */
-  public JPPFManagementInfo getNodeInfo()
-  {
+  public JPPFManagementInfo getNodeInfo() {
     return nodeInfo;
   }
 
@@ -94,14 +92,20 @@ public class JobNotification extends Notification
    * Get the type of this job event.
    * @return a <code>JobManagerEventType</code> enum value.
    */
-  public JobEventType getEventType()
-  {
+  public JobEventType getEventType() {
     return eventType;
   }
 
+  /**
+   * Get the uuid of the driver that sent this notification.
+   * @return the driver uuid as a string.
+   */
+  public String getDriverUuid() {
+    return (String) getUserData();
+  }
+
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("eventType=").append(eventType);
     sb.append(", jobInfo=").append(jobInfo);
@@ -118,15 +122,11 @@ public class JobNotification extends Notification
    * Create an ObjectName for the job management MBean.
    * @return an instance of {@link ObjectName}.
    */
-  private static ObjectName createObjectName()
-  {
+  private static ObjectName createObjectName() {
     ObjectName name = null;
-    try
-    {
+    try {
       name = new ObjectName(DriverJobManagementMBean.MBEAN_NAME);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
     }
     return name;
   }

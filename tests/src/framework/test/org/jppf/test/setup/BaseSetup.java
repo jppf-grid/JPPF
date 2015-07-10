@@ -456,4 +456,12 @@ public class BaseSetup {
       ConfigSource.clientConfig = clientConfig;
     }
   }
+
+  /**
+   * Get the jppf client to use.
+   * @return a {@link JPPFClient} instance.
+   */
+  public static JPPFClient getClient() {
+    return client;
+  }
 }

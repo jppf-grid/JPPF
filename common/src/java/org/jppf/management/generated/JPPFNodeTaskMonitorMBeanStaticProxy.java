@@ -64,12 +64,12 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public Long getTotalTaskCpuTime() {
-    return (Long) getAttribute("TotalTaskCpuTime");
+  public Long getTotalTaskElapsedTime() {
+    return (Long) getAttribute("TotalTaskElapsedTime");
   }
 
   @Override
-  public Long getTotalTaskElapsedTime() {
-    return (Long) getAttribute("TotalTaskElapsedTime");
+  public Long getTotalTaskCpuTime() {
+    return (Long) getAttribute("TotalTaskCpuTime");
   }
 }

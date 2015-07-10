@@ -278,6 +278,11 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     }
   }
 
+  @Override
+  public String getEmitterUuid() {
+    return driver.getUuid();
+  }
+
   /**
    * Add a listener to the list of dispatch listeners.
    * @param listener the listener to add to the list.

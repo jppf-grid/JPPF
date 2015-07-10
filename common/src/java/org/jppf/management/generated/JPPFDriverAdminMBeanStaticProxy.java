@@ -51,6 +51,36 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   }
 
   @Override
+  public Integer nbIdleNodes() {
+    return (Integer) invoke("nbIdleNodes", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Integer nbIdleNodes(final NodeSelector param0) {
+    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Integer nbNodes() {
+    return (Integer) invoke("nbNodes", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public Integer nbNodes(final NodeSelector param0) {
+    return (Integer) invoke("nbNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  }
+
+  @Override
+  public Integer matchingNodes(final ExecutionPolicy param0) {
+    return (Integer) invoke("matchingNodes", new Object[] { param0 }, new String[] { "org.jppf.node.policy.ExecutionPolicy" });
+  }
+
+  @Override
+  public JPPFStatistics statistics() {
+    return (JPPFStatistics) invoke("statistics", (Object[]) null, (String[]) null);
+  }
+
+  @Override
   public Collection nodesInformation(final NodeSelector param0) {
     return (Collection) invoke("nodesInformation", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
@@ -118,36 +148,6 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   @Override
   public boolean getBroadcasting() {
     return (boolean) getAttribute("Broadcasting");
-  }
-
-  @Override
-  public Integer nbIdleNodes() {
-    return (Integer) invoke("nbIdleNodes", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Integer nbIdleNodes(final NodeSelector param0) {
-    return (Integer) invoke("nbIdleNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public Integer nbNodes(final NodeSelector param0) {
-    return (Integer) invoke("nbNodes", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
-  }
-
-  @Override
-  public Integer nbNodes() {
-    return (Integer) invoke("nbNodes", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Integer matchingNodes(final ExecutionPolicy param0) {
-    return (Integer) invoke("matchingNodes", new Object[] { param0 }, new String[] { "org.jppf.node.policy.ExecutionPolicy" });
-  }
-
-  @Override
-  public JPPFStatistics statistics() {
-    return (JPPFStatistics) invoke("statistics", (Object[]) null, (String[]) null);
   }
 
   @Override

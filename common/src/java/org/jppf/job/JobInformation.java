@@ -22,11 +22,10 @@ import java.io.Serializable;
 import org.jppf.node.protocol.TaskBundle;
 
 /**
- * Instances of this class provide information about the state of a job being processed by a driver. 
+ * Instances of this class provide information about the state of a job being processed by a driver.
  * @author Laurent Cohen
  */
-public class JobInformation implements Serializable
-{
+public class JobInformation implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -67,16 +66,14 @@ public class JobInformation implements Serializable
   /**
    * Initialize this object.
    */
-  public JobInformation()
-  {
+  public JobInformation() {
   }
 
   /**
    * Initialize this object with the specified parameters.
    * @param bundle the task bundle from which to get the job information.
    */
-  public JobInformation(final TaskBundle bundle)
-  {
+  public JobInformation(final TaskBundle bundle) {
     this(bundle.getUuid(), bundle.getName(), bundle.getCurrentTaskCount(), bundle.getInitialTaskCount(), bundle.getSLA().getPriority(), bundle.getSLA().isSuspended(), bundle.isPending());
   }
 
@@ -90,8 +87,7 @@ public class JobInformation implements Serializable
    * @param suspended determines whether the job is in suspended state.
    * @param pending determines whether the job is waiting to reach its scheduled execution date.
    */
-  public JobInformation(final String jobUuid, final String jobId, final int taskCount, final int initialTaskCount, final int priority, final boolean suspended, final boolean pending)
-  {
+  public JobInformation(final String jobUuid, final String jobId, final int taskCount, final int initialTaskCount, final int priority, final boolean suspended, final boolean pending) {
     this.jobUuid = jobUuid;
     this.jobName = jobId;
     this.taskCount = taskCount;
@@ -105,17 +101,18 @@ public class JobInformation implements Serializable
    * Get the user-defined name for the job.
    * @return the job name as a string.
    */
-  public String getJobName()
-  {
+  public String getJobName() {
     return jobName;
   }
 
   /**
    * Set the user-defined name for the job.
    * @param name the name as a string.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setJobName(final String name)
-  {
+  @Deprecated
+  public void setJobName(final String name) {
     this.jobName = name;
   }
 
@@ -123,17 +120,18 @@ public class JobInformation implements Serializable
    * Get the current number of tasks in the job.
    * @return the number of tasks as an int.
    */
-  public int getTaskCount()
-  {
+  public int getTaskCount() {
     return taskCount;
   }
 
   /**
    * Set the current number of tasks in the job.
    * @param taskCount the number of tasks as an int.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setTaskCount(final int taskCount)
-  {
+  @Deprecated
+  public void setTaskCount(final int taskCount) {
     this.taskCount = taskCount;
   }
 
@@ -141,17 +139,18 @@ public class JobInformation implements Serializable
    * Get the priority of the job.
    * @return the priority as an int.
    */
-  public int getPriority()
-  {
+  public int getPriority() {
     return priority;
   }
 
   /**
    * Set the priority of the job.
    * @param priority the priority as an int.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setPriority(final int priority)
-  {
+  @Deprecated
+  public void setPriority(final int priority) {
     this.priority = priority;
   }
 
@@ -159,17 +158,18 @@ public class JobInformation implements Serializable
    * Get the initial task count of this bundle.
    * @return the task count as an int.
    */
-  public int getInitialTaskCount()
-  {
+  public int getInitialTaskCount() {
     return initialTaskCount;
   }
 
   /**
    * Set the initial task count of the job.
    * @param initialTaskCount the task count as an int.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setInitialTaskCount(final int initialTaskCount)
-  {
+  @Deprecated
+  public void setInitialTaskCount(final int initialTaskCount) {
     this.initialTaskCount = initialTaskCount;
   }
 
@@ -177,17 +177,18 @@ public class JobInformation implements Serializable
    * Determine whether the job is in suspended state.
    * @return true if the job is suspended, false otherwise.
    */
-  public boolean isSuspended()
-  {
+  public boolean isSuspended() {
     return suspended;
   }
 
   /**
    * Specify whether the job is in suspended state.
    * @param suspended true if the job is suspended, false otherwise.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setSuspended(final boolean suspended)
-  {
+  @Deprecated
+  public void setSuspended(final boolean suspended) {
     this.suspended = suspended;
   }
 
@@ -195,17 +196,16 @@ public class JobInformation implements Serializable
    * Get the maximum number of nodes this job can run on.
    * @return the number of nodes as an int value.
    */
-  public int getMaxNodes()
-  {
+  public int getMaxNodes() {
     return maxNodes;
   }
 
   /**
    * Get the maximum number of nodes this job can run on.
    * @param maxNodes the number of nodes as an int value.
+   * @exclude
    */
-  public void setMaxNodes(final int maxNodes)
-  {
+  public void setMaxNodes(final int maxNodes) {
     this.maxNodes = maxNodes;
   }
 
@@ -214,41 +214,43 @@ public class JobInformation implements Serializable
    * A job is pending if its scheduled execution date/time has not yet been reached.
    * @return determines whether the job is waiting to reach its scheduled execution date.
    */
-  public boolean isPending()
-  {
+  public boolean isPending() {
     return pending;
   }
 
   /**
    * Set the pending state of the job.
    * @param pending specifies whether the job is waiting to reach its scheduled execution date.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setPending(final boolean pending)
-  {
+  @Deprecated
+  public void setPending(final boolean pending) {
     this.pending = pending;
   }
 
   /**
    * Get the unique identifier for the job.
    * @return the uuid as a string.
+   * @exclude
    */
-  public String getJobUuid()
-  {
+  public String getJobUuid() {
     return jobUuid;
   }
 
   /**
    * Set the unique identifier for the job.
    * @param jobUuid the uuid as a string.
+   * @deprecated the field is initialized in a constructor, this setter is never used in JPPF code and should not be used in client code.
+   * @exclude
    */
-  public void setJobUuid(final String jobUuid)
-  {
+  @Deprecated
+  public void setJobUuid(final String jobUuid) {
     this.jobUuid = jobUuid;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("jobUuid=").append(jobUuid);
     sb.append(", jobName=").append(jobName);

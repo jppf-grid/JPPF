@@ -21,12 +21,15 @@ package test.org.jppf.server.job.management;
 import static org.jppf.utils.ReflectionUtils.getCurrentMethodName;
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.*;
 
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
+import org.jppf.job.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -36,7 +39,15 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the functionality of the DriverJobManagementMBean from the client point of view.
  * @author Laurent Cohen
  */
-public class TestDriverJobManagementMBean extends Setup1D1N1C {
+public class TestDriverJobManagementMBean extends Setup1D2N1C {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TestDriverJobManagementMBean.class);
+  /**
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * A "short" duration for this test.
    */
@@ -47,7 +58,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C {
   private static final long TIME_LONG = 3000L;
 
   /**
-   * We test a job with 1 task, and attempt to cancel it after it has completed.
+   * We test a job with 1 task, and attempt to cancel it before completion.
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 15000L)
@@ -60,13 +71,219 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C {
     assertNotNull(proxy);
     proxy.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
+    assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    assertNotNull(results.get(0));
-    int count = 0;
-    for (Task<?> t : results) {
-      if (t.getResult() == null) count++;
+    for (Task<?> t : results) assertNull(t.getResult());
+  }
+
+  /**
+   * Test 2 jobs and attempt to cancel them using an all jobs selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testCancelJobsWithAllJobsSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, new AllJobsSelector()));
+  }
+
+  /**
+   * Test 2 jobs and attempt to cancel them using a job uuid selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testCancelJobsWithJobUuidSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<String> uuids = new ArrayList<>();
+    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, new JobUuidSelector(uuids)));
+  }
+
+  /**
+   * Test 2 jobs and attempt to cancel them using an all jobs selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testCancelJobsWithScriptedJobSelector() throws Exception {
+    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, prefix, false);
+    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, selector));
+  }
+
+  /**
+   * Test 2 suspended jobs jobs and attempt to resume them using an all jobs selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testResumeJobsWithAllJobsSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, new AllJobsSelector()));
+  }
+
+  /**
+   * Test 2 suspended jobs jobs and attempt to resume them using a job uuid selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testResumeJobsWithJobUuidSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    List<String> uuids = new ArrayList<>();
+    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, new JobUuidSelector(uuids)));
+  }
+
+  /**
+   * Test 2 suspended jobs jobs and attempt to resume them using an all jobs selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testResumeJobsWithScriptedJobSelector() throws Exception {
+    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, prefix, true);
+    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, selector));
+  }
+
+  /**
+   * Test 2 jobs and attempt to suspend them using an all jobs selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testSuspendJobsWithAllJobsSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, new AllJobsSelector()));
+  }
+
+  /**
+   * Test 2 jobs and attempt to suspend them using a job uuid selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testSuspendJobsWithJobUuidSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<String> uuids = new ArrayList<>();
+    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, new JobUuidSelector(uuids)));
+  }
+
+  /**
+   * Test 2 jobs and attempt to suspend them using an all jobs selector.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testSuspendJobsWithScriptedJobSelector() throws Exception {
+    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, prefix, false);
+    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, selector));
+  }
+
+  /**
+   * Test 2 jobs and check their node dispatches.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testGetNodeInfoWithAllJobsSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, new AllJobsSelector()));
+  }
+
+  /**
+   * Test 2 jobs and check their node dispatches.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testGetNodeInfoWithJobUuidSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<String> uuids = new ArrayList<>();
+    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, new JobUuidSelector(uuids)));
+  }
+
+  /**
+   * Test 2 jobs and check their node dispatches.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testGetNodeInfoWithScriptedJobSelector() throws Exception {
+    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, prefix, false);
+    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, selector));
+  }
+
+  /**
+   * Test 2 jobs and check their node dispatches.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testUpdatePriorityAndMaxNodesWithAllJobsSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new AllJobsSelector()));
+  }
+
+  /**
+   * Test 2 jobs and check their node dispatches.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testUpdatePriorityAndMaxNodesWithJobUuidSelector() throws Exception {
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    List<String> uuids = new ArrayList<>();
+    for (JPPFJob job: jobs) uuids.add(job.getUuid());
+    testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new JobUuidSelector(uuids)));
+  }
+
+  /**
+   * Test 2 jobs and check their node dispatches.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 15000L)
+  public void testUpdatePriorityAndMaxNodesWithScriptedJobSelector() throws Exception {
+    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, prefix, true);
+    JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
+    testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, selector));
+  }
+
+  /**
+   * Create the specified number of jobs with the specified number of tasks.
+   * @param nbJobs the number of jobs to create.
+   * @param nbTasks the number of tasks to add to each job.
+   * @param taskDuration the duration of each task in millis.
+   * @param namePrefix the prefix of the job names.
+   * @param suspended whether the job is submitted in suspended state.
+   * @return a list of {@link JPPFJob} instances.
+   * @throws Exception if any error occurs.
+   */
+  private List<JPPFJob> createMultipleJobs(final int nbJobs, final int nbTasks, final long taskDuration, final String namePrefix, final boolean suspended) throws Exception {
+    List<JPPFJob> jobs = new ArrayList<>();
+    for (int i=1; i<= nbJobs; i++) {
+      JPPFJob job = BaseTestHelper.createJob(namePrefix + '-' + i, false, false, nbTasks, LifeCycleTask.class, taskDuration);
+      job.getSLA().setSuspended(suspended);
+      jobs.add(job);
     }
-    assertEquals(nbTasks, count);
+    return jobs;
+  }
+
+  /**
+   * Test the submission and cancellation of the specified jobs filtered by the specified job selector.
+   * @param action the action to run.
+   * @throws Exception if any error occurs.
+   */
+  private void testJobSelectorAction(final JobSelectorAction action) throws Exception {
+    List<JPPFJob> jobs = action.getJobs();
+    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    try {
+      pool.setSize(jobs.size());
+      pool.awaitWorkingConnections(Operator.EQUAL, jobs.size());
+      for (JPPFJob job: jobs) client.submitJob(job);
+      action.call();
+    } finally {
+      log.info("setting pool size to 1");
+      pool.setSize(1);
+      pool.awaitWorkingConnections(Operator.EQUAL, 1);
+    }
   }
 
   /**
@@ -105,7 +322,7 @@ public class TestDriverJobManagementMBean extends Setup1D1N1C {
     List<Task<?>> results = job.awaitResults();
     assertEquals(nbTasks, results.size());
     Thread.sleep(1000L);
-    String[] ids = proxy.getAllJobIds();
+    String[] ids = proxy.getAllJobUuids();
     assertNotNull(ids);
     assertEquals("the driver's job queue should be empty", 0, ids.length);
   }

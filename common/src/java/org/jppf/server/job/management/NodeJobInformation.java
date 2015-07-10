@@ -24,7 +24,7 @@ import org.jppf.job.JobInformation;
 import org.jppf.management.JPPFManagementInfo;
 
 /**
- * Instances of this cass hold temporary information about a sub-job and the node it was dispatched to
+ * Instances of this cass hold temporary information about a sub-job and the nodes it was dispatched to
  * @author Laurent Cohen
  */
 public class NodeJobInformation implements Serializable
@@ -42,18 +42,34 @@ public class NodeJobInformation implements Serializable
    */
   public final JPPFManagementInfo nodeInfo;
   /**
-   * The information about the sub-job.
+   * The information about the job dispatch.
    */
   public final JobInformation jobInfo;
 
   /**
    * 
-   * @param nodeInfo - the information about the node.
-   * @param jobInfo - the information about the sub-job.
+   * @param nodeInfo the information about the node.
+   * @param jobInfo the information about the sub-job.
    */
   public NodeJobInformation(final JPPFManagementInfo nodeInfo, final JobInformation jobInfo)
   {
     this.nodeInfo = nodeInfo;
     this.jobInfo = jobInfo;
+  }
+
+  /**
+   * Get the information about the node.
+   * @return a {@link JPPFManagementInfo} object.
+   */
+  public JPPFManagementInfo getNodeInfo() {
+    return nodeInfo;
+  }
+
+  /**
+   * Get the information about the job dispatch.
+   * @return a {@link JobInformation} object.
+   */
+  public JobInformation getJobInformation() {
+    return jobInfo;
   }
 }

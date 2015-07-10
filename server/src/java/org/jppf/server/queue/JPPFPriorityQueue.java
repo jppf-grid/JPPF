@@ -319,7 +319,20 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   public Set<String> getAllJobIds() {
     lock.lock();
     try {
-      return Collections.unmodifiableSet(jobMap.keySet());
+      return new HashSet(jobMap.keySet());
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get the set of all the jobs currently queued or executing.
+   * @return a list of {@link ServerJob} instances.
+   */
+  public List<ServerJob> getAllJobs() {
+    lock.lock();
+    try {
+      return new ArrayList<>(jobMap.values());
     } finally {
       lock.unlock();
     }
