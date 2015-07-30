@@ -43,6 +43,7 @@ public class LocalClassContext extends NodeClassContext {
 
   @Override
   public JPPFResourceWrapper deserializeResource() throws Exception {
+    requestStartTime = System.nanoTime();
     return resource;
   }
 
