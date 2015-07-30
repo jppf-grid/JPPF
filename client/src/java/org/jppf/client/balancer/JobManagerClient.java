@@ -137,11 +137,12 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param wrapper the connection wrapper to add.
    */
-  protected synchronized void addConnection(final ChannelWrapper wrapper) {
+  protected void addConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
-
-    allConnections.add(wrapper);
+    synchronized(this) {
+      allConnections.add(wrapper);
+    }
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
   }
 
@@ -149,13 +150,14 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Remove the specified connection wrapper from the list of connections handled by this manager.
    * @param wrapper the connection wrapper to remove.
    */
-  protected synchronized void removeConnection(final ChannelWrapper wrapper)
-  {
+  protected void removeConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     try {
       updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
     } finally {
-      allConnections.remove(wrapper);
+      synchronized(this) {
+        allConnections.remove(wrapper);
+      }
     }
   }
 
@@ -164,25 +166,28 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @param cnn the client connection to add.
    * @return wrapper for the added client connection.
    */
-  protected synchronized ChannelWrapper addConnection(final JPPFClientConnection cnn) {
+  protected ChannelWrapper addConnection(final JPPFClientConnection cnn) {
     if (log.isDebugEnabled()) log.debug("adding connection " + cnn);
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
-
-    ChannelWrapper wrapper = wrapperMap.get(cnn);
+    ChannelWrapper wrapper = null;
+    synchronized(this) {
+      wrapper = wrapperMap.get(cnn);
+    }
     if (wrapper == null) {
-      try
-      {
+      try {
         wrapper = new ChannelWrapperRemote(cnn);
-        JMXDriverConnectionWrapper jmx = cnn.getConnectionPool().getJmxConnection();
+        JPPFConnectionPool pool = cnn.getConnectionPool();
         JPPFSystemInformation systemInfo = cnn.getSystemInfo();
         if (systemInfo != null) wrapper.setSystemInformation(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), jmx == null ? -1 : jmx.getPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
+        JPPFManagementInfo info = new JPPFManagementInfo(cnn.getHost(), pool.getJmxPort(), cnn.getDriverUuid(), JPPFManagementInfo.DRIVER, cnn.isSSLEnabled());
         if (systemInfo != null) info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       } catch (Throwable e) {
         log.error("Error while adding connection " + cnn, e);
       } finally {
-        wrapperMap.put(cnn, wrapper);
+        synchronized(this) {
+          wrapperMap.put(cnn, wrapper);
+        }
         addConnection(wrapper);
       }
     }
@@ -195,8 +200,11 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @param connection the client connection to remove.
    * @return wrapper for the removed client connection or null.
    */
-  protected synchronized ChannelWrapper removeConnection(final JPPFClientConnection connection) {
-    ChannelWrapper wrapper = wrapperMap.remove(connection);
+  protected ChannelWrapper removeConnection(final JPPFClientConnection connection) {
+    ChannelWrapper wrapper = null;
+    synchronized(this) {
+      wrapper = wrapperMap.remove(connection);
+    }
     if (wrapper != null) removeConnection(wrapper);
     return wrapper;
   }
@@ -213,7 +221,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Dtermine whether there is at east one connection, idle or not.
    * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
    */
-  public synchronized boolean hasWorkingConnection() {
+  public boolean hasWorkingConnection() {
     return nbWorkingConnections.get() > 0;
   }
 
@@ -299,7 +307,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
 
   @Override
   public synchronized boolean hasAvailableConnection() {
-    return taskQueueChecker.hasIdleChannel() || wrapperLocal != null && wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE;
+    return taskQueueChecker.hasIdleChannel() || ((wrapperLocal != null) && (wrapperLocal.getStatus() == JPPFClientConnectionStatus.ACTIVE));
   }
 
   @Override

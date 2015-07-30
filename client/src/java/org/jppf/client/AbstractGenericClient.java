@@ -108,7 +108,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       log.error(e.getMessage(), e);
     }
     if (jobManager == null) jobManager = createJobManager();
-    System.out.println("jobManager = " + jobManager);
+    //System.out.println("jobManager = " + jobManager);
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -147,7 +147,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (debugEnabled) log.debug("initializing connections");
     int coreThreads = Runtime.getRuntime().availableProcessors();
     //LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
-    LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    //BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
+    BlockingQueue<Runnable> queue = new SynchronousQueue<>();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
     if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
@@ -233,7 +234,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   protected void newConnectionPool(final String name, final JPPFConnectionInformation info, final int priority, final int poolSize, final boolean ssl, final int jmxPoolSize) {
-    if (debugEnabled) log.debug("new connection: {}", name);
+    if (debugEnabled) log.debug("new connection pool: {}", name);
     final int size = poolSize > 0 ? poolSize : 1;
     Runnable r = new Runnable() {
       @Override public void run() {
@@ -243,12 +244,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           pools.putValue(priority, pool);
           pendingPools.add(pool);
         }
-        fireConnectionPoolAdded(pool);
         HostIP hostIP = new HostIP(info.host, info.host);
         if (JPPFConfiguration.getProperties().getBoolean("org.jppf.resolve.addresses", true)) hostIP = NetworkUtils.getHostIP(info.host);
         if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
-        pool.setDriverHost(hostIP.hostName());
-        pool.setDriverIPAddress(hostIP.ipAddress());
+        pool.setDriverHostIP(hostIP);
+        fireConnectionPoolAdded(pool);
         for (int i=1; i<=size; i++) {
           if (isClosed()) return;
           submitNewConnection(info, pool);
@@ -284,11 +284,10 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (isClosed()) return;
     log.info("connection [" + c.getName() + "] created");
     c.addClientConnectionStatusListener(this);
-    c.setStatus(JPPFClientConnectionStatus.NEW);
-    //pendingConnections.add(c);
+    //c.setStatus(JPPFClientConnectionStatus.NEW);
     executor.submit(new ConnectionInitializer(c));
     fireConnectionAdded(c);
-    if (debugEnabled) log.debug("end of connection [" + c.getName() + "] created");
+    if (debugEnabled) log.debug("end of of newConnection({})", c.getName());
   }
 
   /**
@@ -298,11 +297,15 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   @Override
   protected void connectionFailed(final JPPFClientConnection connection) {
-    if (debugEnabled) log.debug("Connection [" + connection.getName() + "] {}", connection.getStatus());
-    if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
+    if (debugEnabled) log.debug("Connection [{}] {}", connection.getName(), connection.getStatus());
+    JPPFConnectionPool pool = connection.getConnectionPool();
     connection.close();
-    removeClientConnection(connection);
+    boolean poolRemoved = removeClientConnection(connection);
     fireConnectionRemoved(connection);
+    if (poolRemoved) {
+      fireConnectionPoolRemoved(pool);
+      if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
+    }
   }
 
   @Override
@@ -319,6 +322,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     if (closed.get()) return;
     if (debugEnabled) log.debug("closing JPPF client");
     closed.set(true);
+    if (debugEnabled) log.debug("closing broadcast receiver");
+    if (receiverThread != null) {
+      receiverThread.close();
+      receiverThread = null;
+    }
     if (debugEnabled) log.debug("unregistering startup classes");
     HookFactory.unregister(JPPFClientStartupSPI.class);
     if (jobManager != null) {
@@ -330,11 +338,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         jobManager.close();
         jobManager = null;
       }
-    }
-    if (debugEnabled) log.debug("closing broadcast receiver");
-    if (receiverThread != null) {
-      receiverThread.close();
-      receiverThread = null;
     }
     if (debugEnabled) log.debug("closing executor");
     if (executor != null) {
@@ -383,7 +386,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     JobManager jobManager = getJobManager();
     if(jobManager != null) {
       ClientConnectionStatusListener listener = jobManager.getClientConnectionStatusListener();
-      if(listener != null) listener.statusChanged(event);
+      if (listener != null) listener.statusChanged(event);
       if (jobManager instanceof ThreadSynchronization) ((ThreadSynchronization) jobManager).wakeUp();
     }
   }

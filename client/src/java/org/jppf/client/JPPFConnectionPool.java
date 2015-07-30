@@ -65,14 +65,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    */
   private final AtomicInteger sequence = new AtomicInteger(0);
   /**
-   * The host name or address of the remote driver.
-   */
-  private String driverHost;
-  /**
-   * The host name or address of the remote driver.
-   */
-  private String driverIPAddress;
-  /**
    * The port to use on the remote driver.
    */
   private int driverPort = -1;
@@ -88,6 +80,10 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * The pool of JMX connections.
    */
   private final JMXConnectionPool jmxPool;
+  /**
+   * The host and IP address of the driver.
+   */
+  private HostIP hostIP;
 
   /**
    * Initialize this pool with the specified parameters.
@@ -106,7 +102,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     this.priority = priority;
     this.name = name;
     this.sslEnabled = sslEnabled;
-    jmxPool = new JMXConnectionPool(this, jmxPoolSize);
+    jmxPool = new JMXConnectionPool(jmxPoolSize, sslEnabled);
   }
 
   @Override
@@ -126,10 +122,12 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param statuses the set of connection statuses to look for.
    * @return the size as an int.
    */
-  public synchronized int connectionCount(final JPPFClientConnectionStatus...statuses) {
-    if ((statuses == null) || (statuses.length <= 0)) return connections.size();
+  public int connectionCount(final JPPFClientConnectionStatus...statuses) {
+    synchronized(this) {
+      if ((statuses == null) || (statuses.length <= 0)) return connections.size();
+    }
     int count = 0;
-    for (JPPFClientConnection c: connections) {
+    for (JPPFClientConnection c: getConnections()) {
       if (connectionHasStatus(c, true, statuses)) count++;
     }
     return count;
@@ -147,7 +145,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * Get the priority associated with this pool.
    * @return the priority as an int.
    */
-  public synchronized int getPriority() {
+  public int getPriority() {
     return priority;
   }
 
@@ -209,16 +207,18 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   @Override
-  public synchronized int setSize(final int maxSize) {
-    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.size);
-    if (maxSize == this.size) return this.size;
-    int diff = maxSize - this.size;
+  public int setSize(final int newSize) {
+    int currentSize = getSize();
+    if (currentSize == newSize) return currentSize;
+    if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", newSize, currentSize);
+    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
+    int diff = newSize - currentSize;
     int size = connectionCount();
     if (diff < 0) {
       int actual = 0;
       int i = size;
       while ((--i >= 0) && (actual < -diff)) {
-        JPPFClientConnection c = connections.get(i);
+        JPPFClientConnection c = getConnection(i);
         if (connectionHasStatus(c, false, JPPFClientConnectionStatus.EXECUTING)) {
           if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
           c.close();
@@ -226,19 +226,24 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
           actual++;
         }
       }
-      this.size -= actual;
+      synchronized(this) {
+        this.size -= actual;
+      }
     } else {
-      JPPFClientConnection c = connections.get(0);
       JPPFConnectionInformation info = new JPPFConnectionInformation();
-      info.host = driverHost;
-      int[] ports = new int[] {driverPort };
+      int[] ports = null;
+      synchronized(this) {
+        info.uuid = driverUuid;
+        //info.host = hostIP != null ? hostIP.hostName() : null;
+        info.host = hostIP != null ? hostIP.ipAddress() : null;
+        ports = new int[] { driverPort };
+        this.size += diff;
+      }
       if (sslEnabled) info.sslServerPorts = ports;
       else info.serverPorts = ports;
-      info.uuid = driverUuid;
       for (int i=0; i<diff; i++) client.submitNewConnection(info, this);
-      this.size += diff;
     }
-    return this.size;
+    return getSize();
   }
 
   /**
@@ -247,11 +252,12 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param statuses an array of {@link JPPFClientConnectionStatus} values to check against.
    * @return a list of {@link JPPFClientConnection} instances, possibly empty but never {@code null}.
    */
-  public synchronized List<JPPFClientConnection> getConnections(final JPPFClientConnectionStatus...statuses) {
-    List<JPPFClientConnection> list = new ArrayList<>(connections.size());
-    for (JPPFClientConnection c: connections) {
+  public List<JPPFClientConnection> getConnections(final JPPFClientConnectionStatus...statuses) {
+    List<JPPFClientConnection> list = new ArrayList<>(getSize());
+    for (JPPFClientConnection c: getConnections()) {
       if (connectionHasStatus(c, true, statuses)) list.add(c);
     }
+    if (log.isTraceEnabled()) log.trace("statuses={}, got connections {}", Arrays.asList(statuses), list);
     return list;
   }
 
@@ -263,12 +269,37 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return {@code true} if the connection status is not one of the specified statuses, {@code false} otherwise.
    */
   boolean connectionHasStatus(final JPPFClientConnection connection, final boolean has, final JPPFClientConnectionStatus...statuses) {
-    if ((connection == null) || (statuses == null)) return !has;
+    if (connection == null) return !has;
+    if ((statuses == null) || (statuses.length <= 0)) return has;
     JPPFClientConnectionStatus status = connection.getStatus();
     for (JPPFClientConnectionStatus s: statuses) {
       if (status == s) return has;
     }
     return !has;
+  }
+
+  /**
+   * Wait for the specified number of connections to be in one of the specified states, or the specified timeout to expire, whichever happens first.
+   * This method will increase or decrease the number of connections in this pool as needed.
+   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
+   * @param nbConnections the number of connections to wait for.
+   * @param timeout the maximum time to wait, in milliseconds.
+   * @param statuses the possible statuses of the connections to wait for.
+   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @since 5.0
+   */
+  public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
+    final Operator op = operator == null ? Operator.EQUAL : operator;
+    if (debugEnabled) log.debug(String.format("awaiting %d connections with operator=%s and status in %s", nbConnections, op, Arrays.asList(statuses)));
+    //setSize(nbConnections);
+    final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override public boolean evaluate() {
+        return op.evaluate(ref.set(getConnections(statuses)).size(), nbConnections);
+      }
+    }, timeout);
+    if (debugEnabled) log.debug("got expected connections: " + ref.get());
+    return ref.get();
   }
 
   @Override
@@ -278,7 +309,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     sb.append(", id=").append(id);
     sb.append(", maxSize=").append(size);
     sb.append(", priority=").append(priority);
-    sb.append(", driverHost=").append(driverHost);
+    sb.append(", driverHost=").append(hostIP != null ? hostIP.hostName() : null);
     sb.append(", driverPort=").append(driverPort);
     sb.append(", sslEnabled=").append(sslEnabled);
     sb.append(", client=").append(client);
@@ -295,23 +326,21 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
+   * Set the host and IP address of the driver.
+   * @param hostIP a {@link HostIP} instance.
+   */
+  synchronized void setDriverHostIP(final HostIP hostIP) {
+    this.hostIP = hostIP;
+    jmxPool.setDriverHostIP(hostIP);
+  }
+
+  /**
    * Get the host name of the remote driver.
    * @return a string representing the host name or ip address.
    * @since 4.2
    */
   public synchronized String getDriverHost() {
-    return driverHost;
-  }
-
-  /**
-   * Set the host name of the remote driver.
-   * @param driverHost a string representing the host name or ip address.
-   */
-  synchronized void setDriverHost(final String driverHost) {
-    if ((this.driverHost == null) && (driverHost != null)) {
-      this.driverHost = driverHost;
-      jmxPool.hostSet();
-    }
+    return hostIP != null ? hostIP.hostName() : null;
   }
 
   /**
@@ -320,18 +349,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @since 4.2
    */
   public synchronized String getDriverIPAddress() {
-    return driverIPAddress;
-  }
-
-  /**
-   * Set the ip address of the remote driver.
-   * @param ipAddress a string representing the host name or ip address.
-   */
-  synchronized void setDriverIPAddress(final String ipAddress) {
-    if ((this.driverIPAddress == null) && (ipAddress != null)) {
-      this.driverIPAddress = ipAddress;
-      jmxPool.hostSet();
-    }
+    return hostIP != null ? hostIP.ipAddress() : null;
   }
 
   /**
@@ -450,7 +468,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   /**
    * Wait for the specified number of connections to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status.
    * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE)}.
-   * This method will create or close connections as needed to reach the desired number of connections.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the expected number of connections to wait for.
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
@@ -461,9 +478,18 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
+   * Wait for the a connection to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} status.
+   * This is a shorthand for {@code awaitActiveConnections(Operator.AT_LEAST, 1).get(0)}.
+   * @return a {@link JPPFClientConnection} instances with the desired status.
+   * @since 5.1
+   */
+  public JPPFClientConnection awaitActiveConnection() {
+    return awaitActiveConnections(Operator.AT_LEAST, 1).get(0);
+  }
+
+  /**
    * Wait for the specified number of connections to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
    * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING)}.
-   * This method will create or close connections as needed to reach the desired number of connections.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
@@ -474,9 +500,18 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
+   * Wait for a connection to be in the {@link JPPFClientConnectionStatus#ACTIVE ACTIVE} or {@link JPPFClientConnectionStatus#EXECUTING EXECUTING} status.
+   * This is a shorthand for {@code awaitWorkingConnections(Operator.AT_LEAST, 1).get(0)}.
+   * @return a list of {@code nbConnections} {@link JPPFClientConnection} instances with the desired status.
+   * @since 5.0
+   */
+  public JPPFClientConnection awaitWorkingConnection() {
+    return awaitWorkingConnections(Operator.AT_LEAST, 1).get(0);
+  }
+
+  /**
    * Wait for the specified number of connections to be in one of the specified states.
    * This is a shorthand for {@code awaitConnections(nbConnections, Long.MAX_VALUE, JPPFstatuses)}.
-   * This method will create or close connections as needed to reach the desired number of connections.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param statuses the possible statuses of the connections to wait for.
@@ -488,32 +523,19 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
-   * Wait for the specified number of connections to be in one of the specified states, or the specified timeout to expire, whichever happens first.
-   * This method will increase or decrease the number of connections in this pool as needed.
-   * This method will create or close connections as needed to reach the desired number of connections.
-   * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
-   * @param nbConnections the number of connections to wait for.
-   * @param timeout the maximum time to wait, in milliseconds.
+   * Wait for a connection to be in one of the specified states.
+   * This is a shorthand for {@code awaitConnections(Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0)}.
    * @param statuses the possible statuses of the connections to wait for.
-   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
-   * @since 5.0
+   * @return a {@link JPPFClientConnection} instance in one of the specified statuses.
+   * @since 5.1
    */
-  public List<JPPFClientConnection> awaitConnections(final Operator operator, final int nbConnections, final long timeout, final JPPFClientConnectionStatus...statuses) {
-    final Operator op = operator == null ? Operator.EQUAL : operator;
-    setSize(nbConnections);
-    final MutableReference<List<JPPFClientConnection>> ref = new MutableReference<>();
-    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        return op.evaluate(ref.set(getConnections(statuses)).size(), nbConnections);
-      }
-    }, timeout);
-    return ref.get();
+  public JPPFClientConnection awaitConnection(final JPPFClientConnectionStatus...statuses) {
+    return awaitConnections(Operator.AT_LEAST, 1, Long.MAX_VALUE, statuses).get(0);
   }
 
   /**
    * Wait for the specified number of JMX connections to be in the specified state.
    * This is a shorthand for {@code awaitJMXConnections(nbConnections, Long.MAX_VALUE, connectedOnly)}.
-   * This method will create or close JMX connections as needed to reach the desired number of connections.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
@@ -526,7 +548,6 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
 
   /**
    * Wait for the specified number of JMX connections to be in the specified state, or the specified timeout to expire, whichever happens first.
-   * This method will create or close JMX connections as needed to reach the desired number of connections.
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
@@ -536,5 +557,16 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    */
   public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connectedOnly) {
     return jmxPool.awaitJMXConnections(operator, nbConnections, timeout, connectedOnly);
+  }
+
+  /**
+   * Wait a JMX connection to be in the specified state.
+   * This is a shorthand for {@code awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0)}.
+   * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
+   * @return a {@link JMXDriverConnectionWrapper} instance in the specified connected state.
+   * @since 5.1
+   */
+  public JMXDriverConnectionWrapper awaitJMXConnection(final boolean connectedOnly) {
+    return awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0);
   }
 }

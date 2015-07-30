@@ -75,7 +75,7 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
         if (socketClient == null) initSocketClient();
         String msg = "[client: " + name + "] Attempting connection to the task server at " + host + ':' + port;
         System.out.println(msg);
-        if (debugEnabled) log.debug(msg);
+        log.info(msg);
         socketInitializer.initializeSocket(socketClient);
         if (!socketInitializer.isSuccessful()) throw new JPPFException("[" + (name != null ? name : "null") + "] Could not reconnect to the JPPF task server");
         try {
@@ -88,8 +88,8 @@ public class TaskServerConnectionHandler extends AbstractClientConnectionHandler
           owner.getConnectionPool().setJmxPort(owner.isSSLEnabled() ? sslJmxPort : plainJmxPort);
           msg = "[client: " + name + "] Reconnected to the JPPF task server";
           System.out.println(msg);
-          if (debugEnabled) log.debug(msg);
-          setStatus(ACTIVE);
+          log.info(msg);
+          if (!isClosed()) setStatus(ACTIVE);
           done = true;
         } catch (Exception e) {
           String format = "error initializing connection to job server: {}";

@@ -220,7 +220,7 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
       if (taskServerConnection != null) taskServerConnection.close();
       if (debugEnabled) log.debug("closing class server connection " + this);
       if (delegate != null) delegate.close();
-      if (debugEnabled) log.debug("closing jmx connection " + this);
+      //if (debugEnabled) log.debug("closing jmx connection " + this);
     } catch (Exception e) {
       if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
       else log.error('[' + name + "] " + e.getMessage());

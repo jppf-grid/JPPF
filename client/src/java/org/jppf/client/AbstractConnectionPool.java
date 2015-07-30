@@ -115,6 +115,16 @@ public abstract class AbstractConnectionPool<E extends AutoCloseable> implements
     return connections.iterator();
   }
 
+  /**
+   * Get the connection at the specified index.
+   * @param i the index to look at.
+   * @return a connection object.
+   * @since 5.1
+   */
+  synchronized E getConnection(final int i) {
+    return connections.get(i);
+  }
+
   @Override
   public synchronized int getSize() {
     return size;

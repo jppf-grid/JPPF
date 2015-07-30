@@ -52,6 +52,7 @@ class ConnectionInitializer implements Runnable
   public void run()
   {
     if (debugEnabled) log.debug("initializing driver connection '" + connection + '\'');
+    connection.setStatus(JPPFClientConnectionStatus.NEW);
     connection.init();
   }
 }

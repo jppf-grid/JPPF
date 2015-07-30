@@ -27,12 +27,8 @@ import org.jppf.node.protocol.Task;
  * Interface for facilities managing the persistence of jobs and their state.
  * It is intended to enable the storage of jobs in a persistent store, so as to be able
  * to resubmit them at a later time, if the client terminated for any reason before the job completed.
- * <p>The state of a job is essentially made of the tasks initially submitted, associated with the list
- * of tasks that completed, such as captured by the job's <code>TaskResultListener</code>.
- * The class {@link org.jppf.client.JPPFResultCollector JPPFResultCollector} does that automatically,
- * and it is recommended to use it or a subclass that calls <code>super.resultsReceived()</code> in its implementation.
- * <p>The underlying physical store that is used is implementation-dependent.
- * For example: file system, database, cloud storage facility, etc.
+ * <p>The state of a job is essentially made of the tasks initially submitted, associated with the list of tasks that completed.
+ * <p>The underlying physical store that is used is implementation-dependent. For example: file system, database, cloud storage facility, etc.
  * @param <K> the type of the keys used to identify and locate jobs in the persistence store.
  * @author Laurent Cohen
  */

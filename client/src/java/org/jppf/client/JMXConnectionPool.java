@@ -40,28 +40,32 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
+   * The host and IP address of the driver.
+   */
+  private HostIP hostIP;
+  /**
    * The jmx port to use on the remote driver.
    */
   private int port = -1;
   /**
-   * The associated client connection pool.
+   * Determines whether the pool is for SSL connections.
    */
-  private final JPPFConnectionPool pool;
+  private final boolean sslEnabled;
 
   /**
    * Initialize this pool witht he psecified core size.
-   * @param pool the associated client connection pool.
    * @param size the pool core size.
+   * @param sslEnabled whether the pool is for SSL connections.
    */
-  public JMXConnectionPool(final JPPFConnectionPool pool, final int size) {
+  public JMXConnectionPool(final int size, final boolean sslEnabled) {
     super(size);
-    this.pool = pool;
+    this.sslEnabled = sslEnabled;
   }
 
   @Override
-  public synchronized JMXDriverConnectionWrapper getConnection() {
+  public JMXDriverConnectionWrapper getConnection() {
     int count = 0;
-    int size = connections.size();
+    int size = connectionCount();
     while (count++ < size) {
       JMXDriverConnectionWrapper jmx = nextConnection();
       if (jmx.isConnected()) return jmx;
@@ -76,7 +80,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    * @since 5.0
    */
   synchronized List<JMXDriverConnectionWrapper> getConnections(final boolean connectedOnly) {
-    if (connectedOnly) return getConnections();
+    if (!connectedOnly) return getConnections();
     List<JMXDriverConnectionWrapper> list = new ArrayList<>();
     for (JMXDriverConnectionWrapper connection: getConnections()) {
       if (connection.isConnected()) list.add(connection);
@@ -106,20 +110,13 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
       this.size -= actual;
     } else {
       for (int i=0; i<diff; i++) {
-        JMXDriverConnectionWrapper c = new JMXDriverConnectionWrapper(pool.getDriverHost(), port, pool.isSslEnabled());
+        JMXDriverConnectionWrapper c = new JMXDriverConnectionWrapper(hostIP.ipAddress(), port, sslEnabled);
         this.add(c);
         c.connect();
       }
       this.size += diff;
     }
     return this.size;
-  }
-
-  /**
-   * Callback invoked when the driver host is set on the enclosing {@link JPPFConnectionPool}.
-   */
-  synchronized void hostSet() {
-    if (getPort() >= 0) initializeConnections();
   }
 
   /**
@@ -137,7 +134,18 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
   synchronized void setPort(final int port) {
     if ((this.port < 0) && (port >= 0)) {
       this.port = port;
-      if (pool.getDriverIPAddress() != null) initializeConnections();
+      if (hostIP != null) initializeConnections();
+    }
+  }
+
+  /**
+   * Set the host and IP address of the driver.
+   * @param hostIP a {@link HostIP} instance.
+   */
+  synchronized void setDriverHostIP(final HostIP hostIP) {
+    if ((this.hostIP == null) && (hostIP != null)) {
+      this.hostIP = hostIP;
+      if (port >= 0) initializeConnections();
     }
   }
 
@@ -148,7 +156,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
     int n = 0;
     if ((n = connectionCount()) < size) {
       for (int i=n; i<size; i++) {
-        JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(pool.getDriverIPAddress(), port, pool.isSslEnabled());
+        JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper(hostIP.ipAddress(), port, sslEnabled);
         this.add(jmx);
         jmx.connect();
       }
@@ -167,7 +175,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    */
   List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connected) {
     final Operator op = operator == null ? Operator.EQUAL : operator;
-    setSize(nbConnections);
+    //setSize(nbConnections);
     final MutableReference<List<JMXDriverConnectionWrapper>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {

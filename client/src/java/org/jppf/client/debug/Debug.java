@@ -19,7 +19,7 @@
 package org.jppf.client.debug;
 
 import java.lang.management.ManagementFactory;
-import java.util.List;
+import java.util.*;
 
 import javax.management.*;
 
@@ -34,6 +34,10 @@ public class Debug implements DebugMBean {
    * The client to monitor.
    */
   private final JPPFClient client;
+  /**
+   *
+   */
+  private final Map<String, String> parameters = new TreeMap<>();
 
   /**
    * Initialize this MBean instance.
@@ -87,5 +91,31 @@ public class Debug implements DebugMBean {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public String getParameter(final String key) {
+    return parameters.get(key);
+  }
+
+  @Override
+  public void setParameter(final String key, final String value) {
+    parameters.put(key, value);
+  }
+
+  @Override
+  public void removeParameter(final String key) {
+    parameters.remove(key);
+  }
+
+  @Override
+  public String allParameters() {
+    StringBuilder sb = new StringBuilder();
+    int count = 0;
+    for (Map.Entry<String, String> param: parameters.entrySet()) {
+      if (count > 0) sb.append('\n');
+      sb.append(param.getKey()).append(" = ").append(param.getValue());
+    }
+    return sb.toString();
   }
 }

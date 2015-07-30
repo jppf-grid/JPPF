@@ -28,9 +28,36 @@ public interface DebugMBean {
    * 
    */
   String MBEAN_NAME_PREFIX = "org.jppf:name=debug,type=client,uuid=";
+
   /**
    * Get a list of all the driver connections.
    * @return the list of connections as a formatted string.
    */
   String allConnections();
+
+  /**
+   * 
+   * @param key .
+   * @return .
+   */
+  String getParameter(String key);
+
+  /**
+   * 
+   * @param key .
+   * @param value .
+   */
+  void setParameter(String key, String value);
+
+  /**
+   * 
+   * @param key .
+   */
+  void removeParameter(String key);
+
+  /**
+   * 
+   * @return .
+   */
+  String allParameters();
 }
