@@ -30,41 +30,6 @@
   </target>
   
   <!-- ========================================================================= -->
-  <!-- update the dependencies of the Android project                            -->
-  <!-- ========================================================================= -->
-  
-  <target name="update.android.dependencies" depends="build" description="update.android.dependencies">
-    <jar destfile="${build}/jppf-node-android.jar">
-      <zipfileset src="${build}/jppf-node.jar">
-        <exclude name="**/screensaver/**/*.*"/>
-        <exclude name="**/*.gif"/>
-        <exclude name="**/*.png"/>
-        <exclude name="META-INF/services/org.jppf.management.spi.JPPFNodeMBeanProvider"/>
-        <exclude name="META-INF/services/org.jppf.node.initialization.InitializationHook"/>
-      </zipfileset>
-    </jar>
-    <checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>
-    <copy toDir="${basedir}/../node-android/app/libs">
-      <fileset dir="${build}" includes="jppf-common.jar,jppf-node-android.jar,jppf-server.jar"/>
-    </copy>
-  </target>
-
-  <!-- ========================================================================= -->
-  <!-- Build the Android project                                                 -->
-  <!-- ========================================================================= -->
-  
-  <target name="build.android" depends="update.android.dependencies" description="build.android">
-    <local name="cmdname"/>
-    <condition property="cmdname" value="gradlew.bat" else="gradlew">
-      <os family="windows"/>
-    </condition>
-    <exec executable="${node.android}/${cmdname}" dir="${node.android}" failonerror="true" searchpath="false">
-      <arg value="assemble"/>
-    </exec>
-    <copy file="${node.android}/app/build/outputs/apk/app-release.apk" tofile="${build}/JPPF-${version.number}-AndroidNode.apk"/>
-  </target>
-
-  <!-- ========================================================================= -->
 	<!-- Build a separate and self-contained jar with common JPPF utility classes  -->
 	<!-- ========================================================================= -->
 

@@ -20,9 +20,6 @@ package org.jppf.example.fractals;
 
 import java.util.*;
 
-import org.jppf.example.fractals.lyapunov.LyapunovRunner;
-import org.jppf.example.fractals.mandelbrot.MandelbrotRunner;
-
 /**
  * 
  * @author Laurent Cohen

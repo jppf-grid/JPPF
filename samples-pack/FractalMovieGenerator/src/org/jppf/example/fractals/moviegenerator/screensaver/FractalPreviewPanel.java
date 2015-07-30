@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.*;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import org.jppf.example.fractals.FractalPoint;
+import org.jppf.example.common.FractalPoint;
 import org.jppf.utils.FileUtils;
 
 /**

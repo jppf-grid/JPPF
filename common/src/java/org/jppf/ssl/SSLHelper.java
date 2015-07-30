@@ -282,7 +282,7 @@ public final class SSLHelper {
       if (is == null) throw new SSLConfigurationException("could not load the SSL configuration '" + source + "'");
       try {
         sslConfig.load(is);
-        log.info("loaded SSL properties: " + sslConfig);
+        //log.info("loaded SSL properties: " + sslConfig);
         if (debugEnabled) log.debug("successfully loaded the SSL configuration from '{}'", source);
       } finally {
         StreamUtils.closeSilent(is);

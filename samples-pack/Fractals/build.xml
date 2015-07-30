@@ -82,6 +82,22 @@
 		</copy>
   </target>
 
+  <!-- ========================================================================= -->
+  <!--                                  Jar                                      -->
+  <!-- ========================================================================= -->
+  
+  <target name="jar" depends="compile">
+    <jar jarfile="jppf-fractals-android.jar" index="false">
+      <fileset dir="${classes.dir}">
+        <include name="**/common/*.class"/>
+        <include name="**/mandelbrot/*.class"/>
+      </fileset>
+    </jar>
+    <echo/>
+    <echo message="*** The file jppf-fractals-android.jar is now ready to be deployed ***"/>
+    <echo/>
+  </target>
+  
 	<!-- ========================================================================= -->
 	<!--                     Run the sample application                            -->
 	<!-- ========================================================================= -->

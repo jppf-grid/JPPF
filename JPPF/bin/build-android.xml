@@ -35,7 +35,7 @@
       </zipfileset>
     </jar>
     <!--<checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>-->
-    <copy toDir="${node-android}/org.jppf.android.events/libs">
+    <copy toDir="${node-android}/events/libs">
       <fileset dir="${build}" includes="jppf-common.jar,jppf-node-android.jar,jppf-server.jar"/>
     </copy>
   </target>
@@ -52,8 +52,11 @@
     <exec executable="${node-android}/${cmdname}" dir="${node-android}" failonerror="true" searchpath="false">
       <arg value="assemble"/>
     </exec>
-    <copy file="${node-android}/app/build/outputs/apk/app-release.apk" tofile="${build}/JPPF-${version.number}-AndroidNode.apk"/>
-    <copy file="${node-android}/org.jppf.android.events/build/outputs/aar/org.jppf.android.events-release.aar" tofile="${build}/JPPF-${version.number}-AndroidNodeEvents.aar"/>
+    <copy file="${node-android}/app/build/outputs/apk/app-release.apk" tofile="${build}/JPPF-${version.number}-AndroidNode.apk" quiet="true" force="true"/>
+    <copy file="${node-android}/events/build/outputs/aar/events-release.aar" tofile="${build}/JPPF-${version.number}-AndroidNodeEvents.aar" quiet="true" force="true"/>
+    <delete dir="${samples-pack}/Fractals/data" includes="*.apk" quiet="true"/>
+    <copy file="${node-android}/demo/build/outputs/apk/demo-release-unsigned.apk" tofile="${samples-pack}/Fractals/data/demo-release-unsigned.apk" quiet="true" force="true"/>
+    <copy file="${node-android}/demo/build/outputs/apk/demo-debug.apk" tofile="${samples-pack}/Fractals/data/demo-debug.apk" quiet="true" force="true"/>
   </target>
   
   <!-- ========================================================================= -->

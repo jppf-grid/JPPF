@@ -18,7 +18,7 @@
 
 package org.jppf.example.fractals.lyapunov;
 
-import org.jppf.example.fractals.AbstractFractalConfiguration;
+import org.jppf.example.common.AbstractFractalConfiguration;
 
 /**
  * Instances of this class represent the set of parameters for either

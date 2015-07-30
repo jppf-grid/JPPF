@@ -41,11 +41,11 @@ public class DefaultLifeCycleErrorHandler implements NodeLifeCycleErrorHandler {
   /**
    * If <code>true</code> (the default), then {@link Error}s caught in the listeners methods will be propagated, otherwise they will be just logged.
    */
-  private static final boolean propagateErrors = JPPFConfiguration.getProperties().getBoolean("jppf.node.listener.errors.propagate", true);
+  protected static final boolean propagateErrors = JPPFConfiguration.getProperties().getBoolean("jppf.node.listener.errors.propagate", true);
   /**
    * Mapping of event type to listener method name.
    */
-  private static final Map<NodeLifeCycleEventType, String> methodsNamesMap = generateMethodsNamesMap();
+  public static final Map<NodeLifeCycleEventType, String> methodsNamesMap = generateMethodsNamesMap();
 
   /**
    * {@inheritDoc}

@@ -18,7 +18,7 @@
 
 package org.jppf.example.fractals.mandelbrot;
 
-import org.jppf.example.fractals.FractalPoint;
+import org.jppf.example.common.FractalPoint;
 import org.jppf.node.protocol.AbstractTask;
 
 /**
@@ -58,8 +58,7 @@ public class MandelbrotTask extends AbstractTask<int[]> {
       double bval = config.i_lower + lineToCompute * (config.i_upper - config.i_lower) / config.height;
       double astep = (config.r_upper - config.r_lower) / config.width;
       double aval = config.r_lower;
-      for (int i=0; i<config.width; i++)
-      {
+      for (int i=0; i<config.width; i++) {
         double x = aval;
         double y = bval;
         int iteration = 0;
@@ -95,12 +94,8 @@ public class MandelbrotTask extends AbstractTask<int[]> {
     x = 2 * t * (Math.cos(value) + 1);
     y = 2 * t * (Math.sin(t) + 1);
     z = t;
-    int rgb[] = new int[3];
-    rgb[0] = (int) (230 * x);
-    rgb[1] = (int) (230 * y);
-    rgb[2] = (int) (230 * z);
-    for (int i=0; i<3; i++)
-    {
+    int rgb[] = { (int) (230 * x), (int) (230 * y), (int) (230 * z) };
+    for (int i=0; i<3; i++) {
       if (rgb[i] > 460) rgb[i] = rgb[i] % 460;
       if (rgb[i] > 230) rgb[i] = 460 - rgb[i];
       rgb[i] += 25;

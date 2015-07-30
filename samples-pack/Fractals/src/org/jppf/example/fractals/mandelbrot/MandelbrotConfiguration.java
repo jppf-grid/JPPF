@@ -18,15 +18,14 @@
 
 package org.jppf.example.fractals.mandelbrot;
 
-import org.jppf.example.fractals.AbstractFractalConfiguration;
+import org.jppf.example.common.AbstractFractalConfiguration;
 
 /**
  * Instances of this class represent the set of parameters for the Mandelbrot algorithm, based on
  * the <a href="http://en.wikipedia.org/wiki/Mandelbrot_set">Mandlebrot set article</a> on Wikipedia.
  * @author Laurent Cohen
  */
-public class MandelbrotConfiguration extends AbstractFractalConfiguration
-{
+public class MandelbrotConfiguration extends AbstractFractalConfiguration {
   /**
    * Explicit serialVersionUID.
    */

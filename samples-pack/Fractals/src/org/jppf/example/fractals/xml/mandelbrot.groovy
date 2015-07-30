@@ -1,15 +1,24 @@
 MandelbrotConfiguration createConfig() {
+  System.out.println("createConfig(1)")
   def x = option.findFirstWithName("/centerX").getValue();
+  System.out.println("createConfig(2)")
   def y = option.findFirstWithName("/centerY").getValue();
+  System.out.println("createConfig(3)")
   def d = option.findFirstWithName("/diameter").getValue();
+  System.out.println("createConfig(4)")
   def iter = option.findFirstWithName("/iterations").getValue();
+  System.out.println("createConfig(5)")
   return new MandelbrotConfiguration(x, y, d, iter.intValue());
 }
 
 void computeMandelbrot(config) {
+  System.out.println("computeMandelbrot(1)")
   def future = RunnerFactory.getRunner("mandelbrot").submitExecution(config)
+  System.out.println("computeMandelbrot(2)")
   def img = future.get().getImage()
+  System.out.println("computeMandelbrot(3) img = " + img)
   option.findFirstWithName("/mandelbrotImage").getUIComponent().setImage(img)
+  System.out.println("computeMandelbrot(4)")
 }
 
 void applyConfig(x, y, d, iter) {

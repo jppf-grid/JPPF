@@ -30,6 +30,7 @@ import java.util.concurrent.*;
 import javax.imageio.ImageIO;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.example.common.AbstractFractalConfiguration;
 import org.jppf.example.fractals.*;
 import org.jppf.example.fractals.mandelbrot.*;
 import org.jppf.node.protocol.Task;

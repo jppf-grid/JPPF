@@ -216,9 +216,9 @@ public class LifeCycleEventHandler {
     try {
       handler.handleError(listener, event, t);
     } catch (Exception e) {
-      String msg = "exception occurred while invoking error handler "  + handler + " : ";
-      if (debugEnabled) log.debug(msg, e);
-      else log.error(msg + ExceptionUtils.getMessage(e));
+      String msg = "exception occurred while invoking error handler "  + handler + " :\n" + ExceptionUtils.getStackTrace(e);
+      /*if (debugEnabled) log.debug(msg, e);
+      else*/ log.error(msg);
     }
   }
 }
