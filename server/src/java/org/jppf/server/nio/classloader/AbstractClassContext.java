@@ -57,7 +57,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
   /**
    * Time at which the current request was received.
    */
-  private long requestStartTime = 0L;
+  protected long requestStartTime = 0L;
 
   /**
    * Deserialize a resource wrapper from an array of bytes.

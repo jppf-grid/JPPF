@@ -106,7 +106,7 @@ class WaitInitialBundleState extends NodeServerState {
           JMXServer jmxServer = initializer.getJmxServer(sslEnabled);
           if (jmxServer != null) host = jmxServer.getManagementHost();
         }
-        HostIP hostIP = resolveHost(channel);
+        HostIP hostIP = channel.isLocal() ? new HostIP(host, host) : resolveHost(channel);
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
