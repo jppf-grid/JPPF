@@ -18,6 +18,7 @@
 package org.jppf.classloader;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.jppf.android.AndroidHelper;
 import org.jppf.location.FileLocation;
@@ -33,9 +34,13 @@ import java.io.File;
 import dalvik.system.DexClassLoader;
 
 /**
- * .
+ * A class loader that can dynamically load classes from a dexed jar or an apk transported within a job.
  */
 public class AndroidClassLoader extends AbstractJPPFClassLoader {
+  /**
+   * Log tag for thsi class.
+   */
+  private static final String LOG_TAG = AndroidClassLoader.class.getSimpleName();
   /**
    * Logger for this class.
    */
@@ -69,6 +74,7 @@ public class AndroidClassLoader extends AbstractJPPFClassLoader {
    * @return a new {@link DexClassLoader} instance.
    */
   private static DexClassLoader createDexClassLoader(final ClassLoader parent, ClassPath classpath) {
+    Log.v(LOG_TAG, String.format("in createDexClassLoader(classpath=%s)", classpath));
     StringBuilder pathBuilder = new StringBuilder();
     int count = 0;
     File inDir = AndroidHelper.getActivity().getDir(DEX_IN_DIR, Context.MODE_PRIVATE);
@@ -77,14 +83,14 @@ public class AndroidClassLoader extends AbstractJPPFClassLoader {
     FileUtils.deletePath(outDir, true);
     if (classpath != null) {
       for (ClassPathElement element: classpath) {
+        Log.v(LOG_TAG, "in createDexClassLoader() : processing cp element '" + element.getName() + "'");
         File file = createDexFile(element, inDir);
         if (count > 0) pathBuilder.append(File.pathSeparator);
         pathBuilder.append(file.getAbsolutePath());
         count++;
       }
     }
-    DexClassLoader loader = new DexClassLoader(pathBuilder.toString(), outDir.getAbsolutePath(), null, parent);
-    return loader;
+    return new DexClassLoader(pathBuilder.toString(), outDir.getAbsolutePath(), null, parent);
   }
 
   /**
@@ -95,11 +101,12 @@ public class AndroidClassLoader extends AbstractJPPFClassLoader {
   private static File createDexFile(final ClassPathElement element, final File inDir) {
     Location<?> inLoc = element.getRemoteLocation();
     File file = new File(inDir, element.getName());
+    Log.v(LOG_TAG, String.format("createDexFile('%s') : file='%s'", element.getName(), file));
     try {
       Location<?> outLoc = new FileLocation(file);
       inLoc.copyTo(outLoc);
     } catch (Exception e) {
-      log.error(e.getMessage(), e);
+      Log.e(LOG_TAG, e.getMessage(), e);
     }
     return file;
   }

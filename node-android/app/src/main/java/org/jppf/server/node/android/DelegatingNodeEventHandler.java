@@ -50,6 +50,8 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
    *
    */
   private View view = null;
+  private String jobUuid;
+  private boolean newJob = false;
 
   /**
    * Initialize this event handler with the default delegate.
@@ -98,22 +100,33 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
 
   @Override
   public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
+    String newJobUuid = event.getJob().getUuid();
+    newJob = (jobUuid == null) || !jobUuid.equals(newJobUuid);
+    jobUuid = newJobUuid;
     AndroidNodeIntegrationAdapter adapter = null;
-    JobSLA sla = event.getJob().getSLA();
-    ClassPath classpath = sla.getClassPath();
-    AbstractJPPFClassLoader cl = event.getTaskClassLoader();
-    JobMetadata meta = event.getJob().getMetadata();
-    String s = meta.getParameter("jppf.node.integration.class");
-    Log.v(LOG_TAG, "jobHeaderLoaded() event handler class = " + s);
-    if (s != null) {
-      try {
-        Class<?> c = Class.forName(s, true, cl);
-        adapter = (AndroidNodeIntegrationAdapter) c.newInstance();
-      } catch (Exception e) {
-        e.printStackTrace();
+    if (newJob) {
+      JobSLA sla = event.getJob().getSLA();
+      ClassPath classpath = sla.getClassPath();
+      AbstractJPPFClassLoader cl = null;
+        Log.v(LOG_TAG, String.format("jobHeaderLoaded(job='%s') classpath=%s", event.getJob().getName(), classpath));
+      if ((classpath != null) && !classpath.isEmpty()) cl = event.getNode().resetTaskClassLoader(classpath);
+      else cl = event.getTaskClassLoader();
+      JobMetadata meta = event.getJob().getMetadata();
+      String s = meta.getParameter("jppf.node.integration.class");
+      Log.v(LOG_TAG, "jobHeaderLoaded() event handler class = " + s);
+      if (s != null) {
+        try {
+          Class<?> c = Class.forName(s, true, cl);
+          adapter = (AndroidNodeIntegrationAdapter) c.newInstance();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+      if (adapter != null) {
+        setDelegate(adapter);
+        adapter.jobHeaderLoaded(event);
       }
     }
-    if (adapter != null) setDelegate(adapter);
   }
 
   /**
@@ -144,6 +157,20 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
   public void jobEnding(final NodeLifeCycleEvent event) {
     AndroidNodeIntegrationAdapter adapter = getDelegate();
     if (adapter != null) adapter.jobEnding(event);
+  }
+
+  @Override
+  public void beforeNextJob(final NodeLifeCycleEvent event) {
+    AndroidNodeIntegrationAdapter adapter = getDelegate();
+    if (adapter != null) adapter.beforeNextJob(event);
+  }
+
+  /**
+   * Whether the current job is the same job (same uuid) as the previous one.
+   * @return true if the current job is different from the previous one, false otherwise.
+   */
+  public boolean isNewJob() {
+    return newJob;
   }
 
   /**

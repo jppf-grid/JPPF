@@ -22,6 +22,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 
+/**
+ * Activity that displays the node configuration settings.
+ */
 public class SettingsActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {

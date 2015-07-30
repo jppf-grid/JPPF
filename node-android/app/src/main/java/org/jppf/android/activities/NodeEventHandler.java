@@ -31,7 +31,7 @@ import org.jppf.server.node.android.AndroidNodeIntegrationAdapter;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * .
+ * This is the default node events handler, used if none is provided by the jobs.
  * @author Laurent Cohen
  * @since 5.1
  */

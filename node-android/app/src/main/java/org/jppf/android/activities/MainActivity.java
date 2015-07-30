@@ -43,14 +43,13 @@ public class MainActivity extends Activity {
     AndroidHelper.setDefaultUncaughtExceptionHandler();
     setContentView(R.layout.activity_main);
     Log.v(LOG_TAG, "onCreate(), thread = " + Thread.currentThread());
-    /*
-    LayoutInflater inflater = getLayoutInflater();
-    ViewGroup mainLayout = (ViewGroup) findViewById(R.id.main_layout);
-    //View defLayout = (View) inflater.inflate(R.layout.activity_main_default, null, false);
-    View root = inflater.inflate(R.layout.activity_main_default, mainLayout, true);
-    //mainLayout.addView(defLayout);
-    */
     AndroidHelper.launchNode(this);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    Log.v(LOG_TAG, "onDestroy(), thread = " + Thread.currentThread());
   }
 
   @Override

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * .
+ * Implementation of a connection strategy which configures itself from the node settings.
  * @author Laurent Cohen
  */
 public class AndroidNodeConnectionStrategy implements DriverConnectionStrategy {

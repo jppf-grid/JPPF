@@ -40,10 +40,21 @@ public class FilechoserEditTextPreference extends DialogPreference {
    * Tag used for logging.
    */
   private final static String LOG_TAG = SettingsFragment.class.getSimpleName();
-  //Layout Fields
+  /**
+   * The layout for this preference widget.
+   */
   private final LinearLayout layout = new LinearLayout(this.getContext());
+  /**
+   * Editable text field where the selected URI is displayed.
+   */
   private final EditText editText = new EditText(this.getContext());
+  /**
+   * The 'Browse' button.
+   */
   private final Button button = new Button(this.getContext());
+  /**
+   * The settings fragment which contains this preference widget.
+   */
   private transient SettingsFragment fragment = null;
 
   /**
@@ -68,7 +79,6 @@ public class FilechoserEditTextPreference extends DialogPreference {
 
   @Override
   protected View onCreateDialogView() {
-    //editText.set
     layout.addView(editText);
     layout.addView(button);
     return layout;
@@ -83,7 +93,9 @@ public class FilechoserEditTextPreference extends DialogPreference {
   @Override
   protected void onDialogClosed(boolean positiveResult) {
     super.onDialogClosed(positiveResult);
+    // persist the URI
     if (positiveResult && shouldPersist()) persistString(editText.getText().toString());
+    // remùove the custom fields from the dialog
     ((ViewGroup) editText.getParent()).removeView(editText);
     ((ViewGroup) button.getParent()).removeView(button);
     ((ViewGroup) layout.getParent()).removeView(layout);

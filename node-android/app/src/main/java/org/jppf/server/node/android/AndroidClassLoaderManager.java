@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
- * .
+ * An android-sepcific {@link AbstractClassLoaderManager} implementation.
  * @author Laurent Cohen
  */
 public class AndroidClassLoaderManager extends AbstractClassLoaderManager {

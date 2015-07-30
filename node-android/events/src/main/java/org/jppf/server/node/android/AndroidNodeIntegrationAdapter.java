@@ -18,15 +18,25 @@
 package org.jppf.server.node.android;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
+import org.jppf.node.event.DefaultLifeCycleErrorHandler;
 import org.jppf.node.event.NodeIntegrationAdapter;
+import org.jppf.node.event.NodeLifeCycleErrorHandler;
+import org.jppf.node.event.NodeLifeCycleEvent;
+import org.jppf.node.event.NodeLifeCycleListener;
+import org.jppf.utils.ExceptionUtils;
 
 /**
  * .
  * @author Laurent Cohen
  */
-public abstract class AndroidNodeIntegrationAdapter extends NodeIntegrationAdapter<Activity> {
+public abstract class AndroidNodeIntegrationAdapter extends NodeIntegrationAdapter<Activity> implements NodeLifeCycleErrorHandler {
+  /**
+   * Log tag for this class.
+   */
+  private static String LOG_TAG = AndroidNodeIntegrationAdapter.class.getSimpleName();
   /**
    * An activity holding the UI to update.
    */
@@ -49,5 +59,14 @@ public abstract class AndroidNodeIntegrationAdapter extends NodeIntegrationAdapt
 
   public Activity getActivity() {
     return activity;
+  }
+
+  @Override
+  public void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
+    StringBuilder sb = new StringBuilder("error executing ");
+    sb.append(event == null ? "unknown" : DefaultLifeCycleErrorHandler.methodsNamesMap.get(event.getType()));
+    sb.append(" on an instance of ").append(listener == null ? "[unknown listener class]" : listener.getClass().getName());
+    sb.append(", nbTasks=").append(event.getTasks() == null ? -1 : event.getTasks().size()).append(" :\n");
+    Log.e(LOG_TAG, sb.append(ExceptionUtils.getStackTrace(t)).toString());
   }
 }

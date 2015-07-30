@@ -28,6 +28,7 @@ import org.jppf.server.node.remote.AbstractRemoteNode;
  */
 public class JPPFAndroidNode extends AbstractRemoteNode {
   private static DelegatingNodeEventHandler handler = null;
+  private boolean alreadyAdded = false;
 
   /**
    * Initialize this node.
@@ -40,8 +41,14 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
   @Override
   public void initDataChannel() throws Exception {
     super.initDataChannel();
-    if (handler == null) handler = new DelegatingNodeEventHandler(AndroidHelper.getActivity());
-    lifeCycleEventHandler.addNodeLifeCycleListener(handler);
+    if (handler == null) {
+      handler = new DelegatingNodeEventHandler(AndroidHelper.getActivity());
+    }
+    if (!alreadyAdded) {
+      lifeCycleEventHandler.addNodeLifeCycleListener(handler);
+      getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(handler);
+      alreadyAdded = true;
+    }
   }
 
   @Override

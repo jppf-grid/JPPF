@@ -54,11 +54,12 @@ public class AndroidHelper {
    * The SSL/TLS configuration.
    */
   private static final TypedProperties sslConfig = new TypedProperties();
+  /**
+   * The default handler for uncaught exceptions.
+   */
   private static final Thread.UncaughtExceptionHandler ueh = new Thread.UncaughtExceptionHandler() {
     @Override
     public void uncaughtException(final Thread thread, final Throwable ex) {
-      //System.err.print("uncaught exception in thread " + thread + ": ");
-      //ex.printStackTrace();
       Log.e(LOG_TAG, "uncaught exception in thread " + thread + " : ", ex);
     }
   };
@@ -87,11 +88,11 @@ public class AndroidHelper {
 
   /**
    * Start the node in a separate thread.
-   * @param act a global activity that can be used by the node.
+   * @param activity a global activity that can be used by the node.
    */
-  public static void launchNode(MainActivity act) {
+  public static void launchNode(MainActivity activity) {
     if (nodeLaunched.compareAndSet(false, true)) {
-      activity = act;
+      AndroidHelper.activity = activity;
       new AsyncTask<Void, Void, Boolean>() {
         @Override
         protected Boolean doInBackground(final Void... params) {
@@ -116,7 +117,7 @@ public class AndroidHelper {
   }
 
   /**
-   * Set the configuration and start the node in the current thread.
+   * Set the node configuration from the settings.
    */
   public static void changeConfigFromPrefs() {
     try {

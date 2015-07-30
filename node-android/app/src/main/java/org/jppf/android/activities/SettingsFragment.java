@@ -68,7 +68,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-    //Log.v(LOG_TAG, "onCreate()");
     try {
       super.onCreate(savedInstanceState);
       // Load the preferences from an XML resource
@@ -82,9 +81,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
       if (SUPPORTED_CIPHER_SUITES.isEmpty()) {
         SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
         ENABLED_CIPHER_SUITES.addAll(Arrays.asList(ssf.getDefaultCipherSuites()));
-        //Log.v(LOG_TAG, "enabled cipher suites: " + ENABLED_CIPHER_SUITES);
         SUPPORTED_CIPHER_SUITES.addAll(Arrays.asList(ssf.getSupportedCipherSuites()));
-        //Log.v(LOG_TAG, "supported cipher suites: " + SUPPORTED_CIPHER_SUITES);
       }
       MultiSelectListPreference ciphersPref = (MultiSelectListPreference) findPreference(PreferenceUtils.ENABLED_CIPHER_SUITES_KEY);
       ciphersPref.setDefaultValue(ENABLED_CIPHER_SUITES.toArray(new String[ENABLED_CIPHER_SUITES.size()]));
@@ -98,14 +95,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
   @Override
   public void onResume() {
     super.onResume();
-    //Log.v(LOG_TAG, "onResume()");
     getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
   }
 
   @Override
   public void onPause() {
     super.onPause();
-    //Log.v(LOG_TAG, "onPause()");
     getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
   }
 
@@ -116,18 +111,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
   @Override
   public void onActivityResult(final int requestCode, final int resultCode, final Intent resultData) {
-    //super.onActivityResult(requestCode, resultCode, resultData);
     Log.v(LOG_TAG, String.format("onActivityResult(requestCode=%d, resultCode=%d, resultData=%s)", requestCode, resultCode, resultData));
     if ((requestCode == PreferenceUtils.READ_REQUEST_CODE) && (resultCode == Activity.RESULT_OK)) {
       if (resultData != null) {
         try {
           Uri uri = resultData.getData();
           Log.v(LOG_TAG, "Uri: " + uri);
-          //final int takeFlags = resultData.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
           final int takeFlags = resultData.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION);
           getActivity().grantUriPermission(getActivity().getPackageName(), uri, Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
           getActivity().grantUriPermission(getActivity().getPackageName(), uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-          //getActivity().getContentResolver().takePersistableUriPermission(uri, takeFlags);
           Preference pref = currentPref;
           currentPref = null;
           if (pref instanceof FilechoserEditTextPreference) ((FilechoserEditTextPreference) pref).onValueChanged(uri.toString());
@@ -145,7 +137,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
   public void startFileChooser(Preference pref) {
     Log.v(LOG_TAG, "startFileChooser(Preference)");
     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-    //intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
     intent.addCategory(Intent.CATEGORY_OPENABLE);
     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
     intent.setType("*/*");
@@ -157,14 +148,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
   @Override
   public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-    try {
-      super.onPreferenceTreeClick(preferenceScreen, preference);
-      // If the user has clicked on a preference screen, set up the action bar
-      if (preference instanceof PreferenceScreen) initializeActionBar((PreferenceScreen) preference);
-      Log.v(LOG_TAG, "clicked on preference " + preference);
-    } catch(Throwable t) {
-      t.printStackTrace();
-    }
+    super.onPreferenceTreeClick(preferenceScreen, preference);
+    // If the user clicks on a preference screen, set up the action bar
+    if (preference instanceof PreferenceScreen) initializeActionBar((PreferenceScreen) preference);
+    Log.v(LOG_TAG, "clicked on preference " + preference);
     return false;
   }
 
