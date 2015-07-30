@@ -20,6 +20,7 @@ package org.jppf.ui.monitoring.job;
 
 import javax.swing.tree.*;
 
+import org.jppf.client.monitoring.jobs.*;
 import org.jppf.job.JobInformation;
 import org.jppf.ui.treetable.AbstractJPPFTreeTableModel;
 
@@ -71,14 +72,14 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
     Object res = "";
     if (node instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode defNode = (DefaultMutableTreeNode) node;
-      if (defNode.getUserObject() instanceof JobData) {
-        JobData data = (JobData) defNode.getUserObject();
-        JobInformation jobInfo = data.getJobInformation();
+      if (defNode.getUserObject() instanceof AbstractJobComponent) {
+        AbstractJobComponent data = (AbstractJobComponent) defNode.getUserObject();
         switch (column) {
           case NODE_URL:
             break;
           case JOB_STATE:
-            if (data.getType().equals(JobDataType.JOB)) {
+            if (data instanceof Job) {
+              JobInformation jobInfo = ((Job) data).getJobInformation();
               String s = null;
               if (jobInfo.isPending()) s = "pending";
               else s = jobInfo.isSuspended() ? "suspended" : "executing";
@@ -86,20 +87,21 @@ public class JobTreeTableModel extends AbstractJPPFTreeTableModel {
             }
             break;
           case TASK_COUNT:
-            if (data.getType().equals(JobDataType.SUB_JOB) || data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getTaskCount());
+            if (data instanceof Job) res = Integer.toString(((Job) data).getJobInformation().getTaskCount());
+            else if (data instanceof JobDispatch) res = Integer.toString(((JobDispatch) data).getJobInformation().getTaskCount());
             break;
           case INITIAL_TASK_COUNT:
-            if (data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getInitialTaskCount());
+            if (data instanceof Job) res = Integer.toString(((Job) data).getJobInformation().getInitialTaskCount());
+            else if (data instanceof JobDispatch) res = Integer.toString(((JobDispatch) data).getJobInformation().getInitialTaskCount());
             break;
           case PRIORITY:
-            if (data.getType().equals(JobDataType.JOB)) res = Integer.toString(jobInfo.getPriority());
+            if (data instanceof Job) res = Integer.toString(((Job) data).getJobInformation().getPriority());
             break;
           case MAX_NODES:
-            if (data.getType().equals(JobDataType.JOB)) {
-              int n = jobInfo.getMaxNodes();
+            if (data instanceof Job) {
+              int n = ((Job) data).getJobInformation().getMaxNodes();
               // \u221E = infinity symbol
-              if (n == Integer.MAX_VALUE) res = "\u221E";
-              else res = Integer.toString(n);
+              res = (n == Integer.MAX_VALUE) ? "\u221E" : Integer.toString(n);
             }
             break;
           default:

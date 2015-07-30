@@ -20,7 +20,9 @@ package org.jppf.ui.plugin;
 
 import javax.swing.JComponent;
 
+import org.jppf.client.monitoring.jobs.JobMonitor;
 import org.jppf.client.monitoring.topology.TopologyManager;
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
  * This is the interface for user-defined view added to the administration console.
@@ -32,6 +34,10 @@ public abstract class PluggableView {
    * The {@link TopologyManager} associated with the administration console.
    */
   private TopologyManager topologyManager;
+  /**
+   * The object which monitors and maintains a representation of the jobs hierarchy.
+   */
+  private JobMonitor jobMonitor;
 
   /**
    * Get the GUI component which contains the view.
@@ -54,5 +60,32 @@ public abstract class PluggableView {
    */
   final void setTopologyManager(final TopologyManager topologyManager) {
     this.topologyManager = topologyManager;
+  }
+
+  /**
+   * Get the {@link JobMonitor} associated with the administration console.
+   * @return a {@link JobMonitor} object.
+   * @since 5.1
+   */
+  public final JobMonitor getJobMonitor() {
+    return jobMonitor;
+  }
+
+  /**
+   * Set the {@link JobMonitor} associated with the administration console.
+   * @param jobMonitor a {@link JobMonitor} object.
+   * @since 5.1
+   */
+  final void setJobMonitor(final JobMonitor jobMonitor) {
+    this.jobMonitor = jobMonitor;
+  }
+
+  /**
+   * Determine whether IP addresses are shown in the console, instead of host names.
+   * @return {@code true} if IP adresses are displayed, {@code false} otherwise.
+   * @since 5.1
+   */
+  public final boolean isShowIP() {
+    return StatsHandler.getInstance().isShowIP();
   }
 }

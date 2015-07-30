@@ -20,6 +20,7 @@ package org.jppf.client.monitoring.topology;
 
 import java.util.*;
 
+import org.jppf.client.monitoring.AbstractRefreshHandler;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
@@ -42,13 +43,20 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * The topology manager to which topology change notifications are to be sent. 
+   */
+  private final TopologyManager manager;
 
   /**
    * Initialize this node handler.
    * @param manager the topology manager.
+   * @param period the interval between refreshes in millis.
    */
-  public NodeRefreshHandler(final TopologyManager manager) {
-    super(manager, "JPPF Topology Update Timer", JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.topology", 1000L));
+  NodeRefreshHandler(final TopologyManager manager, final long period) {
+    super("JPPF Topology Update Timer", period);
+    this.manager = manager;
+    startRefreshTimer();
   }
 
   /**
@@ -56,8 +64,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * @exclude
    */
   protected synchronized void performRefresh() {
-    List<TopologyDriver> drivers = manager.getDrivers();
-    for (TopologyDriver driver: drivers) {
+    for (TopologyDriver driver: manager.getDrivers()) {
       refreshNodes(driver);
       if (driver.getChildCount() > 0) refreshNodeStates(driver);
     }
@@ -70,11 +77,11 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
   private void refreshNodes(final TopologyDriver driver) {
     Set<String> knownUuids = new HashSet<>();
     for (AbstractTopologyComponent child: driver.getChildren()) knownUuids.add(child.getUuid());
-    JMXDriverConnectionWrapper wrapper = driver.getJmx();
-    if ((wrapper == null) || !wrapper.isConnected()) return;
+    JMXDriverConnectionWrapper jmx = driver.getJmx();
+    if ((jmx == null) || !jmx.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
     try {
-      nodesInfo = wrapper.nodesInformation(null, true);
+      nodesInfo = jmx.nodesInformation(null, true);
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       return;

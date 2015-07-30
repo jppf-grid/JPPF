@@ -92,6 +92,7 @@ public class PluggableViewHandler {
         }
         if (view != null) {
           view.setTopologyManager(StatsHandler.getInstance().getTopologyManager());
+          view.setJobMonitor(StatsHandler.getInstance().getJobMonitor());
           option = new PluggableViewOption(view);
           option.setName(name);
           String title = config.getString(prefix + ".title", name);

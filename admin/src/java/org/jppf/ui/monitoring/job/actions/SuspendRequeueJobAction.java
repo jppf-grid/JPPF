@@ -20,12 +20,10 @@ package org.jppf.ui.monitoring.job.actions;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
-
 /**
  * This action suspends a job and causes all sub-jobs currently executing to be canceled and requeued on the server.
  */
-public class SuspendRequeueJobAction extends AbstractSuspendJobAction
-{
+public class SuspendRequeueJobAction extends AbstractSuspendJobAction {
   /**
    * Logger for this class.
    */
@@ -38,8 +36,7 @@ public class SuspendRequeueJobAction extends AbstractSuspendJobAction
   /**
    * Initialize this action.
    */
-  public SuspendRequeueJobAction()
-  {
+  public SuspendRequeueJobAction() {
     setupIcon("/org/jppf/ui/resources/suspend_requeue.gif");
     putValue(NAME, localize("job.suspend_requeue.label"));
     requeue = true;

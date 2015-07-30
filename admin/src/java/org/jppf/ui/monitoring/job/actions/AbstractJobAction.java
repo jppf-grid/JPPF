@@ -20,33 +20,35 @@ package org.jppf.ui.monitoring.job.actions;
 
 import java.util.*;
 
+import org.jppf.client.monitoring.jobs.*;
 import org.jppf.ui.actions.AbstractUpdatableAction;
-import org.jppf.ui.monitoring.job.*;
 
 /**
  * Common super class for job actions.
  * @author Laurent Cohen
  */
-public abstract class AbstractJobAction extends AbstractUpdatableAction
-{
+public abstract class AbstractJobAction extends AbstractUpdatableAction {
   /**
    * Constant for an empty <code>JobData</code> array.
    */
-  private static final JobData[] EMPTY_JOB_DATA_ARRAY = new JobData[0];
+  private static final Job[] EMPTY_JOB_ARRAY = new Job[0];
+  /**
+   * Constant for an empty <code>JobData</code> array.
+   */
+  private static final JobDispatch[] EMPTY_JOB_DISPATCH_ARRAY = new JobDispatch[0];
   /**
    * The object representing the JPPF jobs in the tree table.
    */
-  protected JobData[] jobDataArray = EMPTY_JOB_DATA_ARRAY;
+  protected Job[] jobDataArray = EMPTY_JOB_ARRAY;
   /**
    * The object representing the JPPF sub-jobs in the tree table.
    */
-  protected JobData[] subjobDataArray = EMPTY_JOB_DATA_ARRAY;
+  protected JobDispatch[] subjobDataArray = EMPTY_JOB_DISPATCH_ARRAY;
 
   /**
    * Initialize this action.
    */
-  public AbstractJobAction()
-  {
+  public AbstractJobAction() {
     BASE = "org.jppf.ui.i18n.JobDataPage";
   }
 
@@ -56,18 +58,15 @@ public abstract class AbstractJobAction extends AbstractUpdatableAction
    * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
-    List<JobData> jobList = new ArrayList<>();
-    List<JobData> subjobList = new ArrayList<>();
-    for (Object o: selectedElements)
-    {
-      JobData data = (JobData) o;
-      if (JobDataType.JOB.equals(data.getType())) jobList.add(data);
-      else if (JobDataType.SUB_JOB.equals(data.getType())) subjobList.add(data);
+    List<Job> jobList = new ArrayList<>();
+    List<JobDispatch> subjobList = new ArrayList<>();
+    for (Object o : selectedElements) {
+      if (o instanceof Job) jobList.add((Job) o);
+      else if (o instanceof JobDispatch) subjobList.add((JobDispatch) o);
     }
-    jobDataArray = jobList.toArray(new JobData[jobList.size()]);
-    subjobDataArray = subjobList.toArray(new JobData[subjobList.size()]);
+    jobDataArray = jobList.toArray(new Job[jobList.size()]);
+    subjobDataArray = subjobList.toArray(new JobDispatch[subjobList.size()]);
   }
 }

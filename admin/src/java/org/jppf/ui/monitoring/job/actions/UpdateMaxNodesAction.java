@@ -22,11 +22,13 @@ import java.util.List;
 
 import javax.swing.*;
 
-import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.ui.monitoring.job.JobData;
+import org.jppf.client.monitoring.jobs.*;
+import org.jppf.job.JobUuidSelector;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -84,7 +86,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
     try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JobMaxNodesPanel.xml");
       maxNodes = Integer.MAX_VALUE;
-      for (JobData data: jobDataArray) {
+      for (Job data: jobDataArray) {
         int n = data.getJobInformation().getMaxNodes();
         if (n < maxNodes) maxNodes = n;
       }
@@ -128,14 +130,16 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
     AbstractOption maxNodesOption = (AbstractOption) panel.findFirstWithName("job.max.nodes");
     boolean noLimit = (Boolean) noLimitOption.getValue();
     maxNodes = noLimit ? Integer.MAX_VALUE : ((Number) maxNodesOption.getValue()).intValue();
+    final CollectionMap<JobDriver, String> map = new SetHashMap<>();
+    for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        for (JobData data: jobDataArray) {
+        for (JobDriver driver: map.keySet()) {
           try {
-            JMXDriverConnectionWrapper jmx = data.getJmxWrapper();
-            jmx.updateMaxNodes(data.getJobInformation().getJobUuid(), maxNodes);
-          } catch(Exception e) {
+            DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
+            if (jmx != null) jmx.updateMaxNodes(new JobUuidSelector(map.getValues(driver)), maxNodes);
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }

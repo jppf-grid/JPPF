@@ -18,6 +18,7 @@
 
 package org.jppf.client.monitoring.topology;
 
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
@@ -168,6 +169,49 @@ public class TopologyDriver extends AbstractTopologyComponent {
 
   @Override
   public String getDisplayName() {
-    return managementInfo == null ? "?" : managementInfo.toDisplayString();
+    return managementInfo == null ? toString() : managementInfo.toDisplayString();
+  }
+
+  /**
+   * Convenience method to get the nodes attached to this driver as {@link TopologyNode} objects.
+   * @return a list of {@link TopologyNode} objects, possibly empty if this driver has no attache node.
+   * @since 5.1
+   */
+  public List<TopologyNode> getNodes() {
+    List<TopologyNode> nodes = new ArrayList<>(getChildCount());
+    synchronized(this) {
+      for (AbstractTopologyComponent comp: children.values()) {
+        if (comp.isNode()) nodes.add((TopologyNode) comp);
+      }
+    }
+    return nodes;
+  }
+
+  /**
+   * Convenience method to get the peers connected to this driver as {@link TopologyPeer} objects.
+   * @return a list of {@link TopologyPeer} objects, possibly empty if this driver is not connected to any peer.
+   * @since 5.1
+   */
+  public List<TopologyPeer> getPeers() {
+    List<TopologyPeer> peers = new ArrayList<>(getChildCount());
+    synchronized(this) {
+      for (AbstractTopologyComponent comp: children.values()) {
+        if (comp.isPeer()) peers.add((TopologyPeer) comp);
+      }
+    }
+    return peers;
+  }
+
+  /**
+   * Convenience method to get the nodes and peers connected to this driver as {@link TopologyNode} objects.
+   * @return a list of {@link TopologyNode} objects, possibly empty if this driver has no attached node and isn't connected to any peer.
+   * @since 5.1
+   */
+  public List<TopologyNode> getNodesAndPeers() {
+    List<TopologyNode> nodes = new ArrayList<>(getChildCount());
+    synchronized(this) {
+      for (AbstractTopologyComponent comp: children.values()) nodes.add((TopologyNode) comp);
+    }
+    return nodes;
   }
 }

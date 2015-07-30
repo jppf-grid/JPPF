@@ -44,7 +44,6 @@ public class StatsRefreshTask extends TimerTask {
 
   /**
    * Request an update from the JPPF driver.
-   * @see java.util.TimerTask#run()
    */
   @Override
   public void run() {

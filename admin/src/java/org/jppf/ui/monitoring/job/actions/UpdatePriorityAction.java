@@ -22,11 +22,13 @@ import java.util.List;
 
 import javax.swing.*;
 
-import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.ui.monitoring.job.JobData;
+import org.jppf.client.monitoring.jobs.*;
+import org.jppf.job.JobUuidSelector;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -84,8 +86,8 @@ public class UpdatePriorityAction extends AbstractJobAction {
     try {
       panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JobPriorityPanel.xml");
       priority = Integer.MAX_VALUE;
-      for (JobData data: jobDataArray) {
-        int n = data.getJobInformation().getPriority();
+      for (Job joba: jobDataArray) {
+        int n = joba.getJobInformation().getPriority();
         if (n < priority) priority = n;
       }
       ((AbstractOption) panel.findFirstWithName("job.priority")).setValue(priority);
@@ -125,14 +127,16 @@ public class UpdatePriorityAction extends AbstractJobAction {
   private void doOK() {
     AbstractOption priorityOption = (AbstractOption) panel.findFirstWithName("job.priority");
     priority = ((Number) priorityOption.getValue()).intValue();
+    final CollectionMap<JobDriver, String> map = new SetHashMap<>();
+    for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        for (JobData data: jobDataArray) {
+        for (JobDriver driver: map.keySet()) {
           try {
-            JMXDriverConnectionWrapper jmx = data.getJmxWrapper();
-            jmx.updateJobPriority(data.getJobInformation().getJobUuid(), priority);
-          } catch(Exception e) {
+            DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
+            if (jmx != null) jmx.updatePriority(new JobUuidSelector(map.getValues(driver)), priority);
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }

@@ -23,6 +23,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.ui.monitoring.data.StatsHandler;
@@ -51,39 +52,37 @@ public class JobRenderer extends AbstractTreeCellRenderer {
     if (value instanceof DefaultMutableTreeNode) {
       DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
       if (!node.isRoot()) {
-        JobData data = (JobData) node.getUserObject();
+        AbstractJobComponent data = (AbstractJobComponent) node.getUserObject();
+        renderer.setText(data.getDisplayName());
         String path = null;
         Color background = defaultNonSelectionBackground;
         Color backgroundSelected = defaultSelectionBackground;
-        switch(data.getType()) {
-          case DRIVER:
-            renderer.setText(TreeTableUtils.getDisplayName(data.getDriver()));
-            if (data.getClientConnection().getStatus().isWorkingStatus()) {
-              path = DRIVER_ICON;
-              background = ACTIVE_COLOR;
-            } else {
-              path = DRIVER_INACTIVE_ICON;
-              background = INACTIVE_COLOR;
-              backgroundSelected = INACTIVE_SELECTION_COLOR;
-            }
-            break;
-
-          case JOB:
-            path = JOB_ICON;
-            if (data.getJobInformation().isSuspended()) {
-              background = SUSPENDED_COLOR;
-              backgroundSelected = INACTIVE_SELECTION_COLOR;
-            }
-            break;
-
-          case SUB_JOB:
-            TopologyNode nodeData = data.getNodeInformation();
-            JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
-            renderer.setText((StatsHandler.getInstance().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
-            TopologyManager mgr = StatsHandler.getInstance().getTopologyManager();
-            if (nodeData != null) path = GuiUtils.computeNodeIconKey(nodeData);
-            //else path = AbstractTreeCellRenderer.NODE_ICON;
-            break;
+        if (data instanceof JobDriver) {
+          JobDriver driver = (JobDriver) data;
+          renderer.setText(TreeTableUtils.getDisplayName(driver.getTopologyDriver()));
+          if (((JobDriver) data).getTopologyDriver().getConnection().getStatus().isWorkingStatus()) {
+            path = DRIVER_ICON;
+            background = ACTIVE_COLOR;
+          } else {
+            path = DRIVER_INACTIVE_ICON;
+            background = INACTIVE_COLOR;
+            backgroundSelected = INACTIVE_SELECTION_COLOR;
+          }
+        } else if (data instanceof Job) {
+          Job job = (Job) data;
+          path = JOB_ICON;
+          if (job.getJobInformation().isSuspended()) {
+            background = SUSPENDED_COLOR;
+            backgroundSelected = INACTIVE_SELECTION_COLOR;
+          }
+        } else if (data instanceof JobDispatch) {
+          JobDispatch dispatch = (JobDispatch) data;
+          TopologyNode nodeData = dispatch.getNode();
+          JPPFManagementInfo nodeInfo = nodeData.getManagementInfo();
+          renderer.setText((StatsHandler.getInstance().isShowIP() ? nodeInfo.getIpAddress() : nodeInfo.getHost()) + ":" + nodeInfo.getPort());
+          TopologyManager mgr = StatsHandler.getInstance().getTopologyManager();
+          if (nodeData != null) path = GuiUtils.computeNodeIconKey(nodeData);
+          //else path = AbstractTreeCellRenderer.NODE_ICON;
         }
         ImageIcon icon = GuiUtils.loadIcon(path);
         renderer.setIcon(icon);

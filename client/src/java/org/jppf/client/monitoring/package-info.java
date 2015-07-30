@@ -15,18 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.event;
-
-import java.util.EventListener;
 
 /**
- * Event listener for handling changes to the state of the "ShowIP" toggle.
- * @author Laurent Cohen
+ * Classes supporting the monitoring and refreshing of the JPPF grid topology.
+ * <p>Found in: <b>jppf-client.jar</b> 
+ * @since 5.0
  */
-public interface ShowIPListener extends EventListener {
-  /**
-   * Called to notify that the toggle state has changed.
-   * @param event the object that encapsulates the toggle change event.
-   */
-  void stateChanged(ShowIPEvent event);
-}
+package org.jppf.client.monitoring;

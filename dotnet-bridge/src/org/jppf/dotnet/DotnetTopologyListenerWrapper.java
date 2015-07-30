@@ -21,7 +21,7 @@ package org.jppf.dotnet;
 import org.jppf.client.monitoring.topology.*;
 
 /**
- * This class wraps a .Net job listener to which job event notifications are delegated.
+ * This class wraps a .Net topology listener to which toplogy event notifications are delegated.
  * @author Laurent Cohen
  * @since 5.0
  * @exclude
@@ -32,7 +32,7 @@ public class DotnetTopologyListenerWrapper extends AbstractDotnetListenerWrapper
    * @param dotnetListener a proxy to a .Net job listener.
    */
   public DotnetTopologyListenerWrapper(final system.Object dotnetListener) {
-    super(dotnetListener, "DriverAdded", "DriverRemoved", "DriverUpdated", "NodeAdded", "NodeRemoved", "NodeUpdated");
+    super(false, dotnetListener, "DriverAdded", "DriverRemoved", "DriverUpdated", "NodeAdded", "NodeRemoved", "NodeUpdated");
   }
 
   @Override

@@ -20,7 +20,10 @@ package org.jppf.ui.monitoring.job.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.jppf.ui.monitoring.job.JobData;
+import org.jppf.client.monitoring.jobs.*;
+import org.jppf.job.JobUuidSelector;
+import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -60,13 +63,18 @@ public class CancelJobAction extends AbstractJobAction {
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
+    final CollectionMap<JobDriver, String> map = new SetHashMap<>();
+    for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        for (JobData data: jobDataArray) {
+        for (JobDriver driver: map.keySet()) {
           try {
-            data.getJmxWrapper().cancelJob(data.getJobInformation().getJobUuid());
-          } catch(Exception e) {
+            DriverJobManagementMBean jmx = driver.getTopologyDriver().getJobManager();
+            if (jmx != null) {
+              jmx.cancelJobs(new JobUuidSelector(map.getValues(driver)));
+            }
+          } catch (Exception e) {
             log.error(e.getMessage(), e);
           }
         }

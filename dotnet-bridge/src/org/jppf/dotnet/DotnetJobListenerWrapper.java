@@ -32,7 +32,7 @@ public class DotnetJobListenerWrapper extends AbstractDotnetListenerWrapper impl
    * @param dotnetListener a proxy to a .Net job listener.
    */
   public DotnetJobListenerWrapper(final system.Object dotnetListener) {
-    super(dotnetListener, "JobStarted", "JobEnded", "JobDispatched", "JobReturned");
+    super(false, dotnetListener, "JobStarted", "JobEnded", "JobDispatched", "JobReturned");
     //System.out.printf("Creating job listener with dotnetListener=%s, class=%s%n", dotnetListener, dotnetListener.getClass());
   }
 

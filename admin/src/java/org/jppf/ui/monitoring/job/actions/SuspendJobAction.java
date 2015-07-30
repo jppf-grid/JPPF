@@ -20,12 +20,10 @@ package org.jppf.ui.monitoring.job.actions;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
-
 /**
  * This action suspends a job and causes all sub-jobs currently executing to lwft executing until completion.
  */
-public class SuspendJobAction extends AbstractSuspendJobAction
-{
+public class SuspendJobAction extends AbstractSuspendJobAction {
   /**
    * Logger for this class.
    */
@@ -38,8 +36,7 @@ public class SuspendJobAction extends AbstractSuspendJobAction
   /**
    * Initialize this action.
    */
-  public SuspendJobAction()
-  {
+  public SuspendJobAction() {
     setupIcon("/org/jppf/ui/resources/suspend.gif");
     putValue(NAME, localize("job.suspend.label"));
     requeue = false;

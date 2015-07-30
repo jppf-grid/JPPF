@@ -27,9 +27,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import javax.swing.*;
 
+import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.plugin.PluggableView;
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.JPPFConfiguration;
 
 /**
  * Example of a pluggable view that can be added to the JPPF administration and monitoring console.
@@ -65,7 +67,7 @@ public class MyView extends PluggableView {
   /**
    * The maximum number of entries in the log.
    */
-  private static final int MAX_MESSAGES = 50_000;
+  private static final int MAX_MESSAGES = JPPFConfiguration.getProperties().getInt("org.jppf.example.pluggableview.max_log_lines", 10_000);
   /**
    * The view's backgroud color.
    */
@@ -73,7 +75,7 @@ public class MyView extends PluggableView {
   /**
    * The Swing component enclosing the view.
    */
-  private JComponent component = null;
+  private JPanel mainPanel = null;
   /**
    * The text area where the log entries are displayed
    */
@@ -97,31 +99,49 @@ public class MyView extends PluggableView {
    */
   @Override
   public JComponent getUIComponent() {
-    if (component == null) {
-      JPanel panel = new JPanel();
-      panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-      panel.setBorder(BorderFactory.createEtchedBorder());
-      panel.setBackground(BKG);
-      panel.add(Box.createVerticalStrut(10));
-      // add the JPPF logo
-      panel.add(new JLabel(GuiUtils.loadIcon("/jppf_logo.gif")));
-      // add a formatted text just below the logo
-      JLabel label = new JLabel("JPPF pluggable view");
-      label.setForeground(new Color(109, 120, 182));
-      Font font = label.getFont();
-      label.setFont(new Font("Arial", Font.BOLD, 2*font.getSize()));
-      panel.add(label);
-      panel.add(Box.createVerticalStrut(10));
-      // add the text area that displays the log messages
-      panel.add(createTextArea());
-      // add the action buttons
-      panel.add(createButtonsPanel());
-      // register this view to listen to topology events to update the log accordingly
-      getTopologyManager().addTopologyListener(new MyListener());
-      panel.add(Box.createGlue());
-      component = panel;
+    if (mainPanel == null) {
+      try {
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEtchedBorder());
+        mainPanel.setBackground(BKG);
+        mainPanel.add(Box.createVerticalStrut(5));
+        // add the JPPF logo
+        mainPanel.add(createLogoPanel());
+        mainPanel.add(Box.createVerticalStrut(5));
+        // add the text area that displays the log messages
+        mainPanel.add(createTextArea());
+        mainPanel.add(Box.createVerticalStrut(5));
+        // add the action buttons
+        mainPanel.add(createButtonsPanel());
+        // susbcribe this view to topology events to update the log accordingly
+        getTopologyManager().addTopologyListener(new MyTopologyListener());
+        // subscribe this view to job monitoring events to update the log accordingly
+        getJobMonitor().addJobMonitoringListener(new MyJobMonitorListener());
+      } catch(Throwable t) {
+        t.printStackTrace();
+      }
     }
-    return component;
+    return mainPanel;
+  }
+
+  /**
+   * Create the logo area.
+   * @return the {@link JComponent} enclosing the text area.
+   */
+  private JComponent createLogoPanel() {
+    JPanel logoPanel = new JPanel();
+    logoPanel.setBackground(BKG);
+    logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
+    // add the JPPF logo
+    logoPanel.add(new JLabel(GuiUtils.loadIcon("/jppf_logo.gif")));
+    // add a formatted text just below the logo
+    JLabel label = new JLabel("JPPF pluggable view");
+    label.setForeground(new Color(109, 120, 182));
+    Font font = label.getFont();
+    label.setFont(new Font("Arial", Font.BOLD, 2*font.getSize()));
+    logoPanel.add(label);
+    return logoPanel;
   }
 
   /**
@@ -135,7 +155,6 @@ public class MyView extends PluggableView {
     textArea.setBackground(BKG);
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setBorder(BorderFactory.createTitledBorder("Topology Events"));
-    scrollPane.setPreferredSize(new Dimension(800, 400));
     scrollPane.setBackground(BKG);
     return scrollPane;
   }
@@ -182,7 +201,10 @@ public class MyView extends PluggableView {
     panel.add(Box.createHorizontalStrut(10));
     panel.add(copyButton);
     panel.add(Box.createHorizontalGlue());
-    panel.setPreferredSize(new Dimension(800, 28));
+    Dimension d = new Dimension(2800, 48);
+    panel.setPreferredSize(d);
+    panel.setMaximumSize(d);
+    panel.setMinimumSize(new Dimension(100, 48));
     return panel;
   }
 
@@ -191,6 +213,7 @@ public class MyView extends PluggableView {
    * @param message the message to add.
    */
   private synchronized void newMessage(final String message) {
+    System.out.println(message);
     // create and format a timestamp
     String date = sdf.format(new Date());
     // add the new, timestamped message to the log
@@ -212,7 +235,7 @@ public class MyView extends PluggableView {
   /**
    * Our topology events listener implementation.
    */
-  private class MyListener extends TopologyListenerAdapter {
+  private class MyTopologyListener extends TopologyListenerAdapter {
     @Override
     public void driverAdded(final TopologyEvent event) {
       newMessage("added driver " + event.getDriver().getDisplayName());
@@ -234,6 +257,42 @@ public class MyView extends PluggableView {
     public void nodeRemoved(final TopologyEvent event) {
       TopologyNode node = event.getNodeOrPeer();
       String message = String.format("removed %s %s from driver %s", (node.isNode() ? "node" :  "peer"), node.getDisplayName(), event.getDriver().getDisplayName());
+      newMessage(message);
+    }
+  }
+
+  /**
+   * Our job monitoring events listener implementation.
+   * <br>Driver events are not processed here, since the topology listener already handles them.
+   */
+  private class MyJobMonitorListener extends JobMonitoringListenerAdapter {
+    @Override
+    public void jobAdded(final JobMonitoringEvent event) {
+      Job job = event.getJob();
+      String message = String.format("added job '%s' to driver %s", job.getDisplayName(), event.getJobDriver().getDisplayName());
+      newMessage(message);
+    }
+
+    @Override
+    public void jobRemoved(final JobMonitoringEvent event) {
+      Job job = event.getJob();
+      // we can't use job.getJobDriver(), since the job is already removed from its parent driver
+      String message = String.format("removed job '%s' from driver %s", job.getDisplayName(), event.getJobDriver().getDisplayName());
+      newMessage(message);
+    }
+
+    @Override
+    public void jobDispatchAdded(final JobMonitoringEvent event) {
+      JobDispatch dispatch = event.getJobDispatch();
+      String message = String.format("job '%s' dispatched to node %s", event.getJob().getDisplayName(), dispatch.getDisplayName());
+      newMessage(message);
+    }
+
+    @Override
+    public void jobDispatchRemoved(final JobMonitoringEvent event) {
+      JobDispatch dispatch = event.getJobDispatch();
+      // we can't use dispatch.getJob(), since the job dispatch is already removed from its parent job
+      String message = String.format("job '%s' returned from node %s", event.getJob().getDisplayName(), dispatch.getDisplayName());
       newMessage(message);
     }
   }

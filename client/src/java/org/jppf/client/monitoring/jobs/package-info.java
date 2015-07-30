@@ -16,23 +16,9 @@
  * limitations under the License.
  */
 
-package org.jppf.ui.monitoring.job;
-
 /**
- * Enumeration of possible type of job data nodes.
+ * Classes supporting the monitoring and refreshing of the JPPF jobs hierarchy.
+ * <p>Found in: <b>jppf-client.jar</b> 
+ * @since 5.1
  */
-public enum JobDataType
-{
-  /**
-   * Driver.
-   */
-  DRIVER,
-  /**
-   * A job submitted to a driver
-   */
-  JOB,
-  /**
-   * A part of a job submitted to a node.
-   */
-  SUB_JOB
-}
+package org.jppf.client.monitoring.jobs;

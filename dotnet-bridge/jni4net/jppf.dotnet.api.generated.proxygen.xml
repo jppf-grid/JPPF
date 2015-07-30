@@ -42,5 +42,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <ClrType TypeName="org.jppf.dotnet.DotnetJobEventDispatcher"/>
   <ClrType TypeName="org.jppf.dotnet.DotnetNotificationDispatcher"/>
   <ClrType TypeName="org.jppf.dotnet.DotnetTopologyEventDispatcher"/>
+  <ClrType TypeName="org.jppf.dotnet.DotnetJobMonitoringEventDispatcher"/>
 
 </jni4net-proxygen>

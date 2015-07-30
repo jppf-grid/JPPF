@@ -55,10 +55,8 @@
       </initializer>
 			<listener type="script">
 				<script language="groovy"><![CDATA[
-          def b = option.getUIComponent().isSelected();
-					def handler = option.findFirstWithName("/JobTreetable").getAccumulator();
-					if (b) handler.setup();
-					else handler.cleanup();
+          def b = option.getUIComponent().isSelected()
+					option.findFirstWithName("/JobTreetable").setSuspended(!b)
 				]]></script>
 			</listener>
 		</child>

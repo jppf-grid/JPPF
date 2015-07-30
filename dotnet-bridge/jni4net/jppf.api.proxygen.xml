@@ -74,6 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.client.event.ClientConnectionStatusEvent"/>
   <JavaClass TypeName="org.jppf.client.event.ClientListener"/>
   <JavaClass TypeName="org.jppf.client.event.ConnectionPoolListener"/>
+  <JavaClass TypeName="org.jppf.client.event.ConnectionPoolEvent"/>
 
   <JavaClass TypeName="org.jppf.client.concurrent.JPPFExecutorService"/>
   <JavaClass TypeName="org.jppf.client.concurrent.JPPFCompletionService"/>
@@ -86,7 +87,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.client.concurrent.TaskConfiguration"/>
   <JavaClass TypeName="org.jppf.client.concurrent.TaskConfigurationImpl"/>
 
-  <JavaClass TypeName="org.jppf.client.monitoring.topology.AbstractRefreshHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.AbstractComponent"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.AbstractRefreshHandler"/>
+  
   <JavaClass TypeName="org.jppf.client.monitoring.topology.AbstractTopologyComponent"/>
   <JavaClass TypeName="org.jppf.client.monitoring.topology.JVMHealthRefreshHandler"/>
   <JavaClass TypeName="org.jppf.client.monitoring.topology.NodeRefreshHandler"/>
@@ -99,6 +102,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyNodeStatus"/>
   <JavaClass TypeName="org.jppf.client.monitoring.topology.TopologyPeer"/>
   
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.AbstractJobComponent"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.AbstractJobNotificationsHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.DeferredJobNotificationsHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.ImmediateJobNotificationsHandler"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.Job"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobDispatch"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobDriver"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobMonitor"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobMonitoringEvent"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobMonitoringListener"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobMonitoringListenerAdapter"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobMonitorUpdateMode"/>
+  <JavaClass TypeName="org.jppf.client.monitoring.jobs.JobPollingHandler"/>
+    
   <JavaClass TypeName="org.jppf.execute.ExecutorChannel"/>
   <JavaClass TypeName="org.jppf.queue.QueueListener"/>
   <JavaClass TypeName="org.jppf.location.Location"/>
@@ -195,8 +212,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.node.protocol.Task" SyncInterface="true"/>
   <JavaClass TypeName="org.jppf.node.protocol.TaskBundle"/>
   <JavaClass TypeName="org.jppf.node.protocol.TaskExecutionDispatcher"/>
+  
   <JavaClass TypeName="org.jppf.scheduling.JPPFSchedule"/>
   <JavaClass TypeName="org.jppf.utils.JPPFCallable"/>
+  <JavaClass TypeName="org.jppf.utils.JPPFConfiguration"/>
   <JavaClass TypeName="org.jppf.utils.PropertiesCollection"/>
   <JavaClass TypeName="org.jppf.utils.TraversalList"/>
   <JavaClass TypeName="org.jppf.utils.TypedProperties"/>
@@ -213,5 +232,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <JavaClass TypeName="org.jppf.dotnet.DotnetJobListenerWrapper"/>
   <JavaClass TypeName="org.jppf.dotnet.DotnetNotificationListenerWrapper"/>
   <JavaClass TypeName="org.jppf.dotnet.DotnetTopologyListenerWrapper"/>
+  <JavaClass TypeName="org.jppf.dotnet.DotnetJobMonitoringListenerWrapper"/>
 
 </jni4net-proxygen>

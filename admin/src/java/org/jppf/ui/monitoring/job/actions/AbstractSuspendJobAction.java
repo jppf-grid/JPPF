@@ -20,7 +20,10 @@ package org.jppf.ui.monitoring.job.actions;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import org.jppf.ui.monitoring.job.JobData;
+import org.jppf.client.monitoring.jobs.*;
+import org.jppf.job.JobUuidSelector;
+import org.jppf.server.job.management.DriverJobManagementMBean;
+import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
@@ -48,14 +51,14 @@ public abstract class AbstractSuspendJobAction extends AbstractJobAction {
 
   /**
    * Update this action's enabled state based on a list of selected elements.
-   * @param selectedElements - a list of objects.
+   * @param selectedElements a list of objects.
    */
   @Override
   public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     if (jobDataArray.length > 0) {
-      for (JobData data : jobDataArray) {
-        if (!data.getJobInformation().isSuspended()) {
+      for (Job job : jobDataArray) {
+        if (!job.getJobInformation().isSuspended()) {
           setEnabled(true);
           return;
         }
@@ -67,16 +70,19 @@ public abstract class AbstractSuspendJobAction extends AbstractJobAction {
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
+    final CollectionMap<JobDriver, String> map = new SetHashMap<>();
+    for (Job data : jobDataArray) map.putValue(data.getJobDriver(), data.getUuid());
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        for (JobData data : jobDataArray) {
+        for (JobDriver driver: map.keySet()) {
           try {
-            data.getJmxWrapper().suspendJob(data.getJobInformation().getJobUuid(), requeue);
+            log.info("attempting to suspend jobs {} via driver {}", map.getValues(driver), driver.getDisplayName());
+            DriverJobManagementMBean jmx = driver.getJobManager();
+            if (jmx != null) jmx.suspendJobs(new JobUuidSelector(map.getValues(driver)), requeue);
           } catch (Exception e) {
             log.error(e.getMessage(), e);
           }

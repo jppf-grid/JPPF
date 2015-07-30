@@ -45,13 +45,13 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
+   * The JPPF configuration.
+   */
+  private static TypedProperties config = JPPFConfiguration.getProperties();
+  /**
    * Mapping of driver uuids to the corresponding {@link TopologyDriver} objects.
    */
   private final Map<String, TopologyDriver> driverMap = new Hashtable<>();
-  /**
-   * Mapping of JMX ids to the corresponding {@link TopologyDriver} objects.
-   */
-  private final Map<String, TopologyDriver> driverJmxMap = new Hashtable<>();
   /**
    * Synchronizationlock.
    */
@@ -90,49 +90,46 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
   private final JVMHealthRefreshHandler jvmHealthRefreshHandler;
 
   /**
-   * Initialize this topology manager with a new {@link JPPFClient}.
+   * Initialize this topology manager with a new {@link JPPFClient} and the specified listeners.
+   * The refresh intervals are determined from the configuration, or take a default value of 1000L if they are not configured.
+   * @param listeners a set of listeners to subscribe immediately for topology events.
    */
-  public TopologyManager() {
-    this((TopologyListener[]) null);
+  public TopologyManager(final TopologyListener...listeners) {
+    this(null, listeners);
   }
 
   /**
    * Initialize this topology manager with a new {@link JPPFClient} and the specified listeners.
+   * @param topologyRefreshInterval the interval in millis between refreshes of the topology.
+   * @param jvmHealthRefreshInterval the interval in millis between refreshes of the JVM health data.
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
-  public TopologyManager(final TopologyListener...listeners) {
-    this.refreshHandler = new NodeRefreshHandler(this);
-    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this);
-    if (listeners != null) for (TopologyListener listener: listeners) addTopologyListener(listener);
-    this.client = new JPPFClient(this);
-  }
-
-  /**
-   * Initialize this topology manager with the specified {@link JPPFClient}.
-   * @param client the JPPF client used to discover and monitor the grid topology.
-   */
-  public TopologyManager(final JPPFClient client) {
-    this(client, (TopologyListener[]) null);
+  public TopologyManager(final long topologyRefreshInterval, final long jvmHealthRefreshInterval, final TopologyListener...listeners) {
+    this(topologyRefreshInterval, jvmHealthRefreshInterval, null, listeners);
   }
 
   /**
    * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
-   * @param client the JPPF client used to discover and monitor the grid topology.
-   * @param listener a listener to subscribe immediately for topology events.
-   */
-  public TopologyManager(final JPPFClient client, final TopologyListener listener) {
-    this(client, new TopologyListener[] { listener });
-  }
-
-  /**
-   * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
+   * The refresh intervals are determined from the configuration, or take a default value of 1000L if they are not configured.
    * @param client the JPPF client used to discover and monitor the grid topology.
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final JPPFClient client, final TopologyListener...listeners) {
-    this.refreshHandler = new NodeRefreshHandler(this);
-    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this);
-    this.client = client;
+    this(config.getLong("jppf.admin.refresh.interval.topology", 1000L), config.getLong("jppf.admin.refresh.interval.health", 1000L), client, listeners);
+  }
+
+  /**
+   * Initialize this topology manager with the specified {@link JPPFClient} and listeners.
+   * @param topologyRefreshInterval the interval in millis between refreshes of the topology.
+   * @param jvmHealthRefreshInterval the interval in millis between refreshes of the JVM health data.
+   * @param client the JPPF client used to discover and monitor the grid topology.
+   * @param listeners a set of listeners to subscribe immediately for topology events.
+   */
+  public TopologyManager(final long topologyRefreshInterval, final long jvmHealthRefreshInterval, final JPPFClient client, final TopologyListener...listeners) {
+    this.refreshHandler = new NodeRefreshHandler(this, topologyRefreshInterval);
+    this.jvmHealthRefreshHandler = new JVMHealthRefreshHandler(this, jvmHealthRefreshInterval);
+    this.client = (client == null) ? new JPPFClient(this) : client;
+    if (client != null) client.addConnectionPoolListener(this);
     if (listeners != null) for (TopologyListener listener: listeners) addTopologyListener(listener);
     init();
   }
@@ -141,12 +138,13 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * Intialize the topology tree.
    */
   private void init() {
-    client.addConnectionPoolListener(this);
     for (JPPFConnectionPool pool: client.getConnectionPools()) {
-      List<JPPFClientConnection> connections = pool.getConnections(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
-      if (connections.isEmpty()) connections = pool.getConnections();
-      JPPFClientConnection c = connections.get(0);
-      if (!connections.isEmpty()) connectionAdded(new ConnectionPoolEvent(c.getConnectionPool(), c));
+      List<JPPFClientConnection> list = pool.getConnections(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+      if (list.isEmpty()) list = pool.getConnections();
+      if (!list.isEmpty()) { 
+        JPPFClientConnection c = list.get(0);
+        connectionAdded(new ConnectionPoolEvent(pool, c));
+      }
     }
   }
 
@@ -313,7 +311,6 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
     }
     synchronized(driversLock) {
       driverMap.put(driver.getUuid(), driver);
-      driverJmxMap.put(driver.getManagementInfo().toDisplayString(), driver);
     }
     TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_ADDED);
@@ -332,7 +329,6 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
     for (AbstractTopologyComponent child: driver.getChildren()) nodeRemoved(driver, (TopologyNode) child);
     synchronized(driversLock) {
       driverMap.remove(driver.getUuid());
-      driverJmxMap.remove(driver.getManagementInfo().toDisplayString());
     }
     TopologyEvent event = new TopologyEvent(this, driver, null, TopologyEvent.UpdateType.TOPOLOGY);
     dispatchEvent(event, TopologyEvent.Type.DRIVER_REMOVED);

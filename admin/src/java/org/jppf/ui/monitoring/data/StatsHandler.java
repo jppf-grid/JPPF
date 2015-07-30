@@ -21,7 +21,9 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jppf.client.monitoring.jobs.*;
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.management.diagnostics.HealthSnapshot;
@@ -89,9 +91,13 @@ public final class StatsHandler implements StatsConstants {
    */
   private final TopologyManager topologyManager;
   /**
+   * The object which monitors and maintains a representation of the jobs hierarchy.
+   */
+  private final JobMonitor jobMonitor;
+  /**
    * {@code true} to show IP addresses, {@code false} to display host names.
    */
-  private boolean showIP = false;
+  private AtomicBoolean showIP = new AtomicBoolean(false);
 
   /**
    * Get the singleton instance of this class.
@@ -119,7 +125,14 @@ public final class StatsHandler implements StatsConstants {
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
     if (debugEnabled) log.debug("initializing TopologyManager");
     topologyManager = new TopologyManager();
-    if (debugEnabled) log.debug("done initializing TopologyManager");
+    if (debugEnabled) log.debug("done initializing JobMonitor");
+    String modeStr = JPPFConfiguration.getProperties().getString("jppf.gui.publish.mode", "immediate_notifications");
+    long period = JPPFConfiguration.getProperties().getLong("jppf.gui.publish.period", 1000L);
+    JobMonitorUpdateMode mode = JobMonitorUpdateMode.IMMEDIATE_NOTIFICATIONS;
+    if ("deferred_notifications".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.DEFERRED_NOTIFICATIONS;
+    else if ("polling".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.POLLING;
+    jobMonitor = new JobMonitor(mode, period, topologyManager);
+    if (debugEnabled) log.debug("done initializing JobMonitor");
     clientHandler = new ClientHandler(this);
   }
 
@@ -249,7 +262,7 @@ public final class StatsHandler implements StatsConstants {
    * @return {@code true} to show IP addresses, {@code false} to display host names.
    */
   public boolean isShowIP() {
-    return showIP;
+    return showIP.get();
   }
 
   /**
@@ -257,9 +270,9 @@ public final class StatsHandler implements StatsConstants {
    * @param showIP {@code true} to show IP addresses, {@code false} to display host names.
    */
   public void setShowIP(final boolean showIP) {
-    if (showIP != this.showIP) {
-      boolean oldState = this.showIP;
-      this.showIP = showIP;
+    if (showIP != this.showIP.get()) {
+      boolean oldState = this.showIP.get();
+      this.showIP.set(showIP);
       ShowIPEvent event = new ShowIPEvent(this, oldState);
       for (ShowIPListener listener: showIPListeners) listener.stateChanged(event);
     }
@@ -445,5 +458,13 @@ public final class StatsHandler implements StatsConstants {
    */
   public TopologyManager getTopologyManager() {
     return topologyManager;
+  }
+
+  /**
+   * Get the object which monitors and maintains a representation of the jobs hierarchy.
+   * @return a {@link JobMonitor} instance.
+   */
+  public JobMonitor getJobMonitor() {
+    return jobMonitor;
   }
 }

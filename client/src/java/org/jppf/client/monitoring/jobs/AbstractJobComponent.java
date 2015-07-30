@@ -15,18 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.event;
 
-import java.util.EventListener;
+package org.jppf.client.monitoring.jobs;
+
+import org.jppf.client.monitoring.AbstractComponent;
 
 /**
- * Event listener for handling changes to the state of the "ShowIP" toggle.
+ * Base superclass for components of a JPPF job hierarchy.
  * @author Laurent Cohen
+ * @since 5.1
  */
-public interface ShowIPListener extends EventListener {
+public abstract class AbstractJobComponent extends AbstractComponent<AbstractJobComponent> {
   /**
-   * Called to notify that the toggle state has changed.
-   * @param event the object that encapsulates the toggle change event.
+   * Initialize this component with the specified uuid.
+   * @param uuid the uuid assigned to this component.
    */
-  void stateChanged(ShowIPEvent event);
+  AbstractJobComponent(final String uuid) {
+    super(uuid);
+  }
 }

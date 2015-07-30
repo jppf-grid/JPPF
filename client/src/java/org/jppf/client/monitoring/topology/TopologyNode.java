@@ -81,6 +81,7 @@ public class TopologyNode extends AbstractTopologyComponent {
   public boolean isNode() {
     return true;
   }
+
   /**
    * Get the object describing the current state of a node.
    * @return a <code>JPPFNodeState</code> instance.
@@ -152,5 +153,19 @@ public class TopologyNode extends AbstractTopologyComponent {
    */
   public NodePendingAction getPendingAction() {
     return (nodeState == null) ? null : nodeState.getPendingAction();
+  }
+
+  /**
+   * Convenience method to get the driver this node is attached to as a {@link TopologyDriver} instance.
+   * @return a {@link TopologyDriver} if this node is a real node, or {@code null} if this is a peer server.
+   * @sine 5.1
+   */
+  public TopologyDriver getDriver() {
+    return isNode() ? (TopologyDriver) getParent() : null;
+  }
+
+  @Override
+  public String getDisplayName() {
+    return managementInfo != null ? managementInfo.toDisplayString() : toString();
   }
 }

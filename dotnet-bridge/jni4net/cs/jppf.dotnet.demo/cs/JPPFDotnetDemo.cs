@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +25,9 @@ using net.sf.jni4net;
 using org.jppf.client;
 using org.jppf.client.concurrent;
 using org.jppf.client.@event;
+using org.jppf.client.monitoring;
 using org.jppf.client.monitoring.topology;
+using org.jppf.client.monitoring.jobs;
 using org.jppf.dotnet;
 using org.jppf.node.policy;
 using org.jppf.node.protocol;
@@ -58,26 +61,32 @@ namespace org.jppf.dotnet.demo {
     static void Main(string[] args) {
       JPPFClient client = null;
       TopologyManager manager = null;
+      JobMonitor jobMonitor = null;
       try {
         // initialize the .Net bridge with verbose/quiet mode
         JPPFDotnet.Init(false);
-        // initialize the JPPF client
-        client = new JPPFClient();
-        // uncomment to test an executor service
-        //SubmitWithExecutor(client);
-        // uncomment to test a completion service
-        //SubmitWithCompletionService(client);
         // initialize a topology manager and register a listener for topology events
-        manager = new TopologyManager(client);
-        manager.AddTopologyListener(new MyTopologyListener());
+        manager = new DotnetTopologyManager(new MyTopologyListener());
+        // initialize a topology manager and register a listener for topology events
+        jobMonitor = new DotnetJobMonitor(manager, new MyJobMonitoringListener());
+        // wait until the topology manager and job monitor are fully initialized
+        while (jobMonitor.getJobDrivers().size() <= 0) Thread.Sleep(10);
+        JobDriver jobDriver = jobMonitor.getJobDrivers().get(0) as JobDriver;
+        while (jobDriver.getTopologyDriver().getChildCount() <= 0) Thread.Sleep(10);
+        // initialize the JPPF client
+        client = manager.getJPPFClient();
         // print the number of nodes connected to the server
         PrintNbNodes(client);
         // provision a slave node for each .Net-capable master node
         //ProvisionNodes(client, 1);
         // subscribe to job notifications emitted by the JPPF server
-        RegisterJobNotificationListener(client);
+        //RegisterJobNotificationListener(client);
         // subscribe to task completion notifications emitted by the JPPF nodes
         RegisterTaskNotificationListener(client);
+        // uncomment to test an executor service
+        //SubmitWithExecutor(client);
+        // uncomment to test a completion service
+        //SubmitWithCompletionService(client);
 
         JPPFJob job = new JPPFJob();
         job.setName(".NET job");
@@ -110,14 +119,19 @@ namespace org.jppf.dotnet.demo {
           }
         }
       } catch (Exception e) {
-        Console.WriteLine("" + e);
+        Console.WriteLine(e.ToString());
       }
 
-      Console.WriteLine("Please press ESC to terminate");
-      do {
-        while (!Console.KeyAvailable) {
-        }
-      } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+      if (!Console.IsInputRedirected && !Console.IsOutputRedirected) {
+        Console.WriteLine("Please press ESC to terminate");
+        do {
+          while (!Console.KeyAvailable) {
+          }
+        } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+      } else {
+        Console.WriteLine("Waiting 5 seconds ...");
+        Thread.Sleep(5000);
+      }
       if (client != null) client.close();
     }
 
@@ -149,7 +163,7 @@ namespace org.jppf.dotnet.demo {
           if (result != null) Console.WriteLine("[executor service] got result = " + result);
           else Console.WriteLine("[executor service] no result or exception");
         } catch (Exception e) {
-          Console.WriteLine("[executor service] exception during execution: " + e);
+          Console.WriteLine("[executor service] exception during execution: " + e.ToString());
         }
       }
       executor.shutdownNow();
@@ -176,7 +190,7 @@ namespace org.jppf.dotnet.demo {
           if (result != null) Console.WriteLine("[executor service] got result = " + result);
           else Console.WriteLine("[executor service] no result or exception");
         } catch (Exception e) {
-          Console.WriteLine("[executor service] exception during execution: " + e);
+          Console.WriteLine("[executor service] exception during execution: " + e.ToString());
         }
       }
       executor.shutdownNow();
@@ -240,6 +254,11 @@ namespace org.jppf.dotnet.demo {
         jmx = (JMXDriverConnectionWrapper) list.get(0);
       }
       return jmx;
+    }
+
+    public static String GetName(AbstractComponent comp) {
+      if (comp == null) return "none";
+      return comp.getDisplayName();
     }
   }
 
@@ -351,15 +370,67 @@ namespace org.jppf.dotnet.demo {
 
     /// <summary>Print a console message describing a topology event notification</summary>
     /// <param name="topologyEvent">the received event</param>
-    /// <param name="type">a string describing the type of event notification</param>
-    private void WriteEvent(TopologyEvent topologyEvent, string type) {
-      TopologyDriver driver = topologyEvent.getDriver();
-      string s1 = "none";
-      if (driver != null) s1 = driver.getDisplayName();
-      TopologyNode node = topologyEvent.getNodeOrPeer();
-      string s2 = "none";
-      if (node != null) s2 = node.getDisplayName();
-      Console.WriteLine("[.Net] topology: " + type + " for driver=" + s1 + " and node=" + s2);
+    /// <param name="prefix">a string describing the type of event</param>
+    private void WriteEvent(TopologyEvent topologyEvent, string prefix) {
+      string s1 = JPPFDotnetDemo.GetName(topologyEvent.getDriver());
+      string s2 = JPPFDotnetDemo.GetName(topologyEvent.getNodeOrPeer());
+      Console.WriteLine("[.Net TopologyManager] " + prefix + " for driver=" + s1 + " and node=" + s2);
+    }
+  }
+
+  /// <summary>A job monitoring listener which prints job events to the console</summary>
+  class MyJobMonitoringListener : BaseDotnetJobMonitoringListener {
+
+    /// <summary>Called when a new driver is added to the grid</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void DriverAdded(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "driver added");
+    }
+
+    /// <summary>Called when a driver is removed from the grid</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void DriverRemoved(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "driver removed");
+    }
+
+    /// <summary>Called when a new job is added to a driver</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void JobAdded(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "job added");
+    }
+
+    /// <summary>Called when a job is removed from a driver</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void JobRemoved(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "job removed");
+    }
+
+    /// <summary>Called when a job is updated in a driver</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void JobUpdated(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "job updated");
+    }
+
+    /// <summary>Called when a job is dispatched to a node</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void JobDispatchAdded(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "dispatch added");
+    }
+
+    /// <summary>Called when a job returns from a node</summary>
+    /// <param name="jobEvent">encapsulates the job event</param>
+    public override void JobDispatchRemoved(JobMonitoringEvent jobEvent) {
+      WriteEvent(jobEvent, "dispatch removed");
+    }
+
+    /// <summary>Print a console message describing a topology event notification</summary>
+    /// <param name="topologyEvent">the received event</param>
+    /// <param name="prefix">a string describing the type of event</param>
+    private void WriteEvent(JobMonitoringEvent jobEvent, string prefix) {
+      string s1 = JPPFDotnetDemo.GetName(jobEvent.getJobDriver());
+      string s2 = JPPFDotnetDemo.GetName(jobEvent.getJob());
+      string s3 = JPPFDotnetDemo.GetName(jobEvent.getJobDispatch());
+      Console.WriteLine("[.Net JobMonitor] " + prefix + " for driver=" + s1 + ", job=" + s2 + " and dispatch=" + s3);
     }
   }
 }

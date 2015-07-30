@@ -90,7 +90,7 @@
 	<!-- Build                                                                     -->
 	<!-- ========================================================================= -->
 
-  <target name="build" depends="build.apis, build.demo, doxygen" description="build all"/>
+  <target name="build" depends="build.nodoc, doxygen" description="build all"/>
   <target name="build.nodoc" depends="build.apis, build.demo" description="build all except C# doc"/>
 
   <target name="build.init" depends="">

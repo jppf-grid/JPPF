@@ -18,27 +18,21 @@
 
 package org.jppf.ui.monitoring.job;
 
-import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.jppf.client.*;
-import org.jppf.client.event.*;
-import org.jppf.client.monitoring.topology.*;
-import org.jppf.job.*;
-import org.jppf.management.JPPFManagementInfo;
-import org.jppf.server.job.management.*;
+import org.jppf.client.monitoring.AbstractComponent;
+import org.jppf.client.monitoring.jobs.*;
+import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorDriver;
-import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorJob;
-import org.jppf.ui.monitoring.job.AccumulatorHelper.AccumulatorNode;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
-import org.jppf.utils.*;
+import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -46,7 +40,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin Janda
  */
-public class JobDataPanel extends AbstractTreeTableOption implements TopologyListener {
+public class JobDataPanel extends AbstractTreeTableOption implements JobMonitoringListener {
   /**
    * Logger for this class.
    */
@@ -56,21 +50,21 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The object that manages updates to and navigation within the tree table.
-   */
-  JobDataPanelManager panelManager = null;
-  /**
-   * Accumulator for driver and job state change notifications.
-   */
-  private final AccumulatorHelper accumulatorHelper;
-  /**
-   * Handles the notifications received from the drivers.
-   */
-  private final ExecutorService notificationsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("JobNotifications"));
-  /**
    * The topology manager.
    */
   private final TopologyManager topologyManager;
+  /**
+   * The object which monitors and maintains a representation of the jobs hierarchy.
+   */
+  private final JobMonitor jobMonitor;
+ /**
+  * Determines whether at least one driver was added.
+  */
+ private boolean firstDriverAdded = false;
+ /**
+  * Determines whether refreshes are currently suspended.
+  */
+ private AtomicBoolean suspended = new AtomicBoolean(false);
 
   /**
    * Initialize this panel with the specified information.
@@ -79,10 +73,9 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
     BASE = "org.jppf.ui.i18n.JobDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
     this.topologyManager = StatsHandler.getInstance().getTopologyManager();
-    panelManager = new JobDataPanelManager(this);
-    accumulatorHelper = new AccumulatorHelper(this);
+    this.jobMonitor = StatsHandler.getInstance().getJobMonitor();
     createTreeTableModel();
-    topologyManager.addTopologyListener(this);
+    jobMonitor.addJobMonitoringListener(this);
   }
 
   /**
@@ -95,7 +88,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
   }
 
   /**
-   * Create, initialize and layout the GUI components displayed in this panel.
+   * Create, initialize and layout the GUI components displayed in this 
    */
   @Override
   public void createUI() {
@@ -121,226 +114,175 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
   }
 
   /**
-   * Refresh the tree from the latest data found in the server.
-   * This method will clear the entire tree and repopulate it.
-   */
-  public synchronized void refresh() {
-    SwingUtilities.invokeLater(new RefreshTask());
-  }
-
-  /**
    * Create and initialize the tree table model holding the drivers and nodes data.
    */
   private synchronized void populateTreeTableModel() {
     if (debugEnabled) log.debug("populating the tree table");
     assert SwingUtilities.isEventDispatchThread() : "Not on event dispatch thread";
-    for (TopologyDriver driver: topologyManager.getDrivers()) {
-      panelManager.addDriver(driver);
-      if (debugEnabled) log.debug("added driver " + driver);
-      if (driver.getJmx() == null) continue;
-      String driverUuid = driver.getUuid();
-      DefaultMutableTreeNode driverNode = panelManager.findDriver(driverUuid);
-      if (driverNode == null) continue;
-      JobData driverData = (JobData) driverNode.getUserObject();
-      DriverJobManagementMBean proxy = driverData.getProxy();
-      if (proxy == null) continue;
-      String[] jobIds;
-      try {
-        jobIds = proxy.getAllJobIds();
-      } catch (Exception ex) {
-        if (debugEnabled) log.debug("populating model: " + ex.getMessage(), ex);
-        continue;
-      }
-      for (String id : jobIds) {
-        JobInformation jobInfo = null;
-        try {
-          jobInfo = proxy.getJobInformation(id);
-        } catch (Exception e) {
-          if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
-        }
-        if (jobInfo == null) continue;
-        panelManager.addJob(driverUuid, jobInfo);
-        try {
-          NodeJobInformation[] subJobInfo = proxy.getNodeInformation(id);
-          for (NodeJobInformation nji : subJobInfo) panelManager.addJobDispatch(driverUuid, nji.jobInfo, topologyManager.getNode(nji.nodeInfo.getUuid()));
-        } catch (Exception e) {
-          if (debugEnabled) log.debug("populating model: " + e.getMessage(), e);
-        }
+    for (JobDriver driver: jobMonitor.getJobDrivers()) {
+      addDriver(driver);
+      for (Job job: driver.getJobs()) {
+        addJob(driver, job);
+        for (JobDispatch dispatch: job.getJobDispatches()) addJobDispatch(job, dispatch);
       }
     }
   }
 
   /**
-   * Called to notify that a driver was added.
-   * @param driverData a reference to the driver connection.
+   * Remove all driver nodes from the tree table.
    */
-  public void driverAdded(final TopologyDriver driverData) {
-    if (driverData == null) throw new IllegalArgumentException("clientConnection is null");
-    String driverUuid = driverData.getUuid();
-    if (debugEnabled) log.debug("adding driver " + driverData + ", uuid=" + driverUuid);
-    synchronized(accumulatorHelper) {
-      AccumulatorDriver driver = accumulatorHelper.accumulatorMap.get(driverUuid);
-      if (driver == null) {
-        driver = new AccumulatorDriver(JobAccumulator.Type.ADD, driverData);
-        accumulatorHelper.accumulatorMap.put(driverUuid, driver);
-      } else {
-        boolean remove = driver.mergeChange(JobAccumulator.Type.ADD);
-        if (remove) accumulatorHelper.accumulatorMap.remove(driverUuid);
+  private void clearDrivers() {
+    DefaultMutableTreeNode root = getTreeTableRoot();
+    if (debugEnabled) log.debug("removing all drivers");
+    int n = root.getChildCount();
+    if (n <= 0) return;
+    for (int i=n-1; i>=0; i--) getModel().removeNodeFromParent((DefaultMutableTreeNode) root.getChildAt(i));
+  }
+
+  /**
+   * Refresh the entire tree table.
+   */
+  public void refresh() {
+    clearDrivers();
+    populateTreeTableModel();
+  }
+
+  /**
+   * Called to notify that a driver was added.
+   * @param driver a reference to the driver.
+   */
+  public void addDriver(final JobDriver driver) {
+    final int index = insertIndex(treeTableRoot, driver);
+    if (index < 0) return;
+    final DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);
+    if (debugEnabled) log.debug("adding driver: " + driver.getDisplayName() + " at index " + index);
+    getModel().insertNodeInto(driverNode, getTreeTableRoot(), index);
+    if (!firstDriverAdded) {
+      firstDriverAdded = true;
+      if (debugEnabled) log.debug("adding first driver: " + driver.getDisplayName() + " at index " + index);
+      Runnable r =  new Runnable() {
+        @Override public synchronized void run() {
+          try {
+            JPPFTreeTable treeTable = null;
+            while ((treeTable = getTreeTable()) == null) wait(10L);
+            treeTable.expand(getTreeTableRoot());
+            treeTable.expand(driverNode);
+          } catch (Exception e) {
+          }
+        }
+      };
+      new Thread(r, "Job tree expansion").start();
+    } else {
+      if (debugEnabled) log.debug("additional driver: " + driver.getDisplayName() + " at index " + index);
+      JPPFTreeTable treeTable = getTreeTable();
+      if (treeTable != null) {
+        treeTable.expand(getTreeTableRoot());
+        treeTable.expand(driverNode);
       }
     }
   }
 
   /**
    * Called to notify that a driver was removed.
-   * @param driverData a reference to the driver connection to remove.
+   * @param driver the name of the driver to remove.
    */
-  public void driverRemoved(final TopologyDriver driverData) {
-    //if (driverData == null) throw new IllegalArgumentException("clientConnection is null");
-    if (driverData == null) return;
-    String driverUuid = driverData.getUuid();
-    if (debugEnabled) log.debug("removing driver " + driverData + ", uuid=" + driverUuid);
-    synchronized(accumulatorHelper) {
-      AccumulatorDriver driver = accumulatorHelper.accumulatorMap.get(driverUuid);
-      if (driver == null) accumulatorHelper.accumulatorMap.put(driverUuid, new AccumulatorDriver(JobAccumulator.Type.REMOVE, driverData));
-      else {
-        boolean remove = driver.mergeChange(JobAccumulator.Type.REMOVE);
-        if (remove) accumulatorHelper.accumulatorMap.remove(driverUuid);
-      }
-    }
-  }
-
-  /**
-   * Called to notify that a driver was updated.
-   * @param driverData a reference to the driver connection that changed.
-   */
-  public void updateDriver(final TopologyDriver driverData) {
-    if (driverData == null) throw new IllegalArgumentException("clientConnection is null");
-    String uuid = driverData.getUuid();
-    if (debugEnabled) log.debug("updating driver " + driverData + ", uuid=" + uuid);
-    synchronized(accumulatorHelper) {
-      AccumulatorDriver driver = accumulatorHelper.accumulatorMap.get(uuid);
-      if (driver == null) {
-        driver = new AccumulatorDriver(JobAccumulator.Type.UPDATE, driverData);
-        accumulatorHelper.accumulatorMap.put(uuid, driver);
-      } else {
-        boolean remove = driver.mergeChange(JobAccumulator.Type.UPDATE, driverData);
-        if (remove) accumulatorHelper.accumulatorMap.remove(uuid);
-      }
-    }
+  public void removeDriver(final JobDriver driver) {
+    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
+    if (debugEnabled) log.debug("removing driver: " + driver.getDisplayName());
+    if (driverNode == null) return;
+    getModel().removeNodeFromParent(driverNode);
   }
 
   /**
    * Called to notify that a job was submitted to a driver.
-   * @param driverUuid the name of the driver the job was submitted to.
-   * @param jobInfo    information about the submitted job.
+   * @param driver the driver the job was submitted to.
+   * @param job information about the submitted job.
    */
-  public void addJob(final String driverUuid, final JobInformation jobInfo) {
-    if (jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
-    String jobUuid = jobInfo.getJobUuid();
-    if (debugEnabled) log.debug("adding job " + jobInfo + " to driver " + driverUuid);
-    synchronized(accumulatorHelper) {
-      AccumulatorDriver driver = accumulatorHelper.getAccumulatedDriver(driverUuid);
-      Map<String, AccumulatorJob> jobMap = driver.getMap();
-      AccumulatorJob job = jobMap.get(jobUuid);
-      if (job == null) {
-        job = new AccumulatorJob(JobAccumulator.Type.ADD, jobInfo);
-        jobMap.put(jobUuid, job);
-      } else {
-        boolean remove = job.mergeChange(JobAccumulator.Type.ADD);
-        if (remove) jobMap.remove(jobUuid);
-      }
-    }
+  public void addJob(final JobDriver driver, final Job job) {
+    final DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
+    if (driverNode == null) return;
+    final int index = insertIndex(driverNode, job);
+    if (index < 0) return;
+    final DefaultMutableTreeNode jobNode = new DefaultMutableTreeNode(job);
+    if (debugEnabled) log.debug("adding job: " + job.getDisplayName() + " to driver " + driver.getDisplayName() + " at index " + index);
+    getModel().insertNodeInto(jobNode, driverNode, index);
+    if (getTreeTable() != null) getTreeTable().expand(driverNode);
   }
 
   /**
    * Called to notify that a job was removed from a driver.
-   * @param driverUuid the name of the driver the job was submitted to.
-   * @param jobInfo    information about the job.
+   * @param driver the the driver the job was submitted to.
+   * @param job the job.
    */
-  public void removeJob(final String driverUuid, final JobInformation jobInfo) {
-    if (jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
-    synchronized(accumulatorHelper) {
-      AccumulatorDriver driver = accumulatorHelper.getAccumulatedDriver(driverUuid);
-      Map<String, AccumulatorJob> jobMap = driver.getMap();
-      String jobUuid = jobInfo.getJobUuid();
-      if (debugEnabled) log.debug("removing job " + jobInfo + " from driver " + driverUuid);
-      AccumulatorJob job = jobMap.get(jobUuid);
-      if (job == null) {
-        job = new AccumulatorJob(JobAccumulator.Type.REMOVE, jobInfo);
-        jobMap.put(jobUuid, job);
-      } else {
-        boolean remove = job.mergeChange(JobAccumulator.Type.REMOVE);
-        if (remove) jobMap.remove(jobUuid);
-      }
-    }
+  public void removeJob(final JobDriver driver, final Job job) {
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, driver.getUuid());
+    if (driverNode == null) return;
+    final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
+    //if (debugEnabled) log.debug("*** jobNode =  " + jobNode);
+    if (jobNode == null) return;
+    if (debugEnabled) log.debug("removing job: " + job.getDisplayName() + " from driver " + driver.getDisplayName());
+    getModel().removeNodeFromParent(jobNode);
+    //if (getTreeTable() != null) getTreeTable().repaint();
   }
 
   /**
    * Called to notify that a job was removed from a driver.
-   * @param driverUuid the name of the driver the job was submitted to.
-   * @param jobInfo    information about the job.
+   * @param job information about the job.
    */
-  public void updateJob(final String driverUuid, final JobInformation jobInfo) {
-    if (jobInfo == null) throw new IllegalArgumentException("jobInfo is null");
-    String jobUuid = jobInfo.getJobUuid();
-    if (debugEnabled) log.debug("updating job " + jobInfo + " from driver " + driverUuid);
-    synchronized(accumulatorHelper) {
-      AccumulatorDriver driver = accumulatorHelper.getAccumulatedDriver(driverUuid);
-      Map<String, AccumulatorJob> jobMap = driver.getMap();
-      AccumulatorJob job = jobMap.get(jobUuid);
-      if (job == null) {
-        job = new AccumulatorJob(JobAccumulator.Type.UPDATE, jobInfo);
-        jobMap.put(jobUuid, job);
-      } else {
-        boolean remove = job.mergeChange(JobAccumulator.Type.UPDATE, jobInfo);
-        if (remove) jobMap.remove(jobUuid);
-      }
-    }
+  public void updateJob(final Job job) {
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
+    if (driverNode == null) return;
+    final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
+    if (jobNode == null) return;
+    if (debugEnabled) log.debug("updating job: " + job.getDisplayName() + " from driver " + job.getJobDriver().getDisplayName());
+    getModel().changeNode(jobNode);
   }
 
   /**
    * Called to notify that a sub-job was dispatched to a node.
-   * @param driverUuid the name of the driver the job was submitted to.
-   * @param jobInfo    information about the sub-job.
-   * @param nodeInfo   information about the node where the sub-job was dispatched.
+   * @param job information about the job.
+   * @param dispatch information about the job dispatch.
    */
-  public void addDispatch(final String driverUuid, final JobInformation jobInfo, final TopologyNode nodeInfo) {
-    if (debugEnabled) log.debug("driver " + driverUuid + ": adding sub-job " + jobInfo + " to node " + nodeInfo);
-    synchronized(accumulatorHelper) {
-      AccumulatorJob job = accumulatorHelper.getAccumulatorJob(driverUuid, jobInfo);
-      Map<String, AccumulatorNode> nodeMap = job.getMap();
-      AccumulatorNode node = nodeMap.get(nodeInfo.getUuid());
-      if (node == null) {
-        node = new AccumulatorNode(JobAccumulator.Type.ADD, jobInfo, nodeInfo);
-        nodeMap.put(nodeInfo.getUuid(), node);
-      } else {
-        boolean remove = node.mergeChange(JobAccumulator.Type.ADD);
-        if (remove) nodeMap.remove(nodeInfo.getUuid());
-      }
-    }
+  public void addJobDispatch(final Job job, final JobDispatch dispatch) {
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
+    if (driverNode == null) return;
+    final DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
+    if (jobNode == null) return;
+    final int index = insertIndex(jobNode, dispatch);
+    if (index < 0) return;
+    final DefaultMutableTreeNode subJobNode = new DefaultMutableTreeNode(dispatch);
+    if (debugEnabled) log.debug("sub-job: {} dispatched to node {} (index {})", new Object[] { job.getDisplayName(), dispatch.getDisplayName(), index});
+    getModel().insertNodeInto(subJobNode, jobNode, index);
+    if (getTreeTable() != null) getTreeTable().expand(jobNode);
   }
 
   /**
    * Called to notify that a sub-job was removed from a node.
-   * @param driverUuid the name of the driver the job was submitted to.
-   * @param jobInfo    information about the job.
-   * @param nodeInfo   information about the node where the sub-job was dispatched.
+   * @param job information about the job.
+   * @param dispatch information about the node where the sub-job was dispatched.
    */
-  public void removeDispatch(final String driverUuid, final JobInformation jobInfo, final TopologyNode nodeInfo) {
-    //String nodeName = nodeInfo.getUuid();
-    if (debugEnabled) log.debug("driver " + driverUuid + ": removing sub-job " + jobInfo + " from node " + nodeInfo);
-    synchronized(accumulatorHelper) {
-      AccumulatorJob job = accumulatorHelper.getAccumulatorJob(driverUuid, jobInfo);
-      Map<String, AccumulatorNode> nodeMap = job.getMap();
-      AccumulatorNode node = nodeMap.get(nodeInfo.getUuid());
-      if (node == null) {
-        node = new AccumulatorNode(JobAccumulator.Type.REMOVE, jobInfo, nodeInfo);
-        nodeMap.put(nodeInfo.getUuid(), node);
-      } else {
-        boolean remove = node.mergeChange(JobAccumulator.Type.REMOVE);
-        if (remove) nodeMap.remove(nodeInfo.getUuid());
-      }
-    }
+  public void removeJobDispatch(final Job job, final JobDispatch dispatch) {
+    if (dispatch == null) return;
+    DefaultMutableTreeNode driverNode = TreeTableUtils.findComponent(treeTableRoot, job.getJobDriver().getUuid());
+    if (driverNode == null) return;
+    DefaultMutableTreeNode jobNode = TreeTableUtils.findComponent(driverNode, job.getUuid());
+    if (jobNode == null) return;
+    final DefaultMutableTreeNode subJobNode = TreeTableUtils.findComponent(jobNode, dispatch.getUuid());
+    if (subJobNode == null) return;
+    if (debugEnabled) log.debug("removing dispatch: " + job.getDisplayName() + " from node " + dispatch.getDisplayName());
+    getModel().removeNodeFromParent(subJobNode);
+    if (getTreeTable() != null) getTreeTable().repaint();
+  }
+
+  /**
+   * Find the position at which to insert a driver, using the sorted lexical order of driver display names.
+   * @param root the parent tree node of the component to insert.
+   * @param comp the driver to insert.
+   * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
+   */
+  int insertIndex(final DefaultMutableTreeNode root, final AbstractComponent comp) {
+    if (TreeTableUtils.findComponent(root, comp.getUuid()) != null) return -1;
+    return TreeTableUtils.insertIndex(root, comp);
   }
 
   /**
@@ -351,7 +293,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
   }
 
   /**
-   * Initialize all actions used in the panel.
+   * Initialize all actions used in the toolbar and popup menus.
    */
   public void setupActions() {
     actionHandler = new JTreeTableActionHandler(treeTable);
@@ -370,143 +312,49 @@ public class JobDataPanel extends AbstractTreeTableOption implements TopologyLis
     new Thread(r).start();
   }
 
-  /**
-   * Put a new task in the executor's queue to handle th specified notification from the psecified driver.
-   * @param driver the name of the driver that sent the notification.
-   * @param notif the notification to process.
-   */
-  void handleNotification(final TopologyDriver driver, final JobNotification notif) {
-    notificationsExecutor.submit(new JobNotificationTask(driver, notif));
-  }
-
-  /**
-   * Instances of this class process a single job notification sent from a driver.
-   */
-  private final class JobNotificationTask implements Runnable {
-    /**
-     * The driver that sent the notification.
-     */
-    private final TopologyDriver driver;
-    /**
-     * The notification to process.
-     */
-    private final JobNotification notif;
-
-    /**
-     * Initialize this notification processing task.
-     * @param driver the driver that sent the notification.
-     * @param notif the notification to process.
-     */
-    private JobNotificationTask(final TopologyDriver driver, final JobNotification notif) {
-      this.driver = driver;
-      this.notif = notif;
-    }
-
-    @Override
-    public void run() {
-      String uuid = driver.getUuid();
-      JobInformation jobInfo = notif.getJobInformation();
-      JPPFManagementInfo nodeInfo = notif.getNodeInfo();
-      switch(notif.getEventType()) {
-        case JOB_QUEUED:
-          addJob(uuid, jobInfo);
-          break;
-        case JOB_ENDED:
-          removeJob(uuid, jobInfo);
-          break;
-        case JOB_UPDATED:
-          updateJob(uuid, jobInfo);
-          break;
-        case JOB_DISPATCHED:
-          addDispatch(uuid, jobInfo, getOrCreateTopologyNode(nodeInfo));
-          break;
-        case JOB_RETURNED:
-          removeDispatch(uuid, jobInfo, getOrCreateTopologyNode(nodeInfo));
-          break;
-      }
-    }
-  }
-
-  /**
-   * 
-   * @param nodeInfo .
-   * @return .
-   */
-  private TopologyNode getOrCreateTopologyNode(final JPPFManagementInfo nodeInfo) {
-    TopologyNode node = null;
-    if (nodeInfo != null) {
-      node = topologyManager.getNode(nodeInfo.getUuid());
-      if (node == null) node = new TopologyNode(nodeInfo);
-    }
-    return node;
-  }
-
-  /**
-   * This task refreshes the entire job data panel.
-   */
-  public class RefreshTask implements Runnable {
-    @Override
-    public void run() {
-      if (debugEnabled) log.debug("refresh requested");
-      synchronized(accumulatorHelper) {
-        accumulatorHelper.cleanup();
-        panelManager.clearDriver();
-        populateTreeTableModel();
-        //accumulatorHelper.setup();
-        accumulatorHelper.publish();
-        refreshUI();
-      }
-    }
+  @Override
+  public void driverAdded(final JobMonitoringEvent event) {
+    addDriver(event.getJobDriver());
   }
 
   @Override
-  public void driverAdded(final TopologyEvent event) {
-    final TopologyDriver driver = event.getDriver();
-    final JPPFClientConnection c = driver.getConnection();
-    JPPFClientConnectionStatus status = c.getStatus();
-    if ((status != null) && status.isWorkingStatus()) driverAdded(driver);
-    else c.addClientConnectionStatusListener(new ClientConnectionStatusListener() {
-      @Override
-      public void statusChanged(final ClientConnectionStatusEvent cevt) {
-        if (c.getStatus().isWorkingStatus()) driverAdded(driver);
-      }
-    });
+  public void driverRemoved(final JobMonitoringEvent event) {
+    if (!suspended.get()) removeDriver(event.getJobDriver());
   }
 
   @Override
-  public void driverRemoved(final TopologyEvent event) {
-    driverRemoved(event.getDriver());
+  public void jobAdded(final JobMonitoringEvent event) {
+    if (!suspended.get()) addJob(event.getJobDriver(), event.getJob());
   }
 
   @Override
-  public void driverUpdated(final TopologyEvent event) {
+  public void jobRemoved(final JobMonitoringEvent event) {
+    if (!suspended.get()) removeJob(event.getJobDriver(), event.getJob());
   }
 
   @Override
-  public void nodeAdded(final TopologyEvent event) {
+  public void jobUpdated(final JobMonitoringEvent event) {
+    if (!suspended.get()) updateJob(event.getJob());
   }
 
   @Override
-  public void nodeRemoved(final TopologyEvent event) {
+  public void jobDispatchAdded(final JobMonitoringEvent event) {
+    if (!suspended.get()) addJobDispatch(event.getJob(), event.getJobDispatch());
   }
 
   @Override
-  public void nodeUpdated(final TopologyEvent event) {
+  public void jobDispatchRemoved(final JobMonitoringEvent event) {
+    if (!suspended.get()) removeJobDispatch(event.getJob(), event.getJobDispatch());
   }
 
   /**
-   * Get the topology manager.
-   * @return a {@link TopologyManager} object.
+   * Specify whether refreshes are currently suspended.
+   * @param suspended {@code true} to suspend refreshes, {@code false} to resume them.
+   * @since 5.1
    */
-  TopologyManager getTopologyManager() {
-    return topologyManager;
-  }
-
-  /**
-   * Get the accumulator for driver and job state change notifications.
-   * @return an instance of {@link AccumulatorHelper}.
-   */
-  public AccumulatorHelper getAccumulator() {
-    return accumulatorHelper;
+  public void setSuspended(final boolean suspended) {
+    if (suspended == this.suspended.get()) return;
+    if (!suspended) refresh();
+    this.suspended.set(suspended);
   }
 }

@@ -23,7 +23,7 @@ import javax.management.*;
 import org.slf4j.*;
 
 /**
- * This class wraps a .Net job listener to which job event notifications are delegated.
+ * This class wraps a .Net job listener to which JMX notifications are delegated.
  * @author Laurent Cohen
  * @since 5.0
  * @exclude
@@ -39,7 +39,7 @@ public class DotnetNotificationListenerWrapper extends AbstractDotnetListenerWra
    * @param dotnetListener a proxy to a .Net job listener.
    */
   public DotnetNotificationListenerWrapper(final system.Object dotnetListener) {
-    super(dotnetListener, "HandleNotification");
+    super(log.isDebugEnabled(), dotnetListener, "HandleNotification");
     if (log.isDebugEnabled()) log.debug("initializing with listener = {}", dotnetListener);
   }
 

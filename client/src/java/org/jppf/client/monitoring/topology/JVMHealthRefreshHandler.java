@@ -20,6 +20,7 @@ package org.jppf.client.monitoring.topology;
 
 import java.util.*;
 
+import org.jppf.client.monitoring.AbstractRefreshHandler;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.utils.*;
@@ -38,13 +39,20 @@ public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * The topology manager to which topology change notifications are to be sent. 
+   */
+  private final TopologyManager manager;
 
   /**
    * Initialize this node handler.
    * @param manager the topology manager.
+   * @param period the interval between refreshes in millis.
    */
-  public JVMHealthRefreshHandler(final TopologyManager manager) {
-    super(manager, "JVM Health Update Timer", JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.health", 1000L));
+  JVMHealthRefreshHandler(final TopologyManager manager, final long period) {
+    super("JVM Health Update Timer", period);
+    this.manager = manager;
+    startRefreshTimer();
   }
 
   @Override

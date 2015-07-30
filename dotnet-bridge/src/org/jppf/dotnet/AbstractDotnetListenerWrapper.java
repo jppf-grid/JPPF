@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import org.jppf.JPPFRuntimeException;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -35,24 +35,35 @@ public class AbstractDotnetListenerWrapper {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(DotnetJobListenerWrapper.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractDotnetListenerWrapper.class);
   /**
-   * Mapping of method names to reflection {@link Method} objects.
+   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
+   */
+  private final boolean debugEnabled;
+  /**
+   * Cache mapping method names to reflection {@link Method} objects.
    */
   protected final Map<String, Method> methodMap = new HashMap<>();
   /**
    * The object which propagates event notifications to the actual .Net listener.
    */
   protected final system.Object dotnetDispatcher;
+  /**
+   * 
+   */
+  private final String namePrefix;
 
   /**
    * Initialize this wrapper with the .Net dispatcher and names of notification methods.
    * @param dotnetDispatcher the object which propagates event notifications to the actual .Net listener.
    * @param methodNames the names of the .Net listener notification methods.
    */
-  public AbstractDotnetListenerWrapper(final system.Object dotnetDispatcher, final String...methodNames) {
+  public AbstractDotnetListenerWrapper(final boolean debugEnabled, final system.Object dotnetDispatcher, final String...methodNames) {
+    if (debugEnabled) log.debug(String.format("init of %s wrapper for dispatcher %s, methods=%s", getClass().getSimpleName(), dotnetDispatcher, StringUtils.arrayToString(methodNames)));
     if (dotnetDispatcher == null) throw new IllegalArgumentException(".Net listener cannot be null");
     this.dotnetDispatcher = dotnetDispatcher;
+    this.debugEnabled = debugEnabled;
+    namePrefix = dotnetDispatcher.getClass().getSimpleName();
     try {
       Class<?> c = dotnetDispatcher.getClass();
       for (String name: methodNames) {
@@ -60,6 +71,7 @@ public class AbstractDotnetListenerWrapper {
         methodMap.put(name, method);
       }
     } catch (Exception e) {
+      e.printStackTrace();
       if (e instanceof RuntimeException) throw (RuntimeException) e;
       throw new JPPFRuntimeException("Error initializing " + getClass().getName(), e);
     }
@@ -72,11 +84,12 @@ public class AbstractDotnetListenerWrapper {
    */
   protected void delegate(final Object event, final String methodName) {
     if (dotnetDispatcher == null) return;
+    if (debugEnabled) log.debug(String.format("delegating to method %s.%s() event=%s", namePrefix, methodName, event));
     try {
       Method m = methodMap.get(methodName);
       m.invoke(dotnetDispatcher, event);
     } catch (Exception e) {
-      log.error("error invoking {}() : {}", methodName, ExceptionUtils.getStackTrace(e));
+      log.error(String.format("error invoking %s.%s() with event=%s :%n%s", namePrefix, methodName, event, ExceptionUtils.getStackTrace(e)));
     }
   }
 }

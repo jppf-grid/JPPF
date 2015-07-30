@@ -18,8 +18,7 @@
 
 package org.jppf.client.monitoring.topology;
 
-import java.util.*;
-
+import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.management.JPPFManagementInfo;
 import org.jppf.management.diagnostics.HealthSnapshot;
 
@@ -29,20 +28,7 @@ import org.jppf.management.diagnostics.HealthSnapshot;
  * @author Laurent Cohen
  * @since 5.0
  */
-public abstract class AbstractTopologyComponent {
-  /**
-   * The children of this component.
-   */
-  protected final Map<String, AbstractTopologyComponent> children = new HashMap<>();
-  //protected final List<AbstractTopologyComponent> children = new ArrayList<>();
-  /**
-   * The parent of this component.
-   */
-  protected AbstractTopologyComponent parent;
-  /**
-   * The uuid of this component.
-   */
-  protected final String uuid;
+public abstract class AbstractTopologyComponent extends AbstractComponent<AbstractTopologyComponent> {
   /**
    * Object describing the current health snapshot of a node or driver.
    */
@@ -57,75 +43,7 @@ public abstract class AbstractTopologyComponent {
    * @param uuid the uuid assigned to this component.
    */
   AbstractTopologyComponent(final String uuid) {
-    this.uuid = uuid;
-  }
-
-  /**
-   * Get the parent of this compponent.
-   * @return the parent as a {@link AbstractTopologyComponent} instance.
-   */
-  public synchronized AbstractTopologyComponent getParent() {
-    return parent;
-  }
-
-  /**
-   * Set the parent of this compponent.
-   * @param parent the parent as a {@link AbstractTopologyComponent} instance.
-   */
-  synchronized void setParent(final AbstractTopologyComponent parent) {
-    this.parent = parent;
-  }
-
-  /**
-   * Get the child with the specified uuid.
-   * @param uuid the uuid of the child to look for.
-   * @return a {@link AbstractTopologyComponent} or {@code null} if there is no child with this uuid.
-   */
-  public synchronized AbstractTopologyComponent getChild(final String uuid) {
-    return children.get(uuid);
-  }
-
-  /**
-   * Get the number of children of this topology component.
-   * @return the number of children.
-   */
-  public synchronized int getChildCount() {
-    return children.size();
-  }
-
-  /**
-   * Get the children of this component in a thread-safe way.
-   * The returned list is a copy of the list of children and can be mainupalted without affect the internal state of this object.
-   * @return a list of {@link AbstractTopologyComponent} instances.
-   */
-  public synchronized List<AbstractTopologyComponent> getChildren() {
-    return new ArrayList<>(children.values());
-  }
-
-  /**
-   * Add a child to this component.
-   * @param child the child component to add.
-   */
-  synchronized void add(final AbstractTopologyComponent child) {
-    children.put(child.getUuid(), child);
-    child.setParent(this);
-  }
-
-  /**
-   * Remove a child from this component.
-   * @param child the child component to remove.
-   */
-  synchronized void remove(final AbstractTopologyComponent child) {
-    children.remove(child.getUuid());
-    child.setParent(null);
-  }
-
-  /**
-   * Get the uuid of this ocmponent.
-   * @return the uuid as a strring.
-   */
-  public synchronized String getUuid() {
-    return uuid;
+    super(uuid);
   }
 
   /**
@@ -163,9 +81,8 @@ public abstract class AbstractTopologyComponent {
   /**
    * Refresh the health snapshot state of the driver or node represented by this topology data.
    * @param newSnapshot the new health snapshot fetched from the grid.
-   * @exclude
    */
-  public synchronized void refreshHealthSnapshot(final HealthSnapshot newSnapshot) {
+  synchronized void refreshHealthSnapshot(final HealthSnapshot newSnapshot) {
     if (isPeer()) return;
     this.healthSnapshot = newSnapshot;
   }
@@ -176,32 +93,6 @@ public abstract class AbstractTopologyComponent {
    */
   public synchronized JPPFManagementInfo getManagementInfo() {
     return managementInfo;
-  }
-
-  /**
-   * Get a user-friendly representation of this topology component.
-   * @return a displayable string representing this object.
-   */
-  public String getDisplayName() {
-    return toString();
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    AbstractTopologyComponent other = (AbstractTopologyComponent) obj;
-    if (uuid == null) return other.getUuid() == null;
-    return uuid.equals(other.getUuid());
   }
 
   @Override
