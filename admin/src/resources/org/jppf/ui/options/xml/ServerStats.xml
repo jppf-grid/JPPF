@@ -89,17 +89,13 @@
   </child>
 
 	<!-- ===================================================================== -->
-	<!--                      Tree table area                                  -->
+	<!--                      Tables area                                      -->
 	<!-- ===================================================================== -->
 
 	<child name="Tables" type="Java">
     <property name="scrollable" value="true"/>
     <property name="horizontalScrollbar" value="false"/>
 		<property name="class" value="org.jppf.ui.monitoring.MonitoringPanel"/>
-    <!--
-    <property name="layoutConstraints" value="fill, flowy"/>
-    <property name="componentConstraints" value="grow"/>
-		-->
     <property name="layoutConstraints" value=""/>
     <property name="componentConstraints" value="grow, push"/>
 		<property name="value" value=""/>
