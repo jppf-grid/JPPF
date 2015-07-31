@@ -104,7 +104,7 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.0";
+        $ver1 = "5.0.3";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -149,7 +149,7 @@
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "4.2.7";
+        $ver1 = "4.2.8";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
