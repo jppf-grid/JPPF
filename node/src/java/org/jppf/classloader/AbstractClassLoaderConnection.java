@@ -86,7 +86,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
    */
   protected void sendCloseChannelCommand(final ResourceRequestRunner requestRunner) {
     try {
-      if (debugEnabled) log.debug("sending node initiation message");
+      if (debugEnabled) log.debug("sending close channel command");
       JPPFResourceWrapper request = new JPPFResourceWrapper();
       request.setState(JPPFResourceWrapper.State.CLOSE_CHANNEL);
       request.setData(ResourceIdentifier.NODE_UUID, NodeRunner.getUuid());
@@ -97,7 +97,7 @@ public abstract class AbstractClassLoaderConnection<C> extends AbstractNodeConne
         if (t instanceof Exception) throw (Exception) t;
         else throw new RuntimeException(t);
       }
-      if (debugEnabled) log.debug("received node initiation response");
+      if (debugEnabled) log.debug("received node response");
       requestRunner.reset();
     } catch (Exception e) {
       String format = "error sending close channel command : {}";
