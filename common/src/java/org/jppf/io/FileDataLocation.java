@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Juan Manuel Rodriguez
  */
-public class FileDataLocation extends AbstractDataLocation
-{
+public class FileDataLocation extends AbstractDataLocation {
   /**
    * Logger for this class.
    */
@@ -74,8 +73,7 @@ public class FileDataLocation extends AbstractDataLocation
    * Initialize this file location with the specified file path and an unknown size.
    * @param path the path to the underlying file.
    */
-  public FileDataLocation(final String path)
-  {
+  public FileDataLocation(final String path) {
     this(new File(path));
   }
 
@@ -84,8 +82,7 @@ public class FileDataLocation extends AbstractDataLocation
    * @param path the path to the underlying file.
    * @param size the size of the data represented by this file location.
    */
-  public FileDataLocation(final String path, final int size)
-  {
+  public FileDataLocation(final String path, final int size) {
     filePath = path;
     this.size = size;
     copyCount = new AtomicLong(1L);
@@ -97,8 +94,7 @@ public class FileDataLocation extends AbstractDataLocation
    * @param size the size of the data represented by this file location.
    * @param copyCount .
    */
-  private FileDataLocation(final String path, final int size, final AtomicLong copyCount)
-  {
+  private FileDataLocation(final String path, final int size, final AtomicLong copyCount) {
     filePath = path;
     this.size = size;
     this.copyCount = copyCount;
@@ -109,8 +105,7 @@ public class FileDataLocation extends AbstractDataLocation
    * Initialize this file location with the specified file and unknown size.
    * @param file an abstract path to the underlying file.
    */
-  public FileDataLocation(final File file)
-  {
+  public FileDataLocation(final File file) {
     this(file, (int) file.length());
   }
 
@@ -119,8 +114,7 @@ public class FileDataLocation extends AbstractDataLocation
    * @param file an abstract path to the underlying file.
    * @param size the size of the data represented by this file location.
    */
-  public FileDataLocation(final File file, final int size)
-  {
+  public FileDataLocation(final File file, final int size) {
     this(file.getPath(), size);
   }
 
@@ -130,13 +124,10 @@ public class FileDataLocation extends AbstractDataLocation
    * @param blocking if true, the method will block until the entire content has been transferred.
    * @return the number of bytes actually transferred.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.DataLocation#transferFrom(org.jppf.io.InputSource, boolean)
    */
   @Override
-  public int transferFrom(final InputSource source, final boolean blocking) throws Exception
-  {
-    if (!transferring)
-    {
+  public int transferFrom(final InputSource source, final boolean blocking) throws Exception {
+    if (!transferring) {
       transferring = true;
       fileChannel = new FileOutputStream(filePath).getChannel();
       //buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
@@ -144,24 +135,18 @@ public class FileDataLocation extends AbstractDataLocation
       if (size < buffer.limit()) buffer.limit(size);
       count = 0;
     }
-    try
-    {
+    try {
       int n = blocking ? blockingTransferFrom(source) : nonBlockingTransferFrom(source);
       if ((n < 0) || (count >= size)) transferring = false;
       return n;
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       transferring = false;
       throw e;
     }
-    finally
-    {
-      if (!transferring)
-      {
+    finally {
+      if (!transferring) {
         buffer = null;
-        if (fileChannel != null)
-        {
+        if (fileChannel != null) {
           fileChannel.force(false);
           fileChannel.close();
           fileChannel = null;
@@ -176,25 +161,17 @@ public class FileDataLocation extends AbstractDataLocation
    * @return the number of bytes actually transferred.
    * @throws Exception if an IO error occurs.
    */
-  private int nonBlockingTransferFrom(final InputSource source) throws Exception
-  {
+  private int nonBlockingTransferFrom(final InputSource source) throws Exception {
     int remaining = size - count;
-    if (remaining < buffer.remaining())
-    {
-      buffer.limit(buffer.position() + remaining);
-    }
+    if (remaining < buffer.remaining()) buffer.limit(buffer.position() + remaining);
     int n = source.read(buffer);
-    if (n > 0)
-    {
-      //if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
+    if (n > 0) {
       count += n;
       buffer.flip();
       int tempCount = 0;
-      while (tempCount < n)
-      {
+      while (tempCount < n) {
         int tmp = fileChannel.write(buffer);
-        if (tmp < 0)
-        {
+        if (tmp < 0) {
           transferring = false;
           return -1;
         }
@@ -213,28 +190,21 @@ public class FileDataLocation extends AbstractDataLocation
    * @return the number of bytes actually transferred.
    * @throws Exception if an IO error occurs.
    */
-  private int blockingTransferFrom(final InputSource source) throws Exception
-  {
-    while (count < size)
-    {
+  private int blockingTransferFrom(final InputSource source) throws Exception {
+    while (count < size) {
       int remaining = size - count;
       if ((remaining < buffer.limit()) && (remaining > 0))  buffer.limit(remaining);
       int n = source.read(buffer);
-      if (n < 0)
-      {
+      if (n < 0) {
         transferring = false;
         return -1;
-      }
-      else if (n > 0)
-      {
+      } else if (n > 0) {
         count += n;
         buffer.flip();
         int tempCount = 0;
-        while (tempCount < n)
-        {
+        while (tempCount < n) {
           int tmp = fileChannel.write(buffer);
-          if (tmp < 0)
-          {
+          if (tmp < 0) {
             transferring = false;
             return -1;
           }
@@ -253,35 +223,24 @@ public class FileDataLocation extends AbstractDataLocation
    * @param blocking if true, the method will block until the entire content has been transferred.
    * @return the number of bytes actually transferred.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.DataLocation#transferTo(org.jppf.io.OutputDestination, boolean)
    */
   @Override
-  public int transferTo(final OutputDestination dest, final boolean blocking) throws Exception
-  {
-    if (!transferring)
-    {
+  public int transferTo(final OutputDestination dest, final boolean blocking) throws Exception {
+    if (!transferring) {
       transferring = true;
       fileChannel = new FileInputStream(filePath).getChannel();
-      //buffer = ByteBuffer.wrap(new byte[IO.TEMP_BUFFER_SIZE]);
       buffer = ByteBuffer.wrap(IO.TEMP_BUFFER_POOL.get());
       count = 0;
     }
-    try
-    {
+    try {
       return blocking ? blockingTransferTo(dest) : nonBlockingTransferTo(dest);
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       transferring = false;
       throw e;
-    }
-    finally
-    {
-      if (!transferring)
-      {
+    } finally {
+      if (!transferring) {
         buffer = null;
-        if (fileChannel != null)
-        {
+        if (fileChannel != null) {
           fileChannel.close();
           fileChannel = null;
         }
@@ -294,24 +253,19 @@ public class FileDataLocation extends AbstractDataLocation
    * @param dest the output destination to transfer to.
    * @return the number of bytes actually transferred.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.DataLocation#transferTo(org.jppf.io.OutputDestination, boolean)
    */
-  private int nonBlockingTransferTo(final OutputDestination dest) throws Exception
-  {
-    if (blockSize == 0)
-    {
+  private int nonBlockingTransferTo(final OutputDestination dest) throws Exception {
+    if (blockSize == 0) {
       blockSize = fileChannel.read(buffer);
       buffer.flip();
     }
     int n = dest.write(buffer);
-    if (n < 0)
-    {
+    if (n < 0) {
       transferring = false;
       return -1;
     }
     else blockCount += n;
-    if (!buffer.hasRemaining())
-    {
+    if (!buffer.hasRemaining()) {
       count += blockSize;
       blockSize = 0;
       buffer.clear();
@@ -325,19 +279,14 @@ public class FileDataLocation extends AbstractDataLocation
    * @param dest the output destination to transfer to.
    * @return the number of bytes actually transferred.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.DataLocation#transferTo(org.jppf.io.OutputDestination, boolean)
    */
-  private int blockingTransferTo(final OutputDestination dest) throws Exception
-  {
-    while (count < size)
-    {
+  private int blockingTransferTo(final OutputDestination dest) throws Exception {
+    while (count < size) {
       blockSize = fileChannel.read(buffer);
       buffer.flip();
-      while(buffer.hasRemaining())
-      {
+      while(buffer.hasRemaining()) {
         int n = dest.write(buffer);
-        if (n < 0)
-        {
+        if (n < 0) {
           transferring = false;
           return -1;
         }
@@ -352,21 +301,16 @@ public class FileDataLocation extends AbstractDataLocation
   /**
    * This method deletes the underlying file.
    * @throws Throwable if an error occurs.
-   * @see java.lang.Object#finalize()
    */
   @Override
   protected void finalize() throws Throwable
   {
     if (traceEnabled) log.trace("finalizing " + this);
-    if (copyCount.decrementAndGet() <= 0)
-    {
-      try
-      {
+    if (copyCount.decrementAndGet() <= 0) {
+      try {
         File file = new File(filePath);
         if (file.exists()) file.delete();
-      }
-      finally
-      {
+      } finally {
         super.finalize();
       }
     }
@@ -376,11 +320,9 @@ public class FileDataLocation extends AbstractDataLocation
    * Get an input stream for this location.
    * @return an <code>InputStream</code> instance.
    * @throws Exception if an I/O error occurs.
-   * @see org.jppf.io.DataLocation#getInputStream()
    */
   @Override
-  public InputStream getInputStream() throws Exception
-  {
+  public InputStream getInputStream() throws Exception {
     return new BufferedInputStream(new FileInputStream(filePath));
   }
 
@@ -388,11 +330,9 @@ public class FileDataLocation extends AbstractDataLocation
    * Get an output stream for this location.
    * @return an <code>OutputStream</code> instance.
    * @throws Exception if an I/O error occurs.
-   * @see org.jppf.io.DataLocation#getOutputStream()
    */
   @Override
-  public OutputStream getOutputStream() throws Exception
-  {
+  public OutputStream getOutputStream() throws Exception {
     return new BufferedOutputStream(new FileOutputStream(filePath));
   }
 
@@ -400,11 +340,9 @@ public class FileDataLocation extends AbstractDataLocation
    * Make a shallow copy of this data location.
    * The data it points to is not copied.
    * @return a new DataLocation instance pointing to the same data.
-   * @see org.jppf.io.DataLocation#copy()
    */
   @Override
-  public DataLocation copy()
-  {
+  public DataLocation copy() {
     if (traceEnabled) log.trace("copying " + this);
     return new FileDataLocation(filePath, size, copyCount);
   }
@@ -413,8 +351,7 @@ public class FileDataLocation extends AbstractDataLocation
    * Get the path to the underlying file.
    * @return the path as a string.
    */
-  public String getFilePath()
-  {
+  public String getFilePath() {
     return filePath;
   }
 }

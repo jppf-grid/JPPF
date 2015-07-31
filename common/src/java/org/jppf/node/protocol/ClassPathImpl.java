@@ -26,8 +26,7 @@ import org.jppf.location.Location;
  * A simple implementation of the {@link ClassPath} interface
  * @author Laurent Cohen
  */
-public class ClassPathImpl implements ClassPath
-{
+public class ClassPathImpl implements ClassPath {
   /**
    * Mapping of classpath elements to their names.
    */
@@ -38,80 +37,80 @@ public class ClassPathImpl implements ClassPath
   private boolean forceClassLoaderReset = false;
 
   @Override
-  public Iterator<ClassPathElement> iterator()
-  {
+  public Iterator<ClassPathElement> iterator() {
     return elementMap.values().iterator();
   }
 
   @Override
-  public ClassPath add(final ClassPathElement element)
-  {
+  public ClassPath add(final ClassPathElement element) {
     elementMap.put(element.getName(), element);
     return this;
   }
 
   @Override
-  public ClassPath add(final String name, final Location<?> location)
-  {
+  public ClassPath add(final String name, final Location<?> location) {
     elementMap.put(name, new ClassPathElementImpl(name, location));
     return this;
   }
 
   @Override
-  public ClassPath add(final String name, final Location<?> localLocation, final Location<?> remoteLocation)
-  {
+  public ClassPath add(final String name, final Location<?> localLocation, final Location<?> remoteLocation) {
     elementMap.put(name, new ClassPathElementImpl(name, localLocation, remoteLocation));
     return this;
   }
 
   @Override
-  public ClassPath remove(final ClassPathElement element)
-  {
+  public ClassPath remove(final ClassPathElement element) {
     elementMap.remove(element.getName());
     return this;
   }
 
   @Override
-  public ClassPath remove(final String name)
-  {
+  public ClassPath remove(final String name) {
     elementMap.remove(name);
     return null;
   }
 
   @Override
-  public ClassPath clear()
-  {
+  public ClassPath clear() {
     elementMap.clear();
     return this;
   }
 
   @Override
-  public ClassPathElement element(final String name)
-  {
+  public ClassPathElement element(final String name) {
     return elementMap.get(name);
   }
 
   @Override
-  public Collection<ClassPathElement> allElements()
-  {
+  public Collection<ClassPathElement> allElements() {
     return new ArrayList<>(elementMap.values());
   }
 
   @Override
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     return elementMap.isEmpty();
   }
 
   @Override
-  public boolean isForceClassLoaderReset()
-  {
+  public boolean isForceClassLoaderReset() {
     return forceClassLoaderReset;
   }
 
   @Override
-  public void setForceClassLoaderReset(final boolean forceClassLoaderReset)
-  {
+  public void setForceClassLoaderReset(final boolean forceClassLoaderReset) {
     this.forceClassLoaderReset = forceClassLoaderReset;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    int count = 0;
+    for (ClassPathElement elt: this) {
+      if (count > 0) sb.append(", ");
+      sb.append(elt.getName());
+    }
+    sb.append(']');
+    return sb.toString();
   }
 }

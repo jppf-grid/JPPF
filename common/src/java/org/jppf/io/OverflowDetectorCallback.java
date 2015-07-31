@@ -27,8 +27,7 @@ import org.jppf.utils.streams.NotifyingStreamCallback;
  * written to a stream exceeds {@link java.lang.Integer#MAX_VALUE}.
  * @author Laurent Cohen
  */
-public class OverflowDetectorCallback implements NotifyingStreamCallback
-{
+public class OverflowDetectorCallback implements NotifyingStreamCallback {
   /**
    * Maximum Integer expressed as a Long to ensure no implicit coversion has to be odne at runtime.
    */
@@ -39,11 +38,9 @@ public class OverflowDetectorCallback implements NotifyingStreamCallback
   private long sum = 0L;
 
   @Override
-  public void bytesNotification(final long length) throws IOException
-  {
+  public void bytesNotification(final long length) throws IOException {
     sum += length;
-    if (sum >= MAX_VALUE)
-    {
+    if (sum >= MAX_VALUE) {
       StringBuilder sb = new StringBuilder();
       sb.append("stream output exceeds maximum size of Integer.MAX_VALUE, current size=");
       sb.append(sum - length).append(" bytes, about to add ").append(length).append(" bytes");

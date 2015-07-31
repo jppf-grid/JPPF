@@ -25,8 +25,7 @@ import java.io.*;
  * This interface represents an abstraction of a block of data, regardless of where it is stored.
  * @author Laurent Cohen
  */
-public interface DataLocation
-{
+public interface DataLocation {
   /**
    * Constant for unknown data location size.
    */

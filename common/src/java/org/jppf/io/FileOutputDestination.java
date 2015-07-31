@@ -25,15 +25,13 @@ import java.nio.channels.FileChannel;
  * Output destination backed by a file.
  * @author Laurent Cohen
  */
-public class FileOutputDestination extends ChannelOutputDestination
-{
+public class FileOutputDestination extends ChannelOutputDestination {
   /**
    * Initialize this file output destination with the specified file path.
    * @param path the path to the file to read from.
    * @throws Exception if an IO error occurs.
    */
-  public FileOutputDestination(final String path) throws Exception
-  {
+  public FileOutputDestination(final String path) throws Exception {
     this(new File(path));
   }
 
@@ -42,19 +40,16 @@ public class FileOutputDestination extends ChannelOutputDestination
    * @param file the file to read from.
    * @throws Exception if an IO error occurs.
    */
-  public FileOutputDestination(final File file) throws Exception
-  {
+  public FileOutputDestination(final File file) throws Exception {
     super(new FileOutputStream(file).getChannel());
   }
 
   /**
    * Close this output destination and release any system resources associated with it.
    * @throws IOException if an IO error occurs.
-   * @see java.io.Closeable#close()
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
     ((FileChannel) channel).force(false);
     channel.close();
   }

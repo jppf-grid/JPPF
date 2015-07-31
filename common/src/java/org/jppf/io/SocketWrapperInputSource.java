@@ -27,8 +27,7 @@ import org.jppf.comm.socket.SocketWrapper;
  * Input source backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
  * @author Laurent Cohen
  */
-public class SocketWrapperInputSource implements InputSource
-{
+public class SocketWrapperInputSource implements InputSource {
   /**
    * The backing <code>SocketWrapper</code>.
    */
@@ -38,8 +37,7 @@ public class SocketWrapperInputSource implements InputSource
    * Initialize this input source with the specified <code>SocketWrapper</code>.
    * @param socketWrapper the backing <code>SocketWrapper</code>.
    */
-  public SocketWrapperInputSource(final SocketWrapper socketWrapper)
-  {
+  public SocketWrapperInputSource(final SocketWrapper socketWrapper) {
     this.socketWrapper = socketWrapper;
   }
 
@@ -50,11 +48,9 @@ public class SocketWrapperInputSource implements InputSource
    * @param len the size in bytes of the data to read.
    * @return the number of bytes actually read, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#read(byte[], int, int)
    */
   @Override
-  public int read(final byte[] data, final int offset, final int len) throws Exception
-  {
+  public int read(final byte[] data, final int offset, final int len) throws Exception {
     int n = socketWrapper.read(data, offset, len);
     if (n < 0) throw new EOFException();
     return n;
@@ -65,12 +61,9 @@ public class SocketWrapperInputSource implements InputSource
    * @param data the buffer into which to write.
    * @return the number of bytes actually read, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
    */
   @Override
-  public int read(final ByteBuffer data) throws Exception
-  {
-    //byte[] buf = new byte[IO.TEMP_BUFFER_SIZE];
+  public int read(final ByteBuffer data) throws Exception {
     byte[] buf =  IO.TEMP_BUFFER_POOL.get();
     try {
       int size = Math.min(buf.length, data.remaining());
@@ -86,11 +79,9 @@ public class SocketWrapperInputSource implements InputSource
    * Read an int value from this input source.
    * @return the value read, or -1 if an end of file condition was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#readInt()
    */
   @Override
-  public int readInt() throws Exception
-  {
+  public int readInt() throws Exception {
     return socketWrapper.readInt();
   }
 
@@ -99,21 +90,17 @@ public class SocketWrapperInputSource implements InputSource
    * @param n the number of bytes to skip.
    * @return the number of bytes actually skipped.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#skip(int)
    */
   @Override
-  public int skip(final int n) throws Exception
-  {
+  public int skip(final int n) throws Exception {
     return socketWrapper.skip(n);
   }
 
   /**
    * This method does nothing.
    * @throws IOException if an IO error occurs.
-   * @see java.io.Closeable#close()
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
   }
 }

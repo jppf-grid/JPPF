@@ -22,8 +22,7 @@ package org.jppf.job;
  * This enum describes the types of events emitted by a JPPFJobManager.
  * @author Laurent Cohen
  */
-public enum JobEventType
-{
+public enum JobEventType {
   /**
    * A new job was submitted to the JPPF driver queue.
    */
@@ -41,7 +40,7 @@ public enum JobEventType
    */
   JOB_RETURNED,
   /**
-   * The current number of tasks in a job was updated.
+   * One or more attributes of a job, possibly including its current number of tasks, has changed.
    */
   JOB_UPDATED
 }

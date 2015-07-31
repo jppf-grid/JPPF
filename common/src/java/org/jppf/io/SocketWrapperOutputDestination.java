@@ -27,8 +27,7 @@ import org.jppf.comm.socket.SocketWrapper;
  * Output destination backed by a {@link org.jppf.comm.socket.SocketWrapper SocketWrapper}.
  * @author Laurent Cohen
  */
-public class SocketWrapperOutputDestination implements OutputDestination
-{
+public class SocketWrapperOutputDestination implements OutputDestination {
   /**
    * The backing <code>SocketWrapper</code>.
    */
@@ -38,8 +37,7 @@ public class SocketWrapperOutputDestination implements OutputDestination
    * Initialize this output destination with the specified <code>SocketWrapper</code>.
    * @param socketWrapper the backing <code>SocketWrapper</code>.
    */
-  public SocketWrapperOutputDestination(final SocketWrapper socketWrapper)
-  {
+  public SocketWrapperOutputDestination(final SocketWrapper socketWrapper) {
     this.socketWrapper = socketWrapper;
   }
 
@@ -50,11 +48,9 @@ public class SocketWrapperOutputDestination implements OutputDestination
    * @param len the size in bytes of the data to write.
    * @return the number of bytes actually written, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#write(byte[], int, int)
    */
   @Override
-  public int write(final byte[] data, final int offset, final int len) throws Exception
-  {
+  public int write(final byte[] data, final int offset, final int len) throws Exception {
     socketWrapper.write(data, offset, len);
     return len;
   }
@@ -64,12 +60,9 @@ public class SocketWrapperOutputDestination implements OutputDestination
    * @param data the buffer containing the data to write.
    * @return the number of bytes actually written, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
    */
   @Override
-  public int write(final ByteBuffer data) throws Exception
-  {
-    //byte[] buf = new byte[IO.TEMP_BUFFER_SIZE];
+  public int write(final ByteBuffer data) throws Exception {
     byte[] buf = IO.TEMP_BUFFER_POOL.get();
     try {
     int size = Math.min(buf.length, data.remaining());
@@ -85,7 +78,6 @@ public class SocketWrapperOutputDestination implements OutputDestination
    * Write an int value to this output destination.
    * @param value the value to write.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#writeInt(int)
    */
   @Override
   public void writeInt(final int value) throws Exception
@@ -96,10 +88,8 @@ public class SocketWrapperOutputDestination implements OutputDestination
   /**
    * This method does nothing.
    * @throws IOException if an IO error occurs.
-   * @see java.io.Closeable#close()
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
   }
 }

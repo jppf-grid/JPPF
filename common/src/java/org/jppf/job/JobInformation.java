@@ -155,7 +155,7 @@ public class JobInformation implements Serializable {
   }
 
   /**
-   * Get the initial task count of this bundle.
+   * Get the initial task count of the job, that is, the number of tasks it contained when it was received by the driver.
    * @return the task count as an int.
    */
   public int getInitialTaskCount() {

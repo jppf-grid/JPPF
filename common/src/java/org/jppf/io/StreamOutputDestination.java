@@ -27,8 +27,7 @@ import org.jppf.serialization.SerializationUtils;
  * Output destination backed by an {@link java.io.OutputStream OutputStream}.
  * @author Laurent Cohen
  */
-public class StreamOutputDestination implements OutputDestination
-{
+public class StreamOutputDestination implements OutputDestination {
   /**
    * The output stream to write to.
    */
@@ -38,8 +37,7 @@ public class StreamOutputDestination implements OutputDestination
    * Initialize this input source with the specified data.
    * @param os the output stream to write to.
    */
-  public StreamOutputDestination(final OutputStream os)
-  {
+  public StreamOutputDestination(final OutputStream os) {
     this.os = os;
   }
 
@@ -50,11 +48,9 @@ public class StreamOutputDestination implements OutputDestination
    * @param len the size in bytes of the data to write.
    * @return the number of bytes actually written, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#write(byte[], int, int)
    */
   @Override
-  public int write(final byte[] buffer, final int offset, final int len) throws Exception
-  {
+  public int write(final byte[] buffer, final int offset, final int len) throws Exception {
     os.write(buffer, offset, len);
     return len;
   }
@@ -64,12 +60,10 @@ public class StreamOutputDestination implements OutputDestination
    * @param buffer the buffer containing the data to write.
    * @return the number of bytes actually written, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
    */
   @Override
   public int write(final ByteBuffer buffer) throws Exception {
     int pos = buffer.position();
-    //byte[] bytes = new byte[IO.TEMP_BUFFER_SIZE];
     byte[] bytes =  IO.TEMP_BUFFER_POOL.get();
     try {
       while (buffer.remaining() > 0) {
@@ -89,11 +83,9 @@ public class StreamOutputDestination implements OutputDestination
    * Write an int value to this output destination.
    * @param value the value to write.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#writeInt(int)
    */
   @Override
-  public void writeInt(final int value) throws Exception
-  {
+  public void writeInt(final int value) throws Exception {
     byte[] bytes = SerializationUtils.writeInt(value);
     os.write(bytes);
   }
@@ -101,11 +93,9 @@ public class StreamOutputDestination implements OutputDestination
   /**
    * Close this output destination and release any system resources associated with it.
    * @throws IOException if an IO error occurs.
-   * @see java.io.Closeable#close()
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
     os.close();
   }
 }

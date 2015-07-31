@@ -23,8 +23,7 @@ package org.jppf;
  * @author Laurent Cohen
  * @exclude
  */
-public final class JPPFInitializer
-{
+public final class JPPFInitializer {
   /**
    * Name of hte package in which custom URL protocols are implemented.
    */
@@ -37,33 +36,34 @@ public final class JPPFInitializer
   /**
    * Prevent any instanciation of this class.
    */
-  private JPPFInitializer()
-  {
+  private JPPFInitializer() {
   }
 
   /**
    * Perfom the initializations.
    */
-  public static void init()
-  {
+  public static void init() {
     if (initCalled) return;
-    try
-    {
+    try {
       initCalled = true;
       String protocolHandlerProperty = "java.protocol.handler.pkgs";
       String s = System.getProperty(protocolHandlerProperty, null);
       if (s == null) System.setProperty(protocolHandlerProperty, PROTOCOL_PACKAGE);
-      else if (s.indexOf(PROTOCOL_PACKAGE) < 0)
-      {
+      else if (s.indexOf(PROTOCOL_PACKAGE) < 0) {
         StringBuilder sb = new StringBuilder(s);
-        if (sb.charAt(sb.length()-1) != '|') sb.append('|');
+        if (sb.charAt(sb.length() - 1) != '|') sb.append('|');
         sb.append(PROTOCOL_PACKAGE);
         s = sb.toString();
         System.setProperty(protocolHandlerProperty, s);
       }
-    }
-    catch (Exception e)
-    {
+      // warmup System.nanoTime() for JIT
+      long start = System.nanoTime();
+      for (int i = 0; i < 20_000; i++) {
+        long t = System.nanoTime();
+      }
+      long elapsed = System.nanoTime() - start;
+      //System.out.printf("System.nanoTime() warmup in %,d ns%n", elapsed);
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

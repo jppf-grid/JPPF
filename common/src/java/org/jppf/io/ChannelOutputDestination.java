@@ -29,8 +29,7 @@ import org.jppf.utils.pooling.DirectBufferPool;
  * Output destination backed by a {@link java.nio.channels.WritableByteChannel WritableByteChannel}.
  * @author Laurent Cohen
  */
-public class ChannelOutputDestination implements OutputDestination
-{
+public class ChannelOutputDestination implements OutputDestination {
   /**
    * The backing <code>WritableByteChannel</code>.
    */
@@ -40,8 +39,7 @@ public class ChannelOutputDestination implements OutputDestination
    * Initialize this output destination with the specified <code>SocketWrapper</code>.
    * @param channel the backing <code>SocketWrapper</code>.
    */
-  public ChannelOutputDestination(final WritableByteChannel channel)
-  {
+  public ChannelOutputDestination(final WritableByteChannel channel) {
     this.channel = channel;
   }
 
@@ -52,22 +50,16 @@ public class ChannelOutputDestination implements OutputDestination
    * @param len the size in bytes of the data to write.
    * @return the number of bytes actually written, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#write(byte[], int, int)
    */
   @Override
-  public int write(final byte[] data, final int offset, final int len) throws Exception
-  {
+  public int write(final byte[] data, final int offset, final int len) throws Exception {
     ByteBuffer tmpBuffer = null;
-    try
-    {
-      //int cap = StreamConstants.TEMP_BUFFER_SIZE;
-      //if (tmpBuffer == null) tmpBuffer = ByteBuffer.allocateDirect(cap);
+    try {
       tmpBuffer = DirectBufferPool.provideBuffer();
       int cap = tmpBuffer.capacity();
       boolean end = false;
       int count = 0;
-      while (count < len)
-      {
+      while (count < len) {
         tmpBuffer.clear();
         int size = Math.min(cap, len - count);
         tmpBuffer.put(data, offset + count, size);
@@ -77,13 +69,9 @@ public class ChannelOutputDestination implements OutputDestination
         count += n;
         if (n < size) break;
       }
-      //if (count >= len) tmpBuffer = null;
       return count;
-    }
-    finally
-    {
-      if (tmpBuffer != null)
-      {
+    } finally {
+      if (tmpBuffer != null) {
         DirectBufferPool.releaseBuffer(tmpBuffer);
         tmpBuffer = null;
       }
@@ -95,11 +83,9 @@ public class ChannelOutputDestination implements OutputDestination
    * @param data the buffer containing the data to write.
    * @return the number of bytes actually written, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#write(java.nio.ByteBuffer)
    */
   @Override
-  public int write(final ByteBuffer data) throws Exception
-  {
+  public int write(final ByteBuffer data) throws Exception {
     return channel.write(data);
   }
 
@@ -107,27 +93,22 @@ public class ChannelOutputDestination implements OutputDestination
    * Write an int value to this output destination.
    * @param value the value to write.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.OutputDestination#writeInt(int)
    */
   @Override
-  public void writeInt(final int value) throws Exception
-  {
+  public void writeInt(final int value) throws Exception {
     SerializationUtils.writeInt(channel, value);
   }
 
   /**
    * This method does nothing.
    * @throws IOException if an IO error occurs.
-   * @see java.io.Closeable#close()
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("ChannelOutputDestination[channel=").append(channel).append("]");
     return builder.toString();

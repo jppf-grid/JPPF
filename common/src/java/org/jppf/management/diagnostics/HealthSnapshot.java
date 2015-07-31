@@ -255,7 +255,6 @@ public class HealthSnapshot implements Serializable {
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
     HealthSnapshot other = (HealthSnapshot) obj;
-    //if (Double.doubleToLongBits(cpuLoad) != Double.doubleToLongBits(other.cpuLoad)) return false;
     if (processCpuLoad != other.processCpuLoad) return false;
     if (systemCpuLoad != other.systemCpuLoad) return false;
     if (deadlocked != other.deadlocked) return false;

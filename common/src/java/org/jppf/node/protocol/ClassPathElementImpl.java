@@ -24,8 +24,7 @@ import org.jppf.location.Location;
  * A simple implementation of the {@link ClassPathElement} interface.
  * @author Laurent Cohen
  */
-public class ClassPathElementImpl implements ClassPathElement
-{
+public class ClassPathElementImpl implements ClassPathElement {
   /**
    * Explicit serialVersionUID.
    */
@@ -49,8 +48,7 @@ public class ClassPathElementImpl implements ClassPathElement
    * @param name the name of this classpath element.
    * @param location the location of this classpath element.
    */
-  protected ClassPathElementImpl(final String name, final Location<?> location)
-  {
+  protected ClassPathElementImpl(final String name, final Location<?> location) {
     this.name = name;
     this.localLocation = location;
     this.remoteLocation = this.localLocation;
@@ -63,28 +61,24 @@ public class ClassPathElementImpl implements ClassPathElement
    * @param localLocation the location of this classpath element in the client environment.
    * @param remoteLocation the location of this classpath element in the node environment.
    */
-  protected ClassPathElementImpl(final String name, final Location<?> localLocation, final Location<?> remoteLocation)
-  {
+  protected ClassPathElementImpl(final String name, final Location<?> localLocation, final Location<?> remoteLocation) {
     this.name = name;
     this.localLocation = localLocation;
     this.remoteLocation = remoteLocation;
   }
 
   @Override
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
   @Override
-  public Location<?> getLocalLocation()
-  {
+  public Location<?> getLocalLocation() {
     return localLocation;
   }
 
   @Override
-  public Location<?> getRemoteLocation()
-  {
+  public Location<?> getRemoteLocation() {
     return remoteLocation;
   }
 
@@ -92,8 +86,13 @@ public class ClassPathElementImpl implements ClassPathElement
    * This default implementation always return true.
    * @return <code>true</code>.
    */
-  public boolean validate()
-  {
+  @Override
+  public boolean validate() {
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 }

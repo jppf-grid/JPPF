@@ -25,8 +25,7 @@ package org.jppf.io;
  * <code>transferTo(WritableByteChannel, boolean)</code> methods.
  * @author Laurent Cohen
  */
-public abstract class AbstractDataLocation implements DataLocation
-{
+public abstract class AbstractDataLocation implements DataLocation {
   /**
    * The capacity of the underlying buffer.
    */
@@ -40,20 +39,17 @@ public abstract class AbstractDataLocation implements DataLocation
   /**
    * Get the size of the data referenced by this data location.
    * @return the data size as an int.
-   * @see org.jppf.io.DataLocation#getSize()
    */
   @Override
-  public int getSize()
-  {
+  public int getSize() {
     return size;
   }
 
   /**
    * Set the size of the data referenced by this data location.
-   * @param size - the data size as an int.
+   * @param size the data size as an int.
    */
-  public void setSize(final int size)
-  {
+  public void setSize(final int size) {
     this.size = size;
   }
 }

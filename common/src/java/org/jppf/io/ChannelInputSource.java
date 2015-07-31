@@ -29,8 +29,7 @@ import org.jppf.utils.pooling.DirectBufferPool;
  * Input source backed by a {@link java.nio.channels.ReadableByteChannel ReadableByteChannel}.
  * @author Laurent Cohen
  */
-public class ChannelInputSource implements InputSource
-{
+public class ChannelInputSource implements InputSource {
   /**
    * The backing <code>ReadableByteChannel</code>.
    */
@@ -40,8 +39,7 @@ public class ChannelInputSource implements InputSource
    * Initialize this input source with the specified <code>SocketWrapper</code>.
    * @param channel the backing <code>SocketWrapper</code>.
    */
-  public ChannelInputSource(final ReadableByteChannel channel)
-  {
+  public ChannelInputSource(final ReadableByteChannel channel) {
     this.channel = channel;
   }
 
@@ -52,46 +50,38 @@ public class ChannelInputSource implements InputSource
    * @param len the size in bytes of the data to read.
    * @return the number of bytes actually read, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#read(byte[], int, int)
    */
   @Override
-  public int read(final byte[] data, final int offset, final int len) throws Exception
-  {
+  public int read(final byte[] data, final int offset, final int len) throws Exception {
     ByteBuffer buffer = ByteBuffer.wrap(data, offset, len);
     return read(buffer);
   }
 
   /**
    * Read data from this input source into a byte buffer.
-   * <p><b>Implementation details</b>:<br/>
-   * We read the data by small chunks of max {@link IO#TEMP_BUFFER_SIZE} bytes wrapped in a direct ByteBuffer,
-   * to work around the fact that Sun NIO implementation of SocketChannelImpl.read()
-   * attempts to allocate a direct buffer of the requested data size (i.e. <code>data</code>.remaining() in our case),
-   * <i>if the destination ByteBuffer is not direct</i>.<br/>
+   * <p>
+   * <b>Implementation details</b>:<br/>
+   * We read the data by small chunks of max {@link IO#TEMP_BUFFER_SIZE} bytes wrapped in a direct ByteBuffer, to work around the fact that Sun NIO implementation of SocketChannelImpl.read() attempts
+   * to allocate a direct buffer of the requested data size (i.e. <code>data</code>.remaining() in our case), <i>if the destination ByteBuffer is not direct</i>.<br/>
    * This implementation can result in a &quot;OutOfMemoryError: Direct buffer space&quot; when the size of the data to read is too large.<br/>
    * See <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4879883">Sun Bug ID: 4879883</a> for details.
    * @param data the buffer into which to write.
    * @return the number of bytes actually read, or -1 if end of stream was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#read(java.nio.ByteBuffer)
    */
   @Override
-  public int read(final ByteBuffer data) throws Exception
-  {
+  public int read(final ByteBuffer data) throws Exception {
     ByteBuffer tmpBuffer = null;
-    try
-    {
+    try {
       tmpBuffer = DirectBufferPool.provideBuffer();
       int remaining = data.remaining();
       int count = 0;
-      while (count < remaining)
-      {
+      while (count < remaining) {
         if (data.remaining() < tmpBuffer.remaining()) tmpBuffer.limit(data.remaining());
         int n = channel.read(tmpBuffer);
         if (n < 0) throw new EOFException();
         else if (n == 0) break;
-        else
-        {
+        else {
           count += n;
           tmpBuffer.flip();
           data.put(tmpBuffer);
@@ -99,11 +89,8 @@ public class ChannelInputSource implements InputSource
         }
       }
       return count;
-    }
-    finally
-    {
-      if (tmpBuffer != null)
-      {
+    } finally {
+      if (tmpBuffer != null) {
         DirectBufferPool.releaseBuffer(tmpBuffer);
         tmpBuffer = null;
       }
@@ -114,11 +101,9 @@ public class ChannelInputSource implements InputSource
    * Read an int value from this input source.
    * @return the value read, or -1 if an end of file condition was reached.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#readInt()
    */
   @Override
-  public int readInt() throws Exception
-  {
+  public int readInt() throws Exception {
     return SerializationUtils.readInt(channel);
   }
 
@@ -127,11 +112,9 @@ public class ChannelInputSource implements InputSource
    * @param n the number of bytes to skip.
    * @return the number of bytes actually skipped.
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.io.InputSource#skip(int)
    */
   @Override
-  public int skip(final int n) throws Exception
-  {
+  public int skip(final int n) throws Exception {
     ByteBuffer buf = ByteBuffer.allocate(n);
     read(buf);
     return buf.position();
@@ -140,16 +123,13 @@ public class ChannelInputSource implements InputSource
   /**
    * This method does nothing.
    * @throws IOException if an IO error occurs.
-   * @see java.io.Closeable#close()
    */
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("ChannelInputSource[channel=").append(channel).append("]");
     return sb.toString();

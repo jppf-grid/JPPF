@@ -58,7 +58,7 @@ public interface JPPFNodeProvisioningMBean {
    * <p>If {@code configOverrides} is null, then previous overrides are applied,
    * and already running slave nodes do not need to be stopped.
    * @param nbNodes the number of slave nodes to reach.
-   * @param configOverrides the configuration overriddes to apply.
+   * @param configOverrides the configuration overrides to apply.
    */
   void provisionSlaveNodes(int nbNodes, TypedProperties configOverrides);
 
@@ -69,7 +69,7 @@ public interface JPPFNodeProvisioningMBean {
    * and already running slave nodes do not need to be stopped.
    * @param nbNodes the number of slave nodes to reach.
    * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
-   * @param configOverrides the configuration overriddes to apply.
+   * @param configOverrides the configuration overrides to apply.
    */
   void provisionSlaveNodes(int nbNodes, boolean interruptIfRunning, TypedProperties configOverrides);
 }

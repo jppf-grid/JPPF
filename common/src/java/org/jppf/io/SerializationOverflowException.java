@@ -24,13 +24,11 @@ import java.io.IOException;
  * Exception raised when an attempt to serialize an object results in an array of bytes (or file) larger than {@link java.lang.Integer#MAX_VALUE}.
  * @author Laurent Cohen
  */
-public class SerializationOverflowException extends IOException
-{
+public class SerializationOverflowException extends IOException {
   /**
    * Default constructor.
    */
-  public SerializationOverflowException()
-  {
+  public SerializationOverflowException() {
     super();
   }
 
@@ -39,8 +37,7 @@ public class SerializationOverflowException extends IOException
    * @param message the message associated witht his exception.
    * @param cause the cause exception.
    */
-  public SerializationOverflowException(final String message, final Throwable cause)
-  {
+  public SerializationOverflowException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -48,8 +45,7 @@ public class SerializationOverflowException extends IOException
    * Initialize this exception with the specified message.
    * @param message the message associated witht his exception.
    */
-  public SerializationOverflowException(final String message)
-  {
+  public SerializationOverflowException(final String message) {
     super(message);
   }
 
@@ -57,8 +53,7 @@ public class SerializationOverflowException extends IOException
    * Initialize this exception with the specified cause.
    * @param cause the cause exception.
    */
-  public SerializationOverflowException(final Throwable cause)
-  {
+  public SerializationOverflowException(final Throwable cause) {
     super(cause);
   }
 }
