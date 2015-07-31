@@ -34,8 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ProportionalBundler extends AbstractProportionalBundler
-{
+public class ProportionalBundler extends AbstractProportionalBundler {
   /**
    * Logger for this class.
    */
@@ -53,30 +52,25 @@ public class ProportionalBundler extends AbstractProportionalBundler
    * Creates a new instance with the initial size of bundle as the start size.
    * @param profile the parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
    */
-  public ProportionalBundler(final LoadBalancingProfile profile)
-  {
+  public ProportionalBundler(final LoadBalancingProfile profile) {
     super(profile);
   }
 
   /**
    * Make a copy of this bundler
    * @return a <code>Bundler</code> instance.
-   * @see org.jppf.load.balancer.Bundler#copy()
    */
   @Override
-  public Bundler copy()
-  {
+  public Bundler copy() {
     return new ProportionalBundler(profile);
   }
 
   /**
    * Get the max bundle size that can be used for this bundler.
    * @return the bundle size as an int.
-   * @see org.jppf.load.balancer.AbstractBundler#maxSize()
    */
   @Override
-  protected int maxSize()
-  {
+  protected int maxSize() {
     if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": jppfContext=" + jppfContext);
     if (jppfContext == null) return 300;
     int n = jppfContext.getMaxBundleSize();

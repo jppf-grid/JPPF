@@ -37,8 +37,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundler
-{
+public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundler {
   /**
    * Logger for this class.
    */
@@ -63,13 +62,16 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    * Bounded memory of the past performance updates.
    */
   protected final BundleDataHolder dataHolder;
+  /**
+   * 
+   */
+  private Random rand = new Random(System.nanoTime());
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
    * @param profile the parameters of the load-balancing algorithm,
    */
-  public AbstractProportionalBundler(final LoadBalancingProfile profile)
-  {
+  public AbstractProportionalBundler(final LoadBalancingProfile profile) {
     this(profile, null);
   }
 
@@ -78,15 +80,10 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    * @param profile the parameters of the load-balancing algorithm,
    * @param bundlers mapping of individual bundler to corresponding performance data.
    */
-  protected AbstractProportionalBundler(final LoadBalancingProfile profile, final Set<AbstractProportionalBundler> bundlers)
-  {
+  protected AbstractProportionalBundler(final LoadBalancingProfile profile, final Set<AbstractProportionalBundler> bundlers) {
     super(profile);
-
-    if (bundlers == null)
-      this.bundlers = BUNDLERS;
-    else
-      this.bundlers = bundlers;
-
+    if (bundlers == null) this.bundlers = BUNDLERS;
+    else this.bundlers = bundlers;
     if (this.profile == null) this.profile = new ProportionalTuneProfile();
     ProportionalTuneProfile prof = (ProportionalTuneProfile) this.profile;
     dataHolder = new BundleDataHolder(prof.getPerformanceCacheSize(), prof.getInitialMeanTime());
@@ -99,35 +96,41 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    * Get local mapping of individual bundler to corresponding performance data.
    * @return <code>Set<AbstractProportionalBundler></code>
    */
-  protected final Set<AbstractProportionalBundler> getBundlers()
-  {
+  protected final Set<AbstractProportionalBundler> getBundlers() {
     return bundlers;
   }
 
   /**
    * Set the current size of bundle.
    * @param size the bundle size as an int value.
-   * @see org.jppf.load.balancer.Bundler#getBundleSize()
    */
-  public void setBundleSize(final int size)
-  {
-    bundleSize = (size <= 0) ? 1 : size;
+  public void setBundleSize(final int size) {
+    //bundleSize = sizeWithNoise(size <= 0 ? 1 : size);
+    bundleSize = size <= 0 ? 1 : size;
+  }
+
+  /**
+   * Add some random noise to the bundle size.
+   * @param value the initial size to add noise to
+   * @return the "noisy" size.
+   */
+  private double noisyValue(final double value) {
+    double newValue = value * (1d + 0.1d * (0.5d - rand.nextDouble()));
+    return (newValue < 0d) ? 0d : newValue;
   }
 
   /**
    * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
    * @param size the number of tasks executed.
    * @param time the time in nanoseconds it took to execute the tasks.
-   * @see org.jppf.load.balancer.AbstractBundler#feedback(int, double)
    */
   @Override
-  public void feedback(final int size, final double time)
-  {
+  public void feedback(final int size, final double time) {
     if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
     if (size <= 0) return;
+    //BundlePerformanceSample sample = new BundlePerformanceSample(noisyValue(time) / size, size);
     BundlePerformanceSample sample = new BundlePerformanceSample(time / size, size);
-    synchronized(bundlers)
-    {
+    synchronized (bundlers) {
       dataHolder.addSample(sample);
       computeBundleSizes();
     }
@@ -135,26 +138,20 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
 
   /**
    * Perform context-independent initializations.
-   * @see org.jppf.load.balancer.AbstractBundler#setup()
    */
   @Override
-  public void setup()
-  {
-    synchronized(bundlers)
-    {
+  public void setup() {
+    synchronized (bundlers) {
       bundlers.add(this);
     }
   }
 
   /**
    * Release the resources used by this bundler.
-   * @see org.jppf.load.balancer.AbstractBundler#dispose()
    */
   @Override
-  public void dispose()
-  {
-    synchronized(bundlers)
-    {
+  public void dispose() {
+    synchronized (bundlers) {
       bundlers.remove(this);
     }
   }
@@ -163,61 +160,51 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    * Get the bounded memory of the past performance updates.
    * @return a BundleDataHolder instance.
    */
-  public BundleDataHolder getDataHolder()
-  {
+  public BundleDataHolder getDataHolder() {
     return dataHolder;
   }
 
   /**
    * Update the bundler sizes.
    */
-  private void computeBundleSizes()
-  {
-    synchronized(bundlers)
-    {
+  private void computeBundleSizes() {
+    synchronized (bundlers) {
       double maxMean = Double.NEGATIVE_INFINITY;
       double minMean = Double.POSITIVE_INFINITY;
       AbstractProportionalBundler minBundler = null;
       double meanSum = 0.0d;
-      for (AbstractProportionalBundler b: bundlers)
-      {
+      for (AbstractProportionalBundler b : bundlers) {
         BundleDataHolder h = b.getDataHolder();
         double m = h.getMean();
         if (m > maxMean) maxMean = m;
-        if (m < minMean)
-        {
+        if (m < minMean) {
           minMean = m;
           minBundler = b;
         }
       }
-      for (AbstractProportionalBundler b: bundlers)
-      {
+      for (AbstractProportionalBundler b : bundlers) {
         BundleDataHolder h = b.getDataHolder();
         meanSum += normalize(h.getMean());
       }
       int max = maxSize();
       int sum = 0;
-      for (AbstractProportionalBundler b: bundlers)
-      {
+      for (AbstractProportionalBundler b : bundlers) {
         BundleDataHolder h = b.getDataHolder();
         double p = normalize(h.getMean()) / meanSum;
         int size = Math.max(1, (int) (p * max));
-        if (size >= max) size = max-1;
+        if (size >= max) size = max - 1;
         b.setBundleSize(size);
         sum += size;
       }
-      if ((sum < max) && (minBundler != null))
-      {
+      if ((sum < max) && (minBundler != null)) {
         int size = minBundler.getBundleSize();
         minBundler.setBundleSize(size + (max - sum));
       }
-      if (traceEnabled)
-      {
+      if (traceEnabled) {
         StringBuilder sb = new StringBuilder();
         sb.append("bundler info:\n");
         sb.append("  minMean=").append(minMean).append(", maxMean=").append(maxMean).append(", maxSize=").append(max).append('\n');
-        for (AbstractProportionalBundler b: bundlers)
-        {
+        for (AbstractProportionalBundler b : bundlers) {
           sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
           sb.append(b.getDataHolder()).append('\n');
         }
@@ -231,13 +218,11 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    * @param x .
    * @return .
    */
-  public double normalize(final double x)
-  {
-    //return 1d / (1d + (x <= 0d ? 0d : Math.log(1d + ((ProportionalTuneProfile) profile).getProportionalityFactor() * x)));
-    //return Math.exp(-((ProportionalTuneProfile) profile).getProportionalityFactor() * x);
+  public double normalize(final double x) {
     double r = 1.0d;
-    for (int i=0; i<((ProportionalTuneProfile) profile).getProportionalityFactor(); i++) r *= x;
-    return 1.0d /r;
+    for (int i = 0; i < ((ProportionalTuneProfile) profile).getProportionalityFactor(); i++)
+      r *= x;
+    return 1.0d / r;
     /*
      */
   }
