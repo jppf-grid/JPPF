@@ -29,8 +29,7 @@ import org.jppf.utils.streams.StreamUtils;
  * 
  * @author Laurent Cohen
  */
-public class ConfigurationHelper
-{
+public class ConfigurationHelper {
   /**
    * Cache of the created temp files, so they can be deleted upon cleanup.
    */
@@ -41,28 +40,21 @@ public class ConfigurationHelper
    * @param config the configuration to store on file.
    * @return the path to the created file.
    */
-  public static String createTempConfigFile(final TypedProperties config)
-  {
+  public static String createTempConfigFile(final TypedProperties config) {
     String path = null;
-    try
-    {
+    try {
       File file = File.createTempFile("config", ".properties");
       file.deleteOnExit();
       Writer writer = null;
-      try
-      {
+      try {
         writer = new BufferedWriter(new FileWriter(file));
         config.store(writer, null);
-      }
-      finally
-      {
+      } finally {
         if (writer != null) StreamUtils.closeSilent(writer);
       }
       path = file.getCanonicalPath().replace('\\', '/');
       tempFiles.add(file);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
     }
@@ -75,8 +67,7 @@ public class ConfigurationHelper
    * @param n the driver or node number to use.
    * @return a configuration object where the string "${n}" was replace with the driver or node number.
    */
-  public static TypedProperties createConfigFromTemplate(final String templatePath, final int n)
-  {
+  public static TypedProperties createConfigFromTemplate(final String templatePath, final int n) {
     Map<String, Object> variables = new HashMap<>();
     variables.put("$n", n);
     return createConfigFromTemplate(templatePath, variables);
@@ -88,42 +79,31 @@ public class ConfigurationHelper
    * @param variables a map of variable names to their value, which can be used in a groovy expression.
    * @return a configuration object where the string "${n}" was replace with the driver or node number.
    */
-  public static TypedProperties createConfigFromTemplate(final String templatePath, final Map<String, Object> variables)
-  {
+  public static TypedProperties createConfigFromTemplate(final String templatePath, final Map<String, Object> variables) {
     TypedProperties result = new TypedProperties();
     Reader reader = null;
-    try
-    {
+    try {
       TypedProperties props = new TypedProperties();
       reader = FileUtils.getFileReader(templatePath);
       if (reader == null) throw new FileNotFoundException("could not load config file '" + templatePath + '\'');
       props.load(reader);
-      for (Map.Entry<Object, Object> entry: props.entrySet())
-      {
-        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-        {
+      for (Map.Entry<Object, Object> entry : props.entrySet()) {
+        if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
           String key = (String) entry.getKey();
           String value = (String) entry.getValue();
-          try
-          {
+          try {
             String s = "[" + templatePath + ", " + key + "]";
             value = parseValue(s, value, variables);
-          }
-          catch(Exception e)
-          {
+          } catch (Exception e) {
             throw new RuntimeException("Invalid expression for template file: '" + templatePath + "', property: '" + key + " = " + value + '\'', e);
           }
           result.setProperty(key, value);
         }
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
-    }
-    finally
-    {
+    } finally {
       if (reader != null) StreamUtils.closeSilent(reader);
     }
     return result;
@@ -137,21 +117,16 @@ public class ConfigurationHelper
    * @return a string where tmeplate expressions have been replaced.
    * @throws Exception if any error occurs.
    */
-  private static String parseValue(final String key, final String source, final Map<String, Object> variables) throws Exception
-  {
+  private static String parseValue(final String key, final String source, final Map<String, Object> variables) throws Exception {
     String value = source.trim();
-    if (value.startsWith("expr:"))
-    {
+    if (value.startsWith("expr:")) {
       String expr = value.substring("expr:".length()).trim();
       ScriptRunner runner = null;
-      try
-      {
+      try {
         runner = ScriptRunnerFactory.getScriptRunner("groovy");
         Object o = runner.evaluate(key, expr, variables);
         if (o != null) value = o.toString();
-      }
-      finally
-      {
+      } finally {
         ScriptRunnerFactory.releaseScriptRunner(runner);
       }
     }
@@ -163,8 +138,7 @@ public class ConfigurationHelper
    * @param path the path to the file to load.
    * @return a {@link TypedProperties} with the properties of the specified file.
    */
-  public static TypedProperties loadProperties(final File path)
-  {
+  public static TypedProperties loadProperties(final File path) {
     return loadProperties(new TypedProperties(), path);
   }
 
@@ -174,21 +148,15 @@ public class ConfigurationHelper
    * @param path the path to the file to load.
    * @return a {@link TypedProperties} with the properties of the specified file.
    */
-  public static TypedProperties loadProperties(final TypedProperties properties, final File path)
-  {
+  public static TypedProperties loadProperties(final TypedProperties properties, final File path) {
     Reader reader = null;
-    try
-    {
+    try {
       reader = new BufferedReader(new FileReader(path));
       properties.load(reader);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
       throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
-    }
-    finally
-    {
+    } finally {
       if (reader != null) StreamUtils.closeSilent(reader);
     }
     return properties;
@@ -199,8 +167,7 @@ public class ConfigurationHelper
    * @param config the config for which to override properties.
    * @param overridePath the path to the properties that will override those in the configuration.
    */
-  public static void overrideConfig(final TypedProperties config, final File overridePath)
-  {
+  public static void overrideConfig(final TypedProperties config, final File overridePath) {
     overrideConfig(config, loadProperties(overridePath));
   }
 
@@ -209,12 +176,9 @@ public class ConfigurationHelper
    * @param config the config for which to override properties.
    * @param override the properties that will override those in the configuration.
    */
-  public static void overrideConfig(final TypedProperties config, final TypedProperties override)
-  {
-    for (Map.Entry<Object, Object> entry: override.entrySet())
-    {
-      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String))
-      {
+  public static void overrideConfig(final TypedProperties config, final TypedProperties override) {
+    for (Map.Entry<Object, Object> entry : override.entrySet()) {
+      if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         config.put(entry.getKey(), entry.getValue());
       }
     }
@@ -223,8 +187,7 @@ public class ConfigurationHelper
   /**
    * Cleanup the created temporary files.
    */
-  public static void cleanup()
-  {
+  public static void cleanup() {
     while (!tempFiles.isEmpty()) tempFiles.remove(0).delete();
   }
 }

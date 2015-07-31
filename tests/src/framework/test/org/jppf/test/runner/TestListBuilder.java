@@ -50,8 +50,7 @@ public class TestListBuilder {
   public TestListBuilder(final File rootDir) {
     this(rootDir, new FileFilter() {
       @Override
-      public boolean accept(final File file)
-      {
+      public boolean accept(final File file) {
         return (file != null) && !file.isDirectory() && file.getName().endsWith(".class");
       }
     });
@@ -113,8 +112,7 @@ public class TestListBuilder {
    * @return a list of Java class names.
    * @throws Exception if any error occurs.
    */
-  protected boolean hasJUnitTest(final String className) throws Exception
-  {
+  protected boolean hasJUnitTest(final String className) throws Exception {
     Class<?> clazz = Class.forName(className);
     int mod = clazz.getModifiers();
     if (Modifier.isAbstract(mod) || !Modifier.isPublic(mod)) return false;

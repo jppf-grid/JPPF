@@ -73,15 +73,15 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
     for (String className: result.getClasses()) {
       body.append("class ").append(className).append('\n');
       incIndentation();
-      List<Failure> failures = result.getFailures().get(className);
+      Collection<Failure> failures = result.getFailures().getValues(className);
       if (failures != null) {
         for (Failure failure: failures) renderFailure(failure);
       }
-      List<Description> descriptions = result.getSuccesses().get(className);
+      Collection<Description> descriptions = result.getSuccesses().getValues(className);
       if (descriptions != null) {
         for (Description d: descriptions) renderDescription(d, "OK");
       }
-      descriptions = result.getIngored().get(className);
+      descriptions = result.getIngored().getValues(className);
       if (descriptions != null) {
         for (Description d: descriptions) renderDescription(d, "Ignored");
       }

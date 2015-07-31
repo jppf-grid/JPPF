@@ -21,7 +21,7 @@ package test.org.jppf.test.runner;
 import java.io.Serializable;
 import java.util.*;
 
-import org.jppf.utils.collections.CollectionUtils;
+import org.jppf.utils.collections.*;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 
@@ -30,8 +30,7 @@ import org.junit.runner.notification.Failure;
  * outside of the runner scope.
  * @author Laurent Cohen
  */
-public class ResultHolder implements Serializable
-{
+public class ResultHolder implements Serializable {
   /**
    * Holds exceptions that occurred outside of the JUnit runner.
    */
@@ -39,15 +38,18 @@ public class ResultHolder implements Serializable
   /**
    * Holds all failures.
    */
-  private final Map<String, List<Failure>> failureMap = new TreeMap<>();
+  //private final Map<String, List<Failure>> failureMap = new TreeMap<>();
+  private final CollectionMap<String, Failure> failureMap = new LinkedListSortedMap<>();
   /**
    * Holds all ingored tests.
    */
-  private final Map<String, List<Description>> ignoredMap = new TreeMap<>();
+  //private final Map<String, List<Description>> ignoredMap = new TreeMap<>();
+  private final CollectionMap<String, Description> ignoredMap = new LinkedListSortedMap<>();
   /**
    * Holds all failures.
    */
-  private final Map<String, List<Description>> successMap = new TreeMap<>();
+  //private final Map<String, List<Description>> successMap = new TreeMap<>();
+  private final CollectionMap<String, Description> successMap = new LinkedListSortedMap<>();
   /**
    * A sorted set of classes that were run.
    */
@@ -80,16 +82,14 @@ public class ResultHolder implements Serializable
   /**
    * Initialize this result holder.
    */
-  public ResultHolder()
-  {
+  public ResultHolder() {
   }
 
   /**
    * Add a new exception.
    * @param holder holds the exception to add.
    */
-  public void addException(final ExceptionHolder holder)
-  {
+  public void addException(final ExceptionHolder holder) {
     exceptions.add(holder);
   }
 
@@ -97,14 +97,12 @@ public class ResultHolder implements Serializable
    * Get the exceptions that occurred outside of the JUnit runner.
    * @return a list of <code>ExceptionHolder</code> instances.
    */
-  public List<ExceptionHolder> getExceptions()
-  {
+  public List<ExceptionHolder> getExceptions() {
     return exceptions;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder("ResultHolder[");
     sb.append("testsCount=").append(getTestsCount()).append(", failureCount=").append(failureCount).append(", successCount=").append(successCount);
     sb.append(", failures=").append(failureMap).append(", successes=").append(successMap);
@@ -117,10 +115,10 @@ public class ResultHolder implements Serializable
    * Add a test failure.
    * @param failure the failure to add.
    */
-  public void addFailure(final Failure failure)
-  {
+  public void addFailure(final Failure failure) {
     Description d = failure.getDescription();
-    CollectionUtils.putInListMap(d.getClassName(), failure, failureMap);
+    //CollectionUtils.putInListMap(d.getClassName(), failure, failureMap);
+    failureMap.putValue(d.getClassName(), failure);
     processDescription(d);
     failureCount++;
   }
@@ -129,8 +127,7 @@ public class ResultHolder implements Serializable
    * Get the failures.
    * @return a map of failed tests grouped by class name.
    */
-  public Map<String, List<Failure>> getFailures()
-  {
+  public CollectionMap<String, Failure> getFailures() {
     return failureMap;
   }
 
@@ -138,9 +135,9 @@ public class ResultHolder implements Serializable
    * Add an ignored test.
    * @param desc the description of the ignored test.
    */
-  public void addIgnored(final Description desc)
-  {
-    CollectionUtils.putInListMap(desc.getClassName(), desc, ignoredMap);
+  public void addIgnored(final Description desc) {
+    //CollectionUtils.putInListMap(desc.getClassName(), desc, ignoredMap);
+    ignoredMap.putValue(desc.getClassName(), desc);
     processDescription(desc);
     ignoredCount++;
   }
@@ -149,8 +146,7 @@ public class ResultHolder implements Serializable
    * Get the ignored tests.
    * @return a map of ignored tests grouped by class name.
    */
-  public Map<String, List<Description>> getIngored()
-  {
+  public CollectionMap<String, Description> getIngored() {
     return ignoredMap;
   }
 
@@ -158,9 +154,9 @@ public class ResultHolder implements Serializable
    * Add a successful test.
    * @param desc the description of the successful test.
    */
-  public void addSuccess(final Description desc)
-  {
-    CollectionUtils.putInListMap(desc.getClassName(), desc, successMap);
+  public void addSuccess(final Description desc) {
+    //CollectionUtils.putInListMap(desc.getClassName(), desc, successMap);
+    successMap.putValue(desc.getClassName(), desc);
     processDescription(desc);
     successCount++;
   }
@@ -169,8 +165,7 @@ public class ResultHolder implements Serializable
    * Process the specified test description.
    * @param desc the test description.
    */
-  private void processDescription(final Description desc)
-  {
+  private void processDescription(final Description desc) {
     String name = desc.getClassName();
     String testName = name + "." + desc.getMethodName();
     if (!classes.contains(name)) classes.add(name);
@@ -181,8 +176,7 @@ public class ResultHolder implements Serializable
    * Get the successful tests.
    * @return a map of successful tests grouped by class name.
    */
-  public Map<String, List<Description>> getSuccesses()
-  {
+  public CollectionMap<String, Description> getSuccesses() {
     return successMap;
   }
 
@@ -190,8 +184,7 @@ public class ResultHolder implements Serializable
    * Get the test run start time.
    * @return the start time as a long.
    */
-  public long getStartTime()
-  {
+  public long getStartTime() {
     return startTime;
   }
 
@@ -199,8 +192,7 @@ public class ResultHolder implements Serializable
    * Set the test run start time.
    * @param time the start time as a long.
    */
-  public void setStartTime(final long time)
-  {
+  public void setStartTime(final long time) {
     this.startTime = time;
   }
 
@@ -208,8 +200,7 @@ public class ResultHolder implements Serializable
    * Get the test run end time.
    * @return the end time as a long.
    */
-  public long getEndTime()
-  {
+  public long getEndTime() {
     return endTime;
   }
 
@@ -217,8 +208,7 @@ public class ResultHolder implements Serializable
    * Set the test run end time.
    * @param time the end time as a long.
    */
-  public void setEndTime(final long time)
-  {
+  public void setEndTime(final long time) {
     this.endTime = time;
   }
 
@@ -226,8 +216,7 @@ public class ResultHolder implements Serializable
    * Get the total number of tests.
    * @return the number of tests as an int.
    */
-  public int getTestsCount()
-  {
+  public int getTestsCount() {
     return failureCount + ignoredCount + successCount;
   }
 
@@ -235,8 +224,7 @@ public class ResultHolder implements Serializable
    * Get the count of failed tests.
    * @return the count as an int.
    */
-  public int getFailureCount()
-  {
+  public int getFailureCount() {
     return failureCount;
   }
 
@@ -244,8 +232,7 @@ public class ResultHolder implements Serializable
    * Get the count of ignored tests.
    * @return the count as an int.
    */
-  public int getIgnoredCount()
-  {
+  public int getIgnoredCount() {
     return ignoredCount;
   }
 
@@ -253,8 +240,7 @@ public class ResultHolder implements Serializable
    * Get the count of successful tests.
    * @return the count as an int.
    */
-  public int getSuccessCount()
-  {
+  public int getSuccessCount() {
     return successCount;
   }
 
@@ -263,8 +249,7 @@ public class ResultHolder implements Serializable
    * @param desc the description of th etest to look for.
    * @return <code>true</code> if the test already exists, <code>false</code> otherwise.
    */
-  public boolean hasTest(final Description desc)
-  {
+  public boolean hasTest(final Description desc) {
     String name = desc.getClassName() + "." + desc.getMethodName();
     return tests.contains(name);
   }
@@ -273,8 +258,7 @@ public class ResultHolder implements Serializable
    * Get the sorted set of classes that were run.
    * @return a set of string class names.
    */
-  public Set<String> getClasses()
-  {
+  public Set<String> getClasses() {
     return classes;
   }
 }
