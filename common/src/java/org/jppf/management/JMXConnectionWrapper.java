@@ -256,14 +256,17 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public Object invoke(final String name, final String methodName, final Object[] params, final String[] signature) throws Exception {
-    if (!isConnected()) return null;
+    if (!isConnected()) {
+      log.warn(String.format("invoking mbean '%s' method '%s(%s)' while not connected", name, methodName, (signature == null ? "" : StringUtils.arrayToString(signature))));
+      return null;
+    }
     synchronized(this) {
       Object result = null;
       try {
         ObjectName mbeanName = new ObjectName(name);
         result = getMbeanConnection().invoke(mbeanName, methodName, params, signature);
       } catch(IOException e) {
-        if (debugEnabled) log.debug(getId() + " : error while invoking the JMX connection", e);
+        if (debugEnabled) log.debug(String.format("error invoking mbean '%s' method '%s(%s)' while not connected%n%s", name, methodName, StringUtils.arrayToString(signature), ExceptionUtils.getStackTrace(e)));
         reset();
       }
       return result;
@@ -291,7 +294,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public Object getAttribute(final String name, final String attribute) throws Exception {
-    if (!isConnected()) return null;
+    if (!isConnected()) {
+      log.warn(String.format("getting mbean '%s' attribute '%s' while not connected", name, attribute));
+      return null;
+    }
     synchronized(this) {
       Object result = null;
       try {
@@ -314,7 +320,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * @throws Exception if the invocation failed.
    */
   public void setAttribute(final String name, final String attribute, final Object value) throws Exception {
-    if (!isConnected()) return;
+    if (!isConnected()) {
+      log.warn(String.format("setting mbean '%s' attribute '%s' while not connected", name, attribute));
+      return;
+    }
     synchronized(this) {
       try {
         ObjectName mbeanName = new ObjectName(name);
