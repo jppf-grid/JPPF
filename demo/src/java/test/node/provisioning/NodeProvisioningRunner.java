@@ -55,47 +55,88 @@ public class NodeProvisioningRunner {
    */
   public static void main(final String[] args) {
     try (JPPFClient client = new JPPFClient()) {
-      JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-      JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-      JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
-      
-      int nbSlaves = 3;
-      System.out.printf("provisioning %d slaves%n", nbSlaves);
-      Object o = forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, false }, signature);
-      Thread.sleep(3000L);
-      printNbSlaves(forwarder);
-
-      System.out.println("submitting job ...");
-      JPPFJob job = new JPPFJob();
-      job.setBlocking(false);
-      job.setName("Hello World");
-      for (int i=1; i<=4; i++) job.add(new LongTask(30_000L)).setId("task " + i);
-      client.submitJob(job);
-
-      Thread.sleep(2000L);
-      System.out.printf("provisioning 0 slaves%n");
-      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, false }, signature);      
-      Thread.sleep(3000L);
-      printNbSlaves(forwarder);
-      System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
-
-      Thread.sleep(2000L);
-      System.out.printf("provisioning %d slaves%n", nbSlaves);
-      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, false }, signature);      
-      Thread.sleep(3000L);
-      printNbSlaves(forwarder);
-      System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
-
-      List<Task<?>> results = job.awaitResults();
-      System.out.println("got " + results.size() + " results for job");
-
-      System.out.println("shutting down all slaves ...");
-      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, false }, signature);
-      Thread.sleep(3000L);
-      printNbSlaves(forwarder);
+      perform2(client);
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * 
+   * @param client the lcient to use.
+   * @throws Exception if any error occurs.
+   */
+  private static void perform1(final JPPFClient client) throws Exception {
+    JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+    JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    JPPFNodeForwardingMBean forwarder = jmxDriver.getNodeForwarder();
+    
+    int nbSlaves = 3;
+    System.out.printf("provisioning %d slaves%n", nbSlaves);
+    Object o = forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, false }, signature);
+    Thread.sleep(3000L);
+    printNbSlaves(forwarder);
+
+    System.out.println("submitting job ...");
+    JPPFJob job = new JPPFJob();
+    job.setBlocking(false);
+    job.setName("Hello World");
+    for (int i=1; i<=4; i++) job.add(new LongTask(30_000L)).setId("task " + i);
+    client.submitJob(job);
+
+    Thread.sleep(2000L);
+    System.out.printf("provisioning 0 slaves%n");
+    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, false }, signature);      
+    Thread.sleep(3000L);
+    printNbSlaves(forwarder);
+    System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
+
+    Thread.sleep(2000L);
+    System.out.printf("provisioning %d slaves%n", nbSlaves);
+    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, false }, signature);      
+    Thread.sleep(3000L);
+    printNbSlaves(forwarder);
+    System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
+
+    List<Task<?>> results = job.awaitResults();
+    System.out.println("got " + results.size() + " results for job");
+
+    System.out.println("shutting down all slaves ...");
+    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, false }, signature);
+    Thread.sleep(3000L);
+    printNbSlaves(forwarder);
+  }
+
+  /**
+   * 
+   * @param client the lcient to use.
+   * @throws Exception if any error occurs.
+   */
+  private static void perform2(final JPPFClient client) throws Exception {
+    JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitJMXConnection(true);
+    JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
+    int nbSlaves = 10;
+    long totalElapsed = 0L;
+    for (int i=1; i<=10; i++) {
+      System.out.println("*******************");
+      System.out.printf("iteration %d: provisioning %d slaves%n", i, nbSlaves);
+      long start = System.nanoTime();
+      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, true }, signature);
+      int n = 0;
+      while ((n = jmx.nbIdleNodes()) != nbSlaves + 1) Thread.sleep(1L);
+      long elapsed = System.nanoTime() - start;
+      totalElapsed += elapsed;
+      System.out.printf("iteration %d: provisioning %d slaves took %,d ms%n", i, nbSlaves, elapsed/1_000_000L);
+      System.out.printf("iteration %d: un-provisioning %d slaves%n", i, nbSlaves);
+      start = System.nanoTime();
+      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, true }, signature);
+      while ((n = jmx.nbIdleNodes()) != 1) Thread.sleep(1L);
+      elapsed = System.nanoTime() - start;
+      totalElapsed += elapsed;
+      System.out.printf("iteration %d: un-provisioning %d slaves took %,d ms%n", i, nbSlaves, elapsed/1_000_000L);
+    }
+    System.out.println("*******************");
+    System.out.printf("total time: %,d ms%n", totalElapsed/1_000_000L);
   }
 
   /**

@@ -32,7 +32,7 @@ public class RunOptions {
   /**
    * Max concurrent jobs that can be submitted by the client.
    */
-  public final int concurrencyLimit = config.getInt("deadlock.concurrencyLimit", 4);
+  public final int concurrencyLimit = config.getInt("deadlock.concurrencyLimit", 1);
   /**
    * Number of driver connections.
    */

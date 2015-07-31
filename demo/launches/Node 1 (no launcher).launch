@@ -35,7 +35,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.node.NodeRunner"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="noLauncher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="node"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx1g -Dlog4j.configuration=log4j-node1.properties -Djppf.config=node1.properties -Djava.util.logging.config.file=config/logging-gui.properties"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-server -Xmx128m -Dlog4j.configuration=log4j-node1.properties -Djppf.config=node1.properties -Djava.util.logging.config.file=config/logging-gui.properties"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:demo}"/>
 <booleanAttribute key="org.eclipse.tptp.platform.jvmti.client.ATTR_EXEC_AUTO_POLLING" value="true"/>
 <booleanAttribute key="org.eclipse.tptp.platform.jvmti.client.ATTR_EXEC_CPU_TIME" value="true"/>
