@@ -188,21 +188,6 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   }
 
   /**
-   * Wait until the job is complete or the timeout expires, whichever happens first.
-   * @param timeout the maximum time to wait for the job completion.
-   * @param raiseTimeoutException whether to raise a {@link TimeoutException} when the timeout expires.
-   * @throws TimeoutException if the tiemout expired and {@code raiseTimeoutException == true}.
-   */
-  void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
-    boolean fullfilled = ConcurrentUtils.awaitCondition(results, new ConcurrentUtils.Condition() {
-      @Override public boolean evaluate() {
-        return results.size() >= tasks.size();
-      }
-    }, timeout);
-    if (!fullfilled && raiseTimeoutException) throw new TimeoutException("timeout expired");
-  }
-
-  /**
    * Get the flag that determines whether this job has been cancelled.
    * @return an {@code AtomicBoolean} instance.
    * @exclude

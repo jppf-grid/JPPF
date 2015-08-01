@@ -241,21 +241,27 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   /**
    * Remove a connection from the set of connections handled by this client.
    * @param connection the connection to remove.
+   * @return {@code true} if the pool holding the connection became empty and was also removed, {@code false} otherwise.
    * @exclude
    */
-  void removeClientConnection(final JPPFClientConnection connection) {
+  boolean removeClientConnection(final JPPFClientConnection connection) {
     if (connection == null) throw new IllegalArgumentException("connection is null");
     if (debugEnabled) log.debug("removing connection {}", connection);
     connection.removeClientConnectionStatusListener(this);
     int priority = connection.getPriority();
     JPPFConnectionPool pool = connection.getConnectionPool();
+    boolean poolRemoved = false;
     synchronized (pools) {
       if (pool != null) {
         pool.remove(connection);
-        if (pool.isEmpty()) pools.removeValue(priority, pool);
+        if (pool.isEmpty()) {
+          pools.removeValue(priority, pool);
+          poolRemoved = true;
+        }
       }
     }
     allConnections.remove(connection);
+    return poolRemoved;
   }
 
   /**

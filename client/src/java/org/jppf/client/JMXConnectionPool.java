@@ -76,7 +76,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
    * @since 5.0
    */
   synchronized List<JMXDriverConnectionWrapper> getConnections(final boolean connectedOnly) {
-    if (connectedOnly) return getConnections();
+    if (!connectedOnly) return getConnections();
     List<JMXDriverConnectionWrapper> list = new ArrayList<>();
     for (JMXDriverConnectionWrapper connection: getConnections()) {
       if (connection.isConnected()) list.add(connection);

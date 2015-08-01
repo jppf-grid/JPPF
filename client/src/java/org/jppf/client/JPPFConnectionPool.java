@@ -222,6 +222,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
 
   @Override
   public synchronized int setMaxSize(final int maxSize) {
+    if (this.maxSize == maxSize) return this.maxSize;
     if (debugEnabled) log.debug("requesting new maxSize={}, current maxSize={}", maxSize, this.maxSize);
     if ((maxSize < coreSize) || (maxSize == this.maxSize)) return this.maxSize;
     int diff = maxSize - this.maxSize;

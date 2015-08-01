@@ -142,14 +142,16 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   @SuppressWarnings("unchecked")
   protected void initPools(final TypedProperties config) {
-    if (debugEnabled) log.debug("initializing connections");
+    boolean localEnabled = config.getBoolean("jppf.local.execution.enabled", false);
+    boolean remoteEnabled = config.getBoolean("jppf.remote.execution.enabled", true);
+    if (debugEnabled) log.debug("initializing connections, local execution enabled = {}, rmeote execution enabled = {}", localEnabled, remoteEnabled);
     int coreThreads = Runtime.getRuntime().availableProcessors();
     //LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
-    if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
-    if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
+    if (localEnabled) setLocalExecutionEnabled(true);
+    if (remoteEnabled) initRemotePools(config);
   }
 
   /**
@@ -301,10 +303,11 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   @Override
   protected void connectionFailed(final JPPFClientConnection connection) {
     if (debugEnabled) log.debug("Connection [" + connection.getName() + "] {}", connection.getStatus());
-    if (receiverThread != null) receiverThread.removeConnectionInformation(connection.getDriverUuid());
+    JPPFConnectionPool pool = connection.getConnectionPool();
     connection.close();
-    removeClientConnection(connection);
+    boolean poolRemoved = removeClientConnection(connection);
     fireConnectionFailed(connection);
+    if (poolRemoved && (receiverThread != null)) receiverThread.removeConnectionInformation(pool.getDriverUuid());
   }
 
   @Override
