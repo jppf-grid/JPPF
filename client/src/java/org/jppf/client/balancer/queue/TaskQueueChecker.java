@@ -290,7 +290,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   @SuppressWarnings("unchecked")
   private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)  throws Exception {
-    if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()});
+    if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid={}", new Object[] {selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()});
     synchronized (channel.getMonitor()) {
       int size = 1;
       try {
