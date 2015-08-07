@@ -235,7 +235,7 @@ public abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @exclude
    */
   @SuppressWarnings("unchecked")
-  protected Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
+  public Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
     List<Task<?>> taskList = new LinkedList<>();
     TaskBundle bundle = null;
     ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();

@@ -74,12 +74,13 @@ public class JPPFResultCollector implements JobStatusHandler {
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param tasks the list of tasks whose results have been received from the server.
    * @param throwable the throwable that was raised while receiving the results.
+   * @param sendJobEvent whether to emit a {@link org.jppf.client.event.JobEvent JobEvent} notification.
    */
   @SuppressWarnings("unchecked")
-  public synchronized void resultsReceived(final List<Task<?>> tasks, final Throwable throwable) {
+  public synchronized void resultsReceived(final List<Task<?>> tasks, final Throwable throwable, final boolean sendJobEvent) {
     if (tasks != null) {
       jobResults.addResults(tasks);
-      if (debugEnabled) log.debug("Received results for {} tasks, pendingCount={}, count={}, jobResults={}", new Object[] {tasks.size(), job.unexecutedTaskCount(), job.getJobTasks().size(), jobResults});
+      if (debugEnabled) log.debug(String.format("Received results for %d tasks, pendingCount=%d, count=%d, jobResults=%s", tasks.size(), job.unexecutedTaskCount(), job.getJobTasks().size(), jobResults));
       JobPersistence pm = job.getPersistenceManager();
       if ((job != null) && (pm != null)) {
         try {
@@ -91,8 +92,10 @@ public class JPPFResultCollector implements JobStatusHandler {
     } else {
       if (debugEnabled) log.debug("received throwable '{}'", ExceptionUtils.getMessage(throwable));
     }
-    job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, tasks);
-    if (job.unexecutedTaskCount() <= 0) job.fireJobEvent(Type.JOB_END, null, tasks);
+    if (sendJobEvent) {
+      job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, tasks);
+      if (job.unexecutedTaskCount() <= 0) job.fireJobEvent(Type.JOB_END, null, tasks);
+    }
     job.client.unregisterClassLoaders(job.getUuid());
     jobResults.wakeUp();
     notifyAll();

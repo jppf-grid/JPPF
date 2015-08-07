@@ -342,7 +342,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @return the fully qualified class name of a <code>SerializationHelper</code> implementation.
    * @exclude
    */
-  protected String getSerializationHelperClassName() {
+  public String getSerializationHelperClassName() {
     return serializationHelperClassName;
   }
 

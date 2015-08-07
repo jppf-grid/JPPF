@@ -29,8 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @author Martin JANDA
  */
-class ScheduleManager
-{
+class ScheduleManager {
   /**
    * Logger for this class.
    */
@@ -42,7 +41,7 @@ class ScheduleManager
   /**
    * Handles the schedule of each job that has one.
    */
-  private final JPPFScheduleHandler jobScheduleHandler = new JPPFScheduleHandler("Job Schedule Handler");
+  private final JPPFScheduleHandler jobStartHandler = new JPPFScheduleHandler("Job Schedule Handler");
   /**
    * Handles the expiration schedule of each job that has one.
    */
@@ -50,31 +49,25 @@ class ScheduleManager
 
   /**
    * Process the start schedule specified in the job SLA.
-   * @param bundleWrapper the job to process.
+   * @param serverJob the job to process.
    */
-  void handleStartJobSchedule(final ServerJob bundleWrapper)
-  {
-    JPPFSchedule schedule = bundleWrapper.getSLA().getJobSchedule();
-    if (schedule != null)
-    {
-      bundleWrapper.setPending(true);
-      String jobId = bundleWrapper.getName();
-      final String uuid = bundleWrapper.getUuid();
+  void handleStartJobSchedule(final ServerJob serverJob) {
+    final String uuid = serverJob.getUuid();
+    if (jobStartHandler.hasAction(uuid)) return;
+    JPPFSchedule schedule = serverJob.getSLA().getJobSchedule();
+    if (schedule != null) {
+      serverJob.setPending(true);
+      String jobId = serverJob.getName();
       if (debugEnabled) log.debug("found start " + schedule + " for jobId = " + jobId);
-      try
-      {
-        long dt = bundleWrapper.getJobReceivedTime();
-        jobScheduleHandler.scheduleAction(uuid, schedule, new JobScheduleAction(bundleWrapper), dt);
-      }
-      catch(ParseException e)
-      {
-        bundleWrapper.setPending(false);
+      try {
+        long dt = serverJob.getJobReceivedTime();
+        jobStartHandler.scheduleAction(uuid, schedule, new JobScheduleAction(serverJob), dt);
+      } catch (ParseException e) {
+        serverJob.setPending(false);
         log.error("Unparseable start date for job id " + jobId + " : date = " + schedule.getDate() + ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
-    }
-    else
-    {
-      bundleWrapper.setPending(false);
+    } else {
+      serverJob.setPending(false);
     }
   }
 
@@ -82,23 +75,18 @@ class ScheduleManager
    * Process the expiration schedule specified in the job SLA.
    * @param serverJob the job to process.
    */
-  void handleExpirationJobSchedule(final ServerJob serverJob)
-  {
+  void handleExpirationJobSchedule(final ServerJob serverJob) {
+    final String uuid = serverJob.getUuid();
+    if (jobExpirationHandler.hasAction(uuid)) return;
     JPPFSchedule schedule = serverJob.getSLA().getJobExpirationSchedule();
-    if (schedule != null)
-    {
+    if (schedule != null) {
       String jobId = serverJob.getName();
-      final String uuid = serverJob.getUuid();
       if (debugEnabled) log.debug("found expiration " + schedule + " for jobId = " + jobId);
       long dt = serverJob.getJobReceivedTime();
-      try
-      {
+      try {
         jobExpirationHandler.scheduleAction(uuid, schedule, new JobExpirationAction(serverJob), dt);
-      }
-      catch(ParseException e)
-      {
-        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-          ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+      } catch (ParseException e) {
+        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() + ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
   }
@@ -108,18 +96,16 @@ class ScheduleManager
    * This method should normally only be called when a job has completed.
    * @param jobUuid the job uuid.
    */
-  void clearSchedules(final String jobUuid)
-  {
-    jobScheduleHandler.cancelAction(jobUuid);
+  void clearSchedules(final String jobUuid) {
+    jobStartHandler.cancelAction(jobUuid);
     jobExpirationHandler.cancelAction(jobUuid);
   }
 
   /**
    * Close this this schedule manager and all resources it uses.
    */
-  void close()
-  {
-    jobScheduleHandler.clear(true);
+  void close() {
+    jobStartHandler.clear(true);
     jobExpirationHandler.clear(true);
   }
 }

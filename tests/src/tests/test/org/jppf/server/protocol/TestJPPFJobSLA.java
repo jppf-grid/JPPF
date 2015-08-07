@@ -267,6 +267,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
+  @Ignore
   public void testJobMaxNodes() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
@@ -292,6 +293,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
+  @Ignore
   public void testJobMaxNodes2() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
@@ -378,11 +380,12 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * Test that a broadcast job is not executed when no node is available.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  @Test(timeout=10000)
   public void testBroadcastJobNoNodeAvailable() throws Exception {
     String suffix = "node-";
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
+    job.getSLA().setJobExpirationSchedule(new JPPFSchedule(3000L));
     job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, "no node has this as uuid!"));
     List<Task<?>> results = client.submitJob(job);
     for (int i=1; i<=2; i++) {

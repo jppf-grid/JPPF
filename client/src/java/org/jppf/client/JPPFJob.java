@@ -337,7 +337,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * Wait until the job is complete or the timeout expires, whichever happens first.
    * @param timeout the maximum time to wait for the job completion.
    * @param raiseTimeoutException whether to raise a {@link TimeoutException} when the timeout expires.
-   * @throws TimeoutException if the tiemout expired and {@code raiseTimeoutException == true}.
+   * @throws TimeoutException if the timmout expired and {@code raiseTimeoutException == true}.
    */
   void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
     boolean fullfilled = ConcurrentUtils.awaitCondition(results, new ConcurrentUtils.Condition() {

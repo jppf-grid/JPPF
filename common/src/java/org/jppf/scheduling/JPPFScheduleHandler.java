@@ -31,8 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class JPPFScheduleHandler
-{
+public class JPPFScheduleHandler {
   /**
    * Logger for this class.
    */
@@ -65,8 +64,7 @@ public class JPPFScheduleHandler
   /**
    * Initialize this schedule handler with a default name.
    */
-  public JPPFScheduleHandler()
-  {
+  public JPPFScheduleHandler() {
     this("JPPFScheduleHandler timer - " + instanceCount.incrementAndGet());
   }
 
@@ -74,8 +72,7 @@ public class JPPFScheduleHandler
    * Initialize this schedule handler with the specified name.
    * @param name the name given to this schedule handler.
    */
-  public JPPFScheduleHandler(final String name)
-  {
+  public JPPFScheduleHandler(final String name) {
     this.name = name;
     createExecutor();
   }
@@ -87,8 +84,7 @@ public class JPPFScheduleHandler
    * @param action the action to perform when the schedule date is reached.
    * @throws ParseException if the schedule date could not be parsed
    */
-  public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action) throws ParseException
-  {
+  public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action) throws ParseException {
     scheduleAction(key, schedule, action, System.currentTimeMillis());
   }
 
@@ -102,7 +98,7 @@ public class JPPFScheduleHandler
    */
   public void scheduleAction(final Object key, final JPPFSchedule schedule, final Runnable action, final long start) throws ParseException {
     if (debugEnabled) {
-      synchronized(sdf) {
+      synchronized (sdf) {
         log.debug(name + " : scheduling action[key=" + key + ", " + schedule + ", action=" + action + ", start=" + sdf.format(new Date(start)));
       }
     }
@@ -110,18 +106,26 @@ public class JPPFScheduleHandler
     ScheduledFuture<?> future = executor.schedule(action, date.getTime() - start, TimeUnit.MILLISECONDS);
     futureMap.put(key, future);
     if (debugEnabled) {
-      synchronized(sdf) {
+      synchronized (sdf) {
         log.debug(name + " : date=" + sdf.format(date) + ", key=" + key + ", future=" + future);
       }
     }
   }
 
   /**
+   * Determine whether an action is already regsitered for the specified job uuid.
+   * @param uuid the uuid of a job to check.
+   * @return {@code true} if an action is already scheduled for the job, {@code false} otherwise.
+   */
+  public boolean hasAction(final String uuid) {
+    return futureMap.get(uuid) != null;
+  }
+
+  /**
    * Cancel the scheduled action identified by the specified key.
    * @param key the key associated with the action.
    */
-  public void cancelAction(final Object key)
-  {
+  public void cancelAction(final Object key) {
     if (key == null) return;
     ScheduledFuture<?> future = futureMap.remove(key);
     if (debugEnabled) log.debug(name + " : cancelling action for key=" + key + ", future=" + future);
@@ -131,8 +135,7 @@ public class JPPFScheduleHandler
   /**
    * Cleanup this schedule handler.
    */
-  public void clear()
-  {
+  public void clear() {
     clear(false);
   }
 
@@ -140,10 +143,8 @@ public class JPPFScheduleHandler
    * Shutdown this schedule handler.
    * @param shutdown flag indicating whether this schedule handler should be shutdown.
    */
-  public void clear(final boolean shutdown)
-  {
-    for (Map.Entry<Object, ScheduledFuture<?>> entry: futureMap.entrySet())
-    {
+  public void clear(final boolean shutdown) {
+    for (Map.Entry<Object, ScheduledFuture<?>> entry : futureMap.entrySet()) {
       ScheduledFuture<?> f = entry.getValue();
       if (f != null) f.cancel(true);
     }
@@ -154,8 +155,7 @@ public class JPPFScheduleHandler
   /**
    * Create the executor used for task scheduling.
    */
-  private void createExecutor()
-  {
+  private void createExecutor() {
     executor = Executors.newScheduledThreadPool(1, new JPPFThreadFactory(this.name));
     if (debugEnabled) log.debug("created executor with name=" + name);
   }

@@ -26,6 +26,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobEvent.Type;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
@@ -48,7 +49,7 @@ public class ClientJob extends AbstractClientJob {
    */
   private final List<Task<?>> tasks;
   /**
-   * The broadcast UUID.
+   * The broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */
   private transient String broadcastUUID = null;
   /**
@@ -63,10 +64,6 @@ public class ClientJob extends AbstractClientJob {
    * The listener that receives notifications of completed tasks.
    */
   private final JPPFResultCollector resultCollector;
-  /**
-   * Instance of parent broadcast job.
-   */
-  private final transient ClientJob parentJob;
   /**
    * Map of all dispatched broadcast jobs.
    */
@@ -106,7 +103,7 @@ public class ClientJob extends AbstractClientJob {
    * @param job   underlying task bundle.
    * @param tasks list of tasks to execute.
    * @param parentJob instance of parent broadcast job.
-   * @param broadcastUUID the broadcast UUID.
+   * @param broadcastUUID the broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */
   @SuppressWarnings("deprecation")
   protected ClientJob(final JPPFJob job, final List<Task<?>> tasks, final ClientJob parentJob, final String broadcastUUID) {
@@ -164,7 +161,7 @@ public class ClientJob extends AbstractClientJob {
 
   /**
    * Make a copy of this client job wrapper.
-   * @param broadcastUUID the broadcast UUID.
+   * @param broadcastUUID the broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    * @return a new <code>ClientJob</code> instance.
    */
   public ClientJob createBroadcastJob(final String broadcastUUID) {
@@ -232,7 +229,7 @@ public class ClientJob extends AbstractClientJob {
       setJobStatus(JobStatus.EXECUTING);
       setExecuting(true);
     }
-    job.fireJobEvent(JobEvent.Type.JOB_DISPATCH, channel, bundle.getTasksL());
+    if (!isParentBroadcastJob()) job.fireJobEvent(JobEvent.Type.JOB_DISPATCH, channel, bundle.getTasksL());
     if (parentJob != null) parentJob.broadcastDispatched(this);
   }
 
@@ -299,11 +296,13 @@ public class ClientJob extends AbstractClientJob {
     if (listener != null) {
       try {
         synchronized (listener) {
-          listener.resultsReceived(results, throwable);
+          listener.resultsReceived(results, throwable, !isParentBroadcastJob());
         }
       } catch(Exception e) {
         log.error("error while calling the TaskResultListener for job [name={}, uuid={}] : {}", new Object[] {job.getName(), job.getUuid(), ExceptionUtils.getStackTrace(e)});
       }
+    } else if (isChildBroadcastJob()) {
+      job.fireJobEvent(JobEvent.Type.JOB_RETURN, null, results);
     } else log.warn("<null> result collector for job {}", this.job);
   }
 
@@ -415,6 +414,8 @@ public class ClientJob extends AbstractClientJob {
     if (this.jobStatus == jobStatus) return;
     this.jobStatus = jobStatus;
     if (resultCollector instanceof JobStatusHandler) ((JobStatusHandler) resultCollector).setStatus(this.jobStatus);
+    else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob())
+      job.fireJobEvent(Type.JOB_END, null, tasks);
   }
 
   @Override
@@ -495,7 +496,9 @@ public class ClientJob extends AbstractClientJob {
     //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     boolean empty;
     synchronized (bundleMap) {
-      if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) throw new IllegalStateException("broadcast job not found");
+      if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) {
+        if (debugEnabled) log.debug("broadcast job not found: " + broadcastJob);
+      }
       empty = broadcastMap.isEmpty();
     }
     if (empty) taskCompleted(null, null);

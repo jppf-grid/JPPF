@@ -33,7 +33,7 @@ import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
 /**
- * This class ensures that idle nodes get assigned pending tasks in the queue.
+ * This class ensures that idle driver connections get assigned pending tasks in the queue.
  */
 public class TaskQueueChecker extends ThreadSynchronization implements Runnable {
   /**
@@ -79,8 +79,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
   private final ExecutorService channelsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ChannelsExecutor"));
 
   /**
-   * Initialize this task queue checker with the specified node server.
-   * @param queue        the reference queue to use.
+   * Initialize this task queue checker with the specified queue.
+   * @param queue the reference queue to use.
    */
   public TaskQueueChecker(final JPPFPriorityQueue queue) {
     this.queue = queue;

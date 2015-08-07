@@ -53,7 +53,6 @@ class WaitingJobState extends ClientServerState {
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public ClientTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
@@ -74,14 +73,18 @@ class WaitingJobState extends ClientServerState {
       clientBundle.addCompletionListener(new CompletionListener(channel, server.getTransitionManager()));
       context.setInitialBundleWrapper(clientBundle);
       clientBundle.handleNullTasks();
-      JPPFDriver.getQueue().addBundle(clientBundle);
-
+      
       // there is nothing left to do, so this instance will wait for a task bundle
       // make sure the context is reset so as not to resubmit the last bundle executed by the node.
       context.setClientMessage(null);
       context.setBundle(null);
-      //return TO_SENDING_RESULTS;
-      return clientBundle.isDone() ? TO_SENDING_RESULTS : TO_IDLE;
+
+      if (clientBundle.isDone()) {
+        context.jobEnded();
+        return TO_WAITING_JOB;
+      }
+      JPPFDriver.getQueue().addBundle(clientBundle);
+      return TO_IDLE;
     }
     return TO_WAITING_JOB;
   }

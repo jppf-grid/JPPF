@@ -85,7 +85,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   /**
    * A priority queue holding broadcast jobs that could not be sent due to no available connection.
    */
-  private final PriorityBlockingQueue<ServerJobBroadcast> pendingBroadcasts = new PriorityBlockingQueue<>(16, new JobPriorityComparator());
+  private final ConcurrentHashMap<String, ServerJobBroadcast> pendingBroadcasts = new ConcurrentHashMap<>();
   /**
    * Callback for getting all available connections. Used for processing broadcast jobs.
    */
@@ -388,12 +388,13 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       broadcastJob.setQueueEntryTime(System.currentTimeMillis());
       broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
       broadcastJob.addOnDone(new RemoveBundleAction(this, broadcastJob));
-
       jobMap.put(jobUuid, broadcastJob);
       broadcastJob.addBundle(clientBundle);
+      scheduleManager.handleStartJobSchedule(broadcastJob);
+      scheduleManager.handleExpirationJobSchedule(broadcastJob);
       jobManager.jobQueued(broadcastJob);
-      pendingBroadcasts.offer(broadcastJob);
-      processPendingBroadcasts();
+      pendingBroadcasts.put(jobUuid, broadcastJob);
+      //processPendingBroadcasts();
     } else serverJob.addBundle(clientBundle);
   }
 
@@ -431,10 +432,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       connections = Collections.emptyList();
     }
     if (connections.isEmpty()) return;
-    ServerJobBroadcast clientJob;
-    while ((clientJob = pendingBroadcasts.poll()) != null) {
-      if (debugEnabled) log.debug("queuing job " + clientJob.getJob());
-      processPendingBroadcast(connections, clientJob);
+    for (Map.Entry<String, ServerJobBroadcast> entry: pendingBroadcasts.entrySet()) {
+      ServerJobBroadcast broadcastJob = entry.getValue();
+      if (debugEnabled) log.debug("queuing job " + broadcastJob.getJob());
+      processPendingBroadcast(connections, broadcastJob);
     }
   }
 
@@ -445,6 +446,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   private void processPendingBroadcast(final List<AbstractNodeContext> connections, final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
+    if (pendingBroadcasts.remove(broadcastJob.getUuid()) == null) return;
     JobSLA sla = broadcastJob.getSLA();
     List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
     Set<String> uuidSet = new HashSet<>();
@@ -492,13 +494,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    */
   private void addBroadcastJob(final ServerJobBroadcast broadcastJob) {
     if (broadcastJob == null) throw new IllegalArgumentException("broadcastJob is null");
-
     final String jobUuid = broadcastJob.getUuid();
     broadcastJob.setSubmissionStatus(SubmissionStatus.PENDING);
     broadcastJob.setQueueEntryTime(System.currentTimeMillis());
     broadcastJob.setJobReceivedTime(broadcastJob.getQueueEntryTime());
     broadcastJob.addOnDone(new RemoveBundleAction(this, broadcastJob));
-
     priorityMap.putValue(broadcastJob.getSLA().getPriority(), broadcastJob);
     if (debugEnabled) log.debug("adding bundle with " + broadcastJob);
     scheduleManager.handleStartJobSchedule(broadcastJob);
@@ -507,7 +507,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     updateLatestMaxSize();
     jobManager.jobQueued(broadcastJob);
     fireBundleAdded(new QueueEvent<>(this, broadcastJob, false));
-
     if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
     driver.getStatistics().addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, broadcastJob.getTaskCount());
   }

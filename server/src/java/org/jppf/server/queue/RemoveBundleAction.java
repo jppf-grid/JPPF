@@ -21,10 +21,9 @@ package org.jppf.server.queue;
 import org.jppf.server.protocol.ServerJob;
 
 /**
-* @author Martin JANDA
-*/
-class RemoveBundleAction implements Runnable
-{
+ * @author Martin JANDA
+ */
+class RemoveBundleAction implements Runnable {
   /**
    * Reference to the job queue.
    */
@@ -39,18 +38,15 @@ class RemoveBundleAction implements Runnable
    * @param queue the reference queue to use.
    * @param serverJob the reference to job to use.
    */
-  public RemoveBundleAction(final JPPFPriorityQueue queue, final ServerJob serverJob)
-  {
+  public RemoveBundleAction(final JPPFPriorityQueue queue, final ServerJob serverJob) {
     if (queue == null) throw new IllegalArgumentException("queue is null");
     if (serverJob == null) throw new IllegalArgumentException("serverJob is null");
-
     this.queue = queue;
     this.serverJob = serverJob;
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     queue.removeBundle(serverJob, true);
   }
 }

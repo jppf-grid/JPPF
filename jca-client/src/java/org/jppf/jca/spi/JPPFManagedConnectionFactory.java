@@ -144,7 +144,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
       }
 
       @Override
-      protected String getSerializationHelperClassName(){
+      public String getSerializationHelperClassName(){
         return AbstractJPPFClient.JCA_SERIALIZATION_HELPER;
       }
     };

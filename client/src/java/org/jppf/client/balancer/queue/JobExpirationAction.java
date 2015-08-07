@@ -25,8 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Action triggered when a job reaches its scheduled execution date.
  */
-class JobExpirationAction implements Runnable
-{
+class JobExpirationAction implements Runnable {
   /**
    * Logger for this class.
    */
@@ -44,8 +43,7 @@ class JobExpirationAction implements Runnable
    * Initialize this action with the specified bundle wrapper.
    * @param clientJob the bundle wrapper encapsulating the job.
    */
-  public JobExpirationAction(final ClientJob clientJob)
-  {
+  public JobExpirationAction(final ClientJob clientJob) {
     if (clientJob == null) throw new IllegalArgumentException("bundleWrapper is null");
 
     this.clientJob = clientJob;
@@ -56,16 +54,12 @@ class JobExpirationAction implements Runnable
    * @see Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     String jobId = clientJob.getName();
-    try
-    {
+    try {
       if (debugEnabled) log.debug("job '" + jobId + "' is expiring");
       clientJob.jobExpired();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error("Error while cancelling job id = " + jobId, e);
     }
   }

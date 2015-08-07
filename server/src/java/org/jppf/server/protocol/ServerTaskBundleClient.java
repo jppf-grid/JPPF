@@ -127,6 +127,7 @@ public class ServerTaskBundleClient {
       if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
       ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
       if (dataLocation == null) {
+        if (debugEnabled) log.debug("job '" + job.getName() + "' has null task at index " + index);
         nullTasks.add(task);
         task.resultReceived(task.getInitialTask());
       } else {
@@ -353,8 +354,7 @@ public class ServerTaskBundleClient {
    * Get the number of tasks that remain to execute.
    * @return the number of tasks as an int.
    */
-  public int getPendingTasksCount()
-  {
+  public int getPendingTasksCount() {
     return pendingTasksCount.get();
   }
 
