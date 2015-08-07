@@ -25,8 +25,7 @@ import org.slf4j.*;
 /**
  * Action triggered when a job reaches its scheduled execution date.
  */
-class JobScheduleAction implements Runnable
-{
+class JobScheduleAction implements Runnable {
   /**
    * Logger for this class.
    */
@@ -44,22 +43,17 @@ class JobScheduleAction implements Runnable
    * Initialize this action with the specified bundle wrapper.
    * @param bundleWrapper the bundle wrapper encapsulating the job.
    */
-  public JobScheduleAction(final ClientJob bundleWrapper)
-  {
+  public JobScheduleAction(final ClientJob bundleWrapper) {
     if (bundleWrapper == null) throw new IllegalArgumentException("bundleWrapper is null");
-
     this.bundleWrapper = bundleWrapper;
   }
 
   @Override
-  public void run()
-  {
-    synchronized (bundleWrapper)
-    {
-      if (debugEnabled)
-      {
+  public void run() {
+    synchronized (bundleWrapper) {
+      if (debugEnabled) {
         String jobId = bundleWrapper.getName();
-        log.debug("job '" + jobId + "' is resuming");
+        if (debugEnabled) log.debug("job '" + jobId + "' is resuming");
       }
       bundleWrapper.setPending(false);
     }

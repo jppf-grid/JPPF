@@ -209,6 +209,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
         int count = 0;
         boolean completed = false;
         JPPFJob newJob = createNewJob(clientBundle, tasks);
+        if (debugEnabled) log.debug(String.format("%s executing %d tasks of job %s", ChannelWrapperRemote.this, tasks.size(), newJob));
         Collection<ClassLoader> loaders = registerClassLoaders(newJob);
         while (!completed) {
           TaskBundle bundle = createBundle(newJob);
@@ -216,7 +217,11 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
           List<Task<?>> notSerializableTasks = connection.sendTasks(cl, bundle, newJob);
-          if (!notSerializableTasks.isEmpty()) clientBundle.resultsReceived(notSerializableTasks);
+          if (!notSerializableTasks.isEmpty()) {
+            if (debugEnabled) log.debug(String.format("%s got %d non-serializable tasks", ChannelWrapperRemote.this, notSerializableTasks.size()));
+            count += notSerializableTasks.size();
+            clientBundle.resultsReceived(notSerializableTasks);
+          }
           while (count < tasks.size()) {
             List<Task<?>> results = connection.receiveResults(cl);
             int n = results.size();

@@ -267,6 +267,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
+  @Ignore
   public void testJobMaxNodes() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);
@@ -292,6 +293,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * @throws Exception if any error occurs.
    */
   @Test(timeout=8000)
+  @Ignore
   public void testJobMaxNodes2() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 250L);

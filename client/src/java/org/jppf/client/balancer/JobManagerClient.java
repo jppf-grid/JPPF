@@ -140,7 +140,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   protected void addConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
-    synchronized(this) {
+    if (log.isDebugEnabled()) log.debug("adding connection " + wrapper);
+    synchronized(allConnections) {
       allConnections.add(wrapper);
     }
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
@@ -155,7 +156,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     try {
       updateConnectionStatus(wrapper, wrapper.getStatus(), JPPFClientConnectionStatus.DISCONNECTED);
     } finally {
-      synchronized(this) {
+      synchronized(allConnections) {
         allConnections.remove(wrapper);
       }
     }
@@ -170,7 +171,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     if (log.isDebugEnabled()) log.debug("adding connection " + cnn);
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
     ChannelWrapper wrapper = null;
-    synchronized(this) {
+    synchronized(wrapperMap) {
       wrapper = wrapperMap.get(cnn);
     }
     if (wrapper == null) {
@@ -185,7 +186,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       } catch (Throwable e) {
         log.error("Error while adding connection " + cnn, e);
       } finally {
-        synchronized(this) {
+        synchronized(wrapperMap) {
           wrapperMap.put(cnn, wrapper);
         }
         addConnection(wrapper);
@@ -202,7 +203,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    */
   protected ChannelWrapper removeConnection(final JPPFClientConnection connection) {
     ChannelWrapper wrapper = null;
-    synchronized(this) {
+    synchronized(wrapperMap) {
       wrapper = wrapperMap.remove(connection);
     }
     if (wrapper != null) removeConnection(wrapper);
@@ -213,8 +214,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Get all the client connections handled by this manager.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
-  public synchronized List<ChannelWrapper> getAllConnections() {
-    return new ArrayList<>(allConnections);
+  public List<ChannelWrapper> getAllConnections() {
+    synchronized(allConnections) {
+      return new ArrayList<>(allConnections);
+    }
   }
 
   /**
@@ -230,7 +233,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * @param oldStatus the connection status before the change.
    */
   private void updateConnectionStatus(final JPPFClientConnection connection, final JPPFClientConnectionStatus oldStatus) {
-    ChannelWrapper wrapper = wrapperMap.get(connection);
+    ChannelWrapper wrapper = null;
+    synchronized(wrapperMap) {
+      wrapper = wrapperMap.get(connection);
+    }
     if (wrapper != null) {
       if (oldStatus == JPPFClientConnectionStatus.CONNECTING && wrapper.getStatus() == JPPFClientConnectionStatus.ACTIVE) {
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
@@ -238,7 +244,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         wrapper.setSystemInformation(systemInfo);
         JPPFManagementInfo info = new JPPFManagementInfo(connection.getHost(), jmx != null ? jmx.getPort() : -1,
             jmx != null ? jmx.getId() : (connection.getDriverUuid() != null ? connection.getDriverUuid() : "?"),
-                JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+            JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
         info.setSystemInfo(systemInfo);
         wrapper.setManagementInfo(info);
       }
@@ -326,7 +332,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    * Starts or stops local execution node according to specified parameter.
    * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
    */
-  protected synchronized void updateLocalExecution(final boolean localExecutionEnabled) {
+  private void updateLocalExecution(final boolean localExecutionEnabled) {
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
     if (localExecutionEnabled) {
       wrapperLocal = new ChannelWrapperLocal();
@@ -362,7 +368,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
 
   @Override
   public void reset() {
-    synchronized(this) {
+    synchronized(allConnections) {
       for (ChannelWrapper channel: allConnections) channel.close();
       allConnections.clear();
       if (taskQueueChecker != null) taskQueueChecker.clearChannels();
@@ -380,7 +386,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
       taskQueueChecker.wakeUp();
     }
     queue.close();
-    synchronized(this) {
+    synchronized(allConnections) {
       for (ChannelWrapper channel: allConnections) channel.close();
       allConnections.clear();
     }

@@ -71,6 +71,10 @@ public abstract class AbstractClientJob {
    */
   private transient long queueEntryTime = 0L;
   /**
+   * Instance of parent broadcast job.
+   */
+  protected ClientJob parentJob;
+  /**
    * The underlying task bundle.
    */
   protected final JPPFJob job;
@@ -85,7 +89,7 @@ public abstract class AbstractClientJob {
   /**
    * The service level agreement between the job and the server.
    */
-  private JobSLA sla = null;
+  JobSLA sla = null;
   /**
    * The service level agreement on the client side.
    */
@@ -251,8 +255,7 @@ public abstract class AbstractClientJob {
    */
   protected final boolean updateStatus(final ClientJobStatus expect, final ClientJobStatus newStatus) {
     if (status == expect) {
-      if ((newStatus == EXECUTING) && (status != newStatus)) job.fireJobEvent(JobEvent.Type.JOB_START, null, null);
-      //else if (newStatus.compareTo(DONE) >= 0) job.fireJobEvent(JobEvent.Type.JOB_END, null, null);
+      if ((newStatus == EXECUTING) && (status != newStatus) && !isParentBroadcastJob()) job.fireJobEvent(JobEvent.Type.JOB_START, null, null);
       status = newStatus;
       return true;
     }
@@ -400,5 +403,21 @@ public abstract class AbstractClientJob {
    */
   public void clearChannels() {
     channelsCount.set(0);
+  }
+
+  /**
+   * Whether this is the master/parent broadcast job.
+   * @return {@code true} if this job is the parent broadcast job, {@code false} otherwise.
+   */
+  boolean isParentBroadcastJob() {
+    return sla.isBroadcastJob() && (parentJob == null);
+  }
+
+  /**
+   * Whether this is the master/parent broadcast job.
+   * @return {@code true} if this job is the parent broadcast job, {@code false} otherwise.
+   */
+  boolean isChildBroadcastJob() {
+    return sla.isBroadcastJob() && (parentJob != null);
   }
 }

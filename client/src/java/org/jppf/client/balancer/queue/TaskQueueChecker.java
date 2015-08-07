@@ -284,7 +284,7 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
 
   /**
    * Dispatch the specified job to the selected channel, after applying the load balancer to the job.
-   * @param channel        the node channel to dispatch the job to.
+   * @param channel the driver channel to dispatch the job to.
    * @param selectedBundle the job to dispatch.
    * @throws Exception if any error occurs.
    */

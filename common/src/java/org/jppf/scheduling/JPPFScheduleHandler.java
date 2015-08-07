@@ -113,6 +113,15 @@ public class JPPFScheduleHandler {
   }
 
   /**
+   * Determine whether an action is already regsitered for the specified job uuid.
+   * @param uuid the uuid of a job to check.
+   * @return {@code true} if an action is already scheduled for the job, {@code false} otherwise.
+   */
+  public boolean hasAction(final String uuid) {
+    return futureMap.get(uuid) != null;
+  }
+
+  /**
    * Cancel the scheduled action identified by the specified key.
    * @param key the key associated with the action.
    */

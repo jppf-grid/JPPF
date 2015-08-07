@@ -247,6 +247,7 @@ public class ServerJobBroadcast extends ServerJob {
         list.addAll(broadcastSet);
         broadcastSet.clear();
         for (ServerJobBroadcast broadcastJob : list) broadcastJob.cancel(false);
+        jobEnded();
         return true;
       } else {
         return super.cancel(mayInterruptIfRunning);
