@@ -48,7 +48,8 @@ public final class ConcurrentUtils {
     long elapsed = 0L;
     final long start = System.currentTimeMillis();
     while (!(fulfilled = condition.evaluate()) && ((elapsed = System.currentTimeMillis() - start) < timeout)) {
-      monitor.goToSleep(timeout - elapsed);
+      //monitor.goToSleep(timeout - elapsed);
+      monitor.goToSleep(1L);
     }
     return fulfilled;
   }

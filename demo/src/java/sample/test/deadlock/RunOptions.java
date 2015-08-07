@@ -73,4 +73,8 @@ public class RunOptions {
    * After how many jobs to submit the one that triggers a deadlock in one of the nodes.
    */
   public final int triggerNodeDeadlockAfter = config.getInt("deadlock.triggerNodeDeadlockAfter", -1);
+  /**
+   * Callback invoked when a job is created by the job streaming pattern.
+   */
+  public JobCreationCallback jobCreationCallback;
 }

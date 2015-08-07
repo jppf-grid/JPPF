@@ -23,7 +23,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.policy.Equal;
+import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.*;
@@ -62,6 +62,15 @@ public class DeadlockRunner {
    */
   public void jobStreaming() {
     RunOptions ro = new RunOptions();
+    ro.jobCreationCallback = new JobCreationCallback() {
+      @Override
+      public void jobCreated(final JPPFJob job) {
+        //job.getSLA().setMaxNodeProvisioningGroups(1);
+        ExecutionPolicy policy = new Equal("jppf.node.provisioning.slave", true).and(new Equal("job.uuid", false, job.getUuid()));
+        job.getSLA().setExecutionPolicy(policy);
+        job.getSLA().setSuspended(true);
+      }
+    };
     System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
