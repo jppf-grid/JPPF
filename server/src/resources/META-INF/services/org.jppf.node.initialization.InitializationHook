@@ -1,0 +1,1 @@
+org.jppf.node.initialization.OutputRedirectHook # redirect System.out and/or System.err to files specified in the configuration

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2015 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  Root XML descriptor for the JPPF administration console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JPPFAdminTool" type="page">
+	<property name="label" value="JPPF Monitoring and Administration Tool"/>
+	<property name="layoutConstraints" value="flowy, fill, insets 0 0 0 0"/>
+	<script language="groovy" source="org/jppf/ui/options/xml/imports.groovy"/>
+	<initializer type="script">
+		<script language="groovy">
+      StatsHandler.getInstance()
+      def adminPanels = OptionsHandler.findOptionWithName(option,"/AdminPanels")
+      if (adminPanels != null) adminPanels.getUIComponent().setSelectedIndex(0)
+    </script>
+	</initializer>
+	<finalizer type="script">
+		<script language="groovy">OptionsHandler.saveMainWindowAttributes(OptionsHandler.getPreferences());</script>
+	</finalizer>
+
+  <!-- Server Chooser Panel -->
+  <import source="file" location="org/jppf/ui/options/xml/ServerChooser.xml" pluggableView="ServerChooser"/>
+
+  <!-- Settings import / export -->
+  <!-- <import source="file" location="org/jppf/ui/options/xml/SettingActions.xml" pluggableView="Settings"/> -->
+
+  <!-- Main tabbed pane -->
+  <import source="file" location="org/jppf/ui/options/xml/MainTabbedPane.xml" pluggableView="Main"/>
+
+  <!-- Status bar -->
+  <import source="file" location="org/jppf/ui/options/xml/StatusBar.xml" pluggableView="StatusBar"/>
+
+</opt:main>
