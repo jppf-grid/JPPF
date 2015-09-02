@@ -28,6 +28,8 @@
         <!-- start content -->
         <div align="left" style="margin: 10px">
           <!-- ${SAMPLE_START_CONTENT} -->
+          <script src="http://www.jppf.org/scripts/code-prettify/run_prettify.js?skin=java"></script>
+          <script src="http://www.jppf.org/scripts/code-prettify/lang-conf.js"></script>
           <h3>What does the sample do?</h3>
           <p>This sample dmeonstrates how a JPPF Grid can be grown or shrunk dynamically based on the current workload.
           <p>To achieve this, the demo will adjust two components of the grid topology:
@@ -46,8 +48,8 @@
           <h3>How do I run it?</h3>
           <p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.
           <p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux or "run.bat" on Windows. You will then see a number of meesages like these while the demo is running:
-          <p>It is also possible to specify how many jobs can be sent concurrently by the application, by setting the following in config/jppf.properties:
-<pre class="samples">**** submitting jobs batch #2 *****
+<pre class="prettyprint lang-txt">
+**** submitting jobs batch #2 *****
 increasing the number of server connections to 2
 increasing the number of server connections to 3
 increasing the number of server connections to 4
@@ -57,17 +59,19 @@ increasing the number of nodes to 4
 job 'Job 11 - batch 2 (1/20)' result: execution successful
 job 'Job 12 - batch 2 (2/20)' result: execution successful
 job 'Job 13 - batch 2 (3/20)' result: execution successful
-...</pre>
+...
+</pre>
           <p>It is also interesting to monitor the grid with the amdinistration console: the topology view will show the slave nodes that are started and stopped,
           and the job data view will show more or less jobs in the server quueue, depending on the client connection pool size.
-          <p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties">config/jppf.properties</a> file:
-<pre class="samples"><span style="color: green"># the maximum allowed connection pool size</span>
+          <p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties.html">config/jppf.properties</a> file:
+<pre class="prettyprint lang-conf">
+# the maximum allowed connection pool size
 maxAllowedPoolSize = 10
-<span style="color: green"># the maximum allowed number of nodes</span>
+# the maximum allowed number of nodes
 maxAllowedNodes = 10
-<span style="color: green"># defines the number of job batches and their sizes</span>
+# defines the number of job batches and their sizes
 jobBatches = 1 20 50 10
-<span style="color: green"># duration of each task in millis</span>
+# duration of each task in millis
 taskDuration = 1500
 </pre>
 

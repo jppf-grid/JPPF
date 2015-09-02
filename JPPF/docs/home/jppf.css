@@ -24,7 +24,7 @@ body {
 }
 
 a { text-decoration: none; font-weight: normal; }
-a:hover { text-decoration: underline; color: red; font-weight: normal }
+a:hover { text-decoration: underline; color: red; }
 div { margin: 0px; padding; 0px; }
 
 .gwrapper { width: 900px; max-width: 900px; background: white; }
@@ -299,4 +299,12 @@ div#mw-content-text h3 a {
 
 div#mw-content-text li a {
   /*font-size: 11pt;*/
+}
+
+.yellow_highlight {
+  background-color: yellow;
+  font-weight: bold;
+  padding: 10px;
+  margin: 0px;
+  border-radius: 10px
 }

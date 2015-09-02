@@ -1,0 +1,64 @@
+pre .str, code .str { color: #804000 }
+pre .kwd, code .kwd { color: #0000FF }
+pre .com, code .com { color: green; }
+/*pre .typ, code .typ { color: #0080FF }*/
+pre .typ, code .typ { color: #0060DF; font-weight: bold }
+pre .lit, code .lit { color: #2F2F2F }
+pre .pun, code .pun { color: red }
+pre .pln, code .pln { color: black }
+/*pre .tag, code .tag { color: #0080FF; } #2B2BAD  #A8372F */
+pre .tag, code .tag { color: #88170F; font-weight: bold }
+pre .htm, code .htm { color: #dda0dd }
+pre .xsl, code .xsl { color: #d0a0d0 }
+pre .atn, code .atn { color: #0000FF }
+pre .atv, code .atv { color: #804000 }
+pre .dec, code .dec { color: #3387cc }
+a { text-decoration: none }
+pre.prettyprint, code.prettyprint {
+  /*
+  font-family: 'Droid Sans Mono','CPMono_v07 Bold','Droid Sans';
+  font-weight: bold;
+  */
+  font-family: Courier New, Source Code Pro, monospace;
+  font-size: 10pt;
+  background-color: #E0E0E0;
+  /*
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -o-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -khtml-border-radius: 8px;
+  border-radius: 8px
+  */
+}
+pre.prettyprint {
+  /*
+  width: 95%;
+  margin: 1em auto;
+  padding: 1em;
+  */
+  white-space: pre-wrap
+}
+pre.prettyprint a, code.prettyprint a { text-decoration: none}
+ol.linenums {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #8b8970
+}
+li.L0, li.L1, li.L2, li.L3, li.L5, li.L6, li.L7, li.L8 { list-style-type: none }
+
+@media print {
+  pre.prettyprint,code.prettyprint [ background-color: #fff }
+  pre .str,code .str [ color: #088 }
+  pre .kwd,code .kwd [ color: #006; font-weight: bold }
+  pre .com,code .com [ color: #oc3; font-style: italic }
+  pre .typ,code .typ [ color: #404; font-weight: bold }
+  pre .lit,code .lit [ color: #044 }
+  pre .pun,code .pun [ color: #440 }
+  pre .pln,code .pln [ color: #000 }
+  pre .tag,code .tag [ color: #b66ff7; font-weight: bold }
+  pre .htm,code .htm [ color: #606; font-weight: bold }
+  pre .xsl,code .xsl [ color: #606; font-weight: bold }
+  pre .atn,code .atn [ color: #c71585; font-weight: normal }
+  pre .atv,code .atv [ color: #088; font-weight: normal }
+}

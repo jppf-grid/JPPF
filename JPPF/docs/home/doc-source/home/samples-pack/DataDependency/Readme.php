@@ -3,6 +3,8 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 
 <div align="justify" class="blockWithHighlightedTitle" style="padding: 5px">
 
+          <script src="http://www.jppf.org/scripts/code-prettify/run_prettify.js?skin=java"></script>
+          <script src="http://www.jppf.org/scripts/code-prettify/lang-conf.js"></script>
 					<h3>What does the sample do?</h3>
 					<p>This sample simulates near real-time updates of a portfolio, based on simulated "live" events from financial markets.
 
@@ -65,45 +67,48 @@ $template{name="samples-page-header" title="Data Dependency sample"}$
 						<li>from the sample's "config" folder, open the client configuration file "<b>jppf.properties</b>" in a text editor</li>
 						<li>find the line containing "<b>jppf.pool.size = value</b>" and update the value as you see fit (server connection pool size)</li>
 						<li>At the end of the file, you will find the configuration of the simulation parameters, for instance:
-<pre Class="samples"><font color="green">#------------------------------------------------------------------------------#</font>
-<font color="green">#         Parameters specific to the data dependency application               #</font>
-<font color="green">#------------------------------------------------------------------------------#</font>
+<pre class="prettyprint lang-conf">
+#------------------------------------------------------------------------------#
+#         Parameters specific to the data dependency application               #
+#------------------------------------------------------------------------------#
 
-<font color="green"># Pseudo-random number generator, either "gaussian" or "uniform" (the default).</font>
-<font color="green"># This determines the distribution of randomly generated data</font>
+# Pseudo-random number generator, either "gaussian" or "uniform" (the default).
+# This determines the distribution of randomly generated data
 dataFactoryImpl = gaussian
 
-<font color="green"># run mode, either snapshot-based or event-based. Possible values: event | snapshot</font>
+# run mode, either snapshot-based or event-based. Possible values: event | snapshot
 runMode = snapshot
 
-<font color="green"># number of market data objects to use</font>
+# number of market data objects to use
 nbMarketData = 2000
 
-<font color="green"># number of trade objects</font>
+# number of trade objects
 nbTrades = 4000
 
-<font color="green"># min and max number of market data object a trade depends on (randomly chosen)</font>
+# min and max number of market data object a trade depends on (randomly chosen)
 minDataPerTrade = 1
 maxDataPerTrade = 6
 
-<font color="green"># min and max intervals in milliseconds between ticker events</font>
-<font color="green"># (computed randomly in the specified range)</font>
+# min and max intervals in milliseconds between ticker events
+# (computed randomly in the specified range)
 minTickerInterval = 50
 maxTickerInterval = 200
 
-<font color="green"># number of ticker events during the simulation; value <= 0 means no limit</font>
+# number of ticker events during the simulation; value <= 0 means no limit
 nbTickerEvents = 0
 
-<font color="green"># duration of the simulation in milliseconds (after that the ticker stops emitting events)</font>
+# duration of the simulation in milliseconds (after that the ticker stops emitting events)
 simulationDuration = 10000
 
-<font color="green"># min and max simulated task duration in milliseconds</font>
-<font color="green"># (task duration is computed randomly in the specified range)</font>
+# min and max simulated task duration in milliseconds
+# (task duration is computed randomly in the specified range)
 minTaskDuration = 50
 maxTaskDuration = 100
 
-<font color="green"># interval between 2 snapshots when running in snapshot-based mode</font>
-snapshotInterval = 3250</pre>
+# interval between 2 snapshots when running in snapshot-based mode
+snapshotInterval = 3250
+</pre>
+
 						</li>
 						<li>once you have configured your scenario, in the sample's command prompt, type either "<b>run.bat</b>" (on Windows), "<b>./run.sh</b>" (on Linux/Unix) or "<b>ant run</b>" to run the simulation</li>
 						<li>for a clearer visualization of what is happening during the simulation, it is recommended to start the JPPF administration UI in  the "Jobs" view:<br/>

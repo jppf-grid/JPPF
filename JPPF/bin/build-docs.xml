@@ -115,10 +115,12 @@
 			<packageset dir="${admin}/src/java"/>
 			<packageset dir="${jca-client}/src/java"/>
 			<packageset dir="${jca-client}/src/j2eeclient"/>
+      <packageset dir="${node-android}/events/src/main/java"/>
 			<link href="https://docs.oracle.com/javase/7/docs/api/"/>
 			<link href="https://docs.oracle.com/javaee/6/api/"/>
 			<link href="http://junit.sourceforge.net/javadoc"/>
-			<link href="http://xstream.codehaus.org/javadoc"/>
+			<link href="http://x-stream.github.io/javadoc"/>
+		  <link offline="true" href="http://d.android.com/reference" packagelistURL="file:/${android.home}/docs/reference"/>
 			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
 			<header>
 				<![CDATA[

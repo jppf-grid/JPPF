@@ -39,7 +39,7 @@ public class MandelbrotRunner extends AbstractRunner {
    */
   static Logger log = LoggerFactory.getLogger(MandelbrotRunner.class);
   /**
-   * 
+   * The android demo apk in memory, so it can be sent with a job to run on an Android node.
    */
   private static final Location androidApk = initApk();
 
@@ -70,7 +70,7 @@ public class MandelbrotRunner extends AbstractRunner {
   protected List<Task<?>> submitJob(final JPPFJob job, final AbstractFractalConfiguration cfg) throws Exception {
     int nbTask = cfg.height;
     log.info("Executing " + nbTask + " tasks");
-    job.getSLA().getClassPath().add("demo-release-unsigned.apk", androidApk);
+    job.getSLA().getClassPath().add("android-fractal-demo.apk", androidApk);
     job.getMetadata().setParameter("jppf.node.integration.class", "org.jppf.android.demo.FractalEventHandler");
     for (int i=0; i<nbTask; i++) job.add(new MandelbrotTask(i));
     return jppfClient.submitJob(job);
@@ -86,7 +86,6 @@ public class MandelbrotRunner extends AbstractRunner {
       int[] values = task.getResult();
       int[] colors = task.getColors();
       for (int i=0; i<config.width; i++) image.setRGB(i, config.height - j - 1, colors[i]);
-      //for (int i=0; i<config.width; i++) image.setRGB(i, j, colors[i]);
     }
     return image;
   }
@@ -102,13 +101,12 @@ public class MandelbrotRunner extends AbstractRunner {
   }
 
   /**
-   * Load the android demo apk in memory.
+   * Load the android demo apk in memory, so it can be sent with a job to run on an Android node.
    * @return the apk as a {@link Location} object transportable in a job.
    */
   private static Location initApk() {
     try {
-      //Location file = new FileLocation("data/demo-release-unsigned.apk");
-      Location file = new FileLocation("data/demo-debug.apk");
+      Location file = new FileLocation("data/android-fractal-demo.apk");
       return file.copyTo(new MemoryLocation((int) file.size()));
     } catch(Exception e) {
       log.error(e.getMessage(), e);

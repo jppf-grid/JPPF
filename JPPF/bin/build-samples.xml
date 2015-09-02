@@ -25,11 +25,39 @@
   <taskdef name="java2html" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${lib}/java2html_50/java2html.jar"/>
 
   <!-- Convert source files to HTML -->
+  <!--
   <macrodef name="include.code">
     <attribute name="sample"/>
     <sequential>
       <java2html srcdir="${samples-pack}/@{sample}" destdir="${samples-pack}/@{sample}" includes="**/*.java" excludes="**/package-info.java"
         style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
+    </sequential>
+  </macrodef>
+  -->
+  
+  <scriptdef name="include.code" language="javascript" manager="javax" src="${basedir}/bin/HTMLSourceScript.js">
+    <attribute name="sample"/>
+  </scriptdef>
+  
+  <macrodef name="tohtml">
+    <attribute name="in"/>
+    <attribute name="lang" default="java"/>
+    <sequential>
+      <delete file="@{in}.html" quiet="true"/>
+      <local name="src.lang"/>
+      <property name="src.lang" value="@{lang}"/>
+      <copy file="${basedir}/bin/html_source_header.txt" toFile="${build}/header.txt" quiet="true" overwrite="true"/>
+      <replace file="${build}/header.txt" token="@lang@" value="@{lang}"/>
+      <copy file="@{in}" toFile="${build}/temp.java" quiet="true" overwrite="true"/>
+      <replace file="${build}/temp.java">
+        <replacetoken><![CDATA[<]]></replacetoken>
+        <replacevalue><![CDATA[&lt;]]></replacevalue>
+      </replace>
+      <concat destfile="@{in}.html">
+        <header file="${build}/header.txt"/>
+        <path location="${build}/temp.java"/>
+        <footer file="${basedir}/bin/html_source_footer.txt"/>
+      </concat>
     </sequential>
   </macrodef>
 
@@ -39,6 +67,7 @@
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
     <!-- Convert sources to HTML and include them in the designated samples -->
     <include.code sample="AdaptiveGrid"/>
+    <include.code sample="AndroidDemo"/>
     <include.code sample="ConcurrentJobs"/>
     <include.code sample="CustomLoadBalancer"/>
     <include.code sample="DataEncryption"/>
@@ -96,7 +125,9 @@
       </fileset>
     </copy>
     <!-- remove HTML-converted files after the zip is created -->
-    <delete><fileset dir="${samples-pack}" includes="**/*.java.html"/></delete>
+    <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html"/></delete>
+    <delete file="${build}/header.txt" quiet="true"/>
+    <delete file="${build}/temp.java" quiet="true"/>
   </target>
 
 </project> 
