@@ -539,7 +539,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
-   * @return a list of at least {@code nbConnections} {@link JPPFClientConnection} instances.
+   * @return a list of at least {@code nbConnections} {@link JMXDriverConnectionWrapper} instances.
    * @since 5.0
    */
   public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final boolean connectedOnly) {
@@ -552,7 +552,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
    * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
-   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @return a list of {@link JMXDriverConnectionWrapper} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
   public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connectedOnly) {
@@ -560,13 +560,21 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
   }
 
   /**
-   * Wait a JMX connection to be in the specified state.
-   * This is a shorthand for {@code awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0)}.
+   * Wait a JMX connection to be in the specified state. This is a shorthand for {@code awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0)}.
    * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
    * @return a {@link JMXDriverConnectionWrapper} instance in the specified connected state.
    * @since 5.1
    */
   public JMXDriverConnectionWrapper awaitJMXConnection(final boolean connectedOnly) {
     return awaitJMXConnections(Operator.AT_LEAST, 1, connectedOnly).get(0);
+  }
+
+  /**
+   * Wait an established JMX connection to be available. This is a shorthand for {@code awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0)}.
+   * @return a connected {@link JMXDriverConnectionWrapper} instance.
+   * @since 5.1
+   */
+  public JMXDriverConnectionWrapper awaitWorkingJMXConnection() {
+    return awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
   }
 }
