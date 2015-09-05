@@ -149,7 +149,9 @@ public class JPPFTaskFuture<V> extends AbstractJPPFFuture<V> {
    * @return a {@link Task} instance.
    */
   public Task<?> getTask() {
-    return job.getResults().getResultTask(position);
+    //TODO: why can the result task be null? to investigate
+    Task<?> task = job.getResults().getResultTask(position);
+    return task != null ? task : job.getJobTasks().get(position);
   }
 
   /**

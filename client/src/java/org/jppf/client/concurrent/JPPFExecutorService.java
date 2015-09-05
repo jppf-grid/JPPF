@@ -32,8 +32,7 @@ import org.slf4j.*;
  * Implementation of an {@link ExecutorService} wrapper around a {@link JPPFClient}.
  * <p>This executor has two modes in which it functions:
  * <p>1) Standard mode: in this mode each task or set of tasks submitted via one of the
- * <code>invokeXXX()</code> or <code>submit()</code> methods is sent immediately to the server
- * in its own JPPF job.
+ * <code>invokeXXX()</code> or <code>submit()</code> methods is sent immediately to the server in its own JPPF job.
  * <p>2) Batch mode: the <code>JPPFExecutorService</code> can be configured to only send tasks to the server
  * when a number of tasks, submitted via one of the <code>invokeXXX()</code> or <code>submit()</code> methods,
  * has been reached, or when a timeout specified in milliseconds has expired, or a combination of both.<br/>
@@ -54,8 +53,7 @@ import org.slf4j.*;
  * @see org.jppf.client.concurrent.JPPFExecutorService#setBatchTimeout(long)
  * @author Laurent Cohen
  */
-public class JPPFExecutorService extends JobListenerAdapter implements ExecutorService
-{
+public class JPPFExecutorService extends JobListenerAdapter implements ExecutorService {
   /**
    * Logger for this class.
    */
@@ -89,8 +87,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Initialize this executor service with the specified JPPF client.
    * @param client the {@link JPPFClient} to use for job submission.
    */
-  public JPPFExecutorService(final JPPFClient client)
-  {
+  public JPPFExecutorService(final JPPFClient client) {
     this.client = client;
     batchHandler = new BatchHandler(this);
     new Thread(batchHandler, "BatchHandler").start();
@@ -108,8 +105,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection)
    */
   @Override
-  public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks) throws InterruptedException
-  {
+  public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks) throws InterruptedException {
     return invokeAll(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
   }
 
@@ -129,8 +125,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   @Override
   @SuppressWarnings("unchecked")
-  public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException
-  {
+  public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");
     long start = System.currentTimeMillis();
@@ -140,15 +135,14 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
     JPPFJob job = pair.first();
     int position = pair.second();
     List<Future<T>> futureList = new ArrayList<>(tasks.size());
-    for (Callable<T> task: tasks)
-    {
+    for (Callable<T> task : tasks) {
       if (task == null) throw new NullPointerException("a task cannot be null");
       JPPFTaskFuture future = new JPPFTaskFuture<T>(job, position);
       futureList.add(future);
       long elapsed = System.currentTimeMillis() - start;
       try {
         future.getResult(millis - elapsed);
-      } catch(TimeoutException ignore) {
+      } catch (TimeoutException ignore) {
       }
       position++;
     }
@@ -160,12 +154,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @param <T> the type of results held by each future.
    * @param futureList the list of futures to handle.
    */
-  private static <T> void handleFutureList(final List<Future<T>> futureList)
-  {
-    for (Future<T> f: futureList)
-    {
-      if (!f.isDone())
-      {
+  private static <T> void handleFutureList(final List<Future<T>> futureList) {
+    for (Future<T> f : futureList) {
+      if (!f.isDone()) {
         JPPFTaskFuture<T> future = (JPPFTaskFuture<T>) f;
         future.setDone();
         future.setCancelled();
@@ -187,14 +178,10 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection)
    */
   @Override
-  public <T> T invokeAny(final Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException
-  {
-    try
-    {
+  public <T> T invokeAny(final Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+    try {
       return invokeAny(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-    }
-    catch(TimeoutException e)
-    {
+    } catch (TimeoutException e) {
       return null;
     }
   }
@@ -217,13 +204,10 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#invokeAny(java.util.Collection, long, java.util.concurrent.TimeUnit)
    */
   @Override
-  public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit)
-  throws InterruptedException, ExecutionException, TimeoutException
-  {
+  public <T> T invokeAny(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     List<Future<T>> futureList = invokeAll(tasks, timeout, unit);
     handleFutureList(futureList);
-    for (Future<T> f: futureList)
-    {
+    for (Future<T> f : futureList) {
       if (f.isDone() && !f.isCancelled()) return f.get();
     }
     return null;
@@ -237,8 +221,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#submit(java.util.concurrent.Callable)
    */
   @Override
-  public <T> Future<T> submit(final Callable<T> task)
-  {
+  public <T> Future<T> submit(final Callable<T> task) {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (task instanceof Task<?>) return batchHandler.addTask((Task<?>) task, (T) null);
     return batchHandler.addTask(task);
@@ -251,8 +234,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#submit(java.lang.Runnable)
    */
   @Override
-  public Future<?> submit(final Runnable task)
-  {
+  public Future<?> submit(final Runnable task) {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (task instanceof Task<?>) return batchHandler.addTask((Task<?>) task, (Object) null);
     return batchHandler.addTask(task, (Object) null);
@@ -267,8 +249,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#submit(java.lang.Runnable, java.lang.Object)
    */
   @Override
-  public <T> Future<T> submit(final Runnable task, final T result)
-  {
+  public <T> Future<T> submit(final Runnable task, final T result) {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (task instanceof Task<?>) return batchHandler.addTask((Task<?>) task, result);
     return batchHandler.addTask((Runnable) task, result);
@@ -281,8 +262,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
    */
   @Override
-  public void execute(final Runnable command)
-  {
+  public void execute(final Runnable command) {
     submit(command);
   }
 
@@ -296,8 +276,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#awaitTermination(long, java.util.concurrent.TimeUnit)
    */
   @Override
-  public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException
-  {
+  public boolean awaitTermination(final long timeout, final TimeUnit unit) throws InterruptedException {
     long millis = DateTimeUtils.toMillis(timeout, unit);
     waitForTerminated(millis);
     return isTerminated();
@@ -309,8 +288,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#isShutdown()
    */
   @Override
-  public boolean isShutdown()
-  {
+  public boolean isShutdown() {
     return shuttingDown.get();
   }
 
@@ -321,8 +299,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#isTerminated()
    */
   @Override
-  public boolean isTerminated()
-  {
+  public boolean isTerminated() {
     return terminated.get();
   }
 
@@ -330,11 +307,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Set the terminated status for this executor.
    * @see java.util.concurrent.ExecutorService#isTerminated()
    */
-  private void setTerminated()
-  {
+  private void setTerminated() {
     terminated.set(true);
-    synchronized(this)
-    {
+    synchronized (this) {
       notifyAll();
     }
   }
@@ -344,11 +319,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#shutdown()
    */
   @Override
-  public void shutdown()
-  {
+  public void shutdown() {
     shuttingDown.set(true);
-    synchronized(jobMap)
-    {
+    synchronized (jobMap) {
       if (debugEnabled) log.debug("normal shutdown requested, " + jobMap.size() + " jobs pending");
       terminated.compareAndSet(false, jobMap.isEmpty());
     }
@@ -363,11 +336,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#shutdownNow()
    */
   @Override
-  public List<Runnable> shutdownNow()
-  {
+  public List<Runnable> shutdownNow() {
     shuttingDown.set(true);
-    synchronized(jobMap)
-    {
+    synchronized (jobMap) {
       if (debugEnabled) log.debug("immediate shutdown requested, " + jobMap.size() + " jobs pending");
       //terminated.compareAndSet(false, jobMap.isEmpty());
       jobMap.clear();
@@ -384,12 +355,10 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @throws Exception if any error occurs.
    * @exclude
    */
-  void submitJob(final JPPFJob job) throws Exception
-  {
+  void submitJob(final JPPFJob job) throws Exception {
     if (debugEnabled) log.debug("submitting job '" + job.getName() + "' with " + job.getJobTasks().size() + " tasks");
     client.submitJob(job);
-    synchronized(jobMap)
-    {
+    synchronized (jobMap) {
       jobMap.put(job.getUuid(), job);
     }
   }
@@ -398,20 +367,14 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Wait until this executor has terminated, or the specified timeout has expired, whichever happens first.
    * @param timeout the maximum time to wait, zero means indefinite time.
    */
-  private void waitForTerminated(final long timeout)
-  {
+  private void waitForTerminated(final long timeout) {
     long elapsed = 0L;
     long start = System.currentTimeMillis();
-    while (!isTerminated() && (elapsed < timeout))
-    {
-      synchronized (this)
-      {
-        try
-        {
+    while (!isTerminated() && (elapsed < timeout)) {
+      synchronized (this) {
+        try {
           wait(timeout - elapsed);
-        }
-        catch(InterruptedException e)
-        {
+        } catch (InterruptedException e) {
           log.error(e.getMessage(), e);
         }
         elapsed = System.currentTimeMillis() - start;
@@ -426,11 +389,9 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @exclude
    */
   @Override
-  public void jobReturned(final JobEvent event)
-  {
+  public void jobReturned(final JobEvent event) {
     String jobUuid = event.getJob().getUuid();
-    synchronized(jobMap)
-    {
+    synchronized (jobMap) {
       jobMap.remove(jobUuid);
       if (isShutdown() && jobMap.isEmpty()) setTerminated();
     }
@@ -440,8 +401,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Get the minimum number of tasks that must be submitted before they are sent to the server.
    * @return the batch size as an int.
    */
-  public int getBatchSize()
-  {
+  public int getBatchSize() {
     return batchHandler.getBatchSize();
   }
 
@@ -449,8 +409,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Set the minimum number of tasks that must be submitted before they are sent to the server.
    * @param batchSize the batch size as an int.
    */
-  public void setBatchSize(final int batchSize)
-  {
+  public void setBatchSize(final int batchSize) {
     batchHandler.setBatchSize(batchSize);
   }
 
@@ -458,8 +417,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Get the maximum time to wait before the next batch of tasks is to be sent for execution.
    * @return the timeout as a long.
    */
-  public long getBatchTimeout()
-  {
+  public long getBatchTimeout() {
     return batchHandler.getBatchTimeout();
   }
 
@@ -467,8 +425,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Set the maximum time to wait before the next batch of tasks is to be sent for execution.
    * @param batchTimeout the timeout as a long.
    */
-  public void setBatchTimeout(final long batchTimeout)
-  {
+  public void setBatchTimeout(final long batchTimeout) {
     batchHandler.setBatchTimeout(batchTimeout);
   }
 
@@ -476,8 +433,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Get the configuration for this executor service.
    * @return an {@link ExecutorServiceConfiguration} instance.
    */
-  public ExecutorServiceConfiguration getConfiguration()
-  {
+  public ExecutorServiceConfiguration getConfiguration() {
     return batchHandler.getConfig();
   }
 
@@ -485,8 +441,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * Reset the configuration for this executor service to a blank state.
    * @return an {@link ExecutorServiceConfiguration} instance.
    */
-  public ExecutorServiceConfiguration resetConfiguration()
-  {
+  public ExecutorServiceConfiguration resetConfiguration() {
     return batchHandler.resetConfig();
   }
 }
