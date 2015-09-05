@@ -19,7 +19,6 @@
 package org.jppf.client.balancer;
 
 import static org.jppf.client.balancer.ClientJobStatus.*;
-import static org.jppf.utils.StringUtils.build;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -376,7 +375,7 @@ public abstract class AbstractClientJob {
    * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
    */
   public boolean acceptsChannel(final ExecutorChannel channel) {
-    if (traceEnabled) log.trace(build("job '", getName(), "' : ", "pending=", isPending(), ", expired=", isJobExpired()));
+    if (traceEnabled) log.trace(String.format("job '%s' : pending=%b, expired=%b, nb channels=%d, max channels=%d", job.getName(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
     if (isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
     ExecutionPolicy policy = clientSla.getExecutionPolicy();
     boolean b = true;

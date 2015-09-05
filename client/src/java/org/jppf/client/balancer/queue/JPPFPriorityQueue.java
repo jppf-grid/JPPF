@@ -77,28 +77,11 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     final String jobUuid = clientJob.getUuid();
     if (sla.isBroadcastJob() && (clientJob.getBroadcastUUID() == null)) {
       if (debugEnabled) log.debug("before processing broadcast job " + clientJob.getJob());
-      processBroadcastJob(clientJob);
+      processBroadcastJob(clientJob, jobManager.getWorkingRemoteConnections());
     } else {
       lock.lock();
       try {
-        ClientJob other = jobMap.get(jobUuid);
-        if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
-        clientJob.addOnDone(new Runnable() {
-          @Override
-          public void run() {
-            lock.lock();
-            try {
-              jobMap.remove(jobUuid);
-              removeBundle(clientJob);
-            } finally {
-              lock.unlock();
-            }
-          }
-        });
-        clientJob.setJobStatus(JobStatus.PENDING);
-        clientJob.setQueueEntryTime(System.currentTimeMillis());
-        clientJob.setJobReceivedTime(clientJob.getQueueEntryTime());
-
+        prepareClientJob(clientJob);
         if (!sla.isBroadcastJob() || clientJob.getBroadcastUUID() != null) {
           priorityMap.putValue(sla.getPriority(), clientJob);
           sizeMap.putValue(getSize(clientJob), clientJob);
@@ -205,38 +188,42 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    * and with an execution policy that enforces its execution ont he designated node only.
    * @param clientJob the broadcast job to process.
    */
-  private void processBroadcastJob(final ClientJob clientJob) {
+  /**
+   * Process the specified broadcast job.
+   * This consists in creating one job per node, each containing the same tasks and with an execution policy that enforces its execution ont he designated node only.
+   * @param clientJob the broadcast job to process.
+   * @param workingRemoteConnections the connections to which the job may be broadcasted.
+   */
+  private void processBroadcastJob(final ClientJob clientJob, final List<ChannelWrapper> workingRemoteConnections) {
+    scheduleManager.handleStartJobSchedule(clientJob);
+    scheduleManager.handleExpirationJobSchedule(clientJob);
     JPPFJob bundle = clientJob.getJob();
     List<ChannelWrapper> connections = jobManager.getAllConnections();
     for (Iterator<ChannelWrapper> it=connections.iterator(); it.hasNext();) {
       ChannelWrapper ch = it.next();
-      if (ch.isLocal()) it.remove();
+      ExecutorStatus status = ch.getExecutionStatus();
+      if (ch.isLocal() || !((status == ExecutorStatus.ACTIVE) || (status == ExecutorStatus.EXECUTING))) it.remove();
     }
-    if (debugEnabled) log.debug(String.format("%d connection(s) for broadcast job '%s' : %s", connections.size(), bundle.getName(), connections));
-    scheduleManager.handleStartJobSchedule(clientJob);
-    scheduleManager.handleExpirationJobSchedule(clientJob);
+    if (log.isTraceEnabled()) log.trace(String.format("%d connection(s) for broadcast job '%s' : %s", connections.size(), bundle.getName(), connections));
     if (connections.isEmpty()) {
       pendingBroadcasts.putIfAbsent(bundle.getUuid(), clientJob);
       return;
-    } else pendingBroadcasts.remove(bundle.getUuid());
+    }
+    pendingBroadcasts.remove(bundle.getUuid());
     JobSLA sla = bundle.getSLA();
     List<ClientJob> jobList = new ArrayList<>(connections.size());
-
     Set<String> uuidSet = new HashSet<>();
     for (ChannelWrapper connection : connections) {
-      ExecutorStatus status = connection.getExecutionStatus();
-      if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {
-        String uuid = connection.getUuid();
-        if (uuid != null && uuid.length() > 0 && uuidSet.add(uuid)) {
-          ClientJob newBundle = clientJob.createBroadcastJob(uuid);
-          JPPFManagementInfo info = connection.getManagementInfo();
-          newBundle.setClientSLA(((JPPFJobClientSLA) bundle.getClientSLA()).copy());
-          newBundle.setSLA(((JPPFJobSLA) sla).copy());
-          newBundle.setMetadata(bundle.getMetadata());
-          newBundle.setName(bundle.getName() + " [driver: " + info.toString() + ']');
-          newBundle.setUuid(new JPPFUuid(JPPFUuid.HEXADECIMAL_CHAR, 32).toString());
-          jobList.add(newBundle);
-        }
+      String uuid = connection.getUuid();
+      if ((uuid != null) && (uuid.length() > 0) && uuidSet.add(uuid)) {
+        ClientJob newBundle = clientJob.createBroadcastJob(uuid);
+        JPPFManagementInfo info = connection.getManagementInfo();
+        newBundle.setClientSLA(((JPPFJobClientSLA) bundle.getClientSLA()).copy());
+        newBundle.setSLA(((JPPFJobSLA) sla).copy());
+        newBundle.setMetadata(bundle.getMetadata());
+        newBundle.setName(bundle.getName() + " [driver: " + info.toString() + ']');
+        newBundle.setUuid(JPPFUuid.normalUUID());
+        jobList.add(newBundle);
       }
     }
     if (jobList.isEmpty()) clientJob.taskCompleted(null, null);
@@ -244,23 +231,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       final String jobUuid = clientJob.getUuid();
       lock.lock();
       try {
-        ClientJob other = jobMap.get(jobUuid);
-        if (other != null) throw new IllegalStateException("Job " + jobUuid + " already enqueued");
-        clientJob.addOnDone(new Runnable() {
-          @Override
-          public void run() {
-            lock.lock();
-            try {
-              jobMap.remove(jobUuid);
-              removeBundle(clientJob);
-            } finally {
-              lock.unlock();
-            }
-          }
-        });
-        clientJob.setJobStatus(JobStatus.PENDING);
-        clientJob.setQueueEntryTime(System.currentTimeMillis());
-        clientJob.setJobReceivedTime(clientJob.getQueueEntryTime());
+        prepareClientJob(clientJob);
         jobMap.put(jobUuid, clientJob);
         fireBundleAdded(new QueueEvent<>(this, clientJob, false));
         for (ClientJob job : jobList) addBundle(job);
@@ -268,6 +239,30 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
         lock.unlock();
       }
     }
+  }
+
+  /**
+   * Setup a {@link ClientJob} before adding it to the queue.
+   * @param clientJob the job to prepare.
+   */
+  private void prepareClientJob(final ClientJob clientJob) {
+    ClientJob other = jobMap.get(clientJob.getUuid());
+    if (other != null) throw new IllegalStateException("Job " + clientJob.getUuid() + " already enqueued");
+    clientJob.addOnDone(new Runnable() {
+      @Override
+      public void run() {
+        lock.lock();
+        try {
+          jobMap.remove(clientJob.getUuid());
+          removeBundle(clientJob);
+        } finally {
+          lock.unlock();
+        }
+      }
+    });
+    clientJob.setJobStatus(JobStatus.PENDING);
+    clientJob.setQueueEntryTime(System.currentTimeMillis());
+    clientJob.setJobReceivedTime(clientJob.getQueueEntryTime());
   }
 
   /**
@@ -353,7 +348,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     for (Map.Entry<String, ClientJob> entry: pendingBroadcasts.entrySet()) {
       ClientJob clientJob = entry.getValue();
       if (log.isTraceEnabled()) log.trace("queuing broadcast job " + clientJob.getJob());
-      processBroadcastJob(clientJob);
+      processBroadcastJob(clientJob, jobManager.getWorkingRemoteConnections());
     }
   }
 
