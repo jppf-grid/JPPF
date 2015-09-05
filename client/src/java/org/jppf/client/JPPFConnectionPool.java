@@ -557,7 +557,7 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param operator the condition on the number of connections to wait for. If {@code null}, it is assumed to be {@link Operator#EQUAL}.
    * @param nbConnections the number of connections to wait for.
    * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
-   * @return a list of at least {@code nbConnections} {@link JPPFClientConnection} instances.
+   * @return a list of at least {@code nbConnections} {@link JMXDriverConnectionWrapper} instances.
    * @since 5.0
    */
   public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final boolean connectedOnly) {
@@ -571,10 +571,19 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @param nbConnections the number of connections to wait for.
    * @param timeout the maximum time to wait, in milliseconds.
    * @param connectedOnly specifies whether to get a connection in connected state only or in any state.
-   * @return a list of {@link JPPFClientConnection} instances, possibly less than the requested number if the timeout expired first.
+   * @return a list of {@link JMXDriverConnectionWrapper} instances, possibly less than the requested number if the timeout expired first.
    * @since 5.0
    */
   public List<JMXDriverConnectionWrapper> awaitJMXConnections(final Operator operator, final int nbConnections, final long timeout, final boolean connectedOnly) {
     return jmxPool.awaitJMXConnections(operator, nbConnections, timeout, connectedOnly);
+  }
+
+  /**
+   * Wait for an established JMX connection to be available.
+   * @return a connected {@link JMXDriverConnectionWrapper} instance.
+   * @since 5.0
+   */
+  public JMXDriverConnectionWrapper awaitWorkingJMXConnection() {
+    return jmxPool.awaitJMXConnections(Operator.AT_LEAST, 1, Long.MAX_VALUE, true).get(0);
   }
 }
