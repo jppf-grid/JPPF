@@ -30,13 +30,11 @@ import org.jppf.node.protocol.*;
  * The bundle size is computed dynamically, depending on the number of nodes connected to the server, and other factors.
  * @author Laurent Cohen
  */
-public class ClientTaskBundle extends JPPFTaskBundle
-{
+public class ClientTaskBundle extends JPPFTaskBundle {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-
   /**
    * The job to execute.
    */
@@ -60,17 +58,15 @@ public class ClientTaskBundle extends JPPFTaskBundle
   /**
    * Job cancel indicator
    */
-  private boolean cancelled  = false;
+  private boolean cancelled = false;
 
   /**
    * Initialize this task bundle and set its build number.
-   * @param job   the job to execute.
+   * @param job the job to execute.
    * @param tasks the tasks to execute.
    */
-  public ClientTaskBundle(final ClientJob job, final List<Task<?>> tasks)
-  {
+  public ClientTaskBundle(final ClientJob job, final List<Task<?>> tasks) {
     if (job == null) throw new IllegalArgumentException("job is null");
-
     this.job = job;
     this.setSLA(job.getSLA());
     this.setMetadata(job.getJob().getMetadata());
@@ -84,8 +80,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the job this job is for.
    * @return a {@link JPPFJob} instance.
    */
-  public JPPFJob getJob()
-  {
+  public JPPFJob getJob() {
     return job.getJob();
   }
 
@@ -93,8 +88,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the client job this job is for
    * @return a {@link ClientJob} instance.
    */
-  public ClientJob getClientJob()
-  {
+  public ClientJob getClientJob() {
     return job;
   }
 
@@ -102,8 +96,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get shared data provider for this task.
    * @return a <code>DataProvider</code> instance.
    */
-  public DataProvider getDataProviderL()
-  {
+  public DataProvider getDataProviderL() {
     return dataProvider;
   }
 
@@ -111,8 +104,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Set shared data provider for this task.
    * @param dataProvider a <code>DataProvider</code> instance.
    */
-  public void setDataProviderL(final DataProvider dataProvider)
-  {
+  public void setDataProviderL(final DataProvider dataProvider) {
     this.dataProvider = dataProvider;
   }
 
@@ -120,8 +112,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the tasks to be executed by the node.
    * @return the tasks as a <code>List</code> of arrays of bytes.
    */
-  public List<Task<?>> getTasksL()
-  {
+  public List<Task<?>> getTasksL() {
     return tasks;
   }
 
@@ -130,8 +121,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * @return a new <code>ClientTaskBundle</code> instance.
    */
   @Override
-  public ClientTaskBundle copy()
-  {
+  public ClientTaskBundle copy() {
     throw new UnsupportedOperationException();
   }
 
@@ -139,8 +129,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the broadcast UUID.
    * @return an <code>String</code> instance.
    */
-  public String getBroadcastUUID()
-  {
+  public String getBroadcastUUID() {
     return broadcastUUID;
   }
 
@@ -148,8 +137,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Set the broadcast UUID.
    * @param broadcastUUID the broadcast UUID.
    */
-  public void setBroadcastUUID(final String broadcastUUID)
-  {
+  public void setBroadcastUUID(final String broadcastUUID) {
     this.broadcastUUID = broadcastUUID;
   }
 
@@ -157,8 +145,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Called when all or part of a job is dispatched to a node.
    * @param channel the node to which the job is dispatched.
    */
-  public void jobDispatched(final ChannelWrapper channel)
-  {
+  public void jobDispatched(final ChannelWrapper channel) {
     job.jobDispatched(this, channel);
   }
 
@@ -166,8 +153,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param results the list of tasks whose results have been received from the server.
    */
-  public void resultsReceived(final List<Task<?>> results)
-  {
+  public void resultsReceived(final List<Task<?>> results) {
     job.resultsReceived(this, results);
   }
 
@@ -175,8 +161,7 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Called to notify that throwable eventually raised while receiving the results.
    * @param throwable the throwable that was raised while receiving the results.
    */
-  public void resultsReceived(final Throwable throwable)
-  {
+  public void resultsReceived(final Throwable throwable) {
     job.resultsReceived(this, throwable);
   }
 
@@ -184,16 +169,14 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Called to notify that the execution of a task has completed.
    * @param exception the {@link Exception} thrown during job execution or <code>null</code>.
    */
-  public void taskCompleted(final Exception exception)
-  {
+  public void taskCompleted(final Exception exception) {
     job.taskCompleted(this, exception);
   }
 
   /**
    * Called when this task bundle should be resubmitted
    */
-  public synchronized void resubmit()
-  {
+  public synchronized void resubmit() {
     if (getSLA().isBroadcastJob()) return; // broadcast jobs cannot be resubmitted.
     requeued = true;
   }
@@ -202,16 +185,14 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the requeued indicator.
    * @return <code>true</code> if job is requeued, <code>false</code> otherwise.
    */
-  public synchronized boolean isRequeued()
-  {
+  public synchronized boolean isRequeued() {
     return requeued;
   }
 
   /**
    * Called when this task bundle is cancelled.
    */
-  public synchronized void cancel()
-  {
+  public synchronized void cancel() {
     this.cancelled = true;
   }
 
@@ -219,15 +200,13 @@ public class ClientTaskBundle extends JPPFTaskBundle
    * Get the cancelled indicator.
    * @return <code>true</code> if job is cancelled, <code>false</code> otherwise.
    */
-  public synchronized boolean isCancelled()
-  {
+  public synchronized boolean isCancelled() {
     return cancelled;
   }
 
   @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder("[");
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("jobId=").append(getName());
     sb.append(", jobUuid=").append(getUuid());
     sb.append(", initialTaskCount=").append(getInitialTaskCount());

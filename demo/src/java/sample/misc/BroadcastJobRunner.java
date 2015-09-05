@@ -21,6 +21,7 @@ package sample.misc;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.client.concurrent.*;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
@@ -35,30 +36,98 @@ public class BroadcastJobRunner {
    * @param args not used.
    */
   public static void main(final String[] args) {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    boolean remoteEnabled = true;
-    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
-    try (JPPFClient client = new JPPFClient()) {
-      client.setLocalExecutionEnabled(true);
-      if (remoteEnabled) client.awaitActiveConnectionPool();
-      JPPFJob job = new JPPFJob();
-      job.setName("my job");
-      job.getSLA().setBroadcastJob(true);
-      job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(5000L));
-      job.add(new LongTask(10L)).setId("my task");
-      List<Task<?>> results = client.submitJob(job);
-      System.out.println("job complete");
-      for (Task<?> task : results) {
-        if (task.getThrowable() != null) System.out.println("got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));
-        else System.out.println("got result: " + task.getResult());
-      }
+    try {
+      //submitJob();
+      submitJobWithExecutor();
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
   /**
-   * 
+   * Submit a broadcast job.
+   * @throws Exception if any error occurs.
+   */
+  private static void submitJob() throws Exception {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    boolean remoteEnabled = true;
+    config.setBoolean("jppf.discovery.enabled", false);
+    config.setString("jppf.drivers", "driver1");
+    config.setString("driver1.jppf.server.host", "localhost");
+    config.setInt("driver1.jppf.server.port", 11111);
+    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
+    config.setBoolean("jppf.local.execution.enabled", true);
+    config.setString("jppf.load.balancing.algorithm", "manual");
+    config.setString("jppf.load.balancing.profile", "manual");
+    config.setInt("jppf.load.balancing.profile.manual.size", 10);
+    try (JPPFClient client = new JPPFClient()) {
+      JPPFJob job = new JPPFJob();
+      job.setName("my job");
+      job.getSLA().setBroadcastJob(true);
+      job.getClientSLA().setJobExpirationSchedule(new JPPFSchedule(5000L));
+      job.getClientSLA().setMaxChannels(2);
+      for (int i=0; i<1; i++) job.add(new LongTask(10L)).setId("my task" + (i + 1));
+      List<Task<?>> results = client.submitJob(job);
+      System.out.println("job complete");
+      for (Task<?> task : results) {
+        if (task.getThrowable() != null) System.out.printf("got exception for task '%' : %s%n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));
+        else System.out.printf("got result for task '%s': %s%n", task.getId(), task.getResult());
+      }
+    }
+  }
+
+  /**
+   * Submit a broadcast job with a {@link JPPFExecutorService}.
+   * @throws Exception if any error occurs.
+   */
+  private static void submitJobWithExecutor() throws Exception {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    boolean remoteEnabled = true;
+    config.setBoolean("jppf.discovery.enabled", false);
+    config.setString("jppf.drivers", "driver1");
+    config.setString("driver1.jppf.server.host", "localhost");
+    config.setInt("driver1.jppf.server.port", 11111);
+    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
+    config.setBoolean("jppf.local.execution.enabled", true);
+    config.setString("jppf.load.balancing.algorithm", "manual");
+    config.setString("jppf.load.balancing.profile", "manual");
+    config.setInt("jppf.load.balancing.profile.manual.size", 10);
+    System.out.println("starting client");
+    JPPFClient client = new JPPFClient();
+    System.out.println("creating executor");
+    int nbTasks = 10;
+    JPPFExecutorService executor = new JPPFExecutorService(client);
+    executor.setBatchSize(nbTasks);
+    JPPFCompletionService completionService = new JPPFCompletionService(executor);
+    ExecutorServiceConfiguration cfg = executor.getConfiguration();
+    JobConfiguration jobConfig = cfg.getJobConfiguration();
+    jobConfig.getClientSLA().setMaxChannels(2);
+    jobConfig.getSLA().setBroadcastJob(true);
+    System.out.println("submitting tasks");
+    for (int i=0; i<nbTasks; i++) {
+      Task<?> task = new LongTask(10L);
+      task.setId("my task " + (i + 1));
+      completionService.submit(task, null);
+    }
+    System.out.println("getting results");
+    int count = 0;
+    while (count < nbTasks) {
+      JPPFTaskFuture<?> future = (JPPFTaskFuture<?>) completionService.take();
+      Object o = future.get();
+      Task<?> task = future.getTask();
+      System.out.printf("got result for task '%s': %s%n", task.getId(), o);
+      count++;
+    }
+    System.out.println("executor shutdown");
+    //executor.shutdown();
+    executor.shutdownNow();
+    System.out.println("closing client");
+    client.close();
+    System.out.println("done");
+  }
+
+  /**
+   * A simple task that sleeps for a specified time.
    */
   public static class LongTask extends AbstractTask<String> {
     /**

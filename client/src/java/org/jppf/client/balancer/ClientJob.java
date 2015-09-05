@@ -316,7 +316,7 @@ public class ClientJob extends AbstractClientJob {
     boolean empty;
     synchronized (bundleMap) {
       ChannelWrapper channel = bundleMap.remove(bundle);
-      if (bundle != null && channel == null) throw new IllegalStateException("future already removed");
+      if ((bundle != null) && (channel == null)) throw new IllegalStateException("future already removed");
       empty = bundleMap.isEmpty() && broadcastMap.isEmpty();
     }
     boolean requeue = false;
@@ -366,9 +366,7 @@ public class ClientJob extends AbstractClientJob {
       }
     }
     if (hasPending()) {
-      if (exception != null) {
-        setJobStatus(exception instanceof NotSerializableException ? JobStatus.COMPLETE : JobStatus.FAILED);
-      }
+      if (exception != null) setJobStatus(exception instanceof NotSerializableException ? JobStatus.COMPLETE : JobStatus.FAILED);
       if (empty) setExecuting(false);
       if (requeue && onRequeue != null) {
         onRequeue.run();
@@ -392,9 +390,8 @@ public class ClientJob extends AbstractClientJob {
    */
   protected boolean hasPending() {
     synchronized (tasks) {
-      if (tasks.isEmpty() && taskStateMap.size() >= job.getJobTasks().size()) {
-        return taskStateMap.getStateCount(TaskState.EXCEPTION) > 0;
-      } else return true;
+      if (tasks.isEmpty() && taskStateMap.size() >= job.getJobTasks().size()) return taskStateMap.getStateCount(TaskState.EXCEPTION) > 0;
+      else return true;
     }
   }
 
@@ -414,8 +411,7 @@ public class ClientJob extends AbstractClientJob {
     if (this.jobStatus == jobStatus) return;
     this.jobStatus = jobStatus;
     if (resultCollector instanceof JobStatusHandler) ((JobStatusHandler) resultCollector).setStatus(this.jobStatus);
-    else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob())
-      job.fireJobEvent(Type.JOB_END, null, tasks);
+    else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob()) job.fireJobEvent(Type.JOB_END, null, tasks);
   }
 
   @Override
@@ -496,7 +492,7 @@ public class ClientJob extends AbstractClientJob {
     //    if (debugEnabled) log.debug("received " + n + " tasks for node uuid=" + uuid);
     boolean empty;
     synchronized (bundleMap) {
-      if (broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob && !broadcastSet.contains(broadcastJob)) {
+      if ((broadcastMap.remove(broadcastJob.getBroadcastUUID()) != broadcastJob) && !broadcastSet.contains(broadcastJob)) {
         if (debugEnabled) log.debug("broadcast job not found: " + broadcastJob);
       }
       empty = broadcastMap.isEmpty();
@@ -525,9 +521,9 @@ public class ClientJob extends AbstractClientJob {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
-    sb.append("job=").append(job);
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("uuid=").append(job.getUuid());
+    sb.append(", jobName=").append(job.getName());
     sb.append(", jobStatus=").append(jobStatus);
     sb.append(", broadcastUUID=").append(broadcastUUID);
     sb.append(", executing=").append(executing);

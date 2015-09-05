@@ -270,7 +270,8 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
         continue;
       }
       if (!bundle.acceptsChannel(ch)) continue;
-      if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
+      if (traceEnabled) log.trace(String.format("job '%s' : broadcastUUID=%s, channelUuid=%s", bundle.getJob().getName(), bundle.getBroadcastUUID(), ch.getUuid()));
+      if ((bundle.getBroadcastUUID() != null) && !bundle.getBroadcastUUID().equals(ch.getUuid())) continue;
       acceptableChannels.add(ch);
     }
     if (!channelsToRemove.isEmpty()){

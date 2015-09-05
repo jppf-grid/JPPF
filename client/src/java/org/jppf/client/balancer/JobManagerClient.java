@@ -19,6 +19,7 @@
 package org.jppf.client.balancer;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.*;
 
 import org.jppf.client.*;
@@ -91,9 +92,9 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    */
   private ChannelWrapperLocal wrapperLocal = null;
   /**
-   * Counts the current number of connections with ACTIVE or EXECUTING status.
+   * Holds the current connections with ACTIVE or EXECUTING status.
    */
-  private final AtomicInteger nbWorkingConnections = new AtomicInteger(0);
+  private final ConcurrentHashMap<String, ChannelWrapper> workingConnections = new ConcurrentHashMap<>();
   /**
    * Determines whether this job manager has been closed.
    */
@@ -143,7 +144,6 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   protected synchronized void addConnection(final ChannelWrapper wrapper) {
     if (wrapper == null) throw new IllegalArgumentException("wrapper is null");
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
-
     allConnections.add(wrapper);
     updateConnectionStatus(wrapper, JPPFClientConnectionStatus.NEW, wrapper.getStatus());
   }
@@ -211,11 +211,38 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   }
 
   /**
-   * Dtermine whether there is at east one connection, idle or not.
-   * @return <code>true</code> if there is at least one connection, <code>false</code> otherwise.
+   * Get all the client connections with a working status.
+   * @return a list of {@link ChannelWrapper} instances.
    */
-  public synchronized boolean hasWorkingConnection() {
-    return nbWorkingConnections.get() > 0;
+  public List<ChannelWrapper> getWorkingConnections() {
+    return new ArrayList<>(workingConnections.values());
+  }
+
+  /**
+   * Get all the client connections with a working status, excluding the local executor if it is enabled.
+   * @return a list of {@link ChannelWrapper} instances.
+   */
+  public List<ChannelWrapper> getWorkingRemoteConnections() {
+    List<ChannelWrapper> result = getWorkingConnections();
+    if (isLocalExecutionEnabled()) {
+      Iterator<ChannelWrapper> it = result.iterator();
+      while (it.hasNext()) {
+        ChannelWrapper channel = it.next();
+        if (channel.isLocal()) {
+          it.remove();
+          break;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Determine whether there is at least one working connection, idle or not.
+   * @return {@code true} if there is at least one connection, {@code false} otherwise.
+   */
+  public boolean hasWorkingConnection() {
+    return !workingConnections.isEmpty();
   }
 
   /**
@@ -264,8 +291,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
     }
     boolean bNew = newStatus.isWorkingStatus();
     boolean bOld = oldStatus.isWorkingStatus();
-    if (bNew && !bOld) nbWorkingConnections.incrementAndGet();
-    else if (!bNew && bOld) nbWorkingConnections.decrementAndGet();
+    if (bNew && !bOld) workingConnections.put(wrapper.getConnectionUuid(), wrapper);
+    else if (!bNew && bOld) workingConnections.remove(wrapper.getConnectionUuid());
   }
 
   @Override
@@ -316,7 +343,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
 
   /**
    * Starts or stops local execution node according to specified parameter.
-   * @param localExecutionEnabled <code>true</code> to enable local execution, <code>false</code> otherwise
+   * @param localExecutionEnabled {@code true} to enable local execution, {@code false} otherwise
    */
   private synchronized void updateLocalExecution(final boolean localExecutionEnabled) {
     if (closed.get()) throw new IllegalStateException("this job manager was closed");
