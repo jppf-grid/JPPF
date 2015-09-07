@@ -70,7 +70,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
   public void onCreate(Bundle savedInstanceState) {
     try {
       super.onCreate(savedInstanceState);
-      // Load the preferences from an XML resource
+      // Load the preferences screen from an XML resource
       addPreferencesFromResource(R.xml.preferences);
       String[] pickerKeys = { PreferenceUtils.TRUST_STORE_LOCATION_KEY, PreferenceUtils.KEY_STORE_LOCATION_KEY };
       for (String key: pickerKeys) {

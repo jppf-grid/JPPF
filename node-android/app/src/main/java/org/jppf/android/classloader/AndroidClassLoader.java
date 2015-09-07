@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.classloader;
+package org.jppf.android.classloader;
 
 import android.content.Context;
 import android.util.Log;
 
 import org.jppf.android.AndroidHelper;
+import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.location.FileLocation;
 import org.jppf.location.Location;
 import org.jppf.node.protocol.ClassPath;
@@ -112,6 +113,6 @@ public class AndroidClassLoader extends AbstractJPPFClassLoader {
   }
 
   @Override
-  void reset() {
+  protected void reset() {
   }
 }

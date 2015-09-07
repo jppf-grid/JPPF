@@ -15,3 +15,12 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# --------------------------------------------------------------------
+# Remove all Log messages except warnings and errors
+# --------------------------------------------------------------------
+-assumenosideeffects class android.util.Log {
+  public static *** d(...);
+  public static *** v(...);
+  public static *** i(...);
+}

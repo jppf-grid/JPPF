@@ -36,6 +36,10 @@ public class MainActivity extends Activity {
    */
   private final static String LOG_TAG = MainActivity.class.getSimpleName();
 
+  public MainActivity() {
+    Log.v(LOG_TAG, "in constructor MainActivity()");
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

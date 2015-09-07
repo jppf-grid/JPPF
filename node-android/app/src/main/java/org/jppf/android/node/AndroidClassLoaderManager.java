@@ -15,17 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node.android;
+package org.jppf.android.node;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.classloader.AndroidClassLoader;
-import org.jppf.classloader.JPPFClassLoader;
+import org.jppf.android.classloader.AndroidClassLoader;
 import org.jppf.node.NodeRunner;
 import org.jppf.node.protocol.ClassPath;
 import org.jppf.server.node.AbstractClassLoaderManager;
 import org.jppf.server.node.JPPFContainer;
 import org.jppf.server.node.remote.JPPFRemoteContainer;
-import org.jppf.server.node.remote.RemoteNodeConnection;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;

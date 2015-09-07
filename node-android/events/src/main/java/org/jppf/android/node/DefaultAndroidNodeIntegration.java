@@ -15,18 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.android.activities;
+package org.jppf.android.node;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import org.jppf.android.R;
+import org.jppf.android.events.R;
 import org.jppf.node.NodeInternal;
 import org.jppf.node.event.NodeLifeCycleEvent;
 import org.jppf.node.event.TaskExecutionEvent;
-import org.jppf.server.node.android.AndroidNodeIntegrationAdapter;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,11 +34,11 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Laurent Cohen
  * @since 5.1
  */
-public class NodeEventHandler extends AndroidNodeIntegrationAdapter {
+public class DefaultAndroidNodeIntegration extends AndroidNodeIntegrationAdapter {
   /**
    * Log tag for this class.
    */
-  private final static String LOG_TAG = NodeEventHandler.class.getSimpleName();
+  private final static String LOG_TAG = DefaultAndroidNodeIntegration.class.getSimpleName();
   /**
    * Atomic counter for the number of tasks executed by the node.
    */
@@ -49,8 +48,8 @@ public class NodeEventHandler extends AndroidNodeIntegrationAdapter {
    */
   private View view = null;
 
-  public NodeEventHandler() {
-    Log.v(LOG_TAG, "in NodeEventHandler()");
+  public DefaultAndroidNodeIntegration() {
+    Log.v(LOG_TAG, "in DefaultAndroidNodeIntegration()");
   }
 
   @Override
@@ -58,7 +57,7 @@ public class NodeEventHandler extends AndroidNodeIntegrationAdapter {
     Log.v(LOG_TAG, "in getContentView() : view = " + view + ", activity = " + activity + ", this = " + this);
     if ((view == null) && (activity != null)) {
       LayoutInflater inflater = activity.getLayoutInflater();
-      view = inflater.inflate(R.layout.activity_main_default, null, false);
+      view = inflater.inflate(R.layout.default_view, null, false);
     }
     return view;
   }

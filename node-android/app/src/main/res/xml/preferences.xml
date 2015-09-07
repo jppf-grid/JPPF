@@ -33,11 +33,36 @@
       android:title="@string/pref_servers_title"/>
   </PreferenceCategory>
 
+  <!--
+  <CheckBoxPreference
+    android:key="pref_ssl_enabled"
+    android:summaryOn="@string/pref_ssl_enabled_sum_on"
+    android:summaryOff="@string/pref_ssl_enabled_sum_off"
+    android:title="@string/pref_ssl_enabled_title"
+  />
+
   <PreferenceScreen android:key="pref_security"
     android:icon="@android:drawable/ic_menu_more"
     android:title="@string/pref_security_title"
     android:summary="@string/pref_security_sum"
-    android:persistent="false">
+    android:persistent="false"
+    android:dependency="pref_ssl_enabled"
+  >
+  -->
+
+  <PreferenceScreen android:key="pref_security"
+    android:icon="@android:drawable/ic_menu_more"
+    android:title="@string/pref_security_title"
+    android:summary="@string/pref_security_sum"
+    android:persistent="false"
+  >
+
+    <CheckBoxPreference
+      android:key="pref_ssl_auth_type"
+      android:summaryOn="@string/pref_ssl_auth_type_sum_on"
+      android:summaryOff="@string/pref_ssl_auth_type_sum_off"
+      android:title="@string/pref_ssl_auth_type_title"
+    />
 
     <org.jppf.android.activities.FilechoserEditTextPreference android:defaultValue=""
       android:key="pref_trust_store_location"
@@ -59,6 +84,7 @@
       android:summary="@string/pref_key_store_location_sum"
       android:title="@string/pref_key_store_location_title"
       android:persistent="true"
+      android:dependency="pref_ssl_auth_type"
     />
 
     <EditTextPreference android:defaultValue=""
@@ -67,6 +93,7 @@
       android:title="@string/pref_key_store_password_title"
       android:password="true"
       android:singleLine="true"
+      android:dependency="pref_ssl_auth_type"
     />
 
     <MultiSelectListPreference

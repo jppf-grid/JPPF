@@ -82,13 +82,22 @@ public class AndroidNodeConnectionStrategy implements DriverConnectionStrategy {
     List<DriverConnectionInfo> list = new ArrayList<>();
     TypedProperties config = JPPFConfiguration.getProperties();
     String servers = config.getString("jppf.node.android.connections", "");
-    String[] connectionStr = servers.split("\\s");
-    for (String s2: connectionStr) {
-      String[] comps = s2.split(":");
+    String[] connectionInfos = servers.split("\\s");
+    for (String info: connectionInfos) {
+      String[] comps = info.split(":");
       if (comps.length > 0) {
         String host = comps[0];
-        int port = (comps.length > 1) ? Integer.valueOf(comps[1]) : 11111;
-        list.add(new JPPFDriverConnectionInfo(SECURE, host, port, -1));
+        boolean secure = (comps.length > 2) ? Boolean.valueOf(comps[2]) : true ;
+        int port = secure ? 11443 : 11111;
+        try {
+          if ((comps.length > 1) && (comps[1] != null)) {
+            String s = comps[1].trim();
+            if (!s.isEmpty()) port = Integer.valueOf(s);
+          }
+        } catch (Exception e) {
+          Log.e(LOG_TAG, String.format("error parsing port number for connection strategy '%s'", info), e);
+        }
+        list.add(new JPPFDriverConnectionInfo(secure, host, port, -1));
       }
     }
     return list;

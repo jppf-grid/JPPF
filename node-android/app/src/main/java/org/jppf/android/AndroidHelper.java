@@ -26,7 +26,7 @@ import android.util.Log;
 
 import org.jppf.android.activities.MainActivity;
 import org.jppf.node.NodeRunner;
-import org.jppf.server.node.android.JPPFAndroidNode;
+import org.jppf.android.node.JPPFAndroidNode;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.StringUtils;
 import org.jppf.utils.TypedProperties;
@@ -231,5 +231,9 @@ public class AndroidHelper {
 
   public static void setDefaultUncaughtExceptionHandler() {
     Thread.setDefaultUncaughtExceptionHandler(ueh);
+  }
+
+  public static boolean isNodeLaunched() {
+    return nodeLaunched.get();
   }
 }

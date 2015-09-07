@@ -20,7 +20,7 @@ apply plugin: 'com.android.application'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "22.0.1"
+  buildToolsVersion "23.0.0"
   defaultConfig {
     applicationId "org.jppf.android"
     minSdkVersion 19
@@ -43,7 +43,7 @@ android {
     release {
       debuggable true
       minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
     }
   }
@@ -55,15 +55,12 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_7
     targetCompatibility JavaVersion.VERSION_1_7
   }
-  productFlavors {
-  }
   lintOptions {
     abortOnError false
   }
 }
 
 dependencies {
-  compile fileTree(include: ['*.jar'], dir: 'libs')
   compile fileTree(dir: '../events/libs', include: ['*.jar'])
   compile project(":events")
 }

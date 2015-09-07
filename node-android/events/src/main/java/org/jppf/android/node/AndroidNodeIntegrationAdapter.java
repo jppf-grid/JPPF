@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node.android;
+package org.jppf.android.node;
 
 import android.app.Activity;
 import android.util.Log;
@@ -29,7 +29,7 @@ import org.jppf.node.event.NodeLifeCycleListener;
 import org.jppf.utils.ExceptionUtils;
 
 /**
- * .
+ * This is the base event handler for an Android node.
  * @author Laurent Cohen
  */
 public abstract class AndroidNodeIntegrationAdapter extends NodeIntegrationAdapter<Activity> implements NodeLifeCycleErrorHandler {
@@ -53,10 +53,18 @@ public abstract class AndroidNodeIntegrationAdapter extends NodeIntegrationAdapt
     setActivity(uiComponent);
   }
 
+  /**
+   * Set the Android activity from which the node is launched.
+   * @param activity the activity to set.
+   */
   void setActivity(Activity activity) {
     this.activity = activity;
   }
 
+  /**
+   * Get the Android activity from which the node is launched.
+   * @return an instance of {@link android.app.Activity}.
+   */
   public Activity getActivity() {
     return activity;
   }

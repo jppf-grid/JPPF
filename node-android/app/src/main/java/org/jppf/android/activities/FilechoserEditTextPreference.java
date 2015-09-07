@@ -95,7 +95,7 @@ public class FilechoserEditTextPreference extends DialogPreference {
     super.onDialogClosed(positiveResult);
     // persist the URI
     if (positiveResult && shouldPersist()) persistString(editText.getText().toString());
-    // remùove the custom fields from the dialog
+    // remove the custom fields from the dialog
     ((ViewGroup) editText.getParent()).removeView(editText);
     ((ViewGroup) button.getParent()).removeView(button);
     ((ViewGroup) layout.getParent()).removeView(layout);

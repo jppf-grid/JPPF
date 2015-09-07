@@ -22,12 +22,11 @@ import android.view.View;
 
 import org.jppf.example.common.FractalPoint;
 import org.jppf.example.fractals.mandelbrot.MandelbrotConfiguration;
-import org.jppf.node.NodeRunner;
 import org.jppf.node.event.NodeLifeCycleEvent;
 import org.jppf.node.event.NodeLifeCycleListener;
 import org.jppf.node.event.TaskExecutionEvent;
 import org.jppf.node.protocol.DataProvider;
-import org.jppf.server.node.android.AndroidNodeIntegrationAdapter;
+import org.jppf.android.node.AndroidNodeIntegrationAdapter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -70,15 +69,8 @@ public class FractalEventHandler extends AndroidNodeIntegrationAdapter {
     cfg = dp.getParameter("config");
     FractalSurfaceView view = (FractalSurfaceView) getContentView();
     view.setConfig(cfg);
-    // if this is a continuation (dispatch) of the same job then keep the same view
-    if ((jobUuid != null) && jobUuid.equals(event.getJob().getUuid())) {
-      view.startViewThread();
-    } else {
-      // otherwise ensure the bitmap is reset
-      NodeRunner.removePersistentData("fractals.bitmap");
-      NodeRunner.removePersistentData("fractals.bitmap.scale");
-      view.resetBitmap();
-    }
+    // if this is not a continuation (dispatch) of the same job then ensure the bitmap is reset
+    if ((jobUuid == null) || !jobUuid.equals(event.getJob().getUuid())) view.resetBitmap();
     jobUuid = event.getJob().getUuid();
   }
 
@@ -93,7 +85,7 @@ public class FractalEventHandler extends AndroidNodeIntegrationAdapter {
       try {
         FractalSurfaceView v = (FractalSurfaceView) getContentView();
         while (!v.isQueueEmpty() || (pointCount.get() < nbTasks * cfg.width)) Thread.sleep(1L);
-        v.stopViewThread();
+        //v.stopViewThread();
       } catch(Exception e) {
       }
     }
@@ -106,9 +98,7 @@ public class FractalEventHandler extends AndroidNodeIntegrationAdapter {
     ((FractalSurfaceView) getContentView()).addPoint(point);
     // diplay a log message every 10,000 points
     int n = pointCount.incrementAndGet();
-    if (n % 10_000 == 0) {
-      Log.v(LOG_TAG, String.format("got %,d notifications", n));
-    }
+    if (n % 10_000 == 0) Log.v(LOG_TAG, String.format("got %,d notifications", n));
   }
 
   @Override
@@ -137,7 +127,7 @@ public class FractalEventHandler extends AndroidNodeIntegrationAdapter {
 
   @Override
   public void handleError(final NodeLifeCycleListener listener, final NodeLifeCycleEvent event, final Throwable t) {
-    String s = String.format("error executing %s on an istance of %s for job '%s'", event.getType(), listener.getClass(), event.getJob().getName());
+    String s = String.format("error executing %s on an instance of %s for job '%s'", event.getType(), listener.getClass(), event.getJob().getName());
     Log.e(LOG_TAG, s, t);
   }
 }

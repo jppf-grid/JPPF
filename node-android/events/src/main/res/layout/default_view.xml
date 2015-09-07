@@ -33,11 +33,11 @@
   <!-- the fields updated during the node life cycle and the execution of the jobs -->
   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
     android:layout_width="wrap_content" android:layout_height="match_parent" android:padding="4dp">
-    <TextView android:id="@+id/node_state"                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:id="@+id/execution_state"            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:id="@+id/current_job"                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:id="@+id/current_tasks"              android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:id="@+id/total_tasks"                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/node_state"                 android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/node_state_offline"/>
+    <TextView android:id="@+id/execution_state"            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/execution_state_idle"/>
+    <TextView android:id="@+id/current_job"                android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/n_slash_a"/>
+    <TextView android:id="@+id/current_tasks"              android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/int_zero"/>
+    <TextView android:id="@+id/total_tasks"                android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/int_zero"/>
   </LinearLayout>
 
 </LinearLayout>

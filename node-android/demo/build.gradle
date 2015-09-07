@@ -20,12 +20,12 @@ apply plugin: 'com.android.application'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "22.0.1"
+  buildToolsVersion "23.0.0"
 
   defaultConfig {
     applicationId "org.jppf.android.demo"
     minSdkVersion 19
-    targetSdkVersion 21
+    targetSdkVersion 19
     versionCode 1
     versionName "1.0"
   }
@@ -46,8 +46,15 @@ android {
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
-  provided fileTree(dir: '../events/libs', include: ['*.jar'])
-  compile project(":events")
-  //provided project(":events")
+  //compile project(":events")
+  compile(name: 'events-release', ext: 'aar')
+  // these ae already included in the main node apk
+  provided fileTree(dir: 'libs', exclude: ['jppf-fractals-android.jar', '*.aar'])
+  compile(name: 'jppf-fractals-android', ext: 'jar')
+}
+
+repositories {
+  flatDir {
+    dirs 'libs'
+  }
 }

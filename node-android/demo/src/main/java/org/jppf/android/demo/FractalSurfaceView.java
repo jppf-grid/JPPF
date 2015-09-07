@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This view queues notifications emitted from the mandelbrot tasks and uses their information
- * (x and y coordinates plus RGB color) to draw the fractal while the tasks are executing.
+ * (x and y coordinates plus RGB color) to draw the fractal image while the tasks are executing.
  * @author Laurent Cohen
  */
 public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
@@ -42,7 +42,7 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
    */
   private static String LOG_TAG = FractalSurfaceView.class.getSimpleName();
   /**
-   * The quezue of points to draw.
+   * The queue of points to draw.
    */
   private final LinkedBlockingQueue<FractalPoint> queue = new LinkedBlockingQueue<>();
   /**
@@ -61,8 +61,16 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
    * Scale factor to convert betzeen Mandelbrot and view coordinates.
    */
   private double scale;
+  /**
+   * The thread which updates the view.
+   */
   ViewThread thread = null;
+  /**
+   * Whether {@link #doDraw(Canvas)} should be called.
+   */
   AtomicBoolean firstDraw = new AtomicBoolean(true);
+  int currentWidth = 0;
+  int currentHeight = 0;
 
   /**
    * Create this SurfaceView.
@@ -78,13 +86,18 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
   @Override
   public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
     Log.v(LOG_TAG, "surfaceChanged() width=" + width + ", height=" + height);
+    //stopViewThread();
+    currentWidth = width;
+    currentHeight = height;
+    firstDraw.set(true);
+    startViewThread();
   }
 
   @Override
   public void surfaceCreated(final SurfaceHolder holder) {
     Log.v(LOG_TAG, "surfaceCreated()");
-    firstDraw.set(true);
-    startViewThread();
+    currentWidth = getWidth();
+    currentHeight = getHeight();
   }
 
   @Override
@@ -107,8 +120,11 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
    */
   void stopViewThread() {
     try {
-      thread.stopped.set(true);
-      thread.join();
+      if (thread != null) {
+        thread.stopped.set(true);
+        thread.join();
+        thread = null;
+      }
     } catch(Exception e) {
     }
   }
@@ -131,12 +147,13 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
   /**
    * This is the draw method. It drains the queue of fractal points to a temporary queue,
-   * then draws each of the points in the bitmap, then draws the bitmap onto the view's canvas.
-   * @param canvas the view'ws canvas on which the bitmap is drawn.
+   * then draws each of the points to the bitmap, then draws the bitmap onto the view's canvas.
+   * @param canvas the view's canvas on which the bitmap is drawn.
    */
   private void doDraw(final Canvas canvas) {
     try {
       if (config != null) {
+        // empty the points queue into a temporary queue
         queue.drainTo(tempQueue);
         boolean first = firstDraw.compareAndSet(true, false);
         if (!tempQueue.isEmpty() || first) {
@@ -177,6 +194,8 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
    * @return A {@link Bitmap} object.
    */
   Bitmap resetBitmap() {
+    NodeRunner.removePersistentData("fractals.bitmap");
+    NodeRunner.removePersistentData("fractals.bitmap.scale");
     bitmap = null;
     return getBitmap();
   }
@@ -194,12 +213,13 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     }
     if (bitmap == null) {
       if ((config != null) && (getWidth() > 0) && (getHeight() > 0)) {
-        Log.v(LOG_TAG, "getBitmap() creating new bitmap");
+        //Log.v(LOG_TAG, "getBitmap() creating new bitmap");
         // compute the scale factor
-        scale = Math.min((double) getWidth() / config.width, (double) getHeight() / config.height);
+        scale = Math.min((double) currentWidth / config.width, (double) currentHeight / config.height);
         // in case the scale is > 1, we set it to 1 to avoid ugly graphics due to scaling
         if (scale > 1d) scale = 1d;
         bitmap = Bitmap.createBitmap((int) (config.width * scale), (int) (config.height * scale), Bitmap.Config.ARGB_8888);
+        Log.v(LOG_TAG, "getBitmap() creating new bitmap " + bitmap);
         // persist the bitmap in the node persistent data for later reuse
         NodeRunner.setPersistentData("fractals.bitmap", bitmap);
         NodeRunner.setPersistentData("fractals.bitmap.scale", scale);
@@ -208,7 +228,13 @@ public class FractalSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     return bitmap;
   }
 
+  /**
+   * This thread updates the view, checking the queue of points to draw periodically.
+   */
   class ViewThread extends Thread {
+    /**
+     * Whether this thread is stopped.
+     */
     AtomicBoolean stopped = new AtomicBoolean(false);
 
     @Override

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node.android;
+package org.jppf.android.node;
 
 import android.app.Activity;
 import android.util.Log;
@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import org.jppf.android.R;
-import org.jppf.android.activities.NodeEventHandler;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.node.event.NodeLifeCycleEvent;
 import org.jppf.node.event.TaskExecutionEvent;
@@ -58,7 +57,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
    */
   public DelegatingNodeEventHandler(final Activity activity) {
     setActivity(activity);
-    setDelegate(new NodeEventHandler());
+    setDelegate(new DefaultAndroidNodeIntegration());
   }
 
   @Override
@@ -108,38 +107,38 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
       JobSLA sla = event.getJob().getSLA();
       ClassPath classpath = sla.getClassPath();
       AbstractJPPFClassLoader cl = null;
-        Log.v(LOG_TAG, String.format("jobHeaderLoaded(job='%s') classpath=%s", event.getJob().getName(), classpath));
+      Log.v(LOG_TAG, String.format("jobHeaderLoaded(job='%s') classpath=%s", event.getJob().getName(), classpath));
       if ((classpath != null) && !classpath.isEmpty()) cl = event.getNode().resetTaskClassLoader(classpath);
       else cl = event.getTaskClassLoader();
-      JobMetadata meta = event.getJob().getMetadata();
-      String s = meta.getParameter("jppf.node.integration.class");
+      JobMetadata metadata = event.getJob().getMetadata();
+      String s = metadata.getParameter("jppf.node.integration.class");
       Log.v(LOG_TAG, "jobHeaderLoaded() event handler class = " + s);
       if (s != null) {
         try {
           Class<?> c = Class.forName(s, true, cl);
           adapter = (AndroidNodeIntegrationAdapter) c.newInstance();
         } catch (Exception e) {
-          e.printStackTrace();
+          Log.e(LOG_TAG, "error instantiating the node event handler '" + s + "' : ", e);
         }
       }
-      if (adapter != null) {
-        setDelegate(adapter);
-        adapter.jobHeaderLoaded(event);
-      }
+      if (adapter == null) adapter = new DefaultAndroidNodeIntegration();
+      setDelegate(adapter);
+      adapter.jobHeaderLoaded(event);
     }
   }
 
   /**
    * Remove the previous view if any, and set the new view if possible.
    */
-  private void resetUI() {
+  void resetUI() {
+    if (delegate == null) return;
     final ViewGroup group = (ViewGroup) activity.findViewById(R.id.main_layout);
     final View newView = delegate.getContentView();
     Log.v(LOG_TAG, "resetUI() newView = " + newView + ", current view = " + view + ", delegate.activity = " + delegate.getActivity());
     if (newView != null) activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        if (view != null) group.removeView(view);
+        if ((view != null) && (view.getParent() == group)) group.removeView(view);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         group.addView(newView, params);
         view = newView;

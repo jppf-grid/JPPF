@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.server.node.android;
+package org.jppf.android.node;
 
 import org.jppf.android.AndroidHelper;
 import org.jppf.node.connection.DriverConnectionInfo;
@@ -40,7 +40,6 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
 
   @Override
   public void initDataChannel() throws Exception {
-    super.initDataChannel();
     if (handler == null) {
       handler = new DelegatingNodeEventHandler(AndroidHelper.getActivity());
     }
@@ -49,6 +48,7 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
       getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(handler);
       alreadyAdded = true;
     }
+    super.initDataChannel();
   }
 
   @Override

@@ -26,48 +26,49 @@
   <string name="title_activity_main">JPPF Android Node</string>
   <string name="title_activity_settings">Configuration</string>
 
-  <string name="execution_state_executing">executing</string>
-  <string name="execution_state_idle">idle</string>
-  <string name="node_state_online">online</string>
-  <string name="node_state_offline">offline</string>
-
-  <string name="node_state_label">Connection</string>
-  <string name="execution_state_label">Execution</string>
-  <string name="current_job_label">Current job</string>
-  <string name="current_tasks_label">Current tasks</string>
-  <string name="total_tasks_label">Total tasks</string>
-
-  <string name="action_settings">Settings</string>
-
   <!-- ===================================================== -->
   <!-- preferences                                           -->
   <!-- ===================================================== -->
 
+  <string name="action_settings">Settings</string>
+
   <!-- preferences: server connections configuration -->
   <string name="pref_server_connection_title">Server connection</string>
   <string name="pref_server_connection_sum">Server connectivity settings</string>
-  <string name="pref_servers_title">Servers</string>
-  <string name="pref_servers_sum">Servers to connect to, 1 per line</string>
-  <string name="pref_servers_hint">my.host1.com:port1\n1.2.3.4:port2</string>
+  <string name="pref_servers_title">Servers to connect to</string>
+  <string name="pref_servers_sum">1 per line, format server:port[:ssl_enabled]</string>
+  <string name="pref_servers_hint">my.host1.com:11443\n1.2.3.4:11111:false</string>
 
   <!-- preferences: processing threads configuration -->
   <string name="pref_threads_title">Threads</string>
   <string name="pref_threads_sum">Number of processing threads</string>
 
+  <!-- preferences: SSL enabled flag -->
+  <string name="pref_ssl_enabled_title">SSL enabled</string>
+  <string name="pref_ssl_enabled_sum_on">on: SSL/TLS communications are enabled</string>
+  <string name="pref_ssl_enabled_sum_off">off: SSL/TLS communications are disabled</string>
+  <string name="pref_ssl_enabled_default">false</string>
+
   <!-- preferences: security subscreen -->
   <string name="pref_security_title">Security</string>
   <string name="pref_security_sum">SSL/TLS configuration</string>
 
+  <!-- preferences: authentication type -->
+  <string name="pref_ssl_auth_type_title">Mutual authentication</string>
+  <string name="pref_ssl_auth_type_sum_on">on: client authentication required</string>
+  <string name="pref_ssl_auth_type_sum_off">off: server authentication only</string>
+  <string name="pref_ssl_auth_type_default">false</string>
+
   <!-- preferences: key store location and password configuration -->
-  <string name="pref_key_store_location_title">Key store location</string>
-  <string name="pref_key_store_location_sum">Location of server public/private key store</string>
-  <string name="pref_key_store_password_title">Key store password</string>
-  <string name="pref_key_store_password_sum">Password for the server public/private key store</string>
+  <string name="pref_key_store_location_title">Node key store location</string>
+  <string name="pref_key_store_location_sum">Location of the node public/private key store</string>
+  <string name="pref_key_store_password_title">Node key store password</string>
+  <string name="pref_key_store_password_sum">Password for the node public/private key store</string>
 
   <!-- preferences: trust store location and password configuration -->
-  <string name="pref_trust_store_location_title">Trust store location</string>
-  <string name="pref_trust_store_location_sum">Location of server certificate store</string>
-  <string name="pref_trust_store_password_title">Trust store password</string>
+  <string name="pref_trust_store_location_title">Server trust store location</string>
+  <string name="pref_trust_store_location_sum">Location of the server certificate store</string>
+  <string name="pref_trust_store_password_title">Server trust store password</string>
   <string name="pref_trust_store_password_sum">Password for the server certificate store</string>
 
   <!-- preferences: SSLContext protocol configuration -->
