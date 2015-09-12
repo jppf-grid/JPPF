@@ -27,12 +27,12 @@ $template{name="samples-page-header" title="Word Count sample"}$
 
           <h3>How do I run it?</h3>
           Before running this sample, you need to install a JPPF server and at least one node.<br>
-          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
           Once you have installed a server and node, perform the following steps:
           <ol class="samplesList">
             <li>Open a command prompt in JPPF-x.y-samples-pack/WordCount</li>
             <li>Build the sample's node add-on: type "<b>ant jar</b>". This will create a file named <b>WordCountNodeListener.jar</b>.
-            This add-on is a <a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle listener</a> which accomplishes 2 goals:
+            This add-on is a <a href="http://www.jppf.org/doc/v5/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle listener</a> which accomplishes 2 goals:
             load the dictionary when the node starts (in the <i>nodeStarting()</i> notification) and aggregate the results of tasks that have just been processed (in the <i>jobEnding()</i> notification)</li>
             <li>Copy <b>WordCountNodeListener.jar</b> in the "<b>lib</b>" folder of the JPPF driver installation, to add it to the driver's classpath. The nodes will download the node listener code from the server.</li>
             <li>Start the driver</li>
@@ -71,7 +71,7 @@ wordcount.job.capacity = 2</pre>
           <p>There are 2 privileged places you can go to:
           <ul class="samplesList">
             <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-            <li><a href="http://www.jppf.org/doc/v4">The JPPF documentation</a></li>
+            <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
           </ul>
           
 </div><br>

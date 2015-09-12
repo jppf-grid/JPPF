@@ -8,7 +8,7 @@ $template{name="samples-page-header" title="Node Connection Events sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol class="samplesList">
 						<li>open a command prompt in JPPF-x.y-samples-pack/NodeConnectionEvents</li>
@@ -23,9 +23,9 @@ $template{name="samples-page-header" title="Node Connection Events sample"}$
 
 					<h3>What features of JPPF are demonstrated?</h3>
 					<ul class="samplesList">
-						<li>Pluggable <a href="http://www.jppf.org/doc/v4/index.php?title=JPPF_startup_classes">startup classes</a> for JPPF nodes and servers</li>
+						<li>Pluggable <a href="http://www.jppf.org/doc/v5/index.php?title=JPPF_startup_classes">startup classes</a> for JPPF nodes and servers</li>
 						<li>Dynamic code deployment from the server to a node</li>
-						<li><a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_node_connection_events_in_the_server">Receiving node connection events in the server</a></li>
+						<li><a href="http://www.jppf.org/doc/v5/index.php?title=Receiving_node_connection_events_in_the_server">Receiving node connection events in the server</a></li>
 					</ul>
 
 					<h3>I have additional questions and comments, where can I go?</h3>
@@ -33,7 +33,7 @@ $template{name="samples-page-header" title="Node Connection Events sample"}$
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
 					</ul>
 					
 </div><br>

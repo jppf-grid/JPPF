@@ -9,7 +9,7 @@ $template{name="samples-page-header" title="Generation of Mandelbrot Fractals"}$
 
           <h3>How do I run it?</h3>
           Before running this sample application, you must have a JPPF server and at least one node running.<br>
-          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
           Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.
 
           <h3>How do I use it?</h3>
@@ -63,7 +63,7 @@ image.height = 600</pre>
           <p>In addition, There are 2 privileged places you can go to:
           <ul class="samplesList">
             <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-            <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+            <li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
           </ul>
           
 </div><br>

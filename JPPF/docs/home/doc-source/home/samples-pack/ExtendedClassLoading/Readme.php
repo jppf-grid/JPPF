@@ -37,7 +37,7 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
             <li>A <a href="src/org/jppf/example/extendedclassloading/Repository.java.html">Repository</a> interface, which will be in charge of maintaining the local node repository and downloading missing libraries
             when requested by a job. As we can see in the code, this interface has only a few methods, as we tried to keep it simple. There is just enough to perform repository updates and maintenance</li>
             <li>A <a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath</a> interface, which represents a set of libraries needed by a job and which can be transported within the
-            <a href="http://www.jppf.org/doc/v4/index.php?title=Job_Metadata">job metadata</a></li>
+            <a href="http://www.jppf.org/doc/v5/index.php?title=Job_Metadata">job metadata</a></li>
           </ul>
 
           <p>Based on these abstractions, we define our mechanism in two distinct sections: node-side behavior and client-side behavior.
@@ -52,7 +52,7 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
             on the jar files it uses,  which makes it impossible to delete them as long as the JVM is alive. Thus this file is used to keep track of the libraries that can't be deleted immediately</li>
           </ul>
 
-          The node behavior is driven by a <a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle listener</a>:
+          The node behavior is driven by a <a href="http://www.jppf.org/doc/v5/index.php?title=Receiving_notifications_of_node_life_cycle_events">node life cycle listener</a>:
           <ul class="samplesList">
             <li>On "node starting" events, the node creates a <tt>Repository</tt> instance and performs cleanup operations. The cleanup mainly consists in deleting the jar files that were marked as deleted but could not be physically
             removed from the file system</li>
@@ -60,7 +60,7 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
             <li>On "job header loaded" events, the node reads the metadata associated with the jobs and performs repository updates accordingly:
             <ol class="samplesList">
               <li>if a <a href="src/org/jppf/example/extendedclassloading/RepositoryFilter.java.html">RepositoryFilter</a> is provided, the repository's <tt>delete()</tt> method will remove the jar files that match the filter.
-              This is a repository maintenance operation, which we recommend to perform via a <a href="http://www.jppf.org/doc/v4/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs">broadcast job</a></li>
+              This is a repository maintenance operation, which we recommend to perform via a <a href="http://www.jppf.org/doc/v5/index.php?title=Job_Service_Level_Agreement#Broadcast_jobs">broadcast job</a></li>
               <li>if a <a href="src/org/jppf/example/extendedclassloading/ClassPath.java.html">ClassPath</a> is provided, then the node will download the specified libraries that are not in the repository, then add them to the
               client class loader's classpath. If necessary, it will create a new class loader instance, without disconnecting from the driver, using the node's <a href="http://www.jppf.org/api/org/jppf/node/Node.html#resetTaskClassLoader()">resetTaskClassLoader()</a> method.
               The <a href="http://www.jppf.org/api/org/jppf/node/event/NodeLifeCycleListener.html#jobHeaderLoaded(org.jppf.node.event.NodeLifeCycleEvent)">NodeLifeCycleListener.jobHeaderLoaded()</a> method
@@ -89,7 +89,7 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
           <a name="4"></a>
           <h3>How to run the sample</h3>
           Before running this sample, you need to install a JPPF server and at least one node.<br>
-          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+          For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
           Once you have installed a server and node, perform the following steps:
           <ol class="samplesList">
             <li>open a command prompt or shell console in JPPF-x.y-samples-pack/ExtendedClassLoading</li>
@@ -148,9 +148,9 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
           <a name="6"></a>
           <h3>What features of JPPF are demonstrated?</h3>
           <ul class="samplesList">
-            <li><a href="http://www.jppf.org/doc/v4/index.php?title=Class_loading_in_JPPF#JPPF_class_loading_extensions">Class loading extensions</a></li>
-            <li><a href="http://www.jppf.org/doc/v4/index.php?title=Receiving_notifications_of_node_life_cycle_events">Receiving notifications of node life cycle events</a></li>
-            <li><a href="http://www.jppf.org/doc/v4/index.php?title=Job_Metadata">Job metadata</a></li>
+            <li><a href="http://www.jppf.org/doc/v5/index.php?title=Class_loading_in_JPPF#JPPF_class_loading_extensions">Class loading extensions</a></li>
+            <li><a href="http://www.jppf.org/doc/v5/index.php?title=Receiving_notifications_of_node_life_cycle_events">Receiving notifications of node life cycle events</a></li>
+            <li><a href="http://www.jppf.org/doc/v5/index.php?title=Job_Metadata">Job metadata</a></li>
           </ul>
 
           <a name="7"></a>
@@ -159,7 +159,7 @@ $template{name="samples-page-header" title="Extended Class Loading sample"}$
           <p>In addition, There are 2 privileged places you can go to:
           <ul>
             <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-            <li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+            <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
           </ul>
           
 </div><br>

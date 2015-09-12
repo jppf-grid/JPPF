@@ -9,10 +9,10 @@ $template{name="samples-page-header" title="Adaptive Grid demo"}$
           <p>This sample dmeonstrates how a JPPF Grid can be grown or shrunk dynamically based on the current workload.
           <p>To achieve this, the demo will adjust two components of the grid topology:
           <ul class="samplesList">
-            <li>the number of connections in the <a href="http://www.jppf.org/doc/v4/index.php?title=Connection_pools">JPPF client's connection pool</a></li>
-            <li>the number of nodes in the grid, using the <a href="http://www.jppf.org/doc/v4/index.php?title=Node_provisioning">node provisioning facility</a></li>
+            <li>the number of connections in the <a href="http://www.jppf.org/doc/v5/index.php?title=Connection_pools">JPPF client's connection pool</a></li>
+            <li>the number of nodes in the grid, using the <a href="http://www.jppf.org/doc/v5/index.php?title=Node_provisioning">node provisioning facility</a></li>
           </ul>
-          <p>The calculations for the number of client connections and the number of nodes are done as follows in a <a href="http://www.jppf.org/doc/v4/index.php?title=Notifications_of_client_job_queue_events">client queue listener</a>:
+          <p>The calculations for the number of client connections and the number of nodes are done as follows in a <a href="http://www.jppf.org/doc/v5/index.php?title=Notifications_of_client_job_queue_events">client queue listener</a>:
           <ul class="samplesList">
             <li>the number of connections in the client pool is set to the number of jobs in the client queue, with a configurable maximum allowed</li>
             <li>the number of nodes is computed as one node for every five jobs in the client queue, with a minimum of 1 and a configurable maximum allowed</li>
@@ -21,7 +21,7 @@ $template{name="samples-page-header" title="Adaptive Grid demo"}$
           It will display a message each tile the size of the connection pool or the number of nodes is changed.
 
           <h3>How do I run it?</h3>
-          <p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.
+          <p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.
           <p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux or "run.bat" on Windows. You will then see a number of meesages like these while the demo is running:
 <pre class="prettyprint lang-txt">
 **** submitting jobs batch #2 *****
@@ -63,7 +63,7 @@ taskDuration = 1500
           <p>In addition, There are 2 privileged places you can go to:
           <ul>
             <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-            <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+            <li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
           </ul>
           
 </div><br>

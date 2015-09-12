@@ -8,7 +8,7 @@ $template{name="samples-page-header" title="Dense Matrix Multiplication sample"}
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you must have a JPPF server and at least one node running.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/wiki">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5">JPPF documentation</a>.<br>
 					Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
 
 					<h3>How do I use it?</h3>
@@ -37,7 +37,7 @@ matrix.iterations = 100</pre>
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul>
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
 					</ul>
 					
 </div><br>

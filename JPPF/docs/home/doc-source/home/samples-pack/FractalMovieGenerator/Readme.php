@@ -10,18 +10,18 @@ $template{name="samples-page-header" title="Generation of Mandelbrot Fractal Mov
           The movie file itself is created using the <a href="http://www.randelshofer.ch/monte/">Monte Media Library</a>.
           <p>Additionally, we will also generate a specific node distribution, with the following extensions and customizations:
           <ul class="samplesList">
-            <li>the node will run in <a href="http://www.jppf.org/doc/v4/index.php?title=Deployment_and_run_modes#Offline_nodes">offline mode</a>: it will disconnect from the server to execute the job, then reconnect to send the results back</li>
-            <li>the node will run in <a href="http://www.jppf.org/doc/v4/index.php?title=Deployment_and_run_modes#JPPF_Node_in_.E2.80.9CIdle_Host.E2.80.9D_mode">idle mode</a>:
+            <li>the node will run in <a href="http://www.jppf.org/doc/v5/index.php?title=Deployment_and_run_modes#Offline_nodes">offline mode</a>: it will disconnect from the server to execute the job, then reconnect to send the results back</li>
+            <li>the node will run in <a href="http://www.jppf.org/doc/v5/index.php?title=Deployment_and_run_modes#JPPF_Node_in_.E2.80.9CIdle_Host.E2.80.9D_mode">idle mode</a>:
             it will start when the computer is idle (no user activity) and stop when the user wakes it up</li>
-            <li>it will embed a modified version of the <a href="http://www.jppf.org/doc/v4/index.php?title=JPPF_node_screensaver#JPPF_built-in_screensaver">JPPF default screensaver</a>, which will display a preview of the image being computed by the node.
-            This relies on <a href="http://www.jppf.org/doc/v4/index.php?title=Task_objects#Sending_notifications_from_a_task">task notifications emitted for each point of the image</a>.
+            <li>it will embed a modified version of the <a href="http://www.jppf.org/doc/v5/index.php?title=JPPF_node_screensaver#JPPF_built-in_screensaver">JPPF default screensaver</a>, which will display a preview of the image being computed by the node.
+            This relies on <a href="http://www.jppf.org/doc/v5/index.php?title=Task_objects#Sending_notifications_from_a_task">task notifications emitted for each point of the image</a>.
             The screen saver will look like <a href="../shared/images/MandelbrotNode.gif" target="_blank">this screenshot</a>.</li>
             <li>Since the node is offline, and to reduce network traffic, all required libraries and classes will be part of the node's local classpath</li>
           </ul>
 
           <h3>How do I run it?</h3>
           Before running this sample application, you must have a JPPF server running.<br>
-          For information on how to set up a server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.
+          For information on how to set up a server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.
           <p>Once you have a server running, you can build the node distribution by typing <b>ant build</b> from a command or shell prompt.
           This will produce two files "<b>JPPF-node.zip</b>" and "<b>JPPF-node.tar.gz</b>". Use the file appropriate for the platform where the node is deployed (the .tar.gz includes execute permission for the startNode.sh script).
           If you wish to modify the node settings before this, you can edit the configuration files in <b>FractalMovieGenerator/config/node</b>.<br>
@@ -56,7 +56,7 @@ jppf.fractals.concurrent.jobs = 4</pre>
 <pre Class="samples">jppf.fractals.concurrent.jobs = <b>4</b>
 jppf.pool.size = <b>4</b></pre>
 
-          <p>Lastly, you can also configure a job <a href="http://www.jppf.org/doc/v4/index.php?title=Job_Service_Level_Agreement#Expiration_of_job_dispatches">dispatch timeout and maximum allowed timeouts</a> in the client configuration.
+          <p>Lastly, you can also configure a job <a href="http://www.jppf.org/doc/v5/index.php?title=Job_Service_Level_Agreement#Expiration_of_job_dispatches">dispatch timeout and maximum allowed timeouts</a> in the client configuration.
           These 2 properties are used to prevent jobs from getting stuck forever, in case a node never completes the execution of a job. This is done as follows:
 <pre Class="samples"><font color="green"># maximum allowed time for a job to execute in a node, before it is resubmitted</font>
 <font color="green"># or cancelled; defaults to 15000 ms</font>
@@ -74,7 +74,7 @@ jppf.fractals.dispatch.max.timeouts = 1</pre>
           <p>In addition, There are 2 privileged places you can go to:
           <ul class="samplesList">
             <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-            <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+            <li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
           </ul>
           
 </div><br>

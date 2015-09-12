@@ -12,7 +12,7 @@ $template{name="samples-page-header" title="Parallel N-body Sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you need to install a JPPF server and at least one node.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
 					Once you have installed a server and node, perform the following steps:
 					<ol class="samplesList">
 						<li>open a command prompt in JPPF-x.y-samples-pack/Nbody</li>
@@ -42,7 +42,7 @@ nbody.bodies.per.task = 25
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul class="samplesList">
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
 					</ul>
 					
 </div><br>

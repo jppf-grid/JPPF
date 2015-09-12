@@ -14,7 +14,7 @@ $template{name="samples-page-header" title="GPU computation sample"}$
 
 					<h3>How do I run it?</h3>
 					Before running this sample application, you must have a JPPF server and at least one node running.<br>
-					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4">JPPF documentation</a>.<br>
+					For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5">JPPF documentation</a>.<br>
 
 					<p>The node will require some additional configuration. In effect, since the APARAPI library load a native library, the file "aparapi.jar" must be added directly to the node's classpath.
 					If you simply keep it in the client's classpath, the node will attempt to load it for each distinct client. This will only work the first time, and fail on subsequent attempts.<br/>
@@ -73,7 +73,7 @@ execMode = GPU</pre>
 					<p>In addition, There are 2 privileged places you can go to:
 					<ul>
 						<li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-						<li><a href="http://www.jppf.org/wiki">The JPPF documentation</a></li>
+						<li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
 					</ul>
 					
 </div><br>
