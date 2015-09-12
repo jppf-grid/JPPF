@@ -115,7 +115,7 @@ public class JobMonitor extends TopologyListenerAdapter {
   /**
    * Get the driver with the specified uuid.
    * @param driverUuid the uuid of the driver to retrieve.
-   * @return a {@link JobDriver} object, or {@link null} if there si no such driver.
+   * @return a {@link JobDriver} object, or {@code null} if there si no such driver.
    */
   public JobDriver getJobDriver(final String driverUuid) {
     synchronized(driverMap) {

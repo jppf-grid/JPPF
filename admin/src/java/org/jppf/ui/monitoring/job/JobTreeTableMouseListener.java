@@ -31,7 +31,7 @@ import org.slf4j.*;
 /**
  * Mouse listener for the node data panel.
  * Processes right-click events to display popup menus.
- * @author laurentcohen
+ * @author Laurent Cohen
  */
 public class JobTreeTableMouseListener extends MouseAdapter
 {

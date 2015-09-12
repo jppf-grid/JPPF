@@ -30,7 +30,7 @@ import org.slf4j.*;
 /**
  * Mouse listener for debug use. Shows a popup menu on the top container of options loaded through an "import" tag in the XML descriptor.
  * The menu provides one option to reload the page.
- * @author laurentcohen
+ * @author Laurent Cohen
  */
 public class DebugMouseListener extends MouseAdapter {
   /**

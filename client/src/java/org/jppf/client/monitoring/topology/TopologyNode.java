@@ -158,7 +158,7 @@ public class TopologyNode extends AbstractTopologyComponent {
   /**
    * Convenience method to get the driver this node is attached to as a {@link TopologyDriver} instance.
    * @return a {@link TopologyDriver} if this node is a real node, or {@code null} if this is a peer server.
-   * @sine 5.1
+   * @since 5.1
    */
   public TopologyDriver getDriver() {
     return isNode() ? (TopologyDriver) getParent() : null;
