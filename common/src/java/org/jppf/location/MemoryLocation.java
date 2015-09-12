@@ -27,8 +27,7 @@ import org.jppf.utils.streams.BoundedByteArrayOutputStream;
  * This implementation of the {@link Location} interface allows writing to and reading from a <code>byte</code> array.
  * @author Laurent Cohen
  */
-public class MemoryLocation extends AbstractLocation<byte[]>
-{
+public class MemoryLocation extends AbstractLocation<byte[]> {
   /**
    * Explicit serialVersionUID.
    */
@@ -44,19 +43,18 @@ public class MemoryLocation extends AbstractLocation<byte[]>
 
   /**
    * Initialize this location and create a buffer of the specified size.
+   * The size is cast to an {@code int} value before the internal buffer is initialized.
    * @param size the size of the buffer handled by this memory location.
    */
-  public MemoryLocation(final int size)
-  {
-    this(new byte[size], 0, size);
+  public MemoryLocation(final long size) {
+    this(new byte[(int) size], 0, (int) size);
   }
 
   /**
    * Initialize this location with the specified buffer.
    * @param buffer an array of bytes.
    */
-  public MemoryLocation(final byte[] buffer)
-  {
+  public MemoryLocation(final byte[] buffer) {
     this(buffer, 0, buffer.length);
   }
 
@@ -66,22 +64,19 @@ public class MemoryLocation extends AbstractLocation<byte[]>
    * @param offset the start position in the array of bytes.
    * @param len the length of the buffer.
    */
-  public MemoryLocation(final byte[] buffer, final int offset, final int len)
-  {
+  public MemoryLocation(final byte[] buffer, final int offset, final int len) {
     super(buffer);
     this.offset = offset;
     this.len = len;
   }
 
   @Override
-  public InputStream getInputStream() throws Exception
-  {
+  public InputStream getInputStream() throws Exception {
     return new ByteArrayInputStream(path, offset, len);
   }
 
   @Override
-  public OutputStream getOutputStream() throws Exception
-  {
+  public OutputStream getOutputStream() throws Exception {
     return new BoundedByteArrayOutputStream(path, offset, len);
   }
 
@@ -90,8 +85,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
    * @return the size as a long value, or -1 if the file does not exist.
    */
   @Override
-  public long size()
-  {
+  public long size() {
     return len;
   }
 
@@ -101,8 +95,7 @@ public class MemoryLocation extends AbstractLocation<byte[]>
    * @return a byte array with a length equals to this location's size and starting at the offset specified in the constructor, if any.
    */
   @Override
-  public byte[] toByteArray()
-  {
+  public byte[] toByteArray() {
     if ((offset == 0) && (len == path.length)) return path;
     byte[] buf = new byte[len];
     System.arraycopy(path, offset, buf, 0, len);

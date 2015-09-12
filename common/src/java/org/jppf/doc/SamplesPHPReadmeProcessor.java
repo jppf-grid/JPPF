@@ -28,8 +28,7 @@ import org.jppf.utils.FileUtils;
  * This utility generates the doc-source php files for the samples pack from the readme in each sample.
  * @author Laurent Cohen
  */
-public class SamplesPHPReadmeProcessor implements Runnable
-{
+public class SamplesPHPReadmeProcessor implements Runnable {
   /**
    * Marks the start of the readme's content.
    */
@@ -58,8 +57,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
    * @param template the template file for each Readme.php.
    * @throws Exception if any error occurs.
    */
-  public SamplesPHPReadmeProcessor(final File sourceDir, final File destDir, final File template) throws Exception
-  {
+  public SamplesPHPReadmeProcessor(final File sourceDir, final File destDir, final File template) throws Exception {
     this.sourceDir = sourceDir;
     this.destDir = destDir;
     this.template = FileUtils.readTextFile(template);
@@ -70,31 +68,22 @@ public class SamplesPHPReadmeProcessor implements Runnable
    * @return a list of files.
    * @throws Exception if any error occurs.
    */
-  private List<File> getHTMLFiles() throws Exception
-  {
+  private List<File> getHTMLFiles() throws Exception {
     List<File> result = new ArrayList<>();
     File[] subdirs = sourceDir.listFiles(new JPPFDirFilter());
-    for (File dir: subdirs)
-    {
+    for (File dir : subdirs) {
       File readme = new File(dir, "Readme.html");
       if (readme.exists()) result.add(readme);
     }
     return result;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       List<File> list = getHTMLFiles();
-      for (File file: list) processFile(file);
-    }
-    catch (Exception e)
-    {
+      for (File file : list) processFile(file);
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -104,8 +93,7 @@ public class SamplesPHPReadmeProcessor implements Runnable
    * @param file the html file to process.
    * @throws Exception if any error occurs.
    */
-  private void processFile(final File file) throws Exception
-  {
+  private void processFile(final File file) throws Exception {
     System.out.println("processing input file " + file);
     String text = FileUtils.readTextFile(file);
     int idx = text.indexOf("<h1>");
@@ -135,17 +123,13 @@ public class SamplesPHPReadmeProcessor implements Runnable
    * Run this utility with the specified command-line parameters.
    * @param args the source and destination directories.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       File srcDir = new File(args[0]);
       File destDir = new File(args[1]);
       File template = new File(args[2]);
       new SamplesPHPReadmeProcessor(srcDir, destDir, template).run();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

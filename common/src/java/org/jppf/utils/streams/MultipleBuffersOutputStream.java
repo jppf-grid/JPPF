@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class MultipleBuffersOutputStream extends OutputStream
-{
+public class MultipleBuffersOutputStream extends OutputStream {
   /**
    * Logger for this class.
    */
@@ -72,8 +71,7 @@ public class MultipleBuffersOutputStream extends OutputStream
   /**
    * Initialize this output stream with a default buffer length of 32768.
    */
-  public MultipleBuffersOutputStream()
-  {
+  public MultipleBuffersOutputStream() {
     list = new ArrayList<>();
   }
 
@@ -81,10 +79,10 @@ public class MultipleBuffersOutputStream extends OutputStream
    * Initialize this output stream with a default buffer length of 32768.
    * @param initialList contains the data that is written to this output stream.
    */
-  public MultipleBuffersOutputStream(final List<JPPFBuffer> initialList)
-  {
+  public MultipleBuffersOutputStream(final List<JPPFBuffer> initialList) {
     list = new ArrayList<>(initialList.size() + 10);
-    for (JPPFBuffer buf: initialList) this.list.add(new JPPFBuffer(buf.buffer, 0));
+    for (JPPFBuffer buf : initialList)
+      this.list.add(new JPPFBuffer(buf.buffer, 0));
     hasInitialBuffers = true;
   }
 
@@ -93,8 +91,7 @@ public class MultipleBuffersOutputStream extends OutputStream
    * @param defaultLength the default buffer length to use, must be strictly greater than 0.
    * @throws IllegalArgumentException if the specified default length is less than 1.
    */
-  public MultipleBuffersOutputStream(final int defaultLength) throws IllegalArgumentException
-  {
+  public MultipleBuffersOutputStream(final int defaultLength) throws IllegalArgumentException {
     list = new ArrayList<>();
     if (defaultLength <= 0) throw new IllegalArgumentException("the default buffer length must be > 0");
     this.defaultLength = defaultLength;
@@ -104,11 +101,9 @@ public class MultipleBuffersOutputStream extends OutputStream
    * Write a single byte into this output stream.
    * @param b the data to write.
    * @throws IOException if any error occurs.
-   * @see java.io.OutputStream#write(int)
    */
   @Override
-  public void write(final int b) throws IOException
-  {
+  public void write(final int b) throws IOException {
     if ((currentBuffer == null) || (currentBuffer.remaining() < 1)) newCurrentBuffer(defaultLength);
     currentBuffer.buffer[currentBuffer.length] = (byte) b;
     currentBuffer.length++;
@@ -122,11 +117,9 @@ public class MultipleBuffersOutputStream extends OutputStream
    * @param off the start offset in the data.
    * @param len the number of bytes to write.
    * @throws IOException if any error occurs.
-   * @see java.io.OutputStream#write(byte[], int, int)
    */
   @Override
-  public void write(final byte[] b, final int off, final int len) throws IOException
-  {
+  public void write(final byte[] b, final int off, final int len) throws IOException {
     if ((currentBuffer == null) || (currentBuffer.remaining() < len)) newCurrentBuffer(Math.max(defaultLength, len));
     System.arraycopy(b, off, currentBuffer.buffer, currentBuffer.length, len);
     currentBuffer.length += len;
@@ -137,11 +130,9 @@ public class MultipleBuffersOutputStream extends OutputStream
    * Writes the specified byte array to this output stream.
    * @param b the data to write.
    * @throws IOException if any error occurs.
-   * @see java.io.OutputStream#write(byte[])
    */
   @Override
-  public void write(final byte[] b) throws IOException
-  {
+  public void write(final byte[] b) throws IOException {
     write(b, 0, b.length);
   }
 
@@ -149,16 +140,12 @@ public class MultipleBuffersOutputStream extends OutputStream
    * Create a new current buffer with the specified size and a length of 0, and add it to the list of buffers.
    * @param size the size of the new buffer.
    */
-  private void newCurrentBuffer(final int size)
-  {
+  private void newCurrentBuffer(final int size) {
     if (traceEnabled) log.trace("creating new buffer with size=" + size + " for " + this);
-    if (hasInitialBuffers)
-    {
+    if (hasInitialBuffers) {
       currentBuffer = list.get(bufferIndex++);
       currentBuffer.length = 0;
-    }
-    else
-    {
+    } else {
       byte[] bytes = (size == IO.TEMP_BUFFER_SIZE) ? IO.TEMP_BUFFER_POOL.get() : new byte[size];
       currentBuffer = new JPPFBuffer(bytes, 0);
       list.add(currentBuffer);
@@ -169,8 +156,7 @@ public class MultipleBuffersOutputStream extends OutputStream
    * Get the size of the content of this output stream.
    * @return the size as an int value.
    */
-  public int size()
-  {
+  public int size() {
     return totalSize;
   }
 
@@ -178,31 +164,12 @@ public class MultipleBuffersOutputStream extends OutputStream
    * Get the content of the output stream as a list of {@link JPPFBuffer} instances.
    * @return a list of {@link JPPFBuffer} instances.
    */
-  public List<JPPFBuffer> toBufferList()
-  {
+  public List<JPPFBuffer> toBufferList() {
     return list;
   }
 
-  /**
-   * Get te content of the output stream as a single array of byte
-   * @return an array of bytes.
-   */
-  public byte[] toByteArray()
-  {
-    if ((totalSize >= 1) && (list.get(0).length == totalSize)) return list.get(0).buffer;
-    int pos = 0;
-    byte[] tmp = new byte[totalSize];
-    for (JPPFBuffer buf: list)
-    {
-      System.arraycopy(buf.buffer, 0, tmp, pos, buf.length);
-      pos += buf.length;
-    }
-    return tmp;
-  }
-
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("defaultLength=").append(defaultLength);

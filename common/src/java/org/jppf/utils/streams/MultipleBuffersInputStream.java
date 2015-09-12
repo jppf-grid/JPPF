@@ -29,8 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class MultipleBuffersInputStream extends InputStream
-{
+public class MultipleBuffersInputStream extends InputStream {
   /**
    * Logger for this class.
    */
@@ -58,7 +57,7 @@ public class MultipleBuffersInputStream extends InputStream
   /**
    * The total number of bytes written into this output stream.
    */
-  private int totalSize = -1;
+  private long totalSize = -1L;
   /**
    * Determines whether end of file was reached.
    */
@@ -68,8 +67,7 @@ public class MultipleBuffersInputStream extends InputStream
    * Initialize this input stream with the specified buffers.
    * @param buffers an array of {@link JPPFBuffer} instances.
    */
-  public MultipleBuffersInputStream(final JPPFBuffer...buffers)
-  {
+  public MultipleBuffersInputStream(final JPPFBuffer... buffers) {
     list = buffers;
   }
 
@@ -77,8 +75,7 @@ public class MultipleBuffersInputStream extends InputStream
    * Initialize this input stream with the specified buffers.
    * @param buffers an array of {@link JPPFBuffer} instances.
    */
-  public MultipleBuffersInputStream(final List<JPPFBuffer> buffers)
-  {
+  public MultipleBuffersInputStream(final List<JPPFBuffer> buffers) {
     list = buffers.toArray(new JPPFBuffer[buffers.size()]);
   }
 
@@ -88,8 +85,7 @@ public class MultipleBuffersInputStream extends InputStream
    * @throws IOException if any error occurs.
    */
   @Override
-  public int read() throws IOException
-  {
+  public int read() throws IOException {
     if (eofReached) return -1;
     if ((currentBuffer == null) || (currentBuffer.length - currentBuffer.pos < 1)) nextBuffer();
     byte b = currentBuffer.buffer[currentBuffer.pos];
@@ -108,12 +104,10 @@ public class MultipleBuffersInputStream extends InputStream
    * @throws IOException if any error occurs.
    */
   @Override
-  public int read(final byte[] b, final int off, final int len) throws IOException
-  {
+  public int read(final byte[] b, final int off, final int len) throws IOException {
     if (eofReached) return -1;
     int count = 0;
-    while (count < len)
-    {
+    while (count < len) {
       if ((currentBuffer == null) || (currentBuffer.length <= currentBuffer.pos)) nextBuffer();
       if (eofReached) break;
       int n = Math.min(currentBuffer.length - currentBuffer.pos, len - count);
@@ -131,19 +125,16 @@ public class MultipleBuffersInputStream extends InputStream
    * @throws IOException if any error occurs.
    */
   @Override
-  public int read(final byte[] b) throws IOException
-  {
+  public int read(final byte[] b) throws IOException {
     return read(b, 0, b.length);
   }
 
   /**
    * Get to the next buffer in the list and set it as the current buffer.
    */
-  private void nextBuffer()
-  {
+  private void nextBuffer() {
     bufferIndex++;
-    if (bufferIndex >= list.length)
-    {
+    if (bufferIndex >= list.length) {
       eofReached = true;
       currentBuffer = null;
       return;
@@ -156,29 +147,26 @@ public class MultipleBuffersInputStream extends InputStream
    * Get the JPPFBuffer currently being read from.
    * @return a {@link JPPFBuffer} instance.
    */
-  public JPPFBuffer getCurrentBuffer()
-  {
+  public JPPFBuffer getCurrentBuffer() {
     if (eofReached) return null;
     if ((currentBuffer == null) || (currentBuffer.remainingFromPos() <= 0)) nextBuffer();
     return currentBuffer;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    if (totalSize < 0)
-    {
+    if (totalSize < 0) {
       totalSize = 0;
-      for (JPPFBuffer buf: list) totalSize += buf.length;
+      for (JPPFBuffer buf : list)
+        totalSize += buf.length;
     }
     sb.append("totalSize=").append(totalSize);
     sb.append(", nbBuffers=").append(list.length);
     sb.append(", bufferIndex=").append(bufferIndex);
     if (currentBuffer == null) sb.append(", currentBuffer=null");
-    else
-    {
+    else {
       sb.append(", currentBuffer.pos=").append(currentBuffer.pos);
       sb.append(", currentBuffer.length=").append(currentBuffer.length);
     }
