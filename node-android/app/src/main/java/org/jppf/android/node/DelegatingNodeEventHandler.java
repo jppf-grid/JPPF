@@ -134,7 +134,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
     if (delegate == null) return;
     final ViewGroup group = (ViewGroup) activity.findViewById(R.id.main_layout);
     final View newView = delegate.getContentView();
-    Log.v(LOG_TAG, "resetUI() newView = " + newView + ", current view = " + view + ", delegate.activity = " + delegate.getActivity());
+    Log.v(LOG_TAG, "resetUI() newView = " + newView + ", current view = " + view + ", delegate.activity = " + delegate.activity);
     if (newView != null) activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {

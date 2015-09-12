@@ -27,7 +27,7 @@ android {
     minSdkVersion 19
     targetSdkVersion 19
     versionCode 1
-    versionName "1.0"
+    versionName "${jppfVersion}"
   }
   buildTypes {
     release {

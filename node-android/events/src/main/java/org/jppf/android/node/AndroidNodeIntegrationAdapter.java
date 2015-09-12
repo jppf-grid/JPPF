@@ -65,7 +65,7 @@ public abstract class AndroidNodeIntegrationAdapter extends NodeIntegrationAdapt
    * Get the Android activity from which the node is launched.
    * @return an instance of {@link android.app.Activity}.
    */
-  public Activity getActivity() {
+  public final Activity getActivity() {
     return activity;
   }
 
