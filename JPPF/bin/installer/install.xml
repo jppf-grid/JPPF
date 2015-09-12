@@ -11,7 +11,7 @@
 		<!--<url>http://www.jppf.org</url>-->
     <url>@{installer.url}</url>
     <javaversion>1.5</javaversion>
-    <webdir>http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20@{version.number}/web_installer</webdir>
+    <webdir>@{jppf.web.dir}</webdir>
     <run-privileged condition="izpack.windowsinstall"/>
   </info>
 
@@ -95,6 +95,20 @@
         <include name="**/*.*"/>
       </fileset>
       <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-application-template/run.sh" stage="never" os="unix"/>
+    </pack>
+    <pack name="JPPF_Node_Android_Distributables" required="no" preselected="yes">
+      <description>Redistributable binaries for the Android node</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node-android-redist" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-android-redist">
+        <include name="**/*.*"/>
+      </fileset>
+    </pack>
+    <pack name="JPPF_Node_Android_Sources" required="no" preselected="yes">
+      <description>Source files for the Android node</description>
+      <fileset dir="./build/@{app.ver}/@{app.ver}-node-android-src" targetdir="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-android-src">
+        <include name="**/*.*"/>
+        <include name="gradlew"/>
+      </fileset>
+      <executable targetfile="$INSTALL_PATH/${APP_NAME}-${APP_VER}-node-android-src/gradlew" stage="never" os="unix"/>
     </pack>
     <pack name="JPPF_Dotnet" required="no" preselected="yes">
       <description>A fully working .Net JPPF demo application</description>

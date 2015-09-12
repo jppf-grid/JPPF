@@ -138,7 +138,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * Reset and reinitialize the connection to the server.
    * @exclude
    */
-  abstract void reset();
+  protected abstract void reset();
 
   /**
    * Load the specified class from a socket connection.

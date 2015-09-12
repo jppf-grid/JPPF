@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" output="AdaptiveGrid/classes" path="AdaptiveGrid/src"/>
+	<classpathentry kind="src" output="AndroidDemo/classes" path="AndroidDemo/src"/>
 	<classpathentry kind="src" output="ConcurrentJobs/classes" path="ConcurrentJobs/src"/>
 	<classpathentry kind="src" output="CustomLoadBalancer/classes" path="CustomLoadBalancer/src"/>
 	<classpathentry kind="src" output="CustomMBeans/classes" path="CustomMBeans/src"/>

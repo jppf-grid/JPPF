@@ -25,3 +25,6 @@ call createUpdateTruststore driver driver
 rem create driver_client trust store with client certificate
 call createUpdateTruststore client driver_client
 call createUpdateTruststore driver driver_client
+
+rem convert node keystore and trustore to BKS format for use with Android
+call toBKS node

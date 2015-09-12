@@ -84,7 +84,8 @@
 	</path>
 
   <path id="javadoc.classpath">
-		<pathelement location="${bin}"/>
+    <pathelement location="${bin}"/>
+    <pathelement location="${android.home}/platforms/android-19/android.jar"/>
     <path refid="project.classpath"/>	
   </path>
 

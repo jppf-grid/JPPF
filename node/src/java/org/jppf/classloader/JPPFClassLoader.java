@@ -61,7 +61,7 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader {
    * @exclude
    */
   @Override
-  void reset() {
+  protected void reset() {
     if (!isOffline()) {
       try {
         connection.reset();

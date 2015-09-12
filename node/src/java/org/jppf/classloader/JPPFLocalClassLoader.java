@@ -63,7 +63,7 @@ public class JPPFLocalClassLoader extends AbstractJPPFClassLoader
    * @exclude
    */
   @Override
-  void reset()
+  protected void reset()
   {
     init();
   }
