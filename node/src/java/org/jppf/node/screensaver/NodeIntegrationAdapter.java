@@ -39,7 +39,7 @@ public abstract class NodeIntegrationAdapter extends org.jppf.node.event.NodeInt
   /**
    * Set the screen saver to which events will be dispatched.
    * @param screensaver ainstance of a class implementing the {@link JPPFScreenSaver} interface.
-   * @deprecated use {@link #setUiComponent(JPPFScreenSaver)} instead.
+   * @deprecated use {@link #setUiComponent(Object)} instead.
    */
   public void setScreenSaver(final JPPFScreenSaver screensaver) {
   }
