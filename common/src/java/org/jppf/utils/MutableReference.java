@@ -22,7 +22,7 @@ package org.jppf.utils;
  * Holds a mutable object reference witho no locking or synchronization mechanism.
  * This can be used in anonymous classes for mutating values without the cost of synchronization such as implemented in {@link java.util.concurrent.atomic.AtomicReference}.
  * <p>For thread-safe access, instances of this class <i>must</i> be synchronized externally or by using the
- * {@link #getSynchronized(Object)} and {@link #setSynchronized(E, Object)} methods.
+ * {code getSynchronized(Object)} and {@code setSynchronized(E, Object)} methods.
  * @param <E> The type of reference to handle.
  * @author Laurent Cohen
  * @since 5.0

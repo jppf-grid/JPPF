@@ -25,7 +25,7 @@ import java.util.EventListener;
  * @param <T> the type of jobs that are queued.
  * @param <U> the type of bundles the jobs are split into.
  * @param <V> the type of resulting bundles the jobs are split into.
- * @author Domingo Creados
+ * @author Domingos Creado
  * @author Laurent Cohen
  */
 public interface QueueListener<T, U, V> extends EventListener
