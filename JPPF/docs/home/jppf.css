@@ -306,5 +306,14 @@ div#mw-content-text li a {
   font-weight: bold;
   padding: 10px;
   margin: 0px;
-  border-radius: 10px
+  border-radius: 10px;
+  box-shadow: 4px 4px 4px #6D78B6;
 }
+
+a.yellow_highlight:hover {
+  text-decoration: none;
+  box-shadow: none;
+}
+
+
+
