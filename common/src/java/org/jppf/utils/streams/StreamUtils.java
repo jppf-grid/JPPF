@@ -21,7 +21,7 @@ package org.jppf.utils.streams;
 import java.io.*;
 
 import org.jppf.io.IO;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.Logger;
 
 /**
@@ -82,6 +82,19 @@ public final class StreamUtils {
     ByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
     copyStream(is, baos, true);
     return baos.toByteArray();
+  }
+
+  /**
+   * Copy the data read from the specified input stream to the specified output stream.
+   * This method closes both streams before terminating.
+   * @param src the input stream to read from.
+   * @param dest the output stream to write to.
+   * @throws IOException if an I/O error occurs.
+   */
+  public static void copyFile(final File src, final File dest) throws IOException {
+    try (InputStream is = new BufferedInputStream(new FileInputStream(src)); OutputStream os = new BufferedOutputStream(new FileOutputStream(dest))) { 
+      copyStream(is, os);
+    }
   }
 
   /**

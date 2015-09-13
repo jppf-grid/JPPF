@@ -141,6 +141,16 @@ public final class FileUtils {
   }
 
   /**
+   * Get an input stream given a file.
+   * @param path the file to lookup.
+   * @return an {@link InputStream} instance, or null if the file could not be created.
+   * @throws IOException if an I/O error occurs.
+   */
+  public static InputStream getFileInputStream(final File path) throws IOException {
+    return new BufferedInputStream(new FileInputStream(path));
+  }
+
+  /**
    * Get an input stream given a file path.
    * This method first looks up in the file system for the specified path, then in the classpath.
    * @param path the path to the file to lookup.

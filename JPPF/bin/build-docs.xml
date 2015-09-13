@@ -77,6 +77,7 @@
 			<arg value="${home}/doc-source/home/samples-pack"/>
 			<arg value="${home}/doc-source/templates/sample-readme.html"/>
 		</java>
+	  <copy file="${samples-pack}/index.php" toDir="${home}/doc-source/home/samples-pack"/>
 	</target>
 
 	<!-- ========================================================================= -->
@@ -124,15 +125,13 @@
 			<doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
 			<header>
 				<![CDATA[
-					<table>
-					<tr>
+					<table><tr>
 						<td valign="center">
 							<a href="http://www.jppf.org" target="_top">
 								<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
 							</a>
 						</td>
-					</tr>
-					</table>
+					</tr></table>
 				]]>
 			</header>
 			<bottom>

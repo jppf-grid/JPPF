@@ -61,8 +61,7 @@
     </sequential>
   </macrodef>
 
-  <target name="samples.pack" description="Generate the packaging for the samples pack"
-    depends="init, build" if="samples.pack.present">
+  <target name="samples.pack" description="Generate the packaging for the samples pack" depends="init, build, samples.html.readme" if="samples.pack.present">
     <!-- Copy the JPPF jars to the shared/lib directory -->
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
     <!-- Convert sources to HTML and include them in the designated samples -->
@@ -85,11 +84,13 @@
     <delete file="samples.pack.file" quiet="true"/>
     <zip destfile="${samples.pack.file}">
       <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}">
+        <exclude name="**/Readme.html"/>
         <exclude name="**/*.log"/>
         <exclude name="**/IdleSystem/**/*.*"/>
         <exclude name="**/javadoc/**/*.*"/>
         <exclude name="**/*.sh"/>
       </zipfileset>
+      <zipfileset dir="${build}/samples-pack" prefix="${samples.pack.prefix}" includes="**/Readme.html"/>
       <zipfileset dir="${basedir}/../samples-pack" prefix="${samples.pack.prefix}" includes="**/*.sh" filemode="755"/>
       <zipfileset dir="${build}/" prefix="${samples.pack.prefix}/shared/lib-src">
         <include name="jppf-node-src.jar"/>
@@ -128,6 +129,17 @@
     <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html"/></delete>
     <delete file="${build}/header.txt" quiet="true"/>
     <delete file="${build}/temp.java" quiet="true"/>
+    <delete dir="${build}/samples-pack" quiet="true"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Build the samples Readme.html files                                       -->
+  <!-- ========================================================================= -->
+  
+  <target name="samples.html.readme" depends="">
+    <delete dir="${build}/samples-pack" quiet="true"/>
+    <mkdir dir="${build}/samples-pack"/>
+    <doc.gen source="${samples-pack}" dest="${build}/samples-pack" templates="${home}/doc-source/templates-samples/"/>
   </target>
 
 </project> 

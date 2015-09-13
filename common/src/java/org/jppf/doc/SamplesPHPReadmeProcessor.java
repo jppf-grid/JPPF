@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.utils.FileUtils;
+import org.jppf.utils.streams.StreamUtils;
 
 /**
  * This utility generates the doc-source php files for the samples pack from the readme in each sample.
@@ -32,11 +33,11 @@ public class SamplesPHPReadmeProcessor implements Runnable {
   /**
    * Marks the start of the readme's content.
    */
-  private static final String START_CONTENT_TAG = "<!-- ${SAMPLE_START_CONTENT} -->";
+  private static final String START_CONTENT_TAG = "<!-- $SAMPLE_START_CONTENT$ -->";
   /**
    * Marks the end of the readme's content.
    */
-  private static final String END_CONTENT_TAG = "<!-- ${SAMPLE_END_CONTENT} -->";
+  private static final String END_CONTENT_TAG = "<!-- $SAMPLE_END_CONTENT$ -->";
   /**
    * The source directory from which all Readme.html are found.
    */
@@ -94,6 +95,23 @@ public class SamplesPHPReadmeProcessor implements Runnable {
    * @throws Exception if any error occurs.
    */
   private void processFile(final File file) throws Exception {
+    System.out.println("processing input file " + file);
+    int len = sourceDir.getCanonicalPath().length();
+    String s = file.getParentFile().getCanonicalPath().substring(len);
+    if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
+    s += "/Readme.php";
+    File outFile = new File(destDir, s);
+    FileUtils.mkdirs(outFile);
+    StreamUtils.copyFile(file, outFile);
+    System.out.println("writing output file " + outFile);
+  }
+
+  /**
+   * Process the specified html file into an equivalent php file.
+   * @param file the html file to process.
+   * @throws Exception if any error occurs.
+   */
+  private void processFile2(final File file) throws Exception {
     System.out.println("processing input file " + file);
     String text = FileUtils.readTextFile(file);
     int idx = text.indexOf("<h1>");
