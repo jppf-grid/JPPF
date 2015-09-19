@@ -20,6 +20,7 @@ package org.jppf.utils;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.*;
 
@@ -33,6 +34,18 @@ public final class LocalizationUtils {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(LocalizationUtils.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
+  /**
+   * Whether to log the {@link MissingResourceException}s.
+   */
+  private static final boolean SHOW_EXCEPTIONS = JPPFConfiguration.getProperties().getBoolean("jppf.show.localization.errors", false);
+  /**
+   * Cache of resources bundles that were already found missing, to avoid repeating the search and filling the log uselessly.
+   */
+  private static final Map<String, Boolean> notFoundBundleCache = new ConcurrentHashMap<>();
 
   /**
    * Get a localized property value.
@@ -90,21 +103,22 @@ public final class LocalizationUtils {
    * @see java.util.ResourceBundle
    */
   public static String getLocalized(final String baseName, final String key, final String def, final Locale locale) {
-    if (baseName == null) return def;
+    if ((baseName == null) || notFoundBundleCache.containsKey(baseName)) return def;
     ResourceBundle bundle = null;
     try {
       bundle = ResourceBundle.getBundle(baseName, locale);
     } catch (Exception e) {
-      if (log.isDebugEnabled()) log.debug("Could not find resource bundle \""+baseName+ '\"', e);
+      notFoundBundleCache.put(baseName, Boolean.TRUE);
+      if (SHOW_EXCEPTIONS && debugEnabled) log.debug("Could not find resource bundle \""+baseName+ '\"', e);
       return def;
     }
-    String result = null;
+    String result = def;
     try {
       result = bundle.getString(key);
     } catch (Exception e) {
-      if (log.isDebugEnabled()) log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+ '\"', e);
+      if (SHOW_EXCEPTIONS && debugEnabled) log.debug("Could not find key \""+key+"\" in resource bundle \""+baseName+ '\"', e);
     }
-    return result == null ? def : result;
+    return result;
   }
 
   /**
