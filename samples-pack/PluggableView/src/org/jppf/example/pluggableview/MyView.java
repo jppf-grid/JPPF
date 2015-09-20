@@ -23,7 +23,6 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 import javax.swing.*;
 
@@ -40,26 +39,27 @@ import org.jppf.utils.JPPFConfiguration;
  * <p>The view comprises 3 panels:
  * <ul>
  * <li>the top panel displays a JPPF logo with a formatted title</li>
- * <li>the middle panel is a text area where timestamped events scroll down as they occur</li>
+ * <li>the middle panel is a {@link JList} where timestamped events scroll down as they occur</li>
  * <li>the bottom panel has 2 buttons to clear the log and copy all log entries to the clipboard</li>
  * </ul>
  * <p>To plug the view into the admin console, the following properties are added to the conosle's
  * configuration file:
- * <pre> # enable / disable the custom view. defaults to true (enabled)
+ * <pre>
+ * <font color="green"># enable / disable the custom view. defaults to true (enabled)</font>
  * jppf.admin.console.view.MyView.enabled = true
- * # name of a class extending org.jppf.ui.plugin.PluggableView
+ * <font color="green"># name of a class extending org.jppf.ui.plugin.PluggableView</font>
  * jppf.admin.console.view.MyView.class = test.console.MyView
- * # the title for the view; only used if placed in a tabbed pane
+ * <font color="green"># the title for the view; only used if placed in a tabbed pane</font>
  * jppf.admin.console.view.MyView.title = Events Log
- * # path to the icon for the view; only used if placed in a tabbed pane
+ * <font color="green"># path to the icon for the view; only used if placed in a tabbed pane</font>
  * jppf.admin.console.view.MyView.icon = /test.gif
- * # the built-in view it is attached to; "Main" is the main tabbed pane
+ * <font color="green"># the built-in view it is attached to; "Main" is the main tabbed pane</font>
  * jppf.admin.console.view.MyView.addto = Main
- * # the position at which the custom view is inserted withing the enclosing tabbed pane
- * # a negative value means insert at the end; defaults to -1 (insert at the end)
+ * <font color="green"># the position at which the custom view is inserted withing the enclosing tabbed pane
+ * # a negative value means insert at the end; defaults to -1 (insert at the end)</font>
  * jppf.admin.console.view.MyView.position = 1
- * # whether to automatically select the view on startup; defaults to false
- * #jppf.admin.console.view.MyView.autoselect = true
+ * <font color="green"># whether to automatically select the view on startup; defaults to false</font>
+ * jppf.admin.console.view.MyView.autoselect = true
  * </pre>
  * @author Laurent Cohen
  */
@@ -67,7 +67,7 @@ public class MyView extends PluggableView {
   /**
    * The maximum number of entries in the log.
    */
-  private static final int MAX_MESSAGES = JPPFConfiguration.getProperties().getInt("org.jppf.example.pluggableview.max_log_lines", 10_000);
+  private static final int MAX_MESSAGES = JPPFConfiguration.getProperties().getInt("org.jppf.example.pluggableview.max_log_lines", 1_000);
   /**
    * The view's backgroud color.
    */
@@ -77,13 +77,17 @@ public class MyView extends PluggableView {
    */
   private JPanel mainPanel = null;
   /**
-   * The text area where the log entries are displayed
+   * A JList where the log entries are displayed
    */
-  private JTextArea textArea = null;
+  private JList<String> logView;
   /**
-   * Rolling double-ended queue of log entries.
+   * The model associated with the {@link JList}.
    */
-  private Deque<String> messages = new ConcurrentLinkedDeque<>();
+  private DefaultListModel<String> listModel;
+  /**
+   * The scroll pane enclosing the {@link JList}.
+   */
+  private JScrollPane listScroller;
   /**
    * Maintains the current log size to avoid expensive computations.
    */
@@ -110,7 +114,7 @@ public class MyView extends PluggableView {
         mainPanel.add(createLogoPanel());
         mainPanel.add(Box.createVerticalStrut(5));
         // add the text area that displays the log messages
-        mainPanel.add(createTextArea());
+        mainPanel.add(createLogView());
         mainPanel.add(Box.createVerticalStrut(5));
         // add the action buttons
         mainPanel.add(createButtonsPanel());
@@ -149,14 +153,13 @@ public class MyView extends PluggableView {
    * It is enclosed within a {@link JScrollPane} with a border and title.
    * @return the {@link JComponent} enclosing the text area.
    */
-  private JComponent createTextArea() {
-    textArea = new JTextArea();
-    textArea.setEditable(false);
-    textArea.setBackground(BKG);
-    JScrollPane scrollPane = new JScrollPane(textArea);
-    scrollPane.setBorder(BorderFactory.createTitledBorder("Topology Events"));
-    scrollPane.setBackground(BKG);
-    return scrollPane;
+  private JComponent createLogView() {
+    logView = new JList<>(listModel = new DefaultListModel<>());
+    logView.setBackground(BKG);
+    listScroller = new JScrollPane(logView);
+    listScroller.setBorder(BorderFactory.createTitledBorder("Topology Events"));
+    listScroller.setBackground(BKG);
+    return listScroller;
   }
 
   /**
@@ -172,8 +175,7 @@ public class MyView extends PluggableView {
       @Override
       public void actionPerformed(final ActionEvent e) {
         synchronized(MyView.this) {
-          messages.clear();
-          textArea.setText("");
+          listModel.clear();
           logSize = 0;
         }
       }
@@ -184,12 +186,15 @@ public class MyView extends PluggableView {
     copyButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        String text = null;
+        StringBuilder sb = new StringBuilder();
         synchronized(MyView.this) {
-          text = textArea.getText();
+          Enumeration<?> elements =  listModel.elements();
+          while (elements.hasMoreElements()) {
+            sb.append(elements.nextElement()).append('\n');
+          }
         }
         Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clip.setContents(new StringSelection(text), null);
+        clip.setContents(new StringSelection(sb.toString()), null);
       }
     });
     JPanel panel = new JPanel();
@@ -212,24 +217,24 @@ public class MyView extends PluggableView {
    * This method adds a new entry to the messages log.
    * @param message the message to add.
    */
-  private synchronized void newMessage(final String message) {
-    System.out.println(message);
+  private void newMessage(final String message) {
     // create and format a timestamp
     String date = sdf.format(new Date());
     // add the new, timestamped message to the log
-    messages.add(String.format("[%s] %s", date, message));
-    logSize++;
-    // if number of log entries > max, remove the oldest ones
-    while (logSize > MAX_MESSAGES) {
-      messages.removeFirst();
-      logSize--;
+    String formatted = String.format("[%s] %s", date, message);
+    synchronized(this) {
+      logSize++;
+      // if number of log entries > max, remove the oldest ones
+      while (logSize > MAX_MESSAGES) {
+        logSize--;
+        listModel.remove(0);
+      }
+      // add the log entry to the JList
+      listModel.addElement(formatted);
+      // scroll to the end of the log
+      JScrollBar scrollBar = listScroller.getVerticalScrollBar();
+      scrollBar.setValue(scrollBar.getMaximum());
     }
-    // update the text of the text area
-    StringBuilder sb = new StringBuilder();
-    for (String msg: messages) sb.append(msg).append("\n");
-    textArea.setText(sb.toString());
-    // scroll to the end of the log
-    textArea.setCaretPosition(sb.length() - 1);
   }
 
   /**
