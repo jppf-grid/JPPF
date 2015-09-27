@@ -35,10 +35,6 @@ import org.slf4j.*;
  */
 public class ServerTaskBundleNode {
   /**
-   * Explicit serialVersionUID.
-   */
-  private static final long serialVersionUID = 1L;
-  /**
    * Logger for this class.
    */
   private static final Logger log = LoggerFactory.getLogger(ServerTaskBundleNode.class);

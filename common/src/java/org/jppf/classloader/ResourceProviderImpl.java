@@ -17,9 +17,6 @@
  */
 package org.jppf.classloader;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * Instances of this class are dedicated to reading resource files form the JVM's classpath and converting them into arrays of bytes.
  * @author Laurent Cohen
@@ -27,15 +24,6 @@ import org.slf4j.*;
  * @exclude
  */
 public class ResourceProviderImpl extends  AbstractResourceProvider {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(ResourceProviderImpl.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-
   /**
    * Default constructor.
    */

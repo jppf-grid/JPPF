@@ -24,22 +24,12 @@ import java.util.concurrent.locks.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public class NodeClassContext extends AbstractClassContext<NodeClassState> {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(NodeClassContext.class);
-  /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of pending resource responses for a node.
    */

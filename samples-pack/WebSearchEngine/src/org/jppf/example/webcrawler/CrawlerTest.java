@@ -25,7 +25,6 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 import com.torunski.crawler.Crawler;
@@ -38,20 +37,14 @@ import com.torunski.crawler.model.MaxDepthModel;
  * Test of the crawler API.
  * @author Laurent Cohen
  */
-public class CrawlerTest
-{
+public class CrawlerTest {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(CrawlerTest.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Server to crawl.
    */
-  //private static String server = "http://www.jppf.org";
   private static String server = "http://localhost:8880";
   /**
    * Starting server page.
@@ -60,24 +53,19 @@ public class CrawlerTest
   /**
    * Location of the temporary files folder.
    */
-  //private static String index = System.getProperty("java.io.tmpdir") + File.separator + "crawler";
   private static String index = "crawler";
 
   /**
    * Entry point.
    * @param args not used.
    */
-  public static void main(final String... args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       init();
       //simpleCrawl();
       //luceneIndex();
       luceneSearch("+client +driver", 50);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -86,17 +74,14 @@ public class CrawlerTest
    * Simple crawler test.
    * @throws Exception if an error is thrown while executing.
    */
-  public static void simpleCrawl() throws Exception
-  {
+  public static void simpleCrawl() throws Exception {
     Crawler crawler = new Crawler();
     crawler.setLinkFilter(new ServerFilter(server));
 
-    crawler.addParserListener(new IParserEventListener()
-    {
+    crawler.addParserListener(new IParserEventListener() {
       @Override
-      public void parse(final ParserEvent event)
-      {
-        print("Parsing link: "+event.getLink());
+      public void parse(final ParserEvent event) {
+        print("Parsing link: " + event.getLink());
       }
     });
     crawler.start(server, startPage);
@@ -106,22 +91,23 @@ public class CrawlerTest
     print("Links visited=" + visitedLinks.size());
 
     Iterator list = visitedLinks.iterator();
-    while (list.hasNext()) print(""+list.next());
+    while (list.hasNext())
+      print("" + list.next());
 
     // show visited links
     Collection notVisitedLinks = crawler.getModel().getToVisitURIs();
 
     print("Links NOT visited=" + notVisitedLinks.size());
     Iterator listNot = notVisitedLinks.iterator();
-    while (listNot.hasNext()) print(""+listNot.next());
+    while (listNot.hasNext())
+      print("" + listNot.next());
   }
 
   /**
    * Test of indexing with Lucene.
    * @throws Exception if an error is thrown while executing.
    */
-  public static void luceneIndex() throws Exception
-  {
+  public static void luceneIndex() throws Exception {
     // setting default parameters
     int depth = 3;
 
@@ -134,12 +120,10 @@ public class CrawlerTest
     Crawler crawler = new Crawler();
     crawler.setLinkFilter(new ServerFilter(server));
     crawler.setModel(new MaxDepthModel(depth));
-    crawler.addParserListener(new IParserEventListener()
-    {
+    crawler.addParserListener(new IParserEventListener() {
       @Override
-      public void parse(final ParserEvent event)
-      {
-        print("Parsing link: "+event.getLink());
+      public void parse(final ParserEvent event) {
+        print("Parsing link: " + event.getLink());
       }
     });
 
@@ -161,8 +145,7 @@ public class CrawlerTest
    * @param max the maximum number of results to show.
    * @throws Exception if an error is thrown while executing.
    */
-  public static void luceneSearch(final String search, final int max) throws Exception
-  {
+  public static void luceneSearch(final String search, final int max) throws Exception {
     print("Searching for: " + search);
     print("  max results: " + max);
 
@@ -174,8 +157,7 @@ public class CrawlerTest
 
     print("    results: " + hits.length());
 
-    for (int i = 0; i < Math.min(hits.length(), max); i++)
-    {
+    for (int i = 0; i < Math.min(hits.length(), max); i++) {
       float relevance = ((float) Math.round(hits.score(i) * 1000)) / 10;
       String url = hits.doc(i).getField("url").stringValue();
       print("No " + (i + 1) + " with relevance " + relevance + "% : " + url);
@@ -188,8 +170,7 @@ public class CrawlerTest
    * Print a string to the standard output and the log.
    * @param s the string to print.
    */
-  private static void print(final String s)
-  {
+  private static void print(final String s) {
     System.out.println(s);
     log.info(s);
   }
@@ -197,8 +178,7 @@ public class CrawlerTest
   /**
    * Initializations.
    */
-  private static void init()
-  {
+  private static void init() {
     DefaultHttpParams.setHttpParamsFactory(new JPPFHttpDefaultParamsFactory());
   }
 }

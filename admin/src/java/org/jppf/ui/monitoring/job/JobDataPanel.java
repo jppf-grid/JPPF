@@ -25,7 +25,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.AbstractComponent;
 import org.jppf.client.monitoring.jobs.*;
-import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
@@ -50,10 +49,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The topology manager.
-   */
-  private final TopologyManager topologyManager;
-  /**
    * The object which monitors and maintains a representation of the jobs hierarchy.
    */
   private final JobMonitor jobMonitor;
@@ -72,7 +67,6 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
   public JobDataPanel() {
     BASE = "org.jppf.ui.i18n.JobDataPage";
     if (debugEnabled) log.debug("initializing NodeDataPanel");
-    this.topologyManager = StatsHandler.getInstance().getTopologyManager();
     this.jobMonitor = StatsHandler.getInstance().getJobMonitor();
     createTreeTableModel();
     jobMonitor.addJobMonitoringListener(this);

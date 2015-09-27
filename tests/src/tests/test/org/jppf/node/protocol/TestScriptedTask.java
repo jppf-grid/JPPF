@@ -33,60 +33,57 @@ import test.org.jppf.test.setup.Setup1D1N1C;
  * Unit tests for the {@link ScriptedTask} class.
  * @author Laurent Cohen
  */
-public class TestScriptedTask extends Setup1D1N1C
-{
-  /** */
-  private static final String MSG_PREFIX = "Hello JPPF ";
-
+public class TestScriptedTask extends Setup1D1N1C {
   /**
    * Test the execution of a scripted task with a simple groovy script.
    * The test includes verifcation that the groovy classes are loaded from the client or server classpath.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout = 8000)
   public void testSimpleGroovyScript() throws Exception {
     int nbTasks = 10;
     String msg = "Hello JPPF ";
     String script = "return '" + msg + "' + jppfTask.getId()";
     JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
-    for (int i=0; i<nbTasks; i++) {
-      job.add(new ScriptedTask<String>("groovy", script, "someId", null)).setId("(" + (i+1) + ")");
+    for (int i = 0; i < nbTasks; i++) {
+      job.add(new ScriptedTask<String>("groovy", script, "someId", null)).setId("(" + (i + 1) + ")");
     }
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
+    for (int i = 0; i < nbTasks; i++) {
       Task<?> task = results.get(i);
       Throwable t = task.getThrowable();
       assertNull("task has throwable: " + ExceptionUtils.getStackTrace(t), t);
       assertNotNull(task.getResult());
-      assertEquals(msg + '(' + (i+1) + ')', task.getResult());
+      assertEquals(msg + '(' + (i + 1) + ')', task.getResult());
     }
   }
+
   /**
    * Test the execution of a scripted task with a simple javascript script.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout = 8000)
   public void testSimpleJavascript() throws Exception {
     int nbTasks = 10;
     String msg = "Hello JPPF ";
     String script = "function myFunc() { return '" + msg + "' + jppfTask.getId(); } myFunc();";
     JPPFJob job = new JPPFJob();
     job.setName(ReflectionUtils.getCurrentMethodName());
-    for (int i=0; i<nbTasks; i++) {
-      job.add(new ScriptedTask<String>("javascript", script, "someId", null)).setId("(" + (i+1) + ")");
+    for (int i = 0; i < nbTasks; i++) {
+      job.add(new ScriptedTask<String>("javascript", script, "someId", null)).setId("(" + (i + 1) + ")");
     }
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
-    for (int i=0; i<nbTasks; i++) {
+    for (int i = 0; i < nbTasks; i++) {
       Task<?> task = results.get(i);
       Throwable t = task.getThrowable();
       assertNull("task has throwable: " + ExceptionUtils.getStackTrace(t), t);
       assertNotNull(task.getResult());
-      assertEquals(msg + '(' + (i+1) + ')', task.getResult());
+      assertEquals(msg + '(' + (i + 1) + ')', task.getResult());
     }
   }
 }

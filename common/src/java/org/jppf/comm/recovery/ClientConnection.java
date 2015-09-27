@@ -40,10 +40,6 @@ public class ClientConnection extends AbstractRecoveryConnection
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Constant for an empty array of <code>ClientConnectionListener</code>.
-   */
-  private static final ClientConnectionListener[] ZERO_CONNECTION_LISTENER = new ClientConnectionListener[0];
-  /**
    * Used to synchronize access to the underlying socket from multiple threads.
    */
   private SocketInitializer socketInitializer;

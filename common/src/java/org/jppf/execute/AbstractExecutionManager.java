@@ -338,15 +338,6 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     this.bundle = bundle;
   }
 
-  /**
-   * Get the appropiate class loader for the specfied task.
-   * @param task the task from which to get the class laoder.
-   * @return an instance of {@link ClassLoader}.
-   */
-  private ClassLoader getTaskClassLoader(final Task<?> task) {
-    return task.getTaskClassLoader();
-  }
-
   @Override
   public TaskExecutionDispatcher getTaskNotificationDispatcher() {
     return taskNotificationDispatcher;

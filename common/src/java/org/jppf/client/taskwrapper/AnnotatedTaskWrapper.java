@@ -131,16 +131,6 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
    * @param clazz the class to check.
    * @return true if the class can be executed as a task, false otherwise.
    */
-  private boolean isJPPFAnnotated(final Class<?> clazz)
-  {
-    return getJPPFAnnotatedElement(clazz) != null;
-  }
-
-  /**
-   * Determines whether a class has a JPPF-annotated method and can be executed as a task.
-   * @param clazz the class to check.
-   * @return true if the class can be executed as a task, false otherwise.
-   */
   private AnnotatedElement getJPPFAnnotatedElement(final Class<?> clazz)
   {
     if (clazz == null) return null;

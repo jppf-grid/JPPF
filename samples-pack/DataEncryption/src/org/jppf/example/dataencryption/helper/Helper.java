@@ -31,8 +31,7 @@ import org.jppf.utils.streams.StreamUtils;
  * and create and perform operations on a keystore.
  * @author Laurent Cohen
  */
-public final class Helper
-{
+public final class Helper {
   /**
    * The keystore password.
    * This variable will be assigned the password value in clear,
@@ -43,8 +42,7 @@ public final class Helper
   /**
    * Instantiation of this class is not permitted.
    */
-  private Helper()
-  {
+  private Helper() {
   }
 
   /**
@@ -55,14 +53,10 @@ public final class Helper
    * in clear is ever deployed.
    * @param args the first argument must be the keystore password in clear.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       generateKeyStore(args[0]);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -72,20 +66,16 @@ public final class Helper
    * @param pwd default keystore password
    * @throws Exception if any error occurs.
    */
-  private static void generateKeyStore(final String pwd) throws Exception
-  {
+  private static void generateKeyStore(final String pwd) throws Exception {
     byte[] passwordBytes = pwd.getBytes();
     // encode the password in Base64
     byte[] encodedBytes = Base64Encoding.encodeBytesToBytes(passwordBytes);
     // store the encoded password to a file
     FileOutputStream fos = new FileOutputStream(getPasswordFilename());
-    try
-    {
+    try {
       fos.write(encodedBytes);
       fos.flush();
-    }
-    finally
-    {
+    } finally {
       fos.close();
     }
     char[] password = pwd.toCharArray();
@@ -100,12 +90,9 @@ public final class Helper
     ks.setEntry(getKeyAlias(), skEntry, new KeyStore.PasswordProtection(password));
     // save the keystore to a file
     fos = new FileOutputStream(getKeystoreFilename());
-    try
-    {
+    try {
       ks.store(fos, password);
-    }
-    finally
-    {
+    } finally {
       fos.close();
     }
   }
@@ -114,12 +101,9 @@ public final class Helper
    * Get the keystore password.
    * @return the password as a char[].
    */
-  public static char[] getPassword()
-  {
-    if (some_chars == null)
-    {
-      try
-      {
+  public static char[] getPassword() {
+    if (some_chars == null) {
+      try {
         String path = getKeystoreFolder() + getPasswordFilename();
         InputStream is = Helper.class.getClassLoader().getResourceAsStream(path);
         // read the encoded password
@@ -127,9 +111,7 @@ public final class Helper
         // decode the password from Base64
         byte[] passwordBytes = Base64Decoding.decode(encodedBytes);
         some_chars = new String(passwordBytes).toCharArray();
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
@@ -140,8 +122,7 @@ public final class Helper
    * Get the password file name.
    * @return the password file name.
    */
-  public static String getPasswordFilename()
-  {
+  public static String getPasswordFilename() {
     return "password.pwd";
   }
 
@@ -149,8 +130,7 @@ public final class Helper
    * Get the keystore file name.
    * @return the keystore file name.
    */
-  public static String getKeystoreFilename()
-  {
+  public static String getKeystoreFilename() {
     return "keystore.ks";
   }
 
@@ -158,8 +138,7 @@ public final class Helper
    * The folder in which the keystore and password file will be in the jar file.
    * @return the folder name as a string.
    */
-  public static String getKeystoreFolder()
-  {
+  public static String getKeystoreFolder() {
     return "org/jppf/example/dataencryption/helper/";
   }
 
@@ -167,8 +146,7 @@ public final class Helper
    * Get the key alias.
    * @return the key alias.
    */
-  public static String getKeyAlias()
-  {
+  public static String getKeyAlias() {
     return "secretKeyAlias";
   }
 
@@ -176,8 +154,7 @@ public final class Helper
    * Get the cryptographic provider, or keystore type.
    * @return the provider name.
    */
-  public static String getProvider()
-  {
+  public static String getProvider() {
     // jceks is the only ootb provider that allows storing a secret key
     return "jceks";
   }
@@ -186,8 +163,7 @@ public final class Helper
    * Get the name of the cryptographic algorithm used to generate secret keys.
    * @return the algorithm name as a string.
    */
-  public static String getAlgorithm()
-  {
+  public static String getAlgorithm() {
     return "DES";
   }
 
@@ -195,8 +171,7 @@ public final class Helper
    * Get the name of the cryptographic transformation used when encrypting or decrypting data.
    * @return the transformation as a string.
    */
-  public static String getTransformation()
-  {
+  public static String getTransformation() {
     return "DES/ECB/PKCS5Padding";
   }
 }

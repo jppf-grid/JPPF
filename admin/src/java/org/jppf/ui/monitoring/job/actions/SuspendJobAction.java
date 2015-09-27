@@ -17,22 +17,10 @@
  */
 package org.jppf.ui.monitoring.job.actions;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * This action suspends a job and causes all sub-jobs currently executing to lwft executing until completion.
  */
 public class SuspendJobAction extends AbstractSuspendJobAction {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(SuspendJobAction.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-
   /**
    * Initialize this action.
    */

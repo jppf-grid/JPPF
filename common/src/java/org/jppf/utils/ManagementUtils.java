@@ -41,10 +41,6 @@ public class ManagementUtils {
    */
   private static boolean managementAvailable = true;
   /**
-   * The name of the thread MXBean.
-   */
-  private static Object THREAD_MXBEAN_NAME = null;
-  /**
    * The the thread MXBean iself.
    */
   private static Object THREAD_MXBEAN = null;
@@ -60,14 +56,6 @@ public class ManagementUtils {
    * The method that gets the user time from the {@code ThreadMXBean}.
    */
   private static Method GET_THREAD_USER_TIME_METHOD = null;
-  /**
-   * The name of the operating system MXBean.
-   */
-  private static Object OS_MXBEAN_NAME = null;
-  /**
-   * The name of the operating system MXBean.
-   */
-  private static Object RUNTIME_MXBEAN_NAME = null;
   /**
    * The name of the operating system MXBean.
    */
@@ -148,9 +136,6 @@ public class ManagementUtils {
       GET_MBEAN_NOTIFICATIONS_INFO_METHOD = mbeanInfoClass.getDeclaredMethod("getNotifications");
 
       Class<?> factoryClass = Class.forName("java.lang.management.ManagementFactory");
-      OS_MXBEAN_NAME = getObjectName("java.lang:type=OperatingSystem");
-      RUNTIME_MXBEAN_NAME = getObjectName("java.lang:type=Runtime");
-      THREAD_MXBEAN_NAME = getObjectName("java.lang:type=Threading");
       Method m = factoryClass.getDeclaredMethod("getThreadMXBean");
       THREAD_MXBEAN = m.invoke(null);
       Class<?> threadMXBeanClass = Class.forName("java.lang.management.ThreadMXBean");

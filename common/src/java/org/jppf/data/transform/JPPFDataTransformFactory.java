@@ -35,10 +35,6 @@ public class JPPFDataTransformFactory {
    */
   private static Logger log = LoggerFactory.getLogger(JPPFDataTransformFactory.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The transform class specified in the configuration.
    */
   private static final Class<?> TRANSFORM_CLASS = initTransformClass();

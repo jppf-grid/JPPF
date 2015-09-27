@@ -19,14 +19,14 @@
 package org.jppf.load.balancer;
 
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.node.protocol.JPPFDistributedJob;
 
 /**
  * 
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractAdaptiveBundler extends AbstractBundler implements BundlerEx, NodeAwareness, ContextAwareness
-{
+public abstract class AbstractAdaptiveBundler extends AbstractBundler implements BundlerEx, NodeAwareness, ContextAwareness, JobAwarenessEx {
   /**
    * The current bundle size.
    */
@@ -34,7 +34,7 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   /**
    * Holds information about the node's environment and configuration.
    */
-  protected JPPFSystemInformation nodeConfiguration = null;
+  protected JPPFSystemInformation nodeConfiguration;
   /**
    * The number of processing threads in the node.
    */
@@ -42,46 +42,44 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   /**
    * Holds information about the execution context.
    */
-  protected JPPFContext jppfContext = null;
+  protected JPPFContext jppfContext;
+  /**
+   * Holds information about the current job being dispatched.
+   */
+  protected JPPFDistributedJob job;
 
   /**
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm.
    */
-  public AbstractAdaptiveBundler(final LoadBalancingProfile profile)
-  {
+  public AbstractAdaptiveBundler(final LoadBalancingProfile profile) {
     super(profile);
   }
 
   @Override
-  public int getBundleSize()
-  {
+  public int getBundleSize() {
     return bundleSize;
   }
 
   @Override
-  public JPPFSystemInformation getNodeConfiguration()
-  {
+  public JPPFSystemInformation getNodeConfiguration() {
     return nodeConfiguration;
   }
 
   @Override
-  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration)
-  {
+  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.nodeConfiguration = nodeConfiguration;
     nbThreads = nodeConfiguration.getJppf().getInt("jppf.processing.threads", 1);
   }
 
   @Override
-  public void feedback(final int size, final double totalTime, final double accumulatedElapsed, final double overheadTime)
-  {
+  public void feedback(final int size, final double totalTime, final double accumulatedElapsed, final double overheadTime) {
     int n1 = size / nbThreads;
     int n2 = size % nbThreads;
     double mean = accumulatedElapsed / size;
     double t = 0d;
     if (n1 == 0) t = mean;
-    else
-    {
+    else {
       t = n1 * mean;
       if (n2 > 0) t += mean * ((double) n2 / nbThreads);
     }
@@ -90,14 +88,39 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   }
 
   @Override
-  public JPPFContext getJPPFContext()
-  {
+  public JPPFContext getJPPFContext() {
     return jppfContext;
   }
 
   @Override
-  public void setJPPFContext(final JPPFContext context)
-  {
+  public void setJPPFContext(final JPPFContext context) {
     this.jppfContext = context;
+  }
+
+  @Override
+  public JPPFDistributedJob getJob() {
+    return job;
+  }
+
+  @Override
+  public void setJob(final JPPFDistributedJob job) {
+    this.job = job;
+  }
+
+  @Override
+  public Bundler copy() {
+    return null;
+  }
+
+  @Override
+  protected int maxSize() {
+    return 0;
+  }
+
+  @Override
+  public void dispose() {
+    nodeConfiguration = null;
+    jppfContext = null;
+    job = null;
   }
 }

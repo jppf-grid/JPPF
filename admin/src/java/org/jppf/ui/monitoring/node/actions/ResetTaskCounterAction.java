@@ -23,29 +23,22 @@ import java.util.*;
 import org.jppf.client.monitoring.topology.TopologyDriver;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.CollectionMap;
 import org.slf4j.*;
 
 /**
  * This action resets the task counter of a node to 0.
  */
-public class ResetTaskCounterAction extends AbstractTopologyAction
-{
+public class ResetTaskCounterAction extends AbstractTopologyAction {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ResetTaskCounterAction.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this action.
    */
-  public ResetTaskCounterAction()
-  {
+  public ResetTaskCounterAction() {
     setupIcon("/org/jppf/ui/resources/reset.gif");
     setupNameAndTooltip("reset.counter");
   }
@@ -53,11 +46,9 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
   /**
    * Update this action's enabled state based on a list of selected elements.
    * @param selectedElements - a list of objects.
-   * @see org.jppf.ui.actions.AbstractUpdatableAction#updateState(java.util.List)
    */
   @Override
-  public void updateState(final List<Object> selectedElements)
-  {
+  public void updateState(final List<Object> selectedElements) {
     super.updateState(selectedElements);
     setEnabled(dataArray.length > 0);
   }
@@ -65,7 +56,6 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
   /**
    * Perform the action.
    * @param event not used.
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   @Override
   public void actionPerformed(final ActionEvent event) {
@@ -73,7 +63,7 @@ public class ResetTaskCounterAction extends AbstractTopologyAction
       @Override
       public void run() {
         CollectionMap<TopologyDriver, String> map = getDriverMap();
-        for (Map.Entry<TopologyDriver, Collection<String>> entry: map.entrySet()) {
+        for (Map.Entry<TopologyDriver, Collection<String>> entry : map.entrySet()) {
           try {
             JPPFNodeForwardingMBean forwarder = entry.getKey().getForwarder();
             if (forwarder == null) continue;

@@ -57,7 +57,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
    * Initialize this panel with the specified information.
    */
   public JVMHealthPanel() {
-    BASE = "org.jppf.ui.i18n.JVMHealthPage";
+    BASE = "org.jppf.ui.i18n.NodeDataPage";
     if (debugEnabled) log.debug("initializing JVMHealthPanel");
     manager = StatsHandler.getInstance().getTopologyManager();
     createTreeTableModel();

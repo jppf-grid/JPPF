@@ -34,10 +34,6 @@ public class ThreadManagerThreadPool extends AbstractThreadManager {
    */
   private static Logger log = LoggerFactory.getLogger(ThreadManagerThreadPool.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The thread pool that really processes the tasks
    */
   private ThreadPoolExecutor threadPool;

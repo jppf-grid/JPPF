@@ -40,18 +40,6 @@ public final class SerializationReflectionHelper
    */
   private static Logger log = LoggerFactory.getLogger(SerializationReflectionHelper.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Constant for empty Fields arrays.
-   */
-  private static final Field[] EMPTY_FIELDS = new Field[0];
-  /**
-   * Constant for empty Class arrays.
-   */
-  private static final Class<?>[] EMPTY_CLASSES = new Class<?>[0];
-  /**
    * Default byte value.
    */
   private static final Byte DEFAULT_BYTE = Byte.valueOf((byte) 0);

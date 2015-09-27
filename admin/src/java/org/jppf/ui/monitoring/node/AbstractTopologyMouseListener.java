@@ -20,7 +20,7 @@ package org.jppf.ui.monitoring.node;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -29,8 +29,6 @@ import javax.swing.tree.*;
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Mouse listener for the node data panel.
@@ -38,14 +36,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractTopologyMouseListener extends MouseAdapter {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractTopologyMouseListener.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Constant for an empty <code>TopologyData</code> array.
    */

@@ -45,10 +45,6 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
    */
   private static Logger log = LoggerFactory.getLogger(DeferredJobNotificationsHandler.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-  /**
    * This map represents the roots of the job notifications tree.
    */
   final Map<String, DriverNotif> driverMap = new HashMap<>();

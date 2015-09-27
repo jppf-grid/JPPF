@@ -52,11 +52,6 @@ public class UILauncher {
    * @since 5.0
    */
   private static boolean embedded = false;
-  /**
-   * .
-   * @since 5.0
-   */
-  private static boolean adminConsole = false;
 
   /**
    * Start this UI.

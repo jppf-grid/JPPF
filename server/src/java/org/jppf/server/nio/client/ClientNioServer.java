@@ -41,10 +41,6 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * Reference to the driver.
    */
   private static JPPFDriver driver;

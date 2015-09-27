@@ -21,14 +21,12 @@ import org.jppf.example.ftp.service.FTPClientWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.FileUtils;
 
-
 /**
  * This task processes a text file downloaded from an FTP server embedded within the JPPF driver.
  * The text file is transformed into a resulting html file which is then uploaded to the same FTP server.
  * @author Laurent Cohen
  */
-public class FTPTask extends AbstractTask<String>
-{
+public class FTPTask extends AbstractTask<String> {
   /**
    * The file to download from the driver.
    */
@@ -43,8 +41,7 @@ public class FTPTask extends AbstractTask<String>
    * @param inFile the file to download from the driver.
    * @param outFile the place where to store the downloaded file.
    */
-  public FTPTask(final String inFile, final String outFile)
-  {
+  public FTPTask(final String inFile, final String outFile) {
     this.inFile = inFile;
     this.outFile = outFile;
   }
@@ -53,10 +50,8 @@ public class FTPTask extends AbstractTask<String>
    * Download a text file from the driver, process it, store the result in an HTML file and upload it to the driver.
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       // retrieve the FTP host from the data provider
       DataProvider dataProvider = getDataProvider();
       String host = dataProvider.getParameter("ftp.host");
@@ -82,12 +77,9 @@ public class FTPTask extends AbstractTask<String>
 
       client.close();
       setResult("execution successful");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       setResult("execution failed: " + e.getClass().getName() + ": " + e.getMessage());
       setThrowable(e);
     }
   }
 }
-

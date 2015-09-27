@@ -23,8 +23,7 @@ package org.jppf.nio;
  * @param <S> the type of states this transition goes to.
  * @author Laurent Cohen
  */
-public class NioTransition<S extends Enum>
-{
+public class NioTransition<S extends Enum> {
   /**
    * The new state after the transition.
    */
@@ -35,19 +34,11 @@ public class NioTransition<S extends Enum>
   private int interestOps = 0;
 
   /**
-   * Default instantiation of this class is not permitted.
-   */
-  private NioTransition()
-  {
-  }
-
-  /**
    * Create a new transition with the specified state and set of interests.
    * @param state the state after the transition.
    * @param interestOps the new set of interests after the transition.
    */
-  public NioTransition(final S state, final int interestOps)
-  {
+  public NioTransition(final S state, final int interestOps) {
     this.state = state;
     this.interestOps = interestOps;
   }
@@ -56,8 +47,7 @@ public class NioTransition<S extends Enum>
    * Get the set of IO operations the corresponding channel is interested in after the transition.
    * @return the set of interests as an int value.
    */
-  public int getInterestOps()
-  {
+  public int getInterestOps() {
     return interestOps;
   }
 
@@ -65,8 +55,7 @@ public class NioTransition<S extends Enum>
    * Set the set of IO operations the corresponding channel is interested in after the transition.
    * @param interestOps the set of interests as an int value.
    */
-  public void setInterestOps(final int interestOps)
-  {
+  public void setInterestOps(final int interestOps) {
     this.interestOps = interestOps;
   }
 
@@ -74,8 +63,7 @@ public class NioTransition<S extends Enum>
    * Get the new state after the transition.
    * @return an <code>NioState</code> instance.
    */
-  public S getState()
-  {
+  public S getState() {
     return state;
   }
 
@@ -83,8 +71,7 @@ public class NioTransition<S extends Enum>
    * Set the new state after the transition.
    * @param state an <code>NioState</code> instance.
    */
-  public void setState(final S state)
-  {
+  public void setState(final S state) {
     this.state = state;
   }
 }

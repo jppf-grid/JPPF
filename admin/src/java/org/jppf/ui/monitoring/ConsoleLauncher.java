@@ -55,11 +55,6 @@ public class ConsoleLauncher {
    * @since 5.0
    */
   private static boolean embedded = false;
-  /**
-   * .
-   * @since 5.0
-   */
-  private static boolean adminConsole = true;
 
   /**
    * Start this UI.

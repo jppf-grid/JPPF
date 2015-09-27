@@ -38,10 +38,6 @@ class WaitingProviderInitialRequestState extends ClientClassServerState {
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Determines whether management features are enabled for this driver.
-   */
-  private static boolean managementEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
 
   /**
    * Initialize this state with a specified NioServer.

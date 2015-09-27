@@ -19,22 +19,11 @@ package org.jppf.scripting;
 
 import java.util.*;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * Factory used to instantiate script runners.
  * @author Laurent Cohen
  */
 public final class ScriptRunnerFactory {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(ScriptRunnerFactory.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of languages to associated pool of engines.
    */

@@ -22,9 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.*;
 
-import org.jppf.utils.LoggingUtils;
 import org.jppf.utils.collections.*;
-import org.slf4j.*;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
@@ -35,14 +33,6 @@ import org.slf4j.*;
  * @author Martin JANDA
  */
 public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(AbstractJPPFQueue.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Used for synchronized access to the queue.
    */

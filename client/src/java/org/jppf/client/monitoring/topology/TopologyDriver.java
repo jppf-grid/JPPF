@@ -19,15 +19,12 @@
 package org.jppf.client.monitoring.topology;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Implementation of {@link TopologyDriver} for JPPF drivers.
@@ -36,14 +33,6 @@ import org.slf4j.*;
  */
 public class TopologyDriver extends AbstractTopologyComponent {
   /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(TopologyDriver.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Determines whether the corresponding driver is collapsed in the visualization panel.
    */
   private boolean collapsed = false;
@@ -51,10 +40,6 @@ public class TopologyDriver extends AbstractTopologyComponent {
    * A driver connection.
    */
   private final JPPFClientConnection connection;
-  /**
-   * Determines whether this driver copmonent is currently initializing its JMX connection and mbean proxies.
-   */
-  private AtomicBoolean initializing = new AtomicBoolean(false);
 
   /**
    * Initialize this topology data as a driver related object.

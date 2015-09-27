@@ -44,19 +44,6 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestJPPFJobSLA2 extends Setup1D2N1C {
   /**
-   * A "short" duration for this test.
-   */
-  private static final long TIME_SHORT = 750L;
-  /**
-   * A "long" duration for this test.
-   */
-  private static final long TIME_LONG = 3000L;
-  /**
-   * A the date format used in the tests.
-   */
-  private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
-
-  /**
    * Test that a job dispatch expires after a given duration.
    * @throws Exception if any error occurs.
    */

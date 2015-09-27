@@ -41,10 +41,6 @@ public class ResubmitRunner extends AbstractScenarioRunner
    */
   static Logger log = LoggerFactory.getLogger(ResubmitRunner.class);
   /**
-   * The count of itearations runs.
-   */
-  private int iterationsCount = 0;
-  /**
    * 
    */
   private final AtomicBoolean dispatched = new AtomicBoolean(false);

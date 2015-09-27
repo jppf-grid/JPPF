@@ -21,9 +21,6 @@ package org.jppf.client.monitoring;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * Instances of this class hold information about the associations between JPPF drivers and
  * their attached nodes, for management and monitoring purposes.
@@ -33,14 +30,6 @@ import org.slf4j.*;
  */
 public abstract class AbstractRefreshHandler {
   /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractRefreshHandler.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Timer used to query the driver management data.
    */
   private Timer refreshTimer = null;
@@ -48,10 +37,6 @@ public abstract class AbstractRefreshHandler {
    * Interval, in milliseconds, between refreshes from the server.
    */
   private final long refreshInterval;
-  /**
-   * Count of refresh invocations.
-   */
-  private AtomicLong refreshCount = new AtomicLong(0L);
   /**
    * Determines whether we are currently refreshing.
    */

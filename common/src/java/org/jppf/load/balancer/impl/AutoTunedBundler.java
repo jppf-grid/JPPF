@@ -18,7 +18,6 @@
 package org.jppf.load.balancer.impl;
 
 import org.jppf.load.balancer.*;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -33,16 +32,11 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class AutoTunedBundler extends AbstractAutoTunedBundler
-{
+public class AutoTunedBundler extends AbstractAutoTunedBundler {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(AutoTunedBundler.class);
-  /**
-   * Determines whether debugging level is set for logging.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether trace level is set for logging.
    */
@@ -53,8 +47,7 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
    * @param profile the parameters of the auto-tuning algorithm,
    * grouped as a performance analysis profile.
    */
-  public AutoTunedBundler(final LoadBalancingProfile profile)
-  {
+  public AutoTunedBundler(final LoadBalancingProfile profile) {
     super((AnnealingTuneProfile) profile);
   }
 
@@ -72,34 +65,28 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
    * @param time total execution time of the new sample.
    */
   @Override
-  public void feedback(final int bundleSize, final double time)
-  {
+  public void feedback(final int bundleSize, final double time) {
     assert bundleSize > 0;
-    if (traceEnabled)
-    {
+    if (traceEnabled) {
       log.trace("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize + " and totalTime=" + time);
     }
 
     // retrieving the record of the bundle size
     BundlePerformanceSample bundleSample;
-    synchronized (samplesMap)
-    {
+    synchronized (samplesMap) {
       bundleSample = samplesMap.get(bundleSize);
-      if (bundleSample == null)
-      {
+      if (bundleSample == null) {
         bundleSample = new BundlePerformanceSample();
         samplesMap.put(bundleSize, bundleSample);
       }
     }
 
     long samples = bundleSample.samples + bundleSize;
-    synchronized (bundleSample)
-    {
+    synchronized (bundleSample) {
       bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
       bundleSample.samples = samples;
     }
-    if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
-    {
+    if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse()) {
       performAnalysis();
       if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
     }
@@ -108,26 +95,21 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
   /**
    * Recompute the bundle size after a performance profile change has been detected.
    */
-  private void performAnalysis()
-  {
+  private void performAnalysis() {
     double stableMean = 0;
-    synchronized (samplesMap)
-    {
+    synchronized (samplesMap) {
       int bestSize = searchBestSize();
       int max = maxSize();
       if ((max > 0) && (bestSize > max)) bestSize = max;
       int counter = 0;
-      while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable())
-      {
+      while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable()) {
         int diff = ((AnnealingTuneProfile) profile).createDiff(bestSize, samplesMap.size(), rnd);
-        if (diff < bestSize)
-        {
+        if (diff < bestSize) {
           // the second part is there to ensure the size is > 0
           if (rnd.nextBoolean()) diff = -diff;
         }
         bundleSize = bestSize + diff;
-        if (samplesMap.get(bundleSize) == null)
-        {
+        if (samplesMap.get(bundleSize) == null) {
           if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + bundleSize);
           return;
         }
@@ -136,30 +118,25 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
 
       bundleSize = Math.max(1, bestSize);
       BundlePerformanceSample sample = samplesMap.get(bundleSize);
-      if (sample != null)
-      {
+      if (sample != null) {
         stableMean = sample.mean;
         samplesMap.clear();
         samplesMap.put(bundleSize, sample);
       }
     }
-    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize
-        + " with the mean execution of " + stableMean);
+    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize + " with the mean execution of " + stableMean);
   }
 
   /**
    * Lookup the best bundle size in the current samples map.
    * @return the best bundle size as an int value.
    */
-  private int searchBestSize()
-  {
+  private int searchBestSize() {
     int bestSize = 0;
     double minorMean = Double.POSITIVE_INFINITY;
-    for (Integer size: samplesMap.keySet())
-    {
+    for (Integer size : samplesMap.keySet()) {
       BundlePerformanceSample sample = samplesMap.get(size);
-      if (sample.mean < minorMean)
-      {
+      if (sample.mean < minorMean) {
         bestSize = size;
         minorMean = sample.mean;
       }
@@ -174,14 +151,12 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler
    * @see org.jppf.load.balancer.Bundler#copy()
    */
   @Override
-  public Bundler copy()
-  {
+  public Bundler copy() {
     return new AutoTunedBundler(profile.copy());
   }
 
   @Override
-  protected int maxSize()
-  {
+  protected int maxSize() {
     if (jppfContext == null) throw new IllegalStateException("jppfContext not set");
     return jppfContext.getMaxBundleSize() / 2;
   }

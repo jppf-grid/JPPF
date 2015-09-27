@@ -21,7 +21,6 @@ package org.jppf.comm.discovery;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -68,10 +67,6 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
    * List of retrieved connection information.
    */
   private LinkedList<JPPFConnectionInformation> infoList = new LinkedList<>();
-  /**
-   * Count of connection information objects used for ordering.
-   */
-  private AtomicLong count = new AtomicLong(0L);
   /**
    * Handles include and exclude IP filters.
    */
@@ -263,14 +258,6 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
    */
   private synchronized InetAddress getGroupInetAddress() {
     return groupInetAddress;
-  }
-
-  /**
-   * Set the multicast group to join.
-   * @param groupInetAddress an {@link InetAddress} instance.
-   */
-  private synchronized void setGroupInetAddress(final InetAddress groupInetAddress) {
-    this.groupInetAddress = groupInetAddress;
   }
 
   @Override

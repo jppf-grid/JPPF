@@ -27,10 +27,6 @@ public class FileReplacerEx {
   /**
    * 
    */
-  private static String exts = "php";
-  /**
-   * 
-   */
   private static String[][] arguments = {
     //{ "C:/Workspaces/temp/jppf", "C:/Workspaces/temp", exts, "pervasiv_", "lolocohe_" },
     //{ "C:/Workspaces/SourceForgeSVN", "C:/Workspaces/temp", exts, "pervasiv_", "lolocohe_" },

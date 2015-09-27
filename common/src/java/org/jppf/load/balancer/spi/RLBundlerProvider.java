@@ -27,18 +27,14 @@ import org.jppf.utils.TypedProperties;
  * @author Laurent Cohen
  * @exclude
  */
-public class RLBundlerProvider implements JPPFBundlerProvider
-{
-
+public class RLBundlerProvider implements JPPFBundlerProvider {
   /**
    * Create a bundler instance using the specified parameters profile.
    * @param profile - an <code>AutoTuneProfile</code> instance.
    * @return an instance of the bundler implementation defined by this provider.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createBundler(org.jppf.load.balancer.LoadBalancingProfile)
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile)
-  {
+  public Bundler createBundler(final LoadBalancingProfile profile) {
     return new RLBundler(profile);
   }
 
@@ -46,22 +42,18 @@ public class RLBundlerProvider implements JPPFBundlerProvider
    * Create a bundler profile containing the parameters of the algorithm.
    * @param configuration - a set of properties defining the algorithm's parameters.
    * @return an {@link org.jppf.load.balancer.impl.RLProfile RLProfile} instance.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration)
-  {
+  public LoadBalancingProfile createProfile(final TypedProperties configuration) {
     return new RLProfile(configuration);
   }
 
   /**
    * Get the name of the algorithm defined by this provider.
    * @return the algorithm's name as a string.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#getAlgorithmName()
    */
   @Override
-  public String getAlgorithmName()
-  {
+  public String getAlgorithmName() {
     return "rl";
   }
 }

@@ -49,10 +49,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether trace log statements are enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * Prefix for the name given to the connection thread.
    */
   public static String CONNECTION_NAME_PREFIX = "jmx@";

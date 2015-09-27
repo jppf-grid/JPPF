@@ -86,10 +86,6 @@ public class NodeTaskWrapper implements Runnable {
    * The class loader that was used to load the task class.
    */
   private final ClassLoader taskClassLoader;
-  /**
-   * Whether cpu time is supported/enabled.
-   */
-  private final boolean cpuTimeEnabled;
 
   /**
    * Initialize this task wrapper with a specified JPPF task.
@@ -102,7 +98,6 @@ public class NodeTaskWrapper implements Runnable {
     this.task = task;
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
-    this.cpuTimeEnabled = cpuTimeEnabled;
   }
 
   /**

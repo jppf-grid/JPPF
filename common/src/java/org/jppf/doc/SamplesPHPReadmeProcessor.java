@@ -21,7 +21,6 @@ package org.jppf.doc;
 import java.io.File;
 import java.util.*;
 
-import org.jppf.JPPFException;
 import org.jppf.utils.FileUtils;
 import org.jppf.utils.streams.StreamUtils;
 
@@ -31,14 +30,6 @@ import org.jppf.utils.streams.StreamUtils;
  */
 public class SamplesPHPReadmeProcessor implements Runnable {
   /**
-   * Marks the start of the readme's content.
-   */
-  private static final String START_CONTENT_TAG = "<!-- $SAMPLE_START_CONTENT$ -->";
-  /**
-   * Marks the end of the readme's content.
-   */
-  private static final String END_CONTENT_TAG = "<!-- $SAMPLE_END_CONTENT$ -->";
-  /**
    * The source directory from which all Readme.html are found.
    */
   private File sourceDir = null;
@@ -46,22 +37,16 @@ public class SamplesPHPReadmeProcessor implements Runnable {
    * The destination directory where all Readme.php are generated.
    */
   private File destDir = null;
-  /**
-   * The template file for each Readme.php.
-   */
-  private String template = null;
 
   /**
    * Initialize this processor with the specified source, destination and template file path.
    * @param sourceDir the source directory from which all Readme.html are found.
    * @param destDir the destination directory where all Readme.php are generated.
-   * @param template the template file for each Readme.php.
    * @throws Exception if any error occurs.
    */
-  public SamplesPHPReadmeProcessor(final File sourceDir, final File destDir, final File template) throws Exception {
+  public SamplesPHPReadmeProcessor(final File sourceDir, final File destDir) throws Exception {
     this.sourceDir = sourceDir;
     this.destDir = destDir;
-    this.template = FileUtils.readTextFile(template);
   }
 
   /**
@@ -107,37 +92,6 @@ public class SamplesPHPReadmeProcessor implements Runnable {
   }
 
   /**
-   * Process the specified html file into an equivalent php file.
-   * @param file the html file to process.
-   * @throws Exception if any error occurs.
-   */
-  private void processFile2(final File file) throws Exception {
-    System.out.println("processing input file " + file);
-    String text = FileUtils.readTextFile(file);
-    int idx = text.indexOf("<h1>");
-    if (idx < 0) throw new JPPFException("could not find start of title for " + file);
-    int idx2 = text.indexOf("</h1>");
-    if (idx2 < 0) throw new JPPFException("could not find end of title for " + file);
-    String title = text.substring(idx + 4, idx2);
-    idx = text.indexOf(START_CONTENT_TAG);
-    if (idx < 0) throw new JPPFException("could not find start of content for " + file);
-    idx2 = text.indexOf(END_CONTENT_TAG);
-    if (idx2 < 0) throw new JPPFException("could not find end of content for " + file);
-    String content = text.substring(idx + START_CONTENT_TAG.length(), idx2);
-    content = content.replace("Readme.html", "Readme.php");
-    String result = template.replace("${TITLE}", title);
-    result = result.replace("${SAMPLE_README}", content);
-    int len = sourceDir.getCanonicalPath().length();
-    String s = file.getParentFile().getCanonicalPath().substring(len);
-    if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
-    s += "/Readme.php";
-    File outFile = new File(destDir, s);
-    FileUtils.mkdirs(outFile);
-    FileUtils.writeTextFile(outFile, result);
-    System.out.println("writing output file " + outFile);
-  }
-
-  /**
    * Run this utility with the specified command-line parameters.
    * @param args the source and destination directories.
    */
@@ -145,8 +99,7 @@ public class SamplesPHPReadmeProcessor implements Runnable {
     try {
       File srcDir = new File(args[0]);
       File destDir = new File(args[1]);
-      File template = new File(args[2]);
-      new SamplesPHPReadmeProcessor(srcDir, destDir, template).run();
+      new SamplesPHPReadmeProcessor(srcDir, destDir).run();
     } catch (Exception e) {
       e.printStackTrace();
     }

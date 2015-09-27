@@ -17,12 +17,10 @@
  */
 package org.jppf.node.protocol;
 
-import java.io.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.*;
 import org.jppf.utils.collections.MetadataImpl;
-import org.slf4j.*;
 
 /**
  * Instances of this class group tasks from the same client together, so they are sent to the same node,
@@ -41,10 +39,6 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
    * Flag indicating whether collection of debug information is available via JMX.
    */
   private static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(JPPFTaskBundle.class);
   /**
    * The unique identifier for the request (the job) this task bundle is a part of.
    */
@@ -291,48 +285,5 @@ public class JPPFTaskBundle extends MetadataImpl implements Comparable<JPPFTaskB
   @Override
   public void setHandshake(final boolean handshake) {
     this.handshake = handshake;
-  }
-
-  /**
-   * Save the state of the Hashtable to a stream (i.e., serialize it).
-   * @param s the stream to serialize to.
-   * @throws IOException if any error occurs.
-   */
-  private void writeObject2(final ObjectOutputStream s) throws IOException {
-    s.writeUTF(uuid);
-    s.writeUTF(name);
-    s.writeObject(uuidPath);
-    int[] taskCounts = { driverQueueTaskCount, taskCount, currentTaskCount, initialTaskCount };
-    s.writeObject(taskCounts);
-    long[] times = { nodeExecutionTime, executionStartTime };
-    s.writeObject(times);
-    s.writeBoolean(handshake);
-    s.writeObject(jobSLA);
-    s.writeObject(jobMetadata);
-  }
-
-  /**
-   * Reconstitute this object from a stream (i.e., deserialize it).
-   * @param s the stream to serialize to.
-   * @throws IOException if any I/O error occurs.
-   * @throws ClassNotFoundException if a class could not be found.
-   */
-  private void readObject2(final ObjectInputStream s) throws IOException, ClassNotFoundException {
-    uuid = s.readUTF();
-    name = s.readUTF();
-    uuidPath = (TraversalList) s.readObject();
-    int[] taskCounts = (int[]) s.readObject();
-    int i = 0;
-    driverQueueTaskCount = taskCounts[i++];
-    taskCount = taskCounts[i++];
-    currentTaskCount = taskCounts[i++];
-    initialTaskCount = taskCounts[i++];
-    long[] times = (long[]) s.readObject();
-    i = 0;
-    nodeExecutionTime = times[i++];
-    executionStartTime = times[i++];
-    handshake = s.readBoolean();
-    jobSLA = (JobSLA) s.readObject();
-    jobMetadata = (JobMetadata) s.readObject();
   }
 }

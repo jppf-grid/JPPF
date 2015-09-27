@@ -21,7 +21,7 @@ package org.jppf.utils.configuration;
 import java.util.Set;
 import java.util.regex.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -38,17 +38,9 @@ public class SubstitutionsHandler {
    */
   private static Logger log = LoggerFactory.getLogger(SubstitutionsHandler.class);
   /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Determines whether trace log statements are enabled.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Prefix for references to environment variables.
-   */
-  private static final String ENV_PREFIX ="env.";
   /**
    * Provider for environment variables.
    */

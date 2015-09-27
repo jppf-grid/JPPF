@@ -34,10 +34,6 @@ public class CancelJobAction extends AbstractJobAction {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(CancelJobAction.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this action.

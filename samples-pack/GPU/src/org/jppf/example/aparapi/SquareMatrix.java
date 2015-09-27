@@ -25,8 +25,7 @@ import java.util.Random;
  * The values are stored in a one-dimensional float array of length <code>size*size</code>.
  * @author Laurent Cohen
  */
-public class SquareMatrix implements Serializable
-{
+public class SquareMatrix implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -48,21 +47,19 @@ public class SquareMatrix implements Serializable
    * Initialize this matrix with a specified size.
    * @param size the size of this matrix.
    */
-  public SquareMatrix(final int size)
-  {
+  public SquareMatrix(final int size) {
     this.size = size;
-    values = new float[size*size];
+    values = new float[size * size];
   }
 
   /**
    * Initialize this matrix from an array of flot values.
    * @param values the values of the matrix.
    */
-  public SquareMatrix(final float[] values)
-  {
+  public SquareMatrix(final float[] values) {
     if ((values == null) || (values.length < 1)) throw new IllegalArgumentException("matrix values must be a non empty float[]");
     int newSize = (int) (Math.sqrt(values.length));
-    if (newSize * newSize != values.length)  throw new IllegalArgumentException("not a square matrix");
+    if (newSize * newSize != values.length) throw new IllegalArgumentException("not a square matrix");
     this.size = newSize;
     this.values = values;
   }
@@ -70,11 +67,9 @@ public class SquareMatrix implements Serializable
   /**
    * Initialize this matrix with random values.
    */
-  public void assignRandomValues()
-  {
+  public void assignRandomValues() {
     Random rand = new Random(System.nanoTime());
-    for (int i=0; i<values.length; i++)
-    {
+    for (int i = 0; i < values.length; i++) {
       // values in ]-RANDOM_RANGE, +RANDOM_RANGE[
       values[i] = RANDOM_RANGE * (2f * rand.nextFloat() - 1f);
     }
@@ -84,8 +79,7 @@ public class SquareMatrix implements Serializable
    * Get the size of this matrix.
    * @return the size as an integer value.
    */
-  public int getSize()
-  {
+  public int getSize() {
     return size;
   }
 
@@ -95,9 +89,8 @@ public class SquareMatrix implements Serializable
    * @param column the column coordinate.
    * @return the specified value as a float.
    */
-  public float getValueAt(final int row, final int column)
-  {
-    return values[row*size + column];
+  public float getValueAt(final int row, final int column) {
+    return values[row * size + column];
   }
 
   /**
@@ -106,9 +99,8 @@ public class SquareMatrix implements Serializable
    * @param column the column coordinate.
    * @param value the value to set.
    */
-  public void setValueAt(final int row, final int column, final float value)
-  {
-    values[row*size + column] = value;
+  public void setValueAt(final int row, final int column, final float value) {
+    values[row * size + column] = value;
   }
 
   /**
@@ -116,16 +108,14 @@ public class SquareMatrix implements Serializable
    * @param otherMatrix the matrix to multiply this one by.
    * @return a new matrix containing the result of the multiplication.
    */
-  public SquareMatrix multiply(final SquareMatrix otherMatrix)
-  {
+  public SquareMatrix multiply(final SquareMatrix otherMatrix) {
     if (otherMatrix.getSize() != size) return null;
     SquareMatrix result = new SquareMatrix(size);
-    for (int i=0; i<size; i++)
-    {
-      for (int j=0; j<size; j++)
-      {
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
         float value = 0f;
-        for (int k=0; k< size; k++) value += otherMatrix.getValueAt(k, j) * getValueAt(i, k);
+        for (int k = 0; k < size; k++)
+          value += otherMatrix.getValueAt(k, j) * getValueAt(i, k);
         result.setValueAt(j, i, value);
       }
     }
@@ -139,14 +129,11 @@ public class SquareMatrix implements Serializable
    * @param matrix the matrix to multiply by.
    * @return a new row represented as an array of <code>float</code> values.
    */
-  public float[] multiplyRow(final int n, final SquareMatrix matrix)
-  {
+  public float[] multiplyRow(final int n, final SquareMatrix matrix) {
     float[] result = new float[size];
-    for (int col=0; col<size; col++)
-    {
+    for (int col = 0; col < size; col++) {
       float sum = 0f;
-      for (int row=0; row<size; row++)
-      {
+      for (int row = 0; row < size; row++) {
         sum += matrix.getValueAt(row, col) * getValueAt(n, row);
       }
       result[col] = sum;
@@ -158,8 +145,7 @@ public class SquareMatrix implements Serializable
    * Get the values.
    * @return an array of float.
    */
-  public float[] getValues()
-  {
+  public float[] getValues() {
     return values;
   }
 }

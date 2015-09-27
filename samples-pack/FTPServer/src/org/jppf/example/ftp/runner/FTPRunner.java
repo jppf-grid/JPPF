@@ -29,8 +29,7 @@ import org.slf4j.*;
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class FTPRunner
-{
+public class FTPRunner {
   /**
    * Logger for this class.
    */
@@ -46,19 +45,13 @@ public class FTPRunner
    * The size of the matrices is specified as a configuration property named &quot;matrix.size&quot;.<br>
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
       perform();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -67,8 +60,7 @@ public class FTPRunner
    * Perform the test.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform() throws Exception
-  {
+  private static void perform() throws Exception {
     output("Running FTP demo");
     long totalTime = System.nanoTime();
     JPPFJob job = new JPPFJob();
@@ -83,21 +75,19 @@ public class FTPRunner
     // add a single task
     job.add(new FTPTask("input.txt", "output.html"));
     List<Task<?>> results = jppfClient.submitJob(job);
-    for (Task<?> t: results)
-    {
-      if (t.getThrowable() != null) System.out.println("task error: " +  ExceptionUtils.getStackTrace(t.getThrowable()));
+    for (Task<?> t : results) {
+      if (t.getThrowable() != null) System.out.println("task error: " + ExceptionUtils.getStackTrace(t.getThrowable()));
       else System.out.println("task result: " + t.getResult());
     }
     totalTime = System.nanoTime() - totalTime;
-    output("Computation time: " + StringUtils.toStringDuration(totalTime/1000000L));
+    output("Computation time: " + StringUtils.toStringDuration(totalTime / 1000000L));
   }
 
   /**
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

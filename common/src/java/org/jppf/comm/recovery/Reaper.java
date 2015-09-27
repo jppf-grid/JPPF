@@ -40,14 +40,6 @@ public class Reaper
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Size of the reaper thread pool.
-   */
-  private int poolSize = 1;
-  /**
-   * The interval between two runs of the reaper.
-   */
-  private long runInterval = 60000L;
-  /**
    * Reaper thread pool.
    */
   private ExecutorService threadPool = null;
@@ -73,8 +65,6 @@ public class Reaper
   public Reaper(final RecoveryServer server, final int poolSize, final long runInterval)
   {
     this.server = server;
-    this.poolSize = poolSize;
-    this.runInterval = runInterval;
     threadPool = Executors.newFixedThreadPool(poolSize, new JPPFThreadFactory("Reaper"));
     timer = new Timer("Reaper timer");
     timer.schedule(new ReaperTask(), 0L, runInterval);

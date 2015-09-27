@@ -25,8 +25,7 @@ import org.jppf.io.*;
 import org.jppf.nio.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.utils.ObjectSerializerImpl;
 
 /**
  * Context object associated with a socket channel used by the class server of the JPPF driver.
@@ -34,14 +33,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioContext<S> {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(AbstractClassContext.class);
-  /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The resource read from or written to the associated channel.
    */

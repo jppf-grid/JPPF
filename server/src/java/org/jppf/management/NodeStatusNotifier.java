@@ -19,8 +19,6 @@
 package org.jppf.management;
 
 import org.jppf.node.event.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
 
 /**
  * This NodeLifeCycleListener implementations is used to update the node state
@@ -29,18 +27,6 @@ import org.slf4j.*;
  * @exclude
  */
 public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements NodeLifeCycleListener {
-  /**
-   * Logger for this class.
-   */
-  private static final Logger log = LoggerFactory.getLogger(NodeStatusNotifier.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Base name used for localization lookups.
-   */
-  private static final String I18N_BASE = "org.jppf.server.i18n.messages";
   /**
    * The mbean that provides information on the node's state.
    */
@@ -87,16 +73,6 @@ public class NodeStatusNotifier extends DefaultLifeCycleErrorHandler implements 
         e.printStackTrace();
       }
     }
-  }
-
-  /**
-   * Get a localized message given its unique name and the current locale.
-   * @param message the unique name of the localized message.
-   * @return a message in the current locale, or the default locale
-   *         if the localization for the current locale is not found.
-   */
-  private static String localize(final String message) {
-    return LocalizationUtils.getLocalized(I18N_BASE, message);
   }
 
   @Override

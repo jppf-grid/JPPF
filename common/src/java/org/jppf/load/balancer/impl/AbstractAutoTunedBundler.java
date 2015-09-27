@@ -34,8 +34,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @exclude
  */
-public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
-{
+public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler {
   /**
    * Logger for this class.
    */
@@ -59,8 +58,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
    * @param profile the parameters of the auto-tuning algorithm,
    * grouped as a performance analysis profile.
    */
-  public AbstractAutoTunedBundler(final AnnealingTuneProfile profile)
-  {
+  public AbstractAutoTunedBundler(final AnnealingTuneProfile profile) {
     super(profile);
     log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
     if (bundleSize < 1) bundleSize = 1;
@@ -81,31 +79,26 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
    * @param time total execution time of the new sample.
    */
   @Override
-  public void feedback(final int bundleSize, final double time)
-  {
+  public void feedback(final int bundleSize, final double time) {
     assert bundleSize > 0;
     if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize + " and totalTime=" + time);
 
     // retrieving the record of the bundle size
     BundlePerformanceSample bundleSample;
-    synchronized (samplesMap)
-    {
+    synchronized (samplesMap) {
       bundleSample = samplesMap.get(bundleSize);
-      if (bundleSample == null)
-      {
+      if (bundleSample == null) {
         bundleSample = new BundlePerformanceSample();
         samplesMap.put(bundleSize, bundleSample);
       }
     }
 
     long samples = bundleSample.samples + bundleSize;
-    synchronized (bundleSample)
-    {
+    synchronized (bundleSample) {
       bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
       bundleSample.samples = samples;
     }
-    if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse())
-    {
+    if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse()) {
       performAnalysis();
       if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
     }
@@ -114,30 +107,22 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
   /**
    * Recompute the bundle size after a performance profile change has been detected.
    */
-  private void performAnalysis()
-  {
+  private void performAnalysis() {
     double stableMean = 0;
-    synchronized (samplesMap)
-    {
+    synchronized (samplesMap) {
       int bestSize = searchBestSize();
       int max = maxSize();
       if ((max > 0) && (bestSize > max)) bestSize = max;
       int counter = 0;
-      while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable())
-      {
+      while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable()) {
         int diff = ((AnnealingTuneProfile) profile).createDiff(bestSize, samplesMap.size(), rnd);
-        if (diff < bestSize)
-        {
+        if (diff < bestSize) {
           // the second part is there to ensure the size is > 0
           if (rnd.nextBoolean()) diff = -diff;
         }
         bundleSize = bestSize + diff;
-        if (samplesMap.get(bundleSize) == null)
-        {
-          if (debugEnabled)
-          {
-            log.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + bundleSize);
-          }
+        if (samplesMap.get(bundleSize) == null) {
+          if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": The next bundle size that will be used is " + bundleSize);
           return;
         }
         counter++;
@@ -145,38 +130,30 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler
 
       bundleSize = Math.max(1, bestSize);
       BundlePerformanceSample sample = samplesMap.get(bundleSize);
-      if (sample != null)
-      {
+      if (sample != null) {
         stableMean = sample.mean;
         samplesMap.clear();
         samplesMap.put(bundleSize, sample);
       }
     }
-    log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize
-        + " with the mean execution of " + stableMean);
+    log.info("Bundler#" + bundlerNumber + ": The bundle size converged to " + bundleSize + " with the mean execution of " + stableMean);
   }
 
   /**
    * Lookup the best bundle size in the current samples map.
    * @return the best bundle size as an int value.
    */
-  private int searchBestSize()
-  {
+  private int searchBestSize() {
     int bestSize = 0;
     double minorMean = Double.POSITIVE_INFINITY;
-    for (Integer size: samplesMap.keySet())
-    {
+    for (Integer size : samplesMap.keySet()) {
       BundlePerformanceSample sample = samplesMap.get(size);
-      if (sample.mean < minorMean)
-      {
+      if (sample.mean < minorMean) {
         bestSize = size;
         minorMean = sample.mean;
       }
     }
-    if (debugEnabled)
-    {
-      log.debug("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
-    }
+    if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
     return bestSize;
   }
 }

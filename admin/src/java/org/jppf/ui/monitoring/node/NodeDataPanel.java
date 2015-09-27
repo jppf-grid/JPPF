@@ -116,7 +116,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     treeTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     treeTable.doLayout();
     treeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-    treeTable.getTree().setCellRenderer(new NodeRenderer(this));
+    treeTable.getTree().setCellRenderer(new NodeRenderer());
     treeTable.setDefaultRenderer(Object.class, new NodeTableCellRenderer(this));
     JScrollPane sp = new JScrollPane(treeTable);
     setUIComponent(sp);

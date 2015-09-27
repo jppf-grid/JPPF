@@ -52,10 +52,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   private static AtomicLong jobCount = new AtomicLong(0);
   /**
-   * The default configuration all batch handlers.
-   */
-  private static final ExecutorServiceConfiguration DEFAULT_CONFIG = new ExecutorServiceConfigurationImpl();
-  /**
    * The minimum number of tasks that must be submitted before they are sent to the server.
    */
   private int batchSize = 0;

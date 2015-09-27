@@ -38,10 +38,6 @@ class JobPollingHandler extends AbstractRefreshHandler {
    */
   private static Logger log = LoggerFactory.getLogger(JobPollingHandler.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-  /**
    * The job monitor.
    */
   private final JobMonitor monitor;

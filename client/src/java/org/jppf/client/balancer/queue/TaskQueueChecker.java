@@ -27,7 +27,6 @@ import org.jppf.client.balancer.*;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.impl.*;
-import org.jppf.node.protocol.JobMetadata;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -314,11 +313,13 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @param taskBundle the job.
    * @param context    the current node context.
    */
+  @SuppressWarnings("deprecation")
   private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final ChannelWrapper context) {
     context.checkBundler(bundler, jppfContext);
     if (context.getBundler() instanceof JobAwareness) {
-      JobMetadata metadata = taskBundle.getMetadata();
-      ((JobAwareness) context.getBundler()).setJobMetadata(metadata);
+      ((JobAwareness) context.getBundler()).setJobMetadata(taskBundle.getMetadata());
+    } else if (context.getBundler() instanceof JobAwarenessEx) {
+      ((JobAwarenessEx) context.getBundler()).setJob(taskBundle);
     }
   }
 

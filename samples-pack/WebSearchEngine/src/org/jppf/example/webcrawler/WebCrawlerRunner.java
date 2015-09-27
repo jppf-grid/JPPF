@@ -31,22 +31,16 @@ import org.jppf.ui.options.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
-
 /**
  * Example of a workflow to visit a web ste starting from a given page, and matching the visited
  * pages with a user-specified search query.
  * @author Laurent Cohen
  */
-public class WebCrawlerRunner
-{
+public class WebCrawlerRunner {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(WebCrawlerRunner.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The JPPF client.
    */
@@ -80,10 +74,8 @@ public class WebCrawlerRunner
    * @param option an option used as an entry point to the UI.
    * @throws Exception if the computation failed.
    */
-  public static void perform(final String url, final String query, final int depth, final Option option) throws Exception
-  {
-    synchronized(WebCrawlerRunner.class)
-    {
+  public static void perform(final String url, final String query, final int depth, final Option option) throws Exception {
+    synchronized (WebCrawlerRunner.class) {
       if (client == null) client = new JPPFClient();
     }
     init();
@@ -102,18 +94,13 @@ public class WebCrawlerRunner
    * @return a list of URLs to visit.
    * @throws Exception if the computation failed.
    */
-  public static List<Task<?>> doPerform(final Collection<String> urls, final String query, final boolean doSearch) throws Exception
-  {
+  public static List<Task<?>> doPerform(final Collection<String> urls, final String query, final boolean doSearch) throws Exception {
     int n = 0;
     JPPFJob job = new JPPFJob();
-    for (String url: urls)
-    {
-      try
-      {
-      job.add(new CrawlerTask(url, query, ++n, doSearch));
-      }
-      catch(Throwable t)
-      {
+    for (String url : urls) {
+      try {
+        job.add(new CrawlerTask(url, query, ++n, doSearch));
+      } catch (Throwable t) {
         log.error(t.getMessage(), t);
         if (t instanceof Exception) throw (Exception) t;
         else if (t instanceof Error) throw (Error) t;
@@ -129,8 +116,7 @@ public class WebCrawlerRunner
   /**
    * Initialize http connection settings from the configuration file.
    */
-  private static void init()
-  {
+  private static void init() {
     int n = JPPFConfiguration.getProperties().getInt("http.socket.timeout", 3000);
     JPPFHttpDefaultParamsFactory.setSocketTimeout(n);
     n = JPPFConfiguration.getProperties().getInt("http.method.retry-handler.retries", 2);
@@ -141,13 +127,10 @@ public class WebCrawlerRunner
    * Creates a window that pops up during the computation.
    * The window contains a progress bar.
    */
-  public static void createOrDisplayWaitWindow()
-  {
-    if (window == null)
-    {
+  public static void createOrDisplayWaitWindow() {
+    if (window == null) {
       Frame frame = null;
-      for (Frame f: Frame.getFrames())
-      {
+      for (Frame f : Frame.getFrames()) {
         if (f.isVisible()) frame = f;
       }
       progressBar = new JProgressBar();
@@ -161,16 +144,14 @@ public class WebCrawlerRunner
       window.getContentPane().add(progressBar);
       window.getContentPane().setBackground(Color.white);
     }
-    SwingUtilities.invokeLater(new Runnable()
-    {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         Dimension d = window.getOwner().getSize();
         Point p = window.getOwner().getLocationOnScreen();
         int w = 300;
         int h = 60;
-        window.setBounds(p.x+(d.width-w)/2, p.y+(d.height-h)/2, w, h);
+        window.setBounds(p.x + (d.width - w) / 2, p.y + (d.height - h) / 2, w, h);
         updateProgress(0);
         window.setVisible(true);
       }
@@ -180,14 +161,11 @@ public class WebCrawlerRunner
   /**
    * Close the wait window and release the resources it uses.
    */
-  public static void hideWaitWindow()
-  {
+  public static void hideWaitWindow() {
     //if (window.isVisible()) window.dispose();
-    SwingUtilities.invokeLater(new Runnable()
-    {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         window.setVisible(false);
       }
     });
@@ -197,11 +175,9 @@ public class WebCrawlerRunner
    * Update the progress value of the progress bar.
    * @param n the new value to set.
    */
-  public static synchronized void updateProgress(final int n)
-  {
+  public static synchronized void updateProgress(final int n) {
     urlCount += n;
-    if (progressBar != null)
-    {
+    if (progressBar != null) {
       progressBar.setString("Visited urls: " + urlCount);
     }
   }
@@ -210,8 +186,7 @@ public class WebCrawlerRunner
    * Task for submitting the computation from a separate thread.
    * The goal is to avoid doing the calculations in the AWT event thread.
    */
-  public static class CrawlExecution implements Runnable
-  {
+  public static class CrawlExecution implements Runnable {
     /**
      * the sequence to compare those in the database with.
      */
@@ -231,8 +206,7 @@ public class WebCrawlerRunner
      * @param query the name of the substitution matrix to use in the alignments.
      * @param depth the path to the database of sequences.
      */
-    public CrawlExecution(final String url, final String query, final int depth)
-    {
+    public CrawlExecution(final String url, final String query, final int depth) {
       this.url = url;
       this.query = query;
       this.depth = depth;
@@ -243,40 +217,32 @@ public class WebCrawlerRunner
      * @see java.lang.Runnable#run()
      */
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         long start = System.currentTimeMillis();
         Set<LinkMatch> results = new TreeSet<>(new LinkMatch.Comparator());
         Set<String> toSearch = new HashSet<>();
         toSearch.add(url);
         List<String> temp = new ArrayList<>();
         temp.add(url);
-        for (int i=0; i<=depth; i++)
-        {
+        for (int i = 0; i <= depth; i++) {
           boolean doSearch = (i >= depth);
           List<Task<?>> tasks = doPerform(doSearch ? toSearch : temp, query, doSearch);
           temp.clear();
-          for (Task<?> t: tasks)
-          {
+          for (Task<?> t : tasks) {
             CrawlerTask task = (CrawlerTask) t;
-            if (task.getThrowable() != null)
-            {
-              String msg = "Exception in task #"+task.getNumber()+ ", url: "+ task.getUrl();
+            if (task.getThrowable() != null) {
+              String msg = "Exception in task #" + task.getNumber() + ", url: " + task.getUrl();
               log.info(msg, task.getThrowable());
               continue;
             }
             Collection<LinkMatch> matchList = task.getMatchedLinks();
-            for (LinkMatch lm: matchList)
-            {
+            for (LinkMatch lm : matchList) {
               if (!results.contains(lm)) results.add(lm);
             }
             Collection<String> urlList = task.getToVisit();
-            for (String s: urlList)
-            {
-              if (!toSearch.contains(s))
-              {
+            for (String s : urlList) {
+              if (!toSearch.contains(s)) {
                 toSearch.add(s);
                 temp.add(s);
               }
@@ -284,18 +250,15 @@ public class WebCrawlerRunner
           }
         }
         StringBuilder sb = new StringBuilder();
-        for (LinkMatch lm: results)
-        {
-          sb.append(StringUtils.padLeft(""+lm.relevance, ' ', 6)).append("     ");
+        for (LinkMatch lm : results) {
+          sb.append(StringUtils.padLeft("" + lm.relevance, ' ', 6)).append("     ");
           sb.append(lm.url).append('\n');
         }
         ((AbstractOption) option.findFirstWithName("/resultText")).setValue(sb.toString());
         long elapsed = System.currentTimeMillis() - start;
         hideWaitWindow();
         log.info("Computation done in " + elapsed + " ms");
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }

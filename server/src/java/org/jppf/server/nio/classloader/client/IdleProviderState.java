@@ -23,23 +23,12 @@ import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * This class represents an idle state for a class loader provider.
  * @author Laurent Cohen
  */
 public class IdleProviderState extends ClientClassServerState {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(IdleProviderState.class);
-  /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-
   /**
    * Initialize this state with a specified NioServer.
    * @param server the NioServer this state relates to.

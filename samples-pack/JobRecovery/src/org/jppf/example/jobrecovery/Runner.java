@@ -33,8 +33,7 @@ import org.jppf.utils.stats.JPPFStatisticsHelper;
  * in the use case of an application crash before it completes.
  * @author Laurent Cohen
  */
-public class Runner
-{
+public class Runner {
   /**
    * The JPPF client.
    */
@@ -44,11 +43,9 @@ public class Runner
    * Entry point.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
+  public static void main(final String[] args) {
     JobPersistence<String> persistenceManager = null;
-    try
-    {
+    try {
       client = new JPPFClient();
       // configure the driver so it behaves suitably for this demo
       int nbNodes = configureDriver();
@@ -59,13 +56,13 @@ public class Runner
       Collection<String> keys = persistenceManager.allKeys();
       // if there is no job in the persistent store,
       // we submit a job normally and simulate an application crash
-      if (keys.isEmpty())
-      {
+      if (keys.isEmpty()) {
         int nbTasks = 10 * nbNodes;
         System.out.println("no job found in persistence store, creating a new job with " + nbTasks + " tasks");
         JPPFJob job = new JPPFJob();
         // add 10 tasks per node, each task waiting for 1 second
-        for (int i=0; i<nbTasks; i++) job.add(new MyTask(1000L, i+1));
+        for (int i = 0; i < nbTasks; i++)
+          job.add(new MyTask(1000L, i + 1));
         // set the persistence manager so the job will be persisted
         // each time completed tasks are received from the driver
         job.setPersistenceManager(persistenceManager);
@@ -86,14 +83,12 @@ public class Runner
       }
       // otherwise, if there are jobs in the persistence store,
       // we load them and execute them on the grid
-      else
-      {
+      else {
         System.out.println("found jobs in persistence store: " + keys);
-        for (String key: keys)
-        {
+        for (String key : keys) {
           // load the job from the persistent store, using its key (= job uuid)
           JPPFJob job = persistenceManager.loadJob(key);
-          System.out.println("loaded job '" + key +"' from persistence store " + persistenceManager);
+          System.out.println("loaded job '" + key + "' from persistence store " + persistenceManager);
           // don't forget this! the application may crash again
           job.setPersistenceManager(persistenceManager);
           // start the job execution, only non-completed tasks will be executed
@@ -102,13 +97,9 @@ public class Runner
           persistenceManager.deleteJob(key);
         }
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
       if (persistenceManager != null) persistenceManager.close();
     }
@@ -119,13 +110,11 @@ public class Runner
    * @param job the job to execute.
    * @throws Exception if any error occurs.
    */
-  private static void executeJob(final JPPFJob job) throws Exception
-  {
+  private static void executeJob(final JPPFJob job) throws Exception {
     List<Task<?>> results = client.submitJob(job);
-    for (Task<?> task: results)
-    {
-      if (task.getThrowable() != null) System.out.println("task "+ task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getThrowable()));
-      else System.out.println("task "+ task.getId() + " result: " + task.getResult());
+    for (Task<?> task : results) {
+      if (task.getThrowable() != null) System.out.println("task " + task.getId() + " exception occurred: " + ExceptionUtils.getStackTrace(task.getThrowable()));
+      else System.out.println("task " + task.getId() + " result: " + task.getResult());
     }
   }
 
@@ -136,8 +125,7 @@ public class Runner
    * @return the number of nodes connected to the driver.
    * @throws Exception if any error occurs while configuring the driver.
    */
-  private static int configureDriver() throws Exception
-  {
+  private static int configureDriver() throws Exception {
     // get a connection to the driver's JMX server
     JMXDriverConnectionWrapper jmxDriver = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     // obtain the current load-balancing settings

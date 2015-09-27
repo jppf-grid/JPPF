@@ -114,7 +114,7 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    * @param value the initial size to add noise to
    * @return the "noisy" size.
    */
-  private double noisyValue(final double value) {
+  double noisyValue(final double value) {
     double newValue = value * (1d + 0.1d * (0.5d - rand.nextDouble()));
     return (newValue < 0d) ? 0d : newValue;
   }
@@ -151,6 +151,7 @@ public abstract class AbstractProportionalBundler extends AbstractAdaptiveBundle
    */
   @Override
   public void dispose() {
+    super.dispose();
     synchronized (bundlers) {
       bundlers.remove(this);
     }

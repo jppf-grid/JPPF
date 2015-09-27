@@ -38,10 +38,6 @@ public class JPPFNodeTaskMonitor extends NotificationBroadcasterSupport implemen
    */
   private static Logger log = LoggerFactory.getLogger(JPPFNodeTaskMonitor.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The mbean object name sent with the notifications.
    */
   private ObjectName OBJECT_NAME;

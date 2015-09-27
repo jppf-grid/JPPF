@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
 import java.security.KeyStore;
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.net.ssl.*;
@@ -47,10 +47,6 @@ public final class SSLHelper {
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Mapping of identifiers to corresponding SSL configuration.
-   */
-  private static final Map<String, SSLHelper> helperMap = new Hashtable<>();
   /**
    * The SSL configuration properties.
    */

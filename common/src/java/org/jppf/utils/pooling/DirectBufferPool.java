@@ -20,24 +20,12 @@ package org.jppf.utils.pooling;
 
 import java.nio.ByteBuffer;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * Static factory for a bool of direct byte buffers.
  * @author Laurent Cohen
  * @exclude
  */
-public class DirectBufferPool
-{
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(DirectBufferPool.class);
-  /**
-   * Determines whether debug-level logging is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public class DirectBufferPool {
   /**
    * 
    */
@@ -47,8 +35,7 @@ public class DirectBufferPool
    * Get a buffer from the pool, or a new buffer if the pool is empty.
    * @return a {@link ByteBuffer} instance.
    */
-  public static ByteBuffer provideBuffer()
-  {
+  public static ByteBuffer provideBuffer() {
     return pool.get();
   }
 
@@ -56,8 +43,7 @@ public class DirectBufferPool
    * Release a buffer into the pool and make it available.
    * @param buffer the buffer to release.
    */
-  public static void releaseBuffer(final ByteBuffer buffer)
-  {
+  public static void releaseBuffer(final ByteBuffer buffer) {
     pool.put(buffer);
   }
 }

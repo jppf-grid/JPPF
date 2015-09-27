@@ -454,4 +454,9 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
     in.defaultReadObject();
     resultCollector = new JPPFResultCollector(this);
   }
+
+  @Override
+  public int getTaskCount() {
+    return tasks.size();
+  }
 }

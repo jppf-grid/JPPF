@@ -38,10 +38,6 @@ public class ScriptedJobSelector implements JobSelector {
    */
   private static Logger log = LoggerFactory.getLogger(ScriptedJobSelector.class);
   /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * The language of the script to evaluate.
    */
   private final String language;

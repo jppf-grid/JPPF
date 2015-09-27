@@ -43,10 +43,6 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The thread polling the local channel.
    */
   protected ChannelSelectorThread selectorThread = null;

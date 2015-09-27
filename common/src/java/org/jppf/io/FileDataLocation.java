@@ -60,10 +60,6 @@ public class FileDataLocation extends AbstractDataLocation {
    */
   private int blockSize = 0;
   /**
-   * The current count of bytes read from/written to the block of data currently being transferred.
-   */
-  private int blockCount = 0;
-  /**
    * Count of instances of this class which refer to the same underlying file.
    * This is a fix for bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-105">JPPF-105 Temporary files disappear when setting a large MemoryMapDataProvider as data provider in a JPPFJob</a>.
    */
@@ -264,7 +260,6 @@ public class FileDataLocation extends AbstractDataLocation {
       transferring = false;
       return -1;
     }
-    else blockCount += n;
     if (!buffer.hasRemaining()) {
       count += blockSize;
       blockSize = 0;

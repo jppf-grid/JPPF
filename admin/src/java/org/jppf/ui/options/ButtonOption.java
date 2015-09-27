@@ -22,23 +22,12 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import org.jppf.ui.utils.GuiUtils;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Option implementation with a JButton as the underlying component.
  * @author Laurent Cohen
  */
-public class ButtonOption extends AbstractOption
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(ButtonOption.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public class ButtonOption extends AbstractOption {
   /**
    * Determines whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
    */
@@ -48,8 +37,7 @@ public class ButtonOption extends AbstractOption
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  public ButtonOption()
-  {
+  public ButtonOption() {
   }
 
   /**
@@ -58,8 +46,7 @@ public class ButtonOption extends AbstractOption
    * @param label the label displayed with the checkbox.
    * @param tooltip the tooltip associated with the checkbox.
    */
-  public ButtonOption(final String name, final String label, final String tooltip)
-  {
+  public ButtonOption(final String name, final String label, final String tooltip) {
     this(name, label, tooltip, false);
   }
 
@@ -70,8 +57,7 @@ public class ButtonOption extends AbstractOption
    * @param tooltip the tooltip associated with the checkbox.
    * @param toggle specifies
    */
-  public ButtonOption(final String name, final String label, final String tooltip, final boolean toggle)
-  {
+  public ButtonOption(final String name, final String label, final String tooltip, final boolean toggle) {
     this.name = name;
     this.label = label;
     this.toggle = toggle;
@@ -83,12 +69,10 @@ public class ButtonOption extends AbstractOption
    * Create the UI components for this option.
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     AbstractButton button = toggle ? new JToggleButton() : new JButton();
     if (label != null) button.setText(label);
-    if (iconPath != null)
-    {
+    if (iconPath != null) {
       ImageIcon icon = GuiUtils.loadIcon(iconPath);
       if (icon != null) button.setIcon(icon);
     }
@@ -99,17 +83,13 @@ public class ButtonOption extends AbstractOption
 
   /**
    * This method does nothing.
-   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
     AbstractButton button = (AbstractButton) UIComponent;
-    button.addActionListener(new ActionListener()
-    {
+    button.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent e)
-      {
+      public void actionPerformed(final ActionEvent e) {
         fireValueChanged();
       }
     });
@@ -118,22 +98,18 @@ public class ButtonOption extends AbstractOption
   /**
    * Enable or disable this option.
    * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.Option#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
     UIComponent.setEnabled(enabled);
   }
 
   /**
    * This method always returns false, since buttons have no value to persist.
    * @return false.
-   * @see org.jppf.ui.options.AbstractOption#isPersistent()
    */
   @Override
-  public boolean isPersistent()
-  {
+  public boolean isPersistent() {
     return false;
   }
 
@@ -141,8 +117,7 @@ public class ButtonOption extends AbstractOption
    * Determine whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
    * @return <code>true</code> if this object is a toggle button, <code>false</code> otherwise.
    */
-  public boolean isToggle()
-  {
+  public boolean isToggle() {
     return toggle;
   }
 
@@ -150,8 +125,7 @@ public class ButtonOption extends AbstractOption
    * Specify whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
    * @param toggle <code>true</code> if this object is a toggle button, <code>false</code> otherwise.
    */
-  public void setToggle(final boolean toggle)
-  {
+  public void setToggle(final boolean toggle) {
     this.toggle = toggle;
   }
 }

@@ -21,8 +21,6 @@ package org.jppf.utils;
 import java.io.*;
 import java.util.*;
 
-import org.slf4j.*;
-
 /**
  * This class is an extension of {@link TypedProperties} which does not allow modifying the properties it contains.
  * The methods in the super class that modify the properties have been overriden such that they do nothing, without
@@ -34,10 +32,6 @@ public class UnmodifiableTypedProperties extends TypedProperties {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(UnmodifiableTypedProperties.class);
 
   /**
    * Creates an empty unmodifiable properties map.

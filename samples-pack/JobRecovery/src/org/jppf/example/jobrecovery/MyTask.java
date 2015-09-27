@@ -25,8 +25,7 @@ import org.jppf.node.protocol.AbstractTask;
  * then prints a message on the node console.
  * @author Laurent Cohen
  */
-public class MyTask extends AbstractTask<String>
-{
+public class MyTask extends AbstractTask<String> {
   /**
    * How long this task waits before completing.
    */
@@ -37,26 +36,18 @@ public class MyTask extends AbstractTask<String>
    * @param duration the duration in milliseconds.
    * @param id an id assigned to this task.
    */
-  public MyTask(final long duration, final int id)
-  {
+  public MyTask(final long duration, final int id) {
     this.duration = duration;
     setId("" + id);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       Thread.sleep(duration);
       System.out.println("task " + getId() + " completed successfully");
       setResult("successful completion");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       System.out.println("task " + getId() + " completed with error [" + e.getClass().getName() + ": " + e.getMessage() + ']');
       setThrowable(e);
     }

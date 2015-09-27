@@ -26,18 +26,14 @@ import org.jppf.utils.TypedProperties;
  * Provider implementation for the custom load-balancing algorithm.
  * @author Laurent Cohen
  */
-public class CustomLoadBalancerProvider implements JPPFBundlerProvider
-{
-
+public class CustomLoadBalancerProvider implements JPPFBundlerProvider {
   /**
    * Create a bundler instance using the specified parameters profile.
    * @param profile no used in this implementation.
    * @return an instance of {@link CustomLoadBalancer}.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createBundler(org.jppf.load.balancer.LoadBalancingProfile)
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile)
-  {
+  public Bundler createBundler(final LoadBalancingProfile profile) {
     return new CustomLoadBalancer(profile);
   }
 
@@ -45,23 +41,19 @@ public class CustomLoadBalancerProvider implements JPPFBundlerProvider
    * Create a bundler profile containing the parameters of the algorithm.
    * This method returns null, as the algorithm does not use any parameter.
    * @param configuration a set of properties defining the algorithm parameters.
-   * @return null.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
+   * @return {@code null}.
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration)
-  {
+  public LoadBalancingProfile createProfile(final TypedProperties configuration) {
     return null;
   }
 
   /**
    * Get the name of the algorithm defined by this provider.
    * @return the algorithm name as a string.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#getAlgorithmName()
    */
   @Override
-  public String getAlgorithmName()
-  {
+  public String getAlgorithmName() {
     return "customLoadBalancer";
   }
 }

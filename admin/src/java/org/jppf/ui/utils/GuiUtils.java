@@ -53,14 +53,6 @@ public final class GuiUtils {
    */
   private static final Pattern TOOLTIP_PATTERN = Pattern.compile("\\n");
   /**
-   * Keywords to look for and replace in the legend items of the charts.
-   */
-  private static final String[] KEYWORDS = { "Execution", "execution", "Maximum", "Minimum", "Average", "Cumulated" };
-  /**
-   * The the replacements words for the keywords in the legend items. Used to shorten the legend labels.
-   */
-  private static final String[] REPLACEMENTS = { "Exec", "exec", "Max", "Min", "Avg", "Cumul" };
-  /**
    *
    */
   private static Map<String, String> shortenerMap = createShortener();

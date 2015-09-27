@@ -41,10 +41,6 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The scenario configuration.
    */
   private final ScenarioConfiguration config;

@@ -55,10 +55,6 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    */
   private AtomicInteger nbNodes = new AtomicInteger(0);
   /**
-   * The option holding the status bar UI component.
-   */
-  private final OptionElement statusBarOption;
-  /**
    * The option holding the count of drivers.
    */
   private final FormattedNumberOption serverField;
@@ -72,7 +68,6 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    * @param statusBarOption the option holding the status bar UI component.
    */
   public StatusBarHandler(final OptionElement statusBarOption) {
-    this.statusBarOption = statusBarOption;
     this.serverField = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbServers");
     this.nodeField = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbNodes");
     TopologyManager manager = StatsHandler.getInstance().getTopologyManager();

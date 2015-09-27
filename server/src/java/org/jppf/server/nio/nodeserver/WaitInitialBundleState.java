@@ -84,8 +84,11 @@ class WaitInitialBundleState extends NodeServerState {
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
       Bundler bundler = server.getBundler().copy();
+      boolean isPeer = bundle.getParameter(IS_PEER, false);
+      context.setPeer(isPeer);
       JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
       if (systemInfo != null) {
+        systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
         context.setNodeInfo(systemInfo);
         if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
@@ -93,8 +96,6 @@ class WaitInitialBundleState extends NodeServerState {
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
       context.setBundler(bundler);
-      boolean isPeer = bundle.getParameter(IS_PEER, false);
-      context.setPeer(isPeer);
       int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
       if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !offline && (port >= 0)) {
         String host = getChannelHost(channel);

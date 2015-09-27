@@ -21,8 +21,6 @@ package org.jppf.server.nio.classloader;
 import org.jppf.classloader.ResourceProvider;
 import org.jppf.nio.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Instances of this class serve class loading requests from the JPPF nodes.
@@ -31,18 +29,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public abstract class ClassNioServer<S extends Enum<S>, T extends Enum<T>> extends NioServer<S, T> {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(ClassNioServer.class);
-  /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Reads resource files from the classpath.
    */

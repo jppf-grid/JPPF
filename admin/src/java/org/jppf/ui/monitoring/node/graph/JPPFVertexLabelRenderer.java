@@ -101,14 +101,6 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
         backgroundSelected = AbstractTreeCellRenderer.INACTIVE_SELECTION_COLOR;
         font = italicFont;
       }
-      /*
-      else {
-        JMXConnectionWrapper wrapper = data.getJmxWrapper();
-        boolean b = wrapper != null && wrapper.isConnected();
-        if (!b) foreground = AbstractTreeCellRenderer.UNMANAGED_COLOR;
-      }
-      */
-      //renderer.setToolTipText(computeNodeText(data));
     }
 
     if (font != null) renderer.setFont(font);
@@ -118,18 +110,5 @@ public class JPPFVertexLabelRenderer extends DefaultVertexLabelRenderer {
     renderer.setForeground(foreground);
 
     return renderer;
-  }
-
-  /**
-   * Compute the tooltipe for a node vertex.
-   * @param node contains the information to put in the tooltip.
-   * @return the text to set as tooltip.
-   */
-  private String computeNodeText(final TopologyNode node) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("uuid: ").append(node.getUuid()).append("<br>");
-    sb.append("Threads: ").append(node.getNodeState().getThreadPoolSize());
-    sb.append(" | Tasks: ").append(node.getNodeState().getNbTasksExecuted());
-    return sb.toString();
   }
 }

@@ -25,23 +25,12 @@ import javax.crypto.*;
 
 import org.jppf.data.transform.JPPFDataTransform;
 import org.jppf.example.dataencryption.helper.Helper;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Sample data transform that uses the DES cryptographic algorithm with a 56 bits secret key.
  * @author Laurent Cohen
  */
-public class SecureKeyCipherTransform implements JPPFDataTransform
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(SecureKeyCipherTransform.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public class SecureKeyCipherTransform implements JPPFDataTransform {
   /**
    * Secret (symmetric) key used for encryption and decryption.
    */
@@ -55,8 +44,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
    * @see org.jppf.data.transform.JPPFDataTransform#wrap(byte[])
    */
   @Override
-  public void wrap(final InputStream source, final OutputStream destination) throws Exception
-  {
+  public void wrap(final InputStream source, final OutputStream destination) throws Exception {
     // create a cipher instance
     Cipher cipher = Cipher.getInstance(Helper.getTransformation());
     // initialize the cipher with the key stored in the secured keystore
@@ -91,8 +79,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
    * @see org.jppf.data.transform.JPPFDataTransform#unwrap(byte[])
    */
   @Override
-  public void unwrap(final InputStream source, final OutputStream destination) throws Exception
-  {
+  public void unwrap(final InputStream source, final OutputStream destination) throws Exception {
     // start by reading the secret key to use to decrypt the data
     DataInputStream dis = new DataInputStream(source);
     // read the length of the key
@@ -100,8 +87,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
     // read the encrypted key
     byte[] keyBytes = new byte[keyLength];
     int count = 0;
-    while (count < keyLength)
-    {
+    while (count < keyLength) {
       int n = dis.read(keyBytes, count, keyLength - count);
       if (n > 0) count += n;
       else throw new EOFException("could only read " + count + " bytes of the key, out of " + keyLength);
@@ -127,8 +113,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
    * @return a {@link SecretKey} instance.
    * @throws Exception if any error occurs.
    */
-  private SecretKey generateKey() throws Exception
-  {
+  private SecretKey generateKey() throws Exception {
     KeyGenerator gen = KeyGenerator.getInstance(Helper.getAlgorithm());
     return gen.generateKey();
   }
@@ -140,12 +125,10 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
    * @param destination the stream into which the encrypted/decrypted data is written.
    * @throws Exception if any error occurs while encrypting or decrypting the data.
    */
-  private void transform(final InputStream source, final OutputStream destination) throws Exception
-  {
+  private void transform(final InputStream source, final OutputStream destination) throws Exception {
     byte[] buffer = new byte[8192];
     // encrypt or decrypt from source to destination
-    while (true)
-    {
+    while (true) {
       int n = source.read(buffer);
       if (n <= 0) break;
       destination.write(buffer, 0, n);
@@ -159,12 +142,9 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
    * The secret key should be stored in a secure location such as a key store.
    * @return a <code>SecretKey</code> instance.
    */
-  private static synchronized SecretKey getSecretKey()
-  {
-    if (secretKey == null)
-    {
-      try
-      {
+  private static synchronized SecretKey getSecretKey() {
+    if (secretKey == null) {
+      try {
         // get the keystore password
         char[] password = Helper.getPassword();
         ClassLoader cl = SecureKeyCipherTransform.class.getClassLoader();
@@ -174,9 +154,7 @@ public class SecureKeyCipherTransform implements JPPFDataTransform
         ks.load(is, password);
         // get the secret key from the keystore
         secretKey = (SecretKey) ks.getKey(Helper.getKeyAlias(), password);
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }

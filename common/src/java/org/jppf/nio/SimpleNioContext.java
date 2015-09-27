@@ -18,23 +18,12 @@
 
 package org.jppf.nio;
 
-import org.slf4j.*;
-
 /**
  * Context associated with an open socket channel.
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioContext<S>
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(SimpleNioContext.class);
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
+public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioContext<S> {
 
   /**
    * Read data from a channel.
@@ -43,8 +32,7 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
    * @throws Exception if an error occurs while reading the data.
    */
   @Override
-  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public boolean readMessage(final ChannelWrapper<?> wrapper) throws Exception {
     if (message == null) message = new BaseNioMessage(channel);
     return message.read();
   }
@@ -56,8 +44,7 @@ public abstract class SimpleNioContext<S extends Enum<S>> extends AbstractNioCon
    * @throws Exception if an error occurs while writing the data.
    */
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception
-  {
+  public boolean writeMessage(final ChannelWrapper<?> wrapper) throws Exception {
     //if (message == null) message = new BaseNioMessage(sslHandler != null);
     return message.write();
   }

@@ -49,10 +49,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether trace-level logging is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * Constant for JPPF automatic connection discovery
    */
   static final String VALUE_JPPF_DISCOVERY = "jppf_discovery";

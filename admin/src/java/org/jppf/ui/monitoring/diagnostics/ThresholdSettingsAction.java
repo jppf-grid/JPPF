@@ -45,21 +45,9 @@ public class ThresholdSettingsAction extends AbstractTopologyAction {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether the "OK" button was pressed.
-   */
-  private boolean isOk = false;
-  /**
    * Panel containing the dialog for entering the number of threads and their priority.
    */
   private OptionElement panel = null;
-  /**
-   * Number of threads.
-   */
-  private int nbThreads = 1;
-  /**
-   * Threads priority.
-   */
-  private int priority = Thread.NORM_PRIORITY;
   /**
    * The JVM Health Panel option.
    */

@@ -45,13 +45,6 @@ public abstract class AbstractBundler implements Bundler
   protected LoadBalancingProfile profile;
 
   /**
-   * Default constructor.
-   */
-  private AbstractBundler()
-  {
-  }
-
-  /**
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm,
    */

@@ -234,11 +234,6 @@ public class TextAreaOption extends AbstractOption {
    */
   private class EditorMouseListener extends MouseAdapter {
     /**
-     * The string to copy to the clipboard.
-     */
-    private String text;
-
-    /**
      * Processes right-click events to display popup menus.
      * @param event the mouse event to process.
      */

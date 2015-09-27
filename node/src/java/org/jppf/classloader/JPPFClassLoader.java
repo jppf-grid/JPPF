@@ -19,7 +19,6 @@ package org.jppf.classloader;
 
 import java.util.List;
 
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -31,10 +30,6 @@ public class JPPFClassLoader extends AbstractJPPFClassLoader {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFClassLoader.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Initialize this class loader with a parent class loader.

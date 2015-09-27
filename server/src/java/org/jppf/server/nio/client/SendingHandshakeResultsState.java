@@ -42,10 +42,6 @@ class SendingHandshakeResultsState extends ClientServerState
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * Initialize this state.
    * @param server the server that handles this state.
    */

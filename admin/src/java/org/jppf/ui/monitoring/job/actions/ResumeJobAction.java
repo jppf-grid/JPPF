@@ -34,10 +34,6 @@ public class ResumeJobAction extends AbstractJobAction {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ResumeJobAction.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
 
   /**
    * Initialize this action.

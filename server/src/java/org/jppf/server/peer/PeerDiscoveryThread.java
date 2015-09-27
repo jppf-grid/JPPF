@@ -39,10 +39,6 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * Interval for removal cleanup.
    */
   private static final long REMOVAL_CLEANUP_INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.peer.discovery.removal.cleanup.interval", 30_000L);

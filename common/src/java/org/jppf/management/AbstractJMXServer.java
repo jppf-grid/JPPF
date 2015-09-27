@@ -23,25 +23,13 @@ import java.util.concurrent.locks.*;
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * This class is a wrapper around a JMX management server.
  * It is used essentially to hide the details of the remote management protocol used.
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractJMXServer implements JMXServer
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractJMXServer.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public abstract class AbstractJMXServer implements JMXServer {
   /**
    * Used to synchronize lookup for available port.
    */
@@ -76,39 +64,33 @@ public abstract class AbstractJMXServer implements JMXServer
   protected boolean ssl = false;
 
   @Override
-  public void stop() throws Exception
-  {
+  public void stop() throws Exception {
     stopped = true;
     connectorServer.stop();
   }
 
   @Override
-  public MBeanServer getServer()
-  {
+  public MBeanServer getServer() {
     return server;
   }
 
   @Override
-  public boolean isStopped()
-  {
+  public boolean isStopped() {
     return stopped;
   }
 
   @Override
-  public String getId()
-  {
+  public String getId() {
     return id;
   }
 
   @Override
-  public int getManagementPort()
-  {
+  public int getManagementPort() {
     return managementPort;
   }
 
   @Override
-  public String getManagementHost()
-  {
+  public String getManagementHost() {
     return managementHost;
   }
 }

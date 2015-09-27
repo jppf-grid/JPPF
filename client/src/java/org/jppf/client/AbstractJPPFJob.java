@@ -20,14 +20,13 @@ package org.jppf.client;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.event.JobListener;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.*;
-import org.slf4j.*;
+import org.jppf.utils.JPPFUuid;
 
 /**
  * Instances of this class represent a JPPF job and hold all the required elements:
@@ -35,10 +34,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJob {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractJPPFJob.class);
   /**
    * Explicit serialVersionUID.
    */

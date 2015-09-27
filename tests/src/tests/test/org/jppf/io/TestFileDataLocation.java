@@ -28,7 +28,6 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
-import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -37,12 +36,7 @@ import test.org.jppf.test.setup.common.*;
  * Unit tests for {@link org.jppf.io.FileDataLocation}.
  * @author Laurent Cohen
  */
-public class TestFileDataLocation extends Setup1D1N1C
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(TestFileDataLocation.class);
+public class TestFileDataLocation extends Setup1D1N1C {
   /**
    * 
    */
@@ -52,23 +46,19 @@ public class TestFileDataLocation extends Setup1D1N1C
    * Test the execution of a job with a very large footprint, and multiple dispatches from the load-balancer.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=20000)
-  public void testSubmitLargeDataProvider() throws Exception
-  {
+  @Test(timeout = 20000)
+  public void testSubmitLargeDataProvider() throws Exception {
     System.out.println("******************** TestFileDataLocation.testSubmitLargeDataProvider() ********************");
     int size = 128 * 1024 * 1024;
     int nbTasks = 3;
-    try
-    {
+    try {
       configureLoadBalancing();
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
       DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("bytes", new byte[size]);
       job.setDataProvider(dp);
       List<Task<?>> results = client.submitJob(job);
-    }
-    finally
-    {
+    } finally {
       resetLoadBalancing();
     }
   }
@@ -77,8 +67,7 @@ public class TestFileDataLocation extends Setup1D1N1C
    * Configure the driver's load balancing settings.
    * @throws Exception if any error occurs
    */
-  private void configureLoadBalancing() throws Exception
-  {
+  private void configureLoadBalancing() throws Exception {
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     assertNotNull(driver);
     JPPFSystemInformation info = driver.systemInformation();
@@ -93,8 +82,7 @@ public class TestFileDataLocation extends Setup1D1N1C
    * Reset the driver's load balancing settings.
    * @throws Exception if any error occurs
    */
-  private void resetLoadBalancing() throws Exception
-  {
+  private void resetLoadBalancing() throws Exception {
     LoadBalancingInformation tmpLbi = oldLbi;
     oldLbi = null;
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);

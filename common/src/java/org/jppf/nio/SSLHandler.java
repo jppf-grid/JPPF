@@ -249,14 +249,6 @@ public class SSLHandler {
   }
 
   /**
-   * 
-   * @throws Exception if any error occurs.
-   */
-  private void processEngineResult() throws Exception {
-    while (processEngineResultStatus() && processHandshake()) continue;
-  }
-
-  /**
    * Process the current handshaking status.
    * @return <code>true</code> if handshaking is still ongoing, <code>false</code> otherwise.
    * @throws Exception if any error occurs.
@@ -392,15 +384,6 @@ public class SSLHandler {
    */
   public ByteBuffer getChannelSendBuffer() {
     return channelSendBuffer;
-  }
-
-  /**
-   * Perform an <code>SSLEngine.wrap()</code> operation.
-   * @return the resulting {@link SSLEngineResult}.
-   * @throws Exception if any error occurs.
-   */
-  private SSLEngineResult doWrap() throws Exception {
-    return sslEngine.wrap(applicationSendBuffer, channelSendBuffer);
   }
 
   /**

@@ -23,21 +23,12 @@ import org.jppf.serialization.SerializationUtils;
 import org.jppf.server.JPPFDriver;
 import org.jppf.utils.JPPFIdentifiers;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
-import org.slf4j.*;
 
 /**
  * Context associated with a channel serving tasks to a node.
  * @author Laurent Cohen
  */
 public class AcceptorContext extends SimpleNioContext<AcceptorState> {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AcceptorContext.class);
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * Identifier for the channel.
    */

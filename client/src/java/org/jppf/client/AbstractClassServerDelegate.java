@@ -197,21 +197,4 @@ abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandl
   public void uncaughtException(final Thread t, final Throwable e) {
     log.error("uncaught exception", e);
   }
-
-  /**
-   * Construct a resource provider based on the JPPF configuration.
-   * @return an {@link AbstractResourceProvider} implementation.
-   */
-  private ResourceProvider initResourceProvider() {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    String name = config.getString("jppf.resource.provider.class", ResourceProviderImpl.class.getName());
-    if (debugEnabled) log.debug("jppf.resource.provider.class = {}", name);
-    try {
-      Class<?> clazz = Class.forName(name);
-      return (ResourceProvider) clazz.newInstance(); 
-    } catch (Exception e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-    }
-    return new ResourceProviderImpl();
-  }
 }

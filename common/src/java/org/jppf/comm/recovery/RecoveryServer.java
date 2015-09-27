@@ -20,7 +20,6 @@ package org.jppf.comm.recovery;
 
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -46,10 +45,6 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable {
    * The list of active connections.
    */
   private final List<ServerConnection> connections = new ArrayList<>(100);
-  /**
-   * The count of connections that have been opened.
-   */
-  private final AtomicInteger connectionCount = new AtomicInteger(0);
   /**
    * Performs the connections checks at regular intervals.
    */

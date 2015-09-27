@@ -33,10 +33,6 @@ public final class ReflectionHelper {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ReflectionHelper.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
    * Invoke a method using reflection.

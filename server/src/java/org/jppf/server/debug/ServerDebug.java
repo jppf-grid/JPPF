@@ -112,20 +112,6 @@ public class ServerDebug implements ServerDebugMBean {
     return sb.toString();
   }
 
-  /**
-   * Get the set of channels for the specified server name.
-   * @param name the name of the server for which to get the channels.
-   * @return a set of <code>ChannelWrapper</code> instances.
-   */
-  private Set<ChannelWrapper<?>> findSetFromName(final String name)
-  {
-    if (NioConstants.CLIENT_CLASS_SERVER.equals(name)) return clientClassLoaderSet();
-    else if (NioConstants.NODE_CLASS_SERVER.equals(name)) return nodeClassLoaderSet();
-    else if (NioConstants.NODE_SERVER.equals(name)) return nodeSet();
-    else if (NioConstants.CLIENT_SERVER.equals(name)) return clientSet();
-    return acceptorSet();
-  }
-
   @Override
   public String allChannels() {
     StringBuilder sb = new StringBuilder();
@@ -232,14 +218,6 @@ public class ServerDebug implements ServerDebugMBean {
    */
   private Set<ChannelWrapper<?>> clientSet() {
     return new HashSet<>(driver.getClientNioServer().getAllConnections());
-  }
-
-  /**
-   * Get the set of client class loader connections.
-   * @return a set of {@link ChannelWrapper} instances.
-   */
-  private Set<ChannelWrapper<?>> acceptorSet() {
-    return new HashSet<>(driver.getAcceptorServer().getAllConnections());
   }
 
   @Override

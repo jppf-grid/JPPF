@@ -28,24 +28,22 @@ import org.jppf.node.protocol.AbstractTask;
  * to the maximum task length specified in the job metadata.
  * @author Laurent Cohen
  */
-public class CustomLoadBalancerTask extends AbstractTask<String>
-{
+public class CustomLoadBalancerTask extends AbstractTask<String> {
   /**
    * The task data, corresponding approximately to its memory footprint.
    */
-  private byte[] data = null;
+  byte[] data = null;
   /**
    * The task duration, corresponding the maximum task length specified in the job metadata.
    */
-  private long duration = 0L;
+  long duration = 0L;
 
   /**
    * Initialize this task with the specified data size and task duration.
    * @param size the data size in bytes.
    * @param duration the task duration in milliseconds.
    */
-  public CustomLoadBalancerTask(final int size, final long duration)
-  {
+  public CustomLoadBalancerTask(final int size, final long duration) {
     data = new byte[size];
     this.duration = duration;
   }
@@ -53,20 +51,15 @@ public class CustomLoadBalancerTask extends AbstractTask<String>
   /**
    * The execution of this task consists in performing a <code>Thread.sleep(duration)</code>,
    * and printing a message that will allow us to check that the load-balancer behaved as expected.
-   * @see java.lang.Runnable#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     // this task's id is specified on the client side and contains
     // the name of the job it is a part of
     System.out.println("Starting execution of task " + this.getId());
-    try
-    {
+    try {
       Thread.sleep(duration);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       setThrowable(e);
     }
     // set the execution results

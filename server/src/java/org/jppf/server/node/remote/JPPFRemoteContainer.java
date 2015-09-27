@@ -23,7 +23,6 @@ import java.util.concurrent.*;
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
 import org.jppf.server.node.JPPFContainer;
-import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -38,10 +37,6 @@ public class JPPFRemoteContainer extends JPPFContainer {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JPPFRemoteContainer.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */

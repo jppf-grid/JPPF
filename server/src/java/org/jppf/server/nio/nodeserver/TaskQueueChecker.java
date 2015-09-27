@@ -462,9 +462,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * @param taskBundle the job.
    * @param context the current node context.
    */
+  @SuppressWarnings("deprecation")
   private void updateBundler(final Bundler bundler, final TaskBundle taskBundle, final C context) {
     context.checkBundler(bundler, jppfContext);
     Bundler ctxBundler = context.getBundler();
     if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJobMetadata(taskBundle.getMetadata());
+    else if (ctxBundler instanceof JobAwarenessEx) ((JobAwarenessEx) ctxBundler).setJob(taskBundle);
   }
 }

@@ -26,7 +26,6 @@ import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.junit.Test;
-import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -37,10 +36,6 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestConnectionPool extends Setup1D1N {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(TestConnectionPool.class);
   /**
    * The JPPF client.
    */

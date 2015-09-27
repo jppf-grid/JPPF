@@ -38,10 +38,6 @@ public class JMXThreadsRunner extends AbstractScenarioRunner
    */
   static Logger log = LoggerFactory.getLogger(JMXThreadsRunner.class);
   /**
-   * The count of itearations runs.
-   */
-  private int iterationsCount = 0;
-  /**
    * Executor used to restart the nodes as fast as possible.
    */
   private ExecutorService executor = null;

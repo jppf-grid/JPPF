@@ -40,10 +40,6 @@ public final class JPPFConfiguration {
    */
   private static Logger log = LoggerFactory.getLogger(JPPFConfiguration.class);
   /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Name of the system property holding the location of the JPPF configuration file.
    */
   public static final String CONFIG_PROPERTY = "jppf.config";

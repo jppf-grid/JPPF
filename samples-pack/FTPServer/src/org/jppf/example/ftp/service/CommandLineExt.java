@@ -26,8 +26,7 @@ import org.apache.ftpserver.main.CommandLine;
  * while keeping the convenience of the XML configuration file.
  * @author Laurent Cohen
  */
-public class CommandLineExt extends CommandLine
-{
+public class CommandLineExt extends CommandLine {
   /**
    * Path to the FTP server's XML configuration file.
    */
@@ -37,8 +36,7 @@ public class CommandLineExt extends CommandLine
    * Initialize this object with the specified configuration file.
    * @param configFile the path to an ftpd XML configuration file.
    */
-  public CommandLineExt(final String configFile)
-  {
+  public CommandLineExt(final String configFile) {
     super();
     this.configFile = configFile;
   }
@@ -48,8 +46,7 @@ public class CommandLineExt extends CommandLine
    * @return an <code>FtpServer</code> instance.
    * @throws Exception if any error occurs.
    */
-  public FtpServer createServer() throws Exception
-  {
-    return super.getConfiguration(new String[] {configFile});
+  public FtpServer createServer() throws Exception {
+    return super.getConfiguration(new String[] { configFile });
   }
 }

@@ -45,17 +45,9 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   private static Logger log = LoggerFactory.getLogger(TestDriverJobManagementMBean.class);
   /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
-  /**
    * A "short" duration for this test.
    */
   private static final long TIME_SHORT = 1000L;
-  /**
-   * A "long" duration for this test.
-   */
-  private static final long TIME_LONG = 3000L;
 
   /**
    * We test a job with 1 task, and attempt to cancel it before completion.

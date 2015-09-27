@@ -32,35 +32,27 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * 
  * @author Laurent Cohen
  */
-public class S3Runner extends AbstractScenarioRunner
-{
+public class S3Runner extends AbstractScenarioRunner {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(S3Runner.class);
-  /**
-   * The count of itearations runs.
-   */
-  private int iterationsCount = 0;
+  private static Logger log = LoggerFactory.getLogger(S3Runner.class);
 
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       TypedProperties props = getConfiguration().getProperties();
       int nbJobs = props.getInt("nbJobs", 1);
       int nbTasks = props.getInt("nbTasks", 1);
       long count = props.getInt("count", 1);
       output("submitting " + nbJobs + " jobs with " + nbTasks + " each, count=" + count);
       //StreamUtils.waitKeyPressed("press any key to continue ...");
-  
+
       long totalIterationTime = 0L;
       long min = Long.MAX_VALUE;
       long max = 0L;
-  
-      for (int i=1; i<=nbJobs; i++)
-      {
+
+      for (int i = 1; i <= nbJobs; i++) {
         long start = System.nanoTime();
         JPPFJob job = BaseTestHelper.createJob("S3-job-" + i, true, false, nbTasks, MyTask.class, count);
         job.getMetadata().setParameter("job.name", "job-" + i);
@@ -71,12 +63,9 @@ public class S3Runner extends AbstractScenarioRunner
         totalIterationTime += elapsed;
         output("Iteration #" + i + " performed in " + StringUtils.toStringDuration(elapsed));
       }
-      output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / nbJobs) +
-          ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max) + 
-          ", total time: " + StringUtils.toStringDuration(totalIterationTime));
-    }
-    catch (Exception e)
-    {
+      output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / nbJobs) + ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max)
+          + ", total time: " + StringUtils.toStringDuration(totalIterationTime));
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -85,8 +74,7 @@ public class S3Runner extends AbstractScenarioRunner
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

@@ -37,11 +37,7 @@ public class S2Runner extends AbstractScenarioRunner
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(S2Runner.class);
-  /**
-   * The count of itearations runs.
-   */
-  private int iterationsCount = 0;
+  private static Logger log = LoggerFactory.getLogger(S2Runner.class);
 
   @Override
   public void run()

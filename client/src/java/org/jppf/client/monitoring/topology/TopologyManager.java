@@ -83,11 +83,11 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
   /**
    * Refreshes the states of the nodes at rehular intervals.
    */
-  private final NodeRefreshHandler refreshHandler;
+  final NodeRefreshHandler refreshHandler;
   /**
    * Refreshes the latests JVM health snapshots of the drivers and nodes at rehular intervals.
    */
-  private final JVMHealthRefreshHandler jvmHealthRefreshHandler;
+  final JVMHealthRefreshHandler jvmHealthRefreshHandler;
 
   /**
    * Initialize this topology manager with a new {@link JPPFClient} and the specified listeners.

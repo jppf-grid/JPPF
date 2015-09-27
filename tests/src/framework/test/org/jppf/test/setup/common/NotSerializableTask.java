@@ -23,14 +23,13 @@ import org.jppf.node.protocol.AbstractTask;
 /**
  * A task which holds a non-serializable object.
  */
-public class NotSerializableTask extends AbstractTask<String>
-{
+public class NotSerializableTask extends AbstractTask<String> {
   /**
    * A non-serializable object.
    */
-  private NotSerializableObject nso = null;
+  NotSerializableObject nso = null;
   /**
-   *  <code>true</code> if the non-serializable object should be created in the constructor, <code>false</code> if it should be created in the client.
+   * <code>true</code> if the non-serializable object should be created in the constructor, <code>false</code> if it should be created in the client.
    */
   private final boolean instantiateInClient;
 
@@ -39,15 +38,13 @@ public class NotSerializableTask extends AbstractTask<String>
    * @param instantiateInClient <code>true</code> if the non-serializable object should be created in the constructor (client side),
    * <code>false</code> if it should be created in the <code>run()</code> method (node side).
    */
-  public NotSerializableTask(final boolean instantiateInClient)
-  {
+  public NotSerializableTask(final boolean instantiateInClient) {
     this.instantiateInClient = instantiateInClient;
     if (instantiateInClient) nso = new NotSerializableObject();
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     if (!instantiateInClient) nso = new NotSerializableObject();
     setResult("success");
   }

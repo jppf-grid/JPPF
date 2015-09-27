@@ -314,27 +314,4 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     return list;
   }
-
-  /**
-   * Select the uuids of th ejobs specified by a given job selector.
-   * @param selector determines for which jobs to return the uuid.
-   * @return a list of uuids, possibly empty.
-   */
-  private List<ServerJob> selectJobs(final JobSelector selector) {
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
-    if ((selector == null) || (selector instanceof AllJobsSelector)) return queue.getAllJobs();
-    List<ServerJob> jobs = new ArrayList<>();
-    if (selector instanceof JobUuidSelector) {
-      Set<String> uuids = ((JobUuidSelector) selector).getUuids();
-      for (String uuid: uuids) {
-        ServerJob job = queue.getJob(uuid);
-        if (job != null) jobs.add(job);
-      }
-    } else {
-      for (ServerJob job: queue.getAllJobs()) {
-        if (selector.accepts(job.getJob())) jobs.add(job);
-      }
-    }
-    return jobs;
-  }
 }

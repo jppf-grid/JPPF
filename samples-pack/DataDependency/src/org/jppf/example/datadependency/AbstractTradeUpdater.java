@@ -238,7 +238,7 @@ public abstract class AbstractTradeUpdater implements TickerListener, Runnable {
      * @param tradeIdList the list of impacted trades to recompute on the node.
      * @throws Exception if any error occurs.
      */
-    private void submitOneJobPerTrade(final String nodeId, final List<String> tradeIdList) throws Exception {
+    void submitOneJobPerTrade(final String nodeId, final List<String> tradeIdList) throws Exception {
       ExecutionPolicy policy = new Equal("jppf.uuid", false, nodeId);
       // create a job for each trade
       for (String tradeId: tradeIdList) {

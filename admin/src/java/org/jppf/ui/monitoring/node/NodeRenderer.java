@@ -33,16 +33,9 @@ import org.jppf.ui.utils.*;
  */
 public class NodeRenderer extends AbstractTreeCellRenderer {
   /**
-   * The topology tree view.
-   */
-  private final NodeDataPanel panel;
-
-  /**
    * Default constructor.
-   * @param panel the topology tree view.
    */
-  public NodeRenderer(final NodeDataPanel panel) {
-    this.panel = panel;
+  public NodeRenderer() {
     defaultNonSelectionBackground = getBackgroundNonSelectionColor();
     defaultSelectionBackground = getBackgroundSelectionColor();
   }

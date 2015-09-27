@@ -21,7 +21,6 @@ package org.jppf.server.nio.acceptor;
 import javax.net.ssl.SSLEngine;
 
 import org.jppf.nio.*;
-import org.jppf.server.JPPFDriver;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -39,14 +38,6 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
    * Determines whether DEBUG logging level is enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
-   * Reference to the driver.
-   */
-  private JPPFDriver driver = JPPFDriver.getInstance();
 
   /**
    * Initialize this server with the specified port numbers.

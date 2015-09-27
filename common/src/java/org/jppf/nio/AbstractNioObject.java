@@ -19,24 +19,13 @@
 package org.jppf.nio;
 
 import org.jppf.io.DataLocation;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Abstract implementation of the {@link NioObject} interface, providing the means to keep stateful information
  * across multiple calls to the <code>read()</code> or <code>write()</code> methods.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioObject implements NioObject
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractNioObject.class);
-  /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public abstract class AbstractNioObject implements NioObject {
   /**
    * The size of the data ot send or receive.
    */
@@ -59,27 +48,23 @@ public abstract class AbstractNioObject implements NioObject
    * @param location the object which holds the data to read or write.
    * @param size the size of the data.
    */
-  protected AbstractNioObject(final DataLocation location, final int size)
-  {
+  protected AbstractNioObject(final DataLocation location, final int size) {
     this.location = location;
     this.size = size;
   }
 
   @Override
-  public DataLocation getData()
-  {
+  public DataLocation getData() {
     return location;
   }
 
   @Override
-  public int getSize()
-  {
+  public int getSize() {
     return size;
   }
 
   @Override
-  public long getChannelCount()
-  {
+  public long getChannelCount() {
     return channelCount;
   }
 }

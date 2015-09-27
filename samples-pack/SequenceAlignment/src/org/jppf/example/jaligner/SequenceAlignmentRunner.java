@@ -18,12 +18,7 @@
 
 package org.jppf.example.jaligner;
 
-import jaligner.Sequence;
-import jaligner.matrix.MatrixLoader;
-import jaligner.util.SequenceParser;
-
 import java.awt.*;
-import java.io.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,6 +31,10 @@ import org.jppf.ui.options.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
+import jaligner.Sequence;
+import jaligner.matrix.MatrixLoader;
+import jaligner.util.SequenceParser;
+
 
 /**
  * Example of a searching a sequence in a database, that has the highest alignment score
@@ -47,10 +46,6 @@ public class SequenceAlignmentRunner {
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(SequenceAlignmentRunner.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The JPPF client.
    */
@@ -161,28 +156,6 @@ public class SequenceAlignmentRunner {
     log.info("Total time = " + StringUtils.toStringDuration(elapsed) + ", calculation time = " + StringUtils.toStringDuration(elapsed2));
     hideWaitWindow();
     return maxTask;
-  }
-
-  /**
-   * Load a sequence from the specified file path.
-   * @param path location of the sequence.
-   * @return sequence the sequence read form the file.
-   * @throws IOException if an error occurs when reading the file.
-   */
-  private static String loadSampleSequence(final String path) throws IOException {
-    InputStream is = null;
-    StringBuilder buffer = new StringBuilder();
-    try {
-      is = SequenceAlignmentRunner.class.getClassLoader().getResourceAsStream(path);
-      if (is == null) is = new BufferedInputStream(new FileInputStream(path));
-      int ch;
-      while ((ch = is.read()) != -1) {
-        buffer.append((char) ch);
-      }
-    } finally {
-      if (is != null) is.close();
-    }
-    return buffer.toString();
   }
 
   /**

@@ -257,25 +257,6 @@ public class MBeanStaticProxyGenerator {
 
   /**
    * Generate the code for calling the same method in the superclass.
-   * @param m the MBean interface method to generate the code for.
-   * @throws Exception if any error occurs.
-   */
-  private void generateSuperCall(final Method m) throws Exception {
-    printIndent();
-    if (m.getReturnType() != void.class) print("return (").print(m.getReturnType().getSimpleName()).print(") ");
-    print(" super.").print(m.getName()).print("(");
-    Class<?>[] types = m.getParameterTypes();
-    if (types.length > 0) {
-      for (int i=0; i<types.length; i++) {
-        if (i > 0) print(", ");
-        print("param" + i);
-      }
-    }
-    println(");");
-  }
-
-  /**
-   * Generate the code for calling the same method in the superclass.
    * @throws Exception if any error occurs.
    */
   private void generateGetMBeanName() throws Exception {

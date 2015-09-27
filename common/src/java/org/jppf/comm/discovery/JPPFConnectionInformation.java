@@ -23,7 +23,6 @@ import static org.jppf.utils.ComparisonUtils.*;
 import java.io.*;
 
 import org.jppf.utils.StringUtils;
-import org.slf4j.*;
 
 /**
  * This class encapsulates the connection information for a JPPF driver.
@@ -35,14 +34,6 @@ public class JPPFConnectionInformation implements Serializable, Comparable<JPPFC
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JPPFConnectionInformation.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
   /**
    * The host name.
    */

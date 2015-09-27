@@ -15,18 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jppf.ui.monitoring.job.actions;
+
+package org.jppf.load.balancer;
+
+import org.jppf.node.protocol.*;
 
 /**
- * This action suspends a job and causes all sub-jobs currently executing to be canceled and requeued on the server.
+ * Bundler implementations should implement this interface if they wish to have access to a job's information.
+ * @author Laurent Cohen
  */
-public class SuspendRequeueJobAction extends AbstractSuspendJobAction {
+public interface JobAwarenessEx {
   /**
-   * Initialize this action.
+   * Get the current job's metadata.
+   * @return a {@link JPPFDistributedJob} instance.
    */
-  public SuspendRequeueJobAction() {
-    setupIcon("/org/jppf/ui/resources/suspend_requeue.gif");
-    putValue(NAME, localize("job.suspend_requeue.label"));
-    requeue = true;
-  }
+  JPPFDistributedJob getJob();
+
+  /**
+   * Set the current job's metadata.
+   * @param job a {@link JPPFDistributedJob} instance.
+   */
+  void setJob(JPPFDistributedJob job);
 }

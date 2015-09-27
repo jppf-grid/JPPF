@@ -24,8 +24,7 @@ import java.util.*;
  * Instances of this class compute the differences between two {@link ClassPath} instances.
  * @author Laurent Cohen
  */
-public class ClassPathDiff
-{
+public class ClassPathDiff {
   /**
    * The list of elements that are the same in the source and the target classpath.
    */
@@ -50,8 +49,7 @@ public class ClassPathDiff
    * @param source the source classpath.
    * @param target the target classpath.
    */
-  public ClassPathDiff(final ClassPath source, final ClassPath target)
-  {
+  public ClassPathDiff(final ClassPath source, final ClassPath target) {
     computeDifferences(source, target);
   }
 
@@ -59,8 +57,7 @@ public class ClassPathDiff
    * Get he list of elements that are the same in the source and the target classpath.
    * @return a list of unchanged element names.
    */
-  public List<String> getUnchangedElements()
-  {
+  public List<String> getUnchangedElements() {
     return unchangedElements;
   }
 
@@ -68,8 +65,7 @@ public class ClassPathDiff
    * Get the list of elements that are in the target but not in the source classpath.
    * @return a list of new element names.
    */
-  public List<String> getNewElements()
-  {
+  public List<String> getNewElements() {
     return newElements;
   }
 
@@ -77,8 +73,7 @@ public class ClassPathDiff
    * Get the list of elements that are that are in the source and whose signature is different in the target classpath.
    * @return a list of updated element names.
    */
-  public List<String> getUpdatedElements()
-  {
+  public List<String> getUpdatedElements() {
     return updatedElements;
   }
 
@@ -86,8 +81,7 @@ public class ClassPathDiff
    * Get the list of elements that are in the source and not in the target classpath.
    * @return a list of deleted element names.
    */
-  public List<String> getDeletedElements()
-  {
+  public List<String> getDeletedElements() {
     return deletedElements;
   }
 
@@ -96,16 +90,13 @@ public class ClassPathDiff
    * @param source the source classpath.
    * @param target the target classpath.
    */
-  private void computeDifferences(final ClassPath source, final ClassPath target)
-  {
-    for (Map.Entry<String, String> sourceEntry: source.elements().entrySet())
-    {
+  private void computeDifferences(final ClassPath source, final ClassPath target) {
+    for (Map.Entry<String, String> sourceEntry : source.elements().entrySet()) {
       String name = sourceEntry.getKey();
       String targetSignature = target.getElementSignature(name);
       // element in the source but not in the target: it has been deleted
       if (targetSignature == null) deletedElements.add(name);
-      else
-      {
+      else {
         String sourceSignature = sourceEntry.getValue();
         // source signature different from the target: element has been updated
         if (!targetSignature.equals(sourceSignature)) updatedElements.add(name);
@@ -115,8 +106,7 @@ public class ClassPathDiff
     }
     // compute which elements were added
     Map<String, String> targetMap = target.elements();
-    for (Map.Entry<String, String> targetEntry: target.elements().entrySet())
-    {
+    for (Map.Entry<String, String> targetEntry : target.elements().entrySet()) {
       String name = targetEntry.getKey();
       String sourceSignature = source.getElementSignature(name);
       // element in the target but not in the source: it has been added
@@ -125,14 +115,13 @@ public class ClassPathDiff
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName());
     sb.append("[unchanged=").append(unchangedElements);
-    sb.append(", new=")     .append(newElements);
-    sb.append(", updated=") .append(updatedElements);
-    sb.append(", deleted=") .append(deletedElements);
+    sb.append(", new=").append(newElements);
+    sb.append(", updated=").append(updatedElements);
+    sb.append(", deleted=").append(deletedElements);
     sb.append(']');
     return sb.toString();
   }

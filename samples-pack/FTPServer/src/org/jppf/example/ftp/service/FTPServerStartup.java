@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @see <a href="http://mina.apache.org/ftpserver">Apache Mina FTPServer</a>
  * @author Laurent Cohen
  */
-public class FTPServerStartup implements JPPFDriverStartupSPI
-{
+public class FTPServerStartup implements JPPFDriverStartupSPI {
   /**
    * Logger for this class.
    */
@@ -45,23 +44,17 @@ public class FTPServerStartup implements JPPFDriverStartupSPI
    * Start the FTP server and add a JVM shutdown hook to stop it.
    */
   @Override
-  public void run()
-  {
-    try
-    {
-      Runnable hook = new Runnable()
-      {
+  public void run() {
+    try {
+      Runnable hook = new Runnable() {
         @Override
-        public void run()
-        {
+        public void run() {
           stop();
         }
       };
       Runtime.getRuntime().addShutdownHook(new Thread(hook));
       start();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       log.error("FTP server initialization failed", e);
       // display the error message on the driver's shell console
       System.err.println("FTP server initialization failed: " + e.getMessage());
@@ -72,8 +65,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI
    * Start the FTP server using the configuration file whose path is specified in the driver's configuration.
    * @throws Exception if an error occurs while reading the configuration.
    */
-  public void start() throws Exception
-  {
+  public void start() throws Exception {
     String configPath = JPPFConfiguration.getProperties().getString("jppf.file.server.config", "config/ftpd.xml");
     server = new CommandLineExt(configPath).createServer();
     server.start();
@@ -82,14 +74,10 @@ public class FTPServerStartup implements JPPFDriverStartupSPI
   /**
    * Stop the FTP server. This method is called from a JVM shutdown hook.
    */
-  public void stop()
-  {
-    try
-    {
+  public void stop() {
+    try {
       if ((server != null) && !server.isStopped()) server.stop();
-    }
-    catch(Throwable t)
-    {
+    } catch (Throwable t) {
       t.printStackTrace();
     }
   }
@@ -98,8 +86,7 @@ public class FTPServerStartup implements JPPFDriverStartupSPI
    * Get the underlying embedded FTP server.
    * @return an <code>FtpServer</code> instance.
    */
-  public FtpServer getServer()
-  {
+  public FtpServer getServer() {
     return server;
   }
 }

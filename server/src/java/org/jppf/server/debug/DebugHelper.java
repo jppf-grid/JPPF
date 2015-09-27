@@ -30,10 +30,6 @@ import org.jppf.utils.collections.*;
  */
 public final class DebugHelper {
   /**
-   * The JPPF driver.
-   */
-  private static final JPPFDriver driver = JPPFDriver.getInstance();
-  /**
    * Map of job uuids to the positions of the tasks whose results have been sent back to the client.
    */
   private static CollectionMap<String, Integer> resultsMap = new SetHashMap<>();

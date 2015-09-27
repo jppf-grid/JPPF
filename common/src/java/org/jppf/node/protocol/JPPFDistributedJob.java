@@ -47,4 +47,10 @@ public interface JPPFDistributedJob
    * @return a {@link JobMetadata} instance.
    */
   JobMetadata getMetadata();
+  
+  /**
+   * Get the number of tasks in the job.
+   * @return the number fo tasks.
+   */
+  int getTaskCount();
 }

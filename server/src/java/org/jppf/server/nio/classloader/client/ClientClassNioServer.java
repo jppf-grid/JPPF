@@ -42,10 +42,6 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * A mapping of the remote resource provider connections handled by this socket server, to their unique uuid.<br>
    * Provider connections represent connections form the clients only. The mapping to a uuid is required to determine in
    * which application classpath to look for the requested resources.

@@ -32,10 +32,6 @@ import org.jppf.node.screensaver.impl.NodePanel;
  */
 public class FractalPanel extends NodePanel {
   /**
-   * The maximum size (widht and height) of the image preview.
-   */
-  private final int maxPreviewSize = 400;
-  /**
    * The fractal preview panel.
    */
   private FractalPreviewPanel fractalPreviewPanel;
@@ -59,20 +55,7 @@ public class FractalPanel extends NodePanel {
     c.gridx = 0;
     addLayoutComp(panel, g, c, getFractalPreviewPanel());
     addLayoutComp(panel, g, c, Box.createVerticalStrut(5));
-    /*
-    addLayoutComp(panel, g, c, createProgressPanel());
-    addLayoutComp(panel, g, c, Box.createVerticalStrut(5));
-    */
     return panel;
-  }
-
-  /**
-   * Create the progress panel. It will show the current work's progress expressed as
-   * the ratio of completed tasks in the job. It will be updated by the listener's <code>taskExecuted()</code> notifications.
-   * @return the panel as a {@link JComponent}.
-   */
-  private JComponent createProgressPanel() {
-    return progressPanel = new FractalProgressPanel();
   }
 
   /**

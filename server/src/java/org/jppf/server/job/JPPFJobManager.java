@@ -68,10 +68,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
   /**
-   * Reference to the driver queue.
-   */
-  private final JPPFPriorityQueue queue = (JPPFPriorityQueue) driver.getQueue();
-  /**
    * Count of notifications in the executor's quueue.
    */
   private final AtomicInteger notifCount = new AtomicInteger(0);

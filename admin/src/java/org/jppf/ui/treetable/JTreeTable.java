@@ -58,9 +58,6 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * This example shows how to create a simple JTreeTable component, by using a JTree as a renderer (and editor) for the
  * cells in a particular column in the JTable.
@@ -71,14 +68,6 @@ import org.slf4j.*;
  * @author Scott Violet
  */
 public class JTreeTable extends JTable {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JTreeTable.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * A subclass of JTree.
    */

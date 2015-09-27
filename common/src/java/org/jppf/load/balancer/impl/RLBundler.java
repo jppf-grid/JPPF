@@ -19,54 +19,34 @@
 package org.jppf.load.balancer.impl;
 
 import org.jppf.load.balancer.*;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Bundler based on a reinforcement learning algorithm.
  * @author Laurent Cohen
  * @exclude
  */
-public class RLBundler extends AbstractRLBundler
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(RLBundler.class);
-  /**
-   * Determines whether debugging level is set for logging.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-
+public class RLBundler extends AbstractRLBundler {
   /**
    * Creates a new instance with the specified parameters.
    * @param profile the parameters of the algorithm, grouped as a performance analysis profile.
    */
-  public RLBundler(final LoadBalancingProfile profile)
-  {
+  public RLBundler(final LoadBalancingProfile profile) {
     super(profile);
   }
 
-  /**
-   * Make a copy of this bundler
-   * @return a <code>Bundler</code> instance.
-   * @see org.jppf.load.balancer.Bundler#copy()
-   */
   @Override
-  public Bundler copy()
-  {
+  public Bundler copy() {
     return new RLBundler(profile);
   }
 
   /**
    * Get the max bundle size that can be used for this bundler.
    * @return the bundle size as an int.
-   * @see org.jppf.load.balancer.AbstractBundler#maxSize()
    */
   @Override
-  protected int maxSize()
-  {
-    if(jppfContext == null) throw new IllegalStateException("jppfContext not set");
+  protected int maxSize() {
+    if (job != null) return job.getTaskCount();
+    if (jppfContext == null) throw new IllegalStateException("jppfContext not set");
     return jppfContext.getMaxBundleSize();
   }
 }

@@ -45,10 +45,6 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestJPPFTask extends Setup1D1N1C {
   /**
-   * Count of the number of jobs created.
-   */
-  private static AtomicInteger jobCount = new AtomicInteger(0);
-  /**
    * A "short" duration for this test.
    */
   private static final long TIME_SHORT = 1000L;
@@ -56,10 +52,6 @@ public class TestJPPFTask extends Setup1D1N1C {
    * A "long" duration for this test.
    */
   private static final long TIME_LONG = 3000L;
-  /**
-   * A "rest" duration for this test.
-   */
-  private static final long TIME_REST = 1L;
   /**
    * The date format used in the tests.
    */

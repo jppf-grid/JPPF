@@ -30,7 +30,7 @@ import org.jppf.classloader.DelegationModel;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.nio.nodeserver.*;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -48,10 +48,6 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
-   * Base name used for localization lookups.
-   */
-  private static final String I18N_BASE = "org.jppf.server.i18n.server_messages";
   /**
    * Flag to indicate a task which invokes an MBean method.
    */
@@ -122,15 +118,6 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   public Map<String, Object> forwardSetAttribute(final NodeSelector selector, final String name, final String attribute, final Object value) throws Exception {
     Set<AbstractNodeContext> channels = selectionHelper.getChannels(selector);
     return forward(SET_ATTRIBUTE, channels, name, attribute, value);
-  }
-
-  /**
-   * Get the JPPF nodes server.
-   * @return a <code>NodeNioServer</code> instance.
-   * @exclude
-   */
-  private NodeNioServer getNodeNioServer() {
-    return driver.getNodeNioServer();
   }
 
   @Override

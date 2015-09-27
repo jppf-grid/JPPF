@@ -216,10 +216,6 @@ public class ConsoleLoader {
    */
   private static class DownloadListener implements LocationEventListener {
     /**
-     * Total count of bytes transferred.
-     */
-    private int count = 0;
-    /**
      * Used to format the number of bytes downloaded.
      */
     private NumberFormat nf = null;
@@ -231,10 +227,6 @@ public class ConsoleLoader {
      * Contains the displayed progress text.
      */
     private JLabel label = null;
-    /**
-     * 
-     */
-    private double max = 7542745.0;
 
     /**
      * Default constructor.
@@ -267,7 +259,7 @@ public class ConsoleLoader {
      */
     @Override
     public void dataTransferred(final LocationEvent event) {
-      count += event.getTransferredBytes();
+      event.getTransferredBytes();
       /*
       SwingUtilities.invokeLater(new Runnable() {
         @Override

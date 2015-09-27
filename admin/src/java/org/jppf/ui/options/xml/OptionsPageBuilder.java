@@ -42,10 +42,6 @@ public class OptionsPageBuilder {
    */
   private static Logger log = LoggerFactory.getLogger(OptionsPageBuilder.class);
   /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Base name used to localize labels and tooltips.
    */
   public static final String BASE_NAME = "org.jppf.ui.i18n.";

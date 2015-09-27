@@ -22,13 +22,11 @@ package org.jppf.example.extendedclassloading.clientlib1;
  * 
  * @author Laurent Cohen
  */
-public class MyClientDynamicClass1
-{
+public class MyClientDynamicClass1 {
   /**
    * Print a message.
    */
-  public void printHello()
-  {
+  public void printHello() {
     System.out.println("Hello from class 1 loaded from the client");
   }
 }

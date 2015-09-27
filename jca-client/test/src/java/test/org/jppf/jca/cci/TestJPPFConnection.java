@@ -37,10 +37,6 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestJPPFConnection {
-  /**
-   * A connection to the JPPF connector.
-   */
-  private JPPFConnection connection = null;
 
   /**
    * Test submitting a simple job and getting the results.

@@ -41,7 +41,6 @@ package org.jppf.example.nbody;
 import java.awt.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JPanel;
 
@@ -65,10 +64,6 @@ public class NBodyPanel extends JPanel
    * Thread pool used to generate paint requests.
    */
   private ExecutorService executor = Executors.newFixedThreadPool(1, new JPPFThreadFactory("PanelUpdater"));
-  /**
-   * Used to synchronize access to the current positions array.
-   */
-  private ReentrantLock lock = new ReentrantLock();
   /**
    * The positions currently displayed.
    */

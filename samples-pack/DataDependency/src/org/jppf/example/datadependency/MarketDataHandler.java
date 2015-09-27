@@ -23,8 +23,6 @@ import java.util.concurrent.*;
 
 import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.simulation.*;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 import com.hazelcast.core.Hazelcast;
 
@@ -33,14 +31,6 @@ import com.hazelcast.core.Hazelcast;
  * @author Laurent Cohen
  */
 public class MarketDataHandler implements TickerListener {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(MarketDataHandler.class);
-  /**
-   * Debug enabled flag.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of the market data.
    */

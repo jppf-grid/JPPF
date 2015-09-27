@@ -23,8 +23,6 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.slf4j.*;
-
 /**
  * Instances of this class are intended to serialize object graphs to an underlying output stream.
  * @author Laurent Cohen
@@ -56,14 +54,6 @@ class Serializer {
    */
   static final byte CLASS_OBJECT_HEADER = 4;
   /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(Serializer.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The stream serialized data is written to.
    */
   ObjectOutputStream out;
@@ -71,10 +61,6 @@ class Serializer {
    * Holds all class and object descriptors.
    */
   SerializationCaches caches = new SerializationCaches();
-  /**
-   * Determines if the root has already been written to the stream.
-   */
-  private boolean rootWritten = false;
   /**
    * Descriptor the class of the object currently being written.
    */

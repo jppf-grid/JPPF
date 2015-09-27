@@ -31,8 +31,7 @@ import org.slf4j.*;
  * Runner class for the square matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class DBRunner
-{
+public class DBRunner {
   /**
    * Logger for this class.
    */
@@ -53,10 +52,8 @@ public class DBRunner
    * on the node side. Once the job is complete, we display all the rows in the table.
    * @param args the first argument, if any, will be used as the JPPF client's uuid.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       TypedProperties config = JPPFConfiguration.getProperties();
       int nbTasks = config.getInt("job.nbtasks", 20);
       long taskSleepTime = config.getLong("task.sleep.time", 2000L);
@@ -68,8 +65,7 @@ public class DBRunner
       // Create a job with the specified number of tasks
       JPPFJob job = new JPPFJob();
       job.setName("NodeLifeCycle demo job");
-      for (int i=1; i<=nbTasks; i++)
-      {
+      for (int i = 1; i <= nbTasks; i++) {
         DBTask task = new DBTask(taskSleepTime);
         task.setId("" + i);
         job.add(task);
@@ -79,7 +75,7 @@ public class DBRunner
       JobListener jobListener = new JobListenerAdapter() {
         @Override
         public synchronized void jobReturned(final JobEvent event) {
-          for (Task<?> task: event.getJobTasks()) {
+          for (Task<?> task : event.getJobTasks()) {
             if (task.getThrowable() != null) output("task " + task.getId() + " error: " + task.getThrowable().getMessage());
             else output("task " + task.getId() + " result: " + task.getResult());
           }
@@ -96,13 +92,9 @@ public class DBRunner
       // display the list of rows in the DB table
       if (config.getBoolean("display.db.content", false)) displayDBContent();
       output("demo ended");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -112,10 +104,8 @@ public class DBRunner
    * @return the node connection as a {@link JMXNodeConnectionWrapper} instance.
    * @throws Exception if the node connection could not be established.
    */
-  private static JMXNodeConnectionWrapper getNode() throws Exception
-  {
-    if (jmxNode == null)
-    {
+  private static JMXNodeConnectionWrapper getNode() throws Exception {
+    if (jmxNode == null) {
       JMXDriverConnectionWrapper jmxDriver = jppfClient.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       Collection<JPPFManagementInfo> nodesInfo = jmxDriver.nodesInformation();
       JPPFManagementInfo info = nodesInfo.iterator().next();
@@ -128,15 +118,11 @@ public class DBRunner
   /**
    * Kill the node.
    */
-  private static void restartNode()
-  {
-    try
-    {
+  private static void restartNode() {
+    try {
       JMXNodeConnectionWrapper jmxNode = getNode();
       jmxNode.restart();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       output("Could not restart a node:\n" + ExceptionUtils.getStackTrace(e));
     }
   }
@@ -145,8 +131,7 @@ public class DBRunner
    * List all the rows in the TASK_RESULT table.
    * @throws Exception if any error occurs.
    */
-  private static void displayDBContent() throws Exception
-  {
+  private static void displayDBContent() throws Exception {
     Class.forName("org.h2.Driver");
     Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "jppf", "jppf");
     //Connection c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/jppf_samples", "jppf", "jppf");
@@ -155,8 +140,7 @@ public class DBRunner
     ResultSet rs = stmt.executeQuery(sql);
     int count = 1;
     output("\n***** displaying the DB table content *****");
-    while (rs.next())
-    {
+    while (rs.next()) {
       StringBuilder sb = new StringBuilder();
       sb.append("row ").append(count).append(": ");
       sb.append("id=").append(rs.getObject("id"));
@@ -175,8 +159,7 @@ public class DBRunner
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

@@ -45,10 +45,6 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
    */
   private final ThreadMXBean threadsMXBean = ManagementFactory.getThreadMXBean();
   /**
-   * Reference to the platform's {@link ThreadMXBean} instance.
-   */
-  private final OperatingSystemMXBean systemMXBean = ManagementFactory.getOperatingSystemMXBean();
-  /**
    * Collects regular snapshots of the total CPU time.
    */
   private CPUTimeCollector cpuTimeCollector = null;
@@ -172,14 +168,6 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       snapshot.ramUsedRatio = -1d;
     }
     return snapshot;
-  }
-
-  /**
-   * Get the number of live threads i the JVM.
-   * @return the number of threads as an int.
-   */
-  private int liveThreads() {
-    return threadsMXBean.getThreadCount();
   }
 
   @Override

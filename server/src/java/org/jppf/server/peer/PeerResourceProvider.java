@@ -18,17 +18,13 @@
 package org.jppf.server.peer;
 
 import java.net.*;
-import java.nio.channels.*;
-
-import javax.net.ssl.*;
+import java.nio.channels.SocketChannel;
 
 import org.jppf.JPPFRuntimeException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.socket.*;
-import org.jppf.nio.*;
-import org.jppf.server.JPPFDriver;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.*;
-import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -50,14 +46,6 @@ class PeerResourceProvider {
    * Determines whether ssl is enabled for peer-to-peer cpmmunication between servers.
    */
   private final boolean secure;
-  /**
-   * The name of the peer in the configuration file.
-   */
-  private final String peerNameBase;
-  /**
-   * The name of the peer with host and port information when connected.
-   */
-  private String peerName;
   /**
    * Peer connection information.
    */
@@ -89,8 +77,6 @@ class PeerResourceProvider {
   public PeerResourceProvider(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final ClientClassNioServer server, final boolean secure) {
     if (peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerName is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
-    this.peerNameBase = peerNameBase;
-    this.peerName = peerNameBase;
     this.connectionInfo = connectionInfo;
     this.server = server;
     this.secure = secure;
@@ -127,7 +113,6 @@ class PeerResourceProvider {
       if (secure) context.setSsl(true);
       server.getTransitionManager().transitionChannel(channel, ClientClassTransition.TO_SENDING_PEER_CHANNEL_IDENTIFIER);
       socketClient = null;
-      peerName = peerNameBase;
     } catch (Exception e) {
       log.error(e.getMessage());
       throw new JPPFRuntimeException(e);
@@ -143,26 +128,7 @@ class PeerResourceProvider {
     String host = connectionInfo.host == null || connectionInfo.host.isEmpty() ? "localhost" : connectionInfo.host;
     host = InetAddress.getByName(host).getHostName();
     int port = secure ? connectionInfo.sslServerPorts[0] : connectionInfo.serverPorts[0];
-    peerName = peerNameBase + '@' + host + ':' + port;
     return new SocketChannelClient(host, port, false);
-  }
-
-  /**
-   * Configure the SSL options for the specified channel.
-   * @param  channel the channel for which to configure SSL.
-   * @throws Exception if any error occurs.
-   */
-  private void configureSSL(final ChannelWrapper<?> channel) throws Exception {
-    SocketChannel socketChannel = (SocketChannel) ((SelectionKey) channel.getChannel()).channel();
-    ClientClassContext context = (ClientClassContext) channel.getContext();
-    SSLContext sslContext = JPPFDriver.getInstance().getAcceptorServer().getSSLContext();
-    Socket socket = socketChannel.socket();
-    SSLEngine engine = sslContext.createSSLEngine(socket.getInetAddress().getHostAddress(), socket.getPort());
-    SSLParameters params = SSLHelper.getSSLParameters();
-    engine.setUseClientMode(true);
-    engine.setSSLParameters(params);
-    SSLHandler sslHandler = new SSLHandler(channel, engine);
-    context.setSSLHandler(sslHandler);
   }
 
   /**

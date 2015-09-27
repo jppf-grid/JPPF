@@ -26,10 +26,6 @@ import org.jppf.serialization.*;
  */
 public class SerializationHelperImpl implements SerializationHelper {
   /**
-   * Determines whether dumping byte arrays in the log is enabled.
-   */
-  private boolean dumpEnabled = JPPFConfiguration.getProperties().getBoolean("byte.array.dump.enabled", false);
-  /**
    * Used to serialize and deserialize objects to and from object streams.
    */
   protected ObjectSerializer serializer = null;

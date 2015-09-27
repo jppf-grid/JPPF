@@ -22,38 +22,24 @@ import javax.swing.SwingUtilities;
 
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Result collector that updates the progress bar's value during the computation.
  */
-public class CrawlerResultCollector extends JobListenerAdapter
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(CrawlerResultCollector.class);
-  /**
-   * Determines whether debug-level logging is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-
+public class CrawlerResultCollector extends JobListenerAdapter {
   /**
    * Called to notify that the results of a number of tasks have been received from the server.
    * @param event a notification of completion for a set of submitted tasks.
    */
   @Override
-  public synchronized void jobReturned(final JobEvent event)
-  {
+  public synchronized void jobReturned(final JobEvent event) {
     int sum = 0;
-    for (Task<?> task: event.getJobTasks()) sum += ((CrawlerTask) task).getToVisit().size();
+    for (Task<?> task : event.getJobTasks())
+      sum += ((CrawlerTask) task).getToVisit().size();
     final int n = sum;
-    SwingUtilities.invokeLater(new Runnable()
-    {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
-      public void run()
-      {
+      public void run() {
         WebCrawlerRunner.updateProgress(n);
       }
     });

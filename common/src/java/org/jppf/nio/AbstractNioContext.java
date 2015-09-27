@@ -18,24 +18,12 @@
 
 package org.jppf.nio;
 
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
-
 /**
  * Context associated with an open communication channel.
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S>
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(AbstractNioContext.class);
-  /**
-   * Determines whether DEBUG logging level is enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public abstract class AbstractNioContext<S extends Enum<S>> implements NioContext<S> {
   /**
    * The current state of the channel this context is associated with.
    */
@@ -74,27 +62,23 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   protected boolean enabled = true;
 
   @Override
-  public S getState()
-  {
+  public S getState() {
     return state;
   }
 
   @Override
-  public boolean setState(final S state)
-  {
+  public boolean setState(final S state) {
     this.state = state;
     return true;
   }
 
   @Override
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
   @Override
-  public void setUuid(final String uuid)
-  {
+  public void setUuid(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -102,8 +86,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Give the non qualified name of the class of this instance.
    * @return a class name as a string.
    */
-  protected String getShortClassName()
-  {
+  protected String getShortClassName() {
     String fqn = getClass().getName();
     int idx = fqn.lastIndexOf('.');
     return fqn.substring(idx + 1);
@@ -113,8 +96,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Get the container for the current message data.
    * @return an <code>NioMessage</code> instance.
    */
-  public NioMessage getMessage()
-  {
+  public NioMessage getMessage() {
     return message;
   }
 
@@ -122,20 +104,17 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Set the container for the current message data.
    * @param message an <code>NioMessage</code> instance.
    */
-  public void setMessage(final NioMessage message)
-  {
+  public void setMessage(final NioMessage message) {
     this.message = message;
   }
 
   @Override
-  public ChannelWrapper<?> getChannel()
-  {
+  public ChannelWrapper<?> getChannel() {
     return channel;
   }
 
   @Override
-  public void setChannel(final ChannelWrapper<?> channel)
-  {
+  public void setChannel(final ChannelWrapper<?> channel) {
     this.channel = channel;
   }
 
@@ -143,8 +122,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Get the unique ID for the corresponding connection on the remote peer.
    * @return the id as a string.
    */
-  public String getConnectionUuid()
-  {
+  public String getConnectionUuid() {
     return connectionUuid;
   }
 
@@ -152,38 +130,32 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Set the unique ID for the corresponding connection on the remote peer.
    * @param connectionUuid the id as a string.
    */
-  public void setConnectionUuid(final String connectionUuid)
-  {
+  public void setConnectionUuid(final String connectionUuid) {
     this.connectionUuid = connectionUuid;
   }
 
   @Override
-  public SSLHandler getSSLHandler()
-  {
+  public SSLHandler getSSLHandler() {
     return sslHandler;
   }
 
   @Override
-  public void setSSLHandler(final SSLHandler sslHandler)
-  {
+  public void setSSLHandler(final SSLHandler sslHandler) {
     this.sslHandler = sslHandler;
   }
 
   @Override
-  public boolean isPeer()
-  {
+  public boolean isPeer() {
     return peer;
   }
 
   @Override
-  public void setPeer(final boolean peer)
-  {
+  public void setPeer(final boolean peer) {
     this.peer = peer;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("channel=").append(channel.getClass().getSimpleName()).append("[id=").append(channel.getId()).append(']');
     sb.append(", state=").append(getState());
@@ -199,8 +171,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Determine whether the associated channel is secured via SSL/TLS.
    * @return <code>true</code> if the channel is secure, <code>false</code> otherwise.
    */
-  public boolean isSecure()
-  {
+  public boolean isSecure() {
     return sslHandler != null;
   }
 
@@ -209,8 +180,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * @return <code>true</code> for an SSL connection, <code>false</code> otherwise.
    */
   @Override
-  public boolean isSsl()
-  {
+  public boolean isSsl() {
     return ssl;
   }
 
@@ -219,8 +189,7 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * @param ssl <code>true</code> for an SSL connection, <code>false</code> otherwise.
    */
   @Override
-  public void setSsl(final boolean ssl)
-  {
+  public void setSsl(final boolean ssl) {
     this.ssl = ssl;
   }
 

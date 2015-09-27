@@ -41,8 +41,7 @@ import com.atomikos.jdbc.nonxa.AtomikosNonXADataSourceBean;
  * rolled back. If the node crashes suddenly, rollback will be performed at its next startup.
  * @author Laurent Cohen
  */
-public class NodeListener extends NodeLifeCycleListenerAdapter
-{
+public class NodeListener extends NodeLifeCycleListenerAdapter {
   /**
    * Logger for this class.
    */
@@ -59,8 +58,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
   private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
   @Override
-  public void nodeStarting(final NodeLifeCycleEvent event)
-  {
+  public void nodeStarting(final NodeLifeCycleEvent event) {
     output("node ready to process jobs");
     // start a transaction to activate recovery
     // so we can process pending transactions after a node crash
@@ -70,27 +68,23 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
   }
 
   @Override
-  public void nodeEnding(final NodeLifeCycleEvent event)
-  {
+  public void nodeEnding(final NodeLifeCycleEvent event) {
     output("node ending");
     endTransaction(true);
   }
 
   @Override
-  public void jobHeaderLoaded(final NodeLifeCycleEvent event)
-  {
+  public void jobHeaderLoaded(final NodeLifeCycleEvent event) {
   }
 
   @Override
-  public void jobStarting(final NodeLifeCycleEvent event)
-  {
+  public void jobStarting(final NodeLifeCycleEvent event) {
     output("node starting job '" + event.getJob().getName() + "'");
     startTransaction(false);
   }
 
   @Override
-  public void jobEnding(final NodeLifeCycleEvent event)
-  {
+  public void jobEnding(final NodeLifeCycleEvent event) {
     output("node finished job '" + event.getJob().getName() + "'");
     endTransaction(false);
   }
@@ -99,29 +93,28 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * Get or initialize the XA data source.
    * @return a {@link DataSource} instance.
    */
-  private static DataSource createXADataSource()
-  {
-    AtomikosDataSourceBean ds =  new AtomikosDataSourceBean();
+  private static DataSource createXADataSource() {
+    AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
     Properties props = ds.getXaProperties();
     /*
-		// PostgreSQL Properties
-		// !!! on PostgreSQL, the server configuration property "maxPreparedConnections"
-		// must be set to a value > 0
-		ds.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
-		props.setProperty("user", "jppf");
-		props.setProperty("password", "jppf");
-		props.setProperty("databaseName", "jppf_samples");
-		props.setProperty("serverName", "localhost");
-		props.setProperty("portNumber", "5432");
-		// MySQL Properties
-		ds.setXaDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlXADataSource");
-		props.setProperty("user", "jppf");
-		props.setProperty("password", "jppf");
-		props.setProperty("serverName", "localhost");
-		props.setProperty("port", "3306");
-		props.setProperty("databaseName", "jppf_samples");
-		props.setProperty("pinGlobalTxToPhysicalConnection", "true");
-     */
+    // PostgreSQL Properties
+    // !!! on PostgreSQL, the server configuration property "maxPreparedConnections"
+    // must be set to a value > 0
+    ds.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
+    props.setProperty("user", "jppf");
+    props.setProperty("password", "jppf");
+    props.setProperty("databaseName", "jppf_samples");
+    props.setProperty("serverName", "localhost");
+    props.setProperty("portNumber", "5432");
+    // MySQL Properties
+    ds.setXaDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlXADataSource");
+    props.setProperty("user", "jppf");
+    props.setProperty("password", "jppf");
+    props.setProperty("serverName", "localhost");
+    props.setProperty("port", "3306");
+    props.setProperty("databaseName", "jppf_samples");
+    props.setProperty("pinGlobalTxToPhysicalConnection", "true");
+    */
     // H2 Properties
     ds.setXaDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
     props.setProperty("user", "jppf");
@@ -139,17 +132,16 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * Get or initialize the non-XA data source.
    * @return a {@link DataSource} instance.
    */
-  private static DataSource createNonXADataSource()
-  {
-    AtomikosNonXADataSourceBean ds =  new AtomikosNonXADataSourceBean();
+  static DataSource createNonXADataSource() {
+    AtomikosNonXADataSourceBean ds = new AtomikosNonXADataSourceBean();
     ds.setUser("jppf");
     ds.setPassword("jppf");
 
     /*
-		// MySQL Properties
-		ds.setDriverClassName("com.mysql.jdbc.Driver");
-		ds.setUrl("jdbc:mysql://localhost:3306/jppf_samples");
-     */
+    // MySQL Properties
+    ds.setDriverClassName("com.mysql.jdbc.Driver");
+    ds.setUrl("jdbc:mysql://localhost:3306/jppf_samples");
+    */
     // H2 Properties
     ds.setDriverClassName("org.h2.Driver");
     ds.setUrl("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC");
@@ -163,10 +155,8 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * Get or initialize the XA data source.
    * @return a {@link DataSource} instance.
    */
-  public synchronized static DataSource getDataSource()
-  {
-    if (dataSource == null)
-    {
+  public synchronized static DataSource getDataSource() {
+    if (dataSource == null) {
       //dataSource = createNonXADataSource();
       dataSource = createXADataSource();
     }
@@ -178,8 +168,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * @return Connection the connection.
    * @throws Exception if any error occurs.
    */
-  public static synchronized Connection getConnection() throws Exception
-  {
+  public static synchronized Connection getConnection() throws Exception {
     return getDataSource().getConnection();
   }
 
@@ -189,8 +178,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * @param rollbackOnly determines whether the transaction should be in rollback only mode.
    * This is used to discard logged transactions that would remain after a node crash.
    */
-  public static void startTransaction(final boolean rollbackOnly)
-  {
+  public static void startTransaction(final boolean rollbackOnly) {
     Exception e = submit(new StartTransactionTask(rollbackOnly));
     if (e != null) output(ExceptionUtils.getStackTrace(e));
   }
@@ -201,8 +189,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * @param rollback indicates if an error has occurred or not. If true, the transaction will be rolled back.
    * If false, the transaction will be committed.
    */
-  public synchronized static void endTransaction(final boolean rollback)
-  {
+  public synchronized static void endTransaction(final boolean rollback) {
     Exception e = submit(new EndTransactionTask(rollback));
     if (e != null) output(ExceptionUtils.getStackTrace(e));
   }
@@ -213,16 +200,12 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * @param callable the task to execute.
    * @return the task's result.
    */
-  public static <T> T submit(final Callable<T> callable)
-  {
+  public static <T> T submit(final Callable<T> callable) {
     T result = null;
-    try
-    {
+    try {
       Future<T> f = executor.submit(callable);
       result = f.get();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       output(ExceptionUtils.getStackTrace(e));
     }
     return result;
@@ -231,8 +214,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
   /**
    * Starts a transaction.
    */
-  private static class StartTransactionTask implements Callable<Exception>
-  {
+  private static class StartTransactionTask implements Callable<Exception> {
     /**
      * Indicates whether the transaction should only be rolled back.
      * This is used for recovery after a node crash.
@@ -244,8 +226,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
      * Initialize this task with the specified error flag.
      * @param rollbackOnly rollback / commit flag.
      */
-    public StartTransactionTask(final boolean rollbackOnly)
-    {
+    public StartTransactionTask(final boolean rollbackOnly) {
       this.rollbackOnly = rollbackOnly;
     }
 
@@ -254,10 +235,8 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
      * @return Exception if any error occurred.
      */
     @Override
-    public Exception call()
-    {
-      try
-      {
+    public Exception call() {
+      try {
         // create the datasource; it will be automatically enlisted in the transaction
         getDataSource();
         // start the atomikos transaction manager
@@ -268,9 +247,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
         Connection c = getConnection();
         c.close();
         return null;
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         return e;
       }
     }
@@ -279,8 +256,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
   /**
    * Performs a rollback or commit of the current transaction.
    */
-  private static class EndTransactionTask implements Callable<Exception>
-  {
+  private static class EndTransactionTask implements Callable<Exception> {
     /**
      * Indicates if an error has occurred or not. If true, the transaction will be rolled back.
      * If false, the transaction will be committed.
@@ -291,8 +267,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
      * Initialize this task with the specified error flag.
      * @param rollback rollback / commit flag.
      */
-    public EndTransactionTask(final boolean rollback)
-    {
+    public EndTransactionTask(final boolean rollback) {
       this.rollback = rollback;
     }
 
@@ -301,22 +276,17 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
      * @return Exception if any error occurred.
      */
     @Override
-    public Exception call()
-    {
-      try
-      {
+    public Exception call() {
+      try {
         UserTransactionImp utx = new UserTransactionImp();
         if (utx.getStatus() == Status.STATUS_NO_TRANSACTION) output("WARNING: endTransaction() called outside a tx");
-        else
-        {
+        else {
           output("INFO: transaction " + (rollback ? "rollback" : "commit"));
           if (rollback) utx.rollback();
           else utx.commit();
         }
         return null;
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         return e;
       }
     }
@@ -326,8 +296,7 @@ public class NodeListener extends NodeLifeCycleListenerAdapter
    * Print a message to the console and/or log file.
    * @param message - the message to print.
    */
-  public static void output(final String message)
-  {
+  public static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

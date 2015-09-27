@@ -23,8 +23,6 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.client.balancer.JobManagerClient;
 import org.jppf.client.event.JobStatusListener;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * This task provides asynchronous management of tasks submitted through the resource adapter.
@@ -33,14 +31,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public class JcaJobManager extends JobManagerClient {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JcaJobManager.class);
-  /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Mapping of jobs to their uuid.
    */

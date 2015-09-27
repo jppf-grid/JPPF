@@ -25,24 +25,13 @@ import javax.swing.*;
 
 import org.jppf.ui.actions.*;
 import org.jppf.ui.treetable.JPPFTreeTable;
-import org.jppf.utils.LoggingUtils;
-import org.slf4j.*;
 
 /**
  * Mouse listener for the node data panel.
  * Processes right-click events to display popup menus.
  * @author Laurent Cohen
  */
-public class JobTreeTableMouseListener extends MouseAdapter
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JobTreeTableMouseListener.class);
-  /**
-   * Determines whether debug log statements are enabled.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+public class JobTreeTableMouseListener extends MouseAdapter {
   /**
    * The object that handles toolbar and menu actions.
    */
@@ -52,27 +41,23 @@ public class JobTreeTableMouseListener extends MouseAdapter
    * Initialize this mouse listener.
    * @param actionHandler - the object that handles toolbar and menu actions.
    */
-  public JobTreeTableMouseListener(final JTreeTableActionHandler actionHandler)
-  {
+  public JobTreeTableMouseListener(final JTreeTableActionHandler actionHandler) {
     this.actionHandler = actionHandler;
   }
 
   /**
    * Processes right-click events to display popup menus.
    * @param event the mouse event to process.
-   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
    */
   @Override
-  public void mousePressed(final MouseEvent event)
-  {
+  public void mousePressed(final MouseEvent event) {
     Component comp = event.getComponent();
     if (!(comp instanceof JPPFTreeTable)) return;
     JPPFTreeTable treeTable = (JPPFTreeTable) comp;
     int x = event.getX();
     int y = event.getY();
     int button = event.getButton();
-    if (button == MouseEvent.BUTTON3)
-    {
+    if (button == MouseEvent.BUTTON3) {
       JPopupMenu menu = createPopupMenu(event);
       menu.show(treeTable, x, y);
     }
@@ -83,8 +68,7 @@ public class JobTreeTableMouseListener extends MouseAdapter
    * @param event the mouse event to process.
    * @return a <code>JPopupMenu</code> instance.
    */
-  private JPopupMenu createPopupMenu(final MouseEvent event)
-  {
+  private JPopupMenu createPopupMenu(final MouseEvent event) {
     Component comp = event.getComponent();
     Point p = comp.getLocationOnScreen();
     JPopupMenu menu = new JPopupMenu();
@@ -104,8 +88,7 @@ public class JobTreeTableMouseListener extends MouseAdapter
    * @param location - the location to use for any window create by the action.
    * @return a <code>JMenuItem</code> instance.
    */
-  private static JMenuItem createMenuItem(final Action action, final Point location)
-  {
+  private static JMenuItem createMenuItem(final Action action, final Point location) {
     if (action instanceof AbstractUpdatableAction) ((AbstractUpdatableAction) action).setLocation(location);
     return new JMenuItem(action);
   }

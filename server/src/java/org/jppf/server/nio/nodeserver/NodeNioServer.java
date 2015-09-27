@@ -55,10 +55,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static boolean traceEnabled = log.isTraceEnabled();
-  /**
    * The uuid for the task bundle sent to a newly connected node.
    */
   private final String INITIAL_BUNDLE_UUID;
@@ -91,10 +87,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * The thread polling the local channel.
    */
   private ChannelSelectorThread selectorThread = null;
-  /**
-   * The local channel, if any.
-   */
-  private ChannelWrapper localChannel = null;
   /**
    * Handles listeners to node connection events.
    */
@@ -250,7 +242,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param localChannel the local channel to use.
    */
   public void initLocalChannel(final ChannelWrapper<?> localChannel) {
-    this.localChannel = localChannel;
     ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
     localChannel.setSelector(channelSelector);
     selectorThread = new ChannelSelectorThread(channelSelector, this, 1L);
@@ -400,27 +391,11 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
-   * Get a reference to the driver's tasks queue.
-   * @return a <code>JPPFQueue</code> instance.
-   */
-  public JPPFQueue getQueue() {
-    return queue;
-  }
-
-  /**
    * Get the factory object used to create bundler instances.
    * @return an instance of <code>JPPFBundlerFactory</code>.
    */
   public JPPFBundlerFactory getBundlerFactory() {
     return bundlerFactory;
-  }
-
-  /**
-   * Get number of nodes attached to the server.
-   * @return the number of nodes as an <code>int</code> value.
-   */
-  public int getNbNodes() {
-    return allConnections.size();
   }
 
   /**
@@ -437,14 +412,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public Set<AbstractNodeContext> getAllChannelsAsSet() {
     return new HashSet<>(allConnections.values());
-  }
-
-  /**
-   * Get the number of idle channels.
-   * @return the size of the underlying list of idle channels.
-   */
-  public int getNbIdleChannels() {
-    return taskQueueChecker.getNbIdleChannels();
   }
 
   /**
@@ -467,7 +434,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         context.handleException(context.getChannel(), null);
       } else {
         log.warn("found null context - a job may be stuck!");
-        //closeNode(context);
       }
     }
   }

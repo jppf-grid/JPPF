@@ -26,16 +26,13 @@ import org.jppf.utils.FileUtils;
  * Create the H2 database.
  * @author Laurent Cohen
  */
-public class CreateDB
-{
+public class CreateDB {
   /**
    * Create the H2 database.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       Class.forName("org.h2.Driver");
       Connection c = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/./jppf_samples;SCHEMA=PUBLIC", "sa", "");
       String sql = FileUtils.readTextFile("./db/jppf_samples-h2.sql");
@@ -44,9 +41,7 @@ public class CreateDB
       stmt.close();
       c.close();
       System.out.println("database created successfully");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

@@ -20,19 +20,13 @@ package org.jppf.example.loadbalancer.common;
 
 import org.jppf.node.policy.CustomPolicy;
 import org.jppf.utils.PropertiesCollection;
-import org.slf4j.*;
 
 /**
  * A custom execution policy that checks a node has a specified minimum
  * amount of memory for each processing thread in the node.
  * @author Laurent Cohen
  */
-public class MyCustomPolicy extends CustomPolicy
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(MyCustomPolicy.class);
+public class MyCustomPolicy extends CustomPolicy {
   /**
    * Minimum available size per node processing thread, in bytes.
    */
@@ -42,8 +36,7 @@ public class MyCustomPolicy extends CustomPolicy
    * Initialize this policy with the specified parameter.
    * @param minimumSizePerThreadStr the minimum available heap size per node processing thread.
    */
-  public MyCustomPolicy(final String minimumSizePerThreadStr)
-  {
+  public MyCustomPolicy(final String minimumSizePerThreadStr) {
     super(minimumSizePerThreadStr);
     this.minimumSizePerThread = Long.valueOf(minimumSizePerThreadStr);
   }
@@ -52,11 +45,9 @@ public class MyCustomPolicy extends CustomPolicy
    * Determines whether this policy accepts the specified node.
    * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
-   * @see org.jppf.node.policy.ExecutionPolicy#accepts(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public boolean accepts(final PropertiesCollection info)
-  {
+  public boolean accepts(final PropertiesCollection info) {
     // get the number of processing threads in the node
     long nbThreads = info.getProperties("jppf").getLong("jppf.processing.threads");
     // get the node's max heap size

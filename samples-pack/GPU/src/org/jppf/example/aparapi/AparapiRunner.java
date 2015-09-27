@@ -29,8 +29,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class AparapiRunner
-{
+public class AparapiRunner {
   /**
    * Logger for this class.
    */
@@ -76,7 +75,7 @@ public class AparapiRunner
     long max = 0L;
 
     // one job per iteration
-    for (int n=0; n<iterations; n++) {
+    for (int n = 0; n < iterations; n++) {
       SquareMatrix matrixA = new SquareMatrix(matrixSize);
       matrixA.assignRandomValues();
       SquareMatrix matrixB = new SquareMatrix(matrixSize);
@@ -84,10 +83,11 @@ public class AparapiRunner
       long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("gpu_job_" + n);
-      for (int i=0; i<tasksPerJob; i++) job.add(new AparapiTask(matrixA, matrixB, execMode));
+      for (int i = 0; i < tasksPerJob; i++)
+        job.add(new AparapiTask(matrixA, matrixB, execMode));
       // submit and get the results
       List<Task<?>> results = client.submitJob(job);
-      for (Task<?> task: results) {
+      for (Task<?> task : results) {
         if (task.getThrowable() != null) throw task.getThrowable();
         AparapiTask t = (AparapiTask) task;
         assert t.getResult() instanceof SquareMatrix;
@@ -97,19 +97,17 @@ public class AparapiRunner
       if (elapsed < min) min = elapsed;
       if (elapsed > max) max = elapsed;
       totalIterationTime += elapsed;
-      print("Iteration #" + (n+1) + " performed in " + StringUtils.toStringDuration(elapsed));
+      print("Iteration #" + (n + 1) + " performed in " + StringUtils.toStringDuration(elapsed));
     }
-    print("total time: " + StringUtils.toStringDuration(totalIterationTime) +
-        ", average time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
-        ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
+    print("total time: " + StringUtils.toStringDuration(totalIterationTime) + ", average time: " + StringUtils.toStringDuration(totalIterationTime / iterations) + ", min = "
+        + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
   }
 
   /**
    * Print a message to the log and to the console.
    * @param msg the message to print.
    */
-  private static void print(final String msg)
-  {
+  private static void print(final String msg) {
     System.out.println(msg);
     log.info(msg);
   }

@@ -43,10 +43,6 @@ public class ServerShutdownRestartAction extends AbstractTopologyAction {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether the "OK" button was pressed.
-   */
-  private boolean isOk = false;
-  /**
    * Panel containing the dialog for entering the number of threads and their priority.
    */
   private OptionElement panel = null;

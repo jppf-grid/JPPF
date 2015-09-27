@@ -26,7 +26,7 @@ import java.util.concurrent.Callable;
 import org.jppf.client.JPPFJob;
 import org.jppf.job.*;
 import org.jppf.management.JPPFManagementInfo;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.*;
 import org.slf4j.*;
 
@@ -37,15 +37,10 @@ import test.org.jppf.test.setup.common.BaseTestHelper;
  * @author Laurent Cohen
  */
 abstract class JobSelectorAction implements Callable<Void> {
-
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(JobSelectorAction.class);
-  /**
-   * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * A "short" duration for this test.
    */

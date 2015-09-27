@@ -36,10 +36,6 @@ public class MultipleBuffersOutputStream extends OutputStream {
    */
   private static Logger log = LoggerFactory.getLogger(MultipleBuffersOutputStream.class);
   /**
-   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
-   */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
-  /**
    * Determines whether the trace level is enabled in the logging configuration, without the cost of a method call.
    */
   private static boolean traceEnabled = log.isTraceEnabled();

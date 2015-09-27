@@ -371,24 +371,6 @@ public final class StatsFormatter implements StatsConstants {
   }
 
   /**
-   * Format a floating point value.
-   * @param value the value to format.
-   * @return the formatted value as a string.
-   */
-  private static String formatDouble(final long value) {
-    return (value == Long.MAX_VALUE) ? "" : doubleFormatter.format(value);
-  }
-
-  /**
-   * Format a a time (or duration) value in format hh:mm:ss&#46;ms.
-   * @param value the value to format.
-   * @return the formatted value as a string.
-   */
-  private static String formatTime(final long value) {
-    return StringUtils.toStringDuration(value);
-  }
-
-  /**
    * Format a a time (or duration) value in format hh:mm:ss&#46;ms.
    * @param value the value to format.
    * @return the formatted value as a string.

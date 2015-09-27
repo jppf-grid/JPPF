@@ -20,43 +20,18 @@ package org.jppf.test.scenario.offline;
 
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.streams.StreamUtils;
-import org.slf4j.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
-public class OfflineNodeRunner extends AbstractScenarioRunner
-{
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(OfflineNodeRunner.class);
-  /**
-   * The count of itearations runs.
-   */
-  private int iterationsCount = 0;
-
+public class OfflineNodeRunner extends AbstractScenarioRunner {
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       StreamUtils.waitKeyPressed();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Print a message to the console and/or log file.
-   * @param message - the message to print.
-   */
-  private static void output(final String message)
-  {
-    System.out.println(message);
-    log.info(message);
   }
 }
