@@ -109,10 +109,8 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     TypedProperties config = JPPFConfiguration.getProperties();
     ConfigurationHelper helper = new ConfigurationHelper(config);
     int poolSize = helper.getInt(nbThreadsProperty, legacyNbThreadsProperty, Runtime.getRuntime().availableProcessors());
-    if (poolSize <= 0) {
-      poolSize = Runtime.getRuntime().availableProcessors();
-      config.setInt(nbThreadsProperty, poolSize);
-    }
+    if (poolSize <= 0) poolSize = Runtime.getRuntime().availableProcessors();
+    config.setInt(nbThreadsProperty, poolSize);
     log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadManager = createThreadManager(config, poolSize);
   }

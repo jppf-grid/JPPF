@@ -97,6 +97,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   protected JMXNodeConnectionWrapper jmxConnection = null;
   /**
+   * Provides access to the management functions of the peer driver.
+   */
+  JMXDriverConnectionWrapper peerJmxConnection = null;
+  /**
    * Execution status for the node.
    */
   protected ExecutorStatus executionStatus = ExecutorStatus.DISABLED;
@@ -312,14 +316,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Set the node system information.
    * @param nodeInfo a {@link JPPFSystemInformation} instance.
-   */
-  void setNodeInfo(final JPPFSystemInformation nodeInfo) {
-    setNodeInfo(nodeInfo, false);
-  }
-
-  /**
-   * Set the node system information.
-   * @param nodeInfo a {@link JPPFSystemInformation} instance.
    * @param update a flag indicates whether update system information in management information.
    */
   void setNodeInfo(final JPPFSystemInformation nodeInfo, final boolean update) {
@@ -341,8 +337,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   void setManagementInfo(final JPPFManagementInfo managementInfo) {
     if (debugEnabled) log.debug("context " + this + " setting management info [" + managementInfo + "]");
     this.managementInfo = managementInfo;
-    if (isPeer()) driver.getNodeNioServer().nodeConnected(this);
-    else  if ((managementInfo.getIpAddress() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
+    if ((managementInfo.getIpAddress() != null) && (managementInfo.getPort() >= 0)) initializeJmxConnection();
   }
 
   @Override
@@ -378,8 +373,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
     }
-    final JMXNodeConnectionWrapper jmx = jmxConnection;
+    final JMXConnectionWrapper jmx = isPeer() ? peerJmxConnection : jmxConnection;
     jmxConnection = null;
+    peerJmxConnection = null;
     if (jmx != null) {
       Runnable r = new Runnable() {
         @Override public void run() {
@@ -403,28 +399,15 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   private void initializeJmxConnection() {
     JPPFManagementInfo info = getManagementInfo();
-    if (info == null) jmxConnection = null;
-    else {
-      if ((info.getIpAddress() != null) && (info.getPort() >= 0) && channel.isOpen()) {
-        if (debugEnabled) log.debug("establishing JMX connection for {}", info);
-        jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
-        final NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
-        jmxConnection.addJMXWrapperListener(new JMXWrapperListener() {
-          @Override public void jmxWrapperConnected(final JMXWrapperEvent event) {
-            server.nodeConnected(AbstractNodeContext.this);
-          }
-
-          @Override
-          public void jmxWrapperTimeout(final JMXWrapperEvent event) {
-            if (debugEnabled) log.debug("received jmxWrapperTimeout() for {}", AbstractNodeContext.this);
-            jmxConnection = null;
-            server.nodeConnected(AbstractNodeContext.this);
-          }
-        });
-        jmxConnection.connect();
-      } else jmxConnection = null;
+    if (channel.isOpen()) {
+      if (debugEnabled) log.debug("establishing JMX connection for {}", info);
+      JMXConnectionWrapper jmx = null;
+      if (!isPeer()) jmx = jmxConnection = new JMXNodeConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+      else jmx = peerJmxConnection = new JMXDriverConnectionWrapper(info.getIpAddress(), info.getPort(), info.isSecure());
+      jmx.addJMXWrapperListener(new NodeJMXWrapperListener(this));
+      jmx.connect();
+      if (debugEnabled && (jmxConnection == null)) log.debug("could not establish JMX connection for " + info);
     }
-    if (debugEnabled && (jmxConnection == null)) log.debug("could not establish JMX connection for " + info);
   }
 
   /**
@@ -436,12 +419,19 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   /**
+   * Get the object that provides access to the management functions of the driver.
+   * @return a <code>JMXConnectionWrapper</code> instance.
+   */
+  public JMXDriverConnectionWrapper getPeerJmxConnection() {
+    return peerJmxConnection;
+  }
+
+  /**
    * Cancel the job with the specified id.
    * @param jobId the id of the job to cancel.
    * @param requeue true if the job should be requeued on the server side, false otherwise.
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.job.management.DriverJobManagementMBean#cancelJob(java.lang.String)
    */
   public boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
     if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);
