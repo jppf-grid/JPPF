@@ -29,9 +29,10 @@ import org.jppf.management.JMXServer;
 import org.jppf.node.connection.*;
 import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.ServerTaskBundleClient;
-import org.jppf.utils.*;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -118,10 +119,6 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
           resultSender = new PeerNodeResultSender(getSocketWrapper());
           perform();
         } catch(Exception e) {
-          /*
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.warn(ExceptionUtils.getMessage(e));
-          */
           close();
           throw new JPPFRuntimeException(e);
         } catch(Error e) {
@@ -150,6 +147,12 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
           bundle.setUuid(uuid);
           bundle.setParameter(BundleParameter.IS_PEER, true);
           bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+          JMXServer jmxServer = driver.getInitializer().getJmxServer(secure);
+          bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
+          PeerAttributesHandler peerHandler = driver.getNodeNioServer().getPeerHandler();
+          systemInformation.getJppf().setInt(PeerAttributesHandler.PEER_TOTAL_THREADS, peerHandler.getTotalThreads());
+          systemInformation.getJppf().setInt(PeerAttributesHandler.PEER_TOTAL_NODES, peerHandler.getTotalNodes());
+          if (debugEnabled) log.debug("sending totalNodes={}, totalThreads={}", peerHandler.getTotalNodes(), peerHandler.getTotalThreads());
           bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
         }
         if (bundleWrapper.getTaskCount() > 0) {

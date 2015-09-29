@@ -118,6 +118,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Handles expiration of dispatched bundles.
    */
   private final JPPFScheduleHandler dispatchExpirationHandler = new JPPFScheduleHandler("DispatchExpiration");
+  /**
+   * The peer handler.
+   */
+  private final PeerAttributesHandler peerHandler = new PeerAttributesHandler();
 
   /**
    * Initialize this node server.
@@ -176,7 +180,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       if (debugEnabled) log.debug("adding connection {}", nodeContext.getChannel());
       ChannelWrapper<?> channel = nodeContext.getChannel();
       if (channel.isOpen()) {
-        //allConnections.put(nodeContext.getUuid(), nodeContext);
         if (channel.isOpen()) {
           nodeContext.addExecutionStatusListener(statusListener);
           if (channel.isOpen()) updateConnectionStatus(nodeContext, ExecutorStatus.DISABLED, nodeContext.getExecutionStatus());
@@ -371,6 +374,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       lock.unlock();
     }
     try {
+      peerHandler.onCloseNode(context);
       JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
       if (debugEnabled) log.debug("firing nodeDisconnected() for {}", info);
@@ -506,17 +510,18 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
 
   /**
    * Called when a channel is connected.
-   * @param channel the connected channel.
+   * @param context the connected channel.
    */
-  public void nodeConnected(final AbstractNodeContext channel) {
-    JPPFManagementInfo info = channel.getManagementInfo();
-    if (channel.getChannel().isOpen()) {
-      addConnection(channel);
-      if (channel.getChannel().isOpen()) {
+  public void nodeConnected(final AbstractNodeContext context) {
+    JPPFManagementInfo info = context.getManagementInfo();
+    if (context.getChannel().isOpen()) {
+      peerHandler.onNodeConnected(context);
+      addConnection(context);
+      if (context.getChannel().isOpen()) {
         if (info != null) nodeConnectionHandler.fireNodeConnected(info);
       }
     }
-    if (!channel.getChannel().isOpen()) channel.handleException(channel.getChannel(), null);
+    if (!context.getChannel().isOpen()) context.handleException(context.getChannel(), null);
   }
 
   /**
@@ -541,5 +546,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public JPPFScheduleHandler getDispatchExpirationHandler() {
     return dispatchExpirationHandler;
+  }
+
+  /**
+   * Get the peer handler.
+   * @return a {@link PeerAttributesHandler} instance.
+   */
+  public PeerAttributesHandler getPeerHandler() {
+    return peerHandler;
   }
 }

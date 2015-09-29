@@ -54,6 +54,10 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   private static final boolean traceEnabled = log.isTraceEnabled();
   /**
+   * Whether to allow dispatching to peer drivers without any node attached, defaults to {@code false}.
+   */
+  private static final boolean disptachtoPeersWithoutNode = JPPFConfiguration.getProperties().getBoolean("jppf.peer.allow.orphans", false);
+  /**
    * Random number generator used to randomize the choice of idle channel.
    */
   private final Random random = new Random(System.nanoTime());
@@ -358,8 +362,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
           continue;
         }
         if(bundle.getBroadcastUUID() != null && !bundle.getBroadcastUUID().equals(channel.getUuid())) continue;
+        JPPFSystemInformation info = channel.getSystemInformation();
+        if (channel.isPeer() && !disptachtoPeersWithoutNode) {
+          if ((info != null) && (info.getJppf().getInt(PeerAttributesHandler.PEER_TOTAL_NODES, 0) <= 0)) continue;
+        }
         if (policy != null) {
-          JPPFSystemInformation info = channel.getSystemInformation();
           boolean b = false;
           try {
             preparePolicy(policy, bundle, stats, nbJobChannels);

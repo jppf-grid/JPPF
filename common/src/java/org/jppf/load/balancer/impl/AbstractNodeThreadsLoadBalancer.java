@@ -19,6 +19,7 @@ package org.jppf.load.balancer.impl;
 
 import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -29,8 +30,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler implements NodeAwareness
-{
+public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler implements NodeAwareness {
   /**
    * Logger for this class.
    */
@@ -48,41 +48,34 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm.
    */
-  public AbstractNodeThreadsLoadBalancer(final LoadBalancingProfile profile)
-  {
+  public AbstractNodeThreadsLoadBalancer(final LoadBalancingProfile profile) {
     super(profile);
   }
 
   /**
    * Get the current number of tasks to send to the node.
-   * @return  the bundle size as an int value.
-   * @see org.jppf.load.balancer.Bundler#getBundleSize()
+   * @return the bundle size as an int value.
    */
   @Override
-  public int getBundleSize()
-  {
+  public int getBundleSize() {
     return bundleSize;
   }
 
   /**
    * Get the corresponding node's system information.
    * @return a {@link JPPFSystemInformation} instance.
-   * @see org.jppf.load.balancer.NodeAwareness#getNodeConfiguration()
    */
   @Override
-  public JPPFSystemInformation getNodeConfiguration()
-  {
+  public JPPFSystemInformation getNodeConfiguration() {
     return nodeConfiguration;
   }
 
   /**
    * Set the corresponding node's system information.
    * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
-   * @see org.jppf.load.balancer.NodeAwareness#setNodeConfiguration(org.jppf.management.JPPFSystemInformation)
    */
   @Override
-  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration)
-  {
+  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.nodeConfiguration = nodeConfiguration;
     computeBundleSize();
     if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + nodeConfiguration);
@@ -91,15 +84,14 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
   /**
    * Compute the number of tasks to send to the node. This is the actual algorithm implementation.
    */
-  private void computeBundleSize()
-  {
+  private void computeBundleSize() {
     if (log.isDebugEnabled()) log.debug("computing bundle size for bundler #" + this.bundlerNumber);
     JPPFSystemInformation nodeConfig = getNodeConfiguration();
     if (nodeConfig == null) bundleSize = 1;
-    else
-    {
+    else {
       // get the number of processing threads in the node
-      int nbThreads = getNodeConfiguration().getJppf().getInt("jppf.processing.threads", -1);
+      TypedProperties jppf = getNodeConfiguration().getJppf();
+      int nbThreads = jppf.getBoolean("jppf.peer.driver", false) ? jppf.getInt("jppf.peer.processing.threads", -1) : jppf.getInt("jppf.processing.threads", -1);
       // if number of threads is not defined, we assume it is the number of available processors
       if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
       if (nbThreads <= 0) nbThreads = 1;
@@ -113,11 +105,9 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
 
   /**
    * Release the resources used by this bundler.
-   * @see org.jppf.load.balancer.AbstractBundler#dispose()
    */
   @Override
-  public void dispose()
-  {
+  public void dispose() {
     if (log.isDebugEnabled()) log.debug("disposing bundler #" + this.bundlerNumber);
     this.nodeConfiguration = null;
   }
