@@ -21,12 +21,13 @@ package org.jppf.server.nio.nodeserver;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.comm.recovery.*;
 import org.jppf.execute.*;
 import org.jppf.io.MultipleBuffersLocation;
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.queue.*;
 import org.jppf.server.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
@@ -42,8 +43,7 @@ import org.slf4j.*;
  * Instances of this class serve task execution requests to the JPPF nodes.
  * @author Laurent Cohen
  */
-public class NodeNioServer extends NioServer<NodeState, NodeTransition> implements ReaperListener
-{
+public class NodeNioServer extends NioServer<NodeState, NodeTransition>implements ReaperListener {
   /**
    * Logger for this class.
    */
@@ -106,11 +106,23 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   private final ExecutorChannelStatusListener statusListener = new ExecutorChannelStatusListener() {
     @Override
     public void executionStatusChanged(final ExecutorChannelStatusEvent event) {
-      if(event.getSource() instanceof AbstractNodeContext) {
+      if (event.getSource() instanceof AbstractNodeContext) {
         updateConnectionStatus((AbstractNodeContext) event.getSource(), event.getOldValue(), event.getNewValue());
       }
     }
   };
+  /**
+   * Total number of fully connected nodes.
+   */
+  private AtomicInteger totalNodes = new AtomicInteger(0);
+  /**
+   * Total number of processing threads for all fully connected nodes.
+   */
+  private AtomicInteger totalThreads = new AtomicInteger(0);
+  /**
+   * The peer handler.
+   */
+  private final PeerAttributesHandler peerHandler = new PeerAttributesHandler();
 
   /**
    * Initialize this node server.
@@ -119,8 +131,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param useSSL determines whether an SSLContext should be created for this server.
    * @throws Exception if the underlying server socket can't be opened.
    */
-  public NodeNioServer(final JPPFDriver driver, final JPPFPriorityQueue queue, final boolean useSSL) throws Exception
-  {
+  public NodeNioServer(final JPPFDriver driver, final JPPFPriorityQueue queue, final boolean useSSL) throws Exception {
     super(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL, useSSL);
     if (driver == null) throw new IllegalArgumentException("driver is null");
     if (queue == null) throw new IllegalArgumentException("queue is null");
@@ -156,8 +167,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @return a <code>JPPFDriverStatsManager</code> instance.
    * @exclude
    */
-  public JPPFDriverStatsManager getStatsManager()
-  {
+  public JPPFDriverStatsManager getStatsManager() {
     return statsManager;
   }
 
@@ -165,8 +175,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to add.
    */
-  public synchronized void addConnection(final AbstractNodeContext nodeContext)
-  {
+  public synchronized void addConnection(final AbstractNodeContext nodeContext) {
     if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
     if (nodeContext.getChannel() == null) throw new IllegalArgumentException("wrapper.getChannel() is null");
 
@@ -179,16 +188,12 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Remove the specified connection wrapper from the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to remove.
    */
-  public synchronized void removeConnection(final AbstractNodeContext nodeContext)
-  {
+  public synchronized void removeConnection(final AbstractNodeContext nodeContext) {
     if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
-    try
-    {
+    try {
       taskQueueChecker.removeIdleChannel(nodeContext);
       updateConnectionStatus(nodeContext, nodeContext.getExecutionStatus(), ExecutorStatus.DISABLED);
-    }
-    finally
-    {
+    } finally {
       allConnections.remove(nodeContext.getUuid());
       nodeContext.removeExecutionStatusListener(statusListener);
     }
@@ -199,8 +204,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param uuid the id of the connection to remove.
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext removeConnection(final String uuid)
-  {
+  public synchronized AbstractNodeContext removeConnection(final String uuid) {
     final AbstractNodeContext nodeContext = allConnections.get(uuid);
     if (nodeContext == null) return null;
     removeConnection(nodeContext);
@@ -212,8 +216,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param uuid the id of the connection to get.
    * @return the context of the cpnnect that was found, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext getConnection(final String uuid)
-  {
+  public synchronized AbstractNodeContext getConnection(final String uuid) {
     return allConnections.get(uuid);
   }
 
@@ -223,8 +226,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param activate <code>true</code> to activate the node, <code>false</code> to deactivate it.
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
-  public synchronized AbstractNodeContext activateNode(final String uuid, final boolean activate)
-  {
+  public synchronized AbstractNodeContext activateNode(final String uuid, final boolean activate) {
     final AbstractNodeContext nodeContext = allConnections.get(uuid);
     if (nodeContext == null) return null;
     if (activate != nodeContext.isActive()) nodeContext.setActive(activate);
@@ -235,8 +237,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Initialize the local channel connection.
    * @param localChannel the local channel to use.
    */
-  public void initLocalChannel(final ChannelWrapper<?> localChannel)
-  {
+  public void initLocalChannel(final ChannelWrapper<?> localChannel) {
     this.localChannel = localChannel;
     ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
     localChannel.setSelector(channelSelector);
@@ -247,44 +248,37 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   /**
-   * @param nodeContext   the connection wrapper.
+   * @param nodeContext the connection wrapper.
    * @param oldStatus the connection status before the change.
    * @param newStatus the connection status after the change.
    */
-  private void updateConnectionStatus(final AbstractNodeContext nodeContext, final ExecutorStatus oldStatus, final ExecutorStatus newStatus)
-  {
+  private void updateConnectionStatus(final AbstractNodeContext nodeContext, final ExecutorStatus oldStatus, final ExecutorStatus newStatus) {
     if (oldStatus == null) throw new IllegalArgumentException("oldStatus is null");
     if (newStatus == null) throw new IllegalArgumentException("newStatus is null");
     if (nodeContext == null || oldStatus == newStatus) return;
 
     if (newStatus == ExecutorStatus.ACTIVE) taskQueueChecker.addIdleChannel(nodeContext);
-    else
-    {
+    else {
       taskQueueChecker.removeIdleChannel(nodeContext);
-      if(newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
+      if (newStatus == ExecutorStatus.FAILED || newStatus == ExecutorStatus.DISABLED) queue.cancelBroadcastJobs(nodeContext.getUuid());
     }
     queue.updateWorkingConnections(oldStatus, newStatus);
   }
 
   @Override
-  protected NioServerFactory<NodeState, NodeTransition> createFactory()
-  {
+  protected NioServerFactory<NodeState, NodeTransition> createFactory() {
     return new NodeServerFactory(this);
   }
 
   @Override
-  public void postAccept(final ChannelWrapper channel)
-  {
+  public void postAccept(final ChannelWrapper channel) {
     if (JPPFDriver.JPPF_DEBUG) driver.getInitializer().getServerDebug().addChannel(channel, getName());
     statsManager.newNodeConnection();
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
-    try
-    {
+    try {
       context.setBundle(getInitialBundle());
       transitionManager.transitionChannel(channel, NodeTransition.TO_SEND_INITIAL);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
       closeNode(context);
@@ -292,8 +286,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   @Override
-  public AbstractNodeContext createNioContext()
-  {
+  public AbstractNodeContext createNioContext() {
     final RemoteNodeContext context = new RemoteNodeContext(getTransitionManager());
     context.setOnClose(new Runnable() {
       @Override
@@ -310,12 +303,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * to wait for an actual request to be sent.
    * @return a <code>ServerJob</code> instance, with no task in it.
    */
-  ServerTaskBundleNode getInitialBundle()
-  {
-    if (initialBundle == null)
-    {
-      try
-      {
+  ServerTaskBundleNode getInitialBundle() {
+    if (initialBundle == null) {
+      try {
         SerializationHelper helper = new SerializationHelperImpl();
         // serializing a null data provider.
         JPPFBuffer buf = helper.getSerializer().serialize(null);
@@ -332,9 +322,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         bundle.setState(JPPFTaskBundle.State.INITIAL_BUNDLE);
         ServerJob serverJob = new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(dataProviderBytes, dataProviderBytes.length)));
         initialBundle = serverJob.copy(serverJob.getTaskCount());
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -345,29 +333,33 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Close a connection to a node.
    * @param context a <code>SocketChannel</code> that encapsulates the connection.
    */
-  public void closeNode(final AbstractNodeContext context)
-  {
+  public void closeNode(final AbstractNodeContext context) {
     if (JPPFDriver.JPPF_DEBUG && (context != null)) driver.getInitializer().getServerDebug().removeChannel(context.getChannel(), NioConstants.NODE_SERVER);
-    try
-    {
-      if(context != null) context.close();
-    }
-    catch (Exception e)
-    {
+    try {
+      if (context != null) context.close();
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
-    try
-    {
+    try {
       JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
+      if (!context.isPeer()) {
+        totalNodes.decrementAndGet();
+        JPPFSystemInformation sys = info.getSystemInfo();
+        if (sys != null) {
+          int nbThreads = sys.getJppf().getInt("processing.threads", 1);
+          totalThreads.addAndGet(-nbThreads);
+        }
+        if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
+      } else {
+        peerHandler.removePeer(context);
+      }
       nodeConnectionHandler.fireNodeDisconnected(info);
       driver.getStatsManager().nodeConnectionClosed();
       removeConnection(context);
       taskQueueChecker.removeIdleChannel(context);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
@@ -377,8 +369,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get the algorithm that dynamically computes the task bundle size.
    * @return a <code>Bundler</code> instance.
    */
-  public Bundler getBundler()
-  {
+  public Bundler getBundler() {
     return taskQueueChecker.getBundler();
   }
 
@@ -386,8 +377,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Set the algorithm that dynamically computes the task bundle size.
    * @param bundler a <code>Bundler</code> instance.
    */
-  public void setBundler(final Bundler bundler)
-  {
+  public void setBundler(final Bundler bundler) {
     taskQueueChecker.setBundler(bundler);
   }
 
@@ -395,8 +385,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get a reference to the driver's tasks queue.
    * @return a <code>JPPFQueue</code> instance.
    */
-  public JPPFQueue getQueue()
-  {
+  public JPPFQueue getQueue() {
     return queue;
   }
 
@@ -404,8 +393,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get the factory object used to create bundler instances.
    * @return an instance of <code>JPPFBundlerFactory</code>.
    */
-  public JPPFBundlerFactory getBundlerFactory()
-  {
+  public JPPFBundlerFactory getBundlerFactory() {
     return bundlerFactory;
   }
 
@@ -421,8 +409,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get all the node connections handled by this server.
    * @return a list of <code>ChannelWrapper</code> instances.
    */
-  public synchronized List<AbstractNodeContext> getAllChannels()
-  {
+  public synchronized List<AbstractNodeContext> getAllChannels() {
     return new ArrayList<AbstractNodeContext>(allConnections.values());
   }
 
@@ -430,8 +417,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get all the node connections handled by this server.
    * @return a set of <code>ChannelWrapper</code> instances.
    */
-  public synchronized Set<AbstractNodeContext> getAllChannelsAsSet()
-  {
+  public synchronized Set<AbstractNodeContext> getAllChannelsAsSet() {
     return new HashSet<AbstractNodeContext>(allConnections.values());
   }
 
@@ -439,8 +425,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get the number of idle channels.
    * @return the size of the underlying list of idle channels.
    */
-  public int getNbIdleChannels()
-  {
+  public int getNbIdleChannels() {
     return taskQueueChecker.getNbIdleChannels();
   }
 
@@ -448,27 +433,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Get the list of currently idle channels.
    * @return a list of <code>AbstractNodeContext</code> instances.
    */
-  public List<AbstractNodeContext> getIdleChannels()
-  {
+  public List<AbstractNodeContext> getIdleChannels() {
     return taskQueueChecker.getIdleChannels();
   }
 
   @Override
-  public void connectionFailed(final ReaperEvent event)
-  {
+  public void connectionFailed(final ReaperEvent event) {
     ServerConnection c = event.getConnection();
     AbstractNodeContext context = null;
-    if (!c.isOk())
-    {
+    if (!c.isOk()) {
       String uuid = c.getUuid();
       if (uuid != null) context = removeConnection(uuid);
-      if (context != null)
-      {
+      if (context != null) {
         if (debugEnabled) log.debug("about to close channel = " + (context.getChannel().isOpen() ? context : context.getClass().getSimpleName()) + " with uuid = " + uuid);
         context.handleException(context.getChannel(), null);
-      }
-      else
-      {
+      } else {
         log.warn("found null context - a job may be stuck!");
         closeNode(context);
       }
@@ -476,26 +455,23 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   }
 
   @Override
-  public boolean isIdle(final ChannelWrapper<?> channel)
-  {
+  public boolean isIdle(final ChannelWrapper<?> channel) {
     return NodeState.IDLE == channel.getContext().getState();
   }
 
   /**
    * Close this server and interrupt the thread that runs it.
    */
-  public void close()
-  {
+  public void close() {
     setStopped(true);
-    if (taskQueueChecker != null)
-    {
+    if (taskQueueChecker != null) {
       taskQueueChecker.setStopped(true);
       taskQueueChecker.wakeUp();
     }
     queue.close();
-    synchronized(this)
-    {
-      for (AbstractNodeContext channel: allConnections.values()) {
+    peerHandler.close();
+    synchronized (this) {
+      for (AbstractNodeContext channel : allConnections.values()) {
         try {
           channel.close();
         } catch (Exception e) {
@@ -512,7 +488,20 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public void nodeConnected(final AbstractNodeContext channel) {
     JPPFManagementInfo info = channel.getManagementInfo();
-    if(info != null) nodeConnectionHandler.fireNodeConnected(info);
+    if (!channel.isPeer()) {
+      totalNodes.incrementAndGet();
+      if (info != null) {
+        JPPFSystemInformation sys = info.getSystemInfo();
+        if (sys != null) {
+          int nbThreads = sys.getJppf().getInt(PeerAttributesHandler.PEER_TOTAL_THREADS, 1);
+          totalThreads.addAndGet(nbThreads);
+        }
+      }
+      if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
+    } else {
+      peerHandler.addPeer(channel);
+    }
+    nodeConnectionHandler.fireNodeConnected(info);
     addConnection(channel);
   }
 
@@ -522,5 +511,21 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public JPPFContext getJPPFContext() {
     return taskQueueChecker.getJPPFContext();
+  }
+
+  /**
+   * Get the total number of fully connected nodes.
+   * @return the total number of nodes.
+   */
+  public int getTotalNodes() {
+    return totalNodes.get();
+  }
+
+  /**
+   * Get the total number of processing threads for all fully connected nodes.
+   * @return the total number of threads.
+   */
+  public int getTotalThreads() {
+    return totalThreads.get();
   }
 }

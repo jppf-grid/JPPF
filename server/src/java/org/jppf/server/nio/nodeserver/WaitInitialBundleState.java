@@ -35,8 +35,7 @@ import org.slf4j.*;
  * response to sending the initial bundle.
  * @author Laurent Cohen
  */
-class WaitInitialBundleState extends NodeServerState
-{
+class WaitInitialBundleState extends NodeServerState {
   /**
    * Logger for this class.
    */
@@ -50,8 +49,7 @@ class WaitInitialBundleState extends NodeServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public WaitInitialBundleState(final NodeNioServer server)
-  {
+  public WaitInitialBundleState(final NodeNioServer server) {
     super(server);
   }
 
@@ -60,16 +58,13 @@ class WaitInitialBundleState extends NodeServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.server.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception
-  {
+  public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
     if (debugEnabled) log.debug("exec() for " + channel);
     if (context.getMessage() == null) context.setMessage(context.newMessage());
-    if (context.readMessage(channel))
-    {
+    if (context.readMessage(channel)) {
       if (debugEnabled) log.debug("read bundle for " + channel + " done");
       Pair<JPPFTaskBundle, List<DataLocation>> received = context.deserializeBundle();
       JPPFTaskBundle bundle = received.first();
@@ -78,29 +73,28 @@ class WaitInitialBundleState extends NodeServerState
       String uuid = (String) bundle.getParameter(BundleParameter.NODE_UUID_PARAM);
       context.setUuid(uuid);
       Bundler bundler = server.getBundler().copy();
+      boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
+      context.setPeer(isPeer);
       JPPFSystemInformation systemInfo = (JPPFSystemInformation) bundle.getParameter(BundleParameter.SYSTEM_INFO_PARAM);
       if (systemInfo != null) {
+        systemInfo.getJppf().setProperty("jppf.peer.driver", Boolean.toString(isPeer));
         context.setNodeInfo(systemInfo);
         if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
         if (debugEnabled) log.debug("processing threads for node " + channel + " = " + systemInfo.getJppf().getInt("processing.threads", -1));
       } else if (debugEnabled) log.debug("no system info received for node " + channel);
 
-      if( bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
+      if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());
       bundler.setup();
       context.setBundler(bundler);
-      boolean isPeer = (Boolean) bundle.getParameter(BundleParameter.IS_PEER, Boolean.FALSE);
-      context.setPeer(isPeer);
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true))
-      {
-        if (uuid != null)
-        {
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) {
+        if (uuid != null) {
           String host = (String) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM);
           int port = (Integer) bundle.getParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, -1);
           boolean ssl;
           if (channel.isLocal()) ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
           else ssl = context.getSSLHandler() != null;
           byte type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
-          if(channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
+          if (channel.isLocal()) type |= JPPFManagementInfo.LOCAL;
           JPPFManagementInfo info = new JPPFManagementInfo(host, port, uuid, type, ssl);
           if (debugEnabled) log.debug("setting " + info);
           if (systemInfo != null) info.setSystemInfo(systemInfo);

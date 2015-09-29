@@ -19,6 +19,7 @@ package org.jppf.server.scheduler.bundle.nodethreads;
 
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.server.scheduler.bundle.*;
+import org.jppf.utils.TypedProperties;
 import org.slf4j.*;
 
 /**
@@ -98,7 +99,8 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
     else
     {
       // get the number of processing threads in the node
-      int nbThreads = getNodeConfiguration().getJppf().getInt("processing.threads", -1);
+      TypedProperties jppf = getNodeConfiguration().getJppf();
+      int nbThreads = jppf.getBoolean("jppf.peer.driver", false) ? jppf.getInt("peer.processing.threads", -1) : jppf.getInt("processing.threads", -1);
       // if number of threads is not defined, we assume it is the number of available processors
       if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
       if (nbThreads <= 0) nbThreads = 1;

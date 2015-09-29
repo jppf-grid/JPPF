@@ -125,10 +125,8 @@ public class NodeExecutionManagerImpl
     this.node = node;
     TypedProperties config = JPPFConfiguration.getProperties();
     int poolSize = config.getInt(nbThreadsProperty, Runtime.getRuntime().availableProcessors());
-    if (poolSize <= 0) {
-      poolSize = Runtime.getRuntime().availableProcessors();
-      config.setProperty(nbThreadsProperty, Integer.toString(poolSize));
-    }
+    if (poolSize <= 0) poolSize = Runtime.getRuntime().availableProcessors();
+    config.setProperty(nbThreadsProperty, Integer.toString(poolSize));
     log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     threadManager = createThreadManager(config, poolSize);
   }

@@ -35,8 +35,7 @@ import org.slf4j.*;
  * This class performs performs the work of reading a task bundle execution response from a node.
  * @author Laurent Cohen
  */
-class WaitingResultsState extends NodeServerState
-{
+class WaitingResultsState extends NodeServerState {
   /**
    * Logger for this class.
    */

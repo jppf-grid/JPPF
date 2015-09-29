@@ -27,6 +27,7 @@ import org.jppf.io.*;
 import org.jppf.management.JMXServer;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.server.JPPFDriver;
+import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.*;
 import org.jppf.utils.*;
@@ -38,8 +39,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Martin JANDA
  */
-class PeerNode extends AbstractCommonNode
-{
+class PeerNode extends AbstractCommonNode {
   /**
    * Logger for this class.
    */
@@ -68,6 +68,10 @@ class PeerNode extends AbstractCommonNode
    * Reference to the driver.
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
+  /**
+   * Whether the connection is established over SSL/TLS.
+   */
+  private final boolean secure;
 
   /**
    * Initialize this peer node with the specified configuration name.
@@ -75,14 +79,13 @@ class PeerNode extends AbstractCommonNode
    * @param connectionInfo peer connection information.
    * @param secure specifies whether the connection should be established over SSL/TLS.
    */
-  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure)
-  {
+  public PeerNode(final String peerNameBase, final JPPFConnectionInformation connectionInfo, final boolean secure) {
     if (peerNameBase == null || peerNameBase.isEmpty()) throw new IllegalArgumentException("peerNameBase is blank");
     if (connectionInfo == null) throw new IllegalArgumentException("connectionInfo is null");
-
     this.peerNameBase = peerNameBase;
     this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     this.uuid = driver.getUuid();
+    this.secure = secure;
     this.systemInformation = driver.getSystemInformation();
   }
 
@@ -96,7 +99,7 @@ class PeerNode extends AbstractCommonNode
     while (!isStopped()) {
       try {
         init();
-      } catch(Exception e) {
+      } catch (Exception e) {
         if (debugEnabled) log.debug(getName() + " : " + e.getMessage(), e);
         setStopped(true);
         try {
@@ -110,17 +113,17 @@ class PeerNode extends AbstractCommonNode
         try {
           resultSender = new PeerNodeResultSender(getSocketWrapper());
           perform();
-        } catch(Exception e) {
+        } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
           try {
             nodeConnection.close();
-          } catch(Exception ex) {
+          } catch (Exception ex) {
             if (debugEnabled) log.debug(e.getMessage(), ex);
             else log.warn(ExceptionUtils.getMessage(ex));
           }
           if (e instanceof SSLException) setStopped(true);
-        } catch(Error e) {
+        } catch (Error e) {
           log.error(e.getMessage(), e);
           e.printStackTrace();
           throw e;
@@ -145,6 +148,12 @@ class PeerNode extends AbstractCommonNode
         bundle.setUuid(uuid);
         bundle.setParameter(BundleParameter.IS_PEER, true);
         bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
+        JMXServer jmxServer = driver.getInitializer().getJmxServer(secure);
+        bundle.setParameter(BundleParameter.NODE_MANAGEMENT_HOST_PARAM, jmxServer.getManagementHost());
+        bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
+        systemInformation.getJppf().setProperty(PeerAttributesHandler.PEER_TOTAL_THREADS, Integer.toString(driver.getNodeNioServer().getTotalThreads()));
+        systemInformation.getJppf().setProperty(PeerAttributesHandler.PEER_TOTAL_NODES, Integer.toString(driver.getNodeNioServer().getTotalNodes()));
+        if (debugEnabled) log.debug("sending totalNodes={}, totalThreads={}", driver.getNodeNioServer().getTotalNodes(), driver.getNodeNioServer().getTotalThreads());
         bundle.setParameter(BundleParameter.SYSTEM_INFO_PARAM, systemInformation);
       }
       if (bundleWrapper.getTaskCount() > 0) {
@@ -170,8 +179,7 @@ class PeerNode extends AbstractCommonNode
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public synchronized void init() throws Exception
-  {
+  public synchronized void init() throws Exception {
     nodeConnection.init();
     is = new SocketWrapperInputSource(getSocketWrapper());
   }
@@ -181,8 +189,7 @@ class PeerNode extends AbstractCommonNode
    * @return an array of deserialized objects.
    * @throws Exception if an error occurs while deserializing.
    */
-  private ServerTaskBundleClient readBundle() throws Exception
-  {
+  private ServerTaskBundleClient readBundle() throws Exception {
     // Read the request header - with task count information
     if (debugEnabled) log.debug(getName() + " waiting for next request");
     JPPFTaskBundle header = (JPPFTaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ((RemotePeerConnection) nodeConnection).helper.getSerializer());
@@ -193,11 +200,10 @@ class PeerNode extends AbstractCommonNode
     if (traceEnabled) log.trace("received data provider from peer driver, data length = " + dataProvider.getSize());
 
     List<DataLocation> tasks = new ArrayList<DataLocation>(count);
-    for (int i=1; i<count+1; i++)
-    {
+    for (int i = 1; i < count + 1; i++) {
       DataLocation dl = IOHelper.readData(is);
       tasks.add(dl);
-      if (traceEnabled) log.trace("received task #"+ i + " from peer driver, data length = " + dl.getSize());
+      if (traceEnabled) log.trace("received task #" + i + " from peer driver, data length = " + dl.getSize());
     }
     return new ServerTaskBundleClient(header, dataProvider, tasks);
   }
@@ -206,8 +212,7 @@ class PeerNode extends AbstractCommonNode
    * Get the underlying socket connection wrapper.
    * @return a {@link SocketWrapper} instance.
    */
-  private SocketWrapper getSocketWrapper()
-  {
+  private SocketWrapper getSocketWrapper() {
     return ((RemotePeerConnection) nodeConnection).getChannel();
   }
 
@@ -216,17 +221,13 @@ class PeerNode extends AbstractCommonNode
    * @see org.jppf.node.Node#stopNode()
    */
   @Override
-  public void stopNode()
-  {
+  public void stopNode() {
     if (debugEnabled) log.debug(getName() + " closing node");
     stopped = true;
-    try
-    {
+    try {
       if (debugEnabled) log.debug(getName() + " closing socket: " + nodeConnection.getChannel());
       nodeConnection.close();
-    }
-    catch(Exception ex)
-    {
+    } catch (Exception ex) {
       log.error(ex.getMessage(), ex);
     }
     nodeConnection = null;
@@ -236,20 +237,17 @@ class PeerNode extends AbstractCommonNode
    * Get a string representation of this peer node's name.
    * @return the name as a string.
    */
-  private String getName()
-  {
+  private String getName() {
     return nodeConnection == null ? "[unknown peer]" : ((RemotePeerConnection) nodeConnection).name;
   }
 
   @Override
-  public JMXServer getJmxServer() throws Exception
-  {
+  public JMXServer getJmxServer() throws Exception {
     return driver.getInitializer().getJmxServer(((RemotePeerConnection) nodeConnection).secure);
   }
 
   @Override
-  public boolean isLocal()
-  {
+  public boolean isLocal() {
     return false;
   }
 
@@ -260,8 +258,7 @@ class PeerNode extends AbstractCommonNode
    * @exclude
    */
   @Override
-  public LifeCycleEventHandler getLifeCycleEventHandler()
-  {
+  public LifeCycleEventHandler getLifeCycleEventHandler() {
     return null;
   }
 }
