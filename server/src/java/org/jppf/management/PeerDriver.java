@@ -55,7 +55,7 @@ public final class PeerDriver extends NotificationBroadcasterSupport implements 
   }
 
   /**
-   * Get tingleton instance of this class.
+   * Get the singleton instance of this class.
    * @return a {@link PeerDriver} object.
    */
   public static PeerDriver getInstance() {

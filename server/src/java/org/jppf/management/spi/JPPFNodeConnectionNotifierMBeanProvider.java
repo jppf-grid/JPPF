@@ -16,28 +16,29 @@
  * limitations under the License.
  */
 
-package org.jppf.management;
+package org.jppf.management.spi;
 
-import org.jppf.management.spi.JPPFDriverMBeanProvider;
+import org.jppf.management.*;
 
 /**
  * 
  * @author Laurent Cohen
+ * @since 5.1
  * @exclude
  */
-public class PeerDriverMBeanProvider implements JPPFDriverMBeanProvider {
+public class JPPFNodeConnectionNotifierMBeanProvider implements JPPFDriverMBeanProvider {
   @Override
   public String getMBeanInterfaceName() {
-    return PeerDriverMBean.class.getName();
+    return JPPFNodeConnectionNotifierMBean.class.getName();
   }
 
   @Override
   public String getMBeanName() {
-    return PeerDriverMBean.MBEAN_NAME;
+    return JPPFNodeConnectionNotifierMBean.MBEAN_NAME;
   }
 
   @Override
   public Object createMBean() {
-    return PeerDriver.getInstance();
+    return JPPFNodeConnectionNotifier.getInstance();
   }
 }

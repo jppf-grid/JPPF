@@ -25,8 +25,7 @@ import org.jppf.utils.*;
 
 
 /**
- * Instances of this class encapsulate the information required to access
- * the JMX server of a node.
+ * Instances of this class encapsulate the information required to access the JMX server of a node.
  * @author Laurent Cohen
  */
 public class JPPFManagementInfo implements Serializable, Comparable<JPPFManagementInfo> {
@@ -55,19 +54,25 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Information that the node is a master node for the provisioning feature.
    */
-  public static final int MASTER = 0x10000;
+  public static final int MASTER = 0x0001_0000;
   /**
    * Information that the node is a slave node for the provisioning feature.
    */
-  public static final int SLAVE = 0x20000;
+  public static final int SLAVE = 0x0002_0000;
   /**
    * Information that node is local on DRIVER or CLIENT. Value of this constant can be changed in future!
    */
-  public static final int LOCAL = 0x40000;
+  public static final int LOCAL = 0x0004_0000;
   /**
-   * Information that node is initialized with a .Net bridge and can execute .Net tasks. Value of this constant can be changed in future!
+   * Information that the node is initialized with a .Net bridge and can execute .Net tasks. Value of this constant can be changed in future!
+   * @since 5.0
    */
-  public static final int DOTNET = 0x80000;
+  public static final int DOTNET = 0x0008_0000;
+  /**
+   * Information that the node is an Android node.
+   * @since 5.1
+   */
+  public static final int ANDROID = 0x0010_0000;
   /**
    * Mask for elimination extended type attributes (bits 16-31).
    */
@@ -226,7 +231,8 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Get the system information associated with the node at the time of the initial connection.
-   * @return a <code>JPPFSystemInformation</code> instance.
+   * Please note that this atrribute is <i>transient</i> and will always be null immediately after the {@code JPPFManagementInfo} object is retrieved from a remote server. 
+   * @return a {@link JPPFSystemInformation} instance.
    */
   public synchronized JPPFSystemInformation getSystemInfo() {
     return systemInfo;
@@ -234,7 +240,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Set the system information associated with the node at the time of the initial connection.
-   * @param systemInfo a <code>JPPFSystemInformation</code> instance.
+   * @param systemInfo a {@link JPPFSystemInformation} instance.
    * @exclude
    */
   public synchronized void setSystemInfo(final JPPFSystemInformation systemInfo) {
@@ -251,7 +257,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether this information represents a connection to peer driver.
-   * @return <code>true</code> if this information represents a peer driver, <code>false</code> otherwise.
+   * @return {@code true} if this information represents a peer driver, {@code false} otherwise.
    */
   public boolean isPeer() {
     return (type & TYPE_MASK) == PEER;
@@ -259,7 +265,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether this information represents a real node.
-   * @return <code>true</code> if this information represents a node, <code>false</code> otherwise.
+   * @return {@code true} if this information represents a node, {@code false} otherwise.
    */
   public boolean isNode() {
     return (type & TYPE_MASK) == NODE;
@@ -268,7 +274,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
   /**
    * Determine whether this information represents a driver, connected as a peer to the
    * driver from which this information is obtained.
-   * @return <code>true</code> if this information represents a driver, <code>false</code> otherwise.
+   * @return {@code true} if this information represents a driver, {@code false} otherwise.
    */
   public boolean isDriver() {
     return (type & TYPE_MASK) == DRIVER;
@@ -276,7 +282,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether communication with the node or driver is be secure, i.e. via SSL/TLS.
-   * @return <code>true</code> if the connection is secure, <code>false</code> otherwise.
+   * @return {@code true} if the connection is secure, {@code false} otherwise.
    */
   public boolean isSecure() {
     return secure;
@@ -284,7 +290,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether this information represents a master node for provisioning.
-   * @return <code>true</code> if the node is a master node.
+   * @return {@code true} if the node is a master node, {@code false} otherwise.
    */
   public boolean isMasterNode() {
     return (type & MASTER) == MASTER;
@@ -292,7 +298,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether this information represents a slave node for provisioning.
-   * @return <code>true</code> if the node is a master node.
+   * @return {@code true} if the node is a master node, {@code false} otherwise.
    */
   public boolean isSlaveNode() {
     return (type & SLAVE) == SLAVE;
@@ -300,7 +306,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether this information represents a local node on client or driver.
-   * @return <code>true</code>
+   * @return {@code true} if the node is local to a driver, {@code false} otherwise
    */
   public boolean isLocal() {
     return (type & LOCAL) == LOCAL;
@@ -308,15 +314,25 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Determine whether this information represents a node than can execute .Net tasks.
-   * @return <code>true</code> if the node is .Net-capable.
+   * @return {@code true} if the node is .Net-capable, {@code false} otherwise.
+   * @since 5.0
    */
   public boolean isDotnetCapable() {
     return (type & DOTNET) == DOTNET;
   }
 
   /**
+   * Determine whether this information represents an Android node.
+   * @return {@code true} if the node an Android node, {@code false} otherwise.
+   * @since 5.1
+   */
+  public boolean isAndroidNode() {
+    return (type & ANDROID) == ANDROID;
+  }
+
+  /**
    * Determine whether the node is active or inactive.
-   * @return <code>true</code> if the node is active, <code>false</code> if it is inactve.
+   * @return {@code true} if the node is active, {@code false} if it is inactve.
    */
   public boolean isActive() {
     return active;
@@ -324,7 +340,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Specify whether the node is active or inactive.
-   * @param active <code>true</code> if the node is active, <code>false</code> if it is inactve.
+   * @param active {@code true} if the node is active, {@code false} if it is inactve.
    * @exclude
    */
   public void setIsActive(final boolean active) {
@@ -344,6 +360,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
     if (isSlaveNode()) sb.append("|SLAVE");
     if (isLocal()) sb.append("|LOCAL");
     if (isDotnetCapable()) sb.append("|DOTNET");
+    if (isAndroidNode()) sb.append("|ANDROID");
     return sb.toString();
   }
 

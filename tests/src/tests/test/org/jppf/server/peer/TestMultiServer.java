@@ -30,7 +30,7 @@ import test.org.jppf.test.setup.*;
 public class TestMultiServer extends AbstractNonStandardSetup
 {
   /**
-   * Launches a 2 drivers with 1 node attached to each and start the client.
+   * Launches 2 drivers with 1 node attached to each and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass

@@ -201,11 +201,13 @@ public class ServerTaskBundleClient {
   public void resultReceived(final Collection<ServerTask> results) {
     if (JPPFDriver.JPPF_DEBUG) {
       List<ServerTask> list = DebugHelper.addResults(getUuid(), results);
+      /*
       if (list != null) {
         List<Integer> positions = new ArrayList<>(list.size());
         for (ServerTask task: list) positions.add(task.getJobPosition());
         log.warn(String.format("***** duplicate results %s%njob=%s, call stack:%n%s", positions, this, ExceptionUtils.getCallStack()));
       }
+      */
     }
     List<ServerTask> completedTasks = null;
     synchronized (this) {

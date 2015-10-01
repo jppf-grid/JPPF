@@ -21,7 +21,7 @@ package org.jppf.server.event;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.jppf.management.JPPFManagementInfo;
+import org.jppf.management.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -74,6 +74,7 @@ public class NodeConnectionEventHandler
   {
     NodeConnectionEvent event = new NodeConnectionEvent(info);
     for (NodeConnectionListener listener: listeners) listener.nodeConnected(event);
+    JPPFNodeConnectionNotifier.getInstance().onNodeConnected(info);
   }
 
   /**
@@ -84,6 +85,7 @@ public class NodeConnectionEventHandler
   {
     NodeConnectionEvent event = new NodeConnectionEvent(info);
     for (NodeConnectionListener listener: listeners) listener.nodeDisconnected(event);
+    JPPFNodeConnectionNotifier.getInstance().onNodeDisconnected(info);
   }
 
   /**
