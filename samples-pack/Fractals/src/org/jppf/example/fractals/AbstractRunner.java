@@ -20,7 +20,7 @@ package org.jppf.example.fractals;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,6 +31,7 @@ import javax.swing.*;
 import org.jppf.client.*;
 import org.jppf.example.common.AbstractFractalConfiguration;
 import org.jppf.node.protocol.*;
+import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -58,7 +59,7 @@ public abstract class AbstractRunner {
   /**
    * The option holding the image in the UI.
    */
-  protected boolean uiMode;
+  protected final boolean uiMode;
   /**
    * The panel holding the image in the UI.
    */
@@ -83,6 +84,14 @@ public abstract class AbstractRunner {
    * Count of submitted jobs.
    */
   private final AtomicInteger jobCount = new AtomicInteger(0);
+  /**
+   * Temporary reference to the cursor of the currently focused component.
+   */
+  private Cursor cursor;
+  /**
+   * Temporary reference to the currently focused component.
+   */
+  private Component focusOwner;
 
   /**
    * Initialize this runner.
@@ -104,7 +113,7 @@ public abstract class AbstractRunner {
   /**
    * Initialize this runner.
    * @param name the name associated to this runner, corresponds to the type of fractals.
-   * @param uiMode the option holding the image in the UI.
+   * @param uiMode whether this runner should update the gui while calculating, or display a progress bar, etc.
    */
   public AbstractRunner(final String name, final boolean uiMode) {
     this(name, 1, uiMode);
@@ -126,7 +135,6 @@ public abstract class AbstractRunner {
         semaphore.release();
       }
     };
-    //executor = Executors.newFixedThreadPool(jobCapacity, new JPPFThreadFactory(name + "-runner"));
     if (jppfClient == null) jppfClient = new JPPFClient();
     this.uiMode = uiMode;
   }
@@ -162,7 +170,6 @@ public abstract class AbstractRunner {
    */
   public Future<GeneratedImage> submitExecution(final int id, final AbstractFractalConfiguration config, final long wait) throws Exception {
     semaphore.acquire();
-    if (uiMode) createOrDisplayWaitWindow();
     if (recording) addRecord(config);
     FractalExecution exec = new FractalExecution(id, config, wait);
     return executor.submit(exec);
@@ -186,23 +193,8 @@ public abstract class AbstractRunner {
     List<Task<?>> results = submitJob(job, cfg);
     long elapsed = System.currentTimeMillis() - start;
     if (log.isDebugEnabled()) log.debug("Computation performed in " + StringUtils.toStringDuration(elapsed));
-
-    final BufferedImage image = generateImage(results, cfg);
-    if (uiMode) {
-      /*
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          ImagePanel panel = (ImagePanel) uiMode.getUIComponent();
-          panel.setImage(image);
-          panel.setVisible(false);
-          panel.setVisible(true);
-        }
-      });
-       */
-    }
+    BufferedImage image = generateImage(results, cfg);
     if (JPPFConfiguration.getProperties().getBoolean("jppf.fractals.autosave.enabled", true)) saveImage(image, "png", "data/" + name + ".png");
-    if (uiMode) hideWaitWindow();
     return image;
   }
 
@@ -270,46 +262,60 @@ public abstract class AbstractRunner {
    */
   public void createOrDisplayWaitWindow() {
     if (window == null) {
-      Frame frame = null;
-      for (Frame f: Frame.getFrames()) {
-        if (f.isVisible()) {
-          frame = f;
-          break;
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          JProgressBar progressBar = new JProgressBar();
+          progressBar.setIndeterminate(true);
+          Font font = progressBar.getFont();
+          Font f = new Font(font.getName(), Font.BOLD, 14);
+          progressBar.setFont(f);
+          progressBar.setString("Calculating, please wait ...");
+          progressBar.setStringPainted(true);
+          window = new JWindow();
+          window.getContentPane().add(progressBar);
+          window.getContentPane().setBackground(Color.white);
         }
-      }
-      JProgressBar progressBar = new JProgressBar();
-      progressBar.setIndeterminate(true);
-      Font font = progressBar.getFont();
-      Font f = new Font(font.getName(), Font.BOLD, 14);
-      progressBar.setFont(f);
-      progressBar.setString("Calculating, please wait ...");
-      progressBar.setStringPainted(true);
-      window = new JWindow(frame);
-      window.getContentPane().add(progressBar);
-      window.getContentPane().setBackground(Color.white);
+      };
+      SwingUtilities.invokeLater(r);
     }
-    SwingUtilities.invokeLater(new Runnable() {
+    Runnable r2 = new Runnable() {
       @Override
       public void run() {
-        Dimension d = window.getOwner().getSize();
-        Point p = window.getOwner().getLocationOnScreen();
+        JFrame frame = (JFrame) OptionsHandler.getMainWindow();
+        focusOwner = frame.getFocusOwner();
+        if (focusOwner != null) {
+          cursor = focusOwner.getCursor();
+          focusOwner.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        }
+        Dimension d = frame.getSize();
+        Point p = frame.getLocationOnScreen();
         int w = 300;
         int h = 60;
         window.setBounds(p.x+(d.width-w)/2, p.y+(d.height-h)/2, w, h);
         window.setVisible(true);
+        window.toFront();
+        window.repaint();
       }
-    });
+    };
+    SwingUtilities.invokeLater(r2);
   }
 
   /**
    * Close the wait window and release the resources it uses.
    */
-  public void hideWaitWindow()
-  {
+  public void hideWaitWindow() {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        if (window != null) window.setVisible(false);
+        if (window != null) {
+          window.setVisible(false);
+          if (focusOwner != null) {
+            focusOwner.setCursor(cursor);
+            cursor = null;
+            focusOwner = null;
+          }
+        }
       }
     });
   }
@@ -348,6 +354,7 @@ public abstract class AbstractRunner {
     public GeneratedImage call() throws Exception {
       try {
         BufferedImage image = null;
+        if (uiMode) createOrDisplayWaitWindow();
         try {
           long start = System.currentTimeMillis();
           image = computeFractal(id, config);
@@ -369,6 +376,8 @@ public abstract class AbstractRunner {
           }
         } catch(Exception e) {
           log.error(e.getMessage(), e);
+        } finally {
+          if (uiMode) hideWaitWindow();
         }
         return new GeneratedImage(id, image);
       } finally {

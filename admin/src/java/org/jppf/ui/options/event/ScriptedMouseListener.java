@@ -32,8 +32,7 @@ import org.slf4j.*;
  * A mouse listener which executes a script instead of java code when a {@code mouseClicked()} event occurs.
  * @author Laurent Cohen
  */
-public class ScriptedMouseListener implements MouseListener
-{
+public class ScriptedMouseListener implements MouseListener {
   /**
    * Logger for this class.
    */
@@ -69,8 +68,7 @@ public class ScriptedMouseListener implements MouseListener
    * @param language the name of the scripting language to use.
    * @param content the actual source of the script to execute.
    */
-  public ScriptedMouseListener(final AbstractOption option, final String language, final String content)
-  {
+  public ScriptedMouseListener(final AbstractOption option, final String language, final String content) {
     this.language = language;
     this.script = content;
     this.option = option;
@@ -83,17 +81,13 @@ public class ScriptedMouseListener implements MouseListener
    * @param event the event encapsulating the source of the event.
    * @param eventType the type of mouse event, "clicked", "pressed", "released", "entered" or "exited".
    */
-  private void invokeScript(final MouseEvent event, final String eventType)
-  {
-    if (scriptText == null)
-    {
+  private void invokeScript(final MouseEvent event, final String eventType) {
+    if (scriptText == null) {
       TreePath path = option.getPath();
       StringBuilder sb = new StringBuilder();
-      for (Object o: path.getPath())
-      {
+      for (Object o : path.getPath()) {
         OptionElement elt = (OptionElement) o;
-        for (ScriptDescriptor desc: elt.getScripts())
-        {
+        for (ScriptDescriptor desc : elt.getScripts()) {
           if (language.equals(desc.language)) sb.append(desc.content).append('\n');
         }
       }
@@ -106,52 +100,42 @@ public class ScriptedMouseListener implements MouseListener
     variables.put("event", event);
     variables.put("eventType", eventType);
     ScriptRunner runner = null;
-    try
-    {
+    try {
       runner = ScriptRunnerFactory.getScriptRunner(this.language);
       long start = System.currentTimeMillis();
       runner.evaluate(uuid, scriptText, variables);
       long elapsed = System.currentTimeMillis() - start;
       StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
       if (debugEnabled) log.debug(sb.toString());
-    }
-    catch(JPPFScriptingException e)
-    {
+    } catch (JPPFScriptingException e) {
       log.error("Error while executing script for " + option + "\nScript = \n" + scriptText, e);
-    }
-    finally
-    {
+    } finally {
       ScriptRunnerFactory.releaseScriptRunner(runner);
     }
   }
 
   @Override
-  public void mouseClicked(final MouseEvent event)
-  {
+  public void mouseClicked(final MouseEvent event) {
     invokeScript(event, "clicked");
   }
 
   @Override
-  public void mousePressed(final MouseEvent event)
-  {
+  public void mousePressed(final MouseEvent event) {
     //invokeScript(event, "pressed");
   }
 
   @Override
-  public void mouseReleased(final MouseEvent event)
-  {
+  public void mouseReleased(final MouseEvent event) {
     //invokeScript(event, "released");
   }
 
   @Override
-  public void mouseEntered(final MouseEvent event)
-  {
-    //invokeScript(event, "entered");
+  public void mouseEntered(final MouseEvent event) {
+    invokeScript(event, "entered");
   }
 
   @Override
-  public void mouseExited(final MouseEvent event)
-  {
-    //invokeScript(event, "exited");
+  public void mouseExited(final MouseEvent event) {
+    invokeScript(event, "exited");
   }
 }

@@ -52,10 +52,10 @@ public class MandelbrotRunner extends AbstractRunner {
 
   /**
    * Initialize this runner.
-   * @param option the option holding the image in the UI.
+   * @param uiMode whether this runner should update the gui while calculating, or display a progress bar, etc.
    */
-  public MandelbrotRunner(final boolean option) {
-    super("mandelbrot", option);
+  public MandelbrotRunner(final boolean uiMode) {
+    super("mandelbrot", uiMode);
   }
 
   /**

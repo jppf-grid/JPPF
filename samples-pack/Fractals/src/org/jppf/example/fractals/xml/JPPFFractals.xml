@@ -21,15 +21,6 @@
   <property name="label" value="JPPF Fractals Generation"/>
   <property name="icon" value="/icons/mandelbrot-icon.png"/>
   <script language="groovy" source="org/jppf/example/fractals/xml/imports.groovy"/>
-	<initializer type="script">
-		<script language="groovy"><![CDATA[
-      def frame = OptionsHandler.getMainWindow();
-			def jppfConfig = JPPFConfiguration.getProperties();
-      def width = jppfConfig.getInt("image.width", 800);
-      def height = jppfConfig.getInt("image.height", 600);
-			frame.setSize(width + 120, height + 163);
-		]]></script>
-	</initializer>
 
 	<!-- ===================================================================== -->
 	<!--                    Tabbed Panel                                       -->
