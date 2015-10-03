@@ -49,7 +49,7 @@
       <property name="extensions" value="csv;CSV files (*.csv)|*;All files (*.*)"/>
       <property name="value" value="./mandelbrot.csv"/>
       <listener type="script">
-        <script language="groovy">RunnerFactory.getRunner("mandelbrot").saveRecords(option.getValue())></script>
+        <script language="groovy">RunnerFactory.getRunner("mandelbrot").saveRecords(option.getValue())</script>
       </listener>
     </child>
   
@@ -205,7 +205,7 @@
   
       <child name="iterations" type="SpinnerNumber">
         <property name="label" value="iterations"/>
-        <property name="tooltip" value="Maximum number of iterations for escaping the Mandelbrot set"/>
+        <property name="tooltip" value="Maximum number of iterations to escape the Mandelbrot set"/>
         <property name="value" value="100"/>
         <property name="minValue" value="1"/>
         <property name="maxValue" value="1000000"/>
@@ -236,16 +236,14 @@
       <property name="componentConstraints" value="grow, push"/>
       -->
       <initializer type="script">
-        <script language="groovy"><![CDATA[
-          def runner = RunnerFactory.createRunner("mandelbrot", true);
-          def comp = option.getUIComponent();
-          comp.setImage("data/mandelbrot.png");
-          comp.repaint();
-          runner.setImagePanel(comp);
-        ]]></script>
+        <script language="groovy">initImagePanel()</script>
       </initializer>
       <mouselistener type="script">
-        <script language="groovy">onMouseClicked(event)</script>
+        <script language="groovy"><![CDATA[
+          if (eventType.equals("clicked")) onMouseClicked(event)
+          else if (eventType.equals("entered")) onMouseEntered(event)
+          else if (eventType.equals("exited")) onMouseExited(event)
+        ]]></script>
       </mouselistener>
     </child>
 

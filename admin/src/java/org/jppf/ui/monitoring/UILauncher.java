@@ -125,12 +125,12 @@ public class UILauncher {
         if ("url".equalsIgnoreCase(type)) elt = OptionsHandler.addPageFromURL(src, null);
         else elt = OptionsHandler.addPageFromXml(src);
         OptionsHandler.loadPreferences();
-        OptionsHandler.getBuilder().triggerInitialEvents(elt);
+        frame.add(elt.getUIComponent());
         frame.setTitle(elt.getLabel());
         String iconPath = elt.getIconPath();
         frame.setIconImage(GuiUtils.loadIcon(iconPath != null ? iconPath : GuiUtils.JPPF_ICON).getImage());
-        frame.add(elt.getUIComponent());
         OptionsHandler.loadMainWindowAttributes(OptionsHandler.getPreferences().node(elt.getName()));
+        OptionsHandler.getBuilder().triggerInitialEvents(elt);
       } catch (Exception e) {
         e.printStackTrace();
         log.error(e.getMessage(), e);

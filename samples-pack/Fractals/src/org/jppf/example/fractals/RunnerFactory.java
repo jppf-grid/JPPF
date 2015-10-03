@@ -27,8 +27,7 @@ import org.jppf.example.fractals.mandelbrot.MandelbrotRunner;
  * 
  * @author Laurent Cohen
  */
-public class RunnerFactory
-{
+public class RunnerFactory {
   /**
    * Mandelbrot type of fractals.
    */
@@ -45,18 +44,18 @@ public class RunnerFactory
   /**
    * Create a runner pf the specified type with the specified option.
    * @param name the type of the fractal runner.
-   * @param option the GUI component that uses the runner.
+   * @param uiMode whether the runner should update the gui while calculating, or display a progress bar, etc.
    * @return an {@link AbstractRunner} instance.
    */
-  public static synchronized AbstractRunner createRunner(final String name, final boolean option) {
+  public static synchronized AbstractRunner createRunner(final String name, final boolean uiMode) {
     AbstractRunner runner = runners.get(name);
     if (runner == null) {
       switch(name) {
         case MANDELBROT:
-          runner = new MandelbrotRunner(option);
+          runner = new MandelbrotRunner(uiMode);
           break;
         case LYAPUNOV:
-          runner = new LyapunovRunner(option);
+          runner = new LyapunovRunner(uiMode);
           break;
         default: throw new IllegalArgumentException("fractal type '" + name + "' not supported");
       }

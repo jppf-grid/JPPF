@@ -49,6 +49,10 @@ public final class GuiUtils {
    */
   private static Map<String, ImageIcon> iconMap = new Hashtable<>();
   /**
+   * A mapping of mouse cursors to their name, to use as a cursor cache.
+   */
+  private static Map<String, Cursor> cursorMap = new Hashtable<>();
+  /**
    * Precompiled pattern for searching line breaks in a string.
    */
   private static final Pattern TOOLTIP_PATTERN = Pattern.compile("\\n");
@@ -113,6 +117,35 @@ public final class GuiUtils {
       log.warn(e.getMessage(), e);
     }
     return icon;
+  }
+
+  /**
+   * Create or get a custom mouse cursor.
+   * @param name the name given to the cursor.
+   * @param imagePath the path to the image.
+   * @param hotspot the cursor's hotspot.
+   * @return the create cursor, or {@code null} if it couldn't be created.
+   */
+  public static Cursor createCursor(final String name, final String imagePath, final Point hotspot) {
+    Cursor cursor = cursorMap.get(name);
+    if (cursor == null) {
+      ImageIcon icon = loadIcon(imagePath);
+      if (icon == null) return null;
+      Image image = icon.getImage();
+      if (image == null) return null;
+      cursor = Toolkit.getDefaultToolkit().createCustomCursor(image, hotspot, name);
+      if (cursor != null) cursorMap.put(name, cursor);
+    }
+    return cursor;
+  }
+
+  /**
+   * Get a custom mouse cursor.
+   * @param name the name given to the cursor.
+   * @return a {@link Cursor} object, or {@code null} if it couldn't be retrieved.
+   */
+  public static Cursor getCursor(final String name) {
+    return cursorMap.get(name);
   }
 
   /**
