@@ -294,4 +294,30 @@ public class ServerJob extends AbstractServerJobBase {
     }
     return result;
   }
+
+  /**
+   * Update this job with the specified sla and metadata.
+   * @param sla the SLA to update with.
+   * @param metadata the metadata to update with.
+   */
+  public void update(final JobSLA sla, final JobMetadata metadata) {
+    if (debugEnabled) log.debug("request to update {}", this);
+    boolean updated = false;
+    lock.lock();
+    try {
+      if (sla != null) {
+        this.sla = sla;
+        job.setSLA(sla);
+        updated = true;
+      }
+      if (metadata != null) {
+        this.metadata = metadata;
+        job.setMetadata(metadata);
+        updated = true;
+      }
+    } finally {
+      lock.unlock();
+    }
+    if (updated) fireJobUpdated();
+  }
 }

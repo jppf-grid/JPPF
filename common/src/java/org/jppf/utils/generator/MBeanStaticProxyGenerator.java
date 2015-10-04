@@ -112,6 +112,12 @@ public class MBeanStaticProxyGenerator {
     generateConstructor();
     generateGetMBeanName();
     Method[] methods = inf.getMethods();
+    Arrays.sort(methods, new Comparator<Method>() {
+      @Override
+      public int compare(final Method m1, final Method m2) {
+        return m1.toString().compareTo(m2.toString());
+      }
+    });
     for (Method m: methods) {
       if (StringUtils.isOneOf(m.getName(), false, "addNotificationListener", "removeNotificationListener", "getNotificationInfo")) continue;
       generateMethodHeader(m);
@@ -362,7 +368,7 @@ public class MBeanStaticProxyGenerator {
       /*
       String s = gen.generateSource("DriverJobManagementMBeanStaticProxy", DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class, "org.jppf.management.generated");
       System.out.println(s);
-      */
+       */
     } catch (Exception e) {
       e.printStackTrace();
     }

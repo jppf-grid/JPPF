@@ -234,7 +234,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
   private boolean dispatch() {
     boolean dispatched = false;
     try {
-      queue.processPendingBroadcasts();
+      queue.getBroadcastManager().processPendingBroadcasts();
       C channel = null;
       ServerTaskBundleNode nodeBundle = null;
       synchronized(idleChannels) {

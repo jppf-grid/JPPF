@@ -23,6 +23,7 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.job.*;
+import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
@@ -307,5 +308,24 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   private ServerJob getServerJob(final String jobUuid) {
     return ((JPPFPriorityQueue) JPPFDriver.getQueue()).getBundleForJob(jobUuid);
+  }
+
+  @Override
+  public void updateJobs(final JobSelector selector, final JobSLA sla, final JobMetadata metadata) {
+    if ((sla == null) && (metadata == null)) return;
+    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    List<ServerJob> jobs = queue.selectJobs(selector);
+    if (debugEnabled) log.debug("updating sla and metadata for " + jobs.size() + " jobs");
+    if (jobs.isEmpty()) return;
+    int newPriority = 0;
+    if (sla != null) newPriority = sla.getPriority();
+    for (ServerJob job: jobs) {
+      if (debugEnabled) log.debug("updating sla and metadata for job " + job.getName());
+      if (sla != null) {
+        int oldPriority = job.getSLA().getPriority();
+        if (oldPriority != newPriority) queue.updatePriority(job.getUuid(), newPriority);
+      }
+      job.update(sla, metadata);
+    }
   }
 }

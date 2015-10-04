@@ -47,28 +47,8 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
   }
 
   @Override
-  public void gc() {
-    invoke("gc", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public String[] threadNames() {
-    return (String[]) invoke("threadNames", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public ThreadDump threadDump() {
-    return (ThreadDump) invoke("threadDump", (Object[]) null, (String[]) null);
-  }
-
-  @Override
   public Boolean hasDeadlock() {
     return (Boolean) invoke("hasDeadlock", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public String heapDump() {
-    return (String) invoke("heapDump", (Object[]) null, (String[]) null);
   }
 
   @Override
@@ -77,12 +57,32 @@ public class DriverDiagnosticsMBeanStaticProxy extends AbstractMBeanStaticProxy 
   }
 
   @Override
-  public MemoryInformation memoryInformation() {
-    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
+  public String heapDump() {
+    return (String) invoke("heapDump", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public String[] threadNames() {
+    return (String[]) invoke("threadNames", (Object[]) null, (String[]) null);
   }
 
   @Override
   public HealthSnapshot healthSnapshot() {
     return (HealthSnapshot) invoke("healthSnapshot", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public MemoryInformation memoryInformation() {
+    return (MemoryInformation) invoke("memoryInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public ThreadDump threadDump() {
+    return (ThreadDump) invoke("threadDump", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void gc() {
+    invoke("gc", (Object[]) null, (String[]) null);
   }
 }

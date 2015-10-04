@@ -23,6 +23,8 @@ import org.jppf.job.JobInformation;
 import org.jppf.job.JobSelector;
 import org.jppf.management.AbstractMBeanStaticProxy;
 import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.node.protocol.JobMetadata;
+import org.jppf.node.protocol.JobSLA;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.server.job.management.NodeJobInformation;
 
@@ -48,53 +50,18 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public void cancelJob(final String param0) {
-    invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
-  }
-
-  @Override
-  public void resumeJobs(final JobSelector param0) {
-    invoke("resumeJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
-  }
-
-  @Override
   public String[] getAllJobIds() {
     return (String[]) getAttribute("AllJobIds");
   }
 
   @Override
-  public void suspendJob(final String param0, final Boolean param1) {
-    invoke("suspendJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
-  }
-
-  @Override
-  public void cancelJobs(final JobSelector param0) {
-    invoke("cancelJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
-  }
-
-  @Override
-  public void suspendJobs(final JobSelector param0, final Boolean param1) {
-    invoke("suspendJobs", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Boolean" });
-  }
-
-  @Override
-  public void resumeJob(final String param0) {
-    invoke("resumeJob", new Object[] { param0 }, new String[] { "java.lang.String" });
-  }
-
-  @Override
-  public void updateMaxNodes(final JobSelector param0, final Integer param1) {
-    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Integer" });
-  }
-
-  @Override
-  public void updateMaxNodes(final String param0, final Integer param1) {
-    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
-  }
-
-  @Override
   public String[] getAllJobUuids() {
     return (String[]) getAttribute("AllJobUuids");
+  }
+
+  @Override
+  public Map getNodeInformation(final JobSelector param0) {
+    return (Map) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
   }
 
   @Override
@@ -108,13 +75,53 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public Map getNodeInformation(final JobSelector param0) {
-    return (Map) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  public NodeJobInformation[] getNodeInformation(final String param0) {
+    return (NodeJobInformation[]) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
 
   @Override
-  public NodeJobInformation[] getNodeInformation(final String param0) {
-    return (NodeJobInformation[]) invoke("getNodeInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
+  public void cancelJob(final String param0) {
+    invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public void cancelJobs(final JobSelector param0) {
+    invoke("cancelJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  }
+
+  @Override
+  public void resumeJob(final String param0) {
+    invoke("resumeJob", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
+  public void resumeJobs(final JobSelector param0) {
+    invoke("resumeJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  }
+
+  @Override
+  public void suspendJob(final String param0, final Boolean param1) {
+    invoke("suspendJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void suspendJobs(final JobSelector param0, final Boolean param1) {
+    invoke("suspendJobs", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void updateJobs(final JobSelector param0, final JobSLA param1, final JobMetadata param2) {
+    invoke("updateJobs", new Object[] { param0, param1, param2 }, new String[] { "org.jppf.job.JobSelector", "org.jppf.node.protocol.JobSLA", "org.jppf.node.protocol.JobMetadata" });
+  }
+
+  @Override
+  public void updateMaxNodes(final String param0, final Integer param1) {
+    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Integer" });
+  }
+
+  @Override
+  public void updateMaxNodes(final JobSelector param0, final Integer param1) {
+    invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Integer" });
   }
 
   @Override

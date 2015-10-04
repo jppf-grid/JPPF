@@ -18,7 +18,7 @@
 
 package test.org.jppf.test.setup.common;
 
-import org.jppf.node.protocol.AbstractTask;
+import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -75,6 +75,14 @@ public class LifeCycleTask extends AbstractTask<String> {
    * Whether the thread running this task was interrupted upon cancellation or timeout.
    */
   protected boolean interrupted = false;
+  /**
+   * Job metadata that can optionally be set onto the task by a node lifecycle listener.
+   */
+  protected JobMetadata metadata;
+  /**
+   * Whether to set the job metadata onto this task.
+   */
+  protected boolean fetchMetadata = false;
 
   /**
    * Initialize this task.
@@ -108,7 +116,7 @@ public class LifeCycleTask extends AbstractTask<String> {
     start = System.currentTimeMillis();
     //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);
     start *= ONE_MILLION;
-    
+
     try {
       executedInNode = isInNode();
       TypedProperties config = JPPFConfiguration.getProperties();
@@ -232,5 +240,41 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   public boolean isInterrupted() {
     return interrupted;
+  }
+
+  /**
+   * Whether to set the job metadata onto this task.
+   */
+
+  /**
+   * Get the job metadata.
+   * @return a {@link JobMetadata} object.
+   */
+  public JobMetadata getMetadata() {
+    return metadata;
+  }
+
+  /**
+   * Set the job metadata.
+   * @param metadata a {@link JobMetadata} object.
+   */
+  public void setMetadata(final JobMetadata metadata) {
+    this.metadata = metadata;
+  }
+
+  /**
+   * Determine whether to set the job metadata onto this task.
+   * @return {@code true} to indicate that the metadata should be set, {@code false} otherwise.
+   */
+  public boolean isFetchMetadata() {
+    return fetchMetadata;
+  }
+
+  /**
+   * Specify whether to set the job metadata onto this task.
+   * @param fetchMetadata {@code true} to indicate that the metadata should be set, {@code false} otherwise.
+   */
+  public void setFetchMetadata(final boolean fetchMetadata) {
+    this.fetchMetadata = fetchMetadata;
   }
 }

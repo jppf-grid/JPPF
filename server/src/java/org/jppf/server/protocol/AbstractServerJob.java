@@ -475,4 +475,12 @@ public abstract class AbstractServerJob {
   protected void fireJobReturned(final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
     if (notificationEmitter != null) notificationEmitter.jobReturned(this, channel, bundleNode);
   }
+
+  /**
+   * Get the lock used for synchronized access to job.
+   * @return a {@link Lock} object.
+   */
+  public Lock getLock() {
+    return lock;
+  }
 }

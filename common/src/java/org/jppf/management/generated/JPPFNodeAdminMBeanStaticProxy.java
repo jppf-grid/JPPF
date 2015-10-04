@@ -49,6 +49,61 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
+  public boolean cancelPendingAction() {
+    return (boolean) invoke("cancelPendingAction", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public DelegationModel getDelegationModel() {
+    return (DelegationModel) getAttribute("DelegationModel");
+  }
+
+  @Override
+  public JPPFNodeState state() {
+    return (JPPFNodeState) invoke("state", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public JPPFSystemInformation systemInformation() {
+    return (JPPFSystemInformation) invoke("systemInformation", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public NodePendingAction pendingAction() {
+    return (NodePendingAction) invoke("pendingAction", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void cancelJob(final String param0, final Boolean param1) {
+    invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void resetTaskCounter() {
+    invoke("resetTaskCounter", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void restart() {
+    invoke("restart", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public void restart(final Boolean param0) {
+    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
+  }
+
+  @Override
+  public void setDelegationModel(final DelegationModel param0) {
+    setAttribute("DelegationModel", param0);
+  }
+
+  @Override
+  public void setTaskCounter(final Integer param0) {
+    setAttribute("TaskCounter", param0);
+  }
+
+  @Override
   public void shutdown() {
     invoke("shutdown", (Object[]) null, (String[]) null);
   }
@@ -59,28 +114,8 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
-  public JPPFNodeState state() {
-    return (JPPFNodeState) invoke("state", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public void cancelJob(final String param0, final Boolean param1) {
-    invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
-  }
-
-  @Override
-  public void restart(final Boolean param0) {
-    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
-  }
-
-  @Override
-  public void restart() {
-    invoke("restart", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public NodePendingAction pendingAction() {
-    return (NodePendingAction) invoke("pendingAction", (Object[]) null, (String[]) null);
+  public void updateConfiguration(final Map param0, final Boolean param1) {
+    invoke("updateConfiguration", new Object[] { param0, param1 }, new String[] { "java.util.Map", "java.lang.Boolean" });
   }
 
   @Override
@@ -91,40 +126,5 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   @Override
   public void updateThreadsPriority(final Integer param0) {
     invoke("updateThreadsPriority", new Object[] { param0 }, new String[] { "java.lang.Integer" });
-  }
-
-  @Override
-  public void resetTaskCounter() {
-    invoke("resetTaskCounter", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public void setTaskCounter(final Integer param0) {
-    setAttribute("TaskCounter", param0);
-  }
-
-  @Override
-  public void updateConfiguration(final Map param0, final Boolean param1) {
-    invoke("updateConfiguration", new Object[] { param0, param1 }, new String[] { "java.util.Map", "java.lang.Boolean" });
-  }
-
-  @Override
-  public DelegationModel getDelegationModel() {
-    return (DelegationModel) getAttribute("DelegationModel");
-  }
-
-  @Override
-  public void setDelegationModel(final DelegationModel param0) {
-    setAttribute("DelegationModel", param0);
-  }
-
-  @Override
-  public boolean cancelPendingAction() {
-    return (boolean) invoke("cancelPendingAction", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public JPPFSystemInformation systemInformation() {
-    return (JPPFSystemInformation) invoke("systemInformation", (Object[]) null, (String[]) null);
   }
 }

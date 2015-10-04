@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.management.NotificationEmitter;
 
 import org.jppf.job.*;
+import org.jppf.node.protocol.*;
 
 
 /**
@@ -162,4 +163,13 @@ public interface DriverJobManagementMBean extends NotificationEmitter
    * @param newPriority the jobs new priority value.
    */
   void updatePriority(JobSelector selector, Integer newPriority);
+
+  /**
+   * Update the SLA and/or metadata of the specified jobs.
+   * @param selector specifies which jobs to update.
+   * @param sla the new job SLA; if {@code null} then the sla is not changed.
+   * @param metadata the new job metadata; if {@code null} then the metadata is not changed.
+   * @since 5.1
+   */
+  void updateJobs(JobSelector selector, JobSLA sla, JobMetadata metadata);
 }

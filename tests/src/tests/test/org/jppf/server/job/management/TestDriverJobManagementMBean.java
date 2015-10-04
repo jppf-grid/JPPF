@@ -22,12 +22,18 @@ import static org.jppf.utils.ReflectionUtils.getCurrentMethodName;
 import static org.junit.Assert.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.management.*;
 
 import org.jppf.client.*;
 import org.jppf.job.*;
-import org.jppf.node.protocol.Task;
+import org.jppf.load.balancer.LoadBalancingInformation;
+import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.node.policy.Equal;
+import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
-import org.jppf.utils.ReflectionUtils;
+import org.jppf.utils.*;
 import org.junit.Test;
 import org.slf4j.*;
 
@@ -302,20 +308,86 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   @Test(timeout = 10000L)
   public void testResumeAndCancelSuspendedJob() throws Exception {
     int nbTasks = 2;
-    DriverJobManagementMBean proxy = BaseSetup.getJobManagementProxy(client);
-    assertNotNull(proxy);
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
+    assertNotNull(driver);
+    DriverJobManagementMBean jobManager = driver.getJobManager();
+    assertNotNull(jobManager);
     JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3500L);
     job.getSLA().setSuspended(true);
     client.submitJob(job);
     Thread.sleep(1500L);
-    proxy.resumeJob(job.getUuid());
+    jobManager.resumeJob(job.getUuid());
     Thread.sleep(1000L);
-    proxy.cancelJob(job.getUuid());
+    jobManager.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
     assertEquals(nbTasks, results.size());
     Thread.sleep(1000L);
-    String[] ids = proxy.getAllJobUuids();
+    String[] ids = jobManager.getAllJobUuids();
     assertNotNull(ids);
     assertEquals("the driver's job queue should be empty", 0, ids.length);
+  }
+
+  /**
+   * Test that a dynamic update of the job SLA is taken into account.
+   * @throws Exception if any error occurs.
+   */
+  @Test(timeout = 10000L)
+  public void testUpdateJobSLAAndMetadata() throws Exception {
+    int nbTasks = 2;
+    JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
+    assertNotNull(driver);
+    LoadBalancingInformation info = driver.loadBalancerInformation();
+    assertNotNull(info);
+    try {
+      TypedProperties props = new TypedProperties();
+      props.setInt("size", 1);
+      driver.changeLoadBalancerSettings("manual", props);
+      JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 2000L);
+      for (Task<?> t: job) ((LifeCycleTask) t).setFetchMetadata(true);
+      final JobSLA sla = job.getSLA();
+      final JobMetadata metadata = job.getMetadata();
+      sla.setMaxNodes(1);
+      sla.setExecutionPolicy(new Equal("jppf.node.uuid", false, "n1"));
+      metadata.setParameter("node.uuid", "n1");
+      final DriverJobManagementMBean jobManager = driver.getJobManager();
+      assertNotNull(jobManager);
+      final AtomicInteger count = new AtomicInteger(0);
+      jobManager.addNotificationListener(new NotificationListener() {
+        @Override
+        public void handleNotification(final Notification notification, final Object handback) {
+          JobNotification notif = (JobNotification) notification;
+          if (notif.getEventType() == JobEventType.JOB_DISPATCHED) {
+            int n = count.incrementAndGet();
+            String actualUuid = notif.getNodeInfo().getUuid();
+            String expectedUuid = "n" + n;
+            assertEquals(String.format("job should have been dispatched to node '%s' but was dispatched to '%s'", expectedUuid, actualUuid), expectedUuid, actualUuid);
+            if (n == 1) {
+              sla.setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
+              metadata.setParameter("node.uuid", "n2");
+              jobManager.updateJobs(JobSelector.ALL_JOBS, sla, metadata);
+            }
+          }
+        }
+      }, null, null);
+      client.submitJob(job);
+      List<Task<?>> results = job.awaitResults();
+      assertEquals(nbTasks, results.size());
+      List<String> nodeUuids = new ArrayList<>();
+      for (int i=0; i<nbTasks; i++) {
+        Task<?> t = results.get(i);
+        assertTrue(t instanceof LifeCycleTask);
+        LifeCycleTask task = (LifeCycleTask) t;
+        assertNotNull(task.getResult());
+        assertNull(task.getThrowable());
+        nodeUuids.add(task.getNodeUuid());
+        assertNotNull(task.getMetadata());
+        assertEquals(task.getNodeUuid(), task.getMetadata().getParameter("node.uuid"));
+      }
+      Collections.sort(nodeUuids);
+      assertEquals(nbTasks, nodeUuids.size());
+      for (int i=0; i<nbTasks; i++) assertEquals("n" + (i + 1), nodeUuids.get(i));
+    } finally {
+      driver.changeLoadBalancerSettings(info.getAlgorithm(), info.getParameters());
+    }
   }
 }

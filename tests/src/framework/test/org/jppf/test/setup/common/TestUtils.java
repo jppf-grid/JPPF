@@ -33,18 +33,27 @@ public class TestUtils {
    */
   private static final SimpleDateFormat SDF = new SimpleDateFormat("hh:mm:ss.SSS");
 
- /**
-  * Print to System.out, and optionally log the specified formatted message.
-  * @param log an optional logger, may be {@code null}.
-  * @param format the format to use as in {@link String#format()}.
-  * @param params the parmaters of the formatted string.
-  */
- public static void printf(final Logger log, final String format, final Object...params) {
-   String formatted = String.format(format, params);
-   String s = prefixWithTimestamp("  client", SDF, formatted);
-   System.out.println(s);
-   if (log != null) log.info(formatted);
- }
+  /**
+   * Print to System.out the specified formatted message.
+   * @param format the format to use as in {@link String#format()}.
+   * @param params the parmaters of the formatted string.
+   */
+  public static void printf(final String format, final Object...params) {
+    printf(null, format, params);
+  }
+
+  /**
+   * Print to System.out, and optionally log the specified formatted message.
+   * @param log an optional logger, may be {@code null}.
+   * @param format the format to use as in {@link String#format()}.
+   * @param params the parmaters of the formatted string.
+   */
+  public static void printf(final Logger log, final String format, final Object...params) {
+    String formatted = String.format(format, params);
+    String s = prefixWithTimestamp("  client", SDF, formatted);
+    System.out.println(s);
+    if (log != null) log.info(formatted);
+  }
 
  /**
   * Add a specified prefix and timestamp to the specified string.

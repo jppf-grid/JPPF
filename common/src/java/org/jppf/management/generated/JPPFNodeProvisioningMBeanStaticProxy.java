@@ -50,13 +50,8 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public void provisionSlaveNodes(final int param0, final boolean param1, final TypedProperties param2) {
-    invoke("provisionSlaveNodes", new Object[] { param0, param1, param2 }, new String[] { "int", "boolean", "org.jppf.utils.TypedProperties" });
-  }
-
-  @Override
-  public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
-    invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });
+  public void provisionSlaveNodes(final int param0) {
+    invoke("provisionSlaveNodes", new Object[] { param0 }, new String[] { "int" });
   }
 
   @Override
@@ -65,7 +60,12 @@ public class JPPFNodeProvisioningMBeanStaticProxy extends AbstractMBeanStaticPro
   }
 
   @Override
-  public void provisionSlaveNodes(final int param0) {
-    invoke("provisionSlaveNodes", new Object[] { param0 }, new String[] { "int" });
+  public void provisionSlaveNodes(final int param0, final boolean param1, final TypedProperties param2) {
+    invoke("provisionSlaveNodes", new Object[] { param0, param1, param2 }, new String[] { "int", "boolean", "org.jppf.utils.TypedProperties" });
+  }
+
+  @Override
+  public void provisionSlaveNodes(final int param0, final TypedProperties param1) {
+    invoke("provisionSlaveNodes", new Object[] { param0, param1 }, new String[] { "int", "org.jppf.utils.TypedProperties" });
   }
 }

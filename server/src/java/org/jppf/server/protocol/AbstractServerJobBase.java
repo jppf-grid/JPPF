@@ -57,7 +57,6 @@ public class AbstractServerJobBase extends AbstractServerJob {
   /**
    * Set of all dispatched bundles in this job.
    */
-  //private final Set<ServerTaskBundleNode> dispatchSet = new LinkedHashSet<>();
   protected final Map<Long, ServerTaskBundleNode> dispatchSet = new LinkedHashMap<>();
   /**
    * The requeue handler.

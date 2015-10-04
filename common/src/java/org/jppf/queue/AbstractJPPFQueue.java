@@ -100,7 +100,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    * Notify all queue listeners that a bundle was added tot he queue.
    * @param event the event to notify of.
    */
-  protected void fireBundleAdded(final QueueEvent<T, U, V> event) {
+  public void fireBundleAdded(final QueueEvent<T, U, V> event) {
     synchronized(queueListeners) {
       for (QueueListener<T, U, V> listener : queueListeners) listener.bundleAdded(event);
     }
@@ -111,7 +111,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    * @param event the event to notify of.
    * @since 4.1
    */
-  protected void fireBundleRemoved(final QueueEvent<T, U, V> event) {
+  public void fireBundleRemoved(final QueueEvent<T, U, V> event) {
     synchronized (queueListeners) {
       for (QueueListener<T, U, V> listener : queueListeners) listener.bundleRemoved(event);
     }
@@ -134,7 +134,7 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
   /**
    * Update the value of the max bundle size.
    */
-  protected void updateLatestMaxSize() {
+  public void updateLatestMaxSize() {
     if (!sizeMap.isEmpty()) latestMaxSize.set(sizeMap.lastKey());
   }
 

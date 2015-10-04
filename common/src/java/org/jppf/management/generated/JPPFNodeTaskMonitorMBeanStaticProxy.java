@@ -44,16 +44,6 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public void reset() {
-    invoke("reset", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Long getTotalTaskElapsedTime() {
-    return (Long) getAttribute("TotalTaskElapsedTime");
-  }
-
-  @Override
   public Integer getTotalTasksExecuted() {
     return (Integer) getAttribute("TotalTasksExecuted");
   }
@@ -71,5 +61,15 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
   @Override
   public Long getTotalTaskCpuTime() {
     return (Long) getAttribute("TotalTaskCpuTime");
+  }
+
+  @Override
+  public Long getTotalTaskElapsedTime() {
+    return (Long) getAttribute("TotalTaskElapsedTime");
+  }
+
+  @Override
+  public void reset() {
+    invoke("reset", (Object[]) null, (String[]) null);
   }
 }

@@ -271,7 +271,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
         transitionManager.submit(new Runnable() {
           @Override
           public void run() {
-            queue.cancelBroadcastJobs(uuid);
+            queue.getBroadcastManager().cancelBroadcastJobs(uuid);
           }
         });
       }
