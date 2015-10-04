@@ -25,6 +25,7 @@ import javax.management.*;
 
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.NodeSelector;
+import org.jppf.utils.TypedProperties;
 
 /**
  * MBean interface for forwarding node management requests and monitoring notfications via the driver.
@@ -235,8 +236,7 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
   /**
    * Invoke <code>System.gc()</code> on the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   Map<String, Object> gc(NodeSelector selector) throws Exception;
@@ -244,11 +244,62 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
   /**
    * Get a JVM thread dump for the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
-   * This map may be empty if no exception was raised.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
   Map<String, Object> threadDump(NodeSelector selector) throws Exception;
+
+  /**
+   * Get the number of provisioned slave nodes for the selected nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @return a mapping of node uuids to either an {@code int} corresponding tot he number of slaves provisioned by the node,
+   * or an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> getNbSlaves(NodeSelector selector) throws Exception;
+
+  /**
+   * Start or stop the required number of slaves to reach the specified number on the selected nodes.
+   * This is equivalent to calling {@code provisionSlaveNodes(nbNodes, null)}.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param nbNodes the number of slave nodes to reach.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> provisionSlaveNodes(NodeSelector selector, int nbNodes) throws Exception;
+
+  /**
+   * Start or stop the required number of slaves to reach the specified number on the selected nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param nbNodes the number of slave nodes to reach.
+   * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> provisionSlaveNodes(NodeSelector selector, int nbNodes, boolean interruptIfRunning) throws Exception;
+
+  /**
+   * Start or stop the required number of slaves to reach the specified number, using the specified config overrides, on the selected nodes.
+   * <p>If {@code configOverrides} is null, then previous overrides are applied, and already running slave nodes do not need to be stopped.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param nbNodes the number of slave nodes to reach.
+   * @param configOverrides the configuration overrides to apply.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> provisionSlaveNodes(NodeSelector selector, int nbNodes, TypedProperties configOverrides) throws Exception;
+
+  /**
+   * Start or stop the required number of slaves to reach the specified number, using the specified config overrides, on the selected nodes.
+   * <p>If {@code configOverrides} is null, then previous overrides are applied, and already running slave nodes do not need to be stopped.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param nbNodes the number of slave nodes to reach.
+   * @param interruptIfRunning if true then nodes can only be stopped once they are idle. 
+   * @param configOverrides the configuration overrides to apply.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node. This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   */
+  Map<String, Object> provisionSlaveNodes(NodeSelector selector, int nbNodes, boolean interruptIfRunning, TypedProperties configOverrides) throws Exception;
 
   /**
    * Register a listener with the specified node selector and MBean.

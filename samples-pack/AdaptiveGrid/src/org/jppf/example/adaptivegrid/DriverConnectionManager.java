@@ -22,7 +22,6 @@ import org.jppf.client.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -77,10 +76,8 @@ public class DriverConnectionManager implements AutoCloseable {
    * @throws Exception if any error occurs.
    */
   public void updateSlaveNodes(final int nbSlaves, final TypedProperties configOverrides) throws Exception {
-    String mbeanName = JPPFNodeProvisioningMBean.MBEAN_NAME;
-    Object[] params = { nbSlaves, configOverrides };
     // request that <nbSlaves> slave nodes be provisioned
-    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", params, PROVISIONING_SIGNATURE);
+    forwarder.provisionSlaveNodes(masterSelector, nbSlaves, configOverrides);
   }
 
   /**

@@ -48,13 +48,18 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public String[] getAllJobIds() {
-    return (String[]) getAttribute("AllJobIds");
+  public void cancelJob(final String param0) {
+    invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
 
   @Override
   public void resumeJobs(final JobSelector param0) {
     invoke("resumeJobs", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  }
+
+  @Override
+  public String[] getAllJobIds() {
+    return (String[]) getAttribute("AllJobIds");
   }
 
   @Override
@@ -78,11 +83,6 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public void cancelJob(final String param0) {
-    invoke("cancelJob", new Object[] { param0 }, new String[] { "java.lang.String" });
-  }
-
-  @Override
   public void updateMaxNodes(final JobSelector param0, final Integer param1) {
     invoke("updateMaxNodes", new Object[] { param0, param1 }, new String[] { "org.jppf.job.JobSelector", "java.lang.Integer" });
   }
@@ -98,13 +98,13 @@ public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProx
   }
 
   @Override
-  public JobInformation[] getJobInformation(final JobSelector param0) {
-    return (JobInformation[]) invoke("getJobInformation", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
+  public JobInformation getJobInformation(final String param0) {
+    return (JobInformation) invoke("getJobInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
 
   @Override
-  public JobInformation getJobInformation(final String param0) {
-    return (JobInformation) invoke("getJobInformation", new Object[] { param0 }, new String[] { "java.lang.String" });
+  public JobInformation[] getJobInformation(final JobSelector param0) {
+    return (JobInformation[]) invoke("getJobInformation", new Object[] { param0 }, new String[] { "org.jppf.job.JobSelector" });
   }
 
   @Override

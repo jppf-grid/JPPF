@@ -23,7 +23,6 @@ import java.util.*;
 import org.jppf.client.monitoring.AbstractRefreshHandler;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -178,7 +177,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     }
     Map<String, Object> result = null;
     try {
-      result = forwarder.forwardGetAttribute(new UuidSelector(uuidMap.keySet()), JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
+      result = forwarder.getNbSlaves(new UuidSelector(uuidMap.keySet()));
     } catch(Exception e) {
       if (debugEnabled) log.debug("error getting number of slaves for driver " + driver.getUuid(), e);
     }

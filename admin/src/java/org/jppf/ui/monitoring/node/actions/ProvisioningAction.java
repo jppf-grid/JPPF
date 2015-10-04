@@ -25,7 +25,6 @@ import javax.swing.*;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.management.*;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.GuiUtils;
@@ -151,7 +150,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
           TopologyDriver parent = en.getKey();
           NodeSelector selector = new UuidSelector(en.getValue());
           try {
-            Map<String, Object> result = parent.getForwarder().forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", params, signature);
+            Map<String, Object> result = parent.getForwarder().provisionSlaveNodes(selector, nbSlaves, interruptIfRunning, props);
             printForwardingRequestErrors(result);
           } catch(Exception e) {
             log.error(e.getMessage(), e);

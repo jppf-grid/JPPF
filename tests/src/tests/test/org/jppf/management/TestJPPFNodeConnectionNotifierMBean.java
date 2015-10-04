@@ -18,15 +18,14 @@
 
 package test.org.jppf.management;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 import javax.management.*;
 
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -38,13 +37,9 @@ import test.org.jppf.test.setup.*;
  */
 public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetup implements NotificationListener {
   /**
-   *
+   * 
    */
-  private AtomicInteger connectedCount = new AtomicInteger(0);
-  /**
-   *
-   */
-  private AtomicInteger disconnectedCount = new AtomicInteger(0);
+  private final List<Notification> notifList = new ArrayList<>();
 
   /**
    * Launches 1 driver with 1 node attached and start the client.
@@ -60,31 +55,43 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 15000)
-  public void testCOnnectionNotifications() throws Exception {
+  public void testConnectionNotifications() throws Exception {
+    int nbSlaves = 2;
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
-    // start 2 slaves
-    forwarder.forwardInvoke(NodeSelector.ALL_NODES, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] { 2 }, new String[] { "int" });
-    while (driver.nbNodes() < 3) Thread.sleep(10L);
-    // stop all slaves
-    forwarder.forwardInvoke(NodeSelector.ALL_NODES, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] { 0 }, new String[] { "int" });
+    forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, nbSlaves);
+    while (driver.nbNodes() < nbSlaves + 1) Thread.sleep(10L);
+    forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, 0);
     while (driver.nbNodes() > 1) Thread.sleep(10L);
-    Thread.sleep(1500L);
+    synchronized(notifList) {
+      while (notifList.size() < 2 * nbSlaves) notifList.wait(10L);
+    }
     driver.removeNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
-    assertEquals(2, connectedCount.get());
-    assertEquals(2, disconnectedCount.get());
+    int connectedCount = 0;
+    int disconnectedCount = 0;
+    for (Notification notif: notifList) {
+      assertEquals(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, notif.getSource());
+      switch(notif.getType()) {
+        case JPPFNodeConnectionNotifierMBean.CONNECTED:
+          connectedCount++;
+          break;
+        case JPPFNodeConnectionNotifierMBean.DISCONNECTED:
+          disconnectedCount++;
+          break;
+        default:
+          throw new IllegalStateException(String.format("notification has an invalid type: %s", notif));
+      }
+      assertTrue(notif.getUserData() instanceof JPPFManagementInfo);
+    }
+    assertEquals(nbSlaves, connectedCount);
+    assertEquals(nbSlaves, disconnectedCount);
   }
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
-    switch (notification.getType()) {
-      case JPPFNodeConnectionNotifierMBean.CONNECTED:
-        connectedCount.incrementAndGet();
-        break;
-      case JPPFNodeConnectionNotifierMBean.DISCONNECTED:
-        disconnectedCount.incrementAndGet();
-        break;
+    synchronized(notifList) {
+      notifList.add(notification);
     }
   }
 }

@@ -24,7 +24,6 @@ import org.jppf.client.JPPFClient;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.*;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.ThreadSynchronization;
 import org.slf4j.*;
 
@@ -62,7 +61,6 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
     JPPFNodeForwardingMBean forwarder = null;
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
     NodeSelector masterSelector = new ExecutionPolicySelector(masterPolicy);
-    String[] sig = { int.class.getName() };
     while (!isStopped()) {
       if (forwarder == null) {
         try {
@@ -79,7 +77,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       goToSleep(1000L);
       if (isStopped()) break;
       try {
-        Map<String, Object> map = forwarder.forwardInvoke(masterSelector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] {40}, sig);
+        Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 40);
         for (Map.Entry<String, Object> entry: map.entrySet()) {
           if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
         }
@@ -92,7 +90,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       goToSleep(waitTime);
       if (isStopped()) break;
       try {
-        Map<String, Object> map = forwarder.forwardInvoke(masterSelector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] {0}, sig);
+        Map<String, Object> map = forwarder.provisionSlaveNodes(masterSelector, 0);
         for (Map.Entry<String, Object> entry: map.entrySet()) {
           if (entry.getValue() instanceof Exception) throw (Exception) entry.getValue();
         }
@@ -103,7 +101,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
       }
     }
     try {
-      forwarder.forwardInvoke(masterSelector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] {0}, sig);
+      forwarder.provisionSlaveNodes(masterSelector, 0);
     } catch(Exception e) {
       //e.printStackTrace();
       return;

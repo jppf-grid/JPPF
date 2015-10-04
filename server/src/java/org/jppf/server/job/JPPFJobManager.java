@@ -27,7 +27,6 @@ import org.jppf.job.*;
 import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
-import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
@@ -113,15 +112,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       if (debugEnabled) log.debug("keys = {}", keys);
       return keys.toArray(new String[keys.size()]);
     }
-  }
-
-  /**
-   * Get the queued bundle wrapper for the specified job.
-   * @param jobUuid the id of the job to look for.
-   * @return a <code>ServerJob</code> instance, or null if the job is not queued anymore.
-   */
-  public ServerJob getBundleForJob(final String jobUuid) {
-    return ((JPPFPriorityQueue) JPPFDriver.getQueue()).getBundleForJob(jobUuid);
   }
 
   @Override

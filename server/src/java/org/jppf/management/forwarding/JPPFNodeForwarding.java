@@ -29,6 +29,7 @@ import javax.management.*;
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
+import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
@@ -248,6 +249,33 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     return forwardInvoke(selector, DiagnosticsMBean.MBEAN_NAME_NODE, "gc");
   }
 
+  @Override
+  public Map<String, Object> getNbSlaves(final NodeSelector selector) throws Exception {
+    return forwardGetAttribute(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSLaves");
+  }
+
+  @Override
+  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes) throws Exception {
+    return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] { nbNodes }, new String[] { "int" });
+  }
+
+  @Override
+  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final boolean interruptIfRunning) throws Exception {
+    return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes", new Object[] { nbNodes, interruptIfRunning }, new String[] { "int", "boolean" });
+  }
+
+  @Override
+  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final TypedProperties configOverrides) throws Exception {
+    return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes",
+      new Object[] { nbNodes, configOverrides }, new String[] { "int", TypedProperties.class.getName() });
+  }
+
+  @Override
+  public Map<String, Object> provisionSlaveNodes(final NodeSelector selector, final int nbNodes, final boolean interruptIfRunning, final TypedProperties configOverrides) throws Exception {
+    return forwardInvoke(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "provisionSlaveNodes",
+      new Object[] { nbNodes, interruptIfRunning, configOverrides }, new String[] { "int", "boolean", TypedProperties.class.getName() });
+  }
+
   /**
    * Forward the specified operation to the specified nodes.
    * @param type the type of operation to forward.
@@ -263,7 +291,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     List<Future<Pair<String, Object>>> futures = new ArrayList<>(nodes.size());
     final Map<String, Object> map = new HashMap<>();
     for (AbstractNodeContext node: nodes) {
-      ForwardingTask task = null;
+      AbstractForwardingTask task = null;
       switch(type) {
         case INVOKE_METHOD:
           task = new InvokeMethodTask(node, mbeanName, memberName, (Object[]) otherParams[0], (String[]) otherParams[1]);
@@ -284,145 +312,5 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
       if (result != null) map.put(result.first(), result.second());
     }
     return map;
-  }
-
-  /**
-   * This task invokes an MBean method on a remote node.
-   */
-  private static class InvokeMethodTask extends ForwardingTask {
-    /**
-     * The method parameter values.
-     */
-    private final Object[] params;
-    /**
-     * The types of the method parameters.
-     */
-    private final String[] signature;
-
-    /**
-     * Initialize this task.
-     * @param context represents the node to which a request is sent.
-     * @param mbeanName the name of the node MBean to which the request is sent.
-     * @param methodName the name of the method to invoke, or the attribute to get or set.
-     * @param params the method parameter values.
-     * @param signature the types of the method parameters.
-     */
-    protected InvokeMethodTask(final AbstractNodeContext context, final String mbeanName, final String methodName, final Object[] params, final String[] signature) {
-      super(context, mbeanName, methodName);
-      this.params = params;
-      this.signature = signature;
-    }
-
-    @Override
-    protected Pair<String, Object> execute() throws Exception {
-      String uuid = context.getUuid();
-      JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-      if (debugEnabled) log.debug("invoking {}() on mbean={} for node={} with jmx=", new Object[] {memberName, mbeanName, uuid, wrapper});
-      Object o = wrapper.invoke(mbeanName, memberName, params, signature);
-      return new Pair<>(uuid, o);
-    }
-  }
-
-  /**
-   * This task sets an MBean attribute value on a remote node.
-   */
-  private static class SetAttributeTask extends ForwardingTask {
-    /**
-     * The method parameter values.
-     */
-    private final Object value;
-
-    /**
-     * Initialize this task.
-     * @param context represents the node to which a request is sent.
-     * @param mbeanName the name of the node MBean to which the request is sent.
-     * @param attribute the name of the attribute to set.
-     * @param value the value to set on the attribute.
-     */
-    protected SetAttributeTask(final AbstractNodeContext context, final String mbeanName, final String attribute, final Object value) {
-      super(context, mbeanName, attribute);
-      this.value = value;
-    }
-
-    @Override
-    protected Pair<String, Object> execute() throws Exception {
-      String uuid = context.getUuid();
-      JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-      wrapper.setAttribute(mbeanName, memberName, value);
-      if (debugEnabled) log.debug("set attribute '" + memberName + "' on node " + uuid);
-      return null;
-    }
-  }
-
-  /**
-   * This task gets an MBean attribute value from a remote node.
-   */
-  private static class GetAttributeTask extends ForwardingTask {
-    /**
-     * Initialize this task.
-     * @param context represents the node to which a request is sent.
-     * @param mbeanName the name of the node MBean to which the request is sent.
-     * @param attribute the name of the attribute to get.
-     */
-    protected GetAttributeTask(final AbstractNodeContext context, final String mbeanName, final String attribute) {
-      super(context, mbeanName, attribute);
-    }
-
-    @Override
-    protected Pair<String, Object> execute() throws Exception {
-      String uuid = context.getUuid();
-      JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-      Object o = wrapper.getAttribute(mbeanName, memberName);
-      if (debugEnabled) {
-        log.debug(String.format("get attribute '%s' = %s on node %s", memberName, o, uuid));
-      }
-      return new Pair<>(uuid, o);
-    }
-  }
-
-  /**
-   * Common super class for all forwrding tasks.
-   */
-  private abstract static class ForwardingTask implements Callable<Pair<String, Object>> {
-    /**
-     * Represents the node to which a request is sent.
-     */
-    protected final AbstractNodeContext context;
-    /**
-     * The name of the node MBean to which the request is sent.
-     */
-    protected final String mbeanName;
-    /**
-     * The name of the method to invoke, or the attribute to get or set.
-     */
-    protected final String memberName;
-
-    /**
-     * Initialize this task.
-     * @param context represents the node to which a request is sent.
-     * @param mbeanName the name of the node MBean to which the request is sent.
-     * @param memberName the name of the method to invoke, or the attribute to get or set.
-     */
-    protected ForwardingTask(final AbstractNodeContext context, final String mbeanName, final String memberName) {
-      this.context = context;
-      this.mbeanName = mbeanName;
-      this.memberName = memberName;
-    }
-
-    @Override
-    public Pair<String, Object> call() {
-      try {
-        return execute();
-      } catch (Exception e) {
-       return new Pair<>(context.getUuid(), (Object) e);
-      }
-    }
-
-    /**
-     * Executes the request.
-     * @return a pair made of the node uuid and either the request result or an exception that was raised.
-     * @throws Exception if any error occurs.
-     */
-    protected abstract Pair<String, Object> execute() throws Exception;
   }
 }

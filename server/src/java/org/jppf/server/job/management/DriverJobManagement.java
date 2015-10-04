@@ -24,7 +24,6 @@ import javax.management.*;
 
 import org.jppf.job.*;
 import org.jppf.server.JPPFDriver;
-import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.LoggingUtils;
@@ -46,10 +45,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Reference to the driver's job manager.
-   */
-  private JPPFJobManager jobManager = null;
-  /**
    * Reference to the driver.
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
@@ -58,7 +53,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * Initialize this MBean.
    */
   public DriverJobManagement() {
-    getJobManager().addJobManagerListener(new JobEventNotifier());
+    driver.getJobManager().addJobManagerListener(new JobEventNotifier());
   }
 
   /**
@@ -68,7 +63,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public void cancelJob(final String jobUuid) throws Exception {
-    ServerJob serverJob = getJobManager().getBundleForJob(jobUuid);
+    ServerJob serverJob = getServerJob(jobUuid);
     if (serverJob != null) {
       if (debugEnabled) log.debug("Request to cancel job '{}'", serverJob.getJob().getName());
       serverJob.cancel(false);
@@ -80,13 +75,12 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   /**
    * Suspend the job with the specified id.
    * @param jobUuid the id of the job to suspend.
-   * @param requeue true if the sub-jobs running on each node should be canceled and requeued,
-   *        false if they should be left to execute until completion.
+   * @param requeue true if the sub-jobs running on each node should be canceled and requeued, false if they should be left to execute until completion.
    * @throws Exception if any error occurs.
    */
   @Override
   public void suspendJob(final String jobUuid, final Boolean requeue) throws Exception {
-    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+    ServerJob bundleWrapper = getServerJob(jobUuid);
     if (bundleWrapper == null) {
       if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
       return;
@@ -102,7 +96,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public void resumeJob(final String jobUuid) throws Exception {
-    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+    ServerJob bundleWrapper = getServerJob(jobUuid);
     if (bundleWrapper == null) {
       if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
       return;
@@ -119,13 +113,13 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public void updateMaxNodes(final String jobUuid, final Integer maxNodes) throws Exception {
-    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
-    if (bundleWrapper == null) {
+    ServerJob serverJob = getServerJob(jobUuid);
+    if (serverJob == null) {
       if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
       return;
     }
-    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + bundleWrapper.getJob().getName() + '\'');
-    bundleWrapper.setMaxNodes(maxNodes);
+    if (debugEnabled) log.debug("Request to update maxNodes to " + maxNodes + " for jobId = '" + serverJob.getJob().getName() + '\'');
+    serverJob.setMaxNodes(maxNodes);
   }
 
   /**
@@ -153,7 +147,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public JobInformation getJobInformation(final String jobUuid) throws Exception {
-    ServerJob job = getJobManager().getBundleForJob(jobUuid);
+    ServerJob job = getServerJob(jobUuid);
     if (job == null) return null;
     JobInformation jobInfo = new JobInformation(jobUuid, job.getName(), job.getTaskCount(), job.getInitialTaskCount(), job.getSLA().getPriority(), job.isSuspended(), job.isPending());
     jobInfo.setMaxNodes(job.getSLA().getMaxNodes());
@@ -168,7 +162,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    */
   @Override
   public NodeJobInformation[] getNodeInformation(final String jobUuid) throws Exception {
-    ServerJob bundleWrapper = getJobManager().getBundleForJob(jobUuid);
+    ServerJob bundleWrapper = getServerJob(jobUuid);
     if (bundleWrapper == null) return NodeJobInformation.EMPTY_ARRAY;
     return bundleWrapper.getNodeJobInformation();
   }
@@ -177,15 +171,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   public void updatePriority(final String jobUuid, final Integer newPriority) {
     if (debugEnabled) log.debug("Updating priority of jobId = '" + jobUuid + "' to: " + newPriority);
     ((JPPFPriorityQueue) JPPFDriver.getQueue()).updatePriority(jobUuid, newPriority);
-  }
-
-  /**
-   * Get a reference to the driver's job manager.
-   * @return a <code>JPPFJobManager</code> instance.
-   */
-  private JPPFJobManager getJobManager() {
-    if (jobManager == null) jobManager = driver.getJobManager();
-    return jobManager;
   }
 
   /**
@@ -295,7 +280,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   }
 
   /**
-   * Select the uuids of th ejobs specified by a given job selector.
+   * Select the uuids of the jobs specified by a given job selector.
    * @param selector determines for which jobs to return the uuid.
    * @return a set of uuids, possibly empty.
    */
@@ -313,5 +298,14 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       if (selector.accepts(job.getJob())) list.add(job.getUuid());
     }
     return list;
+  }
+
+  /**
+   * Get the queued bundle wrapper for the specified job.
+   * @param jobUuid the id of the job to look for.
+   * @return a <code>ServerJob</code> instance, or null if the job is not queued anymore.
+   */
+  private ServerJob getServerJob(final String jobUuid) {
+    return ((JPPFPriorityQueue) JPPFDriver.getQueue()).getBundleForJob(jobUuid);
   }
 }

@@ -64,6 +64,26 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
+  public void cancelJob(final String param0, final Boolean param1) {
+    invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
+  }
+
+  @Override
+  public void restart(final Boolean param0) {
+    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
+  }
+
+  @Override
+  public void restart() {
+    invoke("restart", (Object[]) null, (String[]) null);
+  }
+
+  @Override
+  public NodePendingAction pendingAction() {
+    return (NodePendingAction) invoke("pendingAction", (Object[]) null, (String[]) null);
+  }
+
+  @Override
   public void updateThreadPoolSize(final Integer param0) {
     invoke("updateThreadPoolSize", new Object[] { param0 }, new String[] { "java.lang.Integer" });
   }
@@ -101,26 +121,6 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   @Override
   public boolean cancelPendingAction() {
     return (boolean) invoke("cancelPendingAction", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public void cancelJob(final String param0, final Boolean param1) {
-    invoke("cancelJob", new Object[] { param0, param1 }, new String[] { "java.lang.String", "java.lang.Boolean" });
-  }
-
-  @Override
-  public void restart(final Boolean param0) {
-    invoke("restart", new Object[] { param0 }, new String[] { "java.lang.Boolean" });
-  }
-
-  @Override
-  public void restart() {
-    invoke("restart", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public NodePendingAction pendingAction() {
-    return (NodePendingAction) invoke("pendingAction", (Object[]) null, (String[]) null);
   }
 
   @Override

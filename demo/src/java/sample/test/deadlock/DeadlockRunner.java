@@ -26,7 +26,6 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -65,12 +64,7 @@ public class DeadlockRunner {
     ro.jobCreationCallback = new JobCreationCallback() {
       @Override
       public void jobCreated(final JPPFJob job) {
-        //job.getSLA().setMaxNodeProvisioningGroups(1);
-        /*
-        ExecutionPolicy policy = new Equal("jppf.node.provisioning.slave", true).and(new Equal("job.uuid", false, job.getUuid()));
-        job.getSLA().setExecutionPolicy(policy);
-        job.getSLA().setSuspended(true);
-        */
+        job.getSLA().setBroadcastJob(true);
       }
     };
     printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
@@ -179,13 +173,10 @@ public class DeadlockRunner {
     JMXDriverConnectionWrapper jmx = client.getConnectionPool().getJmxConnection();
     if (jmx.nbNodes() == nbSlaves + 1) return;
     JPPFNodeForwardingMBean forwarder = jmx.getNodeForwarder();
-    String mbeanName = JPPFNodeProvisioningMBean.MBEAN_NAME;
-    Object[] params = { nbSlaves, null };
-    String[] sig = new String[] {int.class.getName(), TypedProperties.class.getName()};
     NodeSelector masterSelector = new ExecutionPolicySelector(new Equal("jppf.node.provisioning.master", true));
     // request that <nbSlaves> slave nodes be provisioned
     TimeMarker marker = new TimeMarker().start();
-    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", params, sig);
+    forwarder.provisionSlaveNodes(masterSelector, nbSlaves, null);
     while (jmx.nbNodes() != nbSlaves + 1) Thread.sleep(10L);
     printf("slaves confirmation wait time: %s", marker.stop().getLastElapsedAsString());
   }

@@ -20,19 +20,19 @@ package org.jppf.management.generated;
 
 import org.jppf.management.AbstractMBeanStaticProxy;
 import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.management.JPPFNodeTaskMonitorMBean;
+import org.jppf.management.JPPFNodeConnectionNotifierMBean;
 
 /**
- * Generated static proxy for the {@link org.jppf.management.JPPFNodeTaskMonitorMBean} MBean interface.
+ * Generated static proxy for the {@link org.jppf.management.JPPFNodeConnectionNotifierMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
-public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProxy implements JPPFNodeTaskMonitorMBean {
+public class JPPFNodeConnectionNotifierMBeanStaticProxy extends AbstractMBeanStaticProxy implements JPPFNodeConnectionNotifierMBean {
   /**
    * Initialize this MBean static proxy.
    * @param connection the JMX connection used to invoke remote MBean methods.
    */
-  public JPPFNodeTaskMonitorMBeanStaticProxy(final JMXConnectionWrapper connection) {
-    super(connection, "org.jppf:name=task.monitor,type=node");
+  public JPPFNodeConnectionNotifierMBeanStaticProxy(final JMXConnectionWrapper connection) {
+    super(connection, "org.jppf:name=nodeConnectionNotifier,type=driver");
   }
 
   /**
@@ -40,36 +40,6 @@ public class JPPFNodeTaskMonitorMBeanStaticProxy extends AbstractMBeanStaticProx
    * @return the object name as a string.
    */
   public static final String getMBeanName() {
-    return "org.jppf:name=task.monitor,type=node";
-  }
-
-  @Override
-  public void reset() {
-    invoke("reset", (Object[]) null, (String[]) null);
-  }
-
-  @Override
-  public Long getTotalTaskElapsedTime() {
-    return (Long) getAttribute("TotalTaskElapsedTime");
-  }
-
-  @Override
-  public Integer getTotalTasksExecuted() {
-    return (Integer) getAttribute("TotalTasksExecuted");
-  }
-
-  @Override
-  public Integer getTotalTasksInError() {
-    return (Integer) getAttribute("TotalTasksInError");
-  }
-
-  @Override
-  public Integer getTotalTasksSucessfull() {
-    return (Integer) getAttribute("TotalTasksSucessfull");
-  }
-
-  @Override
-  public Long getTotalTaskCpuTime() {
-    return (Long) getAttribute("TotalTaskCpuTime");
+    return "org.jppf:name=nodeConnectionNotifier,type=driver";
   }
 }

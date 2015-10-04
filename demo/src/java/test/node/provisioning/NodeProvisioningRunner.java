@@ -25,7 +25,6 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
-import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.ExceptionUtils;
 
 import sample.dist.tasklength.LongTask;
@@ -36,14 +35,6 @@ import sample.dist.tasklength.LongTask;
  * @author Laurent Cohen
  */
 public class NodeProvisioningRunner {
-  /**
-   * 
-   */
-  private static String[] signature = {int.class.getName(), boolean.class.getName()};
-  /**
-   * 
-   */
-  private static String mbeanName = JPPFNodeProvisioningMBean.MBEAN_NAME;
   /**
    * 
    */
@@ -73,7 +64,7 @@ public class NodeProvisioningRunner {
     
     int nbSlaves = 3;
     System.out.printf("provisioning %d slaves%n", nbSlaves);
-    Object o = forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, false }, signature);
+    Object o = forwarder.provisionSlaveNodes(masterSelector, nbSlaves, false);
     Thread.sleep(3000L);
     printNbSlaves(forwarder);
 
@@ -86,14 +77,14 @@ public class NodeProvisioningRunner {
 
     Thread.sleep(2000L);
     System.out.printf("provisioning 0 slaves%n");
-    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, false }, signature);      
+    forwarder.provisionSlaveNodes(masterSelector, 0, false);      
     Thread.sleep(3000L);
     printNbSlaves(forwarder);
     System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
 
     Thread.sleep(2000L);
     System.out.printf("provisioning %d slaves%n", nbSlaves);
-    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, false }, signature);      
+    forwarder.provisionSlaveNodes(masterSelector, nbSlaves, false);      
     Thread.sleep(3000L);
     printNbSlaves(forwarder);
     System.out.printf("driver has %d nodes%n", jmxDriver.nbNodes());
@@ -102,7 +93,7 @@ public class NodeProvisioningRunner {
     System.out.println("got " + results.size() + " results for job");
 
     System.out.println("shutting down all slaves ...");
-    forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, false }, signature);
+    forwarder.provisionSlaveNodes(masterSelector, 0, false);
     Thread.sleep(3000L);
     printNbSlaves(forwarder);
   }
@@ -121,7 +112,7 @@ public class NodeProvisioningRunner {
       System.out.println("*******************");
       System.out.printf("iteration %d: provisioning %d slaves%n", i, nbSlaves);
       long start = System.nanoTime();
-      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { nbSlaves, true }, signature);
+      forwarder.provisionSlaveNodes(masterSelector, nbSlaves, true);
       int n = 0;
       while ((n = jmx.nbIdleNodes()) != nbSlaves + 1) Thread.sleep(1L);
       long elapsed = System.nanoTime() - start;
@@ -129,7 +120,7 @@ public class NodeProvisioningRunner {
       System.out.printf("iteration %d: provisioning %d slaves took %,d ms%n", i, nbSlaves, elapsed/1_000_000L);
       System.out.printf("iteration %d: un-provisioning %d slaves%n", i, nbSlaves);
       start = System.nanoTime();
-      forwarder.forwardInvoke(masterSelector, mbeanName, "provisionSlaveNodes", new Object[] { 0, true }, signature);
+      forwarder.provisionSlaveNodes(masterSelector, 0, true);
       while ((n = jmx.nbIdleNodes()) != 1) Thread.sleep(1L);
       elapsed = System.nanoTime() - start;
       totalElapsed += elapsed;
@@ -145,7 +136,7 @@ public class NodeProvisioningRunner {
    * @throws Exception .
    */
   private static void printNbSlaves(final JPPFNodeForwardingMBean forwarder) throws Exception {
-    Map<String, Object> resultsMap = forwarder.forwardGetAttribute(masterSelector, mbeanName, "NbSlaves");
+    Map<String, Object> resultsMap = forwarder.getNbSlaves(masterSelector);
     for (Map.Entry<String, Object> entry: resultsMap.entrySet()) {
       if (entry.getValue() instanceof Throwable) System.out.printf("node %s raised %s%n", entry.getKey(), ExceptionUtils.getStackTrace((Throwable) entry.getValue()));
       else System.out.printf("master node %s has %d slaves%n", entry.getKey(), entry.getValue());
