@@ -65,7 +65,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     this.uuid = pool.getDriverUuid();
     priority = pool.getPriority();
     systemInfo = new JPPFSystemInformation(this.uuid, false, true);
-    managementInfo = new JPPFManagementInfo("remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
+    managementInfo = new JPPFManagementInfo("remote", "remote", -1, getConnectionUuid(), JPPFManagementInfo.DRIVER, pool.isSslEnabled());
     managementInfo.setSystemInfo(systemInfo);
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("RemoteChannelWrapper-" + channel.getName()));
   }
