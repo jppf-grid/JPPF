@@ -1,12 +1,13 @@
-<?php $currentPage="Release notes" ?>
 <?php
-// Connecting, selecting database
-$link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den')
-	 or die('Could not connect: ' . mysql_error());
-mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
+  require_once("db_settings.inc.php");
+  $currentPage="Release notes";
+?>
+<?php
+$link = mysql_connect($jppf_db_server, $jppf_db_user, $jppf_db_pwd) or die('Could not connect: ' . mysql_error());
+mysql_select_db($jppf_db_name) or die('Could not select database');
 $version = $_REQUEST["version"];
 if (!$version) {
-	$version = "5.0";
+	$version = "5.1";
 }
 // Performing SQL query
 $query = "SELECT * FROM news WHERE version = '" . $version . "'";

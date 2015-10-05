@@ -1,4 +1,7 @@
-<?php $currentPage="Links" ?>
+<?php
+  require_once("db_settings.inc.php");
+  $currentPage="Links";
+?>
 <html>
 	  <head>
     <title>JPPF Links
@@ -102,9 +105,8 @@
 				<div class="jppf_content">
 		<h1 align="center">Related Links</h1>
 <?php
-    $link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den')
-			 or die('Could not connect: ' . mysql_error());
-		mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
+    $link = mysql_connect($jppf_db_server, $jppf_db_user, $jppf_db_pwd) or die('Could not connect: ' . mysql_error());
+    mysql_select_db($jppf_db_name) or die('Could not select database');
 		$query = 'SELECT * FROM links_groups ORDER BY group_id ASC';
 		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
 		$groups = array();

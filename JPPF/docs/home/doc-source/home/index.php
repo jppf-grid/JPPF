@@ -1,4 +1,7 @@
-<?php $currentPage="Home" ?>
+<?php
+  require_once("db_settings.inc.php");
+  $currentPage="Home";
+?>
 $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script src="scripts/jquery.js"></script>
   <script src="scripts/tabs.min.js"></script>
@@ -70,9 +73,8 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
 
   <div class="column_right">
     <?php
-      $link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den')
-         or die('Could not connect: ' . mysql_error());
-      mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
+      $link = mysql_connect($jppf_db_server, $jppf_db_user, $jppf_db_pwd) or die('Could not connect: ' . mysql_error());
+      mysql_select_db($jppf_db_name) or die('Could not select database');
       $query = 'SELECT * FROM news ORDER BY date DESC';
       $result = mysql_query($query) or die('Query failed: ' . mysql_error());
     ?>
