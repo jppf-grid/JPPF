@@ -251,7 +251,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
 
   @Override
   public Map<String, Object> getNbSlaves(final NodeSelector selector) throws Exception {
-    return forwardGetAttribute(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSLaves");
+    return forwardGetAttribute(selector, JPPFNodeProvisioningMBean.MBEAN_NAME, "NbSlaves");
   }
 
   @Override
