@@ -28,7 +28,7 @@ import org.jppf.utils.*;
 
 /**
  * 
- * @author lcohen
+ * @author Laurent Cohen
  */
 public class GenericRunner
 {

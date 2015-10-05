@@ -53,9 +53,9 @@ Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>To configure the two nodes, there are 2 predefined node configurations we will use:
     <ul class="samplesNestedList">
-      <li>copy <a href="config/node1/jppf-node.properties"><b>CustomLoadBalancer/config/node1/jppf-node.properties</b></a> to the <b>config</b> folder of your first node installation (it will replace the existing file).
+      <li>copy <a href="config/node1/jppf-node.properties.html"><b>CustomLoadBalancer/config/node1/jppf-node.properties</b></a> to the <b>config</b> folder of your first node installation (it will replace the existing file).
       This will setup the first node with 64 MB of heap and 1 processing thread; this node will be used for "heavy" jobs</li>
-      <li>copy <a href="config/node2/jppf-node.properties"><b>CustomLoadBalancer/config/node2/jppf-node.properties</b></a> to the <b>config</b> folder of your second node installation (it will replace the existing file).
+      <li>copy <a href="config/node2/jppf-node.properties.html"><b>CustomLoadBalancer/config/node2/jppf-node.properties</b></a> to the <b>config</b> folder of your second node installation (it will replace the existing file).
       This will setup the second node with 64 MB of heap and 4 processing thread; this node will be used for "light" jobs</li>
     </ul>
   </li>
@@ -65,7 +65,7 @@ Once you have installed a server and node, perform the following steps:
   <li>in the server's installation config/jppf-driver.properties file, replace the property "<b>jppf.load.balancing.algorithm = xxxxx</b>" with "<b>jppf.load.balancing.algorithm = customLoadBalancer</b>",
   to let the server know it must use the new load-balancer</li>
   <li>start the JPPF server and each of the 2 nodes</li>
-  <li>the demo application should already be configured with a connection pool size of 2; to confirm it you can open the file <a href="config/jppf-client.properties"><b>jppf-client.properties</a></b> in <b>CustomerLoadbalancer/config</b>, you should see a line "<b>jppf.pool.size = 2"</b></li>
+  <li>the demo application should already be configured with a connection pool size of 2; to confirm it you can open the file <a href="config/jppf-client.properties.html"><b>jppf-client.properties</a></b> in <b>CustomerLoadbalancer/config</b>, you should see a line "<b>jppf.pool.size = 2"</b></li>
   <li>start the demo, by opening a console in <b>JPPF-x.y-samples-pack/CustomLoadBalancer</b>, and typing: "<b>ant run</b>"</li>
   <li>in the first node's console output you should see messages of this type:<br>
     <tt>[java] Starting execution of task Heavy Job - task 1</tt> (as many as there are tasks in the "heavy" job)</li>

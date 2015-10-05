@@ -102,7 +102,7 @@
 				<div class="jppf_content">
 <?php
   // Connecting, selecting database
-  $link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den') or die('Could not connect: ' . mysql_error());
+  $link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den') or die('Could not connect: ' . mysql_error());
   mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
   // Performing SQL query
   $query = 'SELECT DISTINCT jppf_version FROM patch ORDER BY jppf_version DESC';

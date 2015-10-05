@@ -128,13 +128,13 @@
         <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-dotnet.zip/download'; ?>">JPPF .Net-enabled node distribution</a><br>
         <h3>Source code and documentation</h3>
         <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
-        User Guide: <a href="/doc/v4">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
-        API documentation: <a href="/api">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip/download'; ?>">download</a><p>
+        User Guide: <a href="/doc/v5">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
+        API documentation: <a href="/api-5">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip/download'; ?>">download</a><p>
         <h3>Connectors and add-ons</h3>
         <a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
         <h3>Samples and tutorials</h3>
         <a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
-        Make sure to get started with our <a href="/doc/v4/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
+        Make sure to get started with our <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
       <!--</div>-->
     </div>
     <br>
@@ -182,9 +182,9 @@
       <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3>&nbsp;<img src="images/icons/curious2.png" class="titleWithIcon"/>Feeling curious or adventurous?</h3>
 </div>
-      <br><b>Try our latest (unstable) version</b><br>last update: <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf 5.0 rc1" style="font-weight: 900">2/12/2015 JPPF 5.0 RC1</a>.
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.1 beta</a>.
       <p>
-      <div align="center" style="background-color: yellow; padding: 5px; margin: 5px; border-radius: 10px"><b><i>Not recommended for production environments</b></i></div><br>
+      <div align="center" class="yellow_highlight"><b><i>Not recommended for production environments</i></div><br>
     </div>
     <br>
   </div>

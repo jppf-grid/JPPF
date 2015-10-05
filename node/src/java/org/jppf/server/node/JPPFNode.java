@@ -251,7 +251,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     checkStopped();
     currentBundle = null;
     if (debugEnabled) log.debug("processing " + (taskList == null ? 0 : taskList.size()) + " task results for job '" + bundle.getName() + '\'');
-    //if (executionManager.checkConfigChanged() || (bundle.isHandshake() && (currentBundle == null))) {
     if (executionManager.checkConfigChanged() || bundle.isHandshake() || isOffline()) {
       if (debugEnabled) log.debug("detected configuration change or initial bundle request, sending new system information to the server");
       TypedProperties jppf = systemInformation.getJppf();

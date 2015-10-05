@@ -24,6 +24,11 @@
 
   <target name="maven.artifacts" depends="maven.generate" description=""/>
 
+  <!--
+    The GPG pass phrase must be stored in a properties file named 'gpg-passphrase.txt'
+    located in the user's home directory, e.g. /home/<user> on Linux, C:\users\<user> on Windows.
+    The passphrase itself is defined as a property: gpg.pass = <passphrase>
+  -->
   <target name="maven.init" depends="">
     <property name="maven.dist" value="${build}/maven"/>
     <echoprop name="maven.dist"/>
@@ -31,7 +36,7 @@
     <mkdir dir="${maven.dist}"/>
     <loadfile property="jppf.maven.header" srcFile="${bin}/maven/pom-header.xml"/>
     <loadfile property="jppf.maven.common" srcFile="${bin}/maven/pom-common.xml"/>
-    <property file="C:/Workspaces/SourceForgeSVN/gpg-passphrase.txt"/>
+    <property file="${user.home}/gpg-passphrase.txt"/>
     <!-- defined maven snapshots and staging repository id and url -->
     <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
     <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots" />

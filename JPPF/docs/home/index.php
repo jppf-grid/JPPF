@@ -134,7 +134,7 @@
   <div class="column_left">
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/getting-started.png" class="titleWithIcon"/>Getting started</h3>
-    Take an easy start with our <a href="/doc/v3/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
+    Take an easy start with our <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
     </div>
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
     <h3><img src="images/icons/easy.png" class="titleWithIcon"/>Easy and powerful</h3>
@@ -165,7 +165,7 @@
   </div>
   <div class="column_right">
     <?php
-      $link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
+      $link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den')
          or die('Could not connect: ' . mysql_error());
       mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
       $query = 'SELECT * FROM news ORDER BY date DESC';

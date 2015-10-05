@@ -62,8 +62,8 @@
       <zipfileset dir="${build}" prefix="${android.redist.prefix}/libs" includes="*.aar"/>
     </zip>
     <echo message="deleting apk and aar"/>
+    <!--<delete file="${build}/${app.ver}-AndroidNode.apk" quiet="true"/>-->
     <delete file="${build}/${app.ver}-AndroidNodeEvents.aar" quiet="true"/>
-    <delete file="${build}/${app.ver}-AndroidNode.apk" quiet="true"/>
     <delete file="${samples-pack}/Fractals/data/android-fractal-demo.apk" quiet="true"/>
     <copy file="${node-android}/demo/build/outputs/apk/demo-release-unsigned.apk" tofile="${samples-pack}/Fractals/data/android-fractal-demo.apk" quiet="true" force="true"/>
   </target>

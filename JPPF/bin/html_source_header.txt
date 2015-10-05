@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>JPPF Samples</title>
+    <title>@title@</title>
     <meta name="description" content="The open source grid computing solution">
     <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
   </head>
   <body>
-    <script src="http://www.jppf.org/scripts/code-prettify/run_prettify.js?skin=java"></script>
+    <h2>@title@</h2>
+    <script src="http://www.jppf.org/scripts/code-prettify/run_prettify.js?skin=java_light_bkg"></script>
     <script src="http://www.jppf.org/scripts/code-prettify/lang-conf.js"></script>
 <pre class="prettyprint lang-@lang@">

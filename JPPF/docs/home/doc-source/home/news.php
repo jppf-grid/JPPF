@@ -2,7 +2,7 @@
 $template{name="about-page-header" title="News"}$
 	<?php
 	// Connecting, selecting database
-	$link = mysql_connect('localhost', 'lolocohe_jppfadm', 'tri75den')
+  $link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den')
 		 or die('Could not connect: ' . mysql_error());
 	mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
 

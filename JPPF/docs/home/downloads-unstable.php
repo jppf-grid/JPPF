@@ -1,7 +1,11 @@
-<?php $currentPage="Patches" ?>
+<?php
+  $currentPage = "Download";
+  $ver1 = "5.1-beta";
+  $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
+?>
 <html>
 	  <head>
-    <title>JPPF Patches
+    <title>JPPF Downloads - unstable
 </title>
     <meta name="description" content="The open source grid computing solution">
     <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
@@ -100,53 +104,67 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-<?php
-  $patch_id = $_REQUEST["patch_id"];
-  // Connecting, selecting database
-  $link = mysql_connect('127.0.0.1', 'lolocohe_jppfadm', 'tri75den')
-     or die('Could not connect: ' . mysql_error());
-  mysql_select_db('lolocohe_jppfweb') or die('Could not select database');
-  // Performing SQL query
-  $query = "SELECT * FROM patch where id = " . $patch_id;
-  $result = mysql_query($query) or die('Query failed: ' . mysql_error());
-  $line = mysql_fetch_array($result, MYSQL_ASSOC);
-  $jppf_ver = $line["jppf_version"];
-  $patch_number = $line["patch_number"];
-  $patch_url = $line["patch_url"];
-  $readme = preg_replace('@\n@', '<br/>', $line['readme']);
-  $readme = preg_replace('@(^ )+@', '&nbsp;', $readme);
-?>
-  <br><div class="blockWithHighlightedTitle">
-  <h1>JPPF <?php echo $jppf_ver ?> patch <?php echo $patch_number ?></h1>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
-<?php
-  $downloadLink = "<a href='/private/patch/" . $patch_url . "'>" . $patch_url . "</a>";
-?>
-  <h3><img src="images/icons/download.png" class="titleWithIcon"/>Download: <?php echo $downloadLink ?></h3>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
-  <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Description (included readme.txt):</h3>
-  <?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
-  <h3><img src="images/icons/bug.png" class="titleWithIcon"/>Fixed bugs:</h3>
-  <ul class="samplesList">
-<?php
-  mysql_free_result($result);
-  $query = "SELECT * FROM patch_bugs where jppf_version = '" . $jppf_ver . "' AND patch_number = '" . $patch_number . "'";
-  $result = mysql_query($query) or die('Query failed: ' . mysql_error());
-  while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-?>
-    <li><a href="<?php echo $line['bug_url'] ?>"><?php echo $line['bug_id'] ?>&nbsp;<?php echo $line['bug_title'] ?></a></li>
-<?php
-  }
-?>
-  </ul>
-  </div><br>
-<?php
-  // Free resultset
-  mysql_free_result($result);
-  // Closing connection
-  mysql_close($link);
-?>
+  <h1 align="center">Downloads - JPPF 5.1 beta preview</h1>
+  <div class="column_left" style="text-align: justify; padding: 0px">
+    <div class="blockWithHighlightedTitle">
+      <a name="<?php echo $ver1 ?>"></a>
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h2>&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
+</div>
+      <h3>Deployable module binaries</h3>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-driver.zip/download'; ?>">JPPF server/driver distribution</a><br>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node.zip/download'; ?>">JPPF node distribution</a><br>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-admin-ui.zip/download'; ?>">JPPF administration and monitoring console</a><br>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-application-template.zip/download'; ?>">JPPF application template</a>.<p>
+      <h3>Deployable .Net binaries</h3>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-dotnet.zip/download'; ?>">JPPF .Net demo application</a><br>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-dotnet.zip/download'; ?>">JPPF .Net-enabled node distribution</a><br>
+      <h3>Android Node</h3>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a><br>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a><br>
+      <p><div>You may also <a class="yellow_highlight" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">Download the node APK to a device</a></div><p>
+      <h3>Source code and documentation</h3>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
+      User Guide: <a href="/doc/v5">view online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-User-Guide.zip/download'; ?>">download the PDF</a><br>
+      API documentation: <a href="/api-5">browse online</a> or <a href="<?php echo $base . 'JPPF-' . $ver1 . '-api.zip/download'; ?>">download</a><p>
+      <h3>Connectors and add-ons</h3>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-j2ee-connector.zip/download'; ?>">J2EE Connector</a><br>
+      <h3>Samples and tutorials</h3>
+      <a href="<?php echo $base . 'JPPF-' . $ver1 . '-samples-pack.zip/download'; ?>">JPPF samples pack</a><br>
+      Make sure to get started with our <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF">online tutorial</a><br/>&nbsp;
+    </div>
+    <br>
+  </div>
+  <div class="column_right" style="text-align: justify; padding: 0px;">
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h2>&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Please note</h2>
+</div>
+      <p style="font-style: italic; font-weight: bold">JPPF 5.1 beta is a preview release and is not intended for deployment in production.
+      <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
+      so we have a chance to improve it before the final release.
+    </div>
+    <br>
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h3>&nbsp;<img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation preview</h3>
+</div>
+      <p>Doc preview for the major new features:
+      <ul class="samplesList">
+        <li><a href="/doc/v5/index.php?title=Android_Node">Android node</a></li>
+        <li><a href="/doc/v5/index.php?title=Job_monitoring_API">Job monitoring API</a></li>
+      </ul>
+      <p><u>Note:</u> these preview doc sections are not yet fully integrated in the main user guide. In particular, the Javadoc links for the new classes will not work.
+    </div>
+    <br>
+    <div class="blockWithHighlightedTitle">
+      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+  <h3>&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>All JPPF releases</h3>
+</div>
+      <br>All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;
+    </div>
+    <br>
+  </div>
 </div>
 				</td>
 				</tr>

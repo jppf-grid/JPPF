@@ -30,7 +30,7 @@ A consequence of this is that we will lose some degree of parallelism, since it 
   Each task waits for a configurable time after inserting a database row, to give the applicatione enough time to simulate a node crash and restart.</li>
   <li><a href="src/org/jppf/example/nodelifecycle/client/DBRunner.java.html">DBRunner.java</a> : this is the code for the client application.
   It submits a job with a configurable number of tasks, waits for a configurable delay, then restarts the node, and finally gets the execution results and displays the rows inserted in the database</li>
-  <li><a href="config/jppf-client.properties">jppf-client.properties</a> : the jppf configuration files, which also allows you to modify some parameters of the sample application</li>
+  <li><a href="config/jppf-client.properties.html">jppf-client.properties</a> : the jppf configuration files, which also allows you to modify some parameters of the sample application</li>
 </ul>
 
 <h3>Sample directory structure</h3>

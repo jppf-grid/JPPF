@@ -22,7 +22,10 @@ for (i=0; i<n; i++) {
   var lang = langFromExtension(name);
   self.log("converting " + file + " to html with lang=" + lang);
   var task = project.createTask("tohtml");
+  var path = file.getCanonicalPath().replace("\\", "/");
+  var idx = path.lastIndexOf("/");
   task.setDynamicAttribute("in", file.getCanonicalPath());
   task.setDynamicAttribute("lang", lang);
+  task.setDynamicAttribute("title", path.substring(idx + 1));
   task.perform();
 }
