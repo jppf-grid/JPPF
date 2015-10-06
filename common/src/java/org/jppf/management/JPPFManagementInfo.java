@@ -121,6 +121,7 @@ public class JPPFManagementInfo implements Serializable, Comparable<JPPFManageme
 
   /**
    * Initialize this information with the specified parameters.
+   * <br>Warning: this constructor performs a DNS lookup to find the IP address, so there is a performance overhead.
    * @param host the host on which the node or driver is running.
    * @param port the port on which the node's or driver's JMX server is listening.
    * @param uuid unique id of the node or driver.

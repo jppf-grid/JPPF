@@ -80,7 +80,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     goToSleep(delay);
     successful = false;
     long elapsed = 0L;
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     while ((elapsed < maxDuration) && !successful && !closed) {
       try {
         if (traceEnabled) log.trace("{} opening the socket connection", name);
@@ -91,7 +91,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
         if (traceEnabled) log.trace("{} socket connection open failed: {}", name, ExceptionUtils.getMessage(e));
       }
       if (!successful && !closed) goToSleep(period);
-      elapsed = System.currentTimeMillis() - start;
+      elapsed = (System.nanoTime() - start) / 1_000_000L;
     }
   }
 

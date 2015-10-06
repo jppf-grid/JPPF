@@ -367,7 +367,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     try {
       peerHandler.onCloseNode(context);
       JPPFManagementInfo info = context.getManagementInfo();
-      if (info == null) info = new JPPFManagementInfo("unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
+      if (info == null) info = new JPPFManagementInfo("unknown host", "unknown host", -1, context.getUuid(), context.isPeer() ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE, context.isSecure());
       if (debugEnabled) log.debug("firing nodeDisconnected() for {}", info);
       nodeConnectionHandler.fireNodeDisconnected(info);
       driver.getStatistics().addValue(JPPFStatisticsHelper.NODES, -1);

@@ -270,11 +270,14 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
         JPPFSystemInformation systemInfo = connection.getSystemInfo();
         JMXDriverConnectionWrapper jmx = connection.getConnectionPool().getJmxConnection();
         wrapper.setSystemInformation(systemInfo);
-        JPPFManagementInfo info = new JPPFManagementInfo(connection.getHost(), jmx != null ? jmx.getPort() : -1,
-            jmx != null ? jmx.getId() : (connection.getDriverUuid() != null ? connection.getDriverUuid() : "?"),
-            JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
-        info.setSystemInfo(systemInfo);
-        wrapper.setManagementInfo(info);
+        if (!wrapper.isLocal()) {
+          String driverUuid = connection.getDriverUuid();
+          JPPFManagementInfo info = null;
+          if (jmx != null) info = new JPPFManagementInfo(connection.getHost(), jmx.getPort(), jmx.getId(), JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+          else info = new JPPFManagementInfo(connection.getHost(), -1, driverUuid != null ? driverUuid : "?", JPPFManagementInfo.DRIVER, connection.isSSLEnabled());
+          info.setSystemInfo(systemInfo);
+          wrapper.setManagementInfo(info);
+        }
       }
       updateConnectionStatus(wrapper, oldStatus);
     }
