@@ -45,7 +45,7 @@ public class TestConnectionPool extends Setup1D1N {
    * Test job submission with <code>jppf.pool.size = 2</code> and local execution disabled.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testSubmitJobMultipleConnections() throws Exception {
     try {
       configure(0);
@@ -63,7 +63,7 @@ public class TestConnectionPool extends Setup1D1N {
    * Test job submission with <code>jppf.pool.size = 2</code> and local execution enabled.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testSubmitJobMultipleConnectionsAndLocalExec() throws Exception {
     try {
       configure(2);
@@ -81,7 +81,7 @@ public class TestConnectionPool extends Setup1D1N {
    * Test job submission with <code>jppf.pool.size = 2</code> and getMachChannels() > 1.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout = 10000)
+  @Test(timeout = 10000)
   public void testSubmitJobMultipleRemoteChannels() throws Exception {
     try {
       configure(0);
@@ -102,7 +102,7 @@ public class TestConnectionPool extends Setup1D1N {
    * Test a sequence of {@link JPPFConnectionPool#setSize(int)} calls.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 30000)
+  @Test(timeout = 10000)
   public void testSetPoolSizeByAPI() throws Exception {
     client = BaseSetup.createClient(null, false);
     try {
@@ -129,13 +129,10 @@ public class TestConnectionPool extends Setup1D1N {
    */
   private void configure(final int localThreads) {
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.load.balancing.algorithm", "proportional");
-    config.setProperty("jppf.load.balancing.profile", "test");
-    config.setInt("jppf.load.balancing.profile.test.initialSize", 10);
-    config.setInt("jppf.pool.size", 2);
+    config.setString("jppf.load.balancing.algorithm", "proportional").setString("jppf.load.balancing.profile", "test")
+      .setInt("jppf.load.balancing.profile.test.initialSize", 10).setInt("jppf.pool.size", 2);
     if (localThreads > 0) {
-      config.setBoolean("jppf.local.execution.enabled", true);
-      config.setInt("jppf.local.execution.threads", localThreads);
+      config.setBoolean("jppf.local.execution.enabled", true).setInt("jppf.local.execution.threads", localThreads);
     }
   }
 

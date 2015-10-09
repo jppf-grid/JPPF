@@ -79,9 +79,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified String value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setString(final String key, final String value) {
+  public TypedProperties setString(final String key, final String value) {
     setProperty(key, value);
+    return this;
   }
 
   /**
@@ -120,9 +122,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified int value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setInt(final String key, final int value) {
+  public TypedProperties setInt(final String key, final int value) {
     setProperty(key, Integer.toString(value));
+    return this;
   }
 
   /**
@@ -161,9 +165,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified long value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setLong(final String key, final long value) {
+  public TypedProperties setLong(final String key, final long value) {
     setProperty(key, Long.toString(value));
+    return this;
   }
 
   /**
@@ -197,9 +203,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified float value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setFloat(final String key, final float value) {
+  public TypedProperties setFloat(final String key, final float value) {
     setProperty(key, Float.toString(value));
+    return this;
   }
 
   /**
@@ -234,9 +242,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified double value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setDouble(final String key, final double value) {
+  public TypedProperties setDouble(final String key, final double value) {
     setProperty(key, Double.toString(value));
+    return this;
   }
 
   /**
@@ -266,9 +276,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified boolean value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setBoolean(final String key, final boolean value) {
+  public TypedProperties setBoolean(final String key, final boolean value) {
     setProperty(key, Boolean.toString(value));
+    return this;
   }
 
   /**
@@ -299,9 +311,11 @@ public class TypedProperties extends Properties {
    * Set a property with the specified char value.
    * @param key the name of the property to set.
    * @param value the value to set on the property.
+   * @return this {@code TypedProperties} object.
    */
-  public void setChar(final String key, final char value) {
+  public TypedProperties setChar(final String key, final char value) {
     setProperty(key, Character.toString(value));
+    return this;
   }
 
   /**
@@ -328,9 +342,11 @@ public class TypedProperties extends Properties {
    * Set the value of the specified property as a {@link File}.
    * @param key the name of the property to look up.
    * @param value the file whose path to set as the property value.
+   * @return this {@code TypedProperties} object.
    */
-  public void setFile(final String key, final File value) {
+  public TypedProperties setFile(final String key, final File value) {
     if (value != null) setProperty(key, value.getPath());
+    return this;
   }
 
   /**

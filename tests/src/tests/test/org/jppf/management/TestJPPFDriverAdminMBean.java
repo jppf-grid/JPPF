@@ -217,12 +217,12 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       assertNotNull(driver);
       oldLbi = driver.loadBalancerInformation();
       TypedProperties newConfig = new TypedProperties();
-      newConfig.setProperty("size", "5");
-      newConfig.setProperty("minSamplesToAnalyse", "100");
-      newConfig.setProperty("minSamplesToCheckConvergence", "50");
-      newConfig.setProperty("maxDeviation", "0.2");
-      newConfig.setProperty("maxGuessToStable", "50");
-      newConfig.setProperty("decreaseRatio", "0.2");
+      newConfig.setInt("size", 5)
+        .setInt("minSamplesToAnalyse", 100)
+        .setInt("minSamplesToCheckConvergence", 50)
+        .setDouble("maxDeviation", 0.2d)
+        .setInt("maxGuessToStable", 50)
+        .setDouble("decreaseRatio", 0.2d);
       driver.changeLoadBalancerSettings("autotuned", newConfig);
       LoadBalancingInformation lbi = driver.loadBalancerInformation();
       assertEquals(lbi.getAlgorithm(), "autotuned");
