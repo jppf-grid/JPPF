@@ -19,6 +19,7 @@
 package sample.test.deadlock;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.client.event.JobEvent;
 import org.jppf.client.utils.AbstractJPPFJobStream;
 
 /**
@@ -27,9 +28,13 @@ import org.jppf.client.utils.AbstractJPPFJobStream;
  */
 public class JobStreamImpl extends AbstractJPPFJobStream {
   /**
-   * 
+   *
    */
-  private final RunOptions options;
+  final RunOptions options;
+  /**
+   * Whether this job stream is stopped.
+   */
+  boolean stopped = false;
 
   /**
    * Initialize this job provider.
@@ -42,14 +47,14 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
 
   @Override
   public boolean hasNext() {
-    return getJobCount() < options.nbJobs;
+    return !isStopped() && (getJobCount() < options.nbJobs);
   }
 
   @Override
   protected JPPFJob createNextJob() {
     JPPFJob job = new JPPFJob();
     job.setName("streaming job " + getJobCount());
-    if (options.jobCreationCallback != null) options.jobCreationCallback.jobCreated(job);
+    if (options.callback != null) options.callback.jobCreated(job);
     try {
       for (int i=1; i<=options.tasksPerJob; i++) {
         String message = "this is task " + i;
@@ -70,5 +75,27 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
   @Override
   protected void processResults(final JPPFJob job) {
     DeadlockRunner.processResults(job);
+  }
+
+  /**
+   * Check whether this job stream is stopped.
+   * @return {@code true} if the job stream has stopped, {@code false} otherwise.
+   */
+  public synchronized boolean isStopped() {
+    return stopped;
+  }
+
+  /**
+   * Specify whether this job stream is to be stopped.
+   * @param stopped {{@code true} if the job stream must be stopped, {@code false} otherwise.
+   */
+  public synchronized void setStopped(final boolean stopped) {
+    this.stopped = stopped;
+  }
+
+  @Override
+  public void jobEnded(final JobEvent event) {
+    super.jobEnded(event);
+    if (options.callback != null) options.callback.jobCompleted(event.getJob(), this);
   }
 }

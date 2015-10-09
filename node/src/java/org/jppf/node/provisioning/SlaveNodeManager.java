@@ -281,7 +281,12 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    */
   public static void handleStartup() {
     int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
-    if (n > 0) INSTANCE.shrinkOrGrowSlaves(n, true, null);
+    if (n > 0) {
+      String msg = "starting " + n + " slave nodes";
+      log.info(msg);
+      System.out.println(msg);
+      INSTANCE.shrinkOrGrowSlaves(n, true, null);
+    }
   }
 
   /**

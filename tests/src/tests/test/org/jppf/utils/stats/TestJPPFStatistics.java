@@ -104,11 +104,13 @@ public class TestJPPFStatistics extends Setup1D1N1C
   @Test(timeout=10000)
   public void testTaskAndJobCountUponClientCloseWithoutCancel() throws Exception {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+    long duration = 3000L;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, duration);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(false);
     client.submitJob(job);
+    long start = System.nanoTime();
     Thread.sleep(1000L);
     try {
       client.close();
@@ -116,6 +118,10 @@ public class TestJPPFStatistics extends Setup1D1N1C
       client = BaseSetup.createClient(null);
     }
     jmx = BaseSetup.getJMXConnection();
+    long elapsed = (System.nanoTime() - start) / 1_000_000L;
+    long waitTime = duration - elapsed + 500L;
+    // make sure the job has time to complete
+    if (waitTime > 0L) Thread.sleep(waitTime);
     BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
   }
 

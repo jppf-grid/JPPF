@@ -47,7 +47,11 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   /**
    * A counter for the total number of submitted jobs.
    */
-  private int jobCount = 0;
+  private int submittedJobCount = 0;
+  /**
+   * A counter for the total number of completed jobs.
+   */
+  private int executedJobCount = 0;
   /**
    * A counter for the total number of submitted tasks.
    */
@@ -96,7 +100,7 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   private JPPFJob buildJob() {
     JPPFJob job = createNextJob();
     if ((job == null) || job.getJobTasks().isEmpty()) return null;
-    jobCount++;
+    submittedJobCount++;
     taskCount += job.getJobTasks().size();
     job.setBlocking(false);
     job.addJobListener(this);
@@ -132,9 +136,9 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   @Override
   public void jobEnded(final JobEvent event) {
     synchronized(this) {
-      // decrease the counter of running jobs
-      // and notify all threads waiting in next()
+      // decrease the counter of running jobs and notify all threads waiting in next()
       currentNbJobs--;
+      executedJobCount++;
       notifyAll();
     }
     // process the results asynchronously
@@ -172,16 +176,24 @@ public abstract class AbstractJPPFJobStream extends JobListenerAdapter implement
   }
 
   /**
-   * Get the number of executed jobs.
-   * @return the count of executed jobs.
+   * Get the number of submitted jobs.
+   * @return the count of submitted jobs.
    */
   public synchronized int getJobCount() {
-    return jobCount;
+    return submittedJobCount;
   }
 
   /**
-   * Get the number of executed task.
-   * @return the count of executed tasks.
+   * Get the number of completed jobs.
+   * @return the count of completed jobs.
+   */
+  public synchronized int getExecutedJobCount() {
+    return executedJobCount;
+  }
+
+  /**
+   * Get the number of submitted task.
+   * @return the count of submitted tasks.
    */
   public synchronized int getTaskCount() {
     return taskCount;

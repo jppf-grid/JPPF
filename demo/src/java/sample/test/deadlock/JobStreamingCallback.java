@@ -25,10 +25,30 @@ import org.jppf.client.JPPFJob;
  * This allows to configure the job, by changing the SLA and other parameters.
  * @author Laurent Cohen
  */
-public interface JobCreationCallback {
+public interface JobStreamingCallback {
   /**
    * Called when a job is created.
    * @param job the created job.
    */
   void jobCreated(JPPFJob job);
+
+  /**
+   * Called when a job has completed.
+   * @param job the job that completed.
+   * @param jobStream the job stream that submitted the job.
+   */
+  void jobCompleted(JPPFJob job, JobStreamImpl jobStream);
+
+  /**
+   *
+   */
+  public static class Adapter implements JobStreamingCallback {
+    @Override
+    public void jobCreated(final JPPFJob job) {
+    }
+
+    @Override
+    public void jobCompleted(final JPPFJob job, final JobStreamImpl jobStream) {
+    }
+  }
 }

@@ -3,5 +3,5 @@
 <!-- The English langpack -->
 
 <langpack>
-	<str id="installer.reversetitle" txt="$APP_NAME $APP_VER - Installation Wizard"/>
+  <str id="installer.reversetitle" txt="$APP_NAME $APP_VER - Installation Wizard"/>
 </langpack>

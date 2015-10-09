@@ -18,25 +18,29 @@
 
 package org.jppf.utils.stats;
 
+import org.slf4j.*;
+
 /**
  * In this implementation, {@code getLatest()} is computed as the cumulated sum of all values added to the snapshot.
  * If values are only added, and not removed, then it will always return the same value as getTotal().
  * @author Laurent Cohen
  */
-public class CumulativeSnapshot extends AbstractJPPFSnapshot
-{
+public class CumulativeSnapshot extends AbstractJPPFSnapshot {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(CumulativeSnapshot.class);
 
   /**
    * Initialize this snapshot with a specified title.
    * @param label the title for this snapshot.
    * @exclude
    */
-  public CumulativeSnapshot(final String label)
-  {
+  public CumulativeSnapshot(final String label) {
     super(label);
   }
 
@@ -45,12 +49,11 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void addValues(final double accumulatedValues, final long count)
-  {
+  public synchronized void addValues(final double accumulatedValues, final long count) {
     total += accumulatedValues;
-    if (count > 0L)
-    {
+    if (count > 0L) {
       valueCount += count;
+      //if (label == JPPFStatisticsHelper.TASK_QUEUE_COUNT) log.info(String.format("latest=%5d; adding %4d; new value=%5d", (long) latest, (long) accumulatedValues, (long) (latest + accumulatedValues)));
       latest += accumulatedValues;
       if (latest > max) max = latest;
       if (latest < min) min = latest;
@@ -63,8 +66,7 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void assignLatestToMax()
-  {
+  public synchronized void assignLatestToMax() {
     max = latest;
     total = latest;
     valueCount = 1L;
@@ -77,8 +79,7 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
-  public JPPFSnapshot copy()
-  {
+  public JPPFSnapshot copy() {
     return copy(new CumulativeSnapshot(getLabel()));
   }
 }

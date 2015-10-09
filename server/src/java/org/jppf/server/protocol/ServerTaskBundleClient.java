@@ -116,25 +116,27 @@ public class ServerTaskBundleClient {
     if (job == null) throw new IllegalArgumentException("job is null");
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
-    int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
-    int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
     this.dataProvider = dataProvider;
-    int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();
-    for (int index = 0; index < taskList.size(); index++) {
-      DataLocation dataLocation = taskList.get(index);
-      int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
-      int maxResubmitCount = (maxResubmits == null) || (index > maxResubmits.length - 1) ? -1 : maxResubmits[index];
-      if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
-      ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
-      if (dataLocation == null) {
-        nullTasks.add(task);
-        task.resultReceived(task.getInitialTask());
-      } else {
-        this.taskList.add(task);
+    if (!job.isHandshake()) {
+      int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
+      int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
+      int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();
+      for (int index = 0; index < taskList.size(); index++) {
+        DataLocation dataLocation = taskList.get(index);
+        int pos = (positions == null) || (index > positions.length - 1) ? -1 : positions[index];
+        int maxResubmitCount = (maxResubmits == null) || (index > maxResubmits.length - 1) ? -1 : maxResubmits[index];
+        if ((maxResubmitCount < 0) && (slaMaxResubmits >= 0)) maxResubmitCount = slaMaxResubmits;
+        ServerTask task = new ServerTask(this, dataLocation, pos, maxResubmitCount);
+        if (dataLocation == null) {
+          nullTasks.add(task);
+          task.resultReceived(task.getInitialTask());
+        } else {
+          this.taskList.add(task);
+        }
       }
-    }
-    this.pendingTasksCount.set(this.taskList.size() + nullTasks.size());
-    this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
+      this.pendingTasksCount.set(this.taskList.size() + nullTasks.size());
+      this.strategy = SendResultsStrategyManager.getStrategy(job.getSLA().getResultsStrategy());
+    } else this.strategy = SendResultsStrategyManager.getStrategy(null);
   }
 
   /**

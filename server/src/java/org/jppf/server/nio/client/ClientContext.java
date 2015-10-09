@@ -22,6 +22,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.*;
 
 import org.jppf.io.*;
 import org.jppf.nio.*;
@@ -96,28 +97,30 @@ public class ClientContext extends AbstractNioContext<ClientState> {
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception e) {
-    ClientNioServer.closeClient(channel);
-    if (uuid != null) {
-      ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
-      List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
-      String s = getClass().getSimpleName() + '[' + "channelId=" + channel.getId() + ']'; 
-      if (debugEnabled) log.debug("{} found {} provider connections for clientUuid={}", new Object[] {s, list == null ? 0 : list.size(), uuid});
-      if ((list != null) && !list.isEmpty()) {
-        for (ChannelWrapper<?> classChannel: list) {
-          ClientClassContext ctx = (ClientClassContext) classChannel.getContext();
-          if (ctx.getConnectionUuid().equals(connectionUuid)) {
-            if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
-            try {
-              ClientClassNioServer.closeConnection(classChannel, false);
-            } catch (Exception e2) {
-              log.error(e2.getMessage(), e2);
+    if (getClosed().compareAndSet(false, true)) {
+      ClientNioServer.closeClient(channel);
+      if (uuid != null) {
+        ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
+        List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
+        String s = getClass().getSimpleName() + '[' + "channelId=" + channel.getId() + ']'; 
+        if (debugEnabled) log.debug("{} found {} provider connections for clientUuid={}", new Object[] {s, list == null ? 0 : list.size(), uuid});
+        if ((list != null) && !list.isEmpty()) {
+          for (ChannelWrapper<?> classChannel: list) {
+            ClientClassContext ctx = (ClientClassContext) classChannel.getContext();
+            if (ctx.getConnectionUuid().equals(connectionUuid)) {
+              if (debugEnabled) log.debug("{} found provider connection with connectionUuid={} : {}", new Object[] {s, connectionUuid, ctx});
+              try {
+                ClientClassNioServer.closeConnection(classChannel, false);
+              } catch (Exception e2) {
+                log.error(e2.getMessage(), e2);
+              }
+              break;
             }
-            break;
           }
         }
       }
+      cancelJobOnClose();
     }
-    cancelJobOnClose();
   }
 
   /**
@@ -252,14 +255,20 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   /**
    * Send the job ended notification.
    */
-  void cancelJobOnClose() {
+  synchronized void cancelJobOnClose() {
     ServerTaskBundleClient clientBundle;
-    if ((clientBundle = getInitialBundleWrapper()) != null) {
+    int count = 0;
+    int pendingCount = 0;
+    int nbTasksToSend = this.nbTasksToSend;
+    int n = 0;
+    for (ServerTaskBundleClient bundle: completedBundles) {
+      count += bundle.getTaskCount();
+      pendingCount += bundle.getPendingTasksCount();
+    }
+    if (((clientBundle = getInitialBundleWrapper()) != null) && (getState() != ClientState.SENDING_RESULTS)) {
       TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
-        int pending = getNbTasksToSend(); // number of non-completed tasks
-        int n = 0;
         ServerJob job = ((JPPFPriorityQueue) driver.getQueue()).getJob(clientBundle.getUuid());
         if (job != null) {
           // count the tasks from the client bundle that are dispatched to nodes
@@ -269,15 +278,18 @@ public class ClientContext extends AbstractNioContext<ClientState> {
             }
           }
         }
-        if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {pending, n, job});
+        if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {nbTasksToSend, n, job});
+        JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+        stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, n - nbTasksToSend);
         clientBundle.cancel();
         clientBundle.bundleEnded();
         setInitialBundleWrapper(null);
-        JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
-        stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -pending + n);
       }
     }
-    else if (debugEnabled) log.debug("getInitialBundleWrapper() is null for {}", this);
+    /*
+    log.info(String.format("null initial bundle; count=%4d; pendingCount=%4d; nbTasksToSend=%4d; n=%4d; connectionUuid=%s; state=%s",
+      count, pendingCount, nbTasksToSend, n, connectionUuid, getState()));
+    */
   }
 
   /**
@@ -339,5 +351,13 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       long n = message.getChannelCount();
       if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : CLIENT_OUT_TRAFFIC, n);
     }
+  }
+
+  /**
+   * Get the closed flag for this client context.
+   * @return an {@link AtomicBoolean}.
+   */
+  AtomicBoolean getClosed() {
+    return closed;
   }
 }

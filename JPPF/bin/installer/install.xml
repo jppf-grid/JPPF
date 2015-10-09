@@ -8,7 +8,7 @@
     <authors>
       <author name="The JPPF Team" email=""/>
     </authors>
-		<!--<url>http://www.jppf.org</url>-->
+    <!--<url>http://www.jppf.org</url>-->
     <url>@{installer.url}</url>
     <javaversion>1.5</javaversion>
     <webdir>@{jppf.web.dir}</webdir>

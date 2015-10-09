@@ -6,8 +6,8 @@ pre .typ, code .typ { color: #0060DF; font-weight: bold }
 pre .lit, code .lit { color: #2F2F2F }
 pre .pun, code .pun { color: red }
 pre .pln, code .pln { color: black }
-/*pre .tag, code .tag { color: #0080FF; } #2B2BAD  #A8372F */
-pre .tag, code .tag { color: #88170F; font-weight: bold }
+/*pre .tag, code .tag { color: #88170F; font-weight: bold }*/
+pre .tag, code .tag { color: #2D3876; font-weight: bold }
 pre .htm, code .htm { color: #dda0dd }
 pre .xsl, code .xsl { color: #d0a0d0 }
 pre .atn, code .atn { color: #0000FF }

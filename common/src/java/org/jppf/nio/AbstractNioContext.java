@@ -18,6 +18,8 @@
 
 package org.jppf.nio;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Context associated with an open communication channel.
  * @param <S> the type of states associated with this context.
@@ -60,6 +62,10 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
    * Whether this context is enabled.
    */
   protected boolean enabled = true;
+  /**
+   * Whether this context has been closed.
+   */
+  protected final AtomicBoolean closed = new AtomicBoolean(false);
 
   @Override
   public S getState() {
@@ -201,5 +207,21 @@ public abstract class AbstractNioContext<S extends Enum<S>> implements NioContex
   @Override
   public void setEnabled(final boolean enabled) {
     this.enabled = enabled;
+  }
+
+  /**
+   * Determine whether this channel has been closed.
+   * @return {@code true} if this channel has been closed, {@code false} otherwise.
+   */
+  public boolean isClosed() {
+    return closed.get();
+  }
+
+  /**
+   * Specify whether this channel has been closed.
+   * @param closed {@code true} if this channel has been closed, {@code false} otherwise.
+   */
+  public void setClosed(final boolean closed) {
+    this.closed.set(closed);
   }
 }

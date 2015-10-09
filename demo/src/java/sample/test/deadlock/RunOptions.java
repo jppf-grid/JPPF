@@ -80,5 +80,5 @@ public class RunOptions {
   /**
    * Callback invoked when a job is created by the job streaming pattern.
    */
-  public JobCreationCallback jobCreationCallback;
+  public JobStreamingCallback callback;
 }

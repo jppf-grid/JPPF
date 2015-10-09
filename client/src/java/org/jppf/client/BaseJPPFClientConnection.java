@@ -190,6 +190,8 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setHandshake(true);
     header.setUuid(header.getName());
     header.setParameter("connection.uuid", connectionUuid);
+    header.setSLA(null);
+    header.setMetadata(null);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser); // null data provider
@@ -212,6 +214,8 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     header.setUuid("close command job");
     header.setParameter("connection.uuid", connectionUuid);
     header.setParameter(BundleParameter.CLOSE_COMMAND, true);
+    header.setSLA(null);
+    header.setMetadata(null);
     SocketWrapper socketClient = taskServerConnection.getSocketClient();
     if (socketClient != null) {
       IOHelper.sendData(socketClient, header, ser);

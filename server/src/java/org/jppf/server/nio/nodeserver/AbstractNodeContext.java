@@ -104,10 +104,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Execution status for the node.
    */
   protected ExecutorStatus executionStatus = ExecutorStatus.DISABLED;
-  /**
-   * Whether this context has been closed.
-   */
-  protected final AtomicBoolean closed = new AtomicBoolean(false);
 
   /**
    * Initialized abstract node context.
@@ -548,13 +544,5 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void unclose() {
     closed.set(false);
-  }
-
-  /**
-   * Determine whether this channel has been closed.
-   * @return {@code true} if this channel has been closed, {@code false} otherwise.
-   */
-  boolean isClosed() {
-    return closed.get();
   }
 }

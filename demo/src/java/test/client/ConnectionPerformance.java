@@ -41,7 +41,6 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
    * @throws Throwable .
    */
   public static void main(final String[] args) throws Throwable {
-    start();
     long start = System.nanoTime();
     try (JPPFClient client = new JPPFClient(new ConnectionPerformance())) {
       client.awaitActiveConnectionPool();
@@ -52,19 +51,6 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
     }
     StreamUtils.waitKeyPressed();
     //Thread.sleep(10000L);
-    stop();
-  }
-
-  /**
-   * 
-   */
-  public static void start() {
-  }
-
-  /**
-   * 
-   */
-  public static void stop() {
   }
 
   @Override
@@ -80,13 +66,9 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
     }
     long elapsed = (time - info.lastStatusTime) / 1_000_000L;
     info.lastStatusTime = time;
-    if (status == JPPFClientConnectionStatus.ACTIVE) {
-      System.out.printf("connection %s connected in %,d ms%n", connection, elapsed);
-    } else if (status != JPPFClientConnectionStatus.NEW) {
-      System.out.printf("connection %s time since previous status: %,d ms%n", connection, elapsed);
-    } else {
-      System.out.printf("connection status change for %s%n", connection);
-    }
+    if (status == JPPFClientConnectionStatus.ACTIVE) System.out.printf("connection %s connected in %,d ms%n", connection, elapsed);
+    else if (status != JPPFClientConnectionStatus.NEW) System.out.printf("connection %s time since previous status: %,d ms%n", connection, elapsed);
+    else System.out.printf("connection status change for %s%n", connection);
   }
 
   @Override
@@ -99,17 +81,11 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
     event.getConnection().removeClientConnectionStatusListener(this);
   }
 
-  /**
-   *
-   */
+  /** */
   private static class ConnectionInfo {
-    /**
-     * 
-     */
+    /** */
     public JPPFClientConnection connection;
-    /**
-     * 
-     */
+    /** */
     public long lastStatusTime = 0L;
   }
 }
