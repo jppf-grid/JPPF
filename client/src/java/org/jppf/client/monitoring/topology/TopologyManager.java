@@ -33,10 +33,6 @@ import org.slf4j.*;
  */
 public class TopologyManager extends ConnectionPoolListenerAdapter {
   /**
-   * The drivers in the topology.
-   */
-  private final List<TopologyDriver> drivers = new CopyOnWriteArrayList<>();
-  /**
    * Logger for this class.
    */
   static Logger log = LoggerFactory.getLogger(TopologyManager.class);
@@ -210,7 +206,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @return the number of drivers.
    */
   public int getDriverCount() {
-    return drivers.size();
+    return driverMap.size();
   }
 
   /**
