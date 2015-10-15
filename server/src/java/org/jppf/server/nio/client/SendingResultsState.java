@@ -23,8 +23,6 @@ import static org.jppf.server.nio.client.ClientTransition.*;
 import java.net.ConnectException;
 
 import org.jppf.nio.ChannelWrapper;
-import org.jppf.server.JPPFDriver;
-import org.jppf.server.debug.DebugHelper;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -82,7 +80,6 @@ class SendingResultsState extends ClientServerState {
           if (debugEnabled) log.debug("*** client bundle ended " + context.getInitialBundleWrapper());
           context.jobEnded();
           context.setInitialBundleWrapper(null);
-          if (JPPFDriver.JPPF_DEBUG) DebugHelper.clearResults(clientBundle.getUuid());
           return TO_WAITING_JOB;
         }
         return TO_IDLE;

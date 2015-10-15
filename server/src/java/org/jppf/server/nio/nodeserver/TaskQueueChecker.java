@@ -29,8 +29,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.node.provisioning.NodeProvisioningConstants;
-import org.jppf.server.*;
-import org.jppf.server.debug.DebugHelper;
+import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
@@ -254,14 +253,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
                   continue;
                 }
                 nodeBundle = prepareJobDispatch(channel, serverJob);
-                if (JPPFDriver.JPPF_DEBUG) {
-                  List<ServerTask> list = DebugHelper.checkResults(serverJob.getUuid(), nodeBundle.getTaskList());
-                  if (list != null) {
-                    List<Integer> positions = new ArrayList<>(list.size());
-                    for (ServerTask task: list) positions.add(task.getJobPosition());
-                    log.warn(String.format("***** duplicate results for %s, positions : %s, channel=%s", nodeBundle, positions, channel));
-                  }
-                }
                 if (debugEnabled) log.debug("prepareJobDispatch() returned {}", nodeBundle);
                 if (nodeBundle != null) {
                   try {
