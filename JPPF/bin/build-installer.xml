@@ -33,6 +33,13 @@
   <target name="installer.local" depends="installer.check.izpack.present" if="izpack.present">
     <property name="jppf.web.dir" value="http://localhost:8880/download/${version.number}"/>
     <installer.package url="http://localhost:8880/" />
+    <local name="local.inst.dir"/>
+    <property name="local.inst.dir" value="${home}/download/${version.number}"/>
+    <delete dir="${local.inst.dir}" quiet="true"/>
+    <mkdir dir="${local.inst.dir}"/>
+    <copy todir="${local.inst.dir}">
+      <fileset dir="${build}/web_installer"/>
+    </copy>
   </target>
 
   <target name="installer.check.izpack.present">

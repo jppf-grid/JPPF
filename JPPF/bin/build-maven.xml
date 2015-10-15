@@ -86,7 +86,7 @@
         <link href="https://docs.oracle.com/javase/7/docs/api/"/>
         <link href="https://docs.oracle.com/javaee/6/api/"/>
         <link href="http://xstream.codehaus.org/javadoc"/>
-        <link href="http://www.jppf.org/api-3"/>
+        <link href="http://www.jppf.org/api-5"/>
         <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
         <header><![CDATA[<table><tr><td valign="center">
             <a href="http://www.jppf.org" target="_top"><img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>

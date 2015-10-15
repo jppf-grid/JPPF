@@ -46,10 +46,6 @@
   <property name="data"                  value="${basedir}/data"/>  
   <property name="config"                value="${basedir}/config"/>  
   <property name="build"                 value="${basedir}/build"/>  
-  <property name="deploy"                value="${build}/deploy"/>  
-  <property name="deploy.lib"            value="${deploy}/lib"/>
-  <property name="deploy.build"          value="${deploy}/build"/>
-  <property name="deploy.config"         value="${deploy}/config"/>  
   <property name="classes"               value="${build}/classes"/>
   <property name="src"                   value="${basedir}/src"/>
   <property name="lib"                   value="${basedir}/lib"/>
@@ -103,12 +99,6 @@
   </target>
 
   <target name="clean.all" depends="clean.deploy">
-    <delete quiet="true">
-      <fileset dir="${build}">
-        <include name="*.zip"/>
-        <exclude name="*${app.ver}*.zip"/>
-      </fileset>
-    </delete>
     <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
     <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
@@ -118,8 +108,14 @@
     <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
   </target>               
 
-  <target name="clean.deploy">
-    <delete dir="${deploy}" quiet="true"/>
+  <target name="clean.deploy" description="clean.deploy">
+    <echo message="app.ver = ${app.ver}"/>
+    <delete quiet="true">
+      <fileset dir="${build}">
+        <include name="*.zip"/>
+        <exclude name="*${app.ver}*.zip"/>
+      </fileset>
+    </delete>
     <delete dir="${runtime}" quiet="true"/>
   </target>               
 
