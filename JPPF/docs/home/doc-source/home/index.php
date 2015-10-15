@@ -9,16 +9,16 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script src="scripts/jppf.js"></script>
   <br>
   <div class="blockWithHighlightedTitle" style="height: 163px">
-  <div style="vertical-align: middle; height: 150px; width: 750px">
-    <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px">
-      <div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_02.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_03.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_04.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_05.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_06.gif" border="0" alt="JPPF"/></div>
+    <div style="vertical-align: middle; height: 150px; width: 750px">
+      <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px">
+        <div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_02.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_03.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_04.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_05.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_06.gif" border="0" alt="JPPF"/></div>
+      </div>
     </div>
-  </div>
   </div>
   <div id="slidetabs" align="center">
     <a href="#"></a>

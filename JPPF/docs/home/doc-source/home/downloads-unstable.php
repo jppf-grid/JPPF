@@ -23,7 +23,10 @@ $template{name="about-page-header" title="Downloads - unstable"}$
       <h3>Android Node</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a><br>
-      <p><div>You may also <a class="yellow_highlight" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">Download the node APK to a device</a></div><p>
+      You may also download the node APK directly to a device:<br><br>
+      <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
+        <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;&nbsp;Download the node APK</span>
+      </a><br><div style="height: 15px"></div>
 
       <h3>Source code and documentation</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>

@@ -72,8 +72,11 @@ $template{name="about-page-header" title="Features"}$
 
     <br><div class="blockWithHighlightedTitle">
     <a name="feat09"></a>
-    $template{name="title-with-icon" img="images/icons/integration.png" title=".Net and J2EE integration" heading="h4"}$
-    <p>Specialized client implementations bring JPPF grids to the <a href="/doc/v5/index.php?title=.Net_Bridge">.Net</a> and <a href="/doc/v5/index.php?title=J2EE_Connector">J2EE</a> worlds. Write your jobs in any .Net language and execute them on .Net-enabled JPPF nodes.
+    $template{name="title-with-icon" img="images/icons/integration.png" title=Android, "Android, .Net and J2EE integration" heading="h4"}$
+    <p>
+    Specialized client and node implementations bring JPPF grids to the <a href="/doc/v5/index.php?title=Android_Node">Android</a>, <a href="/doc/v5/index.php?title=.Net_Bridge">.Net</a> and <a href="/doc/v5/index.php?title=J2EE_Connector">J2EE</a> worlds.
+    Open up your grid implementation to the world of Android mobile devices.
+    Write your jobs in any .Net language and execute them on .Net-enabled JPPF nodes.
     Use JPPF services from JEE enterprise applications or wrap them as Web or REST services. Make interoperability an operational reality.
     <br></div>
 

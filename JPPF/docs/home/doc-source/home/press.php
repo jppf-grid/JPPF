@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="5.0" ?>
+<?php $jppfVersion="5.1" ?>
 $template{name="about-page-header" title="Press Kit"}$
 
 <div align="justify">
@@ -25,55 +25,49 @@ $template{name="about-page-header" title="Press Kit"}$
 <!-- ============================== -->
 $template{name="title-with-icon" img="images/icons/news.png" title="Press release: JPPF <?php echo $jppfVersion ?>" heading="h3"}$
 
-<p><b>.Net integration</b>: the main focus of this release, the <a href="/doc/v5/index.php?title=.Net_Bridge">.Net bridge</a> for JPPF brings JPPF grids to the .Net world.
+<p><b>Android integration</b>
+<p>The main focus of this release, the <a href="/doc/v5/index.php?title=Android_Node">Android node</a> for JPPF, enables execution of Java or Android workloads on Android devices.
 <ul class="samplesList">
-  <li>Submit pure .Net workloads and execute them on .Net-capable JPPF nodes</li>
-  <li>The .Net <a href="/doc/v5/index.php?title=Using_the_JPPF_.Net_API">client API</a> is almost identical to the Java API</li>
-  <li>Includes full <a href="/doc/v5/index.php?title=Management_and_monitoring_from_.Net">grid management and monitoring features</a></li>
-  <li>.Net and Java clients can mix freely in the same grid</li>
+  <li>Execute <a href="/doc/v5/index.php?title=Android_Node#Creating_and_submitting_jobs">arbitrary Java workloads</a> on Android Kitkat or later devices</li>
+  <li><a href="/doc/v5/index.php?title=Android_Node#Getting_and_providing_feedback_from_the_node_and_tasks.">customize the visual feedback</a> on the device based on tasks notifications and node events</li>
+  <li>Secure all operations with <a href="/doc/v5/index.php?title=Android_Node#Using_SSL_.2F_TLS">dedicated SSL/TLS settings</a></li>
+  <li>Includes a dedicated demo that works with the <a href="/samples-pack/Fractals/Readme.php">Mandelbrot fractal sample</a></li>
+  <li><a href="/samples-pack/AndroidDemo/Readme.php">Dedicated sample</a> illustrating how to package a Java workload for execution on Android</li>
 </ul>
 
-<p><b>Administration console extensions</b>:
+<p><b>Client-side Job monitoring API</b>
+<p>A new <a href="/doc/v5/index.php?title=Job_monitoring_API">job monitoring API</a>, which builds on, and complements, the <a href="/doc/v5/index.php?title=Grid_topology_monitoring">topology monitoring</a>, provides an automatically updated view of the jobs hierarchy by server / jobs / node dispatches.
 <ul class="samplesList">
-  <li>new extension point: add your own <a href="/doc/v5/index.php?title=Pluggable_views">pluggable view</a> to the administration tool.
-  A new sample <a href="/samples-pack/PluggableView/Readme.php">"topology event log"</a> is provided to showcase this feature.</li>
-  <li>any built-in view <a href="/doc/v5/index.php?title=Hiding_built-in_views">can be hidden</a> at will</li>
-  <li>the administration console can be <a href="/doc/v5/index.php?title=Embedding_the_administration_console">embedded</a> in any other Swing application</li>
-  <li>the columns in all tree views can now be <a href="/screenshots.php?screenshot=VisibleColumns.gif&shotTitle=Visible Columns">switched from visible to hidden</a> on demand</li>
-  <li>ability to <a href="/screenshots.php?screenshot=ExportConsoleSettings.gif&shotTitle=Export Console Settings">import/export the console settings</a>, including window size and location, value of persistent fields, tree columns' hidden state and width, charts definitions</li>
-  <li>new <a href="/screenshots.php?screenshot=Charts-02.gif&shotTitle=Charts 02">charts types and fields</a> are now available for built-in and user-defined charts</li>
-  <li>the console was refactored to use more consistent code and APIs. In particular, it is now based on the new <a href="/doc/v5/index.php?title=Grid_topology_monitoring">grid topology monitoring</a> API</li>
+  <li>Navigate and manipulate the <a href="/doc/v5/index.php?title=Job_monitoring_API#Job_monitor_and_jobs_hierarchy">job hierarchy</a></li>
+  <li>Receive <a href="/doc/v5/index.php?title=Job_monitoring_API#Receiving_job_monitoring_events">notifications</a> of job events</li>
+  <li>Configure the <a href="/doc/v5/index.php?title=Job_monitoring_API#Update_modes">granularity and frequency of updates</a> for an optimal tradeoff between accuracy and performance</li>
+  <li>The administration console's code was refactored to use the job monitoring API, with update mode settings in its <a href="/doc/v5/index.php?title=Client_and_administration_console_configuration#UI_refresh_intervals_in_the_administration_tool">configuration</a></li>
 </ul>
 
-<p><b>New APIs</b>:
+<p><b>Management and monitoring</b>
 <ul class="samplesList">
-  <li>A new <a href="/doc/v5/index.php?title=Grid_topology_monitoring">grid topology monitoring</a> API was added, enabling developers to programmatically browse the JPPF topology and receive notifications of any change. This is also the API the administration console is based on</li>
-  <li>New and convenient methods were added to easily explore the client <a href="/doc/v5/index.php?title=Connection_pools#Exploring_the_connections_in_a_pool">connections pools</a> and obtain connection objects</li>
-  <li>Execution policies now have access to <a href="/doc/v5/index.php?title=Execution_Policies#Execution_policy_context">contextual information</a> during their evaluation</li>
-  <li>Connection pools defined in the configuration can now <a href="/doc/v5/index.php?title=Configuring_SSL/TLS_communications#In_the_clients">indivdually specify</a> whether secure connections should be used</li>
-  <li>A <a href="/doc/v5/index.php?title=Submitting_multiple_jobs_concurrently#The_AbstractJPPFJobStream_helper_class">new helper class</a> is provided to facilitate the implemetntation of job streaming patterns</li>
+  <li>Job monitoring and management operations now accept a <a href="/doc/v5/index.php?title=Server_management#Job_selectors">job selector</a> parameter, allowing bulk operations with fine-grained filtering</li>
+  <li>It is now possible to dynamically <a href="/doc/v5/index.php?title=Server_management#Updating_the_job_SLA_and_metadata">update the SLA and metadata</a> of a job, even while it is executing</li>
+  <li>Node connection events can now be received as remote <a href="/doc/v5/index.php?title=Receiving_node_connection_events_in_the_server#JMX_notifications">JMX notifications</a></li>
+  <li>The <a href="/api-5/index.html?org/jppf/management/forwarding/JPPFNodeForwardingMBean.html">node forwarding MBean</a> now has dedicated methods for node provisioning, providing a much less cumbersome API</li>
 </ul>
 
-<p><b>Server extensions and improvements</b>:
+<p><b>Server extensions and improvements</b>
 <ul class="samplesList">
-  <li>It is now possible to <a href="/doc/v5/index.php?title=Receiving_the_status_of_tasks_returning_from_the_nodes">receive the status of tasks</a> returning from the nodes with fine details</li>
-  <li>The thread pool management was refactored, resulting in many less threads created and increased scalability</li>
+  <li>It is now possible to receive notifications of <a href="/doc/v5/index.php?title=Receiving_the_status_of_tasks_dispatched_to_or_returned_from_the_nodes">tasks status at dispatch time</a> in the server</li>
+  <li>Servers are now notified in real time of node connection events in other servers, and may decide to <a href="/doc/v5/index.php?title=Configuring_a_JPPF_server#Orphan_servers">exclude orphan servers</a> from job scheduling</li>
 </ul>
 
-<p><b>Management and monitoring</b>:
+<p><b>Other enhancements</b>
 <ul class="samplesList">
-  <li>server monitoring: all MBean methods getting information on the nodes now accept a NodeSelector parameter to provide fine-grained filtering</li>
-  <li>server management: <a href="/doc/v5/index.php?title=Server_management#Driver_UDP_broadcasting_state">server broadcasting</a> can now be remotely enabled or disabled on-demand</li>
-  <li>nodes reprovisioning requests, as well as shutdown and restart requests, can now be deferred until the nodes are idle</li>
+  <li>The <a href="/doc/v5/index.php?title=The_JPPF_configuration_API">configuration API</a> now has a fluent interface for setting properties with typed values</li>
+  <li><a href="/doc/v5/index.php?title=Creating_a_custom_load-balancer#Job-aware_load_balancers">Job-aware</a> load balancers now have full access to the information provided by the <a href="/api-5/index.html?org/jppf/node/protocol/JPPFDistributedJob.html">JPPFDistributedJob</a> interface</li>
+  <li>The "nodethreads" load-balancing algorithm now takes into account the sum of the threads in all the nodes attached to a peer server</li>
 </ul>
 
-<p><b>Deployment</b>:
-<ul class="samplesList">
-  <li>Servers and nodes can now be <a href="/doc/v5/index.php?title=Drivers_and_nodes_as_services#Windows_services_with_Apache.27s_commons-daemon">installed as Windows services</a> without having to download a third-party library</li>
-  <li>Nodes in "idle host" mode (aka CPU scavenging) can now be configured to stop <a href="/doc/v5/index.php?title=Nodes_in_%22Idle_Host%22_mode">only when the current tasks are complete</a></li>
-</ul>
+<p><b>Documentation improvements</b>
+<p>All code in the online documentation and samples now benefits from a full-fledged syntax highlighting, in the hope of making your reading experience an even more pleasant one.
 
-<p><b>Refactoring of distribution packaging</b>: the JPPF jar files were <a href="/doc/v5/index.php?title=Changes_in_JPPF_5.0#New_packaging">refactored</a> to adopt a more meaningful naming and a consistent distribution of the code.
 <!-- ============================== -->
 <!-- end version-specific content   -->
 <!-- ============================== -->

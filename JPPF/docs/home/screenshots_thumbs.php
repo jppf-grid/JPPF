@@ -251,7 +251,7 @@
 </td>
 							<td align="center">
   <a name="pic_37"></a>
-  <a href="screenshots.php?screenshot=PluggableView.gif&shotTitle=Pluggable View&height=798&picnum=37" target="_parent">
+  <a href="screenshots.php?screenshot=PluggableView.gif&shotTitle=Pluggable View&height=890&picnum=37" target="_parent">
     <img src="screenshots/_th_PluggableView.jpg" border="0" alt="screenshot"/>
   </a>
 </td>
@@ -271,7 +271,7 @@
 						<tr>
 							<td align="center">
   <a name="pic_40"></a>
-  <a href="screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01&height=943&picnum=40" target="_parent">
+  <a href="screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01&height=958&picnum=40" target="_parent">
     <img src="screenshots/_th_ServerStats-01.jpg" border="0" alt="screenshot"/>
   </a>
 </td>

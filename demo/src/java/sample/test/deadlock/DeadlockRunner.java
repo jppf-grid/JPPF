@@ -19,7 +19,6 @@
 package sample.test.deadlock;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.*;
 import org.jppf.management.*;
@@ -27,7 +26,6 @@ import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
 import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -67,7 +65,7 @@ public class DeadlockRunner {
     MasterNodeMonitoringThread mnmt = null;
     try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       getJmxConnection(client);
-      ro.callback = new MyCallback(client);
+      //ro.callback = new MyCallback(client);
       ensureSufficientConnections(client, ro.clientConnections);
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
       if (ro.simulateNodeCrashes) {
@@ -213,65 +211,9 @@ public class DeadlockRunner {
    * @param format the message format.
    * @param params the parameters of the message.
    */
-  private static void printf(final String format, final Object...params) {
+  static void printf(final String format, final Object...params) {
     String msg = String.format(format, params);
     System.out.println(msg);
     log.info(msg);
-  }
-
-  /**
-   * 
-   */
-  static class MyCallback extends JobStreamingCallback.Adapter {
-    /**
-     * 
-     */
-    private final JPPFClient client;
-    /**
-     * 
-     */
-    private final AtomicBoolean done = new AtomicBoolean(false);
-
-    /**
-     * 
-     * @param client .
-     */
-    public MyCallback(final JPPFClient client) {
-      this.client = client;
-    }
-
-    @Override
-    public void jobCreated(final JPPFJob job) {
-      //job.getSLA().setBroadcastJob(true);
-      //job.getSLA().setCancelUponClientDisconnect(false);
-    }
-
-    @Override
-    public void jobCompleted(final JPPFJob job, final JobStreamImpl jobStream) {
-      if (jobStream.getExecutedJobCount() <= 200) return;
-      if (done.compareAndSet(false, true)) {
-        printf("reached over 200 jobs");
-        try {
-          JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-          JMXDriverConnectionWrapper tmp = new JMXDriverConnectionWrapper(jmx.getHost(), jmx.getPort(), jmx.isSecure());
-          tmp.connect();
-          jobStream.setStopped(true);
-          client.close();
-          while (!tmp.isConnected()) Thread.sleep(1L);
-          Thread.sleep(500L);
-          JPPFStatistics stats = tmp.statistics();
-          tmp.close();
-          JPPFSnapshot taskCount = stats.getSnapshot(JPPFStatisticsHelper.TASK_QUEUE_COUNT);
-          JPPFSnapshot clientCount = stats.getSnapshot(JPPFStatisticsHelper.CLIENTS);
-          //printf("statistics after client close:%n%s", stats);
-          printf("%s latest: %,d", taskCount.getLabel(), (long) taskCount.getLatest());
-          printf("%s latest: %,d", clientCount.getLabel(), (long) clientCount.getLatest());
-        } catch (Exception e) {
-          e.printStackTrace();
-        } finally {
-          System.exit(0);
-        }
-      }
-    }
   }
 }

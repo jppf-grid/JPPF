@@ -18,42 +18,21 @@
 
 package org.jppf.test.scenario.nodesmix;
 
-import java.util.concurrent.ExecutorService;
-
-import org.jppf.client.JPPFClient;
 import org.jppf.test.scenario.AbstractScenarioRunner;
-import org.jppf.utils.TypedProperties;
 import org.jppf.utils.streams.StreamUtils;
-import org.slf4j.*;
 
 /**
  * 
  * @author Laurent Cohen
  */
 public class NodeMixRunner extends AbstractScenarioRunner {
-  /**
-   * Logger for this class.
-   */
-  static Logger log = LoggerFactory.getLogger(NodeMixRunner.class);
-  /**
-   * Executes job submissions in parallel by the same client.
-   */
-  private ExecutorService executor;
-  /**
-   * The JPPF client.
-   */
-  JPPFClient client;
-
   @Override
   public void run() {
-    client = getSetup().getClient();
-    TypedProperties config = getConfiguration().getProperties();
     try {
       StreamUtils.waitKeyPressed("Press [Enter] to terminate ...");
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
-      if (executor != null) executor.shutdownNow();
     }
   }
 }

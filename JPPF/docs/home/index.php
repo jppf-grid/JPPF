@@ -93,7 +93,7 @@
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.0" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots.php?screenshot=&shotTitle=&picnum=0&height=" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -109,16 +109,16 @@
   <script src="scripts/jppf.js"></script>
   <br>
   <div class="blockWithHighlightedTitle" style="height: 163px">
-  <div style="vertical-align: middle; height: 150px; width: 750px">
-    <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px">
-      <div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_02.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_03.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_04.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_05.gif" border="0" alt="JPPF"/></div>
-      <div><img src="/images/anim/Animation_06.gif" border="0" alt="JPPF"/></div>
+    <div style="vertical-align: middle; height: 150px; width: 750px">
+      <div align="center" id="images" style="vertical-align: middle; height: 150px; width: 700px">
+        <div><img src="/images/anim/Animation_01.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_02.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_03.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_04.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_05.gif" border="0" alt="JPPF"/></div>
+        <div><img src="/images/anim/Animation_06.gif" border="0" alt="JPPF"/></div>
+      </div>
     </div>
-  </div>
   </div>
   <div id="slidetabs" align="center">
     <a href="#"></a>

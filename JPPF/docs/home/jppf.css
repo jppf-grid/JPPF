@@ -301,13 +301,14 @@ div#mw-content-text li a {
   /*font-size: 11pt;*/
 }
 
-.yellow_highlight {
-  background-color: yellow;
+.yh {
+  color: white;
+  background-color: 6D78B6;
   font-weight: bold;
-  padding: 10px;
-  margin: 0px;
+  font-style: italic;
+  padding: 10px 10px;
   border-radius: 10px;
-  box-shadow: 4px 4px 4px #6D78B6;
+  box-shadow: 4px 4px 4px #444;
 }
 
 a.yellow_highlight:hover {
@@ -315,5 +316,39 @@ a.yellow_highlight:hover {
   box-shadow: none;
 }
 
+.yhd {
+  color: white;
+  background-color: 6D78B6;
+  font-size: 16pt;
+  font-style: italic;
+  font-weight: bold;
+  padding: 20px;
+  margin: 0px;
+  border-radius: 20px;
+  box-shadow: 4px 4px 4px #222;
 
+  animation-name: glow_effect;
+  animation-delay: 0s;
+  animation-duration: 3s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
 
+@keyframes glow_effect {
+  from {
+    /*background-color: #6D78B6;*/
+    color: white;
+  }
+  to {
+    /*background-color: #7590B0;*/
+    color: #DDD;
+  }
+}
+
+a.yhd:hover {
+  text-decoration: none;
+  color: #E8EAFD;
+  box-shadow: inset 2px 2px 2px #444;
+  padding-left: 19px;
+}
