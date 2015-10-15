@@ -1,0 +1,115 @@
+//------------------------------------------------------------------------------//
+// JPPF                                                                         //
+// Copyright (C) 2005-2009 JPPF Team.                                           //
+// http://www.jppf.org                                                          //
+//                                                                              //
+// Licensed under the Apache License, Version 2.0 (the "License");              //
+// you may not use this file except in compliance with the License.             //
+// You may obtain a copy of the License at                                      //
+//                                                                              //
+// 	 http://www.apache.org/licenses/LICENSE-2.0                                 //
+//                                                                              //
+// Unless required by applicable law or agreed to in writing, software          //
+// distributed under the License is distributed on an "AS IS" BASIS,            //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.     //
+// See the License for the specific language governing permissions and          //
+// limitations under the License.                                               //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// JPPF Security policy file.                                                   //
+// The syntax used in this file is a subset of that used in Sun's security      //
+// policy files.                                                                //
+// It only accepts "permission" entries.                                        //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// Runtime permissions.                                                         //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.lang.RuntimePermission "createClassLoader";
+permission java.lang.RuntimePermission "setContextClassLoader";
+permission java.lang.RuntimePermission "getClassLoader";
+permission java.lang.RuntimePermission "accessClassInPackage.*";
+permission java.lang.RuntimePermission "defineClassInPackage.*";
+permission java.lang.RuntimePermission "accessDeclaredMembers";
+permission java.lang.RuntimePermission "getStackTrace";
+permission java.lang.RuntimePermission "modifyThread";
+permission java.lang.RuntimePermission "getProtectionDomain";
+
+//------------------------------------------------------------------------------//
+// File permissions.                                                            //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.io.FilePermission "${user.dir}/jppf-node.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/jppf-node1.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/jppf-node2.log", "read,write,delete";
+permission java.io.FilePermission "${user.dir}/config/log4j-node.properties", "read";
+permission java.io.FilePermission "${user.dir}/config/log4j-node1.properties", "read";
+permission java.io.FilePermission "${user.dir}/config/log4j-node2.properties", "read";
+permission java.io.FilePermission "${user.dir}/lib/-", "read";
+
+//------------------------------------------------------------------------------//
+// Property permissions.                                                        //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.util.PropertyPermission "log4j.*", "read";
+permission java.util.PropertyPermission "java.*", "read";
+permission java.util.PropertyPermission "line.separator", "read";
+permission java.util.PropertyPermission "os.name", "read";
+
+//------------------------------------------------------------------------------//
+// Management permissions.                                                      //
+// Please do not change these permissions. JPPF may not work any more if you do //
+//------------------------------------------------------------------------------//
+
+permission java.lang.management.ManagementPermission "control";
+permission java.lang.management.ManagementPermission "monitor";
+
+//------------------------------------------------------------------------------//
+// Permissions for running the node with the Java Wrapper.                      //
+// These permissions are required to run a JPPF node as service with the Java   //
+// Service Wrapper (see http://wrapper.tanukisoftware.org/ ).                   //
+//------------------------------------------------------------------------------//
+
+permission java.lang.RuntimePermission "modifyThreadGroup";
+permission java.lang.RuntimePermission "shutdownHooks";
+permission org.tanukisoftware.wrapper.security.WrapperPermission "signalStarting";
+permission org.tanukisoftware.wrapper.security.WrapperPermission "signalStopped";
+
+//------------------------------------------------------------------------------//
+// add your own permissions here.                                               //
+//------------------------------------------------------------------------------//
+// For example: permission to connect to a MySQL database server on localhost   //
+// on the default port:                                                         //
+//                                                                              //
+//permission java.net.SocketPermission "localhost:3306", "connect,listen";      //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// Connection permissions.                                                      //
+//------------------------------------------------------------------------------//
+//permission java.net.SocketPermission "www.jppf.org:80", "connect,listen";
+//permission java.net.SocketPermission "127.0.0.1:21", "accept,connect,listen,resolve";
+permission java.net.SocketPermission "127.0.0.1:1024-", "accept,connect,listen,resolve";
+//------------------------------------------------------------------------------//
+// permissions for JBoss 4.0.x                                                  //
+//------------------------------------------------------------------------------//
+//permission java.lang.RuntimePermission "org.jboss.security.SecurityAssociation.getPrincipalInfo";
+//permission java.io.SerializablePermission "enableSubstitution";
+//------------------------------------------------------------------------------//
+// for Weblogic 9.2: security should be disabled                                //
+//------------------------------------------------------------------------------//
+
+//------------------------------------------------------------------------------//
+// permissions for WAS 6.1                                                      //
+//------------------------------------------------------------------------------//
+//permission java.util.PropertyPermission "com.ibm.*", "read";
+//permission java.util.PropertyPermission "ws.*", "read";
+//permission java.util.PropertyPermission "was.*", "read";
+//permission java.util.PropertyPermission "client.logsRedirected", "read";
+//permission java.util.PropertyPermission "disableLogs", "read";
+//permission java.util.PropertyPermission "db2.*", "read";
