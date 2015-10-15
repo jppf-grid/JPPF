@@ -1,0 +1,22 @@
+Options -Indexes
+IndexIgnore */*
+#php_flag magic_quotes_gpc Off
+#php_value magic_quotes_gpc off
+AddType application/x-java-jnlp-file JNLP
+<IfModule mod_security.c>
+   # Turn off mod_security filtering.
+   SecFilterEngine Off
+
+   # The below probably isn't needed, but better safe than sorry.
+   SecFilterScanPOST Off
+</IfModule>
+
+RewriteEngine on
+#RewriteRule ^jppf\/?(.*)$ "http\:\/\/www\.jppf\.org\/$1" [R=301,L]
+RewriteRule ^wiki\/?(.*)$ "\/doc\/v5\/$1" [R]
+#RewriteRule ^/wiki$ /doc/v2 [R]
+
+ErrorDocument 403 /JPPF-403.php
+ErrorDocument 404 /JPPF-404.php
+ErrorDocument 500 /JPPF-500.php
+ErrorDocument 503 /JPPF-503.php
