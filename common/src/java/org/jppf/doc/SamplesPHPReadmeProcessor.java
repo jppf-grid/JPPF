@@ -84,11 +84,13 @@ public class SamplesPHPReadmeProcessor implements Runnable {
     int len = sourceDir.getCanonicalPath().length();
     String s = file.getParentFile().getCanonicalPath().substring(len);
     if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
-    s += "/Readme.php";
-    File outFile = new File(destDir, s);
-    FileUtils.mkdirs(outFile);
-    StreamUtils.copyFile(file, outFile);
-    System.out.println("writing output file " + outFile);
+    String[] filenames = { "/index.php", "/Readme.php" };
+    for (String name: filenames) {
+      File outFile = new File(destDir, s + name);
+      FileUtils.mkdirs(outFile);
+      StreamUtils.copyFile(file, outFile);
+      System.out.println("writing output file " + outFile);
+    }
   }
 
   /**
