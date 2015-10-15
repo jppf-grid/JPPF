@@ -23,7 +23,7 @@
 <opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ServerChooserPanel" type="page" i18n="org.jppf.ui.i18n.JPPFAdminTool">
   <property name="tooltip" value="The list of drivers to connect to"/>
   <property name="layoutConstraints" value="flowx, fill, insets 2 2 2 2"/>
-  <property name="componentConstraints" value="pushy 0, pushx, h 25!"/>
+  <property name="componentConstraints" value="pushy 0, growx, h 25!"/>
 
   <child name="sep1" type="ToolbarSeparator"/>
 
@@ -77,6 +77,18 @@
     </initializer>
     <listener type="script">
       <script language="groovy">StatsHandler.getInstance().getClientHandler().setCurrentDriver(option.getValue())</script>
+    </listener>
+  </child>
+
+  <child name="filler" type="page">
+    <property name="componentConstraints" value="growx, pushx"/>
+  </child>
+
+  <child name="exit" type="Button">
+    <property name="icon" value="/org/jppf/ui/resources/exit.png"/>
+    <property name="tooltip" value="Exit the administration console"/>
+    <listener type="script">
+      <script language="groovy">new WindowClosingListener().windowClosing(null)</script>
     </listener>
   </child>
 
