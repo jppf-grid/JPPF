@@ -49,18 +49,18 @@ $template{name="about-page-header" title="Features"}$
     <div class="blockWithHighlightedTitle">
     <a name="feat06"></a>
     $template{name="title-with-icon" img="images/icons/security.png" title="Security" heading="h4"}$
-    <p>Communications between components of a JPPF grid support <a href="/doc/v5/index.php?title=Configuring_SSL/TLS_communications">SSL/TLS</a> encrytpion and authentication all the way. Certificate-based authentocation, 1 way or mutual, is fully supported.
+    <p>Communications between components of a JPPF grid support <a href="/doc/v5/index.php?title=Configuring_SSL/TLS_communications">SSL/TLS</a> encrytpion and authentication all the way. Certificate-based authentication, 1 way or mutual, is fully supported.
     Additional extension points allow you to further <a href="/doc/v5/index.php?title=Transforming_and_encrypting_networked_data">transform any data</a> that is transported over network connections: tunnel grid data within your own protocol, use an additional encryption layer, or any data transformation which can be of use.
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">
     <a name="feat07"></a>
     $template{name="title-with-icon" img="images/icons/monitoring.png" title="Administration and monitoring" heading="h4"}$
-    <p>The JPPF graphical <a href="/screenshots.php?screenshot=Topology-TreeView.gif&shotTitle=Topology  Tree View">administration console</a>, along with the public <a href="http://www.jppf.org/doc/v5/index.php?title=Management_and_monitoring">API</a> it is based on,
-    enable remote monitoring and management of the grid <a href="/screenshots.php?screenshot=GraphView.gif&shotTitle=Graph View">topology</a>, <a href="/screenshots.php?screenshot=JobPriority.gif&shotTitle=Job Priority">jobs</a> life cycle,
-    servers and nodes <a href="/screenshots.php?screenshot=RuntimeMonitoring.gif&shotTitle=Runtime Monitoring">health</a>, <a href="/screenshots.php?screenshot=LoadBalancerSettings.gif&shotTitle=Load Balancer Settings">load-balancing</a> configuration,
-    server <a href="/screenshots.php?screenshot=ServerStats-01.gif&shotTitle=Server Stats 01">statistics</a>, and a lot more.
-    The console also provides the ability to <a href="/screenshots.php?screenshot=ChartsConfiguration-01.gif&shotTitle=Charts Configuration 01">define</a> your own dynamic <a href="/screenshots.php?screenshot=Charts-01.gif&shotTitle=Charts 01">charts</a> based on dozens of dynamically updated fields you can chose from.
+    <p>The JPPF graphical <a href="/screenshots/gallery-images/Topology-TreeView.gif">administration console</a>, along with the public <a href="http://www.jppf.org/doc/v5/index.php?title=Management_and_monitoring">API</a> it is based on,
+    enable remote monitoring and management of the grid <a href="/screenshots/gallery-images/GraphView.gif">topology</a>, <a href="/screenshots/gallery-images/JobPriority.gif">jobs</a> life cycle,
+    servers and nodes <a href="/screenshots/gallery-images/RuntimeMonitoring.gif">health</a>, <a href="/screenshots/gallery-images/LoadBalancerSettings.gif">load-balancing</a> configuration,
+    server <a href="/screenshots/gallery-images/ServerStats-01.gif">statistics</a>, and a lot more.
+    The console also provides the ability to <a href="/screenshots/gallery-images/ChartsConfiguration-01.gif">define</a> your own dynamic <a href="/screenshots/gallery-images/Charts-01.gif">charts</a> based on dozens of dynamically updated fields you can chose from.
     <br></div>
 
     <br><div class="blockWithHighlightedTitle">

@@ -31,7 +31,7 @@ $template{name="about-page-header" title="<?php echo $currentPage ?>"}$
   <script>anim_main2();</script>
   <div align="center">
     <br/>
-    <h2><i>New</i>: JPPF 5.0 is here, <a href='/release_notes.php?version=5.0'>check it out!</a></h2>
+    <h2><i>New</i>: JPPF 5.1 is here, <a href='/release_notes.php?version=5.1'>check it out!</a></h2>
     <p style="font-size: 12pt">JPPF makes it easy to parallelize computationally intensive tasks and execute them on a Grid.
   </div>
 
