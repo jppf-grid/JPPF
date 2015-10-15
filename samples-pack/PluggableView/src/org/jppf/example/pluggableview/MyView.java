@@ -157,7 +157,7 @@ public class MyView extends PluggableView {
     logView = new JList<>(listModel = new DefaultListModel<>());
     logView.setBackground(BKG);
     listScroller = new JScrollPane(logView);
-    listScroller.setBorder(BorderFactory.createTitledBorder("Topology Events"));
+    listScroller.setBorder(BorderFactory.createTitledBorder("Grid Events"));
     listScroller.setBackground(BKG);
     return listScroller;
   }
