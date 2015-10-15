@@ -103,7 +103,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener 
     if (clientBundle.isCancelled()) {
       clientBundle.removeCompletionListener(this);
     } else {
-      int pendingTasksCount = this.bundle.getPendingTasksCount();
+      int pendingTasksCount = (bundle == null) ? 0 : bundle.getPendingTasksCount();
       if (debugEnabled) log.debug("Sending notification of bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
       if (pendingTasksCount <= 0) {
         synchronized(this) {
