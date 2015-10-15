@@ -137,6 +137,7 @@ public class AndroidHelper {
       config.setString("jppf.node.class", JPPFAndroidNode.class.getName());
       config.setString("jppf.ssl.configuration.source", SSLConfigSource.class.getName());
       config.setBoolean("jppf.ssl.enabled", true);
+      config.setString("jppf.resource.cache.storage", "memory");
     } catch(Exception e) {
       Log.e(LOG_TAG, "exception in changeConfigFromPrefs() : ", e);
     }
