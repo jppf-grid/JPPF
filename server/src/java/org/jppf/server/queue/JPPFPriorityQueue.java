@@ -123,7 +123,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
 
         if (!sla.isBroadcastJob() || serverJob.getBroadcastUUID() != null) {
           priorityMap.putValue(sla.getPriority(), serverJob);
-          sizeMap.putValue(getSize(serverJob), serverJob);
+          incrementSizeCount(getSize(serverJob));
         }
         updateLatestMaxSize();
         if (!queued) {
@@ -131,7 +131,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
         }
         fireBundleAdded(new QueueEvent<>(this, serverJob, false));
       }
-      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
+      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
       lock.unlock();
     }
@@ -149,7 +149,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       if (!jobMap.containsKey(job.getUuid())) throw new IllegalStateException("Job " + job + " not managed");
       if (debugEnabled) log.debug("requeuing job {}", job);
       priorityMap.putValue(job.getSLA().getPriority(), job);
-      sizeMap.putValue(getSize(job), job);
+      incrementSizeCount(getSize(job));
       fireBundleAdded(new QueueEvent<>(this, job, true));
     } finally {
       lock.unlock();
@@ -162,7 +162,8 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + serverJob.getTaskCount() + " tasks");
-      sizeMap.removeValue(getSize(serverJob), serverJob);
+      int size = getSize(serverJob);
+      decrementSizeCount(size);
       if (nbTasks >= serverJob.getTaskCount()) {
         serverJob.setOnRequeue(new RequeueBundleAction(this, serverJob));
         result = serverJob.copy(serverJob.getTaskCount());
@@ -170,12 +171,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
       } else {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
         result = serverJob.copy(nbTasks);
-        sizeMap.putValue(getSize(serverJob), serverJob);
+        incrementSizeCount(size);
         // to ensure that other jobs with same priority are also processed without waiting
         priorityMap.moveToEndOfList(serverJob.getSLA().getPriority(), serverJob);
       }
       updateLatestMaxSize();
-      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap) + " - " + formatSizeMapInfo("sizeMap", sizeMap));
+      if (debugEnabled) log.debug("Maps size information: " + formatSizeMapInfo("priorityMap", priorityMap));
     } finally {
       lock.unlock();
     }
@@ -247,7 +248,12 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       ServerJob job = jobMap.get(jobId);
-      return job != null && job.cancel(false);
+      boolean res = job != null;
+      if (res) {
+        decrementSizeCount(getSize(job));
+        res &= job.cancel(false);
+      }
+      return res;
     } finally {
       lock.unlock();
     }

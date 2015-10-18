@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.*;
 
-import org.jppf.utils.collections.*;
+import org.jppf.utils.collections.LinkedListSortedMap;
 
 /**
  * Abstract superclass for all JPPFQueue implementations.
@@ -38,9 +38,9 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
    */
   protected final Lock lock = new ReentrantLock();
   /**
-   * An ordered map of bundle sizes, mapping to a list of bundles of this size.
+   * An ordered map of bundle sizes, mapping to a count of bundles of this size.
    */
-  protected final SetSortedMap<Integer, T> sizeMap = new SetSortedMap<>();
+  protected final SortedMap<Integer, AtomicInteger> sizeMap = new TreeMap<>();
   /**
    *
    */
@@ -166,6 +166,31 @@ public abstract class AbstractJPPFQueue<T, U, V> implements JPPFQueue<T, U, V> {
       return priorityMap.size();
     } finally {
       lock.unlock();
+    }
+  }
+
+  /**
+   * Increment the count of jobs that have the specified size.
+   * @param size the size for which to increment the count.
+   */
+  public void incrementSizeCount(final int size) {
+    synchronized(sizeMap) {
+      AtomicInteger count = sizeMap.get(size);
+      if (count == null) sizeMap.put(size, new AtomicInteger(1));
+      else count.incrementAndGet();
+    }
+  }
+
+  /**
+   * Decrement the count of jobs that have the specified size.
+   * @param size the size for which to decrement the count.
+   */
+  public void decrementSizeCount(final int size) {
+    synchronized(sizeMap) {
+      AtomicInteger count = sizeMap.get(size);
+      if (count == null) return;
+      int n = count.decrementAndGet();
+      if (n <= 0) sizeMap.remove(size);
     }
   }
 }
