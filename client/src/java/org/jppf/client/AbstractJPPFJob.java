@@ -250,8 +250,8 @@ public abstract class AbstractJPPFJob implements Serializable, JPPFDistributedJo
   void await(final long timeout, final boolean raiseTimeoutException) throws TimeoutException {
     long millis = timeout > 0L ? timeout : Long.MAX_VALUE;
     long elapsed = 0L;
-    long start = System.currentTimeMillis();
-    while ((results.size() < tasks.size()) && ((elapsed = System.currentTimeMillis() - start) < millis)) results.goToSleep(millis - elapsed);
+    long start = System.nanoTime();
+    while ((results.size() < tasks.size()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < millis)) results.goToSleep(1L);
     if ((elapsed >= millis) && raiseTimeoutException) throw new TimeoutException("timeout expired");
   }
 

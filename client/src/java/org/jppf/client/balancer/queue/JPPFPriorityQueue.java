@@ -257,8 +257,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
           }
         });
       } catch (ParseException e) {
-        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() +
-                ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
+        log.error("Unparsable expiration date for job id " + jobId + " : date = " + schedule.getDate() + ", date format = " + (schedule.getFormat() == null ? "null" : schedule.getFormat()), e);
       }
     }
   }
@@ -358,7 +357,10 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     lock.lock();
     try {
       ClientJob job = jobMap.get(jobId);
-      return job == null ? false : job.cancel(false);
+      boolean sucess = (job == null) ? false : job.cancel(false);
+      sizeMap.removeValue(getSize(job), job);
+      updateLatestMaxSize();
+      return sucess;
     } finally {
       lock.unlock();
     }
