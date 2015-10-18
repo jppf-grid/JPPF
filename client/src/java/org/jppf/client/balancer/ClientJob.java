@@ -419,7 +419,6 @@ public class ClientJob extends AbstractClientJob {
     if (debugEnabled) log.debug("requesting cancel of jobId=" + this.getUuid());
     if (super.cancel(mayInterruptIfRunning)) {
       job.getCancelledFlag().set(true);
-      done();
       List<ClientJob> list;
       Map<ClientTaskBundle, ChannelWrapper> map = null;
       synchronized (bundleMap) {
