@@ -172,6 +172,8 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
       }
     } else {
       node.requestShutdown(restart);
+      nodeState.setPendingAction(pendingAction());
+      if (debugEnabled) log.debug(String.format("pending action after %s request: %s", s, nodeState.getPendingAction()));
     }
   }
 
