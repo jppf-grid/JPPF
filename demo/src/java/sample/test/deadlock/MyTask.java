@@ -19,24 +19,23 @@
 package sample.test.deadlock;
 
 import org.jppf.node.protocol.AbstractTask;
-import org.slf4j.*;
 
 /**
  * A simple task used in the demo.
  */
 public class MyTask extends AbstractTask<String> {
   /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(MyTask.class);
-  /**
    * A string message to transform and set as result of this task.
    */
   private final String message;
   /**
-   * How long this task will sleep to simulate code execution.
+   * How long in millis this task will sleep to simulate code execution.
    */
   private final long duration;
+  /**
+   * How long in nanos, in addition to the millis, this task will sleep to simulate code execution.
+   */
+  private final int durationNanos;
   /**
    * Whether to simulate CPU usage.
    */
@@ -49,63 +48,38 @@ public class MyTask extends AbstractTask<String> {
   /**
    * Initialize this task.
    * @param message a string message to transform and set as result of this task.
-   * @param duration how long this task will sleep to simulate code execution.
+   * @param options holds the configuration properties used for the tasks.
    */
-  public MyTask(final String message, final long duration) {
-    this(message, duration, false);
-  }
-
-  /**
-   * Initialize this task.
-   * @param duration how long this task will sleep to simulate code execution.
-   * @param useCPU whether to simulate CPU usage.
-   */
-  public MyTask(final long duration, final boolean useCPU) {
-    this(null, duration, useCPU);
-  }
-
-  /**
-   * Initialize this task.
-   * @param message a string message to transform and set as result of this task.
-   * @param duration how long this task will sleep to simulate code execution.
-   * @param useCPU whether to simulate CPU usage.
-   */
-  public MyTask(final String message, final long duration, final boolean useCPU) {
-    this(message, duration, useCPU, -1);
-  }
-
-  /**
-   * Initialize this task.
-   * @param message a string message to transform and set as result of this task.
-   * @param duration how long this task will sleep to simulate code execution.
-   * @param useCPU whether to simulate CPU usage.
-   * @param dataSize size of the dummy data.
-   */
-  public MyTask(final String message, final long duration, final boolean useCPU, final int dataSize) {
+  public MyTask(final String message, final RunOptions options) {
     this.message = message;
-    this.duration = duration;
-    this.useCPU = useCPU;
-    dummyData = dataSize < 0 ? null : new byte[dataSize];
+    this.duration = options.taskDuration;
+    this.durationNanos = options.taskDurationNanos;
+    this.useCPU = options.useCPU;
+    dummyData = options.dataSize < 0 ? null : new byte[options.dataSize];
   }
 
   @Override
   public void run() {
     //System.out.println("starting execution for "  + getId());
     try {
+      long time = 1_000_000L * duration + durationNanos;
       if (!useCPU) {
-        if (duration > 0L) Thread.sleep(duration);
-        //log.info(getId());
+        if (time > 0L) Thread.sleep(duration, durationNanos);
       } else {
-        long taskStart = System.currentTimeMillis();
-        for (long elapsed = 0L; elapsed < duration; elapsed = System.currentTimeMillis() - taskStart) {
+        for (long elapsed = 0L, taskStart = System.nanoTime(); elapsed < time; elapsed = System.nanoTime() - taskStart) {
           String s = "";
           for (int i=0; i<10; i++) s += "A10";
         }
       }
-      //setResult("execution success for " + message);
+      setResult("execution success for " + message);
       //System.out.println("execution success for "  + getId());
     } catch (Exception e) {
       setThrowable(e);
     }
+  }
+
+  @Override
+  public void onCancel() {
+    //System.out.println("task cancelled");
   }
 }
