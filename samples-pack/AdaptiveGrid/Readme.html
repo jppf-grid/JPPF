@@ -1,0 +1,117 @@
+<html>
+
+  <head>
+    <title>Adaptive Grid demo</title>
+    <meta name="description" content="An open-source, Java-based, framework for parallel computing.">
+    <meta name="keywords" content="JPPF, Java, Parallel Computing, Distributed Computing, Grid Computing, Cluster, Grid">
+    <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="../shared/images/jppf.css" title="Style">
+  </head>
+
+  <body>
+    <div align="center">
+      <div class="gwrapper" align="center">
+
+        <!-- start header -->
+        <div style="background-color: #E2E4F0; margin: 0px;height: 10px"><img src="../shared/images/frame_top.gif"/></div>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class="jppfheader" style="border-left: 1px solid #6D78B6; border-right: 1px solid #6D78B6;  border-bottom: 9px solid #6D78B6;">
+          <tr style="height: 80px">
+            <td width="20"></td>
+            <td width="400" align="left" valign="center"><a href="http://www.jppf.org"><img src="../shared/images/logo2.gif" border="0" alt="JPPF"/></a></td>
+            <td valign="center"><h1>Adaptive Grid demo</h1></td>
+            <td width="20"></td>
+          </tr>
+        </table>
+        <!-- end header -->
+
+        <!-- start content -->
+        <div align="left" style="margin: 10px">
+          <!-- ${SAMPLE_START_CONTENT} -->
+          <h3>What does the sample do?</h3>
+          <p>This sample dmeonstrates how a JPPF Grid can be grown or shrunk dynamically based on the current workload.
+          <p>To achieve this, the demo will adjust two components of the grid topology:
+          <ul class="samplesList">
+            <li>the number of connections in the <a href="http://www.jppf.org/doc/v4/index.php?title=Connection_pools">JPPF client's connection pool</a></li>
+            <li>the number of nodes in the grid, using the <a href="http://www.jppf.org/doc/v4/index.php?title=Node_provisioning">node provisioning facility</a></li>
+          </ul>
+          <p>The calculations for the number of client connections and the number of nodes are done as follows in a <a href="http://www.jppf.org/doc/v4/index.php?title=Notifications_of_client_job_queue_events">client queue listener</a>:
+          <ul class="samplesList">
+            <li>the number of connections in the client pool is set to the number of jobs in the client queue, with a configurable maximum allowed</li>
+            <li>the number of nodes is computed as one node for every five jobs in the client queue, with a minimum of 1 and a configurable maximum allowed</li>
+          </ul>
+          <p>The demo itself will start with a single connection and a single node, then run a sequence of job batches, where the number of batches and the number of jobs in each batch are also configurable.
+          It will display a message each tile the size of the connection pool or the number of nodes is changed.
+
+          <h3>How do I run it?</h3>
+          <p>You will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v4/index.php?title=Introduction">JPPF documentation</a>.
+          <p>To run the demo, in a command prompt or shell console, type "./run.sh" on Linux or "run.bat" on Windows. You will then see a number of meesages like these while the demo is running:
+          <p>It is also possible to specify how many jobs can be sent concurrently by the application, by setting the following in config/jppf.properties:
+<pre class="samples">**** submitting jobs batch #2 *****
+increasing the number of server connections to 2
+increasing the number of server connections to 3
+increasing the number of server connections to 4
+increasing the number of server connections to 5
+increasing the number of nodes to 3
+increasing the number of nodes to 4
+job 'Job 11 - batch 2 (1/20)' result: execution successful
+job 'Job 12 - batch 2 (2/20)' result: execution successful
+job 'Job 13 - batch 2 (3/20)' result: execution successful
+...</pre>
+          <p>It is also interesting to monitor the grid with the amdinistration console: the topology view will show the slave nodes that are started and stopped,
+          and the job data view will show more or less jobs in the server quueue, depending on the client connection pool size.
+          <p>You can also play with the parameters of the demo that are configurable in the <a href="config/jppf.properties">config/jppf.properties</a> file:
+<pre class="samples"><span style="color: green"># the maximum allowed connection pool size</span>
+maxAllowedPoolSize = 10
+<span style="color: green"># the maximum allowed number of nodes</span>
+maxAllowedNodes = 10
+<span style="color: green"># defines the number of job batches and their sizes</span>
+jobBatches = 1 20 50 10
+<span style="color: green"># duration of each task in millis</span>
+taskDuration = 1500
+</pre>
+
+          <h3>Source files</h3>
+          <ul class="samplesList">
+            <li><a href="src/org/jppf/example/adaptivegrid/AdaptiveGridDemo.java.html">AdaptiveGridDemo.java</a>: The entry point for the demo</li>
+            <li><a href="src/org/jppf/example/adaptivegrid/DriverConnectionManager.java.html">DriverConnectionManager.java</a>: encapsulates the fuctionality to update the connection pool size and nulber of slave nodes</li>
+            <li><a href="src/org/jppf/example/adaptivegrid/MyQueueListener.java.html">MyQueueListener.java</a>: reacts to client queue events by adapting the grid topology</li>
+            <li><a href="src/org/jppf/example/adaptivegrid/SimpleTask.java.html">SimpleTask.java</a>: a very simple JPPF task used in this demo</li>
+          </ul>
+
+          <h3>I have additional questions and comments, where can I go?</h3>
+          <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomLoadBalancer/src</b> folder.
+          <p>In addition, There are 2 privileged places you can go to:
+          <ul>
+            <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
+            <li><a href="http://www.jppf.org/doc/v4/">The JPPF documentation</a></li>
+          </ul>
+          <!-- ${SAMPLE_END_CONTENT} -->
+        </div>
+        <!-- end content -->
+
+        <!-- start footer -->
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" class="jppffooter">
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+          <tr>
+            <td align="center" style="font-size: 9pt; color: #6D78B6">Copyright &copy; 2005-2014 JPPF.org</td>
+            <td align="right">
+              <a href="http://www.parallel-matters.com"><img src="http://www.jppf.org/images/pm_logo_tiny.jpg" border="0" alt="Powered by Parallel Matters" /></a>&nbsp;
+              <a href="http://sourceforge.net/projects/jppf-project">
+                <img src="http://sflogo.sourceforge.net/sflogo.php?group_id=135654&type=10" width="80" height="15" border="0"
+                  alt="Get JPPF at SourceForge.net. Fast, secure and Free Open Source software downloads"/>
+              </a>
+            </td>
+            <td style="width: 10px"></td>
+          </tr>
+          <tr><td colspan="*" style="height: 10px"></td></tr>
+        </table>
+        <div style="background-color: #E2E4F0; width: 100%;"><img src="../shared/images/frame_bottom.gif" border="0"/></div>
+        <!-- end footer -->
+
+      </div>
+    </div>
+
+  </body>
+
+</html>
