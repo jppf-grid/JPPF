@@ -25,6 +25,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
@@ -56,9 +57,7 @@ public class JobPriorityRunner
   {
     try
     {
-      TypedProperties props = JPPFConfiguration.getProperties();
-      props.setProperty("jppf.discovery.enabled", "true");
-      props.setProperty("jppf.pool.size", "2");
+      JPPFConfiguration.set(JPPFProperties.DISCOVERY_ENABLED, true).set(JPPFProperties.POOL_SIZE, 2);
       jppfClient = new JPPFClient();
       perform();
     }

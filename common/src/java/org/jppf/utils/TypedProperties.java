@@ -452,4 +452,50 @@ public class TypedProperties extends Properties {
     new ScriptHandler().process(this);
     return this;
   }
+
+  /**
+   * Get the value of a predefined property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @return the value of the property according to its type.
+   */
+  public <T> T get(final JPPFProperty<T> property) {
+    String value = null;
+    if (this.containsKey(property.getName())) {
+      value = getProperty(property.getName());
+      return property.valueOf(value);
+    }
+    String[] aliases = property.getAliases();
+    if ((aliases != null) && (aliases.length > 0)) {
+      for (String alias: aliases) {
+        if (this.containsKey(alias)) {
+          value = getProperty(alias);
+          return property.valueOf(value);
+        }
+      }
+    }
+    return property.getDefaultValue();
+  }
+
+  /**
+   * Set the value of a predefined property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to set.
+   * @param value the value to set.
+   * @return the value of the property according to its type.
+   */
+  public <T> TypedProperties set(final JPPFProperty<T> property, final T value) {
+    setProperty(property.getName(), property.toString(value));
+    return this;
+  }
+
+  /**
+   * Remove the specified predefined property.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @return the old value of the property, or {@code null} if it wasn't defined.
+   */
+  public <T> T remove(final JPPFProperty<T> property) {
+    return (T) remove(property.getName());
+  }
 }

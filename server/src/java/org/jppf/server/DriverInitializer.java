@@ -18,6 +18,8 @@
 
 package org.jppf.server;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
+
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
@@ -33,6 +35,7 @@ import org.jppf.server.nio.classloader.ClassCache;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -147,9 +150,9 @@ public class DriverInitializer {
       s = config.getString("jppf.ssl.server.port", null);
       connectionInfo.sslServerPorts = s != null ? parsePorts(s, -1) : null;
       connectionInfo.host = NetworkUtils.getManagementHost();
-      if (config.getBoolean("jppf.management.enabled", true)) connectionInfo.managementPort = config.getInt("jppf.management.port", 11198);
-      if (config.getBoolean("jppf.management.ssl.enabled", false)) connectionInfo.sslManagementPort = config.getInt("jppf.management.ssl.port", 11193);
-      if (config.getBoolean("jppf.recovery.enabled", false)) connectionInfo.recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+      if (config.get(MANAGEMENT_ENABLED)) connectionInfo.managementPort = config.get(MANAGEMENT_PORT);
+      if (config.get(MANAGEMENT_SSL_ENABLED)) connectionInfo.sslManagementPort = config.get(MANAGEMENT_SSL_PORT);
+      if (config.get(RECOVERY_ENABLED)) connectionInfo.recoveryPort = config.get(RECOVERY_SERVER_PORT);
     }
     return connectionInfo;
   }
@@ -158,7 +161,7 @@ public class DriverInitializer {
    * Initialize and start the discovery service.
    */
   public void initBroadcaster() {
-    if (config.getBoolean("jppf.discovery.enabled", true)) {
+    if (config.get(DISCOVERY_ENABLED)) {
       broadcaster = new JPPFBroadcaster(getConnectionInformation());
       new Thread(broadcaster, "JPPF Broadcaster").start();
     }
@@ -190,8 +193,8 @@ public class DriverInitializer {
   void initPeers(final ClientClassNioServer classServer) {
     boolean initPeers;
     TypedProperties props = JPPFConfiguration.getProperties();
-    final boolean ssl = props.getBoolean("jppf.peer.ssl.enabled", false);
-    if (props.getBoolean("jppf.peer.discovery.enabled", false)) {
+    final boolean ssl = props.get(PEER_SSL_ENABLED);
+    if (props.get(PEER_DISCOVERY_ENABLED)) {
       if (debugEnabled) log.debug("starting peers discovery");
       peerDiscoveryThread = new PeerDiscoveryThread(new PeerDiscoveryThread.ConnectionHandler() {
         @Override
@@ -206,7 +209,7 @@ public class DriverInitializer {
       initPeers = true;
     }
 
-    String discoveryNames = props.getString("jppf.peers");
+    String discoveryNames = props.get(PEERS);
     if ((discoveryNames != null) && !discoveryNames.trim().isEmpty()) {
       if (debugEnabled) log.debug("found peers in the configuration");
       String[] names = discoveryNames.split("\\s");
@@ -274,12 +277,12 @@ public class DriverInitializer {
   private JMXServer createJMXServer(final boolean ssl) {
     JMXServer server = null;
     JPPFConnectionInformation info = getConnectionInformation();
-    String prop = ssl ? "jppf.management.ssl.enabled" : "jppf.management.enabled";
+    JPPFProperty<Boolean> prop = ssl ? MANAGEMENT_SSL_ENABLED : MANAGEMENT_ENABLED;
     String tmp = ssl ? "secure " : "";
     try {
       // default is false for ssl, true for plain connection
-      if (config.getBoolean(prop, !ssl)) {
-        server = JMXServerFactory.createServer(driver.getUuid(), ssl);
+      if (config.get(prop)) {
+        server = JMXServerFactory.createServer(driver.getUuid(), ssl, ssl ? MANAGEMENT_SSL_PORT : MANAGEMENT_PORT);
         server.start(getClass().getClassLoader());
         if (!ssl) info.managementPort = server.getManagementPort();
         else info.sslManagementPort = server.getManagementPort();
@@ -287,7 +290,7 @@ public class DriverInitializer {
       }
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-      config.setProperty(prop, "false");
+      config.set(prop, false);
       String s = e.getMessage();
       s = (s == null) ? "<none>" : s.replace("\t", "  ").replace("\n", " - ");
       System.out.println(tmp + "management failed to initialize, with error message: '" + s + '\'');
@@ -319,7 +322,7 @@ public class DriverInitializer {
    * Initialize the recovery server.
    */
   public void initRecoveryServer() {
-    if (config.getBoolean("jppf.recovery.enabled", false)) {
+    if (config.get(RECOVERY_ENABLED)) {
       recoveryServer = new RecoveryServer();
       new Thread(recoveryServer, "RecoveryServer thread").start();
     }

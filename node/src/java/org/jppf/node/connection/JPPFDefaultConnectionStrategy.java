@@ -20,6 +20,7 @@ package org.jppf.node.connection;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -36,7 +37,7 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
 
   @Override
   public DriverConnectionInfo nextConnectionInfo(final DriverConnectionInfo currentInfo, final ConnectionContext context) {
-    return JPPFConfiguration.getProperties().getBoolean("jppf.discovery.enabled", true) ? discoverDriver() : connectionFromManualConfiguration();
+    return JPPFConfiguration.get(JPPFProperties.DISCOVERY_ENABLED) ? discoverDriver() : connectionFromManualConfiguration();
   }
 
   /**
@@ -56,8 +57,8 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
       return connectionFromManualConfiguration();
     }
     if (log.isDebugEnabled()) log.debug("Discovered driver: " + info);
-    boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
-    boolean recovery = config.getBoolean("jppf.recovery.enabled", false) && (info.recoveryPort >= 0);
+    boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
+    boolean recovery = config.get(JPPFProperties.RECOVERY_ENABLED) && (info.recoveryPort >= 0);
     return JPPFDriverConnectionInfo.fromJPPFConnectionInformation(info, ssl, recovery);
   }
 
@@ -67,10 +68,10 @@ public class JPPFDefaultConnectionStrategy implements DriverConnectionStrategy {
    */
   private DriverConnectionInfo connectionFromManualConfiguration() {
     TypedProperties config = JPPFConfiguration.getProperties();
-    boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
-    String host = config.getString("jppf.server.host", "localhost");
-    int port = config.getInt("jppf.server.port", ssl ? 11143 : 11111);
-    int recoveryPort  = config.getBoolean("jppf.recovery.enabled", false) ? config.getInt("jppf.recovery.server.port", -1) : -1; 
+    boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
+    String host = config.get(JPPFProperties.SERVER_HOST);
+    int port = config.get(ssl ? JPPFProperties.SERVER_SSL_PORT_NODE : JPPFProperties.SERVER_PORT);
+    int recoveryPort  = config.get(JPPFProperties.RECOVERY_ENABLED) ? config.get(JPPFProperties.RECOVERY_SERVER_PORT) : -1; 
     return new JPPFDriverConnectionInfo(ssl, host, port, recoveryPort);
   }
 }

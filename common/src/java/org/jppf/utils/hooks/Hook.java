@@ -21,6 +21,7 @@ package org.jppf.utils.hooks;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -57,12 +58,12 @@ public class Hook<E> {
    * @param defaultImpl the default implementation, which may be null.
    * @param loader the class loader used to load the implemntation.
    */
-  public Hook(final String property, final Class<E> infClass, final E defaultImpl, final ClassLoader loader) {
+  public Hook(final JPPFProperty<String> property, final Class<E> infClass, final E defaultImpl, final ClassLoader loader) {
     if (infClass == null) throw new IllegalArgumentException("interface class cannot be null");
     this.infName = infClass.getName();
     this.type = HookType.CONFIG_SINGLE_INSTANCE;
     ClassLoader cl = findClassLoader(loader);
-    String fqn = JPPFConfiguration.getProperties().getString(property);
+    String fqn = JPPFConfiguration.get(property);
     if ((fqn != null) && !"".equals(fqn.trim())) {
       try {
         Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);

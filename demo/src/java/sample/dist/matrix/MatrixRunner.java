@@ -27,6 +27,7 @@ import org.jppf.location.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -88,7 +89,7 @@ public class MatrixRunner {
    */
   public void perform(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception {
     try {
-      JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(nbChannels));
+      JPPFConfiguration.set(JPPFProperties.POOL_SIZE, nbChannels);
       String s = JPPFConfiguration.getProperties().getString("matrix.classpath");
       if (s != null) {
         classpath = new ClassPathImpl();

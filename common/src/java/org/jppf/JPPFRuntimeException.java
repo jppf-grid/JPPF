@@ -21,15 +21,13 @@ package org.jppf;
  * Class of exceptions for JPPF-specific exceptions.
  * @author Laurent Cohen
  */
-public class JPPFRuntimeException extends RuntimeException
-{
+public class JPPFRuntimeException extends RuntimeException {
   /**
    * Initialize this exception with a specified message and cause exception.
    * @param message the message for this exception.
    * @param cause the cause exception.
    */
-  public JPPFRuntimeException(final String message, final Throwable cause)
-  {
+  public JPPFRuntimeException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
@@ -37,8 +35,7 @@ public class JPPFRuntimeException extends RuntimeException
    * Initialize this exception with a specified message.
    * @param message the message for this exception.
    */
-  public JPPFRuntimeException(final String message)
-  {
+  public JPPFRuntimeException(final String message) {
     super(message);
   }
 
@@ -46,8 +43,7 @@ public class JPPFRuntimeException extends RuntimeException
    * Initialize this exception with a specified cause exception.
    * @param cause the cause exception.
    */
-  public JPPFRuntimeException(final Throwable cause)
-  {
+  public JPPFRuntimeException(final Throwable cause) {
     super(cause);
   }
 }

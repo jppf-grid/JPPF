@@ -31,6 +31,7 @@ import org.slf4j.*;
  * some.property.name = ${env.&lt;environment_variable_name&gt;}
  * other.property.name = ${sys.&lt;system_property_name&gt;}</pre>
  * @author Laurent Cohen
+ * @exclude
  */
 public class SubstitutionsHandler {
   /**
@@ -210,7 +211,7 @@ public class SubstitutionsHandler {
     public final String mapName;
 
     /**
-     *Initialize this provider.
+     * Initialize this provider.
      * @param prefix the prefix of the properties to substitute.
      * @param mapName only used in trace logging.
      */

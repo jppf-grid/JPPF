@@ -33,6 +33,7 @@ import org.jppf.server.nio.nodeserver.PeerAttributesHandler;
 import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.protocol.ServerTaskBundleClient;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -146,7 +147,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
         ServerTaskBundleClient bundleWrapper = readBundle();
         TaskBundle bundle = bundleWrapper.getJob();
         if (bundle.isHandshake()) {
-          if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true)) setupManagementParameters(bundle);
+          if (JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED)) setupManagementParameters(bundle);
           bundle.setUuid(uuid);
           bundle.setParameter(BundleParameter.IS_PEER, true);
           bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
@@ -187,7 +188,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
     this.nodeConnection = new RemotePeerConnection(peerNameBase, connectionInfo, secure);
     nodeConnection.init();
     is = new SocketWrapperInputSource(getSocketWrapper());
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.recovery.enabled", false)) {
+    if (JPPFConfiguration.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
         DriverConnectionInfo driverConnectionInfo = JPPFDriverConnectionInfo.fromJPPFConnectionInformation(connectionInfo, secure, true);

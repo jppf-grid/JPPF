@@ -20,6 +20,7 @@ package org.jppf.example.loadbalancer.common;
 
 import org.jppf.node.policy.CustomPolicy;
 import org.jppf.utils.PropertiesCollection;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * A custom execution policy that checks a node has a specified minimum
@@ -49,7 +50,7 @@ public class MyCustomPolicy extends CustomPolicy {
   @Override
   public boolean accepts(final PropertiesCollection info) {
     // get the number of processing threads in the node
-    long nbThreads = info.getProperties("jppf").getLong("jppf.processing.threads");
+    long nbThreads = info.getProperties("jppf").get(JPPFProperties.PROCESSING_THREADS);
     // get the node's max heap size
     long maxHeap = info.getProperties("runtime").getLong("maxMemory");
     // we assume that 10 MB is taken by JPPF code and data

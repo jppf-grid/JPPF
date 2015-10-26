@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.process.AbstractProcessLauncher;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -128,9 +129,9 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     }
     if (log.isDebugEnabled()) log.debug("{} read config {} : {}", new Object[] {name, configFile, config});
     List<String> jvmOptions = new ArrayList<>();
-    String s = config.getString("jppf.jvm.options");
+    String s = config.get(JPPFProperties.JVM_OPTIONS);
     jvmOptions.addAll(parseJvmOptions(s).first());
-    s = config.getString(NodeProvisioningConstants.SLAVE_JVM_OPTIONS_PROPERTY);
+    s = config.get(JPPFProperties.PROVISIONING_SLAVE_JVM_OPTIONS);
     jvmOptions.addAll(parseJvmOptions(s).first());
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
     List<String> command = new ArrayList<>();

@@ -18,6 +18,8 @@
 
 package org.jppf.utils;
 
+import org.jppf.JPPFTimeoutException;
+
 /**
  * A set of utility methods to facilitate concurrent and multithreaded rpogramming.
  * @author Laurent Cohen
@@ -63,15 +65,31 @@ public final class ConcurrentUtils {
    * @throws IllegalArgumentException if the millis are negative.
    */
   public static boolean awaitCondition(final Condition condition, final long millis) throws IllegalArgumentException {
+    return awaitCondition(condition, millis, false);
+  }
+
+  /**
+   * Wait until the specified condition is fulfilled, or the timeout expires, whichever happens first.
+   * This method waits for 1 millisecond each time the condition check fails and until the condition is fulfilled or the timeout expires.
+   * @param condition the condition to check.
+   * @param millis the milliseconds part of the timeout. A value of zero means an infinite timeout.
+   * @param throwExceptionOnTImeout whether to raise an exception if the timeout expires.
+   * @return true if the condition is {@code null} or was fulfilled before the timeout expired, {@code false} otherwise.
+   * @throws IllegalArgumentException if the millis are negative.
+   * @throws JPPFTimeoutException if the timeout expires.
+   */
+  public static boolean awaitCondition(final Condition condition, final long millis, final boolean throwExceptionOnTImeout) throws IllegalArgumentException, JPPFTimeoutException {
     if (condition == null) return true;
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
     long timeout = millis > 0L ? millis : Long.MAX_VALUE;
     long start = System.nanoTime();
     ThreadSynchronization monitor = new ThreadSynchronization() { };
     boolean fulfilled = false;
-    while (!(fulfilled = condition.evaluate()) && ((System.nanoTime() - start) / 1_000_000L < timeout)) {
+    long elapsed = 0L;
+    while (!(fulfilled = condition.evaluate()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout)) {
       monitor.goToSleep(1L);
     }
+    if ((elapsed > timeout) && throwExceptionOnTImeout) throw new JPPFTimeoutException(String.format("exceeded timeout of %,d", timeout));
     return fulfilled;
   }
 

@@ -40,8 +40,7 @@ import test.org.jppf.test.setup.common.*;
  * Unit tests for {@link JPPFExecutorService}.
  * @author Laurent Cohen
  */
-public class TestExecutorServiceConfiguration extends Setup1D1N1C
-{
+public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   /**
    * Default duration for tasks that use a duration. Adjust the value for slow hardware.
    */
@@ -64,8 +63,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * @throws IOException if a process could not be started.
    */
   @Before
-  public void setupTest() throws IOException
-  {
+  public void setupTest() throws IOException {
     executor = new JPPFExecutorService(client);
   }
 
@@ -74,8 +72,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * @throws IOException if a process could not be stopped.
    */
   @After
-  public void cleanupTest() throws IOException
-  {
+  public void cleanupTest() throws IOException {
     if ((executor != null) && !executor.isShutdown()) executor.shutdownNow();
   }
 
@@ -83,9 +80,8 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testSubmitCallableWithTimeout() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testSubmitCallableWithTimeout() throws Exception {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getTaskConfiguration().setOnTimeoutCallback(new MyTaskCallback(TIMEOUT_MESSAGE));
     executor.getConfiguration().getTaskConfiguration().setTimeoutSchedule(new JPPFSchedule(1500L));
@@ -102,9 +98,8 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=15000)
-  public void testSubmitCallableWithJobTimeout() throws Exception
-  {
+  @Test(timeout = 15000)
+  public void testSubmitCallableWithJobTimeout() throws Exception {
     client.setLocalExecutionEnabled(false);
     executor.getConfiguration().getJobConfiguration().getSLA().setJobExpirationSchedule(new JPPFSchedule(1500L));
     executor.getConfiguration().getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
@@ -120,9 +115,8 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSubmitWithDataProvider() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSubmitWithDataProvider() throws Exception {
     client.setLocalExecutionEnabled(false);
     DataProvider dp = new MemoryMapDataProvider();
     String key = "myKey";
@@ -141,9 +135,8 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testResetConfiguration() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testResetConfiguration() throws Exception {
     client.setLocalExecutionEnabled(false);
     ExecutorServiceConfiguration config = executor.getConfiguration();
     config.getTaskConfiguration().setOnCancelCallback(new MyTaskCallback(CANCELLED_MESSAGE));
@@ -169,19 +162,17 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testSubmitWithClientExecutionPolicy() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testSubmitWithClientExecutionPolicy() throws Exception {
     client.setLocalExecutionEnabled(true);
     executor.setBatchTimeout(100L);
     executor.setBatchSize(2);
     executor.getConfiguration().getJobConfiguration().getClientSLA().setExecutionPolicy(new Equal("jppf.channel.local", true));
     int nbTasks = 10;
     List<Future<String>> futures = new ArrayList<>();
-    for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
+    for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask()));
     assertEquals(nbTasks, futures.size());
-    for (Future<String> future: futures)
-    {
+    for (Future<String> future : futures) {
       String s = future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
@@ -194,9 +185,8 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
    * Submit a Callable task with a timeout.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSubmitWithJobListener() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSubmitWithJobListener() throws Exception {
     client.setLocalExecutionEnabled(false);
     CountingJobListener listener = new CountingJobListener();
     executor.setBatchTimeout(2000L);
@@ -204,10 +194,9 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     executor.getConfiguration().getJobConfiguration().addJobListener(listener);
     int nbTasks = 20;
     List<Future<String>> futures = new ArrayList<>();
-    for (int i=0; i<nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
+    for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
     assertEquals(nbTasks, futures.size());
-    for (Future<String> future: futures)
-    {
+    for (Future<String> future : futures) {
       String s = future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
@@ -224,8 +213,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   /**
    * A callback used in lieu of JPPFTask.onCancel() and JPPFTask.onTimeout().
    */
-  private static class MyTaskCallback extends JPPFTaskCallback<String>
-  {
+  private static class MyTaskCallback extends JPPFTaskCallback<String> {
     /**
      * A message that will be set as the task's result.
      */
@@ -235,14 +223,12 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
      * Initialize this callback with a message that will be set as the task's result and printed to the node console.
      * @param message a message that will be set as the task's result.
      */
-    public MyTaskCallback(final String message)
-    {
+    public MyTaskCallback(final String message) {
       this.message = message;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
       getTask().setResult(message);
       System.out.println(message);
     }
@@ -251,8 +237,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   /**
    * 
    */
-  private static class MyCallableTask implements Callable<String>, Serializable
-  {
+  private static class MyCallableTask implements Callable<String>, Serializable {
     /**
      * the duration of this task.
      */
@@ -261,24 +246,20 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
     /**
      * Initialize this task.
      */
-    public MyCallableTask()
-    {
+    public MyCallableTask() {
     }
 
     /**
      * Initialize this task with the specified duration.
      * @param duration the duration of this task.
      */
-    public MyCallableTask(final long duration)
-    {
+    public MyCallableTask(final long duration) {
       this.duration = duration;
     }
 
     @Override
-    public String call() throws Exception
-    {
-      if (duration > 0L)
-      {
+    public String call() throws Exception {
+      if (duration > 0L) {
         Thread.sleep(duration);
         //System.out.println("task executed");
         return BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE;
@@ -290,8 +271,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
   /**
    * 
    */
-  private static class MyTask implements Callable<String>, Serializable, DataProviderHolder
-  {
+  private static class MyTask implements Callable<String>, Serializable, DataProviderHolder {
     /**
      * The key of an object to retrieve from the data provider.
      */
@@ -305,22 +285,19 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C
      * Initialize this task with the specified duration.
      * @param key the key of an object to retrieve from the data provider.
      */
-    public MyTask(final String key)
-    {
+    public MyTask(final String key) {
       this.key = key;
     }
 
     @Override
-    public String call() throws Exception
-    {
+    public String call() throws Exception {
       String result = dataProvider.getParameter(key);
       System.out.println("task executed");
       return result;
     }
 
     @Override
-    public void setDataProvider(final DataProvider dataProvider)
-    {
+    public void setDataProvider(final DataProvider dataProvider) {
       this.dataProvider = dataProvider;
     }
   }

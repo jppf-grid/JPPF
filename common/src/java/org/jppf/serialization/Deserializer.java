@@ -184,8 +184,7 @@ class Deserializer {
       Field field = cd.clazz.getDeclaredField(fd.name);
       if (!field.isAccessible()) field.setAccessible(true);
       if (typeDesc.primitive) {
-        switch(typeDesc.signature.charAt(0))
-        {
+        switch(typeDesc.signature.charAt(0)) {
           case 'B': field.setByte(obj, (byte) in.read()); break;
           case 'S': field.setShort(obj, in.readShort()); break;
           case 'I': field.setInt(obj, in.readInt()); break;

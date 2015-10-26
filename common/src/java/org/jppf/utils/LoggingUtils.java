@@ -18,6 +18,7 @@
 
 package org.jppf.utils;
 
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.Logger;
 
 /**
@@ -28,7 +29,7 @@ public final class LoggingUtils {
   /**
    * Whether this JVM is running an Android jPPF node.
    */
-  private static final boolean ANDROID = JPPFConfiguration.getProperties().getBoolean("jppf.node.android", false);
+  private static final boolean ANDROID = JPPFConfiguration.get(JPPFProperties.NODE_ANDROID);
 
   /**
    * Instanciation not permitted.

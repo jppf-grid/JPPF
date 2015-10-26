@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 
@@ -45,7 +46,7 @@ public class ClassLoaderRequestHandler
   /**
    * Maximum time to wait in nanoseconds before sending the next request.
    */
-  private static final long MAX_WAIT = JPPFConfiguration.getProperties().getLong("jppf.node.classloading.batch.period", 100L);
+  private static final long MAX_WAIT = JPPFConfiguration.get(JPPFProperties.NODE_CLASSLOADING_BATCH_PERIOD);
   /**
    * How many nanaoseconds in a millisecond.
    */

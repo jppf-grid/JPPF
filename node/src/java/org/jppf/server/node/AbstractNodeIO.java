@@ -28,6 +28,7 @@ import org.jppf.io.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -68,7 +69,7 @@ public abstract class AbstractNodeIO implements NodeIO {
    */
   public AbstractNodeIO(final JPPFNode node) {
     this.node = node;
-    HookFactory.registerConfigSingleHook("jppf.serialization.exception.hook", SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
+    HookFactory.registerConfigSingleHook(JPPFProperties.SERIALIZATION_EXCEPTION_HOOK, SerializationExceptionHook.class, new DefaultSerializationExceptionHook(), getClass().getClassLoader());
   }
 
   /**

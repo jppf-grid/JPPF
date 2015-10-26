@@ -24,6 +24,7 @@ import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.*;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -48,7 +49,7 @@ public class S1Runner extends AbstractScenarioRunner {
       int iterations = props.getInt("matrix.iterations", 10);
       int nbChannels = props.getInt("matrix.nbChannels", 1);
       if (nbChannels < 1) nbChannels = 1;
-      JPPFConfiguration.getProperties().setProperty("jppf.pool.size", String.valueOf(nbChannels));
+      JPPFConfiguration.getProperties().set(JPPFProperties.POOL_SIZE, nbChannels);
       int nbRows = props.getInt("task.nbRows", 1);
       output("performing " + size + 'x' + size + " matrix multiplication for " + iterations + " iterations, using " + nbChannels + " channels");
   

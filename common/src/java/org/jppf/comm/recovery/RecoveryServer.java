@@ -22,6 +22,7 @@ import java.net.*;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -55,17 +56,17 @@ public class RecoveryServer extends ThreadSynchronization implements Runnable {
    */
   public RecoveryServer() {
     TypedProperties config = JPPFConfiguration.getProperties();
-    int reaperPoolSize = config.getInt("jppf.recovery.reaper.pool.size", Runtime.getRuntime().availableProcessors());
-    long reaperRunInterval = config.getLong("jppf.recovery.reaper.run.interval", 60000L);
+    int reaperPoolSize = config.get(JPPFProperties.RECOVERY_REAPER_POOL_SIZE);
+    long reaperRunInterval = config.get(JPPFProperties.RECOVERY_REAPER_RUN_INTERVAL);
     reaper = new Reaper(this, reaperPoolSize, reaperRunInterval);
   }
 
   @Override
   public void run() {
     TypedProperties config = JPPFConfiguration.getProperties();
-    int maxRetries = config.getInt("jppf.recovery.max.retries", 3);
-    int socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 6000);
-    int recoveryPort = config.getInt("jppf.recovery.server.port", 22222);
+    int maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
+    int socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
+    int recoveryPort = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
     try {
       serverSocket = new ServerSocket(recoveryPort);
       while (!isStopped()) {

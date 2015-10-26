@@ -24,6 +24,7 @@ import org.jppf.client.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -99,7 +100,7 @@ public class MatrixRunner {
         output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
       }
       output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled"))
+      if (JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED))
       {
         JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();
         output("End statistics :\n" + stats.toString());

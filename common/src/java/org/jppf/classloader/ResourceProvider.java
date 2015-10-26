@@ -21,6 +21,7 @@ package org.jppf.classloader;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -122,8 +123,7 @@ public interface ResourceProvider {
      * @return an {@link AbstractResourceProvider} implementation.
      */
     public static ResourceProvider initResourceProvider() {
-      TypedProperties config = JPPFConfiguration.getProperties();
-      String name = config.getString("jppf.resource.provider.class", ResourceProviderImpl.class.getName());
+      String name = JPPFConfiguration.get(JPPFProperties.RESOURCE_PROVIDER_CLASS);
       if (debugEnabled) log.debug("jppf.resource.provider.class = {}", name);
       try {
         Class<?> clazz = Class.forName(name);

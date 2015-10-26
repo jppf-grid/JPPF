@@ -27,6 +27,7 @@ import java.util.concurrent.*;
 import javax.net.ssl.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -433,7 +434,7 @@ public class SSLHandler {
    * @return an {@link ExecutorService} instance.
    */
   private static ExecutorService createExecutor() {
-    int n = JPPFConfiguration.getProperties().getInt("jppf.ssl.thread.pool", 10);
+    int n = JPPFConfiguration.get(JPPFProperties.SSL_THREAD_POOL_SIZE);
     LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     JPPFThreadFactory tf = new JPPFThreadFactory("SSLDelegatedTasks");
     ThreadPoolExecutor exec = new ThreadPoolExecutor(n, n, 10L, TimeUnit.SECONDS, queue, tf);

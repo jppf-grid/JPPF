@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.load.balancer.LoadBalancingProfile;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -80,7 +81,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
   {
     if (debugEnabled) log.debug("in constructor with profile name");
     this.name = profileName;
-    String prefix = "jppf.load.balancing.profile." + profileName + '.';
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
     if (performanceCacheSize < 1) performanceCacheSize = 1;

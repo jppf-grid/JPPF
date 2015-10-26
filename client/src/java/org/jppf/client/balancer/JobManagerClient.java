@@ -31,6 +31,7 @@ import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.queue.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -107,7 +108,7 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
    */
   public JobManagerClient(final JPPFClient client) throws Exception {
     if (client == null) throw new IllegalArgumentException("client is null");
-    this.localEnabled = client.getConfig().getBoolean("jppf.local.execution.enabled", false);
+    this.localEnabled = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_ENABLED);
     Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.queue = new JPPFPriorityQueue(this);
     taskQueueChecker = new TaskQueueChecker(queue);

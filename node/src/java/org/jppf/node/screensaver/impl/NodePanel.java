@@ -24,6 +24,7 @@ import javax.swing.*;
 
 import org.jppf.node.screensaver.ScreenSaverMain;
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * This class displays the connection status, execution status and number of tasks for a node.
@@ -45,7 +46,7 @@ public class NodePanel extends JPanel {
   /**
    * Default path for the central image.
    */
-  static final String DEFAULT_IMG = IMAGE_PATH + '/' + "jppf@home.gif";
+  static final String DEFAULT_IMG = JPPFProperties.SCREENSAVER_CENTERIMAGE.getDefaultValue();
   /**
    * Number of tasks executed by the node.
    */
@@ -101,7 +102,7 @@ public class NodePanel extends JPanel {
    * @return the panel as a {@link JComponent}.
    */
   protected JComponent createTopPanel() {
-    String path = JPPFConfiguration.getProperties().getString("jppf.screensaver.centerimage", DEFAULT_IMG);
+    String path = JPPFConfiguration.get(JPPFProperties.SCREENSAVER_CENTERIMAGE);
     ImageIcon logo = ScreenSaverMain.loadImage(path);
     if (logo == null) logo = ScreenSaverMain.loadImage(DEFAULT_IMG);
     return new JLabel(logo);

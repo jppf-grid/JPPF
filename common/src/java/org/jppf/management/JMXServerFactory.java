@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -41,13 +42,13 @@ public class JMXServerFactory
    * Create a JMXServer instance based on the specified parameters.
    * @param uuid the server's unique identifier.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
-   * @param portProperties an ordered set of configuration properties to use for looking up the desired management port.
+   * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
    * @return an instance of {@link JMXServer}.
    * @throws Exception if the server could not be created.
    */
-  public static JMXServer createServer(final String uuid, final boolean ssl, final String...portProperties) throws Exception
+  public static JMXServer createServer(final String uuid, final boolean ssl, final JPPFProperty<Integer> portProperty) throws Exception
   {
-    JMXServer server = new JMXMPServer(uuid, ssl, portProperties);
+    JMXServer server = new JMXMPServer(uuid, ssl, portProperty);
     if (debugEnabled) log.debug("created JMX server: " + server);
     return server;
   }

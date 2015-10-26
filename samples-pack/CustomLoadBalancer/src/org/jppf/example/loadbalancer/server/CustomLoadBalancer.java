@@ -22,6 +22,7 @@ import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -152,9 +153,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
     // if allowed time is not defined we assume no time limit
     if (allowedTime <= 0) allowedTime = Long.MAX_VALUE;
     // get the number of processing threads in the node
-    int nbThreads = getNodeConfiguration().getJppf().getInt("jppf.processing.threads", -1);
-    // if number of threads is not defined, we assume it is the number of available processors
-    if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
+    int nbThreads = getNodeConfiguration().getJppf().get(JPPFProperties.PROCESSING_THREADS);
     // max node heap size of the node in bytes
     long nodeMemory = getNodeConfiguration().getRuntime().getLong("maxMemory");
     // we assume 20 MB of the node's memory is taken by JPPF code and add-ons

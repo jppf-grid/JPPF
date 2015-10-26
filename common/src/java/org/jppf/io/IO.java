@@ -21,7 +21,7 @@ package org.jppf.io;
 import java.io.Closeable;
 
 import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.configuration.ConfigurationHelper;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.pooling.AbstractBoundedObjectPoolQueue;
 
 /**
@@ -32,27 +32,27 @@ public interface IO extends Closeable {
   /**
    * Size of send and receive buffer for socket connections. Defaults to 32768.
    */
-  int SOCKET_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.socket.buffer.size", 32*1024, 1024, 1024 * 1024);
+  int SOCKET_BUFFER_SIZE = JPPFConfiguration.get(JPPFProperties.SOCKET_BUFFER_SIZE);
   /**
    * Disable Nagle's algorithm to improve performance. Defaults to true.
    */
-  boolean SOCKET_TCP_NODELAY = JPPFConfiguration.getProperties().getBoolean("jppf.socket.tcp_nodelay", true);
+  boolean SOCKET_TCP_NODELAY = JPPFConfiguration.get(JPPFProperties.SOCKET_TCP_NODELAY);
   /**
    * Enable / disable keepalive. Defaults to false.
    */
-  boolean SOCKET_KEEPALIVE = JPPFConfiguration.getProperties().getBoolean("jppf.socket.keepalive", false);
+  boolean SOCKET_KEEPALIVE = JPPFConfiguration.get(JPPFProperties.SOCKET_KEEPALIVE);
   /**
    * Size of temporary buffers (including direct buffers) used in I/O transfers. Defaults to 32768.
    */
-  int TEMP_BUFFER_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.temp.buffer.size", 32*1024, 1024, 65536);
+  int TEMP_BUFFER_SIZE = JPPFConfiguration.get(JPPFProperties.TEMP_BUFFER_SIZE);
   /**
    * Size of temporary buffer pool. Defaults to 10.
    */
-  int TEMP_BUFFER_POOL_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.temp.buffer.pool.size", 10, 1, 2*1024);
+  int TEMP_BUFFER_POOL_SIZE = JPPFConfiguration.get(JPPFProperties.TEMP_BUFFER_POOL_SIZE);
   /**
    * Size of temporary buffer pool. Defaults to 100.
    */
-  int LENGTH_BUFFER_POOL_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt("jppf.length.buffer.pool.size", 100, 1, 2*1024);
+  int LENGTH_BUFFER_POOL_SIZE = JPPFConfiguration.get(JPPFProperties.LENGTH_BUFFER_POOL_SIZE);
   /**
    * A definition of an empty byte array.
    */
@@ -68,14 +68,14 @@ public interface IO extends Closeable {
   /**
    * Ratio of free memory / requested allocation size threshold that triggers disk overflow.
    */
-  double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.getProperties().getDouble("jppf.disk.overflow.threshold", 2.0d);
+  double FREE_MEM_TO_SIZE_RATIO = JPPFConfiguration.get(JPPFProperties.DISK_OVERFLOW_THRESHOLD);
   /**
    * Whether to trigger a garbage collection whenever disk overflow is triggered.
    */
-  boolean GC_ON_DISK_OVERFLOW = JPPFConfiguration.getProperties().getBoolean("jppf.gc.on.disk.overflow", true);
+  boolean GC_ON_DISK_OVERFLOW = JPPFConfiguration.get(JPPFProperties.GC_ON_DISK_OVERFLOW);
   /**
    * The available heap threshold above which it is unlikely that memory fragmentation will cause object allocations to fail,
    * i.e. when there is enough free memory but not enough <i><b>contiguous</b></i> free memory. Default value is 32 MB.  
    */
-  long LOW_MEMORY_THRESHOLD = JPPFConfiguration.getProperties().getLong("jppf.low.memory.threshold", 32L) * 1024L * 1024L;
+  long LOW_MEMORY_THRESHOLD = JPPFConfiguration.get(JPPFProperties.LOW_MEMORY_THRESHOLD) * 1024L * 1024L;
 }

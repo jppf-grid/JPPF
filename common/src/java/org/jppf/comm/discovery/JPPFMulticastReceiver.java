@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -88,9 +89,9 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
    * @param ipFilter handles include and exclude IP filters.
    */
   public JPPFMulticastReceiver(final IPFilter ipFilter) {
-    group = config.getString("jppf.discovery.group", "230.0.0.1");
-    port = config.getInt("jppf.discovery.port", 11111);
-    timeout = config.getInt("jppf.discovery.timeout", 5000);
+    group = config.get(JPPFProperties.DISCOVERY_GROUP);
+    port = config.get(JPPFProperties.DISCOVERY_PORT);
+    timeout = config.get(JPPFProperties.DISCOVERY_TIMEOUT);
     this.ipFilter = ipFilter;
   }
 
@@ -227,8 +228,6 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
               byte[] bytes = new byte[len];
               buffer.get(bytes);
               info = JPPFConnectionInformation.fromBytes(bytes);
-              String host = config.getString("jppf.management.host", null);
-              if (host == null) host = addr.getHostAddress();
               addConnectionInfo(info);
             } catch(SocketTimeoutException e) {
               if (traceEnabled) log.trace(e.getMessage(), e);

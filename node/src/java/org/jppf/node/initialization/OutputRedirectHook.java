@@ -22,6 +22,7 @@ import java.io.*;
 import java.util.Date;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -52,10 +53,11 @@ public class OutputRedirectHook implements InitializationHook {
    */
   private void handleStream(final UnmodifiableTypedProperties config, final boolean isOut) {
     try {
-      String propBase = "jppf.redirect." + (isOut ? "out" :  "err");
-      File outFile = config.getFile(propBase);
+      JPPFProperty<File> pathProp = isOut ? JPPFProperties.REDIRECT_OUT : JPPFProperties.REDIRECT_ERR;
+      File outFile = config.get(pathProp);
       if (outFile == null) return;
-      boolean append = config.getBoolean(propBase + ".append", false);
+      JPPFProperty<Boolean> appendProp = isOut ? JPPFProperties.REDIRECT_OUT_APPEND : JPPFProperties.REDIRECT_ERR_APPEND;
+      boolean append = config.get(appendProp);
       OutputStream os = new BufferedOutputStream(new FileOutputStream(outFile, append));
       if (os != null) {
         PrintStream pos = new PrintStream(os, true);

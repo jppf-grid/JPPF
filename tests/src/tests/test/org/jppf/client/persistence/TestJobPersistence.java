@@ -28,6 +28,7 @@ import org.jppf.client.event.*;
 import org.jppf.client.persistence.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -42,7 +43,8 @@ public class TestJobPersistence extends Setup1D1N {
    * Test the recovery of a job by closing the JPPF client before it completes.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=20000)
+  @Test
+  //@Test(timeout=20000)
   public void testJobRecovery() throws Exception {
     String key = null;
     JobPersistence<String> pm = null;
@@ -51,9 +53,9 @@ public class TestJobPersistence extends Setup1D1N {
     JPPFClient client = null;
     try {
       // send tasks 1 at a time
-      config.setProperty("jppf.load.balancing.algorithm", "manual");
-      config.setProperty("jppf.load.balancing.profile", "test");
-      config.setProperty("jppf.load.balancing.profile.test.size", "1");
+      config.set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
+        .set(JPPFProperties.LOAD_BALANCING_PROFILE, "test")
+        .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".test.size", 1);
       client = BaseSetup.createClient(null, false);
       int nbTasks = 3;
       final AtomicBoolean resultsReceived = new AtomicBoolean(false);
@@ -87,9 +89,9 @@ public class TestJobPersistence extends Setup1D1N {
       assertEquals(nbTasks, results.size());
       assertEquals(nbTasks, job2.getResults().size());
     } finally {
-      config.remove("jppf.load.balancing.algorithm");
-      config.remove("jppf.load.balancing.profile");
-      config.remove("jppf.load.balancing.profile.test.size");
+      config.remove(JPPFProperties.LOAD_BALANCING_ALGORITHM);
+      config.remove(JPPFProperties.LOAD_BALANCING_PROFILE);
+      config.remove(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".test.size");
       if ((pm != null) && (key != null)) pm.deleteJob(key);
       if (client != null) client.close();
     }

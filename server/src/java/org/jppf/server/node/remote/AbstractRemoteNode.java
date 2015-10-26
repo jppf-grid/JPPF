@@ -21,6 +21,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.node.connection.DriverConnectionInfo;
 import org.jppf.server.node.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -66,7 +67,7 @@ public abstract class AbstractRemoteNode extends JPPFNode implements ClientConne
     TypedProperties config = JPPFConfiguration.getProperties();
     (nodeConnection = new RemoteNodeConnection(connectionInfo, serializer)).init();
     if (nodeIO == null) nodeIO = new RemoteNodeIO(this);
-    if (config.getBoolean("jppf.recovery.enabled", false)) {
+    if (config.get(JPPFProperties.RECOVERY_ENABLED)) {
       if (recoveryConnection == null) {
         if (debugEnabled) log.debug("Initializing recovery");
         recoveryConnection = new ClientConnection(uuid, connectionInfo.getHost(), connectionInfo.getRecoveryPort());

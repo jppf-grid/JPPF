@@ -115,7 +115,7 @@ public class ServerTaskBundleClient {
     if (taskList == null) throw new IllegalArgumentException("taskList is null");
     this.job = job;
     this.dataProvider = dataProvider;
-    if (!job.isHandshake()) {
+    if (!job.isHandshake() && !job.getParameter(BundleParameter.CLOSE_COMMAND, false)) {
       int[] positions = job.getParameter(BundleParameter.TASK_POSITIONS);
       int[] maxResubmits = job.getParameter(BundleParameter.TASK_MAX_RESUBMITS);
       int slaMaxResubmits = job.getSLA().getMaxTaskResubmits();

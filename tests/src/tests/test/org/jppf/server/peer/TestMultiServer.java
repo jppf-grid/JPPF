@@ -19,6 +19,7 @@
 package test.org.jppf.server.peer;
 
 import org.jppf.node.policy.Equal;
+import org.jppf.utils.JPPFConfiguration;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -27,46 +28,42 @@ import test.org.jppf.test.setup.*;
  * Test a multi-server topology with 2 servers, 1 node attached to each server and 1 client.
  * @author Laurent Cohen
  */
-public class TestMultiServer extends AbstractNonStandardSetup
-{
+public class TestMultiServer extends AbstractNonStandardSetup {
   /**
    * Launches 2 drivers with 1 node attached to each and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     client = BaseSetup.setup(2, 2, true, createConfig("p2p"));
+    awaitPeersInitialized();
+    System.out.println("configuration: " + JPPFConfiguration.getProperties());
   }
 
   /**
-   * 
+   *
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
-  public void testSimpleJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSimpleJob() throws Exception {
     super.testSimpleJob(new Equal("jppf.server.port", 11101));
   }
 
   @Override
-  @Test(timeout=15000)
-  public void testMultipleJobs() throws Exception
-  {
+  @Test(timeout = 15000)
+  public void testMultipleJobs() throws Exception {
     super.testMultipleJobs();
   }
 
   @Override
-  @Test(timeout=10000)
-  public void testCancelJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testCancelJob() throws Exception {
     super.testCancelJob();
   }
 
   @Override
-  @Test(timeout=5000)
-  public void testNotSerializableExceptionFromNode() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testNotSerializableExceptionFromNode() throws Exception {
     super.testNotSerializableExceptionFromNode();
   }
 }

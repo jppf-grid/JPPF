@@ -19,6 +19,7 @@ package sample.dist.manyjobs;
 
 import org.jppf.client.JPPFClient;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -45,8 +46,7 @@ public class ManyConnections
     try
     {
       TypedProperties props = JPPFConfiguration.getProperties();
-      props.setProperty("jppf.discovery.enabled", "true");
-      props.setProperty("jppf.pool.size", "50");
+      props.set(JPPFProperties.DISCOVERY_ENABLED, true).set(JPPFProperties.POOL_SIZE, 50);
       long start = System.nanoTime();
       jppfClient = new JPPFClient();
       //Thread.sleep(1000);

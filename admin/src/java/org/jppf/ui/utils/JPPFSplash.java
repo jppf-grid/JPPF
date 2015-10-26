@@ -27,6 +27,7 @@ import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * This class handles the splash screen displayed while starting the admin console.
@@ -53,7 +54,7 @@ public class JPPFSplash extends Window
   /**
    * Delay between images scrolling.
    */
-  private long delay = JPPFConfiguration.getProperties().getLong("jppf.ui.splash.delay", 500L);
+  private long delay = JPPFConfiguration.get(JPPFProperties.UI_SPLASH_DELAY);
 
   /**
    * Initialize this window with the specified owner.

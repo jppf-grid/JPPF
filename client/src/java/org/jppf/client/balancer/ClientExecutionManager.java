@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.execute.AbstractExecutionManager;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperty;
 import org.slf4j.*;
 
 /**
@@ -46,10 +47,9 @@ public class ClientExecutionManager extends AbstractExecutionManager
   /**
    * Initialize this execution manager.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
-   * @param legacyNbThreadsProperty the legacy name of the property which configures the number of threads.
    */
-  public ClientExecutionManager(final String nbThreadsProperty, final String legacyNbThreadsProperty) {
-    super(nbThreadsProperty, legacyNbThreadsProperty);
+  public ClientExecutionManager(final JPPFProperty<Integer> nbThreadsProperty) {
+    super(nbThreadsProperty);
   }
 
   /**

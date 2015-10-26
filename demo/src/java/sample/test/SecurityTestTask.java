@@ -21,6 +21,7 @@ import java.io.*;
 import java.net.Socket;
 
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * This task is intended for testing the framework only.
@@ -68,7 +69,7 @@ public class SecurityTestTask extends JPPFTestTask
   {
     try
     {
-      String host = JPPFConfiguration.getProperties().getString("jppf.server.host", "localhost");
+      String host = JPPFConfiguration.get(JPPFProperties.SERVER_HOST);
       Socket s = new Socket(host, 1001);
       s.close();
     }

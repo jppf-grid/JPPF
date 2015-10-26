@@ -27,6 +27,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -108,7 +109,7 @@ public class LargeDataRunner
       nbTasks = config.getInt("largedata.tasks.per.job");
       nbChannels = config.getInt("largedata.channels");
       if (nbChannels < 1) nbChannels = 1;
-      config.setProperty("jppf.pool.size", String.valueOf(nbChannels));
+      config.set(JPPFProperties.POOL_SIZE, nbChannels);
       jppfClient = new JPPFClient();
       queue = new SubmitQueue(jppfClient);
       Thread t = new Thread(queue, "SubmitQueue");

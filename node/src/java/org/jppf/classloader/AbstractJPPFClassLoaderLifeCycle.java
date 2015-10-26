@@ -29,6 +29,7 @@ import org.jppf.caching.*;
 import org.jppf.classloader.resource.ResourceCache;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -54,7 +55,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */
-  private static final boolean FILE_LOOKUP = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.file.lookup", true);
+  private static final boolean FILE_LOOKUP = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
   /**
    * Determines whether this class loader should handle dynamic class updating.
    * @exclude
@@ -402,7 +403,7 @@ public abstract class AbstractJPPFClassLoaderLifeCycle extends URLClassLoader {
    * @return a {@code ResourceCache} object.
    */
   private ResourceCache createResourceCache() {
-    boolean enabled = JPPFConfiguration.getProperties().getBoolean("jppf.resource.cache.enabled", true);
+    boolean enabled = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_ENABLED);
     return new ResourceCache(enabled);
   }
 }

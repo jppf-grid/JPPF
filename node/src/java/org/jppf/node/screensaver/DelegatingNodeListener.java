@@ -20,6 +20,7 @@ package org.jppf.node.screensaver;
 import org.jppf.node.NodeInternal;
 import org.jppf.node.event.*;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * This class registers as a NodeLifeCycleListener and instantiates an implementation of {@link NodeIntegration},
@@ -42,7 +43,7 @@ public class DelegatingNodeListener extends NodeLifeCycleListenerAdapter {
       ScreenSaverMain ssm = ScreenSaverMain.getInstance();
       if (ssm != null) {
         TypedProperties config = ssm.getConfig();
-        String name = config.getString("jppf.screensaver.node.listener");
+        String name = config.get(JPPFProperties.SCREENSAVER_NODE_LISTENER);
         if (name != null) {
           Class<?> clazz = Class.forName(name, true, getClass().getClassLoader());
           delegate = (NodeIntegration) clazz.newInstance();

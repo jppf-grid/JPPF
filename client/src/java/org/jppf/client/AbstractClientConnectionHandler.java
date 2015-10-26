@@ -28,6 +28,7 @@ import org.jppf.client.event.*;
 import org.jppf.comm.socket.*;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -92,7 +93,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
     this.owner = owner;
     //if (owner != null) this.name = owner.getName();
     this.name = name;
-    long configSocketIdle = JPPFConfiguration.getProperties().getLong("jppf.socket.max-idle", -1L);
+    long configSocketIdle = JPPFConfiguration.get(JPPFProperties.SOCKET_MAX_IDLE);
     maxSocketIdleMillis = (configSocketIdle > 10L) ? configSocketIdle * 1000L : -1L;
   }
 

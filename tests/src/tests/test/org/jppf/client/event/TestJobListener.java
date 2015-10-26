@@ -25,6 +25,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.*;
@@ -136,14 +137,14 @@ public class TestJobListener extends Setup1D1N {
    * @param poolSize the size of the connection pool.
    */
   private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
-    config.setBoolean("jppf.local.execution.enabled", localEnabled);
-    config.setInt("jppf.local.execution.threads", 4);
-    config.setProperty("jppf.load.balancing.algorithm", "manual");
-    config.setProperty("jppf.load.balancing.profile", "manual");
-    config.setInt("jppf.load.balancing.profile.manual.size", 5);
-    config.setInt("jppf.pool.size", poolSize);
+    JPPFConfiguration.getProperties()
+    .set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled)
+    .set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
+    .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4)
+    .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
+    .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
+    .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
+    .set(JPPFProperties.POOL_SIZE, poolSize);
   }
 
   /**

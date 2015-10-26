@@ -27,6 +27,7 @@ import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.ClassNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -71,7 +72,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
    * @param localChannel the local channel to use.
    */
   public void initLocalChannel(final ChannelWrapper<?> localChannel) {
-    if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false)) {
+    if (JPPFConfiguration.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       this.localChannel = localChannel;
       ChannelSelector channelSelector = new LocalChannelSelector(localChannel);
       localChannel.setSelector(channelSelector);

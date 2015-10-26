@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.jppf.location.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * Privileged action wrapper for saving a resource definition to a temporary file.
@@ -161,7 +162,7 @@ public class SaveResourceAction implements PrivilegedAction<Location>
    */
   private static boolean isMemoryStorageType()
   {
-    String s = JPPFConfiguration.getProperties().getString("jppf.resource.cache.storage", FILE_STORAGE);
+    String s = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_STORAGE);
     return MEMORY_STORAGE.equalsIgnoreCase(s);
   }
 }

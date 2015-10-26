@@ -29,6 +29,7 @@ import org.jppf.node.NodeRunner;
 import org.jppf.process.*;
 import org.jppf.utils.*;
 import org.jppf.utils.ConcurrentUtils.Condition;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -50,12 +51,12 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Path prefix used for the root directory of each slave node.
    * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
    */
-  private static final String SLAVE_PATH_PREFIX = JPPFConfiguration.getProperties().getString(SLAVE_PATH_PREFIX_PROPERTY, "slave_nodes/node_");
+  private static final String SLAVE_PATH_PREFIX = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_PATH_PREFIX);
   /**
    * Directory where configuration files, other than the jppf configuration, are located.
    * The files in this folder will be copied into each slave node's 'config' directory.
    */
-  private static final String SLAVE_CONFIG_PATH = JPPFConfiguration.getProperties().getString(SLAVE_CONFIG_PATH_PROPERTY, "config");
+  private static final String SLAVE_CONFIG_PATH = JPPFConfiguration.get(JPPFProperties.PROVISIONING_SLAVE_CONFIG_PATH);
   /**
    * The directory where the slave's config files are located, relative to its root folder.
    */
@@ -67,7 +68,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
   /**
    * Max timeout in millis for checking the fulfillment of a provisioning request.
    */
-  static final long REQUEST_CHECK_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.provisioning.request.check.timeout", 15_000L);
+  static final long REQUEST_CHECK_TIMEOUT = JPPFConfiguration.get(JPPFProperties.PROVISIONING_REQUEST_CHECK_TIMEOUT);
   /**
    * Singleton instance of this class.
    */
@@ -235,8 +236,8 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     TypedProperties config = JPPFConfiguration.getProperties();
     TypedProperties props = new TypedProperties(config);
     for (String key: configOverrides.stringPropertyNames()) props.setProperty(key, configOverrides.getProperty(key));
-    props.setBoolean(MASTER_PROPERTY, false);
-    props.setBoolean(SLAVE_PROPERTY, true);
+    props.set(JPPFProperties.PROVISIONING_MASTER, false);
+    props.set(JPPFProperties.PROVISIONING_SLAVE, true);
     props.setInt(SLAVE_ID_PROPERTY, id);
     props.setString(MASTER_UUID_PROPERTY, NodeRunner.getUuid());
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
@@ -280,7 +281,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Automatically start slaves if specified in the configuration.
    */
   public static void handleStartup() {
-    int n = JPPFConfiguration.getProperties().getInt(STARTUP_SLAVES_PROPERTY, 0);
+    int n = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_SLAVES);
     if (n > 0) {
       String msg = "starting " + n + " slave nodes";
       log.info(msg);

@@ -26,6 +26,7 @@ import javax.management.*;
 
 import org.jppf.management.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -48,11 +49,11 @@ public class PeerAttributesHandler implements NotificationListener {
   /**
    * Property for total nodes attached to a peer driver.
    */
-  public static final String PEER_TOTAL_THREADS = "jppf.peer.processing.threads";
+  public static final String PEER_TOTAL_THREADS = JPPFProperties.PROCESSING_THREADS.getName();
   /**
    * Property for how often the timer task runs.
    */
-  private static final long PEERIOD = JPPFConfiguration.getProperties().getLong("jppf.peer.handler.period", 1000L);
+  private static final long PEERIOD = JPPFConfiguration.get(JPPFProperties.PEER_HANDLER_PERIOD);
   /**
    * The peers to manage.
    */
@@ -228,7 +229,7 @@ public class PeerAttributesHandler implements NotificationListener {
       totalNodes.decrementAndGet();
       JPPFSystemInformation sys = context.getSystemInformation();
       if (sys != null) {
-        int nbThreads = sys.getJppf().getInt("jppf.processing.threads", 1);
+        int nbThreads = sys.getJppf().getInt(JPPFProperties.PROCESSING_THREADS.getName(), 1);
         totalThreads.addAndGet(-nbThreads);
       }
       sendNotfication();
@@ -254,7 +255,7 @@ public class PeerAttributesHandler implements NotificationListener {
       totalNodes.incrementAndGet();
       JPPFSystemInformation sys = context.getSystemInformation();
       if (sys != null) {
-        int nbThreads = sys.getJppf().getInt("jppf.processing.threads", 1);
+        int nbThreads = sys.getJppf().getInt(JPPFProperties.PROCESSING_THREADS.getName(), 1);
         totalThreads.addAndGet(nbThreads);
       }
       sendNotfication();

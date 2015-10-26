@@ -30,7 +30,9 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.Task;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.ConcurrentUtils.Condition;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.AfterClass;
 
 import test.org.jppf.test.setup.BaseSetup.Configuration;
@@ -142,7 +144,7 @@ public class AbstractNonStandardSetup {
     int nbJobs = 3;
     try {
       if (client != null) client.close();
-      JPPFConfiguration.getProperties().setInt("jppf.pool.size", 2);
+      JPPFConfiguration.set(JPPFProperties.POOL_SIZE, 2);
       client = BaseSetup.createClient(null, false);
       String name = getClass().getSimpleName() + '.' + ReflectionUtils.getCurrentMethodName();
       List<JPPFJob> jobs = new ArrayList<>(nbJobs);
@@ -232,7 +234,7 @@ public class AbstractNonStandardSetup {
 
   /**
    * Test that we can obtain the state of a node via the node forwarder mbean.
-   * @throws Exception if nay error occurs.
+   * @throws Exception if any error occurs.
    */
   protected void testForwardingMBean() throws Exception {
     JMXDriverConnectionWrapper driverJmx = BaseSetup.getJMXConnection(client);
@@ -254,5 +256,28 @@ public class AbstractNonStandardSetup {
       }
     }
     assertTrue(ready);
+  }
+
+  /**
+   * Wait for the server with port = 11101 to be initialized.
+   * @throws Exception if any error occurs.
+   */
+  protected static void awaitPeersInitialized() throws Exception {
+    List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
+    for (JPPFConnectionPool pool: pools) {
+      final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
+      long timeout = 5000L;
+      long time = System.nanoTime();
+      ConcurrentUtils.awaitCondition(new Condition() {
+        @Override
+        public boolean evaluate() {
+          try {
+            return jmx.nbNodes() < 2;
+          } catch (Exception e) {
+            return false;
+          }
+        }
+      }, timeout, true);
+    }
   }
 }

@@ -18,6 +18,8 @@
 
 package sample.misc;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
+
 import java.util.List;
 
 import org.jppf.client.*;
@@ -49,17 +51,16 @@ public class BroadcastJobRunner {
    * @throws Exception if any error occurs.
    */
   private static void submitJob() throws Exception {
-    TypedProperties config = JPPFConfiguration.getProperties();
     boolean remoteEnabled = true;
-    config.setBoolean("jppf.discovery.enabled", false);
-    config.setString("jppf.drivers", "driver1");
-    config.setString("driver1.jppf.server.host", "localhost");
-    config.setInt("driver1.jppf.server.port", 11111);
-    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
-    config.setBoolean("jppf.local.execution.enabled", true);
-    config.setString("jppf.load.balancing.algorithm", "manual");
-    config.setString("jppf.load.balancing.profile", "manual");
-    config.setInt("jppf.load.balancing.profile.manual.size", 10);
+    JPPFConfiguration.set(DISCOVERY_ENABLED, false)
+      .set(DRIVERS, "driver1")
+      .setString("driver1.jppf.server.host", "localhost")
+      .setInt("driver1.jppf.server.port", 11111)
+      .set(REMOTE_EXECUTION_ENABLED, remoteEnabled)
+      .set(LOCAL_EXECUTION_ENABLED, true)
+      .set(LOAD_BALANCING_ALGORITHM, "manual")
+      .set(LOAD_BALANCING_PROFILE, "manual")
+      .setInt(LOAD_BALANCING_PROFILE.getName() + ".manual.size", 10);
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = new JPPFJob();
       job.setName("my job");
@@ -81,17 +82,16 @@ public class BroadcastJobRunner {
    * @throws Exception if any error occurs.
    */
   private static void submitJobWithExecutor() throws Exception {
-    TypedProperties config = JPPFConfiguration.getProperties();
     boolean remoteEnabled = true;
-    config.setBoolean("jppf.discovery.enabled", false);
-    config.setString("jppf.drivers", "driver1");
-    config.setString("driver1.jppf.server.host", "localhost");
-    config.setInt("driver1.jppf.server.port", 11111);
-    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
-    config.setBoolean("jppf.local.execution.enabled", true);
-    config.setString("jppf.load.balancing.algorithm", "manual");
-    config.setString("jppf.load.balancing.profile", "manual");
-    config.setInt("jppf.load.balancing.profile.manual.size", 10);
+    JPPFConfiguration.set(DISCOVERY_ENABLED, false)
+      .setString("jppf.drivers", "driver1")
+      .setString("driver1.jppf.server.host", "localhost")
+      .setInt("driver1.jppf.server.port", 11111)
+      .set(REMOTE_EXECUTION_ENABLED, remoteEnabled)
+      .set(LOCAL_EXECUTION_ENABLED, true)
+      .set(LOAD_BALANCING_ALGORITHM, "manual")
+      .set(LOAD_BALANCING_PROFILE, "manual")
+      .setInt(LOAD_BALANCING_PROFILE.getName() + ".manual.size", 10);
     System.out.println("starting client");
     JPPFClient client = new JPPFClient();
     System.out.println("creating executor");

@@ -18,6 +18,7 @@
 
 package test.org.jppf.client;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -60,13 +61,12 @@ public class TestJPPFJob extends Setup1D1N {
   @Test(timeout=5000)
   public void testJobListenerLocalExecution() throws Exception {
     int nbTasks = 10;
-    TypedProperties props = JPPFConfiguration.getProperties();
-    props.setBoolean("jppf.remote.execution.enabled", false);
-    props.setBoolean("jppf.local.execution.enabled", true);
-    props.setInt("jppf.local.execution.threads", 4);
-    props.setString("jppf.load.balancing.algorithm", "manual");
-    props.setString("jppf.load.balancing.profile", "manual");
-    props.setInt("jppf.load.balancing.profile.manual.size", 5);
+    JPPFConfiguration.set(LOAD_BALANCING_ALGORITHM, "manual")
+      .set(LOAD_BALANCING_PROFILE, "manual")
+      .setInt(LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
+      .set(REMOTE_EXECUTION_ENABLED, false)
+      .set(LOCAL_EXECUTION_ENABLED, true)
+      .set(LOCAL_EXECUTION_THREADS, 4);
     try (JPPFClient client = BaseSetup.createClient(null, false)) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 50L);
       CountingJobListener listener = new CountingJobListener();

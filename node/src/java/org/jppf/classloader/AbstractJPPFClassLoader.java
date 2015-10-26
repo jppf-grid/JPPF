@@ -26,6 +26,7 @@ import java.util.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.IteratorEnumeration;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -438,7 +439,7 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @return the delegation model indicator as computed from the configuration.
    */
   private static synchronized DelegationModel initDelegationModel() {
-    String s = JPPFConfiguration.getProperties().getString("jppf.classloader.delegation", "parent");
+    String s = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_DELEGATION);
     DelegationModel model = "url".equalsIgnoreCase(s) ? DelegationModel.URL_FIRST : DelegationModel.PARENT_FIRST;
     if (debugEnabled) log.debug(build("Using ", model, " class loader delegation model"));
     return model;

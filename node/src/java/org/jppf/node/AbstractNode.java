@@ -117,8 +117,7 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
 
   /**
    * {@inheritDoc}
-   * <p>
-   * This implementation throws a <code>JPPFUnsupportedOperationException</code>. It is up to subclasses to implement it.
+   * <p>This implementation throws a <code>JPPFUnsupportedOperationException</code>. It is up to subclasses to implement it.
    * @exclude
    */
   @Override
@@ -145,8 +144,8 @@ public abstract class AbstractNode extends ThreadSynchronization implements Node
   }
 
   /**
-   * This implementation does nothing.
    * {@inheritDoc}
+   * This implementation does nothing.
    * @exclude
    */
   @Override

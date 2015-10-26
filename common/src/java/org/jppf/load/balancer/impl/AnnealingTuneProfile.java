@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.jppf.load.balancer.LoadBalancingProfile;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 
 
 /**
@@ -95,7 +96,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    */
   public AnnealingTuneProfile(final String profileName)
   {
-    String prefix = "jppf.load.balancing.profile." + profileName + '.';
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     minSamplesToAnalyse = props.getInt(prefix + "minSamplesToAnalyse", 500);
     minSamplesToCheckConvergence = props.getInt(prefix + "minSamplesToCheckConvergence", 300);

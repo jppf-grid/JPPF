@@ -26,6 +26,7 @@ import java.util.*;
 import org.jppf.location.*;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -221,7 +222,7 @@ public class ResourceCache {
    */
   private void initTempFolders() {
     try {
-      String base = JPPFConfiguration.getProperties().getString("jppf.resource.cache.dir", null);
+      String base = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_DIR);
       if (base == null) {
         base = System.getProperty("java.io.tmpdir");
         if (base == null) base = System.getProperty("user.home");

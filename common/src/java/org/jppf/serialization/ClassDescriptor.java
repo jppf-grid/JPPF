@@ -204,9 +204,6 @@ class ClassDescriptor
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString()
   {

@@ -25,42 +25,14 @@ package org.jppf.node.provisioning;
  */
 public final class NodeProvisioningConstants {
   /**
-   * Name of the property which defines a node as master. Value defaults to {@code true}.
-   */
-  public static final String MASTER_PROPERTY = "jppf.node.provisioning.master";
-  /**
    * Name of the property which defines the uuid of the master in a given slave's configuration.
    * This can be used to correlate a slave and its master.
    */
   public static final String MASTER_UUID_PROPERTY = "jppf.node.provisioning.master.uuid";
   /**
-   * Name of the property which defines a node as a slave. Value defaults to {@code false}.
-   */
-  public static final String SLAVE_PROPERTY = "jppf.node.provisioning.slave";
-  /**
    * Name of the property which defines the id of a slave node.
    */
   public static final String SLAVE_ID_PROPERTY = "jppf.node.provisioning.slave.id";
-  /**
-   * Name of the property that specifies the path prefix used for the root directory of each slave node.
-   * The value of this property defaults to the path slave_nodes/node_", relative to the master's root directory.
-   */
-  public static final String SLAVE_PATH_PREFIX_PROPERTY = "jppf.node.provisioning.slave.path.prefix";
-  /**
-   * Name of the property specifying the directory where template configuration files, other than the jppf configuration, are located.
-   * The value of this property defaults to the path "config", relative to the master's root directory .
-   */
-  public static final String SLAVE_CONFIG_PATH_PROPERTY = "jppf.node.provisioning.slave.config.path";
-  /**
-   * A set of space-spearted JVM options that will always be added to the slaves' startup command,
-   * even if the property "jppf.jvm.options" is already supplied.
-   */
-  public static final String SLAVE_JVM_OPTIONS_PROPERTY = "jppf.node.provisioning.slave.jvm.options";
-  /**
-   * Number of slaves to launch when the master starts up.
-   * @exclude
-   */
-  public static final String STARTUP_SLAVES_PROPERTY = "jppf.node.provisioning.startup.slaves";
 
   /**
    * Instanciation not permitted.

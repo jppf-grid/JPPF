@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -41,7 +42,7 @@ public class PeerDiscoveryThread extends ThreadSynchronization implements Runnab
   /**
    * Interval for removal cleanup.
    */
-  private static final long REMOVAL_CLEANUP_INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.peer.discovery.removal.cleanup.interval", 30_000L);
+  private static final long REMOVAL_CLEANUP_INTERVAL = JPPFConfiguration.get(JPPFProperties.PEER_DISCOVERY_REMOVAL_CLEANUP_INTERVAL);
   /**
    * Contains the set of retrieved connection information objects.
    */

@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.node.idle.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -99,8 +100,8 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
   public void run() {
     if (idleModeSupported) {
       TypedProperties config = JPPFConfiguration.getProperties();
-      idleMode = config.getBoolean("jppf.idle.mode.enabled", false);
-      idleModeImmediateShutdown = config.getBoolean("jppf.idle.interruptIfRunning", true);
+      idleMode = config.get(JPPFProperties.IDLE_MODE_ENABLED);
+      idleModeImmediateShutdown = config.get(JPPFProperties.IDLE_INTERRUPT_IF_RUNNING);
     }
     boolean end = false;
     try {
@@ -144,7 +145,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    */
   private Process buildProcess() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
-    String s = config.getString("jppf.jvm.options");
+    String s = config.get(JPPFProperties.JVM_OPTIONS);
     if (debugEnabled) log.debug("jppf.jvm.options=" + s);
     Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
     List<String> jvmOptions = parsed.first();
@@ -258,7 +259,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
       if (idleMode && (process != null)) {
         idle.set(false);
         stoppedOnBusyState.set(true);
-        boolean b = JPPFConfiguration.getProperties().getBoolean("jppf.idle.interruptIfRunning", true);
+        boolean b = JPPFConfiguration.get(JPPFProperties.IDLE_INTERRUPT_IF_RUNNING);
         int action = b ? ProcessCommands.SHUTDOWN_INTERRUPT : ProcessCommands.SHUTDOWN_NO_INTERRUPT;
         if (debugEnabled) log.debug("sending command {}", ProcessCommands.getCommandName(action));
         //process.destroy();

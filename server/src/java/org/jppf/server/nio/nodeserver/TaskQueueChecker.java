@@ -33,6 +33,7 @@ import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -56,7 +57,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
   /**
    * Whether to allow dispatching to peer drivers without any node attached, defaults to {@code false}.
    */
-  private static final boolean disptachtoPeersWithoutNode = JPPFConfiguration.getProperties().getBoolean("jppf.peer.allow.orphans", false);
+  private static final boolean disptachtoPeersWithoutNode = JPPFConfiguration.get(JPPFProperties.PEER_ALLOW_ORPHANS);
   /**
    * Random number generator used to randomize the choice of idle channel.
    */

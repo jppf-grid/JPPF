@@ -30,6 +30,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.junit.Test;
 
@@ -186,12 +187,12 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     TypedProperties driverConfig = new TypedProperties();
     driverConfig.load(is);
     LoadBalancingInformation lbi = driver.loadBalancerInformation();
-    assertTrue(lbi.getAlgorithmNames().contains(driverConfig.getString("jppf.load.balancing.algorithm")));
-    assertEquals(driverConfig.getString("jppf.load.balancing.algorithm"), lbi.getAlgorithm());
+    assertTrue(lbi.getAlgorithmNames().contains(driverConfig.get(JPPFProperties.LOAD_BALANCING_ALGORITHM)));
+    assertEquals(driverConfig.get(JPPFProperties.LOAD_BALANCING_ALGORITHM), lbi.getAlgorithm());
     TypedProperties params = lbi.getParameters();
     assertNotNull(params);
-    String profile = driverConfig.getString("jppf.load.balancing.profile");
-    String prefix = "jppf.load.balancing.profile." + profile + '.';
+    String profile = driverConfig.get(JPPFProperties.LOAD_BALANCING_PROFILE);
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + "." + profile + '.';
     for (Map.Entry entry : driverConfig.entrySet()) {
       if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
       String name = (String) entry.getKey();

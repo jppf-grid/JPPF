@@ -22,6 +22,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 
@@ -49,9 +50,9 @@ public class JobFromTaskRunner
     try
     {
       TypedProperties config = JPPFConfiguration.getProperties();
-      int poolSize = config.getInt("jppf.pool.size", 1);
+      int poolSize = config.get(JPPFProperties.POOL_SIZE);
       // ensure we have at least 2 connections to the server
-      if (poolSize < 2) config.setProperty("jppf.pool.size", "2");
+      if (poolSize < 2) config.set(JPPFProperties.POOL_SIZE, 2);
       jppfClient = new JPPFClient();
       print("Running Long Task demo with");
       long start = System.currentTimeMillis();

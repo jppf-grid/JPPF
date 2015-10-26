@@ -29,6 +29,7 @@ import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -66,8 +67,8 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
    */
   public ChannelWrapperLocal() {
     executor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("LocalChannelWrapper"));
-    executionManager = new ClientExecutionManager("jppf.local.execution.threads", "jppf.local.execution.threads");
-    priority = JPPFConfiguration.getProperties().getInt("jppf.local.execution.priority", 0);
+    executionManager = new ClientExecutionManager(JPPFProperties.LOCAL_EXECUTION_THREADS);
+    priority = JPPFConfiguration.get(JPPFProperties.LOCAL_EXECUTION_PRIORITY);
     systemInfo = new JPPFSystemInformation(getConnectionUuid(), true, false);
     managementInfo = new JPPFManagementInfo("local", "local", -1, getConnectionUuid(), JPPFManagementInfo.NODE | JPPFManagementInfo.LOCAL, false);
     managementInfo.setSystemInfo(systemInfo);

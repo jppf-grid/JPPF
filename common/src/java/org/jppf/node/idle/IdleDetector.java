@@ -22,6 +22,7 @@ import java.util.Timer;
 
 import org.jppf.JPPFException;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -74,8 +75,8 @@ public class IdleDetector implements Runnable {
   private void init() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
     String factoryName = "org.jppf.node.idle.IdleTimeDetectorFactoryImpl";
-    idleTimeout = config.getLong("jppf.idle.timeout", 300000L);
-    pollInterval = config.getLong("jppf.idle.poll.interval", 1000L);
+    idleTimeout = config.get(JPPFProperties.IDLE_TIMEOUT);
+    pollInterval = config.get(JPPFProperties.IDLE_POLL_INTEFRVAL);
     Class c = Class.forName(factoryName);
     factory = (IdleTimeDetectorFactory) c.newInstance();
   }

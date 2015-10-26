@@ -24,6 +24,7 @@ import org.jppf.classloader.*;
 import org.jppf.comm.socket.SocketClient;
 import org.jppf.io.IOHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -42,7 +43,7 @@ abstract class AbstractClassServerDelegate extends AbstractClientConnectionHandl
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */
-  private static final boolean FILE_LOOKUP = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.file.lookup", true);
+  private static final boolean FILE_LOOKUP = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
   /**
    * Indicates whether this socket handler should be terminated and stop processing.
    */

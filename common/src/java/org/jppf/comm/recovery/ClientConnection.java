@@ -23,14 +23,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
  * Client-side connection for the recovery mechanism.
  * @author Laurent Cohen
  */
-public class ClientConnection extends AbstractRecoveryConnection
-{
+public class ClientConnection extends AbstractRecoveryConnection {
   /**
    * Logger for this class.
    */
@@ -60,8 +60,7 @@ public class ClientConnection extends AbstractRecoveryConnection
    * Initialize this client connection with the specified uuid.
    * @param uuid the JPPF node or client uuid.
    */
-  public ClientConnection(final String uuid)
-  {
+  public ClientConnection(final String uuid) {
     this.uuid = uuid;
   }
 
@@ -71,39 +70,32 @@ public class ClientConnection extends AbstractRecoveryConnection
    * @param host the host ot which to connect.
    * @param port the port number to connect to on the host.
    */
-  public ClientConnection(final String uuid, final String host, final int port)
-  {
+  public ClientConnection(final String uuid, final String host, final int port) {
     this.uuid = uuid;
     this.host = host;
     this.port = port;
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     runThread = Thread.currentThread();
-    try
-    {
+    try {
       configure();
       if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
       socketInitializer = new SocketInitializerImpl();
       socketInitializer.initializeSocket(socketWrapper);
-      if (!socketInitializer.isSuccessful())
-      {
+      if (!socketInitializer.isSuccessful()) {
         log.error("Could not initialize recovery client connection " + socketWrapper);
         close();
         return;
       }
-      while (!isStopped())
-      {
+      while (!isStopped()) {
         String message = receiveMessage(maxRetries, socketReadTimeout);
         if ((message != null) && message.startsWith("handshake")) setInitialized(true);
         String response = "checked;" + uuid;
         sendMessage(response);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       if (!(e instanceof InterruptedException)) fireClientConnectionEvent();
       close();
@@ -114,14 +106,13 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * Configure this client connection from the JPPF properties.
    */
-  private void configure()
-  {
+  private void configure() {
     if (debugEnabled) log.debug("configuring connection");
     TypedProperties config = JPPFConfiguration.getProperties();
-    if (host == null) host = config.getString("jppf.server.host", "localhost");
-    if (port < 0) port = config.getInt("jppf.recovery.server.port", 22222);
-    maxRetries = config.getInt("jppf.recovery.max.retries", 2);
-    socketReadTimeout = config.getInt("jppf.recovery.read.timeout", 60000);
+    if (host == null) host = config.get(JPPFProperties.SERVER_HOST);
+    if (port < 0) port = config.get(JPPFProperties.RECOVERY_SERVER_PORT);
+    maxRetries = config.get(JPPFProperties.RECOVERY_MAX_RETRIES);
+    socketReadTimeout = config.get(JPPFProperties.RECOVERY_READ_TIMEOUT);
     socketWrapper = new BootstrapSocketClient();
     socketWrapper.setHost(host);
     socketWrapper.setPort(port);
@@ -131,12 +122,10 @@ public class ClientConnection extends AbstractRecoveryConnection
    * Close this client and release any resources it is using.
    */
   @Override
-  public void close()
-  {
+  public void close() {
     setStopped(true);
     if (runThread != null) runThread.interrupt();
-    try
-    {
+    try {
       if (debugEnabled) log.debug("closing connection");
       SocketWrapper tmp = socketWrapper;
       socketWrapper = null;
@@ -144,9 +133,7 @@ public class ClientConnection extends AbstractRecoveryConnection
       if (socketInitializer != null) socketInitializer.close();
       socketInitializer = null;
       listeners.clear();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -155,8 +142,7 @@ public class ClientConnection extends AbstractRecoveryConnection
    * Add a listener to the list of listeners.
    * @param listener the listener to add.
    */
-  public void addClientConnectionListener(final ClientConnectionListener listener)
-  {
+  public void addClientConnectionListener(final ClientConnectionListener listener) {
     if (listener == null) return;
     listeners.add(listener);
   }
@@ -165,8 +151,7 @@ public class ClientConnection extends AbstractRecoveryConnection
    * Remove a listener from the list of listeners.
    * @param listener the listener to remove.
    */
-  public void removeClientConnectionListener(final ClientConnectionListener listener)
-  {
+  public void removeClientConnectionListener(final ClientConnectionListener listener) {
     if (listener == null) return;
     listeners.remove(listener);
   }
@@ -174,8 +159,7 @@ public class ClientConnection extends AbstractRecoveryConnection
   /**
    * Notify all listeners that an event has occurred.
    */
-  private void fireClientConnectionEvent()
-  {
+  private void fireClientConnectionEvent() {
     ClientConnectionEvent event = new ClientConnectionEvent(this);
     for (ClientConnectionListener listener : listeners) listener.clientConnectionFailed(event);
   }

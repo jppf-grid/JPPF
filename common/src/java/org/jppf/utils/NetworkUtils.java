@@ -21,6 +21,7 @@ package org.jppf.utils;
 import java.net.*;
 import java.util.*;
 
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -169,13 +170,19 @@ public final class NetworkUtils {
    * @return the host as a string.
    */
   public static String getManagementHost() {
-    TypedProperties props = JPPFConfiguration.getProperties();
+    String host = JPPFConfiguration.getProperties().getString(JPPFProperties.MANAGEMENT_HOST.getName(), retrieveManagementHostOrLocalhost());
+    if (debugEnabled) log.debug("computed JMX host: " + host);
+    return host;
+  }
+
+  /**
+   * Get the management host specified in the configuration file.
+   * @return the host as a string.
+   */
+  public static String retrieveManagementHostOrLocalhost() {
     String host = NetworkUtils.getNonLocalHostAddress();
     if (debugEnabled) log.debug("JMX host from NetworkUtils: "+host);
-    if (host == null) host = "localhost";
-    host = props.getString("jppf.management.host", host);
-    if (debugEnabled) log.debug("computed JMX host: "+host);
-    return host;
+    return (host == null) ? "localhost" : host;
   }
 
   /**

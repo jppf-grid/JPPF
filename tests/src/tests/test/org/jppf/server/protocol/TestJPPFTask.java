@@ -18,6 +18,7 @@
 
 package test.org.jppf.server.protocol;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
@@ -441,9 +442,7 @@ public class TestJPPFTask extends Setup1D1N1C {
   private void configure() throws Exception {
     client.close();
     // enable only local execution
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.remote.execution.enabled", "false");
-    config.setProperty("jppf.local.execution.enabled", "true");
+    JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
     client = BaseSetup.createClient(null, false);
   }
 

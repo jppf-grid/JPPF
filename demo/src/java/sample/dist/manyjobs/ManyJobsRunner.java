@@ -22,6 +22,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
@@ -54,8 +55,7 @@ public class ManyJobsRunner
       long length = config.getLong("manyjobs.task.duration", 1L);
       int nbTask = config.getInt("manyjobs.nbtasks", 1);
       int nbJobs = config.getInt("manyjobs.nbjobs", 1);
-      config.setBoolean("jppf.discovery.enabled", true);
-      config.setInt("jppf.pool.size", poolSize);
+      config.set(JPPFProperties.DISCOVERY_ENABLED, true).set(JPPFProperties.POOL_SIZE, poolSize);
       jppfClient = new JPPFClient();
       while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
       print("Running " + nbJobs+ " jobs with " + nbTask + " tasks of length = " + length + " ms, pools size = " + poolSize);

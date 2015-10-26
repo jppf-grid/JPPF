@@ -34,6 +34,7 @@ import org.jppf.serialization.*;
 import org.jppf.ssl.SSLConfigurationException;
 import org.jppf.startup.JPPFNodeStartupSPI;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -64,11 +65,11 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Determines whether JMX management and monitoring is enabled for this node.
    */
-  private boolean jmxEnabled = JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true);
+  private boolean jmxEnabled = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
   /**
    * Determines whether this node can execute .Net tasks.
    */
-  private final boolean dotnetCapable = JPPFConfiguration.getProperties().getBoolean("jppf.dotnet.bridge.initialized", false);
+  private final boolean dotnetCapable = JPPFConfiguration.get(JPPFProperties.DOTNET_NRIDGE_INITIALIZED);
   /**
    * Action executed when the node exits the main loop, in its {@link #run() run()} method.
    */
@@ -452,8 +453,8 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   public JMXServer getJmxServer() throws Exception {
     synchronized(this) {
       if ((jmxServer == null) || jmxServer.isStopped()) {
-        boolean ssl = JPPFConfiguration.getProperties().getBoolean("jppf.ssl.enabled", false);
-        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, "jppf.node.management.port", "jppf.management.port");
+        boolean ssl = JPPFConfiguration.getProperties().get(JPPFProperties.SSL_ENABLED);
+        jmxServer = JMXServerFactory.createServer(NodeRunner.getUuid(), ssl, ssl ? JPPFProperties.MANAGEMENT_SSL_PORT_NODE : JPPFProperties.MANAGEMENT_PORT_NODE);
         jmxServer.start(getClass().getClassLoader());
         System.out.println("JPPF Node management initialized on port " + jmxServer.getManagementPort());
       }
@@ -524,12 +525,12 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   @Override
   public boolean isMasterNode() {
-    return !isOffline() && (systemInformation != null) && systemInformation.getJppf().getBoolean(NodeProvisioningConstants.MASTER_PROPERTY, true);
+    return !isOffline() && (systemInformation != null) && systemInformation.getJppf().get(JPPFProperties.PROVISIONING_MASTER);
   }
 
   @Override
   public boolean isSlaveNode() {
-    return (systemInformation != null) && systemInformation.getJppf().getBoolean(NodeProvisioningConstants.SLAVE_PROPERTY, false);
+    return (systemInformation != null) && systemInformation.getJppf().get(JPPFProperties.PROVISIONING_SLAVE);
   }
 
   /**

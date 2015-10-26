@@ -44,6 +44,7 @@ import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
@@ -179,12 +180,12 @@ public class JPPFDriver {
 
     acceptorServer = startServer(recoveryServer, new AcceptorNioServer(extractValidPorts(info.serverPorts), sslPorts));
 
-    if (config.getBoolean("jppf.local.node.enabled", false)) {
+    if (config.get(JPPFProperties.LOCAL_NODE_ENABLED)) {
       LocalClassLoaderChannel localClassChannel = new LocalClassLoaderChannel(new LocalClassContext());
       localClassChannel.getContext().setChannel(localClassChannel);
       LocalNodeChannel localNodeChannel = new LocalNodeChannel(new LocalNodeContext(nodeNioServer.getTransitionManager()));
       localNodeChannel.getContext().setChannel(localNodeChannel);
-      final boolean offline = JPPFConfiguration.getProperties().getBoolean("jppf.node.offline", false);
+      final boolean offline = JPPFConfiguration.get(JPPFProperties.NODE_OFFLINE);
       localNode = new JPPFLocalNode(new LocalNodeConnection(localNodeChannel), offline  ? null : new LocalClassLoaderConnection(localClassChannel));
       nodeClassServer.initLocalChannel(localClassChannel);
       nodeNioServer.initLocalChannel(localNodeChannel);
@@ -419,7 +420,7 @@ public class JPPFDriver {
    * @param config the configuration to test whether management is enabled.
    */
   private static boolean isManagementEnabled(final TypedProperties config) {
-    return config.getBoolean("jppf.management.enabled", true) || config.getBoolean("jppf.management.ssl.enabled", false);
+    return config.get(JPPFProperties.MANAGEMENT_ENABLED) || config.get(JPPFProperties.MANAGEMENT_SSL_ENABLED);
   }
 
   /**

@@ -30,6 +30,7 @@ import org.jppf.management.diagnostics.HealthSnapshot;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
 
@@ -121,13 +122,13 @@ public final class StatsHandler implements StatsConstants {
    */
   private StatsHandler() {
     if (debugEnabled) log.debug("initializing StatsHandler");
-    refreshInterval = JPPFConfiguration.getProperties().getLong("jppf.admin.refresh.interval.stats", 1000L);
+    refreshInterval = JPPFConfiguration.getProperties().get(JPPFProperties.ADMIN_REFRESH_INTERVAL_STATS);
     if (refreshInterval > 0L) timer = new java.util.Timer("JPPF Driver Statistics Update Timer");
     if (debugEnabled) log.debug("initializing TopologyManager");
     topologyManager = new TopologyManager();
     if (debugEnabled) log.debug("done initializing JobMonitor");
-    String modeStr = JPPFConfiguration.getProperties().getString("jppf.gui.publish.mode", "immediate_notifications");
-    long period = JPPFConfiguration.getProperties().getLong("jppf.gui.publish.period", 1000L);
+    String modeStr = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_MODE);
+    long period = JPPFConfiguration.get(JPPFProperties.GUI_PUBLISH_PERIOD);
     JobMonitorUpdateMode mode = JobMonitorUpdateMode.IMMEDIATE_NOTIFICATIONS;
     if ("deferred_notifications".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.DEFERRED_NOTIFICATIONS;
     else if ("polling".equalsIgnoreCase(modeStr)) mode = JobMonitorUpdateMode.POLLING;

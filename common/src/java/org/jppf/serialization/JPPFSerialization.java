@@ -22,6 +22,7 @@ import java.io.*;
 
 import org.jppf.JPPFError;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -33,11 +34,6 @@ import org.slf4j.*;
  * @author Laurent Cohen
  */
 public interface JPPFSerialization {
-  /**
-   * Configuration property name for object serialization.
-   */
-  String SERIALIZATION_CLASS = "jppf.object.serialization.class";
-
   /**
    * Serialize an object into the specified output stream.
    * @param o the object to serialize.
@@ -76,15 +72,16 @@ public interface JPPFSerialization {
      * @return the defined {@link JPPFSerialization} instance.
      */
     private static JPPFSerialization init() {
-      String className = JPPFConfiguration.getProperties().getString(SERIALIZATION_CLASS);
-      if (debugEnabled) log.debug("found " + SERIALIZATION_CLASS + " = " + className);
+      JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
+      String className = JPPFConfiguration.get(prop);
+      if (debugEnabled) log.debug("found " + prop.getName() + " = " + className);
       if (className != null) {
         try {
           Class<?> clazz = Class.forName(className);
           return (JPPFSerialization) clazz.newInstance();
         } catch (Exception e) {
           StringBuilder sb = new StringBuilder();
-          sb.append("Could not instantiate JPPF serialization [").append(SERIALIZATION_CLASS).append(" = ").append(className);
+          sb.append("Could not instantiate JPPF serialization [").append(prop.getName()).append(" = ").append(className);
           sb.append(", terminating this application");
           log.error(sb.toString(), e);
           throw new JPPFError(sb.toString(), e);

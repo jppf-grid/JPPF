@@ -28,6 +28,7 @@ import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -145,7 +146,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   public JPPFStatistics statistics() throws Exception {
     try {
       JPPFStatistics  stats = driver.getStatistics().copy();
-      if (debugEnabled) log.debug("stats request = " + stats);
+      if (log.isTraceEnabled()) log.trace("stats request = " + stats);
       return stats;
     } catch(Throwable e) {
       log.error(e.getMessage(), e);
@@ -200,9 +201,8 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
    */
   private LoadBalancingInformation computeCurrentLoadBalancingInformation() {
     TypedProperties props = JPPFConfiguration.getProperties();
-    String algorithm = props.getString("jppf.load.balancing.algorithm", "proportional");
-    String profileName = props.getString("jppf.load.balancing.profile", null);
-    if (profileName == null) profileName = props.getString("jppf.load.balancing.strategy", "jppf");
+    String algorithm = props.get(JPPFProperties.LOAD_BALANCING_ALGORITHM);
+    String profileName = props.get(JPPFProperties.LOAD_BALANCING_PROFILE);
     JPPFBundlerFactory factory = getNodeNioServer().getBundlerFactory();
     TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
     List<String> algorithmsList = null;

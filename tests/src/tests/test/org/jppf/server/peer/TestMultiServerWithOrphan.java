@@ -41,7 +41,7 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    * Launches 2 drivers with 1 node attached to the first server only and start the client.
    * @throws Exception if a process could not be started.
    */
-  @BeforeClass
+  @BeforeClass()
   public static void setup() throws Exception {
     System.out.println("checking topology");
     client = BaseSetup.setup(2, 1, true, createConfig("p2p"));
@@ -54,6 +54,7 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
+    awaitPeersInitialized();
     int nbTasks = 20;
     String name = ReflectionUtils.getCurrentClassAndMethod();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);

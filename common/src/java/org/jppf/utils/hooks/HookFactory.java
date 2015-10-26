@@ -20,6 +20,8 @@ package org.jppf.utils.hooks;
 
 import java.util.*;
 
+import org.jppf.utils.configuration.JPPFProperty;
+
 
 /**
  * Factcory methods for the registration and invocation of hooks.
@@ -41,7 +43,7 @@ public class HookFactory
    * @param classLoader the class loader used to load the implementation.
    * @return the registered hook as a {@link Hook} instance.
    */
-  public static <T> Hook<T> registerConfigSingleHook(final String property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
+  public static <T> Hook<T> registerConfigSingleHook(final JPPFProperty<String> property, final Class<T> infClass, final T defaultImpl, final ClassLoader classLoader)
   {
     return register(new Hook<>(property, infClass, defaultImpl, classLoader));
   }

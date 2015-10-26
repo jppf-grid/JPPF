@@ -22,6 +22,7 @@ import java.lang.management.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -43,7 +44,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
    * Taken from the value of configuration property "jppf.cpu.load.compuation.interval".
    * It defaults to 1000 (1 second) if the property is unspecified.
    */
-  protected static long INTERVAL = JPPFConfiguration.getProperties().getLong("jppf.cpu.load.computation.interval", 1L * 1000L);
+  protected static long INTERVAL = JPPFConfiguration.get(JPPFProperties.CPU_LOAD_COMPUTATION_INTERVAL);
   /**
    * The total CPU time in milliseconds.
    */

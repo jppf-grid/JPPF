@@ -26,6 +26,7 @@ import org.jppf.ui.options.event.WindowClosingListener;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.utils.*;
 import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -83,7 +84,7 @@ public class UILauncher {
           UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
       }
-      boolean showSplash = JPPFConfiguration.getProperties().getBoolean("jppf.ui.splash", true);
+      boolean showSplash = JPPFConfiguration.get(JPPFProperties.UI_SPLASH);
       if (showSplash) (splash = new JPPFSplash("The management console is starting ...")).start();
       loadUI(args[0], args[1]);
       if (showSplash) splash.stop();

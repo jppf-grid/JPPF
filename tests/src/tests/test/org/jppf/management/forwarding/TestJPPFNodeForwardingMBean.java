@@ -28,6 +28,7 @@ import org.jppf.management.*;
 import org.jppf.node.policy.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
 
 import test.org.jppf.test.setup.common.*;
@@ -306,7 +307,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       assertNotNull(info.getEnv());
       assertFalse(info.getEnv().isEmpty());
       assertNotNull(info.getJppf());
-      assertEquals(1, info.getJppf().getInt("jppf.processing.threads"));
+      assertEquals(1, (int) info.getJppf().get(JPPFProperties.PROCESSING_THREADS));
       assertEquals(entry.getKey(), info.getJppf().getString("jppf.node.uuid"));
       assertFalse(info.getJppf().isEmpty());
       assertNotNull(info.getNetwork());
@@ -353,15 +354,10 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       TypedProperties config = info.getJppf();
       assertNotNull(config);
       assertFalse(config.isEmpty());
-      assertEquals(1, config.getInt("jppf.processing.threads"));
+      assertEquals(1, (int) config.get(JPPFProperties.PROCESSING_THREADS));
       assertEquals(uuid, config.getString("jppf.node.uuid"));
       if (oldConfig == null) oldConfig = new TypedProperties(config);
-      if (newConfig == null)
-      {
-        newConfig = new TypedProperties(config);
-        newConfig.setProperty("jppf.processing.threads", "8");
-        newConfig.setProperty("custom.property", "custom.value");
-      }
+      if (newConfig == null) newConfig = new TypedProperties(config).set(JPPFProperties.PROCESSING_THREADS, 8).setString("custom.property", "custom.value");
     }
     result = nodeForwarder.updateConfiguration(selector, newConfig, false);
     checkNoException(result, expectedNodes);
@@ -375,7 +371,7 @@ public class TestJPPFNodeForwardingMBean extends AbstractTestJPPFNodeForwardingM
       newConfig = info.getJppf();
       assertNotNull(newConfig);
       assertFalse(newConfig.isEmpty());
-      assertEquals(8, newConfig.getInt("jppf.processing.threads"));
+      assertEquals(8, (int) newConfig.get(JPPFProperties.PROCESSING_THREADS));
       assertEquals(uuid, newConfig.getString("jppf.node.uuid"));
       assertEquals("custom.value", newConfig.getString("custom.property"));
     }

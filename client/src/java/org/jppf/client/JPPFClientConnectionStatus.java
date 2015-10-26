@@ -18,6 +18,8 @@
 
 package org.jppf.client;
 
+import java.util.*;
+
 /**
  * Status of the connection between a client and a driver.
  * @author Laurent Cohen
@@ -57,11 +59,20 @@ public enum JPPFClientConnectionStatus {
   CLOSED;
 
   /**
+   * The list of working statuses.
+   */
+  private static final List<JPPFClientConnectionStatus> WORKING_STATUSES = Collections.unmodifiableList(Arrays.asList(ACTIVE, EXECUTING));
+  /**
+   * The list of working statuses.
+   */
+  private static final List<JPPFClientConnectionStatus> TERMINATED_STATUSES = Collections.unmodifiableList(Arrays.asList(CLOSED, FAILED));
+
+  /**
    * Determine whether this status is one of those specified as input.
    * @param statuses the statuses to check against.
    * @return {@code true} if this status is one of those specified as input, {@code false} otherwise.
    */
-  public boolean isOneOf(final JPPFClientConnectionStatus...statuses) {
+  public boolean isOneOf(final List<JPPFClientConnectionStatus> statuses) {
     if (statuses == null) return false;
     for (JPPFClientConnectionStatus status: statuses) {
       if (this == status) return true;
@@ -74,7 +85,7 @@ public enum JPPFClientConnectionStatus {
    * @return {@code true} if this status is a working status, {@code false} otherwise.
    */
   public boolean isWorkingStatus() {
-    return isOneOf(ACTIVE, EXECUTING);
+    return isOneOf(WORKING_STATUSES);
   }
 
   /**
@@ -82,6 +93,22 @@ public enum JPPFClientConnectionStatus {
    * @return {@code true} if this status is a working status, {@code false} otherwise.
    */
   public boolean isTerminatedStatus() {
-    return isOneOf(FAILED, CLOSED);
+    return isOneOf(TERMINATED_STATUSES);
+  }
+
+  /**
+   * Get the statuses indicating that a connection is in a working state.
+   * @return an array of {@link JPPFClientConnectionStatus} enum values.
+   */
+  public static JPPFClientConnectionStatus[] workingStatuses() {
+    return WORKING_STATUSES.toArray(new JPPFClientConnectionStatus[WORKING_STATUSES.size()]);
+  }
+
+  /**
+   * Get the statuses indicating that a connection is in a terminated state.
+   * @return an array of {@link JPPFClientConnectionStatus} enum values.
+   */
+  public static JPPFClientConnectionStatus[] terminatedStatuses() {
+    return TERMINATED_STATUSES.toArray(new JPPFClientConnectionStatus[TERMINATED_STATUSES.size()]);
   }
 }

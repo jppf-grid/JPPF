@@ -20,6 +20,8 @@ package org.jppf.load.balancer;
 
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.node.protocol.JPPFDistributedJob;
+import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.*;
 
 /**
  * 
@@ -69,7 +71,10 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   @Override
   public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.nodeConfiguration = nodeConfiguration;
-    nbThreads = nodeConfiguration.getJppf().getInt("jppf.processing.threads", 1);
+    TypedProperties jppf = nodeConfiguration.getJppf();
+    boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
+    JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
+    nbThreads = jppf.getInt(prop.getName(), 1);
   }
 
   @Override

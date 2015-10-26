@@ -32,6 +32,7 @@ import org.jppf.node.protocol.TaskBundle;
 import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -51,7 +52,7 @@ class WaitInitialBundleState extends NodeServerState {
   /**
    * Whether to resolve the nodes' ip addresses into host names.
    */
-  protected final boolean resolveIPs = JPPFConfiguration.getProperties().getBoolean("org.jppf.resolve.addresses", true);
+  protected final boolean resolveIPs = JPPFConfiguration.get(JPPFProperties.RESOLVE_ADDRESSES);
 
   /**
    * Initialize this state.
@@ -96,7 +97,7 @@ class WaitInitialBundleState extends NodeServerState {
       bundler.setup();
       context.setBundler(bundler);
       int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
-      if (JPPFConfiguration.getProperties().getBoolean("jppf.management.enabled", true) && (uuid != null) && !offline && (port >= 0)) {
+      if (JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED) && (uuid != null) && !offline && (port >= 0)) {
         String host = getChannelHost(channel);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
         int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;
@@ -110,7 +111,7 @@ class WaitInitialBundleState extends NodeServerState {
         if (bundle.getParameter(NODE_PROVISIONING_MASTER, false)) type |= JPPFManagementInfo.MASTER;
         else if (bundle.getParameter(NODE_PROVISIONING_SLAVE, false)) type |= JPPFManagementInfo.SLAVE;
         if (bundle.getParameter(NODE_DOTNET_CAPABLE, false)) type |= JPPFManagementInfo.DOTNET;
-        if ((systemInfo != null) && (systemInfo.getJppf().getBoolean("jppf.android.node", false))) type |= JPPFManagementInfo.ANDROID;
+        if ((systemInfo != null) && (systemInfo.getJppf().get(JPPFProperties.NODE_ANDROID))) type |= JPPFManagementInfo.ANDROID;
         JPPFManagementInfo info = new JPPFManagementInfo(hostIP, port, uuid, type, sslEnabled);
         if (debugEnabled) log.debug(String.format("configuring management for node %s", info));
         if (systemInfo != null) info.setSystemInfo(systemInfo);

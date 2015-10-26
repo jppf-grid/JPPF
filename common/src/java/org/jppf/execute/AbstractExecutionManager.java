@@ -27,7 +27,7 @@ import org.jppf.execute.ThreadManager.UsedClassLoader;
 import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFScheduleHandler;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.ConfigurationHelper;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -102,29 +102,26 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
   /**
    * Initialize this execution manager with the specified node.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
-   * @param legacyNbThreadsProperty the legacy name of the property which configures the number of threads.
    */
-  public AbstractExecutionManager(final String nbThreadsProperty, final String legacyNbThreadsProperty) {
+  public AbstractExecutionManager(final JPPFProperty<Integer> nbThreadsProperty) {
     taskNotificationDispatcher = new TaskExecutionDispatcher(getClass().getClassLoader());
-    TypedProperties config = JPPFConfiguration.getProperties();
-    ConfigurationHelper helper = new ConfigurationHelper(config);
-    int poolSize = helper.getInt(nbThreadsProperty, legacyNbThreadsProperty, Runtime.getRuntime().availableProcessors());
+    int poolSize = JPPFConfiguration.get(nbThreadsProperty);
     if (poolSize <= 0) poolSize = Runtime.getRuntime().availableProcessors();
-    config.setInt(nbThreadsProperty, poolSize);
+    JPPFConfiguration.set(nbThreadsProperty, poolSize);
     log.info("running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
-    threadManager = createThreadManager(config, poolSize);
+    threadManager = createThreadManager(poolSize);
   }
 
   /**
    * Create the thread manager instance. Default is {@link ThreadManagerThreadPool}.
-   * @param config The JPPF configuration properties.
    * @param poolSize the initial pool size.
    * @return an instance of {@link ThreadManager}.
    */
-  protected static ThreadManager createThreadManager(final TypedProperties config, final int poolSize) {
+  protected static ThreadManager createThreadManager(final int poolSize) {
     ThreadManager result = null;
-    String s = config.getString("jppf.thread.manager.class", "default");
-    if (!"default".equalsIgnoreCase(s) && !"org.jppf.server.node.ThreadManagerThreadPool".equals(s) && s != null) {
+    TypedProperties config = JPPFConfiguration.getProperties();
+    String s = config.get(JPPFProperties.THREAD_MANAGER_CLASS);
+    if (!"default".equalsIgnoreCase(s) && !ThreadManagerThreadPool.class.getName().equals(s) && s != null) {
       try {
         Class clazz = Class.forName(s);
         Object instance = ReflectionHelper.invokeConstructor(clazz, new Class[]{Integer.TYPE}, poolSize);
@@ -140,7 +137,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       log.info("Using default thread manager");
       return new ThreadManagerThreadPool(poolSize);
     }
-    config.setInt("processing.threads", result.getPoolSize());
+    config.set(JPPFProperties.PROCESSING_THREADS, result.getPoolSize());
     log.info("Node running " + poolSize + " processing thread" + (poolSize > 1 ? "s" : ""));
     boolean cpuTimeEnabled = result.isCpuTimeEnabled();
     config.setBoolean("cpuTimeSupported", cpuTimeEnabled);
@@ -291,7 +288,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     int newSize = getThreadPoolSize();
     if (oldSize != newSize) {
       log.info("Node thread pool size changed from " + oldSize + " to " + size);
-      JPPFConfiguration.getProperties().setProperty("jppf.processing.threads", Integer.toString(size));
+      JPPFConfiguration.set(JPPFProperties.PROCESSING_THREADS, size);
       triggerConfigChanged();
     }
   }

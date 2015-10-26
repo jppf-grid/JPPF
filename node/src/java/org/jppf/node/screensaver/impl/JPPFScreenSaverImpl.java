@@ -25,6 +25,7 @@ import javax.swing.*;
 
 import org.jppf.node.screensaver.*;
 import org.jppf.utils.TypedProperties;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * A built-in screen saver implementation.
@@ -123,20 +124,19 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
    * Initialize the parameters of the screensaver.
    */
   private void configure() {
-    collisions = config.getBoolean("jppf.screensaver.handle.collisions", true);
-    nbLogos = config.getInt("jppf.screensaver.logos", 10);
-    speed = config.getInt("jppf.screensaver.speed", 10);
+    collisions = config.get(JPPFProperties.SCREENSAVER_HANDLE_COLLISIONS);
+    nbLogos = config.get(JPPFProperties.SCREENSAVER_LOGOS);
+    speed = config.get(JPPFProperties.SCREENSAVER_SPEED);
     if (speed < 1) speed = 1;
     if (speed > MAX_SPEED) speed = MAX_SPEED;
-    String defaultPath = NodePanel.IMAGE_PATH + '/' + "jppf_group_small.gif";
-    String paths = config.getString("jppf.screensaver.logo.path", defaultPath);
+    String paths = config.get(JPPFProperties.SCREENSAVER_LOGO_PATH);
     String[] tokens = paths.split("\\|");
     java.util.List<ImageIcon> list = new LinkedList<>();
     for (String s: tokens) {
       ImageIcon icon = ScreenSaverMain.loadImage(s.trim());
       if (icon != null) list.add(icon);
     }
-    if (list.isEmpty()) list.add(ScreenSaverMain.loadImage(defaultPath));
+    if (list.isEmpty()) list.add(ScreenSaverMain.loadImage(JPPFProperties.SCREENSAVER_LOGO_PATH.getDefaultValue()));
     logos = new ImageIcon[list.size()];
     Random rnd = new Random(System.nanoTime());
     int count = 0;
@@ -145,7 +145,7 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
       logos[count++] = list.remove(n);
     }
     //logos = list.toArray(new ImageIcon[list.size()]);
-    String s = config.getString("jppf.screensaver.status.panel.alignment", "center").trim().toLowerCase();
+    String s = config.get(JPPFProperties.SCREENSAVER_STATUS_PANEL_ALIGNMENT).trim().toLowerCase();
     if (s.startsWith("l")) alignment = 0;
     else if (s.startsWith("r")) alignment = 2;
     else alignment = 1;

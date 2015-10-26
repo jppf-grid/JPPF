@@ -27,7 +27,7 @@ import org.jppf.comm.discovery.*;
 import org.jppf.queue.*;
 import org.jppf.startup.JPPFClientStartupSPI;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.ConfigurationHelper;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -147,8 +147,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
     BlockingQueue<Runnable> queue = new SynchronousQueue<>();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
-    if (config.getBoolean("jppf.local.execution.enabled", false)) setLocalExecutionEnabled(true);
-    if (config.getBoolean("jppf.remote.execution.enabled", true)) initRemotePools(config);
+    if (config.get(JPPFProperties.LOCAL_EXECUTION_ENABLED)) setLocalExecutionEnabled(true);
+    if (config.get(JPPFProperties.REMOTE_EXECUTION_ENABLED)) initRemotePools(config);
   }
 
   /**
@@ -159,23 +159,22 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   protected void initRemotePools(final TypedProperties config) {
     try {
       boolean initPeers;
-      if (config.getBoolean("jppf.discovery.enabled", true)) {
-        final int priority = config.getInt("jppf.discovery.priority", 0);
-        boolean acceptMultipleInterfaces = config.getBoolean("jppf.discovery.acceptMultipleInterfaces", false);
+      if (config.get(JPPFProperties.DISCOVERY_ENABLED)) {
+        final int priority = config.get(JPPFProperties.DISCOVERY_PRIORITY);
+        boolean acceptMultipleInterfaces = config.get(JPPFProperties.DISCOVERY_ACCEPT_MULTIPLE_INTERFACES);
         if (debugEnabled) log.debug("initializing connections from discovery with priority = {} and acceptMultipleInterfaces = {}", priority, acceptMultipleInterfaces);
         receiverThread = new JPPFMulticastReceiverThread(new JPPFMulticastReceiverThread.ConnectionHandler() {
           @Override
           public void onNewConnection(final String name, final JPPFConnectionInformation info) {
-            ConfigurationHelper ch = new ConfigurationHelper(config);
-            boolean ssl = config.getBoolean("jppf.ssl.enabled", false);
+            boolean ssl = config.get(JPPFProperties.SSL_ENABLED);
             if (info.hasValidPort(ssl)) {
-              int poolSize = ch.getInt("jppf.pool.size", 1, 1, Integer.MAX_VALUE);
-              int jmxPoolSize = ch.getInt("jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
+              int poolSize = config.get(JPPFProperties.POOL_SIZE);
+              int jmxPoolSize = config.get(JPPFProperties.JMX_POOL_SIZE);
               newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
             } else {
               String type = ssl ? "secure" : "plain";
               String msg = String.format("this client cannot fulfill a %s connection request to %s:%d because the host does not expose that port as a %s port",
-                  type, info.host, info.getValidPort(ssl), type);
+                type, info.host, info.getValidPort(ssl), type);
               log.warn(msg);
             }
           }
@@ -188,7 +187,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       }
 
       if (debugEnabled) log.debug("found peers in the configuration");
-      String discoveryNames = config.getString("jppf.drivers");
+      String discoveryNames = config.get(JPPFProperties.DRIVERS);
       if ((discoveryNames == null) || "".equals(discoveryNames.trim())) discoveryNames = "default-driver";
       if (debugEnabled) log.debug("list of drivers: " + discoveryNames);
       String[] names = discoveryNames.split("\\s");
@@ -198,18 +197,21 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         for (String name : names) {
           if (!VALUE_JPPF_DISCOVERY.equals(name)) {
             JPPFConnectionInformation info = new JPPFConnectionInformation();
-            boolean ssl = config.getBoolean(name + ".jppf.ssl.enabled", false);
-            info.host = config.getString(name + ".jppf.server.host", "localhost");
-            int port = config.getInt(name + ".jppf.server.port", ssl ? 11443 : 11111);
+            boolean ssl = config.getBoolean(name + '.' + JPPFProperties.SSL_ENABLED.getName(), false);
+            JPPFProperty<String> serverProp = JPPFProperties.SERVER_HOST;
+            info.host = config.getString(name + '.' + serverProp.getName(), serverProp.getDefaultValue());
+            JPPFProperty<Integer> portProp = ssl ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT;
+            int port = config.getInt(name + '.' + portProp.getName(), portProp.getDefaultValue());
             if (!ssl) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };
-            if (!ssl) info.managementPort = config.getInt(name + ".jppf.management.port", -1);
-            else info.sslManagementPort = config.getInt(name + ".jppf.management.port", -1);
+            portProp = ssl ? JPPFProperties.MANAGEMENT_SSL_PORT : JPPFProperties.MANAGEMENT_PORT;
+            port = config.getInt(name + '.' + portProp.getName(), -1);
+            if (!ssl) info.managementPort = port;
+            else info.sslManagementPort = port;
             int priority = config.getInt(name + ".jppf.priority", 0);
             if (receiverThread != null) receiverThread.addConnectionInformation(info);
-            ConfigurationHelper ch = new ConfigurationHelper(config);
-            int poolSize = ch.getInt(name + ".jppf.pool.size", 1, 1, Integer.MAX_VALUE);
-            int jmxPoolSize = ch.getInt(name + ".jppf.jmx.pool.size", 1, 1, Integer.MAX_VALUE);
+            int poolSize = config.get(new IntProperty(name + '.' + JPPFProperties.POOL_SIZE.getName(), 1, 1, Integer.MAX_VALUE));
+            int jmxPoolSize = config.get(new IntProperty(name + '.' + JPPFProperties.JMX_POOL_SIZE.getName(), 1, 1, Integer.MAX_VALUE));
             newConnectionPool(name, info, priority, poolSize, ssl, jmxPoolSize);
           }
         }
@@ -241,7 +243,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
           pendingPools.add(pool);
         }
         HostIP hostIP = new HostIP(info.host, info.host);
-        if (JPPFConfiguration.getProperties().getBoolean("org.jppf.resolve.addresses", true)) hostIP = NetworkUtils.getHostIP(info.host);
+        if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);
         if (debugEnabled) log.debug("'{}' was resolved into '{}'", info.host, hostIP.hostName());
         pool.setDriverHostIP(hostIP);
         fireConnectionPoolAdded(pool);

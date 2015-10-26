@@ -24,6 +24,7 @@ import org.jppf.client.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
@@ -131,18 +132,18 @@ public class ConnectionPoolRunner {
    */
   private static void configure(final int nbPools) {
     TypedProperties config = JPPFConfiguration.getProperties();
-    config.setBoolean("jppf.discovery.enabled", false);
+    config.set(JPPFProperties.DISCOVERY_ENABLED, false);
     StringBuilder sb = new StringBuilder();
     for (int i=1; i<=nbPools; i++) {
       if (i > 1) sb.append(' ');
       String name = DRIVER_NAME + i;
       sb.append(name);
-      config.setString(name + ".jppf.server.host", "localhost");
-      config.setInt(name + ".jppf.server.port", 11110 + i);
-      config.setInt(name + ".jppf.pool.size", 1);
-      config.setInt(name + ".jppf.priority", 1);
+      config.setString(name + ".jppf.server.host", "localhost")
+        .setInt(name + ".jppf.server.port", 11110 + i)
+        .setInt(name + '.' + JPPFProperties.POOL_SIZE.getName(), 1)
+        .setInt(name + ".jppf.priority", 1);
     }
-    config.setString("jppf.drivers", sb.toString());
+    config.set(JPPFProperties.DRIVERS, sb.toString());
   }
 
   /**

@@ -71,6 +71,7 @@ import org.slf4j.*;
  * <p>The scripts are evaluated after all includes and variable substitutions have been resolved.
  * This will allow the scripts to use a variable binding for the Properties (or {@link TypedProperties} object) being loaded.
  * @author Laurent Cohen
+ * @exclude
  */
 public class ScriptHandler {
   /**
@@ -85,10 +86,6 @@ public class ScriptHandler {
    * The regex pattern for identifying scripted property values.
    */
   private static final Pattern SCRIPT_PATTERN = Pattern.compile("\\$script(?:\\:([^:]*?))?(?:\\:(.*?))?\\{(.*?)\\}\\$");
-  /**
-   * Name of the property which sets the default script language to use.
-   */
-  private static final String DEFAULT_LANGUAGE_PROPERTY = "jppf.script.default.language";
   /**
    * Inline script source type.
    */
@@ -133,14 +130,14 @@ public class ScriptHandler {
     this.config = props;
     bindings.put("thisProperties", config);
 
-    String value = config.getString(DEFAULT_LANGUAGE_PROPERTY, "javascript");
-    value = evaluate(DEFAULT_LANGUAGE_PROPERTY, value).trim();
+    String value = config.get(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE);
+    value = evaluate(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName(), value).trim();
     if ("".equals(value)) value = "javascript";
-    props.setString(DEFAULT_LANGUAGE_PROPERTY, value);
+    props.set(JPPFProperties.SCRIPT_DEFAULT_LANGUAGE, value);
     defaultLanguage = value;
 
     for (String name: config.stringPropertyNames()) {
-      if (DEFAULT_LANGUAGE_PROPERTY.equals(name)) continue;
+      if (JPPFProperties.SCRIPT_DEFAULT_LANGUAGE.getName().equals(name)) continue;
       value = config.getString(name);
       config.setString(name, evaluate(name, value));
     }

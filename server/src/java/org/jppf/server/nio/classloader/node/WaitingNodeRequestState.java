@@ -30,6 +30,7 @@ import org.jppf.server.nio.classloader.*;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -48,7 +49,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
   /**
    * Whether resources should be looked up in the file system if not found in the classpath.
    */
-  private static final boolean FILE_LOOKUP = JPPFConfiguration.getProperties().getBoolean("jppf.classloader.file.lookup", true);
+  private static final boolean FILE_LOOKUP = JPPFConfiguration.get(JPPFProperties.CLASSLOADER_FILE_LOOKUP);
   /**
    * 
    */

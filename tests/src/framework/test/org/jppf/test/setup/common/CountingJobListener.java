@@ -25,8 +25,7 @@ import org.jppf.client.event.*;
 /**
  * A simple job listener.
  */
-public class CountingJobListener extends JobListenerAdapter
-{
+public class CountingJobListener extends JobListenerAdapter {
   /**
    * The count of 'jobStarted' notifications.
    */
@@ -45,26 +44,22 @@ public class CountingJobListener extends JobListenerAdapter
   public AtomicInteger returnedCount = new AtomicInteger(0);
 
   @Override
-  public void jobStarted(final JobEvent event)
-  {
+  public void jobStarted(final JobEvent event) {
     startedCount.incrementAndGet();
   }
 
   @Override
-  public void jobEnded(final JobEvent event)
-  {
+  public void jobEnded(final JobEvent event) {
     endedCount.incrementAndGet();
   }
 
   @Override
-  public void jobDispatched(final JobEvent event)
-  {
+  public void jobDispatched(final JobEvent event) {
     dispatchedCount.incrementAndGet();
   }
 
   @Override
-  public void jobReturned(final JobEvent event)
-  {
+  public void jobReturned(final JobEvent event) {
     returnedCount.incrementAndGet();
   }
 }

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.comm.socket.*;
 import org.jppf.process.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -193,7 +194,7 @@ public class GenericProcessLauncher implements Runnable {
    */
   private void updateJvmOptionsFromConfig() {
     TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
-    String s = config.getString("jppf.jvm.options", null);
+    String s = config.get(JPPFProperties.JVM_OPTIONS);
     if (s != null) {
       String[] options = s.split("\\s");
       for (String opt: options) addJvmOption(opt);

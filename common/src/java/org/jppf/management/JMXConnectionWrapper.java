@@ -33,6 +33,7 @@ import org.jppf.*;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -55,7 +56,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   /**
    * The timeout in millis for JMX connection attempts. A value of 0 or less means no timeout.
    */
-  private static final long CONNECTION_TIMEOUT = JPPFConfiguration.getProperties().getLong("jppf.management.connection.timeout", 60_000L);
+  private static final long CONNECTION_TIMEOUT = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_CONNECTION_TIMEOUT);
   /**
    * URL of the MBean server, in a JMX-compliant format.
    */
@@ -147,7 +148,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       env.put(JMXConnectorFactory.DEFAULT_CLASS_LOADER, getClass().getClassLoader());
       env.put("jmx.remote.x.server.max.threads", 1);
       env.put("jmx.remote.x.client.connection.check.period", 0);
-      env.put("jmx.remote.x.request.timeout", JPPFConfiguration.getProperties().getLong("jppf.jmx.request.timeout", Long.MAX_VALUE));
+      env.put("jmx.remote.x.request.timeout", JPPFConfiguration.get(JPPFProperties.JMX_REQUEST_TIMEOUT));
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }

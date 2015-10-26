@@ -18,6 +18,8 @@
 
 package org.jppf.node.screensaver;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
@@ -66,7 +68,7 @@ public class ScreenSaverMain implements InitializationHook
   public void initializing(final UnmodifiableTypedProperties initialConfiguration) {
     try {
       if (instance != null) return;
-      if (initialConfiguration.getBoolean("jppf.screensaver.enabled")) startScreenSaver(initialConfiguration);
+      if (initialConfiguration.get(SCREENSAVER_ENABLED)) startScreenSaver(initialConfiguration);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -92,7 +94,7 @@ public class ScreenSaverMain implements InitializationHook
       System.err.println("This is a headless graphics environment - cannot run in full screen");
       return;
     }
-    boolean fullscreenRequested = config.getBoolean("jppf.screensaver.fullscreen", false);
+    boolean fullscreenRequested = config.get(SCREENSAVER_FULLSCREEN);
     final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
     final GraphicsDevice device = env.getDefaultScreenDevice();
     final GraphicsDevice[] devices = env.getScreenDevices();
@@ -106,10 +108,10 @@ public class ScreenSaverMain implements InitializationHook
     }
 
     if (fullscreenRequested && !fullscreenSupported) System.err.println("Full screen is not supported by the current graphics device");
-    String title = config.getString("jppf.screensaver.title", "JPPF screensaver");
+    String title = config.get(SCREENSAVER_TITLE);
     final JFrame frame = new FocusedJFrame(title);
-    ImageIcon icon = loadImage(config.getString("jppf.screensaver.icon", "org/jppf/node/jppf-icon.gif"));
-    if (icon == null) icon = loadImage("org/jppf/node/jppf-icon.gif");
+    ImageIcon icon = loadImage(config.get(SCREENSAVER_ICON));
+    if (icon == null) icon = loadImage(SCREENSAVER_ICON.getDefaultValue());
     frame.setIconImage(icon.getImage());
     if (fullscreenRequested && fullscreenSupported) {
       frame.setUndecorated(true);
@@ -121,8 +123,8 @@ public class ScreenSaverMain implements InitializationHook
       frame.getContentPane().setCursor(blankCursor); // Set the blank cursor to the JFrame.
     } else {
       Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-      int w = JPPFConfiguration.getProperties().getInt("jppf.screensaver.width", 1000);
-      int h = JPPFConfiguration.getProperties().getInt("jppf.screensaver.height", 800);
+      int w = JPPFConfiguration.get(SCREENSAVER_WIDTH);
+      int h = JPPFConfiguration.get(SCREENSAVER_HEIGHT);
       if ((w <= 0) || (w > d.width)) w = 1000;
       if ((h <= 0) || (h > d.height)) h = 800;
       frame.setSize(w, h);
@@ -133,8 +135,8 @@ public class ScreenSaverMain implements InitializationHook
     createScreenSaver();
     frame.add(screensaver.getComponent());
     screensaver.getComponent().setSize(frame.getSize());
-    int screenX = config.getInt("jppf.screensaver.screen.location.x", 0);
-    int screenY = config.getInt("jppf.screensaver.screen.location.Y", 0);
+    int screenX = config.get(SCREENSAVER_LOCATION_X);
+    int screenY = config.get(SCREENSAVER_LOCATION_Y);
     frame.setLocation(screenX, screenY);
     screensaver.init(config, fullscreenRequested && fullscreenSupported);
     frame.setVisible(true);
@@ -152,7 +154,7 @@ public class ScreenSaverMain implements InitializationHook
    */
   private JPPFScreenSaver createScreenSaver() throws Exception {
     try {
-      String name = JPPFConfiguration.getProperties().getString("jppf.screensaver.class", "org.jppf.node.screensaver.impl.JPPFScreenSaverImpl");
+      String name = JPPFConfiguration.get(SCREENSAVER_CLASS);
       Class<?> clazz = Class.forName(name);
       screensaver = (JPPFScreenSaver) clazz.newInstance();
     } catch(Exception e) {
@@ -178,8 +180,8 @@ public class ScreenSaverMain implements InitializationHook
           doOnclose();
         }
       });
-      if (config.getBoolean("jppf.screensaver.mouse.motion.close", true)) {
-        final long mouseMotionDelay = config.getLong("jppf.screensaver.mouse.motion.delay", 500L);
+      if (config.get(SCREENSAVER_MOUSE_MOTION_CLOSE)) {
+        final long mouseMotionDelay = config.get(SCREENSAVER_MOUSE_MOTION_DELAY);
         final long start = System.currentTimeMillis();
         frame.addMouseMotionListener(new MouseAdapter() {
           @Override

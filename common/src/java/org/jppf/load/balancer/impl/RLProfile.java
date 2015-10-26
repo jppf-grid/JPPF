@@ -20,6 +20,7 @@ package org.jppf.load.balancer.impl;
 
 import org.jppf.load.balancer.LoadBalancingProfile;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * Parameters profile for a proportional bundler.
@@ -54,7 +55,7 @@ public class RLProfile implements LoadBalancingProfile
    */
   public RLProfile(final String profileName)
   {
-    String prefix = "jppf.load.balancing.profile." + profileName + '.';
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
     performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.0001d);

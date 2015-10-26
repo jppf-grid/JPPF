@@ -32,6 +32,7 @@ import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -83,7 +84,7 @@ public class NodeRunner {
   /**
    * The offline node flag.
    */
-  private static boolean offline = JPPFConfiguration.getProperties().getBoolean("jppf.node.offline", false);
+  private static boolean offline = JPPFConfiguration.get(JPPFProperties.NODE_OFFLINE);
   /**
    * The initial configuration, such as read from the config file.
    * The JPPF config is modified by the discovery mechanism, so we want to store the initial values somewhere.
@@ -104,7 +105,7 @@ public class NodeRunner {
   /**
    * 
    */
-  private static boolean ANDROID = JPPFConfiguration.getProperties().getBoolean("jppf.node.android", false);
+  private static boolean ANDROID = JPPFConfiguration.get(JPPFProperties.NODE_ANDROID);
 
   /**
    * Run a node as a standalone application.
@@ -118,7 +119,7 @@ public class NodeRunner {
       if (debugEnabled) log.debug("launching the JPPF node");
       VersionUtils.logVersionInformation("node", uuid);
       HookFactory.registerSPIMultipleHook(InitializationHook.class, null, null);
-      HookFactory.registerConfigSingleHook("jppf.server.connection.strategy", DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(), null);
+      HookFactory.registerConfigSingleHook(JPPFProperties.SERVER_CONNECTION_STRATEGY, DriverConnectionStrategy.class, new JPPFDefaultConnectionStrategy(), null);
       if ((args == null) || (args.length <= 0))
         throw new JPPFException("The node should be run with an argument representing a valid TCP port or 'noLauncher'");
       if (!"noLauncher".equals(args[0])) {
@@ -185,7 +186,7 @@ public class NodeRunner {
     currentConnectionInfo = (DriverConnectionInfo) HookFactory.invokeHook(DriverConnectionStrategy.class, "nextConnectionInfo", currentConnectionInfo, connectionContext)[0];
     setSecurity();
     //String className = "org.jppf.server.node.remote.JPPFRemoteNode";
-    String className = JPPFConfiguration.getProperties().getString("jppf.node.class", "org.jppf.server.node.remote.JPPFRemoteNode");
+    String className = JPPFConfiguration.get(JPPFProperties.NODE_CLASS);
     Class<?> clazz = getJPPFClassLoader().loadClass(className);
     Constructor c = clazz.getConstructor(DriverConnectionInfo.class);
     JPPFNode node = (JPPFNode) c.newInstance(currentConnectionInfo);
@@ -211,8 +212,7 @@ public class NodeRunner {
    */
   private static void setSecurity() throws Exception {
     if (!securityManagerSet) {
-      TypedProperties props = JPPFConfiguration.getProperties();
-      String s = props.getString("jppf.policy.file");
+      String s = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
       if (s != null) {
         if (debugEnabled) log.debug("setting security");
         Policy.setPolicy(new JPPFPolicy(getJPPFClassLoader()));

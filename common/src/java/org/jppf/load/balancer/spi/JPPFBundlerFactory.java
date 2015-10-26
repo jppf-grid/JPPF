@@ -18,12 +18,12 @@
 
 package org.jppf.load.balancer.spi;
 
-import java.io.*;
 import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.load.balancer.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -50,18 +50,11 @@ public class JPPFBundlerFactory
     /**
      * Default load-balancing configuration for JPPF servers.
      */
-    SERVER(new StringBuilder().append("jppf.load.balancing.algorithm = proportional\n")
-      .append("jppf.load.balancing.profile = jppf\n")
-      .append("jppf.load.balancing.profile.jppf.performanceCacheSize = 3000\n")
-      .append("jppf.load.balancing.profile.jppf.proportionalityFactor = 1\n")
-      .append("jppf.load.balancing.profile.jppf.initialSize = 10\n")
-      .append("jppf.load.balancing.profile.jppf.initialMeanTime = 1e9\n")),
+    SERVER(createServerDefaults()),
     /**
      * Default load-balancing configuration for JPPF clients.
      */
-    CLIENT(new StringBuilder().append("jppf.load.balancing.algorithm = manual\n")
-      .append("jppf.load.balancing.profile = jppf\n")
-      .append("jppf.load.balancing.profile.jppf.size = 1000000\n"));
+    CLIENT(createClientDefaults());
 
     /**
      * The configuration as a string.
@@ -72,15 +65,8 @@ public class JPPFBundlerFactory
      * Initialize with the specified configuration as a string.
      * @param config the configuration as a string.
      */
-    Defaults(final CharSequence config) {
-      try {
-        String s = (config instanceof String) ? (String) config : config.toString();
-        try (Reader reader = new StringReader(s)) {
-          this.config = new TypedProperties().loadAndResolve(reader);
-        }
-      } catch (Exception e) {
-        if (debugEnabled) log.debug("could not load default configuration", e);
-      }
+    Defaults(final TypedProperties config) {
+      this.config = config;
     }
  
     /**
@@ -142,13 +128,12 @@ public class JPPFBundlerFactory
    */
   public Bundler createBundlerFromJPPFConfiguration() throws Exception {
     TypedProperties config = JPPFConfiguration.getProperties();
-    String algorithm = config.getString("jppf.load.balancing.algorithm", null);
-    if (algorithm == null) algorithm = defaultConfig.config().getString("jppf.load.balancing.algorithm");
-    String profileName = config.getString("jppf.load.balancing.strategy", null);
-    if (profileName == null) profileName = config.getString("jppf.load.balancing.profile", null);
+    String algorithm = config.getString(JPPFProperties.LOAD_BALANCING_ALGORITHM.getName(), null);
+    if (algorithm == null) algorithm = defaultConfig.config().get(JPPFProperties.LOAD_BALANCING_ALGORITHM);
+    String profileName = config.getString(JPPFProperties.LOAD_BALANCING_PROFILE.getName(), null);
     if (profileName == null) {
-      String prefix = "jppf.load.balancing.profile";
-      profileName = defaultConfig.config().getString(prefix, "jppf");
+      String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName();
+      profileName = defaultConfig.config().get(JPPFProperties.LOAD_BALANCING_PROFILE);
       String prefixDot = prefix + '.';
       for (Map.Entry<Object, Object> entry: defaultConfig.config().entrySet()) {
         if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
@@ -219,7 +204,7 @@ public class JPPFBundlerFactory
    */
   public TypedProperties convertJPPFConfiguration(final String profileName, final TypedProperties configuration) {
     TypedProperties profile = extractJPPFConfiguration(profileName, configuration);
-    String prefix = "jppf.load.balancing.profile." + profileName + '.';
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     TypedProperties result = new TypedProperties();
     for (Map.Entry<Object, Object> entry: profile.entrySet()) {
       String key = (String) entry.getKey();
@@ -239,7 +224,7 @@ public class JPPFBundlerFactory
   private TypedProperties extractJPPFConfiguration(final String profileName, final TypedProperties configuration) {
     TypedProperties profile = new TypedProperties();
     String prefix = "strategy." + profileName + '.';
-    String prefix2 = "jppf.load.balancing.profile." + profileName + '.';
+    String prefix2 = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     for (Map.Entry<Object, Object> entry: configuration.entrySet()) {
       if ((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) {
         String key = (String) entry.getKey();
@@ -251,5 +236,30 @@ public class JPPFBundlerFactory
       }
     }
     return profile;
+  }
+
+  /**
+   * Create the default server load-balancing settings. 
+   * @return the settings as a {@link TypedProperties} instance.
+   */
+  private static TypedProperties createServerDefaults() {
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".jppf.";
+    return new TypedProperties().set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "proportional")
+      .set(JPPFProperties.LOAD_BALANCING_PROFILE, "jppf")
+      .setInt(prefix + "performanceCacheSize", 3000)
+      .setInt(prefix + "proportionalityFactor", 1)
+      .setInt(prefix + "initialSize = 10", 1)
+      .setDouble(prefix + "initialMeanTime", 1e9);
+  }
+
+  /**
+   * Create the default server load-balancing settings. 
+   * @return the settings as a {@link TypedProperties} instance.
+   */
+  private static TypedProperties createClientDefaults() {
+    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".jppf.";
+    return new TypedProperties().set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
+      .set(JPPFProperties.LOAD_BALANCING_PROFILE, "jppf")
+      .setInt(prefix + "size", 1_000_000);
   }
 }

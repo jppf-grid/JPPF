@@ -22,6 +22,7 @@ import java.util.*;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -56,7 +57,7 @@ public class ProfilingRunner
       int iterations = config.getInt("profiling.iterations");
       int nbChannels = config.getInt("profiling.channels");
       if (nbChannels < 1) nbChannels = 1;
-      config.setProperty("jppf.pool.size", String.valueOf(nbChannels));
+      config.set(JPPFProperties.POOL_SIZE, nbChannels);
       jppfClient = new JPPFClient();
       System.out.println("Running with " + nbTask + " tasks of size=" + dataSize + " for " + iterations + " iterations, nb channels = " + nbChannels);
       //performSequential(nbTask, true);

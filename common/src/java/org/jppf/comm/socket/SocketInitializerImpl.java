@@ -18,7 +18,7 @@
 package org.jppf.comm.socket;
 
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.ConfigurationHelper;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -68,15 +68,13 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     try {
       if (debugEnabled) log.debug("{} about to close socket wrapper", name);
       socketWrapper.close();
+    } catch(Exception e) {
     }
-    catch(Exception e) {
-    }
-    ConfigurationHelper helper = new ConfigurationHelper(JPPFConfiguration.getProperties());
-    long delay = 1000L * helper.getLong("jppf.reconnect.initial.delay", "reconnect.initial.delay", 0L);
+    long delay = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
     if (delay <= 0L) delay = 1L + rand.nextInt(10);
-    long maxTime = helper.getLong("jppf.reconnect.max.time", "reconnect.max.time", 60L);
+    long maxTime = JPPFConfiguration.get(JPPFProperties.RECONNECT_MAX_TIME);
     long maxDuration = (maxTime <= 0) ? Long.MAX_VALUE : 1000L * maxTime;
-    long period = 1000L * helper.getLong("jppf.reconnect.interval", "reconnect.interval", 1L);
+    long period = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INTERVAL);
     goToSleep(delay);
     successful = false;
     long elapsed = 0L;

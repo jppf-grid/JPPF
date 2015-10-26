@@ -29,6 +29,7 @@ import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -224,12 +225,12 @@ public class MemoryLeakTest {
     public void configure() {
       config
         // load balancing
-        .setString("jppf.load.balancing.algorithm", "manual")
-        .setString("jppf.load.balancing.profile", "manual")
-        .setInt("jppf.load.balancing.profile.manual.size", 1)
+        .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
+        .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
+        .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 1)
         // server connection
-        .setBoolean("jppf.discovery.enabled", false)
-        .setString("jppf.drivers", "driver1")
+        .set(JPPFProperties.DISCOVERY_ENABLED, false)
+        .set(JPPFProperties.DRIVERS, "driver1")
         .setString("driver1.jppf.server.host", "localhost")
         .setInt("driver1.jppf.server.port", 11111);
     }

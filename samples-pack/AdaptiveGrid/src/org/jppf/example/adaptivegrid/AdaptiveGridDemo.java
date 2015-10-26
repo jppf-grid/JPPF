@@ -26,6 +26,7 @@ import org.jppf.client.*;
 import org.jppf.client.event.ClientQueueListener;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 
 /**
  * This isi the main class for the Adaptive Grid demo.
@@ -83,17 +84,16 @@ public class AdaptiveGridDemo implements Runnable {
    * Programmatically configure the JPPF client to ensure the created connection pool has the desired name.
    */
   private void configure() {
-    TypedProperties config = JPPFConfiguration.getProperties();
     // disable auto-discovery
-    config.setBoolean("jppf.discovery.enabled", false);
-    // set the pool name
-    config.setString("jppf.drivers", POOL_NAME);
-    // set the server address
-    config.setString(POOL_NAME + ".jppf.server.host", "localhost");
-    // set the server port
-    config.setInt(POOL_NAME + ".jppf.server.port", 11111);
-    // set the core pool size
-    config.setInt(POOL_NAME + ".jppf.pool.size", 1);
+    JPPFConfiguration.set(JPPFProperties.DISCOVERY_ENABLED, false)
+      // set the pool name
+      .set(JPPFProperties.DRIVERS, POOL_NAME)
+      // set the server address
+      .setString(POOL_NAME + ".jppf.server.host", "localhost")
+      // set the server port
+      .setInt(POOL_NAME + ".jppf.server.port", 11111)
+      // set the core pool size
+      .setInt(POOL_NAME + ".jppf.pool.size", 1);
   }
 
   /**

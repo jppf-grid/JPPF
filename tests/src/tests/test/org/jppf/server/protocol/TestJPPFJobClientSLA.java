@@ -18,6 +18,7 @@
 
 package test.org.jppf.server.protocol;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.text.SimpleDateFormat;
@@ -306,14 +307,13 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
    */
   private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) throws Exception {
     BaseSetup.resetClientConfig();
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setBoolean("jppf.remote.execution.enabled", remoteEnabled);
-    config.setBoolean("jppf.local.execution.enabled", localEnabled);
-    config.setInt("jppf.local.execution.threads", Runtime.getRuntime().availableProcessors());
-    config.setProperty("jppf.load.balancing.algorithm", "manual");
-    config.setProperty("jppf.load.balancing.profile", "manual");
-    config.setInt("jppf.load.balancing.profile.manual.size", 5);
-    config.setInt("jppf.pool.size", poolSize);
+    JPPFConfiguration.set(LOAD_BALANCING_ALGORITHM, "manual")
+      .set(LOAD_BALANCING_PROFILE, "manual")
+      .setInt(LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
+      .set(POOL_SIZE, poolSize)
+      .set(REMOTE_EXECUTION_ENABLED, remoteEnabled)
+      .set(LOCAL_EXECUTION_ENABLED, localEnabled)
+      .set(LOCAL_EXECUTION_THREADS, Runtime.getRuntime().availableProcessors());
     client = BaseSetup.createClient(null, false);
   }
 

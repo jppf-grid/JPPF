@@ -18,6 +18,7 @@
 
 package test.org.jppf.client;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -128,12 +129,8 @@ public class TestConnectionPool extends Setup1D1N {
    * @param localThreads a value greater than 0 to enable local execution with this number of threads, 0 or less otherwise.
    */
   private void configure(final int localThreads) {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setString("jppf.load.balancing.algorithm", "proportional").setString("jppf.load.balancing.profile", "test")
-      .setInt("jppf.load.balancing.profile.test.initialSize", 10).setInt("jppf.pool.size", 2);
-    if (localThreads > 0) {
-      config.setBoolean("jppf.local.execution.enabled", true).setInt("jppf.local.execution.threads", localThreads);
-    }
+    JPPFConfiguration.set(LOAD_BALANCING_ALGORITHM, "proportional").set(LOAD_BALANCING_PROFILE, "test").setInt(LOAD_BALANCING_PROFILE.getName() + ".test.initialSize", 10).set(POOL_SIZE, 2);
+    if (localThreads > 0) JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, localThreads);
   }
 
   /**

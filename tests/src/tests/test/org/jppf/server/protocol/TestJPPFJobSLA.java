@@ -37,6 +37,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.junit.*;
 
@@ -71,9 +72,11 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
   public void instanceCleanup() throws Exception {
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     String driverState = (String) jmx.invoke("org.jppf:name=debug,type=driver", "dumpQueueDetails");
-    System.out.println("-------------------- driver state --------------------");
-    System.out.println(driverState);
-    //System.out.println("------------------------------------------------------");
+    if ((driverState !=  null) && !driverState.trim().isEmpty()) {
+      System.out.println("-------------------- driver state --------------------");
+      System.out.println(driverState);
+      //System.out.println("------------------------------------------------------");
+    }
   }
 
   /**
@@ -188,8 +191,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
    * and <code>JPPFJob.getSLA().setCancelUponClientDisconnect(false)</code> has been set.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=8000)
+  @Test(timeout=10000)
   public void testCancelJobUponClientDisconnect() throws Exception {
+    System.out.println(ReflectionUtils.getCurrentMethodName() + "() configuration: " + JPPFConfiguration.getProperties());
     String fileName = "testCancelJobUponClientDisconnect";
     File f = new File(fileName + ".tmp");
     f.deleteOnExit();
@@ -202,6 +206,9 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
       client.close();
       Thread.sleep(2000L);
       assertTrue(f.exists());
+    } catch(Exception e) {
+      e.printStackTrace();
+      throw e;
     } finally {
       f.delete();
       client = BaseSetup.createClient(null);
@@ -341,18 +348,17 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
 
   /**
    * Test that a broadcast job is executed on all nodes,
-   * event though another job is already executing at the time it is submitted.
+   * even though another job is already executing at the time it is submitted.
    * @throws Exception if any error occurs.
    */
   @Test(timeout=15000)
   public void testBroadcastJob2() throws Exception {
     try {
       client.close();
-      TypedProperties config = JPPFConfiguration.getProperties();
-      config.setProperty("jppf.pool.size", "2");
+      JPPFConfiguration.set(JPPFProperties.POOL_SIZE, 2);
       client = BaseSetup.createClient(null, false);
       String methodName = ReflectionUtils.getCurrentMethodName();
-      JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 1000L);
+      JPPFJob job1 = BaseTestHelper.createJob(methodName + "-normal", false, false, 10, LifeCycleTask.class, 500L);
       job1.getSLA().setPriority(1000);
       String suffix = "broadcast-node-";
       JPPFJob job2 = BaseTestHelper.createJob(methodName + "-broadcast", false, true, 1, FileTask.class, suffix, true);

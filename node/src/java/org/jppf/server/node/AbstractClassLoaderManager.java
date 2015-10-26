@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.classloader.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -56,18 +57,13 @@ public abstract class AbstractClassLoaderManager {
    * A list retaining the container in chronological order of their creation.
    */
   private final LinkedList<JPPFContainer> containerList = new LinkedList<>();
-  /**
-   Leak prevention instance.
-   */
-  //private final JPPFLeakPrevention leakPrevention;
 
   /**
    * Default constructor for class loader manager.
    */
   protected AbstractClassLoaderManager() {
     TypedProperties config = JPPFConfiguration.getProperties();
-    this.maxContainers = config.getInt("jppf.classloader.cache.size", 50);
-    //this.leakPrevention = new JPPFLeakPrevention(config);
+    this.maxContainers = config.get(JPPFProperties.CLASSLOADER_CACHE_SIZE);
   }
 
   /**

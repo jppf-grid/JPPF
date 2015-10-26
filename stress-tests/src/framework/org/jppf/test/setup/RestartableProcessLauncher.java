@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.jppf.test.scenario.ScenarioConfiguration;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
@@ -136,7 +137,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
    */
   protected void setJVMOptions() {
     TypedProperties props = ConfigurationHelper.loadProperties(new File(jppfConfig));
-    String opts = props.getString("jppf.jvm.options");
+    String opts = props.get(JPPFProperties.JVM_OPTIONS);
     if ((opts != null) && !"".equals(opts.trim())) {
       String[] options = opts.split("\\s");
       for (int i=0; i<options.length; i++) {

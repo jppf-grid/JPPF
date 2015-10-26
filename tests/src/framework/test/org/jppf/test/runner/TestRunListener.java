@@ -111,7 +111,7 @@ public class TestRunListener extends RunListener {
     if (isLogging) {
       if (!description.getClassName().equals(currentClass)) {
         currentClass = description.getClassName();
-        out.println("\n---------- end of output for class " + currentClass + " ----------\n");
+        out.println("\n---------- output for class " + currentClass + " ----------\n");
         defaultSysout.println("class " + currentClass);
       }
       //out.println("----- " + description.getMethodName() + " -----");

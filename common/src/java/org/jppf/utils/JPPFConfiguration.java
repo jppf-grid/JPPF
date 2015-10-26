@@ -21,6 +21,7 @@ import java.io.*;
 
 import org.jppf.serialization.JPPFSerialization;
 import org.jppf.ssl.SSLHelper;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -72,6 +73,40 @@ public final class JPPFConfiguration {
   }
 
   /**
+   * Get the value of a predefined property.
+   * This is the same as calling {@code JPPFConfiguration.getProperties().get(property)}.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @return the value of the property according to its type.
+   */
+  public static <T> T get(final JPPFProperty<T> property) {
+    return getProperties().get(property);
+  }
+
+  /**
+   * Set the value of a predefined property.
+   * This is the same as calling {@code JPPFConfiguration.getProperties().set(property, value)}.
+   * @param <T> the type of the property.
+   * @param property the property whose value to set.
+   * @param value the value to set.
+   * @return the {@link TypedProperties} instance in which the value is set.
+   */
+  public static <T> TypedProperties set(final JPPFProperty<T> property, final T value) {
+    return getProperties().set(property, value);
+  }
+
+  /**
+   * Remove the predefined property.
+   * This is the same as calling {@code JPPFConfiguration.getProperties().remove(property)}.
+   * @param <T> the type of the property.
+   * @param property the property whose value to retrieve.
+   * @return the value of the property according to its type.
+   */
+  public static <T> T remove(final JPPFProperty<T> property) {
+    return getProperties().remove(property);
+  }
+
+  /**
    * Reset and reload the JPPF configuration.
    * This allows reloading the configuration from a different source or file
    * (after changing the values of the related system properties for instance).
@@ -86,6 +121,7 @@ public final class JPPFConfiguration {
    * Load the JPPF configuration properties from a file.
    */
   private static void loadProperties() {
+    JPPFProperties.init();
     props = new TypedProperties();
     try (Reader reader = getReader()) {
       if (reader != null) props.loadAndResolve(reader);

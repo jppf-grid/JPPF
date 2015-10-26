@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -72,9 +73,9 @@ public class JPPFBroadcaster extends ThreadSynchronization implements Runnable, 
    */
   private void init() throws Exception {
     TypedProperties props = JPPFConfiguration.getProperties();
-    broadcastInterval = props.getLong("jppf.discovery.broadcast.interval", 1000L);
-    String group = props.getString("jppf.discovery.group", "230.0.0.1");
-    int port = props.getInt("jppf.discovery.port", 11111);
+    broadcastInterval = props.get(JPPFProperties.DISCOVERY_BROADCAST_INTERVAL);
+    String group = props.get(JPPFProperties.DISCOVERY_GROUP);
+    int port = props.get(JPPFProperties.DISCOVERY_PORT);
 
     List<InetAddress> addresses = NetworkUtils.getNonLocalIPV4Addresses();
     addresses.addAll(NetworkUtils.getNonLocalIPV6Addresses());

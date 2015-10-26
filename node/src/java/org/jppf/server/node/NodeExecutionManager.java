@@ -26,6 +26,7 @@ import org.jppf.node.NodeInternal;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -53,17 +54,16 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param node the node that uses this execution manager.
    */
   public NodeExecutionManager(final NodeInternal node) {
-    this(node, "jppf.processing.threads", "processing.threads");
+    this(node, JPPFProperties.PROCESSING_THREADS);
   }
 
   /**
    * Initialize this execution manager with the specified node.
    * @param node the node that uses this execution manager.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
-   * @param legacyNbThreadsProperty the legacy name of the property which configures the number of threads.
    */
-  public NodeExecutionManager(final NodeInternal node, final String nbThreadsProperty, final String legacyNbThreadsProperty) {
-    super(nbThreadsProperty, legacyNbThreadsProperty);
+  public NodeExecutionManager(final NodeInternal node, final JPPFProperty nbThreadsProperty) {
+    super(nbThreadsProperty);
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;
   }

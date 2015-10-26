@@ -18,6 +18,7 @@
 
 package test.org.jppf.client;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
 import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
@@ -131,9 +132,7 @@ public class TestJPPFClient extends Setup1D1N {
   public void testLocalExecutionNbThreads() throws Exception
   {
     int nbThreads = 2;
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setBoolean("jppf.local.execution.enabled", true);
-    config.setInt("jppf.local.execution.threads", nbThreads);
+    JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, nbThreads);
     try (JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       // submit a job to ensure all local execution threads are created
@@ -173,9 +172,7 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testLocalExecutionContextClassLoader() throws Exception {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setBoolean("jppf.remote.execution.enabled", false);
-    config.setBoolean("jppf.local.execution.enabled", true);
+    JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, ThreadContextClassLoaderTask.class);
       List<Task<?>> results = client.submitJob(job);
@@ -197,9 +194,7 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testRemoteExecutionContextClassLoader() throws Exception {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    config.setProperty("jppf.rmeote.execution.enabled", "true");
-    config.setProperty("jppf.local.execution.enabled", "false");
+    JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_ENABLED, false);
     try (JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
       String name = ReflectionUtils.getCurrentClassAndMethod();
@@ -262,19 +257,20 @@ public class TestJPPFClient extends Setup1D1N {
   public void testNoJMXConnectionThreadsLeak() throws Exception {
     String name = Thread.currentThread().getName();
     MyClient client = null;
-    TypedProperties config = JPPFConfiguration.getProperties();
+    //TypedProperties config = JPPFConfiguration.getProperties();
     try {
       Thread.currentThread().setName("JPPF-test");
       int poolSize = 2;
-      int maxReconnect = 3;
-      config.setInt("jppf.reconnect.initial.delay", 1);
-      config.setInt("jppf.reconnect.max.time", maxReconnect);
-      config.setBoolean("jppf.discovery.enabled", false);
-      config.setProperty("jppf.drivers", "test");
-      config.setProperty("test.jppf.server.host", "localhost");
-      config.setInt("test.jppf.server.port", 11101);
-      config.setInt("test.jppf.pool.size", poolSize);
-      config.setInt("test.jppf.management.port", 11201);
+      long maxReconnect = 3;
+      JPPFConfiguration.set(RECONNECT_INITIAL_DELAY, 0L)
+        .set(RECONNECT_MAX_TIME, maxReconnect)
+        .set(DISCOVERY_ENABLED, false)
+        .set(DRIVERS, "test")
+        .setString("test.jppf.server.host", "localhost")
+        .setInt("test.jppf.server.port", 11101)
+        .setInt("test.jppf.pool.size", poolSize)
+        .setInt("test.jppf.management.port", 11201);
+      log.info("configured client with: {}", JPPFConfiguration.getProperties());
       ConnectionPoolListener listener = new ConnectionPoolListenerAdapter() {
         @Override public void connectionAdded(final ConnectionPoolEvent event) {
           TestUtils.printf(log, "connectionAdded(%s) : connectionCount = %d", event .getConnection(), event.getConnectionPool().getClient().getAllConnectionsCount());
@@ -364,7 +360,7 @@ public class TestJPPFClient extends Setup1D1N {
     ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
     long[] ids = threadsBean.getAllThreadIds();
     ThreadInfo[] infos = threadsBean.getThreadInfo(ids, 0);
-    List<String> result = new ArrayList<>();
+    List<String> result = new ArrayList<>(infos.length);
     for (int i=0; i<infos.length; i++) {
       if ((p == null) || p.matcher(infos[i].getThreadName()).matches())
         result.add(infos[i].getThreadName());
@@ -396,11 +392,9 @@ public class TestJPPFClient extends Setup1D1N {
   }
 
   /**
-   *
    */
   public static class MyClient extends JPPFClient {
     /**
-     *
      * @param listener .
      */
     public MyClient(final ConnectionPoolListener listener) {

@@ -33,6 +33,7 @@ import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -89,7 +90,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
     selectionHelper = new NodeSelectionHelper();
     NodeForwardingHelper.getInstance().setSelectionProvider(selectionHelper);
     manager = new ForwardingNotificationManager(this);
-    int nbThreads = JPPFConfiguration.getProperties().getInt("jppf.node.forwarding.pool.size", Runtime.getRuntime().availableProcessors());
+    int nbThreads = JPPFConfiguration.get(JPPFProperties.NODE_FORWARDING_POOL_SIZE);
     ThreadFactory factory = new JPPFThreadFactory("NodeForwarding");
     executor = Executors.newFixedThreadPool(nbThreads, factory);
     //executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), factory);

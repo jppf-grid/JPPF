@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -111,7 +112,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * @param listeners a set of listeners to subscribe immediately for topology events.
    */
   public TopologyManager(final JPPFClient client, final TopologyListener...listeners) {
-    this(config.getLong("jppf.admin.refresh.interval.topology", 1000L), config.getLong("jppf.admin.refresh.interval.health", 1000L), client, listeners);
+    this(config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_TOPOLOGY), config.get(JPPFProperties.ADMIN_REFRESH_INTERVAL_HEALTH), client, listeners);
   }
 
   /**

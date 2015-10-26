@@ -25,6 +25,7 @@ import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 import sample.dist.tasklength.LongTask;
@@ -54,7 +55,7 @@ public class LocalExecutionRunner
     try
     {
       TypedProperties props = JPPFConfiguration.getProperties();
-      props.setProperty("jppf.local.execution.enabled", "false");
+      props.set(JPPFProperties.LOCAL_EXECUTION_ENABLED, false);
       int length = props.getInt("longtask.length");
       int nbTask = props.getInt("longtask.number");
       print("starting client ...");

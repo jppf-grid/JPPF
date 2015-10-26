@@ -19,6 +19,7 @@
 package org.jppf.data.transform;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -61,7 +62,7 @@ public class JPPFDataTransformFactory {
    */
   private static Class<?> initTransformClass() {
     Class<?> c = null;
-    String s = JPPFConfiguration.getProperties().getString("jppf.data.transform.class", null);
+    String s = JPPFConfiguration.get(JPPFProperties.DATA_TRANSFORM_CLASS);
     if (s != null) {
       try {
         c = Class.forName(s);

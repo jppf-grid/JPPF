@@ -26,6 +26,7 @@ import java.util.*;
 import javax.management.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -138,12 +139,13 @@ public final class PermissionsFactory
     try
     {
       TypedProperties config = JPPFConfiguration.getProperties();
-      String host = config.getString("jppf.server.host", "localhost");
-      boolean sslEnabled = config.getBoolean("jppf.ssl.enabled", false);
+      String host = config.get(JPPFProperties.SERVER_HOST);
+      boolean sslEnabled = config.get(JPPFProperties.SSL_ENABLED);
       // for backward compatibility with v2.x configurations
-      int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
+      //int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
+      int port = config.get(sslEnabled ? JPPFProperties.SERVER_SSL_PORT: JPPFProperties.SERVER_PORT);
       addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
-      host = config.getString("jppf.discovery.group", "230.0.0.1");
+      host = config.get(JPPFProperties.DISCOVERY_GROUP);
       //port = props.getInt("jppf.discovery.port", 11111);
       addPermission(new SocketPermission(host + ":0-", "accept,connect,listen,resolve"), "dynamic");
     }
@@ -162,12 +164,10 @@ public final class PermissionsFactory
     {
       TypedProperties props = JPPFConfiguration.getProperties();
       //String host = props.getString("jppf.management.host", "localhost");
-      int port = props.getInt("jppf.management.port", 11198);
-      int rmiPort = props.getInt("jppf.management.rmi.port", 12198);
+      int port = props.get(JPPFProperties.MANAGEMENT_PORT);
       // TODO: find a way to be more restrictive on RMI permissions
       //addPermission(new SocketPermission(host + ":1024-", "accept,connect,listen,resolve"), "management");
       addPermission(new SocketPermission("localhost:" + port, "accept,connect,listen,resolve"), "management");
-      addPermission(new SocketPermission("localhost:" + rmiPort, "accept,connect,listen,resolve"), "management");
       //p.add(new MBeanServerPermission("createMBeanServer"));
       addPermission(new MBeanServerPermission("*"), "management");
       addPermission(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"), "management");
@@ -190,7 +190,7 @@ public final class PermissionsFactory
     LineNumberReader reader = null;
     try
     {
-      String file = JPPFConfiguration.getProperties().getString("jppf.policy.file");
+      String file = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
       if (file == null) return;
       try
       {

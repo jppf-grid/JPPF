@@ -30,6 +30,7 @@ import javax.net.ssl.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -75,7 +76,7 @@ public final class SSLHelper {
    */
   public static SSLContext getSSLContext(final int identifier) throws Exception {
     if (sslConfig == null) loadSSLProperties();
-    boolean b = sslConfig.getBoolean("jppf.ssl.client.distinct.truststore", false);
+    boolean b = sslConfig.get(JPPFProperties.SSL_CLIENT_DISTINCT_TRUSTSTORE);
     if (debugEnabled) log.debug("using {} trust store for clients, identifier = {}", b ? "distinct" : "same", JPPFIdentifiers.asString(identifier));
     switch(identifier) {
       case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:
@@ -111,7 +112,7 @@ public final class SSLHelper {
       tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
       tmf.init(trustStore);
     }
-    SSLContext sslContext = SSLContext.getInstance(sslConfig.getString("jppf.ssl.context.protocol"));
+    SSLContext sslContext = SSLContext.getInstance(sslConfig.get(JPPFProperties.SSL_CONTEXT_PROTOCOL));
     sslContext.init(kmf == null ? null : kmf.getKeyManagers(), tmf == null ? null : tmf.getTrustManagers(), null);
     return sslContext;
     } catch(Exception e) {
@@ -127,13 +128,13 @@ public final class SSLHelper {
   public static SSLParameters getSSLParameters() throws Exception {
     if (sslConfig == null) loadSSLProperties();
     SSLParameters params = new SSLParameters();
-    String s = sslConfig.getString("jppf.ssl.cipher.suites");
+    String s = sslConfig.get(JPPFProperties.SSL_CIPHER_SUITES);
     String[] tokens = (s == null) ? null : s.trim().split("\\s");
     params.setCipherSuites(tokens);
-    s = sslConfig.getString("jppf.ssl.protocols");
+    s = sslConfig.get(JPPFProperties.SSL_PROTOCOLS);
     tokens = (s == null) ? null : s.trim().split("\\s");
     params.setProtocols(tokens);
-    s = sslConfig.getString("jppf.ssl.client.auth", "none").toLowerCase();
+    s = sslConfig.get(JPPFProperties.SSL_CLIENT_AUTH).toLowerCase();
     params.setWantClientAuth("want".equals(s));
     params.setNeedClientAuth("need".equals(s));
 
@@ -268,10 +269,10 @@ public final class SSLHelper {
       sslConfig = new TypedProperties();
       InputStream is = null;
       TypedProperties config = JPPFConfiguration.getProperties();
-      source = config.getString("jppf.ssl.configuration.source", null);
+      source = config.get(JPPFProperties.SSL_CONFIGURATION_SOURCE);
       if (source != null) is = callSource(source);
       else {
-        source = config.getString("jppf.ssl.configuration.file", null);
+        source = config.get(JPPFProperties.SSL_CONFIGURATION_FILE);
         if (source == null) throw new SSLConfigurationException("no SSL configuration source is configured");
         is = FileUtils.getFileInputStream(source);
       }
@@ -304,10 +305,10 @@ public final class SSLHelper {
   public static String getClientConfigId(final String driverName) {
     TypedProperties config = JPPFConfiguration.getProperties();
     String suffix = (driverName == null) || "".equals(driverName) ? "" : driverName + ".";
-    String name = suffix + "jppf.ssl.configuration.file";
+    String name = suffix + JPPFProperties.SSL_CONFIGURATION_FILE.getName();
     String value = config.getString(name);
     if ((value == null) || "".equals(value.trim())) {
-      name = suffix + "jppf.ssl.configuration.source";
+      name = suffix + JPPFProperties.SSL_CONFIGURATION_SOURCE.getName();
       value = config.getString(name);
       // use the global definition
       if (value == null) {
