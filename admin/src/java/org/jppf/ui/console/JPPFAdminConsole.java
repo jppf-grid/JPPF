@@ -20,7 +20,10 @@ package org.jppf.ui.console;
 
 import javax.swing.JComponent;
 
+import org.jppf.client.JPPFClient;
+import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.ui.monitoring.ConsoleLauncher;
+import org.jppf.ui.monitoring.data.StatsHandler;
 
 /**
  * This class provides an API to launch the JPPF admininstration console
@@ -44,5 +47,25 @@ public class JPPFAdminConsole {
    */
   public static JComponent getAdminConsole() {
     return ConsoleLauncher.loadAdminConsole();
+  }
+
+  /**
+   * Get the JPPF client used by the admin console.
+   * This method always returns the same {@code JPPFClient} instance.
+   * @return a {@link JPPFClient} instance used by the admin console.
+   */
+  public static JPPFClient getJPPFClient() {
+    TopologyManager manager = getTopologyManager();
+    return (manager == null) ? null : manager.getJPPFClient();
+  }
+
+  /**
+   * Get the topology manager used by the admin console.
+   * This method always returns the same {@code TopologyManager} instance.
+   * @return a {@link TopologyManager} instance used by the admin console.
+   */
+  public static TopologyManager getTopologyManager() {
+    StatsHandler handler = StatsHandler.getInstance();
+    return (handler == null) ? null : handler.getTopologyManager();
   }
 }
