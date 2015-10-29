@@ -23,8 +23,6 @@ import java.util.concurrent.atomic.*;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFDriver;
-import org.jppf.server.debug.DebugHelper;
 import org.jppf.utils.ExceptionUtils;
 import org.slf4j.*;
 
@@ -200,14 +198,6 @@ public class ServerTaskBundleClient {
    * @param results the tasks for which results were received.
    */
   public void resultReceived(final Collection<ServerTask> results) {
-    if (JPPFDriver.JPPF_DEBUG) {
-      List<ServerTask> list = DebugHelper.addResults(getUuid(), results);
-      if (list != null) {
-        List<Integer> positions = new ArrayList<>(list.size());
-        for (ServerTask task: list) positions.add(task.getJobPosition());
-        log.warn(String.format("***** duplicate results %s%njob=%s, call stack:%n%s", positions, this, ExceptionUtils.getCallStack()));
-      }
-    }
     List<ServerTask> completedTasks = null;
     synchronized (this) {
       if (isCancelled()) return;

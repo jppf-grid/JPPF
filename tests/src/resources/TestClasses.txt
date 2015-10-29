@@ -26,6 +26,7 @@ test.org.jppf.serialization.TestJPPFSerialization
 test.org.jppf.serialization.TestKryo
 test.org.jppf.server.job.management.TestDriverJobManagementMBean
 test.org.jppf.server.peer.TestMultiServer
+test.org.jppf.server.peer.TestMultiServerWithOrphan
 test.org.jppf.server.peer.TestMultiServerWithSSL
 test.org.jppf.server.protocol.TestJPPFJobClientSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA

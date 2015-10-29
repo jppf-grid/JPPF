@@ -47,13 +47,13 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
-  public Map shutdown(final NodeSelector param0, final Boolean param1) {
-    return (Map) invoke("shutdown", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
+  public Map shutdown(final NodeSelector param0) {
+    return (Map) invoke("shutdown", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
 
   @Override
-  public Map shutdown(final NodeSelector param0) {
-    return (Map) invoke("shutdown", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
+  public Map shutdown(final NodeSelector param0, final Boolean param1) {
+    return (Map) invoke("shutdown", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Boolean" });
   }
 
   @Override
@@ -97,6 +97,16 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
+  public String registerForwardingNotificationListener(final NodeSelector param0, final String param1) {
+    return (String) invoke("registerForwardingNotificationListener", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String" });
+  }
+
+  @Override
+  public void unregisterForwardingNotificationListener(final String param0) {
+    invoke("unregisterForwardingNotificationListener", new Object[] { param0 }, new String[] { "java.lang.String" });
+  }
+
+  @Override
   public Map healthSnapshot(final NodeSelector param0) {
     return (Map) invoke("healthSnapshot", new Object[] { param0 }, new String[] { "org.jppf.management.NodeSelector" });
   }
@@ -109,16 +119,6 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   @Override
   public Map forwardSetAttribute(final NodeSelector param0, final String param1, final String param2, final Object param3) {
     return (Map) invoke("forwardSetAttribute", new Object[] { param0, param1, param2, param3 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String", "java.lang.String", "java.lang.Object" });
-  }
-
-  @Override
-  public String registerForwardingNotificationListener(final NodeSelector param0, final String param1) {
-    return (String) invoke("registerForwardingNotificationListener", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.String" });
-  }
-
-  @Override
-  public void unregisterForwardingNotificationListener(final String param0) {
-    invoke("unregisterForwardingNotificationListener", new Object[] { param0 }, new String[] { "java.lang.String" });
   }
 
   @Override

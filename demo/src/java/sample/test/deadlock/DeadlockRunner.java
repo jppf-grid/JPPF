@@ -66,9 +66,11 @@ public class DeadlockRunner {
       @Override
       public void jobCreated(final JPPFJob job) {
         //job.getSLA().setMaxNodeProvisioningGroups(1);
+        /*
         ExecutionPolicy policy = new Equal("jppf.node.provisioning.slave", true).and(new Equal("job.uuid", false, job.getUuid()));
         job.getSLA().setExecutionPolicy(policy);
         job.getSLA().setSuspended(true);
+        */
       }
     };
     System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);

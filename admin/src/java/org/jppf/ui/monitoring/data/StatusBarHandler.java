@@ -18,7 +18,7 @@
 
 package org.jppf.ui.monitoring.data;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.swing.SwingUtilities;
 
 import org.jppf.client.monitoring.topology.*;
 import org.jppf.ui.options.*;
@@ -38,26 +38,6 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    */
   static boolean debugEnabled = log.isDebugEnabled();
   /**
-   * Identifies the field counting the drivers.
-   */
-  private static final int DRIVERS = 1;
-  /**
-   * Identifies the field counting the nodes.
-   */
-  private static final int NODES = 2;
-  /**
-   * Number of active servers.
-   */
-  private AtomicInteger nbServers = new AtomicInteger(0);
-  /**
-   * Number of active nodes.
-   */
-  private AtomicInteger nbNodes = new AtomicInteger(0);
-  /**
-   * The option holding the status bar UI component.
-   */
-  private final OptionElement statusBarOption;
-  /**
    * The option holding the count of drivers.
    */
   private final FormattedNumberOption serverField;
@@ -65,63 +45,57 @@ public class StatusBarHandler extends TopologyListenerAdapter {
    * The option holding the count of nodes.
    */
   private final FormattedNumberOption nodeField;
+  /**
+   * 
+   */
+  private final TopologyManager manager;
 
   /**
    * Initialize this status bar handler.
    * @param statusBarOption the option holding the status bar UI component.
    */
   public StatusBarHandler(final OptionElement statusBarOption) {
-    this.statusBarOption = statusBarOption;
     this.serverField = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbServers");
     this.nodeField = (FormattedNumberOption) statusBarOption.findFirstWithName("/StatusNbNodes");
-    TopologyManager manager = StatsHandler.getInstance().getTopologyManager();
-    updateStatusBar(DRIVERS, manager.getDriverCount());
-    updateStatusBar(NODES, manager.getNodeCount());
+    manager = StatsHandler.getInstance().getTopologyManager();
+    updateStatusBar();
     manager.addTopologyListener(this);
   }
 
   /**
-   * Update the number of active servers or nodes in the status bar.
-   * @param fieldId the id of the field to update.
-   * @param n the number of servers to add or subtract.
+   * Update the number of active servers and nodes in the status bar.
    */
-  void updateStatusBar(final int fieldId, final int n) {
-    try {
-      FormattedNumberOption field = (fieldId == DRIVERS) ? serverField : nodeField;
-      AtomicInteger nb = (fieldId == DRIVERS) ? nbServers : nbNodes;
-      int newNb = nb.addAndGet(n);
-      if (debugEnabled) log.debug("updating '" + field.getName() + "' with value = " + n + ", result = " + newNb);
-      field.setValue(Double.valueOf(newNb));
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Refresh the number of active servers and nodes in the status bar.
-   */
-  public void refreshStatusBar() {
-    serverField.setValue(Double.valueOf(nbServers.get()));
-    nodeField.setValue(Double.valueOf(nbNodes.get()));
+  void updateStatusBar() {
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        if (debugEnabled) log.debug("updating status bar with nbDrivers={}, nbNodes={}", manager.getDriverCount(), manager.getNodeCount());
+        synchronized(StatusBarHandler.this) {
+          serverField.setValue(manager.getDriverCount());
+          nodeField.setValue(manager.getNodeCount());
+        }
+      }
+    };
+    SwingUtilities.invokeLater(r);
   }
 
   @Override
   public void driverAdded(final TopologyEvent event) {
-    updateStatusBar(DRIVERS, 1);
+    updateStatusBar();
   }
 
   @Override
   public void driverRemoved(final TopologyEvent event) {
-    updateStatusBar(DRIVERS, -1);
+    updateStatusBar();
   }
 
   @Override
   public void nodeAdded(final TopologyEvent event) {
-    if (event.getNodeOrPeer().isNode()) updateStatusBar(NODES, 1);
+    updateStatusBar();
   }
 
   @Override
   public void nodeRemoved(final TopologyEvent event) {
-    if (event.getNodeOrPeer().isNode()) updateStatusBar(NODES, -1);
+    updateStatusBar();
   }
 }

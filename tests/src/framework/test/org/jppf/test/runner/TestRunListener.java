@@ -122,7 +122,7 @@ public class TestRunListener extends RunListener {
   @Override
   public void testFailure(final Failure failure) throws Exception {
     resultHolder.addFailure(failure);
-    if (isLogging) defaultSysout.println("  - " + failure.getDescription().getMethodName() + " : Failure '" + failure.getMessage() + "'");
+    if (isLogging) defaultSysout.printf("  - %s : Failure '%s'%n", failure.getDescription().getMethodName(), failure.getTrace());
     if ("EXIT".equals(actionOnError)) System.exit(1);
     if ("WAIT".equals(actionOnError)) StreamUtils.waitKeyPressed("Press [Enter] to continue ...");
   }

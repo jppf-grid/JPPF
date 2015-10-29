@@ -28,7 +28,7 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -230,6 +230,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
    * Test that a job is only executed on one channel at a time, either local or remote.
    * @throws Exception if any error occurs.
    */
+  @Ignore
   @Test(timeout=15000)
   public void testJobMaxChannelsClient() throws Exception {
     try {
@@ -264,6 +265,7 @@ public class TestJPPFJobClientSLA extends Setup1D1N {
    * Test that a job is executed on both local and remote channels.
    * @throws Exception if any error occurs.
    */
+  @Ignore
   @Test(timeout=15000)
   public void testJobMaxChannels2Client() throws Exception {
     try {
