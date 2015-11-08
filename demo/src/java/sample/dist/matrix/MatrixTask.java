@@ -24,8 +24,7 @@ import sample.BaseDemoTask;
  * the multiplication of 2 whole matrices.
  * @author Laurent Cohen
  */
-public class MatrixTask extends BaseDemoTask
-{
+public class MatrixTask extends BaseDemoTask {
   /**
    * Data provider key mapping to the second matrix operand in the multiplication.
    */
@@ -43,8 +42,7 @@ public class MatrixTask extends BaseDemoTask
    * Initialize this task with a specified row of values to multiply.
    * @param rowValues the values as an array of <code>double</code> values.
    */
-  public MatrixTask(final double[] rowValues)
-  {
+  public MatrixTask(final double[] rowValues) {
     this.rowValues = rowValues;
   }
 
@@ -53,8 +51,7 @@ public class MatrixTask extends BaseDemoTask
    * @return a matrix column as an array of <code>double</code> values.
    */
   @Override
-  public Object getResult()
-  {
+  public Object getResult() {
     return result;
   }
 
@@ -63,26 +60,18 @@ public class MatrixTask extends BaseDemoTask
    * @see sample.BaseDemoTask#doWork()
    */
   @Override
-  public void doWork()
-  {
-    try
-    {
+  public void doWork() {
+    try {
       Matrix matrix = getDataProvider().getParameter(DATA_KEY);
       int size = matrix.getSize();
       result = new double[size];
 
-      for (int col=0; col<size; col++)
-      {
+      for (int col = 0; col < size; col++) {
         double sum = 0.0d;
-        for (int row=0; row<size; row++)
-        {
-          sum += matrix.getValueAt(row, col) * rowValues[row];
-        }
+        for (int row = 0; row < size; row++) sum += matrix.getValueAt(row, col) * rowValues[row];
         result[col] = sum;
       }
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       setThrowable(e);
     }
   }

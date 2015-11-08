@@ -46,6 +46,10 @@ public class JPPFObjectInputStream extends ObjectInputStream {
    * Determines whether the stream is already reading an object graph.
    */
   private boolean readingObject = false;
+  /**
+   * Temporary buffer.
+   */
+  private final byte[] buf = new byte[16];
 
   /**
    * Initialize this object input stream with the specified stream.
@@ -97,32 +101,36 @@ public class JPPFObjectInputStream extends ObjectInputStream {
 
   @Override
   public char readChar() throws IOException {
-    return in.readChar();
+    readToBuf(2);
+    return SerializationUtils.readChar(buf, 0);
   }
 
   @Override
   public short readShort() throws IOException {
-    return in.readShort();
+    readToBuf(2);
+    return SerializationUtils.readShort(buf, 0);
   }
 
   @Override
   public int readInt() throws IOException {
-    return in.readInt();
+    readToBuf(4);
+    return SerializationUtils.readInt(buf, 0);
   }
 
   @Override
   public long readLong() throws IOException {
-    return in.readLong();
+    readToBuf(8);
+    return SerializationUtils.readLong(buf, 0);
   }
 
   @Override
   public float readFloat() throws IOException {
-    return in.readFloat();
+    return Float.intBitsToFloat(readInt());
   }
 
   @Override
   public double readDouble() throws IOException {
-    return in.readDouble();
+    return Double.longBitsToDouble(readLong());
   }
 
   @Override
@@ -197,8 +205,25 @@ public class JPPFObjectInputStream extends ObjectInputStream {
    * @throws Exception if any error occurs.
    */
   private void readFields0(final Map<String, Object> map) throws Exception {
-    String[] names = (String[]) deserializer.readObject();
-    Object[] values = (Object[]) deserializer.readObject();
-    for (int i = 0; i < names.length; i++) map.put(names[i], values[i]);
+    int n = readInt();
+    for (int i=0; i<n; i++) {
+      String name = (String) deserializer.readObject();
+      Object value = (Object) deserializer.readObject();
+      map.put(name, value);
+    }
+  }
+
+  /**
+   * Read the specified number of bytes into the temp buyffer.
+   * @param len the number of bytes to read.
+   * @throws IOException if any error occurs.
+   */
+  private void readToBuf(final int len) throws IOException {
+    int pos = 0;
+    while (pos < len) {
+      int n = in.read(buf, pos, len - pos);
+      if (n > 0) pos += n;
+      else if (n < 0) throw new EOFException("could only read " + pos + " bytes out of " + len);
+    }
   }
 }

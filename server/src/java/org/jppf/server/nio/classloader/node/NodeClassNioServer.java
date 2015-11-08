@@ -96,6 +96,7 @@ public class NodeClassNioServer extends ClassNioServer<NodeClassState, NodeClass
   @Override
   public void postAccept(final ChannelWrapper<?> channel) {
     try {
+      if (debugEnabled) log.debug("accepting channel {}", channel);
       synchronized(channel) {
         transitionManager.transitionChannel(channel, NodeClassTransition.TO_WAITING_INITIAL_NODE_REQUEST);
         if (transitionManager.checkSubmitTransition(channel)) transitionManager.submitTransition(channel);

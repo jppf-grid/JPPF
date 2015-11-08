@@ -331,17 +331,14 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       SerializationHelper helper = new SerializationHelperImpl();
       // serializing a null data provider.
       JPPFBuffer buf = helper.getSerializer().serialize(null);
-      int len = buf.getLength();
-      byte[] bytes = new byte[4 + len];
-      SerializationUtils.writeInt(len, bytes, 0);
-      System.arraycopy(buf.getBuffer(), 0, bytes, 4, len);
+      byte[] lengthBytes = SerializationUtils.writeInt(buf.getLength());
       TaskBundle bundle = new JPPFTaskBundle();
       bundle.setName("server handshake");
       bundle.setUuid(INITIAL_BUNDLE_UUID);
       bundle.getUuidPath().add(driver.getUuid());
       bundle.setTaskCount(0);
       bundle.setHandshake(true);
-      return new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(bytes)));
+      return new ServerJob(new ReentrantLock(), null, bundle, new MultipleBuffersLocation(new JPPFBuffer(lengthBytes), buf));
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }

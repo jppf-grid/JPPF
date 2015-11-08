@@ -29,8 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T> the type of the elements in the pool.
  * @author Laurent Cohen
  */
-public abstract class AbstractBoundedObjectPoolQueue<T> extends AbstractObjectPoolQueue<T>
-{
+public abstract class AbstractBoundedObjectPoolQueue<T> extends AbstractObjectPoolQueue<T> {
   /**
    * The current size of the pool.
    */
@@ -44,14 +43,12 @@ public abstract class AbstractBoundedObjectPoolQueue<T> extends AbstractObjectPo
    * Initialize this pool with the specified maximum size.
    * @param maxSize the pool max size.
    */
-  public AbstractBoundedObjectPoolQueue(final int maxSize)
-  {
+  public AbstractBoundedObjectPoolQueue(final int maxSize) {
     this.maxSize = maxSize;
   }
 
   @Override
-  public T get()
-  {
+  public T get() {
     T t = queue.poll();
     if (t != null) size.decrementAndGet();
     else t = create();
@@ -59,18 +56,15 @@ public abstract class AbstractBoundedObjectPoolQueue<T> extends AbstractObjectPo
   }
 
   @Override
-  public void put(final T t)
-  {
-    if (size.get() < maxSize)
-    {
+  public void put(final T t) {
+    if (size.get() < maxSize) {
       size.incrementAndGet();
       queue.offer(t);
     }
   }
 
   @Override
-  public int size()
-  {
+  public int size() {
     return size.get();
   }
 }

@@ -20,6 +20,7 @@ package org.jppf.serialization;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Instances of this class describe a Java class with all its non-transient fields
@@ -27,8 +28,7 @@ import java.lang.reflect.*;
  * @author Laurent Cohen
  * @exclude
  */
-class ClassDescriptor
-{
+class ClassDescriptor {
   /**
    * Constant value for classes with no fields.
    */
@@ -58,17 +58,21 @@ class ClassDescriptor
    */
   FieldDescriptor[] fields = NO_FIELDS;
   /**
-   * Is the described class externalizable.
-   */
-  boolean hasWriteObject = false;
-  /**
    * Bitwise flags associated with the described class.
    */
   byte flags = 0;
   /**
    * Is the described class externalizable.
    */
+  boolean hasReadWriteObject = false;
+  /**
+   * Is the described class externalizable.
+   */
   Method writeObjectMethod;
+  /**
+   * Is the described class externalizable.
+   */
+  Method readObjectMethod;
   /**
    * Is the described class externalizable.
    */
@@ -102,23 +106,14 @@ class ClassDescriptor
    */
   ClassDescriptor superClass;
   /**
-   * Handle for the superclass, used for deserialization only.
-   */
-  int superClassHandle;
-  /**
    * Component type if this class is an array.
    */
   ClassDescriptor componentType;
-  /**
-   * Handle for the component type, used for deserialization only.
-   */
-  int componentTypeHandle;
 
   /**
    * Initialize an empty class descriptor.
    */
-  ClassDescriptor()
-  {
+  ClassDescriptor() {
   }
 
   /**
@@ -126,106 +121,92 @@ class ClassDescriptor
    * @param clazz the class from which to initialize.
    * @throws Exception if any error occurs.
    */
-  ClassDescriptor(final Class<?> clazz) throws Exception
-  {
+  ClassDescriptor(final Class<?> clazz) throws Exception {
+    fillIn(clazz, true);
+  }
+
+  /**
+   * Initialize a class descriptor from the specified class.
+   * @param clazz the class from which to initialize.
+   * @param serializing whether we are serializing or deserializing.
+   * @throws Exception if any error occurs.
+   */
+  void fillIn(final Class<?> clazz, final boolean serializing) throws Exception {
     this.clazz = clazz;
     primitive = clazz.isPrimitive();
     enumType = clazz.isEnum();
-    if (!primitive && !enumType)
-    {
+    if (!primitive && !enumType) {
       externalizable = Externalizable.class.isAssignableFrom(clazz);
-      writeObjectMethod = SerializationReflectionHelper.getWriteObjectMethod(clazz);
-      hasWriteObject = writeObjectMethod != null;
+      Method m = serializing ? SerializationReflectionHelper.getWriteObjectMethod(clazz) : SerializationReflectionHelper.getReadObjectMethod(clazz);
+      hasReadWriteObject = m != null;
+      if (hasReadWriteObject) {
+        m.setAccessible(true);
+        if (serializing) writeObjectMethod = m;
+        else readObjectMethod = m;
+      }
       array = clazz.isArray();
-      if (!array)
-      {
-        Field[] refFields = SerializationReflectionHelper.getNonTransientFields(clazz);
-        if (refFields.length > 0)
-        {
+      if (!array) {
+        Field[] refFields = SerializationReflectionHelper.getNonTransientDeclaredFields(clazz);
+        if (refFields.length > 0) {
+          Arrays.sort(refFields, new Comparator<Field>() {
+            @Override
+            public int compare(final Field o1, final Field o2) {
+              return o1.getName().compareTo(o2.getName());
+            }
+          });
           fields = new FieldDescriptor[refFields.length];
-          for (int i=0; i<refFields.length; i++) fields[i] = new FieldDescriptor(refFields[i]);
+          for (int i=0; i<refFields.length; i++) {
+            refFields[i].setAccessible(true);
+            fields[i] = new FieldDescriptor(refFields[i]);
+          }
         }
       }
     }
-    signature = SerializationReflectionHelper.getSignatureFromType(clazz).intern();
+    if (signature == null) signature = SerializationReflectionHelper.getSignatureFromType(clazz).intern();
   }
 
   /**
    * Write this class descriptor to an object output stream.
-   * @param out the stream to write to.
-   * @throws IOException if any error occurs.
+   * @param serializer the stream to write to.
+   * @throws Exception if any error occurs.
    */
-  void write(final ObjectOutputStream out) throws IOException
-  {
-    out.writeInt(handle);
-    out.writeUTF(signature);
-    flags = 0;
-    if (primitive) flags |= PRIMITIVE;
-    if (enumType) flags |= ENUM_TYPE;
-    if (hasWriteObject) flags |= HAS_WRITE_OBJECT;
-    if (externalizable) flags |= EXTERNALIZABLE;
-    if (array) flags |= ARRAY;
-    out.writeByte(flags);
-    out.writeInt((superClass != null) ? superClass.handle : 0);
-    if (array) out.writeInt(componentType.handle);
-    if (!primitive)
-    {
-      out.writeInt(fields.length);
-      for (FieldDescriptor field : fields) field.write(out);
-    }
+  void write(final Serializer serializer) throws Exception {
+    serializer.writeClassHandle(handle);
+    serializer.writeString(signature);
   }
 
   /**
    * Read this class descriptor from an input stream.
-   * @param in the stream to read from.
-   * @throws IOException if any error occurs.
+   * @param deserializer the stream to read from.
+   * @return this class descriptor.
+   * @throws Exception if any error occurs.
    */
-  void read(final ObjectInputStream in) throws IOException
-  {
-    handle = in.readInt();
-    signature = in.readUTF();
-    flags = in.readByte();
-    primitive = (flags & PRIMITIVE) != 0;
-    enumType = (flags & ENUM_TYPE) != 0;
-    hasWriteObject = (flags & HAS_WRITE_OBJECT) != 0;
-    externalizable = (flags & EXTERNALIZABLE) != 0;
-    array = (flags & ARRAY) != 0;
-    superClassHandle = in.readInt();
-    if (array) componentTypeHandle = in.readInt();
-    if (!primitive)
-    {
-      int n = in.readInt();
-      fields = new FieldDescriptor[n];
-      for (int i=0; i<n; i++)
-      {
-        fields[i] = new FieldDescriptor();
-        fields[i].read(in);
-      }
-    }
+  ClassDescriptor read(final Deserializer deserializer) throws Exception {
+    handle = deserializer.readClassHandle();
+    signature = deserializer.readString();
+    return this;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("handle=").append(handle).append(", ");
     sb.append("signature=").append(signature).append(", ");
+    sb.append("clazz=").append(clazz == null ? "null" : clazz.getName()).append(", ");
     sb.append("primitive=").append(primitive).append(", ");
-    sb.append("hasWriteObject=").append(hasWriteObject).append(", ");
+    sb.append("hasWriteObject=").append(hasReadWriteObject).append(", ");
     sb.append("externalizable=").append(externalizable).append(", ");
     sb.append("array=").append(array).append(", ");
-    if (superClassHandle > 0) sb.append("superClassHandle=").append(superClassHandle).append(", ");
     if (superClass != null) sb.append("superClass=").append(superClass.signature).append(", ");
-    if (componentTypeHandle > 0) sb.append("componentTypeHandle=").append(componentTypeHandle).append(", ");
     if (componentType != null) sb.append("componentType=").append(componentType.signature).append(", ");
     sb.append("fields={");
-    for (int i=0; i<fields.length; i++)
-    {
-      if (i > 0) sb.append(", ");
-      sb.append(fields[i]);
+    if ((fields != null) && (fields.length > 0)) {
+      for (int i=0; i<fields.length; i++) sb.append("\n  ").append(fields[i]);
+      sb.append('\n');
     }
     sb.append('}');
+    sb.append(']');
     return sb.toString();
   }
 }

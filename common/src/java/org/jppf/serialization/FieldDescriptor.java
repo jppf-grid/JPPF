@@ -26,8 +26,7 @@ import java.lang.reflect.Field;
  * @author Laurent Cohen
  * @exclude
  */
-class FieldDescriptor
-{
+class FieldDescriptor {
   /**
    * The name of this field.
    */
@@ -40,16 +39,11 @@ class FieldDescriptor
    * Descriptor for the type of this field.
    */
   ClassDescriptor type;
-  /**
-   * Handler for the field type, use at deserialization only.
-   */
-  int typeHandle;
 
   /**
    * Initialize an empty field descriptor.
    */
-  FieldDescriptor()
-  {
+  FieldDescriptor() {
   }
 
   /**
@@ -57,20 +51,17 @@ class FieldDescriptor
    * @param field the field to initialize from.
    * @throws Exception if any error occurs.
    */
-  FieldDescriptor(final Field field) throws Exception
-  {
+  FieldDescriptor(final Field field) throws Exception {
     this.field = field;
     name = field.getName();
   }
-
 
   /**
    * Write this field descriptor to an object output stream.
    * @param out the stream to write to.
    * @throws IOException if any error occurs.
    */
-  void write(final ObjectOutputStream out) throws IOException
-  {
+  void write(final ObjectOutputStream out) throws IOException {
     out.writeUTF(name);
     out.writeInt(type.handle);
   }
@@ -80,18 +71,20 @@ class FieldDescriptor
    * @param in the stream to read from.
    * @throws IOException if any error occurs.
    */
-  void read(final ObjectInputStream in) throws IOException
-  {
+  void read(final ObjectInputStream in) throws IOException {
     name = in.readUTF();
-    typeHandle = in.readInt();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public String toString()
-  {
-    return "FieldDescriptor[name=" + name + ", type=" + type + ", typeHandle=" + typeHandle + ']';
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName()).append('[');
+    sb.append("name=").append(name).append(", ");
+    sb.append("type=");
+    if (type != null) sb.append("{signature=").append(type.signature).append(", handle=").append(type.handle).append('}');
+    else sb.append("null");
+    sb.append(", field=").append(field);
+    sb.append(']');
+    return sb.toString();
   }
 }

@@ -24,12 +24,22 @@ import java.util.concurrent.locks.*;
 import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.*;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public class NodeClassContext extends AbstractClassContext<NodeClassState> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(NodeClassContext.class);
+  /**
+   * Determines whether DEBUG logging level is enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The list of pending resource responses for a node.
    */
@@ -139,6 +149,7 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
 
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception e) {
+    if (debugEnabled) log.debug("excception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
     NodeClassNioServer.closeConnection(channel);
   }
 

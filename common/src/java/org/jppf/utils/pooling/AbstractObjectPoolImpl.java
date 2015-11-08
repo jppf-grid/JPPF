@@ -23,19 +23,14 @@ package org.jppf.utils.pooling;
  * @param <T>
  * @author Laurent Cohen
  */
-public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
-{
+public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T> {
   /**
    * The pool of objects.
    */
   protected final LinkedData<T> data = new LinkedData<>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public T get()
-  {
+  public T get() {
     T t = data.get();
     return t == null ? create() : t;
   }
@@ -45,40 +40,26 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
    * @return an object that can be returned to the pool.
    */
   protected abstract T create();
- 
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
-  public void put(final T t)
-  {
+  public void put(final T t) {
     data.put(t);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     return data.isEmpty();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public int size()
-  {
+  public int size() {
     return data.size();
   }
-
 
   /**
    * @param <E>
    */
-  public static class LinkedData<E>
-  {
+  public static class LinkedData<E> {
     /**
      * 
      */
@@ -96,17 +77,13 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
      * Add an object to the tail.
      * @param content the object to add.
      */
-    public void put(final E content)
-    {
+    public void put(final E content) {
       LinkedNode<E> node = new LinkedNode<>(content);
-      synchronized(this)
-      {
-        if (tail != null)
-        {
+      synchronized (this) {
+        if (tail != null) {
           node.next = tail;
           tail.prev = node;
-        }
-        else head = node;
+        } else head = node;
         tail = node;
         size++;
       }
@@ -116,17 +93,13 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
      * Get the head object or null when queue is empty;
      * @return the head object or null.
      */
-    public synchronized E get()
-    {
+    public synchronized E get() {
       if (head == null) return null;
       LinkedNode<E> res = head;
-      if (res.prev == null)
-      {
+      if (res.prev == null) {
         tail = null;
         head = null;
-      }
-      else
-      {
+      } else {
         head = res.prev;
         head.next = null;
       }
@@ -138,8 +111,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
      * Get the size of this queue.
      * @return the size of this queue.
      */
-    synchronized int size()
-    {
+    synchronized int size() {
       return size;
     }
 
@@ -147,8 +119,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
      * Determine whether this queue is empty
      * @return whether this queue is empty
      */
-    synchronized boolean isEmpty()
-    {
+    synchronized boolean isEmpty() {
       return head == null;
     }
   }
@@ -156,8 +127,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
   /**
    * @param <E>
    */
-  static class LinkedNode<E>
-  {
+  static class LinkedNode<E> {
     /**
      * 
      */
@@ -175,8 +145,7 @@ public abstract class AbstractObjectPoolImpl<T> implements ObjectPool<T>
      * Initialize this node with the specified content.
      * @param content the node's content.
      */
-    LinkedNode(final E content)
-    {
+    LinkedNode(final E content) {
       this.content = content;
     }
   }

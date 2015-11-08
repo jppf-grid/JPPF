@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JPPF"/>
 	<classpathentry kind="lib" path="/JPPF/lib/Groovy/groovy-all-1.6.5.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jmxremote"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/lz4"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -52,19 +52,19 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * Mapping of all properties containers.
    */
-  private final Map<String, TypedProperties> map = new LinkedHashMap<>();
-  /**
-   * Holds the latests set of properties maps.
-   */
-  private TypedProperties[] propertiesArray = new TypedProperties[0];
+  private Map<String, TypedProperties> map = new HashMap<>();
   /**
    * <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
    */
-  private final boolean local;
+  private boolean local;
   /**
    * If <code>true</code>, then the name resolution for <code>InetAddress</code>es should occur immediately,
    */
-  private final boolean resolveInetAddressesNow;
+  private boolean resolveInetAddressesNow;
+  /**
+   * 
+   */
+  private transient TypedProperties[] propertiesArray;
 
   /**
    * Initialize this system information object with the specified uuid.
@@ -86,7 +86,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     addProperties("uuid", uuidProps);
     populate();
   }
- 
+
 
   /**
    * Get the map holding the system properties.
@@ -280,5 +280,14 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    */
   public HostIP[] parseIPV6Addresses() {
     return NetworkUtils.parseAddresses(getNetwork().getString("ipv6.addresses"));
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
+    sb.append("local=").append(local);
+    sb.append(", resolveInetAddressesNow=").append(resolveInetAddressesNow);
+    sb.append(", map=").append(map);
+    return sb.append(']').toString();
   }
 }

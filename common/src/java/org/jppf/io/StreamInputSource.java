@@ -21,8 +21,6 @@ package org.jppf.io;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-import org.jppf.serialization.SerializationUtils;
-
 
 /**
  * Input source that takes an input stream as its source.
@@ -86,12 +84,15 @@ public class StreamInputSource implements InputSource {
    */
   @Override
   public int readInt() throws Exception {
-    byte[] value = IO.LENGTH_BUFFER_POOL.get();
+    byte[] data = IO.LENGTH_BUFFER_POOL.get();
     try {
-      read(value, 0, 4);
-      return SerializationUtils.readInt(value, 0);
+      read(data, 0, 4);
+      int result = 0;
+      for (int i=24, pos=0; i>=0; i-=8) result += (long) (data[pos++] & 0xFF) << i;
+      return result;
+      //return SerializationUtils.readInt(data, 0);
     } finally {
-      IO.LENGTH_BUFFER_POOL.put(value);
+      IO.LENGTH_BUFFER_POOL.put(data);
     }
   }
 

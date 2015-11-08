@@ -19,11 +19,9 @@ package org.jppf.utils;
 
 import java.io.*;
 import java.net.*;
-import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.text.*;
 import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**
@@ -206,37 +204,6 @@ public final class StringUtils {
   }
 
   /**
-   * Returns the IP address of the remote host for a socket channel.
-   * @param channel the channel to get the host from.
-   * @return an IP address as a string.
-   */
-  public static String getRemoteHost(final Channel channel) {
-    StringBuilder sb = new StringBuilder();
-    if (channel instanceof SocketChannel) {
-      if (channel.isOpen()) {
-        Socket s = ((SocketChannel)channel).socket();
-        sb.append(getRemoteHost(s.getRemoteSocketAddress()));
-      } else sb.append("[channel closed]");
-    } else sb.append("[JVM-local]");
-    return sb.toString();
-  }
-
-  /**
-   * Returns the IP address of the remote host for a socket channel.
-   * @param address the address to get the host from.
-   * @return an IP address as a string.
-   */
-  public static String getRemoteHost(final SocketAddress address) {
-    StringBuilder sb = new StringBuilder();
-    if (address instanceof InetSocketAddress) {
-      InetSocketAddress add = (InetSocketAddress) address;
-      sb.append(add.getHostName()).append(':').append(add.getPort());
-    }
-    else sb.append("socket address type not handled: ").append(address);
-    return sb.toString();
-  }
-
-  /**
    * Get a String representation of an array of any type.
    * @param <T> the type of the array.
    * @param array the array from which to build a string representation.
@@ -266,29 +233,6 @@ public final class StringUtils {
       }
       if (suffix != null) sb.append(suffix);
     }
-    return sb.toString();
-  }
-
-  /**
-   * Get a String representation of an collection of any type.
-   * @param <T> the type of the elements in the collection.
-   * @param collection the collection from which to build a string representation.
-   * @param sep the separator to use for values. If null, no separator is used.
-   * @param prefix the prefix to use at the start of the resulting string. If null, no prefix is used.
-   * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
-   * @return the collection's content as a string.
-   */
-  public static <T> String collectionToString(final String sep, final String prefix, final String suffix, final Collection<T> collection) {
-    if (collection == null) return null;
-    StringBuilder sb = new StringBuilder();
-    int count = 0;
-    if (prefix != null) sb.append(prefix);
-    for (T t: collection) {
-      if ((count > 0) && (sep != null)) sb.append(sep);
-      count++;
-      sb.append(t);
-    }
-    if (suffix != null) sb.append(suffix);
     return sb.toString();
   }
 
@@ -375,23 +319,6 @@ public final class StringUtils {
   }
 
   /**
-   * Convert a string with <code>separator</code>-separated values into an int array.
-   * @param source the source string to convert.
-   * @param separatorPattern the values separator, expressed as a regular expression, must comply with the specifications for {@link java.util.regex.Pattern}.
-   * @return an array of int value, or null if the source could not be parsed.
-   */
-  public static int[] toIntArray(final String source, final Pattern separatorPattern) {
-    try {
-      String[] vals = separatorPattern.split(source);
-      int[] result = new int[vals.length];
-      for (int i=0; i<vals.length; i++) result[i] = Integer.valueOf(vals[i]);
-      return result;
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-  /**
    * Create an instance of the UTF-8 charset.
    * @return a {@link Charset} instance for UTF-8, or null if the charset could not be instantiated.
    */
@@ -399,30 +326,8 @@ public final class StringUtils {
     try {
       return Charset.forName("UTF-8");
     } catch(Exception e) {
-      //log.error("Charset UTF-8 could not be instantiated", e);
       return null;
     }
-  }
-
-  /**
-   * Indent the specified source string by added the specified
-   * indentation at the start of each of its lines.
-   * @param source the osurce string to indent.
-   * @param indentation the indentation to use.
-   * @return the indented string.
-   */
-  public static String indent(final String source, final String indentation) {
-    if (source == null) throw new IllegalArgumentException("source can't be null");
-    if (indentation == null) throw new IllegalArgumentException("indentation can't be null");
-    boolean endsWithNewline = source.endsWith("\n") || source.endsWith("\r");
-    StringBuilder sb = new StringBuilder();
-    try (BufferedReader reader = new BufferedReader(new StringReader(source))) {
-      String s;
-      while ((s = reader.readLine()) != null) sb.append(indentation).append(s).append('\n');
-      if (!endsWithNewline) sb.deleteCharAt(sb.length()-1);
-    } catch(Exception ignore) {
-    }
-    return sb.toString();
   }
 
   /**
@@ -512,5 +417,15 @@ public final class StringUtils {
     } catch (ParseException ignore) {
     }
     return null;
+  }
+
+  /**
+   * Return a String in the format &lt;object class name&gt;@hashcode for the specified object.
+   * @param obj the object for which to get a string.
+   * @return an identity string, or "null" if the object is null.
+   */
+  public static String toIdentityString(final Object obj) {
+    if (obj == null) return "null";
+    return obj.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(obj));
   }
 }

@@ -33,8 +33,7 @@ import java.util.Map;
  * </ul>
  * @author Laurent Cohen
  */
-public class JPPFObjectOutputStream extends ObjectOutputStream
-{
+public class JPPFObjectOutputStream extends ObjectOutputStream {
   /**
    * The stream serialized data is written to.
    */
@@ -50,7 +49,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   /**
    * Temporary buffer to write primitive types.
    */
-  private final byte[] buf = new byte[8];
+  private final byte[] buf = new byte[16];
   /**
    * The latest generated PutField instance.
    */
@@ -61,30 +60,22 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
    * @param out the stream to write objects to.
    * @throws IOException if any error occurs.
    */
-  public JPPFObjectOutputStream(final OutputStream out) throws IOException
-  {
+  public JPPFObjectOutputStream(final OutputStream out) throws IOException {
     super();
     this.out = (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out);
     serializer = new Serializer(this);
   }
 
   @Override
-  protected final void writeObjectOverride(final Object obj) throws IOException
-  {
+  protected final void writeObjectOverride(final Object obj) throws IOException {
     boolean alreadyWriting = writingObject;
-    try
-    {
+    try {
       if (!alreadyWriting) writingObject = true;
       serializer.writeObject(obj);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw (e instanceof IOException) ? (IOException) e : new IOException(e.getMessage(), e);
-    }
-    finally
-    {
-      if (!alreadyWriting)
-      {
+    } finally {
+      if (!alreadyWriting) {
         writingObject = false;
         flush();
       }
@@ -92,136 +83,114 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
   }
 
   @Override
-  public void write(final int val) throws IOException
-  {
+  public void write(final int val) throws IOException {
     out.write(val);
   }
 
   @Override
-  public void write(final byte[] buf) throws IOException
-  {
+  public void write(final byte[] buf) throws IOException {
     out.write(buf);
   }
 
   @Override
-  public void write(final byte[] buf, final int off, final int len) throws IOException
-  {
+  public void write(final byte[] buf, final int off, final int len) throws IOException {
     out.write(buf, off, len);
   }
 
   @Override
-  public void writeBoolean(final boolean val) throws IOException
-  {
+  public void writeBoolean(final boolean val) throws IOException {
     out.writeBoolean(val);
   }
 
   @Override
-  public void writeByte(final int val) throws IOException
-  {
+  public void writeByte(final int val) throws IOException {
     out.writeByte(val);
   }
 
   @Override
-  public void writeShort(final int val) throws IOException
-  {
-    out.writeShort(val);
+  public void writeShort(final int val) throws IOException {
+    SerializationUtils.writeShort((short) val, buf, 0);
+    out.write(buf, 0, 2);
   }
 
   @Override
-  public void writeChar(final int val) throws IOException
-  {
-    out.writeChar(val);
+  public void writeChar(final int val) throws IOException {
+    SerializationUtils.writeChar((char) val, buf, 0);
+    out.write(buf, 0, 2);
   }
 
   @Override
-  public void writeInt(final int val) throws IOException
-  {
+  public void writeInt(final int val) throws IOException {
     SerializationUtils.writeInt(val, buf, 0);
     out.write(buf, 0, 4);
-    //out.writeInt(val);
   }
 
   @Override
-  public void writeLong(final long val) throws IOException
-  {
-    out.writeLong(val);
+  public void writeLong(final long val) throws IOException {
+    SerializationUtils.writeLong(val, buf, 0);
+    out.write(buf, 0, 8);
   }
 
   @Override
-  public void writeFloat(final float val) throws IOException
-  {
-    out.writeFloat(val);
+  public void writeFloat(final float val) throws IOException {
+    SerializationUtils.writeInt(Float.floatToIntBits(val), buf, 0);
+    out.write(buf, 0, 4);
   }
 
   @Override
-  public void writeDouble(final double val) throws IOException
-  {
-    //out.writeDouble(val);
-    out.writeLong(Double.doubleToLongBits(val));
+  public void writeDouble(final double val) throws IOException {
+    SerializationUtils.writeLong(Double.doubleToLongBits(val), buf, 0);
+    out.write(buf, 0, 8);
   }
 
   @Override
-  public void writeBytes(final String str) throws IOException
-  {
+  public void writeBytes(final String str) throws IOException {
     out.writeBytes(str);
   }
 
   @Override
-  public void writeChars(final String str) throws IOException
-  {
+  public void writeChars(final String str) throws IOException {
     out.writeChars(str);
   }
 
   @Override
-  public void writeUTF(final String str) throws IOException
-  {
+  public void writeUTF(final String str) throws IOException {
     out.writeUTF(str);
   }
 
   @Override
-  public void defaultWriteObject() throws IOException
-  {
-    try
-    {
+  public void defaultWriteObject() throws IOException {
+    try {
       serializer.writeDeclaredFields(serializer.currentObject, serializer.currentClassDescriptor);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e.getMessage(), e);
     }
   }
 
   @Override
-  public void flush() throws IOException
-  {
+  public void flush() throws IOException {
     out.flush();
   }
 
   @Override
-  public void close() throws IOException
-  {
+  public void close() throws IOException {
     out.close();
   }
 
   @Override
-  public PutField putFields() throws IOException
-  {
+  public PutField putFields() throws IOException {
     if (currentPutField == null) currentPutField = new JPPFPutField(this);
     return currentPutField;
   }
 
   @Override
-  public void writeFields() throws IOException
-  {
-    try
-    {
+  public void writeFields() throws IOException {
+    try {
       JPPFPutField f = (JPPFPutField) currentPutField;
       writeFields0(f.primitiveFields);
       writeFields0(f.objectFields);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (e instanceof IOException) throw (IOException) e;
       else throw new IOException(e);
     }
@@ -232,19 +201,11 @@ public class JPPFObjectOutputStream extends ObjectOutputStream
    * @param map the map containing fields names and values.
    * @throws Exception if any error occurs.
    */
-  private void writeFields0(final Map<String, Object> map) throws Exception
-  {
-    int n = map.size();
-    String[] names = new String[n];
-    Object[] values = new Object[n];
-    int count = 0;
-    for (Map.Entry<String, Object> entry: map.entrySet())
-    {
-      names[count] = entry.getKey();
-      values[count] = entry.getValue();
-      count++;
+  private void writeFields0(final Map<String, Object> map) throws Exception {
+    writeInt(map.size());
+    for (Map.Entry<String, Object> entry : map.entrySet()) {
+      serializer.writeObject(entry.getKey());
+      serializer.writeObject(entry.getValue());
     }
-    serializer.writeObject(names);
-    serializer.writeObject(values);
   }
 }

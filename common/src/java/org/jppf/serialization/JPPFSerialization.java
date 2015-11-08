@@ -73,15 +73,32 @@ public interface JPPFSerialization {
      */
     private static JPPFSerialization init() {
       JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
-      String className = JPPFConfiguration.get(prop);
+      String className = null;
+      CompositeSerialization compressor = null;
+      String value  = JPPFConfiguration.get(prop);
+      if (value != null) {
+        String[] elts = value.split("\\s");
+        if (elts.length == 1) className = elts[0];
+        else if (elts.length >= 2) {
+          className = elts[1];
+          switch(elts[0].toUpperCase()) {
+            case "LZ4":
+              compressor = new LZ4Serialization();
+              break;
+            case "GZIP":
+              break;
+          }
+        }
+      }
       if (debugEnabled) log.debug("found " + prop.getName() + " = " + className);
       if (className != null) {
         try {
           Class<?> clazz = Class.forName(className);
-          return (JPPFSerialization) clazz.newInstance();
+          JPPFSerialization ser = (JPPFSerialization) clazz.newInstance();
+          return compressor == null ? ser : compressor.delegateTo(ser);
         } catch (Exception e) {
-          StringBuilder sb = new StringBuilder();
-          sb.append("Could not instantiate JPPF serialization [").append(prop.getName()).append(" = ").append(className);
+          StringBuilder sb = new StringBuilder("Could not instantiate JPPF serialization [");
+          sb.append(prop.getName()).append(" = ").append(className);
           sb.append(", terminating this application");
           log.error(sb.toString(), e);
           throw new JPPFError(sb.toString(), e);

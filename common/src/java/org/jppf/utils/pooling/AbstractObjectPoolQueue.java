@@ -33,16 +33,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @param <T> the type of objects in the pool.
  * @author Laurent Cohen
  */
-public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
-{
+public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T> {
   /**
    * The pool of objects.
    */
   protected final Queue<T> queue = new ConcurrentLinkedQueue<>();
 
   @Override
-  public T get()
-  {
+  public T get() {
     T t = queue.poll();
     return (t == null) ? create() : t;
   }
@@ -52,16 +50,14 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
    * @return an object that can be returned to the pool.
    */
   protected abstract T create();
- 
+
   @Override
-  public void put(final T t)
-  {
+  public void put(final T t) {
     queue.offer(t);
   }
-  
+
   @Override
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     return queue.isEmpty();
   }
 
@@ -70,8 +66,7 @@ public abstract class AbstractObjectPoolQueue<T> implements ObjectPool<T>
    * {@inheritDoc}
    */
   @Override
-  public int size()
-  {
+  public int size() {
     return queue.size();
   }
 }

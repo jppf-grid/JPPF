@@ -25,7 +25,7 @@ import java.util.*;
 import org.jppf.serialization.*;
 import org.jppf.utils.pooling.*;
 import org.objenesis.instantiator.ObjectInstantiator;
-import org.objenesis.strategy.InstantiatorStrategy;
+import org.objenesis.strategy.*;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.*;
@@ -117,7 +117,8 @@ public class KryoSerialization implements JPPFSerialization {
    */
   private static Kryo createKryo() {
     Kryo kryo = new Kryo();
-    kryo.setInstantiatorStrategy(str);
+    //kryo.setInstantiatorStrategy(str);
+    kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 
     kryo.register(Arrays.asList( "" ).getClass(), new ArraysAsListSerializer() );
     kryo.register(Collections.EMPTY_LIST.getClass(), new CollectionsEmptyListSerializer() );

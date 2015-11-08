@@ -28,7 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class SerializationCaches {
+class SerializationCaches implements Cleanable {
   /**
    * Logger for this class.
    */
@@ -42,13 +42,17 @@ class SerializationCaches {
    */
   static final Class<?>[] PRIMITIVE_TYPES = { Byte.TYPE, Short.TYPE, Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Character.TYPE, Boolean.TYPE/*, Void.TYPE*/ };
   /**
+   * List of all wrapper types.
+   */
+  static final Class<?>[] WRAPPER_TYPES = { Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class, Boolean.class/*, Void.class*/ };
+  /**
    * Mapping of primitive types to their descriptor.
    */
   static Map<Class<?>, ClassDescriptor> globalTypesMap = initGlobalTypes();
   /**
    * Mapping of classes to their descriptor.
    */
-  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
+  Map<Class<?>, ClassDescriptor> classToDescMap = createClassKeyMap();
   //Map<Class<?>, ClassDescriptor> classToDescMap = new IdentityHashMap<Class<?>, ClassDescriptor>(256);
   /**
    * Mapping of objects to their handle.
@@ -68,16 +72,26 @@ class SerializationCaches {
    * @return a mapping of primitive types to their class descriptor.
    */
   private static Map<Class<?>, ClassDescriptor> initGlobalTypes() {
-    Map<Class<?>, ClassDescriptor> map = new IdentityHashMap<>();
+    Map<Class<?>, ClassDescriptor> map = createClassKeyMap();
     AtomicInteger counter = new AtomicInteger(0);
     try {
       for (Class<?> c: PRIMITIVE_TYPES) getClassDescriptorGeneric(c, counter, map, null);
+      //for (Class<?> c: WRAPPER_TYPES) getClassDescriptorGeneric(c, counter, map, null);
       getClassDescriptorGeneric(Object.class, counter, map, null);
       getClassDescriptorGeneric(String.class, counter, map, null);
     } catch (Exception e) {
       log.error("error initializing global types", e);
     }
     return map;
+  }
+
+  /**
+   * Create a Map where the keys are {@link Class} objects.
+   * @param <V> the type of the map's values.
+   * @return a new {@link Map}.
+   */
+  static <V> Map<Class<?>, V> createClassKeyMap() {
+    return new HashMap<>();
   }
 
   /**
@@ -148,5 +162,13 @@ class SerializationCaches {
     if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
     if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
     return cd;
+  }
+
+  @Override
+  public void setup() {
+  }
+
+  @Override
+  public void cleanup() {
   }
 }

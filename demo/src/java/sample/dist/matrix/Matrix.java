@@ -24,8 +24,7 @@ import java.util.Random;
  * This class represents a square matrix of arbitrary size.
  * @author Laurent Cohen
  */
-public class Matrix implements Serializable
-{
+public class Matrix implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -33,7 +32,7 @@ public class Matrix implements Serializable
   /**
    * The range of values for random values.
    */
-  private static final double RANDOM_RANGE = 1.0e6d;
+  private static final double RANDOM_RANGE = 1e6d;
   /**
    * The size of this matrix. The matrix contains size*size values.
    */
@@ -47,32 +46,29 @@ public class Matrix implements Serializable
    * Initialize this matrix with a specified size.
    * @param newSize the size of this matrix.
    */
-  public Matrix(final int newSize)
-  {
+  public Matrix(final int newSize) {
     this.size = newSize;
     values = new double[size][size];
   }
 
   /**
    * Initialize this matrix with random values.
+   * @return this matrix.
    */
-  public void assignRandomValues()
-  {
+  public Matrix assignRandomValues() {
     Random rand = new Random(System.nanoTime());
-    for (int i=0; i<values.length; i++)
-    {
-      for (int j=0; j<values[i].length; j++)
-        // values in ]-RANDOM_RANGE, +RANDOM_RANGE[
-        values[i][j] = RANDOM_RANGE * (2.0d * rand.nextDouble() - 1.0d);
+    for (int i = 0; i < values.length; i++) {
+      // values in ]-RANDOM_RANGE, +RANDOM_RANGE[
+      for (int j = 0; j < values[i].length; j++) values[i][j] = RANDOM_RANGE * (2d * rand.nextDouble() - 1d);
     }
+    return this;
   }
 
   /**
    * Get the size of this matrix.
    * @return the size as an integer value.
    */
-  public int getSize()
-  {
+  public int getSize() {
     return size;
   }
 
@@ -82,8 +78,7 @@ public class Matrix implements Serializable
    * @return the values in the row as an array of <code>double</code> values, or null if the row index is
    * greater than the matrix size.
    */
-  public double[] getRow(final int row)
-  {
+  public double[] getRow(final int row) {
     return (row < size) ? values[row] : null;
   }
 
@@ -93,8 +88,7 @@ public class Matrix implements Serializable
    * @param column the column coordinate.
    * @return the specified value as a double.
    */
-  public double getValueAt(final int row, final int column)
-  {
+  public double getValueAt(final int row, final int column) {
     return values[row][column];
   }
 
@@ -104,8 +98,7 @@ public class Matrix implements Serializable
    * @param column the column coordinate.
    * @param value the value to set.
    */
-  public void setValueAt(final int row, final int column, final double value)
-  {
+  public void setValueAt(final int row, final int column, final double value) {
     values[row][column] = value;
   }
 
@@ -114,16 +107,13 @@ public class Matrix implements Serializable
    * @param matrix the matrix to multiply this one by.
    * @return a new matrix containing the result of the multiplication.
    */
-  public Matrix multiply(final Matrix matrix)
-  {
+  public Matrix multiply(final Matrix matrix) {
     if (matrix.getSize() != size) return null;
     Matrix result = new Matrix(size);
-    for (int i=0; i<size; i++)
-    {
-      for (int j=0; j<size; j++)
-      {
-        double value = 0.0d;
-        for (int k=0; k< size; k++) value += matrix.getValueAt(k, j) * values[i][k];
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        double value = 0d;
+        for (int k = 0; k < size; k++) value += matrix.getValueAt(k, j) * values[i][k];
         result.setValueAt(j, i, value);
       }
     }
@@ -137,16 +127,11 @@ public class Matrix implements Serializable
    * @param matrix the matrix to multiply by.
    * @return a new row represented as an array of <code>double</code> values.
    */
-  public double[] multiplyRow(final int n, final Matrix matrix)
-  {
+  public double[] multiplyRow(final int n, final Matrix matrix) {
     double[] result = new double[size];
-    for (int col=0; col<size; col++)
-    {
-      double sum = 0.0d;
-      for (int row=0; row<size; row++)
-      {
-        sum += matrix.getValueAt(row, col) * getValueAt(n, row);
-      }
+    for (int col = 0; col < size; col++) {
+      double sum = 0d;
+      for (int row = 0; row < size; row++) sum += matrix.getValueAt(row, col) * getValueAt(n, row);
       result[col] = sum;
     }
     return result;
