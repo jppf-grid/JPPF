@@ -72,14 +72,18 @@ class Deserializer {
   /**
    * Initialize this deserializer with the specified input stream.
    * @param in the stream from which objects are read.
-   * @throws IOException if an error occurs while reading the header.
    */
+  Deserializer(final ObjectInputStream in) {
+    this.in = in;
+  }
+  /*
   Deserializer(final ObjectInputStream in) throws IOException {
     this.in = in;
     readToBuf(0, 4);
     if ( (buf[0] != Serializer.HEADER[0]) || (buf[1] != Serializer.HEADER[1]) || (buf[2] != Serializer.HEADER[2]) || (buf[3] != Serializer.HEADER[3]))
       throw new IOException("bad header: " + StringUtils.toHexString(buf, 0, 4, " "));
   }
+  */
 
   /**
    * Read an object graph from the stream.
@@ -187,12 +191,12 @@ class Deserializer {
   @SuppressWarnings("unchecked")
   void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception {
     if (traceEnabled) try { log.trace("reading declared fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(Exception e) {}
-    for (int i=0; i<cd.fields.length; i++) {
-      FieldDescriptor fd = cd.fields[i];
+    for (FieldDescriptor fd: cd.fields) {
       //if (traceEnabled) try { log.trace("reading field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
       ClassDescriptor typeDesc = fd.type;
       if (fd.field == null) fd.field = cd.clazz.getDeclaredField(fd.name);
       Field field = fd.field;
+      //if (typeDesc == null) log.info(String.format("type null for fd=%s, cd=%s", fd, cd));
       if (typeDesc.primitive) {
         switch(typeDesc.signature.charAt(0)) {
           case 'B': field.setByte(obj, (byte) in.read()); break;
@@ -229,11 +233,10 @@ class Deserializer {
     ClassDescriptor compCd = cd.componentType;
     if (compCd == null) {
       Class<?> compClass = cd.clazz.getComponentType();
-      String signature = SerializationReflectionHelper.getSignatureFromType(compClass);
-      compCd = caches.signatureToDescriptorMap.get(signature);
+      compCd = caches.classToDescMap.get(compClass);
       if (compCd == null) {
         compCd = new ClassDescriptor(compClass);
-        caches.signatureToDescriptorMap.put(signature, cd);
+        caches.classToDescMap.put(compClass, compCd);
       }
     }
     Object obj = null;
@@ -277,7 +280,6 @@ class Deserializer {
     Map<String, ClassDescriptor> map = new HashMap<>(n);
     for (int i=0; i<n; i++) {
       ClassDescriptor cd = new ClassDescriptor().read(this);
-      caches.handleToDescriptorMap.put(cd.handle, cd);
       map.put(cd.signature, cd);
       if (traceEnabled) try { log.trace("read handle={}, cd={}", cd.handle, cd); } catch(Exception e) {}
     }

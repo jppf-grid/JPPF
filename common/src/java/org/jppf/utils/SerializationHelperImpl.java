@@ -44,11 +44,13 @@ public class SerializationHelperImpl implements SerializationHelper {
    */
   @Override
   public ObjectSerializer getSerializer() throws Exception {
-    if (serializer == null) {
-      ClassLoader cl = getClass().getClassLoader();
-      Class<?> clazz = null;
-      clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
-      serializer = (ObjectSerializer) clazz.newInstance();
+    synchronized(this) {
+      if (serializer == null) {
+        ClassLoader cl = getClass().getClassLoader();
+        Class<?> clazz = null;
+        clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
+        serializer = (ObjectSerializer) clazz.newInstance();
+      }
     }
     return serializer;
   }

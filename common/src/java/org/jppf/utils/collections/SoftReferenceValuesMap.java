@@ -30,8 +30,7 @@ import org.slf4j.*;
  * @param <V> the type of the values.
  * @author Laurent Cohen
  */
-public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
-{
+public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
   /**
    * Logger for this class.
    */
@@ -52,29 +51,33 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
   /**
    * Default constructor.
    */
-  public SoftReferenceValuesMap()
-  {
+  public SoftReferenceValuesMap() {
     refQueue = new ReferenceQueue<>();
-    map = new HashMap<>();
+    map = createMap();
+  }
+
+  /**
+   * Create the underlying map of soft references.
+   * @return a new {@code Map} instance.
+   */
+  Map<K, SoftValue<K, V>> createMap() {
+    return new HashMap<>();
   }
 
   @Override
-  public int size()
-  {
+  public int size() {
     cleanup();
     return map.size();
   }
 
   @Override
-  public boolean isEmpty()
-  {
+  public boolean isEmpty() {
     cleanup();
     return map.isEmpty();
   }
 
   @Override
-  public V get(final Object key)
-  {
+  public V get(final Object key) {
     cleanup();
     SoftReference<V> ref = map.get(key);
     return ref == null ? null : ref.get();
@@ -82,30 +85,26 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
 
   @Override
   @SuppressWarnings("unchecked")
-  public V put(final K key, final V value)
-  {
+  public V put(final K key, final V value) {
     cleanup();
     SoftReference<V> ref = map.put(key, new SoftValue(key, value, refQueue));
     return ref == null ? null : ref.get();
   }
 
   @Override
-  public V remove(final Object key)
-  {
+  public V remove(final Object key) {
     cleanup();
     SoftReference<V> ref = map.remove(key);
     return ref == null ? null : ref.get();
   }
 
   @Override
-  public Set<Map.Entry<K, V>> entrySet()
-  {
+  public Set<Map.Entry<K, V>> entrySet() {
     throw new UnsupportedOperationException("This operation is not implemented");
   }
 
   @Override
-  public void clear()
-  {
+  public void clear() {
     cleanup();
     map.clear();
   }
@@ -114,11 +113,9 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
    * Cleanup the reference queue, by removing entries whose value was garbage collected.
    */
   @SuppressWarnings("unchecked")
-  private void cleanup()
-  {
+  private void cleanup() {
     SoftValue<K, V> ref;
-    while ((ref = (SoftValue) refQueue.poll()) != null)
-    {
+    while ((ref = (SoftValue) refQueue.poll()) != null) {
       // NPE on this line ==>
       K key = ref.key;
       if (key == null) continue;
@@ -134,8 +131,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
    * @param <K> the type of the key.
    * @param <V> the type of the value.
    */
-  private static class SoftValue<K, V> extends SoftReference<V>
-  {
+  static class SoftValue<K, V> extends SoftReference<V> {
     /**
      * The associated key.
      */
@@ -147,8 +143,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V>
      * @param value the value.
      * @param queue the reference queue to use.
      */
-    public SoftValue(final K key, final V value, final ReferenceQueue<V> queue)
-    {
+    public SoftValue(final K key, final V value, final ReferenceQueue<V> queue) {
       super(value, queue);
       this.key = key;
     }

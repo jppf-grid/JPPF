@@ -63,18 +63,23 @@ public interface JPPFSerialization {
      */
     private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
     /**
-     * The serialization to use.
+     * The class of the serialization to use.
      */
-    private static JPPFSerialization serialization = init();
+    private static Class<? extends JPPFSerialization> serializationClass = null;
+    /**
+     * The class of the composite to use on top of the serialization.
+     */
+    private static Class<? extends CompositeSerialization> compositeClass = null;
+    static {
+      init();
+    }
 
     /**
      * Initialize the serialization.
-     * @return the defined {@link JPPFSerialization} instance.
      */
-    private static JPPFSerialization init() {
+    private static void init() {
       JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
       String className = null;
-      CompositeSerialization compressor = null;
       String value  = JPPFConfiguration.get(prop);
       if (value != null) {
         String[] elts = value.split("\\s");
@@ -83,9 +88,10 @@ public interface JPPFSerialization {
           className = elts[1];
           switch(elts[0].toUpperCase()) {
             case "LZ4":
-              compressor = new LZ4Serialization();
+              compositeClass = LZ4Serialization.class;
               break;
             case "GZIP":
+              compositeClass = GZIPSerialization.class;
               break;
           }
         }
@@ -93,9 +99,7 @@ public interface JPPFSerialization {
       if (debugEnabled) log.debug("found " + prop.getName() + " = " + className);
       if (className != null) {
         try {
-          Class<?> clazz = Class.forName(className);
-          JPPFSerialization ser = (JPPFSerialization) clazz.newInstance();
-          return compressor == null ? ser : compressor.delegateTo(ser);
+          serializationClass = (Class<? extends JPPFSerialization>) Class.forName(className);
         } catch (Exception e) {
           StringBuilder sb = new StringBuilder("Could not instantiate JPPF serialization [");
           sb.append(prop.getName()).append(" = ").append(className);
@@ -103,9 +107,10 @@ public interface JPPFSerialization {
           log.error(sb.toString(), e);
           throw new JPPFError(sb.toString(), e);
         }
+      } else {
+        if (debugEnabled) log.debug("using DefaultJavaSerialization");
+        serializationClass = DefaultJavaSerialization.class;
       }
-      if (debugEnabled) log.debug("using DefaultJavaSerialization");
-      return new DefaultJavaSerialization();
     }
 
     /**
@@ -113,7 +118,14 @@ public interface JPPFSerialization {
      * @return an instance of {@link JPPFSerialization}.
      */
     public static JPPFSerialization getSerialization() {
-      return serialization;
+      try {
+        JPPFSerialization serialization = serializationClass.newInstance();
+        return (compositeClass != null) ? compositeClass.newInstance().delegateTo(serialization) : serialization;
+      } catch (Exception e) {
+        String msg = String.format("error instantiating serialization scheme '%s'", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
+        log.error(String.format(msg + " :%n%s", ExceptionUtils.getStackTrace(e)));
+        throw new JPPFError(msg, e);
+      }
     }
 
     /**
@@ -121,7 +133,11 @@ public interface JPPFSerialization {
      * @exclude
      */
     public static void reset() {
-      serialization = init();
+      serializationClass = null;
+      compositeClass = null;
+      init();
+      if (debugEnabled) log.debug(String.format("serialization = %s, composite = %s", serializationClass, compositeClass));
+      //log.info(String.format("serialization = %s, composite = %s", serializationClass, compositeClass));
     }
   }
 }

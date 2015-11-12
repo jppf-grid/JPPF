@@ -37,17 +37,13 @@ class DeserializationCaches implements Cleanable {
    */
   Map<Integer, ClassDescriptor> handleToDescriptorMap = new HashMap<>();
   /**
-   * Mapping of signatures to corresponding class descriptors.
+   * Mapping of classes to their descriptor.
    */
-  Map<String, ClassDescriptor> signatureToDescriptorMap = new HashMap<>();
+  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap();
   /**
    * Mapping of handles to corresponding objects.
    */
   Map<Integer, Object> handleToObjectMap = new HashMap<>();
-  /**
-   * Mapping of classes to their descriptor.
-   */
-  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap();
 
   /**
    * Default constructor.
@@ -56,8 +52,7 @@ class DeserializationCaches implements Cleanable {
     for (Map.Entry<Class<?>, ClassDescriptor> entry: SerializationCaches.globalTypesMap.entrySet()) {
       ClassDescriptor cd = entry.getValue();
       handleToDescriptorMap.put(cd.handle, cd);
-      //classToDescMap.put(cd.clazz, cd);
-      signatureToDescriptorMap.put(cd.signature, cd);
+      classToDescMap.put(cd.clazz, cd);
     }
   }
 
@@ -79,60 +74,76 @@ class DeserializationCaches implements Cleanable {
   void setupHandles(final Map<String, ClassDescriptor> cdMap, final ClassLoader cl) throws Exception {
     for (Map.Entry<String, ClassDescriptor> entry: cdMap.entrySet()) {
       ClassDescriptor cd = entry.getValue();
-      if (cd.handle <= 0) throw new IllegalStateException("no handle for " + cd);
+      handleToDescriptorMap.put(cd.handle, cd);
     }
-    //System.out.println("*****");
-    for (Map.Entry<String, ClassDescriptor> entry: cdMap.entrySet()) setupHandles(entry.getValue(), cl, cdMap);
+    for (Map.Entry<String, ClassDescriptor> entry: cdMap.entrySet()) setupHandles(entry.getValue(), cdMap, cl);
   }
 
   /**
    * 
-   * @param cd .
+   * @param initCD .
+   * @param map .
    * @param cl .
-   * @param cdMap .
    * @throws Exception if any error occurs.
    */
-  private void setupHandles(final ClassDescriptor cd, final ClassLoader cl, final Map<String, ClassDescriptor> cdMap) throws Exception {
-    try {
-      if (!signatureToDescriptorMap.containsKey(cd.signature)) {
-        signatureToDescriptorMap.put(cd.signature, cd); 
-        if (cd.clazz == null) cd.fillIn(SerializationReflectionHelper.getTypeFromSignature(cd.signature, cl), false);
-        if (cd.array) {
-          Class<?> clazz = cd.clazz.getComponentType();
-          if (cd.componentType == null) cd.componentType = descriptorFromClass(clazz, cdMap);
-          if (cd.componentType != null) setupHandles(cd.componentType, cl, cdMap);
-        }
-        if (cd.superClass == null) {
-          Class<?> clazz = cd.clazz.getSuperclass();
-          if ((clazz != null) && (clazz != Object.class)) cd.superClass = descriptorFromClass(clazz, cdMap);
-        }
-        if (cd.superClass != null) setupHandles(cd.superClass, cl, cdMap);
-        if (cd.fields != null) {
-          for (FieldDescriptor fd: cd.fields) {
-            if (fd.type == null) fd.type = descriptorFromClass(fd.field.getType(), cdMap);
-            setupHandles(fd.type, cl, cdMap);
-          }
+  private void setupHandles(final ClassDescriptor initCD, final Map<String, ClassDescriptor> map, final ClassLoader cl) throws Exception {
+    //if (cd.handle <= 0) log.info("no handle for cd={}", cd);
+    ClassDescriptor cd = initCD;
+    if (cd.clazz == null) {
+      cd.fillIn(SerializationReflectionHelper.getTypeFromSignature(cd.signature, cl), false);
+    }
+    if (!classToDescMap.containsKey(cd.clazz)) {
+      classToDescMap.put(cd.clazz, cd);
+      if (cd.array) {
+        Class<?> clazz = cd.clazz.getComponentType();
+        if (cd.componentType == null) cd.componentType = descriptorFromClass(clazz, map);
+        if ((cd.componentType != null) && (cd.componentType.clazz == null)) setupHandles(cd.componentType, map, cl);
+      }
+      if (cd.superClass == null) {
+        Class<?> clazz = cd.clazz.getSuperclass();
+        if ((clazz != null) && (clazz != Object.class)) cd.superClass = descriptorFromClass(clazz, map);
+      }
+      if ((cd.superClass != null) && (cd.superClass.clazz == null)) setupHandles(cd.superClass, map, cl);
+      if (cd.fields != null) {
+        for (FieldDescriptor fd: cd.fields) {
+          if (fd.type == null) fd.type = descriptorFromClass(fd.field.getType(), map);
+          if (fd.type.clazz == null) setupHandles(fd.type, map, cl);
         }
       }
-      //System.out.println("setupHandle() for " + cd);
-    } catch(Exception e) {
-      log.error("cd = " + cd, e);
-      throw e;
     }
   }
 
   /**
    * 
    * @param clazz .
-   * @param cdMap .
+   * @param map .
    * @return .
    * @throws Exception if any error occurs.
    */
-  private ClassDescriptor descriptorFromClass(final Class<?> clazz, final Map<String, ClassDescriptor> cdMap) throws Exception {
-    String signature = SerializationReflectionHelper.getSignatureFromType(clazz);
-    ClassDescriptor cd = signatureToDescriptorMap.get(signature);
-    if (cd == null) cd = cdMap.get(signature);
+  private ClassDescriptor descriptorFromClass(final Class<?> clazz, final Map<String, ClassDescriptor> map) throws Exception {
+    ClassDescriptor cd = classToDescMap.get(clazz);
+    if (cd == null) cd = map.get(SerializationReflectionHelper.getSignatureFromType(clazz));
     return cd;
+  }
+
+  /**
+   * 
+   */
+  private class Remapping {
+    /**
+     * 
+     */
+    public ClassDescriptor cd, cd2;
+
+    /**
+     * 
+     * @param cd .
+     * @param cd2 .
+     */
+    public Remapping(final ClassDescriptor cd, final ClassDescriptor cd2) {
+      this.cd = cd;
+      this.cd2 = cd2;
+    }
   }
 
   @Override

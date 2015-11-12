@@ -18,7 +18,6 @@
 
 package org.jppf.serialization;
 
-import java.io.*;
 import java.lang.reflect.Field;
 
 /**
@@ -54,25 +53,6 @@ class FieldDescriptor {
   FieldDescriptor(final Field field) throws Exception {
     this.field = field;
     name = field.getName();
-  }
-
-  /**
-   * Write this field descriptor to an object output stream.
-   * @param out the stream to write to.
-   * @throws IOException if any error occurs.
-   */
-  void write(final ObjectOutputStream out) throws IOException {
-    out.writeUTF(name);
-    out.writeInt(type.handle);
-  }
-
-  /**
-   * Read this class descriptor from an input stream.
-   * @param in the stream to read from.
-   * @throws IOException if any error occurs.
-   */
-  void read(final ObjectInputStream in) throws IOException {
-    name = in.readUTF();
   }
 
   @Override

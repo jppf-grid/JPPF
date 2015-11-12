@@ -52,8 +52,7 @@ class SerializationCaches implements Cleanable {
   /**
    * Mapping of classes to their descriptor.
    */
-  Map<Class<?>, ClassDescriptor> classToDescMap = createClassKeyMap();
-  //Map<Class<?>, ClassDescriptor> classToDescMap = new IdentityHashMap<Class<?>, ClassDescriptor>(256);
+  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
   /**
    * Mapping of objects to their handle.
    */

@@ -18,9 +18,8 @@
 
 package org.jppf.serialization;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
+import java.io.Externalizable;
+import java.lang.reflect.Method;
 
 /**
  * Instances of this class describe a Java class with all its non-transient fields
@@ -34,37 +33,13 @@ class ClassDescriptor {
    */
   static final FieldDescriptor[] NO_FIELDS = new FieldDescriptor[0];
   /**
-   * Indicates the class is a primitive type.
-   */
-  static final byte PRIMITIVE = 1;
-  /**
-   * Indicates the class is an array type.
-   */
-  static final byte ARRAY = 2;
-  /**
-   * Indicates the class is an enum type.
-   */
-  static final byte ENUM_TYPE = 4;
-  /**
-   * Indicates the class has the readObject() and writeObject() methods.
-   */
-  static final byte HAS_WRITE_OBJECT = 8;
-  /**
-   * Indicates the class implements the Externalizable interface.
-   */
-  static final byte EXTERNALIZABLE = 16;
-  /**
    * The fields of the described class.
    */
   FieldDescriptor[] fields = NO_FIELDS;
   /**
-   * Bitwise flags associated with the described class.
-   */
-  byte flags = 0;
-  /**
    * Is the described class externalizable.
    */
-  boolean hasReadWriteObject = false;
+  boolean hasReadWriteObject;
   /**
    * Is the described class externalizable.
    */
@@ -76,7 +51,7 @@ class ClassDescriptor {
   /**
    * Is the described class externalizable.
    */
-  boolean externalizable = false;
+  boolean externalizable;
   /**
    * Is the class an array type.
    */
@@ -100,7 +75,7 @@ class ClassDescriptor {
   /**
    * Handle for this class descriptor.
    */
-  int handle = 0;
+  int handle;
   /**
    * Descriptor for this the super class.
    */
@@ -137,32 +112,29 @@ class ClassDescriptor {
     enumType = clazz.isEnum();
     if (!primitive && !enumType) {
       externalizable = Externalizable.class.isAssignableFrom(clazz);
-      Method m = serializing ? SerializationReflectionHelper.getWriteObjectMethod(clazz) : SerializationReflectionHelper.getReadObjectMethod(clazz);
-      hasReadWriteObject = m != null;
-      if (hasReadWriteObject) {
-        m.setAccessible(true);
-        if (serializing) writeObjectMethod = m;
-        else readObjectMethod = m;
-      }
+      //hasReadWriteObject = handleReadOrWriteObjectMethod(true) && handleReadOrWriteObjectMethod(false);
+      hasReadWriteObject = handleReadOrWriteObjectMethod(serializing);
       array = clazz.isArray();
-      if (!array) {
-        Field[] refFields = SerializationReflectionHelper.getNonTransientDeclaredFields(clazz);
-        if (refFields.length > 0) {
-          Arrays.sort(refFields, new Comparator<Field>() {
-            @Override
-            public int compare(final Field o1, final Field o2) {
-              return o1.getName().compareTo(o2.getName());
-            }
-          });
-          fields = new FieldDescriptor[refFields.length];
-          for (int i=0; i<refFields.length; i++) {
-            refFields[i].setAccessible(true);
-            fields[i] = new FieldDescriptor(refFields[i]);
-          }
-        }
-      }
+      if (!array) fields = SerializationReflectionHelper.getPersistentDeclaredFields(clazz);
     }
-    if (signature == null) signature = SerializationReflectionHelper.getSignatureFromType(clazz).intern();
+    if (signature == null) signature = SerializationReflectionHelper.getSignatureFromType(clazz);
+  }
+
+  /**
+   * Retrieve the {@code writeObject()} or {@code readObject()} method. 
+   * @param serializing if {@code true} then retireve the {@code writeObject()} method, otherwise retrieve the {@code readObject()} method.
+   * @return {@code true} if the method exists for this class, {@code false} otherwise.
+   * @throws Exception if any error occurs.
+   */
+  boolean handleReadOrWriteObjectMethod(final boolean serializing) throws Exception {
+    Method m = SerializationReflectionHelper.getReadOrWriteObjectMethod(clazz, !serializing);
+    boolean found = (m != null);
+    if (found) {
+      m.setAccessible(true);
+      if (serializing) writeObjectMethod = m;
+      else readObjectMethod = m;
+    }
+    return found;
   }
 
   /**

@@ -21,6 +21,8 @@ package org.jppf.serialization;
 import java.io.*;
 import java.util.Map;
 
+import org.jppf.utils.StringUtils;
+
 /**
  * Implementation of {@link ObjectInputStream} that reads objects without regards to whether
  * they implement {@link Serializable} or not. This allows using non-serializable classes in
@@ -60,6 +62,25 @@ public class JPPFObjectInputStream extends ObjectInputStream {
     super();
     this.in = (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in);
     deserializer = new Deserializer(this);
+    readToBuf(4);
+    if ( (buf[0] != Serializer.HEADER[0]) || (buf[1] != Serializer.HEADER[1]) || (buf[2] != Serializer.HEADER[2]) || (buf[3] != Serializer.HEADER[3]))
+      throw new IOException("bad header: " + StringUtils.toHexString(buf, 0, 4, " "));
+  }
+
+  /**
+   * Initialize this object input stream with the specified stream.
+   * @param in the stream to read data from.
+   * @param deserializer the deserializer to use.
+   * @throws IOException if an I/O error occurs.
+   */
+  public JPPFObjectInputStream(final InputStream in, final Deserializer deserializer) throws IOException {
+    super();
+    this.in = (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in);
+    this.deserializer = deserializer;
+    deserializer.in = this;
+    readToBuf(4);
+    if ( (buf[0] != Serializer.HEADER[0]) || (buf[1] != Serializer.HEADER[1]) || (buf[2] != Serializer.HEADER[2]) || (buf[3] != Serializer.HEADER[3]))
+      throw new IOException("bad header: " + StringUtils.toHexString(buf, 0, 4, " "));
   }
 
   @Override

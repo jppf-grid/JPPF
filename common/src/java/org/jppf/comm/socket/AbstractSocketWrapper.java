@@ -27,7 +27,6 @@ import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
-
 /**
  * Common abstract superclass for all socket clients. This class is provided as a convenience and provides
  * as set of common methods to all classes implementing the
@@ -36,8 +35,7 @@ import org.slf4j.*;
  * @author Domingos Creado
  * @author Jeff Rosen
  */
-public abstract class AbstractSocketWrapper implements SocketWrapper
-{
+public abstract class AbstractSocketWrapper implements SocketWrapper {
   /**
    * Logger for this class.
    */
@@ -79,8 +77,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   /**
    * Default constructor is visible to subclasses only.
    */
-  protected AbstractSocketWrapper()
-  {
+  protected AbstractSocketWrapper() {
   }
 
   /**
@@ -91,8 +88,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @throws ConnectException if the connection fails.
    * @throws IOException if there is an issue with the socket streams.
    */
-  public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer) throws ConnectException, IOException
-  {
+  public AbstractSocketWrapper(final String host, final int port, final ObjectSerializer serializer) throws ConnectException, IOException {
     this.host = host;
     this.port = port;
     this.serializer = serializer;
@@ -104,18 +100,14 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @param socket the underlying socket this socket client wraps around.
    * @throws JPPFException if the socket connection fails.
    */
-  public AbstractSocketWrapper(final Socket socket) throws JPPFException
-  {
-    try
-    {
+  public AbstractSocketWrapper(final Socket socket) throws JPPFException {
+    try {
       this.host = socket.getInetAddress().getHostName();
       this.port = socket.getPort();
       this.socket = socket;
       initStreams();
       opened = true;
-    }
-    catch(IOException ioe)
-    {
+    } catch (IOException ioe) {
       throw new JPPFException(ioe.getMessage(), ioe);
     }
   }
@@ -127,8 +119,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
    */
   @Override
-  public void sendBytes(final JPPFBuffer buf) throws IOException
-  {
+  public void sendBytes(final JPPFBuffer buf) throws IOException {
     dos.writeInt(buf.getLength());
     dos.write(buf.getBuffer(), 0, buf.getLength());
     flush();
@@ -143,8 +134,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
    */
   @Override
-  public void write(final byte[] data, final int offset, final int len) throws Exception
-  {
+  public void write(final byte[] data, final int offset, final int len) throws Exception {
     checkOpened();
     dos.write(data, offset, len);
     flush();
@@ -157,8 +147,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
    */
   @Override
-  public void writeInt(final int n) throws Exception
-  {
+  public void writeInt(final int n) throws Exception {
     checkOpened();
     dos.writeInt(n);
     flush();
@@ -170,8 +159,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#flush()
    */
   @Override
-  public void flush() throws IOException
-  {
+  public void flush() throws IOException {
     updateSocketTimestamp();
     dos.flush();
   }
@@ -184,8 +172,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#receive()
    */
   @Override
-  public Object receive() throws Exception
-  {
+  public Object receive() throws Exception {
     return receive(0);
   }
 
@@ -198,20 +185,16 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
    */
   @Override
-  public JPPFBuffer receiveBytes(final int timeout) throws IOException
-  {
+  public JPPFBuffer receiveBytes(final int timeout) throws IOException {
     checkOpened();
     JPPFBuffer buf = null;
-    try
-    {
+    try {
       if (timeout > 0) socket.setSoTimeout(timeout);
       int len = dis.readInt();
       byte[] buffer = new byte[len];
       read(buffer, 0, len);
       buf = new JPPFBuffer(buffer, len);
-    }
-    finally
-    {
+    } finally {
       // disable the timeout on subsequent read operations.
       if (timeout > 0) socket.setSoTimeout(0);
       updateSocketTimestamp();
@@ -228,15 +211,12 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @param len the length of data to read.
    * @return the number of bytes actually read or -1 if the end of stream was reached.
    * @throws IOException if the underlying input stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#read(byte[], int, int)
    */
   @Override
-  public int read(final byte[] data, final int offset, final int len) throws IOException
-  {
+  public int read(final byte[] data, final int offset, final int len) throws IOException {
     checkOpened();
     int count = 0;
-    while (count < len)
-    {
+    while (count < len) {
       int n = dis.read(data, count + offset, len - count);
       if (n < 0) break;
       else count += n;
@@ -246,8 +226,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   }
 
   @Override
-  public int readPartial(final byte[] data, final int offset, final int len) throws IOException
-  {
+  public int readPartial(final byte[] data, final int offset, final int len) throws IOException {
     checkOpened();
     int n = dis.read(data, offset, len);
     updateSocketTimestamp();
@@ -258,11 +237,9 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * Read an int value from a socket connection.
    * @return n the value to read from the socket, or -1 if end of stream was reached.
    * @throws Exception if the underlying input stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#readInt()
    */
   @Override
-  public int readInt() throws Exception
-  {
+  public int readInt() throws Exception {
     int intRead = dis.readInt();
     updateSocketTimestamp();
     return intRead;
@@ -272,13 +249,10 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * Open the underlying socket connection.
    * @throws ConnectException if the socket fails to connect.
    * @throws IOException if the underlying input and output streams raise an error.
-   * @see org.jppf.comm.socket.SocketWrapper#open()
    */
   @Override
-  public final void open() throws ConnectException, IOException
-  {
-    if (!opened)
-    {
+  public final void open() throws ConnectException, IOException {
+    if (!opened) {
       if ((host == null) || "".equals(host.trim())) throw new ConnectException("You must specify the host name");
       else if (port <= 0) throw new ConnectException("You must specify the port number");
       socket = new Socket();
@@ -300,8 +274,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * underlying socket connection.
    * @throws IOException if an error occurs during the streams initialization.
    */
-  protected final void initStreams() throws IOException
-  {
+  protected final void initStreams() throws IOException {
     OutputStream os = socket.getOutputStream();
     InputStream is = socket.getInputStream();
     dos = new DataOutputStream(new BufferedOutputStream(os));
@@ -312,14 +285,11 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * Close the underlying socket connection.
    * @throws ConnectException if the socket connection is not opened.
    * @throws IOException if the underlying input and output streams raise an error.
-   * @see org.jppf.comm.socket.SocketWrapper#close()
    */
   @Override
-  public void close() throws ConnectException, IOException
-  {
+  public void close() throws ConnectException, IOException {
     opened = false;
-    if (socket != null)
-    {
+    if (socket != null) {
       StreamUtils.closeSilent(dis);
       StreamUtils.closeSilent(dos);
       socket.close();
@@ -329,11 +299,9 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
   /**
    * Determine whether this socket client is opened or not.
    * @return true if this client is opened, false otherwise.
-   * @see org.jppf.comm.socket.SocketWrapper#isOpened()
    */
   @Override
-  public boolean isOpened()
-  {
+  public boolean isOpened() {
     return opened;
   }
 
@@ -341,8 +309,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * Check whether the underlying socket is opened or not.
    * @throws ConnectException if the connection is not opened.
    */
-  protected void checkOpened() throws ConnectException
-  {
+  protected void checkOpened() throws ConnectException {
     if (!opened) throw new ConnectException("Client connection not opened");
   }
 
@@ -352,19 +319,16 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
    */
   @Override
-  public ObjectSerializer getSerializer()
-  {
+  public ObjectSerializer getSerializer() {
     return null;
   }
 
   /**
    * This implementation does nothing.
    * @param serializer not used.
-   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.serialization.ObjectSerializer)
    */
   @Override
-  public void setSerializer(final ObjectSerializer serializer)
-  {
+  public void setSerializer(final ObjectSerializer serializer) {
   }
 
   /**
@@ -372,8 +336,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @return the host name or ip address as a string.
    */
   @Override
-  public String getHost()
-  {
+  public String getHost() {
     return host;
   }
 
@@ -382,8 +345,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @param host the host name or ip address as a string.
    */
   @Override
-  public void setHost(final String host)
-  {
+  public void setHost(final String host) {
     this.host = host;
   }
 
@@ -392,8 +354,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @return the port number on the remote host.
    */
   @Override
-  public int getPort()
-  {
+  public int getPort() {
     return port;
   }
 
@@ -402,30 +363,25 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @param port the port number on the remote host.
    */
   @Override
-  public void setPort(final int port)
-  {
+  public void setPort(final int port) {
     this.port = port;
   }
 
   /**
    * Get the underlying socket used by this socket wrapper.
    * @return a Socket instance.
-   * @see org.jppf.comm.socket.SocketWrapper#getSocket()
    */
   @Override
-  public Socket getSocket()
-  {
+  public Socket getSocket() {
     return socket;
   }
 
   /**
    * Set the underlying socket to be used by this socket wrapper.
    * @param socket a Socket instance.
-   * @see org.jppf.comm.socket.SocketWrapper#setSocket(java.net.Socket)
    */
   @Override
-  public void setSocket(final Socket socket)
-  {
+  public void setSocket(final Socket socket) {
     this.socket = socket;
   }
 
@@ -434,17 +390,14 @@ public abstract class AbstractSocketWrapper implements SocketWrapper
    * @param n the number of bytes to skip.
    * @return the actual number of bytes skipped, or -1 if the end of file is reached..
    * @throws Exception if an IO error occurs.
-   * @see org.jppf.comm.socket.SocketWrapper#skip(int)
    */
   @Override
-  public int skip(final int n) throws Exception
-  {
+  public int skip(final int n) throws Exception {
     if (n < 0) throw new IllegalArgumentException("number of bytes to skip must be >= 0");
     else if (n == 0) return 0;
     int count = 0;
-    while (count < n)
-    {
-      long p = dis.skip(n-count);
+    while (count < n) {
+      long p = dis.skip(n - count);
       //if (p < 0) break;
       if (p <= 0) break;
       else count += p;

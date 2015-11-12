@@ -92,12 +92,16 @@ class Serializer {
   /**
    * Initialize this serializer with the specified output stream, and write the header.
    * @param out the stream to which the serialized data is written.
-   * @throws IOException if an error occurs while writing the header.
    */
+  Serializer(final ObjectOutputStream out) {
+    this.out = out;
+  }
+  /*
   Serializer(final ObjectOutputStream out) throws IOException {
     this.out = out;
-    out.write(HEADER);
+    //out.write(HEADER);
   }
+  */
 
   /**
    * Write the specified object to the output stream.
@@ -194,8 +198,7 @@ class Serializer {
    * @throws Exception if any error occurs.
    */
   void writeDeclaredFields(final Object obj, final ClassDescriptor cd) throws Exception {
-    for (int i=0; i<cd.fields.length; i++) {
-      FieldDescriptor fd = cd.fields[i];
+    for (FieldDescriptor fd: cd.fields) {
       //if (traceEnabled) try { log.trace("writing field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
       Object val = fd.field.get(obj);
       if (fd.type.primitive) {

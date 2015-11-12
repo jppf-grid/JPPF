@@ -64,6 +64,21 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
     super();
     this.out = (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out);
     serializer = new Serializer(this);
+    write(Serializer.HEADER);
+  }
+
+  /**
+   * Initialize this object stream.
+   * @param out the stream to write objects to.
+   * @param serializer the serializer to use.
+   * @throws IOException if any error occurs.
+   */
+  public JPPFObjectOutputStream(final OutputStream out, final Serializer serializer) throws IOException {
+    super();
+    this.out = (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out);
+    this.serializer = serializer;
+    serializer.out = this;
+    write(Serializer.HEADER);
   }
 
   @Override

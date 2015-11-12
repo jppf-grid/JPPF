@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.jppf.JPPFException;
 import org.jppf.utils.Pair;
-import org.jppf.utils.collections.SoftReferenceValuesMap;
+import org.jppf.utils.collections.ConcurrentSoftReferenceValuesMap;
 import org.slf4j.*;
 
 /**
@@ -66,29 +66,29 @@ public final class SerializationReflectionHelper {
    */
   private static final Character DEFAULT_CHAR = Character.valueOf((char) 0);
   /**
-   * Default boolean value.
+   * The modifiers for the declared non persistent fields of a class.
    */
-  private static final Boolean DEFAULT_BOOLEAN = Boolean.FALSE;
-  /**
-   * Default object reference value.
-   */
-  private static final Object DEFAULT_REF = null;
+  private static final int NON_PERSISTENT_MODIFIERS = Modifier.TRANSIENT | Modifier.STATIC;
   /**
    * COnstant for empty field array.
    */
-  private static final Field[] NO_FIELDS = new Field[0];
+  private static final FieldDescriptor[] NO_FIELDS = new FieldDescriptor[0];
   /**
    * A cache of readObject() methods for deserialization.
    */
-  private static final Map<Class<?>, Object> READ_OBJECT_MAP = new SoftReferenceValuesMap<>();
+  private static final Map<Class<?>, Object> READ_OBJECT_MAP = new ConcurrentSoftReferenceValuesMap<>();
   /**
    * A cache of writeObject() methods for serialization.
    */
-  private static final Map<Class<?>, Object> WRITE_OBJECT_MAP = new SoftReferenceValuesMap<>();
+  private static final Map<Class<?>, Object> WRITE_OBJECT_MAP = new ConcurrentSoftReferenceValuesMap<>();
   /**
    * A cache of non transient fields.
    */
-  private static final Map<Class<?>, Field[]> FIELDS_MAP = new SoftReferenceValuesMap<>();
+  private static final Map<Class<?>, FieldDescriptor[]> FIELDS_MAP = new ConcurrentSoftReferenceValuesMap<>();
+  /**
+   * A cache classes to their string signature.
+   */
+  private static final Map<Class<?>, String> SIGNATURE_MAP = new ConcurrentSoftReferenceValuesMap<>();
   /**
    * 
    */
@@ -109,14 +109,11 @@ public final class SerializationReflectionHelper {
   /**
    * Get all declared non-transient and non-static fields of the given class.
    * @param clazz the class object from which to extract the fields.
-   * @return an array of {@link Field} objects.
+   * @return an array of {@link FieldDescriptor} objects.
    * @throws Exception if any error occurs.
    */
-  public static Field[] getNonTransientDeclaredFields(final Class<?> clazz) throws Exception {
-    Field[] result = null;
-    synchronized(FIELDS_MAP) {
-      result = FIELDS_MAP.get(clazz);
-    }
+  public static FieldDescriptor[] getPersistentDeclaredFields(final Class<?> clazz) throws Exception {
+    FieldDescriptor[] result = FIELDS_MAP.get(clazz);
     if (result == null) {
       Field[] allFields = clazz.getDeclaredFields();
       if (allFields.length <= 0) result = NO_FIELDS;
@@ -124,19 +121,31 @@ public final class SerializationReflectionHelper {
         Field[] fields = new Field[allFields.length];
         int count = 0;
         for (Field f : allFields) {
-          int mod = f.getModifiers();
-          if (!Modifier.isTransient(mod) && !Modifier.isStatic(mod)) fields[count++] = f;
+          if ((f.getModifiers() & NON_PERSISTENT_MODIFIERS) == 0) fields[count++] = f;
         }
         if (count == 0) result = NO_FIELDS;
-        else if (count == allFields.length) result = allFields;
         else {
-          result = new Field[count];
-          System.arraycopy(fields, 0, result, 0, count);
+          Field[] tmp = null;
+          if (count == allFields.length) tmp = allFields;
+          else {
+            tmp = new Field[count];
+            System.arraycopy(fields, 0, tmp, 0, count);
+          }
+          Arrays.sort(tmp, new Comparator<Field>() {
+            @Override
+            public int compare(final Field o1, final Field o2) {
+              return o1.getName().compareTo(o2.getName());
+            }
+          });
+          result = new FieldDescriptor[count]; 
+          for (int i=0; i<count; i++) {
+            Field f = tmp[i];
+            f.setAccessible(true);
+            result[i] = new FieldDescriptor(f);
+          }
         }
       }
-      synchronized(FIELDS_MAP) {
-        FIELDS_MAP.put(clazz, result);
-      }
+      FIELDS_MAP.put(clazz, result);
     }
     return result;
   }
@@ -148,7 +157,9 @@ public final class SerializationReflectionHelper {
    * @throws Exception if any error occurs.
    */
   public static String getSignatureFromType(final Class<?> clazz) throws Exception {
-    StringBuilder sb = new StringBuilder();
+    String sig = SIGNATURE_MAP.get(clazz);
+    if (sig != null) return sig;
+    StringBuilder sb = new StringBuilder(32);
     Class<?> tmp = clazz;
     while (tmp.isArray()) {
       sb.append('[');
@@ -163,7 +174,9 @@ public final class SerializationReflectionHelper {
     else if (tmp == Boolean.TYPE) sb.append('Z');
     else if (tmp == Character.TYPE) sb.append('C');
     else sb.append('L').append(tmp.getName());
-    return sb.toString();
+    sig = sb.toString();
+    SIGNATURE_MAP.put(clazz, sig);
+    return sig;
   }
 
   /**
@@ -176,7 +189,6 @@ public final class SerializationReflectionHelper {
   public static Class<?> getTypeFromSignature(final String signature, final ClassLoader cl) throws Exception {
     if (signature.charAt(0) != '[') return getNonArrayTypeFromSignature(signature, cl);
     int pos = 0;
-    List<Class<?>> types = new ArrayList<>();
     while (signature.charAt(pos) == '[') pos++;
     Class<?> componentType = getNonArrayTypeFromSignature(signature.substring(pos), cl);
     int[] dimensions = new int[pos];
@@ -194,48 +206,19 @@ public final class SerializationReflectionHelper {
    */
   public static Class<?> getNonArrayTypeFromSignature(final String signature, final ClassLoader cl) throws Exception {
     switch (signature.charAt(0)) {
-      case 'B':
-        return Byte.TYPE;
-      case 'S':
-        return Short.TYPE;
-      case 'I':
-        return Integer.TYPE;
-      case 'J':
-        return Long.TYPE;
-      case 'F':
-        return Float.TYPE;
-      case 'D':
-        return Double.TYPE;
-      case 'C':
-        return Character.TYPE;
-      case 'Z':
-        return Boolean.TYPE;
+      case 'B': return Byte.TYPE;
+      case 'S': return Short.TYPE;
+      case 'I': return Integer.TYPE;
+      case 'J': return Long.TYPE;
+      case 'F': return Float.TYPE;
+      case 'D': return Double.TYPE;
+      case 'C': return Character.TYPE;
+      case 'Z': return Boolean.TYPE;
       case 'L':
         String s = signature.substring(1);
-        if ("void".equals(s)) return Void.TYPE;
-        return cl.loadClass(s);
+        return "void".equals(s) ? Void.TYPE : cl.loadClass(s);
     }
     throw new JPPFException("Could not load type with signature '" + signature + '\'');
-  }
-
-  /**
-   * Get the writeObject() method with the signature specified in {@link Serializable}.
-   * @param clazz the class for which to get the method.
-   * @return the desired method, or {@code null} if th emthod could not be found.
-   * @throws Exception if any error occurs.
-   */
-  public static Method getWriteObjectMethod(final Class<?> clazz) throws Exception {
-    return getReadOrWriteObjectMethod(clazz, false);
-  }
-
-  /**
-   * Get the readObject() method with the signature specified in {@link Serializable}.
-   * @param clazz the class for which to get the method.
-   * @return the desired method, or {@code null} if th emthod could not be found.
-   * @throws Exception if any error occurs.
-   */
-  public static Method getReadObjectMethod(final Class<?> clazz) throws Exception {
-    return getReadOrWriteObjectMethod(clazz, true);
   }
 
   /**
@@ -245,12 +228,9 @@ public final class SerializationReflectionHelper {
    * @return the desired method, or {@code null} if the mthod could not be found.
    * @throws Exception if any error occurs.
    */
-  private static Method getReadOrWriteObjectMethod(final Class<?> clazz, final boolean isRead) throws Exception {
-    Object method = null;
+  static Method getReadOrWriteObjectMethod(final Class<?> clazz, final boolean isRead) throws Exception {
     Map<Class<?>, Object> map = isRead ? READ_OBJECT_MAP : WRITE_OBJECT_MAP;
-    synchronized(map) {
-      method = map.get(clazz);
-    }
+    Object method = map.get(clazz);
     if (method == NO_MEMBER) return null;
     else if (method != null) return (Method) method;
     String methodName = isRead ? "readObject" : "writeObject";
@@ -268,9 +248,7 @@ public final class SerializationReflectionHelper {
         }
       }
     }
-    synchronized(map) {
-      map.put(clazz, method == null ? NO_MEMBER : method);
-    }
+    map.put(clazz, method == null ? NO_MEMBER : method);
     return (Method) method;
   }
 
@@ -288,7 +266,6 @@ public final class SerializationReflectionHelper {
    * The method to invoke on the reflection factory to create a new instance of a deserialized object.
    */
   private static Method rfMethod = null;
-
   static {
     try {
       rfClass = Class.forName("sun.reflect.ReflectionFactory");
@@ -334,7 +311,7 @@ public final class SerializationReflectionHelper {
   /**
    * A cache of constructors used for deserialization.
    */
-  private static final Map<Class<?>, Constructor> CONSTRUCTOR_MAP = new SoftReferenceValuesMap<>();
+  private static final Map<Class<?>, Constructor> CONSTRUCTOR_MAP = new ConcurrentSoftReferenceValuesMap<>();
 
   /**
    * Create an object without calling any of its class constructors if the JVM supports it,
@@ -344,9 +321,7 @@ public final class SerializationReflectionHelper {
    * @throws Exception if any error occurs.
    */
   public static Object create(final Class<?> clazz) throws Exception {
-    //return createFromConstructor(clazz);
-    if (rfMethod == null) return createFromConstructor(clazz);
-    return create(clazz, Object.class);
+    return (rfMethod == null) ? createFromConstructor(clazz) : create(clazz, Object.class);
   }
 
   /**
@@ -359,18 +334,13 @@ public final class SerializationReflectionHelper {
    */
   static Object create(final Class<?> clazz, final Class<?> parent) throws Exception {
     try {
-      Constructor constructor;
-      synchronized (CONSTRUCTOR_MAP) {
-        constructor = CONSTRUCTOR_MAP.get(clazz);
-      }
+      Constructor constructor = CONSTRUCTOR_MAP.get(clazz);
       if (constructor == null) {
-        //ReflectionFactory rf = ReflectionFactory.getReflectionFactory();
+        //==> ReflectionFactory rf = ReflectionFactory.getReflectionFactory();
         Constructor superConstructor = parent.getDeclaredConstructor();
-        //constructor = rf.newConstructorForSerialization(clazz, superConstructor);
+        //==> constructor = rf.newConstructorForSerialization(clazz, superConstructor);
         constructor = (Constructor) rfMethod.invoke(rf, clazz, superConstructor);
-        synchronized (CONSTRUCTOR_MAP) {
-          CONSTRUCTOR_MAP.put(clazz, constructor);
-        }
+        CONSTRUCTOR_MAP.put(clazz, constructor);
       }
       return clazz.cast(constructor.newInstance());
     } catch (RuntimeException e) {
@@ -383,7 +353,8 @@ public final class SerializationReflectionHelper {
   /**
    * A cache of constructors used for deserialization.
    */
-  private static final Map<Class<?>, ConstructorWithParameters> DEFAULT_CONSTRUCTOR_MAP = new SoftReferenceValuesMap<>();
+  //private static final Map<Class<?>, ConstructorWithParameters> DEFAULT_CONSTRUCTOR_MAP = new ConcurrentHashMap<>();
+  private static final Map<Class<?>, ConstructorWithParameters> DEFAULT_CONSTRUCTOR_MAP = new ConcurrentSoftReferenceValuesMap<>();
 
   /**
    * Instantiate an object from one of its class' existing constructor.
@@ -393,10 +364,7 @@ public final class SerializationReflectionHelper {
    * @throws Exception if any error occurs.
    */
   static Object createFromConstructor(final Class<?> clazz) throws Exception {
-    ConstructorWithParameters cwp = null;
-    synchronized (DEFAULT_CONSTRUCTOR_MAP) {
-      cwp = DEFAULT_CONSTRUCTOR_MAP.get(clazz);
-    }
+    ConstructorWithParameters cwp = DEFAULT_CONSTRUCTOR_MAP.get(clazz);
     if (cwp == null) {
       Constructor<?>[] constructors = clazz.getDeclaredConstructors();
       Arrays.sort(constructors, new ConstructorComparator());
@@ -408,9 +376,7 @@ public final class SerializationReflectionHelper {
         try {
           Object result = c.newInstance(params);
           cwp = new ConstructorWithParameters(c, params);
-          synchronized (DEFAULT_CONSTRUCTOR_MAP) {
-            DEFAULT_CONSTRUCTOR_MAP.put(clazz, cwp);
-          }
+          DEFAULT_CONSTRUCTOR_MAP.put(clazz, cwp);
           return result;
         } catch (Throwable t) {
           log.info(t.getMessage(), t);
@@ -459,8 +425,8 @@ public final class SerializationReflectionHelper {
     else if ((c == Float.TYPE) || (c == Float.class)) return DEFAULT_FLOAT;
     else if ((c == Double.TYPE) || (c == Double.class)) return DEFAULT_DOUBLE;
     else if ((c == Character.TYPE) || (c == Character.class)) return DEFAULT_CHAR;
-    else if ((c == Boolean.TYPE) || (c == Boolean.class)) return DEFAULT_BOOLEAN;
-    return DEFAULT_REF;
+    else if ((c == Boolean.TYPE) || (c == Boolean.class)) return Boolean.FALSE;
+    return null;
   }
 
   /**
