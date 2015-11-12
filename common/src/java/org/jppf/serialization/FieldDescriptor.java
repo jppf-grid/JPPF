@@ -61,7 +61,7 @@ class FieldDescriptor {
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name).append(", ");
     sb.append("type=");
-    if (type != null) sb.append("{signature=").append(type.signature).append(", handle=").append(type.handle).append('}');
+    if (type != null) sb.append("{signature=").append(type.signature).append('}');
     else sb.append("null");
     sb.append(", field=").append(field);
     sb.append(']');

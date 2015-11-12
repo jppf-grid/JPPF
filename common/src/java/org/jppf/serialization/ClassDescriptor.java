@@ -73,10 +73,6 @@ class ClassDescriptor {
    */
   Class<?> clazz;
   /**
-   * Handle for this class descriptor.
-   */
-  int handle;
-  /**
    * Descriptor for this the super class.
    */
   ClassDescriptor superClass;
@@ -84,6 +80,10 @@ class ClassDescriptor {
    * Component type if this class is an array.
    */
   ClassDescriptor componentType;
+  /**
+   * 
+   */
+  boolean populated = false;
 
   /**
    * Initialize an empty class descriptor.
@@ -107,6 +107,7 @@ class ClassDescriptor {
    * @throws Exception if any error occurs.
    */
   void fillIn(final Class<?> clazz, final boolean serializing) throws Exception {
+    populated = true;
     this.clazz = clazz;
     primitive = clazz.isPrimitive();
     enumType = clazz.isEnum();
@@ -143,7 +144,6 @@ class ClassDescriptor {
    * @throws Exception if any error occurs.
    */
   void write(final Serializer serializer) throws Exception {
-    serializer.writeClassHandle(handle);
     serializer.writeString(signature);
   }
 
@@ -154,7 +154,6 @@ class ClassDescriptor {
    * @throws Exception if any error occurs.
    */
   ClassDescriptor read(final Deserializer deserializer) throws Exception {
-    handle = deserializer.readClassHandle();
     signature = deserializer.readString();
     return this;
   }
@@ -163,7 +162,6 @@ class ClassDescriptor {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
-    sb.append("handle=").append(handle).append(", ");
     sb.append("signature=").append(signature).append(", ");
     sb.append("clazz=").append(clazz == null ? "null" : clazz.getName()).append(", ");
     sb.append("primitive=").append(primitive).append(", ");

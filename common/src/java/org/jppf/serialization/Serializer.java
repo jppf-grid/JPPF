@@ -112,8 +112,8 @@ class Serializer {
     if (obj == null) out.writeByte(NULL_OBJECT_HEADER);
     else if (obj instanceof Class) writeClassObject((Class) obj);
     else {
-      boolean isString = obj instanceof String;
       Integer handle = caches.objectHandleMap.get(obj);
+      boolean isString = obj instanceof String;
       if (handle == null) {
         handle = caches.newObjectHandle(obj);
         if (traceEnabled) try { log.trace("writing handle = {}, object = {}", handle, StringUtils.toIdentityString(obj)); } catch(Exception e) {}
@@ -138,9 +138,8 @@ class Serializer {
     ClassDescriptor cd = caches.getClassDescriptor(obj.getClass(), cdMap);
     currentObject = obj;
     currentClassDescriptor = cd;
-    writeClassDescriptors(cdMap);
     writeHeaderAndHandle(OBJECT_HEADER, handle);
-    writeClassHandle(cd.handle);
+    writeClassHandle(cd);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
     if (cd.array) writeArray(obj, cd);
     else if (cd.enumType) writeString(((Enum) obj).name());
@@ -152,13 +151,14 @@ class Serializer {
    * @param obj the object to write.
    * @throws Exception if any error occurs.
    */
-  private void writeClassObject(final Class obj) throws Exception {
+  private void writeClassObject(final Class<?> obj) throws Exception {
     Map<Class<?>, ClassDescriptor> cdMap = new IdentityHashMap<>();
     ClassDescriptor cd = caches.getClassDescriptor(obj, cdMap);
+    Integer handle = caches.objectHandleMap.get(obj);
     currentObject = obj;
     currentClassDescriptor = cd;
-    writeClassDescriptors(cdMap);
-    writeHeaderAndHandle(CLASS_OBJECT_HEADER, cd.handle);
+    out.writeByte(CLASS_OBJECT_HEADER);
+    writeString(cd.signature);
   }
 
   /**
@@ -250,22 +250,6 @@ class Serializer {
         Object val = Array.get(obj, i);
         writeObject(val);
       }
-    }
-  }
-
-  /**
-   * Write all class descriptors to the output stream.
-   * @param map a class to descriptor association map.
-   * @throws Exception if any error occurs.
-   */
-  void writeClassDescriptors(final Map<Class<?>, ClassDescriptor> map) throws Exception {
-    if (map.isEmpty()) return;
-    out.writeByte(CLASS_HEADER);
-    writeInt(map.size());
-    for (Map.Entry<Class<?>, ClassDescriptor> entry: map.entrySet()) {
-      ClassDescriptor cd = entry.getValue();
-      cd.write(this);
-      if (traceEnabled) try { log.trace("wrote handle={}, cd={}", cd.handle, cd); } catch(Exception e) {}
     }
   }
 
@@ -413,10 +397,12 @@ class Serializer {
 
   /**
    * Write the handle of a class descriptor to the underlying stream.
-   * @param handle the handle to write.
+   * @param cd contains the handle to write.
    * @throws Exception if any error occurs.
    */
-  void writeClassHandle(final int handle)  throws Exception {
+  void writeClassHandle(final ClassDescriptor cd)  throws Exception {
+    writeString(cd.signature);
+    /*
     byte n = 3;
     for (int i=0; i<2; i++) {
       if (handle < HANDLE_MAX_VALUES[i]) {
@@ -427,6 +413,7 @@ class Serializer {
     buf[0] = n;
     for (int i=8*(n-1), pos=1; i>=0; i-=8) buf[pos++] = (byte) ((handle >>> i) & 0xFF);
     out.write(buf, 0, n+1);
+    */
   }
 
   /**

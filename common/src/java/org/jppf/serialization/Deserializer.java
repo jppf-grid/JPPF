@@ -92,10 +92,6 @@ class Deserializer {
    */
   Object readObject() throws Exception {
     byte header = in.readByte();
-    while ((header & 0x0F) == Serializer.CLASS_HEADER) {
-      readClassDescriptors();
-      header = in.readByte();
-    }
     int type = header & 0x0F;
     if (type == Serializer.NULL_OBJECT_HEADER) return null;
     else if (type == Serializer.CLASS_OBJECT_HEADER) return readClassObject(header);
@@ -120,8 +116,8 @@ class Deserializer {
    */
   @SuppressWarnings("unchecked")
   private void readObject(final int handle) throws Exception {
-    int cdHandle = readClassHandle();
-    ClassDescriptor cd = caches.getDescriptor(cdHandle);
+    String sig = readClassHandle();
+    ClassDescriptor cd = caches.getDescriptor(sig, classloader);
     if (cd.array) readArray(handle, cd);
     else if (cd.enumType) {
       String name = readString();
@@ -146,9 +142,8 @@ class Deserializer {
    */
   @SuppressWarnings("unchecked")
   private Object readClassObject(final byte header) throws Exception {
-    int cdHandle = readHandle(header);
-    ClassDescriptor cd = caches.getDescriptor(cdHandle);
-    return cd.clazz;
+    String handle = readClassHandle();
+    return caches.getClassFromHandle(handle, classloader);
   }
 
   /**
@@ -269,21 +264,6 @@ class Deserializer {
         Array.set(obj, i, ref);
       }
     }
-  }
-
-  /**
-   * Read all the class descriptors available in the input stream.
-   * @throws Exception if any error occurs.
-   */
-  private void readClassDescriptors() throws Exception {
-    int n = readInt();
-    Map<String, ClassDescriptor> map = new HashMap<>(n);
-    for (int i=0; i<n; i++) {
-      ClassDescriptor cd = new ClassDescriptor().read(this);
-      map.put(cd.signature, cd);
-      if (traceEnabled) try { log.trace("read handle={}, cd={}", cd.handle, cd); } catch(Exception e) {}
-    }
-    caches.setupHandles(map, classloader);
   }
 
   /**
@@ -490,12 +470,8 @@ class Deserializer {
    * @return a handle as an int value.
    * @throws Exception if any error occurs.
    */
-  int readClassHandle() throws Exception {
-    byte n = in.readByte();
-    readToBuf(0, n);
-    int handle = 0;
-    for (int i=8*(n-1), pos=0; i>=0; i-=8) handle += (buf[pos++] & 0xFF) << i;
-    return handle;
+  String readClassHandle() throws Exception {
+    return readString();
   }
 
   /**

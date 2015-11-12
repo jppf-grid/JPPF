@@ -42,8 +42,7 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
 
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
-    new JPPFObjectOutputStream(os).writeObject(o);
-    /*
+    //new JPPFObjectOutputStream(os).writeObject(o);
     synchronized(this) {
       ClassLoader refCl = ref.get();
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -59,13 +58,11 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     } finally {
       if (serializer != null) serializerPool.put(serializer);
     }
-    */
   }
 
   @Override
   public Object deserialize(final InputStream is) throws Exception {
-    return new JPPFObjectInputStream(is).readObject();
-    /*
+    //return new JPPFObjectInputStream(is).readObject();
     synchronized(this) {
       ClassLoader refCl = ref.get();
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -81,7 +78,6 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     } finally {
       if (deserializer != null) deserializerPool.put(deserializer);
     }
-    */
   }
 
   /**
@@ -114,6 +110,7 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     @Override
     public void put(final Deserializer deserializer) {
       deserializer.caches.handleToObjectMap.clear();
+      //deserializer.caches.handleToClassMap.clear();
       super.put(deserializer);
     }
   };

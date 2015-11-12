@@ -28,7 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class SerializationCaches implements Cleanable {
+class SerializationCaches {
   /**
    * Logger for this class.
    */
@@ -152,7 +152,6 @@ class SerializationCaches implements Cleanable {
   static ClassDescriptor addClassGeneric(final Class<?> clazz, final AtomicInteger counter,
       final Map<Class<?>, ClassDescriptor> map, final Map<Class<?>, ClassDescriptor> map2) throws Exception {
     ClassDescriptor cd = new ClassDescriptor(clazz);
-    cd.handle = counter.incrementAndGet();
     //if (traceEnabled) try { log.trace("created " + cd); } catch(Exception e) {}
     map.put(clazz, cd);
     if (map2 != null) map2.put(clazz, cd);
@@ -161,13 +160,5 @@ class SerializationCaches implements Cleanable {
     if ((tmpClazz != null) && (tmpClazz != Object.class)) cd.superClass = getClassDescriptorGeneric(tmpClazz, counter, map, map2);
     if (clazz.isArray()) cd.componentType = getClassDescriptorGeneric(clazz.getComponentType(), counter, map, map2);
     return cd;
-  }
-
-  @Override
-  public void setup() {
-  }
-
-  @Override
-  public void cleanup() {
   }
 }
