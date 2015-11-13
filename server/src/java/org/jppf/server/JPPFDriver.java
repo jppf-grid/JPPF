@@ -31,6 +31,7 @@ import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.NioServer;
 import org.jppf.process.LauncherListener;
 import org.jppf.queue.JPPFQueue;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
 import org.jppf.server.nio.classloader.LocalClassContext;
@@ -78,6 +79,10 @@ public class JPPFDriver {
    * Singleton instance of the JPPFDriver.
    */
   private static JPPFDriver instance = null;
+  /**
+   * Used for serialization / deserialization.
+   */
+  private static final ObjectSerializer serializer = new ObjectSerializerImpl();
   /**
    * Reference to the local node if it is enabled.
    */
@@ -453,5 +458,14 @@ public class JPPFDriver {
    */
   public JPPFStatistics getStatistics() {
     return statistics;
+  }
+
+  /**
+   * Get the object used for serialization / deserialization.
+   * @return an {@link ObjectSerializer} instance.
+   * @exclude
+   */
+  public static ObjectSerializer getSerializer() {
+    return serializer;
   }
 }

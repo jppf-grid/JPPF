@@ -148,14 +148,12 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
 
   @Override
   public void writeFloat(final float val) throws IOException {
-    SerializationUtils.writeInt(Float.floatToIntBits(val), buf, 0);
-    out.write(buf, 0, 4);
+    writeInt(Float.floatToIntBits(val));
   }
 
   @Override
   public void writeDouble(final double val) throws IOException {
-    SerializationUtils.writeLong(Double.doubleToLongBits(val), buf, 0);
-    out.write(buf, 0, 8);
+    writeLong(Double.doubleToLongBits(val));
   }
 
   @Override

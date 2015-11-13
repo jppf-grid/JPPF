@@ -101,7 +101,7 @@ public class LocalNodeIO extends AbstractNodeIO {
     list.add(bundle);
     try {
       initializeBundleData(bundle);
-      if (debugEnabled) log.debug("bundle task count = " + count + ", hanshake = " + bundle.isHandshake());
+      if (debugEnabled) log.debug("bundle task count = " + count + ", handshake = " + bundle.isHandshake());
       if (!bundle.isHandshake()) {
         JPPFLocalContainer cont = (JPPFLocalContainer) node.getContainer(bundle.getUuidPath().getList());
         cont.getClassLoader().setRequestUuid(bundle.getUuid());
@@ -129,8 +129,9 @@ public class LocalNodeIO extends AbstractNodeIO {
     ExecutorService executor = node.getExecutionManager().getExecutor();
     finalizeBundleData(bundle, tasks);
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
-    futureList.add(executor.submit(new ObjectSerializationTask(bundle)));
-    for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task)));
+    JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
+    futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont.getSerializer(), cont.getClassLoader())));
+    for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
     LocalNodeContext ctx = channel.getChannel();
     LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
     for (Future<DataLocation> f: futureList) {

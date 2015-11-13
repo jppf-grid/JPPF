@@ -104,6 +104,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
 
   /**
    * Send tasks to the server for execution.
+   * @param ser the serializer to use.
    * @param cl classloader used for serialization.
    * @param header the task bundle to send to the driver.
    * @param job the job to execute remotely.
@@ -111,8 +112,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @throws Exception if an error occurs while sending the request.
    * @exclude
    */
-  public List<Task<?>> sendTasks(final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
-    ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
+  public List<Task<?>> sendTasks(final ObjectSerializer ser, final ClassLoader cl, final TaskBundle header, final JPPFJob job) throws Exception {
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
@@ -196,7 +196,9 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser); // null data provider
     socketClient.flush();
-    return receiveBundleAndResults(getClass().getClassLoader(), AbstractJPPFClient.SERIALIZATION_HELPER_IMPL).first();
+    ClassLoader loader = getClass().getClassLoader();
+    ser = makeHelper(loader).getSerializer();
+    return receiveBundleAndResults(ser, loader).first();
   }
 
   /**
@@ -226,14 +228,14 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
 
   /**
    * Receive results of tasks execution.
+   * @param ser the serializer to use.
    * @param cl the class loader to use for deserializing the tasks.
-   * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
    * @throws Exception if an error is raised while reading the results from the server.
    */
   @SuppressWarnings("unchecked")
-  private Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ClassLoader cl, final String helperClassName) throws Exception {
+  private Pair<TaskBundle, List<Task<?>>> receiveBundleAndResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
     List<Task<?>> taskList = new LinkedList<>();
     TaskBundle bundle = null;
     ClassLoader ctxCl = Thread.currentThread().getContextClassLoader();
@@ -241,7 +243,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       ClassLoader loader = cl == null ? getClass().getClassLoader() : cl;
       Thread.currentThread().setContextClassLoader(loader);
       SocketWrapper socketClient = taskServerConnection.getSocketClient();
-      ObjectSerializer ser = makeHelper(loader, helperClassName).getSerializer();
+      //ObjectSerializer ser = makeHelper(loader, helperClassName).getSerializer();
       bundle = (TaskBundle) IOHelper.unwrappedData(socketClient, ser);
       int count = bundle.getTaskCount();
       int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
@@ -283,6 +285,19 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
 
   /**
    * Receive results of tasks execution.
+   * @param ser the serializer to use.
+   * @param cl the context classloader to use to deserialize the results.
+   * @return a pair of objects representing the executed tasks results, and the index
+   * of the first result within the initial task execution request.
+   * @throws Exception if an error is raised while reading the results from the server.
+   * @exclude
+   */
+  public List<Task<?>> receiveResults(final ObjectSerializer ser, final ClassLoader cl) throws Exception {
+    return receiveBundleAndResults(ser, cl).second();
+  }
+
+  /**
+   * Receive results of tasks execution.
    * @param cl the context classloader to use to deserialize the results.
    * @return a pair of objects representing the executed tasks results, and the index
    * of the first result within the initial task execution request.
@@ -290,7 +305,8 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    * @exclude
    */
   public List<Task<?>> receiveResults(final ClassLoader cl) throws Exception {
-    return receiveBundleAndResults(cl, pool.getClient().getSerializationHelperClassName()).second();
+    ObjectSerializer ser = makeHelper(cl, pool.getClient().getSerializationHelperClassName()).getSerializer();
+    return receiveBundleAndResults(ser, cl).second();
   }
 
   /**
@@ -306,11 +322,23 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Instantiate a <code>SerializationHelper</code> using the current context class loader.
    * @param classLoader the class loader to use to load the serialization helper class.
+   * @return a <code>SerializationHelper</code> instance.
+   * @throws Exception if the serialization helper could not be instantiated.
+   * @exclude
+   */
+  public SerializationHelper makeHelper(final ClassLoader classLoader) throws Exception {
+    return makeHelper(classLoader, pool.getClient().getSerializationHelperClassName());
+  }
+
+  /**
+   * Instantiate a <code>SerializationHelper</code> using the current context class loader.
+   * @param classLoader the class loader to use to load the serialization helper class.
    * @param helperClassName the fully qualified class name of the serialization helper to use.
    * @return a <code>SerializationHelper</code> instance.
    * @throws Exception if the serialization helper could not be instantiated.
+   * @exclude
    */
-  SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
+  public SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
     ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
     Class clazz = null;
     for (ClassLoader cl: clArray) {
@@ -328,7 +356,6 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
   /**
    * Get the name assigned to this client connection.
    * @return the name as a string.
-   * @see org.jppf.client.JPPFClientConnection#getName()
    */
   @Override
   public String getName() {

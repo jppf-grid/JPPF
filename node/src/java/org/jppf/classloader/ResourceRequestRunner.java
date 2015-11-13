@@ -23,9 +23,7 @@ package org.jppf.classloader;
  * @author Laurent Cohen
  * @exclude
  */
-interface ResourceRequestRunner extends Runnable
-{
-
+interface ResourceRequestRunner extends Runnable {
   /**
    * Get the throwable eventually raised during communication with the server.
    * @return a {@link Throwable} instance.

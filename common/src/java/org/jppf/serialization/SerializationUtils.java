@@ -369,7 +369,7 @@ public final class SerializationUtils {
     if (n == 1) result = is.read();
     else {
       is.read(buf, 0, n);
-      for (int i=8*(n-1), pos=0; i>=0; i-=8) result += (buf[pos++] & 0xFF) << i;
+      for (int i=8*(n-1), pos=0; i>=0; i-=8) result += (long) (buf[pos++] & 0xFF) << i;
     }
     if ((b & SIGN_BIT) != 0) result = -result;
     return result;

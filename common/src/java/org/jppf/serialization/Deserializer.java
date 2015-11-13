@@ -21,7 +21,8 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -40,6 +41,14 @@ class Deserializer {
    * Determines whether the debug level is enabled in the log configuration, without the cost of a method call.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * 
+   */
+  static final AtomicInteger instanceCount = new AtomicInteger(0);
+  /**
+   * 
+   */
+  final int instanceNumber = instanceCount.incrementAndGet();
   /**
    * The underlying input stream.
    */
@@ -76,14 +85,6 @@ class Deserializer {
   Deserializer(final ObjectInputStream in) {
     this.in = in;
   }
-  /*
-  Deserializer(final ObjectInputStream in) throws IOException {
-    this.in = in;
-    readToBuf(0, 4);
-    if ( (buf[0] != Serializer.HEADER[0]) || (buf[1] != Serializer.HEADER[1]) || (buf[2] != Serializer.HEADER[2]) || (buf[3] != Serializer.HEADER[3]))
-      throw new IOException("bad header: " + StringUtils.toHexString(buf, 0, 4, " "));
-  }
-  */
 
   /**
    * Read an object graph from the stream.
@@ -118,7 +119,8 @@ class Deserializer {
   private void readObject(final int handle) throws Exception {
     String sig = readClassHandle();
     ClassDescriptor cd = caches.getDescriptor(sig, classloader);
-    if (cd.array) readArray(handle, cd);
+    if (cd.clazz == ConcurrentHashMap.class) readConcurrentHashMap(cd, handle);
+    else if (cd.array) readArray(handle, cd);
     else if (cd.enumType) {
       String name = readString();
       //if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(Exception e) {}
@@ -508,5 +510,29 @@ class Deserializer {
    */
   double readDouble() throws Exception {
     return Double.longBitsToDouble(readLong());
+  }
+
+  /**
+   * Special handling for {@link ConncurrentHashMap}s.
+   * @param cd the clas descriptor.
+   * @param handle handle of the object to deserialize.
+   * @throws Exception if any error occurs.
+   */
+  void readConcurrentHashMap(final ClassDescriptor cd, final int handle) throws Exception {
+    ClassDescriptor tmpDesc = null;
+    try {
+      tmpDesc = currentClassDescriptor;
+      currentClassDescriptor = cd;
+      ConcurrentHashMap map = new ConcurrentHashMap();
+      int size = readInt();
+      for (int i=0; i<size; i++) {
+        Object key = readObject();
+        Object value = readObject();
+        map.put(key, value);
+      }
+      caches.handleToObjectMap.put(handle, map);
+    } finally {
+      currentClassDescriptor = tmpDesc;
+    }
   }
 }

@@ -23,9 +23,7 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 import org.jppf.classloader.*;
 import org.jppf.io.*;
 import org.jppf.nio.*;
-import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.JPPFDriver;
-import org.jppf.utils.ObjectSerializerImpl;
 
 /**
  * Context object associated with a socket channel used by the class server of the JPPF driver.
@@ -57,9 +55,8 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    */
   public JPPFResourceWrapper deserializeResource() throws Exception {
     requestStartTime = System.nanoTime();
-    ObjectSerializer serializer = new ObjectSerializerImpl();
     DataLocation dl = ((BaseNioMessage) message).getLocations().get(0);
-    resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl);
+    resource = (JPPFResourceWrapper) IOHelper.unwrappedData(dl, JPPFDriver.getSerializer());
     return resource;
   }
 
@@ -68,8 +65,7 @@ public abstract class AbstractClassContext<S extends Enum<S>> extends SimpleNioC
    * @throws Exception if an error occurs while serializing.
    */
   public void serializeResource() throws Exception {
-    ObjectSerializer serializer = new ObjectSerializerImpl();
-    DataLocation location = IOHelper.serializeData(resource, serializer);
+    DataLocation location = IOHelper.serializeData(resource, JPPFDriver.getSerializer());
     message = new BaseNioMessage(getChannel());
     ((BaseNioMessage) message).addLocation(location);
   }

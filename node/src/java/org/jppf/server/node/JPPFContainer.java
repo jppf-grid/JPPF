@@ -23,7 +23,7 @@ import java.util.concurrent.locks.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.io.*;
-import org.jppf.serialization.SerializationHelper;
+import org.jppf.serialization.*;
 import org.jppf.utils.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
@@ -36,8 +36,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class JPPFContainer
-{
+public abstract class JPPFContainer {
   /**
    * Logger for this class.
    */
@@ -54,6 +53,10 @@ public abstract class JPPFContainer
    * Utility for deserialization and serialization.
    */
   protected SerializationHelper helper = null;
+  /**
+   * Utility for deserialization and serialization.
+   */
+  protected ObjectSerializer serializer = null;
   /**
    * Class loader used for dynamic loading and updating of client classes.
    */
@@ -77,8 +80,7 @@ public abstract class JPPFContainer
    * @param classLoader the class loader for this container.
    * @throws Exception if an error occurs while initializing.
    */
-  public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception
-  {
+  public JPPFContainer(final List<String> uuidPath, final AbstractJPPFClassLoader classLoader) throws Exception {
     if (debugEnabled) log.debug("new JPPFContainer with uuidPath=" + uuidPath + ", classLoader=" + classLoader);
     this.uuidPath = uuidPath;
     this.classLoader = classLoader;
@@ -89,8 +91,7 @@ public abstract class JPPFContainer
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
    */
-  public final void init() throws Exception
-  {
+  public final void init() throws Exception {
     initHelper();
   }
 
@@ -108,8 +109,7 @@ public abstract class JPPFContainer
    * Get the main class loader for this container.
    * @return a <code>ClassLoader</code> used for loading the classes of the framework.
    */
-  public AbstractJPPFClassLoader getClassLoader()
-  {
+  public AbstractJPPFClassLoader getClassLoader() {
     return classLoader;
   }
 
@@ -117,15 +117,11 @@ public abstract class JPPFContainer
    * Get the main class loader for this container.
    * @param classLoader a <code>ClassLoader</code> used for loading the classes of the framework.
    */
-  public void setClassLoader(final AbstractJPPFClassLoader classLoader)
-  {
+  public void setClassLoader(final AbstractJPPFClassLoader classLoader) {
     this.classLoader = classLoader;
-    try
-    {
+    try {
       initHelper();
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       log.error("error setting new class loader", e);
     }
   }
@@ -134,19 +130,17 @@ public abstract class JPPFContainer
    * Get the main classloader for the node. This method performs a lazy initialization of the classloader.
    * @throws Exception if an error occurs while instantiating the class loader.
    */
-  protected void initHelper() throws Exception
-  {
-    Class c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
-    Object o = c.newInstance();
-    helper = (SerializationHelper) o;
+  protected void initHelper() throws Exception {
+    Class<?> c = getClassLoader().loadJPPFClass("org.jppf.utils.SerializationHelperImpl");
+    helper = (SerializationHelper) c.newInstance();
+    serializer = helper.getSerializer();
   }
 
   /**
    * Get the unique identifier for the submitting application.
    * @return the application uuid as a string.
    */
-  public String getAppUuid()
-  {
+  public String getAppUuid() {
     return uuidPath.isEmpty() ? null : uuidPath.get(0);
   }
 
@@ -154,8 +148,7 @@ public abstract class JPPFContainer
    * Set the unique identifier for the submitting application.
    * @param uuidPath the application uuid as a string.
    */
-  public void setUuidPath(final List<String> uuidPath)
-  {
+  public void setUuidPath(final List<String> uuidPath) {
     this.uuidPath = uuidPath;
   }
 
@@ -163,8 +156,7 @@ public abstract class JPPFContainer
    * Instances of this class are used to deserialize objects from an
    * incoming message in parallel.
    */
-  protected class ObjectDeserializationTask implements Callable<Object>
-  {
+  protected class ObjectDeserializationTask implements Callable<Object> {
     /**
      * The data received over the network connection.
      */
@@ -179,8 +171,7 @@ public abstract class JPPFContainer
      * @param dl the data read from the network connection, stored in a memory-sensitive location.
      * @param index index of the object to deserialize in the incoming IO message; used for debugging purposes.
      */
-    public ObjectDeserializationTask(final DataLocation dl, final int index)
-    {
+    public ObjectDeserializationTask(final DataLocation dl, final int index) {
       this.dl = dl;
       this.index = index;
     }
@@ -190,40 +181,35 @@ public abstract class JPPFContainer
      * @return a deserialized object.
      */
     @Override
-    public Object call()
-    {
+    public Object call() {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      try
-      {
+      try {
         Thread.currentThread().setContextClassLoader(getClassLoader());
         if (traceEnabled) log.debug("deserializing object index = " + index);
         if (sequentialDeserialization) lock.lock();
-        try
-        {
-          return IOHelper.unwrappedData(dl, helper.getSerializer());
-        }
-        finally
-        {
+        try {
+          return IOHelper.unwrappedData(dl, serializer);
+        } finally {
           if (sequentialDeserialization) lock.unlock();
         }
-      }
-      catch(Throwable t)
-      {
-        /*
-        log.error(t.getMessage() + " [object index: " + index + ']', t);
-        return t;
-        */
+      } catch (Throwable t) {
         String desc = (index == 0 ? "data provider" : "task at index " + index) + " could not be deserialized";
         if (debugEnabled) log.debug("{} : {}", desc, ExceptionUtils.getStackTrace(t));
         else log.error("{} : {}", desc, ExceptionUtils.getMessage(t));
         Object result = null;
         if (index > 0) result = HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", desc, t);
         return result;
-      }
-      finally
-      {
+      } finally {
         Thread.currentThread().setContextClassLoader(cl);
       }
     }
+  }
+
+  /**
+   * Return the utility object for serialization and deserialization.
+   * @return an {@link ObjectSerializer} instance.
+   */
+  public ObjectSerializer getSerializer() {
+    return serializer;
   }
 }

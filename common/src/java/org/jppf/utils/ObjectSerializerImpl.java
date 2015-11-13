@@ -46,7 +46,6 @@ public class ObjectSerializerImpl implements ObjectSerializer {
    * @param o the object to Serialize.
    * @return a <code>JPPFBuffer</code> instance holding the serialized object.
    * @throws Exception if the object can't be serialized.
-   * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object)
    */
   @Override
   public JPPFBuffer serialize(final Object o) throws Exception {
@@ -59,11 +58,9 @@ public class ObjectSerializerImpl implements ObjectSerializer {
    * @param noCopy avoid copying intermediate buffers.
    * @return a <code>JPPFBuffer</code> instance holding the serialized object.
    * @throws Exception if the object can't be serialized.
-   * @see org.jppf.serialization.ObjectSerializer#serialize(java.lang.Object)
    */
   @Override
-  public JPPFBuffer serialize(final Object o, final boolean noCopy) throws Exception
-  {
+  public JPPFBuffer serialize(final Object o, final boolean noCopy) throws Exception {
     JPPFByteArrayOutputStream baos = new JPPFByteArrayOutputStream();
     serialize(o, baos);
     byte[] data = noCopy ? baos.getBuf() : baos.toByteArray();

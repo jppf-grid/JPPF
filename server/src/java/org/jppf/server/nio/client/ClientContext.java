@@ -22,12 +22,11 @@ import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.io.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
-import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.protocol.*;
@@ -62,10 +61,6 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    */
   protected ServerTaskBundleClient clientBundle = null;
   /**
-   * Helper used to serialize the bundle objects.
-   */
-  protected SerializationHelper helper = new SerializationHelperImpl();
-  /**
    * List of completed bundles to send to the client.
    */
   //protected final LinkedList<ServerTaskBundleClient> completedBundles = new LinkedList<>();
@@ -98,6 +93,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   @Override
   public void handleException(final ChannelWrapper<?> channel, final Exception e) {
     if (getClosed().compareAndSet(false, true)) {
+      if (debugEnabled && (e != null)) log.debug("exception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
       ClientNioServer.closeClient(channel);
       if (uuid != null) {
         ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
@@ -138,7 +134,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
     if (traceEnabled) log.trace("serializing bundle with tasks postions={}", StringUtils.buildString(positions));
     bundle.setParameter(BundleParameter.TASK_POSITIONS, positions);
     bundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
-    message.addLocation(IOHelper.serializeData(bundle, helper.getSerializer()));
+    message.addLocation(IOHelper.serializeData(bundle, JPPFDriver.getSerializer()));
     for (ServerTask task: tasks) message.addLocation(task.getResult());
     message.setBundle(bundle);
     setClientMessage(message);

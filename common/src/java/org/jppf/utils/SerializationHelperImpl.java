@@ -40,15 +40,13 @@ public class SerializationHelperImpl implements SerializationHelper {
    * Get the object serializer for this helper.
    * @return an <code>ObjectSerializer</code> instance.
    * @throws Exception if the object serializer could not be instantiated.
-   * @see org.jppf.serialization.SerializationHelper#getSerializer()
    */
   @Override
   public ObjectSerializer getSerializer() throws Exception {
     synchronized(this) {
       if (serializer == null) {
         ClassLoader cl = getClass().getClassLoader();
-        Class<?> clazz = null;
-        clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
+        Class<?> clazz = cl.loadClass("org.jppf.utils.ObjectSerializerImpl");
         serializer = (ObjectSerializer) clazz.newInstance();
       }
     }

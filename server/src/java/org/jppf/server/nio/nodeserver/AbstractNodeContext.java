@@ -31,7 +31,6 @@ import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.nio.*;
 import org.jppf.node.protocol.*;
-import org.jppf.serialization.SerializationHelper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.server.protocol.*;
@@ -64,10 +63,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Bundler used to schedule tasks for the corresponding node.
    */
   protected Bundler bundler = null;
-  /**
-   * Helper used to serialize the bundle objects.
-   */
-  protected SerializationHelper helper = new SerializationHelperImpl();
   /**
    * Represents the node system information.
    */
@@ -249,7 +244,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
       taskBundle.setParameter(BundleParameter.NODE_BUNDLE_ID, bundle.getId());
       if (!isPeer()) taskBundle.removeParameter(BundleParameter.TASK_MAX_RESUBMITS);
     }
-    message.addLocation(IOHelper.serializeData(taskBundle, helper.getSerializer()));
+    message.addLocation(IOHelper.serializeData(taskBundle, JPPFDriver.getSerializer()));
     message.addLocation(bundle.getDataProvider());
     for (ServerTask task: bundle.getTaskList()) message.addLocation(task.getInitialTask());
     message.setBundle(bundle.getJob());

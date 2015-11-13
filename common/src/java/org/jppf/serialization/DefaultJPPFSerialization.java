@@ -54,6 +54,7 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     Serializer serializer = null;
     try {
       serializer = serializerPool.get();
+      //System.out.printf("serializing %s with serializer#%-6d%n", StringUtils.toIdentityString(o), serializer.instanceNumber);
       new JPPFObjectOutputStream(os, serializer).writeObject(o);
     } finally {
       if (serializer != null) serializerPool.put(serializer);
@@ -74,6 +75,7 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     Deserializer deserializer = null;
     try {
       deserializer = deserializerPool.get();
+      //System.out.printf("deserializing with serializer#%-6d%n", deserializer.instanceNumber);
       return new JPPFObjectInputStream(is, deserializer).readObject();
     } finally {
       if (deserializer != null) deserializerPool.put(deserializer);
@@ -110,7 +112,6 @@ public class DefaultJPPFSerialization implements JPPFSerialization {
     @Override
     public void put(final Deserializer deserializer) {
       deserializer.caches.handleToObjectMap.clear();
-      //deserializer.caches.handleToClassMap.clear();
       super.put(deserializer);
     }
   };

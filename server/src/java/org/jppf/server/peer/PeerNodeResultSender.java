@@ -22,9 +22,9 @@ import java.util.List;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.TaskBundle;
-import org.jppf.serialization.SerializationHelper;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.protocol.*;
-import org.jppf.utils.*;
+import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
 /**
@@ -46,10 +46,6 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener 
    * Output destination wrapping all write operations on the socket client.
    */
   private final OutputDestination destination;
-  /**
-   * Used to serialize and deserialize the tasks data.
-   */
-  protected SerializationHelper helper = new SerializationHelperImpl();
   /**
    * The socket client used to communicate over a socket connection.
    */
@@ -91,7 +87,7 @@ class PeerNodeResultSender implements ServerTaskBundleClient.CompletionListener 
     //bundle.setSLA(null);
     //bundle.setMetadata(null);
     if (debugEnabled) log.debug("Sending bundle with " + clientBundle.getTaskList().size() + " tasks: " + bundle);
-    IOHelper.sendData(socketClient, bundle, helper.getSerializer());
+    IOHelper.sendData(socketClient, bundle, JPPFDriver.getSerializer());
     for (ServerTask task : clientBundle.getTaskList()) IOHelper.writeData(task.getResult(), destination);
     socketClient.flush();
     if (debugEnabled) log.debug("bundle sent");

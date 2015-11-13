@@ -228,7 +228,8 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   private void readFields0(final Map<String, Object> map) throws Exception {
     int n = readInt();
     for (int i=0; i<n; i++) {
-      String name = (String) deserializer.readObject();
+      Object o = deserializer.readObject();
+      String name = (String) o;
       Object value = (Object) deserializer.readObject();
       map.put(name, value);
     }

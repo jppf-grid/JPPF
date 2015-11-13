@@ -32,48 +32,34 @@ import org.jppf.utils.streams.StreamUtils;
  * @author Laurent Cohen
  * @exclude
  */
-public class CustomWrapping implements ObjectWrapping
-{
+public class CustomWrapping implements ObjectWrapping {
   /**
    * 
    */
-  private ObjectSerializer serializer = new BootstrapObjectSerializer();
+  private static ObjectSerializer serializer = new BootstrapObjectSerializer();
 
   @Override
-  public Object unwrap(final Object wrapped, final ClassLoader cl) throws IOException, ClassNotFoundException
-  {
-    try
-    {
+  public Object unwrap(final Object wrapped, final ClassLoader cl) throws IOException, ClassNotFoundException {
+    try {
       return IOHelper.unwrappedData(new MultipleBuffersLocation((byte[]) wrapped), serializer);
-    }
-    catch(IOException e)
-    {
+      //return IOHelper.unwrappedData(new MultipleBuffersLocation((byte[]) wrapped));
+    } catch (IOException e) {
       throw e;
-    }
-    catch(ClassNotFoundException e)
-    {
+    } catch (ClassNotFoundException e) {
       throw e;
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       throw new IOException(e);
     }
   }
 
   @Override
-  public Object wrap(final Object obj) throws IOException
-  {
-    try
-    {
+  public Object wrap(final Object obj) throws IOException {
+    try {
       DataLocation dl = IOHelper.serializeData(obj, serializer);
       return StreamUtils.getInputStreamAsByte(dl.getInputStream());
-    }
-    catch(IOException e)
-    {
+    } catch (IOException e) {
       throw e;
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       throw new IOException(e);
     }
   }

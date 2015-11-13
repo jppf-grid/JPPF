@@ -27,8 +27,7 @@ import java.util.*;
  * @author Laurent Cohen
  * @exclude
  */
-class JPPFPutField extends PutField
-{
+class JPPFPutField extends PutField {
   /**
    * Map of names to primitive values.
    */
@@ -46,68 +45,57 @@ class JPPFPutField extends PutField
    * Initialize this put field with the specified class descriptor.
    * @param out the stream to write the fields to.
    */
-  public JPPFPutField(final ObjectOutputStream out)
-  {
+  public JPPFPutField(final ObjectOutputStream out) {
     this.out = out;
   }
 
   @Override
-  public void put(final String name, final boolean val)
-  {
+  public void put(final String name, final boolean val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final byte val)
-  {
+  public void put(final String name, final byte val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final char val)
-  {
+  public void put(final String name, final char val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final short val)
-  {
+  public void put(final String name, final short val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final int val)
-  {
+  public void put(final String name, final int val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final long val)
-  {
+  public void put(final String name, final long val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final float val)
-  {
+  public void put(final String name, final float val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final double val)
-  {
+  public void put(final String name, final double val) {
     primitiveFields.put(name, val);
   }
 
   @Override
-  public void put(final String name, final Object val)
-  {
+  public void put(final String name, final Object val) {
     objectFields.put(name, val);
   }
 
   @Override
-  public void write(final ObjectOutput out) throws IOException
-  {
+  public void write(final ObjectOutput out) throws IOException {
     if (out != this.out) throw new IOException("not using the right stream");
     this.out.writeFields();
   }

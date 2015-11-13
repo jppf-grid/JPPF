@@ -28,6 +28,7 @@ import org.jppf.client.event.*;
 import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
+import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -216,14 +217,15 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           bundle.setUuid(uuid);
           bundle.setInitialTaskCount(clientBundle.getClientJob().initialTaskCount);
           ClassLoader cl = loaders.isEmpty() ? null : loaders.iterator().next();
-          List<Task<?>> notSerializableTasks = connection.sendTasks(cl, bundle, newJob);
+          ObjectSerializer ser = connection.makeHelper(cl).getSerializer();
+          List<Task<?>> notSerializableTasks = connection.sendTasks(ser, cl, bundle, newJob);
           if (!notSerializableTasks.isEmpty()) {
             if (debugEnabled) log.debug(String.format("%s got %d non-serializable tasks", ChannelWrapperRemote.this, notSerializableTasks.size()));
             count += notSerializableTasks.size();
             clientBundle.resultsReceived(notSerializableTasks);
           }
           while (count < tasks.size()) {
-            List<Task<?>> results = connection.receiveResults(cl);
+            List<Task<?>> results = connection.receiveResults(ser, cl);
             int n = results.size();
             count += n;
             if (debugEnabled) log.debug("received " + n + " tasks from server" + (n > 0 ? ", first position=" + results.get(0).getPosition() : ""));

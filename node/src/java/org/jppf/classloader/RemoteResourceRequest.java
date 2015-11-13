@@ -26,8 +26,7 @@ import org.jppf.serialization.ObjectSerializer;
  * Encapsulates a remote resource request submitted asynchronously
  * via the single-thread executor.
  */
-class RemoteResourceRequest extends AbstractResourceRequest
-{
+class RemoteResourceRequest extends AbstractResourceRequest {
   /**
    * Used to serialize the requets and deserialze the response.
    */
@@ -44,11 +43,9 @@ class RemoteResourceRequest extends AbstractResourceRequest
    * @param socketClient the socket client used to get response for request.
    * @throws Exception if any error occurs.
    */
-  public RemoteResourceRequest(final JPPFResourceWrapper request, final ObjectSerializer serializer, final SocketWrapper socketClient) throws Exception
-  {
+  public RemoteResourceRequest(final JPPFResourceWrapper request, final ObjectSerializer serializer, final SocketWrapper socketClient) throws Exception {
     super(request);
     if (socketClient == null) throw new IllegalArgumentException("socketClient is null");
-    
     this.serializer = serializer;
     this.socketClient = socketClient;
   }
@@ -59,25 +56,19 @@ class RemoteResourceRequest extends AbstractResourceRequest
    * @param socketClient the socket client used to get response for request.
    * @throws Exception if any error occurs.
    */
-  public RemoteResourceRequest(final ObjectSerializer serializer, final SocketWrapper socketClient) throws Exception
-  {
+  public RemoteResourceRequest(final ObjectSerializer serializer, final SocketWrapper socketClient) throws Exception {
     if (socketClient == null) throw new IllegalArgumentException("socketClient is null");
-
     this.serializer = serializer;
     this.socketClient = socketClient;
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       throwable = null;
       IOHelper.sendData(socketClient, request, serializer);
       response = (JPPFResourceWrapper) IOHelper.unwrappedData(socketClient, serializer);
-    }
-    catch (Throwable t)
-    {
+    } catch (Throwable t) {
       throwable = t;
     }
   }

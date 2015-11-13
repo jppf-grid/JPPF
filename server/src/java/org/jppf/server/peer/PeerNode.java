@@ -207,7 +207,8 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
   private ServerTaskBundleClient readBundle() throws Exception {
     // Read the request header - with task count information
     if (debugEnabled) log.debug("waiting for next request");
-    TaskBundle header = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ((RemotePeerConnection) nodeConnection).helper.getSerializer());
+    //TaskBundle header = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ((RemotePeerConnection) nodeConnection).helper.getSerializer());
+    TaskBundle header = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), JPPFDriver.getSerializer());
     int count = header.getTaskCount();
     if (debugEnabled) log.debug(getName() + " received header from peer driver: " + header + " with " + count + " tasks");
 

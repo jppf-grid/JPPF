@@ -21,7 +21,8 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -69,6 +70,14 @@ class Serializer {
    */
   static final byte STRING_HEADER = 5;
   /**
+   * 
+   */
+  static final AtomicInteger instanceCount = new AtomicInteger(0);
+  /**
+   * 
+   */
+  final int instanceNumber = instanceCount.incrementAndGet();
+  /**
    * The stream serialized data is written to.
    */
   ObjectOutputStream out;
@@ -96,12 +105,6 @@ class Serializer {
   Serializer(final ObjectOutputStream out) {
     this.out = out;
   }
-  /*
-  Serializer(final ObjectOutputStream out) throws IOException {
-    this.out = out;
-    //out.write(HEADER);
-  }
-  */
 
   /**
    * Write the specified object to the output stream.
@@ -141,7 +144,8 @@ class Serializer {
     writeHeaderAndHandle(OBJECT_HEADER, handle);
     writeClassHandle(cd);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
-    if (cd.array) writeArray(obj, cd);
+    if (cd.clazz == ConcurrentHashMap.class) writeConcurrentHashMap(cd, obj);
+    else if (cd.array) writeArray(obj, cd);
     else if (cd.enumType) writeString(((Enum) obj).name());
     else writeFields(obj, cd);
   }
@@ -366,7 +370,6 @@ class Serializer {
       char[] chars = SerializationReflectionHelper.getStringValue(s);
       for (int count=0; count<len;) {
         int n = Math.min(buf.length / 2, len - count);
-        //for (int i=0; i<2*n; i+=2) SerializationUtils.writeChar(s.charAt(count++), buf, i);
         for (int i=0; i<2*n; i+=2) SerializationUtils.writeChar(chars[count++], buf, i);
         out.write(buf, 0, 2*n);
       }
@@ -450,5 +453,31 @@ class Serializer {
    */
   void writeDouble(final double value) throws Exception {
    writeLong(Double.doubleToLongBits(value));
+  }
+
+  /**
+   * Special handling for {@link ConncurrentHashMap}s.
+   * @param cd the clas descriptor.
+   * @param obj the {@link ConncurrentHashMap} to serialize
+   * @throws Exception if any error occurs.
+   */
+  void writeConcurrentHashMap(final ClassDescriptor cd, final Object obj) throws Exception {
+    if (cd.clazz == ConcurrentHashMap.class) {
+      ConcurrentHashMap map = (ConcurrentHashMap) obj;
+      ClassDescriptor tmpDesc = null;
+      try {
+        tmpDesc = currentClassDescriptor;
+        currentClassDescriptor = cd;
+        writeInt(map.size());
+        //Object r = map.
+        for (Object o: map.entrySet()) {
+          Map.Entry entry = (Map.Entry) o;
+          writeObject(entry.getKey());
+          writeObject(entry.getValue());
+        }
+      } finally {
+        currentClassDescriptor = tmpDesc;
+      }
+    }
   }
 }

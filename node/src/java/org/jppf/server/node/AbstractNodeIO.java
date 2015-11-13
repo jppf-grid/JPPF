@@ -196,7 +196,7 @@ public abstract class AbstractNodeIO implements NodeIO {
    * @param tasks the list of tasks after they have been executed.
    */
   protected void finalizeBundleData(final TaskBundle bundle, final List<Task<?>> tasks) {
-    long elapsed = (System.nanoTime() - bundle.getNodeExecutionTime());
+    long elapsed = System.nanoTime() - bundle.getNodeExecutionTime();
     bundle.setNodeExecutionTime(elapsed);
     Set<Integer> resubmitSet = new HashSet<>();
     for (Task<?> task: tasks) {
@@ -235,24 +235,36 @@ public abstract class AbstractNodeIO implements NodeIO {
      * The data to send over the network connection.
      */
     private final Object object;
+    /**
+     * Used to serialize the object.
+     */
+    private final ObjectSerializer serializer;
+    /**
+     * The context class loader to use.
+     */
+    private final ClassLoader contextCL;
 
     /**
      * Initialize this task with the specified data buffer.
      * @param object the object to serialize.
+     * @param serializer used to serialize the object.
+     * @param contextCL the context class loader to use.
      */
-    public ObjectSerializationTask(final Object object) {
+    public ObjectSerializationTask(final Object object, final ObjectSerializer serializer, final ClassLoader contextCL) {
       this.object = object;
+      this.serializer = serializer;
+      this.contextCL = contextCL;
     }
 
     @Override
     public DataLocation call() {
-      ObjectSerializer ser = null;
       DataLocation dl = null;
       int p = (object instanceof Task) ? ((Task) object).getPosition() : -1;
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();
       try {
-        ser = node.getHelper().getSerializer();
+        Thread.currentThread().setContextClassLoader(contextCL);
         if (traceEnabled) log.trace("before serialization of object at position " + p);
-        dl = IOHelper.serializeData(object, ser);
+        dl = IOHelper.serializeData(object, serializer);
         int size = dl.getSize();
         if (traceEnabled) log.trace("serialized object at position " + p + ", size = " + size);
       } catch(Throwable t) {
@@ -260,10 +272,12 @@ public abstract class AbstractNodeIO implements NodeIO {
         try {
           JPPFExceptionResult result = (JPPFExceptionResult) HookFactory.invokeSingleHook(SerializationExceptionHook.class, "buildExceptionResult", object, t);
           result.setPosition(p);
-          dl = IOHelper.serializeData(result, ser);
+          dl = IOHelper.serializeData(result, serializer);
         } catch(Exception e2) {
           log.error(e2.getMessage(), e2);
         }
+      } finally {
+        Thread.currentThread().setContextClassLoader(contextCL);
       }
       return dl;
     }
