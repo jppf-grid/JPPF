@@ -7,7 +7,7 @@
     <title>JPPF Patches
 </title>
     <meta name="description" content="The open source grid computing solution">
-    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
+    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
     <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
@@ -15,7 +15,8 @@
 	<body>
 		<div align="center">
 		<div class="gwrapper" align="center">
-			<?php
+			<div style="display: none">JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net</div>
+    <?php
     if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
       if (($currentPage == NULL) || ($currentPage == "")) {
@@ -147,9 +148,9 @@
     while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 ?>
     <!--<div style="background-color: white; border-radius: 10px">-->
-    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-top: solid 1px #6D78B6; margin_left: -5px; margin-right: -8px">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-top: solid 1px #B5C0E0; margin_left: -5px; margin-right: -8px">
     <tr>
-      <td valign="top" width="80px" class="patch_cell" style="border-right: solid 1px #6D78B6"><a href="patch_info.php?patch_id=<?php echo $line['id'] ?>"><b>patch <?php echo $line['patch_number'] ?></b></a></td>
+      <td valign="top" width="80px" class="patch_cell" style="border-right: solid 1px #B5C0E0"><a href="patch_info.php?patch_id=<?php echo $line['id'] ?>"><b>patch <?php echo $line['patch_number'] ?></b></a></td>
 <?php
       $port = ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'];
 ?>

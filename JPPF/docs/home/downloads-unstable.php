@@ -8,7 +8,7 @@
     <title>JPPF Downloads - unstable
 </title>
     <meta name="description" content="The open source grid computing solution">
-    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
+    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
     <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
@@ -16,7 +16,8 @@
 	<body>
 		<div align="center">
 		<div class="gwrapper" align="center">
-			<?php
+			<div style="display: none">JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net</div>
+    <?php
     if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
       if (($currentPage == NULL) || ($currentPage == "")) {
@@ -108,7 +109,7 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
-      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h2>&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
 </div>
       <h3>Deployable module binaries</h3>
@@ -140,7 +141,7 @@
   </div>
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
-      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h2>&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Please note</h2>
 </div>
       <p style="font-style: italic; font-weight: bold">JPPF 5.1 beta is a preview release and is not intended for deployment in production.
@@ -149,7 +150,7 @@
     </div>
     <br>
     <div class="blockWithHighlightedTitle">
-      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3>&nbsp;<img src="images/icons/documentation.png" class="titleWithIcon"/>Documentation preview</h3>
 </div>
       <p>Doc preview for the major new features:
@@ -161,7 +162,7 @@
     </div>
     <br>
     <div class="blockWithHighlightedTitle">
-      <div align="left" style="border-bottom: solid 1px #6D78B6; padding: 0px; margin-left: -5px; margin-right: -8px">
+      <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3>&nbsp;<img src="images/icons/folder-download.png" class="titleWithIcon"/>All JPPF releases</h3>
 </div>
       <br>All JPPF files can be found from <a href="http://sourceforge.net/projects/jppf-project/files/jppf-project"><b>this location</b></a>.<br/>&nbsp;

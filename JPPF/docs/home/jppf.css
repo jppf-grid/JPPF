@@ -219,7 +219,10 @@ pre.samples { margin-top: 0px; margin-bottom: 0px; background: #D8D8D8; }
   box-shadow: inset -3px -3px 4px #B5C0E0;
   box-shadow: inset -3px -3px 4px #6D78B6;
   */
+  border: solid 1px #E8EAFD;
+  /*
   border: solid 1px #6D78B6;
+  */
   border-radius: 10px;
   padding: 0px;
   padding-left: 5px;

@@ -7,7 +7,7 @@
     <title>JPPF Patches
 </title>
     <meta name="description" content="The open source grid computing solution">
-    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source">
+    <meta name="keywords" content="JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net">
     <meta HTTP-EQUIV="Content-Type" content="text/html; charset=UTF-8">
     <link rel="shortcut icon" href="images/jppf-icon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="/jppf.css" title="Style">
@@ -15,7 +15,8 @@
 	<body>
 		<div align="center">
 		<div class="gwrapper" align="center">
-			<?php
+			<div style="display: none">JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net</div>
+    <?php
     if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
       if (($currentPage == NULL) || ($currentPage == "")) {
@@ -119,15 +120,15 @@
 ?>
   <br><div class="blockWithHighlightedTitle">
   <h1>JPPF <?php echo $jppf_ver ?> patch <?php echo $patch_number ?></h1>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  <div style="border-bottom: solid 1px #B5C0E0; height: 10px; margin-left: -5px; margin-right: -8px"></div>
 <?php
   $downloadLink = "<a href='/private/patch/" . $patch_url . "'>" . $patch_url . "</a>";
 ?>
   <h3><img src="images/icons/download.png" class="titleWithIcon"/>Download: <?php echo $downloadLink ?></h3>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  <div style="border-bottom: solid 1px #B5C0E0; height: 10px; margin-left: -5px; margin-right: -8px"></div>
   <h3><img src="images/icons/view-list.png" class="titleWithIcon"/>Description (included readme.txt):</h3>
   <?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  <div style="border-bottom: solid 1px #B5C0E0; height: 10px; margin-left: -5px; margin-right: -8px"></div>
   <h3><img src="images/icons/bug.png" class="titleWithIcon"/>Fixed bugs:</h3>
   <ul class="samplesList">
 <?php

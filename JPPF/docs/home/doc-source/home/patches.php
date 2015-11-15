@@ -48,9 +48,9 @@ $template{name="about-page-header" title="Patches"}$
     while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 ?>
     <!--<div style="background-color: white; border-radius: 10px">-->
-    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-top: solid 1px #6D78B6; margin_left: -5px; margin-right: -8px">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-top: solid 1px #B5C0E0; margin_left: -5px; margin-right: -8px">
     <tr>
-      <td valign="top" width="80px" class="patch_cell" style="border-right: solid 1px #6D78B6"><a href="patch_info.php?patch_id=<?php echo $line['id'] ?>"><b>patch <?php echo $line['patch_number'] ?></b></a></td>
+      <td valign="top" width="80px" class="patch_cell" style="border-right: solid 1px #B5C0E0"><a href="patch_info.php?patch_id=<?php echo $line['id'] ?>"><b>patch <?php echo $line['patch_number'] ?></b></a></td>
 <?php
       $port = ($_SERVER['SERVER_PORT'] == 80) ? '' : ':' . $_SERVER['SERVER_PORT'];
 ?>

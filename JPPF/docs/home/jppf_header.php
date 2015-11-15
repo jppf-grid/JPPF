@@ -1,4 +1,5 @@
-<?php
+<div style="display: none">JPPF, java, parallel computing, distributed computing, grid computing, parallel, distributed, cluster, grid, cloud, open source, android, .net</div>
+    <?php
     if (!isset($currentPage)) {
       $currentPage = $_REQUEST["page"];
       if (($currentPage == NULL) || ($currentPage == "")) {

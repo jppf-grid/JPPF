@@ -20,18 +20,18 @@ $template{name="about-page-header" title="Patches"}$
 ?>
   <br><div class="blockWithHighlightedTitle">
   <h1>JPPF <?php echo $jppf_ver ?> patch <?php echo $patch_number ?></h1>
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  <div style="border-bottom: solid 1px #B5C0E0; height: 10px; margin-left: -5px; margin-right: -8px"></div>
 
 <?php
   $downloadLink = "<a href='/private/patch/" . $patch_url . "'>" . $patch_url . "</a>";
 ?>
   $template{name="title-with-icon" img="images/icons/download.png" title="Download: <?php echo $downloadLink ?>" heading="h3"}$
 
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  <div style="border-bottom: solid 1px #B5C0E0; height: 10px; margin-left: -5px; margin-right: -8px"></div>
   $template{name="title-with-icon" img="images/icons/view-list.png" title="Description (included readme.txt):" heading="h3"}$
   <?php echo preg_replace('/\n/', '<br/>', $line['readme']) ?>
 
-  <div style="border-bottom: solid 1px #6D78B6; height: 10px; margin-left: -5px; margin-right: -8px"></div>
+  <div style="border-bottom: solid 1px #B5C0E0; height: 10px; margin-left: -5px; margin-right: -8px"></div>
   $template{name="title-with-icon" img="images/icons/bug.png" title="Fixed bugs:" heading="h3"}$
   <ul class="samplesList">
 <?php
