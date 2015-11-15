@@ -46,7 +46,7 @@ public final class SerializationUtils {
   /**
    * .
    */
-  private static final int[] INT_MAX_VALUES = { 128, 128 << 8, 128 << 16 };
+  static final int[] INT_MAX_VALUES = { 128, 128 << 8, 128 << 16 };
   /**
    * .
    */
@@ -54,7 +54,7 @@ public final class SerializationUtils {
   /**
    * 
    */
-  public static int TEMP_BUFFER_SIZE = 4096;
+  public static int TEMP_BUFFER_SIZE = 2048;
 
   /**
    * Instantiation of this class is not permitted.

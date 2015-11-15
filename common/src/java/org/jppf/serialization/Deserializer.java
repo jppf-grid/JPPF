@@ -20,7 +20,7 @@ package org.jppf.serialization;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.Deque;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,11 +42,11 @@ class Deserializer {
    */
   private static boolean traceEnabled = log.isTraceEnabled();
   /**
-   * 
+   * Count of instances of this class, used for debugging.
    */
   static final AtomicInteger instanceCount = new AtomicInteger(0);
   /**
-   * 
+   * Sequence number for this instance, used for debugging.
    */
   final int instanceNumber = instanceCount.incrementAndGet();
   /**
@@ -119,8 +119,7 @@ class Deserializer {
   private void readObject(final int handle) throws Exception {
     String sig = readClassHandle();
     ClassDescriptor cd = caches.getDescriptor(sig, classloader);
-    if (cd.clazz == ConcurrentHashMap.class) readConcurrentHashMap(cd, handle);
-    else if (cd.array) readArray(handle, cd);
+    if (cd.array) readArray(handle, cd);
     else if (cd.enumType) {
       String name = readString();
       //if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(Exception e) {}
@@ -163,7 +162,8 @@ class Deserializer {
       tmpDesc = tmpDesc.superClass;
     }
     for (ClassDescriptor desc: stack) {
-      if (desc.hasReadWriteObject) {
+      if (desc.clazz == ConcurrentHashMap.class) readConcurrentHashMapFields(desc, (ConcurrentHashMap) obj);
+      else if (desc.hasReadWriteObject) {
         Method m = desc.readObjectMethod;
         if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(Exception e) {}
         try {
@@ -513,24 +513,27 @@ class Deserializer {
   }
 
   /**
-   * Special handling for {@link ConncurrentHashMap}s.
+   * Special handling for {@link ConcurrentHashMap}s.
    * @param cd the clas descriptor.
-   * @param handle handle of the object to deserialize.
+   * @param map the object to initialize.
    * @throws Exception if any error occurs.
    */
-  void readConcurrentHashMap(final ClassDescriptor cd, final int handle) throws Exception {
+  void readConcurrentHashMapFields(final ClassDescriptor cd, final ConcurrentHashMap map) throws Exception {
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = currentClassDescriptor;
       currentClassDescriptor = cd;
-      ConcurrentHashMap map = new ConcurrentHashMap();
+      ConcurrentHashMap tmp = new ConcurrentHashMap();
+      for (FieldDescriptor fd: cd.fields) {
+        Object val = fd.field.get(tmp);
+        fd.field.set(map, val);
+      }
       int size = readInt();
       for (int i=0; i<size; i++) {
         Object key = readObject();
         Object value = readObject();
         map.put(key, value);
       }
-      caches.handleToObjectMap.put(handle, map);
     } finally {
       currentClassDescriptor = tmpDesc;
     }

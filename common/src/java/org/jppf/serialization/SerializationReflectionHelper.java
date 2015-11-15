@@ -21,6 +21,7 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jppf.JPPFException;
 import org.jppf.utils.Pair;
@@ -94,6 +95,10 @@ public final class SerializationReflectionHelper {
    */
   private static final Object NO_MEMBER = new Object();
   /**
+   * 
+   */
+  private static final Set<Class<?>> TRANSIENT_EXCEPTION_CLASSES = initTransientExceptionClasses();
+  /**
    * The field "private final char{] value" in String.
    */
   private static Field STRING_VALUE_FIELD;
@@ -118,10 +123,11 @@ public final class SerializationReflectionHelper {
       Field[] allFields = clazz.getDeclaredFields();
       if (allFields.length <= 0) result = NO_FIELDS;
       else {
-        Field[] fields = new Field[allFields.length];
         int count = 0;
+        int mods = TRANSIENT_EXCEPTION_CLASSES.contains(clazz) ? Modifier.STATIC : NON_PERSISTENT_MODIFIERS;
+        Field[] fields = new Field[allFields.length];
         for (Field f : allFields) {
-          if ((f.getModifiers() & NON_PERSISTENT_MODIFIERS) == 0) fields[count++] = f;
+          if ((f.getModifiers() & mods) == 0) fields[count++] = f;
         }
         if (count == 0) result = NO_FIELDS;
         else {
@@ -269,11 +275,9 @@ public final class SerializationReflectionHelper {
   static {
     try {
       rfClass = Class.forName("sun.reflect.ReflectionFactory");
-    } catch (Throwable t) {
-    }
-    if (rfClass != null) {
       rf = initializeRF();
       if (rf != null) rfMethod = initializeRFMethod();
+    } catch (Throwable t) {
     }
   }
 
@@ -286,8 +290,7 @@ public final class SerializationReflectionHelper {
   private static Object initializeRF() {
     try {
       Method m = rfClass.getDeclaredMethod("getReflectionFactory");
-      Object o = m.invoke(null);
-      return o;
+      return m.invoke(null);
     } catch (Throwable t) {
     }
     return null;
@@ -449,5 +452,21 @@ public final class SerializationReflectionHelper {
    */
   public static char[] getStringValue(final String s) throws Exception {
     return (char[]) STRING_VALUE_FIELD.get(s);
+  }
+
+  /**
+   * 
+   * @return .
+   */
+  private static Set<Class<?>> initTransientExceptionClasses() {
+    Set<Class<?>> result = new HashSet<>();
+    try {
+      result.add(ConcurrentHashMap.class);
+      result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$Segment"));
+      result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$HashEntry"));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
   }
 }

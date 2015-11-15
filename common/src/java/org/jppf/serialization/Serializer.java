@@ -46,10 +46,6 @@ class Serializer {
    */
   static final byte[] HEADER = { 74, 80, 80, 70 };
   /**
-   * .
-   */
-  private static final int[] HANDLE_MAX_VALUES = { 128, 128 << 8, 128 << 16 };
-  /**
    * Header written before a class descriptor.
    */
   static final byte CLASS_HEADER = 1;
@@ -144,8 +140,7 @@ class Serializer {
     writeHeaderAndHandle(OBJECT_HEADER, handle);
     writeClassHandle(cd);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
-    if (cd.clazz == ConcurrentHashMap.class) writeConcurrentHashMap(cd, obj);
-    else if (cd.array) writeArray(obj, cd);
+    if (cd.array) writeArray(obj, cd);
     else if (cd.enumType) writeString(((Enum) obj).name());
     else writeFields(obj, cd);
   }
@@ -179,7 +174,8 @@ class Serializer {
       tmpDesc = tmpDesc.superClass;
     }
     for (ClassDescriptor desc: stack) {
-      if (desc.hasReadWriteObject) {
+      if (desc.clazz == ConcurrentHashMap.class) writeConcurrentHashMap(desc, obj);
+      else if (desc.hasReadWriteObject) {
         Method m = desc.writeObjectMethod;
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
         try {
@@ -385,8 +381,8 @@ class Serializer {
   void writeHeaderAndHandle(final byte header, final int handle)  throws Exception {
     byte b = header;
     byte n = 4;
-    for (int i=0; i<HANDLE_MAX_VALUES.length; i++) {
-      if (handle < HANDLE_MAX_VALUES[i]) {
+    for (int i=0; i<SerializationUtils.INT_MAX_VALUES.length; i++) {
+      if (handle < SerializationUtils.INT_MAX_VALUES[i]) {
         n = (byte) (i + 1);
         break;
       }
@@ -405,18 +401,6 @@ class Serializer {
    */
   void writeClassHandle(final ClassDescriptor cd)  throws Exception {
     writeString(cd.signature);
-    /*
-    byte n = 3;
-    for (int i=0; i<2; i++) {
-      if (handle < HANDLE_MAX_VALUES[i]) {
-        n = (byte) (i + 1);
-        break;
-      }
-    }
-    buf[0] = n;
-    for (int i=8*(n-1), pos=1; i>=0; i-=8) buf[pos++] = (byte) ((handle >>> i) & 0xFF);
-    out.write(buf, 0, n+1);
-    */
   }
 
   /**
@@ -456,28 +440,25 @@ class Serializer {
   }
 
   /**
-   * Special handling for {@link ConncurrentHashMap}s.
+   * Special handling for {@link ConcurrentHashMap}s.
    * @param cd the clas descriptor.
    * @param obj the {@link ConncurrentHashMap} to serialize
    * @throws Exception if any error occurs.
    */
   void writeConcurrentHashMap(final ClassDescriptor cd, final Object obj) throws Exception {
-    if (cd.clazz == ConcurrentHashMap.class) {
-      ConcurrentHashMap map = (ConcurrentHashMap) obj;
-      ClassDescriptor tmpDesc = null;
-      try {
-        tmpDesc = currentClassDescriptor;
-        currentClassDescriptor = cd;
-        writeInt(map.size());
-        //Object r = map.
-        for (Object o: map.entrySet()) {
-          Map.Entry entry = (Map.Entry) o;
-          writeObject(entry.getKey());
-          writeObject(entry.getValue());
-        }
-      } finally {
-        currentClassDescriptor = tmpDesc;
+    ConcurrentHashMap map = (ConcurrentHashMap) obj;
+    ClassDescriptor tmpDesc = null;
+    try {
+      tmpDesc = currentClassDescriptor;
+      currentClassDescriptor = cd;
+      writeInt(map.size());
+      for (Object o: map.entrySet()) {
+        Map.Entry entry = (Map.Entry) o;
+        writeObject(entry.getKey());
+        writeObject(entry.getValue());
       }
+    } finally {
+      currentClassDescriptor = tmpDesc;
     }
   }
 }
