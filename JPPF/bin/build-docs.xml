@@ -22,7 +22,8 @@
   <!--                     Build the web site content                            -->
   <!-- ========================================================================= -->
 
-  <target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home" description=""/>
+  <!--<target name="doc" depends="doc.screenshots, doc.samples.pack, doc.home" description=""/>-->
+  <target name="doc" depends="doc.samples.pack, doc.home" description=""/>
 
   <target name="doc.home">
     <doc.gen source="${home}/doc-source/home" dest="${home}/" templates="${home}/doc-source/templates/"/>
