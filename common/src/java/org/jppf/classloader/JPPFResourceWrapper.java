@@ -32,8 +32,7 @@ import org.jppf.utils.TraversalList;
  * @author Martin JANDA
  * @exclude
  */
-public class JPPFResourceWrapper implements Serializable
-{
+public class JPPFResourceWrapper implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -50,12 +49,12 @@ public class JPPFResourceWrapper implements Serializable
    * Constant for an empty <code>JPPFResourceWrapper</code> array.
    */
   public static final JPPFResourceWrapper[] EMPTY_RESOURCE_WRAPPER_ARRAY = new JPPFResourceWrapper[0];
+
   /**
    * Enumeration of the possible states for this resource wrapper.
    * @exclude
    */
-  public enum State
-  {
+  public enum State {
     /**
      * State for a node first contacting the class server.
      */
@@ -123,8 +122,7 @@ public class JPPFResourceWrapper implements Serializable
    * Add a uuid to the uuid path of this resource wrapper.
    * @param uuid the identifier as a string.
    */
-  public void addUuid(final String uuid)
-  {
+  public void addUuid(final String uuid) {
     uuidPath.add(uuid);
   }
 
@@ -132,8 +130,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the name of the class whose definition is requested.
    * @return the class name as a string.
    */
-  public String getName()
-  {
+  public String getName() {
     return (String) getData(NAME);
   }
 
@@ -141,8 +138,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set the name of the class whose definition is requested.
    * @param name the class name as a string.
    */
-  public void setName(final String name)
-  {
+  public void setName(final String name) {
     setData(NAME, name);
   }
 
@@ -150,8 +146,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the actual definition of the requested class.
    * @return the class definition as an array of bytes.
    */
-  public byte[] getDefinition()
-  {
+  public byte[] getDefinition() {
     return (byte[]) getData(DEFINITION);
   }
 
@@ -159,8 +154,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set the actual definition of the requested class.
    * @param definition the class definition as an array of bytes.
    */
-  public void setDefinition(final byte[] definition)
-  {
+  public void setDefinition(final byte[] definition) {
     setData(DEFINITION, definition);
   }
 
@@ -168,8 +162,7 @@ public class JPPFResourceWrapper implements Serializable
    * Determine whether the class should be loaded through the network classloader.
    * @return true if the class should be loaded via the network classloader, false otherwise.
    */
-  public boolean isDynamic()
-  {
+  public boolean isDynamic() {
     return dynamic;
   }
 
@@ -177,8 +170,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set whether the class should be loaded through the network classloader.
    * @param dynamic true if the class should be loaded via the network classloader, false otherwise.
    */
-  public void setDynamic(final boolean dynamic)
-  {
+  public void setDynamic(final boolean dynamic) {
     this.dynamic = dynamic;
   }
 
@@ -186,8 +178,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the state associated with this resource wrapper.
    * @return a <code>State</code> typesafe enumerated value.
    */
-  public State getState()
-  {
+  public State getState() {
     synchronized (dataMap) {
       return state;
     }
@@ -197,8 +188,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set the state associated with this resource wrapper.
    * @param state a <code>State</code> typesafe enumerated value.
    */
-  public void setState(final State state)
-  {
+  public void setState(final State state) {
     synchronized (dataMap) {
       this.state = state;
     }
@@ -209,8 +199,7 @@ public class JPPFResourceWrapper implements Serializable
    * and the current position in it.
    * @return a traversal list of string elements.
    */
-  public TraversalList<String> getUuidPath()
-  {
+  public TraversalList<String> getUuidPath() {
     return uuidPath;
   }
 
@@ -219,8 +208,7 @@ public class JPPFResourceWrapper implements Serializable
    * and the current position in it.
    * @param uuidPath a traversal list of string elements.
    */
-  public void setUuidPath(final TraversalList<String> uuidPath)
-  {
+  public void setUuidPath(final TraversalList<String> uuidPath) {
     this.uuidPath = uuidPath;
   }
 
@@ -228,8 +216,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the uuid sent by a node when it first contacts a resource provider.
    * @return the uuid as a string.
    */
-  public String getProviderUuid()
-  {
+  public String getProviderUuid() {
     return providerUuid;
   }
 
@@ -237,8 +224,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set the uuid sent by a node when it first contacts a resource provider.
    * @param providerUuid the uuid as a string.
    */
-  public void setProviderUuid(final String providerUuid)
-  {
+  public void setProviderUuid(final String providerUuid) {
     this.providerUuid = providerUuid;
   }
 
@@ -246,8 +232,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the uuid for the original task bundle that triggered this resource request.
    * @return the uuid as a string.
    */
-  public String getRequestUuid()
-  {
+  public String getRequestUuid() {
     return requestUuid;
   }
 
@@ -255,8 +240,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set the uuid for the original task bundle that triggered this resource request.
    * @param requestUuid the uuid as a string.
    */
-  public void setRequestUuid(final String requestUuid)
-  {
+  public void setRequestUuid(final String requestUuid) {
     this.requestUuid = requestUuid;
   }
 
@@ -264,8 +248,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the serialized callback to execute code on the client side.
    * @return a <code>byte[]</code> instance.
    */
-  public byte[] getCallable()
-  {
+  public byte[] getCallable() {
     return (byte[]) getData(CALLABLE);
   }
 
@@ -273,8 +256,7 @@ public class JPPFResourceWrapper implements Serializable
    * Set the serialized callback to execute code on the client side.
    * @param callable a <code>byte[]</code> instance.
    */
-  public void setCallable(final byte[] callable)
-  {
+  public void setCallable(final byte[] callable) {
     setData(CALLABLE, callable);
   }
 
@@ -282,8 +264,7 @@ public class JPPFResourceWrapper implements Serializable
    * Get the ID of an eventual remote-computed callable.
    * @return the id as a long.
    */
-  public long getCallableID()
-  {
+  public long getCallableID() {
     Long id = (Long) getData(CALLABLE_ID);
     return id == null ? NO_CALLABLE_ID : id;
   }
@@ -341,8 +322,7 @@ public class JPPFResourceWrapper implements Serializable
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("dynamic=").append(dynamic);
@@ -357,8 +337,7 @@ public class JPPFResourceWrapper implements Serializable
   /**
    * Ensure there is a callableId if needed.
    */
-  void preProcess()
-  {
+  void preProcess() {
     if ((getCallable() != null) && (getCallableID() == NO_CALLABLE_ID)) setData(CALLABLE_ID, CALLABLE_ID_SEQUENCE.incrementAndGet());
   }
 
@@ -393,10 +372,10 @@ public class JPPFResourceWrapper implements Serializable
    * @param ids the ids of the data to check.
    * @return <code>true</code> if this resource has any of the specified data, <code>false</code> otherwise.
    */
-  public boolean hasAny(final ResourceIdentifier...ids) {
+  public boolean hasAny(final ResourceIdentifier... ids) {
     if (ids != null) {
-      synchronized(dataMap) {
-        for (ResourceIdentifier id: ids) {
+      synchronized (dataMap) {
+        for (ResourceIdentifier id : ids) {
           if (dataMap.get(id) != null) return true;
         }
       }
