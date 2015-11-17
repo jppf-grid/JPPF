@@ -22,7 +22,7 @@ package org.jppf.serialization;
  * Abstract super class for serialization schemes that delegate to another serialization scheme.
  * @author Laurent Cohen
  */
-abstract class CompositeSerialization implements JPPFSerialization {
+public abstract class JPPFCompositeSerialization implements JPPFSerialization {
   /**
    * Serialization scheme to delegate to.
    */
@@ -33,7 +33,7 @@ abstract class CompositeSerialization implements JPPFSerialization {
    * @param delegate the serialization scheme to compress/decompress.
    * @return this serialization scheme.
    */
-  CompositeSerialization delegateTo(final JPPFSerialization delegate) {
+  JPPFCompositeSerialization delegateTo(final JPPFSerialization delegate) {
     this.delegate = delegate;
     return this;
   }
@@ -42,7 +42,14 @@ abstract class CompositeSerialization implements JPPFSerialization {
    * Get the concrete serialization to delegate to.
    * @return the serialization scheme to compress/decompress.
    */
-  JPPFSerialization getDelegate() {
+  public final JPPFSerialization getDelegate() {
     return delegate;
   }
+
+  /**
+   * Get the name given to this composite serialization. The name is case-insensitive and must be unique among all defined
+   * composite serializations, otherwise it will either override, or be overriden by, a serialization with the same name. 
+   * @return the name of this composite serialization.
+   */
+  public abstract String getName();
 }

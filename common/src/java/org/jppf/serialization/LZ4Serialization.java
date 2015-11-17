@@ -24,9 +24,10 @@ import net.jpountz.lz4.*;
 
 /**
  * A composite serialization scheme which applies a LZ4 compression/decompression to a concrete {@link JPPFSerialization} implementation.
+ * <p><b>See also: <a href="http://cyan4973.github.io/lz4/">LZ4 home</a></b>.
  * @author Laurent Cohen
  */
-class LZ4Serialization extends CompositeSerialization {
+public class LZ4Serialization extends JPPFCompositeSerialization {
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
     LZ4BlockOutputStream lz4os = new LZ4BlockOutputStream(os, 32*1024, LZ4Factory.fastestJavaInstance().fastCompressor());
@@ -41,5 +42,10 @@ class LZ4Serialization extends CompositeSerialization {
   public Object deserialize(final InputStream is) throws Exception {
     LZ4BlockInputStream lz4is = new LZ4BlockInputStream(is);
     return getDelegate().deserialize(lz4is);
+  }
+
+  @Override
+  public String getName() {
+    return "LZ4";
   }
 }

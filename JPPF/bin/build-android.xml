@@ -37,6 +37,7 @@
     <!--<checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>-->
     <copy toDir="${node-android}/events/libs">
       <fileset dir="${build}" includes="jppf-common.jar,jppf-node-android.jar,jppf-server.jar"/>
+      <fileset dir="${lib}/LZ4" includes="lz4-1.3.0.jar"/>
     </copy>
   </target>
 

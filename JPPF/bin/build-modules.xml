@@ -45,6 +45,7 @@
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="slf4j-api-*.jar,slf4j-${slf4j.bindings}-*.jar"/>
+        <zipfileset dir="${lib}/LZ4" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <module-elements/>
       </zip>
     </sequential>

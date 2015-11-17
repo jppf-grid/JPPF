@@ -41,6 +41,40 @@ public class ServiceFinder {
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
 
   /**
+   * Find the classes of all providers implementing or extending the specified provider interface or class, using the specified class loader.
+   * @param <T> The type of provider implementations to find.
+   * @param providerClass the provider class.
+   * @param loader the class loader to use for the lookup.
+   * @param single determines whether only the first looked up provider should be returned, or all the providers found.
+   * @return a list of concrete providers of the specified type.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> List<Class<? extends T>> findProviderClassess(final Class<T> providerClass, final ClassLoader loader, final boolean single) {
+    if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
+    ClassLoader cl = loader;
+    if (cl == null) cl = Thread.currentThread().getContextClassLoader();
+    if (cl == null) cl = getClass().getClassLoader();
+    List<Class<? extends T>> list = new ArrayList<>();
+    String name = providerClass.getName();
+    List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
+    Set<String> alreadyLoaded = new HashSet<>();
+    for (String s: lines) {
+      if (alreadyLoaded.contains(s)) continue;
+      try {
+        @SuppressWarnings("unchecked")
+        Class<? extends T> clazz = (Class<? extends T>) cl.loadClass(s);
+        list.add(clazz);
+        if (single) break;
+        alreadyLoaded.add(s);
+      } catch(Exception|NoClassDefFoundError e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
+        else log.warn(ExceptionUtils.getMessage(e));
+      }
+    }
+    return list;
+  }
+
+  /**
    * Find all providers implementing or extending the specified provider interface or class, using the specified class loader.
    * @param <T> The type of provider implementations to find.
    * @param providerClass the provider class.
@@ -50,20 +84,12 @@ public class ServiceFinder {
    */
   @SuppressWarnings("unchecked")
   public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single) {
-    if (providerClass == null) throw new IllegalArgumentException("Provider class cannot be null");
-    if (cl == null) throw new NullPointerException("The specified class loader cannot be null");
+    List<Class<? extends T>> classes = findProviderClassess(providerClass, cl, single);
     List<T> list = new ArrayList<>();
-    String name = providerClass.getName();
-    List<String> lines = findServiceDefinitions("META-INF/services/" + name, cl);
-    Set<String> alreadyLoaded = new HashSet<>();
-    for (String s: lines) {
-      if (alreadyLoaded.contains(s)) continue;
+    for (Class<? extends T> c: classes) {
       try {
-        Class<?> clazz = cl.loadClass(s);
-        T t = (T) clazz.newInstance();
+        T t = c.newInstance();
         list.add(t);
-        if (single) break;
-        alreadyLoaded.add(s);
       } catch(Exception|NoClassDefFoundError e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));

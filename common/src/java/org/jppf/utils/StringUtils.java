@@ -237,6 +237,29 @@ public final class StringUtils {
   }
 
   /**
+   * Get a String representation of an collection of any type.
+   * @param <T> the type of the elements in the collection.
+   * @param collection the collection from which to build a string representation.
+   * @param sep the separator to use for values. If null, no separator is used.
+   * @param prefix the prefix to use at the start of the resulting string. If null, no prefix is used.
+   * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
+   * @return the collection's content as a string.
+   */
+  public static <T> String collectionToString(final String sep, final String prefix, final String suffix, final Collection<T> collection) {
+    if (collection == null) return null;
+    StringBuilder sb = new StringBuilder();
+    int count = 0;
+    if (prefix != null) sb.append(prefix);
+    for (T t: collection) {
+      if ((count > 0) && (sep != null)) sb.append(sep);
+      count++;
+      sb.append(t);
+    }
+    if (suffix != null) sb.append(suffix);
+    return sb.toString();
+  }
+
+  /**
    * Parse an array of port numbers from a string containing a list of space-separated port numbers.
    * @param s list of space-separated port numbers
    * @return an array of int port numbers.

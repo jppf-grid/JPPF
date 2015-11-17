@@ -19,6 +19,7 @@
 package org.jppf.serialization;
 
 import java.io.*;
+import java.util.*;
 
 import org.jppf.JPPFError;
 import org.jppf.utils.*;
@@ -69,15 +70,38 @@ public interface JPPFSerialization {
     /**
      * The class of the composite to use on top of the serialization.
      */
-    private static Class<? extends CompositeSerialization> compositeClass = null;
+    private final static Map<String, Class<? extends JPPFCompositeSerialization>> compositeMap = new HashMap<>();
+    /**
+     * The class of the composite to use on top of the serialization.
+     */
+    private final static List<Class<? extends JPPFCompositeSerialization>> compositeClasses = new ArrayList<>();
     static {
       init();
+      configure();
     }
 
     /**
      * Initialize the serialization.
      */
     private static void init() {
+      List<Class<? extends JPPFCompositeSerialization>> list = new ServiceFinder().findProviderClassess(JPPFCompositeSerialization.class, null, false);
+      for (Class<? extends JPPFCompositeSerialization> c: list) {
+        try {
+          JPPFCompositeSerialization jcs = c.newInstance();
+          compositeMap.put(jcs.getName().toUpperCase(), c);
+        } catch (Exception e) {
+          StringBuilder sb = new StringBuilder("Could not instantiate composite serialization '");
+          sb.append(c.getName()).append("', terminating this application");
+          log.error(sb.toString(), e);
+          throw new JPPFError(sb.toString(), e);
+        }
+      }
+    }
+
+    /**
+     * Initialize the serialization.
+     */
+    private static void configure() {
       JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
       String className = null;
       String value  = JPPFConfiguration.get(prop);
@@ -85,15 +109,12 @@ public interface JPPFSerialization {
         String[] elts = value.split("\\s");
         if (elts.length == 1) className = elts[0];
         else if (elts.length >= 2) {
-          className = elts[1];
-          switch(elts[0].toUpperCase()) {
-            case "LZ4":
-              compositeClass = LZ4Serialization.class;
-              break;
-            case "GZIP":
-              compositeClass = GZIPSerialization.class;
-              break;
+          for (int i=0; i<elts.length-1; i++) {
+            String name = elts[i].toUpperCase();
+            Class<? extends JPPFCompositeSerialization> c = compositeMap.get(name);
+            compositeClasses.add(c);
           }
+          className = elts[elts.length - 1];
         }
       }
       if (debugEnabled) log.debug("found " + prop.getName() + " = " + className);
@@ -120,7 +141,16 @@ public interface JPPFSerialization {
     public static JPPFSerialization getSerialization() {
       try {
         JPPFSerialization serialization = serializationClass.newInstance();
-        return (compositeClass != null) ? compositeClass.newInstance().delegateTo(serialization) : serialization;
+        JPPFCompositeSerialization composite = null;
+        JPPFCompositeSerialization prev = null;
+        for (Class<? extends JPPFCompositeSerialization> c: compositeClasses) {
+          JPPFCompositeSerialization tmp = c.newInstance();
+          if (composite == null) composite = tmp;
+          if (prev != null) prev.delegateTo(tmp);
+          prev = tmp;
+        }
+        if (prev != null) prev.delegateTo(serialization);
+        return (composite == null) ? serialization : composite;
       } catch (Exception e) {
         String msg = String.format("error instantiating serialization scheme '%s'", JPPFConfiguration.get(JPPFProperties.OBJECT_SERIALIZATION_CLASS));
         log.error(String.format(msg + " :%n%s", ExceptionUtils.getStackTrace(e)));
@@ -134,9 +164,9 @@ public interface JPPFSerialization {
      */
     public static void reset() {
       serializationClass = null;
-      compositeClass = null;
-      init();
-      if (debugEnabled) log.debug(String.format("serialization = %s, composite = %s", serializationClass, compositeClass));
+      compositeClasses.clear();
+      configure();
+      if (debugEnabled) log.debug(String.format("serialization = %s, composite = %s", serializationClass, compositeClasses));
       //log.info(String.format("serialization = %s, composite = %s", serializationClass, compositeClass));
     }
   }

@@ -54,7 +54,7 @@ public final class SerializationUtils {
   /**
    * 
    */
-  public static int TEMP_BUFFER_SIZE = 2048;
+  public static int TEMP_BUFFER_SIZE = 4096;
 
   /**
    * Instantiation of this class is not permitted.
@@ -284,12 +284,13 @@ public final class SerializationUtils {
    * @param os the stream to write to.
    * @param value the int value to serialize.
    * @param data the array of bytes into which to serialize the value.
+   * @return the number of bytes written to the buffer.
    * @throws IOException if an error occurs while writing the data.
    */
-  public static void writeVarInt(final OutputStream os, final int value, final byte[] data) throws IOException {
+  public static int writeVarInt(final OutputStream os, final int value, final byte[] data) throws IOException {
     if (value == 0) {
       os.write(ZERO_BIT);
-      return;
+      return 1;
     }
     int absValue = (value > 0) ? value : -value;
     byte n = 4;
@@ -304,6 +305,7 @@ public final class SerializationUtils {
     data[0] = b;
     for (int i=8*(n-1), pos=1; i>=0; i-=8) data[pos++] = (byte) ((absValue >>> i) & 0xFF);
     os.write(data, 0, n+1);
+    return n + 1;
   }
 
   /**
@@ -311,12 +313,13 @@ public final class SerializationUtils {
    * @param os the stream to write to.
    * @param value the long value to serialize.
    * @param data the array of bytes into which to serialize the value.
+   * @return the number of bytes written to the buffer.
    * @throws IOException if an error occurs while writing the data.
    */
-  public static void writeVarLong(final OutputStream os, final long value, final byte[] data) throws IOException {
+  public static int writeVarLong(final OutputStream os, final long value, final byte[] data) throws IOException {
     if (value == 0) {
       os.write(ZERO_BIT);
-      return;
+      return 1;
     }
     long absValue = (value > 0L) ? value : -value;
     byte n = 8;
@@ -331,6 +334,7 @@ public final class SerializationUtils {
     data[0] = b;
     for (int i=8*(n-1), pos=1; i>=0; i-=8) data[pos++] = (byte) ((absValue >>> i) & 0xFF);
     os.write(data, 0, n+1);
+    return n + 1;
   }
 
   /**
@@ -436,5 +440,101 @@ public final class SerializationUtils {
     }
     if ((b & SIGN_BIT) != 0) result = -result;
     return new Pair<>(result, (b & ASCII_BIT) != 0);
+  }
+
+  /**
+   * Serialize an int value into an array of bytes.
+   * @param value the int value to serialize.
+   * @param buffer the array of bytes into which to serialize the value.
+   * @param offset the position at which to start writing in the buffer.
+   * @return the number of bytes written to the buffer.
+   * @throws IOException if an error occurs while writing the data.
+   */
+  static int writeVarInt(final int value, final byte[] buffer, final int offset) throws IOException {
+    if (value == 0) {
+      buffer[offset] = ZERO_BIT;
+      return 1;
+    }
+    long absValue = (value > 0L) ? value : -value;
+    byte n = 4;
+    for (int i=0; i<INT_MAX_VALUES.length; i++) {
+      if (absValue < INT_MAX_VALUES[i]) {
+        n = (byte) (i + 1);
+        break;
+      }
+    }
+    byte b = n;
+    if (value < 0) b |= SIGN_BIT;
+    buffer[offset] = b;
+    for (int i=4*(n-1), pos=offset+1; i>=0; i-=4) buffer[pos++] = (byte) ((absValue >>> i) & 0xFF);
+    return n + 1;
+  }
+
+  /**
+   * Serialize a long value into an array of bytes.
+   * @param value the long value to serialize.
+   * @param buffer the array of bytes into which to serialize the value.
+   * @param offset the position at which to start writing in the buffer.
+   * @return the number of bytes written to the buffer.
+   * @throws IOException if an error occurs while writing the data.
+   */
+  static int writeVarLong(final long value, final byte[] buffer, final int offset) throws IOException {
+    if (value == 0) {
+      buffer[offset] = ZERO_BIT;
+      return 1;
+    }
+    long absValue = (value > 0L) ? value : -value;
+    byte n = 8;
+    for (int i=0; i<LONG_MAX_VALUES.length; i++) {
+      if (absValue < LONG_MAX_VALUES[i]) {
+        n = (byte) (i + 1);
+        break;
+      }
+    }
+    byte b = n;
+    if (value < 0) b |= SIGN_BIT;
+    buffer[offset] = b;
+    for (int i=8*(n-1), pos=offset+1; i>=0; i-=8) buffer[pos++] = (byte) ((absValue >>> i) & 0xFF);
+    return n + 1;
+  }
+
+  /**
+   * Deserialize an int value from a buffer.
+   * @param buffer a temporary buffer.
+   * @param offset the position at which to start writing in the buffer.
+   * @return a pair holding the value read from the buffer and the number of bytes read.
+   * @throws IOException if an error occurs while reading the data.
+   */
+  static Pair<Integer, Integer> readVarInt(final byte[] buffer, final int offset) throws IOException {
+    byte b = buffer[offset];
+    if (b == ZERO_BIT) return new Pair<>(0, 1);
+    byte n = (byte) (b & 0x0F);
+    int result = 0;
+    if (n == 1) result = buffer[offset + 1];
+    else {
+      for (int i=4*(n-1), pos=offset+1; i>=0; i-=4) result += (buffer[pos++] & 0xFF) << i;
+    }
+    if ((b & SIGN_BIT) != 0) result = -result;
+    return new Pair<>(result, n+1);
+  }
+
+  /**
+   * Deserialize a long value from a buffer.
+   * @param buffer a temporary buffer.
+   * @param offset the position at which to start writing in the buffer.
+   * @return a pair holding the value read from the buffer and the number of bytes read.
+   * @throws IOException if an error occurs while reading the data.
+   */
+  static Pair<Long, Integer> readVarLong(final byte[] buffer, final int offset) throws IOException {
+    byte b = buffer[offset];
+    if (b == ZERO_BIT) return new Pair<>(0L, 1);
+    byte n = (byte) (b & 0x0F);
+    long result = 0L;
+    if (n == 1) result = (long) buffer[offset + 1];
+    else {
+      for (int i=8*(n-1), pos=offset+1; i>=0; i-=8) result += (long) (buffer[pos++] & 0xFF) << i;
+    }
+    if ((b & SIGN_BIT) != 0) result = -result;
+    return new Pair<>(result, n+1);
   }
 }

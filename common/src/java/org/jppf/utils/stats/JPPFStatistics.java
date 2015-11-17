@@ -39,7 +39,7 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
   /**
    * The list of liteners.
    */
-  private List<JPPFStatisticsListener> listeners = new CopyOnWriteArrayList<>();
+  private transient List<JPPFStatisticsListener> listeners = new CopyOnWriteArrayList<>();
 
   /**
    * Default constructor.

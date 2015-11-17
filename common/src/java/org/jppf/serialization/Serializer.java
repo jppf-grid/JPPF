@@ -406,37 +406,41 @@ class Serializer {
   /**
    * Write an int to the stream.
    * @param value the int value to write.
+   * @return the number of bytes written to the buffer.
    * @throws Exception if any error occurs.
    */
-  void writeInt(final int value) throws Exception {
-    SerializationUtils.writeVarInt(out, value, buf);
+  int writeInt(final int value) throws Exception {
+    return SerializationUtils.writeVarInt(out, value, buf);
   }
 
   /**
    * Write a long to the stream.
    * @param value the long value to write.
+   * @return the number of bytes written to the buffer.
    * @throws Exception if any error occurs.
    */
-  void writeLong(final long value) throws Exception {
-    SerializationUtils.writeVarLong(out, value, buf);
+  int writeLong(final long value) throws Exception {
+    return SerializationUtils.writeVarLong(out, value, buf);
   }
 
   /**
    * Write a float to the stream.
    * @param value the float value to write.
+   * @return the number of bytes written to the buffer.
    * @throws Exception if any error occurs.
    */
-  void writeFloat(final float value) throws Exception {
-    writeInt(Float.floatToIntBits(value));
+  int writeFloat(final float value) throws Exception {
+    return writeInt(Float.floatToIntBits(value));
   }
 
   /**
    * Write a double to the stream.
    * @param value the double value to write.
+   * @return the number of bytes written to the buffer.
    * @throws Exception if any error occurs.
    */
-  void writeDouble(final double value) throws Exception {
-   writeLong(Double.doubleToLongBits(value));
+  int writeDouble(final double value) throws Exception {
+   return writeLong(Double.doubleToLongBits(value));
   }
 
   /**

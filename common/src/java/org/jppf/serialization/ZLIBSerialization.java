@@ -22,23 +22,35 @@ import java.io.*;
 import java.util.zip.*;
 
 /**
- * A composite serialization scheme which applies a GZIP compression/decompression to a concrete {@link JPPFSerialization} implementation.
+ * A composite serialization scheme which applies a ZLIB compression/decompression to a concrete {@link JPPFSerialization} implementation.
  * @author Laurent Cohen
  */
-class GZIPSerialization extends CompositeSerialization {
+public class ZLIBSerialization extends JPPFCompositeSerialization {
   @Override
   public void serialize(final Object o, final OutputStream os) throws Exception {
-    GZIPOutputStream gzos = new GZIPOutputStream(os);
+    Deflater deflater = new Deflater();
+    DeflaterOutputStream zlibos = new DeflaterOutputStream(os, deflater);
     try {
-      getDelegate().serialize(o, gzos);
+      getDelegate().serialize(o, zlibos);
     } finally {
-      gzos.finish();
+      zlibos.finish();
+      deflater.end(); // required to clear the native/JNI buffers
     }
   }
 
   @Override
   public Object deserialize(final InputStream is) throws Exception {
-    GZIPInputStream gzis = new GZIPInputStream(is);
-    return getDelegate().deserialize(gzis);
+    Inflater inflater = new Inflater();
+    InflaterInputStream zlibis = new InflaterInputStream(is, inflater);
+    try {
+      return getDelegate().deserialize(zlibis);
+    } finally {
+      inflater.end(); // required to clear the native/JNI buffers
+    }
+  }
+
+  @Override
+  public String getName() {
+    return "ZLIB";
   }
 }

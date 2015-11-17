@@ -50,6 +50,7 @@
     <pathelement location="${basedir}/../common/classes"/>
     <pathelement location="${basedir}/../node/classes"/>
     <pathelement location="${basedir}/../client/classes"/>
+    <pathelement location="${basedir}/../JPPF/lib/LZ4/lz4-1.3.0.jar"/>
     <pathelement location="${basedir}/../JPPF/lib/slf4j/slf4j-api-1.6.1.jar"/>
     <pathelement location="${basedir}/../JPPF/lib/jmxremote/jppf-jmxremote_optional-1.1.1.jar"/>
 	</path>

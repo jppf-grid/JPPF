@@ -68,9 +68,9 @@ public class Hook<E> {
       try {
         Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);
         processConcreteInstance(clazz.newInstance(), false);
-      } catch(Exception e) {
+      } catch (Exception e) {
         String format = "failed to instantiate concrete class for {}, {}={}, exception={}";
-        Object[] params = new Object[] {this, property, fqn, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e)};
+        Object[] params = new Object[] { this, property, fqn, debugEnabled ? ExceptionUtils.getStackTrace(e) : ExceptionUtils.getMessage(e) };
         if (debugEnabled) log.debug(format, params);
         else log.warn(format, params);
       }
@@ -85,14 +85,14 @@ public class Hook<E> {
    * @param loader the class loader used to load the implemntation.
    * @param single determines whether only the first looked up implementation should be used, or all the instances found.
    */
-  public Hook(final Class<E> infClass, final E defaultImpl, final ClassLoader loader, final boolean single)
-  {
+  public Hook(final Class<E> infClass, final E defaultImpl, final ClassLoader loader, final boolean single) {
     if (infClass == null) throw new IllegalArgumentException("interface class cannot be null");
     this.infName = infClass.getName();
     this.type = single ? HookType.SPI_SINGLE_INSTANCE : HookType.SPI_MULTIPLE_INSTANCES;
     ClassLoader cl = findClassLoader(loader);
     Iterator<E> it = ServiceFinder.lookupProviders(infClass, cl, single);
-    while (it.hasNext()) processConcreteInstance(it.next(), false);
+    while (it.hasNext())
+      processConcreteInstance(it.next(), false);
     processConcreteInstance(defaultImpl, true);
   }
 
@@ -100,8 +100,7 @@ public class Hook<E> {
    * Get the hook interface.
    * @return the class object for the hook's interface.
    */
-  public String getInterfaceName()
-  {
+  public String getInterfaceName() {
     return infName;
   }
 
@@ -109,8 +108,7 @@ public class Hook<E> {
    * Get the type of this hook.
    * @return the type as a typesafe {@link HookType} enum value.
    */
-  public HookType getType()
-  {
+  public HookType getType() {
     return type;
   }
 
@@ -120,17 +118,17 @@ public class Hook<E> {
    * @param parameters the parameters supplied to each method invocation.
    * @return this method always return null.
    */
-  public Object[] invoke(final String methodName, final Object...parameters)
-  {
+  public Object[] invoke(final String methodName, final Object... parameters) {
     List<Object> results = new ArrayList<>();
-    switch(type)
-    {
+    switch (type) {
       case CONFIG_SINGLE_INSTANCE:
       case SPI_SINGLE_INSTANCE:
         if (!instances.isEmpty()) results.add(instances.get(0).invoke(methodName, parameters));
         break;
       case SPI_MULTIPLE_INSTANCES:
-        if (!instances.isEmpty()) for (HookInstance instance: instances) results.add(instance.invoke(methodName, parameters));
+        if (!instances.isEmpty()) {
+          for (HookInstance instance : instances) results.add(instance.invoke(methodName, parameters));
+        }
         break;
     }
     return results.toArray(new Object[results.size()]);
@@ -141,8 +139,7 @@ public class Hook<E> {
    * @param loader the class loader to check.
    * @return the supplied class loader if not null, or another one if it is.
    */
-  private ClassLoader findClassLoader(final ClassLoader loader)
-  {
+  private ClassLoader findClassLoader(final ClassLoader loader) {
     ClassLoader cl = loader;
     if (cl == null) cl = Thread.currentThread().getContextClassLoader();
     if (cl == null) cl = getClass().getClassLoader();
@@ -154,16 +151,14 @@ public class Hook<E> {
    * @param concrete a concrete implementation, which may be null.
    * @param isDefault <code>true</code> if the implementation is the specified default, <code>false</code> otherwise.
    */
-  private void processConcreteInstance(final E concrete, final boolean isDefault)
-  {
+  private void processConcreteInstance(final E concrete, final boolean isDefault) {
     if ((concrete != null) && (!isDefault || instances.isEmpty())) {
       instances.add(new HookInstance(concrete));
     }
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("interface=").append(infName);
@@ -177,17 +172,16 @@ public class Hook<E> {
    * Get the list of instances of this hook.
    * @return a list of {@link HookInstance} objects.
    */
-  public List<HookInstance<E>> getInstances()
-  {
+  public List<HookInstance<E>> getInstances() {
     return instances;
   }
 
   /**
    * Cleanup this hook and release its resources.
    */
-  public void dispose()
-  {
-    for (HookInstance<E> instance: instances) instance.dispose();
+  public void dispose() {
+    for (HookInstance<E> instance : instances)
+      instance.dispose();
     instances.clear();
   }
 }

@@ -316,6 +316,7 @@
           <include name="jppf-common.jar"/>
           <include name="jppf-client.jar"/>
           <include name="jppf-jmxremote_optional-1.1.1.jar"/>
+          <include name="lz4-1.3.0.jar"/>
           <include name="slf4j-api-1.6.1.jar"/>
           <include name="slf4j-${logging}-1.6.1.jar"/>
         </zipfileset>
