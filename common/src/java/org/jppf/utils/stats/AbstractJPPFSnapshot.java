@@ -17,13 +17,11 @@
  */
 package org.jppf.utils.stats;
 
-
 /**
  * Convenience class for collecting time or size statistics.
  * Instances of this class are thread-safe.
  */
-public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
-{
+public abstract class AbstractJPPFSnapshot implements JPPFSnapshot {
   /**
    * Explicit serialVersionUID.
    */
@@ -69,8 +67,7 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
    * @param label the title for this snapshot.
    * @exclude
    */
-  public AbstractJPPFSnapshot(final String label)
-  {
+  public AbstractJPPFSnapshot(final String label) {
     this.label = label;
   }
 
@@ -80,8 +77,7 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
    * @return a <code>TimeSnapshot</code> instance.
    * @exclude
    */
-  public synchronized AbstractJPPFSnapshot copy(final AbstractJPPFSnapshot ts)
-  {
+  public synchronized AbstractJPPFSnapshot copy(final AbstractJPPFSnapshot ts) {
     ts.total = total;
     ts.latest = latest;
     ts.min = min;
@@ -96,8 +92,7 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void reset()
-  {
+  public synchronized void reset() {
     total = 0d;
     latest = 0d;
     min = Double.POSITIVE_INFINITY;
@@ -112,13 +107,8 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
    */
   public abstract void assignLatestToMax();
 
-  /**
-   * {@inheritDoc}
-   * @exclude
-   */
   @Override
-  public synchronized String toString()
-  {
+  public synchronized String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(JPPFStatisticsHelper.getLocalizedLabel(this)).append(": type=").append(getClass().getSimpleName());
     sb.append(": total=").append(total);
@@ -131,45 +121,38 @@ public abstract class AbstractJPPFSnapshot implements JPPFSnapshot
   }
 
   @Override
-  public synchronized double getTotal()
-  {
+  public synchronized double getTotal() {
     return total;
   }
 
   @Override
-  public synchronized double getLatest()
-  {
+  public synchronized double getLatest() {
     return latest;
   }
 
   @Override
-  public synchronized double getMin()
-  {
+  public synchronized double getMin() {
     if (Double.compare(min, Double.POSITIVE_INFINITY) == 0) return latest;
     else return min;
   }
 
   @Override
-  public synchronized double getMax()
-  {
+  public synchronized double getMax() {
     return max;
   }
 
   @Override
-  public synchronized double getAvg()
-  {
+  public synchronized double getAvg() {
     return avg;
   }
 
   @Override
-  public synchronized String getLabel()
-  {
+  public synchronized String getLabel() {
     return label;
   }
 
   @Override
-  public synchronized long getValueCount()
-  {
+  public synchronized long getValueCount() {
     return valueCount;
   }
 }
