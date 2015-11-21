@@ -162,7 +162,8 @@ class Deserializer {
       tmpDesc = tmpDesc.superClass;
     }
     for (ClassDescriptor desc: stack) {
-      if (desc.clazz == ConcurrentHashMap.class) readConcurrentHashMapFields(desc, (ConcurrentHashMap) obj);
+      SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
+      if (handler != null) handler.readDeclaredFields(this, desc, obj);
       else if (desc.hasReadWriteObject) {
         Method m = desc.readObjectMethod;
         if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(Exception e) {}
@@ -510,32 +511,5 @@ class Deserializer {
    */
   double readDouble() throws Exception {
     return Double.longBitsToDouble(readLong());
-  }
-
-  /**
-   * Special handling for {@link ConcurrentHashMap}s.
-   * @param cd the clas descriptor.
-   * @param map the object to initialize.
-   * @throws Exception if any error occurs.
-   */
-  void readConcurrentHashMapFields(final ClassDescriptor cd, final ConcurrentHashMap map) throws Exception {
-    ClassDescriptor tmpDesc = null;
-    try {
-      tmpDesc = currentClassDescriptor;
-      currentClassDescriptor = cd;
-      ConcurrentHashMap tmp = new ConcurrentHashMap();
-      for (FieldDescriptor fd: cd.fields) {
-        Object val = fd.field.get(tmp);
-        fd.field.set(map, val);
-      }
-      int size = readInt();
-      for (int i=0; i<size; i++) {
-        Object key = readObject();
-        Object value = readObject();
-        map.put(key, value);
-      }
-    } finally {
-      currentClassDescriptor = tmpDesc;
-    }
   }
 }

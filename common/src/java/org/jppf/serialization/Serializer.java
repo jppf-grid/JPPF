@@ -174,7 +174,8 @@ class Serializer {
       tmpDesc = tmpDesc.superClass;
     }
     for (ClassDescriptor desc: stack) {
-      if (desc.clazz == ConcurrentHashMap.class) writeConcurrentHashMap(desc, obj);
+      SerializationHandler handler = SerializationReflectionHelper.getSerializationHandler(desc.clazz);
+      if (handler != null) handler.writeDeclaredFields(this, desc, obj);
       else if (desc.hasReadWriteObject) {
         Method m = desc.writeObjectMethod;
         //if (traceEnabled) try { log.trace("invoking writeObject() for class=" + desc + " on object " + obj.hashCode()); } catch(Exception e) { log.trace(e.getMessage(), e); }
@@ -441,28 +442,5 @@ class Serializer {
    */
   int writeDouble(final double value) throws Exception {
    return writeLong(Double.doubleToLongBits(value));
-  }
-
-  /**
-   * Special handling for {@link ConcurrentHashMap}s.
-   * @param cd the clas descriptor.
-   * @param obj the {@link ConncurrentHashMap} to serialize
-   * @throws Exception if any error occurs.
-   */
-  void writeConcurrentHashMap(final ClassDescriptor cd, final Object obj) throws Exception {
-    ConcurrentHashMap map = (ConcurrentHashMap) obj;
-    ClassDescriptor tmpDesc = null;
-    try {
-      tmpDesc = currentClassDescriptor;
-      currentClassDescriptor = cd;
-      writeInt(map.size());
-      for (Object o: map.entrySet()) {
-        Map.Entry entry = (Map.Entry) o;
-        writeObject(entry.getKey());
-        writeObject(entry.getValue());
-      }
-    } finally {
-      currentClassDescriptor = tmpDesc;
-    }
   }
 }

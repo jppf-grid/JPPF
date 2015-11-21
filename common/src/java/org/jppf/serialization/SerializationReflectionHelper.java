@@ -91,13 +91,20 @@ public final class SerializationReflectionHelper {
    */
   private static final Map<Class<?>, String> SIGNATURE_MAP = new ConcurrentSoftReferenceValuesMap<>();
   /**
-   * 
+   *
    */
   private static final Object NO_MEMBER = new Object();
   /**
-   * 
+   *
    */
   private static final Set<Class<?>> TRANSIENT_EXCEPTION_CLASSES = initTransientExceptionClasses();
+  /**
+   * Map of classes to their assigned {@link SerializationHandler}, if any.
+   */
+  private static final Map<Class<?>, SerializationHandler> handlerMap = new HashMap<>();
+  static {
+    handlerMap.put(ConcurrentHashMap.class, new ConcurrentHashMapHandler());
+  }
   /**
    * The field "private final char{] value" in String.
    */
@@ -143,7 +150,7 @@ public final class SerializationReflectionHelper {
               return o1.getName().compareTo(o2.getName());
             }
           });
-          result = new FieldDescriptor[count]; 
+          result = new FieldDescriptor[count];
           for (int i=0; i<count; i++) {
             Field f = tmp[i];
             f.setAccessible(true);
@@ -455,7 +462,7 @@ public final class SerializationReflectionHelper {
   }
 
   /**
-   * 
+   *
    * @return .
    */
   private static Set<Class<?>> initTransientExceptionClasses() {
@@ -468,5 +475,14 @@ public final class SerializationReflectionHelper {
       e.printStackTrace();
     }
     return result;
+  }
+
+  /**
+   * Get the serialization handler defined for the specified class, if any.
+   * @param clazz the class to lookup.
+   * @return a {@link SerializationHandler} instance, or null if none is defined for the class.
+   */
+  static SerializationHandler getSerializationHandler(final Class<?> clazz) {
+    return handlerMap.get(clazz);
   }
 }
