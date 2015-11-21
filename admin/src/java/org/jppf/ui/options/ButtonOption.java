@@ -24,7 +24,7 @@ import javax.swing.*;
 import org.jppf.ui.utils.GuiUtils;
 
 /**
- * Option implementation with a JButton as the underlying component.
+ * Option implementation with a {@link JButton} or {@link JToggleButton}  as the underlying component.
  * @author Laurent Cohen
  */
 public class ButtonOption extends AbstractOption {
@@ -32,6 +32,10 @@ public class ButtonOption extends AbstractOption {
    * Determines whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
    */
   private boolean toggle = false;
+  /**
+   * WHther the toggle button is selected or not.
+   */
+  private boolean selected = false;
 
   /**
    * Constructor provided as a convenience to facilitate the creation of
@@ -40,34 +44,6 @@ public class ButtonOption extends AbstractOption {
   public ButtonOption() {
   }
 
-  /**
-   * Initialize this text option with the specified parameters.
-   * @param name this component's name.
-   * @param label the label displayed with the checkbox.
-   * @param tooltip the tooltip associated with the checkbox.
-   */
-  public ButtonOption(final String name, final String label, final String tooltip) {
-    this(name, label, tooltip, false);
-  }
-
-  /**
-   * Initialize this text option with the specified parameters.
-   * @param name this component's name.
-   * @param label the label displayed with the checkbox.
-   * @param tooltip the tooltip associated with the checkbox.
-   * @param toggle specifies
-   */
-  public ButtonOption(final String name, final String label, final String tooltip, final boolean toggle) {
-    this.name = name;
-    this.label = label;
-    this.toggle = toggle;
-    setToolTipText(tooltip);
-    createUI();
-  }
-
-  /**
-   * Create the UI components for this option.
-   */
   @Override
   public void createUI() {
     AbstractButton button = toggle ? new JToggleButton() : new JButton();
@@ -81,9 +57,6 @@ public class ButtonOption extends AbstractOption {
     setupValueChangeNotifications();
   }
 
-  /**
-   * This method does nothing.
-   */
   @Override
   protected void setupValueChangeNotifications() {
     AbstractButton button = (AbstractButton) UIComponent;
@@ -104,13 +77,9 @@ public class ButtonOption extends AbstractOption {
     UIComponent.setEnabled(enabled);
   }
 
-  /**
-   * This method always returns false, since buttons have no value to persist.
-   * @return false.
-   */
   @Override
   public boolean isPersistent() {
-    return false;
+    return toggle ? super.isPersistent() : false;
   }
 
   /**
@@ -127,5 +96,22 @@ public class ButtonOption extends AbstractOption {
    */
   public void setToggle(final boolean toggle) {
     this.toggle = toggle;
+  }
+
+  @Override
+  public Object getValue() {
+    return toggle ? ((JToggleButton) UIComponent).isSelected() : null;
+  }
+
+  @Override
+  public void setValue(final Object value) {
+    if (!toggle || (value == null)) return;
+    boolean b = (value instanceof Boolean) ? (Boolean) value : Boolean.valueOf(value.toString());
+    JToggleButton toggleBtn = ((JToggleButton) UIComponent);
+    if (b != toggleBtn.isSelected()) {
+      super.setValue(b);
+      toggleBtn.doClick();
+      //toggleBtn.setSelected(b);
+    }
   }
 }

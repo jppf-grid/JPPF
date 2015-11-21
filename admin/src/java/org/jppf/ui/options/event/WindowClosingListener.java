@@ -19,7 +19,6 @@
 package org.jppf.ui.options.event;
 
 import java.awt.event.*;
-import java.util.prefs.*;
 
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.options.OptionElement;
@@ -43,13 +42,7 @@ public class WindowClosingListener extends WindowAdapter {
       OptionsPageBuilder builder = new OptionsPageBuilder();
       builder.triggerFinalEvents(elt);
     }
-
-    try {
-      Preferences pref = OptionsHandler.getPreferences();
-      pref.flush();
-    } catch(BackingStoreException e) {
-    }
-
+    OptionsHandler.savePreferences();
     System.exit(0);
   }
 }

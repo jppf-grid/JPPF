@@ -75,13 +75,14 @@
       <property name="componentConstraints" value="grow, push"/>
 
       <!-- Text area -->
-  		<child name="configOverrides" type="TextArea">
+  		<child name="configOverrides" type="CodeEditor">
         <property name="bordered" value="false"/>
         <property name="scrollable" value="true"/>
   			<property name="editable" value="true"/>
   			<property name="label" value="Configuration overrides"/>
   			<property name="tooltip" value="Configuration properties that will override the default slaves configuration"/>
   			<property name="value" value=""/>
+        <property name="language" value="text/properties"/>
   			<property name="componentConstraints" value="grow, push, w 250, h 150"/>
         <property name="persistent" value="true"/>
       </child>

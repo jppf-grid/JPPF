@@ -49,11 +49,12 @@
 	<!--                   Server messages area                                -->
 	<!-- ===================================================================== -->
 
-	<child name="LoadBalancingParameters" type="TextArea">
+	<child name="LoadBalancingParameters" type="CodeEditor">
 		<property name="label" value="Parameters"/>
 		<property name="tooltip" value="Parameters of the load-balancing algorithm"/>
 		<property name="value" value=""/>
-		<property name="editable" value="true"/>
+    <property name="editable" value="true"/>
+    <property name="language" value="text/properties"/>
 		<property name="componentConstraints" value="grow, pushx, pushy 3"/>
 	</child>
 

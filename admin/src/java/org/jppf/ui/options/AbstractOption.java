@@ -190,4 +190,17 @@ public abstract class AbstractOption extends AbstractOptionElement implements Op
   {
     this.persistent = persistent;
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append('[').append((this instanceof OptionContainer) ? "Page" : "Option").append(" : ");
+    sb.append(getClass().getName()).append("] ");
+    sb.append("name=").append(name);
+    sb.append("; label=").append(label);
+    sb.append("; path=").append(getStringPath());
+    sb.append("; value=").append(getValue());
+    return sb.toString();
+  }
 }

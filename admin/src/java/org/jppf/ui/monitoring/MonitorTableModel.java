@@ -24,12 +24,12 @@ import java.util.Map;
 import javax.swing.table.AbstractTableModel;
 
 import org.jppf.ui.monitoring.data.*;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Data model for the tables displaying the values.
  */
-class MonitorTableModel extends AbstractTableModel
-{
+class MonitorTableModel extends AbstractTableModel {
   /**
    * Default values to use when the driver connection is no longer available.
    */
@@ -43,30 +43,25 @@ class MonitorTableModel extends AbstractTableModel
    * Initialize this table model with the specified list of fields.
    * @param fields the list of fields whose values are displayed in the table.
    */
-  MonitorTableModel(final Fields[] fields)
-  {
+  MonitorTableModel(final Fields[] fields) {
     this.fields = fields;
   }
 
   /**
    * Get the number of columns in the table.
    * @return 2.
-   * @see javax.swing.table.TableModel#getColumnCount()
    */
   @Override
-  public int getColumnCount()
-  {
+  public int getColumnCount() {
     return 2;
   }
 
   /**
    * Get the number of rows in the table.
    * @return the number of fields displayed in the table.
-   * @see javax.swing.table.TableModel#getRowCount()
    */
   @Override
-  public int getRowCount()
-  {
+  public int getRowCount() {
     return fields.length;
   }
 
@@ -75,13 +70,11 @@ class MonitorTableModel extends AbstractTableModel
    * @param row the row coordinate.
    * @param column the column coordinate.
    * @return the value as an object.
-   * @see javax.swing.table.TableModel#getValueAt(int, int)
    */
   @Override
-  public Object getValueAt(final int row, final int column)
-  {
+  public Object getValueAt(final int row, final int column) {
     Fields name = fields[row];
-    if (column == 0) return name;
+    if (column == 0) return GuiUtils.shortenLabel(name.toString());
     Map<Fields, String> valuesMap = null;
     if (StatsHandler.getInstance().getStatsCount() > 0) valuesMap = StatsHandler.getInstance().getLatestStringValues();
     else valuesMap = EMPTY_VALUES;

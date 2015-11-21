@@ -187,6 +187,23 @@ public class OptionElementFactory {
   }
 
   /**
+   * Build a code editor option from the specified option descriptor.
+   * @param desc the descriptor to get the page properties from.
+   * @return an <code>Option</code> instance, or null if the option could not be build.
+   * @throws Exception if an error was raised while building the option.
+   */
+  public Option buildCodeEditor(final OptionDescriptor desc) throws Exception {
+    CodeEditorOption option = new CodeEditorOption();
+    option.setEventsEnabled(false);
+    builder.initCommonOptionAttributes(option, desc);
+    option.setEditable(desc.getBoolean("editable", false));
+    option.setLanguage(desc.getString("language", "text/xml"));
+    option.createUI();
+    option.setEventsEnabled(true);
+    return option;
+  }
+
+  /**
    * Build a password option from the specified option descriptor.
    * @param desc the descriptor to get the page properties from.
    * @return an <code>Option</code> instance, or null if the option could not be build.

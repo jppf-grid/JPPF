@@ -43,7 +43,7 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
     JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
     Job job = driver.getJob(jobInfo.getJobUuid());
     JPPFManagementInfo nodeInfo = notif.getNodeInfo();
-    TopologyNode node = nodeInfo == null ? null : (TopologyNode) driver.getTopologyDriver().getChild(nodeInfo.getUuid());
+    TopologyNode node = (nodeInfo == null) ? null : (TopologyNode) driver.getTopologyDriver().getChild(nodeInfo.getUuid());
     switch (notif.getEventType()) {
       case JOB_QUEUED:
         monitor.jobAdded(driver, new Job(jobInfo));
@@ -61,11 +61,11 @@ class ImmediateJobNotificationsHandler extends AbstractJobNotificationsHandler {
         break;
 
       case JOB_DISPATCHED:
-        monitor.dispatchAdded(driver, job, new JobDispatch(jobInfo, node));
+        if (node != null) monitor.dispatchAdded(driver, job, new JobDispatch(jobInfo, node));
         break;
 
       case JOB_RETURNED:
-        monitor.dispatchRemoved(driver, job, job.getJobDispatch(node.getUuid()));
+        if (node != null) monitor.dispatchRemoved(driver, job, job.getJobDispatch(node.getUuid()));
         break;
     }
   }

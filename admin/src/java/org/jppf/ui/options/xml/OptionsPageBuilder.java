@@ -301,6 +301,7 @@ public class OptionsPageBuilder {
     else if ("ToolbarSeparator".equalsIgnoreCase(desc.type)) list.add(f.buildToolbarSeparator(desc));
     else if ("Button".equalsIgnoreCase(desc.type)) list.add(f.buildButton(desc));
     else if ("TextArea".equalsIgnoreCase(desc.type)) list.add(f.buildTextArea(desc));
+    else if ("CodeEditor".equalsIgnoreCase(desc.type)) list.add(f.buildCodeEditor(desc));
     else if ("Password".equalsIgnoreCase(desc.type)) list.add(f.buildPassword(desc));
     else if ("PlainText".equalsIgnoreCase(desc.type)) list.add(f.buildPlainText(desc));
     else if ("FormattedNumber".equalsIgnoreCase(desc.type)) list.add(f.buildFormattedNumber(desc));

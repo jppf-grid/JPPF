@@ -215,6 +215,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   @Override
   public TypedProperties[] getPropertiesArray() {
     synchronized(map) {
+      if (propertiesArray == null) propertiesArray = map.values().toArray(new TypedProperties[map.size()]);
       return propertiesArray;
     }
   }

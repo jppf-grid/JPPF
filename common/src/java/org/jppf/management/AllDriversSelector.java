@@ -19,11 +19,11 @@
 package org.jppf.management;
 
 /**
- * Selects all nodes.
+ * Selects all drivers.
  * @author Laurent Cohen
- * @since 5.0
+ * @since 5.2
  */
-public class AllNodesSelector implements NodeSelector {
+public class AllDriversSelector implements DriverSelector {
   /**
    * Explicit serialVersionUID.
    */

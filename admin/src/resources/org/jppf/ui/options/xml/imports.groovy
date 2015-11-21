@@ -6,9 +6,11 @@ import java.awt.*
 import java.awt.event.*
 import javax.swing.*
 import org.jppf.client.*
+import org.jppf.management.*
+import org.jppf.node.policy.*
+import org.jppf.server.protocol.*
 import org.jppf.utils.*
 import org.jppf.utils.collections.*
-import org.jppf.server.protocol.*
 import org.jppf.ui.monitoring.*
 import org.jppf.ui.monitoring.event.*
 import org.jppf.ui.monitoring.charts.*

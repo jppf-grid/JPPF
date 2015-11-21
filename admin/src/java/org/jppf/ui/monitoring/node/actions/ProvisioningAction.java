@@ -94,8 +94,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ProvisioningPanel.xml");
     OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
     OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
-    TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
-
+    CodeEditorOption editorOption = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("provisioning.frame.caption"), false);
@@ -109,7 +108,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
     };
     AbstractAction cancelAction = new AbstractAction() {
       @Override public void actionPerformed(final ActionEvent event) {
-        TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
+        CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
         overrides = (String) textArea.getValue();
         dialog.setVisible(false);
         dialog.dispose();
@@ -131,7 +130,7 @@ public class ProvisioningAction extends AbstractTopologyAction {
   private void doOK() {
     OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
     OptionsHandler.savePreferences(optionNode, OptionsHandler.getPreferences());
-    TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configOverrides");
+    CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
     final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("useOverrides")).getValue();
     overrides = (String) textArea.getValue();
     final TypedProperties props = ((b != null) && b.booleanValue()) ? getPropertiesFromString(overrides) : null;

@@ -37,5 +37,10 @@
       <artifactId>miglayout</artifactId>
       <version>3.7</version>
     </dependency>
+    <dependency>
+      <groupId>com.fifesoft</groupId>
+      <artifactId>rsyntaxtextarea</artifactId>
+      <version>2.5.7</version>
+    </dependency>
   </dependencies>
 </project>

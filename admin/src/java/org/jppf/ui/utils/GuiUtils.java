@@ -19,7 +19,7 @@ package org.jppf.ui.utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -29,6 +29,7 @@ import javax.swing.*;
 import org.jppf.client.monitoring.topology.TopologyNode;
 import org.jppf.management.*;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -57,7 +58,11 @@ public final class GuiUtils {
    */
   private static final Pattern TOOLTIP_PATTERN = Pattern.compile("\\n");
   /**
-   *
+   * The default empty execution policy for node filtering from a resource file.
+   */
+  public static final String DEFAULT_EMPTY_FILTER = loadDefaultEmptyFilter();
+  /**
+   * A mapping of words or phrases to abbreviated versions for use in the UI.
    */
   private static Map<String, String> shortenerMap = createShortener();
   static {
@@ -330,5 +335,19 @@ public final class GuiUtils {
    */
   public static void runAction(final Runnable r, final String name) {
     new Thread(r, name).start();
+  }
+
+  /**
+   * Load the default empty execution policy for node filtering from a resource file.
+   * @return an XML execution policy as a string.
+   */
+  private static String loadDefaultEmptyFilter() {
+    try {
+      ClassLoader cl = GuiUtils.class.getClassLoader();
+      return FileUtils.readTextFile("org/jppf/ui/filtering/empty_policy.xml");
+    } catch (Exception e) {
+      if (log.isDebugEnabled()) log.debug("Could not load default empty policy", e);
+      return "<ExecutionPolicy>\n  \n</ExecutionPolicy>";
+    }
   }
 }

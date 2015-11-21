@@ -181,6 +181,7 @@ public final class OptionsHandler {
    * Save the value of all persistent options in the preferences store.
    */
   public static void savePreferences() {
+    log.trace("saving preferences");
     try {
       for (OptionElement elt: pageList) {
         OptionNode node = buildPersistenceGraph(elt);
@@ -200,12 +201,14 @@ public final class OptionsHandler {
    */
   public static void savePreferences(final OptionNode node, final Preferences prefs) {
     if (!node.children.isEmpty()) {
+      log.trace("persisting node {}", node.elt.getName());
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) savePreferences(child, p);
     } else if (node.elt instanceof Option) {
       Option option = (Option) node.elt;
+      log.trace("persisting option {}", option);
       if (option.isPersistent()) prefs.put(option.getName(), String.valueOf(option.getValue()));
-    }
+    } else log.trace("persisting node {}", node.elt.getName());
   }
 
   /**

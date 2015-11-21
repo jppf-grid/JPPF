@@ -24,7 +24,7 @@ import java.util.*;
  * Selects nodes based on their uuids.
  * @author Laurent Cohen
  */
-public class UuidSelector implements NodeSelector {
+public class UuidSelector implements NodeSelector, DriverSelector {
   /**
    * Explicit serialVersionUID.
    */

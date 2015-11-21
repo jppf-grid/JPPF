@@ -225,7 +225,7 @@ public class PolicyParser {
    */
   public static ExecutionPolicy parsePolicy(final Reader reader) throws Exception {
     PolicyDescriptor desc = new PolicyParser().parse(reader);
-    return new PolicyBuilder().buildPolicy(desc.children.get(0));
+    return desc.children.isEmpty() ? null :  new PolicyBuilder().buildPolicy(desc.children.get(0));
   }
 
   /**

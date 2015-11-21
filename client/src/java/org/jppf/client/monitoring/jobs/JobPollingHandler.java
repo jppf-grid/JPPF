@@ -21,6 +21,7 @@ package org.jppf.client.monitoring.jobs;
 import java.util.*;
 
 import org.jppf.client.monitoring.AbstractRefreshHandler;
+import org.jppf.client.monitoring.topology.TopologyNode;
 import org.jppf.job.*;
 import org.jppf.server.job.management.*;
 import org.jppf.utils.ExceptionUtils;
@@ -135,7 +136,8 @@ class JobPollingHandler extends AbstractRefreshHandler {
     toHandle.removeAll(monitorUuids);
     for (String uuid: toHandle) {
       NodeJobInformation nji = nodeJobInfoMap.get(uuid);
-      monitor.dispatchAdded(jobDriver, job, new JobDispatch(nji.getJobInformation(), monitor.getTopologyManager().getNode(uuid)));
+      TopologyNode node = monitor.getTopologyManager().getNode(uuid);
+      if (node != null) monitor.dispatchAdded(jobDriver, job, new JobDispatch(nji.getJobInformation(), node));
     }
   }
 }

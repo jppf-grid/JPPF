@@ -23,6 +23,7 @@ import java.util.concurrent.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
+import org.jppf.management.NodeSelector;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -85,6 +86,11 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
    * Refreshes the latests JVM health snapshots of the drivers and nodes at rehular intervals.
    */
   final JVMHealthRefreshHandler jvmHealthRefreshHandler;
+  /**
+   * Use to filter the nodes and associated events.
+   * @since 5.2
+   */
+  private NodeSelector nodeFilter;
 
   /**
    * Initialize this topology manager with a new {@link JPPFClient} and the specified listeners.
@@ -138,7 +144,7 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
     for (JPPFConnectionPool pool: client.getConnectionPools()) {
       List<JPPFClientConnection> list = pool.getConnections(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
       if (list.isEmpty()) list = pool.getConnections();
-      if (!list.isEmpty()) { 
+      if (!list.isEmpty()) {
         JPPFClientConnection c = list.get(0);
         connectionAdded(new ConnectionPoolEvent(pool, c));
       }
@@ -443,5 +449,23 @@ public class TopologyManager extends ConnectionPoolListenerAdapter {
         }
       }
     }
+  }
+
+  /**
+   * Get the node selector used to filter the nodes and associated events.
+   * @return a {@link NodeSelector} instance.
+   * @since 5.2
+   */
+  public synchronized NodeSelector getNodeFilter() {
+    return nodeFilter;
+  }
+
+  /**
+   * Set the node selector used to filter the nodes and associated events.
+   * @param nodeFilter a {@link NodeSelector} instance.
+   * @since 5.2
+   */
+  public synchronized void setNodeFilter(final NodeSelector nodeFilter) {
+    this.nodeFilter = nodeFilter;
   }
 }

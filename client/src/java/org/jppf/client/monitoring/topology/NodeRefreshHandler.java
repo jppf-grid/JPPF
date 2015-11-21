@@ -80,7 +80,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     if ((jmx == null) || !jmx.isConnected()) return;
     Collection<JPPFManagementInfo> nodesInfo = null;
     try {
-      nodesInfo = jmx.nodesInformation(null, true);
+      nodesInfo = jmx.nodesInformation(manager.getNodeFilter(), true);
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       return;

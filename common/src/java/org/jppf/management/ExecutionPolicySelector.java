@@ -24,7 +24,7 @@ import org.jppf.node.policy.ExecutionPolicy;
  * Selects nodes based on an {@link ExecutionPolicy}.
  * @author Laurent Cohen
  */
-public class ExecutionPolicySelector implements NodeSelector {
+public class ExecutionPolicySelector implements NodeSelector, DriverSelector {
   /**
    * Explicit serialVersionUID.
    */

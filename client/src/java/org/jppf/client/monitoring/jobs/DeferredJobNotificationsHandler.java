@@ -75,6 +75,7 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
     JobInformation jobInfo = notif.getJobInformation();
     JobDriver driver = monitor.getJobDriver(notif.getDriverUuid());
     DriverNotif driverNotif = getDriverNotif(driver);
+    JPPFManagementInfo nodeInfo = notif.getNodeInfo();
     switch (notif.getEventType()) {
       case JOB_QUEUED:
         handleJobNotif(jobInfo, driverNotif, ADD);
@@ -86,10 +87,10 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
         handleJobNotif(jobInfo, driverNotif, UPDATE);
         break;
       case JOB_DISPATCHED:
-        handleJobDispatchNotif(jobInfo, notif.getNodeInfo(), driverNotif, ADD);
+        handleJobDispatchNotif(jobInfo, nodeInfo, driverNotif, ADD);
         break;
       case JOB_RETURNED:
-        handleJobDispatchNotif(jobInfo, notif.getNodeInfo(), driverNotif, REMOVE);
+        handleJobDispatchNotif(jobInfo, nodeInfo, driverNotif, REMOVE);
         break;
     }
   }
