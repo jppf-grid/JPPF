@@ -17,7 +17,7 @@
  */
 package org.jppf.utils.stats;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -319,5 +319,25 @@ public class JPPFStatistics implements Serializable, Iterable<JPPFSnapshot> {
      * @return <code>true</code> if the snapshot is accepted, <code>false</code> otherwise.
      */
     boolean accept(JPPFSnapshot snapshot);
+  }
+
+  /**
+   * Saves the state of this object to a stream.
+   * @param oos the stream to write to.
+   * @throws IOException if an I/O error occurs.
+   */
+  private void writeObject(final ObjectOutputStream oos) throws IOException {
+    oos.defaultWriteObject();
+  }
+
+  /**
+   * Restore the state of this object from a stream.
+   * @param ois the stream to read from.
+   * @throws IOException if an I/O error occurs.
+   * @throws ClassNotFoundException if a class cannot be found or initialized during desrialization.
+   */
+  private void readObject(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    listeners = new CopyOnWriteArrayList<>();
+    ois.defaultReadObject();
   }
 }
