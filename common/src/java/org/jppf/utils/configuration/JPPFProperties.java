@@ -157,9 +157,9 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> NODE_ANDROID = new BooleanProperty("jppf.node.android", false);
   /** Whether the node is .Net-enabled */
   public static final JPPFProperty<Boolean> DOTNET_NRIDGE_INITIALIZED = new BooleanProperty("jppf.dotnet.bridge.initialized", false);
-  /** Whteher the node is a master node */
+  /** Whether the node is a master node */
   public static final JPPFProperty<Boolean> PROVISIONING_MASTER = new BooleanProperty("jppf.node.provisioning.master", true);
-  /** Whteher the node is a slavez node */
+  /** Whether the node is a slave node */
   public static final JPPFProperty<Boolean> PROVISIONING_SLAVE = new BooleanProperty("jppf.node.provisioning.slave", false);
   /** Directory where slave-specific configuration files are located */
   public static final JPPFProperty<String> PROVISIONING_SLAVE_CONFIG_PATH = new StringProperty("jppf.node.provisioning.slave.config.path", "config");
