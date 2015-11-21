@@ -75,7 +75,7 @@ public abstract class PropertiesTableFormat {
     for (String name: orderedProps) {
       rowStart();
       cellStart();
-      sb.append(name);
+      sb.append(formatName(name));
       cellEnd();
       cellSeparator();
       cellStart();
@@ -127,6 +127,15 @@ public abstract class PropertiesTableFormat {
    * Write the separator between 2 cells.
    */
   public void cellSeparator() {
+  }
+
+  /**
+   * Format the specified property name if needed.
+   * @param name the name to format.
+   * @return the formatted name as a string.
+   */
+  public String formatName(final String name) {
+    return name;
   }
 
   /**

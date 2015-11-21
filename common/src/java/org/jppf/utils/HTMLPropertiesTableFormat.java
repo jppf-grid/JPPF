@@ -38,7 +38,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
   @Override
   public void start() {
     sb.append("<html><head></head><body style=\"font-family: Arial; font-size: 12pt\">");
-    sb.append("<h1>").append(docTitle).append("</h1>");
+    sb.append("<h1><font color=\"#2D3876\">").append(docTitle).append("</font></h1>");
   }
 
   /**
@@ -55,7 +55,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
    */
   @Override
   public void tableStart(final String title) {
-    sb.append("<h2>").append(title).append("</h2>");
+    sb.append("<h2><font color=\"#2D3876\">").append(title).append("</font></h2>");
     sb.append("<table cellspacing=\"0\" cellpadding=\"1\">");
   }
 
@@ -104,6 +104,12 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
    */
   @Override
   public void cellSeparator() {
-    sb.append("<td width\"5\"/");
+    //sb.append("<td width=\"5\"/>");
+    sb.append("<td><font color=\"red\"> = </font></td>");
+  }
+
+  @Override
+  public String formatName(final String name) {
+    return "<font color=\"#2D3876\">" + name + "</font>";
   }
 }
