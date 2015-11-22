@@ -469,8 +469,8 @@ public final class SerializationReflectionHelper {
     Set<Class<?>> result = new HashSet<>();
     try {
       result.add(ConcurrentHashMap.class);
-      result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$Segment"));
-      result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$HashEntry"));
+      //result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$Segment"));
+      //result.add(Class.forName("java.util.concurrent.ConcurrentHashMap$HashEntry"));
     } catch (Exception e) {
       e.printStackTrace();
     }
