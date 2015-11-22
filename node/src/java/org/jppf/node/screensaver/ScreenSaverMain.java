@@ -182,11 +182,11 @@ public class ScreenSaverMain implements InitializationHook
       });
       if (config.get(SCREENSAVER_MOUSE_MOTION_CLOSE)) {
         final long mouseMotionDelay = config.get(SCREENSAVER_MOUSE_MOTION_DELAY);
-        final long start = System.currentTimeMillis();
+        final long start = System.nanoTime();
         frame.addMouseMotionListener(new MouseAdapter() {
           @Override
           public void mouseMoved(final MouseEvent e) {
-            if (System.currentTimeMillis() - start > mouseMotionDelay) doOnclose();
+            if (DateTimeUtils.elapsedFrom(start) > mouseMotionDelay) doOnclose();
           }
         });
       }

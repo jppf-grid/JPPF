@@ -143,7 +143,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    */
   @Override
   public void run() {
-    start = System.currentTimeMillis();
+    start = System.nanoTime();
     while (!isStopped()) {
       try {
         lock.lock();
@@ -162,7 +162,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
           configureJob(job);
           executor.submitJob(job);
           currentJobRef.set(null);
-          elapsed = System.currentTimeMillis() - start;
+          elapsed = (System.nanoTime() - start) / 1_000_000L;
           submittingJob.signal();
         } finally {
           lock.unlock();
@@ -180,7 +180,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
   private void updateNextJob(final boolean sendSignal) {
     JPPFJob job = nextJobRef.get();
     int size = job.getJobTasks().size();
-    if (batchTimeout > 0L) elapsed = System.currentTimeMillis() - start;
+    if (batchTimeout > 0L) elapsed = (System.nanoTime() - start) / 1_000_000L;
     if (size == 0) {
       if ((batchTimeout > 0L) && (elapsed >= batchTimeout)) resetTimeout();
       return;
@@ -206,7 +206,7 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * Reset the timeout counter.
    */
   private void resetTimeout() {
-    start = System.currentTimeMillis();
+    start = System.nanoTime();
     elapsed = 0L;
   }
 

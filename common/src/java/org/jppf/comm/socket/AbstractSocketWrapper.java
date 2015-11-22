@@ -421,7 +421,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * system millisecond counter.
    */
   protected void updateSocketTimestamp() {
-    socketTimestamp = System.currentTimeMillis();
+    socketTimestamp = System.nanoTime();
   }
 
   @Override

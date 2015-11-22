@@ -136,7 +136,7 @@ public class NodeSimulator
 
       for (int i=0; i<nbIter; i++)
       {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         int pending = maxTasks;
         while (pending > 0)
         {
@@ -159,7 +159,7 @@ public class NodeSimulator
           }
           for (Future<?> f: futures) f.get();
         }
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed = (System.nanoTime() - start) - 1_000_000L;
         System.out.println("Iteration #" + i + " performed in " + elapsed + " ms");
       }
       threadPool.shutdownNow();

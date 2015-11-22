@@ -103,7 +103,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
         count = 0;
         resultMap.clear();
         nbTasks = size;
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         // create a task for each row in matrix a
         JPPFJob job = new JPPFJob();
         job.setName("non-blocking matrix sample");
@@ -125,7 +125,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
           double[] row = (double[]) matrixTask.getResult();
           for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
         }
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed = (System.nanoTime() - start) / 1_000_000L;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }
       JPPFStatistics stats = jppfClient.getConnectionPool().getJmxConnection().statistics();

@@ -67,7 +67,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
     try {
       while (!isStopped()) {
         long oldValue = totalCpuTime.get();
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         long[] ids = threadMXBean.getAllThreadIds();
         long time = 0L;
         for (long id: ids) {
@@ -79,7 +79,7 @@ public class CPUTimeCollector extends ThreadSynchronization implements Runnable 
 
         double d = (double) (cpuTime - oldValue) / (double) (INTERVAL * systemMXBean.getAvailableProcessors());
         load.set(Double.doubleToLongBits(d));
-        long sleepTime = INTERVAL - (System.currentTimeMillis() - start);
+        long sleepTime = INTERVAL - ((System.nanoTime() - start) / 1_000_000L);
         //log.info("computed difference ms = " + (cpuTime - oldValue) + ", sleep time = " + sleepTime);
         goToSleep(sleepTime <= 0L ? INTERVAL : sleepTime);
       }

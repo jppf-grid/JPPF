@@ -80,7 +80,7 @@ public class JobPriorityRunner
     try
     {
       DriverJobManagementMBean jobMgt = getJobManagement();
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job1 = createJob("job 1", 1, 10, 1000);
       JPPFJob job2 = createJob("job 2", 0, 10, 1000);
       JobRunner runner1 = new JobRunner(job1);
@@ -92,7 +92,7 @@ public class JobPriorityRunner
       runner1.join();
       runner2.join();
       // submit the tasks for execution
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       print("elapsed time: " + StringUtils.toStringDuration(elapsed));
     }
     catch(Exception e)

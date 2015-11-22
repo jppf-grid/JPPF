@@ -47,7 +47,7 @@ public abstract class AbstractAutoTunedBundler extends AbstractAdaptiveBundler {
    * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
    * towards a good solution.
    */
-  protected Random rnd = new Random(System.currentTimeMillis());
+  protected Random rnd = new Random(System.nanoTime());
   /**
    * A map of performance samples, sorted by increasing bundle size.
    */

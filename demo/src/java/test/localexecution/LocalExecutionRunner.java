@@ -98,7 +98,7 @@ public class LocalExecutionRunner
   {
     try
     {
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("Long task iteration " + iter);
       for (int i=0; i<nbTasks; i++)
@@ -114,7 +114,7 @@ public class LocalExecutionRunner
         Throwable e = task.getThrowable();
         if (e != null) throw e;
       }
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       print("run " + iter + " time: "+StringUtils.toStringDuration(elapsed));
 
     }

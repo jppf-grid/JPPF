@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 import org.jppf.JPPFError;
 import org.jppf.client.JPPFJob;
 import org.jppf.node.protocol.Task;
+import org.jppf.utils.DateTimeUtils;
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
@@ -128,7 +129,7 @@ public class BaseTestHelper {
    */
   public static void waitForTest(final Callable<? super Object> test, final long timeout) throws Exception {
     Throwable throwable = null;
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     while (true) {
       try {
         test.call();
@@ -136,7 +137,7 @@ public class BaseTestHelper {
         throwable = e;
       }
       if (throwable == null) return;
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       if (elapsed >= timeout) {
         if (throwable instanceof Exception) throw (Exception) throwable;
         else if (throwable instanceof Error) throw (Error) throwable;

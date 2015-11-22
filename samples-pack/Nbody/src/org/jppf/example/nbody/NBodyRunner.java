@@ -152,7 +152,7 @@ public class NBodyRunner
       for (Task<?> task: tasks) job.add(task);
       panel.updatePositions(positions);
       dp.setParameter("positions", positions);
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       // submit the tasks for execution
       List<Task<?>> results = jppfClient.submitJob(job);
       //System.out.println(msg);
@@ -168,7 +168,7 @@ public class NBodyRunner
         NBody[] bodies = ((NBodyTask) tasks.get(i)).getBodies();
         for (NBody body: bodies) positions[body.number] = body.pos;
       }
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       totalTime += elapsed;
       if (iter % 100 == 0) updateLabel("Time steps: " + iter);
       //log.info(msg);

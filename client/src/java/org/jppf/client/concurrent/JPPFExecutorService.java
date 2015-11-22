@@ -128,7 +128,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     long millis = TimeUnit.MILLISECONDS.equals(unit) ? timeout : DateTimeUtils.toMillis(timeout, unit);
     if (debugEnabled) log.debug("timeout in millis: " + millis);
     Pair<JPPFJob, Integer> pair = batchHandler.addTasks(tasks);
@@ -139,7 +139,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
       if (task == null) throw new NullPointerException("a task cannot be null");
       JPPFTaskFuture future = new JPPFTaskFuture<T>(job, position);
       futureList.add(future);
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
       try {
         future.getResult(millis - elapsed);
       } catch (TimeoutException ignore) {
@@ -369,7 +369,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    */
   private void waitForTerminated(final long timeout) {
     long elapsed = 0L;
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     while (!isTerminated() && (elapsed < timeout)) {
       synchronized (this) {
         try {
@@ -377,7 +377,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
         } catch (InterruptedException e) {
           log.error(e.getMessage(), e);
         }
-        elapsed = System.currentTimeMillis() - start;
+        elapsed = (System.nanoTime() - start) / 1_000_000L;
       }
     }
   }

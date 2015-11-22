@@ -45,4 +45,13 @@ public final class DateTimeUtils {
     }
     return millis;
   }
+
+  /**
+   * Return the time in miliis elapsed since the start given in nanos.
+   * @param startNanos the start value.
+   * @return the elapsed time coverted to millis.
+   */
+  public static long elapsedFrom(final long startNanos) {
+    return (System.nanoTime() - startNanos) / 1_000_000L;
+  }
 }

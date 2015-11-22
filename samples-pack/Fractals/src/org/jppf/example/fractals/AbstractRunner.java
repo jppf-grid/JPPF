@@ -189,9 +189,9 @@ public abstract class AbstractRunner {
     DataProvider dp = new MemoryMapDataProvider();
     dp.setParameter("config", cfg);
     job.setDataProvider(dp);
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     List<Task<?>> results = submitJob(job, cfg);
-    long elapsed = System.currentTimeMillis() - start;
+    long elapsed = DateTimeUtils.elapsedFrom(start);
     if (log.isDebugEnabled()) log.debug("Computation performed in " + StringUtils.toStringDuration(elapsed));
     BufferedImage image = generateImage(results, cfg);
     if (JPPFConfiguration.getProperties().getBoolean("jppf.fractals.autosave.enabled", true)) saveImage(image, "png", "data/" + name + ".png");
@@ -356,9 +356,9 @@ public abstract class AbstractRunner {
         BufferedImage image = null;
         if (uiMode) createOrDisplayWaitWindow();
         try {
-          long start = System.currentTimeMillis();
+          long start = System.nanoTime();
           image = computeFractal(id, config);
-          long elapsed = System.currentTimeMillis() - start;
+          long elapsed = DateTimeUtils.elapsedFrom(start);
           if (wait > 0L) {
             Thread.sleep(Math.max(1L, wait - elapsed));
             final ImagePanel panel = getImagePanel();

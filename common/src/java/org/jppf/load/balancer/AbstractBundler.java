@@ -25,8 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractBundler implements Bundler
-{
+public abstract class AbstractBundler implements Bundler {
   /**
    * Count of the bundlers used to generate a readable unique id.
    */
@@ -48,8 +47,7 @@ public abstract class AbstractBundler implements Bundler
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm,
    */
-  public AbstractBundler(final LoadBalancingProfile profile)
-  {
+  public AbstractBundler(final LoadBalancingProfile profile) {
     this.profile = profile;
   }
 
@@ -57,8 +55,7 @@ public abstract class AbstractBundler implements Bundler
    * Increment the bundlers count by one.
    * @return the new count as an int value.
    */
-  private static int incBundlerCount()
-  {
+  private static int incBundlerCount() {
     return bundlerCount.incrementAndGet();
   }
 
@@ -74,19 +71,16 @@ public abstract class AbstractBundler implements Bundler
    * @param totalTime in nanoseconds - not used.
    */
   @Override
-  public void feedback(final int bundleSize, final double totalTime)
-  {
+  public void feedback(final int bundleSize, final double totalTime) {
   }
 
   /**
    * Get the timestamp at which this bundler was created.
    * This is used to enable node channels to know when the bundler settings have changed.
    * @return the timestamp as a long value.
-   * @see org.jppf.load.balancer.Bundler#getTimestamp()
    */
   @Override
-  public long getTimestamp()
-  {
+  public long getTimestamp() {
     return timestamp;
   }
 
@@ -94,37 +88,30 @@ public abstract class AbstractBundler implements Bundler
    * Get the bundler number for this bundler.
    * @return the bundler number as an int.
    */
-  public int getBundlerNumber()
-  {
+  public int getBundlerNumber() {
     return bundlerNumber;
   }
 
   /**
    * Perform context-independent initializations.
-   * @see org.jppf.load.balancer.Bundler#setup()
    */
   @Override
-  public void setup()
-  {
+  public void setup() {
   }
 
   /**
    * Release the resources used by this bundler.
-   * @see org.jppf.load.balancer.Bundler#dispose()
    */
   @Override
-  public void dispose()
-  {
+  public void dispose() {
   }
 
   /**
    * Get the parameters of the algorithm, grouped as a performance analysis profile.
    * @return an instance of <code>LoadBalancingProfile</code>.
-   * @see org.jppf.load.balancer.Bundler#getProfile()
    */
   @Override
-  public LoadBalancingProfile getProfile()
-  {
+  public LoadBalancingProfile getProfile() {
     return profile;
   }
 }

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -68,10 +68,10 @@ public class SerializationOverflowRunner
   private static void perform(final int i) throws Exception
   {
     output("Start of iteration " + i);
-    long totalTime = System.currentTimeMillis();
+    long totalTime = System.nanoTime();
     submitJob("SerializationOverflow-"+ i + "/1", 1, 0L, true);
     //submitJob(" job " + i + "/2",   2, 1L, false);
-    totalTime = System.currentTimeMillis() - totalTime;
+    totalTime = DateTimeUtils.elapsedFrom(totalTime);
     //output("Computation time for iteration " + i + ": " + StringUtils.toStringDuration(totalTime));
   }
 

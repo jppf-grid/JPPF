@@ -58,7 +58,7 @@ public class Matrix implements Serializable
    */
   public void assignRandomValues()
   {
-    Random rand = new Random(System.currentTimeMillis());
+    Random rand = new Random(System.nanoTime());
     for (int i=0; i<values.length; i++)
     {
       for (int j=0; j<values[i].length; j++)

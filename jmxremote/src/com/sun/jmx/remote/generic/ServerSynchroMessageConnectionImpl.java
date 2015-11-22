@@ -363,7 +363,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
     synchronized (stateLock) {
       if (state == CONNECTED) return;
       else if (state != CONNECTING) throw new IOException("The connection was closed or failed.");
-      final long startTime = System.currentTimeMillis();
+      final long startTime = System.nanoTime();
       long remainingTime = waitConnectedState;
       while (state == CONNECTING && waitConnectedState > 0) {
         try {
@@ -371,7 +371,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
         } catch (InterruptedException ire) {
           break;
         }
-        remainingTime = waitConnectedState - (System.currentTimeMillis() - startTime);
+        remainingTime = waitConnectedState - ((System.nanoTime() - startTime) / 1_000_000L);
       }
       if (state != CONNECTED) throw new IOException("The connection is not connected.");
       else return;

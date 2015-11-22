@@ -148,12 +148,9 @@ public class JobResults extends ThreadSynchronization implements Serializable
    */
   public synchronized Task<?> waitForTask(final int position, final long timeout)
   {
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     long elapsed = 0L;
-    while ((elapsed < timeout) && !hasResult(position)) {
-      goToSleep(timeout - elapsed);
-      elapsed = System.currentTimeMillis() - start;
-    }
+    while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && !hasResult(position)) goToSleep(1L);
     return getResultTask(position);
   }
 

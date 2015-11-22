@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
+import org.jppf.utils.DateTimeUtils;
 
 /**
  * This class contains the code for the demo web application
@@ -63,7 +64,7 @@ public class Demo
    */
   public String submitJob(final String jobName, final int nbTasks, final long taskDuration)
   {
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     JPPFJob job = null;
     StringBuilder sb = new StringBuilder();
     sb.append("<h2>Results for job ").append(jobName).append("</h2>");
@@ -91,7 +92,7 @@ public class Demo
         sb.append(elt).append("<br/>");
       }
     }
-    long elapsed = System.currentTimeMillis() - start;
+    long elapsed = DateTimeUtils.elapsedFrom(start);
     sb.append("<p> Total processing time: ").append(elapsed).append(" ms");
     return sb.toString();
   }

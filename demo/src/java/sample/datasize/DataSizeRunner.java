@@ -109,7 +109,6 @@ public class DataSizeRunner
       totalTime += elapsed;
       output("iteration " + i + " performed in " + StringUtils.toStringDuration(elapsed/1000000L));
     }
-    //totalTime = System.currentTimeMillis() - totalTime;
     output("Computation time: " + StringUtils.toStringDuration(totalTime/1000000L));
   }
 
@@ -132,7 +131,7 @@ public class DataSizeRunner
     executor.setBatchTimeout(30L);
 
     output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
-    long totalTime = System.currentTimeMillis();
+    long totalTime = System.nanoTime();
     List<Future<?>> futureList = new ArrayList<>();
     for (int i=0; i<nbTasks; i++) futureList.add(executor.submit(new DataTask(datasize, inNodeOnly)));
     for (Future<?> f: futureList)
@@ -142,7 +141,7 @@ public class DataSizeRunner
       if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
       else System.out.println("task result: " + t.getResult());
     }
-    totalTime = System.currentTimeMillis() - totalTime;
+    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
     output("Computation time: " + StringUtils.toStringDuration(totalTime));
     executor.shutdownNow();
   }
@@ -156,7 +155,7 @@ public class DataSizeRunner
     TypedProperties config = JPPFConfiguration.getProperties();
     int iterations = config.getInt("datasize.iterations", 1);
     output("Running test for " + iterations + " iterations");
-    long totalTime = System.currentTimeMillis();
+    long totalTime = System.nanoTime();
     for (int n=1; n<=iterations; n++)
     {
       jppfClient = new JPPFClient();
@@ -167,7 +166,7 @@ public class DataSizeRunner
       if (n % 1000 == 0) output("executed " + n + " jobs");
       jppfClient.close();
     }
-    totalTime = System.currentTimeMillis() - totalTime;
+    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
     output("Computation time: " + StringUtils.toStringDuration(totalTime));
   }
 

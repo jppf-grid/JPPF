@@ -38,7 +38,7 @@ public class BroadcastJobRunner {
       //while (!jppfClient.hasAvailableConnection()) Thread.sleep(10L);
       int nbTasks = 1;
       System.out.println("Running Broadcast Job with " + nbTasks + " tasks");
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job = new JPPFJob("broadcast test");
       for (int i=1; i<=nbTasks; i++) job.add(new BroadcastTask()).setId("task " + i);
       job.getSLA().setBroadcastJob(true);
@@ -47,7 +47,7 @@ public class BroadcastJobRunner {
         Throwable e = task.getThrowable();
         if (e != null) throw e;
       }
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Total time: " + elapsed + " ms");
     } catch(Throwable e) {
       e.printStackTrace();

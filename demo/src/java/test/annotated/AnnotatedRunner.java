@@ -74,7 +74,7 @@ public class AnnotatedRunner
     long time = 0L;
 
     output("Running demo with time = " + time + " for " + nbJobs + " jobs");
-    long totalTime = System.currentTimeMillis();
+    long totalTime = System.nanoTime();
     List<JPPFJob> jobs = new ArrayList<>();
     for (int i=0; i<nbJobs; i++)
     {
@@ -91,7 +91,7 @@ public class AnnotatedRunner
       Task t = results.get(0);
       output((String) t.getResult());
     }
-    totalTime = System.currentTimeMillis() - totalTime;
+    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
     output("Computation time: " + StringUtils.toStringDuration(totalTime));
   }
 
@@ -109,7 +109,7 @@ public class AnnotatedRunner
     URL url = file.toURI().toURL();
     URLClassLoader cl = new URLClassLoader(new URL[] { url }, AnnotatedRunner.class.getClassLoader());
     Thread.currentThread().setContextClassLoader(cl);
-    long totalTime = System.currentTimeMillis();
+    long totalTime = System.nanoTime();
     List<JPPFJob> jobs = new ArrayList<>();
     for (int i=0; i<nbJobs; i++)
     {
@@ -127,7 +127,7 @@ public class AnnotatedRunner
       Task t = results.get(0);
       output((String) t.getResult());
     }
-    totalTime = System.currentTimeMillis() - totalTime;
+    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
     output("Computation time: " + StringUtils.toStringDuration(totalTime));
   }
 

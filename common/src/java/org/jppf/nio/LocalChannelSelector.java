@@ -50,17 +50,13 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
   public boolean select(final long timeout)
   {
     if (timeout < 0L) throw new IllegalArgumentException("timeout must be >= 0");
-    //long start = System.currentTimeMillis();
     long start = System.nanoTime();
     final long timeoutNanos = timeout * 1000000L;
     long elapsed = 0;
     boolean selected =  channel.isSelectable();
-    //while (((timeout == 0L) || (elapsed < timeout)) && !selected)
     while (((timeout == 0L) || (elapsed < timeoutNanos)) && !selected)
     {
-      //goToSleep(timeout == 0L ? 0L : timeout - elapsed);
       goToSleep(1000L, 0);
-      //elapsed = System.currentTimeMillis() - start;
       elapsed = System.nanoTime() - start;
       selected = channel.isSelectable();
     }

@@ -74,17 +74,17 @@ public class LongTask extends AbstractTask<String> {
 
   @Override
   public void run() {
-    long taskStart = System.currentTimeMillis();
+    long taskStart = System.nanoTime();
     long elapsed = 0L;
     try {
       if (useCPU) {
-        for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart) {
+        for (; elapsed < taskLength; elapsed = (System.nanoTime() - taskStart) / 1_000_000L) {
           String s = "";
           for (int i=0; i<10; i++) s += "A10";
         }
       } else {
         if (taskLength > 0) Thread.sleep(taskLength);
-        elapsed = System.currentTimeMillis() - taskStart;
+        elapsed = (System.nanoTime() - taskStart) / 1_000_000L;
       }
       String result = "task '" + getId() + "' has run for " + elapsed + " ms";
       setResult(result);

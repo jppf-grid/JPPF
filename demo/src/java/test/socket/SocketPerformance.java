@@ -190,9 +190,9 @@ public class SocketPerformance
           //log.info("Server: writing datasize");
           socketWrapper.writeInt(datasize);
           //log.info("Server: writing data");
-          long start = System.currentTimeMillis();
+          long start = System.nanoTime();
           socketWrapper.write(data, 0, datasize);
-          long elapsed = System.currentTimeMillis() - start;
+          long elapsed = DateTimeUtils.elapsedFrom(start);
           //log.info("Server: data written in " + elapsed + " ms");
         }
         socketWrapper.writeInt(0);
@@ -242,9 +242,9 @@ public class SocketPerformance
           }
           //log.info("Client: read datasize = " + datasize + ", reading next data");
           if ((data == null) || (data.length < datasize)) data = new byte[datasize];
-          long start = System.currentTimeMillis();
+          long start = System.nanoTime();
           sc.read(data, 0, datasize);
-          long elapsed = System.currentTimeMillis() - start;
+          long elapsed = DateTimeUtils.elapsedFrom(start);
           log.info("Client: read data size = " + datasize + " in " + elapsed + " ms");
         }
       }

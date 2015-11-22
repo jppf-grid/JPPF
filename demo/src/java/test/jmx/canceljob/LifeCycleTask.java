@@ -25,8 +25,7 @@ import org.slf4j.*;
  * A simple JPPF task for unit-testing the task life cycle.
  * @author Laurent Cohen
  */
-public class LifeCycleTask extends AbstractTask<String>
-{
+public class LifeCycleTask extends AbstractTask<String> {
   /**
    * Explicit serialVersionUID.
    */
@@ -60,48 +59,40 @@ public class LifeCycleTask extends AbstractTask<String>
   /**
    * Initialize this task.
    */
-  public LifeCycleTask()
-  {
+  public LifeCycleTask() {
   }
 
   /**
    * Initialize this task.
    * @param duration specifies the duration of this task.
    */
-  public LifeCycleTask(final long duration)
-  {
+  public LifeCycleTask(final long duration) {
     this.duration = duration;
   }
 
   @Override
-  public void run()
-  {
-    start = System.currentTimeMillis();
-    try
-    {
+  public void run() {
+    start = System.nanoTime();
+    try {
       if (duration > 0) Thread.sleep(duration);
-      elapsed = System.currentTimeMillis() - start;
+      elapsed = (System.nanoTime() - start) / 1_000_000L;
       setResult("execution succesful in " + elapsed + " ms");
       displayElapsed("successful");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       setThrowable(e);
     }
   }
 
   @Override
-  public void onCancel()
-  {
-    elapsed = System.currentTimeMillis() - start;
+  public void onCancel() {
+    elapsed = (System.nanoTime() - start) / 1_000_000L;
     cancelled = true;
     displayElapsed("cancelled");
   }
 
   @Override
-  public void onTimeout()
-  {
-    elapsed = System.currentTimeMillis() - start;
+  public void onTimeout() {
+    elapsed = (System.nanoTime() - start) / 1_000_000L;
     timedout = true;
     displayElapsed("timed out");
   }
@@ -110,8 +101,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Log or display a message showing the execution status and elapsed of this task.
    * @param message a short message describing the life cycle status.
    */
-  private void displayElapsed(final String message)
-  {
+  private void displayElapsed(final String message) {
     log.info("task id='" + getId() + "' " + message + ", duration=" + duration + ", result=" + getResult() + ", elapsed=" + elapsed);
   }
 
@@ -119,8 +109,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Determine whether this task was cancelled.
    * @return true if the task was cancelled, false otherwise.
    */
-  public boolean isCancelled()
-  {
+  public boolean isCancelled() {
     return cancelled;
   }
 
@@ -128,8 +117,7 @@ public class LifeCycleTask extends AbstractTask<String>
    * Determine whether this task timed out.
    * @return true if the task timed out, false otherwise.
    */
-  public boolean isTimedout()
-  {
+  public boolean isTimedout() {
     return timedout;
   }
 }

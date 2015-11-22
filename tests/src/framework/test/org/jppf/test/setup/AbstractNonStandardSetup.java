@@ -241,9 +241,9 @@ public class AbstractNonStandardSetup {
     JPPFNodeForwardingMBean nodeForwarder = driverJmx.getNodeForwarder();
     boolean ready = false;
     long elapsed = 0L;
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     while (!ready) {
-      elapsed = System.currentTimeMillis() - start;
+      elapsed = DateTimeUtils.elapsedFrom(start);
       assertTrue((elapsed < 20_000L));
       try {
         Map<String, Object> result = nodeForwarder.state(NodeSelector.ALL_NODES);

@@ -219,7 +219,7 @@ public class WebCrawlerRunner {
     @Override
     public void run() {
       try {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         Set<LinkMatch> results = new TreeSet<>(new LinkMatch.Comparator());
         Set<String> toSearch = new HashSet<>();
         toSearch.add(url);
@@ -255,7 +255,7 @@ public class WebCrawlerRunner {
           sb.append(lm.url).append('\n');
         }
         ((AbstractOption) option.findFirstWithName("/resultText")).setValue(sb.toString());
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed = DateTimeUtils.elapsedFrom(start);
         hideWaitWindow();
         log.info("Computation done in " + elapsed + " ms");
       } catch (Exception e) {

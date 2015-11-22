@@ -172,7 +172,7 @@ public abstract class AbstractClientConnectionHandler implements ClientConnectio
   {
     // If the socket has been idle too long, recycle the connection.
     if ((maxSocketIdleMillis > 10000L)
-        && (System.currentTimeMillis() - maxSocketIdleMillis > socketClient.getSocketTimestamp()))
+        && ((System.nanoTime() - socketClient.getSocketTimestamp()) / 1_000_000L > maxSocketIdleMillis))
     {
       close();
       init();

@@ -102,9 +102,9 @@ public class ScriptedMouseListener implements MouseListener {
     ScriptRunner runner = null;
     try {
       runner = ScriptRunnerFactory.getScriptRunner(this.language);
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       runner.evaluate(uuid, scriptText, variables);
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
       StringBuilder sb = new StringBuilder("executed ").append(language).append(" script in ").append(elapsed).append(" ms for [").append(option).append(']');
       if (debugEnabled) log.debug(sb.toString());
     } catch (JPPFScriptingException e) {

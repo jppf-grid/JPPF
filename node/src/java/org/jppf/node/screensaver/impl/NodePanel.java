@@ -23,7 +23,7 @@ import java.text.NumberFormat;
 import javax.swing.*;
 
 import org.jppf.node.screensaver.ScreenSaverMain;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 
 /**
@@ -116,7 +116,7 @@ public class NodePanel extends JPanel {
     nf.setGroupingUsed(true);
     nf.setMaximumFractionDigits(0);
     nf.setMinimumIntegerDigits(1);
-    startedAt = System.currentTimeMillis();
+    startedAt = System.nanoTime();
     for (int i=0; i<statusLabels.length; i++) statusLabels[i] = new JLabel(NodePanel.DARK_RED);
     Dimension d = new Dimension(8, 8);
     for (JLabel aStatusLabel : statusLabels) {
@@ -236,7 +236,7 @@ public class NodePanel extends JPanel {
    * Update the text of the label indicating how long the screensaver has been active.
    */
   public synchronized void updateTimeLabel() {
-    String s = toStringDuration(System.currentTimeMillis() - startedAt);
+    String s = toStringDuration(DateTimeUtils.elapsedFrom(startedAt));
     timeLabel.setText("Active for: " + s);
   }
 

@@ -23,6 +23,7 @@ import java.util.*;
 import org.jppf.example.datadependency.model.*;
 import org.jppf.example.datadependency.startup.DataDependencyStartup;
 import org.jppf.node.protocol.AbstractTask;
+import org.jppf.utils.DateTimeUtils;
 
 /**
  * JPPF task whose role is to recompute a trade when some market data was updated.
@@ -52,16 +53,15 @@ public class TradeUpdateTask extends AbstractTask<String> {
   @Override
   public void run() {
     String msg = "updating trade " + tradeId;
-    long taskStart = System.currentTimeMillis();
+    long taskStart = System.nanoTime();
     Trade trade = DataDependencyStartup.getTrade(tradeId);
     List<MarketData> data = new ArrayList<>();
     for (String id : trade.getDataDependencies()) data.add(DataDependencyStartup.getMarketData(id));
     // perform some dummy cpu-consuming computation
     long elapsed = 0L;
-    for (; elapsed < taskDuration; elapsed = System.currentTimeMillis() - taskStart) {
+    for (; elapsed < taskDuration; elapsed = DateTimeUtils.elapsedFrom(taskStart)) {
       String s = "";
-      for (int i = 0; i < 10; i++)
-        s += "A" + "10";
+      for (int i = 0; i < 10; i++) s += "A" + "10";
     }
     msg = "updated trade " + tradeId + " in " + elapsed + " ms";
     setResult(msg);

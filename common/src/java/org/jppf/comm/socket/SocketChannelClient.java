@@ -487,6 +487,6 @@ public class SocketChannelClient implements SocketWrapper
    */
   @Override
   public long getSocketTimestamp() {
-    return System.currentTimeMillis();
+    return System.nanoTime();
   }
 }

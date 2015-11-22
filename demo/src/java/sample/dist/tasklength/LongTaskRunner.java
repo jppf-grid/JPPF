@@ -82,7 +82,7 @@ public class LongTaskRunner {
     // perform "iteration" times
     long totalTime = 0L;
     for (int iter=1; iter<=iterations; iter++) {
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("Long task iteration " + iter);
       for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
@@ -95,7 +95,7 @@ public class LongTaskRunner {
           else throw new JPPFException(e);
         }
       }
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
       print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
       totalTime += elapsed;
     }
@@ -114,7 +114,7 @@ public class LongTaskRunner {
       // perform "iteration" times
       long totalTime = 0L;
       for (int iter=1; iter<=iterations; iter++) {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         JPPFJob job = new JPPFJob();
         job.setName("Long task iteration " + iter);
         for (int i=0; i<nbTasks; i++) {
@@ -129,7 +129,7 @@ public class LongTaskRunner {
         jppfClient.submitJob(job);
         print("submitted non blocking job '" + job.getName() + "'");
         Thread.sleep(2000L);
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed = (System.nanoTime() - start) / 1_000_000L;
         print("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed));
         totalTime += elapsed;
       }
@@ -152,7 +152,7 @@ public class LongTaskRunner {
     JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
     //executor.setBatchSize(50);
     //executor.setBatchTimeout(1000L);
-    long totalTime = System.currentTimeMillis();
+    long totalTime = System.nanoTime();
     List<Future<?>> futureList = new ArrayList<>();
     for (int i=0; i<nbTasks; i++) {
       LongTask task = new LongTask(length, false);
@@ -165,7 +165,7 @@ public class LongTaskRunner {
       if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
       else System.out.println("task result: " + t.getResult());
     }
-    totalTime = System.currentTimeMillis() - totalTime;
+    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
     print("Computation time: " + StringUtils.toStringDuration(totalTime));
     executor.shutdownNow();
   }
@@ -184,7 +184,7 @@ public class LongTaskRunner {
     //executor.setBatchTimeout(1000L);
     long totalTime = 0L;
     for (int iter=0; iter<iterations; iter++) {
-      long iterTime = System.currentTimeMillis();
+      long iterTime = System.nanoTime();
       List<JPPFTaskCallable> tasks = new ArrayList<>();
       for (int i=0; i<nbTasks; i++) {
         LongTask task = new LongTask(length, false);
@@ -198,7 +198,7 @@ public class LongTaskRunner {
         if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
         else System.out.println("task result: " + t.getResult());
       }
-      iterTime = System.currentTimeMillis() - iterTime;
+      iterTime = (System.nanoTime() - iterTime) / 1_000_000L;
       print("Computation time for iteration " + (iter+1) + ": " + StringUtils.toStringDuration(iterTime));
       totalTime += iterTime;
     }
@@ -254,11 +254,11 @@ public class LongTaskRunner {
     //System.out.println("\n********** job suspend/resume test **********");
     print("\n********** driver restart test **********");
     print("getting the jmx connection");
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     getJmxConnection();
-    long elapsed = System.currentTimeMillis() - start;
+    long elapsed = (System.nanoTime() - start) / 1_000_000L;
     print("got it in " + elapsed + " ms");
-    start = System.currentTimeMillis();
+    start = System.nanoTime();
     JPPFJob job = new JPPFJob();
     job.setName("Long task job");
     LongTask task = new LongTask(10000L, false);
@@ -285,7 +285,7 @@ public class LongTaskRunner {
       if (e != null) throw e;
       else print("result for task " + t.getId() + " : " + t.getResult());
     }
-    elapsed = System.currentTimeMillis() - start;
+    elapsed = (System.nanoTime() - start) / 1_000_000L;
     print("Iteration performed in " + StringUtils.toStringDuration(elapsed));
   }
 
@@ -295,7 +295,7 @@ public class LongTaskRunner {
    */
   private static void perform5() throws Throwable {
     System.out.println("\n********** job cancel test **********");
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     JPPFJob job = new JPPFJob();
     job.setName("Long task job 1");
     LongTask task = new LongTask(6000L, false);
@@ -318,7 +318,7 @@ public class LongTaskRunner {
       if (e != null) throw e;
       else System.out.println("result for task " + t.getId() + " : " + t.getResult());
     }
-    long elapsed = System.currentTimeMillis() - start;
+    long elapsed = (System.nanoTime() - start) / 1_000_000L;
     print("Iteration performed in "+StringUtils.toStringDuration(elapsed));
   }
 

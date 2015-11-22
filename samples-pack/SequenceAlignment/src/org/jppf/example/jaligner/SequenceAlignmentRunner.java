@@ -77,7 +77,6 @@ public class SequenceAlignmentRunner {
    */
   public static void main(final String[] args) {
     try {
-      long start = System.currentTimeMillis();
       System.out.println("Running example...");
       String s = FileUtils.readTextFile("data/TargetSequence.txt");
       doPerform(s, "PAM120", "data/ecoli.aa");
@@ -112,7 +111,7 @@ public class SequenceAlignmentRunner {
    * @throws Exception if the computation failed.
    */
   public static SequenceAlignmentTask doPerform(final String targetSequence, final String matrix, final String dbPath) throws Exception {
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     Sequence target = SequenceParser.parse(targetSequence);
     DataProvider dp = new MemoryMapDataProvider();
     dp.setParameter(SequenceAlignmentTask.TARGET_SEQUENCE, target);
@@ -132,11 +131,11 @@ public class SequenceAlignmentRunner {
       if (s == null) end = true;
       else job.add(new SequenceAlignmentTask(s, ++n));
     }
-    long start2 = System.currentTimeMillis();
+    long start2 = System.nanoTime();
     AlignmentJobListener listener = new AlignmentJobListener(job.getJobTasks().size());
     job.addJobListener(listener);
     List<Task<?>> results = client.submitJob(job);
-    long elapsed2 = System.currentTimeMillis() - start2;
+    long elapsed2 = DateTimeUtils.elapsedFrom(start2);
     float maxScore = 0;
     SequenceAlignmentTask maxTask = null;
     for (Task<?> t: results) {
@@ -151,7 +150,7 @@ public class SequenceAlignmentRunner {
         maxTask = task;
       }
     }
-    long elapsed = System.currentTimeMillis() - start;
+    long elapsed = DateTimeUtils.elapsedFrom(start);
     log.info("max score is "+maxScore+" for sequence #"+maxTask.getNumber()+" :\n" + maxTask.getSequence());
     log.info("Total time = " + StringUtils.toStringDuration(elapsed) + ", calculation time = " + StringUtils.toStringDuration(elapsed2));
     hideWaitWindow();

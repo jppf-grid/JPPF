@@ -23,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.jppf.example.datadependency.model.MarketData;
 import org.jppf.example.datadependency.simulation.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 import com.hazelcast.core.Hazelcast;
@@ -80,7 +80,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater {
       long snapshotInterval = config.getLong("snapshotInterval", 1000L);
       ProcessSnapshotTask snapshotTask = new ProcessSnapshotTask();
       print("starting ticker ...");
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       new Thread(ticker, "ticker thread").start();
       timer.schedule(snapshotTask, snapshotInterval, snapshotInterval);
       // let it run for the configured time
@@ -99,7 +99,7 @@ public class SnapshotBasedTradeUpdater extends AbstractTradeUpdater {
       while (!jobExecutor.isTerminated()) Thread.sleep(10);
       resultsExecutor.shutdown();
       while (!resultsExecutor.isTerminated()) Thread.sleep(10);
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       //timer.purge();
       statsCollector.setTotalTime(elapsed);
       print(statsCollector.toString());

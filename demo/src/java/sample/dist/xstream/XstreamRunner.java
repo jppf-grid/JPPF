@@ -42,13 +42,13 @@ public class XstreamRunner
     try
     {
       jppfClient = new JPPFClient();
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       Person person = new Person("John", "Smith", new PhoneNumber(123, "456-7890"));
       job.add(new XstreamTask(person));
       // submit the tasks for execution
       List<Task<?>> results = jppfClient.submitJob(job);
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Task executed in " + elapsed + " ms");
       Task result = results.get(0);
       if (result.getThrowable() != null) throw result.getThrowable();

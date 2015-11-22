@@ -18,13 +18,13 @@
 package org.jppf.example.tomcat;
 
 import org.jppf.node.protocol.AbstractTask;
+import org.jppf.utils.DateTimeUtils;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
-public class LongTask extends AbstractTask<String>
-{
+public class LongTask extends AbstractTask<String> {
   /**
    * Determines how long this task will run.
    */
@@ -44,8 +44,7 @@ public class LongTask extends AbstractTask<String>
    * @param taskLength - determines how long this task will run.
    * @param useCPU - determines whether this task should just sleep during its allocated time or do some cpu-intensive work.
    */
-  public LongTask(final long taskLength, final boolean useCPU)
-  {
+  public LongTask(final long taskLength, final boolean useCPU) {
     this.taskLength = taskLength;
     this.useCPU = useCPU;
   }
@@ -54,8 +53,7 @@ public class LongTask extends AbstractTask<String>
    * Initialize this task with a predefined length of time, in milliseconds, during which it will run.
    * @param taskLength determines how long this task will run.
    */
-  public LongTask(final long taskLength)
-  {
+  public LongTask(final long taskLength) {
     this(taskLength, false);
   }
 
@@ -64,28 +62,20 @@ public class LongTask extends AbstractTask<String>
    * @see sample.BaseDemoTask#doWork()
    */
   @Override
-  public void run()
-  {
-    taskStart = System.currentTimeMillis();
+  public void run() {
+    taskStart = System.nanoTime();
     double elapsed = 0L;
-    if (useCPU)
-    {
-      for (; elapsed < taskLength; elapsed = System.currentTimeMillis() - taskStart)
-      {
+    if (useCPU) {
+      for (; elapsed < taskLength; elapsed = DateTimeUtils.elapsedFrom(taskStart)) {
         String s = "";
-        for (int i=0; i<10; i++) s += "A"+"10";
+        for (int i = 0; i < 10; i++) s += "A" + "10";
       }
-    }
-    else
-    {
-      try
-      {
+    } else {
+      try {
         Thread.sleep(taskLength);
-        elapsed = System.currentTimeMillis() - taskStart;
+        elapsed = (taskStart);
         setResult("task has run for " + elapsed + " ms");
-      }
-      catch(InterruptedException e)
-      {
+      } catch (InterruptedException e) {
         setThrowable(e);
         setResult("error executing this task: " + e.getMessage());
       }
@@ -96,8 +86,7 @@ public class LongTask extends AbstractTask<String>
    * Called when this task is cancelled.
    */
   @Override
-  public void onCancel()
-  {
+  public void onCancel() {
     setResult("this task has been cancelled");
   }
 }

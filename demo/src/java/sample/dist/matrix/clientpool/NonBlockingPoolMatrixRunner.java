@@ -91,7 +91,7 @@ public class NonBlockingPoolMatrixRunner
       long totalTime = 0L;
       for (int iter=0; iter<iterations; iter++)
       {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         // create a data provider to share matrix b among all tasks
         DataProvider dataProvider = new MemoryMapDataProvider();
         dataProvider.setParameter(MatrixTask.DATA_KEY, b);
@@ -121,7 +121,7 @@ public class NonBlockingPoolMatrixRunner
             for (int j=0; j<row.length; j++) c.setValueAt(i, j, row[j]);
           }
         }
-        long elapsed = System.currentTimeMillis() - start;
+        long elapsed = (System.nanoTime() - start) / 1_000_000L;
         totalTime += elapsed;
         System.out.println("Iteration #"+(iter+1)+" performed in "+StringUtils.toStringDuration(elapsed));
       }

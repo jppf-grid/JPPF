@@ -172,7 +172,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
           connectionThread.set(jct);
           Thread t = new Thread(jct, CONNECTION_NAME_PREFIX + getId());
           t.setDaemon(true);
-          connectionStart = System.currentTimeMillis();
+          connectionStart = System.nanoTime();
           t.start();
         }
       }
@@ -186,11 +186,11 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void connectAndWait(final long timeout) {
     if (isConnected()) return;
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     long max = timeout > 0 ? timeout : Long.MAX_VALUE;
     connect();
     long elapsed;
-    while (!isConnected() && ((elapsed = System.currentTimeMillis() - start) < max)) goToSleep(max - elapsed);
+    while (!isConnected() && ((elapsed = (System.nanoTime() - start)) / 1_000_000L < max)) goToSleep(Math.min(10L, max - elapsed));
   }
 
   /**
@@ -201,7 +201,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     connected.set(false);
     long elapsed;
     synchronized(this) {
-      elapsed = System.currentTimeMillis() - connectionStart;
+      elapsed = (System.nanoTime() - connectionStart) / 1_000_000L;
     }
     if ((CONNECTION_TIMEOUT > 0L) && (elapsed >= CONNECTION_TIMEOUT)) {
       fireTimeout();
@@ -363,7 +363,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   public void setHost(final String host) {
     this.host = host;
-    //this.idString = this.host + ':' + this.port;
     this.displayName = this.host + ':' + this.port;
   }
 

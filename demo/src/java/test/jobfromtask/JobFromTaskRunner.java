@@ -55,7 +55,7 @@ public class JobFromTaskRunner
       if (poolSize < 2) config.set(JPPFProperties.POOL_SIZE, 2);
       jppfClient = new JPPFClient();
       print("Running Long Task demo with");
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("source job");
       job.add(new SourceTask()).setId("source");
@@ -67,7 +67,7 @@ public class JobFromTaskRunner
         if (e != null) throw e;
         else print("task '" + t.getId() + "' result: " + t.getResult());
       }
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       print("processing  performed in " + StringUtils.toStringDuration(elapsed));
     }
     catch(Throwable e)

@@ -260,9 +260,9 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
         synchronized (connectionLock) { // send out the msg
           connection.writeMessage(msg);
         }
-        final long startTime = System.currentTimeMillis();
+        final long startTime = System.nanoTime();
         boolean got = false;
-        while (!got && (wtimeout > System.currentTimeMillis() - startTime)) {
+        while (!got && (wtimeout > (System.nanoTime() - startTime) / 1_000_000L)) {
           synchronized(mwrapper) { got = mwrapper.got; }
           if (!got) {
             try {
@@ -501,14 +501,14 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       else if (state == TERMINATED) throw new IOException("The connection has been closed.");
       // waiting
       long remainingTime = waitConnectedState;
-      final long startTime = System.currentTimeMillis();
+      final long startTime = System.nanoTime();
       while (state != CONNECTED && state != TERMINATED && remainingTime > 0) {
         try {
           stateLock.wait(remainingTime);
         } catch (InterruptedException ire) {
           break;
         }
-        remainingTime = waitConnectedState - (System.currentTimeMillis() - startTime);
+        remainingTime = waitConnectedState - ((System.nanoTime() - startTime) / 1_000_000L);
       }
       if (state == CONNECTED) return;
       else throw new IOException("The connection is not currently established.");

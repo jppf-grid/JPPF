@@ -19,7 +19,7 @@
 package org.jppf.example.datadependency;
 
 import org.jppf.example.datadependency.simulation.*;
-import org.jppf.utils.LoggingUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 import com.hazelcast.core.Hazelcast;
@@ -59,7 +59,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
       ticker.addTickerListener(marketDataHandler);
       ticker.addTickerListener(this);
       print("starting ticker ...");
-      long start = System.currentTimeMillis();
+      long start = System.nanoTime();
       new Thread(ticker, "ticker thread").start();
       // let it run for the configured time
       Thread.sleep(config.getLong("simulationDuration", 60000L));
@@ -70,7 +70,7 @@ public class EventBasedTradeUpdater extends AbstractTradeUpdater {
       while (!jobExecutor.isTerminated()) Thread.sleep(10);
       resultsExecutor.shutdown();
       while (!resultsExecutor.isTerminated()) Thread.sleep(10);
-      long elapsed = System.currentTimeMillis() - start;
+      long elapsed = DateTimeUtils.elapsedFrom(start);
       statsCollector.setTotalTime(elapsed);
       print(statsCollector.toString());
       marketDataHandler.close();

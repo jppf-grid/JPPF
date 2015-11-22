@@ -218,8 +218,9 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
         byte[] buf = new byte[512];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         while (!isStopped()) {
-          long start = System.currentTimeMillis();
-          while (System.currentTimeMillis() - start < t) {
+          long start = System.nanoTime();
+          long elapsed = 0L;
+          while ((elapsed = (System.nanoTime() - start) / 1_000_000L) < t) {
             try {
               socket.receive(packet);
               if (isStopped()) break;
@@ -232,7 +233,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
             } catch(SocketTimeoutException e) {
               if (traceEnabled) log.trace(e.getMessage(), e);
             }
-            if (System.currentTimeMillis() - start < t) Thread.sleep(50L);
+            if (elapsed < t) Thread.sleep(50L);
           }
         }
         socket.leaveGroup(getGroupInetAddress());
