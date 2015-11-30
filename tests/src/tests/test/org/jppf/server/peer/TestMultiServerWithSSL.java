@@ -28,16 +28,14 @@ import test.org.jppf.test.setup.*;
  * all setup with SSL 2-way authentication.
  * @author Laurent Cohen
  */
-public class TestMultiServerWithSSL extends AbstractNonStandardSetup
-{
+public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
   /**
    * Launches a 2 drivers with 1 node attached to each and start the client,
    * all setup with 2-way SSL authentication.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     client = BaseSetup.setup(2, 2, true, createConfig("ssl2_p2p"));
   }
 
@@ -45,30 +43,26 @@ public class TestMultiServerWithSSL extends AbstractNonStandardSetup
    * Test a simple job.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
-  public void testSimpleJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSimpleJob() throws Exception {
     super.testSimpleJob(new Equal("jppf.ssl.server.port", 12101));
   }
 
   @Override
-  @Test(timeout=15000)
-  public void testMultipleJobs() throws Exception
-  {
+  @Test(timeout = 15000)
+  public void testMultipleJobs() throws Exception {
     super.testMultipleJobs();
   }
 
   @Override
-  @Test(timeout=10000)
-  public void testCancelJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testCancelJob() throws Exception {
     super.testCancelJob();
   }
 
   @Override
-  @Test(timeout=5000)
-  public void testNotSerializableExceptionFromNode() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testNotSerializableExceptionFromNode() throws Exception {
     super.testNotSerializableExceptionFromNode();
   }
 }
