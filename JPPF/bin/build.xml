@@ -1,0 +1,286 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2015 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name="JPPF" default="build" basedir="..">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <!-- JPPF modules -->
+  <property name="common"                value="${basedir}/../common"/>
+  <property name="admin"                 value="${basedir}/../admin"/>
+  <property name="client"                value="${basedir}/../client"/>
+  <property name="node"                  value="${basedir}/../node"/>
+  <property name="node-android"          value="${basedir}/../node-android"/>
+  <property name="server"                value="${basedir}/../server"/>
+  <property name="demo"                  value="${basedir}/../demo"/>
+  <property name="dotnet-bridge"         value="${basedir}/../dotnet-bridge"/>
+  <property name="jca-client"            value="${basedir}/../jca-client"/>
+  <property name="jmxremote"             value="${basedir}/../jmxxremote"/>
+  <property name="application.template"  value="${basedir}/../application-template"/>
+  <property name="samples-pack"          value="${basedir}/../samples-pack"/>
+  <property name="tests"                 value="${basedir}/../tests"/>
+  <property name="stress-tests"          value="${basedir}/../stress-tests"/>
+
+  <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
+  <property file="${build.properties.file}"/>
+  <property name="build.number.file"     value="${basedir}/bin/build.number"/>
+  <property name="bin"                   value="${basedir}/bin"/>  
+  <property name="installer"             value="${bin}/installer"/>
+  <property name="data"                  value="${basedir}/data"/>  
+  <property name="config"                value="${basedir}/config"/>  
+  <property name="build"                 value="${basedir}/build"/>  
+  <property name="classes"               value="${build}/classes"/>
+  <property name="src"                   value="${basedir}/src"/>
+  <property name="lib"                   value="${basedir}/lib"/>
+  <property name="docs"                  value="${basedir}/docs"/>
+  <property name="home"                  value="${docs}/home"/>
+  <property name="examples"              value="${basedir}/examples"/>
+  <property name="javadoc"               value="${home}/api-5"/>
+  <property name="app.jar.file"          value="${ant.project.name}.jar"/>
+  <property name="license.file"          value="LICENSE.txt"/>
+  <property name="runtime"               value="${build}/runtime"/>
+  <property name="runtime.driver"        value="${build}/runtime/driver"/>
+  <property name="runtime.multiplexer"   value="${build}/runtime/multiplexer"/>
+  <property name="runtime.node"          value="${build}/runtime/node"/>
+  <property name="runtime.gui"           value="${build}/runtime/gui"/>
+  <property name="app.ver"               value="${ant.project.name}-${version.number}"/>
+  <property name="build.sysclasspath"    value="last"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="project.classpath">
+    <pathelement location="${common}/classes"/>
+    <pathelement location="${node}/classes"/>
+    <pathelement location="${admin}/classes"/>
+    <pathelement location="${client}/classes"/>
+    <pathelement location="${server}/classes"/>
+    <pathelement location="${demo}/classes"/>
+    <pathelement location="${jca-client}/classes"/>
+    <pathelement location="${samples-pack}/DataEncryption/classes"/>
+    <fileset dir="${lib}" includes="**/*.jar"/>
+  </path>
+
+  <path id="javadoc.classpath">
+    <pathelement location="${bin}"/>
+    <pathelement location="${android.home}/platforms/android-19/android.jar"/>
+    <path refid="project.classpath"/>  
+  </path>
+
+  <path id="run.classpath">
+    <pathelement location="${config}"/>
+    <path refid="project.classpath"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                                    Clean                                  -->
+  <!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete><fileset dir="${build}" includes="**/*.*"/></delete>
+  </target>
+
+  <target name="clean.all" depends="clean.deploy">
+    <delete dir="${node}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${common}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${server}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${client}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${admin}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${demo}/classes" quiet="true" includes="**/*.*"/>
+    <delete dir="${jca-client}/classes" quiet="true" includes="**/*.*"/>
+  </target>               
+
+  <target name="clean.deploy" description="clean.deploy">
+    <echo message="app.ver = ${app.ver}"/>
+    <delete quiet="true">
+      <fileset dir="${build}">
+        <include name="*.zip"/>
+        <exclude name="*${app.ver}*.zip"/>
+      </fileset>
+    </delete>
+    <delete dir="${runtime}" quiet="true"/>
+  </target>               
+
+  <!-- ========================================================================= -->
+  <!--                                    Init                                   -->
+  <!-- ========================================================================= -->
+
+  <target name="init">
+     <mkdir dir="${build}"/>
+    <available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
+    <!-- Format the build number to a 4 figures integer with leading zeroes if required -->
+    <!-- The build number is also incremented by 1                                      -->
+    <propertyfile file="${build.number.file}">
+      <entry key="build.number" type="int" default="0000" operation="+" pattern="0000" />
+    </propertyfile>
+    <!-- Read the build number -->
+    <property file="${build.number.file}"/>
+    <!-- create the build date and time with time zone -->
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+    <!-- Write the build and version information to a resource file -->
+    <!-- The resource file will be part of the corresponding jar    -->
+    <propertyfile file="${common}/src/resources/META-INF/jppf-version.properties">
+      <entry key="version.number" type="string" value="${version.number}"/>
+      <entry key="build.number" type="string" value="${build.number}"/>
+      <entry key="build.date" type="string" value="${readable.now}"/>
+    </propertyfile>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--  Macrodef utilities                                                       -->
+  <!-- ========================================================================= -->
+
+  <!--
+    Display the name and value of a property in the form "name = value".
+    Parameters:
+      - propname: the name of the property to display to the output console
+  -->
+  <macrodef name="echoprop">
+  <attribute name="name"/>
+    <sequential>
+      <echo message="@{name} = ${@{name}}"/>
+    </sequential>
+  </macrodef>
+
+  <!-- ========================================================================= -->
+  <!--                           Build the application                           -->
+  <!-- ========================================================================= -->
+
+  <!--
+  <target name="build" depends="init, compile, jar, jar.src, j2ee.connector.build, tests.build"/>
+  -->
+  <!-- build binary and souurce jars without cleanup -->
+  <target name="build" depends="init, compile, jar, jar.src" description=""/>
+  <!-- build the JEE connector -->
+  <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector" description=""/>
+  <!-- build binary and souurce jars from scratch -->
+  <target name="rebuild" depends="clean.all, build" description=""/>
+  <!-- build the whole JPPF distribution -->
+  <target name="deploy"             depends="deploy.base, javadoc, installer" description=""/>
+  <!-- build the whole JPPF distribution without web installer -->
+  <target name="deploy.noinstaller" depends="deploy.base, javadoc"            description=""/>
+  <!-- build the whole JPPF distribution without javadoc -->
+  <target name="deploy.nojavadoc"   depends="deploy.base, installer"          description=""/>
+  <!-- build the whole JPPF distribution without web installer nor javadoc (makes it twice shorter) -->
+  <target name="deploy.base" depends="clean.all, rebuild, package, runtime, samples.pack, j2ee.connector, dotnet, build.android, tests.build, user.guide, doc"
+    description="deploy without building the javadoc nor the installer"/>
+  <!-- build the whole JPPF distribution with local web installer -->
+  <target name="deploy.local.inst"  depends="deploy.base, javadoc, installer.local" description=""/>
+
+  <import file="build-compile-jar.xml"/>
+  <import file="build-modules.xml"/>
+  <import file="build-samples.xml"/>
+  <import file="build-connectors.xml"/>
+  <import file="build-installer.xml"/>
+  <import file="build-findbugs.xml"/>
+  <import file="build-docs.xml"/>
+  <import file="build-tests.xml"/>
+  <import file="build-maven.xml"/>
+  <import file="build-dotnet.xml"/>
+  <import file="build-android.xml"/>
+  <import file="build-utils.xml"/>
+  
+  <!-- ========================================================================= -->
+  <!--              Package the all-in-one zip distribution                      -->
+  <!-- ========================================================================= -->
+
+  <target name="all.zips" depends="" description="">
+    <property name="all.zip.file" value="${build}/${app.ver}-all.zip"/>
+    <delete file="${all.zip.file}" quiet="true"/>
+    <zip destfile="${all.zip.file}" basedir="${build}" includes="${app.ver}-*.zip"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                 Package the source distribution                           -->
+  <!-- ========================================================================= -->
+
+  <target name="package" depends="rebuild">
+    <property name="zip.prefix" value="${app.ver}-full-src"/>
+    <property name="release.file" value="${build}/${zip.prefix}.zip"/>
+    <delete file="${release.file}" quiet="true"/>
+    <zip destfile="${release.file}">
+      <zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
+        <include name="build/jppf*.jar"/>
+        <include name="bin/**/*.*"/>
+        <include name="config/**/*.*"/>
+        <!--<include name="docs/api/**/*.*"/>-->
+        <include name="lib/**/*.*"/>
+        <include name="${license.file}"/>
+        <include name="JPPF-3rd-party.html"/>
+        <exclude name="docs/home/db_settings.inc.php"/>
+      </zipfileset>
+      <zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
+      <zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
+      <zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
+      <zipfileset dir="${server}" prefix="${zip.prefix}/server"/>
+      <zipfileset dir="${admin}" prefix="${zip.prefix}/admin"/>
+      <zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
+      <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
+      <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
+      <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log"/>
+      <zipfileset dir="${node-android}" prefix="${zip.prefix}/node-android" excludes="**/build/**/*.*"/>
+      <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
+      <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
+        <exclude name="**/*.log"/>
+        <exclude name="**/diagnostics.txt"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                        Zip the whole Eclipse workspace                    -->
+  <!-- ========================================================================= -->
+
+  <target name="zip.workspace">
+    <delete file="${basedir}/../../JPPF.zip" quiet="true"/>
+    <zip destfile="${basedir}/../../JPPF.zip">
+      <zipfileset dir="${basedir}/.." prefix="JPPF">
+        <exclude name="**/*.lock"/>
+        <exclude name="**/JPPF/docs/home/**/*.*"/>
+        <exclude name="**/.history/"/>
+        <exclude name="**/JPPF/build/"/>
+        <exclude name="**/*.history"/>
+        <exclude name="**/*.index"/>
+        <exclude name="**/*.ear"/>
+        <exclude name="**/*.rar"/>
+        <exclude name="**/*.war"/>
+      </zipfileset>
+    </zip>
+  </target>
+
+  <target name="unzip.to.temp" depends="deploy.base">
+    <property name="temp" value="${basedir}/../../temp"/>
+    <delete dir="${temp}" quiet="true" includes="**/*.*" excludes="*.bat"/>
+    <unzip dest="${temp}">
+      <fileset dir="${build}">
+        <include name="*-driver.zip"/>
+        <include name="*-node.zip"/>
+        <include name="*-samples-pack.zip"/>
+      </fileset>
+    </unzip>
+    <property name="ecl.dir" value="${temp}/${app.ver}-samples-pack/ExtendedClassLoading"/>
+    <ant dir="${ecl.dir}"/>
+    <copy todir="${temp}/${app.ver}-driver/lib" file="${ecl.dir}/NodeListener.jar"/>
+  </target>
+  
+</project> 

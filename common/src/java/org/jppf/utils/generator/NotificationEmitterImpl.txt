@@ -1,0 +1,37 @@
+
+  @Override
+  public void addNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    try {
+      connection.addNotificationListener(mbeanName, listener, filter, handback);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error while adding notification filter", e);
+    }
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener) {
+    try {
+      connection.removeNotificationListener(mbeanName, listener, null, null);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error while removing notification filter", e);
+    }
+  }
+
+  @Override
+  public void removeNotificationListener(final NotificationListener listener, final NotificationFilter filter, final Object handback) {
+    try {
+      connection.removeNotificationListener(mbeanName, listener, filter, handback);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error while removing notification filter", e);
+    }
+  }
+
+  @Override
+  public MBeanNotificationInfo[] getNotificationInfo() {
+    try {
+      return connection.getNotificationInfo(mbeanName);
+    } catch (Exception e) {
+      if (debugEnabled) log.debug(connection.getId() + " : error getting MBeanNotificationInfo[]", e);
+    }
+    return new MBeanNotificationInfo[0];
+  }
