@@ -51,6 +51,11 @@
     </condition>
     <exec executable="${node-android}/${cmdname}" dir="${node-android}" failonerror="true" searchpath="false">
       <arg value="assemble"/>
+      <!--
+      <arg value="events:assembleDebug"/>
+      <arg value="app:assemble"/>
+      <arg value="demo:assemble"/>
+      -->
     </exec>
     <copy file="${node-android}/app/build/outputs/apk/app-release.apk" tofile="${build}/${app.ver}-AndroidNode.apk" quiet="true"/>
     <copy file="${node-android}/events/build/outputs/aar/events-release.aar" tofile="${build}/${app.ver}-AndroidNodeEvents.aar" quiet="true"/>
