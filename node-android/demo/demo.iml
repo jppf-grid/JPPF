@@ -71,7 +71,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/events-release/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
@@ -92,9 +91,9 @@
     <orderEntry type="library" exported="" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="jppf-server" level="project" />
     <orderEntry type="library" exported="" name="jppf-common" level="project" />
-    <orderEntry type="library" exported="" name="events-release-" level="project" />
     <orderEntry type="library" exported="" name="jppf-node-android" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="jppf-fractals-android" level="project" />
+    <orderEntry type="module" module-name="events" exported="" />
   </component>
 </module>

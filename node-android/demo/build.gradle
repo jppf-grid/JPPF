@@ -46,8 +46,8 @@ android {
 }
 
 dependencies {
-  //compile project(":events")
-  compile(name: 'events-release', ext: 'aar')
+  compile project(":events")
+  //compile(name: 'events-release', ext: 'aar')
   // these ae already included in the main node apk
   provided fileTree(dir: 'libs', exclude: ['jppf-fractals-android.jar', '*.aar'])
   compile(name: 'jppf-fractals-android', ext: 'jar')
