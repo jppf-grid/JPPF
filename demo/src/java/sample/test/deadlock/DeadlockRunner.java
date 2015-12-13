@@ -76,8 +76,15 @@ public class DeadlockRunner {
     System.out.printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d\n", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
+    JMXTestThread[] jmxTestThreads = (ro.nbJmxTestThreads > 0) ? new JMXTestThread[ro.nbJmxTestThreads] : null;
     try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       ensureSufficientConnections(client, ro.clientConnections);
+      if (jmxTestThreads != null) { 
+        JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+        pool.setJMXPoolMaxSize(ro.nbJmxTestThreads);
+        pool.awaitJMXConnections(Operator.AT_LEAST, ro.nbJmxTestThreads,true);
+        for (int i=0; i<ro.nbJmxTestThreads; i++) jmxTestThreads[i] = new JMXTestThread(client, i);
+      }
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
       if (ro.simulateNodeCrashes) {
         pt = new ProvisioningThread(client, ro.waitTime);
@@ -90,6 +97,7 @@ public class DeadlockRunner {
         }
         TimeMarker marker = new TimeMarker().start();
         int count = 0;
+        if (jmxTestThreads != null) for (int i=0; i<ro.nbJmxTestThreads; i++) new Thread(jmxTestThreads[i], "JMXTestThread-" + i).start();
         for (JPPFJob job: jobProvider) {
           if (job != null) client.submitJob(job);
           if (count == ro.triggerNodeDeadlockAfter) {
@@ -109,6 +117,11 @@ public class DeadlockRunner {
           pt.setStopped(true);
           mnmt.setStopped(true);
         }
+	      if (jmxTestThreads != null) {
+	        for (int i=0; i<ro.nbJmxTestThreads; i++) {
+	          if (jmxTestThreads[i] != null) jmxTestThreads[i].setStopped(true);
+	        }
+	      }
       }
     } catch (Exception e) {
       e.printStackTrace();

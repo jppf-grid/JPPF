@@ -28,7 +28,7 @@ public class RunOptions {
   /**
    * The JPPF configuration.
    */
-  public final TypedProperties config = JPPFConfiguration.getProperties();
+  public static final TypedProperties config = JPPFConfiguration.getProperties();
   /**
    * Max concurrent jobs that can be submitted by the client.
    */
@@ -77,4 +77,8 @@ public class RunOptions {
    * Callback invoked when a job is created by the job streaming pattern.
    */
   public JobCreationCallback jobCreationCallback;
+  /**
+   * Callback invoked when a job is created by the job streaming pattern.
+   */
+  public final int nbJmxTestThreads = config.getInt("deadlock.nbJmxTestThreads", -1);
 }
