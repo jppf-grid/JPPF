@@ -56,6 +56,7 @@ public class OutputRedirectHook implements InitializationHook {
       JPPFProperty<File> pathProp = isOut ? JPPFProperties.REDIRECT_OUT : JPPFProperties.REDIRECT_ERR;
       File outFile = config.get(pathProp);
       if (outFile == null) return;
+      if (debugEnabled) log.debug("redirecting System.{} to file {}", (isOut ? "out" : "err"), outFile);
       JPPFProperty<Boolean> appendProp = isOut ? JPPFProperties.REDIRECT_OUT_APPEND : JPPFProperties.REDIRECT_ERR_APPEND;
       boolean append = config.get(appendProp);
       OutputStream os = new BufferedOutputStream(new FileOutputStream(outFile, append));
