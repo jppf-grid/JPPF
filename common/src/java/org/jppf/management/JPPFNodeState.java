@@ -269,8 +269,7 @@ public class JPPFNodeState implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getClass().getSimpleName()).append('[');
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("threadPoolSize=").append(threadPoolSize);
     sb.append(", threadPriority=").append(threadPriority);
     sb.append(", nbTasksExecuted=").append(nbTasksExecuted);
