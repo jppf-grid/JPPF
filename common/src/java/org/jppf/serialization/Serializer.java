@@ -21,10 +21,10 @@ package org.jppf.serialization;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jppf.utils.StringUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -121,7 +121,8 @@ class Serializer {
           writeString((String) obj);
         } else writeObject(obj, handle);
       } else {
-        writeHeaderAndHandle(isString ? STRING_HEADER : OBJECT_HEADER, handle);
+        //writeHeaderAndHandle(isString ? STRING_HEADER : OBJECT_HEADER, handle);
+        writeHeaderAndHandle(OBJECT_HEADER, handle);
       }
     }
   }
@@ -138,7 +139,7 @@ class Serializer {
     currentObject = obj;
     currentClassDescriptor = cd;
     writeHeaderAndHandle(OBJECT_HEADER, handle);
-    writeClassHandle(cd);
+    writeString(cd.signature);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
     if (cd.array) writeArray(obj, cd);
     else if (cd.enumType) writeString(((Enum) obj).name());
@@ -352,25 +353,19 @@ class Serializer {
    */
   void writeString(final String s) throws Exception {
     int len = s.length();
-    boolean ascii = SerializationUtils.isASCII(s);
+    char[] chars = SerializationReflectionHelper.getStringValue(s);
+    boolean ascii = SerializationUtils.isASCII(chars);
     SerializationUtils.writeStringLength(out, ascii, len, buf);
     if (len == 0) return;
     if (ascii) {
-      char[] chars = SerializationReflectionHelper.getStringValue(s);
       for (int count=0; count<len;) {
         int n = Math.min(buf.length, len - count);
         for (int i=0; i<n; i++) buf[i] = (byte) (chars[count++] & 0x7F);
         out.write(buf, 0, n);
       }
-    } else if (len <= 65535/3) out.writeUTF(s); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
-    else {
-      char[] chars = SerializationReflectionHelper.getStringValue(s);
-      for (int count=0; count<len;) {
-        int n = Math.min(buf.length / 2, len - count);
-        for (int i=0; i<2*n; i+=2) SerializationUtils.writeChar(chars[count++], buf, i);
-        out.write(buf, 0, 2*n);
-      }
     }
+    else if (len <= 65535/3) out.writeUTF(s); // for writeUTF() : max bytes = 64k-1, max bytes per char = 3
+    else writeCharArray(chars);
   }
 
   /**
@@ -388,21 +383,12 @@ class Serializer {
         break;
       }
     }
-    b |= (n << 4);
+    b |= (n << 4) & 0xF0;
     buf[0] = b;
     for (int i=8*(n-1), pos=1; i>=0; i-=8) buf[pos++] = (byte) ((handle >>> i) & 0xFF);
     out.write(buf, 0, n+1);
   }
 
-
-  /**
-   * Write the handle of a class descriptor to the underlying stream.
-   * @param cd contains the handle to write.
-   * @throws Exception if any error occurs.
-   */
-  void writeClassHandle(final ClassDescriptor cd)  throws Exception {
-    writeString(cd.signature);
-  }
 
   /**
    * Write an int to the stream.
@@ -411,7 +397,8 @@ class Serializer {
    * @throws Exception if any error occurs.
    */
   int writeInt(final int value) throws Exception {
-    return SerializationUtils.writeVarInt(out, value, buf);
+    int n = SerializationUtils.writeVarInt(out, value, buf);
+    return n;
   }
 
   /**
@@ -421,7 +408,8 @@ class Serializer {
    * @throws Exception if any error occurs.
    */
   int writeLong(final long value) throws Exception {
-    return SerializationUtils.writeVarLong(out, value, buf);
+    int n = SerializationUtils.writeVarLong(out, value, buf);
+    return n;
   }
 
   /**

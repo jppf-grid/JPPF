@@ -459,6 +459,7 @@ public final class SerializationReflectionHelper {
    */
   public static char[] getStringValue(final String s) throws Exception {
     return (char[]) STRING_VALUE_FIELD.get(s);
+    //return s.toCharArray();
   }
 
   /**

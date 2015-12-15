@@ -33,6 +33,7 @@ public class ZLIBSerialization extends JPPFCompositeSerialization {
     try {
       getDelegate().serialize(o, zlibos);
     } finally {
+      zlibos.flush();
       zlibos.finish();
       deflater.end(); // required to clear the native/JNI buffers
     }

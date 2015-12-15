@@ -135,13 +135,16 @@ public class JPPFObjectInputStream extends ObjectInputStream {
   @Override
   public int readInt() throws IOException {
     readToBuf(4);
-    return SerializationUtils.readInt(buf, 0);
+    int value = SerializationUtils.readInt(buf, 0);
+    return value;
+    //return SerializationUtils.readVarInt(in, buf);
   }
 
   @Override
   public long readLong() throws IOException {
     readToBuf(8);
-    return SerializationUtils.readLong(buf, 0);
+    long value = SerializationUtils.readLong(buf, 0);
+    return value;
   }
 
   @Override

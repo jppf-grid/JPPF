@@ -138,6 +138,7 @@ public class JPPFObjectOutputStream extends ObjectOutputStream {
   public void writeInt(final int val) throws IOException {
     SerializationUtils.writeInt(val, buf, 0);
     out.write(buf, 0, 4);
+    //SerializationUtils.writeVarInt(out, val, buf);
   }
 
   @Override

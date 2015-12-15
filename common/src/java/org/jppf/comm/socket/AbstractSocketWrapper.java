@@ -22,7 +22,7 @@ import java.net.*;
 
 import org.jppf.JPPFException;
 import org.jppf.io.IO;
-import org.jppf.serialization.ObjectSerializer;
+import org.jppf.serialization.*;
 import org.jppf.utils.JPPFBuffer;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
@@ -116,11 +116,11 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * Send an array of bytes over a TCP socket connection.
    * @param buf the buffer container for the data to send.
    * @throws IOException if the underlying output stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#sendBytes(org.jppf.utils.JPPFBuffer)
    */
   @Override
   public void sendBytes(final JPPFBuffer buf) throws IOException {
-    dos.writeInt(buf.getLength());
+    //dos.writeInt(buf.getLength());
+    writeInt(buf.getLength());
     dos.write(buf.getBuffer(), 0, buf.getLength());
     flush();
   }
@@ -131,7 +131,6 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * @param offset the position where to start reading data from the input array.
    * @param len the length of data to write.
    * @throws Exception if the underlying output stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#write(byte[], int, int)
    */
   @Override
   public void write(final byte[] data, final int offset, final int len) throws Exception {
@@ -144,19 +143,18 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * Write an int value over a socket connection.
    * @param n the value to write.
    * @throws Exception if the underlying output stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#writeInt(int)
    */
   @Override
-  public void writeInt(final int n) throws Exception {
+  public void writeInt(final int n) throws IOException {
     checkOpened();
-    dos.writeInt(n);
+    SerializationUtils.writeInt(n, dos);
+    //dos.writeInt(n);
     flush();
   }
 
   /**
    * Flush the data currently in the send buffer.
    * @throws IOException if an I/O error occurs.
-   * @see org.jppf.comm.socket.SocketWrapper#flush()
    */
   @Override
   public void flush() throws IOException {
@@ -169,7 +167,6 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * This method blocks until an object is received.
    * @return the object that was read from the underlying input stream.
    * @throws Exception if the underlying input stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#receive()
    */
   @Override
   public Object receive() throws Exception {
@@ -182,7 +179,6 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
    * @return an array of bytes containing the serialized object to receive.
    * @throws IOException if the underlying input stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#receiveBytes(int)
    */
   @Override
   public JPPFBuffer receiveBytes(final int timeout) throws IOException {
@@ -190,7 +186,8 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
     JPPFBuffer buf = null;
     try {
       if (timeout > 0) socket.setSoTimeout(timeout);
-      int len = dis.readInt();
+      //int len = dis.readInt();
+      int len = readInt();
       byte[] buffer = new byte[len];
       read(buffer, 0, len);
       buf = new JPPFBuffer(buffer, len);
@@ -239,8 +236,9 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
    * @throws Exception if the underlying input stream throws an exception.
    */
   @Override
-  public int readInt() throws Exception {
-    int intRead = dis.readInt();
+  public int readInt() throws IOException {
+    //int intRead = dis.readInt();
+    int intRead = SerializationUtils.readInt(dis);
     updateSocketTimestamp();
     return intRead;
   }

@@ -28,8 +28,7 @@ import org.slf4j.*;
  * This class provides a simple API to transfer objects over a TCP socket connection.
  * @author Laurent Cohen
  */
-public class SocketClient extends AbstractSocketWrapper
-{
+public class SocketClient extends AbstractSocketWrapper {
   /**
    * Logger for this class.
    */
@@ -38,8 +37,7 @@ public class SocketClient extends AbstractSocketWrapper
   /**
    * Default constructor is invisible to other classes.
    */
-  public SocketClient()
-  {
+  public SocketClient() {
     super();
   }
 
@@ -50,8 +48,7 @@ public class SocketClient extends AbstractSocketWrapper
    * @param port the remote port on the host this socket client connects to.
    * @throws Exception if there is an issue with the socket streams.
    */
-  public SocketClient(final String host, final int port) throws Exception
-  {
+  public SocketClient(final String host, final int port) throws Exception {
     super(host, port, null);
   }
 
@@ -62,8 +59,7 @@ public class SocketClient extends AbstractSocketWrapper
    * @param serializer the object serializer used by this socket client.
    * @throws Exception if there is an issue with the socket streams.
    */
-  public SocketClient(final String host, final int port, final ObjectSerializer serializer) throws Exception
-  {
+  public SocketClient(final String host, final int port, final ObjectSerializer serializer) throws Exception {
     super(host, port, serializer);
   }
 
@@ -72,8 +68,7 @@ public class SocketClient extends AbstractSocketWrapper
    * @param socket the underlying socket this socket client wraps around.
    * @throws JPPFException if the socket connection fails.
    */
-  public SocketClient(final Socket socket) throws JPPFException
-  {
+  public SocketClient(final Socket socket) throws JPPFException {
     super(socket);
   }
 
@@ -81,11 +76,9 @@ public class SocketClient extends AbstractSocketWrapper
    * Send an object over a TCP socket connection.
    * @param o the object to send.
    * @throws Exception if the underlying output stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#send(java.lang.Object)
    */
   @Override
-  public void send(final Object o) throws Exception
-  {
+  public void send(final Object o) throws Exception {
     JPPFBuffer buf = getSerializer().serialize(o);
     sendBytes(buf);
   }
@@ -96,21 +89,16 @@ public class SocketClient extends AbstractSocketWrapper
    * @param timeout timeout after which the operation is aborted. A timeout of zero is interpreted as an infinite timeout.
    * @return the object that was read from the underlying input stream or null if the operation timed out.
    * @throws Exception if the underlying input stream throws an exception.
-   * @see org.jppf.comm.socket.SocketWrapper#receive(int)
    */
   @Override
-  public Object receive(final int timeout) throws Exception
-  {
+  public Object receive(final int timeout) throws Exception {
     checkOpened();
     Object o = null;
-    try
-    {
+    try {
       if (timeout > 0) socket.setSoTimeout(timeout);
       JPPFBuffer buf = receiveBytes(timeout);
       o = getSerializer().deserialize(buf);
-    }
-    finally
-    {
+    } finally {
       // disable the timeout on subsequent read operations.
       if (timeout > 0) socket.setSoTimeout(0);
     }
@@ -120,29 +108,15 @@ public class SocketClient extends AbstractSocketWrapper
   /**
    * Get an object serializer / deserializer to convert an object to or from an array of bytes.
    * @return an <code>ObjectSerializer</code> instance.
-   * @see org.jppf.comm.socket.SocketWrapper#getSerializer()
    */
   @Override
-  public ObjectSerializer getSerializer()
-  {
-    if (serializer == null)
-    {
+  public ObjectSerializer getSerializer() {
+    if (serializer == null) {
       // serializer = new ObjectSerializerImpl();
       String name = "org.jppf.utils.ObjectSerializerImpl";
-      try
-      {
+      try {
         serializer = (ObjectSerializer) Class.forName(name).newInstance();
-      }
-      catch (InstantiationException e)
-      {
-        log.error(e.getMessage(), e);
-      }
-      catch (IllegalAccessException e)
-      {
-        log.error(e.getMessage(), e);
-      }
-      catch (ClassNotFoundException e)
-      {
+      } catch (InstantiationException|IllegalAccessException|ClassNotFoundException e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -152,22 +126,18 @@ public class SocketClient extends AbstractSocketWrapper
   /**
    * Set the object serializer / deserializer to convert an object to or from an array of bytes.
    * @param serializer an <code>ObjectSerializer</code> instance.
-   * @see org.jppf.comm.socket.SocketWrapper#setSerializer(org.jppf.serialization.ObjectSerializer)
    */
   @Override
-  public void setSerializer(final ObjectSerializer serializer)
-  {
+  public void setSerializer(final ObjectSerializer serializer) {
     this.serializer = serializer;
   }
 
   /**
    * Generate a string representation of this socket client.
    * @return as string describing this object.
-   * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return "SocketClient[" + this.host + ':' + this.port + ", open=" + this.opened + ']';
   }
 }
