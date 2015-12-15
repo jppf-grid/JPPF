@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.utils.TimeMarker;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
 
@@ -48,10 +48,10 @@ public class WordCountRunner {
         JobProvider jobProvider = new JobProvider(params.jobCapacity, params)) {
       provider = jobProvider;
       System.out.printf(Locale.US, "Processing '%s' with %,d articles per task, %,d tasks per job, nb channels = %d, max concurrent jobs = %d%n",
-          params.dataFile, params.nbArticles, params.nbTasks, params.nbChannels, params.jobCapacity);
+        params.dataFile, params.nbArticles, params.nbTasks, params.nbChannels, params.jobCapacity);
       JPPFConnectionPool pool = client.awaitActiveConnectionPool();
       // set the pool size to the desired number of connections
-      pool.setSize(params.nbChannels);
+      pool.setSize(params.jobCapacity);
       marker = new TimeMarker().start();
       // read the wikipedia file and build jobs according to the configuration parameters
       for (JPPFJob job:  jobProvider) {
@@ -67,10 +67,10 @@ public class WordCountRunner {
       // group the words with equal count and sort by descending count then ascending word within each group,
       // then write the results to the specified file
       writeResults(sortResults(provider.getMergedResults()), "WordCountResults.txt");
-
-      System.out.printf(Locale.US, "processed %,d jobs for %,d articles in %s, total redirects = %,d%n",
-          provider.getJobCount(), (provider.getTotalArticles() - provider.getTotalRedirects()),
-          marker.stop().getLastElapsedAsString(), provider.getTotalRedirects());
+      // print execution statistics
+      System.out.printf(Locale.US, "processed %,d jobs for %,d articles in %s; total redirects = %,d; average article length = %,.0f; min = %,d; max = %,d%n",
+        provider.getJobCount(), (provider.getTotalArticles() - provider.getTotalRedirects()), marker.stop().getLastElapsedAsString(), provider.getTotalRedirects(),
+        provider.getAverageArticleLength(), provider.getMinArticleLength(), provider.getMaxArticleLength());
     } catch(Exception e) {
       e.printStackTrace();
     }

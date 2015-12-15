@@ -78,9 +78,8 @@ public class NodeListener extends NodeLifeCycleListenerAdapter implements  NodeL
   @Override
   @SuppressWarnings("unchecked")
   public void jobEnding(final NodeLifeCycleEvent event) {
+    if (!event.getJob().getName().startsWith("WordCount")) return;
     List<Task<?>> tasks = event.getTasks();
-    if ((tasks == null) || tasks.isEmpty()) return;
-
     Map<String, Long> reduced = null;
     int initialIndex = 0;
     // find the first task whose result is not null

@@ -145,4 +145,12 @@ public class WordCountTask extends AbstractTask<Map<String, Long>> {
   public int getNbArticles() {
     return nbArticles;
   }
+
+  /**
+   * Get the data in this task.
+   * @return a list of wikipedia articles.
+   */
+  public List<String> getArticles() {
+    return articles;
+  }
 }

@@ -63,6 +63,18 @@ public class JobProvider extends AbstractJPPFJobStream {
    */
   private int totalArticles = 0;
   /**
+   * The total cumulated length of all articles.
+   */
+  private long totalArticlesLength = 0L;
+  /**
+   * The size of the smallest article.
+   */
+  private long minArticleLength = Long.MAX_VALUE;
+  /**
+   * The size of the biggest article.
+   */
+  private long maxArticleLength = 0L;
+  /**
    * Count of articles read from the file.
    */
   private final AtomicInteger totalRedirects = new AtomicInteger(0);
@@ -102,6 +114,7 @@ public class JobProvider extends AbstractJPPFJobStream {
   protected JPPFJob createNextJob() {
     int taskCount  = 0;
     int totalJobArticles = 0;
+    long totalLength = 0L;
     JPPFJob job = new JPPFJob();
     job.setName(String.format("WordCount-%04d", (getJobCount() + 1)));
     // job can be sent over this number of channels in parallel
@@ -118,6 +131,10 @@ public class JobProvider extends AbstractJPPFJobStream {
           if (article == null) break;
           list.add(article);
           articleCount++;
+          int len = article.length();
+          totalLength+= len;
+          if (len < minArticleLength) minArticleLength = len;
+          if (len > maxArticleLength) maxArticleLength = len;
         }
         if (articleCount > 0) {
           job.add(new WordCountTask(list));
@@ -127,6 +144,7 @@ public class JobProvider extends AbstractJPPFJobStream {
       }
       if (taskCount > 0) {
         totalArticles += totalJobArticles;
+        totalArticlesLength += totalLength;
         // set the job start timestamp
         job.getMetadata().setParameter("startTime", System.nanoTime());
         return job;
@@ -164,6 +182,30 @@ public class JobProvider extends AbstractJPPFJobStream {
    */
   public int getTotalRedirects() {
     return totalRedirects.get();
+  }
+
+  /**
+   * Get the average of an article, computed over all the articles that were processed.
+   * @return the average length indouble precision, or -1 if no article was processed.
+   */
+  public double getAverageArticleLength() {
+    return (totalArticles > 0) ? (double) totalArticlesLength / (double) totalArticles : -1d;
+  }
+
+  /**
+   * Get the size of the smallest article.
+   * @return the size as a long value.
+   */
+  public long getMinArticleLength() {
+    return minArticleLength;
+  }
+
+  /**
+   * Get the size of the biggest article.
+   * @return the size as a long value.
+   */
+  public long getMaxArticleLength() {
+    return maxArticleLength;
   }
 
   /**
@@ -214,7 +256,7 @@ public class JobProvider extends AbstractJPPFJobStream {
       // job completion time in millis
       long jobCompletionTime = (System.nanoTime() - (Long) job.getMetadata().getParameter("startTime")) / 1_000_000L;
       System.out.printf("processed results of job '%s' - %,4d tasks, %,6d articles, including %,5d redirects. Completion time: %s%n",
-          job.getName(), job.executedTaskCount(), jobArticles, jobRedirects, StringUtils.toStringDuration(jobCompletionTime));
+        job.getName(), job.executedTaskCount(), jobArticles, jobRedirects, StringUtils.toStringDuration(jobCompletionTime));
     }
   }
 }
