@@ -41,8 +41,9 @@
 			<property name="persistent" value="true"/>
 		</child>
 
-		<child name="configProperties" type="TextArea">
+		<child name="configProperties" type="CodeEditor">
 			<property name="scrollable" value="true"/>
+      <property name="language" value="text/properties"/>
 			<property name="editable" value="true"/>
 			<property name="label" value="JPPF Configuration"/>
 			<property name="tooltip" value="Properties of the JPPF configuration"/>

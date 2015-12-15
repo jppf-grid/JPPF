@@ -82,7 +82,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     AbstractButton btn = (AbstractButton) event.getSource();
     if (btn.isShowing()) location = btn.getLocationOnScreen();
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/JPPFConfigurationPanel.xml");
-    TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
+    CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
     textArea.setValue(getPropertiesAsString());
 
     AbstractTopologyComponent data = dataArray[0];
@@ -119,7 +119,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * Perform the action.
    */
   private void doOK() {
-    TextAreaOption textArea = (TextAreaOption) thisPanel.findFirstWithName("configProperties");
+    CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
     final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceReconnect")).getValue();
     Runnable r = new Runnable() {
