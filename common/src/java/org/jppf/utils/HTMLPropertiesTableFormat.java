@@ -105,7 +105,7 @@ public class HTMLPropertiesTableFormat extends PropertiesTableFormat {
   @Override
   public void cellSeparator() {
     //sb.append("<td width=\"5\"/>");
-    sb.append("<td><font color=\"red\"> = </font></td>");
+    sb.append("<td valign=\"top\"><font color=\"red\"> = </font></td>");
   }
 
   @Override
