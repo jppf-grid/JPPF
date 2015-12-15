@@ -90,14 +90,12 @@ public class Pair<U, V> implements Serializable {
       if (other.first != null) return false;
     }
     else if (!first.equals(other.first)) return false;
-    if (second == null) {
-      return  other.second == null;
-    }
+    if (second == null) return  other.second == null;
     return second.equals(other.second);
   }
 
   @Override
   public String toString() {
-    return StringUtils.build(getClass().getSimpleName(), "[first=", first, ", second=", second, "]");
+    return String.format("%s[first=%s, second=%s]", getClass().getSimpleName(), first, second);
   }
 }
