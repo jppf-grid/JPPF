@@ -17,6 +17,6 @@
 	<classpathentry kind="lib" path="/JPPF/lib/MigLayout/miglayout-3.7-swing.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="lib" path="/JPPF/lib/JGoodies/looks-2.2.2.jar"/>
-	<classpathentry kind="lib" path="/JPPF/lib/RSyntaxtTextArea/rsyntaxtextarea-2.5.7.jar"/>
+	<classpathentry kind="lib" path="/JPPF/lib/RSyntaxTextArea/rsyntaxtextarea-2.5.7.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

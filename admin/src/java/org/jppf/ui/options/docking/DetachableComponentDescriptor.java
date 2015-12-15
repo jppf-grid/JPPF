@@ -35,6 +35,10 @@ public class DetachableComponentDescriptor {
    */
   private Component listenerComponent;
   /**
+   * The component displayed in the tab.
+   */
+  private final Component tabComponent;
+  /**
    * The container to which the component was initially attached.
    */
   private final OptionContainer initialContainer;
@@ -51,13 +55,15 @@ public class DetachableComponentDescriptor {
    * Initialize this descriptor
    * @param component the component to describe.
    * @param listenerComponent the UI component which has the mouse listener.
+   * @param tabComponent the component displayed in the tab.
    */
-  public DetachableComponentDescriptor(final OptionElement component, final Component listenerComponent) {
+  public DetachableComponentDescriptor(final OptionElement component, final Component listenerComponent, final Component tabComponent) {
     this.component = component;
     this.listenerComponent = listenerComponent;
     this.initialContainer = (OptionContainer) component.getParent();
     this.currentContainer = this.initialContainer;
     this.viewId = DockingManager.INITIAL_VIEW;
+    this.tabComponent = tabComponent;
   }
 
   /**
@@ -122,5 +128,13 @@ public class DetachableComponentDescriptor {
    */
   public void setListenerComponent(final Component listenerComponent) {
     this.listenerComponent = listenerComponent;
+  }
+
+  /**
+   * Get the component displayed in the tab.
+   * @return a {@link Component}.
+   */
+  public Component getTabComponent() {
+    return tabComponent;
   }
 }

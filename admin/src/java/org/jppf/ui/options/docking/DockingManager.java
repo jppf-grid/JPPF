@@ -126,7 +126,9 @@ public final class DockingManager {
    * @param listenerComponent the UI component which has the mouse listener.
    */
   public void register(final OptionElement element, final Component listenerComponent) {
-    DetachableComponentDescriptor desc = new DetachableComponentDescriptor(element, listenerComponent);
+    TabbedPaneOption parent = (TabbedPaneOption) element.getParent();
+    Component tabComponent = parent.getTabComponent(element);
+    DetachableComponentDescriptor desc = new DetachableComponentDescriptor(element, listenerComponent, tabComponent);
     componentMap.put(element.getUIComponent(), desc);
     listenerToComponentMap.put(listenerComponent, element.getUIComponent());
     ViewDescriptor view = viewMap.get(INITIAL_VIEW);
@@ -165,10 +167,10 @@ public final class DockingManager {
     if (newView == null) throw new IllegalArgumentException("the view '" + viewId + "' does not exist");
     DetachableComponentDescriptor desc = componentMap.get(element.getUIComponent());
     if (desc == null) throw new IllegalArgumentException("the component '" + element + "' could not be found");
-    OptionContainer targetContainer = INITIAL_VIEW.equals(viewId) ? desc.getInitialContainer() : newView.getContainer();
+    TabbedPaneOption targetContainer = (TabbedPaneOption) (INITIAL_VIEW.equals(viewId) ? desc.getInitialContainer() : newView.getContainer());
     ViewDescriptor oldView = viewMap.get(desc.getViewId());
     desc.getCurrentContainer().remove(element);
-    targetContainer.add(element);
+    targetContainer.add(element, desc.getTabComponent());
     desc.setCurrentContainer(targetContainer);
     desc.setViewId(viewId);
     oldView.removeComponent(desc);
@@ -263,7 +265,7 @@ public final class DockingManager {
     DetachableComponentDescriptor desc = componentMap.get(comp);
     OptionElement element = desc.getComponent();
     desc.getCurrentContainer().remove(element);
-    desc.getInitialContainer().add(element);
+    ((TabbedPaneOption) desc.getInitialContainer()).add(element, desc.getTabComponent());
     desc.setCurrentContainer(desc.getInitialContainer());
     ViewDescriptor oldView = viewMap.get(desc.getViewId());
     oldView.removeComponent(desc);

@@ -112,7 +112,7 @@ public class DebugMouseListener extends MouseAdapter {
       }
       else parent.add(elt);
       builder.triggerInitialEvents(elt);
-      parent.getUIComponent().updateUI();
+      parent.getUIComponent().repaint();
     } catch(Exception  e) {
       log.error(e.getMessage(), e);
     }

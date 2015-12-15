@@ -28,6 +28,7 @@ import javax.swing.*;
 
 import org.jppf.client.monitoring.topology.TopologyNode;
 import org.jppf.management.*;
+import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -160,13 +161,6 @@ public final class GuiUtils {
    * @return the copy of the image as a {@link BufferedImage} object.
    */
   private static Image imageCopy(final Image source) {
-    /*
-    ColorModel cm = source.getColorModel();
-    boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-    WritableRaster raster = source.copyData(source.getRaster().createCompatibleWritableRaster());
-    return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-    */
-    //return source.getScaledInstance(-1, -1, Image.SCALE_DEFAULT);
     BufferedImage copy = new BufferedImage(source.getWidth(null), source.getHeight(null), BufferedImage.TYPE_4BYTE_ABGR);
     copy.getGraphics().drawImage(source, 0, 0, null);
     return copy;
@@ -187,7 +181,6 @@ public final class GuiUtils {
       g.drawImage(ico.getImage(), 0, 0, null);
       g.dispose();
     }
-    
     return new ImageIcon(resImg);
   }
 
@@ -349,5 +342,26 @@ public final class GuiUtils {
       if (log.isDebugEnabled()) log.debug("Could not load default empty policy", e);
       return "<ExecutionPolicy>\n  \n</ExecutionPolicy>";
     }
+  }
+
+  /**
+   * Get the component used in the tab to which the specified option belongs.
+   * @param option the option for which to find the tab component.
+   * @return the tab component as a {@link JLabel}, or {@code null} if the option is not in a tab.
+   */
+  public static JLabel getTabComponent(final OptionElement option) {
+    Component comp = option.getUIComponent();
+    while ((comp != null) && (comp.getParent() != null)) {
+      Component parent = comp.getParent();
+      if (parent instanceof JTabbedPane) {
+        JTabbedPane tabbedPane = (JTabbedPane) parent;
+        int index = tabbedPane.indexOfComponent(comp);
+        Component tabComp = tabbedPane.getTabComponentAt(index);
+        if (tabComp instanceof JLabel) return (JLabel) tabComp;
+        break;
+      }
+      comp = parent;
+    }
+    return null;
   }
 }

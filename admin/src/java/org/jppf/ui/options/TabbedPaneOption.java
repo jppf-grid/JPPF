@@ -28,8 +28,7 @@ import org.jppf.ui.utils.GuiUtils;
  * This option class encapsulates a tabbed pane, as the one present in the Swing api.
  * @author Laurent Cohen
  */
-public class TabbedPaneOption extends AbstractOptionContainer
-{
+public class TabbedPaneOption extends AbstractOptionContainer {
   @Override
   public void createUI() {
     JTabbedPane pane = new JTabbedPane();
@@ -40,7 +39,16 @@ public class TabbedPaneOption extends AbstractOptionContainer
 
   @Override
   public void add(final OptionElement element) {
-    add(element, children.size());
+    add(element, children.size(), null);
+  }
+
+  /**
+   * Add the specified component at the specified index.
+   * @param element the component to add.
+   * @param tabComponent the component (normally label with icon + text) displayed in the tab list.
+   */
+  public void add(final OptionElement element, final Component tabComponent) {
+    add(element, children.size(), tabComponent);
   }
 
   /**
@@ -49,6 +57,16 @@ public class TabbedPaneOption extends AbstractOptionContainer
    * @param index the index at which to add the component.
    */
   public void add(final OptionElement element, final int index) {
+    add(element, index, null);
+  }
+
+  /**
+   * Add the specified component at the specified index.
+   * @param element the component to add.
+   * @param index the index at which to add the component.
+   * @param tabComponent the component (normally label with icon + text) displayed in the tab list.
+   */
+  public void add(final OptionElement element, final int index, final Component tabComponent) {
     if (index > children.size()) throw new IndexOutOfBoundsException("index should be < " + children.size() + " but is " + index);
     if (index < 0) throw new IndexOutOfBoundsException("negative index " + index);
     //int idx = children.size();
@@ -60,14 +78,17 @@ public class TabbedPaneOption extends AbstractOptionContainer
     try {
       //pane.addTab("", null, element.getUIComponent(), element.getToolTipText());
       pane.insertTab("", null, element.getUIComponent(), element.getToolTipText(), index);
-      JLabel l = new JLabel(element.getLabel(), icon, SwingConstants.CENTER);
+      JLabel l = null;
+      if (tabComponent != null) {
+        l = (JLabel) tabComponent;
+      } else l = new JLabel(element.getLabel(), icon, SwingConstants.CENTER);
       pane.setTabComponentAt(index, l);
-      if (element.isDetachable()) {
+      if (element.isDetachable() && (tabComponent == null)) {
         l.addMouseListener(dmgr.getMouseAdapter());
         if (!dmgr.isRegistered(element)) dmgr.register(element, l);
         else dmgr.update(element, l);
       }
-    } catch(Throwable t) {
+    } catch (Throwable t) {
       t.printStackTrace();
     }
   }
@@ -77,5 +98,15 @@ public class TabbedPaneOption extends AbstractOptionContainer
     super.remove(element);
     UIComponent.remove(element.getUIComponent());
     Component comp = null;
+  }
+
+  /**
+   * Get the tab component for the specified option.
+   * @param element the option for which to get the tab component.
+   * @return the tab component as a {@link Component}.
+   */
+  public Component getTabComponent(final OptionElement element) {
+    int index = ((JTabbedPane) UIComponent).indexOfComponent(element.getUIComponent());
+    return ((JTabbedPane) UIComponent).getTabComponentAt(index);
   }
 }

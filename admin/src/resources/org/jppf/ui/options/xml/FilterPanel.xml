@@ -43,11 +43,7 @@
       <property name="componentConstraints" value="growx 0"/>
       <property name="icon" value="/org/jppf/ui/resources/run-rebuild.png"/>
       <listener type="script">
-        <script language="groovy">
-          def activeOption = option.findFirstWithName("/ActivateFilter")
-          activeOption.getUIComponent().setSelected(true)
-          apply()
-        </script>
+        <script language="groovy">option.findFirstWithName("/ActivateFilter").setValue(true)</script>
       </listener>
     </child>
 
@@ -56,7 +52,7 @@
       <property name="toggle" value="true"/>
       <property name="persistent" value="true"/>
       <initializer type="script">
-        <script language="groovy">if (option.getValue()) apply()</script>
+        <script language="groovy">apply()</script>
       </initializer>
       <listener type="script">
         <script language="groovy">apply()</script>
