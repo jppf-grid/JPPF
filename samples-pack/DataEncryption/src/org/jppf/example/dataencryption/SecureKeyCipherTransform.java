@@ -41,7 +41,6 @@ public class SecureKeyCipherTransform implements JPPFDataTransform {
    * @param source the input stream of data to encrypt.
    * @param destination the stream into which the encrypted data is written.
    * @throws Exception if any error occurs while encrypting the data.
-   * @see org.jppf.data.transform.JPPFDataTransform#wrap(byte[])
    */
   @Override
   public void wrap(final InputStream source, final OutputStream destination) throws Exception {
@@ -76,7 +75,6 @@ public class SecureKeyCipherTransform implements JPPFDataTransform {
    * @param source the input stream of data to decrypt.
    * @param destination the stream into which the decrypted data is written.
    * @throws Exception if any error occurs while decrypting the data.
-   * @see org.jppf.data.transform.JPPFDataTransform#unwrap(byte[])
    */
   @Override
   public void unwrap(final InputStream source, final OutputStream destination) throws Exception {
