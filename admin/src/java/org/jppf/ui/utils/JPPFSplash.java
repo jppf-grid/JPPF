@@ -20,25 +20,34 @@ package org.jppf.ui.utils;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.Timer;
 
 import javax.swing.*;
 
-import net.miginfocom.swing.MigLayout;
-
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class handles the splash screen displayed while starting the admin console.
  * @author Laurent Cohen
  */
-public class JPPFSplash extends Window
-{
+public class JPPFSplash extends Window {
+  /**
+   * The default list of images to use if none is specified in the configuration.
+   */
+  private static final List<String> DEFAULT_IMAGES = new ArrayList<String>() {{
+    add("/org/jppf/ui/resources/splash1.gif");
+    add("/org/jppf/ui/resources/splash2.gif");
+    add("/org/jppf/ui/resources/splash3.gif");
+    add("/org/jppf/ui/resources/splash4.gif");
+  }};
   /**
    * Contains the images displayed by the splash screen.
    */
-  private ImageIcon[] images = null;
+  private final List<ImageIcon> images = new ArrayList<>();
   /**
    * Component used to display the text and images.
    */
@@ -54,25 +63,32 @@ public class JPPFSplash extends Window
   /**
    * Delay between images scrolling.
    */
-  private long delay = JPPFConfiguration.get(JPPFProperties.UI_SPLASH_DELAY);
+  private final long delay = JPPFConfiguration.get(JPPFProperties.UI_SPLASH_DELAY);
 
   /**
    * Initialize this window with the specified owner.
-   * @param message - the message to display.
+   * @param message the message to display.
    */
-  public JPPFSplash(final String message)
-  {
+  public JPPFSplash(final String message) {
     super(new JFrame());
-    images = new ImageIcon[4];
-    for (int i=1; i<=4; i++) images[i-1] = GuiUtils.loadIcon("/org/jppf/ui/resources/splash" + i + ".gif", false);
-    label = new JLabel(images[0]);
+    setBackground(Color.WHITE);
+    List<String> pathList = StringUtils.parseStrings(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_IMAGES), "\\|");
+    for (String path: pathList) {
+      ImageIcon icon = GuiUtils.loadIcon(path, false);
+      if (icon != null) images.add(icon);
+    }
+    if (images.isEmpty()) {
+      for (String path: DEFAULT_IMAGES) images.add(GuiUtils.loadIcon(path, false));
+    }
+    label = new JLabel(images.get(0));
+    label.setBorder(BorderFactory.createLineBorder(new Color(192, 192, 192), 1, true));
     label.setHorizontalTextPosition(SwingConstants.CENTER);
     label.setVerticalTextPosition(SwingConstants.CENTER);
     label.setText(message);
     label.setForeground(new Color(64, 64, 128));
     Font tmp = label.getFont();
     label.setFont(new Font(tmp.getFamily(), Font.BOLD, 24));
-    setLayout(new MigLayout("fill, ins 0 0 0 0"));
+    setLayout(new MigLayout("fill, ins 4 4 4 4"));
     add(label, "grow, push");
     pack();
     setVisible(true);
@@ -81,8 +97,7 @@ public class JPPFSplash extends Window
   /**
    * Start the animation of this splash screen.
    */
-  public void start()
-  {
+  public void start() {
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     Dimension d2 = label.getSize();
     int x = (d.width - d2.width) / 2;
@@ -97,17 +112,12 @@ public class JPPFSplash extends Window
   /**
    * Stop the animation of this splash screen.
    */
-  public void stop()
-  {
-    Runnable r = new Runnable()
-    {
+  public void stop() {
+    Runnable r = new Runnable() {
       @Override
-      public void run()
-      {
-        /*
-				try { Thread.sleep(2000); }
-				catch(InterruptedException e) {}
-         */
+      public void run() {
+        /* try { Thread.sleep(2000); }
+         * catch(InterruptedException e) {} */
         setVisible(false);
         task.cancel();
         timer.purge();
@@ -122,8 +132,7 @@ public class JPPFSplash extends Window
   /**
    * Task that scrolls the images at regular intervals.
    */
-  public class ScrollTask extends TimerTask
-  {
+  public class ScrollTask extends TimerTask {
     /**
      * Position in the array of images.
      */
@@ -134,10 +143,9 @@ public class JPPFSplash extends Window
      * @see java.util.TimerTask#run()
      */
     @Override
-    public void run()
-    {
-      pos = (pos + 1) % images.length;
-      label.setIcon(images[pos]);
+    public void run() {
+      pos = (pos + 1) % images.size();
+      label.setIcon(images.get(pos));
     }
   }
 }

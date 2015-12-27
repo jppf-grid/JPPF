@@ -89,7 +89,7 @@ public class ConsoleLauncher {
         }
       }
       boolean showSplash = JPPFConfiguration.get(JPPFProperties.UI_SPLASH);
-      if (showSplash) (splash = new JPPFSplash("The management console is starting ...")).start();
+      if (showSplash) (splash = new JPPFSplash(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_MESSAGE))).start();
       loadUI(args[0], args[1], true, -1);
       if (showSplash) splash.stop();
       Frame[] frames = Frame.getFrames();

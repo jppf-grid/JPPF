@@ -261,6 +261,7 @@ public abstract class AbstractRunner {
    * The window contains a progress bar.
    */
   public void createOrDisplayWaitWindow() {
+    final JFrame frame = (JFrame) OptionsHandler.getMainWindow();
     if (window == null) {
       Runnable r = new Runnable() {
         @Override
@@ -272,7 +273,7 @@ public abstract class AbstractRunner {
           progressBar.setFont(f);
           progressBar.setString("Calculating, please wait ...");
           progressBar.setStringPainted(true);
-          window = new JWindow();
+          window = new JWindow(frame);
           window.getContentPane().add(progressBar);
           window.getContentPane().setBackground(Color.white);
         }
@@ -282,7 +283,6 @@ public abstract class AbstractRunner {
     Runnable r2 = new Runnable() {
       @Override
       public void run() {
-        JFrame frame = (JFrame) OptionsHandler.getMainWindow();
         focusOwner = frame.getFocusOwner();
         if (focusOwner != null) {
           cursor = focusOwner.getCursor();

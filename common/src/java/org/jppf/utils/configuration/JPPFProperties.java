@@ -321,14 +321,14 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> TEMP_BUFFER_SIZE = new IntProperty("jppf.temp.buffer.size", 32*1024, 1024, 64*1024);
   /** Number of threads performing network I/O (server only) */
   public static final JPPFProperty<Integer> TRANSITION_THREAD_POOL_SIZE = new IntProperty("jppf.transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32*1024);
-  /** Enable/disable display of splash screen at startup */
+  /** Whether to display the animated splash screen at console startup, defaults to false */
   public static final JPPFProperty<Boolean> UI_SPLASH = new BooleanProperty("jppf.ui.splash", true);
-  /** @exclude */
+  /** Interval between images in milliseconds */
   public static final JPPFProperty<Long> UI_SPLASH_DELAY = new LongProperty("jppf.ui.splash.delay", 500L);
-  /** @exclude */
+  /** One or more paths to the images displayed in a rolling sequence (like a slide show), separated by '|' (pipe) characters */
   public static final JPPFProperty<String> UI_SPLASH_IMAGES = new StringProperty("jppf.ui.splash.images", null);
-  /** @exclude */
-  public static final JPPFProperty<String> UI_SPLASH_MESSAGE = new StringProperty("jppf.ui.splash.message", "The management console is starting ...");
+  /** The fixed text displayed at center of the splash screen */
+  public static final JPPFProperty<String> UI_SPLASH_MESSAGE = new StringProperty("jppf.ui.splash.message", "");
   /** @exclude */
   public static final JPPFProperty<Long> NIO_SELECT_TIMEOUT = new LongProperty("jppf.nio.select.timeout", 1000L);
   /** @exclude */

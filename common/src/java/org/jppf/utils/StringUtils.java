@@ -17,7 +17,6 @@
  */
 package org.jppf.utils;
 
-import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.text.*;
@@ -237,29 +236,6 @@ public final class StringUtils {
   }
 
   /**
-   * Get a String representation of an collection of any type.
-   * @param <T> the type of the elements in the collection.
-   * @param collection the collection from which to build a string representation.
-   * @param sep the separator to use for values. If null, no separator is used.
-   * @param prefix the prefix to use at the start of the resulting string. If null, no prefix is used.
-   * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
-   * @return the collection's content as a string.
-   */
-  public static <T> String collectionToString(final String sep, final String prefix, final String suffix, final Collection<T> collection) {
-    if (collection == null) return null;
-    StringBuilder sb = new StringBuilder();
-    int count = 0;
-    if (prefix != null) sb.append(prefix);
-    for (T t: collection) {
-      if ((count > 0) && (sep != null)) sb.append(sep);
-      count++;
-      sb.append(t);
-    }
-    if (suffix != null) sb.append(suffix);
-    return sb.toString();
-  }
-
-  /**
    * Parse an array of port numbers from a string containing a list of space-separated port numbers.
    * @param s list of space-separated port numbers
    * @return an array of int port numbers.
@@ -354,22 +330,6 @@ public final class StringUtils {
   }
 
   /**
-   * Convert a set of properties from a String to TypedProperties representation.
-   * @param source the source string.
-   * @return a TypedProperties instance containing the entries of the source string.
-   */
-  public static TypedProperties toProperties(final String source) {
-    TypedProperties props = new TypedProperties();
-    if (source != null) {
-      try (Reader reader = new StringReader(source)) {
-        props.load(reader);
-      } catch(Exception ignore) {
-      }
-    }
-    return props;
-  }
-
-  /**
    * Print a top-down representation of a class loader hierarchy into a string.
    * @param leafClassLoader the class loader at the bottom of the hierarchy.
    * @return a string representation of the class loader hierarchy.
@@ -420,15 +380,6 @@ public final class StringUtils {
   /**
    * Parse a Number from a String.
    * @param source the string to parse.
-   * @return the source parsed as a number or <code>null</code> if it could not be parsed as a number.
-   */
-  public static Number parseNumber(final String source) {
-    return parseNumber(source, null);
-  }
-
-  /**
-   * Parse a Number from a String.
-   * @param source the string to parse.
    * @param def the default value to return if the source cannot be parsed.
    * @return the source parsed as a number or <code>def</code> if it could not be parsed as a number.
    */
@@ -450,5 +401,27 @@ public final class StringUtils {
   public static String toIdentityString(final Object obj) {
     if (obj == null) return "null";
     return obj.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(obj));
+  }
+
+  /**
+   * Parse the specified source string into a list of strings according to the specified separator.
+   * @param source the string to parse.
+   * @param separator the delimiter for the resulting strings; it can be a regex.
+   * @return a list of strings, possibly empty but never null;
+   */
+  public static List<String> parseStrings(final String source, final String separator) {
+    List<String> list = new ArrayList<>();
+    if (source != null) {
+      if (separator == null) list.add(source);
+      else {
+        String[] tokens = source.split(separator);
+        for (String token: tokens) {
+          if (token == null) continue;
+          String s = token.trim();
+          if (!s.isEmpty()) list.add(s);
+        }
+      }
+    }
+    return list;
   }
 }
