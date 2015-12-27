@@ -25,17 +25,14 @@ import java.net.*;
  * URL stream handler for the &quot;jppfres:&quot; protocol, which handles class loader cache resources stored in memory.
  * @author Laurent Cohen
  */
-public class Handler extends URLStreamHandler
-{
+public class Handler extends URLStreamHandler {
   @Override
-  protected URLConnection openConnection(final URL u) throws IOException
-  {
+  protected URLConnection openConnection(final URL u) throws IOException {
     return new JPPFResourceConnection(u);
   }
 
   @Override
-  protected URLConnection openConnection(final URL u, final Proxy p) throws IOException
-  {
+  protected URLConnection openConnection(final URL u, final Proxy p) throws IOException {
     return openConnection(u);
   }
 
@@ -44,8 +41,7 @@ public class Handler extends URLStreamHandler
    * {@inheritDoc}
    */
   @Override
-  protected synchronized InetAddress getHostAddress(final URL u)
-  {
+  protected synchronized InetAddress getHostAddress(final URL u) {
     return null;
   }
 }
