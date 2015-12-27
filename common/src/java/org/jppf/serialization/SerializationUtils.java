@@ -245,29 +245,15 @@ public final class SerializationUtils {
   }
 
   /**
-   * Deserialize a char value from a stream.
-   * @param is the stream to read from.
-   * @return the char value read from the stream.
-   * @throws IOException if an error occurs while reading the data.
-   */
-  public static char readChar(final InputStream is) throws IOException {
-    int result = 0;
-    for (int i=8; i>=0; i-=8) result += (is.read() & 0xFF) << i;
-    return (char) result;
-  }
-
-  /**
    * Deserialize an int value from a stream.
    * @param is the stream to read from.
    * @return the int value read from the stream.
    * @throws IOException if an error occurs while reading the data.
    */
   public static int readInt(final InputStream is) throws IOException {
-    int result = 0;
     byte[] buf = new byte[4];
     readToBuf(is, buf, 0, buf.length);
-    for (int i=24, pos=0; i>=0; i-=8) result += (buf[pos++] & 0xFF) << i;
-    return result;
+    return readInt(buf, 0);
   }
 
   /**
@@ -277,11 +263,9 @@ public final class SerializationUtils {
    * @throws IOException if an error occurs while reading the data.
    */
   public static long readLong(final InputStream is) throws IOException {
-    long result = 0L;
     byte[] buf = new byte[8];
     readToBuf(is, buf, 0, buf.length);
-    for (int i=56, pos=0; i>=0; i-=8) result += (long) (buf[pos++] & 0xFF) << i;
-    return result;
+    return readLong(buf, 0);
   }
 
   /**
