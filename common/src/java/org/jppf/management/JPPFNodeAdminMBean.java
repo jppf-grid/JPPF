@@ -100,11 +100,22 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
 
   /**
    * Update the configuration properties of the node.
-   * @param config the set of properties to update.
-   * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
+   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks, when {@code false}, then only shutdown the node when it is no longer executing.
+   * This parameter only applies when the {@code restart} parameter is {@code true}.
+   * @throws Exception if any error occurs.
+   * @since 5.2
+   */
+  void updateConfiguration(Map<Object, Object> configOverrides, Boolean restart, Boolean interruptIfRunning) throws Exception;
+
+  /**
+   * Update the configuration properties of the node. This method is equivalent to calling {@link #updateConfiguration(Map, Boolean, Boolean) updateConfiguration(configOverrides, restart, true)}.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
    * @throws Exception if any error occurs.
    */
-  void updateConfiguration(Map<Object, Object> config, Boolean reconnect) throws Exception;
+  void updateConfiguration(Map<Object, Object> configOverrides, Boolean restart) throws Exception;
 
   /**
    * Cancel the job with the specified id.
@@ -118,7 +129,6 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
    * Get the current class loader delegation model for the node.
    * @return either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
    * @throws Exception if any error occurs.
-   * @see org.jppf.classloader.AbstractJPPFClassLoader#getDelegationModel()
    */
   DelegationModel getDelegationModel() throws Exception;
 
@@ -127,7 +137,6 @@ public interface JPPFNodeAdminMBean extends JPPFAdminMBean {
    * @param model either either {@link org.jppf.classloader.DelegationModel#PARENT_FIRST PARENT_FIRST} or {@link org.jppf.classloader.DelegationModel#URL_FIRST LOCAL_FIRST}.
    * If any other value is specified then this method has no effect.
    * @throws Exception if any error occurs.
-   * @see org.jppf.classloader.AbstractJPPFClassLoader#setDelegationModel(org.jppf.classloader.DelegationModel)
    */
   void setDelegationModel(DelegationModel model) throws Exception;
 

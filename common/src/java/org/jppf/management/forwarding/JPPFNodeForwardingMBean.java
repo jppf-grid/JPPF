@@ -31,8 +31,7 @@ import org.jppf.utils.TypedProperties;
  * MBean interface for forwarding node management requests and monitoring notfications via the driver.
  * @author Laurent Cohen
  */
-public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitter
-{
+public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitter {
   /**
    * Name of the driver's admin MBean.
    */
@@ -174,13 +173,27 @@ public interface JPPFNodeForwardingMBean extends Serializable, NotificationEmitt
   /**
    * Update the configuration properties of the specified nodes.
    * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
-   * @param config the set of properties to update.
-   * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
+   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks, when {@code false}, then only shutdown the node when it is no longer executing.
+   * This parameter only applies when the {@code restart} parameter is {@code true}.
+   * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
+   * This map may be empty if no exception was raised.
+   * @throws Exception if any error occurs.
+   * @since 5.2
+   */
+  Map<String, Object> updateConfiguration(NodeSelector selector, Map<Object, Object> configOverrides, Boolean restart, Boolean interruptIfRunning) throws Exception;
+
+  /**
+   * Update the configuration properties of the specified nodes.
+   * @param selector a filter on the nodes attached to the driver, determines the nodes to which this method applies.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
    * @return a mapping of node uuids to an eventual exception resulting from invoking this method on the corresponding node.
    * This map may be empty if no exception was raised.
    * @throws Exception if any error occurs.
    */
-  Map<String, Object> updateConfiguration(NodeSelector selector, Map<Object, Object> config, Boolean reconnect) throws Exception;
+  Map<String, Object> updateConfiguration(NodeSelector selector, Map<Object, Object> configOverrides, Boolean restart) throws Exception;
 
   /**
    * Cancel the job with the specified id in the specified nodes.

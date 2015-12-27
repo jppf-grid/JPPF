@@ -135,7 +135,7 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     jvmOptions.addAll(parseJvmOptions(s).first());
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
     List<String> command = new ArrayList<>();
-    command.add(System.getProperty("java.home")+"/bin/java");
+    command.add(computeJavaExecPath(config));
     command.add("-cp");
     String pathSeparator = System.getProperty("path.separator");
     StringBuilder sb = new StringBuilder();

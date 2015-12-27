@@ -32,7 +32,7 @@ import org.jppf.process.LauncherListener;
 import org.jppf.security.JPPFPolicy;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.jppf.utils.hooks.HookFactory;
 import org.slf4j.*;
 
@@ -114,6 +114,9 @@ public class NodeRunner {
   public static void main(final String...args) {
     node = null;
     try {
+      TypedProperties config = JPPFConfiguration.getProperties();
+      TypedProperties overrides = new ConfigurationOverridesHandler().load(true);
+      if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
       if (!ANDROID) new JmxMessageNotifier(); // initialize the jmx logger
       Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
       if (debugEnabled) log.debug("launching the JPPF node");

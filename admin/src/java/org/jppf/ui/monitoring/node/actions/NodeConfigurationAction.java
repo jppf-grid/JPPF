@@ -86,9 +86,9 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     textArea.setValue(getPropertiesAsString());
 
     AbstractTopologyComponent data = dataArray[0];
-    JButton okBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsOK").getUIComponent();
-    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration of node " + TreeTableUtils.getDisplayName(data),false);
+    JButton okBtn = (JButton) thisPanel.findFirstWithName("/updateConfigOK").getUIComponent();
+    JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/updateConfigCancel").getUIComponent();
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration of node " + TreeTableUtils.getDisplayName(data), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override
@@ -121,7 +121,8 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
   private void doOK() {
     CodeEditorOption textArea = (CodeEditorOption) thisPanel.findFirstWithName("configProperties");
     final Map<Object, Object> map = getPropertiesAsMap((String) textArea.getValue());
-    final Boolean b = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceReconnect")).getValue();
+    final Boolean restart = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("forceRestart")).getValue();
+    final Boolean interrupt = (Boolean) ((BooleanOption) thisPanel.findFirstWithName("nodeConfig.interruptIfRunning")).getValue();
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -130,7 +131,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
           AbstractTopologyComponent data = dataArray[0];
           parent = (TopologyDriver) data.getParent();
           if (parent == null) return;
-          parent.getForwarder().updateConfiguration(new UuidSelector(data.getUuid()), map, b);
+          parent.getForwarder().updateConfiguration(new UuidSelector(data.getUuid()), map, restart, interrupt);
         } catch(Exception e) {
           log.error(e.getMessage(), e);
         }

@@ -119,6 +119,11 @@ public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy impl
   }
 
   @Override
+  public void updateConfiguration(final Map param0, final Boolean param1, final Boolean param2) {
+    invoke("updateConfiguration", new Object[] { param0, param1, param2 }, new String[] { "java.util.Map", "java.lang.Boolean", "java.lang.Boolean" });
+  }
+
+  @Override
   public void updateThreadPoolSize(final Integer param0) {
     invoke("updateThreadPoolSize", new Object[] { param0 }, new String[] { "java.lang.Integer" });
   }

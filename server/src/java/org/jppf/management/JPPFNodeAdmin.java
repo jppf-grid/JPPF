@@ -27,6 +27,7 @@ import org.jppf.node.NodeRunner;
 import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.ConfigurationOverridesHandler;
 import org.slf4j.*;
 
 /**
@@ -213,19 +214,39 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
 
   /**
    * Update the configuration properties of the node.
-   * @param config the set of properties to update.
-   * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks,
+   * when {@code false}, then only shutdown the node when it is no longer executing.
+   * This parameter only applies when the {@code restart} parameter is {@code true}.
+   * @throws Exception if any error occurs.
+   * @since 5.2
+   */
+  @Override
+  public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
+    if (configOverrides == null) return;
+    if (debugEnabled) log.debug("node request to change configuration");
+    // we don't allow the node uuid to be overriden
+    if (configOverrides.containsKey("jppf.node.uuid")) configOverrides.remove("jppf.node.uuid");
+    TypedProperties overrides = (configOverrides != null) && !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
+    JPPFConfiguration.getProperties().putAll(overrides);
+    new ConfigurationOverridesHandler().save(overrides);
+    node.triggerConfigChanged();
+    //if (restart) triggerReconnect();
+    if (restart) shutdownOrRestart(interruptIfRunning, true);
+  }
+
+  /**
+   * Update the configuration properties of the node. This method is equivalent to calling {@link #updateConfiguration(Map, Boolean, Boolean) updateConfiguration(configOverrides, restart, true)}.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
+   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks, when {@code false}, then only shutdown the node when it is no longer executing.
+   * This parameter only applies when the {@code restart} parameter is {@code true}.
    * @throws Exception if any error occurs.
    */
   @Override
-  public void updateConfiguration(final Map<Object, Object> config, final Boolean reconnect) throws Exception {
-    if (config == null) return;
-    if (debugEnabled) log.debug("node request to change configuration");
-    // we don't allow the node uuid to be overriden
-    if (config.containsKey("jppf.node.uuid")) config.remove("jppf.node.uuid");
-    JPPFConfiguration.getProperties().putAll(config);
-    node.triggerConfigChanged();
-    if (reconnect) triggerReconnect();
+  public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart) throws Exception {
+    updateConfiguration(configOverrides, restart, true);
   }
 
   /**
@@ -272,10 +293,6 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    * Get the current state of the node
    * @return a {@link JPPFNodeState} instance.
    */
-  synchronized JPPFNodeState getNodeState() {
-    return nodeState;
-  }
-
   @Override
   public NodePendingAction pendingAction() {
     if (!node.isShutdownRequested()) return NodePendingAction.NONE;
@@ -288,5 +305,13 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     boolean b = node.cancelShutdownRequest();
     if (b) nodeState.setPendingAction(NodePendingAction.NONE);
     return b;
+  }
+
+  /**
+   * Get the current state of the node
+   * @return a {@link JPPFNodeState} instance.
+   */
+  synchronized JPPFNodeState getNodeState() {
+    return nodeState;
   }
 }

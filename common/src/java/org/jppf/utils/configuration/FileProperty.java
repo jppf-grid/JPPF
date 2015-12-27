@@ -38,7 +38,7 @@ class FileProperty extends AbstractJPPFProperty<File> {
 
   @Override
   public File valueOf(final String value) {
-    return value == null ? null : new File(value);
+    return (value == null) || value.trim().isEmpty() ? null : new File(value);
   }
 
   @Override

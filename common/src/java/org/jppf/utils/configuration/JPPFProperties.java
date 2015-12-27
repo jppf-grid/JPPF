@@ -322,9 +322,13 @@ public class JPPFProperties {
   /** Number of threads performing network I/O (server only) */
   public static final JPPFProperty<Integer> TRANSITION_THREAD_POOL_SIZE = new IntProperty("jppf.transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32*1024);
   /** Enable/disable display of splash screen at startup */
-  public static final JPPFProperty<Boolean> UI_SPLASH = new BooleanProperty("jppf.ui.splash", false);
+  public static final JPPFProperty<Boolean> UI_SPLASH = new BooleanProperty("jppf.ui.splash", true);
   /** @exclude */
   public static final JPPFProperty<Long> UI_SPLASH_DELAY = new LongProperty("jppf.ui.splash.delay", 500L);
+  /** @exclude */
+  public static final JPPFProperty<String> UI_SPLASH_IMAGES = new StringProperty("jppf.ui.splash.images", null);
+  /** @exclude */
+  public static final JPPFProperty<String> UI_SPLASH_MESSAGE = new StringProperty("jppf.ui.splash.message", "The management console is starting ...");
   /** @exclude */
   public static final JPPFProperty<Long> NIO_SELECT_TIMEOUT = new LongProperty("jppf.nio.select.timeout", 1000L);
   /** @exclude */
@@ -345,6 +349,10 @@ public class JPPFProperties {
   public static final JPPFProperty<String> SERVER_CONNECTION_STRATEGY = new StringProperty("jppf.server.connection.strategy", null);
   /** @exclude */
   public static final JPPFProperty<String> SERIALIZATION_EXCEPTION_HOOK = new StringProperty("jppf.serialization.exception.hook", null);
+  /** Full path to the Java executable */
+  public static final JPPFProperty<String> JAVA_PATH = new StringProperty("jppf.java.path", null);
+  /** Path to the temporary config overrides properties file */
+  public static final JPPFProperty<File> CONFIG_OVERRIDES_PATH = new FileProperty("jppf.config.overrides.path", new File("config/config-overrides.properties"));
   /**
    * The list of all predefined properties.
    */

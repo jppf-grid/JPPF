@@ -24,6 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -241,8 +242,21 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
   }
 
   /**
+   * Compute the path to the Java executable, based on the JPPF configuration.
+   * <p>if the property "{@code jppf.java.path}" is defined, then it will be used,
+   * otherwise the value of the system property "java.home" will be used with a "/bin/java" suffix. 
+   * @param config the configuration to use.
+   * @return the full path to the java executable.
+   */
+  protected String computeJavaExecPath(final TypedProperties config) {
+    String path = config.get(JPPFProperties.JAVA_PATH);
+    if ((path == null) || path.trim().isEmpty()) path = System.getProperty("java.home") + "/bin/java"; 
+    return path;
+  }
+
+  /**
    * Accepts a connection from the child process and sends process commands as int values via the connection.
-   * <p>The protocol is very simple: a single int command with no parametr is sent to the child process, which interprets it as it wishes.
+   * <p>The protocol is very simple: a single int command with no parameter is sent to the child process, which interprets it as it wishes.
    * No acknowledgement or response is expected.
    * @since 5.0
    * @exclude

@@ -168,8 +168,14 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
   }
 
   @Override
-  public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> config, final Boolean reconnect) throws Exception {
-    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration", new Object[] {config, reconnect}, array("java.util.Map", "java.lang.Boolean"));
+  public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration",
+      new Object[] {configOverrides, restart, interruptIfRunning}, array("java.util.Map", "java.lang.Boolean", "java.lang.Boolean"));
+  }
+
+  @Override
+  public Map<String, Object> updateConfiguration(final NodeSelector selector, final Map<Object, Object> configOverrides, final Boolean restart) throws Exception {
+    return forwardInvoke(selector, JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration", new Object[] {configOverrides, restart}, array("java.util.Map", "java.lang.Boolean"));
   }
 
   @Override

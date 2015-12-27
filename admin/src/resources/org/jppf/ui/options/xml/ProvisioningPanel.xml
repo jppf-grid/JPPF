@@ -30,7 +30,7 @@
 		<property name="componentConstraints" value="grow, push"/>
 		<property name="bordered" value="false"/>
 
-    <!-- Numbr of slaves spinner -->
+    <!-- Number of slaves spinner -->
     <child name="nbSlaves" type="SpinnerNumber">
       <property name="label" value="Number of slave nodes"/>
       <property name="tooltip" value="Number of slave nodes to provision. Slaves will be started or terminated as needed"/>

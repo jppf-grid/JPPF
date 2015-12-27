@@ -169,14 +169,28 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
 
   /**
    * Update the configuration properties of the node.
-   * @param config the set of properties to update.
-   * @param reconnect specifies whether the node should reconnect ot the driver after updating the properties.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
    * @throws Exception if an error is raised when invoking the node mbean.
    */
   @Override
-  public void updateConfiguration(final Map config, final Boolean reconnect) throws Exception {
+  public void updateConfiguration(final Map configOverrides, final Boolean restart) throws Exception {
+    updateConfiguration(configOverrides, restart, true);
+  }
+
+  /**
+   * Update the configuration properties of the node.
+   * @param configOverrides the set of properties to update.
+   * @param restart specifies whether the node should be restarted after updating the properties.
+   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks, when {@code false}, then only shutdown the node when it is no longer executing.
+   * This parameter only applies when the {@code restart} parameter is {@code true}.
+   * @throws Exception if an error is raised when invoking the node mbean.
+   * @since 5.2
+   */
+  @Override
+  public void updateConfiguration(final Map configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
     invoke(JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration",
-        new Object[] { config, reconnect }, new String[] { "java.util.Map", "java.lang.Boolean" });
+        new Object[] { configOverrides, restart, interruptIfRunning }, new String[] { "java.util.Map", "java.lang.Boolean", "java.lang.Boolean" });
   }
 
   /**

@@ -173,6 +173,11 @@ public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy
   }
 
   @Override
+  public Map updateConfiguration(final NodeSelector param0, final Map param1, final Boolean param2, final Boolean param3) {
+    return (Map) invoke("updateConfiguration", new Object[] { param0, param1, param2, param3 }, new String[] { "org.jppf.management.NodeSelector", "java.util.Map", "java.lang.Boolean", "java.lang.Boolean" });
+  }
+
+  @Override
   public Map updateThreadPoolSize(final NodeSelector param0, final Integer param1) {
     return (Map) invoke("updateThreadPoolSize", new Object[] { param0, param1 }, new String[] { "org.jppf.management.NodeSelector", "java.lang.Integer" });
   }

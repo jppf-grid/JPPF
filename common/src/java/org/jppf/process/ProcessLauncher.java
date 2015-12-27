@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.node.idle.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -120,6 +120,12 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
         int n = process.waitFor();
         end = onProcessExit(n);
         if (process != null) process.destroy();
+        if (!end) {
+          JPPFConfiguration.reset();
+          TypedProperties config = JPPFConfiguration.getProperties();
+          TypedProperties overrides = new ConfigurationOverridesHandler().load(false);
+          if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -152,7 +158,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     List<String> cpElements = parsed.second();
     cpElements.add(0, System.getProperty("java.class.path"));
     List<String> command = new ArrayList<>();
-    command.add(System.getProperty("java.home")+"/bin/java");
+    command.add(computeJavaExecPath(config));
     command.add("-cp");
     StringBuilder sb = new StringBuilder();
     String sep = System.getProperty("path.separator");
