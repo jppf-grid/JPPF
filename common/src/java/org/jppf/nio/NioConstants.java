@@ -27,18 +27,17 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NioConstants
-{
-	/**
-	 * Logger for this class.
-	 */
-	static Logger log = LoggerFactory.getLogger(NioConstants.class);
+public class NioConstants {
+  /**
+   * Logger for this class.
+   */
+  static Logger log = LoggerFactory.getLogger(NioConstants.class);
   /**
    * Size of the pool of threads for the state transition executor.
    * It is defined as the value of the configuration property
    * &quot;jppf.transition.thread.pool.size&quot;, with a default value of {@code Runtime.getRuntime().availableProcessors()}.
    */
-  public static final int THREAD_POOL_SIZE = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_POOL_SIZE);
+  public static final int THREAD_POOL_SIZE = computeNIOPoolSize();
   /**
    * Name of the class server.
    */
@@ -67,19 +66,28 @@ public class NioConstants
    * Default timeout for <code>Selector.select(long)</code> operations.
    */
   public static final long DEFAULT_SELECT_TIMEOUT = JPPFConfiguration.get(JPPFProperties.NIO_SELECT_TIMEOUT);
-	/**
-	 * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
-	 */
-	public static final boolean CHECK_CONNECTION = getCheckConnection();
-	
-	/**
-	 * Determine whether nio checks are enabled, and log accordingly.
-	 * @return <code>true</code> if NIO checks are enabled, <code>false</code> otherwise.
-	 */
-	private static boolean getCheckConnection()
-	{
-		boolean b = JPPFConfiguration.get(JPPFProperties.NIO_CHECK_CONNECTION);
-		log.info("NIO checks are " + (b ? "enabled" : "disabled"));
-		return b;
-	}
+  /**
+   * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
+   */
+  public static final boolean CHECK_CONNECTION = getCheckConnection();
+
+  /**
+   * Determine whether nio checks are enabled, and log accordingly.
+   * @return <code>true</code> if NIO checks are enabled, <code>false</code> otherwise.
+   */
+  private static boolean getCheckConnection() {
+    boolean b = JPPFConfiguration.get(JPPFProperties.NIO_CHECK_CONNECTION);
+    log.info("NIO checks are " + (b ? "enabled" : "disabled"));
+    return b;
+  }
+
+  /**
+   * Compute the size of the transition manager's thread pool size.
+   * @return the pool size as an int.
+   */
+  private static int computeNIOPoolSize() {
+    int n = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_POOL_SIZE);
+    if (JPPFConfiguration.get(JPPFProperties.LOCAL_NODE_ENABLED)) n++;
+    return n;
+  }
 }
