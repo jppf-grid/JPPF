@@ -38,8 +38,7 @@ public class NioConstants
    * It is defined as the value of the configuration property
    * &quot;jppf.transition.thread.pool.size&quot;, with a default value of 1.
    */
-  public static final int THREAD_POOL_SIZE = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt(
-    "jppf.transition.thread.pool.size", "transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32 * 1024);
+  public static final int THREAD_POOL_SIZE = computeNIOPoolSize();
   /**
    * Name of the class server.
    */
@@ -83,4 +82,15 @@ public class NioConstants
 		log.info("NIO checks are " + (b ? "enabled" : "disabled"));
 		return b;
 	}
+
+  /**
+   * Compute the size of the transition manager's thread pool size.
+   * @return the pool size as an int.
+   */
+  private static int computeNIOPoolSize() {
+    int n = new ConfigurationHelper(JPPFConfiguration.getProperties()).getInt(
+      "jppf.transition.thread.pool.size", "transition.thread.pool.size", Runtime.getRuntime().availableProcessors(), 1, 32 * 1024);
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.local.node.enabled", false)) n++;
+    return n;
+  }
 }
