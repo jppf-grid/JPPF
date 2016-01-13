@@ -22,8 +22,9 @@ package org.jppf.utils.configuration;
  * Implementation of {@link JPPFProperty} for {@code char} properties.
  * @author Laurent Cohen
  * @since 5.2
+ * @exclude
  */
-class CharProperty extends AbstractJPPFProperty<Character> {
+public class CharProperty extends AbstractJPPFProperty<Character> {
   /**
    * Initialize this property with the specified name and default value.
    * @param name the name of this property.

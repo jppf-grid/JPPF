@@ -39,6 +39,10 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * The default value of this property.
    */
   private final T defaultValue;
+  /**
+   * The possible values for this property, if any.
+   */
+  private T[] possibleValues;
 
   /**
    * Initialize this property with the specified name and default value.
@@ -80,5 +84,23 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
     sb.append(", aliases=").append(Arrays.asList(aliases));
     sb.append(']');
     return sb.toString();
+  }
+
+  /**
+   * Get the possible values for this property, if any is defined.
+   * @return an array of the possible values.
+   */
+  public T[] getPossibleValues() {
+    return possibleValues;
+  }
+
+  /**
+   * Set the possible values for this property.
+   * @param possibleValues an array of the possible values.
+   * @return this property.
+   */
+  public JPPFProperty<T> setPossibleValues(final T... possibleValues) {
+    this.possibleValues = possibleValues;
+    return this;
   }
 }

@@ -24,6 +24,7 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.jppf.*;
 import org.jppf.comm.socket.SocketWrapper;
 import org.jppf.io.*;
 import org.jppf.node.protocol.*;
@@ -52,7 +53,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
 
   /**
    * Initialize this TaskIO with the specified node.
-   * @param node - the node who owns this TaskIO.
+   * @param node the node who owns this TaskIO.
    */
   public RemoteNodeIO(final JPPFNode node) {
     super(node);
@@ -62,12 +63,18 @@ public class RemoteNodeIO extends AbstractNodeIO {
   protected Object[] deserializeObjects() throws Exception {
     ObjectSerializer ser = node.getHelper().getSerializer();
     if (debugEnabled) log.debug("waiting for next request. Serializer = " + ser + " (class loader = " + ser.getClass().getClassLoader() + ")");
-    TaskBundle bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), node.getHelper().getSerializer());
-    node.setExecuting(true);
-    if (debugEnabled) log.debug("got bundle " + bundle);
-    if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
-    Object[] result = deserializeObjects(bundle);
-    //if (node.isOffline() && !bundle.isHandshake()) sendOfflineCloseRequest(bundle);
+    Object[] result = null;
+    TaskBundle bundle = null;
+    node.setReading(true);
+    try {
+      bundle = (TaskBundle) IOHelper.unwrappedData(getSocketWrapper(), ser);
+      node.setExecuting(true);
+      if (debugEnabled) log.debug("got bundle " + bundle);
+      if (!bundle.isHandshake()) node.getExecutionManager().setBundle(bundle);
+      result = deserializeObjects(bundle);
+    } finally {
+      node.setReading(false);
+    }
     if (node.isOffline() && !bundle.isHandshake()) waitChannelClosed(getSocketWrapper());
     return result;
   }
@@ -87,10 +94,8 @@ public class RemoteNodeIO extends AbstractNodeIO {
         if (!node.isOffline() && !bundle.getSLA().isRemoteClassLoadingEnabled()) cont.getClassLoader().setRemoteClassLoadingDisabled(true);
         node.getLifeCycleEventHandler().fireJobHeaderLoaded(bundle, cont.getClassLoader());
         cont.deserializeObjects(list, 1+count, node.getExecutionManager().getExecutor());
-      } else {
-        // skip null data provider
-        getSocketWrapper().receiveBytes(0);
       }
+      else  getSocketWrapper().receiveBytes(0); // skip null data provider
       if (debugEnabled) log.debug("got all data");
     } catch(Throwable t) {
       log.error("Exception occurred while deserializing the tasks", t);
@@ -103,7 +108,6 @@ public class RemoteNodeIO extends AbstractNodeIO {
   /**
    * Performs the actions required if reloading the classes is necessary.
    * @throws Exception if any error occurs.
-   * @see org.jppf.server.node.AbstractNodeIO#handleReload()
    */
   @Override
   protected void handleReload() throws Exception {
@@ -162,6 +166,9 @@ public class RemoteNodeIO extends AbstractNodeIO {
    * @return a {@link SocketWrapper} instance.
    */
   private SocketWrapper getSocketWrapper() {
-    return ((RemoteNodeConnection) node.getNodeConnection()).getChannel();
+    SocketWrapper socketWrapper = ((RemoteNodeConnection) node.getNodeConnection()).getChannel();
+    // happens when an android node gets in suspended state due to low battery charge, while the node is reading a job from the server
+    if ((socketWrapper == null) && node.isSuspended()) throw new JPPFSuspendedNodeException("node connection was closed by another thread");
+    return socketWrapper;
   }
 }

@@ -69,11 +69,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Determines whether this node can execute .Net tasks.
    */
-  private final boolean dotnetCapable = JPPFConfiguration.get(JPPFProperties.DOTNET_NRIDGE_INITIALIZED);
-  /**
-   * Action executed when the node exits the main loop, in its {@link #run() run()} method.
-   */
-  private Runnable exitAction = null;
+  private final boolean dotnetCapable = JPPFConfiguration.get(JPPFProperties.DOTNET_BRIDGE_INITIALIZED);
   /**
    * The default node's management MBean.
    */
@@ -100,7 +96,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Determines whether the node connection checker should be used.
    * @exclude
    */
-  protected final boolean checkConnection = JPPFConfiguration.getProperties().getBoolean("jppf.node.check.connection", false);
+  protected final boolean checkConnection = JPPFConfiguration.get(JPPFProperties.NODE_CHECK_CONNECTION);
   /**
    * The bundle currently processed in offline mode.
    * @exclude
@@ -153,11 +149,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
       }
     }
     if (debugEnabled) log.debug("End of node main loop");
-    if (exitAction != null) {
-      Runnable r = exitAction;
-      setExitAction(null);
-      r.run();
-    }
   }
 
   /**
@@ -168,12 +159,21 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    */
   public void perform() throws Exception {
     if (debugEnabled) log.debug("Start of node secondary loop");
+    boolean shouldInitDataChannel = false;
     while (!checkStopped()) {
       clearResourceCachesIfRequested();
       if (isShutdownRequested()) shutdown(isRestart());
       else {
         try {
+          while (isSuspended()) suspendedLock.goToSleep(1000L);
+          if (shouldInitDataChannel) {
+            shouldInitDataChannel = false;
+            initDataChannel();
+          }
           processNextJob();
+        } catch (IOException|JPPFSuspendedNodeException e) {
+          if (!isSuspended()) throw e;
+          shouldInitDataChannel = true;
         } finally {
           setExecuting(false);
         }
@@ -185,7 +185,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Read a job to execute or a handshake job.
    * @throws Exception if any error occurs.
-   * @exclude
    */
   private void processNextJob() throws Exception {
     Pair<TaskBundle, List<Task<?>>> pair = nodeIO.readTask();
@@ -224,7 +223,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * and prepare a specific response if it is.
    * @param bundle the bundle to check.
    * @throws Exception if any error occurs.
-   * @exclude
    */
   private void checkInitialBundle(final TaskBundle bundle) throws Exception {
     checkStopped();
@@ -232,13 +230,14 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
     bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);
     if (isOffline()) {
       bundle.setParameter(BundleParameter.NODE_OFFLINE, true);
+      if (isSuspended()) bundle.setParameter(BundleParameter.CLOSE_COMMAND, true);
       if (currentBundle != null) {
         bundle.setParameter(BundleParameter.NODE_OFFLINE_OPEN_REQUEST, true);
         bundle.setParameter(BundleParameter.NODE_BUNDLE_ID, currentBundle.first().getParameter(BundleParameter.NODE_BUNDLE_ID));
         bundle.setParameter(BundleParameter.JOB_UUID, currentBundle.first().getUuid());
       }
     }
-    if (isJmxEnabled()) setupManagementParameters(bundle);
+    if (isJmxEnabled()) setupBundleParameters(bundle);
   }
 
   /**
@@ -246,7 +245,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * @param bundle the bundle that contains the tasks and header information.
    * @param taskList the tasks results.
    * @throws Exception if any error occurs.
-   * @exclude
    */
   private void processResults(final TaskBundle bundle, final List<Task<?>> taskList) throws Exception {
     checkStopped();
@@ -269,14 +267,16 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   /**
    * Initialize this node's resources.
    * @throws Exception if an error is raised during initialization.
-   * @exclude
    */
   private synchronized void init() throws Exception {
     checkStopped();
     if (debugEnabled) log.debug("start node initialization");
     initHelper();
     try {
-      if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) registerProviderMBeans();
+      if (ManagementUtils.isManagementAvailable() && !ManagementUtils.isMBeanRegistered(JPPFNodeAdminMBean.MBEAN_NAME)) {
+        ClassLoader cl = getClass().getClassLoader();
+        if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, ManagementUtils.getPlatformServer(), this);
+      }
     } catch (Exception e) {
       log.error("Error registering the MBeans", e);
     }
@@ -424,26 +424,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Set the action executed when the node exits the main loop.
-   * @param exitAction the action to execute.
-   * @exclude
-   */
-  public synchronized void setExitAction(final Runnable exitAction) {
-    this.exitAction = exitAction;
-  }
-
-  /**
-   * Register all MBeans defined through the service provider interface.
-   * @throws Exception if the registration failed.
-   */
-  @SuppressWarnings("unchecked")
-  private void registerProviderMBeans() throws Exception {
-    ClassLoader cl = getClass().getClassLoader();
-    //MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    if (providerManager == null) providerManager = new JPPFMBeanProviderManager<>(JPPFNodeMBeanProvider.class, cl, ManagementUtils.getPlatformServer(), this);
-  }
-
-  /**
    * Get the jmx server that handles administration and monitoring functions for this node.
    * @return a <code>JMXServerImpl</code> instance.
    * @throws Exception if any error occurs.
@@ -520,7 +500,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
 
   @Override
   public boolean isOffline() {
-    return getClassLoader().isOffline();
+    return isAndroid() || getClassLoader().isOffline();
   }
 
   @Override
@@ -534,7 +514,7 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
   }
 
   /**
-   * Chek whther this node is stopped or shutting down.
+   * Check whether this node is stopped or shutting down.
    * If not, an unchecked {@code IllegalStateException} is thrown.
    * @return {@code true} if the node is stopped or shutting down.
    */

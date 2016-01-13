@@ -24,8 +24,9 @@ import java.io.File;
  * Implementation of {@link JPPFProperty} for {@code File} properties.
  * @author Laurent Cohen
  * @since 5.2
+ * @exclude
  */
-class FileProperty extends AbstractJPPFProperty<File> {
+public class FileProperty extends AbstractJPPFProperty<File> {
   /**
    * Initialize this property with the specified name and default value.
    * @param name the name of this property.

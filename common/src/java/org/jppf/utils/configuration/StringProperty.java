@@ -22,8 +22,9 @@ package org.jppf.utils.configuration;
  * Implementation of {@link JPPFProperty} for {@code String} properties.
  * @author Laurent Cohen
  * @since 5.2
+ * @exclude
  */
-class StringProperty extends AbstractJPPFProperty<String> {
+public class StringProperty extends AbstractJPPFProperty<String> {
   /**
    * Initialize this property with the specified name and default value.
    * @param name the name of this property.

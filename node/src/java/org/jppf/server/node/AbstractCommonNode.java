@@ -36,7 +36,7 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(JPPFNode.class);
+  private static Logger log = LoggerFactory.getLogger(AbstractCommonNode.class);
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
@@ -49,7 +49,6 @@ public abstract class AbstractCommonNode extends AbstractNode {
   /**
    * Flag which determines whether a reset of the resource caches
    * should be performed at the next opportunity.
-   * @exclude
    */
   AtomicBoolean cacheResetFlag = new AtomicBoolean(false);
   /**
@@ -67,13 +66,27 @@ public abstract class AbstractCommonNode extends AbstractNode {
    * @since 5.0
    */
   boolean executing = false;
+  /**
+   * Flag indicating whether the node is suspended, i.e. it is still alive but has stopped taking on new jobs.
+   * @since 5.2
+   */
+  final AtomicBoolean suspended = new AtomicBoolean(false);
+  /**
+   * Lock for synchronization on the suspended state.
+   */
+  final ThreadSynchronization suspendedLock = new ThreadSynchronization();
+  /**
+   * Flag indicating whether the node is suspended, i.e. it is still alive but has stopped taking on new jobs.
+   * @since 5.2
+   */
+  final AtomicBoolean reading = new AtomicBoolean(false);
 
   /**
    * Add management parameters to the specified bundle, before sending it back to a server.
    * @param bundle the bundle to add parameters to.
    * @exclude
    */
-  protected void setupManagementParameters(final TaskBundle bundle) {
+  protected void setupBundleParameters(final TaskBundle bundle) {
     try {
       JMXServer jmxServer = getJmxServer();
       bundle.setParameter(BundleParameter.NODE_MANAGEMENT_PORT_PARAM, jmxServer.getManagementPort());
@@ -116,9 +129,8 @@ public abstract class AbstractCommonNode extends AbstractNode {
 
   /**
    * Clear the resource caches of all class loaders managed by this object.
-   * @exclude
    */
-  protected void clearResourceCachesIfRequested() {
+  void clearResourceCachesIfRequested() {
     if (cacheResetFlag.get()) {
       try {
         classLoaderManager.clearResourceCaches();
@@ -199,5 +211,46 @@ public abstract class AbstractCommonNode extends AbstractNode {
    */
   public void setExecuting(final boolean executing) {
     this.executing = executing;
+  }
+
+  /**
+   * Determine whether the node is suspended, i.e. it is still alive but has stopped taking on new jobs.
+   * @return {@code true} if the node is suspended, {@code false} otherwise.
+   * @since 5.2
+   * @exclude
+   */
+  public boolean isSuspended() {
+    return suspended.get();
+  }
+
+  /**
+   * Set the node's suspended state, i.e. whether it should sto taking on new jobs.
+   * @param suspended {@code true} to suspend the node, {@code false} otherwise.
+   * @since 5.2
+   * @exclude
+   */
+  public void setSuspended(final boolean suspended) {
+    this.suspended.set(suspended);
+    if (!suspended) suspendedLock.wakeUp();
+  }
+
+  /**
+   * Determine the node's reading state.
+   * @return {@code true} set the node in reading mode, {@code false} otherwise.
+   * @since 5.2
+   * @exclude
+   */
+  public boolean isReading() {
+    return reading.get();
+  }
+
+  /**
+   * Set the node's reading state.
+   * @param suspended {@code true} set the node in reading mode, {@code false} otherwise.
+   * @since 5.2
+   * @exclude
+   */
+  public void setReading(final boolean suspended) {
+    this.reading.set(suspended);
   }
 }

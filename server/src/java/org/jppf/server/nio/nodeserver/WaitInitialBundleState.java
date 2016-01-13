@@ -28,7 +28,7 @@ import java.nio.channels.SocketChannel;
 import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.nio.*;
-import org.jppf.node.protocol.TaskBundle;
+import org.jppf.node.protocol.*;
 import org.jppf.server.*;
 import org.jppf.server.protocol.ServerTaskBundleNode;
 import org.jppf.utils.*;
@@ -194,7 +194,13 @@ class WaitInitialBundleState extends NodeServerState {
     if (debugEnabled) log.debug(build("processing offline reopen with jobUuid=", jobUuid, ", id=", id, ", nodeBundle=", nodeBundle, ", node=", context.getChannel()));
     context.setBundle(nodeBundle);
     WaitingResultsState wrs = (WaitingResultsState) server.getFactory().getState(NodeState.WAITING_RESULTS);
-    return wrs.process(received, context);
+    NodeTransition transition = wrs.process(received, context);
+    boolean closeCommand = bundle.getParameter(BundleParameter.CLOSE_COMMAND, false);
+    if (closeCommand) {
+      context.cleanup();
+      return null;
+    }
+    return transition;
   }
 
   /**

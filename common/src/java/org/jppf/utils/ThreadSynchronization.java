@@ -24,7 +24,7 @@ package org.jppf.utils;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class ThreadSynchronization {
+public class ThreadSynchronization {
   /**
    * Determines whether the thread's run() method should terminate.
    */

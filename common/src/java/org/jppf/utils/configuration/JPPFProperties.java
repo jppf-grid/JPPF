@@ -156,7 +156,7 @@ public class JPPFProperties {
   /** Whether the node is an Android node */
   public static final JPPFProperty<Boolean> NODE_ANDROID = new BooleanProperty("jppf.node.android", false);
   /** Whether the node is .Net-enabled */
-  public static final JPPFProperty<Boolean> DOTNET_NRIDGE_INITIALIZED = new BooleanProperty("jppf.dotnet.bridge.initialized", false);
+  public static final JPPFProperty<Boolean> DOTNET_BRIDGE_INITIALIZED = new BooleanProperty("jppf.dotnet.bridge.initialized", false);
   /** Whether the node is a master node */
   public static final JPPFProperty<Boolean> PROVISIONING_MASTER = new BooleanProperty("jppf.node.provisioning.master", true);
   /** Whether the node is a slave node */
@@ -220,7 +220,7 @@ public class JPPFProperties {
   /** Whether the class loader resource cache is enabled */
   public static final JPPFProperty<Boolean> RESOURCE_CACHE_ENABLED = new BooleanProperty("jppf.resource.cache.enabled", true);
   /** Type of cache storage: either 'file' or 'memory' */
-  public static final JPPFProperty<String> RESOURCE_CACHE_STORAGE = new StringProperty("jppf.resource.cache.storage", "file");
+  public static final JPPFProperty<String> RESOURCE_CACHE_STORAGE = new StringProperty("jppf.resource.cache.storage", "file").setPossibleValues("file", "memory");
   /** @exclude */
   public static final JPPFProperty<String> RESOURCE_PROVIDER_CLASS = new StringProperty("jppf.resource.provider.class", "org.jppf.classloader.ResourceProviderImpl");
   /** Enable/disable the screen saver */
@@ -353,9 +353,9 @@ public class JPPFProperties {
   public static final JPPFProperty<String> JAVA_PATH = new StringProperty("jppf.java.path", null);
   /** Path to the temporary config overrides properties file */
   public static final JPPFProperty<File> CONFIG_OVERRIDES_PATH = new FileProperty("jppf.config.overrides.path", new File("config/config-overrides.properties"));
-  /**
-   * The list of all predefined properties.
-   */
+  /** @exclude */
+  public static final JPPFProperty<Boolean> NODE_CHECK_CONNECTION = new BooleanProperty("jppf.node.check.connection", false);
+/** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 
   /**
