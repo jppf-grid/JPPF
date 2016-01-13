@@ -32,7 +32,7 @@ import org.jppf.node.protocol.JobMetadata;
 import org.jppf.node.protocol.JobSLA;
 
 /**
- * .
+ * Delegates node events to another, dynamically loaded event handler, if any.
  * @author Laurent Cohen
  * @since 5.1
  */
@@ -46,9 +46,12 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
    */
   private AndroidNodeIntegrationAdapter delegate;
   /**
-   *
+   * The view managed by the delegate, if any.
    */
   private View view = null;
+  /**
+   * The UUID of the job being processed.
+   */
   private String jobUuid;
   private boolean newJob = false;
 

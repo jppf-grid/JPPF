@@ -92,12 +92,30 @@
     <item>TLSv1</item>
   </string-array>
   <string-array name="pref_ssl_engine_protocol_default">
-    <item>SSLv3</item>
+    <item>TLSv1</item>
   </string-array>
 
   <!-- preferences: enabled cipher suites configuration -->
   <string name="pref_enabled_cipher_suites_title">Enabled cypher suites</string>
   <string name="pref_enabled_cipher_suites_sum">The set of enabled cypher suites</string>
+
+  <!-- preferences: battery monitoring subscreen -->
+  <string name="pref_battery_monitoring_title">Battery monitoring</string>
+  <string name="pref_battery_monitoring_sum">Configure warning and critical battery levels</string>
+
+  <!-- preferences: SSL enabled flag -->
+  <string name="pref_battery_monitoring_enabled_title">Battery monitoring enabled</string>
+  <string name="pref_battery_monitoring_enabled_sum_on">on: battery monitoring is enabled</string>
+  <string name="pref_battery_monitoring_enabled_sum_off">off: battery monitoring is disabled</string>
+  <string name="pref_battery_monitoring_enabled_default">true</string>
+
+  <!-- preferences: warning battery level configuration -->
+  <string name="pref_battery_warning_title">Warning level %</string>
+  <string name="pref_battery_warning_sum">Warning battery level in % of charge</string>
+
+  <!-- preferences: critical battery level configuration -->
+  <string name="pref_battery_critical_title">Critical level %</string>
+  <string name="pref_battery_critical_sum">Critical battery level in % of charge</string>
 
   <!-- ===================================================== -->
   <!-- useful constants                                      -->

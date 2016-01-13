@@ -64,7 +64,7 @@ public class DefaultAndroidNodeIntegration extends AndroidNodeIntegrationAdapter
 
   @Override
   public void taskExecuted(final TaskExecutionEvent event) {
-    totalTasks.incrementAndGet();
+    //if (event.isTaskCompletion()) totalTasks.incrementAndGet();
   }
 
   @Override
@@ -113,6 +113,7 @@ public class DefaultAndroidNodeIntegration extends AndroidNodeIntegrationAdapter
   @Override
   public void jobEnding(final NodeLifeCycleEvent event) {
     Log.v(LOG_TAG, "ending job '" + event.getJob().getName() + "'");
+    totalTasks.addAndGet(event.getTasks().size());
     if (activity != null) activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {

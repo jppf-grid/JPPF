@@ -18,15 +18,17 @@
 package org.jppf.android.activities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.NumberPicker;
+
+import org.jppf.android.R;
 
 /**
  * A preference widget which captures the Uri for a file accessible via the
@@ -35,11 +37,11 @@ import android.widget.TextView;
  * and the standard OK/Cancel buttons.
  * @author Laurent Cohen
  */
-public class FilechoserEditTextPreference extends DialogPreference {
+public class NumberPickerPreference extends DialogPreference {
   /**
    * Tag used for logging.
    */
-  private final static String LOG_TAG = FilechoserEditTextPreference.class.getSimpleName();
+  private final static String LOG_TAG = NumberPickerPreference.class.getSimpleName();
   /**
    * The layout for this preference widget.
    */
@@ -47,75 +49,71 @@ public class FilechoserEditTextPreference extends DialogPreference {
   /**
    * Editable text field where the selected URI is displayed.
    */
-  private final EditText editText = new EditText(this.getContext());
+  private final NumberPicker picker = new NumberPicker(this.getContext());
   /**
-   * The 'Browse' button.
+   * The minimum value.
    */
-  private final Button button = new Button(this.getContext());
+  private int minValue;
   /**
-   * The settings fragment which contains this preference widget.
+   * The maximum value.
    */
-  private transient SettingsFragment fragment = null;
+  private int maxValue;
+  /**
+   * The default value.
+   */
+  private int defValue;
 
   /**
    * Called when addPreferencesFromResource() is called. Initializes basic paraaeters.
    * @param context the context in which this preference is instantiated.
    * @param attrs the attributes for this preference.
    */
-  public FilechoserEditTextPreference(Context context, AttributeSet attrs) {
+  public NumberPickerPreference(Context context, AttributeSet attrs) {
     super(context, attrs);
     setPersistent(true);
-    button.setText("Browse / Search");
-    button.setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_dialog_dialer, 0, 0, 0);
-    button.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(final View v) {
-        Log.v(LOG_TAG, "in chooseFile()");
-        fragment.startFileChooser(FilechoserEditTextPreference.this);
-      }
-    });
     layout.setOrientation(LinearLayout.VERTICAL);
+    TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.NumberPickerPreference, 0, 0);
+    try {
+      minValue = ta.getInt(R.styleable.NumberPickerPreference_minValue, 0);
+      maxValue = ta.getInt(R.styleable.NumberPickerPreference_maxValue, 100);
+      defValue = ta.getInt(R.styleable.NumberPickerPreference_defValue, 50);
+    } finally {
+      ta.recycle();
+    }
   }
 
   @Override
   protected View onCreateDialogView() {
-    layout.addView(editText);
-    layout.addView(button);
+    picker.setMinValue(minValue);
+    picker.setMaxValue(maxValue);
+    int value = defValue;
+    try {
+      value = getPersistedInt(1);
+    } catch(ClassCastException e) {
+      value = Integer.valueOf(getPersistedString("1"));
+      SharedPreferences.Editor editor = getSharedPreferences().edit();
+      editor.remove(getKey());
+      editor.putInt(getKey(), value);
+      editor.commit();
+    }
+    picker.setValue(value);
+    layout.addView(picker);
     return layout;
   }
 
   @Override
   protected void onBindDialogView(View view) {
     super.onBindDialogView(view);
-    editText.setText(getPersistedString(""), TextView.BufferType.NORMAL);
   }
 
   @Override
   protected void onDialogClosed(boolean positiveResult) {
     super.onDialogClosed(positiveResult);
     // persist the URI
-    if (positiveResult && shouldPersist()) persistString(editText.getText().toString());
+    if (positiveResult && shouldPersist()) persistInt(picker.getValue());
     // remove the custom fields from the dialog
-    ((ViewGroup) editText.getParent()).removeView(editText);
-    ((ViewGroup) button.getParent()).removeView(button);
+    ((ViewGroup) picker.getParent()).removeView(picker);
     ((ViewGroup) layout.getParent()).removeView(layout);
     notifyChanged();
-  }
-
-  /**
-   * Set the {@link SettingsFragment} which displays this preference.
-   * @param fragment the fragment to set.
-   */
-  void setFragment(SettingsFragment fragment) {
-    this.fragment = fragment;
-  }
-
-  /**
-   * Called when the value of this preference has changed.
-   * @param value the new value for this preference.
-   */
-  void onValueChanged(String value) {
-    Log.v(LOG_TAG, "onValueChanged('" + value + "')");
-    editText.setText(value);
   }
 }

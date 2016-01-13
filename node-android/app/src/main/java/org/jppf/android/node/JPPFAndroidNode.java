@@ -27,7 +27,17 @@ import org.jppf.server.node.remote.AbstractRemoteNode;
  * @since 5.1
  */
 public class JPPFAndroidNode extends AbstractRemoteNode {
+  /**
+   * Tag used for logging.
+   */
+  private final static String LOG_TAG = JPPFAndroidNode.class.getSimpleName();
+  /**
+   * Delegates node events to another, dynamically loaded event handler, if any.
+   */
   private static DelegatingNodeEventHandler handler = null;
+  /**
+   *
+   */
   private boolean alreadyAdded = false;
 
   /**
@@ -48,6 +58,7 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
       getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(handler);
       alreadyAdded = true;
     }
+    setSuspended(AndroidHelper.getBatteryMonitor().isWarning());
     super.initDataChannel();
   }
 

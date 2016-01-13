@@ -17,11 +17,19 @@
 	limitations under the License.
 -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" xmlns:jppf="http://schemas.android.com/apk/res/org.jppf.android">
 
+  <!--
   <EditTextPreference android:defaultValue="1"
     android:key="pref_threads"
     android:numeric="integer"
+    android:summary="@string/pref_threads_sum"
+    android:title="@string/pref_threads_title"/>
+  -->
+
+  <org.jppf.android.activities.NumberPickerPreference
+    jppf:defValue="1" jppf:minValue="1" jppf:maxValue="1000"
+    android:key="pref_threads"
     android:summary="@string/pref_threads_sum"
     android:title="@string/pref_threads_title"/>
 
@@ -49,6 +57,8 @@
     android:dependency="pref_ssl_enabled"
   >
   -->
+
+  <!-- Security subscreen -->
 
   <PreferenceScreen android:key="pref_security"
     android:icon="@android:drawable/ic_menu_more"
@@ -125,6 +135,41 @@
       android:entryValues="@array/pref_empty_array"
       android:summary="@string/pref_enabled_cipher_suites_sum"
       android:title="@string/pref_enabled_cipher_suites_title"
+    />
+
+  </PreferenceScreen>
+
+  <!-- Battery Monitoring subscreen -->
+
+  <PreferenceScreen android:key="pref_battery_monitoring"
+    android:icon="@android:drawable/ic_menu_more"
+    android:title="@string/pref_battery_monitoring_title"
+    android:summary="@string/pref_battery_monitoring_sum"
+    android:persistent="false"
+  >
+
+    <CheckBoxPreference
+      android:key="pref_battery_monitoring_enabled"
+      android:defaultValue="true"
+      android:summaryOn="@string/pref_battery_monitoring_enabled_sum_on"
+      android:summaryOff="@string/pref_battery_monitoring_enabled_sum_off"
+      android:title="@string/pref_battery_monitoring_enabled_title"
+    />
+
+    <org.jppf.android.activities.NumberPickerPreference
+      jppf:defValue="10" jppf:minValue="0" jppf:maxValue="100"
+      android:key="pref_battery_warning"
+      android:summary="@string/pref_battery_warning_sum"
+      android:title="@string/pref_battery_warning_title"
+      android:dependency="pref_battery_monitoring_enabled"
+    />
+
+    <org.jppf.android.activities.NumberPickerPreference
+      jppf:defValue="5" jppf:minValue="0" jppf:maxValue="100"
+      android:key="pref_battery_critical"
+      android:summary="@string/pref_battery_critical_sum"
+      android:title="@string/pref_battery_critical_title"
+      android:dependency="pref_battery_monitoring_enabled"
     />
 
   </PreferenceScreen>

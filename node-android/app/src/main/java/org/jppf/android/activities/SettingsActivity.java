@@ -21,19 +21,37 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * Activity that displays the node configuration settings.
  */
 public class SettingsActivity extends Activity {
+  /**
+   * Tag used for logging.
+   */
+  private final static String LOG_TAG = SettingsActivity.class.getSimpleName();
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    Log.v(LOG_TAG, "in onCreate()");
     // Display the fragment as the main content.
     FragmentManager fragmentManager = getFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     SettingsFragment fragment = new SettingsFragment();
     transaction.replace(android.R.id.content, fragment);
     transaction.commit();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    Log.v(LOG_TAG, "in onDestroy()");
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    Log.v(LOG_TAG, "in onPause()");
   }
 }

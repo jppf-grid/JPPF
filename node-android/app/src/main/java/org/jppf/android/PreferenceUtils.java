@@ -65,6 +65,25 @@ public class PreferenceUtils {
    * The key name for the names enabled cypher suites. Multi-select prefeence from a list.
    */
   public static final String ENABLED_CIPHER_SUITES_KEY = "pref_enabled_cipher_suites";
+  /**
+   * The key name for the battery warning level preference.
+   */
+  public static final String BATTERY_MONITORING_ENABLED_KEY = "pref_battery_enabled";
+  /**
+   * The key name for the battery warning level preference.
+   */
+  public static final String BATTERY_MONITORING_WARNING_KEY = "pref_battery_warning";
+  /**
+   * The key name for the battery critical level preference.
+   */
+  public static final String BATTERY_MONITORING_CRITICAL_KEY = "pref_battery_critical";
+  /**
+   * The list of prefernece keys.
+   */
+  static final String[] PREF_KEYS = {
+    SERVERS_KEY, THREADS_KEY, KEY_STORE_LOCATION_KEY, KEY_STORE_PASSWORD_KEY, TRUST_STORE_LOCATION_KEY, TRUST_STORE_PASSWORD_KEY, SSL_CONTEXT_PROTOCOL_KEY,
+    SSL_ENGINE_PROTOCOL_KEY, ENABLED_CIPHER_SUITES_KEY, BATTERY_MONITORING_ENABLED_KEY, BATTERY_MONITORING_WARNING_KEY, BATTERY_MONITORING_CRITICAL_KEY
+  };
 
   /**
    * Instantiation of this class is not permitted.
