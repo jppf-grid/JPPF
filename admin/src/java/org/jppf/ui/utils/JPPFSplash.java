@@ -39,10 +39,7 @@ public class JPPFSplash extends Window {
    * The default list of images to use if none is specified in the configuration.
    */
   private static final List<String> DEFAULT_IMAGES = new ArrayList<String>() {{
-    add("/org/jppf/ui/resources/splash1.gif");
-    add("/org/jppf/ui/resources/splash2.gif");
-    add("/org/jppf/ui/resources/splash3.gif");
-    add("/org/jppf/ui/resources/splash4.gif");
+    for (int i=1; i<=4; i++) add("/org/jppf/ui/resources/splash" + i + ".gif");
   }};
   /**
    * Contains the images displayed by the splash screen.
@@ -70,7 +67,7 @@ public class JPPFSplash extends Window {
    * @param message the message to display.
    */
   public JPPFSplash(final String message) {
-    super(new JFrame());
+    super(null);
     setBackground(Color.WHITE);
     List<String> pathList = StringUtils.parseStrings(JPPFConfiguration.get(JPPFProperties.UI_SPLASH_IMAGES), "\\|");
     for (String path: pathList) {
