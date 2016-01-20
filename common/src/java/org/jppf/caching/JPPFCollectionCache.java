@@ -23,8 +23,7 @@ package org.jppf.caching;
  * @param <E> the type of elements.
  * @author Laurent Cohen
  */
-public interface JPPFCollectionCache<E>
-{
+public interface JPPFCollectionCache<E> {
   /**
    * Put an element in the cache.
    * @param element the element's key for retrival.

@@ -26,34 +26,16 @@ import java.util.*;
  * @param <V> the type of values.
  * @author Laurent Cohen
  */
-public class JPPFHashMapCache<K, V> implements JPPFMapCache<K, V> {
+public class JPPFHashMapCache<K, V> extends AbstractJPPFMapCache<K, V> {
   /**
-   * The backing map for this cache.
+   * Initialize this cache.
    */
-  private final Map<K, V> map = new HashMap<>();
-
-  @Override
-  public void put(final K key, final V value) {
-    map.put(key, value);
+  public JPPFHashMapCache() {
+    map = createMap();
   }
 
   @Override
-  public V get(final K key) {
-    return map.get(key);
-  }
-
-  @Override
-  public V remove(final K key) {
-    return map.remove(key);
-  }
-
-  @Override
-  public void clear() {
-    map.clear();
-  }
-
-  @Override
-  public boolean has(final K key) {
-    return map.containsKey(key);
+  protected Map<K, V> createMap() {
+    return new HashMap<>();
   }
 }
