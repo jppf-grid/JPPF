@@ -49,6 +49,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * The node that uses this execution manager.
    */
   private NodeInternal node = null;
+
   /**
    * Initialize this execution manager with the specified node.
    * @param node the node that uses this execution manager.
@@ -62,7 +63,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param node the node that uses this execution manager.
    * @param nbThreadsProperty the name of the property which configures the number of threads.
    */
-  public NodeExecutionManager(final NodeInternal node, final JPPFProperty nbThreadsProperty) {
+  public NodeExecutionManager(final NodeInternal node, final JPPFProperty<Integer> nbThreadsProperty) {
     super(nbThreadsProperty);
     if (node == null) throw new IllegalArgumentException("node is null");
     this.node = node;

@@ -153,7 +153,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
         NioTransition<S> t = factory.getTransition(transition);
         S s2 = t.getState();
         if (s1 != null) {
-          ///if (!factory.isTransitionAllowed(s1, s2)) log.warn("unauthorized transition" + getTransitionMessage(s1, s2, t, channel));
           if (debugEnabled && (s1 != s2)) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
           //if (debugEnabled && isNodeServer) log.debug("transition" + getTransitionMessage(s1, s2, t, channel, submit));
           else if (traceEnabled) log.trace(getTransitionMessage(s1, s2, t, channel, submit));

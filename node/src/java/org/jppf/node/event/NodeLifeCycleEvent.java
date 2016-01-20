@@ -28,8 +28,7 @@ import org.jppf.node.protocol.*;
  * Instances of this class represent node life cycle events.
  * @author Laurent Cohen
  */
-public class NodeLifeCycleEvent extends EventObject
-{
+public class NodeLifeCycleEvent extends EventObject {
   /**
    * The class loader used to load the tasks and the classes they need from the client.
    */
@@ -58,8 +57,7 @@ public class NodeLifeCycleEvent extends EventObject
    * then it can be safely cast to a <code>org.jppf.server.node.JPPFNode</code> instance.
    * @param type the type of this event.
    */
-  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type)
-  {
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type) {
     super(node);
     this.type = type;
   }
@@ -72,8 +70,7 @@ public class NodeLifeCycleEvent extends EventObject
    * @param job the job that is about to be or has been executed.
    * @param cl the class loader used to load the tasks and the classes they need from the client.
    */
-  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl)
-  {
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl) {
     this(node, type);
     this.job = job;
     this.cl = cl;
@@ -89,8 +86,8 @@ public class NodeLifeCycleEvent extends EventObject
    * @param tasks the tasks about to be or which have been executed.
    * @param dataProvider the data provider for the current job, if any.
    */
-  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks, final DataProvider dataProvider)
-  {
+  public NodeLifeCycleEvent(final Node node, final NodeLifeCycleEventType type, final JPPFDistributedJob job, final AbstractJPPFClassLoader cl, final List<Task<?>> tasks,
+      final DataProvider dataProvider) {
     this(node, type);
     this.job = job;
     this.cl = cl;
@@ -105,8 +102,7 @@ public class NodeLifeCycleEvent extends EventObject
    * If the {@link NodeLifeCycleListener} was deployed in the server's classpath,
    * then this return value can be safely cast to a <code>org.jppf.server.node.JPPFNode</code> instance.
    */
-  public Node getNode()
-  {
+  public Node getNode() {
     return (Node) getSource();
   }
 
@@ -116,8 +112,7 @@ public class NodeLifeCycleEvent extends EventObject
    * It will be <code>null</code> in all other cases.
    * @return a {@link JPPFDistributedJob} instance, or null if no job is being executed.
    */
-  public JPPFDistributedJob getJob()
-  {
+  public JPPFDistributedJob getJob() {
     return job;
   }
 
@@ -127,8 +122,7 @@ public class NodeLifeCycleEvent extends EventObject
    * This method will return <code>null</code> in all other cases.
    * @return a list of {@link Task} instances, or null if the node is idle.
    */
-  public List<Task<?>> getTasks()
-  {
+  public List<Task<?>> getTasks() {
     return tasks;
   }
 
@@ -138,8 +132,7 @@ public class NodeLifeCycleEvent extends EventObject
    * It will be <code>null</code> in all other cases.
    * @return an instance of <code>AbstractJPPFClassLoader</code>.
    */
-  public AbstractJPPFClassLoader getTaskClassLoader()
-  {
+  public AbstractJPPFClassLoader getTaskClassLoader() {
     return cl;
   }
 
@@ -149,14 +142,12 @@ public class NodeLifeCycleEvent extends EventObject
    * It will be <code>null</code> in all other cases.
    * @return a {@link DataProvider} instance.
    */
-  public DataProvider getDataProvider()
-  {
+  public DataProvider getDataProvider() {
     return dataProvider;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("type=").append(getType());
@@ -173,8 +164,7 @@ public class NodeLifeCycleEvent extends EventObject
    * Get the type of this event.
    * @return the event type as an instance of the typesafe enum {@link NodeLifeCycleEventType}.
    */
-  public NodeLifeCycleEventType getType()
-  {
+  public NodeLifeCycleEventType getType() {
     return type;
   }
 }

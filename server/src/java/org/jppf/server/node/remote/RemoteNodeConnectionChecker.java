@@ -31,8 +31,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
-{
+public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker {
   /**
    * Logger for this class.
    */
@@ -40,15 +39,15 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
   /**
    * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
    */
-  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The node for which to check the connection.
    */
-  private AbstractRemoteNode node = null;
+  private final AbstractRemoteNode node;
   /**
    * The socket connection.
    */
-  private SocketWrapper socketWrapper = null;
+  private final SocketWrapper socketWrapper;
   /**
    * The thread which performs the checks.
    */
@@ -56,21 +55,19 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
   /**
    * 
    */
-  private Object suspendedLock = new Object();
+  private final ThreadSynchronization suspendedLock = new ThreadSynchronization() {};
 
   /**
    * Initialize this checker <ith the specified node.
    * @param node the node for which to check the connection.
    */
-  public RemoteNodeConnectionChecker(final AbstractRemoteNode node)
-  {
+  public RemoteNodeConnectionChecker(final AbstractRemoteNode node) {
     this.node = node;
     this.socketWrapper = ((RemoteNodeConnection) node.getNodeConnection()).getChannel();
   }
 
   @Override
-  public void start()
-  {
+  public void start() {
     stopped.set(false);
     suspended.set(true);
     checkerThread = new CheckerThread();
@@ -78,24 +75,21 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
   }
 
   @Override
-  public void stop()
-  {
+  public void stop() {
     stopped.set(true);
     checkerThread.setStopped(true);
     checkerThread.wakeUp();
   }
 
   @Override
-  public void resume()
-  {
+  public void resume() {
     suspended.set(false);
     checkerThread.suspended.set(false);
     checkerThread.wakeUp();
   }
 
   @Override
-  public void suspend()
-  {
+  public void suspend() {
     suspended.set(true);
     checkerThread.wakeUp();
     waitSuspended();
@@ -104,66 +98,40 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker
   /**
    * Wait until the checks are effectively suspended.
    */
-  private void waitSuspended()
-  {
-    synchronized(suspendedLock)
-    {
-      while (!checkerThread.suspended.get())
-      {
-        try
-        {
-          long start = System.nanoTime();
-          suspendedLock.wait();
-          double elapsed =  (System.nanoTime() - start) / 1e6d;
-          if (debugEnabled) log.debug("suspended time: " + elapsed);
-        }
-        catch(InterruptedException e)
-        {
-        }
-      }
+  private void waitSuspended() {
+    while (!checkerThread.suspended.get()) {
+      long start = System.nanoTime();
+      suspendedLock.goToSleep();
+      long elapsed = (System.nanoTime() - start) / 1_000_000L;
+      if (debugEnabled) log.debug("suspended time: " + elapsed);
     }
   }
 
   /**
    * 
    */
-  private class CheckerThread extends ThreadSynchronization implements Runnable
-  {
+  private class CheckerThread extends ThreadSynchronization implements Runnable {
     /**
      * 
      */
-    private AtomicBoolean suspended = new AtomicBoolean(true);
+    private final AtomicBoolean suspended = new AtomicBoolean(true);
 
     @Override
-    public void run()
-    {
-      while (!isStopped())
-      {
-        if (RemoteNodeConnectionChecker.this.isSuspended())
-        {
-          if (this.suspended.compareAndSet(false, true))
-          {
-            synchronized(suspendedLock)
-            {
-              suspendedLock.notify();
-            }
-          }
+    public void run() {
+      while (!isStopped()) {
+        if (isSuspended()) {
+          if (this.suspended.compareAndSet(false, true)) suspendedLock.wakeUp();
           goToSleep();
         }
         if (isStopped()) return;
         if (isSuspended()) continue;
         long start = System.nanoTime();
-        try
-        {
+        try {
           socketWrapper.receiveBytes(1);
-        }
-        catch (SocketTimeoutException ignore)
-        {
-          double elapsed =  (System.nanoTime() - start) / 1e6d;
+        } catch (SocketTimeoutException ignore) {
+          double elapsed = (System.nanoTime() - start) / 1e6d;
           if (debugEnabled) log.debug("receive time: " + elapsed);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           exception = e;
           node.getExecutionManager().cancelAllTasks(false, false);
         }

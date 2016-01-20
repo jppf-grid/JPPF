@@ -93,8 +93,7 @@ public class LifeCycleEventHandler {
   /**
    * Notify all listeners that the node is starting.
    */
-  public void fireNodeStarting()
-  {
+  public void fireNodeStarting() {
     NodeLifeCycleEvent event = new NodeLifeCycleEvent(node, NODE_STARTING);
     for (NodeLifeCycleListener listener : listeners) {
       try {
@@ -213,8 +212,7 @@ public class LifeCycleEventHandler {
       handler.handleError(listener, event, t);
     } catch (Exception e) {
       String msg = "exception occurred while invoking error handler "  + handler + " :\n" + ExceptionUtils.getStackTrace(e);
-      /*if (debugEnabled) log.debug(msg, e);
-      else*/ log.error(msg);
+      log.error(msg);
     }
   }
 }

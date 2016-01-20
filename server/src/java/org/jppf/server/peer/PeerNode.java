@@ -147,7 +147,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
         ServerTaskBundleClient bundleWrapper = readBundle();
         TaskBundle bundle = bundleWrapper.getJob();
         if (bundle.isHandshake()) {
-          if (JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED)) setupManagementParameters(bundle);
+          if (JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED)) setupBundleParameters(bundle);
           bundle.setUuid(uuid);
           bundle.setParameter(BundleParameter.IS_PEER, true);
           bundle.setParameter(BundleParameter.NODE_UUID_PARAM, uuid);

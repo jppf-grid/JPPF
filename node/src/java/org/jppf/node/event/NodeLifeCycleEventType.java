@@ -22,8 +22,7 @@ package org.jppf.node.event;
  * A type safe enumeration of all possible types of node life cycle events.
  * @author Laurent Cohen
  */
-public enum NodeLifeCycleEventType
-{
+public enum NodeLifeCycleEventType {
   /**
    * The node is starting and before any job processing.
    */
@@ -33,7 +32,7 @@ public enum NodeLifeCycleEventType
    */
   NODE_ENDING,
   /**
-   * The job header was loaded from the server and before the tasks are loaded.
+   * After the job header was loaded from the server and before the data provider and tasks are loaded.
    */
   JOB_HEADER_LOADED,
   /**

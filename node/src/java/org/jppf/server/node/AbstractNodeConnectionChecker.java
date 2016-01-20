@@ -25,8 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractNodeConnectionChecker implements NodeConnectionChecker
-{
+public abstract class AbstractNodeConnectionChecker implements NodeConnectionChecker {
   /**
    * 
    */
@@ -41,20 +40,17 @@ public abstract class AbstractNodeConnectionChecker implements NodeConnectionChe
   protected Exception exception = null;
 
   @Override
-  public boolean isStopped()
-  {
+  public boolean isStopped() {
     return stopped.get();
   }
 
   @Override
-  public boolean isSuspended()
-  {
+  public boolean isSuspended() {
     return suspended.get();
   }
 
   @Override
-  public Exception getException()
-  {
+  public Exception getException() {
     return exception;
   }
 }

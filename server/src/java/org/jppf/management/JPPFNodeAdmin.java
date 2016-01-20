@@ -20,11 +20,9 @@ package org.jppf.management;
 
 import java.util.Map;
 
-import org.jppf.JPPFNodeReconnectionNotification;
 import org.jppf.classloader.*;
 import org.jppf.execute.ExecutionInfo;
 import org.jppf.node.NodeRunner;
-import org.jppf.node.connection.ConnectionReason;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.ConfigurationOverridesHandler;
@@ -240,27 +238,12 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    * Update the configuration properties of the node. This method is equivalent to calling {@link #updateConfiguration(Map, Boolean, Boolean) updateConfiguration(configOverrides, restart, true)}.
    * @param configOverrides the set of properties to update.
    * @param restart specifies whether the node should be restarted after updating the properties.
-   * @param interruptIfRunning when {@code true}, then restart the node even if it is executing tasks, when {@code false}, then only shutdown the node when it is no longer executing.
    * This parameter only applies when the {@code restart} parameter is {@code true}.
    * @throws Exception if any error occurs.
    */
   @Override
   public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart) throws Exception {
     updateConfiguration(configOverrides, restart, true);
-  }
-
-  /**
-   * Trigger a disconnection/reconnection of this node.
-   * @throws Exception if any error occurs.
-   */
-  private void triggerReconnect() throws Exception {
-    node.setExitAction(new Runnable() {
-      @Override
-      public void run() {
-        throw new JPPFNodeReconnectionNotification("Reconnecting this node due to configuration changes", null, ConnectionReason.MANAGEMENT_REQUEST);
-      }
-    });
-    node.stopNode();
   }
 
   /**

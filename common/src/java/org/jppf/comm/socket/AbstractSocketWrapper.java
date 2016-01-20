@@ -142,7 +142,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
   /**
    * Write an int value over a socket connection.
    * @param n the value to write.
-   * @throws Exception if the underlying output stream throws an exception.
+   * @throws IOException if the underlying output stream throws an exception.
    */
   @Override
   public void writeInt(final int n) throws IOException {
@@ -233,7 +233,7 @@ public abstract class AbstractSocketWrapper implements SocketWrapper {
   /**
    * Read an int value from a socket connection.
    * @return n the value to read from the socket, or -1 if end of stream was reached.
-   * @throws Exception if the underlying input stream throws an exception.
+   * @throws IOException if the underlying input stream throws an exception.
    */
   @Override
   public int readInt() throws IOException {
