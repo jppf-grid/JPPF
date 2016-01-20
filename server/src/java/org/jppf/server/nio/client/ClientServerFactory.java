@@ -30,25 +30,21 @@ import org.jppf.nio.*;
  * transitions between those states.
  * @author Laurent Cohen
  */
-final class ClientServerFactory extends NioServerFactory<ClientState, ClientTransition>
-{
+final class ClientServerFactory extends NioServerFactory<ClientState, ClientTransition> {
   /**
    * Initialize this factory with the specified server.
    * @param server the server for which to initialize.
    */
-  public ClientServerFactory(final ClientNioServer server)
-  {
+  public ClientServerFactory(final ClientNioServer server) {
     super(server);
   }
 
   /**
    * Create the map of all possible states.
    * @return a mapping of the states enumeration to the corresponding NioState instances.
-   * @see org.jppf.nio.NioServerFactory#createStateMap()
    */
   @Override
-  public Map<ClientState, NioState<ClientTransition>> createStateMap()
-  {
+  public Map<ClientState, NioState<ClientTransition>> createStateMap() {
     Map<ClientState, NioState<ClientTransition>> map = new EnumMap<>(ClientState.class);
     map.put(WAITING_HANDSHAKE, new WaitingHandshakeState((ClientNioServer) server));
     map.put(SENDING_HANDSHAKE_RESULTS, new SendingHandshakeResultsState((ClientNioServer) server));
@@ -61,11 +57,9 @@ final class ClientServerFactory extends NioServerFactory<ClientState, ClientTran
   /**
    * Create the map of all possible transitions.
    * @return a mapping of the transitions enumeration to the corresponding NioTransition instances.
-   * @see org.jppf.nio.NioServerFactory#createTransitionMap()
    */
   @Override
-  public Map<ClientTransition, NioTransition<ClientState>> createTransitionMap()
-  {
+  public Map<ClientTransition, NioTransition<ClientState>> createTransitionMap() {
     Map<ClientTransition, NioTransition<ClientState>> map = new EnumMap<>(ClientTransition.class);
     map.put(TO_WAITING_HANDSHAKE, transition(WAITING_HANDSHAKE, R));
     map.put(TO_SENDING_HANDSHAKE_RESULTS, transition(SENDING_HANDSHAKE_RESULTS, NioConstants.CHECK_CONNECTION ? RW : W));

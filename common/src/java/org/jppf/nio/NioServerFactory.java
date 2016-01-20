@@ -21,8 +21,6 @@ package org.jppf.nio;
 import java.nio.channels.SelectionKey;
 import java.util.Map;
 
-import org.jppf.utils.collections.CollectionMap;
-
 /**
  * Instances of this class provide a mapping of enumerated values for states and
  * transitions to the actual corresponding objects.
@@ -30,12 +28,11 @@ import org.jppf.utils.collections.CollectionMap;
  * @param <T> the type safe enumeration of the state transitions.
  * @author Laurent Cohen
  */
-public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
-{
+public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>> {
   /**
    * A short name for read and write channel operations.
    */
-  public static final int RW = SelectionKey.OP_READ|SelectionKey.OP_WRITE;
+  public static final int RW = SelectionKey.OP_READ | SelectionKey.OP_WRITE;
   /**
    * A short name for read channel operations.
    */
@@ -56,21 +53,15 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
    * The server for which this factory is intended.
    */
   protected final NioServer<S, T> server;
-  /**
-   * A map of the allowed states to which each state can transition.
-   */
-  protected final CollectionMap<S, S> allowedTransitions;
 
   /**
    * Initialize this factory with the specified server.
    * @param server the server for which to initialize.
    */
-  protected NioServerFactory(final NioServer<S, T> server)
-  {
+  protected NioServerFactory(final NioServer<S, T> server) {
     this.server = server;
     stateMap = createStateMap();
     transitionMap = createTransitionMap();
-    allowedTransitions = createAllowedTransitionsMap();
   }
 
   /**
@@ -86,21 +77,11 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
   protected abstract Map<T, NioTransition<S>> createTransitionMap();
 
   /**
-   * 
-   * @return a CollectionMap for the possible states.
-   */
-  protected CollectionMap<S, S> createAllowedTransitionsMap()
-  {
-    return null;
-  }
-
-  /**
    * Get a state given its name.
    * @param name the name of the state to lookup.
    * @return an <code>NioState</code> instance.
    */
-  public NioState<T> getState(final S name)
-  {
+  public NioState<T> getState(final S name) {
     return stateMap.get(name);
   }
 
@@ -109,8 +90,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
    * @param name the name of the transition to lookup.
    * @return an <code>NioTransition</code> instance.
    */
-  public NioTransition<S> getTransition(final T name)
-  {
+  public NioTransition<S> getTransition(final T name) {
     return transitionMap.get(name);
   }
 
@@ -118,8 +98,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
    * Get the server for which this factory is intended.
    * @return an <code>NioServer</code> instance.
    */
-  public NioServer<S, T> getServer()
-  {
+  public NioServer<S, T> getServer() {
     return server;
   }
 
@@ -129,19 +108,7 @@ public abstract class NioServerFactory<S extends Enum<S>, T extends Enum<T>>
    * @param ops the operations allowed.
    * @return an <code>NioTransition&lt;ClassState&gt;</code> instance.
    */
-  protected NioTransition<S> transition(final S state, final int ops)
-  {
+  protected NioTransition<S> transition(final S state, final int ops) {
     return new NioTransition<>(state, ops);
-  }
-
-  /**
-   * Determine whether the transion from the current state to a new state is allowed.
-   * @param currentState the current state.
-   * @param newState the new state.
-   * @return <code>true</code> if the transition is allowed, <code>false</code> otherwise.
-   */
-  public boolean isTransitionAllowed(final S currentState, final S newState)
-  {
-    return (allowedTransitions == null) || allowedTransitions.containsValue(currentState, newState);
   }
 }

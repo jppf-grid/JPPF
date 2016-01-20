@@ -24,7 +24,6 @@ import static org.jppf.server.nio.classloader.client.ClientClassTransition.*;
 import java.util.*;
 
 import org.jppf.nio.*;
-import org.jppf.utils.collections.*;
 
 /**
  * Utility class used to specify the possible states of a class server connection, as well as the possible
@@ -43,7 +42,6 @@ final class ClientClassServerFactory extends NioServerFactory<ClientClassState, 
   /**
    * Create the map of all possible states.
    * @return a mapping of the states enumeration to the corresponding NioStateInstances.
-   * @see org.jppf.nio.NioServerFactory#createStateMap()
    */
   @Override
   public Map<ClientClassState, NioState<ClientClassTransition>> createStateMap() {
@@ -62,7 +60,6 @@ final class ClientClassServerFactory extends NioServerFactory<ClientClassState, 
   /**
    * Create the map of all possible states.
    * @return a mapping of the states enumeration to the corresponding NioStateInstances.
-   * @see org.jppf.nio.NioServerFactory#createTransitionMap()
    */
   @Override
   public Map<ClientClassTransition, NioTransition<ClientClassState>> createTransitionMap() {
@@ -76,20 +73,6 @@ final class ClientClassServerFactory extends NioServerFactory<ClientClassState, 
     map.put(TO_SENDING_PEER_CHANNEL_IDENTIFIER, transition(SENDING_PEER_CHANNEL_IDENTIFIER, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_SENDING_PEER_INITIATION_REQUEST, transition(SENDING_PEER_INITIATION_REQUEST, NioConstants.CHECK_CONNECTION ? RW : W));
     map.put(TO_WAITING_PEER_INITIATION_RESPONSE, transition(WAITING_PEER_INITIATION_RESPONSE, R));
-    return map;
-  }
-
-  @Override
-  protected CollectionMap<ClientClassState, ClientClassState> createAllowedTransitionsMap() {
-    CollectionMap<ClientClassState, ClientClassState> map = new EnumSetEnumMap<>(ClientClassState.class);
-    map.addValues(WAITING_INITIAL_PROVIDER_REQUEST, WAITING_INITIAL_PROVIDER_REQUEST, SENDING_INITIAL_PROVIDER_RESPONSE);
-    map.addValues(SENDING_INITIAL_PROVIDER_RESPONSE, SENDING_INITIAL_PROVIDER_RESPONSE, IDLE_PROVIDER);
-    map.addValues(SENDING_PROVIDER_REQUEST, SENDING_PROVIDER_REQUEST, WAITING_PROVIDER_RESPONSE, IDLE_PROVIDER);
-    map.addValues(WAITING_PROVIDER_RESPONSE, WAITING_PROVIDER_RESPONSE, SENDING_PROVIDER_REQUEST, IDLE_PROVIDER);
-    map.addValues(IDLE_PROVIDER, IDLE_PROVIDER, SENDING_PROVIDER_REQUEST);
-    map.addValues(SENDING_PEER_CHANNEL_IDENTIFIER, SENDING_PEER_CHANNEL_IDENTIFIER, SENDING_PEER_INITIATION_REQUEST);
-    map.addValues(SENDING_PEER_INITIATION_REQUEST, SENDING_PEER_INITIATION_REQUEST, WAITING_PEER_INITIATION_RESPONSE);
-    map.addValues(WAITING_PEER_INITIATION_RESPONSE, WAITING_PEER_INITIATION_RESPONSE, IDLE_PROVIDER);
     return map;
   }
 }

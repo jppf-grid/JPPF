@@ -33,8 +33,7 @@ import org.slf4j.*;
  * This class represents the state of waiting for some action.
  * @author Laurent Cohen
  */
-class SendingBundleState extends NodeServerState
-{
+class SendingBundleState extends NodeServerState {
   /**
    * Logger for this class.
    */
@@ -51,8 +50,7 @@ class SendingBundleState extends NodeServerState
    * Initialize this state.
    * @param server the server that handles this state.
    */
-  public SendingBundleState(final NodeNioServer server)
-  {
+  public SendingBundleState(final NodeNioServer server) {
     super(server);
   }
 
@@ -61,7 +59,6 @@ class SendingBundleState extends NodeServerState
    * @param channel the selection key corresponding to the channel and selector for this state.
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
-   * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
