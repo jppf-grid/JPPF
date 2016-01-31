@@ -18,9 +18,9 @@
 
 package org.jppf.utils.stats;
 
-import java.util.Locale;
+import java.util.*;
 
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 
 
 /**
@@ -30,7 +30,7 @@ import org.jppf.utils.LocalizationUtils;
  */
 public final class JPPFStatisticsHelper {
   /**
-   * Count of tasks dispatched to nodes.
+   * Location of the localization resource bundles.
    */
   private  static final String I18N_BASE = "org.jppf.utils.stats.i18n.StatsLabels";
   /**
@@ -184,6 +184,11 @@ public final class JPPFStatisticsHelper {
    */
   public static JPPFStatistics createServerStatistics() {
     JPPFStatistics statistics = new JPPFStatistics();
+    Iterator<JPPFFilteredStatisticsListener> it = ServiceFinder.lookupProviders(JPPFFilteredStatisticsListener.class);
+    while (it.hasNext()) {
+      JPPFFilteredStatisticsListener listener = it.next();
+      statistics.addListener(listener, listener.getFilter());
+    }
     statistics.createSnapshots(false, EXECUTION, NODE_EXECUTION, TRANSPORT_TIME, TASK_QUEUE_TIME, JOB_TIME, JOB_TASKS, TASK_DISPATCH,
         NODE_CLASS_REQUESTS_TIME, CLIENT_CLASS_REQUESTS_TIME);
     statistics.createSnapshots(true, TASK_QUEUE_COUNT, JOB_COUNT, NODES, IDLE_NODES, CLIENTS);

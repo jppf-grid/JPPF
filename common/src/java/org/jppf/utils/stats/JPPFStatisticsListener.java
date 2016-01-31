@@ -23,25 +23,23 @@ import java.util.EventListener;
 /**
  * Listener interface for JPPF statistics.
  * @author Laurent Cohen
- * @exclude
  */
-public interface JPPFStatisticsListener extends EventListener
-{
+public interface JPPFStatisticsListener extends EventListener {
   /**
    * Called when a new snapshot is created.
-   * @param event the event encapsulating a {@link JPPFSnapshot}.
+   * @param event the event encapsulating the {@link JPPFSnapshot} that was created and the {@link JPPFStatistics} it belongs to.
    */
   void snapshotAdded(JPPFStatisticsEvent event);
 
   /**
-   * Called when a new snapshot is removed.
-   * @param event the event encapsulating a {@link JPPFSnapshot}.
+   * Called when a snapshot is removed.
+   * @param event the event encapsulating a {@link JPPFSnapshot} that was removed and the {@link JPPFStatistics} it belonged to.
    */
   void snapshotRemoved(JPPFStatisticsEvent event);
 
   /**
-   * Called when a new snapshot is updated.
-   * @param event the event encapsulating a {@link JPPFSnapshot}.
+   * Called when a snapshot is updated.
+   * @param event the event encapsulating a {@link JPPFSnapshot} that was updated and the {@link JPPFStatistics} it belongs to.
    */
   void snapshotUpdated(JPPFStatisticsEvent event);
 }

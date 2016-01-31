@@ -23,25 +23,36 @@ import java.util.EventObject;
 /**
  * A statistics event.
  * @author Laurent Cohen
- * @exclude
  */
-public class JPPFStatisticsEvent extends EventObject
-{
+public class JPPFStatisticsEvent extends EventObject {
   /**
-   * Initialize this event with the specified source snapshot.
-   * @param snapshot the snapshot on which the event occurred.
+   * The snapshot that was created, removed or updated.
    */
-  public JPPFStatisticsEvent(final JPPFSnapshot snapshot)
-  {
-    super(snapshot);
+  private final JPPFSnapshot snapshot;
+
+  /**
+   * Initialize this event with the specified source statistics and snapshot.
+   * @param statistics the statistics object to whom the snapshot belongs.
+   * @param snapshot the snapshot for which the event occurred.
+   */
+  public JPPFStatisticsEvent(final JPPFStatistics statistics, final JPPFSnapshot snapshot) {
+    super(statistics);
+    this.snapshot = snapshot;
   }
 
   /**
-   * Get the snapshot source of this event.
+   * Get the statistics source of this event.
+   * @return a {@link JPPFStatistics} instance.
+   */
+  public JPPFStatistics getStatistics() {
+    return (JPPFStatistics) getSource();
+  }
+
+  /**
+   * Get the snapshot that was created, removed or updated.
    * @return a {@link JPPFSnapshot} instance.
    */
-  public JPPFSnapshot getSnapshot()
-  {
-    return (JPPFSnapshot) getSource();
+  public JPPFSnapshot getSnapshot() {
+    return snapshot;
   }
 }

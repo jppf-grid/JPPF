@@ -26,8 +26,7 @@ import org.jppf.utils.collections.CollectionUtils;
  * Convenience class for collecting time or size statistics.
  * Instances of this class are thread-safe.
  */
-public interface JPPFSnapshot extends Serializable
-{
+public interface JPPFSnapshot extends Serializable {
   /**
    * Add a set of aggregated values to this snapshot.
    * @param accumulatedValues the accumulated sum of the values to add.
@@ -93,9 +92,9 @@ public interface JPPFSnapshot extends Serializable
 
   /**
    * Base class for filters including or excluding snpashots based on a provided set of labels.
+   * @exclude
    */
-  public abstract static class LabelBasedFilter implements JPPFStatistics.Filter
-  {
+  public abstract static class LabelBasedFilter implements JPPFStatistics.Filter {
     /**
      * The set of labels to exclude.
      */
@@ -110,8 +109,7 @@ public interface JPPFSnapshot extends Serializable
      * @param includeFlag determines whether to include or exclude the snapshots.
      * @param labels the labels to exclude.
      */
-    protected LabelBasedFilter(final boolean includeFlag, final String...labels)
-    {
+    protected LabelBasedFilter(final boolean includeFlag, final String... labels) {
       this.includeFlag = includeFlag;
       this.labels = CollectionUtils.set(labels);
     }
@@ -121,15 +119,13 @@ public interface JPPFSnapshot extends Serializable
      * @param includeFlag determines whether to include or exclude the snapshots.
      * @param labels the labels to exclude.
      */
-    protected LabelBasedFilter(final boolean includeFlag, final Collection<String> labels)
-    {
+    protected LabelBasedFilter(final boolean includeFlag, final Collection<String> labels) {
       this.includeFlag = includeFlag;
       this.labels = new HashSet(labels);
     }
 
     @Override
-    public boolean accept(final JPPFSnapshot snapshot)
-    {
+    public boolean accept(final JPPFSnapshot snapshot) {
       boolean b = labels.contains(snapshot.getLabel());
       return includeFlag ? b : !b;
     }
@@ -137,15 +133,14 @@ public interface JPPFSnapshot extends Serializable
 
   /**
    * Filter including snpashots based on a provided set of labels.
+   * @exclude
    */
-  public static class LabelIncludingFilter extends LabelBasedFilter
-  {
+  public static class LabelIncludingFilter extends LabelBasedFilter {
     /**
      * Initialize with the specified array of labels.
      * @param labels the labels to include.
      */
-    public LabelIncludingFilter(final String...labels)
-    {
+    public LabelIncludingFilter(final String... labels) {
       super(true, labels);
     }
 
@@ -153,23 +148,21 @@ public interface JPPFSnapshot extends Serializable
      * Initialize with the specified collection of labels.
      * @param labels the labels to include.
      */
-    public LabelIncludingFilter(final Collection<String> labels)
-    {
+    public LabelIncludingFilter(final Collection<String> labels) {
       super(true, labels);
     }
   }
 
   /**
    * Filter excluding snpashots based on a provided set of labels.
+   * @exclude
    */
-  public static class LabelExcludingFilter extends LabelBasedFilter
-  {
+  public static class LabelExcludingFilter extends LabelBasedFilter {
     /**
      * Initialize with the specified array of labels.
      * @param labels the labels to exclude.
      */
-    public LabelExcludingFilter(final String...labels)
-    {
+    public LabelExcludingFilter(final String... labels) {
       super(false, labels);
     }
 
@@ -177,8 +170,7 @@ public interface JPPFSnapshot extends Serializable
      * Initialize with the specified collection of labels.
      * @param labels the labels to exclude.
      */
-    public LabelExcludingFilter(final Collection<String> labels)
-    {
+    public LabelExcludingFilter(final Collection<String> labels) {
       super(false, labels);
     }
   }
