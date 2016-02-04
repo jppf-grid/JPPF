@@ -21,7 +21,7 @@ package org.jppf.utils.streams;
 import java.io.*;
 
 import org.jppf.io.IO;
-import org.jppf.utils.*;
+import org.jppf.utils.ExceptionUtils;
 import org.slf4j.Logger;
 
 /**
@@ -92,7 +92,7 @@ public final class StreamUtils {
    * @throws IOException if an I/O error occurs.
    */
   public static void copyFile(final File src, final File dest) throws IOException {
-    try (InputStream is = new BufferedInputStream(new FileInputStream(src)); OutputStream os = new BufferedOutputStream(new FileOutputStream(dest))) { 
+    try (InputStream is = new BufferedInputStream(new FileInputStream(src)); OutputStream os = new BufferedOutputStream(new FileOutputStream(dest))) {
       copyStream(is, os);
     }
   }
@@ -166,5 +166,17 @@ public final class StreamUtils {
     System.out.println(message);
     char c2 = 0;
     while ((c2 = (char) System.in.read()) != c);
+  }
+
+  /**
+   * Convenience method to print a formatted mssage to System.out and a specified logger.
+   * @param logger the logger to print to, may be {@code null}. If specified, the message is logged at INFO level.
+   * @param format the message format as specified in {@link java.util.Formatter}.
+   * @param params the formatted message parameters.
+   */
+  public static void printf(final Logger logger, final String format, final Object...params) {
+    String message = String.format(format, params);
+    System.out.println(message);
+    if (logger != null) logger.info(message);
   }
 }
