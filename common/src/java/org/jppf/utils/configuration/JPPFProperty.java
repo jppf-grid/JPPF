@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,4 +64,10 @@ public interface JPPFProperty<T> extends Serializable {
    * @return a {@link Class} instance.
    */
   Class<T> valueType();
+
+  /**
+   * Get a description of this property.
+   * @return the description as a string.
+   */
+  String getDocumentation();
 }

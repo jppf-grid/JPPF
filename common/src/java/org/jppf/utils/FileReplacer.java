@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -70,33 +71,28 @@ public class FileReplacer {
   private int nbFilesChanged = 0;
 
   /**
-   * Replace, in a set of specified files, a string with another.
-   * @param rootDir the root directory from where to start search.
-   * @param srcFile file containing the content to replace.
-   * @param destFile file containing the replacement content.
-   * @param ext comma-separated list of file extensions to process.
-   * @param searchOnly determines whether only the search is performed (no replacement).
-   * @param regex if true, then interpret the source as a regular expressison.
+   * Replace, in a set of specified files, a piece of text with another. The text can be multi-lines.
+   * @param args the parameters for searching, matching replacing.
    * @throws Exception if an error occurs while performing the replacements.
    */
-  public void replace(final String rootDir, final String srcFile, final String destFile, final String ext, final boolean searchOnly, final boolean regex) throws Exception {
-    src = FileUtils.readTextFile(srcFile);
-    dest = FileUtils.readTextFile(destFile);
+  public void replace(final Arguments args) throws Exception {
+    src = FileUtils.readTextFile(args.in);
+    dest = FileUtils.readTextFile(args.out);
     if (src.endsWith("\n") && dest.endsWith("\n")) {
       src = src.substring(0, src.length() - 1);
       dest = dest.substring(0, dest.length() - 1);
     }
-    this.searchOnly = searchOnly;
-    if (regex) pattern = Pattern.compile(src);
+    this.searchOnly = args.searchOnly;
+    if (args.regex) pattern = Pattern.compile(src);
     else pattern = Pattern.compile(src, Pattern.LITERAL);
-    filter = new ReplacerFilter(ext);
-    File f = new File(rootDir);
+    filter = new ReplacerFilter(args.exts, args.excludeFolders);
+    File f = new File(args.root);
     nbFilesChanged = 0;
     nbReplacements = 0;
     if (f.isDirectory()) replaceFolder(f);
     else replaceFile(f);
-    log.info("Total number of occurrences found: " + nbReplacements);
-    log.info("Total number of files" + (searchOnly ? " that would have been" : "") + " changed: " + nbFilesChanged);
+    StreamUtils.printf(log, "Total number of occurrences found: %d", nbReplacements);
+    StreamUtils.printf(log, "Total number of files %s changed: %d", (searchOnly ? " that would have been" : ""), nbFilesChanged);
   }
 
   /**
@@ -106,7 +102,7 @@ public class FileReplacer {
    */
   private void replaceFolder(final File folder) throws Exception {
     //if (debugEnabled) log.info("Processing folder " + folder.getAbsolutePath());
-    print("Processing folder " + folder.getAbsolutePath());
+    if (debugEnabled) StreamUtils.printf(log, "Processing folder %s", folder.getAbsolutePath());
     File[] fileList = folder.listFiles(filter);
     List<File> folders = new ArrayList<>();
     List<File> files = new ArrayList<>();
@@ -140,7 +136,7 @@ public class FileReplacer {
     if (nbFound > 0) {
       nbFilesChanged++;
       nbReplacements += nbFound;
-      log.info("Found " + nbFound + " occurrence" + (nbFound > 1 ? "s" : "") + " of the sequence in file '" + file + '\'');
+      StreamUtils.printf(log, "Found %d ocurrence%s of the sequence in file '%s'", nbFound, (nbFound > 1 ? "s" : ""), file);
       String s = matcher.replaceAll(dest);
       if (debugEnabled) log.debug("Content with replacements performed:\n" + s);
       if (!searchOnly) FileUtils.writeTextFile(file.getPath(), s);
@@ -163,20 +159,10 @@ public class FileReplacer {
     try {
       Arguments a = parseArguments(args);
       System.out.println("using " + a);
-      FileReplacer replacer = new FileReplacer();
-      replacer.replace(a.root, a.in, a.out, a.exts, a.searchOnly, a.regex);
+      new FileReplacer().replace(a);
     } catch(Exception e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Print hte specified message ot the console and to the log file.
-   * @param message the message to print.
-   */
-  private static void print(final String message) {
-    //log.info(message);
-    System.out.println(message);
   }
 
   /**
@@ -208,10 +194,14 @@ public class FileReplacer {
      * If true, then interpret the content of 'in' as a regular expression.
      */
     public boolean regex = false;
+    /**
+     * A list of comma-separted regex to exclude folders from the search.
+     */
+    public String excludeFolders = null;
 
     @Override
     public String toString() {
-      return "Arguments[in=" + in + ", out=" + out + ", root=" + root + ", exts=" + exts + ", searchOnly=" + searchOnly + ", regex=" + regex + "]";
+      return "Arguments[in=" + in + ", out=" + out + ", root=" + root + ", exts=" + exts + ", searchOnly=" + searchOnly + ", regex=" + regex + ", excludeFolders=" + excludeFolders + "]";
     }
   }
 
@@ -230,6 +220,7 @@ public class FileReplacer {
       else if ("-e".equals(args[i])) ag.exts = args[++i];
       else if ("-p".equals(args[i])) ag.searchOnly = false;
       else if ("-r".equals(args[i])) ag.regex = true;
+      else if ("-ef".equals(args[i])) ag.excludeFolders = args[++i];
     }
     return ag;
   }
@@ -243,15 +234,34 @@ public class FileReplacer {
      * The list of file extensions to process.
      */
     private String[] extensions = null;
+    /**
+     * The patterns used to exclude specified folders.
+     */
+    private Pattern[] folderExlusionPatterns = null;
+
+    /**
+     * Initializer this filter with the specified set of file extensions.
+     * @param ext a comma-separated list of file extensions to process.
+     * @param folderExclusions a comma-separated list of regex used to exclude folders.
+     */
+    public ReplacerFilter(final String ext, final String folderExclusions) {
+      String s = (ext == null) ? "" : ext;
+      extensions = RegexUtils.COMMA_PATTERN.split(s);
+      for (int i=0; i<extensions.length; i++) extensions[i] = extensions[i].trim();
+      if (folderExclusions != null) {
+        String[] exc = RegexUtils.COMMA_PATTERN.split(folderExclusions);
+        for (int i=0; i<exc.length; i++) exc[i] = exc[i].replace(".", "\\.").replace("*", ".*").replace("?", ".?").replace("\\", "\\\\");
+        folderExlusionPatterns = new Pattern[exc.length];
+        for (int i=0; i<exc.length; i++) folderExlusionPatterns[i] = Pattern.compile(exc[i]);
+      }
+    }
 
     /**
      * Initializer this filter with the specified set of file extensions.
      * @param ext a comma-separated list of file extensions to process.
      */
     public ReplacerFilter(final String ext) {
-      String s = (ext == null) ? "" : ext;
-      extensions = RegexUtils.COMMA_PATTERN.split(s);
-      for (int i=0; i<extensions.length; i++) extensions[i] = extensions[i].trim();
+      this(ext, null);
     }
 
     /**
@@ -261,7 +271,15 @@ public class FileReplacer {
      */
     @Override
     public boolean accept(final File file) {
-      if (file.isDirectory()) return true;
+      if (file.isDirectory()) {
+        if (folderExlusionPatterns != null) {
+          String name = file.getPath();
+          for (Pattern p: folderExlusionPatterns) {
+            if (p.matcher(name).find()) return false;
+          }
+        }
+        return true;
+      }
       String ext = FileUtils.getFileExtension(file);
       if (ext == null) return false;
       for (String s: extensions) {

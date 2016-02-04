@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,8 @@ package org.jppf.utils.configuration;
 
 import java.util.Arrays;
 
+import org.jppf.utils.LocalizationUtils;
+
 /**
  * Abstract implementation of the {@link JPPFProperty} interface.
  * @param <T> the type of the value of this property.
@@ -27,6 +29,10 @@ import java.util.Arrays;
  * @since 5.2
  */
 abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
+  /**
+   * Location of the localization resource bundles.
+   */
+  private  static final String I18N_BASE = "org.jppf.utils.configuration.i18n.JPPFProperties";
   /**
    * The name of this property.
    */
@@ -82,6 +88,7 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
     sb.append("name=").append(name);
     sb.append(", default=").append(defaultValue);
     sb.append(", aliases=").append(Arrays.asList(aliases));
+    sb.append(", description=").append(getDocumentation());
     sb.append(']');
     return sb.toString();
   }
@@ -102,5 +109,10 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
   public JPPFProperty<T> setPossibleValues(final T... possibleValues) {
     this.possibleValues = possibleValues;
     return this;
+  }
+
+  @Override
+  public String getDocumentation() {
+    return LocalizationUtils.getLocalized(I18N_BASE, name);
   }
 }
