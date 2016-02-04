@@ -96,7 +96,7 @@ public class IPFilter {
     if (source == null) return;
     String src = source.trim();
     if ("".equals(src)) return;
-    String[] p = src.split(",|;");
+    String[] p = RegexUtils.COMMA_OR_SEMICOLUMN_PATTERN.split(src);
     if ((p == null) || (p.length == 0)) return;
     for (String s: p) {
       try {

@@ -129,10 +129,10 @@ public final class SSLHelper {
     if (sslConfig == null) loadSSLProperties();
     SSLParameters params = new SSLParameters();
     String s = sslConfig.get(JPPFProperties.SSL_CIPHER_SUITES);
-    String[] tokens = (s == null) ? null : s.trim().split("\\s");
+    String[] tokens = (s == null) ? null : RegexUtils.SPACES_PATTERN.split(s.trim());
     params.setCipherSuites(tokens);
     s = sslConfig.get(JPPFProperties.SSL_PROTOCOLS);
-    tokens = (s == null) ? null : s.trim().split("\\s");
+    tokens = (s == null) ? null : RegexUtils.SPACES_PATTERN.split(s.trim());
     params.setProtocols(tokens);
     s = sslConfig.get(JPPFProperties.SSL_CLIENT_AUTH).toLowerCase();
     params.setWantClientAuth("want".equals(s));
@@ -243,7 +243,7 @@ public final class SSLHelper {
   @SuppressWarnings("unchecked")
   private static <E> E callSource(final String value) throws Exception {
     if (value == null) return null;
-    String[] tokens = value.split("\\s");
+    String[] tokens = RegexUtils.SPACES_PATTERN.split(value);
     Class<? extends Callable<E>> clazz = (Class<? extends Callable<E>>) Class.forName(tokens[0]);
     String[] args = null;
     if (tokens.length > 1) {

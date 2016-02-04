@@ -250,7 +250,7 @@ public class FileReplacer {
      */
     public ReplacerFilter(final String ext) {
       String s = (ext == null) ? "" : ext;
-      extensions = s.split(",");
+      extensions = RegexUtils.COMMA_PATTERN.split(s);
       for (int i=0; i<extensions.length; i++) extensions[i] = extensions[i].trim();
     }
 

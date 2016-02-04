@@ -174,7 +174,7 @@ public final class StringUtils {
    * @return the resulting array of bytes.
    */
   public static byte[] toBytes(final String hexString) {
-    String[] bytes = hexString.split("\\s");
+    String[] bytes = RegexUtils.SPACES_PATTERN.split(hexString);
     List<Byte> list = new ArrayList<>(bytes.length);
     byte[] result = new byte[list.size()];
     for (int i=0; i<bytes.length; i++) {
@@ -241,7 +241,7 @@ public final class StringUtils {
    * @return an array of int port numbers.
    */
   public static int[] parseIntValues(final String s) {
-    String[] strPorts = s.split("\\s");
+    String[] strPorts = RegexUtils.SPACES_PATTERN.split(s);
     int[] ports = new int[strPorts.length];
     for (int i=0; i<strPorts.length; i++) {
       try {

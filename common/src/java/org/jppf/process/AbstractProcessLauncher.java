@@ -103,7 +103,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
           break;
         }
       }
-      String[] options = sb.toString().split("\\s");
+      String[] options = RegexUtils.SPACES_PATTERN.split(sb.toString());
       for (int i=0; i<options.length; i++) options[i] = options[i].replaceAll(rep, " ").replace("\\", "\\\\")/*.replaceAll("\"", "\\\"")*/;
       if (log.isTraceEnabled()) {
         StringBuilder sb2 = new StringBuilder("options after split =");

@@ -106,7 +106,7 @@ public interface JPPFSerialization {
       String className = null;
       String value  = JPPFConfiguration.get(prop);
       if (value != null) {
-        String[] elts = value.split("\\s");
+        String[] elts = RegexUtils.SPACES_PATTERN.split(value);
         if (elts.length == 1) className = elts[0];
         else if (elts.length >= 2) {
           for (int i=0; i<elts.length-1; i++) {
