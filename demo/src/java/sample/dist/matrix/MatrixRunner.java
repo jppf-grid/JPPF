@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,12 +22,12 @@ import java.util.List;
 
 import org.jppf.JPPFException;
 import org.jppf.client.*;
-import org.jppf.client.monitoring.topology.TopologyManager;
 import org.jppf.location.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
 /**
@@ -68,11 +68,9 @@ public class MatrixRunner {
       int nbChannels = props.getInt("matrix.nbChannels", 1);
       if (nbChannels < 1) nbChannels = 1;
       int nbRows = props.getInt("task.nbRows", 1);
-      output("Running Matrix demo with matrix size = "+size+ '*'+size+" for "+iterations+" iterations"  + " with " + nbChannels  + " channels");
+      StreamUtils.printf(log, "Running Matrix demo with matrix size = "+size+ '*'+size+" for "+iterations+" iterations"  + " with " + nbChannels  + " channels");
       runner = new MatrixRunner();
       runner.perform(size, iterations, nbRows, clientUuid, nbChannels);
-      //runner.perform2(size, iterations, nbRows, clientUuid);
-      //StreamUtils.waitKeyPressed("***** press {Enter] to exit ...");
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -104,9 +102,9 @@ public class MatrixRunner {
       }
       if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
       else jppfClient = new JPPFClient();
-      while (!jppfClient.hasAvailableConnection()) Thread.sleep(1L);
-      TopologyManager mgr = new TopologyManager(jppfClient);
-
+      JPPFConnectionPool pool = jppfClient.awaitWorkingConnectionPool();
+      pool.setSize(nbChannels);
+      pool.awaitWorkingConnections(Operator.AT_LEAST, nbChannels);
       // initialize the 2 matrices to multiply
       Matrix a = new Matrix(size);
       a.assignRandomValues();
@@ -123,17 +121,14 @@ public class MatrixRunner {
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;
         totalIterationTime += elapsed;
-        output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
+        StreamUtils.printf(log, "Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
       }
-      output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
+      StreamUtils.printf(log, "Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations) +
           ", min = " + StringUtils.toStringDuration(min) + ", max = " + StringUtils.toStringDuration(max));
-      /*
-      JMXDriverConnectionWrapper jmx = jppfClient.getConnectionPool().getJmxConnection();
-      String debug = (String) jmx.invoke("org.jppf:name=debug,type=driver", "all");
-      output(debug);
-      */
+      jppfClient.awaitWorkingConnectionPool().awaitWorkingJMXConnection().getDiagnosticsProxy().healthSnapshot();
+      
     } finally {
-      output("closing the client");
+      StreamUtils.printf(log, "closing the client");
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -180,7 +175,7 @@ public class MatrixRunner {
     int rowIdx = 0;
     for (Task matrixTask : results) {
       if (matrixTask.getThrowable() != null) {
-        output("got exception: " + ExceptionUtils.getStackTrace(matrixTask.getThrowable()));
+        StreamUtils.printf(log, "got exception: " + ExceptionUtils.getStackTrace(matrixTask.getThrowable()));
         throw new JPPFException(matrixTask.getThrowable());
       }
       double[][] rows = (double[][]) matrixTask.getResult();
@@ -189,44 +184,7 @@ public class MatrixRunner {
       }
       rowIdx += rows.length;
     }
-    return (System.nanoTime() - start)/1000000L;
-  }
-
-  /**
-   * Perform the multiplication of 2 matrices with the specified size, for a specified number of times.
-   * Here we create and close a JPPF client for each iteration.
-   * @param size the size of the matrices.
-   * @param iterations the number of times the multiplication will be performed.
-   * @param nbRows number of rows of matrix a per task.
-   * @param clientUuid an optional uuid to set on the JPPF client.
-   * @param nbChannels number of driver channels to use for each job.
-   * @throws Exception if an error is raised during the execution.
-   */
-  public void perform2(final int size, final int iterations, final int nbRows, final String clientUuid, final int nbChannels) throws Exception {
-    try {
-      // initialize the 2 matrices to multiply
-      Matrix a = new Matrix(size);
-      a.assignRandomValues();
-      Matrix b = new Matrix(size);
-      b.assignRandomValues();
-      long totalIterationTime = 0L;
-
-      // perform "iteration" times
-      for (int iter=0; iter<iterations; iter++) {
-        try {
-          if (clientUuid != null) jppfClient = new JPPFClient(clientUuid);
-          else jppfClient = new JPPFClient();
-          long elapsed = performParallelMultiplication(a, b, nbRows, null, nbChannels);
-          totalIterationTime += elapsed;
-          output("Iteration #" + (iter+1) + " performed in " + StringUtils.toStringDuration(elapsed));
-        } finally {
-          jppfClient.close();
-        }
-      }
-      output("Average iteration time: " + StringUtils.toStringDuration(totalIterationTime / iterations));
-    } catch(Exception e) {
-      throw e;
-    }
+    return (System.nanoTime() - start) / 1_000_000L;
   }
 
   /**
@@ -238,15 +196,6 @@ public class MatrixRunner {
     long start = System.nanoTime();
     a.multiply(b);
     long elapsed = System.nanoTime() - start;
-    output("Sequential computation performed in "+StringUtils.toStringDuration(elapsed/1000000));
-  }
-
-  /**
-   * Print a message to the console and/or log file.
-   * @param message - the message to print.
-   */
-  private static void output(final String message) {
-    System.out.println(message);
-    log.info(message);
+    StreamUtils.printf(log, "Sequential computation performed in " + StringUtils.toStringDuration(elapsed / 1_000_000L));
   }
 }

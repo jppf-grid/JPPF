@@ -16,7 +16,24 @@
  * limitations under the License.
  */
 
+package sample.test.deadlock;
+
 /**
- * Tester using tasks whose classes are specified in configuration files.
+ * 
+ * @author Laurent Cohen
  */
-package test.generic;
+public class TaskOptions {
+  /**
+   * Duration of each task in ms.
+   */
+  public long taskDuration;
+  /**
+   * Whether the tasks should consume CPU rather than just idling via a call to Thread.sleep() for their assigned duration.
+   */
+  public boolean useCPU;
+  /**
+   * Size in bytes of the data associated with each task. If < 0 then a null byte[] is initialized, otherwise a bye[] of the specified size.
+   */
+  public int dataSize;
+
+}

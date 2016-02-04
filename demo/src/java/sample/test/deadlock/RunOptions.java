@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ public class RunOptions {
   /**
    * The JPPF configuration.
    */
-  public final TypedProperties config = JPPFConfiguration.getProperties();
+  public static final TypedProperties config = JPPFConfiguration.getProperties();
   /**
    * Max concurrent jobs that can be submitted by the client.
    */
@@ -50,14 +50,6 @@ public class RunOptions {
    */
   public final int tasksPerJob = config.getInt("deadlock.tasksPerJob", 10);
   /**
-   * Duration of each task in ms.
-   */
-  public final long taskDuration = config.getLong("deadlock.taskDuration", 10L);
-  /**
-   * Duration of each task in nanos.
-   */
-  public final int taskDurationNanos = config.getInt("deadlock.taskDurationNanos", 0);
-  /**
    * Time interval in ms for un-provisioning of the slave nodes, when simulating node crashes
    */
   public final long waitTime = config.getLong("deadlock.waitTime", 15000L);
@@ -66,14 +58,6 @@ public class RunOptions {
    */
   public final boolean simulateNodeCrashes = config.getBoolean("deadlock.simulateNodeCrashes", false);
   /**
-   * Whether the tasks should consume CPU rather than just idling via a call to Thread.sleep() for their assigned duration.
-   */
-  public final boolean useCPU = config.getBoolean("deadlock.useCPU", false);
-  /**
-   * Size in bytes of the data associated with each task. If < 0 then a null byte[] is initialized, otherwise a bye[] of the specified size.
-   */
-  public final int dataSize = config.getInt("deadlock.dataSize", -1);
-  /**
    * After how many jobs to submit the one that triggers a deadlock in one of the nodes.
    */
   public final int triggerNodeDeadlockAfter = config.getInt("deadlock.triggerNodeDeadlockAfter", -1);
@@ -81,4 +65,27 @@ public class RunOptions {
    * Callback invoked when a job is created by the job streaming pattern.
    */
   public JobStreamingCallback callback;
+  /**
+   * The task-specific options.
+   */
+  public final TaskOptions taskOptions;
+
+  /**
+   * 
+   */
+  public RunOptions() {
+    taskOptions = createTaskOptions();
+  }
+
+  /**
+   * Create the object holding the task-specific options.
+   * @return a {@link TaskOptions} instance. 
+   */
+  private TaskOptions createTaskOptions() {
+    TaskOptions to = new TaskOptions();
+    to.dataSize = config.getInt("deadlock.dataSize", -1);
+    to.taskDuration = config.getLong("deadlock.taskDuration", 10L);
+    to.useCPU = config.getBoolean("deadlock.useCPU", false);
+    return to;
+  }
 }

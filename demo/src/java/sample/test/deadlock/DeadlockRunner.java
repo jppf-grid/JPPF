@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,12 +60,12 @@ public class DeadlockRunner {
    */
   public void jobStreaming() {
     final RunOptions ro = new RunOptions();
-    printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
+    printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskOptions.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
     try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       getJmxConnection(client);
-      //ro.callback = new MyCallback(client);
+      ro.callback = new MyCallback(client);
       ensureSufficientConnections(client, ro.clientConnections);
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
       if (ro.simulateNodeCrashes) {

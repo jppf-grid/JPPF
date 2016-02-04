@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
     try {
       for (int i=1; i<=options.tasksPerJob; i++) {
         String message = "this is task " + i;
-        MyTask task = new MyTask(message, options);
+        MyTask task = new MyTask(message, options.taskOptions);
         job.add(task).setId(String.format("%s - task %d", job.getName(), i));
       }
     } catch(Exception e) {

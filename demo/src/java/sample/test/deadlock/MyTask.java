@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,10 +33,6 @@ public class MyTask extends AbstractTask<String> {
    */
   private final long duration;
   /**
-   * How long in nanos, in addition to the millis, this task will sleep to simulate code execution.
-   */
-  private final int durationNanos;
-  /**
    * Whether to simulate CPU usage.
    */
   private final boolean useCPU;
@@ -50,29 +46,25 @@ public class MyTask extends AbstractTask<String> {
    * @param message a string message to transform and set as result of this task.
    * @param options holds the configuration properties used for the tasks.
    */
-  public MyTask(final String message, final RunOptions options) {
+  public MyTask(final String message, final TaskOptions options) {
     this.message = message;
     this.duration = options.taskDuration;
-    this.durationNanos = options.taskDurationNanos;
     this.useCPU = options.useCPU;
     dummyData = options.dataSize < 0 ? null : new byte[options.dataSize];
   }
 
   @Override
   public void run() {
-    //System.out.println("starting execution for "  + getId());
     try {
-      long time = 1_000_000L * duration + durationNanos;
       if (!useCPU) {
-        if (time > 0L) Thread.sleep(duration, durationNanos);
+        Thread.sleep(duration);
       } else {
-        for (long elapsed = 0L, taskStart = System.nanoTime(); elapsed < time; elapsed = System.nanoTime() - taskStart) {
+        for (long elapsed=0L, taskStart=System.nanoTime(); elapsed<duration; elapsed=(System.nanoTime()-taskStart) / 1_000_000L) {
           String s = "";
           for (int i=0; i<10; i++) s += "A10";
         }
       }
       setResult("execution success for " + message);
-      //System.out.println("execution success for "  + getId());
     } catch (Exception e) {
       setThrowable(e);
     }
