@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,6 @@ import org.jppf.load.balancer.impl.*;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.node.provisioning.NodeProvisioningConstants;
 import org.jppf.server.JPPFContextDriver;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
@@ -450,7 +449,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     if (info.isMasterNode()) return info.getUuid();
     else if (info.isSlaveNode()) {
       JPPFSystemInformation systemInfo = info.getSystemInfo();
-      if (systemInfo != null) return systemInfo.getJppf().getString(NodeProvisioningConstants.MASTER_UUID_PROPERTY);
+      if (systemInfo != null) return systemInfo.getJppf().get(JPPFProperties.PROVISIONING_MASTER_UUID);
     }
     return null;
   }

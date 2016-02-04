@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -212,7 +212,7 @@ public class DriverInitializer {
     String discoveryNames = props.get(PEERS);
     if ((discoveryNames != null) && !discoveryNames.trim().isEmpty()) {
       if (debugEnabled) log.debug("found peers in the configuration");
-      String[] names = discoveryNames.split("\\s");
+      String[] names = RegexUtils.SPACES_PATTERN.split(discoveryNames);
       for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
       if (initPeers) {
@@ -366,7 +366,7 @@ public class DriverInitializer {
    * @return an array of int port numbers.
    */
   private static int[] parsePorts(final String s, final int def) {
-    String[] strPorts = s.split("\\s");
+    String[] strPorts = RegexUtils.SPACES_PATTERN.split(s);
     List<Integer> portsList = new ArrayList<>(strPorts.length);
     for (int i=0; i<strPorts.length; i++) {
       try {
