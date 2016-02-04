@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -139,7 +139,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
     TypedProperties props = ConfigurationHelper.loadProperties(new File(jppfConfig));
     String opts = props.get(JPPFProperties.JVM_OPTIONS);
     if ((opts != null) && !"".equals(opts.trim())) {
-      String[] options = opts.split("\\s");
+      String[] options = RegexUtils.SPACES_PATTERN.split(opts);
       for (int i=0; i<options.length; i++) {
         if ("-cp".equals(options[i]) || "-classpath".equals(options[i])) addClasspathElement(options[++i]);
         else jvmOptions.add(options[i]);
