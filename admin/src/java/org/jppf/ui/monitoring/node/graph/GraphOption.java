@@ -31,6 +31,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.AbstractOption;
+import org.jppf.ui.utils.GuiUtils;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -136,6 +137,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
         }
       });
       graphComponent = new GraphZoomScrollPane(viewer);
+      graphComponent.getVerticalScrollBar().setPreferredSize(new Dimension(GuiUtils.DEFAULT_SCROLLBAR_THICKNESS, 0));
+      graphComponent.getHorizontalScrollBar().setPreferredSize(new Dimension(0, GuiUtils.DEFAULT_SCROLLBAR_THICKNESS));
       actionHandler = new GraphActionHandler(viewer);
       EditingModalGraphMouse<AbstractTopologyComponent, Number> graphMouse = new EditingModalGraphMouse<>(viewer.getRenderContext(), null, null);
       graphMouse.setMode(ModalGraphMouse.Mode.PICKING);

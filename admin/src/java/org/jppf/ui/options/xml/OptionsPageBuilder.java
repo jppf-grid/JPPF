@@ -313,6 +313,7 @@ public class OptionsPageBuilder {
     else if ("List".equalsIgnoreCase(desc.type)) list.add(f.buildList(desc));
     else if ("FileChooser".equalsIgnoreCase(desc.type)) list.add(f.buildFileChooser(desc));
     else if ("Label".equalsIgnoreCase(desc.type)) list.add(f.buildLabel(desc));
+    else if ("PickList".equalsIgnoreCase(desc.type)) list.add(f.buildPickList(desc));
     else if ("import".equalsIgnoreCase(desc.type)) list.addAll(f.loadImport(desc));
     else if ("Java".equalsIgnoreCase(desc.type)) list.add(f.buildJavaOption(desc));
     else if ("Custom".equalsIgnoreCase(desc.type)) list.add(f.buildCustomOption(desc));

@@ -26,7 +26,7 @@ import java.util.*;
 import org.slf4j.*;
 
 /**
- * This clqss holds a static enumeration of the documented JPPF configuration properties.
+ * This class holds a static enumeration of the documented JPPF configuration properties.
  * @author Laurent Cohen
  * @since 5.2
  */
@@ -147,7 +147,7 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> MANAGEMENT_PORT_NODE = new IntProperty("jppf.node.management.port", 11198, 1024, 65535, "jppf.management.port");
   /** Node secure management port (to distinguish from server management port when local node is on) */
   public static final JPPFProperty<Integer> MANAGEMENT_SSL_PORT_NODE = new IntProperty("jppf.node.management.ssl.port", 93, 1024, 65535, "jppf.management.ssl.port");
-  /** @exclude */
+  /** Size of the pool of threads used to process node forwarding requests and notifications */
   public static final JPPFProperty<Integer> NODE_FORWARDING_POOL_SIZE = new IntProperty("jppf.node.forwarding.pool.size", Runtime.getRuntime().availableProcessors());
   /** enable/disable network connection checks on write operations */
   public static final JPPFProperty<Boolean> NIO_CHECK_CONNECTION = new BooleanProperty("jppf.nio.check.connection", true, "jppf.nio.connection.check");
@@ -161,6 +161,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> PROVISIONING_MASTER = new BooleanProperty("jppf.node.provisioning.master", true);
   /** Whether the node is a slave node */
   public static final JPPFProperty<Boolean> PROVISIONING_SLAVE = new BooleanProperty("jppf.node.provisioning.slave", false);
+  /** UUID of the master node for a given slave node */
+  public static final JPPFProperty<String> PROVISIONING_MASTER_UUID = new StringProperty("jppf.node.provisioning.master.uuid", null);
   /** Directory where slave-specific configuration files are located */
   public static final JPPFProperty<String> PROVISIONING_SLAVE_CONFIG_PATH = new StringProperty("jppf.node.provisioning.slave.config.path", "config");
   /** JVM options always added to the slave startup command */
@@ -331,17 +333,17 @@ public class JPPFProperties {
   public static final JPPFProperty<String> UI_SPLASH_MESSAGE = new StringProperty("jppf.ui.splash.message", "");
   /** @exclude */
   public static final JPPFProperty<Long> NIO_SELECT_TIMEOUT = new LongProperty("jppf.nio.select.timeout", 1000L);
-  /** @exclude */
+  /** Ratio of available heap over the size of an object to deserialize, below which disk overflow is triggered */
   public static final JPPFProperty<Double> DISK_OVERFLOW_THRESHOLD = new DoubleProperty("jppf.disk.overflow.threshold", 2d);
-  /** @exclude */
+  /** Whether to call System.gc() and recompute the avalaible heap size before triggering disk overflow */
   public static final JPPFProperty<Boolean> GC_ON_DISK_OVERFLOW = new BooleanProperty("jppf.gc.on.disk.overflow", true);
-  /** @exclude */
+  /** Minimum heap size in MB below which disk overflow is systematically triggered, to avoid heap fragmentation and ensure there's enough memory to deserialize job headers */
   public static final JPPFProperty<Long> LOW_MEMORY_THRESHOLD = new LongProperty("jppf.low.memory.threshold", 32L);
-  /** @exclude */
+  /** Determines the frequency at which the JVM's cpu load is recomputed, in ms */
   public static final JPPFProperty<Long> CPU_LOAD_COMPUTATION_INTERVAL = new LongProperty("jppf.cpu.load.computation.interval", 1000L);
   /** Type of thread pool to use in the node: either 'default' or 'org.jppf.server.node.fj.ThreadManagerForkJoin' */
   public static final JPPFProperty<String> THREAD_MANAGER_CLASS = new StringProperty("jppf.thread.manager.class", "default");
-  /** @exclude */
+  /** Internal use. The class of node to instantiate upon node startup. For instance Java and Android nodes use a different class */
   public static final JPPFProperty<String> NODE_CLASS = new StringProperty("jppf.node.class", "org.jppf.server.node.remote.JPPFRemoteNode");
   /** Default script language for scripted property values */
   public static final JPPFProperty<String> SCRIPT_DEFAULT_LANGUAGE = new StringProperty("jppf.script.default.language", "javascript");
@@ -355,7 +357,9 @@ public class JPPFProperties {
   public static final JPPFProperty<File> CONFIG_OVERRIDES_PATH = new FileProperty("jppf.config.overrides.path", new File("config/config-overrides.properties"));
   /** @exclude */
   public static final JPPFProperty<Boolean> NODE_CHECK_CONNECTION = new BooleanProperty("jppf.node.check.connection", false);
-/** The list of all predefined properties */
+  /** The default thickness of the scrollbars in the GUI */
+  public static final JPPFProperty<Integer> DEFAULT_SCROLLBAR_THICKNESS = new IntProperty("jppf.ui.default.scrollbar.thickness", 10);
+  /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 
   /**
@@ -380,12 +384,5 @@ public class JPPFProperties {
       }
     }
     return properties;
-  }
-
-  /**
-   * @exclude 
-   */
-  public static void init() {
-    if (log.isDebugEnabled()) log.debug("predefined configuration properties:\n" + allProperties());
   }
 }

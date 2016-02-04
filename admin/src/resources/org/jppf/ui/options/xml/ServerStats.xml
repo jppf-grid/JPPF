@@ -85,6 +85,21 @@
         <script language="groovy">StatsHandler.getInstance().copyStatsToClipboard(StatsExporter.CSV)</script>
       </listener>
     </child>
+
+    <child name="fillerb4" type="Page">
+      <property name="componentConstraints" value="growx, span 2"/>
+    </child>
+
+    <child name="SelectVisibleStatsBtn" type="Button">
+      <property name="componentConstraints" value="growx 0"/>
+      <property name="icon" value="/org/jppf/ui/resources/table-column-hide.png"/>
+      <listener type="script">
+        <script language="groovy">
+          def tables = option.findFirstWithName("/Tables");
+          tables.getInstance().selectStats(option.getUIComponent());
+        </script>
+      </listener>
+    </child>
   
   </child>
 
@@ -99,6 +114,12 @@
     <property name="layoutConstraints" value=""/>
     <property name="componentConstraints" value="grow, push"/>
 		<property name="value" value=""/>
+    <initializer type="script">
+      <script language="groovy">option.getInstance().loadVisibleStats()</script>
+    </initializer>
+    <finalizer type="script">
+      <script language="groovy">option.getInstance().storeVisibleStats()</script>
+    </finalizer>
 	</child>
 
 	<child name="filler" type="Page">

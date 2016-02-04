@@ -89,6 +89,7 @@ public class TextAreaOption extends AbstractOption {
     if (scrollable) {
       JScrollPane scrollPane = new JScrollPane(textArea);
       scrollPane.setOpaque(false);
+      GuiUtils.adjustScrollbarsThickness(scrollPane);
       if (!bordered) scrollPane.setBorder(BorderFactory.createEmptyBorder());
       UIComponent = scrollPane;
     } else {

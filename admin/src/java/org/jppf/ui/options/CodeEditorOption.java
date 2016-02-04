@@ -79,6 +79,7 @@ public class CodeEditorOption extends AbstractOption {
     textArea.setEditable(editable);
     if (scrollable) {
       RTextScrollPane scrollPane = new RTextScrollPane(textArea);
+      GuiUtils.adjustScrollbarsThickness(scrollPane);
       scrollPane.setOpaque(false);
       scrollPane.setLineNumbersEnabled(false);
       scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);

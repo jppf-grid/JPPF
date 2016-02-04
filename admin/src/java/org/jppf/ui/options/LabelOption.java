@@ -25,27 +25,16 @@ import org.jppf.ui.utils.GuiUtils;
  * An option for simple labels that have text, an icon, or both.
  * @author Laurent Cohen
  */
-public class LabelOption extends AbstractOption
-{
-  /**
-   * Constructor provided as a convenience to facilitate the creation of
-   * option elements through reflexion.
-   */
-  public LabelOption()
-  {
-  }
-
+public class LabelOption extends AbstractOption {
   /**
    * Create the UI components for this option.
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     JLabel lab = new JLabel();
     lab.setHorizontalAlignment(SwingConstants.RIGHT);
     if (label != null) lab.setText((String) label);
-    if (iconPath != null)
-    {
+    if (iconPath != null) {
       ImageIcon icon = GuiUtils.loadIcon(iconPath);
       if (icon != null) lab.setIcon(icon);
     }
@@ -56,43 +45,32 @@ public class LabelOption extends AbstractOption
   /**
    * Set the value of this option.
    * @param value the value as an <code>Object</code> instance.
-   * @see org.jppf.ui.options.AbstractOption#setValue(java.lang.Object)
    */
   @Override
-  public void setValue(final Object value)
-  {
+  public void setValue(final Object value) {
     this.value = value;
     if (UIComponent != null) ((JLabel) UIComponent).setText((String) value);
   }
 
-  /**
-   * Propagate the state changes of the underlying checkbox to the listeners to this option.
-   * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
-   */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
   }
 
   /**
    * Enable or disable this option.
    * @param enabled true to enable this option, false to disable it.
-   * @see org.jppf.ui.options.Option#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
     UIComponent.setEnabled(enabled);
   }
 
   /**
    * This method always returns false, since labels have no value to persist.
    * @return false.
-   * @see org.jppf.ui.options.AbstractOption#isPersistent()
    */
   @Override
-  public boolean isPersistent()
-  {
+  public boolean isPersistent() {
     return false;
   }
 }

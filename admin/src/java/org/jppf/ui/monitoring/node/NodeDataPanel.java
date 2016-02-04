@@ -28,7 +28,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.treetable.*;
-import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -119,6 +119,7 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
     treeTable.getTree().setCellRenderer(new NodeRenderer());
     treeTable.setDefaultRenderer(Object.class, new NodeTableCellRenderer(this));
     JScrollPane sp = new JScrollPane(treeTable);
+    GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
     StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {

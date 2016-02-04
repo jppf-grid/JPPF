@@ -20,6 +20,8 @@ package org.jppf.ui.options;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import org.jppf.ui.utils.GuiUtils;
+
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -29,8 +31,7 @@ import net.miginfocom.swing.MigLayout;
  * added to a {@link javax.swing.ButtonGroup ButtonGroup}.
  * @author Laurent Cohen
  */
-public class OptionPanel extends AbstractOptionContainer
-{
+public class OptionPanel extends AbstractOptionContainer {
   /**
    * The panel used to display this options page.
    */
@@ -43,8 +44,7 @@ public class OptionPanel extends AbstractOptionContainer
   /**
    * Default constructor.
    */
-  public OptionPanel()
-  {
+  public OptionPanel() {
   }
 
   /**
@@ -54,8 +54,7 @@ public class OptionPanel extends AbstractOptionContainer
    * @param scrollable determines whether this page should be enclosed within a scroll pane.
    * @param bordered determines whether this page has a border around it.
    */
-  public OptionPanel(final String name, final String label, final boolean scrollable, final boolean bordered)
-  {
+  public OptionPanel(final String name, final String label, final boolean scrollable, final boolean bordered) {
     this.name = name;
     this.label = label;
     this.scrollable = scrollable;
@@ -70,41 +69,32 @@ public class OptionPanel extends AbstractOptionContainer
    * @param label the panel's title.
    * @param scrollable determines whether this page should be enclosed within a scroll pane.
    */
-  public OptionPanel(final String name, final String label, final boolean scrollable)
-  {
+  public OptionPanel(final String name, final String label, final boolean scrollable) {
     this(name, label, scrollable, false);
   }
 
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     panel = new JPanel();
-    if (bordered)
-    {
-      Border border = (label != null)
-          ? BorderFactory.createTitledBorder(label)
-          : BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+    if (bordered) {
+      Border border = (label != null) ? BorderFactory.createTitledBorder(label) : BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
       panel.setBorder(border);
-    }
-    else panel.setBorder(BorderFactory.createEmptyBorder());
+    } else panel.setBorder(BorderFactory.createEmptyBorder());
     if (toolTipText != null) panel.setToolTipText(toolTipText);
     MigLayout mig = new MigLayout(layoutConstraints);
     panel.setLayout(mig);
-    if (scrollable)
-    {
+    if (scrollable) {
       JScrollPane sp = new JScrollPane(panel);
       sp.setBorder(BorderFactory.createEmptyBorder());
+      GuiUtils.adjustScrollbarsThickness(sp);
       UIComponent = sp;
-    }
-    else UIComponent = panel;
+    } else UIComponent = panel;
   }
 
   @Override
-  public void add(final OptionElement element)
-  {
+  public void add(final OptionElement element) {
     super.add(element);
-    if (element instanceof RadioButtonOption)
-    {
+    if (element instanceof RadioButtonOption) {
       if (buttonGroup == null) buttonGroup = new ButtonGroup();
       buttonGroup.add((JRadioButton) element.getUIComponent());
     }
@@ -112,8 +102,7 @@ public class OptionPanel extends AbstractOptionContainer
   }
 
   @Override
-  public void remove(final OptionElement element)
-  {
+  public void remove(final OptionElement element) {
     children.remove(element);
     panel.remove(element.getUIComponent());
   }

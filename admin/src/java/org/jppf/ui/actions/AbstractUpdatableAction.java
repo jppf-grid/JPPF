@@ -132,7 +132,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @param action the action to trigger upon pressing the keyboard key.
    * @param actionKey a key to use int he {@link ActionMap}.
    */
-  protected void setKeyAction(final JComponent comp, final KeyStroke vkey, final Action action, final Object actionKey) {
+  protected static void setKeyAction(final JComponent comp, final KeyStroke vkey, final Action action, final Object actionKey) {
     InputMap inputMap = comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
     inputMap.put(vkey, actionKey);
     ActionMap map = comp.getActionMap();
@@ -145,7 +145,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @param okAction the action to execute upon pressing 'Enter'.
    * @param cancelAction the action to execute upon pressing 'Esc'.
    */
-  protected void setOkCancelKeys(final OptionElement option, final Action okAction, final Action cancelAction) {
+  public static void setOkCancelKeys(final OptionElement option, final Action okAction, final Action cancelAction) {
     setOkCancelKeys(option.getUIComponent(), okAction, cancelAction);
   }
 
@@ -155,7 +155,7 @@ public abstract class AbstractUpdatableAction extends AbstractAction implements 
    * @param okAction the action to execute upon pressing 'Enter'.
    * @param cancelAction the action to execute upon pressing 'Esc'.
    */
-  protected void setOkCancelKeys(final JComponent option, final Action okAction, final Action cancelAction) {
+  public static void setOkCancelKeys(final JComponent option, final Action okAction, final Action cancelAction) {
     if (okAction != null) setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okAction, "ok");
     if (cancelAction != null) setKeyAction(option, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelAction, "cancel");
   }

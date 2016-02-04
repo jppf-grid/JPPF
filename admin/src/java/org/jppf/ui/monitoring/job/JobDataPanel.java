@@ -30,7 +30,7 @@ import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.job.actions.*;
 import org.jppf.ui.treetable.*;
-import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -97,6 +97,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
     treeTable.getTree().setCellRenderer(new JobRenderer());
     treeTable.setDefaultRenderer(Object.class, new JobTableCellRenderer(this));
     JScrollPane sp = new JScrollPane(treeTable);
+    GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
     StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {

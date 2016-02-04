@@ -21,6 +21,8 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import org.jppf.ui.utils.GuiUtils;
+
 /**
  * FlowLayout subclass that fully supports wrapping of components.
  * <p>Disclaimer: this class is based on the code provided at <a href="http://tips4java.wordpress.com/2008/11/06/wrap-layout/">http://tips4java.wordpress.com/2008/11/06/wrap-layout/</a>.
@@ -96,6 +98,7 @@ public class WrapLayout extends FlowLayout {
   private Dimension layoutSize(final Container target, final boolean preferred) {
     synchronized (target.getTreeLock()) {
       JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
+      GuiUtils.adjustScrollbarsThickness(scrollPane);
       //  Each row must fit with the width allocated to the containter.
       //  When the container width = 0, the preferred width of the container
       //  has not yet been calculated so lets ask for the maximum.

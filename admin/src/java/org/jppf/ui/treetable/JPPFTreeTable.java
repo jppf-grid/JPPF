@@ -25,16 +25,14 @@ import javax.swing.tree.*;
  * Common super class for all tree tables in the admin console.
  * @author Laurent Cohen
  */
-public class JPPFTreeTable extends JTreeTable
-{
+public class JPPFTreeTable extends JTreeTable {
   /**
    * Initialize this tree table with the specified model.
    * @param treeTableModel - a tree table model.
    */
-  public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel)
-  {
+  public JPPFTreeTable(final AbstractJPPFTreeTableModel treeTableModel) {
     super(treeTableModel);
-    for (int i=0; i<treeTableModel.getColumnCount(); i++) {
+    for (int i = 0; i < treeTableModel.getColumnCount(); i++) {
       TableColumn column = getColumnModel().getColumn(i);
       column.setIdentifier(Integer.valueOf(i));
     }
@@ -45,8 +43,7 @@ public class JPPFTreeTable extends JTreeTable
    * @param n the row index for which to get the path.
    * @return a <code>TreePath</code> instance.
    */
-  public TreePath getPathForRow(final int n)
-  {
+  public TreePath getPathForRow(final int n) {
     if (getTree().getRowCount() <= n) return null;
     try {
       return getTree().getPathForRow(n);
@@ -60,16 +57,14 @@ public class JPPFTreeTable extends JTreeTable
    * @param node the node for which to get the path.
    * @return a <code>TreePath</code> instance.
    */
-  public TreePath getPathForNode(final DefaultMutableTreeNode node)
-  {
+  public TreePath getPathForNode(final DefaultMutableTreeNode node) {
     return new TreePath(node.getPath());
   }
 
   /**
    * Expand all paths in the tree.
    */
-  public void expandAll()
-  {
+  public void expandAll() {
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
     expand(root, true);
   }
@@ -78,8 +73,7 @@ public class JPPFTreeTable extends JTreeTable
    * Expands the leaves of the specified node.
    * @param node - the node to expand.
    */
-  public void expand(final DefaultMutableTreeNode node)
-  {
+  public void expand(final DefaultMutableTreeNode node) {
     expand(node, false);
   }
 
@@ -88,24 +82,18 @@ public class JPPFTreeTable extends JTreeTable
    * @param node the node to expand.
    * @param recursive specifies whether expansion should recurse down to the leaf nodes.
    */
-  public void expand(final DefaultMutableTreeNode node, final boolean recursive)
-  {
+  public void expand(final DefaultMutableTreeNode node, final boolean recursive) {
     getTree().expandPath(getPathForNode(node));
-    if (recursive && (node.getChildCount() > 0))
-    {
-      for (int i=0; i<node.getChildCount(); i++) expand((DefaultMutableTreeNode) node.getChildAt(i), recursive);
+    if (recursive && (node.getChildCount() > 0)) {
+      for (int i = 0; i < node.getChildCount(); i++) expand((DefaultMutableTreeNode) node.getChildAt(i), recursive);
     }
   }
 
   /**
    * Collapse all paths in the tree.
    */
-  public void collapseAll()
-  {
+  public void collapseAll() {
     DefaultMutableTreeNode root = (DefaultMutableTreeNode) getTree().getModel().getRoot();
-    for (int i=0; i<root.getChildCount(); i++)
-    {
-      getTree().collapsePath(getPathForNode((DefaultMutableTreeNode) root.getChildAt(i)));
-    }
+    for (int i = 0; i < root.getChildCount(); i++) getTree().collapsePath(getPathForNode((DefaultMutableTreeNode) root.getChildAt(i)));
   }
 }

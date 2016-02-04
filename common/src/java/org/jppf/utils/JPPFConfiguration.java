@@ -121,12 +121,16 @@ public final class JPPFConfiguration {
    * Load the JPPF configuration properties from a file.
    */
   private static void loadProperties() {
-    JPPFProperties.init();
     props = new TypedProperties();
     try (Reader reader = getReader()) {
       if (reader != null) props.loadAndResolve(reader);
     } catch(Exception e) {
       log.error("error reading the configuration", e);
+    }
+    if (log.isTraceEnabled()) {
+      StringBuilder sb = new StringBuilder("predefined configuration properties:");
+      for (JPPFProperty<?> prop: JPPFProperties.allProperties()) sb.append('\n').append(prop.toString());
+      log.trace(sb.toString());
     }
   }
 

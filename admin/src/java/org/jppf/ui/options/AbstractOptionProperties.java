@@ -24,6 +24,7 @@ import javax.swing.*;
 
 import org.jppf.ui.options.event.ValueChangeListener;
 import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
+import org.jppf.ui.utils.GuiUtils;
 
 /**
  * Default abstract implementation of the <code>OptionElement</code> interface.
@@ -398,6 +399,7 @@ public abstract class AbstractOptionProperties implements OptionProperties {
    */
   protected JScrollPane createScrollPane(final JComponent comp) {
     JScrollPane jsc = new JScrollPane(comp);
+    GuiUtils.adjustScrollbarsThickness(jsc);
     jsc.setHorizontalScrollBarPolicy(isHorizontalScrollbar() ? ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED : ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     jsc.setVerticalScrollBarPolicy(isVerticalScrollbar() ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
     return jsc;

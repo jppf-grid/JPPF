@@ -31,7 +31,7 @@ import org.jppf.ui.monitoring.event.*;
 import org.jppf.ui.monitoring.node.actions.*;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.ui.treetable.*;
-import org.jppf.ui.utils.TreeTableUtils;
+import org.jppf.ui.utils.*;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
@@ -109,6 +109,7 @@ public class JVMHealthPanel extends AbstractTreeTableOption implements TopologyL
     treeTable.getTree().setCellRenderer(new HealthTreeCellRenderer());
     treeTable.setDefaultRenderer(Object.class, new HealthTableCellRenderer(this));
     JScrollPane sp = new JScrollPane(treeTable);
+    GuiUtils.adjustScrollbarsThickness(sp);
     setUIComponent(sp);
     treeTable.expandAll();
     StatsHandler.getInstance().addShowIPListener(new ShowIPListener() {

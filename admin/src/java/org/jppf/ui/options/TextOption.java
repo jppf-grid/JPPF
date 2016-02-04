@@ -72,8 +72,6 @@ public abstract class TextOption extends AbstractOption
       field.setToolTipText(toolTipText);
       fieldLabel.setToolTipText(toolTipText);
     }
-    //UIComponent = layoutComponents(fieldLabel, field);
-    //UIComponent = layoutComponents(fieldLabel, "align left, growx 0, pushx", field, "gap rel, grow");
     UIComponent = layoutComponents(fieldLabel, "align left, grow 0", field, "gap rel, grow, push");
     setupValueChangeNotifications();
   }

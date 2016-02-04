@@ -25,8 +25,8 @@ import javax.swing.*;
 import org.jppf.scripting.*;
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.ui.options.xml.OptionDescriptor.ItemDescriptor;
-import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.*;
+import org.jppf.ui.picklist.PickList;
 import org.jppf.utils.*;
 
 /**
@@ -386,6 +386,24 @@ public class OptionElementFactory {
     option.setExtensions(desc.getProperty("extensions"));
     option.setValue(desc.getProperty("value"));
     option.createUI();
+    return option;
+  }
+
+  /**
+   * Build a pick list option from the specified option descriptor.
+   * @param desc the descriptor to get the page properties from.
+   * @return an <code>Option</code> instance, or null if the option could not be build.
+   * @throws Exception if an error was raised while building the option.
+   */
+  public Option buildPickList(final OptionDescriptor desc) throws Exception   {
+    PickListOption option = new PickListOption();
+    builder.initCommonOptionAttributes(option, desc);
+    option.createUI();
+    PickList pickList = option.getPickList();
+    String s = desc.getProperty("leftTitle", null);
+    if (s != null) pickList.setLeftTitle(LocalizationUtils.getLocalized(builder.getBaseName(), s));
+    s = desc.getProperty("rightTitle", null);
+    if (s != null) pickList.setRightTitle(LocalizationUtils.getLocalized(builder.getBaseName(), s));
     return option;
   }
 

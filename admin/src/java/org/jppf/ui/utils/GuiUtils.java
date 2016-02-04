@@ -19,7 +19,7 @@ package org.jppf.ui.utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -31,6 +31,7 @@ import org.jppf.management.*;
 import org.jppf.ui.options.OptionElement;
 import org.jppf.ui.treetable.AbstractTreeCellRenderer;
 import org.jppf.utils.*;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -43,9 +44,13 @@ public final class GuiUtils {
    */
   static Logger log = LoggerFactory.getLogger(GuiUtils.class);
   /**
-   * Path tot he JPPF icon used in the GUI.
+   * Path to the JPPF icon used in the GUI.
    */
   public static final String JPPF_ICON = "/org/jppf/ui/resources/jppf-icon.gif";
+  /**
+   * Default thickness for adjusted scrollbars.
+   */
+  public static final int DEFAULT_SCROLLBAR_THICKNESS = JPPFConfiguration.get(JPPFProperties.DEFAULT_SCROLLBAR_THICKNESS);
   /**
    * A mapping of icons to their path, to use as an icon cache.
    */
@@ -285,7 +290,7 @@ public final class GuiUtils {
    * @return the string with its keywords replaced.
    */
   public static String shortenLabel(final String key) {
-    String[] words = key.split("\\s");
+    String[] words = RegexUtils.SPACES_PATTERN.split(key);
     StringBuilder sb = new StringBuilder();
     int count = 0;
     for (String word : words) {
@@ -363,5 +368,23 @@ public final class GuiUtils {
       comp = parent;
     }
     return null;
+  }
+
+  /**
+   * Change the thickness of the horizontal and vertical scrollbars in the specified scroll pane to the {@link #DEFAULT_SCROLLBAR_THICKNESS default value}.
+   * @param scrollPane the scroll pane to change.
+   */
+  public static void adjustScrollbarsThickness(final JScrollPane scrollPane) {
+    adjustScrollbarsThickness(scrollPane, DEFAULT_SCROLLBAR_THICKNESS);
+  }
+
+  /**
+   * Change the thickness of the horizontal and vertical scrollbars in the specified scroll pane.
+   * @param scrollPane the scroll pane to change.
+   * @param thickness the desried scrollbar thickness.
+   */
+  public static void adjustScrollbarsThickness(final JScrollPane scrollPane, final int thickness) {
+    scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(thickness, 0));
+    scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, thickness));
   }
 }

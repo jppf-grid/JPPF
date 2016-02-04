@@ -27,7 +27,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.utils.*;
 
 /**
  * Abstract implementation of a tree table-based option.
@@ -120,7 +120,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
     String key = getName() + "_column_widths";
     String s = pref.get(key, null);
     if (s != null) {
-      String[] wStr = s.split("\\s");
+      String[] wStr = RegexUtils.SPACES_PATTERN.split(s);
       for (int i=0; i<Math.min(treeTable.getColumnCount(), wStr.length); i++) {
         int width = 60;
         try {
@@ -133,7 +133,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
     key = getName() + "_hidden_columns";
     s = pref.get(key, null);
     if (s != null) {
-      String[] posStr = s.split("\\s");
+      String[] posStr = RegexUtils.SPACES_PATTERN.split(s);
       for (String str: posStr) {
         int pos = -1;
         try {

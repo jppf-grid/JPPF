@@ -27,8 +27,7 @@ import net.miginfocom.swing.MigLayout;
  * An option that displays a UI component created through a Java class.
  * @author Laurent Cohen
  */
-public class JavaOption extends AbstractOption
-{
+public class JavaOption extends AbstractOption {
   /**
    * The fully qualified class name of the UI component to instantiate.
    */
@@ -37,24 +36,26 @@ public class JavaOption extends AbstractOption
    * Name of the mouseListener to set on this element.
    */
   protected String mouseListenerClassName = null;
+  /**
+   * The instance of the class that is created.
+   */
+  protected JComponent instance;
 
   /**
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  public JavaOption()
-  {
+  public JavaOption() {
   }
 
   @Override
   public void createUI() {
     try {
-      JComponent comp = (JComponent) Class.forName(getClassName()).newInstance();
+      JComponent comp = instance = (JComponent) Class.forName(getClassName()).newInstance();
       JScrollPane scrollPane = scrollable ? createScrollPane(comp) : null;
       if (comp instanceof JPanel) {
         JPanel panel = (JPanel) comp;
-        if (!(panel.getLayout() instanceof MigLayout) && (layoutConstraints != null) && !"".equals(layoutConstraints))
-          panel.setLayout(new MigLayout(layoutConstraints));
+        if (!(panel.getLayout() instanceof MigLayout) && (layoutConstraints != null) && !"".equals(layoutConstraints)) panel.setLayout(new MigLayout(layoutConstraints));
       }
       if (mouseListenerClassName != null) {
         JavaOptionMouseListener ml = (JavaOptionMouseListener) Class.forName(mouseListenerClassName).newInstance();
@@ -64,9 +65,8 @@ public class JavaOption extends AbstractOption
       if (scrollPane != null) {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         UIComponent = scrollPane;
-      }
-      else UIComponent = comp;
-    } catch(Exception e) {
+      } else UIComponent = comp;
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -76,10 +76,8 @@ public class JavaOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
   }
-
 
   /**
    * Enable or disable this option.
@@ -87,16 +85,14 @@ public class JavaOption extends AbstractOption
    * @see org.jppf.ui.options.Option#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
   }
 
   /**
    * Get the fully qualified class name of the UI component to instantiate.
    * @return the class name as a string.
    */
-  public synchronized String getClassName()
-  {
+  public synchronized String getClassName() {
     return className;
   }
 
@@ -104,16 +100,14 @@ public class JavaOption extends AbstractOption
    * Set the fully qualified class name of the UI component to instantiate.
    * @param className the class name as a string.
    */
-  public synchronized void setClassName(final String className)
-  {
+  public synchronized void setClassName(final String className) {
     this.className = className;
   }
 
   /**
    * Abstract superclass for mouse listeners set on this type of option.
    */
-  public abstract static class JavaOptionMouseListener extends MouseAdapter
-  {
+  public abstract static class JavaOptionMouseListener extends MouseAdapter {
     /**
      * The option on which this listener is set.
      */
@@ -123,8 +117,7 @@ public class JavaOption extends AbstractOption
      * Get the option on which this listener is set.
      * @return a <code>JavaOption</code> instance.
      */
-    public JavaOption getOption()
-    {
+    public JavaOption getOption() {
       return option;
     }
 
@@ -132,8 +125,7 @@ public class JavaOption extends AbstractOption
      * Set the option on which this listener is set.
      * @param option a <code>JavaOption</code> instance.
      */
-    public void setOption(final JavaOption option)
-    {
+    public void setOption(final JavaOption option) {
       this.option = option;
     }
   }
@@ -142,8 +134,7 @@ public class JavaOption extends AbstractOption
    * Get the class name of the mouseListener to set on this element.
    * @return the class name as a string.
    */
-  public String getMouseListenerClassName()
-  {
+  public String getMouseListenerClassName() {
     return mouseListenerClassName;
   }
 
@@ -151,8 +142,15 @@ public class JavaOption extends AbstractOption
    * Set the class name of the mouseListener to set on this element.
    * @param mouseListenerClassName the class name as a string.
    */
-  public void setMouseListenerClassName(final String mouseListenerClassName)
-  {
+  public void setMouseListenerClassName(final String mouseListenerClassName) {
     this.mouseListenerClassName = mouseListenerClassName;
+  }
+
+  /**
+   * Get the instance of the class that is created.
+   * @return a {@link JComponent}.
+   */
+  public JComponent getInstance() {
+    return instance;
   }
 }

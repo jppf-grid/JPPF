@@ -17,20 +17,26 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import net.miginfocom.swing.MigLayout;
-
+import org.jppf.ui.actions.AbstractUpdatableAction;
 import org.jppf.ui.layout.WrapLayout;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
-import org.jppf.utils.LocalizationUtils;
+import org.jppf.ui.options.*;
+import org.jppf.ui.options.factory.OptionsHandler;
+import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class provides a graphical interface for monitoring the status and health
@@ -49,13 +55,73 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    */
   private static final String BASE = "org.jppf.ui.i18n.StatsPage";
   /**
+   * Preference key for loading/storing the list of visible stats.
+   */
+  private static final String VISIBLE_STATS_KEY = "visible.server.stats";
+  /**
+   *
+   */
+  private static final String EXECUTION = "ExecutionTable";
+  /**
+   *
+   */
+  private static final String NODE_EXECUTION = "NodeExecutionTable";
+  /**
+   *
+   */
+  private static final String TRANSPORT = "NetworkOverheadTable";
+  /**
+   *
+   */
+  private static final String CONNECTION = "ConnectionsTable";
+  /**
+   *
+   */
+  private static final String QUEUE = "QueueTable";
+  /**
+   *
+   */
+  private static final String JOB = "JobTable";
+  /**
+   *
+   */
+  private static final String NODE_CL_REQUEST_TIME = "NodeClassLoadingRequestTable";
+  /**
+   *
+   */
+  private static final String CLIENT_CL_REQUEST_TIME = "ClientClassLoadingRequestTable";
+  /**
+   *
+   */
+  private static final String INBOUND_NETWORK_TRAFFIC = "InboundTrafficTable";
+  /**
+   *
+   */
+  private static final String OUTBOUND_NETWORK_TRAFFIC = "OutboundTrafficTable";
+  /**
    * The stats formatter that provides the data.
    */
   private transient StatsHandler statsHandler = null;
   /**
+   *
+   */
+  private final Map<String, Fields[]> allTablesMap = createFieldsMap();
+  /**
+   *
+   */
+  private final Map<String, Item> allItems = createItems();
+  /**
    * Holds a list of table models to update when new stats are received.
    */
-  private java.util.List<MonitorTableModel> tableModels = new ArrayList<>();
+  private final List<MonitorTableModel> tableModels = new ArrayList<>();
+  /**
+   *
+   */
+  private final List<Item> visibleItems = new ArrayList<>();
+  /**
+   *
+   */
+  private final List<JComponent> visibleTableComps = new ArrayList<>();
 
   /**
    * Default constructor.
@@ -65,16 +131,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
     wl.setAlignOnBaseline(true);
     setLayout(wl);
-    addTablePanel(EXECUTION_PROPS, "ExecutionTable");
-    addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable");
-    addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable");
-    addTablePanel(CONNECTION_PROPS, "ConnectionsTable");
-    addTablePanel(QUEUE_PROPS, "QueueTable");
-    addTablePanel(JOB_PROPS, "JobTable");
-    addTablePanel(NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable");
-    addTablePanel(CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable");
-    addTablePanel(INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable");
-    addTablePanel(OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable");
     statsHandler.addStatsHandlerListener(this);
     addComponentListener(new ComponentAdapter() {
       @Override
@@ -85,14 +141,32 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
   }
 
   /**
+   * Add all visible tables to the view.
+   */
+  private void addTables() {
+    for (Item item: visibleItems) addTablePanel(allTablesMap.get(item.name), item.name);
+  }
+
+  /**
+   * Remove all tables from the view.
+   */
+  private void clearTablesFromView() {
+    for (JComponent comp: visibleTableComps) remove(comp);
+    visibleTableComps.clear();
+    tableModels.clear();
+  }
+
+  /**
    * Add a table panel to this panel.
    * @param fields the fields displayed in the table.
    * @param title the reference to the localized title of the table.
    */
   private void addTablePanel(final Fields[] fields, final String title) {
-    JComponent comp = makeTablePanel(fields, LocalizationUtils.getLocalized(BASE, title + ".label"));
-    comp.setToolTipText(LocalizationUtils.getLocalized(BASE, title + ".tooltip"));
+    Item item = allItems.get(title);
+    JComponent comp = makeTablePanel(fields, item.label);
+    comp.setToolTipText(item.tooltip);
     add(comp);
+    visibleTableComps.add(comp);
   }
 
   /**
@@ -147,5 +221,156 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     table.doLayout();
     table.setShowGrid(false);
     return panel;
+  }
+
+  /**
+   * Create a mapping of table names to the corresponding set of fields.
+   * @return a map of names to {@code Field[]}.
+   */
+  private Map<String, Fields[]> createFieldsMap() {
+    Map<String, Fields[]> map = new LinkedHashMap<>();
+    addFieldsMapping(map, EXECUTION, EXECUTION_PROPS);
+    addFieldsMapping(map, NODE_EXECUTION, NODE_EXECUTION_PROPS);
+    addFieldsMapping(map, TRANSPORT, TRANSPORT_PROPS);
+    addFieldsMapping(map, CONNECTION, CONNECTION_PROPS);
+    addFieldsMapping(map, QUEUE, QUEUE_PROPS);
+    addFieldsMapping(map, JOB, JOB_PROPS);
+    addFieldsMapping(map, NODE_CL_REQUEST_TIME, NODE_CL_REQUEST_TIME_PROPS);
+    addFieldsMapping(map, CLIENT_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME_PROPS);
+    addFieldsMapping(map, INBOUND_NETWORK_TRAFFIC, INBOUND_NETWORK_TRAFFIC_PROPS);
+    addFieldsMapping(map, OUTBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC_PROPS);
+    //return map;
+    return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * Add a mmping of the localized specified name to a set of fields.
+   * @param map the map to add the mapping to.
+   * @param name the name to localize and use as a key in the map.
+   * @param fields the fileds associated with the key.
+   */
+  private void addFieldsMapping(final Map<String, Fields[]> map, final String name, final Fields[] fields) {
+    map.put(name, fields);
+  }
+
+  /**
+   * Create the map of all items.
+   * @return a mapping of non-localized names to {@link Item} objects.
+   */
+  private Map<String, Item> createItems() {
+    String[] names = { EXECUTION, NODE_EXECUTION, TRANSPORT, CONNECTION, QUEUE, JOB, NODE_CL_REQUEST_TIME, CLIENT_CL_REQUEST_TIME, INBOUND_NETWORK_TRAFFIC, OUTBOUND_NETWORK_TRAFFIC };
+    Map<String, Item> map = new LinkedHashMap<>();
+    for (String name: names) map.put(name, new Item(name));
+    //return map;
+    return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * Popup the pick list dialog to select the visible stats.
+   * @param btn the button that produced a click event event.
+   */
+  public void selectStats(final AbstractButton btn) {
+    try {
+      Point location = ((btn != null) && btn.isShowing()) ? location = btn.getLocationOnScreen() : new Point(0, 0);
+      OptionElement panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleStatsPanel.xml");
+      final PickListOption option = (PickListOption) panel.findFirstWithName("visible.stats.selection");
+      option.populate(new ArrayList<>(allItems.values()), visibleItems);
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), LocalizationUtils.getLocalized(BASE, "visible.stats.panel.label"), false);
+      dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/table-column-hide.png").getImage());
+      JButton applyBtn = (JButton) panel.findFirstWithName("/visible.stats.apply").getUIComponent();
+      AbstractAction applyAction = new AbstractAction() {
+        @Override public void actionPerformed(final ActionEvent event) {
+          visibleItems.clear();
+          List<Item> value = (List<Item>) option.getPickList().getPickedItems();
+          visibleItems.addAll(value);
+          clearTablesFromView();
+          addTables();
+          MonitoringPanel.this.repaint();
+        }
+      };
+      applyBtn.addActionListener(applyAction);
+      JButton closeBtn = (JButton) panel.findFirstWithName("/visible.stats.close").getUIComponent();
+      AbstractAction closeAction = new AbstractAction() {
+        @Override public void actionPerformed(final ActionEvent event) {
+          dialog.setVisible(false);
+          dialog.dispose();
+        }
+      };
+      closeBtn.addActionListener(closeAction);
+      AbstractUpdatableAction.setOkCancelKeys(panel, applyAction, closeAction);
+      dialog.getContentPane().add(panel.getUIComponent());
+      dialog.pack();
+      dialog.setLocationRelativeTo(null);
+      if (location != null) dialog.setLocation(location);
+      dialog.setVisible(true);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Load the ist of visible stats from the prefrences.
+   */
+  public void loadVisibleStats() {
+    visibleItems.clear();
+    Preferences pref = OptionsHandler.getPreferences();
+    String s = pref.get(VISIBLE_STATS_KEY, null);
+    if (s != null) {
+      String[] names = RegexUtils.SPACES_PATTERN.split(s);
+      for (String name: names) {
+        Item item = allItems.get(name);
+        if (item != null) visibleItems.add(item);
+      }
+    }
+    else visibleItems.addAll(allItems.values());
+    addTables();
+  }
+
+  /**
+   * Store the ist of visible stats into the prefrences.
+   */
+  public void storeVisibleStats() {
+    Preferences pref = OptionsHandler.getPreferences();
+    StringBuilder sb = new StringBuilder();
+    int count  = 0;
+    for (Item item: visibleItems) {
+      if (count > 0) sb.append(' ');
+      sb.append(item.name);
+      count++;
+    }
+    pref.put(VISIBLE_STATS_KEY, sb.toString());
+  }
+
+  /**
+   * Instances of this class are the items displayed int he pick list.
+   */
+  public static class Item {
+    /**
+     * The non-localized name of this item
+     */
+    public final String name;
+    /**
+     * The localized name of this item
+     */
+    public final String label;
+    /**
+     * The localized name of this item
+     */
+    public final String tooltip;
+
+    /**
+     * Initialize this item.
+     * @param name the non-localized name of this item.
+     */
+    public Item(final String name) {
+      this.name = name;
+      this.label = LocalizationUtils.getLocalized(BASE, name + ".label");
+      this.tooltip = LocalizationUtils.getLocalized(BASE, name + ".tooltip");
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
   }
 }

@@ -26,7 +26,7 @@ import java.util.prefs.*;
 import org.jppf.ui.monitoring.charts.ChartType;
 import org.jppf.ui.monitoring.data.Fields;
 import org.jppf.ui.options.factory.OptionsHandler;
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -158,7 +158,7 @@ public class PreferencesStorage {
     config.precision = child.getInt("precision", 0);
     config.unit = child.get("unit", null);
     String fields = child.get("fields", "");
-    String[] sFields = fields.split("\\|");
+    String[] sFields = RegexUtils.PIPE_PATTERN.split(fields);
     List<Fields> list = new ArrayList<>();
     for (String sField : sFields) {
       Fields f = lookupEnum(sField);

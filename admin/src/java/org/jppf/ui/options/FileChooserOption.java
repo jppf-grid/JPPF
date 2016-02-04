@@ -26,6 +26,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
 import org.jppf.ui.utils.GuiUtils;
+import org.jppf.utils.RegexUtils;
 
 /**
  * This option encapsulates a file chooser control. It is composed of three components:
@@ -191,7 +192,7 @@ public class FileChooserOption extends AbstractOption {
     if ((extensions == null) || "".equals(extensions.trim())) this.extensions = DEFAULT_EXTENSIONS;
     else this.extensions = extensions;
     /*else*/ {
-      String[] rawExt = extensions.split("\\|");
+      String[] rawExt = RegexUtils.PIPE_PATTERN.split(extensions);
       for (String s: rawExt) {
         filters.add(parseFilter(s));
       }
