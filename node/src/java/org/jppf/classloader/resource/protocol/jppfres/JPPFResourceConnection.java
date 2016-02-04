@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ package org.jppf.classloader.resource.protocol.jppfres;
 import java.io.*;
 import java.net.*;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jppf.classloader.resource.ResourceCache;
 import org.jppf.location.Location;
@@ -30,6 +31,10 @@ import org.jppf.location.Location;
  * @author Laurent Cohen
  */
 public class JPPFResourceConnection extends URLConnection {
+  /**
+   * Pre-compiled regex pattern that matches any question mark '?' or equals sign '=' characters.
+   */
+  private static final Pattern URL_QUERY_SEPARATOR_PATTERN = Pattern.compile("\\?|=");
   /**
    * The class loader resource the URL points to.
    */
@@ -54,7 +59,7 @@ public class JPPFResourceConnection extends URLConnection {
       StringBuilder path = new StringBuilder(url.getPath());
       char c;
       while (((c = path.charAt(0)) == '/') || (c == '\\')) path.deleteCharAt(0);
-      String[] keyvalue = url.getQuery().split("\\?|=");
+      String[] keyvalue = URL_QUERY_SEPARATOR_PATTERN.split(url.getQuery());
       int id = Integer.valueOf(keyvalue[1]);
       List<Location> list = rc.getResourcesLocations(path.toString());
       if (list != null) resource = list.get(id);

@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ import java.util.Timer;
 import javax.swing.*;
 
 import org.jppf.node.screensaver.*;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 
 /**
@@ -130,7 +130,7 @@ public class JPPFScreenSaverImpl extends JPanel implements JPPFScreenSaver {
     if (speed < 1) speed = 1;
     if (speed > MAX_SPEED) speed = MAX_SPEED;
     String paths = config.get(JPPFProperties.SCREENSAVER_LOGO_PATH);
-    String[] tokens = paths.split("\\|");
+    String[] tokens = RegexUtils.PIPE_PATTERN.split(paths);
     java.util.List<ImageIcon> list = new LinkedList<>();
     for (String s: tokens) {
       ImageIcon icon = ScreenSaverMain.loadImage(s.trim());

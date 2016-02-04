@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -117,7 +117,7 @@ public class JPPFCsvFileConnectionStrategy implements DriverConnectionStrategy {
    */
   private DriverConnectionInfo parseLine(final String csv) {
     if (csv.startsWith("#")) return null;
-    String[] tokens = csv.split(",");
+    String[] tokens = RegexUtils.COMMA_PATTERN.split(csv);
     if ((tokens != null) && (tokens.length == 4)) {
       for (int i=0; i<tokens.length; i++) tokens[i] = tokens[i].trim();
       boolean secure = "true".equalsIgnoreCase(tokens[0]);

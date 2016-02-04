@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,6 @@
  */
 
 package org.jppf.node.provisioning;
-
-import static org.jppf.node.provisioning.NodeProvisioningConstants.*;
 
 import java.io.*;
 import java.util.*;
@@ -47,6 +45,10 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
    * Determines whether debug log statements are enabled.
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * Name of the property which defines the id of a slave node.
+   */
+  private static final String SLAVE_ID_PROPERTY = "jppf.node.provisioning.slave.id";
   /**
    * Path prefix used for the root directory of each slave node.
    * The provisioning facility will then add a sequence number as suffix, to distinguish between slave nodes.
@@ -239,7 +241,7 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     props.set(JPPFProperties.PROVISIONING_MASTER, false);
     props.set(JPPFProperties.PROVISIONING_SLAVE, true);
     props.setInt(SLAVE_ID_PROPERTY, id);
-    props.setString(MASTER_UUID_PROPERTY, NodeRunner.getUuid());
+    props.set(JPPFProperties.PROVISIONING_MASTER_UUID, NodeRunner.getUuid());
     try (Writer writer = new BufferedWriter(new FileWriter(new File(slaveConfigDest, SLAVE_LOCAL_CONFIG_FILE)))) {
       props.store(writer, "generated jppf configuration");
     }
