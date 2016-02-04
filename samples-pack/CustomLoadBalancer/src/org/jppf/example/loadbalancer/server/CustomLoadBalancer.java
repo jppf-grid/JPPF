@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -127,11 +127,11 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
 
   /**
    * Set the current job's information.
-   * @param metadata a {@link JPPFDistributedJob} instance.
+   * @param jobInformation a {@link JPPFDistributedJob} instance.
    */
   @Override
-  public void setJob(final JPPFDistributedJob metadata) {
-    this.jobInformation = metadata;
+  public void setJob(final JPPFDistributedJob jobInformation) {
+    this.jobInformation = jobInformation;
     // compute the number of tasks to send to the node,
     // based on the new job metadata
     computeBundleSize();
