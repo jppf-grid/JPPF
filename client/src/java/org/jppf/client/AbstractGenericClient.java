@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -190,7 +190,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       String discoveryNames = config.get(JPPFProperties.DRIVERS);
       if ((discoveryNames == null) || "".equals(discoveryNames.trim())) discoveryNames = "default-driver";
       if (debugEnabled) log.debug("list of drivers: " + discoveryNames);
-      String[] names = discoveryNames.split("\\s");
+      String[] names = RegexUtils.SPACES_PATTERN.split(discoveryNames);
       for (String name : names) initPeers |= VALUE_JPPF_DISCOVERY.equals(name);
 
       if (initPeers) {

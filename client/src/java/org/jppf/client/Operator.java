@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ public enum Operator {
     public boolean evaluate(final long actual, final long expected) { return actual != expected; }
   },
   /**
-   * The number of connections is at least to the expected number.
+   * The number of connections is at least the expected number.
    */
   AT_LEAST {
     @Override
