@@ -76,7 +76,6 @@ public class IPv4AddressNetmask extends IPv4AddressPattern {
     }
     String[] ipAndNetmask = RegexUtils.SLASH_PATTERN.split(source);
     // Ensure IP address has four parts
-    //String[] ip = ipAndNetmask[0].split("\\.");
     String[] ip = RegexUtils.DOT_PATTERN.split(ipAndNetmask[0]);
     if (ip.length != 4) {
       return source;
