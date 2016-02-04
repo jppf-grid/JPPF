@@ -18,8 +18,9 @@
 
 package org.jppf.nio;
 
+import static org.jppf.utils.configuration.JPPFProperties.*;
+
 import org.jppf.utils.JPPFConfiguration;
-import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -65,7 +66,7 @@ public class NioConstants {
   /**
    * Default timeout for <code>Selector.select(long)</code> operations.
    */
-  public static final long DEFAULT_SELECT_TIMEOUT = JPPFConfiguration.get(JPPFProperties.NIO_SELECT_TIMEOUT);
+  public static final long DEFAULT_SELECT_TIMEOUT = JPPFConfiguration.get(NIO_SELECT_TIMEOUT);
   /**
    * Workaround for the issue described in <a href="http://www.jppf.org/forums/index.php/topic,1626.0.html">this forum thread</a>.
    */
@@ -76,7 +77,7 @@ public class NioConstants {
    * @return <code>true</code> if NIO checks are enabled, <code>false</code> otherwise.
    */
   private static boolean getCheckConnection() {
-    boolean b = JPPFConfiguration.get(JPPFProperties.NIO_CHECK_CONNECTION);
+    boolean b = JPPFConfiguration.get(NIO_CHECK_CONNECTION);
     log.info("NIO checks are " + (b ? "enabled" : "disabled"));
     return b;
   }
@@ -86,8 +87,6 @@ public class NioConstants {
    * @return the pool size as an int.
    */
   private static int computeNIOPoolSize() {
-    int n = JPPFConfiguration.get(JPPFProperties.TRANSITION_THREAD_POOL_SIZE);
-    if (JPPFConfiguration.get(JPPFProperties.LOCAL_NODE_ENABLED)) n++;
-    return n;
+    return Math.max(2, JPPFConfiguration.get(TRANSITION_THREAD_POOL_SIZE));
   }
 }
