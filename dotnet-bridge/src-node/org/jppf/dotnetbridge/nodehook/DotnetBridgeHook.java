@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,9 +45,9 @@ public class DotnetBridgeHook implements InitializationHook {
           Bridge.LoadAndRegisterAssemblyFrom(new File (config.getString(key)));
           System.out.println("loaded assembly " + config.getString(key));
         } else if (key.startsWith("AssemblyPaths.")) {
-          String[] split = config.getString(key).split("|");
+          String[] split = RegexUtils.PIPE_PATTERN.split(config.getString(key));
           if ((split == null) || (split.length < 2)) continue;
-          String[] paths = split[1].split(";");
+          String[] paths = RegexUtils.SEMICOLUMN_PATTERN.split(split[1]);
           for (String path: paths) {
             Bridge.LoadAndRegisterAssemblyFrom(new File(split[0], path));
             System.out.printf("loaded assembly %s/%s%n", split[0], path);
