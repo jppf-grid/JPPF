@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -198,7 +198,7 @@ public class GenericProcessLauncher implements Runnable {
     TypedProperties config = ConfigurationHelper.loadProperties(new File(jppfConfig));
     String s = config.get(JPPFProperties.JVM_OPTIONS);
     if (s != null) {
-      String[] options = s.split("\\s");
+      String[] options = RegexUtils.SPACES_PATTERN.split(s);
       for (String opt: options) addJvmOption(opt);
     }
   }
