@@ -355,3 +355,7 @@ a.yhd:hover {
   box-shadow: inset 2px 2px 2px #444;
   padding-left: 19px;
 }
+
+div#bodyContent div h2 {
+  margin-top: 0.6em;
+}

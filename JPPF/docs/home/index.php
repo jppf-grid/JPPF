@@ -137,7 +137,9 @@
   </div>
   <div class="column_left">
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
+    <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF" style="text-decoration: none">
     <h3><img src="images/icons/getting-started.png" class="titleWithIcon"/>Getting started</h3>
+    </a>
     Take an easy start with our <a href="/doc/v5/index.php?title=A_first_taste_of_JPPF"><b>tutorial</b></a><br><br>
     </div>
     <br><div class="blockWithHighlightedTitle" style="padding-left: 5px">
