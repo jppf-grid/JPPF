@@ -64,13 +64,12 @@ public class TestJobPersistence extends Setup1D1N {
       key = pm.computeKey(job);
       assertEquals(key, job.getUuid());
       job.setPersistenceManager(pm);
-      JobListener jobListener = new JobListenerAdapter() {
+      job.addJobListener(new JobListenerAdapter() {
         @Override
         public synchronized void jobReturned(final JobEvent event) {
           resultsReceived.set(true);
         }
-      };
-      job.addJobListener(jobListener);
+      });
       client.submitJob(job);
       while (!resultsReceived.get()) Thread.sleep(100L);
       client.close();

@@ -26,59 +26,49 @@ import test.org.jppf.test.setup.*;
  * Unit tests for the JPPF serialization scheme.
  * @author Laurent Cohen
  */
-public class TestJPPFSerialization extends AbstractNonStandardSetup
-{
+public class TestJPPFSerialization extends AbstractNonStandardSetup {
   /**
    * Launches a driver and 1 node and start the client,
    * all setup with 1-way SSL authentication.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     System.out.println("main class loader = " + TestJPPFSerialization.class.getClassLoader());
+    //JPPFSerialization.Factory.reset();
     client = BaseSetup.setup(1, 1, true, createConfig("jppf_serialization"));
-    /*
-    ObjectSerializer ser = new ObjectSerializerImpl();
-    ser.serialize("hello lolo");
-    */
   }
 
   /**
    * Test a simple job.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=10000)
-  public void testSimpleJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSimpleJob() throws Exception {
     super.testSimpleJob(null);
   }
 
   @Override
-  @Test(timeout=15000)
-  public void testMultipleJobs() throws Exception
-  {
+  @Test(timeout = 15000)
+  public void testMultipleJobs() throws Exception {
     super.testMultipleJobs();
   }
 
   @Override
-  @Test(timeout=10000)
-  public void testCancelJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testCancelJob() throws Exception {
     super.testCancelJob();
   }
 
   @Override
-  @Test(timeout=5000)
-  public void testNotSerializableWorkingInNode() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testNotSerializableWorkingInNode() throws Exception {
     super.testNotSerializableWorkingInNode();
   }
 
   @Override
-  @Test(timeout=8000)
-  public void testForwardingMBean() throws Exception
-  {
+  @Test(timeout = 8000)
+  public void testForwardingMBean() throws Exception {
     super.testForwardingMBean();
   }
 }

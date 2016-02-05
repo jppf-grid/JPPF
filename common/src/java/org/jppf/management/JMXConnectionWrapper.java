@@ -190,7 +190,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
     long max = timeout > 0 ? timeout : Long.MAX_VALUE;
     connect();
     long elapsed;
-    while (!isConnected() && ((elapsed = (System.nanoTime() - start)) / 1_000_000L < max)) goToSleep(Math.min(10L, max - elapsed));
+    while (!isConnected() && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < max)) goToSleep(Math.min(10L, max - elapsed));
   }
 
   /**

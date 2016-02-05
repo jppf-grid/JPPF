@@ -54,7 +54,9 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
+    System.out.println("before awaitPeersInitialized()");
     awaitPeersInitialized();
+    System.out.println("after awaitPeersInitialized()");
     int nbTasks = 20;
     String name = ReflectionUtils.getCurrentClassAndMethod();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);

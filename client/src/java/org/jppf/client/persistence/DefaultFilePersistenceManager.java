@@ -37,8 +37,7 @@ import org.slf4j.*;
  * as it stores jobs data in a synchronous, blocking way.
  * @author Laurent Cohen
  */
-public class DefaultFilePersistenceManager implements JobPersistence<String>
-{
+public class DefaultFilePersistenceManager implements JobPersistence<String> {
   /**
    * Logger for this class.
    */
@@ -79,8 +78,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @param root the root path for this persistence manager, where the persisted jobs are stored.
    * @throws IllegalArgumentException if the root path is invalid or could not be created.
    */
-  public DefaultFilePersistenceManager(final File root)
-  {
+  public DefaultFilePersistenceManager(final File root) {
     this(root, DEFAULT_PREFIX, DEFAULT_EXT);
   }
 
@@ -92,8 +90,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @param ext the extension for the names of the files in the store.
    * @throws IllegalArgumentException if the root path is invalid or could not be created.
    */
-  public DefaultFilePersistenceManager(final File root, final String prefix, final String ext)
-  {
+  public DefaultFilePersistenceManager(final File root, final String prefix, final String ext) {
     if (root == null) throw new NullPointerException("the root path cannot be null");
     this.root = initialize(root);
     this.prefix = (prefix == null) || "".equals(prefix) ? DEFAULT_PREFIX : prefix;
@@ -106,8 +103,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @param root the root path for this persistence manager, where the persisted jobs are stored.
    * @throws IllegalArgumentException if the root path is invalid or could not be created.
    */
-  public DefaultFilePersistenceManager(final String root)
-  {
+  public DefaultFilePersistenceManager(final String root) {
     this(root, DEFAULT_PREFIX, DEFAULT_EXT);
   }
 
@@ -118,8 +114,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @param ext the extension for the names of the files in the store.
    * @throws IllegalArgumentException if the root path is invalid or could not be created.
    */
-  public DefaultFilePersistenceManager(final String root, final String prefix, final String ext)
-  {
+  public DefaultFilePersistenceManager(final String root, final String prefix, final String ext) {
     if (root == null) throw new IllegalArgumentException("the root path cannot be null");
     this.root = initialize(new File(root));
     this.prefix = (prefix == null) || "".equals(prefix) ? DEFAULT_PREFIX : prefix;
@@ -132,13 +127,10 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @return the root path if it is valid.
    * @throws IllegalArgumentException if the root path is invalid or could not be created.
    */
-  private File initialize(final File root)
-  {
-    if (!root.exists())
-    {
+  private File initialize(final File root) {
+    if (!root.exists()) {
       if (!root.mkdirs()) throw new IllegalArgumentException("root path " + root + " could not be created");
-    }
-    else if (!root.isDirectory()) throw new IllegalArgumentException("root path '" + root.getPath() + "' is not a directory");
+    } else if (!root.isDirectory()) throw new IllegalArgumentException("root path '" + root.getPath() + "' is not a directory");
     return root;
   }
 
@@ -148,40 +140,28 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @return the job's UUID.
    */
   @Override
-  public String computeKey(final JPPFJob job)
-  {
+  public String computeKey(final JPPFJob job) {
     return job.getUuid();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public synchronized Collection<String> allKeys() throws JobPersistenceException
-  {
-    File files[] = root.listFiles(new FileFilter()
-    {
+  public synchronized Collection<String> allKeys() throws JobPersistenceException {
+    File files[] = root.listFiles(new FileFilter() {
       @Override
-      public boolean accept(final File path)
-      {
+      public boolean accept(final File path) {
         if (path.isDirectory()) return false;
         String name = path.getName();
         if (ext == null) return name.startsWith(prefix);
         return name.endsWith(ext) && name.startsWith(prefix);
       }
     });
-    if(files == null || files.length == 0)
-    {
+    if (files == null || files.length == 0) {
       return Collections.emptyList();
-    }
-    else
-    {
+    } else {
       List<String> result = new ArrayList<>(files.length);
-      for (File f: files)
-      {
+      for (File f : files) {
         String s = f.getName().substring(prefix.length());
-        if (ext != null)
-        {
+        if (ext != null) {
           int idx = s.lastIndexOf(ext);
           s = s.substring(0, idx);
         }
@@ -191,9 +171,6 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public synchronized JPPFJob loadJob(final String key) throws JobPersistenceException {
     InputStream is = null;
@@ -202,11 +179,18 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
       if (debugEnabled) log.debug("loading job key=" + key + ", file=" + file);
       is = new BufferedInputStream(new FileInputStream(file));
       JPPFJob job = (JPPFJob) serializer.deserialize(is, false);
-      int size = SerializationUtils.readInt(is);
-      if (size > 0) { 
-        List<Task<?>> tasks = new ArrayList<>(size);
-        for (int i=0; i<size; i++) tasks.add((Task<?>) serializer.deserialize(is, false));
-        job.getResults().addResults(tasks);
+      boolean end = false;
+      while (!end) {
+        int size = 0;
+        try {
+          size = SerializationUtils.readInt(is);
+        } catch(IOException ingore) {
+        }
+        if (size > 0) {
+          List<Task<?>> tasks = new ArrayList<>(size);
+          for (int i = 0; i < size; i++) tasks.add((Task<?>) serializer.deserialize(is, false));
+          job.getResults().addResults(tasks);
+        } else end = true;
       }
       if (debugEnabled) log.debug("loaded job " + job);
       return job;
@@ -230,56 +214,39 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @param job the job to store.
    * @param tasks the newly received completed tasks, may be used to only store the delta for better performance.
    * @throws JobPersistenceException if any error occurs while storing the job.
-   * @see org.jppf.client.persistence.JobPersistence#storeJob(Object, JPPFJob, List)
    */
   @Override
-  public synchronized void storeJob(final String key, final JPPFJob job, final List<Task<?>> tasks) throws JobPersistenceException
-  {
+  public synchronized void storeJob(final String key, final JPPFJob job, final List<Task<?>> tasks) throws JobPersistenceException {
     if (debugEnabled) log.debug("storing job " + job + ", key=" + key + ", nbTasks=" + tasks.size());
     OutputStream os = null;
-    try
-    {
+    try {
       File file = fileFromKey(key);
       if (debugEnabled) log.debug("storing to file " + file);
       boolean isNewFile = !file.exists();
-      if (isNewFile)
-      {
+      if (isNewFile) {
         os = new BufferedOutputStream(new FileOutputStream(file));
         serializer.serialize(job, os);
-      }
-      else if (!tasks.isEmpty())
-      {
+      } 
+      if (!tasks.isEmpty()) {
         os = new BufferedOutputStream(new FileOutputStream(file, true));
         SerializationUtils.writeInt(tasks.size(), os);
-        for (Task<?> task: tasks) serializer.serialize(task, os);
+        for (Task<?> task : tasks) serializer.serialize(task, os);
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       throw new JobPersistenceException(e);
-    }
-    finally
-    {
-      if (os != null)
-      {
-        try
-        {
+    } finally {
+      if (os != null) {
+        try {
           os.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
           throw new JobPersistenceException(e);
         }
       }
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public synchronized void deleteJob(final String key) throws JobPersistenceException
-  {
+  public synchronized void deleteJob(final String key) throws JobPersistenceException {
     File file = fileFromKey(key);
     if (debugEnabled) log.debug("deleting job key=" + key + ", file=" + file);
     if (!file.delete()) throw new JobPersistenceException("could not delete job with key '" + key + '\'');
@@ -290,17 +257,12 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
    * @param key the job key to use.
    * @return a file path built form the given key.
    */
-  private File fileFromKey(final String key)
-  {
+  private File fileFromKey(final String key) {
     return new File(root, prefix + key + (ext == null ? "" : ext));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("root=").append(root.getPath());
@@ -310,11 +272,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String>
     return sb.toString();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void close()
-  {
+  public void close() {
   }
 }
