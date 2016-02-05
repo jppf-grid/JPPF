@@ -1,4 +1,4 @@
-<td align="center" valign="center">
+<td align="middle" valign="center">
           <!-- Google+ button -->
           <!--
           <div class="g-plusone" data-href="http://www.jppf.org" data-annotation="bubble" data-size="small" data-width="300"></div>

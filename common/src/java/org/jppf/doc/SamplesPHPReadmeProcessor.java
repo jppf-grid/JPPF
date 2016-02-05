@@ -84,7 +84,8 @@ public class SamplesPHPReadmeProcessor implements Runnable {
     int len = sourceDir.getCanonicalPath().length();
     String s = file.getParentFile().getCanonicalPath().substring(len);
     if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
-    String[] filenames = { "/index.php", "/Readme.php" };
+    //String[] filenames = { "/index.php", "/Readme.php" };
+    String[] filenames = { "/index.php" };
     for (String name: filenames) {
       File outFile = new File(destDir, s + name);
       FileUtils.mkdirs(outFile);
