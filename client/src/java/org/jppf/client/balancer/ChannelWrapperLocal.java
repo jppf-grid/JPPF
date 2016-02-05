@@ -126,7 +126,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     Runnable task = new LocalRunnable(getBundler(), bundle);
     bundle.jobDispatched(this);
-    executor.execute(task);
+    executor.submit(task);
     return null;
   }
 

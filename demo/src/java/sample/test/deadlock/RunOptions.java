@@ -81,4 +81,8 @@ public class RunOptions {
    * Callback invoked when a job is created by the job streaming pattern.
    */
   public JobStreamingCallback callback;
+  /**
+   * Callback invoked when a job is created by the job streaming pattern.
+   */
+  public final int nbJmxTestThreads = config.getInt("deadlock.nbJmxTestThreads", -1);
 }

@@ -123,7 +123,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     Runnable task = new RemoteRunnable(getBundler(), bundle, channel);
     bundle.jobDispatched(this);
-    executor.execute(task);
+    executor.submit(task);
     return null;
   }
 

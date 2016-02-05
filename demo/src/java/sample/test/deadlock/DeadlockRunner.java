@@ -28,6 +28,8 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
+import test.loadbalancer.MyLoadBalancer;
+
 /**
  * An illustration of the patterns for submitting multiple jobs in parallel.
  */
@@ -63,10 +65,18 @@ public class DeadlockRunner {
     printf("Running with conccurencyLimit=%d, nbJobs=%d, tasksPerJob=%d, taskDuration=%d", ro.concurrencyLimit, ro.nbJobs, ro.tasksPerJob, ro.taskDuration);
     ProvisioningThread pt = null;
     MasterNodeMonitoringThread mnmt = null;
+    JMXTestThread[] jmxTestThreads = (ro.nbJmxTestThreads > 0) ? new JMXTestThread[ro.nbJmxTestThreads] : null;
     try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       getJmxConnection(client);
+      MyLoadBalancer.setClient(client);
       //ro.callback = new MyCallback(client);
       ensureSufficientConnections(client, ro.clientConnections);
+      if (jmxTestThreads != null) { 
+        JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+        pool.setJMXPoolMaxSize(ro.nbJmxTestThreads);
+        pool.awaitJMXConnections(Operator.AT_LEAST, ro.nbJmxTestThreads,true);
+        for (int i=0; i<ro.nbJmxTestThreads; i++) jmxTestThreads[i] = new JMXTestThread(client, i);
+      }
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
       if (ro.simulateNodeCrashes) {
         pt = new ProvisioningThread(client, ro.waitTime);
@@ -79,6 +89,7 @@ public class DeadlockRunner {
         }
         TimeMarker marker = new TimeMarker().start();
         int count = 0;
+        if (jmxTestThreads != null) for (int i=0; i<ro.nbJmxTestThreads; i++) new Thread(jmxTestThreads[i], "JMXTestThread-" + i).start();
         for (JPPFJob job: jobProvider) {
           if ((job != null) && !client.isClosed()) client.submitJob(job);
           if (count == ro.triggerNodeDeadlockAfter) {
@@ -97,6 +108,11 @@ public class DeadlockRunner {
         if (ro.simulateNodeCrashes) {
           pt.setStopped(true);
           mnmt.setStopped(true);
+        }
+        if (jmxTestThreads != null) {
+          for (int i=0; i<ro.nbJmxTestThreads; i++) {
+            if (jmxTestThreads[i] != null) jmxTestThreads[i].setStopped(true);
+          }
         }
       }
     } catch (Exception e) {
@@ -127,7 +143,7 @@ public class DeadlockRunner {
    * @param job the JPPF job whose results are printed.
    */
   public static void processResults(final JPPFJob job) {
-    printf("*** results for job '%s' ***", job.getName());
+    printf(false, "*** results for job '%s' ***", job.getName());
     List<Task<?>> results = job.getAllResults();
     for (Task<?> task: results) {
       if (task.getThrowable() != null) printf("%s raised an exception : %s", task.getId(), ExceptionUtils.getMessage(task.getThrowable()));
@@ -142,13 +158,9 @@ public class DeadlockRunner {
    * @throws Exception if any error occurs.
    */
   private static void ensureSufficientConnections(final JPPFClient client, final int nbConnections) throws Exception {
-    printf("***** ensuring %d connections ...", nbConnections);
     JPPFConnectionPool pool = client.awaitConnectionPool();
-    printf("***** ensuring %d connections, found pool = %s", nbConnections, pool);
     pool.setSize(nbConnections);
-    printf("***** ensuring %d connections, called setSize(%d)", nbConnections, nbConnections);
     pool.awaitActiveConnections(Operator.AT_LEAST, nbConnections);
-    printf("***** ensuring %d connections, after pool.await()", nbConnections);
   }
 
   /**
@@ -212,8 +224,18 @@ public class DeadlockRunner {
    * @param params the parameters of the message.
    */
   static void printf(final String format, final Object...params) {
+    printf(true, format, params);
+  }
+
+  /**
+   * Print and log the specified formatted message.
+   * @param logIt whether to also log the message.
+   * @param format the message format.
+   * @param params the parameters of the message.
+   */
+  static void printf(final boolean logIt, final String format, final Object...params) {
     String msg = String.format(format, params);
     System.out.println(msg);
-    log.info(msg);
+    if (logIt) log.info(msg);
   }
 }
