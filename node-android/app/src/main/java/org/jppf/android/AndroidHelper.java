@@ -1,6 +1,6 @@
 /*
  * JPPF.
- * Copyright (C) 2005-2015 JPPF Team.
+ * Copyright (C) 2005-2016 JPPF Team.
  * http://www.jppf.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,6 @@ import android.util.Log;
 import org.jppf.android.activities.MainActivity;
 import org.jppf.android.node.JPPFAndroidNode;
 import org.jppf.node.NodeRunner;
-import org.jppf.server.node.AbstractCommonNode;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.TypedProperties;
@@ -39,7 +38,18 @@ import org.jppf.utils.configuration.JPPFProperty;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.jppf.android.PreferenceUtils.*;
+import static org.jppf.android.PreferenceUtils.BATTERY_MONITORING_CRITICAL_KEY;
+import static org.jppf.android.PreferenceUtils.BATTERY_MONITORING_ENABLED_KEY;
+import static org.jppf.android.PreferenceUtils.BATTERY_MONITORING_WARNING_KEY;
+import static org.jppf.android.PreferenceUtils.ENABLED_CIPHER_SUITES_KEY;
+import static org.jppf.android.PreferenceUtils.KEY_STORE_LOCATION_KEY;
+import static org.jppf.android.PreferenceUtils.KEY_STORE_PASSWORD_KEY;
+import static org.jppf.android.PreferenceUtils.SERVERS_KEY;
+import static org.jppf.android.PreferenceUtils.SSL_CONTEXT_PROTOCOL_KEY;
+import static org.jppf.android.PreferenceUtils.SSL_ENGINE_PROTOCOL_KEY;
+import static org.jppf.android.PreferenceUtils.THREADS_KEY;
+import static org.jppf.android.PreferenceUtils.TRUST_STORE_LOCATION_KEY;
+import static org.jppf.android.PreferenceUtils.TRUST_STORE_PASSWORD_KEY;
 
 /**
  * Utility methods for launching a node and managing its configuration.
