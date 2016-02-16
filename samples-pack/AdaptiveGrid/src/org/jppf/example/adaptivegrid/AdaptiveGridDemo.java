@@ -87,7 +87,7 @@ public class AdaptiveGridDemo implements Runnable {
     // disable auto-discovery
     JPPFConfiguration.set(JPPFProperties.DISCOVERY_ENABLED, false)
       // set the pool name
-      .set(JPPFProperties.DRIVERS, POOL_NAME)
+      .set(JPPFProperties.DRIVERS, new String[] {POOL_NAME})
       // set the server address
       .setString(POOL_NAME + ".jppf.server.host", "localhost")
       // set the server port
