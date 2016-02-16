@@ -108,10 +108,10 @@ public class TypedProperties extends Properties {
       val = val.trim();
       try {
         intVal = Integer.valueOf(val);
-      } catch(NumberFormatException ignore) {
+      } catch(NumberFormatException e) {
         try {
           intVal = Double.valueOf(val).intValue();
-        } catch(NumberFormatException ignore2) {
+        } catch(NumberFormatException ignore) {
         }
       }
     }
@@ -350,6 +350,52 @@ public class TypedProperties extends Properties {
   }
 
   /**
+   * Get the value of the specified property as an array of strings.
+   * @param key the name of the property to look up.
+   * @param delimiter the delimiter used to split the value into an array of strings. It MUST be a litteral string, i.e. not a regex.
+   * @return an abstract file path based on the value of the property, or null if the property is not defined.
+   * @since 5.2
+   */
+  public String[] getStringArray(final String key, final String delimiter) {
+    return getStringArray(key, delimiter, null);
+  }
+
+  /**
+   * Get the value of the specified property as an array of strings.
+   * @param key the name of the property to look up.
+   * @param delimiter the delimiter used to split the value into an array of strings. It MUST be a litteral string, i.e. not a regex.
+   * @param defValue the value to return if the property is not found.
+   * @return an abstract file path based on the value of the property, or the default value if the property is not defined.
+   * @since 5.2
+   */
+  public String[] getStringArray(final String key, final String delimiter, final String[] defValue) {
+    String s = getProperty(key);
+    if ((s == null) || s.trim().isEmpty()) return defValue;
+    String[] array = StringUtils.parseStringArray(s, delimiter, false);
+    return (array == null) ? defValue : array;
+  }
+
+  /**
+   * Set the value of the specified property as an array of strings.
+   * @param key the name of the property to look up.
+   * @param delimiter the delimiter that will be inserted between any two adjacent strings. It MUST be a litteral string, i.e. not a regex.
+   * @param value an array of strings.
+   * @return this {@code TypedProperties} object.
+   * @since 5.2
+   */
+  public TypedProperties setStringArray(final String key, final String delimiter, final String[] value) {
+    if (value != null) {
+      StringBuilder sb = new StringBuilder();
+      for (int i=0; i<value.length; i++) {
+        if (i > 0) sb.append(delimiter);
+        if (value[i] != null) sb.append(value[i]);
+      }
+      setProperty(key, sb.toString());
+    }
+    return this;
+  }
+
+  /**
    * Get the value of a property with the specified name as a set of a properties.
    * @param key the name of the property to look for.
    * Its value is the path to another properties file. Relative paths are evaluated against the current application directory.
@@ -458,6 +504,7 @@ public class TypedProperties extends Properties {
    * @param <T> the type of the property.
    * @param property the property whose value to retrieve.
    * @return the value of the property according to its type.
+   * @since 5.2
    */
   public <T> T get(final JPPFProperty<T> property) {
     String value = null;
@@ -483,6 +530,7 @@ public class TypedProperties extends Properties {
    * @param property the property whose value to set.
    * @param value the value to set.
    * @return the value of the property according to its type.
+   * @since 5.2
    */
   public <T> TypedProperties set(final JPPFProperty<T> property, final T value) {
     setProperty(property.getName(), property.toString(value));
@@ -494,6 +542,7 @@ public class TypedProperties extends Properties {
    * @param <T> the type of the property.
    * @param property the property whose value to retrieve.
    * @return the old value of the property, or {@code null} if it wasn't defined.
+   * @since 5.2
    */
   public <T> T remove(final JPPFProperty<T> property) {
     return (T) remove(property.getName());

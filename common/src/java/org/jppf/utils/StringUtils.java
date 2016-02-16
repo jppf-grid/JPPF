@@ -21,6 +21,7 @@ import java.net.*;
 import java.nio.charset.Charset;
 import java.text.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -410,11 +411,23 @@ public final class StringUtils {
    * @return a list of strings, possibly empty but never null;
    */
   public static List<String> parseStrings(final String source, final String separator) {
+    return parseStrings(source, separator, true);
+  }
+
+  /**
+   * Parse the specified source string into a list of strings according to the specified separator.
+   * @param source the string to parse.
+   * @param separator the delimiter for the resulting strings.
+   * @param regex if {@code true} then {@code separator} is interpreted as a regex, otherwise it is considered a string litteral.
+   * @return a list of strings, possibly empty but never null;
+   */
+  public static List<String> parseStrings(final String source, final String separator, final boolean regex) {
     List<String> list = new ArrayList<>();
     if (source != null) {
       if (separator == null) list.add(source);
       else {
-        String[] tokens = source.split(separator);
+        Pattern pattern = regex ? Pattern.compile(separator) : Pattern.compile(separator, Pattern.LITERAL);
+        String[] tokens = pattern.split(source);
         for (String token: tokens) {
           if (token == null) continue;
           String s = token.trim();
@@ -423,5 +436,27 @@ public final class StringUtils {
       }
     }
     return list;
+  }
+
+  /**
+   * Parse the specified source string into a list of strings according to the specified separator.
+   * @param source the string to parse.
+   * @param separator the delimiter for the resulting strings; it can be a regex.
+   * @return a list of strings, possibly empty but never null;
+   */
+  public static String[] parseStringArray(final String source, final String separator) {
+    return parseStringArray(source, separator, true);
+  }
+
+  /**
+   * Parse the specified source string into a list of strings according to the specified separator.
+   * @param source the string to parse.
+   * @param separator the delimiter for the resulting strings; it can be a regex.
+   * @param regex if {@code true} then {@code separator} is interpreted as a regex, otherwise it is considered a string litteral.
+   * @return a list of strings, possibly empty but never null;
+   */
+  public static String[] parseStringArray(final String source, final String separator, final boolean regex) {
+    List<String> list = parseStrings(source, separator, regex);
+    return list.toArray(new String[list.size()]);
   }
 }

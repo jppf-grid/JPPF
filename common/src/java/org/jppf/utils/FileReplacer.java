@@ -22,6 +22,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import org.jppf.utils.cli.NamedArguments;
 import org.jppf.utils.streams.StreamUtils;
 import org.slf4j.*;
 
@@ -75,18 +76,18 @@ public class FileReplacer {
    * @param args the parameters for searching, matching replacing.
    * @throws Exception if an error occurs while performing the replacements.
    */
-  public void replace(final Arguments args) throws Exception {
-    src = FileUtils.readTextFile(args.in);
-    dest = FileUtils.readTextFile(args.out);
+  public void replace(final NamedArguments args) throws Exception {
+    src = FileUtils.readTextFile(args.getString("-i"));
+    dest = FileUtils.readTextFile(args.getString("-o"));
     if (src.endsWith("\n") && dest.endsWith("\n")) {
       src = src.substring(0, src.length() - 1);
       dest = dest.substring(0, dest.length() - 1);
     }
-    this.searchOnly = args.searchOnly;
-    if (args.regex) pattern = Pattern.compile(src);
+    this.searchOnly = args.getBoolean("-p", false);
+    if (args.getBoolean("-r", false)) pattern = Pattern.compile(src);
     else pattern = Pattern.compile(src, Pattern.LITERAL);
-    filter = new ReplacerFilter(args.exts, args.excludeFolders);
-    File f = new File(args.root);
+    filter = new ReplacerFilter(args.getStringArray("-e", ","), args.getStringArray("-ef", ","));
+    File f = new File(args.getString("-f"));
     nbFilesChanged = 0;
     nbReplacements = 0;
     if (f.isDirectory()) replaceFolder(f);
@@ -157,72 +158,22 @@ public class FileReplacer {
    */
   public static void main(final String...args) {
     try {
-      Arguments a = parseArguments(args);
-      System.out.println("using " + a);
-      new FileReplacer().replace(a);
+      System.out.println("using " + Arrays.asList(args));
+      NamedArguments namedArgs = new NamedArguments()
+        .addArg("-i", "The input file containing the text or expression to match")
+        .addArg("-o", "The input file containing the replacement text")
+        .addArg("-f", "The root folder in which to perform the search")
+        .addArg("-e", "The file extensions to look for (comma-separated list without the '.' nor spaces)")
+        .addSwitch("-p", "If specified, then only find matches but do not actually replace in the matching files")
+        .addSwitch("-r", "If specified, then interpret the content of '-i' as a regular expression")
+        .addArg("-ef", "A list of comma-separated file patterns to exclude folders from the search")
+        .parseArguments(args);
+      System.out.println("parsed arguments: " + namedArgs);
+      //namedArgs.printUsage();
+      new FileReplacer().replace(namedArgs);
     } catch(Exception e) {
       e.printStackTrace();
     }
-  }
-
-  /**
-   * Encapsulates the command-line arguments.
-   * @exclude
-   */
-  public static class Arguments {
-    /**
-     * The input file containing the the text or expression to match.
-     */
-    public String in = null;
-    /**
-     * The input file containing the the replacement text.
-     */
-    public String out = null;
-    /**
-     * The root folder in which to perform the search.
-     */
-    public String root = null;
-    /**
-     * The file extensions to look for.
-     */
-    public String exts = null;
-    /**
-     * If true, then only find matches but do not actually replace in the matching files.
-     */
-    public boolean searchOnly = true;
-    /**
-     * If true, then interpret the content of 'in' as a regular expression.
-     */
-    public boolean regex = false;
-    /**
-     * A list of comma-separted regex to exclude folders from the search.
-     */
-    public String excludeFolders = null;
-
-    @Override
-    public String toString() {
-      return "Arguments[in=" + in + ", out=" + out + ", root=" + root + ", exts=" + exts + ", searchOnly=" + searchOnly + ", regex=" + regex + ", excludeFolders=" + excludeFolders + "]";
-    }
-  }
-
-  /**
-   * Parse the command-line arguments into a usable object.
-   * @param args the command-line arguments to parse.
-   * @return an <code>Arguments</code> instance.
-   * @throws Exception if any erorr occurs.
-   */
-  private static Arguments parseArguments(final String...args) throws Exception {
-    Arguments ag = new Arguments();
-    for (int i=0; i<args.length; i++) {
-      if ("-i".equals(args[i])) ag.in = args[++i];
-      else if ("-o".equals(args[i])) ag.out = args[++i];
-      else if ("-f".equals(args[i])) ag.root = args[++i];
-      else if ("-e".equals(args[i])) ag.exts = args[++i];
-      else if ("-p".equals(args[i])) ag.searchOnly = false;
-      else if ("-r".equals(args[i])) ag.regex = true;
-      else if ("-ef".equals(args[i])) ag.excludeFolders = args[++i];
-    }
-    return ag;
   }
 
   /**
@@ -241,15 +192,12 @@ public class FileReplacer {
 
     /**
      * Initializer this filter with the specified set of file extensions.
-     * @param ext a comma-separated list of file extensions to process.
-     * @param folderExclusions a comma-separated list of regex used to exclude folders.
+     * @param exts an array of file extensions to process.
+     * @param exc a comma-separated list of regex used to exclude folders.
      */
-    public ReplacerFilter(final String ext, final String folderExclusions) {
-      String s = (ext == null) ? "" : ext;
-      extensions = RegexUtils.COMMA_PATTERN.split(s);
-      for (int i=0; i<extensions.length; i++) extensions[i] = extensions[i].trim();
-      if (folderExclusions != null) {
-        String[] exc = RegexUtils.COMMA_PATTERN.split(folderExclusions);
+    public ReplacerFilter(final String[] exts, final String[] exc) {
+      this.extensions = exts;
+      if (exc != null) {
         for (int i=0; i<exc.length; i++) exc[i] = exc[i].replace(".", "\\.").replace("*", ".*").replace("?", ".?").replace("\\", "\\\\");
         folderExlusionPatterns = new Pattern[exc.length];
         for (int i=0; i<exc.length; i++) folderExlusionPatterns[i] = Pattern.compile(exc[i]);
@@ -258,10 +206,10 @@ public class FileReplacer {
 
     /**
      * Initializer this filter with the specified set of file extensions.
-     * @param ext a comma-separated list of file extensions to process.
+     * @param exts a comma-separated list of file extensions to process.
      */
-    public ReplacerFilter(final String ext) {
-      this(ext, null);
+    public ReplacerFilter(final String[] exts) {
+      this(exts, null);
     }
 
     /**
