@@ -41,7 +41,6 @@ public class TestExecutionPolicy {
   @Test(timeout=5000)
   public void testMatches() throws Exception {
     JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
-    info.populate();
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
     TestCustomPolicy tcp = new TestCustomPolicy();
     ExecutionPolicy policy = new Contains("jppf.uuid", true, "AB").and(tcp);

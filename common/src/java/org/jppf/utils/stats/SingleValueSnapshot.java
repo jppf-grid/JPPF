@@ -25,8 +25,7 @@ package org.jppf.utils.stats;
  * serialization and deserialization.
  * @author Laurent Cohen
  */
-public class SingleValueSnapshot implements JPPFSnapshot
-{
+public class SingleValueSnapshot implements JPPFSnapshot {
   /**
    * Explicit serialVersionUID.
    */
@@ -47,8 +46,7 @@ public class SingleValueSnapshot implements JPPFSnapshot
    * @param label the title for this snapshot.
    * @exclude
    */
-  public SingleValueSnapshot(final String label)
-  {
+  public SingleValueSnapshot(final String label) {
     this.label = label;
   }
 
@@ -57,8 +55,7 @@ public class SingleValueSnapshot implements JPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void addValues(final double accumulatedValues, final long count)
-  {
+  public synchronized void addValues(final double accumulatedValues, final long count) {
     total += accumulatedValues;
   }
 
@@ -67,8 +64,7 @@ public class SingleValueSnapshot implements JPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized JPPFSnapshot copy()
-  {
+  public synchronized JPPFSnapshot copy() {
     SingleValueSnapshot svs = new SingleValueSnapshot(label);
     svs.total = total;
     return svs;
@@ -79,56 +75,47 @@ public class SingleValueSnapshot implements JPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void reset()
-  {
+  public synchronized void reset() {
     total = 0d;
   }
 
   @Override
-  public String getLabel()
-  {
+  public String getLabel() {
     return label;
   }
 
   @Override
-  public synchronized double getTotal()
-  {
+  public synchronized double getTotal() {
     return total;
   }
 
   @Override
-  public long getValueCount()
-  {
+  public long getValueCount() {
     return 0;
   }
 
   @Override
-  public double getLatest()
-  {
+  public double getLatest() {
     return 0;
   }
 
   @Override
-  public double getMin()
-  {
+  public double getMin() {
     return 0;
   }
 
   @Override
-  public double getMax()
-  {
+  public double getMax() {
     return 0;
   }
 
   @Override
-  public double getAvg()
-  {
+  public double getAvg() {
     return 0;
   }
 
   @Override
-  public synchronized String toString()
-  {
+  public synchronized String toString() {
     return new StringBuilder(JPPFStatisticsHelper.getLocalizedLabel(this)).append(": type=").append(getClass().getSimpleName()).append(", total=").append(total).toString();
   }
 }

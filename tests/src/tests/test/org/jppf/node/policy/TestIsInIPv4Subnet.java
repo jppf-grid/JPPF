@@ -80,7 +80,6 @@ public class TestIsInIPv4Subnet {
   @Test(timeout=5000)
   public void testMatches() throws Exception {
     JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
-    info.populate();
     info.getRuntime().setString("ipv4.addresses", "localhost|192.168.1.14");
     assertFalse(new IsInIPv4Subnet("192.168.1.10").accepts(info));
     assertTrue(new IsInIPv4Subnet("192.168.1.0/24").accepts(info));

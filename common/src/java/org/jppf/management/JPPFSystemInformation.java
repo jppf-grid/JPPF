@@ -21,6 +21,7 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.utils.*;
+import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
 /**
@@ -65,6 +66,10 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * 
    */
   private transient TypedProperties[] propertiesArray;
+  /**
+   * An optional statistics object from which events can be received so the corresponding properties can be kept up to date.
+   */
+  private final transient JPPFStatistics stats;
 
   /**
    * Initialize this system information object with the specified uuid.
@@ -74,8 +79,22 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * otherwise it is different and executed in a separate thread.
    */
   public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow) {
+    this(uuid, local, resolveInetAddressesNow, null);
+  }
+
+
+  /**
+   * Initialize this system information object with the specified uuid.
+   * @param uuid the uuid of the corresponding JPPF component.
+   * @param local <code>true</code> if the JPPF component is local (local node or local client executor), <code>false</code> otherwise.
+   * @param resolveInetAddressesNow if <code>true</code>, then name resolution for <code>InetAddress</code>es should occur immediately,
+   * otherwise it is different and executed in a separate thread.
+   * @param stats an optional statistics object from which events can be received so the corresponding properties can be kept up to date.
+   */
+  public JPPFSystemInformation(final String uuid, final boolean local, final boolean resolveInetAddressesNow, final JPPFStatistics stats) {
     this.local = local;
     this.resolveInetAddressesNow = resolveInetAddressesNow;
+    this.stats = stats;
     TypedProperties uuidProps = new TypedProperties();
     uuidProps.setProperty("jppf.uuid", (uuid == null) ? "" : uuid);
     uuidProps.setInt("jppf.pid", SystemUtils.getPID());
@@ -143,7 +162,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
   /**
    * Get the map holding the JPPF configuration properties.
    * @return a <code>TypedProperties</code> instance.
-   * @see org.jppf.utils.JPPFConfiguration
+   * @see org.jppf.utils.JPPFConfiguration#getProperties()
    */
   public TypedProperties getJppf() {
     return getProperties("jppf");
@@ -174,6 +193,7 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * The following properties are provided:
    * <ul>
    * <li>"jppf.uuid" : the uuid of the node or driver</li>
+   * <li>"jppf.pid" : the process id of the JVM running the JPPF driver or node</li>
    * <li>"jppf.version.number" : the current JPPF version number</li>
    * <li>"jppf.build.number" : the current build number</li>
    * <li>"jppf.build.date" : the build date, including the time zone, in the format "yyyy-MM-dd hh:mm z" </li>
@@ -182,6 +202,14 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    */
   public TypedProperties getUuid() {
     return getProperties("uuid");
+  }
+
+  /**
+   * Get the properties object holding the JPPF server statistics, listed as constants in {@link JPPFStatisticsHelper}.
+   * @return a <code>TypedProperties</code> wrapper for the server statistics; for a node this will return an empty set of properties.
+   */
+  public TypedProperties getStats() {
+    return getProperties("stats");
   }
 
   /**
@@ -260,6 +288,11 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
     addProperties("storage", SystemUtils.getStorageInformation());
     if (getProperties("uuid") == null) addProperties("uuid", new TypedProperties());
     addProperties("os", SystemUtils.getOS());
+    TypedProperties statsProperties = new TypedProperties();
+    addProperties("stats", statsProperties);
+    if (stats != null) {
+      for (JPPFSnapshot snapshot: stats) JPPFStatisticsHelper.toProperties(statsProperties, snapshot);
+    }
     return this;
   }
 

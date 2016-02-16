@@ -145,7 +145,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public JPPFStatistics statistics() throws Exception {
     try {
-      JPPFStatistics  stats = driver.getStatistics().copy();
+      JPPFStatistics stats = driver.getStatistics();
       if (log.isTraceEnabled()) log.trace("stats request = " + stats);
       return stats;
     } catch(Throwable e) {

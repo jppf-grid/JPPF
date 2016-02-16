@@ -22,8 +22,7 @@ package org.jppf.utils.stats;
  * In this implementation, {@code getLatest()} is computed as the average of the latest set of values that were added, or the latest value if only one was added.
  * @author Laurent Cohen
  */
-public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
-{
+public class NonCumulativeSnapshot extends AbstractJPPFSnapshot {
   /**
    * Explicit serialVersionUID.
    */
@@ -34,8 +33,7 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
    * @param label the title for this snapshot.
    * @exclude
    */
-  public NonCumulativeSnapshot(final String label)
-  {
+  public NonCumulativeSnapshot(final String label) {
     super(label);
   }
 
@@ -44,11 +42,9 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void addValues(final double accumulatedValues, final long count)
-  {
+  public synchronized void addValues(final double accumulatedValues, final long count) {
     total += accumulatedValues;
-    if (count > 0L)
-    {
+    if (count > 0L) {
       valueCount += count;
       latest = (count == 1L) ? accumulatedValues : accumulatedValues / count;
       if (latest > max) max = latest;
@@ -62,8 +58,7 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
-  public synchronized void assignLatestToMax()
-  {
+  public synchronized void assignLatestToMax() {
     max = latest;
     total = latest;
     valueCount = 0L;
@@ -76,8 +71,7 @@ public class NonCumulativeSnapshot extends AbstractJPPFSnapshot
    * @exclude
    */
   @Override
-  public JPPFSnapshot copy()
-  {
+  public JPPFSnapshot copy() {
     return copy(new NonCumulativeSnapshot(getLabel()));
   }
 }

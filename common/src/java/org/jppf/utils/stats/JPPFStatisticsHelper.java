@@ -178,6 +178,23 @@ public final class JPPFStatisticsHelper {
   }
 
   /**
+   * Add or update the values of the specified snapshot as properties in the specified set of properties.
+   * @param statsProperties the set of properties to update.
+   * @param snapshot the snapshot to update from.
+   */
+  public static void toProperties(final TypedProperties statsProperties, final JPPFSnapshot snapshot) {
+    final String label = snapshot.getLabel() + '.';
+    statsProperties.setDouble(label + "total", snapshot.getTotal());
+    if (snapshot.getClass() != SingleValueSnapshot.class) {
+      statsProperties.setDouble(label + "latest", snapshot.getLatest());
+      statsProperties.setDouble(label + "min", snapshot.getMin());
+      statsProperties.setDouble(label + "max", snapshot.getMax());
+      statsProperties.setDouble(label + "avg", snapshot.getAvg());
+      statsProperties.setDouble(label + "count", snapshot.getValueCount());
+    }
+  }
+
+  /**
    * Create a statistics object initialized with all the required server snapshots.
    * @return a {@link JPPFStatistics} instance.
    * @exclude

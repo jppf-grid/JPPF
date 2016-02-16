@@ -81,7 +81,6 @@ public class TestIsInIPv6Subnet {
   @Test(timeout=5000)
   public void testMatches() throws Exception {
     JPPFSystemInformation info = new JPPFSystemInformation(JPPFUuid.normalUUID(), false, false);
-    info.populate();
     info.getRuntime().setString("ipv6.addresses", "localhost|0:0:0:0:8888:8888:8888:8888");
     assertFalse(new IsInIPv6Subnet("::1/80").accepts(info));
     assertTrue(new IsInIPv6Subnet("::1/64").accepts(info));

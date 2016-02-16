@@ -155,7 +155,8 @@ public class JPPFDriver {
     new OutputRedirectHook().initializing(new UnmodifiableTypedProperties(config));
     VersionUtils.logVersionInformation("driver", uuid);
     SystemUtils.printPidAndUuid("driver", uuid);
-    systemInformation = new JPPFSystemInformation(uuid, false, true);
+    systemInformation = new JPPFSystemInformation(uuid, false, true, statistics);
+    statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
     jobManager = new JPPFJobManager();
     taskQueue = new JPPFPriorityQueue(this, jobManager);
     initializer = new DriverInitializer(this, config);
