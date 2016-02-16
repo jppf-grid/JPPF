@@ -21,14 +21,12 @@ import java.awt.event.MouseListener;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 import javax.swing.JComponent;
 
 import org.jppf.ui.options.*;
 import org.jppf.ui.options.event.*;
-import org.jppf.ui.options.xml.OptionDescriptor.ListenerDescriptor;
-import org.jppf.ui.options.xml.OptionDescriptor.ScriptDescriptor;
+import org.jppf.ui.options.xml.OptionDescriptor.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -57,11 +55,6 @@ public class OptionsPageBuilder {
    * Element factory used by this builder.
    */
   private OptionElementFactory factory = null;
-  /**
-   * Used to executed initial events in a separate thread,
-   * with the goal to speed up the console's startup time.
-   */
-  private static ExecutorService eventExecutor = Executors.newFixedThreadPool(1);
 
   /**
    * Default constructor.
@@ -175,19 +168,7 @@ public class OptionsPageBuilder {
       }
     }
     final ValueChangeListener listener = initial ? elt.getInitializer() : elt.getFinalizer();
-    if (listener != null) {
-      Runnable r = new Runnable() {
-        @Override
-        public void run() {
-          listener.valueChanged(new ValueChangeEvent(elt));
-        }
-      };
-      Future<?> future = eventExecutor.submit(r);
-      try {
-        future.get();
-      } catch (Exception e) {
-      }
-    }
+    if (listener != null) listener.valueChanged(new ValueChangeEvent(elt));
     if (elt instanceof OptionContainer) {
       for (OptionElement child: ((OptionContainer) elt).getChildren()) {
         triggerLifeCycleEvents(child, initial);

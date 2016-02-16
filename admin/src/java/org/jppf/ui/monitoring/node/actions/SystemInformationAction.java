@@ -128,7 +128,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
             if (driver != null) info = driver.getJmx().systemInformation();
           }
         }
-        info = ((TopologyDriver) data).getJmx().systemInformation();
+        else info = ((TopologyDriver) data).getJmx().systemInformation();
       }
     } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
@@ -154,6 +154,7 @@ public class SystemInformationAction extends AbstractTopologyAction {
       format.formatTable(info.getNetwork(), "Network configuration");
       format.formatTable(info.getStorage(), "Storage Information");
       format.formatTable(info.getOS(), "Operating System Information");
+      if (!info.getStats().isEmpty()) format.formatTable(info.getStats(), "Statistics");
     }
     format.end();
     return format.getText();
