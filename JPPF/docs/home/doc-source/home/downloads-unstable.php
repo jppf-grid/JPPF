@@ -1,10 +1,10 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "5.1-beta";
+  $ver1 = "5.2-alpha";
   $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 5.1 beta preview</h1>
+  <h1 align="center">Downloads - JPPF 5.2 alpha preview</h1>
 
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
@@ -23,10 +23,26 @@ $template{name="about-page-header" title="Downloads - unstable"}$
       <h3>Android Node</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a><br>
+      <!--
       You may also download the node APK directly to a device:<br><br>
       <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
         <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;&nbsp;Download the node APK</span>
       </a><br><div style="height: 15px"></div>
+      -->
+      <div style="height: 10px"></div>
+      <table cellpadding="3"><tr>
+        <td valign="middle">
+          <a href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">You may also<br>
+          download the APK<br>
+          directly to a device:</a>
+        </td>
+        <td valign="bottom">
+          <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
+            <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;Node APK</span>
+          </a><br>
+        </td>
+      </tr></table>
+      <div style="height: 5px"></div>
 
       <h3>Source code and documentation</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
@@ -46,7 +62,7 @@ $template{name="about-page-header" title="Downloads - unstable"}$
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Please note" heading="h2"}$
-      <p style="font-style: italic; font-weight: bold">JPPF 5.1 beta is a preview release and is not intended for deployment in production.
+      <p style="font-style: italic; font-weight: bold">JPPF 5.2 alpha is a preview release and is not intended for deployment in production.
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>
@@ -55,10 +71,10 @@ $template{name="about-page-header" title="Downloads - unstable"}$
       $template{name="highlighted-title-with-icon" img="images/icons/documentation.png" title="Documentation preview" heading="h3"}$
       <p>Doc preview for the major new features:
       <ul class="samplesList">
-        <li><a href="/doc/v5/index.php?title=Android_Node">Android node</a></li>
-        <li><a href="/doc/v5/index.php?title=Job_monitoring_API">Job monitoring API</a></li>
+        <li><a href="/doc/5.2">JPPF 5.2 User Guide</a></li>
+        <li><a href="/javadoc/5.2">JPPF 5.2 Javadoc</a></li>
+        <li><a href="/csdoc/5.2">JPPF 5.2 C-Sharp Doc</a></li>
       </ul>
-      <p><u>Note:</u> these preview doc sections are not yet fully integrated in the main user guide. In particular, the Javadoc links for the new classes will not work.
     </div>
     <br>
     <div class="blockWithHighlightedTitle">

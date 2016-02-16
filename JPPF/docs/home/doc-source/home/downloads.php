@@ -30,10 +30,20 @@ $template{name="about-page-header" title="Downloads"}$
       <h3>Android Node</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a><br>
-      You may also download the node APK directly to a device:<br><br>
-      <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
-        <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;&nbsp;Download the node APK</span>
-      </a><br><div style="height: 15px"></div>
+      <div style="height: 10px"></div>
+      <table cellpadding="3"><tr>
+        <td valign="middle">
+          <a href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">You may also<br>
+          download the APK<br>
+          directly to a device:</a>
+        </td>
+        <td valign="bottom">
+          <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
+            <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;Node APK</span>
+          </a><br>
+        </td>
+      </tr></table>
+      <div style="height: 5px"></div>
 
       <h3>Source code and documentation</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-full-src.zip/download'; ?>">Full distribution with source code and required libraries</a><br>
@@ -97,9 +107,9 @@ $template{name="about-page-header" title="Downloads"}$
     <br>
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/emblem-what.png" title="Feeling curious or adventurous?" heading="h3"}$
-      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.1 beta</a>.
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 alpha</a>.
       <br><br>
-      <p align="center"><span class="yh">Not recommended for production environments</span><br>&nbsp;
+      <p align="center"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>
     <br>
   </div>
