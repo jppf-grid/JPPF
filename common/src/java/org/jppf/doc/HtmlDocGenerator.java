@@ -22,7 +22,8 @@ import static org.jppf.doc.ParameterNames.*;
 import java.io.*;
 import java.util.*;
 
-import org.jppf.utils.FileUtils;
+import org.jppf.utils.*;
+import org.jppf.utils.cli.NamedArguments;
 
 /**
  * This class generates an HTML doc based on HTML templates and text files for the content.<br><br>
@@ -237,21 +238,48 @@ public class HtmlDocGenerator {
    * @param args the options to use.
    */
   public static void main(final String... args) {
+    NamedArguments namedArgs = null;
     try {
-      Map<ParameterNames, Object> parameters = new ParametersHandler().parseArguments(args);
-      File sourceDir = new File((String) parameters.get(SOURCE_DIR));
-      if (!sourceDir.exists() || !sourceDir.isDirectory()) showUsageAndExit("Source location must be an existing folder");
-      File destDir = new File((String) parameters.get(DEST_DIR));
-      if (!destDir.exists() || !destDir.isDirectory()) showUsageAndExit("Target location must be an existing folder");
-      File templateDir = new File((String) parameters.get(TEMPLATES_DIR));
-      if (!templateDir.exists() || !templateDir.isDirectory()) showUsageAndExit("Templates location must be an existing folder");
-      boolean recursive = (Boolean) parameters.get(RECURSIVE);
-      if (recursive) generateDocRecursive(sourceDir, destDir, templateDir, parameters);
-      else generateDoc(sourceDir, destDir, templateDir, parameters);
+      StringBuilder title = new StringBuilder("HtmlDocGenerator usage: java ")
+        .append(HtmlDocGenerator.class.getName())
+        .append(" -s sourceDir -d destDir -t templatesDir").append('\n')
+        .append("  [[-r] [-fi includedFiles] [-fe excludedFiles] [-di includedDirs] [-de excludedDirs]]").append('\n')
+        .append("where:");
+      namedArgs = new NamedArguments()
+        .setTitle(title.toString())
+        .addArg(SOURCE_DIR, "sourceDir is the location of the root folder with the documents sources")
+        .addArg(DEST_DIR, "destDir is the root folder where the converted documents are created")
+        .addArg(TEMPLATES_DIR, "templatesDir is the location of the root folder where the templates are")
+        .addSwitch(RECURSIVE, "specifies whether the source directory should be processed recursively")
+        .addArg(FILE_INCLUDES, "specifies extensions of the files to include; if unspecified, default 'html,htm,php' are included")
+        .addArg(FILE_EXCLUDES, "specifies extensions of the files to exclude; if unspecified, none are excluded")
+        .addArg(DIR_INCLUDES, "specifies the names of the directories to include; if unspecified all are included")
+        .addArg(DIR_EXCLUDES, "specifies the names of the directories to include; if unspecified default 'CVS,.svn' are excluded")
+        .parseArguments(args);
+      File sourceDir = namedArgs.getFile(SOURCE_DIR);
+      if (!sourceDir.exists() || !sourceDir.isDirectory()) showUsageAndExit("Source location must be an existing folder", namedArgs);
+      File destDir = namedArgs.getFile(DEST_DIR);
+      if (!destDir.exists() || !destDir.isDirectory()) showUsageAndExit("Target location must be an existing folder", namedArgs);
+      File templateDir = namedArgs.getFile(TEMPLATES_DIR);
+      if (!templateDir.exists() || !templateDir.isDirectory()) showUsageAndExit("Templates location must be an existing folder", namedArgs);
+      boolean recursive = namedArgs.getBoolean(RECURSIVE);
+      if (recursive) generateDocRecursive(sourceDir, destDir, templateDir, namedArgs);
+      else generateDoc(sourceDir, destDir, templateDir,namedArgs);
     } catch (Exception e) {
-      //e.printStackTrace();
-      showUsageAndExit(e.getMessage());
+      e.printStackTrace();
+      showUsageAndExit(e.getMessage(), namedArgs);
     }
+  }
+
+  /**
+   * Give a brief explanation of the command-line parameters.
+   * @param msg text to display before usage text.
+   * @param args holds the command-line arguments.
+   */
+  private static void showUsageAndExit(final String msg, final NamedArguments args) {
+    System.out.println(msg);
+    args.printUsage();
+    System.exit(1);
   }
 
   /**
@@ -262,7 +290,7 @@ public class HtmlDocGenerator {
    * @param parameters the options to use.
    * @throws Exception if any error occurs.
    */
-  private static void generateDocRecursive(final File sourceDir, final File destDir, final File templateDir, final Map<ParameterNames, Object> parameters) throws Exception {
+  private static void generateDocRecursive(final File sourceDir, final File destDir, final File templateDir, final NamedArguments parameters) throws Exception {
     generateDoc(sourceDir, destDir, templateDir, parameters);
     List<File> allSourceDirs = new ArrayList<>();
     allDirsRecursive(sourceDir, allSourceDirs, parameters);
@@ -283,9 +311,10 @@ public class HtmlDocGenerator {
    * @param parameters the options to use.
    * @throws Exception if any error occurs.
    */
-  private static void generateDoc(final File sourceDir, final File destDir, final File templateDir, final Map<ParameterNames, Object> parameters) throws Exception {
+  private static void generateDoc(final File sourceDir, final File destDir, final File templateDir, final NamedArguments parameters) throws Exception {
     HtmlDocGenerator docGen = new HtmlDocGenerator();
-    for (File file : sourceDir.listFiles(new JPPFFileFilter((String[]) parameters.get(FILE_INCLUDES), (String[]) parameters.get(FILE_EXCLUDES)))) {
+    JPPFFileFilter filter = new JPPFFileFilter(parameters.getStringArray(FILE_INCLUDES, ","), parameters.getStringArray(FILE_EXCLUDES, ","));
+    for (File file : sourceDir.listFiles(filter)) {
       FileUtils.mkdirs(destDir);
       String target = destDir.getPath();
       if (!target.endsWith("/") && !target.endsWith("\\")) target += '/';
@@ -301,35 +330,11 @@ public class HtmlDocGenerator {
    * @param parameters the options to use.
    * @throws Exception if any error occurs.
    */
-  private static void allDirsRecursive(final File root, final List<File> list, final Map<ParameterNames, Object> parameters) throws Exception {
-    for (File file : root.listFiles(new JPPFDirFilter((String[]) parameters.get(DIR_INCLUDES), (String[]) parameters.get(DIR_EXCLUDES)))) {
+  private static void allDirsRecursive(final File root, final List<File> list, final NamedArguments parameters) throws Exception {
+    JPPFDirFilter filter = new JPPFDirFilter(parameters.getStringArray(DIR_INCLUDES, ","), parameters.getStringArray(DIR_EXCLUDES, ","));
+    for (File file : root.listFiles(filter)) {
       list.add(file);
       allDirsRecursive(file, list, parameters);
     }
-  }
-
-  /**
-   * Give a brief explanation of the command-line parameters.
-   * @param msg text to display before usage text.
-   */
-  private static void showUsageAndExit(final String msg) {
-    System.err.println(msg);
-    System.err.println("HtmlDocGenerator usage: java " + HtmlDocGenerator.class.getName() + " -s sourceDir -d destDir -t templatesDir");
-    System.err.println("  [[-r] [-fi includedFiles] [-fe excludedFiles] [-di includedDirs] [-de excludedDirs]]");
-    System.err.println("where:");
-    System.err.println("-s  sourceDir is the location of the root folder with the documents sources");
-    System.err.println("-d  destDir is the root folder where the converted documents are created");
-    System.err.println("-t  templatesDir is the location of the root folder where the templates are");
-    System.err.println("-r  specifies whether the source directory should be processed recursively");
-    System.err.println("-fi specifies extensions of the files to include");
-    System.err.println("    if left unspecified, default 'html, htm, php' are included");
-    System.err.println("-fe specifies extensions of the files to exclude");
-    System.err.println("    if left unspecified none are excluded");
-    System.err.println("-di specifies the names of the directories to include");
-    System.err.println("    if left unspecified all are included");
-    System.err.println("-de specifies names of the directories to exclude");
-    System.err.println("    if left unspecified, default 'CVS, .svn' are excluded");
-    System.err.println();
-    System.exit(1);
   }
 }

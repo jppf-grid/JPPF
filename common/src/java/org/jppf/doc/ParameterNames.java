@@ -22,38 +22,37 @@ package org.jppf.doc;
  * 
  * @author Laurent Cohen
  */
-public enum ParameterNames
-{
+public class ParameterNames {
   /**
    * Name for the source directory.
    */
-  SOURCE_DIR,
+  public static final String SOURCE_DIR = "-s";
   /**
    * Name for the destination directory.
    */
-  DEST_DIR,
+  public static final String DEST_DIR = "-d";
   /**
    * Name for the templates directory.
    */
-  TEMPLATES_DIR,
+  public static final String TEMPLATES_DIR = "-t";
   /**
    * Name for the file includes.
    */
-  FILE_INCLUDES,
+  public static final String FILE_INCLUDES = "-fi";
   /**
    * Name for the file excludes.
    */
-  FILE_EXCLUDES,
+  public static final String FILE_EXCLUDES = "-fe";
   /**
    * Name for the directory includes.
    */
-  DIR_INCLUDES,
+  public static final String DIR_INCLUDES = "-di";
   /**
    * Name for the directory excludes.
    */
-  DIR_EXCLUDES,
+  public static final String DIR_EXCLUDES = "-de";
   /**
    * Name for the recursive directory processing flag.
    */
-  RECURSIVE
+  public static final String RECURSIVE = "-r";
 }
