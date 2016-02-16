@@ -265,7 +265,7 @@ public class TestJPPFClient extends Setup1D1N {
       JPPFConfiguration.set(RECONNECT_INITIAL_DELAY, 0L)
         .set(RECONNECT_MAX_TIME, maxReconnect)
         .set(DISCOVERY_ENABLED, false)
-        .set(DRIVERS, "test")
+        .set(DRIVERS, new String[] {"test"})
         .setString("test.jppf.server.host", "localhost")
         .setInt("test.jppf.server.port", 11101)
         .setInt("test.jppf.pool.size", poolSize)

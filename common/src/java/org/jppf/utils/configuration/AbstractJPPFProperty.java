@@ -113,6 +113,6 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
 
   @Override
   public String getDocumentation() {
-    return LocalizationUtils.getLocalized(I18N_BASE, name);
+    return LocalizationUtils.getLocalized(I18N_BASE, name + ".doc");
   }
 }

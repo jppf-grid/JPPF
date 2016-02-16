@@ -92,7 +92,8 @@ public class JPPFProperties {
   /** Priority assigned to discovered server connections (client/admiin console) */
   public static final JPPFProperty<Integer> DISCOVERY_PRIORITY = new IntProperty("jppf.discovery.priority", 0);
   /** Names of the manually configured servers in the client */
-  public static final JPPFProperty<String> DRIVERS = new StringProperty("jppf.drivers", null);
+  //public static final JPPFProperty<String> DRIVERS = new StringProperty("jppf.drivers", null);
+  public static final JPPFProperty<String[]> DRIVERS = new StringArrayProperty("jppf.drivers", " ", new String[] {"default-driver"});
   /** UI refresh mode for the job data panel: 'immediate_notifications' | 'deferred_notifications' | 'polling' */
   public static final JPPFProperty<String> GUI_PUBLISH_MODE = new StringProperty("jppf.gui.publish.mode", "immediate_notifications");
   /** Interval between updates of the job data view */
