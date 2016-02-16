@@ -103,10 +103,8 @@
     <exec executable="java">
       <arg value="-version"/>
     </exec>
-    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF"
-      packagenames="**/*.*" classpathref="javadoc.classpath" stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true"
-      doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes"
-    >
+    <javadoc destdir="${javadoc}" access="protected" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath"
+      stylesheetfile="${bin}/stylesheet.css" verbose="false" use="true" doclet="org.jppf.javadoc.ExcludeDoclet" docletpath="${basedir}/classes">
       <arg value="-J-Xmx512m"/>
       <arg value="-linksource"/>
       <arg value="-quiet"/>
@@ -137,7 +135,7 @@
       </header>
       <bottom>
         <![CDATA[
-          <font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2015 JPPF Team.</i></font>
+          <font face="Arial" size=2 color="#808080"><i>Copyright &copy; 2005-2016 JPPF Team.</i></font>
         ]]>
       </bottom>
     </javadoc>
@@ -155,15 +153,16 @@
   </target>
 
   <target name="javadoc.package" description="Package the javadoc for deployment on the web site">
-    <code.doc.tgz dir="api-5"/>
-    <code.doc.tgz dir="csdoc-5"/>
+    <code.doc.tgz dir="javadoc/5.2" filename="javadoc-5.2"/>
+    <code.doc.tgz dir="csdoc/5.2" filename="csdoc-5.2"/>
   </target>
 
   <macrodef name="code.doc.tgz">
     <attribute name="dir"/>
+    <attribute name="filename"/>
     <sequential>
-      <delete file="${docs}/@{dir}.tar.gz" quiet="true"/>
-      <tar destfile="${docs}/@{dir}.tar.gz" compression="gzip">
+      <delete file="${docs}/@{filename}.tar.gz" quiet="true"/>
+      <tar destfile="${docs}/@{filename}.tar.gz" compression="gzip">
         <tarfileset prefix="@{dir}" dir="${home}/@{dir}" includes="**/*.*, package-list"/>
       </tar>
     </sequential>
