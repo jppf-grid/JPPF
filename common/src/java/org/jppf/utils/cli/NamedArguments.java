@@ -69,7 +69,7 @@ public class NamedArguments extends TypedProperties {
       String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
       if (s.length() > maxLen) maxLen = s.length();
     }
-    String format = "%" + maxLen + "s : %s%n";
+    String format = "%-" + maxLen + "s : %s%n";
     for (Map.Entry<String, NamedArg> entry: argDefs.entrySet()) {
       NamedArg arg = entry.getValue();
       String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
@@ -92,7 +92,7 @@ public class NamedArguments extends TypedProperties {
         String name = clArgs[pos++];
         NamedArg arg = argDefs.get(name);
         if (arg == null) throw new IllegalArgumentException("Unknown argument: " + name);
-        if (!arg.isSwitch()) setBoolean(name, true);
+        if (arg.isSwitch()) setBoolean(name, true);
         else setString(name, clArgs[pos++]);
       }
     } catch (Exception e) {
