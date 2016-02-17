@@ -27,15 +27,18 @@ import javax.management.*;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.recovery.RecoveryServer;
+import org.jppf.load.balancer.NodeAwareness;
 import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
 import org.jppf.management.spi.*;
 import org.jppf.server.debug.*;
 import org.jppf.server.event.NodeConnectionEventHandler;
 import org.jppf.server.nio.classloader.ClassCache;
 import org.jppf.server.nio.classloader.client.ClientClassNioServer;
+import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.peer.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperty;
+import org.jppf.utils.configuration.*;
 import org.slf4j.*;
 
 /**
@@ -135,6 +138,7 @@ public class DriverInitializer {
   void registerProviderMBeans() throws Exception {
     MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
+    registerNodeConfigListener();
   }
 
   /**
@@ -358,6 +362,37 @@ public class DriverInitializer {
   public ClassCache getClassCache() {
     return classCache;
   }
+
+  /**
+  *
+  */
+ void registerNodeConfigListener() {
+   JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();
+   jmx.connect();
+   try {
+     NotificationListener listener = new NotificationListener() {
+       @Override
+       public void handleNotification(final Notification notification, final Object handback) {
+         Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
+         String nodeUuid = (String) notif.getSource();
+         TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
+         log.info("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
+         AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
+         if (node == null) return;
+         synchronized(node.getMonitor()) {
+           TypedProperties oldConfig = node.getSystemInformation().getJppf();
+           oldConfig.clear();
+           oldConfig.putAll(nodeConfig);
+           if (node.getBundler() instanceof NodeAwareness) ((NodeAwareness) node.getBundler()).setNodeConfiguration(node.getSystemInformation());
+         }
+       }
+     };
+     String listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);
+   } catch (Exception e) {
+     if (debugEnabled) log.debug(e.getMessage(), e);
+     else log.warn(ExceptionUtils.getMessage(e));
+   }
+ }
 
   /**
    * Parse an array of port numbers from a string containing a list of space-separated port numbers.

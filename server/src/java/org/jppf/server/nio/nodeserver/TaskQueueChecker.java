@@ -319,7 +319,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   @SuppressWarnings("unchecked")
   private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) throws Exception {
-    if (debugEnabled) log.debug("dispatching job {} to node {}", nodeBundle, channel);
+    if (debugEnabled) log.debug(String.format("dispatching %d tasks of job '%s' to node %s", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getChannel().getChannel()));
     synchronized(channel.getMonitor()) {
       Future<?> future = channel.submit(nodeBundle);
       nodeBundle.jobDispatched(channel, future);

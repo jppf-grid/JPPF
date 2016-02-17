@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer implements ContextAwareness
-{
+public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer implements ContextAwareness {
   /**
    * Logger for this class.
    */
@@ -43,50 +42,28 @@ public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer imp
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm.
    */
-  public NodeThreadsLoadBalancer(final LoadBalancingProfile profile)
-  {
+  public NodeThreadsLoadBalancer(final LoadBalancingProfile profile) {
     super(profile);
     if (log.isDebugEnabled()) log.debug("creating " + this.getClass().getSimpleName() + " #" + this.bundlerNumber);
   }
 
-  /**
-   * Make a copy of this bundler.
-   * Which parts are actually copied depends on the implementation.
-   * @return a new <code>Bundler</code> instance.
-   * @see org.jppf.load.balancer.Bundler#copy()
-   */
   @Override
-  public Bundler copy()
-  {
+  public Bundler copy() {
     return new NodeThreadsLoadBalancer(profile.copy());
   }
 
-  /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
-   * @see org.jppf.load.balancer.AbstractBundler#maxSize()
-   */
   @Override
-  protected int maxSize()
-  {
-    return (jppfContext == null ||  jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
+  protected int maxSize() {
+    return (jppfContext == null || jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public JPPFContext getJPPFContext()
-  {
+  public JPPFContext getJPPFContext() {
     return jppfContext;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void setJPPFContext(final JPPFContext context)
-  {
+  public void setJPPFContext(final JPPFContext context) {
     this.jppfContext = context;
   }
 }

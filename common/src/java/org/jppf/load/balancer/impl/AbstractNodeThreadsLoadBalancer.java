@@ -62,19 +62,11 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
     return bundleSize;
   }
 
-  /**
-   * Get the corresponding node's system information.
-   * @return a {@link JPPFSystemInformation} instance.
-   */
   @Override
   public JPPFSystemInformation getNodeConfiguration() {
     return nodeConfiguration;
   }
 
-  /**
-   * Set the corresponding node's system information.
-   * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
-   */
   @Override
   public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.nodeConfiguration = nodeConfiguration;
@@ -86,7 +78,6 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
    * Compute the number of tasks to send to the node. This is the actual algorithm implementation.
    */
   private void computeBundleSize() {
-    if (log.isDebugEnabled()) log.debug("computing bundle size for bundler #" + this.bundlerNumber);
     JPPFSystemInformation nodeConfig = getNodeConfiguration();
     if (nodeConfig == null) bundleSize = 1;
     else {
@@ -95,6 +86,7 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
       boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
       JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
       int nbThreads = jppf.getInt(prop.getName(), -1);
+      if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " nb threads from config = " + nbThreads);
       // if number of threads is not defined, we assume it is the number of available processors
       if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
       if (nbThreads <= 0) nbThreads = 1;
