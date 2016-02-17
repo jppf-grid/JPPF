@@ -231,7 +231,7 @@ public class PeerAttributesHandler implements NotificationListener {
         int nbThreads = sys.getJppf().getInt("jppf.processing.threads", 1);
         totalThreads.addAndGet(-nbThreads);
       }
-      sendNotfication();
+      sendNotification();
       if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
     } else {
       removePeer(context);
@@ -257,7 +257,7 @@ public class PeerAttributesHandler implements NotificationListener {
         int nbThreads = sys.getJppf().getInt("jppf.processing.threads", 1);
         totalThreads.addAndGet(nbThreads);
       }
-      sendNotfication();
+      sendNotification();
       if (debugEnabled) log.debug("totalNodes={}, totalThreads={}", totalNodes, totalThreads);
     } else {
       addPeer(context);
@@ -274,7 +274,7 @@ public class PeerAttributesHandler implements NotificationListener {
   /**
    * Send the current attributes values as a JMX notification.
    */
-  private void sendNotfication() {
+  private void sendNotification() {
     Notification notif = new Notification("peer.attribute", PeerDriverMBean.MBEAN_NAME, notifCount.incrementAndGet(), System.currentTimeMillis());
     TypedProperties props = new TypedProperties();
     props.setInt(PEER_TOTAL_NODES, totalNodes.get());

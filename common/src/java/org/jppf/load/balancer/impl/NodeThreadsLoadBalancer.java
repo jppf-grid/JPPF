@@ -28,8 +28,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer implements ContextAwareness
-{
+public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer implements ContextAwareness {
   /**
    * Logger for this class.
    */
@@ -43,8 +42,7 @@ public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer imp
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm.
    */
-  public NodeThreadsLoadBalancer(final LoadBalancingProfile profile)
-  {
+  public NodeThreadsLoadBalancer(final LoadBalancingProfile profile) {
     super(profile);
     if (log.isDebugEnabled()) log.debug("creating " + this.getClass().getSimpleName() + " #" + this.bundlerNumber);
   }
@@ -56,8 +54,7 @@ public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer imp
    * @see org.jppf.load.balancer.Bundler#copy()
    */
   @Override
-  public Bundler copy()
-  {
+  public Bundler copy() {
     return new NodeThreadsLoadBalancer(profile.copy());
   }
 
@@ -67,26 +64,22 @@ public class NodeThreadsLoadBalancer extends AbstractNodeThreadsLoadBalancer imp
    * @see org.jppf.load.balancer.AbstractBundler#maxSize()
    */
   @Override
-  protected int maxSize()
-  {
-    return (jppfContext == null ||  jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
+  protected int maxSize() {
+    return (jppfContext == null || jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public JPPFContext getJPPFContext()
-  {
+  public JPPFContext getJPPFContext() {
     return jppfContext;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void setJPPFContext(final JPPFContext context)
-  {
+  public void setJPPFContext(final JPPFContext context) {
     this.jppfContext = context;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "[#" + bundlerNumber + ']';
   }
 }

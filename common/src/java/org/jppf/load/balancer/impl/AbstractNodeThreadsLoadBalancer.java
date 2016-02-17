@@ -85,13 +85,14 @@ public abstract class AbstractNodeThreadsLoadBalancer extends AbstractBundler im
    * Compute the number of tasks to send to the node. This is the actual algorithm implementation.
    */
   private void computeBundleSize() {
-    if (log.isDebugEnabled()) log.debug("computing bundle size for bundler #" + this.bundlerNumber);
+    //if (log.isDebugEnabled()) log.debug("computing bundle size for bundler #" + this.bundlerNumber);
     JPPFSystemInformation nodeConfig = getNodeConfiguration();
     if (nodeConfig == null) bundleSize = 1;
     else {
       // get the number of processing threads in the node
       TypedProperties jppf = getNodeConfiguration().getJppf();
       int nbThreads = jppf.getBoolean("jppf.peer.driver", false) ? jppf.getInt("jppf.peer.processing.threads", -1) : jppf.getInt("jppf.processing.threads", -1);
+      if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " nb threads from config = " + nbThreads);
       // if number of threads is not defined, we assume it is the number of available processors
       if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
       if (nbThreads <= 0) nbThreads = 1;

@@ -22,6 +22,7 @@ import java.util.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.execute.AbstractExecutionManager;
+import org.jppf.management.NodeConfigNotifier;
 import org.jppf.node.NodeInternal;
 import org.jppf.node.event.LifeCycleEventHandler;
 import org.jppf.node.protocol.*;
@@ -47,7 +48,8 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   /**
    * The node that uses this execution manager.
    */
-  private NodeInternal node = null;
+  private final NodeInternal node;
+
   /**
    * Initialize this execution manager with the specified node.
    * @param node the node that uses this execution manager.
@@ -122,5 +124,11 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    */
   private ClassLoader getTaskClassLoader(final Task<?> task) {
     return task.getTaskClassLoader();
+  }
+
+  @Override
+  public void triggerConfigChanged() {
+    super.triggerConfigChanged();
+    NodeConfigNotifier.getInstance().sendNotification(node.getUuid(), JPPFConfiguration.getProperties());
   }
 }
