@@ -18,30 +18,31 @@
 
 package org.jppf.load.balancer;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
- * Abstract implementation of the bundler interface.
+ * Abstract implementation of the {@link Bundler} interface. In general, it will be more convenient to extend this class than
+ * to implement {@link Bundler} directly.
+ * <p>It provides working implementations of the {@link #getTimestamp() getTimestamp()}, {@link #getProfile() getProfile()},
+ * {@link #setup() setup()} and {@link #dispose() dispose()} methods, along with an empty implementation of {@link #feedback(int, double) feedback(int, double)}.
+ * <p>It also adds the {@link #maxSize() maxSize()} method which uses an internal context object to compute a usable cap for the value returned by {@code getBundleSize()}.
  * @author Laurent Cohen
- * @exclude
  */
-public abstract class AbstractBundler implements Bundler {
-  /**
-   * Count of the bundlers used to generate a readable unique id.
-   */
-  private static AtomicInteger bundlerCount = new AtomicInteger(0);
+public abstract class AbstractBundler implements Bundler, ContextAwareness {
   /**
    * The bundler number for this bundler.
    */
-  protected int bundlerNumber = incBundlerCount();
+  protected final int bundlerNumber = BUNDLER_COUNT.incrementAndGet();
   /**
    * The creation timestamp for this bundler.
    */
-  protected long timestamp = System.currentTimeMillis();
+  protected final long timestamp = System.currentTimeMillis();
   /**
    * Parameters of the algorithm, grouped as a performance analysis profile.
    */
   protected LoadBalancingProfile profile;
+  /**
+   * Holds information about the execution context.
+   */
+  private JPPFContext jppfContext = null;
 
   /**
    * Creates a new instance with the specified parameters profile.
@@ -52,23 +53,16 @@ public abstract class AbstractBundler implements Bundler {
   }
 
   /**
-   * Increment the bundlers count by one.
-   * @return the new count as an int value.
-   */
-  private static int incBundlerCount() {
-    return bundlerCount.incrementAndGet();
-  }
-
-  /**
    * Get the max bundle size that can be used for this bundler.
    * @return the bundle size as an int.
    */
-  protected abstract int maxSize();
+  public int maxSize() {
+    return (jppfContext == null || jppfContext.getMaxBundleSize() <= 0) ? 300 : jppfContext.getMaxBundleSize();
+  }
+
 
   /**
-   * This method does nothing and should be overridden in subclasses.
-   * @param bundleSize not used.
-   * @param totalTime in nanoseconds - not used.
+   * This implementation does nothing and should be overridden in subclasses that compute the bundle size based on the feedback from the nodes.
    */
   @Override
   public void feedback(final int bundleSize, final double totalTime) {
@@ -85,8 +79,9 @@ public abstract class AbstractBundler implements Bundler {
   }
 
   /**
-   * Get the bundler number for this bundler.
+   * Get this bundler's number (a unique Bundle instance count). Used for logging and debugging.
    * @return the bundler number as an int.
+   * @exclude
    */
   public int getBundlerNumber() {
     return bundlerNumber;
@@ -104,6 +99,7 @@ public abstract class AbstractBundler implements Bundler {
    */
   @Override
   public void dispose() {
+    jppfContext = null;
   }
 
   /**
@@ -113,5 +109,30 @@ public abstract class AbstractBundler implements Bundler {
   @Override
   public LoadBalancingProfile getProfile() {
     return profile;
+  }
+
+  /**
+   * @exclude
+   */
+  @Override
+  public JPPFContext getJPPFContext() {
+    return jppfContext;
+  }
+
+  /**
+   * @exclude
+   */
+  @Override
+  public void setJPPFContext(final JPPFContext context) {
+    this.jppfContext = context;
+  }
+
+  /**
+   * @return {@code null}.
+   * @deprecated this method is not needed anymore, all bundler and profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
+   */
+  @Override
+  public Bundler copy() {
+    return null;
   }
 }

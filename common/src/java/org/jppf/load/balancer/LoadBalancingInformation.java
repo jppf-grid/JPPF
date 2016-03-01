@@ -27,8 +27,7 @@ import org.jppf.utils.TypedProperties;
  * Information on the load-balancing algorithm currently setup in the driver.
  * @author Laurent Cohen
  */
-public class LoadBalancingInformation implements Serializable
-{
+public class LoadBalancingInformation implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -36,21 +35,23 @@ public class LoadBalancingInformation implements Serializable
   /**
    * The name of the algorithm.
    */
-  private String algorithm = null;
+  private final String algorithm;
   /**
    * The algorithm's parameters.
    */
-  private TypedProperties parameters = null;
+  private final TypedProperties parameters;
   /**
    * The names of all available algorithms.
    */
-  private List<String> algorithmNames = null;
+  private final List<String> algorithmNames;
 
   /**
-   * Default constructor.
+   * Initialize this load balancing information with the specified algorithm and parameters.
+   * @param algorithm the name of the algorithm.
+   * @param parameters the algorithm's parameters.
    */
-  public LoadBalancingInformation()
-  {
+  public LoadBalancingInformation(final String algorithm, final TypedProperties parameters) {
+    this(algorithm, parameters, null);
   }
 
   /**
@@ -59,8 +60,7 @@ public class LoadBalancingInformation implements Serializable
    * @param parameters the algorithm's parameters.
    * @param algorithmNames the names of all available algorithms.
    */
-  public LoadBalancingInformation(final String algorithm, final TypedProperties parameters, final List<String> algorithmNames)
-  {
+  public LoadBalancingInformation(final String algorithm, final TypedProperties parameters, final List<String> algorithmNames) {
     this.algorithm = algorithm;
     this.parameters = parameters;
     this.algorithmNames = algorithmNames;
@@ -68,10 +68,9 @@ public class LoadBalancingInformation implements Serializable
 
   /**
    * Get the name of the algorithm.
-   * @return the algorithm name as a string. 
+   * @return the algorithm name as a string.
    */
-  public String getAlgorithm()
-  {
+  public String getAlgorithm() {
     return algorithm;
   }
 
@@ -79,17 +78,15 @@ public class LoadBalancingInformation implements Serializable
    * Get the algorithm's parameters.
    * @return the parameters as a set of (name, value) pairs.
    */
-  public TypedProperties getParameters()
-  {
+  public TypedProperties getParameters() {
     return parameters;
   }
 
   /**
    * The names of all available algorithms.
-   * @return a list of all available alogrithm names.
+   * @return a list of all available algorithm names.
    */
-  public List<String> getAlgorithmNames()
-  {
+  public List<String> getAlgorithmNames() {
     return algorithmNames;
   }
 

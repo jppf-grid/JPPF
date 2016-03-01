@@ -20,9 +20,8 @@ package org.jppf.load.balancer.impl;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jppf.load.balancer.LoadBalancingProfile;
+import org.jppf.load.balancer.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -30,8 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ProportionalTuneProfile implements LoadBalancingProfile
-{
+public class ProportionalTuneProfile extends AbstractLoadBalancingProfile {
   /**
    * Logger for this class.
    */
@@ -68,37 +66,15 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
   /**
    * Initialize this profile with default parameters.
    */
-  public ProportionalTuneProfile()
-  {
+  public ProportionalTuneProfile() {
     if (debugEnabled) log.debug("in default constructor");
-  }
-
-  /**
-   * Initialize this profile with values read from the configuration file.
-   * @param profileName name of the profile in the configuration file.
-   */
-  public ProportionalTuneProfile(final String profileName)
-  {
-    if (debugEnabled) log.debug("in constructor with profile name");
-    this.name = profileName;
-    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
-    TypedProperties props = JPPFConfiguration.getProperties();
-    performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
-    if (performanceCacheSize < 1) performanceCacheSize = 1;
-    proportionalityFactor = props.getInt(prefix + "proportionalityFactor", 1);
-    if (proportionalityFactor < 1) proportionalityFactor = 1;
-    initialSize = props.getInt(prefix + "initialSize", 10);
-    if (initialSize < 1) initialSize = 1;
-    initialMeanTime = props.getDouble(prefix + "initialMeanTime", 1e9d);
-    if (initialMeanTime < Double.MIN_VALUE) initialMeanTime = Double.MIN_VALUE;
   }
 
   /**
    * Initialize this profile with values read from the configuration file.
    * @param config contains a mapping of the profile parameters to their value.
    */
-  public ProportionalTuneProfile(final TypedProperties config)
-  {
+  public ProportionalTuneProfile(final TypedProperties config) {
     if (debugEnabled) log.debug("in constructor without profile name");
     performanceCacheSize = config.getInt("performanceCacheSize", 2000);
     proportionalityFactor = config.getInt("proportionalityFactor", 1);
@@ -108,27 +84,10 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
   }
 
   /**
-   * Make a copy of this profile.
-   * @return a new <code>AutoTuneProfile</code> instance.
-   * @see org.jppf.load.balancer.LoadBalancingProfile#copy()
-   */
-  @Override
-  public LoadBalancingProfile copy()
-  {
-    ProportionalTuneProfile other = new ProportionalTuneProfile();
-    other.setPerformanceCacheSize(performanceCacheSize);
-    other.setProportionalityFactor(proportionalityFactor);
-    other.setInitialSize(initialSize);
-    other.setInitialMeanTime(initialMeanTime);
-    return other;
-  }
-
-  /**
    * Get the maximum size of the performance samples cache.
    * @return the cache size as an int.
    */
-  public int getPerformanceCacheSize()
-  {
+  public int getPerformanceCacheSize() {
     return performanceCacheSize;
   }
 
@@ -136,8 +95,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Set the maximum size of the performance samples cache.
    * @param performanceCacheSize the cache size as an int.
    */
-  public void setPerformanceCacheSize(final int performanceCacheSize)
-  {
+  public void setPerformanceCacheSize(final int performanceCacheSize) {
     this.performanceCacheSize = performanceCacheSize;
   }
 
@@ -145,8 +103,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Get the proportionality factor.
    * @return the factor as an int.
    */
-  public int getProportionalityFactor()
-  {
+  public int getProportionalityFactor() {
     return proportionalityFactor;
   }
 
@@ -154,8 +111,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Set the proportionality factor.
    * @param proportionalityFactor the factor as an int.
    */
-  public void setProportionalityFactor(final int proportionalityFactor)
-  {
+  public void setProportionalityFactor(final int proportionalityFactor) {
     this.proportionalityFactor = proportionalityFactor;
   }
 
@@ -163,8 +119,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Get the default profile with default parameter values.
    * @return a <code>ProportionalTuneProfile</code> singleton instance.
    */
-  public static ProportionalTuneProfile getDefaultProfile()
-  {
+  public static ProportionalTuneProfile getDefaultProfile() {
     return defaultProfile.get();
   }
 
@@ -172,8 +127,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Get the initial bundle size to use when the performance cache is empty.
    * @return the initial size as an int.
    */
-  public int getInitialSize()
-  {
+  public int getInitialSize() {
     return initialSize;
   }
 
@@ -181,8 +135,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Set the initial bundle size to use when the performance cache is empty.
    * @param initialSize the initial size as an int.
    */
-  public void setInitialSize(final int initialSize)
-  {
+  public void setInitialSize(final int initialSize) {
     this.initialSize = initialSize;
   }
 
@@ -190,8 +143,7 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Get the initial value of the mean execution time, used to bootstrap the algorithm.
    * @return the initial mean time as a double.
    */
-  public double getInitialMeanTime()
-  {
+  public double getInitialMeanTime() {
     return initialMeanTime;
   }
 
@@ -199,24 +151,22 @@ public class ProportionalTuneProfile implements LoadBalancingProfile
    * Set the initial value of the mean execution time, used to bootstrap the algorithm.
    * @param initialMeanTime the initial mean time as a double.
    */
-  public void setInitialMeanTime(final double initialMeanTime)
-  {
+  public void setInitialMeanTime(final double initialMeanTime) {
     this.initialMeanTime = initialMeanTime;
   }
 
   /**
    * Return a string representation of this profile.
    * @return this profile represented as a string value.
-   * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("profileName=").append(name);
     sb.append(", performanceCacheSize=").append(performanceCacheSize);
     sb.append(", proportionalityFactor=").append(proportionalityFactor);
     sb.append(", initialSize=").append(initialSize);
+    sb.append(", initialMeanTime=").append(initialMeanTime);
     return sb.toString();
   }
 }

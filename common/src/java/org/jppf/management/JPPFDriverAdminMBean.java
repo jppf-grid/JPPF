@@ -21,7 +21,6 @@ package org.jppf.management;
 import java.util.*;
 
 import org.jppf.load.balancer.LoadBalancingInformation;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**
@@ -115,18 +114,6 @@ public interface JPPFDriverAdminMBean extends JPPFAdminMBean {
    * @throws Exception if any error occurs.
    */
   void resetStatistics() throws Exception;
-
-  /**
-   * Compute the number of nodes that would match the specified execution policy.
-   * @param policy the execution policy to check against the nodes.
-   * @return the number of nodes that match the execution policy, or 0 if no node matches it.
-   * @throws Exception if any error occurs.
-   * @deprecated use {@link #nbNodes(NodeSelector)} instead, as in this example:<br>
-   * <pre>
-   * JPPFDriverAdminMBean proxy = ...;
-   * int nbNodes = proxy.nbNodes(new ExecutionPolicySelector(policy));</pre>
-   */
-  Integer matchingNodes(ExecutionPolicy policy) throws Exception;
 
   /**
    * Get the number of nodes currently idle.

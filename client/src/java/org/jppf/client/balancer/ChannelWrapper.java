@@ -25,6 +25,7 @@ import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.ClientConnectionStatusListener;
 import org.jppf.execute.*;
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.slf4j.*;
 
@@ -45,7 +46,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
-  private Bundler bundler = null;
+  Bundler bundler = null;
   /**
    * Represents the system information.
    */
@@ -120,19 +121,19 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * with the specified bundler.<br>
    * If it is not, then it is replaced with a copy of the specified bundler, with a
    * timestamp taken at creation time.
-   * @param serverBundler the bundler to compare with.
+   * @param factory the load balancer factory.
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
   @Override
-  public boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext) {
-    if (serverBundler == null) throw new IllegalArgumentException("serverBundler is null");
-    if (this.bundler == null || this.bundler.getTimestamp() < serverBundler.getTimestamp()) {
+  public boolean checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
+    if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
+    if (this.bundler == null || this.bundler.getTimestamp() < factory.getLastUpdateTime()) {
       if (this.bundler != null) {
         this.bundler.dispose();
         if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(null);
       }
-      this.bundler = serverBundler.copy();
+      this.bundler = factory.newBundler();
       if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
       if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);

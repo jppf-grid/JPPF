@@ -27,13 +27,12 @@ import org.jppf.utils.TypedProperties;
  * <p>To integrate a load-balancing algorithm provider, the following steps should be performed:
  * <ul>
  * <li>At one of the classpath roots, ensure that there is a folder named META-INF/services</li>
- * <li>In this folder, create or edit a file named {@link org.jppf.load.balancer.spi.JPPFBundlerProvider org.jppf.server.scheduler.bundle.spi.JPPFBundlerProvider}</li>
- * <li>In this file, add a line containing the fully qualified name of the class implementing the <code>JPPFBundlerProvider</code> interface</li>
+ * <li>In this folder, create or edit a file named {@code org.jppf.load.balancer.spi.JPPFBundlerProvider}</li>
+ * <li>In this file, add a line containing the fully qualified name of the class implementing the {@link JPPFBundlerProvider} interface</li>
  * </ul>
  * @author Laurent Cohen
  */
-public interface JPPFBundlerProvider
-{
+public interface JPPFBundlerProvider {
   /**
    * Get the name of the algorithm defined by this provider. Each algorithm must have a name distinct from that of all other algorithms.
    * @return the algorithm's name as a string.
@@ -42,7 +41,8 @@ public interface JPPFBundlerProvider
 
   /**
    * Create a bundler instance using the specified parameters profile.
-   * @param profile - an <code>AutoTuneProfile</code> instance.
+   * The parameters profile is created by JPPF internally via a call to {@link #createProfile(TypedProperties)}.
+   * @param profile an {@link Bundler} instance.
    * @return an instance of the bundler implementation defined by this provider.
    */
   Bundler createBundler(LoadBalancingProfile profile);
@@ -52,10 +52,10 @@ public interface JPPFBundlerProvider
    * <p>The configuration parameter contains a set of properties that define the parameters names and values.<br>
    * The parameter names are provided <i>without any JPPF configuration-specific prefix</i>.
    * <p>For example: if the JPPF configuration file specifies a profile named "myProfile" (through the property "jppf.load.balancing.profile = myProfile"),
-   * and the algorithm has a parameter named "myParameter", then in the configuration file it will be specified as "jppf.load.balancing.profile.myProfile.myParameter = some_value".<br>
-   * When this method is called, only the parameter name is kept, and its definition becomes "myParameter = some_value".
-   * @param configuration - a set of properties defining the algorithm's parameters.
-   * @return an <code>AutoTuneProfile</code> instance.
+   * and the algorithm has a parameter named "{@code myParameter}", then in the configuration file it will be specified as "{@code jppf.load.balancing.profile.myProfile.myParameter = some_value}".<br>
+   * When this method is called, only the parameter name is kept, and its definition becomes "{@code myParameter = some_value}".
+   * @param configuration a set of properties defining the algorithm's parameters.
+   * @return an {@link LoadBalancingProfile} instance.
    */
   LoadBalancingProfile createProfile(TypedProperties configuration);
 }

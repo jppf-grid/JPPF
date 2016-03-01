@@ -25,10 +25,11 @@ import java.util.concurrent.locks.Lock;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.impl.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.node.protocol.*;
-import org.jppf.server.JPPFContextDriver;
+import org.jppf.server.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
@@ -78,10 +79,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   private final Set<C> idleChannels = new LinkedHashSet<>();
   /**
-   * Bundler used to schedule tasks for the corresponding node.
-   */
-  private Bundler bundler;
-  /**
    * Holds information about the execution context.
    */
   private final JPPFContext jppfContext;
@@ -90,18 +87,28 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-344">JPPF-344 Server deadlock with many slave nodes</a>
    */
   private final ExecutorService channelsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ChannelsExecutor"));
+  /**
+   * The driver's system information
+   */
+  private final JPPFSystemInformation driverInfo;
+  /**
+   * The load-balancer factory.
+   */
+  private final JPPFBundlerFactory bundlerFactory;
 
   /**
    * Initialize this task queue checker with the specified node server.
    * @param queue the reference queue to use.
    * @param stats reference to the statistics.
+   * @param bundlerFactory the load-balancer factory.
    */
-  TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats) {
+  TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFStatistics stats, final JPPFBundlerFactory bundlerFactory) {
     this.queue = queue;
     this.jppfContext = new JPPFContextDriver(queue);
     this.stats = stats;
+    this.bundlerFactory = bundlerFactory;
     this.queueLock = queue.getLock();
-    this.bundler = createDefault();
+    this.driverInfo = JPPFDriver.getInstance().getSystemInformation();
   }
 
   /**
@@ -120,22 +127,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     FixedSizeProfile profile = new FixedSizeProfile();
     profile.setSize(1);
     return new FixedSizeBundler(profile);
-  }
-
-  /**
-   * Get the bundler used to schedule tasks for the corresponding node.
-   * @return a {@link Bundler} instance.
-   */
-  Bundler getBundler() {
-    return bundler;
-  }
-
-  /**
-   * Set the bundler used to schedule tasks for the corresponding node.
-   * @param bundler a {@link Bundler} instance.
-   */
-  void setBundler(final Bundler bundler) {
-    this.bundler = (bundler == null) ? createDefault() : bundler;
   }
 
   /**
@@ -162,7 +153,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
         if (channel.getChannel().isOpen()) {
           synchronized(idleChannels) {
             boolean added = idleChannels.add(channel);
-            if (added) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+            if (added) {
+              JPPFSystemInformation info = channel.getSystemInformation();
+              if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, true);
+              stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
+            }
           }
           wakeUp();
         } else channel.handleException(channel.getChannel(), null);
@@ -179,7 +174,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     if (traceEnabled) log.trace("Removing idle channel " + channel);
     synchronized(idleChannels) {
       boolean removed = idleChannels.remove(channel);
-      if (removed) stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
+      if (removed) {
+        JPPFSystemInformation info = channel.getSystemInformation();
+        if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
+        stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
+      }
     }
     return channel;
   }
@@ -244,6 +243,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
           Iterator<ServerJob> it = queue.iterator();
           while ((channel == null) && it.hasNext() && !idleChannels.isEmpty()) {
             ServerJob serverJob = it.next();
+            if (!checkGridPolicy(serverJob)) continue;
             channel = retrieveChannel(serverJob);
             if (channel != null) {
               synchronized(channel.getMonitor()) {
@@ -300,13 +300,11 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
     if (debugEnabled) log.debug("dispatching jobUuid=" + selectedBundle.getJob().getUuid() + " to node " + channel + ", nodeUuid=" + channel.getConnectionUuid());
     int size = 1;
     try {
-      updateBundler(getBundler(), selectedBundle.getJob(), channel);
+      updateBundler(selectedBundle.getJob(), channel);
       size = channel.getBundler().getBundleSize();
     } catch (Exception e) {
       log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1", e);
-      FixedSizeProfile profile = new FixedSizeProfile();
-      profile.setSize(1);
-      setBundler(new FixedSizeBundler(profile));
+      size = bundlerFactory.getFallbackBundler().getBundleSize();
     }
     return queue.nextBundle(selectedBundle, size);
   }
@@ -384,7 +382,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
   }
 
   /**
-   * Set the parameters needed as bounded variables fro scripted execution policies.
+   * Set the parameters needed as bounded variables for scripted execution policies.
    * @param policy the root policy to explore.
    * @param job the job containing the sla and metadata.
    * @param stats the server statistics.
@@ -456,15 +454,29 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
 
   /**
    * Perform the checks on the bundler before submitting a job.
-   * @param bundler the bundler to check and update.
    * @param taskBundle the job.
    * @param context the current node context.
    */
   @SuppressWarnings("deprecation")
-  private void updateBundler(final Bundler bundler, final TaskBundle taskBundle, final C context) {
-    context.checkBundler(bundler, jppfContext);
+  private void updateBundler(final TaskBundle taskBundle, final C context) {
+    context.checkBundler(bundlerFactory, jppfContext);
     Bundler ctxBundler = context.getBundler();
     if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJobMetadata(taskBundle.getMetadata());
     else if (ctxBundler instanceof JobAwarenessEx) ((JobAwarenessEx) ctxBundler).setJob(taskBundle);
+  }
+
+  /**
+   * Check whether the grid state and job's grid policy match.
+   * If no grid policy is defined for the job, then it is considered matching.
+   * @param job the job to check.
+   * @return {@code true} if the job has no grid policy or the policy matches with the current grid state, {@code false} otherwise.
+   */
+  private boolean checkGridPolicy(final ServerJob job) {
+    ExecutionPolicy policy = job.getSLA().getGridExecutionPolicy();
+    if (policy != null) {
+      preparePolicy(policy, job, stats, job.getNbChannels());
+      return policy.accepts(this.driverInfo);
+    }
+    return true;
   }
 }

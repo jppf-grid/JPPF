@@ -25,9 +25,9 @@ import org.jppf.utils.TypedProperties;
 /**
  * Provider implementation for the fixed bundle size load-balancing algorithm.
  * @author Laurent Cohen
+ * @exclude
  */
-public class FixedSizeBundlerProvider implements JPPFBundlerProvider
-{
+public class FixedSizeBundlerProvider implements JPPFBundlerProvider {
   /**
    * Create a bundler instance using the specified parameters profile.
    * @param profile - an <code>FixedSizeProfile</code> instance.
@@ -35,8 +35,7 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
    * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createBundler(org.jppf.load.balancer.LoadBalancingProfile)
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile)
-  {
+  public Bundler createBundler(final LoadBalancingProfile profile) {
     return new FixedSizeBundler(profile);
   }
 
@@ -47,8 +46,7 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
    * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration)
-  {
+  public LoadBalancingProfile createProfile(final TypedProperties configuration) {
     return new FixedSizeProfile(configuration);
   }
 
@@ -58,8 +56,7 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider
    * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#getAlgorithmName()
    */
   @Override
-  public String getAlgorithmName()
-  {
+  public String getAlgorithmName() {
     return "manual";
   }
 }

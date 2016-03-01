@@ -20,10 +20,9 @@ package org.jppf.load.balancer.impl;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jppf.load.balancer.LoadBalancingProfile;
+import org.jppf.load.balancer.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
-
 
 /**
  * This class implements the basis of a profile based on simulated annealing
@@ -36,8 +35,7 @@ import org.jppf.utils.configuration.JPPFProperties;
  * @author Domingos Creado
  * @exclude
  */
-public class AnnealingTuneProfile implements LoadBalancingProfile
-{
+public class AnnealingTuneProfile extends AbstractLoadBalancingProfile {
   /**
    * A default profile with default parameter values.
    */
@@ -72,10 +70,10 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * Just as example, if the best solution is between 0-100, the following might
    * occur:
    * <ul style="list-style-type: none; text-indent: -20px">
-   * <li>1    => 5 max guesses</li>
-   * <li>2    => 2 max guesses</li>
-   * <li>0.5  => 9 max guesses</li>
-   * <li>0.1  => 46 max guesses</li>
+   * <li>1 => 5 max guesses</li>
+   * <li>2 => 2 max guesses</li>
+   * <li>0.5 => 9 max guesses</li>
+   * <li>0.1 => 46 max guesses</li>
    * <li>0.05 => 96 max guesses</li>
    * </ul>
    * This expected number of guesses might not occur if the number of getMaxGuessToStable()
@@ -86,16 +84,14 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
   /**
    * Initialize this profile with default values.
    */
-  public AnnealingTuneProfile()
-  {
+  public AnnealingTuneProfile() {
   }
 
   /**
    * Initialize this profile with values read from the configuration file.
    * @param profileName name of the profile in the configuration file.
    */
-  public AnnealingTuneProfile(final String profileName)
-  {
+  public AnnealingTuneProfile(final String profileName) {
     String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     minSamplesToAnalyse = props.getInt(prefix + "minSamplesToAnalyse", 500);
@@ -110,8 +106,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * Initialize this profile with values read from the configuration file.
    * @param config contains a mapping of the profile parameters to their value.
    */
-  public AnnealingTuneProfile(final TypedProperties config)
-  {
+  public AnnealingTuneProfile(final TypedProperties config) {
     minSamplesToAnalyse = config.getInt("minSamplesToAnalyse", 500);
     minSamplesToCheckConvergence = config.getInt("minSamplesToCheckConvergence", 300);
     maxDeviation = config.getDouble("maxDeviation", 0.2d);
@@ -125,8 +120,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * random generator, as the maximum.
    * @return the multiplicity as a float value.
    */
-  public float getSizeRatioDeviation()
-  {
+  public float getSizeRatioDeviation() {
     return sizeRatioDeviation;
   }
 
@@ -135,8 +129,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * random generator, as the maximum.
    * @param sizeRatioDeviation the multiplicity as a float value.
    */
-  public void setSizeRatioDeviation(final float sizeRatioDeviation)
-  {
+  public void setSizeRatioDeviation(final float sizeRatioDeviation) {
     this.sizeRatioDeviation = sizeRatioDeviation;
   }
 
@@ -144,8 +137,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * Get the decrease rate for this profile.
    * @return the decrease rate as a float value.
    */
-  public float getDecreaseRatio()
-  {
+  public float getDecreaseRatio() {
     return decreaseRatio;
   }
 
@@ -153,8 +145,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * Set the decrease rate for this profile.
    * @param decreaseRatio the decrease rate as a float value.
    */
-  public void setDecreaseRatio(final float decreaseRatio)
-  {
+  public void setDecreaseRatio(final float decreaseRatio) {
     this.decreaseRatio = decreaseRatio;
   }
 
@@ -165,9 +156,8 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * @param rnd a pseudo-random number generator.
    * @return an always positive diff to be applied to bundle size
    */
-  public int createDiff(final int bestSize, final int collectedSamples, final Random rnd)
-  {
-    double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation()- 1.0f)), 1);
+  public int createDiff(final int bestSize, final int collectedSamples, final Random rnd) {
+    double max = Math.max(Math.round(bestSize * (getSizeRatioDeviation() - 1.0f)), 1);
     if (max < 1.0d) return 1;
     return rnd.nextInt((int) max) + 1;
   }
@@ -182,8 +172,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * @param x a randomly generated bundle size increment.
    * @return an int value.
    */
-  protected double expDist(final long max, final long x)
-  {
+  protected double expDist(final long max, final long x) {
     //return max * Math.exp(-x * getDecreaseRatio());
     return (double) max / (double) (x * decreaseRatio);
   }
@@ -192,8 +181,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * Get the minimum number of samples that must be collected before an analysis is triggered.
    * @return the number of samples as a long value.
    */
-  public long getMinSamplesToAnalyse()
-  {
+  public long getMinSamplesToAnalyse() {
     return minSamplesToAnalyse;
   }
 
@@ -201,8 +189,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * Set the minimum number of samples that must be collected before an analysis is triggered.
    * @param minSamplesToAnalyse the number of samples as a long value.
    */
-  public void setMinSamplesToAnalyse(final long minSamplesToAnalyse)
-  {
+  public void setMinSamplesToAnalyse(final long minSamplesToAnalyse) {
     this.minSamplesToAnalyse = minSamplesToAnalyse;
   }
 
@@ -211,8 +198,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * checking if the performance profile has changed.
    * @return the number of samples as a long value.
    */
-  public long getMinSamplesToCheckConvergence()
-  {
+  public long getMinSamplesToCheckConvergence() {
     return minSamplesToCheckConvergence;
   }
 
@@ -221,8 +207,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * checking if the performance profile has changed.
    * @param minSamplesToCheckConvergence the number of samples as a long value.
    */
-  public void setMinSamplesToCheckConvergence(final long minSamplesToCheckConvergence)
-  {
+  public void setMinSamplesToCheckConvergence(final long minSamplesToCheckConvergence) {
     this.minSamplesToCheckConvergence = minSamplesToCheckConvergence;
   }
 
@@ -231,8 +216,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * when the system was considered stable.
    * @return the percentage of deviation as a double value.
    */
-  public double getMaxDeviation()
-  {
+  public double getMaxDeviation() {
     return maxDeviation;
   }
 
@@ -241,8 +225,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * when the system was considered stable.
    * @param maxDeviation the percentage of deviation as a double value.
    */
-  public void setMaxDeviation(final double maxDeviation)
-  {
+  public void setMaxDeviation(final double maxDeviation) {
     this.maxDeviation = maxDeviation;
   }
 
@@ -251,8 +234,7 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * for the algorithm to consider the current best solution stable.
    * @return the number of guesses as an int value.
    */
-  public int getMaxGuessToStable()
-  {
+  public int getMaxGuessToStable() {
     return maxGuessToStable;
   }
 
@@ -261,35 +243,15 @@ public class AnnealingTuneProfile implements LoadBalancingProfile
    * for the algorithm to consider the current best solution stable.
    * @param maxGuessToStable the number of guesses as an int value.
    */
-  public void setMaxGuessToStable(final int maxGuessToStable)
-  {
+  public void setMaxGuessToStable(final int maxGuessToStable) {
     this.maxGuessToStable = maxGuessToStable;
-  }
-
-  /**
-   * Make a copy of this profile.
-   * @return a newly created <code>AutoTuneProfile</code> instance.
-   * @see org.jppf.load.balancer.LoadBalancingProfile#copy()
-   */
-  @Override
-  public LoadBalancingProfile copy()
-  {
-    AnnealingTuneProfile p = new AnnealingTuneProfile();
-    p.minSamplesToAnalyse = minSamplesToAnalyse;
-    p.minSamplesToCheckConvergence = minSamplesToCheckConvergence;
-    p.maxDeviation = maxDeviation;
-    p.maxGuessToStable = maxGuessToStable;
-    p.sizeRatioDeviation = sizeRatioDeviation;
-    p.decreaseRatio = decreaseRatio;
-    return p;
   }
 
   /**
    * Get the default profile with default parameter values.
    * @return a <code>AnnealingTuneProfile</code> singleton instance.
    */
-  public static AnnealingTuneProfile getDefaultProfile()
-  {
+  public static AnnealingTuneProfile getDefaultProfile() {
     return defaultProfile.get();
   }
 }

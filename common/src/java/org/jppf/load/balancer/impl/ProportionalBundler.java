@@ -18,6 +18,8 @@
 
 package org.jppf.load.balancer.impl;
 
+import java.util.*;
+
 import org.jppf.load.balancer.*;
 import org.slf4j.*;
 
@@ -33,15 +35,35 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class ProportionalBundler extends AbstractProportionalBundler {
+public class ProportionalBundler extends AbstractAdaptiveBundler {
   /**
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(ProportionalBundler.class);
   /**
-   * Determines whether debugging level is set for logging.
+   * Determines whether debug level is set for logging.
+   */
+  private static boolean debugEnabled = log.isTraceEnabled();
+  /**
+   * Determines whether trace level is set for logging.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * Mapping of individual bundler to corresponding performance data - global.
+   */
+  private static final Set<ProportionalBundler> BUNDLERS = new HashSet<>();
+  /**
+   * Mapping of individual bundler to corresponding performance data - local.
+   */
+  private final Set<ProportionalBundler> bundlers = BUNDLERS;
+  /**
+   * Bounded memory of the past performance updates.
+   */
+  private final BundleDataHolder dataHolder;
+  /**
+   * 
+   */
+  private Random rand = new Random(System.nanoTime());
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -49,27 +71,147 @@ public class ProportionalBundler extends AbstractProportionalBundler {
    */
   public ProportionalBundler(final LoadBalancingProfile profile) {
     super(profile);
+    if (this.profile == null) this.profile = new ProportionalTuneProfile();
+    ProportionalTuneProfile prof = (ProportionalTuneProfile) this.profile;
+    dataHolder = new BundleDataHolder(prof.getPerformanceCacheSize(), prof.getInitialMeanTime());
+    bundleSize = prof.getInitialSize();
+    if (bundleSize < 1) bundleSize = 1;
+    if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using proportional bundle size - the initial size is " + bundleSize + ", profile: " + profile);
   }
 
   /**
-   * Make a copy of this bundler
-   * @return a <code>Bundler</code> instance.
+   * Get local mapping of individual bundler to corresponding performance data.
+   * @return <code>Set<AbstractProportionalBundler></code>
    */
-  @Override
-  public Bundler copy() {
-    return new ProportionalBundler(profile);
+  protected final Set<ProportionalBundler> getBundlers() {
+    return bundlers;
   }
 
   /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
+   * Set the current size of bundle.
+   * @param size the bundle size as an int value.
+   */
+  public void setBundleSize(final int size) {
+    //bundleSize = sizeWithNoise(size <= 0 ? 1 : size);
+    bundleSize = size <= 0 ? 1 : size;
+  }
+
+  /**
+   * Add some random noise to the bundle size.
+   * @param value the initial size to add noise to
+   * @return the "noisy" size.
+   */
+  double noisyValue(final double value) {
+    double newValue = value * (1d + 0.1d * (0.5d - rand.nextDouble()));
+    return (newValue < 0d) ? 0d : newValue;
+  }
+
+  /**
+   * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
+   * @param size the number of tasks executed.
+   * @param time the time in nanoseconds it took to execute the tasks.
    */
   @Override
-  protected int maxSize() {
-    if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": jppfContext=" + jppfContext);
-    if (jppfContext == null) return 300;
-    int n = jppfContext.getMaxBundleSize();
-    if (traceEnabled) log.trace("bundler #" + this.bundlerNumber + ": maxBundleSize=" + n);
-    return n <= 0 ? 300 : n;
+  public void feedback(final int size, final double time) {
+    if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
+    if (size <= 0) return;
+    //BundlePerformanceSample sample = new BundlePerformanceSample(noisyValue(time) / size, size);
+    BundlePerformanceSample sample = new BundlePerformanceSample(time / size, size);
+    synchronized (bundlers) {
+      dataHolder.addSample(sample);
+      computeBundleSizes();
+    }
+  }
+
+  /**
+   * Perform context-independent initializations.
+   */
+  @Override
+  public void setup() {
+    synchronized (bundlers) {
+      bundlers.add(this);
+    }
+  }
+
+  /**
+   * Release the resources used by this bundler.
+   */
+  @Override
+  public void dispose() {
+    super.dispose();
+    synchronized (bundlers) {
+      bundlers.remove(this);
+    }
+  }
+
+  /**
+   * Get the bounded memory of the past performance updates.
+   * @return a BundleDataHolder instance.
+   */
+  public BundleDataHolder getDataHolder() {
+    return dataHolder;
+  }
+
+  /**
+   * Update the bundler sizes.
+   */
+  private void computeBundleSizes() {
+    synchronized (bundlers) {
+      double maxMean = Double.NEGATIVE_INFINITY;
+      double minMean = Double.POSITIVE_INFINITY;
+      ProportionalBundler minBundler = null;
+      double meanSum = 0.0d;
+      for (ProportionalBundler b : bundlers) {
+        BundleDataHolder h = b.getDataHolder();
+        double m = h.getMean();
+        if (m > maxMean) maxMean = m;
+        if (m < minMean) {
+          minMean = m;
+          minBundler = b;
+        }
+      }
+      for (ProportionalBundler b : bundlers) {
+        BundleDataHolder h = b.getDataHolder();
+        meanSum += normalize(h.getMean());
+      }
+      int max = maxSize();
+      int sum = 0;
+      for (ProportionalBundler b : bundlers) {
+        BundleDataHolder h = b.getDataHolder();
+        double p = normalize(h.getMean()) / meanSum;
+        int size = Math.max(1, (int) (p * max));
+        if (size >= max) size = max - 1;
+        b.setBundleSize(size);
+        sum += size;
+      }
+      if ((sum < max) && (minBundler != null)) {
+        int size = minBundler.getBundleSize();
+        minBundler.setBundleSize(size + (max - sum));
+      }
+      if (traceEnabled) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("bundler info:\n");
+        sb.append("  minMean=").append(minMean).append(", maxMean=").append(maxMean).append(", maxSize=").append(max).append('\n');
+        for (ProportionalBundler b : bundlers) {
+          sb.append("  bundler #").append(b.getBundlerNumber()).append(" : bundleSize=").append(b.getBundleSize()).append(", ");
+          sb.append(b.getDataHolder()).append('\n');
+        }
+        log.trace(sb.toString());
+      }
+    }
+  }
+
+  /**
+   * 
+   * @param x .
+   * @return .
+   */
+  public double normalize(final double x) {
+    double r = 1.0d;
+    for (int i = 0; i < ((ProportionalTuneProfile) profile).getProportionalityFactor(); i++)
+      r *= x;
+    return 1.0d / r;
+    /*
+     */
   }
 }

@@ -21,6 +21,7 @@ package org.jppf.execute;
 import java.util.concurrent.Future;
 
 import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 
 /**
@@ -43,7 +44,7 @@ public interface ExecutorChannel<T> extends AutoCloseable {
 
   /**
    * Get the bundler used to schedule tasks for the corresponding node.
-   * @return a {@link org.jppf.load.balancer.Bundler} instance.
+   * @return a {@link Bundler} instance.
    */
   Bundler getBundler();
 
@@ -56,17 +57,28 @@ public interface ExecutorChannel<T> extends AutoCloseable {
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
-  boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext);
+  //boolean checkBundler(final Bundler serverBundler, final JPPFContext jppfContext);
+
+  /**
+   * Check whether the bundler held by this context is up to date by comparison
+   * with the specified bundler.<br>
+   * If it is not, then it is replaced with a copy of the specified bundler, with a
+   * timestamp taken at creation time.
+   * @param bundlerFactory the load-balancer factory.
+   * @param jppfContext execution context.
+   * @return true if the bundler is up to date, false if it wasn't and has been updated.
+   */
+  boolean checkBundler(final JPPFBundlerFactory bundlerFactory, final JPPFContext jppfContext);
 
   /**
    * Get the system information.
-   * @return a {@link org.jppf.management.JPPFSystemInformation} instance.
+   * @return a {@link JPPFSystemInformation} instance.
    */
   JPPFSystemInformation getSystemInformation();
 
   /**
    * Get the management information.
-   * @return a {@link org.jppf.management.JPPFManagementInfo} instance.
+   * @return a {@link JPPFManagementInfo} instance.
    */
   JPPFManagementInfo getManagementInfo();
 

@@ -61,7 +61,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   /**
    * The the task bundle sent to a newly connected node.
    */
-  //private ServerTaskBundleNode initialNodeBundle = null;
   private final ServerJob initialServerJob;
   /**
    * A reference to the driver's tasks queue.
@@ -138,10 +137,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     INITIAL_BUNDLE_UUID = driver.getUuid();
     this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-
-    Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
-    taskQueueChecker = new TaskQueueChecker<>(queue, driver.getStatistics());
-    taskQueueChecker.setBundler(bundler);
+    taskQueueChecker = new TaskQueueChecker<>(queue, driver.getStatistics(), bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
@@ -373,22 +369,6 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.warn(ExceptionUtils.getMessage(e));
     }
-  }
-
-  /**
-   * Get the algorithm that dynamically computes the task bundle size.
-   * @return a <code>Bundler</code> instance.
-   */
-  public Bundler getBundler() {
-    return taskQueueChecker.getBundler();
-  }
-
-  /**
-   * Set the algorithm that dynamically computes the task bundle size.
-   * @param bundler a <code>Bundler</code> instance.
-   */
-  public void setBundler(final Bundler bundler) {
-    taskQueueChecker.setBundler(bundler);
   }
 
   /**

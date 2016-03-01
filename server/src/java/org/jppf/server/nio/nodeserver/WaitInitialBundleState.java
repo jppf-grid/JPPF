@@ -83,12 +83,13 @@ class WaitInitialBundleState extends NodeServerState {
       if (debugEnabled) log.debug("read bundle for {}, bundle={}", channel, bundle);
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
-      Bundler bundler = server.getBundler().copy();
+      Bundler bundler = server.getBundlerFactory().newBundler();
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
       if (systemInfo != null) {
         systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
+        systemInfo.getJppf().set(JPPFProperties.NODE_IDLE, true);
         context.setNodeInfo(systemInfo, false);
         if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
@@ -97,7 +98,8 @@ class WaitInitialBundleState extends NodeServerState {
       bundler.setup();
       context.setBundler(bundler);
       int port = bundle.getParameter(NODE_MANAGEMENT_PORT_PARAM, -1);
-      if (JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED) && (uuid != null) && !offline && (port >= 0)) {
+      boolean hasJmx = context.isSecure() ? JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SSL_ENABLED) : JPPFConfiguration.get(JPPFProperties.MANAGEMENT_ENABLED);
+      if (hasJmx && (uuid != null) && !offline && (port >= 0)) {
         String host = getChannelHost(channel);
         boolean sslEnabled = !channel.isLocal() && context.getSSLHandler() != null;
         int type = isPeer ? JPPFManagementInfo.PEER : JPPFManagementInfo.NODE;

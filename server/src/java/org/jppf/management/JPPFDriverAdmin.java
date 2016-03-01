@@ -24,11 +24,9 @@ import java.util.*;
 
 import org.jppf.load.balancer.*;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.*;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
 
@@ -78,8 +76,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbNodes(final NodeSelector selector) throws Exception {
-    Collection<JPPFManagementInfo> nodes = nodesInformation(selector);
-    return nodes == null ? -1 : nodes.size();
+    return selectionHelper.getNbChannels(selector == null ? NodeSelector.ALL_NODES : selector, false);
   }
 
   @Override
@@ -115,8 +112,13 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
 
   @Override
   public Integer nbIdleNodes(final NodeSelector selector) throws Exception {
-    Collection<JPPFManagementInfo> nodes = idleNodesInformation(selector);
-    return nodes == null ? -1 : nodes.size();
+    Set<AbstractNodeContext> nodes = selectionHelper.getChannels(selector == null ? NodeSelector.ALL_NODES : selector);
+    if (nodes == null) return -1;
+    int result = 0;
+    for (AbstractNodeContext node: nodes) {
+      if (getNodeNioServer().isIdle(node.getChannel())) result++;
+    }
+    return result;
   }
 
   @Override
@@ -164,23 +166,9 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
       TypedProperties props = new TypedProperties(parameters);
       synchronized(loadBalancingInformationLock) {
         currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, loadBalancerInformation().getAlgorithmNames());
+        factory.setAndGetCurrentInfo(currentLoadBalancingInformation);
       }
-      Bundler bundler = factory.createBundler(algorithm, props);
-      server.setBundler(bundler);
       return localize("load.balancing.updated") + " (" + algorithm + ")";
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-      return "Error : " + e.getMessage();
-    }
-  }
-
-  @Override
-  public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception {
-    try {
-      if (debugEnabled) log.debug("request to restart/shutdown this driver, shutdownDelay=" + shutdownDelay + ", restartDelay=" + restartDelay);
-      boolean restart = restartDelay >= 0L;
-      driver.initiateShutdownRestart(shutdownDelay, restart, restartDelay);
-      return localize("request.acknowledged");
     } catch(Exception e) {
       log.error(e.getMessage(), e);
       return "Error : " + e.getMessage();
@@ -200,19 +188,23 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
    * @return a {@link LoadBalancingInformation} instance.
    */
   private LoadBalancingInformation computeCurrentLoadBalancingInformation() {
-    TypedProperties props = JPPFConfiguration.getProperties();
-    String algorithm = props.get(JPPFProperties.LOAD_BALANCING_ALGORITHM);
-    String profileName = props.get(JPPFProperties.LOAD_BALANCING_PROFILE);
     JPPFBundlerFactory factory = getNodeNioServer().getBundlerFactory();
-    TypedProperties params = factory.convertJPPFConfiguration(profileName, props);
-    List<String> algorithmsList = null;
+    LoadBalancingInformation info = factory.getCurrentInfo();
+    List<String> algorithmsList = factory.getBundlerProviderNames();
+    return new LoadBalancingInformation(info.getAlgorithm(), info.getParameters(), algorithmsList);
+  }
+
+  @Override
+  public String restartShutdown(final Long shutdownDelay, final Long restartDelay) throws Exception {
     try {
-      algorithmsList = factory.getBundlerProviderNames();
-    } catch (Exception e) {
-      algorithmsList = new ArrayList<>();
+      if (debugEnabled) log.debug("request to restart/shutdown this driver, shutdownDelay=" + shutdownDelay + ", restartDelay=" + restartDelay);
+      boolean restart = restartDelay >= 0L;
+      driver.initiateShutdownRestart(shutdownDelay, restart, restartDelay);
+      return localize("request.acknowledged");
+    } catch(Exception e) {
       log.error(e.getMessage(), e);
+      return "Error : " + e.getMessage();
     }
-    return new LoadBalancingInformation(algorithm, params, algorithmsList);
   }
 
   /**
@@ -240,15 +232,6 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
   @Override
   public JPPFSystemInformation systemInformation() throws Exception {
     return driver.getSystemInformation();
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #nbNodes(NodeSelector)} with an {@link ExecutionPolicySelector} instead.
-   */
-  @Override
-  public Integer matchingNodes(final ExecutionPolicy policy) throws Exception {
-    return nbNodes(new ExecutionPolicySelector(policy));
   }
 
   /**

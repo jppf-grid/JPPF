@@ -18,7 +18,7 @@
 
 package org.jppf.load.balancer.impl;
 
-import org.jppf.load.balancer.LoadBalancingProfile;
+import org.jppf.load.balancer.*;
 import org.jppf.utils.TypedProperties;
 
 /**
@@ -26,8 +26,7 @@ import org.jppf.utils.TypedProperties;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeThreadsProfile implements LoadBalancingProfile
-{
+public class NodeThreadsProfile extends AbstractLoadBalancingProfile {
   /**
    * The multiplicator for the number of threads in the node.
    * The max number of tasks sent to the node will be <code>multiplicator * number_of_threads</code>.
@@ -37,39 +36,23 @@ public class NodeThreadsProfile implements LoadBalancingProfile
   /**
    * Default constructor.
    */
-  public NodeThreadsProfile()
-  {
+  public NodeThreadsProfile() {
   }
 
   /**
    * Initialize this profile with values read from the specified configuration.
    * @param config contains a mapping of the profile parameters to their value.
    */
-  public NodeThreadsProfile(final TypedProperties config)
-  {
+  public NodeThreadsProfile(final TypedProperties config) {
     multiplicator = config.getInt("multiplicator", 1);
     if (multiplicator < 1) multiplicator = 1;
-  }
-
-  /**
-   * Make a copy of this profile.
-   * @return a newly created <code>FixedSizeProfile</code> instance.
-   * @see org.jppf.load.balancer.LoadBalancingProfile#copy()
-   */
-  @Override
-  public LoadBalancingProfile copy()
-  {
-    NodeThreadsProfile other = new NodeThreadsProfile();
-    other.setMultiplicator(multiplicator);
-    return other;
   }
 
   /**
    * Get the multiplicator for the number of threads in the node.
    * @return the multiplicator size as an int.
    */
-  public int getMultiplicator()
-  {
+  public int getMultiplicator() {
     return multiplicator;
   }
 
@@ -77,8 +60,7 @@ public class NodeThreadsProfile implements LoadBalancingProfile
    * Set the multiplicator for the number of threads in the node.
    * @param multiplicator the bundle size as an int.
    */
-  public void setMultiplicator(final int multiplicator)
-  {
+  public void setMultiplicator(final int multiplicator) {
     if (multiplicator >= 1) this.multiplicator = multiplicator;
   }
 }

@@ -24,11 +24,12 @@ import java.io.Serializable;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public interface LoadBalancingProfile extends Serializable
-{
+public interface LoadBalancingProfile extends Serializable {
   /**
    * Make a copy of this profile.
    * @return a newly created <code>LoadBalancingProfile</code> instance.
+   * @deprecated this method is not needed anymore, all profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
    */
+  @Deprecated
   LoadBalancingProfile copy();
 }

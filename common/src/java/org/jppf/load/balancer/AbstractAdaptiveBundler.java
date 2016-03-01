@@ -28,7 +28,7 @@ import org.jppf.utils.configuration.*;
  * @author Laurent Cohen
  * @exclude
  */
-public abstract class AbstractAdaptiveBundler extends AbstractBundler implements BundlerEx, NodeAwareness, ContextAwareness, JobAwarenessEx {
+public abstract class AbstractAdaptiveBundler extends AbstractBundler implements BundlerEx, NodeAwareness, JobAwarenessEx {
   /**
    * The current bundle size.
    */
@@ -41,10 +41,6 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
    * The number of processing threads in the node.
    */
   protected int nbThreads = 1;
-  /**
-   * Holds information about the execution context.
-   */
-  protected JPPFContext jppfContext;
   /**
    * Holds information about the current job being dispatched.
    */
@@ -93,16 +89,6 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   }
 
   @Override
-  public JPPFContext getJPPFContext() {
-    return jppfContext;
-  }
-
-  @Override
-  public void setJPPFContext(final JPPFContext context) {
-    this.jppfContext = context;
-  }
-
-  @Override
   public JPPFDistributedJob getJob() {
     return job;
   }
@@ -113,19 +99,18 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   }
 
   @Override
-  public Bundler copy() {
-    return null;
-  }
-
-  @Override
-  protected int maxSize() {
-    return 0;
-  }
-
-  @Override
   public void dispose() {
+    super.dispose();
     nodeConfiguration = null;
-    jppfContext = null;
     job = null;
+  }
+
+  /**
+   * Get the max bundle size that can be used for this bundler.
+   * @return the bundle size as an int.
+   */
+  @Override
+  public int maxSize() {
+    return (job != null)  ? job.getTaskCount() : super.maxSize();
   }
 }

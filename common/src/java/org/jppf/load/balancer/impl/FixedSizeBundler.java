@@ -25,47 +25,21 @@ import org.jppf.load.balancer.*;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public class FixedSizeBundler extends AbstractBundler
-{
+public class FixedSizeBundler extends AbstractBundler {
   /**
    * Initialize this bundler.
    * @param profile - contains the parameters for this bundler.
    */
-  public FixedSizeBundler(final LoadBalancingProfile profile)
-  {
+  public FixedSizeBundler(final LoadBalancingProfile profile) {
     super(profile);
   }
 
   /**
    * This method always returns a statically assigned bundle size.
    * @return the bundle size defined in the JPPF driver configuration.
-   * @see org.jppf.load.balancer.Bundler#getBundleSize()
    */
   @Override
-  public int getBundleSize()
-  {
+  public int getBundleSize() {
     return ((FixedSizeProfile) profile).getSize();
-  }
-
-  /**
-   * Make a copy of this bundler.
-   * @return a reference to this bundler, no copy is actually made.
-   * @see org.jppf.load.balancer.Bundler#copy()
-   */
-  @Override
-  public Bundler copy()
-  {
-    return new FixedSizeBundler(profile.copy());
-  }
-
-  /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
-   * @see org.jppf.load.balancer.AbstractBundler#maxSize()
-   */
-  @Override
-  protected int maxSize()
-  {
-    return -1;
   }
 }

@@ -22,9 +22,9 @@ package org.jppf.load.balancer;
  * Bundler implementations should use this context if they wish to have access to execution context.
  * This context allows independence for bundlers to work in client and driver context.
  * @author Martin JANDA
+ * @exclude
  */
-public abstract class JPPFContext
-{
+public abstract class JPPFContext {
   /**
    * Get the maximum bundle size for the bundles present in the queue.
    * @return the bundle size as an int.

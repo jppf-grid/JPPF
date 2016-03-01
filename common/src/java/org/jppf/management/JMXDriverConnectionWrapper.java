@@ -26,7 +26,6 @@ import org.jppf.job.JobInformation;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
 import org.jppf.management.forwarding.*;
-import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.server.job.management.*;
 import org.jppf.utils.stats.JPPFStatistics;
 import org.slf4j.*;
@@ -213,15 +212,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   @Override
   public JPPFSystemInformation systemInformation() throws Exception {
     return (JPPFSystemInformation) invoke(MBEAN_NAME, "systemInformation");
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated use {@link #nbNodes(NodeSelector)} with an {@link ExecutionPolicySelector} instead.
-   */
-  @Override
-  public Integer matchingNodes(final ExecutionPolicy policy) throws Exception {
-    return (Integer) invoke(MBEAN_NAME, "matchingNodes", new Object[] { policy }, new String[] { ExecutionPolicy.class.getName() });
   }
 
   @Override

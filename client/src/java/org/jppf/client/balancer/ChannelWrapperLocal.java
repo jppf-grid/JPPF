@@ -25,7 +25,6 @@ import org.jppf.JPPFException;
 import org.jppf.client.JPPFClientConnectionStatus;
 import org.jppf.client.event.*;
 import org.jppf.execute.*;
-import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
@@ -125,7 +124,7 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("locally submitting {}", bundle);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    Runnable task = new LocalRunnable(getBundler(), bundle);
+    Runnable task = new LocalRunnable(bundle);
     bundle.jobDispatched(this);
     executor.execute(task);
     return null;
@@ -154,18 +153,12 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
      * The task bundle to execute.
      */
     private final ClientTaskBundle bundle;
-    /**
-     * Bundler used to schedule tasks for the corresponding node.
-     */
-    private final Bundler bundler;
 
     /**
      * Initialize this runnable for local execution.
-     * @param bundler    the bundler to send the resulting statistics to.
      * @param bundle the execution to perform.
      */
-    public LocalRunnable(final Bundler bundler, final ClientTaskBundle bundle) {
-      this.bundler = bundler;
+    public LocalRunnable(final ClientTaskBundle bundle) {
       this.bundle = bundle;
     }
 

@@ -18,15 +18,10 @@
 
 package org.jppf.management.generated;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
+
 import org.jppf.load.balancer.LoadBalancingInformation;
-import org.jppf.management.AbstractMBeanStaticProxy;
-import org.jppf.management.JMXConnectionWrapper;
-import org.jppf.management.JPPFDriverAdminMBean;
-import org.jppf.management.JPPFSystemInformation;
-import org.jppf.management.NodeSelector;
-import org.jppf.node.policy.ExecutionPolicy;
+import org.jppf.management.*;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**
@@ -53,11 +48,6 @@ public class JPPFDriverAdminMBeanStaticProxy extends AbstractMBeanStaticProxy im
   @Override
   public boolean getBroadcasting() {
     return (boolean) getAttribute("Broadcasting");
-  }
-
-  @Override
-  public Integer matchingNodes(final ExecutionPolicy param0) {
-    return (Integer) invoke("matchingNodes", new Object[] { param0 }, new String[] { "org.jppf.node.policy.ExecutionPolicy" });
   }
 
   @Override

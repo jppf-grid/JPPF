@@ -17,6 +17,7 @@
  */
 package org.jppf.load.balancer;
 
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is the interface of all strategies for defining bundle task size.
@@ -24,16 +25,21 @@ package org.jppf.load.balancer;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public interface Bundler
-{
+public interface Bundler {
   /**
-   * Get the current size of bundle.
-   * @return  the bundle size as an int value.
+   * Count of the bundlers used to generate a readable unique id.
+   * @exclude
+   */
+  AtomicInteger BUNDLER_COUNT = new AtomicInteger(0);
+
+  /**
+   * Get the current bundle size.
+   * @return the bundle size as an int value.
    */
   int getBundleSize();
 
   /**
-   * Feedback the bundler with the result of using the bundle with the specified size.
+   * Provide feedback from a channel after execution of a set of tasks.
    * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.
    * The execution time includes the network round trip between node and server.
    * @param nbTasks number of tasks that were executed.
@@ -45,6 +51,7 @@ public interface Bundler
    * Make a copy of this bundler.
    * Which parts are actually copied depends on the implementation.
    * @return a new <code>Bundler</code> instance.
+   * @deprecated this method is not needed anymore, all Bundler instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
    */
   Bundler copy();
 

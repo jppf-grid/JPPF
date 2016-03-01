@@ -17,6 +17,8 @@
  */
 package org.jppf.load.balancer.impl;
 
+import java.util.*;
+
 import org.jppf.load.balancer.*;
 import org.slf4j.*;
 
@@ -32,7 +34,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class AutoTunedBundler extends AbstractAutoTunedBundler {
+public class AutoTunedBundler extends AbstractAdaptiveBundler {
   /**
    * Logger for this class.
    */
@@ -41,6 +43,15 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler {
    * Determines whether trace level is set for logging.
    */
   private static boolean traceEnabled = log.isTraceEnabled();
+  /**
+   * Used to compute a pseudo-random increment to the bundle size, as part of a Monte Carlo random walk
+   * towards a good solution.
+   */
+  private Random rnd = new Random(System.nanoTime());
+  /**
+   * A map of performance samples, sorted by increasing bundle size.
+   */
+  private final Map<Integer, BundlePerformanceSample> samplesMap = new HashMap<>();
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
@@ -48,7 +59,8 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler {
    * grouped as a performance analysis profile.
    */
   public AutoTunedBundler(final LoadBalancingProfile profile) {
-    super((AnnealingTuneProfile) profile);
+    super(profile);
+    if (bundleSize < 1) bundleSize = 1;
   }
 
   /**
@@ -143,21 +155,5 @@ public class AutoTunedBundler extends AbstractAutoTunedBundler {
     }
     if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": best size found = " + bestSize);
     return bestSize;
-  }
-
-  /**
-   * Make a copy of this bundler.
-   * @return a new <code>AutoTunedBundler</code> instance.
-   * @see org.jppf.load.balancer.Bundler#copy()
-   */
-  @Override
-  public Bundler copy() {
-    return new AutoTunedBundler(profile.copy());
-  }
-
-  @Override
-  protected int maxSize() {
-    if (jppfContext == null) throw new IllegalStateException("jppfContext not set");
-    return jppfContext.getMaxBundleSize() / 2;
   }
 }

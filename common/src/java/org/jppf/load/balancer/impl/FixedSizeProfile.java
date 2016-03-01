@@ -18,15 +18,14 @@
 
 package org.jppf.load.balancer.impl;
 
-import org.jppf.load.balancer.LoadBalancingProfile;
+import org.jppf.load.balancer.*;
 import org.jppf.utils.TypedProperties;
 
 /**
  * Profile for the fixed bundle size load-balancing algorithm.
  * @author Laurent Cohen
  */
-public class FixedSizeProfile implements LoadBalancingProfile
-{
+public class FixedSizeProfile extends AbstractLoadBalancingProfile {
   /**
    * The bundle size.
    */
@@ -35,38 +34,22 @@ public class FixedSizeProfile implements LoadBalancingProfile
   /**
    * Default constructor.
    */
-  public FixedSizeProfile()
-  {
+  public FixedSizeProfile() {
   }
 
   /**
    * Initialize this profile with values read from the specified configuration.
    * @param config contains a mapping of the profile parameters to their value.
    */
-  public FixedSizeProfile(final TypedProperties config)
-  {
+  public FixedSizeProfile(final TypedProperties config) {
     size = config.getInt("size", 1);
-  }
-
-  /**
-   * Make a copy of this profile.
-   * @return a newly created <code>FixedSizeProfile</code> instance.
-   * @see org.jppf.load.balancer.LoadBalancingProfile#copy()
-   */
-  @Override
-  public LoadBalancingProfile copy()
-  {
-    FixedSizeProfile other = new FixedSizeProfile();
-    other.setSize(size);
-    return other;
   }
 
   /**
    * Get the bundle size.
    * @return the bundle size as an int.
    */
-  public int getSize()
-  {
+  public int getSize() {
     return size;
   }
 
@@ -74,8 +57,7 @@ public class FixedSizeProfile implements LoadBalancingProfile
    * Set the bundle size.
    * @param size the bundle size as an int.
    */
-  public void setSize(final int size)
-  {
+  public void setSize(final int size) {
     this.size = size;
   }
 }

@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jppf.client.*;
 import org.jppf.client.balancer.queue.*;
 import org.jppf.client.event.*;
-import org.jppf.load.balancer.Bundler;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
@@ -109,10 +108,8 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   public JobManagerClient(final JPPFClient client) throws Exception {
     if (client == null) throw new IllegalArgumentException("client is null");
     this.localEnabled = client.getConfig().get(JPPFProperties.LOCAL_EXECUTION_ENABLED);
-    Bundler bundler = bundlerFactory.createBundlerFromJPPFConfiguration();
     this.queue = new JPPFPriorityQueue(this);
-    taskQueueChecker = new TaskQueueChecker(queue);
-    taskQueueChecker.setBundler(bundler);
+    taskQueueChecker = new TaskQueueChecker(queue, bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ClientJob, ClientJob, ClientTaskBundle>() {
       @Override
       public void bundleAdded(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {

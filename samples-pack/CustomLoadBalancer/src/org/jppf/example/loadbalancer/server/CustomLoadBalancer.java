@@ -20,7 +20,7 @@ package org.jppf.example.loadbalancer.server;
 
 import org.jppf.load.balancer.*;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.node.protocol.*;
+import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.utils.TypedProperties;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -38,7 +38,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness, JobAwarenessEx, ContextAwareness {
+public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness, JobAwarenessEx {
   /**
    * Logger for this class.
    */
@@ -70,16 +70,6 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   }
 
   /**
-   * Make a copy of this bundler.
-   * Which parts are actually copied depends on the implementation.
-   * @return a new <code>Bundler</code> instance.
-   */
-  @Override
-  public Bundler copy() {
-    return new CustomLoadBalancer(null);
-  }
-
-  /**
    * Get the current number of tasks to send to the node.
    * @return the bundle size as an int value.
    */
@@ -105,15 +95,6 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
   public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.nodeConfiguration = nodeConfiguration;
     if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + nodeConfiguration);
-  }
-
-  /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
-   */
-  @Override
-  protected int maxSize() {
-    return jppfContext == null ? 300 : jppfContext.getMaxBundleSize();
   }
 
   /**

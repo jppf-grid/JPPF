@@ -25,12 +25,11 @@ import org.slf4j.*;
 
 /**
  * Instances of this bundler delegate their operations to a singleton instance of a
- * {@link org.jppf.load.balancer.impl.AbstractAutoTunedBundler AutoTunedBundler}.
+ * {@link org.jppf.load.balancer.impl.AutoTunedBundler AutoTunedBundler}.
  * @author Laurent Cohen
  * @exclude
  */
-public class AutotunedDelegatingBundler extends AbstractBundler
-{
+public class AutotunedDelegatingBundler extends AbstractBundler {
   /**
    * Logger for this class.
    */
@@ -42,34 +41,24 @@ public class AutotunedDelegatingBundler extends AbstractBundler
   /**
    * Used to synchronize multiple threads when creating the simple bundler.
    */
-  private static ReentrantLock lock = new ReentrantLock();
+  private final static ReentrantLock lock = new ReentrantLock();
   /**
    * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
    */
-  protected AnnealingTuneProfile profile;
+  private AnnealingTuneProfile profile;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.
    * @param profile the parameters of the auto-tuning algorithm grouped as a performance analysis profile.
    */
-  public AutotunedDelegatingBundler(final AnnealingTuneProfile profile)
-  {
+  public AutotunedDelegatingBundler(final AnnealingTuneProfile profile) {
     super(profile);
     log.info("Bundler#" + bundlerNumber + ": Using Auto-Tuned bundle size");
     //log.info("Bundler#" + bundlerNumber + ": The initial size is " + bundleSize);
     lock.lock();
-    try
-    {
-      synchronized(AutotunedDelegatingBundler.class)
-      {
-        if (simpleBundler == null)
-        {
-          simpleBundler = new AutoTunedBundler(profile);
-        }
-      }
-    }
-    finally
-    {
+    try {
+      if (simpleBundler == null) simpleBundler = new AutoTunedBundler(profile);
+    } finally {
       lock.unlock();
     }
   }
@@ -77,22 +66,19 @@ public class AutotunedDelegatingBundler extends AbstractBundler
   /**
    * Make a copy of this bundler
    * @return a <code>Bundler</code> instance.
-   * @see org.jppf.load.balancer.Bundler#copy()
+   * @deprecated this method is not needed anymore, all profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
    */
   @Override
-  public Bundler copy()
-  {
+  public Bundler copy() {
     return new AutotunedDelegatingBundler(profile);
   }
 
   /**
    * Get the current size of bundle.
-   * @return  the bundle size as an int value.
-   * @see org.jppf.load.balancer.Bundler#getBundleSize()
+   * @return the bundle size as an int value.
    */
   @Override
-  public int getBundleSize()
-  {
+  public int getBundleSize() {
     return simpleBundler.getBundleSize();
   }
 
@@ -100,25 +86,20 @@ public class AutotunedDelegatingBundler extends AbstractBundler
    * This method delegates the bundle size calculation to the singleton instance of <code>SimpleBundler</code>.
    * @param bundleSize the number of tasks executed.
    * @param totalTime the time in nanoseconds it took to execute the tasks.
-   * @see org.jppf.load.balancer.AbstractBundler#feedback(int, double)
    */
   @Override
-  public void feedback(final int bundleSize, final double totalTime)
-  {
+  public void feedback(final int bundleSize, final double totalTime) {
     simpleBundler.feedback(bundleSize, totalTime);
   }
 
   /**
    * Get the max bundle size that can be used for this bundler.
    * @return the bundle size as an int.
-   * @see org.jppf.load.balancer.AbstractBundler#maxSize()
    */
   @Override
-  protected int maxSize()
-  {
+  public int maxSize() {
     int max = 0;
-    synchronized(simpleBundler)
-    {
+    synchronized (simpleBundler) {
       max = simpleBundler.maxSize();
     }
     return max;

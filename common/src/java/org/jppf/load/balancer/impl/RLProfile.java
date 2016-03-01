@@ -18,7 +18,7 @@
 
 package org.jppf.load.balancer.impl;
 
-import org.jppf.load.balancer.LoadBalancingProfile;
+import org.jppf.load.balancer.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 
@@ -27,8 +27,7 @@ import org.jppf.utils.configuration.JPPFProperties;
  * @author Laurent Cohen
  * @exclude
  */
-public class RLProfile implements LoadBalancingProfile
-{
+public class RLProfile extends AbstractLoadBalancingProfile {
   /**
    * The maximum size of the performance samples cache.
    */
@@ -45,16 +44,14 @@ public class RLProfile implements LoadBalancingProfile
   /**
    * Initialize this profile with default parameters.
    */
-  public RLProfile()
-  {
+  public RLProfile() {
   }
 
   /**
    * Initialize this profile with values read from the configuration file.
    * @param profileName name of the profile in the configuration file.
    */
-  public RLProfile(final String profileName)
-  {
+  public RLProfile(final String profileName) {
     String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
     TypedProperties props = JPPFConfiguration.getProperties();
     performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
@@ -66,8 +63,7 @@ public class RLProfile implements LoadBalancingProfile
    * Initialize this profile with values read from the specified configuration.
    * @param config contains a mapping of the profile parameters to their value.
    */
-  public RLProfile(final TypedProperties config)
-  {
+  public RLProfile(final TypedProperties config) {
     performanceCacheSize = config.getInt("performanceCacheSize", 2000);
     performanceVariationThreshold = config.getDouble("performanceVariationThreshold", 0.05);
     maxActionRange = config.getInt("maxActionRange", 50);
@@ -76,11 +72,9 @@ public class RLProfile implements LoadBalancingProfile
   /**
    * Make a copy of this profile.
    * @return a new <code>AutoTuneProfile</code> instance.
-   * @see org.jppf.load.balancer.LoadBalancingProfile#copy()
    */
   @Override
-  public LoadBalancingProfile copy()
-  {
+  public LoadBalancingProfile copy() {
     RLProfile other = new RLProfile();
     other.setPerformanceCacheSize(performanceCacheSize);
     other.setPerformanceVariationThreshold(performanceVariationThreshold);
@@ -92,8 +86,7 @@ public class RLProfile implements LoadBalancingProfile
    * Get the maximum size of the performance samples cache.
    * @return the cache size as an int.
    */
-  public int getPerformanceCacheSize()
-  {
+  public int getPerformanceCacheSize() {
     return performanceCacheSize;
   }
 
@@ -101,8 +94,7 @@ public class RLProfile implements LoadBalancingProfile
    * Set the maximum size of the performance samples cache.
    * @param performanceCacheSize - the cache size as an int.
    */
-  public void setPerformanceCacheSize(final int performanceCacheSize)
-  {
+  public void setPerformanceCacheSize(final int performanceCacheSize) {
     this.performanceCacheSize = performanceCacheSize;
   }
 
@@ -110,8 +102,7 @@ public class RLProfile implements LoadBalancingProfile
    * Get the variation of the mean execution time that triggers a change in bundle size.
    * @return the variation as a double value.
    */
-  public double getPerformanceVariationThreshold()
-  {
+  public double getPerformanceVariationThreshold() {
     return performanceVariationThreshold;
   }
 
@@ -119,8 +110,7 @@ public class RLProfile implements LoadBalancingProfile
    * Get the variation of the mean execution time that triggers a change in bundle size.
    * @param performanceVariationThreshold - the variation as a double value.
    */
-  public void setPerformanceVariationThreshold(final double performanceVariationThreshold)
-  {
+  public void setPerformanceVariationThreshold(final double performanceVariationThreshold) {
     this.performanceVariationThreshold = performanceVariationThreshold;
   }
 
@@ -128,8 +118,7 @@ public class RLProfile implements LoadBalancingProfile
    * Get the absolute value of the maximum increase of the the bundle size.
    * @return the value as an int.
    */
-  public int getMaxActionRange()
-  {
+  public int getMaxActionRange() {
     return maxActionRange;
   }
 
@@ -137,8 +126,7 @@ public class RLProfile implements LoadBalancingProfile
    * Get the absolute value of the maximum increase of the the bundle size.
    * @param maxActionRange - the value as an int.
    */
-  public void setMaxActionRange(final int maxActionRange)
-  {
+  public void setMaxActionRange(final int maxActionRange) {
     this.maxActionRange = maxActionRange;
   }
 }

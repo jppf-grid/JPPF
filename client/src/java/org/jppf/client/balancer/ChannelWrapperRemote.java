@@ -25,7 +25,6 @@ import java.util.concurrent.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.load.balancer.Bundler;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
 import org.jppf.serialization.ObjectSerializer;
@@ -122,7 +121,7 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   @SuppressWarnings("unchecked")
   public Future<?> submit(final ClientTaskBundle bundle) {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
-    Runnable task = new RemoteRunnable(getBundler(), bundle, channel);
+    Runnable task = new RemoteRunnable(bundle, channel);
     bundle.jobDispatched(this);
     executor.execute(task);
     return null;
@@ -179,22 +178,16 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
      */
     private final ClientTaskBundle clientBundle;
     /**
-     * Bundler used to schedule tasks for the corresponding node.
-     */
-    private final Bundler bundler;
-    /**
      * The connection to the driver to use.
      */
     private final JPPFClientConnectionImpl connection;
 
     /**
      * Initialize this runnable for remote execution.
-     * @param bundler    the bundler to send the resulting statistics to.
      * @param clientBundle     the execution to perform.
      * @param connection the connection to the driver to use.
      */
-    public RemoteRunnable(final Bundler bundler, final ClientTaskBundle clientBundle, final JPPFClientConnectionImpl connection) {
-      this.bundler = bundler;
+    public RemoteRunnable(final ClientTaskBundle clientBundle, final JPPFClientConnectionImpl connection) {
       this.clientBundle = clientBundle;
       this.connection = connection;
     }

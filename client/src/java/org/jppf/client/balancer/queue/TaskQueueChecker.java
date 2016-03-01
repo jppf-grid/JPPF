@@ -26,7 +26,7 @@ import org.jppf.client.*;
 import org.jppf.client.balancer.*;
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
-import org.jppf.load.balancer.impl.*;
+import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.utils.*;
 import org.jppf.utils.collections.*;
 import org.slf4j.*;
@@ -64,10 +64,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   private final AbstractCollectionSortedMap<Integer, ChannelWrapper> idleChannels = new SetSortedMap<>(new AbstractJPPFClient.DescendingIntegerComparator());
   /**
-   * Bundler used to schedule tasks for the corresponding node.
-   */
-  private Bundler bundler;
-  /**
    * Holds information about the execution context.
    */
   private final JPPFContext jppfContext;
@@ -76,16 +72,21 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-398">JPPF-398 Deadlock in the client</a>
    */
   private final ExecutorService channelsExecutor = Executors.newSingleThreadExecutor(new JPPFThreadFactory("ChannelsExecutor"));
+  /**
+   * The load-balancer factory.
+   */
+  private final JPPFBundlerFactory bundlerFactory;
 
   /**
    * Initialize this task queue checker with the specified node server.
-   * @param queue        the reference queue to use.
+   * @param queue the reference queue to use.
+   * @param bundlerFactory the load-balancer factory.
    */
-  public TaskQueueChecker(final JPPFPriorityQueue queue) {
+  public TaskQueueChecker(final JPPFPriorityQueue queue, final JPPFBundlerFactory bundlerFactory) {
     this.queue = queue;
+    this.bundlerFactory = bundlerFactory;
     this.jppfContext = new JPPFContextClient(queue);
     this.queueLock = queue.getLock();
-    this.bundler = createDefault();
   }
 
   /**
@@ -94,32 +95,6 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   public JPPFContext getJPPFContext() {
     return jppfContext;
-  }
-
-  /**
-   * Create new instance of default bundler.
-   * @return a new {@link Bundler} instance.
-   */
-  protected Bundler createDefault() {
-    FixedSizeProfile profile = new FixedSizeProfile();
-    profile.setSize(1);
-    return new FixedSizeBundler(profile);
-  }
-
-  /**
-   * Get the bundler used to schedule tasks for the corresponding node.
-   * @return a {@link Bundler} instance.
-   */
-  public Bundler getBundler() {
-    return bundler;
-  }
-
-  /**
-   * Set the bundler used to schedule tasks for the corresponding node.
-   * @param bundler a {@link Bundler} instance.
-   */
-  public void setBundler(final Bundler bundler) {
-    this.bundler = (bundler == null) ? createDefault() : bundler;
   }
 
   /**
@@ -293,13 +268,11 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
     synchronized (channel.getMonitor()) {
       int size = 1;
       try {
-        updateBundler(getBundler(), selectedBundle.getJob(), channel);
+        updateBundler(selectedBundle.getJob(), channel);
         size = channel.getBundler().getBundleSize();
       } catch (Exception e) {
         log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
-        FixedSizeProfile profile = new FixedSizeProfile();
-        profile.setSize(1);
-        setBundler(new FixedSizeBundler(profile));
+        size = bundlerFactory.getFallbackBundler().getBundleSize();
       }
       ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
       selectedBundle.addChannel(channel);
@@ -309,13 +282,12 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
 
   /**
    * Perform the checks on the bundler before submitting a job.
-   * @param bundler    the bundler to check and update.
    * @param taskBundle the job.
    * @param context    the current node context.
    */
   @SuppressWarnings("deprecation")
-  private void updateBundler(final Bundler bundler, final JPPFJob taskBundle, final ChannelWrapper context) {
-    context.checkBundler(bundler, jppfContext);
+  private void updateBundler(final JPPFJob taskBundle, final ChannelWrapper context) {
+    context.checkBundler(bundlerFactory, jppfContext);
     if (context.getBundler() instanceof JobAwareness) {
       ((JobAwareness) context.getBundler()).setJobMetadata(taskBundle.getMetadata());
     } else if (context.getBundler() instanceof JobAwarenessEx) {

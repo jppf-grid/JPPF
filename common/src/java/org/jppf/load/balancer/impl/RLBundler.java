@@ -19,34 +19,101 @@
 package org.jppf.load.balancer.impl;
 
 import org.jppf.load.balancer.*;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.*;
 
 /**
  * Bundler based on a reinforcement learning algorithm.
  * @author Laurent Cohen
  * @exclude
  */
-public class RLBundler extends AbstractRLBundler {
+public class RLBundler extends AbstractAdaptiveBundler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(RLBundler.class);
+  /**
+   * Determines whether debugging level is set for logging.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+  /**
+   * The incrementation step of the action.
+   */
+  private static final int STEP = 1;
+  /**
+   * Action to take.
+   */
+  private int action = STEP;
+  /**
+   * Bounded memory of the past performance updates.
+   */
+  private BundleDataHolder dataHolder = null;
+  /**
+   * The previous bundle size.
+   */
+  private int prevBundleSize = 1;
+
   /**
    * Creates a new instance with the specified parameters.
    * @param profile the parameters of the algorithm, grouped as a performance analysis profile.
    */
   public RLBundler(final LoadBalancingProfile profile) {
     super(profile);
-  }
-
-  @Override
-  public Bundler copy() {
-    return new RLBundler(profile);
+    if (debugEnabled) log.debug(String.format("Bundler #%d: using RL algorithm, initial size=%d, performanceVariationThreshold=%f",
+      bundlerNumber, bundleSize, ((RLProfile) profile).getPerformanceVariationThreshold()));
+    this.dataHolder = new BundleDataHolder(((RLProfile) profile).getPerformanceCacheSize());
+    this.action = ((RLProfile) profile).getMaxActionRange();
   }
 
   /**
-   * Get the max bundle size that can be used for this bundler.
-   * @return the bundle size as an int.
+   * set the current size of bundle.
+   * @param bundleSize the bundle size as an int value.
+   */
+  public void setBundleSize(final int bundleSize) {
+    this.bundleSize = bundleSize;
+  }
+
+  /**
+   * This method computes the bundle size based on the new state of the server.
+   * @param size the number of tasks executed.
+   * @param totalTime the time in nanoseconds it took to execute the tasks.
    */
   @Override
-  protected int maxSize() {
-    if (job != null) return job.getTaskCount();
-    if (jppfContext == null) throw new IllegalStateException("jppfContext not set");
-    return jppfContext.getMaxBundleSize();
+  public void feedback(final int size, final double totalTime) {
+    if (size <= 0) return;
+    BundlePerformanceSample sample = new BundlePerformanceSample(totalTime / size, size);
+    dataHolder.addSample(sample);
+    computeBundleSize();
+  }
+
+  /**
+   * Compute the new bundle size.
+   */
+  protected void computeBundleSize() {
+    double d = dataHolder.getPreviousMean() - dataHolder.getMean();
+    double threshold = ((RLProfile) profile).getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
+    prevBundleSize = bundleSize;
+    if (action == 0) action = (int) -Math.signum(d);
+    if ((d < -threshold) || (d > threshold)) action = (int) Math.signum(action) * (int) Math.round(d / threshold);
+    else action = 0;
+    if (debugEnabled) log.debug("bundler #" + getBundlerNumber() + ": d = " + d + ", threshold = " + threshold + ", action = " + action);
+    int maxActionRange = ((RLProfile) profile).getMaxActionRange();
+    if (action > maxActionRange) action = maxActionRange;
+    else if (action < -maxActionRange) action = -maxActionRange;
+    bundleSize += action;
+    //int max = Math.max(1, maxSize());
+    int max = maxSize();
+    if (bundleSize > max) bundleSize = max;
+    if (bundleSize <= 0) bundleSize = 1;
+  }
+
+  @Override
+  public void setup() {
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    dataHolder = null;
   }
 }
