@@ -227,7 +227,7 @@ public class ThumbnailGenerator {
   }
 
   /**
-   * File filter that only accepts GIF, JPG and PNG files.
+   * File filter that only accepts files with specified extensions.
    * @exclude
    */
   public static class ImageFileFilter implements FileFilter {
@@ -237,7 +237,7 @@ public class ThumbnailGenerator {
     private String[] extensions = null;
 
     /**
-     * Initialize this filter width he specified extensions.
+     * Initialize this filter with the specified extensions.
      * @param extensions an array of the accepted extensions.
      */
     public ImageFileFilter(final String...extensions) {
@@ -246,8 +246,8 @@ public class ThumbnailGenerator {
 
     @Override
     public boolean accept(final File file) {
-      String ext = FileUtils.getFileExtension(file);
       if (file.getName().startsWith(TH_PREFIX)) return false;
+      String ext = FileUtils.getFileExtension(file);
       for (String s: extensions) {
         if (s.equalsIgnoreCase(ext)) return true;
       }
@@ -260,21 +260,17 @@ public class ThumbnailGenerator {
    * @param args contains in that order: root path, thumbnail width, thumbnail height.
    */
   public static void main(final String...args) {
-    try
-    {
+    try {
       String path = args[0];
       int width = Integer.valueOf(args[1]);
       int height = Integer.valueOf(args[2]);
       String includePath = args[3];
       int rowLength = Integer.valueOf(args[4]);
-      System.out.println("Using folder = " + path + ", max width = " + width + ", max height = " + height +
-          ", include file path = " + includePath + ", thumbnails per row = " + rowLength);
+      System.out.println("Using folder = " + path + ", max width = " + width + ", max height = " + height + ", include file path = " + includePath + ", thumbnails per row = " + rowLength);
       ThumbnailGenerator tg = new ThumbnailGenerator(path, width, height, includePath, rowLength);
       tg.generate();
       System.out.println("finished");
-    }
-    catch(Exception e)
-    {
+    } catch(Exception e) {
       e.printStackTrace();
     }
   }

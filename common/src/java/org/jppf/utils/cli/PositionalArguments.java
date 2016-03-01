@@ -24,45 +24,45 @@ import java.util.Map;
  *
  * @author Laurent Cohen
  */
-public class NamedArguments extends AbstractCLIArguments<NamedArguments> {
+public class PositionalArguments extends AbstractCLIArguments<PositionalArguments> {
   @Override
-  public NamedArguments addSwitch(final String name, final String usage) {
-    return super.addSwitch(name, usage);
-  }
-
-  @Override
-  public NamedArguments printUsage() {
+  public PositionalArguments printUsage() {
     if (title != null) System.out.println(title);
     int maxLen = 0;
     for (CLIArgument arg: argDefs.values()) {
-      String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
-      if (s.length() > maxLen) maxLen = s.length();
+      int len = arg.getName().length();
+      if (len > maxLen) maxLen = len;
     }
     String format = "%-" + maxLen + "s : %s%n";
     for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
       CLIArgument arg = entry.getValue();
-      String s = arg.isSwitch() ? arg.getName() : arg.getName() + " <value>";
-      System.out.printf(format, s, arg.getUsage());
+      System.out.printf(format, arg.getName(), arg.getUsage());
     }
     return this;
   }
 
   @Override
-  public NamedArguments parseArguments(final String...clArgs)  throws Exception {
+  public PositionalArguments parseArguments(final String...clArgs)  throws Exception {
     boolean end = false;
     int pos = 0;
     try {
-      while (pos < clArgs.length) {
-        String name = clArgs[pos++];
-        CLIArgument arg = argDefs.get(name);
-        if (arg == null) throw new IllegalArgumentException("Unknown argument: " + name);
-        if (arg.isSwitch()) setBoolean(name, true);
-        else setString(name, clArgs[pos++]);
+      for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+        if (pos >= clArgs.length) break;
+        setString(Integer.toString(pos), clArgs[pos++]);
       }
     } catch (Exception e) {
       printError(null, e, clArgs);
       throw e;
     }
     return this;
+  }
+
+  /**
+   * Get the value of the argument at the specified position.
+   * @param position the posiiton of the argument ot lookup.
+   * @return the argument value, or {@code null} if it is not found.
+   */
+  public String getString(final int position) {
+    return getString(Integer.toString(position));
   }
 }

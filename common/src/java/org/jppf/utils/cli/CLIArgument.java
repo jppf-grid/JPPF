@@ -22,7 +22,7 @@ package org.jppf.utils.cli;
  * 
  * @author Laurent Cohen
  */
-class NamedArg {
+class CLIArgument {
   /**
    * This argument's name.
    */
@@ -31,40 +31,22 @@ class NamedArg {
    * If {@code true} then this argument has a value explicitly specified on the command line,
    * when {@code false} it is a boolean switch set to {@code true} when present or {@code false} when unspecified.
    */
-  private final boolean explicitValue;
+  private final boolean switchArg;
   /**
    * A description of this argument.
    */
   private final String usage;
 
   /**
-   * Initialize this argument with the specified name and excplicit value flag set to {@code false}, i.e as a boolean switch.
-   * @param name this argument's name.
-   */
-  public NamedArg(final String name) {
-    this(name, false);
-  }
-
-  /**
    * Initialize this argument with the specified name and excplicit value flag.
    * @param name this argument's name.
-   * @param explicitValue if {@code true} then this argument has a value explicitly specified on the command line,
-   * when {@code false} it is a boolean switch set to {@code true} when present or {@code false} when unspecified.
-   */
-  public NamedArg(final String name, final boolean explicitValue) {
-    this(name, explicitValue, "");
-  }
-
-  /**
-   * Initialize this argument with the specified name and excplicit value flag.
-   * @param name this argument's name.
-   * @param explicitValue if {@code true} then this argument has a value explicitly specified on the command line,
+   * @param switchArg if {@code true} then this argument has a value explicitly specified on the command line,
    * when {@code false} it is a boolean switch set to {@code true} when present or {@code false} when unspecified.
    * @param usage a string describing this argument's usage.
    */
-  public NamedArg(final String name, final boolean explicitValue, final String usage) {
+  public CLIArgument(final String name, final boolean switchArg, final String usage) {
     this.name = name;
-    this.explicitValue = explicitValue;
+    this.switchArg = switchArg;
     this.usage = usage == null ? "" : usage;
   }
 
@@ -82,7 +64,7 @@ class NamedArg {
    * {@code true} when it is a boolean switch set to {@code true} when present or {@code false} when unspecified.
    */
   public boolean isSwitch() {
-    return !explicitValue;
+    return switchArg;
   }
 
   /**

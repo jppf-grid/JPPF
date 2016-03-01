@@ -17,12 +17,10 @@
  */
 package org.jppf.doc;
 
-import static org.jppf.doc.ParameterNames.*;
-
 import java.io.*;
 import java.util.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.FileUtils;
 import org.jppf.utils.cli.NamedArguments;
 
 /**
@@ -42,6 +40,38 @@ import org.jppf.utils.cli.NamedArguments;
  * @author Laurent Cohen
  */
 public class HtmlDocGenerator {
+  /**
+   * Name of the source directory parameter.
+   */
+  private static final String SOURCE_DIR = "-s";
+  /**
+   * Name of the destination directory parameter.
+   */
+  private static final String DEST_DIR = "-d";
+  /**
+   * Name of the templates directory parameter.
+   */
+  private static final String TEMPLATES_DIR = "-t";
+  /**
+   * Name of the file includes parameter.
+   */
+  private static final String FILE_INCLUDES = "-fi";
+  /**
+   * Name of the file excludes parameter.
+   */
+  private static final String FILE_EXCLUDES = "-fe";
+  /**
+   * Name of the directory includes parameter.
+   */
+  private static final String DIR_INCLUDES = "-di";
+  /**
+   * Name of the directory excludes parameter.
+   */
+  private static final String DIR_EXCLUDES = "-de";
+  /**
+   * Name ofr the recursive directory processing flag parameter.
+   */
+  private static final String RECURSIVE = "-r";
   /**
    * Start of a template insertion.
    */
@@ -175,7 +205,6 @@ public class HtmlDocGenerator {
     String tf = !templateFolder.endsWith("/") ? templateFolder + "/" : templateFolder;
     String templateFile = tf + parameterMap.get("name") + ".html";
     if (!(new File(templateFile).exists())) throw new Exception("Could not find template file " + templateFile);
-    //String content = FileUtils.readTextFile(templateFile);
     String content = readTextFileStripComments(templateFile);
     content = processTemplates(parameterMap, content, tf);
     content = processParameters(parameterMap, content);
