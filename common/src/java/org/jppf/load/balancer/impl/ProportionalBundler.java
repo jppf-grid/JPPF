@@ -33,9 +33,8 @@ import org.slf4j.*;
  * every time the performance data for a node is updated. In the case of a small network, this overhead is not
  * large enough to impact the overall performance significantly.
  * @author Laurent Cohen
- * @exclude
  */
-public class ProportionalBundler extends AbstractAdaptiveBundler {
+public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalProfile> {
   /**
    * Logger for this class.
    */
@@ -69,19 +68,17 @@ public class ProportionalBundler extends AbstractAdaptiveBundler {
    * Creates a new instance with the initial size of bundle as the start size.
    * @param profile the parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
    */
-  public ProportionalBundler(final LoadBalancingProfile profile) {
+  public ProportionalBundler(final ProportionalProfile profile) {
     super(profile);
-    if (this.profile == null) this.profile = new ProportionalTuneProfile();
-    ProportionalTuneProfile prof = (ProportionalTuneProfile) this.profile;
-    dataHolder = new BundleDataHolder(prof.getPerformanceCacheSize(), prof.getInitialMeanTime());
-    bundleSize = prof.getInitialSize();
+    dataHolder = new BundleDataHolder(profile.getPerformanceCacheSize(), profile.getInitialMeanTime());
+    bundleSize = profile.getInitialSize();
     if (bundleSize < 1) bundleSize = 1;
     if (debugEnabled) log.debug("Bundler#" + bundlerNumber + ": Using proportional bundle size - the initial size is " + bundleSize + ", profile: " + profile);
   }
 
   /**
    * Get local mapping of individual bundler to corresponding performance data.
-   * @return <code>Set<AbstractProportionalBundler></code>
+   * @return a {@code Set<AbstractProportionalBundler>}.
    */
   protected final Set<ProportionalBundler> getBundlers() {
     return bundlers;
@@ -92,18 +89,7 @@ public class ProportionalBundler extends AbstractAdaptiveBundler {
    * @param size the bundle size as an int value.
    */
   public void setBundleSize(final int size) {
-    //bundleSize = sizeWithNoise(size <= 0 ? 1 : size);
     bundleSize = size <= 0 ? 1 : size;
-  }
-
-  /**
-   * Add some random noise to the bundle size.
-   * @param value the initial size to add noise to
-   * @return the "noisy" size.
-   */
-  double noisyValue(final double value) {
-    double newValue = value * (1d + 0.1d * (0.5d - rand.nextDouble()));
-    return (newValue < 0d) ? 0d : newValue;
   }
 
   /**
@@ -115,7 +101,6 @@ public class ProportionalBundler extends AbstractAdaptiveBundler {
   public void feedback(final int size, final double time) {
     if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": new performance sample [size=" + size + ", time=" + (long) time + ']');
     if (size <= 0) return;
-    //BundlePerformanceSample sample = new BundlePerformanceSample(noisyValue(time) / size, size);
     BundlePerformanceSample sample = new BundlePerformanceSample(time / size, size);
     synchronized (bundlers) {
       dataHolder.addSample(sample);
@@ -208,10 +193,8 @@ public class ProportionalBundler extends AbstractAdaptiveBundler {
    */
   public double normalize(final double x) {
     double r = 1.0d;
-    for (int i = 0; i < ((ProportionalTuneProfile) profile).getProportionalityFactor(); i++)
+    for (int i = 0; i < ((ProportionalProfile) profile).getProportionalityFactor(); i++)
       r *= x;
     return 1.0d / r;
-    /*
-     */
   }
 }

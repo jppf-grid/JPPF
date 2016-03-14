@@ -32,9 +32,8 @@ import org.slf4j.*;
  * 
  * @author Domingos Creado
  * @author Laurent Cohen
- * @exclude
  */
-public class AutoTunedBundler extends AbstractAdaptiveBundler {
+public class AutoTunedBundler extends AbstractAdaptiveBundler<AnnealingTuneProfile> {
   /**
    * Logger for this class.
    */
@@ -58,8 +57,9 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler {
    * @param profile the parameters of the auto-tuning algorithm,
    * grouped as a performance analysis profile.
    */
-  public AutoTunedBundler(final LoadBalancingProfile profile) {
+  public AutoTunedBundler(final AnnealingTuneProfile profile) {
     super(profile);
+    bundleSize = profile.size;
     if (bundleSize < 1) bundleSize = 1;
   }
 
@@ -78,7 +78,6 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler {
    */
   @Override
   public void feedback(final int bundleSize, final double time) {
-    assert bundleSize > 0;
     if (traceEnabled) {
       log.trace("Bundler#" + bundlerNumber + ": Got another sample with bundleSize=" + bundleSize + " and totalTime=" + time);
     }
@@ -98,7 +97,7 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler {
       bundleSample.mean = (time + bundleSample.samples * bundleSample.mean) / samples;
       bundleSample.samples = samples;
     }
-    if (samples > ((AnnealingTuneProfile) profile).getMinSamplesToAnalyse()) {
+    if (samples > profile.getMinSamplesToAnalyse()) {
       performAnalysis();
       if (traceEnabled) log.trace("Bundler#" + bundlerNumber + ": bundle size = " + bundleSize);
     }
@@ -114,8 +113,8 @@ public class AutoTunedBundler extends AbstractAdaptiveBundler {
       int max = maxSize();
       if ((max > 0) && (bestSize > max)) bestSize = max;
       int counter = 0;
-      while (counter < ((AnnealingTuneProfile) profile).getMaxGuessToStable()) {
-        int diff = ((AnnealingTuneProfile) profile).createDiff(bestSize, samplesMap.size(), rnd);
+      while (counter < profile.getMaxGuessToStable()) {
+        int diff = profile.createDiff(bestSize, samplesMap.size(), rnd);
         if (diff < bestSize) {
           // the second part is there to ensure the size is > 0
           if (rnd.nextBoolean()) diff = -diff;

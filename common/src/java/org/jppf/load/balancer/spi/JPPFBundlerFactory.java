@@ -307,8 +307,7 @@ public class JPPFBundlerFactory {
    * @return a new {@link Bundler} instance.
    */
   private Bundler createFallbackBundler() {
-    FixedSizeProfile profile = new FixedSizeProfile();
-    profile.setSize(1);
+    FixedSizeProfile profile = new FixedSizeProfile(new TypedProperties().setInt("size", 1));
     return new FixedSizeBundler(profile);
   }
 }

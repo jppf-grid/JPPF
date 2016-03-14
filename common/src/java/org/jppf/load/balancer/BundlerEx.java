@@ -20,9 +20,10 @@ package org.jppf.load.balancer;
 
 /**
  * A bundler which provides a more advanced feedback method with additional performance data.
+ * @param <T> the type of parameters profile used by this bundler.
  * @author Laurent Cohen
  */
-public interface BundlerEx extends Bundler {
+public interface BundlerEx<T extends LoadBalancingProfile> extends Bundler<T> {
   /**
    * Feedback the bundler with the result of using the bundle with the specified size.
    * The feedback data consists in providing a number of tasks that were executed, and their total execution time in milliseconds.

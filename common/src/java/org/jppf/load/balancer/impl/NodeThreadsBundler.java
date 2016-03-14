@@ -29,21 +29,16 @@ import org.slf4j.*;
  * where <i>n</i> is the number of processing threads in the node, and <i>m</i> is a
  * user-defined parameter which defaults to one.
  * @author Laurent Cohen
- * @exclude
  */
-public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwareness {
+public class NodeThreadsBundler extends AbstractBundler<NodeThreadsProfile> implements ChannelAwareness {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(NodeThreadsLoadBalancer.class);
-  /**
-   * Holds information about the execution context.
-   */
-  private JPPFContext jppfContext = null;
+  private static Logger log = LoggerFactory.getLogger(NodeThreadsBundler.class);
   /**
    * Holds information about the node's environment and configuration.
    */
-  private JPPFSystemInformation nodeConfiguration = null;
+  private JPPFSystemInformation channelConfiguration = null;
   /**
    * The current number of tasks to send to the node.
    */
@@ -53,7 +48,7 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm.
    */
-  public NodeThreadsLoadBalancer(final LoadBalancingProfile profile) {
+  public NodeThreadsBundler(final NodeThreadsProfile profile) {
     super(profile);
     if (log.isDebugEnabled()) log.debug("creating " + this.getClass().getSimpleName() + " #" + this.bundlerNumber);
   }
@@ -68,34 +63,34 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
   }
 
   @Override
-  public JPPFSystemInformation getNodeConfiguration() {
-    return nodeConfiguration;
+  public JPPFSystemInformation getChannelConfiguration() {
+    return channelConfiguration;
   }
 
   @Override
-  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
-    this.nodeConfiguration = nodeConfiguration;
+  public void setChannelConfiguration(final JPPFSystemInformation channelConfiguration) {
+    this.channelConfiguration = channelConfiguration;
     computeBundleSize();
-    if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + nodeConfiguration);
+    if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + channelConfiguration);
   }
 
   /**
    * Compute the number of tasks to send to the node. This is the actual algorithm implementation.
    */
   private void computeBundleSize() {
-    JPPFSystemInformation nodeConfig = getNodeConfiguration();
+    JPPFSystemInformation nodeConfig = getChannelConfiguration();
     if (nodeConfig == null) bundleSize = 1;
     else {
       // get the number of processing threads in the node
-      TypedProperties jppf = getNodeConfiguration().getJppf();
+      TypedProperties jppf = getChannelConfiguration().getJppf();
       boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
       JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
       int nbThreads = jppf.getInt(prop.getName(), -1);
       if (log.isDebugEnabled()) log.debug("bundler #" + this.bundlerNumber + " nb threads from config = " + nbThreads);
       // if number of threads is not defined, we assume it is the number of available processors
-      if (nbThreads <= 0) nbThreads = getNodeConfiguration().getRuntime().getInt("availableProcessors");
+      if (nbThreads <= 0) nbThreads = getChannelConfiguration().getRuntime().getInt("availableProcessors");
       if (nbThreads <= 0) nbThreads = 1;
-      int multiplicator = ((NodeThreadsProfile) profile).getMultiplicator();
+      int multiplicator = profile.getMultiplicator();
       if (multiplicator <= 0) multiplicator = 1;
       bundleSize = nbThreads * multiplicator;
     }
@@ -109,16 +104,6 @@ public class NodeThreadsLoadBalancer extends AbstractBundler implements NodeAwar
   @Override
   public void dispose() {
     if (log.isDebugEnabled()) log.debug("disposing bundler #" + this.bundlerNumber);
-    this.nodeConfiguration = null;
-  }
-
-  @Override
-  public JPPFContext getJPPFContext() {
-    return jppfContext;
-  }
-
-  @Override
-  public void setJPPFContext(final JPPFContext context) {
-    this.jppfContext = context;
+    this.channelConfiguration = null;
   }
 }

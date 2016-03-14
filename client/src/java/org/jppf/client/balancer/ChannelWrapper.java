@@ -125,6 +125,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
+  @SuppressWarnings("deprecation")
   @Override
   public boolean checkBundler(final JPPFBundlerFactory factory, final JPPFContext jppfContext) {
     if (factory == null) throw new IllegalArgumentException("Bundler factory is null");
@@ -136,7 +137,8 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
       this.bundler = factory.newBundler();
       if (this.bundler instanceof ContextAwareness) ((ContextAwareness)this.bundler).setJPPFContext(jppfContext);
       this.bundler.setup();
-      if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);
+      if (this.bundler instanceof ChannelAwareness) ((ChannelAwareness) this.bundler).setChannelConfiguration(systemInfo);
+      else if (this.bundler instanceof NodeAwareness) ((NodeAwareness) this.bundler).setNodeConfiguration(systemInfo);
       return true;
     }
     return false;

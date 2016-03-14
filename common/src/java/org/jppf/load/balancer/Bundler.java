@@ -22,10 +22,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This is the interface of all strategies for defining bundle task size.
  * A Bundler defines the current bundle size using different algorithms, depending on the implementation.
+ * @param <T> the type of parameters profile used by this bundler.
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public interface Bundler {
+public interface Bundler<T extends LoadBalancingProfile> {
   /**
    * Count of the bundlers used to generate a readable unique id.
    * @exclude
@@ -76,5 +77,5 @@ public interface Bundler {
    * Get the parameters profile used by this load-balancer.
    * @return an instance of <code>LoadBalancingProfile</code>.
    */
-  LoadBalancingProfile getProfile();
+  T getProfile();
 }

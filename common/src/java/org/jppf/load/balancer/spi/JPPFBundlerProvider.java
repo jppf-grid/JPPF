@@ -30,9 +30,10 @@ import org.jppf.utils.TypedProperties;
  * <li>In this folder, create or edit a file named {@code org.jppf.load.balancer.spi.JPPFBundlerProvider}</li>
  * <li>In this file, add a line containing the fully qualified name of the class implementing the {@link JPPFBundlerProvider} interface</li>
  * </ul>
+ * @param <T> the type of parameters profile used by the bundler.
  * @author Laurent Cohen
  */
-public interface JPPFBundlerProvider {
+public interface JPPFBundlerProvider<T extends LoadBalancingProfile> {
   /**
    * Get the name of the algorithm defined by this provider. Each algorithm must have a name distinct from that of all other algorithms.
    * @return the algorithm's name as a string.
@@ -45,7 +46,7 @@ public interface JPPFBundlerProvider {
    * @param profile an {@link Bundler} instance.
    * @return an instance of the bundler implementation defined by this provider.
    */
-  Bundler createBundler(LoadBalancingProfile profile);
+  Bundler<T> createBundler(T profile);
 
   /**
    * <p>Create a bundler profile containing the parameters of the algorithm.
@@ -57,5 +58,5 @@ public interface JPPFBundlerProvider {
    * @param configuration a set of properties defining the algorithm's parameters.
    * @return an {@link LoadBalancingProfile} instance.
    */
-  LoadBalancingProfile createProfile(TypedProperties configuration);
+  T createProfile(TypedProperties configuration);
 }

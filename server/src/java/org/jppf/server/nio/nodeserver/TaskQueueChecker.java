@@ -24,7 +24,6 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.execute.ExecutorStatus;
 import org.jppf.load.balancer.*;
-import org.jppf.load.balancer.impl.*;
 import org.jppf.load.balancer.spi.JPPFBundlerFactory;
 import org.jppf.management.*;
 import org.jppf.node.policy.ExecutionPolicy;
@@ -117,16 +116,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends ThreadSynch
    */
   JPPFContext getJPPFContext() {
     return jppfContext;
-  }
-
-  /**
-   * Create new instance of default bundler.
-   * @return a new {@link Bundler} instance.
-   */
-  private Bundler createDefault() {
-    FixedSizeProfile profile = new FixedSizeProfile();
-    profile.setSize(1);
-    return new FixedSizeBundler(profile);
   }
 
   /**

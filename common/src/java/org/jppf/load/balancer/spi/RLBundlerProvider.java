@@ -18,33 +18,32 @@
 
 package org.jppf.load.balancer.spi;
 
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.Bundler;
 import org.jppf.load.balancer.impl.*;
 import org.jppf.utils.TypedProperties;
 
 /**
  * Provider implementation for the reinforcement learning load-balancing algorithm.
  * @author Laurent Cohen
- * @exclude
  */
-public class RLBundlerProvider implements JPPFBundlerProvider {
+public class RLBundlerProvider implements JPPFBundlerProvider<RLProfile> {
   /**
    * Create a bundler instance using the specified parameters profile.
-   * @param profile - an <code>AutoTuneProfile</code> instance.
+   * @param profile encapsulates the parameters of this algorithm.
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile) {
+  public Bundler createBundler(final RLProfile profile) {
     return new RLBundler(profile);
   }
 
   /**
    * Create a bundler profile containing the parameters of the algorithm.
-   * @param configuration - a set of properties defining the algorithm's parameters.
-   * @return an {@link org.jppf.load.balancer.impl.RLProfile RLProfile} instance.
+   * @param configuration a set of properties defining the algorithm's parameters.
+   * @return an {@link RLProfile} instance.
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration) {
+  public RLProfile createProfile(final TypedProperties configuration) {
     return new RLProfile(configuration);
   }
 

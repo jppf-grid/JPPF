@@ -18,51 +18,41 @@
 
 package org.jppf.load.balancer.spi;
 
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.Bundler;
 import org.jppf.load.balancer.impl.*;
 import org.jppf.utils.TypedProperties;
 
 /**
  * Provider implementation for the "proportional" load-balancing algorithm.
  * @author Laurent Cohen
- * @exclude
  */
-public class ProportionalBundlerProvider implements JPPFBundlerProvider
-{
-
+public class ProportionalBundlerProvider implements JPPFBundlerProvider<ProportionalProfile> {
   /**
    * Create a bundler instance using the specified parameters profile.
-   * @param profile - an <code>AutoTuneProfile</code> instance.
+   * @param profile encapsulates the parameters of this algorithm.
    * @return an instance of the bundler implementation defined by this provider.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createBundler(org.jppf.load.balancer.LoadBalancingProfile)
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile)
-  {
+  public Bundler createBundler(final ProportionalProfile profile) {
     return new ProportionalBundler(profile);
   }
 
   /**
    * Create a bundler profile containing the parameters of the algorithm.
-   * @param configuration - a set of properties defining the algorithm's parameters.
-   * @return an {@link org.jppf.load.balancer.impl.ProportionalTuneProfile ProportionalTuneProfile} instance.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
+   * @param configuration a set of properties defining the algorithm's parameters.
+   * @return an {@link ProportionalProfile} instance.
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration)
-  {
-    return new ProportionalTuneProfile(configuration);
+  public ProportionalProfile createProfile(final TypedProperties configuration) {
+    return new ProportionalProfile(configuration);
   }
 
   /**
    * Get the name of the algorithm defined by this provider.
    * @return the algorithm's name as a string.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#getAlgorithmName()
    */
   @Override
-  public String getAlgorithmName()
-  {
+  public String getAlgorithmName() {
     return "proportional";
   }
-
 }

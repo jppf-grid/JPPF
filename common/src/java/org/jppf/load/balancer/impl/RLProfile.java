@@ -18,14 +18,12 @@
 
 package org.jppf.load.balancer.impl;
 
-import org.jppf.load.balancer.*;
-import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.load.balancer.AbstractLoadBalancingProfile;
+import org.jppf.utils.TypedProperties;
 
 /**
  * Parameters profile for a proportional bundler.
  * @author Laurent Cohen
- * @exclude
  */
 public class RLProfile extends AbstractLoadBalancingProfile {
   /**
@@ -42,44 +40,13 @@ public class RLProfile extends AbstractLoadBalancingProfile {
   private int maxActionRange = 50;
 
   /**
-   * Initialize this profile with default parameters.
-   */
-  public RLProfile() {
-  }
-
-  /**
-   * Initialize this profile with values read from the configuration file.
-   * @param profileName name of the profile in the configuration file.
-   */
-  public RLProfile(final String profileName) {
-    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
-    TypedProperties props = JPPFConfiguration.getProperties();
-    performanceCacheSize = props.getInt(prefix + "performanceCacheSize", 2000);
-    performanceVariationThreshold = props.getDouble(prefix + "performanceVariationThreshold", 0.0001d);
-    maxActionRange = props.getInt(prefix + "maxActionRange", 50);
-  }
-
-  /**
    * Initialize this profile with values read from the specified configuration.
    * @param config contains a mapping of the profile parameters to their value.
    */
   public RLProfile(final TypedProperties config) {
     performanceCacheSize = config.getInt("performanceCacheSize", 2000);
-    performanceVariationThreshold = config.getDouble("performanceVariationThreshold", 0.05);
+    performanceVariationThreshold = config.getDouble("performanceVariationThreshold", 0.001);
     maxActionRange = config.getInt("maxActionRange", 50);
-  }
-
-  /**
-   * Make a copy of this profile.
-   * @return a new <code>AutoTuneProfile</code> instance.
-   */
-  @Override
-  public LoadBalancingProfile copy() {
-    RLProfile other = new RLProfile();
-    other.setPerformanceCacheSize(performanceCacheSize);
-    other.setPerformanceVariationThreshold(performanceVariationThreshold);
-    other.setMaxActionRange(maxActionRange);
-    return other;
   }
 
   /**

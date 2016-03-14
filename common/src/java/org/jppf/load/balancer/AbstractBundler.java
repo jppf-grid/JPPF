@@ -24,11 +24,13 @@ package org.jppf.load.balancer;
  * <p>It provides working implementations of the {@link #getTimestamp() getTimestamp()}, {@link #getProfile() getProfile()},
  * {@link #setup() setup()} and {@link #dispose() dispose()} methods, along with an empty implementation of {@link #feedback(int, double) feedback(int, double)}.
  * <p>It also adds the {@link #maxSize() maxSize()} method which uses an internal context object to compute a usable cap for the value returned by {@code getBundleSize()}.
+ * @param <T> the type of parameters profile used by this bundler.
  * @author Laurent Cohen
  */
-public abstract class AbstractBundler implements Bundler, ContextAwareness {
+public abstract class AbstractBundler<T extends LoadBalancingProfile> implements Bundler<T>, ContextAwareness {
   /**
    * The bundler number for this bundler.
+   * @exclude
    */
   protected final int bundlerNumber = BUNDLER_COUNT.incrementAndGet();
   /**
@@ -36,9 +38,9 @@ public abstract class AbstractBundler implements Bundler, ContextAwareness {
    */
   protected final long timestamp = System.currentTimeMillis();
   /**
-   * Parameters of the algorithm, grouped as a performance analysis profile.
+   * The parameters of this load-balancing algorithm.
    */
-  protected LoadBalancingProfile profile;
+  protected T profile;
   /**
    * Holds information about the execution context.
    */
@@ -48,7 +50,7 @@ public abstract class AbstractBundler implements Bundler, ContextAwareness {
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm,
    */
-  public AbstractBundler(final LoadBalancingProfile profile) {
+  public AbstractBundler(final T profile) {
     this.profile = profile;
   }
 
@@ -103,11 +105,11 @@ public abstract class AbstractBundler implements Bundler, ContextAwareness {
   }
 
   /**
-   * Get the parameters of the algorithm, grouped as a performance analysis profile.
-   * @return an instance of <code>LoadBalancingProfile</code>.
+   * Get the parameters of this load-balancing algorithm.
+   * @return an instance of an implementation of {@link LoadBalancingProfile}.
    */
   @Override
-  public LoadBalancingProfile getProfile() {
+  public T getProfile() {
     return profile;
   }
 

@@ -68,6 +68,7 @@ class WaitInitialBundleState extends NodeServerState {
    * @return a state transition as an <code>NioTransition</code> instance.
    * @throws Exception if an error occurs while transitioning to another state.
    */
+  @SuppressWarnings("deprecation")
   @Override
   public NodeTransition performTransition(final ChannelWrapper<?> channel) throws Exception  {
     AbstractNodeContext context = (AbstractNodeContext) channel.getContext();
@@ -91,7 +92,8 @@ class WaitInitialBundleState extends NodeServerState {
         systemInfo.getJppf().setBoolean("jppf.peer.driver", isPeer);
         systemInfo.getJppf().set(JPPFProperties.NODE_IDLE, true);
         context.setNodeInfo(systemInfo, false);
-        if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+        if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
+        else if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
       } else if (debugEnabled) log.debug("no system info received for node {}", channel);
 
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(server.getJPPFContext());

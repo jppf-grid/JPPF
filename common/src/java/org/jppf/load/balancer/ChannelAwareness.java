@@ -18,21 +18,22 @@
 
 package org.jppf.load.balancer;
 
+import org.jppf.management.JPPFSystemInformation;
+
 /**
- * Bundler implementations should implement this interface if they wish to have access to a node's context.
- * @author Martin JANDA
- * @exclude
+ * Bundler implementations should implement this interface if they wish to have access to a node's configuration.
+ * @author Laurent Cohen
  */
-public interface ContextAwareness {
+public interface ChannelAwareness {
   /**
-   * Get the corresponding node's context information.
-   * @return a {@link JPPFContext} instance.
+   * Get the corresponding node's system information.
+   * @return a {@link JPPFSystemInformation} instance.
    */
-  JPPFContext getJPPFContext();
+  JPPFSystemInformation getChannelConfiguration();
+
   /**
-   * Set the corresponding node's context information. This method is called before <code>Bundler.setup()</code> with
-   * context instance. And with <code>null</code> after <code>Bundler.dispose()</code>.
-   * @param context a {@link JPPFContext} instance.
+   * Set the corresponding node's system information.
+   * @param channelConfiguration a {@link JPPFSystemInformation} instance.
    */
-  void setJPPFContext(JPPFContext context);
+  void setChannelConfiguration(JPPFSystemInformation channelConfiguration);
 }

@@ -20,9 +20,8 @@ package org.jppf.load.balancer.impl;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.jppf.load.balancer.*;
-import org.jppf.utils.*;
-import org.jppf.utils.configuration.JPPFProperties;
+import org.jppf.load.balancer.AbstractLoadBalancingProfile;
+import org.jppf.utils.TypedProperties;
 
 /**
  * This class implements the basis of a profile based on simulated annealing
@@ -33,13 +32,16 @@ import org.jppf.utils.configuration.JPPFProperties;
  * of changes.
  * 
  * @author Domingos Creado
- * @exclude
  */
 public class AnnealingTuneProfile extends AbstractLoadBalancingProfile {
   /**
    * A default profile with default parameter values.
    */
   private static AtomicReference<AnnealingTuneProfile> defaultProfile = new AtomicReference<>(new AnnealingTuneProfile());
+  /**
+   * The initial bundle size to start from.
+   */
+  protected int size = 5;
   /**
    * The minimum number of samples that must be collected before an analysis is triggered.
    */
@@ -89,30 +91,17 @@ public class AnnealingTuneProfile extends AbstractLoadBalancingProfile {
 
   /**
    * Initialize this profile with values read from the configuration file.
-   * @param profileName name of the profile in the configuration file.
-   */
-  public AnnealingTuneProfile(final String profileName) {
-    String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + '.' + profileName + '.';
-    TypedProperties props = JPPFConfiguration.getProperties();
-    minSamplesToAnalyse = props.getInt(prefix + "minSamplesToAnalyse", 500);
-    minSamplesToCheckConvergence = props.getInt(prefix + "minSamplesToCheckConvergence", 300);
-    maxDeviation = props.getDouble(prefix + "maxDeviation", 0.2d);
-    maxGuessToStable = props.getInt(prefix + "maxGuessToStable", 10);
-    sizeRatioDeviation = props.getFloat(prefix + "sizeRatioDeviation", 1.5f);
-    decreaseRatio = props.getFloat(prefix + "decreaseRatio", 0.2f);
-  }
-
-  /**
-   * Initialize this profile with values read from the configuration file.
    * @param config contains a mapping of the profile parameters to their value.
    */
   public AnnealingTuneProfile(final TypedProperties config) {
+    size = config.getInt("size", 5);
     minSamplesToAnalyse = config.getInt("minSamplesToAnalyse", 500);
     minSamplesToCheckConvergence = config.getInt("minSamplesToCheckConvergence", 300);
     maxDeviation = config.getDouble("maxDeviation", 0.2d);
     maxGuessToStable = config.getInt("maxGuessToStable", 10);
     sizeRatioDeviation = config.getFloat("sizeRatioDeviation", 1.5f);
     decreaseRatio = config.getFloat("decreaseRatio", 0.2f);
+    
   }
 
   /**

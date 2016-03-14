@@ -18,49 +18,42 @@
 
 package org.jppf.load.balancer.spi;
 
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.Bundler;
 import org.jppf.load.balancer.impl.*;
 import org.jppf.utils.TypedProperties;
 
 /**
  * Provider implementation for the autotuned, Monte Carlo-based, load-balancing algorithm.
  * @author Laurent Cohen
- * @exclude
  */
-public class AutoTunedBundlerProvider implements JPPFBundlerProvider
-{
+public class AutoTunedBundlerProvider implements JPPFBundlerProvider<AnnealingTuneProfile> {
   /**
    * Create a bundler instance using the specified parameters profile.
-   * @param profile - an <code>AutoTuneProfile</code> instance.
+   * @param profile an <code>AutoTuneProfile</code> instance.
    * @return an instance of the bundler implementation defined by this provider.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createBundler(org.jppf.load.balancer.LoadBalancingProfile)
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile)
-  {
+  public Bundler createBundler(final AnnealingTuneProfile profile) {
     return new AutoTunedBundler(profile);
+    //return new AutotunedDelegatingBundler(profile);
   }
 
   /**
    * Create a bundler profile containing the parameters of the algorithm.
-   * @param configuration - a set of properties defining the algorithm's parameters.
+   * @param configuration a set of properties defining the algorithm's parameters.
    * @return an {@link org.jppf.load.balancer.impl.AnnealingTuneProfile AnnealingTuneProfile} instance.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration)
-  {
+  public AnnealingTuneProfile createProfile(final TypedProperties configuration) {
     return new AnnealingTuneProfile(configuration);
   }
 
   /**
    * Get the name of the algorithm defined by this provider.
    * @return the algorithm's name as a string.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#getAlgorithmName()
    */
   @Override
-  public String getAlgorithmName()
-  {
+  public String getAlgorithmName() {
     return "autotuned";
   }
 }

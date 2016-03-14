@@ -25,10 +25,10 @@ import org.jppf.utils.configuration.*;
 
 /**
  * 
+ * @param <T> the type of parameters profile used by this bundler.
  * @author Laurent Cohen
- * @exclude
  */
-public abstract class AbstractAdaptiveBundler extends AbstractBundler implements BundlerEx, NodeAwareness, JobAwarenessEx {
+public abstract class AbstractAdaptiveBundler<T extends LoadBalancingProfile> extends AbstractBundler<T> implements BundlerEx<T>, ChannelAwareness, JobAwarenessEx {
   /**
    * The current bundle size.
    */
@@ -36,7 +36,7 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   /**
    * Holds information about the node's environment and configuration.
    */
-  protected JPPFSystemInformation nodeConfiguration;
+  protected JPPFSystemInformation channelConfiguration;
   /**
    * The number of processing threads in the node.
    */
@@ -50,7 +50,7 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
    * Creates a new instance with the specified parameters profile.
    * @param profile the parameters of the load-balancing algorithm.
    */
-  public AbstractAdaptiveBundler(final LoadBalancingProfile profile) {
+  public AbstractAdaptiveBundler(final T profile) {
     super(profile);
   }
 
@@ -60,16 +60,17 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   }
 
   @Override
-  public JPPFSystemInformation getNodeConfiguration() {
-    return nodeConfiguration;
+  public JPPFSystemInformation getChannelConfiguration() {
+    return channelConfiguration;
   }
 
   @Override
-  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
-    this.nodeConfiguration = nodeConfiguration;
+  public void setChannelConfiguration(final JPPFSystemInformation nodeConfiguration) {
+    this.channelConfiguration = nodeConfiguration;
     TypedProperties jppf = nodeConfiguration.getJppf();
     boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
-    JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
+    //JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
+    JPPFProperty prop = JPPFProperties.PROCESSING_THREADS;
     nbThreads = jppf.getInt(prop.getName(), 1);
   }
 
@@ -101,7 +102,7 @@ public abstract class AbstractAdaptiveBundler extends AbstractBundler implements
   @Override
   public void dispose() {
     super.dispose();
-    nodeConfiguration = null;
+    channelConfiguration = null;
     job = null;
   }
 

@@ -17,8 +17,7 @@
  */
 
 /**
- * Classes supporting the automatic tuning of the task bundle size, using the proportional bundling algorithm.
+ * This package contains the implementations of a ll the JPPF built-in load-balancing algorithms.
  * <p>Found in: <b>jppf-common.jar</b> 
- * @exclude
  */
 package org.jppf.load.balancer.impl;

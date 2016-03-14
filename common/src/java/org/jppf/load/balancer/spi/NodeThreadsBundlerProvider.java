@@ -17,51 +17,41 @@
  */
 package org.jppf.load.balancer.spi;
 
-import org.jppf.load.balancer.*;
+import org.jppf.load.balancer.Bundler;
 import org.jppf.load.balancer.impl.*;
 import org.jppf.utils.TypedProperties;
 
 /**
  * Provider implementation for the "nodethreads" algorithm.
  * @author Laurent Cohen
- * @exclude
  */
-public class NodeThreadsLoadBalancerProvider implements JPPFBundlerProvider
-{
-
+public class NodeThreadsBundlerProvider implements JPPFBundlerProvider<NodeThreadsProfile> {
   /**
    * Create a bundler instance using the specified parameters profile.
-   * @param profile no used in this implementation.
-   * @return an instance of {@link NodeThreadsLoadBalancer}.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createBundler(org.jppf.load.balancer.LoadBalancingProfile)
+   * @param profile encapsulates the parameters of this algorithm.
+   * @return an instance of {@link NodeThreadsBundler}.
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile)
-  {
-    return new NodeThreadsLoadBalancer(profile);
+  public Bundler createBundler(final NodeThreadsProfile profile) {
+    return new NodeThreadsBundler(profile);
   }
 
   /**
    * Create a bundler profile containing the parameters of the algorithm.
-   * This method returns null, as the algorithm does not use any parameter.
    * @param configuration a set of properties defining the algorithm parameters.
    * @return an instance of {@link NodeThreadsProfile}.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#createProfile(org.jppf.utils.TypedProperties)
    */
   @Override
-  public LoadBalancingProfile createProfile(final TypedProperties configuration)
-  {
+  public NodeThreadsProfile createProfile(final TypedProperties configuration) {
     return new NodeThreadsProfile(configuration);
   }
 
   /**
    * Get the name of the algorithm defined by this provider.
    * @return the algorithm name as a string.
-   * @see org.jppf.load.balancer.spi.JPPFBundlerProvider#getAlgorithmName()
    */
   @Override
-  public String getAlgorithmName()
-  {
+  public String getAlgorithmName() {
     return "nodethreads";
   }
 }

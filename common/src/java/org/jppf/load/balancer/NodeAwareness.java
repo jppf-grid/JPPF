@@ -22,18 +22,21 @@ import org.jppf.management.JPPFSystemInformation;
 
 /**
  * Bundler implementations should implement this interface if they wish to have access to a node's configuration.
+ * @deprecated use {@link ChannelAwareness} instead.
  * @author Laurent Cohen
  */
-public interface NodeAwareness
-{
+public interface NodeAwareness {
   /**
    * Get the corresponding node's system information.
    * @return a {@link JPPFSystemInformation} instance.
+   * @deprecated use {@link ChannelAwareness} instead.
    */
   JPPFSystemInformation getNodeConfiguration();
+
   /**
    * Set the corresponding node's system information.
    * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
+   * @deprecated use {@link ChannelAwareness} instead.
    */
   void setNodeConfiguration(JPPFSystemInformation nodeConfiguration);
 }

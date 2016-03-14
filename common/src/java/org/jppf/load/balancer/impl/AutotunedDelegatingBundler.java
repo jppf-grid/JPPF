@@ -27,9 +27,8 @@ import org.slf4j.*;
  * Instances of this bundler delegate their operations to a singleton instance of a
  * {@link org.jppf.load.balancer.impl.AutoTunedBundler AutoTunedBundler}.
  * @author Laurent Cohen
- * @exclude
  */
-public class AutotunedDelegatingBundler extends AbstractBundler {
+public class AutotunedDelegatingBundler extends AbstractBundler<AnnealingTuneProfile> {
   /**
    * Logger for this class.
    */
@@ -61,16 +60,6 @@ public class AutotunedDelegatingBundler extends AbstractBundler {
     } finally {
       lock.unlock();
     }
-  }
-
-  /**
-   * Make a copy of this bundler
-   * @return a <code>Bundler</code> instance.
-   * @deprecated this method is not needed anymore, all profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
-   */
-  @Override
-  public Bundler copy() {
-    return new AutotunedDelegatingBundler(profile);
   }
 
   /**

@@ -1,5 +1,10 @@
+# the "rl" algorithm
 org.jppf.load.balancer.spi.RLBundlerProvider
+# the "proportional" algorithm
 org.jppf.load.balancer.spi.ProportionalBundlerProvider
+# the "autotuned" algorithm
 org.jppf.load.balancer.spi.AutoTunedBundlerProvider
+# the "manual" algorithm
 org.jppf.load.balancer.spi.FixedSizeBundlerProvider
-org.jppf.load.balancer.spi.NodeThreadsLoadBalancerProvider
+# the "nodethreads" algorithm
+org.jppf.load.balancer.spi.NodeThreadsBundlerProvider

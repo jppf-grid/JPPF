@@ -24,7 +24,6 @@ import org.jppf.utils.TypedProperties;
 /**
  * Profile for the "nodethreads" load-balancing algorithm.
  * @author Laurent Cohen
- * @exclude
  */
 public class NodeThreadsProfile extends AbstractLoadBalancingProfile {
   /**

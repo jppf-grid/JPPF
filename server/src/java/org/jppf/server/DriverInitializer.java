@@ -27,7 +27,7 @@ import javax.management.*;
 
 import org.jppf.comm.discovery.*;
 import org.jppf.comm.recovery.RecoveryServer;
-import org.jppf.load.balancer.NodeAwareness;
+import org.jppf.load.balancer.*;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
 import org.jppf.management.spi.*;
@@ -371,6 +371,7 @@ public class DriverInitializer {
    jmx.connect();
    try {
      NotificationListener listener = new NotificationListener() {
+       @SuppressWarnings("deprecation")
        @Override
        public void handleNotification(final Notification notification, final Object handback) {
          Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
@@ -383,7 +384,8 @@ public class DriverInitializer {
            TypedProperties oldConfig = node.getSystemInformation().getJppf();
            oldConfig.clear();
            oldConfig.putAll(nodeConfig);
-           if (node.getBundler() instanceof NodeAwareness) ((NodeAwareness) node.getBundler()).setNodeConfiguration(node.getSystemInformation());
+           if (node.getBundler() instanceof ChannelAwareness) ((ChannelAwareness) node.getBundler()).setChannelConfiguration(node.getSystemInformation());
+           else if (node.getBundler() instanceof NodeAwareness) ((NodeAwareness) node.getBundler()).setNodeConfiguration(node.getSystemInformation());
          }
        }
      };

@@ -25,12 +25,12 @@ import org.jppf.load.balancer.*;
  * @author Domingos Creado
  * @author Laurent Cohen
  */
-public class FixedSizeBundler extends AbstractBundler {
+public class FixedSizeBundler extends AbstractBundler<FixedSizeProfile> {
   /**
    * Initialize this bundler.
    * @param profile - contains the parameters for this bundler.
    */
-  public FixedSizeBundler(final LoadBalancingProfile profile) {
+  public FixedSizeBundler(final FixedSizeProfile profile) {
     super(profile);
   }
 
@@ -40,6 +40,6 @@ public class FixedSizeBundler extends AbstractBundler {
    */
   @Override
   public int getBundleSize() {
-    return ((FixedSizeProfile) profile).getSize();
+    return profile.getSize();
   }
 }

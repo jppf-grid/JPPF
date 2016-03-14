@@ -20,14 +20,12 @@ package org.jppf.load.balancer;
 
 import java.util.LinkedList;
 
-
 /**
  * Each instance of this class acts as a container for the performance data related to a node.
  * @author Laurent Cohen
  * @exclude
  */
-public class BundleDataHolder
-{
+public class BundleDataHolder {
   /**
    * Holds the samples required for calculating the moving average.
    */
@@ -57,8 +55,7 @@ public class BundleDataHolder
    * Initialize this data holder with the maximum number of samples in the performance cache.
    * @param performanceCacheSize the number of samples as an int.
    */
-  public BundleDataHolder(final int performanceCacheSize)
-  {
+  public BundleDataHolder(final int performanceCacheSize) {
     this.performanceCacheSize = performanceCacheSize;
   }
 
@@ -67,8 +64,7 @@ public class BundleDataHolder
    * @param performanceCacheSize the number of samples as an int.
    * @param mean the initial mean execution time.
    */
-  public BundleDataHolder(final int performanceCacheSize, final double mean)
-  {
+  public BundleDataHolder(final int performanceCacheSize, final double mean) {
     this.performanceCacheSize = performanceCacheSize;
     this.mean = mean;
   }
@@ -77,13 +73,10 @@ public class BundleDataHolder
    * Add the specified performance sample to the list of samples.
    * @param sample the performance sample to add.
    */
-  public void addSample(final BundlePerformanceSample sample)
-  {
+  public void addSample(final BundlePerformanceSample sample) {
     boolean b = (sample.samples + nbSamples > performanceCacheSize) || samples.isEmpty();
-    if (b)
-    {
-      while ((sample.samples + nbSamples > performanceCacheSize) && !samples.isEmpty())
-      {
+    if (b) {
+      while ((sample.samples + nbSamples > performanceCacheSize) && !samples.isEmpty()) {
         removeHeadSample();
       }
     }
@@ -97,8 +90,7 @@ public class BundleDataHolder
   /**
    * Add the least recent sample from the list of samples.
    */
-  private void removeHeadSample()
-  {
+  private void removeHeadSample() {
     BundlePerformanceSample sample = samples.removeFirst();
     nbSamples -= sample.samples;
     totalTime -= sample.samples * sample.mean;
@@ -107,10 +99,8 @@ public class BundleDataHolder
   /**
    * Compute the mean time.
    */
-  private void computeMean()
-  {
-    if (nbSamples > 0)
-    {
+  private void computeMean() {
+    if (nbSamples > 0) {
       previousMean = mean;
       mean = totalTime / nbSamples;
     }
@@ -120,8 +110,7 @@ public class BundleDataHolder
    * Get the computed mean execution time for the corresponding node.
    * @return the mean value as a double.
    */
-  public double getMean()
-  {
+  public double getMean() {
     return mean;
   }
 
@@ -129,8 +118,7 @@ public class BundleDataHolder
    * Get the computed mean execution time for the corresponding node.
    * @param mean the mean value as a double.
    */
-  public void setMean(final double mean)
-  {
+  public void setMean(final double mean) {
     this.mean = mean;
   }
 
@@ -138,8 +126,7 @@ public class BundleDataHolder
    * Get the previously computed mean execution time for the corresponding node.
    * @return the previous mean value as a double.
    */
-  public double getPreviousMean()
-  {
+  public double getPreviousMean() {
     return previousMean;
   }
 
@@ -147,32 +134,27 @@ public class BundleDataHolder
    * Get the number of samples required to compute the moving average.
    * @return the number of samples as an int.
    */
-  public int getPerformanceCacheSize()
-  {
+  public int getPerformanceCacheSize() {
     return performanceCacheSize;
-  }
-
-  /**
-   * Get a string representation of this bundler data holder.
-   * @return a string representing the state of this object.
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("mean=").append(mean).append(", previousMean=").append(previousMean);
-    sb.append(", totalTime=").append(totalTime).append(", nbSamples=").append(nbSamples);
-    sb.append(", performanceCacheSize=").append(performanceCacheSize).append(", samples.size()=").append(samples.size());
-    return sb.toString();
   }
 
   /**
    * Get the current number of samples.
    * @return the number of samples as an int.
    */
-  public long getNbSamples()
-  {
+  public long getNbSamples() {
     return nbSamples;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder()
+      .append("mean=").append(mean)
+      .append(", previousMean=").append(previousMean)
+      .append(", totalTime=").append(totalTime)
+      .append(", nbSamples=").append(nbSamples)
+      .append(", performanceCacheSize=").append(performanceCacheSize)
+      .append(", samples.size()=").append(samples.size())
+      .toString();
   }
 }

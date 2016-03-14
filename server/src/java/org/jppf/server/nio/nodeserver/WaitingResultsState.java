@@ -103,6 +103,7 @@ class WaitingResultsState extends NodeServerState {
    * @return A boolean requeue indicator.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("deprecation")
   private boolean processResults(final AbstractNodeContext context, final BundleResults received) throws Exception {
     TaskBundle newBundle = received.bundle();
     ServerTaskBundleNode nodeBundle = context.getBundle();
@@ -147,7 +148,8 @@ class WaitingResultsState extends NodeServerState {
     JPPFSystemInformation systemInfo = newBundle.getParameter(SYSTEM_INFO_PARAM);
     if (systemInfo != null) {
       context.setNodeInfo(systemInfo, true);
-      if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
+      if (bundler instanceof ChannelAwareness) ((ChannelAwareness) bundler).setChannelConfiguration(systemInfo);
+      else if (bundler instanceof NodeAwareness) ((NodeAwareness) bundler).setNodeConfiguration(systemInfo);
     }
     return requeue;
   }

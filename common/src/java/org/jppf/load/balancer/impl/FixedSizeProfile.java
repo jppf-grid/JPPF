@@ -29,20 +29,15 @@ public class FixedSizeProfile extends AbstractLoadBalancingProfile {
   /**
    * The bundle size.
    */
-  private int size = 1;
-
-  /**
-   * Default constructor.
-   */
-  public FixedSizeProfile() {
-  }
+  private final int size;
 
   /**
    * Initialize this profile with values read from the specified configuration.
    * @param config contains a mapping of the profile parameters to their value.
    */
   public FixedSizeProfile(final TypedProperties config) {
-    size = config.getInt("size", 1);
+    int n = config.getInt("size", 1);
+    this.size = (n < 1) ? 1 : n; 
   }
 
   /**
@@ -51,13 +46,5 @@ public class FixedSizeProfile extends AbstractLoadBalancingProfile {
    */
   public int getSize() {
     return size;
-  }
-
-  /**
-   * Set the bundle size.
-   * @param size the bundle size as an int.
-   */
-  public void setSize(final int size) {
-    this.size = size;
   }
 }

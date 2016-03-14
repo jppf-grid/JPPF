@@ -27,13 +27,12 @@ import org.slf4j.*;
 /**
  * Parameters profile for a proportional bundler.
  * @author Laurent Cohen
- * @exclude
  */
-public class ProportionalTuneProfile extends AbstractLoadBalancingProfile {
+public class ProportionalProfile extends AbstractLoadBalancingProfile {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(ProportionalTuneProfile.class);
+  private static Logger log = LoggerFactory.getLogger(ProportionalProfile.class);
   /**
    * Determines whether debugging level is set for logging.
    */
@@ -41,7 +40,7 @@ public class ProportionalTuneProfile extends AbstractLoadBalancingProfile {
   /**
    * A default profile with default parameter values.
    */
-  private static AtomicReference<ProportionalTuneProfile> defaultProfile = new AtomicReference<>(new ProportionalTuneProfile());
+  private static AtomicReference<ProportionalProfile> defaultProfile = new AtomicReference<>(new ProportionalProfile());
   /**
    * The maximum size of the performance samples cache.
    */
@@ -66,7 +65,7 @@ public class ProportionalTuneProfile extends AbstractLoadBalancingProfile {
   /**
    * Initialize this profile with default parameters.
    */
-  public ProportionalTuneProfile() {
+  public ProportionalProfile() {
     if (debugEnabled) log.debug("in default constructor");
   }
 
@@ -74,7 +73,7 @@ public class ProportionalTuneProfile extends AbstractLoadBalancingProfile {
    * Initialize this profile with values read from the configuration file.
    * @param config contains a mapping of the profile parameters to their value.
    */
-  public ProportionalTuneProfile(final TypedProperties config) {
+  public ProportionalProfile(final TypedProperties config) {
     if (debugEnabled) log.debug("in constructor without profile name");
     performanceCacheSize = config.getInt("performanceCacheSize", 2000);
     proportionalityFactor = config.getInt("proportionalityFactor", 1);
@@ -119,7 +118,7 @@ public class ProportionalTuneProfile extends AbstractLoadBalancingProfile {
    * Get the default profile with default parameter values.
    * @return a <code>ProportionalTuneProfile</code> singleton instance.
    */
-  public static ProportionalTuneProfile getDefaultProfile() {
+  public static ProportionalProfile getDefaultProfile() {
     return defaultProfile.get();
   }
 
