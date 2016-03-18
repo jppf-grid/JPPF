@@ -38,7 +38,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness, JobAwarenessEx {
+public class CustomLoadBalancer extends AbstractBundler implements ChannelAwareness, JobAwarenessEx {
   /**
    * Logger for this class.
    */
@@ -83,7 +83,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
    * @return a {@link JPPFSystemInformation} instance.
    */
   @Override
-  public JPPFSystemInformation getNodeConfiguration() {
+  public JPPFSystemInformation getChannelConfiguration() {
     return nodeConfiguration;
   }
 
@@ -92,7 +92,7 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
    * @param nodeConfiguration a {@link JPPFSystemInformation} instance.
    */
   @Override
-  public void setNodeConfiguration(final JPPFSystemInformation nodeConfiguration) {
+  public void setChannelConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.nodeConfiguration = nodeConfiguration;
     if (log.isDebugEnabled()) log.debug("setting node configuration on bundler #" + bundlerNumber + ": " + nodeConfiguration);
   }
@@ -134,9 +134,9 @@ public class CustomLoadBalancer extends AbstractBundler implements NodeAwareness
     // if allowed time is not defined we assume no time limit
     if (allowedTime <= 0) allowedTime = Long.MAX_VALUE;
     // get the number of processing threads in the node
-    int nbThreads = getNodeConfiguration().getJppf().get(JPPFProperties.PROCESSING_THREADS);
+    int nbThreads = getChannelConfiguration().getJppf().get(JPPFProperties.PROCESSING_THREADS);
     // max node heap size of the node in bytes
-    long nodeMemory = getNodeConfiguration().getRuntime().getLong("maxMemory");
+    long nodeMemory = getChannelConfiguration().getRuntime().getLong("maxMemory");
     // we assume 20 MB of the node's memory is taken by JPPF code and add-ons
     nodeMemory -= 20 * 1024 * 1024;
     if (nodeMemory < 0) nodeMemory = 0;
