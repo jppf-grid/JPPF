@@ -140,10 +140,14 @@ public final class SystemUtils {
   public static TypedProperties getRuntimeInformation() {
     TypedProperties props = new TypedProperties();
     try {
-      props.setInt("availableProcessors", Runtime.getRuntime().availableProcessors());
-      props.setLong("freeMemory", Runtime.getRuntime().freeMemory());
-      props.setLong("totalMemory", Runtime.getRuntime().totalMemory());
-      props.setLong("maxMemory", Runtime.getRuntime().maxMemory());
+      Runtime rt = Runtime.getRuntime();
+      props.setInt("availableProcessors", rt.availableProcessors());
+      props.setLong("freeMemory", rt.freeMemory());
+      props.setLong("totalMemory", rt.totalMemory());
+      props.setLong("maxMemory", rt.maxMemory());
+      long usedMemory = rt.totalMemory() - rt.freeMemory();
+      props.setLong("usedMemory", usedMemory);
+      props.setLong("availableMemory", rt.maxMemory() - usedMemory);
       if (ManagementUtils.isManagementAvailable()) {
         Object mbeanServer = ManagementUtils.getPlatformServer();
         String mbeanName = "java.lang:type=Runtime";
@@ -151,14 +155,13 @@ public final class SystemUtils {
         props.setProperty("startTime", s);
         s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "Uptime"));
         props.setProperty("uptime", s);
-        s = String.valueOf(ManagementUtils.getAttribute(mbeanServer, mbeanName, "InputArguments"));
-        props.setProperty("inputArgs", s);
+        String[] inputArgs = (String[]) ManagementUtils.getAttribute(mbeanServer, mbeanName, "InputArguments");
+        props.setProperty("inputArgs", StringUtils.arrayToString(", ", null, null, inputArgs));
       }
     } catch(Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       else log.info(e.getMessage());
     }
-
     return props;
   }
 

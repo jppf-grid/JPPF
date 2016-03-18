@@ -53,7 +53,7 @@ public class PeerAttributesHandler implements NotificationListener {
   /**
    * Property for how often the timer task runs.
    */
-  private static final long PEERIOD = JPPFConfiguration.get(JPPFProperties.PEER_HANDLER_PERIOD);
+  private static final long PERIOD = JPPFConfiguration.get(JPPFProperties.PEER_HANDLER_PERIOD);
   /**
    * The peers to manage.
    */
@@ -107,7 +107,7 @@ public class PeerAttributesHandler implements NotificationListener {
           updatePeers();
         }
       };
-      timer.schedule(timerTask, 1000L, PEERIOD);
+      timer.schedule(timerTask, 1000L, PERIOD);
     } else {
       timer = null;
       timerTask = null;

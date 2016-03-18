@@ -25,8 +25,7 @@ import org.jppf.utils.PropertiesCollection;
  * The test applies to numeric values only.
  * @author Laurent Cohen
  */
-public class AtMost extends ExecutionPolicy
-{
+public class AtMost extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -45,8 +44,7 @@ public class AtMost extends ExecutionPolicy
    * @param propertyName the name of the property to compare.
    * @param a the value to compare with.
    */
-  public AtMost(final String propertyName, final double a)
-  {
+  public AtMost(final String propertyName, final double a) {
     this.propertyName = propertyName;
     this.numberValue = a;
   }
@@ -57,15 +55,11 @@ public class AtMost extends ExecutionPolicy
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info)
-  {
-    try
-    {
+  public boolean accepts(final PropertiesCollection info) {
+    try {
       String s = getProperty(info, propertyName);
       if (numberValue != null) return Double.valueOf(s).doubleValue() <= numberValue.doubleValue();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
     }
     return false;
   }
@@ -76,12 +70,9 @@ public class AtMost extends ExecutionPolicy
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString()
-  {
-    if (computedToString == null)
-    {
-      synchronized(ExecutionPolicy.class)
-      {
+  public String toString() {
+    if (computedToString == null) {
+      synchronized (ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<AtMost>\n");
         toStringIndent++;

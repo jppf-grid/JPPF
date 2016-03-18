@@ -49,6 +49,8 @@
       <element name="Preference" type="jppf:OneOrMoreRulesType"/>
       <element name="IsInIPv4Subnet" type="jppf:SubnetRuleType"/>
       <element name="IsInIPv6Subnet" type="jppf:SubnetRuleType"/>
+      <!-- since v5.2 -->
+      <element name="NodesMatching" type="jppf:GlobalType"/>
     </choice>
   </group>
 
@@ -170,6 +172,27 @@
         <attribute name="language" type="string"/>
       </extension>
     </simpleContent>
+  </complexType>
+
+  <!-- test of type "if there are _operator_(_expected_) nodes that match _execution_policy_" -->
+  <!-- since v5.2 -->
+  <complexType name="GlobalType">
+    <sequence>
+      <group ref="jppf:Rule"/>
+    </sequence>
+    <attribute name="operator" use="optional" default="EQUAL">
+      <simpleType>
+        <restriction base="string">
+          <enumeration value="EQUAL"/>
+          <enumeration value="NOT_EQUAL"/>
+          <enumeration value="AT_LEAST"/>
+          <enumeration value="AT_MOST"/>
+          <enumeration value="MORE_THAN"/>
+          <enumeration value="LESS_THAN"/>
+        </restriction>
+      </simpleType>
+    </attribute>
+    <attribute name="expected" type="long" use="optional" default="0"/>
   </complexType>
 
 </schema>

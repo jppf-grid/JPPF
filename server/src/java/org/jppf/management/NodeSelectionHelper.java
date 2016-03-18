@@ -30,8 +30,7 @@ import org.jppf.server.nio.nodeserver.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class NodeSelectionHelper implements NodeSelectionProvider
-{
+public class NodeSelectionHelper implements NodeSelectionProvider {
   /**
    * Reference to the JPPF driver.
    */
@@ -44,13 +43,11 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    * @return a set of {@link AbstractNodeContext} instances.
    * @exclude
    */
-  public boolean isNodeAccepted(final AbstractNodeContext node, final NodeSelector selector)
-  {
+  public boolean isNodeAccepted(final AbstractNodeContext node, final NodeSelector selector) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof AllNodesSelector) return true;
     if (node.isPeer()) return false;
-    else if (selector instanceof UuidSelector)
-      return ((UuidSelector) selector).getUuids().contains(node.getUuid());
+    else if (selector instanceof UuidSelector) return ((UuidSelector) selector).getUuids().contains(node.getUuid());
     else if (selector instanceof ExecutionPolicySelector) {
       ExecutionPolicy policy = ((ExecutionPolicySelector) selector).getPolicy();
       TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
@@ -60,8 +57,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   }
 
   @Override
-  public boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector)
-  {
+  public boolean isNodeAccepted(final String nodeUuid, final NodeSelector selector) {
     if (nodeUuid == null) throw new IllegalArgumentException("node uuid cannot be null");
     AbstractNodeContext node = getNodeNioServer().getConnection(nodeUuid);
     if (node == null) throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
@@ -88,15 +84,12 @@ public class NodeSelectionHelper implements NodeSelectionProvider
     if (selector instanceof AllNodesSelector) {
       Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
       Set<AbstractNodeContext> result = new HashSet<>();
-      for (AbstractNodeContext ctx: fullSet) {
+      for (AbstractNodeContext ctx : fullSet) {
         if (hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) result.add(ctx);
       }
       return result;
-    }
-    else if (selector instanceof UuidSelector)
-      return getChannels(new HashSet<>(((UuidSelector) selector).getUuids()), includePeers);
-    else if (selector instanceof ExecutionPolicySelector)
-      return getChannels(((ExecutionPolicySelector) selector).getPolicy(), includePeers);
+    } else if (selector instanceof UuidSelector) return getChannels(new HashSet<>(((UuidSelector) selector).getUuids()), includePeers);
+    else if (selector instanceof ExecutionPolicySelector) return getChannels(((ExecutionPolicySelector) selector).getPolicy(), includePeers);
     throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
   }
 
@@ -109,7 +102,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
   private Set<AbstractNodeContext> getChannels(final Set<String> uuids, final boolean includePeers) {
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-    for (AbstractNodeContext context: allChannels) {
+    for (AbstractNodeContext context : allChannels) {
       if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
       if (uuids.contains(context.getUuid())) result.add(context);
     }
@@ -127,11 +120,67 @@ public class NodeSelectionHelper implements NodeSelectionProvider
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
-    for (AbstractNodeContext context: allChannels) {
+    for (AbstractNodeContext context : allChannels) {
       if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
       JPPFSystemInformation info = context.getSystemInformation();
       if (info == null) continue;
       if (policy.accepts(info)) result.add(context);
+    }
+    return result;
+  }
+  
+  /**
+   * Get the number of channels matching a NodeSelector.
+   * @param selector the node selector used as a filter.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @return a set of {@link AbstractNodeContext} instances.
+   */
+  public int getNbChannels(final NodeSelector selector, final boolean includePeers) {
+    if (selector == null) throw new IllegalArgumentException("selector cannot be null");
+    if (selector instanceof AllNodesSelector) {
+      Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
+      int result = 0;
+      for (AbstractNodeContext ctx : fullSet) {
+        if (hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) result++;
+      }
+      return result;
+    } else if (selector instanceof UuidSelector) return getNbChannels(new HashSet<>(((UuidSelector) selector).getUuids()), includePeers);
+    else if (selector instanceof ExecutionPolicySelector) return getNbChannels(((ExecutionPolicySelector) selector).getPolicy(), includePeers);
+    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
+  }
+
+  /**
+   * Get the number available channels whose uuids are in a specified set.
+   * @param uuids the node uuids for which we want a channel reference.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @return a {@link Set} of {@link AbstractNodeContext} instances.
+   */
+  private int getNbChannels(final Set<String> uuids, final boolean includePeers) {
+    int result = 0;
+    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+    for (AbstractNodeContext context : allChannels) {
+      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
+      if (uuids.contains(context.getUuid())) result++;
+    }
+    return result;
+  }
+
+  /**
+   * Get the number of available channels that match the specified execution policy.
+   * @param policy an execution to match against the nodes.
+   * @param includePeers whether peer drivers should be counted as nodes and included.
+   * @return a {@link Set} of {@link AbstractNodeContext} instances.
+   */
+  private int getNbChannels(final ExecutionPolicy policy, final boolean includePeers) {
+    if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
+    int result = 0;
+    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
+    TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
+    for (AbstractNodeContext context : allChannels) {
+      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
+      JPPFSystemInformation info = context.getSystemInformation();
+      if (info == null) continue;
+      if (policy.accepts(info)) result++;
     }
     return result;
   }
@@ -141,8 +190,7 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    * @return a <code>NodeNioServer</code> instance.
    * @exclude
    */
-  private NodeNioServer getNodeNioServer()
-  {
+  private NodeNioServer getNodeNioServer() {
     return driver.getNodeNioServer();
   }
 
@@ -151,11 +199,9 @@ public class NodeSelectionHelper implements NodeSelectionProvider
    * @param ctx the context associated witht he node.
    * @return true if node has a working JMX connection, false otherwise.
    */
-  private boolean hasWorkingJmxConnection(final AbstractNodeContext ctx)
-  {
+  private boolean hasWorkingJmxConnection(final AbstractNodeContext ctx) {
     if (ctx.isPeer()) return false;
     JMXNodeConnectionWrapper jmx = ctx.getJmxConnection();
-    if ((jmx == null) || !jmx.isConnected()) return false;
-    return true;
+    return (jmx != null) && jmx.isConnected();
   }
 }

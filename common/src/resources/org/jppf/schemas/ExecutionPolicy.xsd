@@ -188,8 +188,8 @@
           <enumeration value="NOT_EQUAL"/>
           <enumeration value="AT_LEAST"/>
           <enumeration value="AT_MOST"/>
-          <enumeration value="GREATER"/>
-          <enumeration value="LESS"/>
+          <enumeration value="MORE_THAN"/>
+          <enumeration value="LESS_THAN"/>
         </restriction>
       </simpleType>
     </attribute>

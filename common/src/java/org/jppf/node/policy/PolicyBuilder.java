@@ -18,6 +18,8 @@
 
 package org.jppf.node.policy;
 
+import org.jppf.client.Operator;
+
 /**
  * Instances of this class build an execution policy graph, based on a policy
  * descriptor parsed from an XML document.
@@ -53,6 +55,7 @@ public class PolicyBuilder {
       case "Preference": return buildPreferencePolicy(desc);
       case "IsInIPv4Subnet":
       case "IsInIPv6Subnet": return buildIsinIPSubnetPolicy(desc);
+      case "NodesMatching": return buildNodesMatchingPolicy(desc);
     }
     return null;
   }
@@ -127,8 +130,7 @@ public class PolicyBuilder {
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildAtMostPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildAtMostPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value = 0.0d;
     try {
@@ -160,8 +162,7 @@ public class PolicyBuilder {
    * @param desc the descriptor to use.
    * @return an <code>ExecutionPolicy</code> instance.
    */
-  private ExecutionPolicy buildAtLeastPolicy(final PolicyDescriptor desc)
-  {
+  private ExecutionPolicy buildAtLeastPolicy(final PolicyDescriptor desc) {
     String s = desc.operands.get(1);
     double value = 0.0d;
     try {
@@ -357,5 +358,20 @@ public class PolicyBuilder {
    */
   private ExecutionPolicy buildIsinIPSubnetPolicy(final PolicyDescriptor desc) {
     return "IsInIPv4Subnet".equals(desc.type) ? new IsInIPv4Subnet(desc.operands) : new IsInIPv6Subnet(desc.operands);
+  }
+
+
+  /**
+   * Build a global policy.
+   * @param desc the descriptor to use.
+   * @return an <code>ExecutionPolicy</code> instance.
+   * @throws Exception if an error occurs while generating the policy object.
+   * @since 5.2
+   */
+  private ExecutionPolicy buildNodesMatchingPolicy(final PolicyDescriptor desc)  throws Exception {
+    ExecutionPolicy child = (desc.children != null) && (desc.children.size() > 0) ? buildPolicy(desc.children.get(0)) : null;
+    Operator operator = Operator.valueOf(desc.operator.toUpperCase());
+    long expected = Long.valueOf(desc.expected);
+    return new NodesMatching(operator, expected, child);
   }
 }

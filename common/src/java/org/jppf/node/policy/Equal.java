@@ -25,8 +25,7 @@ import org.jppf.utils.PropertiesCollection;
  * The test applies to numeric, string and boolean values only.
  * @author Laurent Cohen
  */
-public class Equal extends ExecutionPolicy
-{
+public class Equal extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -57,8 +56,7 @@ public class Equal extends ExecutionPolicy
    * @param propertyName the name of the property to compare.
    * @param a the value to compare with.
    */
-  public Equal(final String propertyName, final double a)
-  {
+  public Equal(final String propertyName, final double a) {
     this.propertyName = propertyName;
     this.numberValue = a;
   }
@@ -69,8 +67,7 @@ public class Equal extends ExecutionPolicy
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param a the value to compare with.
    */
-  public Equal(final String propertyName, final boolean ignoreCase, final String a)
-  {
+  public Equal(final String propertyName, final boolean ignoreCase, final String a) {
     this.propertyName = propertyName;
     this.stringValue = a;
     this.ignoreCase = ignoreCase;
@@ -81,8 +78,7 @@ public class Equal extends ExecutionPolicy
    * @param propertyName the name of the property to compare.
    * @param a the value to compare with.
    */
-  public Equal(final String propertyName, final boolean a)
-  {
+  public Equal(final String propertyName, final boolean a) {
     this.propertyName = propertyName;
     this.booleanValue = a;
   }
@@ -93,21 +89,15 @@ public class Equal extends ExecutionPolicy
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info)
-  {
-    try
-    {
+  public boolean accepts(final PropertiesCollection info) {
+    try {
       String s = getProperty(info, propertyName);
       if (numberValue != null) return Double.valueOf(s).doubleValue() == numberValue.doubleValue();
-      else if (stringValue != null)
-      {
+      else if (stringValue != null) {
         return ignoreCase ? stringValue.equalsIgnoreCase(s) : stringValue.equals(s);
-      }
-      else if (booleanValue != null) return Boolean.valueOf(s).booleanValue() == booleanValue.booleanValue();
+      } else if (booleanValue != null) return Boolean.valueOf(s).booleanValue() == booleanValue.booleanValue();
       else return s == null;
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
     }
     return false;
   }
@@ -117,12 +107,9 @@ public class Equal extends ExecutionPolicy
    * @return an XML string representation of this object
    */
   @Override
-  public String toString()
-  {
-    if (computedToString == null)
-    {
-      synchronized(ExecutionPolicy.class)
-      {
+  public String toString() {
+    if (computedToString == null) {
+      synchronized (ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<Equal valueType=\"");
         if (stringValue != null) sb.append("string");

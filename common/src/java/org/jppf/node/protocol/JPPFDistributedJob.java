@@ -22,8 +22,7 @@ package org.jppf.node.protocol;
  * (see {@link org.jppf.node.protocol.TaskBundle TaskBundle}).
  * @author Laurent Cohen
  */
-public interface JPPFDistributedJob
-{
+public interface JPPFDistributedJob {
   /**
    * Get the user-defined display name for this job. This is the name displayed in the administration console.
    * @return the name as a string.
@@ -47,7 +46,7 @@ public interface JPPFDistributedJob
    * @return a {@link JobMetadata} instance.
    */
   JobMetadata getMetadata();
-  
+
   /**
    * Get the number of tasks in the job.
    * @return the number fo tasks.

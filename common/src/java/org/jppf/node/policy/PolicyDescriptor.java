@@ -25,8 +25,7 @@ import java.util.*;
  * of an execution policy easier.
  * @author Laurent Cohen
  */
-public class PolicyDescriptor
-{
+public class PolicyDescriptor {
   /**
    * The type of rule, eg AND, NOT, OneOf, Equal, etc.
    */
@@ -64,4 +63,12 @@ public class PolicyDescriptor
    * The actual script to use for ScriptedRule elements.
    */
   String script = null;
+  /**
+   * The comparison operator for a global policy.
+   */
+  String operator = "";
+  /**
+   * The number of expected nodes for a global policy.
+   */
+  String expected = "0";
 }

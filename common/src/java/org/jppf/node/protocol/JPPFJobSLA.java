@@ -86,6 +86,11 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
    * Whether remote class loading is enabled for the job.
    */
   private boolean remoteClassLoadingEnabled = true;
+  /**
+   * The global execution policy which applies to the driver only.
+   * @since 5.2
+   */
+  protected ExecutionPolicy gridExecutionPolicy = null;
 
   /**
    * Default constructor.
@@ -295,5 +300,23 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   @Override
   public void setRemoteClassLoadingEnabled(final boolean enabled) {
     this.remoteClassLoadingEnabled = enabled;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.2
+   */
+  @Override
+  public ExecutionPolicy getGridExecutionPolicy() {
+    return gridExecutionPolicy;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.2
+   */
+  @Override
+  public void setGridExecutionPolicy(final ExecutionPolicy gridExecutionPolicy) {
+    this.gridExecutionPolicy = gridExecutionPolicy;
   }
 }

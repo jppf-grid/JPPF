@@ -360,6 +360,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Boolean> NODE_CHECK_CONNECTION = new BooleanProperty("jppf.node.check.connection", false);
   /** The default thickness of the scrollbars in the GUI */
   public static final JPPFProperty<Integer> DEFAULT_SCROLLBAR_THICKNESS = new IntProperty("jppf.ui.default.scrollbar.thickness", 10);
+  /** Whether a node is idle. This property is only set within a server */
+  public static final JPPFProperty<Boolean> NODE_IDLE = new BooleanProperty("jppf.node.idle", true);
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 

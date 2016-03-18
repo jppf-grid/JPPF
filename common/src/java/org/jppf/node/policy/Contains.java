@@ -25,8 +25,7 @@ import org.jppf.utils.PropertiesCollection;
  * The test applies to string values only.
  * @author Laurent Cohen
  */
-public class Contains extends ExecutionPolicy
-{
+public class Contains extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -50,8 +49,7 @@ public class Contains extends ExecutionPolicy
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param a the value to compare with.
    */
-  public Contains(final String propertyName, final boolean ignoreCase, final String a)
-  {
+  public Contains(final String propertyName, final boolean ignoreCase, final String a) {
     this.propertyName = propertyName;
     this.value = a;
     this.ignoreCase = ignoreCase;
@@ -63,8 +61,7 @@ public class Contains extends ExecutionPolicy
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info)
-  {
+  public boolean accepts(final PropertiesCollection info) {
     if (value == null) return false;
     String s = getProperty(info, propertyName);
     if (s == null) return false;
@@ -77,12 +74,9 @@ public class Contains extends ExecutionPolicy
    * @return an XML string representation of this object
    */
   @Override
-  public String toString()
-  {
-    if (computedToString == null)
-    {
-      synchronized(ExecutionPolicy.class)
-      {
+  public String toString() {
+    if (computedToString == null) {
+      synchronized (ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<Contains ignoreCase=\"").append(ignoreCase).append("\">\n");
         toStringIndent++;

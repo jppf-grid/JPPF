@@ -33,7 +33,8 @@ import org.slf4j.*;
  * <li>Environment variables</li>
  * <li>JPPF configuration properties</li>
  * <li>IPV4 and IPV6 addresses assigned to the JVM host</li>
- * <li>Disk space information (JDK 1.6 or later only)</li>
+ * <li>Disk space information</li>
+ * <li>Server statistics (server-side only)</li>
  * </ul>
  * @author Laurent Cohen
  */
@@ -124,6 +125,12 @@ public class JPPFSystemInformation implements PropertiesCollection<String> {
    * <li>freeMemory = <i>current free heap size in bytes</i></li>
    * <li>totalMemory = <i>current total heap size in bytes</i></li>
    * <li>maxMemory = <i>maximum heap size in bytes (i.e. as specified by -Xmx JVM option)</i></li>
+   * <li>usedMemory = <i>currently used heap memory in bytes</i></li>
+   * <li>availableMemory = <i>the currently available heap memory in bytes; equal to: </i>{@code maxMemory - usedMemory}</li>
+   * <li>startTime = <i>the approximate timestamp in millis of when the JVM started</i></li>
+   * <li>upTime = <i>how long the JVM has been up in millis</i></li>
+   * <li>inputArgs = <i>arguments given to the 'java' command, excluding those passed to the main method.
+   * Arguments are given as a list of strings separated by the ", " delimiter (a comma followed by a space)</i></li>
    * </ul>
    * <p>Some or all of these properties may be missing if a security manager is installed
    * that does not grant access to the related {@link java.lang.Runtime} APIs.

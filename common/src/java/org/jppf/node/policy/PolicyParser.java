@@ -38,7 +38,7 @@ public class PolicyParser {
    */
   private static final List<String> RULE_NAMES = Arrays.asList("NOT", "AND", "OR", "XOR", "LessThan", "AtMost", "AtLeast", "MoreThan",
       "BetweenII", "BetweenIE", "BetweenEI", "BetweenEE", "Equal", "Contains", "OneOf", "RegExp", "CustomRule", "Script", "Preference",
-      "IsinIPv4Subnet", "IsinIPv6Subnet");
+      "IsinIPv4Subnet", "IsinIPv6Subnet", NodesMatching.XML_ELT);
   /**
    * The DOM parser used to build the descriptor tree.
    */
@@ -108,6 +108,8 @@ public class PolicyParser {
     desc.ignoreCase = getAttributeValue(node, "ignoreCase", "false");
     desc.className = getAttributeValue(node, "class", null);
     desc.language = getAttributeValue(node, "language", null);
+    desc.operator = getAttributeValue(node, "operator", "EQUAL");
+    desc.expected = getAttributeValue(node, "expected", "0");
     NodeList list = node.getChildNodes();
     for (int i=0; i<list.getLength(); i++) {
       Node childNode = list.item(i);

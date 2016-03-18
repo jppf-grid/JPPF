@@ -48,22 +48,22 @@ public class OneOf extends ExecutionPolicy {
   private boolean ignoreCase = false;
 
   /**
-   * Define an equality comparison between the numeric value of a property and another numeric value.
+   * Determine whether the value of a property, expressed as a {@code double}, is in the specified array of values.
    * @param propertyName the name of the property to compare.
    * @param values the values to compare with.
    */
-  public OneOf(final String propertyName, final double...values) {
+  public OneOf(final String propertyName, final double... values) {
     this.propertyName = propertyName;
     this.numberValues = values;
   }
 
   /**
-   * Define an equality comparison between the numeric value of a property and another numeric value.
+   * Determine whether the value of a property, expressed as a {@code String}, is in the specified array of values.
    * @param propertyName the name of the property to compare.
    * @param ignoreCase determines if the comparison should ignore the string case.
    * @param values the values to compare with.
    */
-  public OneOf(final String propertyName, final boolean ignoreCase, final String...values) {
+  public OneOf(final String propertyName, final boolean ignoreCase, final String... values) {
     this.propertyName = propertyName;
     this.stringValues = values;
     this.ignoreCase = ignoreCase;
@@ -80,9 +80,9 @@ public class OneOf extends ExecutionPolicy {
       String s = getProperty(info, propertyName);
       if (numberValues != null) {
         double value = Double.valueOf(s);
-        for (double d: numberValues) if (d == value) return true;
+        for (double d : numberValues) if (d == value) return true;
       } else if (stringValues != null) {
-        for (String value: stringValues) {
+        for (String value : stringValues) {
           if ((value == null) && (s == null)) return true;
           else if ((value != null) && (s != null)) {
             if (!ignoreCase && s.equals(value)) return true;
@@ -90,7 +90,7 @@ public class OneOf extends ExecutionPolicy {
           }
         }
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
     }
     return false;
   }
@@ -102,7 +102,7 @@ public class OneOf extends ExecutionPolicy {
   @Override
   public String toString() {
     if (computedToString == null) {
-      synchronized(ExecutionPolicy.class) {
+      synchronized (ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<OneOf valueType=\"");
         if (stringValues != null) sb.append("string");
@@ -111,9 +111,9 @@ public class OneOf extends ExecutionPolicy {
         toStringIndent++;
         sb.append(indent()).append(xmlElement("<Property>", propertyName)).append('\n');
         if (stringValues != null) {
-          for (String s: stringValues) sb.append(indent()).append(xmlElement("<Value>", s)).append('\n');
+          for (String s : stringValues) sb.append(indent()).append(xmlElement("<Value>", s)).append('\n');
         } else {
-          for (double d: numberValues) sb.append(indent()).append(xmlElement("<Value>", d)).append('\n');
+          for (double d : numberValues) sb.append(indent()).append(xmlElement("<Value>", d)).append('\n');
         }
         toStringIndent--;
         sb.append(indent()).append("</OneOf>\n");

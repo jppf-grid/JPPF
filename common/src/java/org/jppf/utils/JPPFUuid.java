@@ -69,7 +69,7 @@ public class JPPFUuid implements Serializable {
   /**
    * String holding a generated unique identifier.
    */
-  private String uuid = null;
+  private final String uuid;
   /**
    * The set of codes from which to choose randomly to build the uuid.
    */

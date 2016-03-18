@@ -35,7 +35,7 @@ import test.org.jppf.test.setup.Setup1D2N1C;
 import test.org.jppf.test.setup.common.*;
 
 /**
- * Unit tests for the <code>Range</code> class.
+ * Unit tests for the <code>ScriptedPolicy</code> class.
  * @author Laurent Cohen
  */
 public class TestScriptedPolicy extends Setup1D2N1C {

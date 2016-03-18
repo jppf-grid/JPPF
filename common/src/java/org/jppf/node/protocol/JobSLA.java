@@ -18,6 +18,7 @@
 
 package org.jppf.node.protocol;
 
+import org.jppf.node.policy.ExecutionPolicy;
 import org.jppf.scheduling.JPPFSchedule;
 
 
@@ -196,4 +197,18 @@ public interface JobSLA extends JobCommonSLA {
    * @since 4.2
    */
   void setRemoteClassLoadingEnabled(boolean enabled);
+
+  /**
+   * Get the global grid execution policy (which applies to the driver).
+   * @return an {@link ExecutionPolicy} object.
+   * @since 5.2
+   */
+  ExecutionPolicy getGridExecutionPolicy();
+
+  /**
+   * Set the global grid execution policy (which applies to the driver).
+   * @param policy an {@link ExecutionPolicy} object.
+   * @since 5.2
+   */
+  void setGridExecutionPolicy(ExecutionPolicy policy);
 }

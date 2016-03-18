@@ -283,8 +283,12 @@ public abstract class ExecutionPolicy implements Serializable {
      */
     @Override
     public boolean accepts(final PropertiesCollection info) {
-      if ((children == null) || (children.length <= 0)) return true; boolean b = true;
-      for (ExecutionPolicy ep: children) b = b && ep.accepts(info);
+      if ((children == null) || (children.length <= 0)) return true;
+      boolean b = true;
+      for (ExecutionPolicy child: children) {
+        b = b && child.accepts(info);
+        if (!b) return false;
+      }
       return b;
     }
 
@@ -325,7 +329,10 @@ public abstract class ExecutionPolicy implements Serializable {
     public boolean accepts(final PropertiesCollection info) {
       if ((children == null) || (children.length <= 0)) return true;
       boolean b = false;
-      for (ExecutionPolicy ep: children) b = b || ep.accepts(info);
+      for (ExecutionPolicy child: children) {
+        b = b || child.accepts(info);
+        if (b) return true;
+      }
       return b;
     }
 
@@ -487,7 +494,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * Initialize the root for all the elements in the policy graph for which this is the root.
    * @since 5.0
    */
-  private void initializeRoot() {
+  void initializeRoot() {
     if (children != null) {
       for (ExecutionPolicy child: children) child.initializeRoot(this);
     }
@@ -498,7 +505,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @param root the root to set.
    * @since 5.0
    */
-  private void initializeRoot(final ExecutionPolicy root) {
+  void initializeRoot(final ExecutionPolicy root) {
     if (this.root != null) return;
     this.root = root;
     if (children != null) {
@@ -517,8 +524,18 @@ public abstract class ExecutionPolicy implements Serializable {
    * @exclude
    */
   public void setContext(final JobSLA sla, final JobClientSLA clientSla, final JobMetadata metadata, final int jobDispatches, final JPPFStatistics stats) {
+    setContext(new PolicyContext(sla, clientSla, metadata, jobDispatches, stats));
+  }
+
+  /**
+   * Set this policy's context.
+   * @param context the context to set.
+   * @since 5.2
+   * @exclude
+   */
+  protected void setContext(final PolicyContext context) {
+    this.context = context;
     initializeRoot();
-    context = new PolicyContext(sla, clientSla, metadata, jobDispatches, stats);
   }
 
   /**

@@ -25,8 +25,7 @@ import org.jppf.utils.PropertiesCollection;
  * The test applies to numeric values only.
  * @author Laurent Cohen
  */
-public class MoreThan extends ExecutionPolicy
-{
+public class MoreThan extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -45,8 +44,7 @@ public class MoreThan extends ExecutionPolicy
    * @param propertyName the name of the property to compare.
    * @param a the value to compare with.
    */
-  public MoreThan(final String propertyName, final double a)
-  {
+  public MoreThan(final String propertyName, final double a) {
     this.propertyName = propertyName;
     this.numberValue = a;
   }
@@ -57,15 +55,11 @@ public class MoreThan extends ExecutionPolicy
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info)
-  {
-    try
-    {
+  public boolean accepts(final PropertiesCollection info) {
+    try {
       String s = getProperty(info, propertyName);
       if (numberValue != null) return Double.valueOf(s).doubleValue() > numberValue.doubleValue();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
     }
     return false;
   }
@@ -75,12 +69,9 @@ public class MoreThan extends ExecutionPolicy
    * @return an XML string representation of this object
    */
   @Override
-  public String toString()
-  {
-    if (computedToString == null)
-    {
-      synchronized(ExecutionPolicy.class)
-      {
+  public String toString() {
+    if (computedToString == null) {
+      synchronized (ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<MoreThan>\n");
         toStringIndent++;

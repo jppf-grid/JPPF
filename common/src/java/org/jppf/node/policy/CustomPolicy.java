@@ -18,13 +18,11 @@
 
 package org.jppf.node.policy;
 
-
 /**
  * Abstract superclass for all user-defined policies.
  * @author Laurent Cohen
  */
-public abstract class CustomPolicy extends ExecutionPolicy
-{
+public abstract class CustomPolicy extends ExecutionPolicy {
   /**
    * Explicit serialVersionUID.
    */
@@ -38,8 +36,7 @@ public abstract class CustomPolicy extends ExecutionPolicy
    * Initialize this policy with the specified arguments.
    * @param args the user-defined arguments for this policy.
    */
-  public CustomPolicy(final String...args)
-  {
+  public CustomPolicy(final String... args) {
     this.args = args;
   }
 
@@ -48,16 +45,14 @@ public abstract class CustomPolicy extends ExecutionPolicy
    * This method is called after instantiating the policy object and setting the arguments.
    * It allows for user-defined initializations when the custom policy is built from an XML document.
    */
-  public void initialize()
-  {
+  public void initialize() {
   }
 
   /**
    * Get the arguments of this policy.
    * @return the arguments as an array of strings.
    */
-  public final String[] getArgs()
-  {
+  public final String[] getArgs() {
     return args;
   }
 
@@ -65,8 +60,7 @@ public abstract class CustomPolicy extends ExecutionPolicy
    * Set the arguments of this policy.
    * @param args the arguments as an array of strings.
    */
-  public final void setArgs(final String...args)
-  {
+  public final void setArgs(final String... args) {
     this.args = args;
   }
 
@@ -75,18 +69,15 @@ public abstract class CustomPolicy extends ExecutionPolicy
    * @return an XML string representation of this object
    */
   @Override
-  public String toString()
-  {
-    if (computedToString == null)
-    {
-      synchronized(ExecutionPolicy.class)
-      {
+  public String toString() {
+    if (computedToString == null) {
+      synchronized (ExecutionPolicy.class) {
         StringBuilder sb = new StringBuilder();
         sb.append(indent()).append("<CustomRule class=\"").append(this.getClass().getName()).append("\">\n");
         toStringIndent++;
-        if (args != null)
-        {
-          for (String s: args) sb.append(indent()).append("<Arg>").append(s).append("</Arg>\n");
+        if (args != null) {
+          for (String s : args)
+            sb.append(indent()).append("<Arg>").append(s).append("</Arg>\n");
         }
         toStringIndent--;
         sb.append(indent()).append("</CustomRule>\n");
