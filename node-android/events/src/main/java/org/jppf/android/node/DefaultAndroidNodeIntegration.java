@@ -23,7 +23,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import org.jppf.android.events.R;
-import org.jppf.node.NodeInternal;
 import org.jppf.node.event.NodeLifeCycleEvent;
 import org.jppf.node.event.TaskExecutionEvent;
 
@@ -70,7 +69,6 @@ public class DefaultAndroidNodeIntegration extends AndroidNodeIntegrationAdapter
   @Override
   public void nodeStarting(final NodeLifeCycleEvent event) {
     Log.v(LOG_TAG, "nodeStarting()");
-    ((NodeInternal) event.getNode()).getExecutionManager().getTaskNotificationDispatcher().addTaskExecutionListener(this);
     if (activity != null) activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -86,7 +84,6 @@ public class DefaultAndroidNodeIntegration extends AndroidNodeIntegrationAdapter
   @Override
   public void nodeEnding(final NodeLifeCycleEvent event) {
     Log.v(LOG_TAG, "nodeEnding()");
-    ((NodeInternal) event.getNode()).getExecutionManager().getTaskNotificationDispatcher().removeTaskExecutionListener(this);
     if (activity != null) activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
