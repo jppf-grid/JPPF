@@ -24,7 +24,8 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.location.*;
 import org.jppf.node.protocol.*;
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.scheduling.JPPFSchedule;
+import org.jppf.utils.*;
 
 /**
  * This class is a simple JPPF client application that submits a job for execution on an Android node.
@@ -36,23 +37,32 @@ public class Runner {
    * @param args not used.
    */
   public static void main(final String[] args) {
+    // extract the parameters of the demo from the JPPF configuration
+    TypedProperties config = JPPFConfiguration.getProperties();
+    int nbTasks = config.getInt("demo.nbTasks", 1);
+    long duration = config.getLong("demo.taskDuration", 2000L);
+    System.out.printf("Android demo parameters: nb tasks=%,d; task duration=%,d msµn", nbTasks, duration);
     // create and start the JPPF client
     try (JPPFClient client = new JPPFClient()) {
       // create the JPPF job
       System.out.println("creating job");
       JPPFJob job = new JPPFJob();
       job.setName("JPPF Android Demo");
-      job.add(new DemoAndroidTask());
+      for (int i=1; i<=nbTasks; i++) {
+        job.add(new DemoAndroidTask(duration)).setId("#" + i);
+      }
       // add the dexed jar to the job's classpath
       System.out.println("setting classpath");
       addToJobClassPath(job, new File("dex-demo.jar"));
+      // set a dispatch timeout of 5 mn to avoid the job being stuck, should the node fail
+      job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(5L * 60_000L));
       // submit the job and get the resutls
       System.out.println("submitting job");
       List<Task<?>> results = client.submitJob(job);
       // process the job's results
       for (Task<?> task : results) {
-        if (task.getThrowable() != null) System.out.println("got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));
-        else System.out.println("got result: " + task.getResult());
+        if (task.getThrowable() != null) System.out.printf("task %s raised an exception : %s%n", task.getId(), ExceptionUtils.getStackTrace(task.getThrowable()));
+        else System.out.printf("Task %s has a result: %s%n", task.getId(), task.getResult());
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -67,8 +77,8 @@ public class Runner {
    */
   public static void addToJobClassPath(final JPPFJob job, final File file) throws Exception {
     // copy the file in memory
-    Location fileLoc = new FileLocation(file);
-    Location memoryLoc = fileLoc.copyTo(new MemoryLocation(file.length()));
+    Location<String> fileLoc = new FileLocation(file);
+    Location<byte[]> memoryLoc = fileLoc.copyTo(new MemoryLocation(file.length()));
     // add the memory location to the classpath
     ClassPath classpath = job.getSLA().getClassPath();
     classpath.add(file.getName(), memoryLoc);

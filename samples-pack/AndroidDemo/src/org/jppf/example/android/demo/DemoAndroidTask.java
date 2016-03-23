@@ -26,11 +26,39 @@ import org.jppf.node.protocol.AbstractTask;
  * @author Laurent Cohen
  */
 public class DemoAndroidTask extends AbstractTask<String> {
+  /**
+   * How long this task will sleep.
+   */
+  private final long duration;
+
+  /**
+   * Initialize this task with a default duration of 2000 ms.
+   */
+  public DemoAndroidTask() {
+    this(2000L);
+  }
+
+  /**
+   * Initialize this task with the specified duration.
+   * @param duration how long this task will sleep in ms
+   */
+  public DemoAndroidTask(final long duration) {
+    this.duration = duration;
+  }
 
   @Override
   public void run() {
     // converted to Log.i("system.out", "I am a demo Android task !!!") Logcat call
     System.out.println("I am a demo Android task !!!");
+    try {
+      Thread.sleep(duration);
+    } catch (Exception e) {
+    }
     setResult("demo Android task successful");
+  }
+
+  @Override
+  public void onCancel() {
+    System.out.println("demo Android task has been cancelled");
   }
 }

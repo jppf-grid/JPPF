@@ -16,17 +16,18 @@
   limitations under the License.
 -->
 
-<project name='AndroidDemo' basedir=".">
+<project name='AndroidDemo' basedir="." default="dex.jar">
 
   <!-- ========================================================================= -->
   <!-- Property definitions                                                      -->
   <!-- ========================================================================= -->
 
-  <property name="shared"      value="${basedir}/../shared"/>
-  <property name="lib"         value="${shared}/lib"/>
-  <property name="config"      value="${basedir}/config"/>
-  <property name="classes"     value="${basedir}/classes"/> 
-  <property name="src"         value="${basedir}/src"/>
+  <property name="build.sysclasspath" value="last"/>
+  <property name="shared"             value="${basedir}/../shared"/>
+  <property name="lib"                value="${shared}/lib"/>
+  <property name="config"             value="${basedir}/config"/>
+  <property name="classes"            value="${basedir}/classes"/> 
+  <property name="src"                value="${basedir}/src"/>
   <property file="${basedir}/build.properties"/>
 
   <!-- ========================================================================= -->
@@ -68,14 +69,17 @@
 
   <!-- create a jar with only the classes required for the JPPF tasks -->
   <target name="jar" depends="compile">
-    <jar jarfile="demo.jar" includes="${classes}/**/*.*" excludes="${classes}/**/Runner.*"/>
+    <delete file="demo.jar" quiet="true"/>
+    <!--<jar jarfile="demo.jar" includes="${classes}/**/*.*" excludes="${classes}/**/Runner.*"/>-->
+    <jar jarfile="demo.jar">
+      <fileset dir="${classes}" excludes="**/Runner.*"/>
+    </jar>
   </target>
   
   <!-- create a jar in dex format from the previously generated Java jar file -->
   <target name="dex.jar" depends="jar" description="dex">
     <delete file="dex-demo.jar" quiet="true"/>
     <dex in="demo.jar" out="dex-demo.jar"/>
-    <delete file="demo.jar" quiet="true"/>
     <printmsg message="The file dex-demo.jar is now ready to be deployed"/>
   </target>
   
