@@ -101,7 +101,7 @@
 
   <!-- preferences: battery monitoring subscreen -->
   <string name="pref_battery_monitoring_title">Battery monitoring</string>
-  <string name="pref_battery_monitoring_sum">Configure warning and critical battery levels</string>
+  <string name="pref_battery_monitoring_sum">Configure warning / critical levels</string>
 
   <!-- preferences: SSL enabled flag -->
   <string name="pref_battery_monitoring_enabled_title">Battery monitoring enabled</string>

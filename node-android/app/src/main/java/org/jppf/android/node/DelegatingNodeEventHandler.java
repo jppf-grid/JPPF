@@ -77,6 +77,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
 
   @Override
   public void taskExecuted(final TaskExecutionEvent event) {
+    Log.v(LOG_TAG, "taskExecuted() this = " + this);
     AndroidNodeIntegrationAdapter adapter = getDelegate();
     if (adapter != null) adapter.taskExecuted(event);
   }
@@ -124,7 +125,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
           Log.e(LOG_TAG, "error instantiating the node event handler '" + s + "' : ", e);
         }
       }
-      if (adapter == null) adapter = new DefaultAndroidNodeIntegration();
+      if (adapter == null) adapter = (delegate instanceof DefaultAndroidNodeIntegration) ? delegate : new DefaultAndroidNodeIntegration();
       setDelegate(adapter);
       adapter.jobHeaderLoaded(event);
     }
@@ -190,6 +191,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
   synchronized void setDelegate(final AndroidNodeIntegrationAdapter delegate) {
     Log.v(LOG_TAG, String.format("setDelegate() : delegate=%s, view=%s, activity=%s", delegate, view, activity));
     if ((delegate != null) && (delegate != this.delegate)) {
+      if (this.delegate != null) this.delegate.setActivity(null);
       delegate.setActivity(activity);
       this.delegate = delegate;
       resetUI();
