@@ -289,21 +289,22 @@ public class TaskQueueChecker extends ThreadSynchronization implements Runnable 
    */
   @SuppressWarnings("unchecked")
   private void dispatchJobToChannel(final ChannelWrapper channel, final ClientJob selectedBundle)  throws Exception {
-    if (debugEnabled) log.debug("dispatching jobUuid={} to channel {}, connectionUuid=", new Object[] {selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()});
+    if (debugEnabled) log.debug(String.format("dispatching jobUuid=%s to channel %s, connectionUuid=%s", selectedBundle.getJob().getUuid(), channel, channel.getConnectionUuid()));
     synchronized (channel.getMonitor()) {
-      int size = 1;
+      int bundlerSize = 1;
       try {
         updateBundler(getBundler(), selectedBundle.getJob(), channel);
-        size = channel.getBundler().getBundleSize();
+        int selectedSize = selectedBundle.getTaskCount();
+        bundlerSize = Math.min(channel.getBundler().getBundleSize(), selectedBundle.getTaskCount());
         boolean local = channel.isLocal();
-        log.info("dispatching " + size  + " tasks to " + (local ? "local" : "remote") + " channel");
+        if (debugEnabled) log.debug("dispatching " + Math.min(bundlerSize, selectedSize)  + " tasks to " + (local ? "local" : "remote") + " channel");
       } catch (Exception e) {
         log.error("Error in load balancer implementation, switching to 'manual' with a bundle size of 1: {}", ExceptionUtils.getStackTrace(e));
         FixedSizeProfile profile = new FixedSizeProfile();
         profile.setSize(1);
         setBundler(new FixedSizeBundler(profile));
       }
-      ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, size);
+      ClientTaskBundle bundleWrapper = queue.nextBundle(selectedBundle, bundlerSize);
       selectedBundle.addChannel(channel);
       channel.submit(bundleWrapper);
     }

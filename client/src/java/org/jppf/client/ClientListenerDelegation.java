@@ -21,7 +21,7 @@ package org.jppf.client;
 import org.jppf.client.event.*;
 
 /**
- *
+ * This class converts a deprecated {@link ClientListener} into a {@link ConnectionPoolListener}. 
  * @author Laurent Cohen
  * @since 5.1
  */

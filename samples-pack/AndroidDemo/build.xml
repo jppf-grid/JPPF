@@ -22,11 +22,12 @@
   <!-- Property definitions                                                      -->
   <!-- ========================================================================= -->
 
-  <property name="shared"      value="${basedir}/../shared"/>
-  <property name="lib"         value="${shared}/lib"/>
-  <property name="config"      value="${basedir}/config"/>
-  <property name="classes"     value="${basedir}/classes"/> 
-  <property name="src"         value="${basedir}/src"/>
+  <property name="build.sysclasspath" value="last"/>
+  <property name="shared"             value="${basedir}/../shared"/>
+  <property name="lib"                value="${shared}/lib"/>
+  <property name="config"             value="${basedir}/config"/>
+  <property name="classes"            value="${basedir}/classes"/> 
+  <property name="src"                value="${basedir}/src"/>
   <property file="${basedir}/build.properties"/>
 
   <!-- ========================================================================= -->

@@ -121,7 +121,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     final ClientTaskBundle result;
     lock.lock();
     try {
-      if (debugEnabled) log.debug("requesting bundle with " + nbTasks + " tasks, next bundle has " + bundleWrapper.getTaskCount() + " tasks");
+      if (debugEnabled) log.debug("requesting bundle with up to {} tasks, next bundle has {} tasks", nbTasks, bundleWrapper.getTaskCount());
       int size = getSize(bundleWrapper);
       decrementSizeCount(size);
       if (nbTasks >= bundleWrapper.getTaskCount()) {

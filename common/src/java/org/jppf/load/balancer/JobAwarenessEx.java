@@ -26,13 +26,14 @@ import org.jppf.node.protocol.*;
  */
 public interface JobAwarenessEx {
   /**
-   * Get the current job's metadata.
+   * Get the current job for which load-balancing is being performed.
    * @return a {@link JPPFDistributedJob} instance.
    */
   JPPFDistributedJob getJob();
 
   /**
-   * Set the current job's metadata.
+   * Set the current job for which load-balancing is being performed.
+   * This method should never be called directly, as it is set automatically be the JPPF load balancing framework.
    * @param job a {@link JPPFDistributedJob} instance.
    */
   void setJob(JPPFDistributedJob job);

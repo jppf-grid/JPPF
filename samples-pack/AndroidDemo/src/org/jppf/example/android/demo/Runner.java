@@ -65,6 +65,7 @@ public class Runner {
    * @param file a dexed jar or Android apk file path. 
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unchecked")
   public static void addToJobClassPath(final JPPFJob job, final File file) throws Exception {
     // copy the file in memory
     Location fileLoc = new FileLocation(file);

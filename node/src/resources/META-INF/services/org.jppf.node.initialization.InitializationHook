@@ -1,2 +1,2 @@
 org.jppf.node.initialization.OutputRedirectHook # redirect System.out and/or System.err to files specified in the configuration
-org.jppf.node.screensaver.ScreenSaverMain       # start a JPPFScreenSaver implementation based ont eh configuration
+org.jppf.node.screensaver.ScreenSaverMain       # start a JPPFScreenSaver implementation based on the configuration
