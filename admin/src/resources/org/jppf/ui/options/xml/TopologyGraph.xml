@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2015 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the topology graph view of the admin console.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="graph.NodeDataPage" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
+	<!-- test comment for save -->
+	<!--<property name="label" value="Graph View"/>-->
+	<property name="layoutConstraints" value="flowy, fill, gap rel, insets 0"/>
+  <property name="icon" value="/org/jppf/ui/resources/code-class.png"/>
+  <property name="scrollable" value="true"/>
+
+	<!-- ===================================================================== -->
+	<!--                        Buttons area                                   -->
+	<!-- ===================================================================== -->
+
+  <child name="graph.topology.toolbar" type="page">
+    <property name="componentConstraints" value="gap rel"/>
+    <property name="layoutConstraints" value="insets 4 2 0 2"/>
+
+    <child name="graph.shutdown.restart.driver" type="Button"/>
+    <child name="graph.driver.reset.statistics" type="Button"/>
+
+    <child name="sep1" type="ToolbarSeparator"/>
+    <child name="graph.update.configuration" type="Button"/>
+    <child name="graph.show.information" type="Button"/>
+
+    <child name="sep2" type="ToolbarSeparator"/>
+    <child name="graph.update.threads" type="Button"/>
+    <child name="graph.reset.counter" type="Button"/>
+
+    <child name="sep3" type="ToolbarSeparator"/>
+    <child name="graph.restart.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green.gif"/>
+    </child>
+    <child name="graph.restart.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_green_yellow.gif"/>
+    </child>
+
+    <child name="sep4" type="ToolbarSeparator"/>
+    <child name="graph.shutdown.node" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red.gif"/>
+    </child>
+    <child name="graph.shutdown.node.deferred" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/traffic_light_red_yellow.gif"/>
+    </child>
+
+    <child name="sep4.5" type="ToolbarSeparator"/>
+    <child name="graph.cancel.deferred.action" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/cancel_deferred_action.gif"/>
+    </child>
+
+    <child name="sep5" type="ToolbarSeparator"/>
+    <child name="graph.toggle.active" type="Button"/>
+    <child name="graph.node.provisioning" type="Button"/>
+
+  </child>
+  
+  <child name="graph.topology.toolbar.bottom" type="page">
+    <property name="componentConstraints" value="gap rel"/>
+    <property name="layoutConstraints" value="insets 4 2 0 2"/>
+
+    <child name="graph.button.refresh" type="Button">
+      <property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
+      <listener type="script">
+        <script language="groovy">
+          def graph = option.findFirstWithName("/NodeGraph");
+          graph.setLayout();
+          graph.init();
+        </script>
+      </listener>
+    </child>
+
+    <child name="graph.toggle.layout" type="Button">
+      <property name="toggle" value="true"/>
+    </child>
+
+    <child name="Layout" type="ComboBox">
+      <property name="label" value="Layout"/>
+      <property name="tooltip" value="choose a graph layout form the list"/>
+      <property name="value" value="Radial"/>
+      <property name="persistent" value="true"/>
+      <listener type="script">
+        <script language="groovy">option.findFirstWithName("/NodeGraph").setLayout(option.getValue())</script>
+      </listener>
+      <item name="Radial" selected="true"/>
+      <item name="Circle" selected="false"/>
+      <item name="Fruchterman-Reingold" selected="false"/>
+      <item name="Fruchterman-Reingold-2" selected="false"/>
+      <item name="Self Organizing Map" selected="false"/>
+      <item name="Kamada-Kawai" selected="false"/>
+      <item name="Spring-2" selected="false"/>
+    </child>
+
+    <child name="sep6" type="ToolbarSeparator"/>
+    <child name="graph.button.expand" type="Button"/>
+    <child name="graph.button.collapse" type="Button"/>
+
+    <child name="sep7" type="ToolbarSeparator"/>
+    <child name="graph.select.drivers" type="Button"/>
+    <child name="graph.select.nodes" type="Button"/>
+
+    <child name="sep8" type="ToolbarSeparator"/>
+    <child name="graph.toggle.mode" type="Button">
+      <property name="toggle" value="true"/>
+    </child>
+  </child>
+  
+	<!-- ===================================================================== -->
+	<!--                      Graph area                                       -->
+	<!-- ===================================================================== -->
+
+	<child name="GraphContainer" type="page">
+		<property name="layoutConstraints" value="fill, nogrid"/>
+		<property name="componentConstraints" value="grow, span, push, width 0"/>
+	
+		<child name="NodeGraph" type="Custom">
+			<property name="componentConstraints" value="grow, width 0"/>
+			<property name="impl.class" value="org.jppf.ui.monitoring.node.graph.GraphOption"/>
+			<property name="value" value=""/>
+			<initializer type="script">
+				<script language="groovy">
+					option.setupActions();
+					option.setLayout();
+          option.init();
+				</script>
+			</initializer>
+		</child>
+
+	</child>
+	
+</opt:main>

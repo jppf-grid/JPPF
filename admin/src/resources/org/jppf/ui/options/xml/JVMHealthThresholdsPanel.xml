@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	JPPF.
+	 Copyright (C) 2005-2015 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<!--
+  XML descriptor for the dialog to set the memory usage and CPU load alert thresholds.
+-->
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="health.thresholds" type="page">
+	<property name="label" value="Update the Memory aznd CPU usage alert thresholds"/>
+	<property name="layoutConstraints" value="flowy"/>
+	<property name="componentConstraints" value=""/>
+
+	<!-- ===================================================================== -->
+	<!--                   Memory usage thresholds                             -->
+	<!-- ===================================================================== -->
+	
+  <child name="health.thresholds.memory" type="page">
+    <property name="label" value="Memory Thresholds"/>
+    <property name="bordered" value="true"/>
+    <property name="titled" value="true"/>
+    <property name="layoutConstraints" value="fill, flowy"/>
+    <property name="componentConstraints" value=""/>
+    <property name="tooltip" value="Alert thresholds for memory usage"/>
+
+    <child name="health.thresholds.memory.warning" type="SpinnerNumber">
+      <property name="label" value="Warning %"/>
+      <property name="tooltip" value="% of used vs. max memory to issue a warning"/>
+      <property name="value" value="60.0d"/>
+      <property name="minValue" value="0.0d"/>
+      <property name="maxValue" value="100.0d"/>
+      <property name="step" value="0.1d"/>
+      <property name="pattern" value="0.0"/>
+      <property name="persistent" value="true"/>
+    </child>
+
+    <child name="health.thresholds.memory.critical" type="SpinnerNumber">
+      <property name="label" value="Critical %"/>
+      <property name="tooltip" value="% of used vs. max memory to issue a critical alert"/>
+      <property name="value" value="80.0d"/>
+      <property name="minValue" value="0.0d"/>
+      <property name="maxValue" value="100.0d"/>
+      <property name="step" value="0.1d"/>
+      <property name="pattern" value="0.0"/>
+      <property name="persistent" value="true"/>
+    </child>
+
+  </child>
+
+  <!-- ===================================================================== -->
+  <!--                     CPU usage thresholds                              -->
+  <!-- ===================================================================== -->
+
+  <child name="health.thresholds.cpu" type="page">
+    <property name="label" value="CPU Thresholds"/>
+    <property name="bordered" value="true"/>
+    <property name="titled" value="true"/>
+    <property name="layoutConstraints" value="fill, flowy"/>
+    <property name="componentConstraints" value=""/>
+    <property name="tooltip" value="Alert thresholds for CPU usage"/>
+
+    <child name="health.thresholds.cpu.warning" type="SpinnerNumber">
+      <property name="label" value="Warning %"/>
+      <property name="tooltip" value="% of used CPU to issue a warning"/>
+      <property name="value" value="60.0"/>
+      <property name="minValue" value="0.0"/>
+      <property name="maxValue" value="100.0"/>
+      <property name="step" value="0.1"/>
+      <property name="pattern" value="0.0"/>
+      <property name="persistent" value="true"/>
+    </child>
+
+    <child name="health.thresholds.cpu.critical" type="SpinnerNumber">
+      <property name="label" value="Critical %"/>
+      <property name="tooltip" value="% of used CPU to issue a critical alert"/>
+      <property name="value" value="80.0"/>
+      <property name="minValue" value="0.0"/>
+      <property name="maxValue" value="100.0"/>
+      <property name="step" value="0.1"/>
+      <property name="pattern" value="0.0"/>
+      <property name="persistent" value="true"/>
+    </child>
+
+  </child>
+
+  <!-- ===================================================================== -->
+  <!--                     Buttons                                           -->
+  <!-- ===================================================================== -->
+
+	<child name="health.thresholds.buttons" type="page">
+		<property name="layoutConstraints" value="fill"/>
+		<property name="componentConstraints" value=""/>
+		<property name="tooltip" value="Validate or cancel the update"/>
+
+		<child name="health.thresholds.buttons.ok" type="Button">
+			<property name="label" value="OK"/>
+			<property name="tooltip" value="Apply new settings"/>
+		</child>
+
+		<child name="health.thresholds.buttons.cancel" type="Button">
+			<property name="label" value="Cancel"/>
+			<property name="tooltip" value="Close this dialog without applying any settings"/>
+			<property name="componentConstraints" value="gap unrel"/>
+		</child>
+
+	</child>
+
+</opt:main>
