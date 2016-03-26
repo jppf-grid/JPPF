@@ -36,10 +36,6 @@ public class TaskExecutionDispatcher {
    */
   private final List<TaskExecutionListener> taskExecutionListeners = new CopyOnWriteArrayList<>();
   /**
-   * Executes the dispatching of notifications asynchronously.
-   */
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
-  /**
    * The bundle whose tasks are currently being executed.
    */
   private TaskBundle bundle = null;
@@ -84,7 +80,7 @@ public class TaskExecutionDispatcher {
    */
   public void fireTaskEnded(final Task<?> task, final String jobId, final String jobName, final long cpuTime, final long elapsedTime, final boolean error) {
     TaskExecutionEvent event = new TaskExecutionEvent(task, jobId, jobName, cpuTime, elapsedTime, error);
-    executor.submit(new NotificationTask(event));
+    fireEvent(event);
   }
 
   /**
@@ -94,44 +90,26 @@ public class TaskExecutionDispatcher {
    * @param sendViaJmx if <code>true</code> then also send this notification via the JMX MBean, otherwise only send to local listeners.
    */
   public void fireTaskNotification(final Task<?> task, final Object userObject, final boolean sendViaJmx) {
-    TaskExecutionEvent event = null;
-    if (bundle == null) event = new TaskExecutionEvent(task, null, null, userObject, sendViaJmx);
-    else event = new TaskExecutionEvent(task, bundle.getUuid(), bundle.getName(), userObject, sendViaJmx);
-    executor.submit(new NotificationTask(event));
+    TaskExecutionEvent event = (bundle == null) ? new TaskExecutionEvent(task, null, null, userObject, sendViaJmx)
+      : new TaskExecutionEvent(task, bundle.getUuid(), bundle.getName(), userObject, sendViaJmx);
+    fireEvent(event);
+  }
+
+  /**
+   * Dispatch the specified event to all registered listeners.
+   * @param event the event to dispatch.
+   */
+  private void fireEvent(final TaskExecutionEvent event) {
+    for (TaskExecutionListener listener : taskExecutionListeners) {
+      if (event.isTaskCompletion()) listener.taskExecuted(event);
+      else listener.taskNotification(event);
+    }
   }
 
   /**
    * Release the resources used by this dispatcher.
    */
   public void close() {
-    executor.shutdownNow();
-  }
-
-  /**
-   * 
-   */
-  private class NotificationTask implements Runnable {
-    /**
-     * The event to dispatch.
-     */
-    private final TaskExecutionEvent event;
-
-    /**
-     * Initiailize this task with the specified event.
-     * @param event the event to dispatch.
-     */
-    public NotificationTask(final TaskExecutionEvent event) {
-      this.event = event;
-    }
-
-    @Override
-    public void run() {
-      for (TaskExecutionListener listener : taskExecutionListeners) {
-        //if ((listener instanceof JPPFNodeTaskMonitorMBean) && !event.isSendViaJmx()) continue;
-        if (event.isTaskCompletion()) listener.taskExecuted(event);
-        else listener.taskNotification(event);
-      }
-    }
   }
 
   /**
