@@ -57,7 +57,7 @@ public class JPPFDirFilter extends AbstractFileFilter
   public JPPFDirFilter(final String[] includes, final String[] excludes)
   {
     this.includes = includes;
-    this.excludes = excludes;
+    this.excludes = (excludes == null) || (excludes.length <= 0) ? DEFAULT_EXCLUDES : excludes;
   }
 
   /**

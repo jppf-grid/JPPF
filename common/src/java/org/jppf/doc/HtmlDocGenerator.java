@@ -292,6 +292,7 @@ public class HtmlDocGenerator {
       File templateDir = namedArgs.getFile(TEMPLATES_DIR);
       if (!templateDir.exists() || !templateDir.isDirectory()) showUsageAndExit("Templates location must be an existing folder", namedArgs);
       boolean recursive = namedArgs.getBoolean(RECURSIVE);
+      System.out.println("Running with args:\n" + namedArgs);
       if (recursive) generateDocRecursive(sourceDir, destDir, templateDir, namedArgs);
       else generateDoc(sourceDir, destDir, templateDir,namedArgs);
     } catch (Exception e) {
@@ -360,6 +361,7 @@ public class HtmlDocGenerator {
    * @throws Exception if any error occurs.
    */
   private static void allDirsRecursive(final File root, final List<File> list, final NamedArguments parameters) throws Exception {
+    String[] dirs = parameters.getStringArray(DIR_INCLUDES, ",");
     JPPFDirFilter filter = new JPPFDirFilter(parameters.getStringArray(DIR_INCLUDES, ","), parameters.getStringArray(DIR_EXCLUDES, ","));
     for (File file : root.listFiles(filter)) {
       list.add(file);
