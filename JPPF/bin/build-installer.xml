@@ -26,21 +26,28 @@
   <!-- ========================================================================= -->
 
   <target name="installer" depends="installer.check.izpack.present" if="izpack.present" description="">
-    <property name="jppf.web.dir" value="http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20${version.number}/web_installer"/>
+    <property name="jppf.web.dir" value="http://www.jppf.org/download/${version.number}"/>
     <installer.package url="http://www.jppf.org/" />
+    <installer.copy.files/>
   </target>
-
+  
   <target name="installer.local" depends="installer.check.izpack.present" if="izpack.present">
     <property name="jppf.web.dir" value="http://localhost:8880/download/${version.number}"/>
     <installer.package url="http://localhost:8880/" />
-    <local name="local.inst.dir"/>
-    <property name="local.inst.dir" value="${home}/download/${version.number}"/>
-    <delete dir="${local.inst.dir}" quiet="true"/>
-    <mkdir dir="${local.inst.dir}"/>
-    <copy todir="${local.inst.dir}">
-      <fileset dir="${build}/web_installer"/>
-    </copy>
+    <installer.copy.files/>
   </target>
+  
+  <macrodef name="installer.copy.files">
+    <sequential>
+      <local name="local.inst.dir"/>
+      <property name="local.inst.dir" value="${home}/download/${version.number}"/>
+      <delete dir="${local.inst.dir}" quiet="true"/>
+      <mkdir dir="${local.inst.dir}"/>
+      <copy todir="${local.inst.dir}">
+        <fileset dir="${build}/web_installer"/>
+      </copy>
+    </sequential>
+  </macrodef>
 
   <target name="installer.check.izpack.present">
     <available file="${izpack.home}/lib/standalone-compiler.jar" property="izpack.present" />
