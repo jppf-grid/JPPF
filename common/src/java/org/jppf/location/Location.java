@@ -27,8 +27,7 @@ import java.io.*;
  * @param <T> the type of this location.
  * @author Laurent Cohen
  */
-public interface Location<T> extends Serializable
-{
+public interface Location<T> extends Serializable {
   /**
    * Get the path for this location.
    * @return the path as a string.
@@ -51,11 +50,13 @@ public interface Location<T> extends Serializable
 
   /**
    * Copy the content at this location to another location.
+   * @param <V> the type of path for the destination location.
    * @param location the destination location to copy to.
    * @return the destination location.
    * @throws Exception if an I/O error occurs.
    */
-  Location copyTo(Location<?> location) throws Exception;
+  <V> Location<V> copyTo(Location<V> location) throws Exception;
+
   /**
    * Get the size of the data this location points to.
    * @return the size as a long value, or -1 if the size is not available.

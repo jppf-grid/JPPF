@@ -58,7 +58,7 @@ public abstract class AbstractLocation<T> implements Location<T> {
   }
 
   @Override
-  public Location copyTo(final Location<?> location) throws Exception {
+  public <V> Location<V> copyTo(final Location<V> location) throws Exception {
     copyStream(getInputStream(), location.getOutputStream(), eventsEnabled);
     return location;
   }
@@ -100,7 +100,8 @@ public abstract class AbstractLocation<T> implements Location<T> {
   protected void fireLocationEvent(final long n) {
     if (listeners.isEmpty()) return;
     LocationEvent event = new LocationEvent(this, n);
-    for (LocationEventListener l: listeners) l.dataTransferred(event);
+    for (LocationEventListener l : listeners)
+      l.dataTransferred(event);
   }
 
   /**
