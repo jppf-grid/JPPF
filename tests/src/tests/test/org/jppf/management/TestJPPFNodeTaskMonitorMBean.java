@@ -38,8 +38,7 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the functionality of the JPPFNodeAdminMBean from the client point of view.
  * @author Laurent Cohen
  */
-public class TestJPPFNodeTaskMonitorMBean
-{
+public class TestJPPFNodeTaskMonitorMBean {
   /**
    * Connection to the node's JMX server.
    */
@@ -52,7 +51,6 @@ public class TestJPPFNodeTaskMonitorMBean
    * 
    */
   private static JPPFNodeTaskMonitorMBean nodeMonitorProxy = null;
-
   /**
    * The jppf client to use.
    */
@@ -63,20 +61,18 @@ public class TestJPPFNodeTaskMonitorMBean
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     client = BaseSetup.setup(1);
     driverJmx = BaseSetup.getJMXConnection(client);
     Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
     JPPFManagementInfo info = coll.iterator().next();
     nodeJmx = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
     nodeJmx.connectAndWait(5000L);
-    if (!nodeJmx.isConnected())
-    {
+    if (!nodeJmx.isConnected()) {
       nodeJmx = null;
       throw new Exception("could not connect to the node's JMX server");
     }
-    nodeMonitorProxy = nodeJmx.getProxy(JPPFNodeTaskMonitorMBean.MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
+    nodeMonitorProxy = nodeJmx.getJPPFNodeTaskMonitorProxy();
   }
 
   /**
@@ -84,16 +80,11 @@ public class TestJPPFNodeTaskMonitorMBean
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass
-  public static void cleanup() throws Exception
-  {
-    if (nodeJmx != null)
-    {
-      try
-      {
+  public static void cleanup() throws Exception {
+    if (nodeJmx != null) {
+      try {
         nodeJmx.close();
-      }
-      finally
-      {
+      } finally {
         nodeJmx = null;
         nodeMonitorProxy = null;
       }
@@ -105,12 +96,10 @@ public class TestJPPFNodeTaskMonitorMBean
    * Test getting the node state.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testSnapshot() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testSnapshot() throws Exception {
     long duration = 100L;
-    try
-    {
+    try {
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksExecuted());
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksInError());
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksSucessfull());
@@ -126,9 +115,7 @@ public class TestJPPFNodeTaskMonitorMBean
       assertTrue("cpu time is only " + n, n > 0L);
       n = nodeMonitorProxy.getTotalTaskElapsedTime();
       assertTrue("elapsed time is only " + n, n >= duration - 1L);
-    }
-    finally
-    {
+    } finally {
       nodeMonitorProxy.reset();
       nodeJmx.resetTaskCounter();
     }
@@ -138,12 +125,10 @@ public class TestJPPFNodeTaskMonitorMBean
    * Test getting the node state.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testReset() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testReset() throws Exception {
     long duration = 100L;
-    try
-    {
+    try {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
       List<Task<?>> result = client.submitJob(job);
@@ -160,9 +145,7 @@ public class TestJPPFNodeTaskMonitorMBean
       assertEquals(Integer.valueOf(0), nodeMonitorProxy.getTotalTasksSucessfull());
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskCpuTime());
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskElapsedTime());
-    }
-    finally
-    {
+    } finally {
       nodeJmx.resetTaskCounter();
     }
   }
@@ -171,7 +154,7 @@ public class TestJPPFNodeTaskMonitorMBean
    * Test getting the node state.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
+  @Test(timeout = 5000)
   public void testNotifications() throws Exception {
     long duration = 100L;
     int nbTasks = 5;
@@ -190,7 +173,7 @@ public class TestJPPFNodeTaskMonitorMBean
           return o1.getId().compareTo(o2.getId());
         }
       });
-      for (int i=0; i < nbTasks; i++) {
+      for (int i = 0; i < nbTasks; i++) {
         Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);
         assertEquals(job.getUuid(), ti.getJobId());
@@ -202,7 +185,7 @@ public class TestJPPFNodeTaskMonitorMBean
           n = ti.getCpuTime();
           assertTrue(n < 0L);
           assertEquals("starting task " + task.getId(), listener.userObjects.get(0));
-          ti = listener.notifs.get(i+1);
+          ti = listener.notifs.get(i + 1);
           n = ti.getCpuTime();
           assertTrue("task " + i + " cpu time is only " + n, n > 0L);
         }
@@ -216,7 +199,7 @@ public class TestJPPFNodeTaskMonitorMBean
 
   /** */
   public class NodeNotificationListener implements NotificationListener {
-    /**  The task information received as notifications from the node. */
+    /** The task information received as notifications from the node. */
     public List<TaskInformation> notifs = new Vector<>();
     /** A user-defined object. */
     public List<Object> userObjects = new Vector<>();
@@ -229,9 +212,7 @@ public class TestJPPFNodeTaskMonitorMBean
         TaskExecutionNotification notif = (TaskExecutionNotification) notification;
         notifs.add(notif.getTaskInformation());
         System.out.println("got task notification for task " + notif.getTaskInformation().getId());
-        if (notif.getUserData() != null) {
-          userObjects.add(notif.getUserData());
-        }
+        if (notif.getUserData() != null) userObjects.add(notif.getUserData());
       } catch (Exception e) {
         if (exception == null) exception = e;
       }

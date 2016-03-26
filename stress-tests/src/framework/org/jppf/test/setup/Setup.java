@@ -81,7 +81,7 @@ public class Setup
   public DriverJobManagementMBean getJobManagementProxy() throws Exception
   {
     JMXDriverConnectionWrapper driver = getDriverManagementProxy();
-    return driver.getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+    return driver.getJobManager();
   }
 
   /**

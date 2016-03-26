@@ -27,45 +27,30 @@ import org.jppf.utils.ExceptionUtils;
  * This is a test of a node startup class.
  * @author Laurent Cohen
  */
-public class TaskNotifier implements JPPFNodeStartupSPI
-{
+public class TaskNotifier implements JPPFNodeStartupSPI {
   /**
    * The proxy to the mbean that sends the actual notifications.
    */
   private static NodeTestMBean mbean = null;
 
   @Override
-  public void run()
-  {
-    //System.out.println("Initializing the tasks notifier");
+  public void run() {
     initNotifier();
   }
 
   /**
    * Initialize the task notifications MBean proxy.
    */
-  private static void initNotifier()
-  {
+  private static void initNotifier() {
     JMXNodeConnectionWrapper jmxWrapper = new JMXNodeConnectionWrapper();
     jmxWrapper.connect();
-    if (!jmxWrapper.isConnected())
-    {
+    if (!jmxWrapper.isConnected()) {
       System.out.println("Error: could not connect to the local MBean server");
       return;
     }
-    //System.out.println("  connected to the local MBean server");
-    try
-    {
-      /*
-      ObjectName objectName = new ObjectName(NodeTestMBean.MBEAN_NAME);
-      MBeanServerConnection mbsc = jmxWrapper.getMbeanConnection();
-      mbean = MBeanServerInvocationHandler.newProxyInstance(mbsc, objectName, NodeTestMBean.class, true);
-      */
+    try {
       mbean = jmxWrapper.getProxy(NodeTestMBean.MBEAN_NAME, NodeTestMBean.class);
-      //System.out.println("  task notifier successfully initialized, proxy=" + mbean);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       System.out.println("Error: " + ExceptionUtils.getMessage(e));
     }
   }
@@ -75,8 +60,7 @@ public class TaskNotifier implements JPPFNodeStartupSPI
    * @param message the message to send to all registered listeners.
    * @throws Exception if any error occurs.
    */
-  public static void addNotification(final Object message) throws Exception
-  {
+  public static void addNotification(final Object message) throws Exception {
     if (mbean == null) return;
     mbean.sendUserObject(message);
     System.out.println("sent object: " + message);
