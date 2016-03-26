@@ -18,10 +18,14 @@
 
 package org.jppf.management.generated;
 
-import java.util.*;
-
+import java.util.Collection;
+import java.util.Map;
 import org.jppf.load.balancer.LoadBalancingInformation;
-import org.jppf.management.*;
+import org.jppf.management.AbstractMBeanStaticProxy;
+import org.jppf.management.JMXConnectionWrapper;
+import org.jppf.management.JPPFDriverAdminMBean;
+import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.NodeSelector;
 import org.jppf.utils.stats.JPPFStatistics;
 
 /**

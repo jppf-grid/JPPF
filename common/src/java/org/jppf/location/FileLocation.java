@@ -25,8 +25,7 @@ import java.io.*;
  * This implementation of the {@link Location} interface allows writing to and reading from a file.
  * @author Laurent Cohen
  */
-public class FileLocation extends AbstractLocation<String>
-{
+public class FileLocation extends AbstractLocation<String> {
   /**
    * Explicit serialVersionUID.
    */
@@ -44,8 +43,7 @@ public class FileLocation extends AbstractLocation<String>
    * @param file an abstract file path.
    * @throws IOException if any I/O error occurs.
    */
-  public FileLocation(final File file) throws IOException
-  {
+  public FileLocation(final File file) throws IOException {
     super(file.getCanonicalPath());
   }
 
@@ -53,20 +51,17 @@ public class FileLocation extends AbstractLocation<String>
    * Initialize this location with the specified file path.
    * @param file a string representing the file path.
    */
-  public FileLocation(final String file)
-  {
+  public FileLocation(final String file) {
     super(file);
   }
 
   @Override
-  public InputStream getInputStream() throws Exception
-  {
+  public InputStream getInputStream() throws Exception {
     return new BufferedInputStream(new FileInputStream(path));
   }
 
   @Override
-  public OutputStream getOutputStream() throws Exception
-  {
+  public OutputStream getOutputStream() throws Exception {
     return new BufferedOutputStream(new FileOutputStream(path));
   }
 
@@ -75,10 +70,8 @@ public class FileLocation extends AbstractLocation<String>
    * @return the size as a long value, or -1 if the file does not exist.
    */
   @Override
-  public long size()
-  {
-    if (size < 0)
-    {
+  public long size() {
+    if (size < 0) {
       File file = new File(path);
       if (file.exists()) size = file.length();
     }

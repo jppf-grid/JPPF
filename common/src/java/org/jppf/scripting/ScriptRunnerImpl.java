@@ -19,17 +19,27 @@
 package org.jppf.scripting;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.script.*;
 
-import org.jppf.utils.ExceptionUtils;
+import org.jppf.utils.*;
 import org.jppf.utils.collections.SoftReferenceValuesMap;
+import org.slf4j.*;
 
 /**
  * ScriptRunner wrapper around a JSR-223 compliant script engine.
  * @author Laurent Cohen
  */
 public class ScriptRunnerImpl implements ScriptRunner {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ScriptRunnerImpl.class);
+  /**
+   * Determines whether debug log statements are enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Map of precompiled scripts.
    */
@@ -46,6 +56,18 @@ public class ScriptRunnerImpl implements ScriptRunner {
    * The language supported by this script engine.
    */
   protected final String language;
+  /**
+   * 
+   */
+  private AtomicInteger cacheHits = new AtomicInteger(0);
+  /**
+   * 
+   */
+  private AtomicInteger cacheMisses = new AtomicInteger(0);
+  /**
+   * 
+   */
+  private AtomicInteger cacheRequests = new AtomicInteger(0);
 
   /**
    * Create a script runner witht he specified language.
@@ -86,15 +108,18 @@ public class ScriptRunnerImpl implements ScriptRunner {
     if ((scriptId != null) && (engine instanceof Compilable)) {
       String key = new StringBuilder().append(language).append(':').append(scriptId).toString();
       cs = map.get(key);
+      cacheRequests.incrementAndGet();
       if (cs == null) {
+        cacheMisses.incrementAndGet();
         try {
           cs = ((Compilable) engine).compile(script);
           if (cs != null) map.put(key, cs);
         } catch (Exception e) {
           throw buildScriptingException(e);
         }
-      }
+      } else cacheRequests.incrementAndGet();
     }
+    if (debugEnabled) log.debug(String.format("script cache statistics for '%s': requests=%d, hits=%d, misses=%d", language, cacheRequests.get(), cacheHits.get(), cacheMisses.get()));
     try {
       Object res = (cs != null) ? cs.eval(bindings) : engine.eval(script, bindings);
       return res;

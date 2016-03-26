@@ -104,4 +104,19 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends Type
     this.title = title;
     return (T) this;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+      String key = entry.getKey();
+      String value = getString(key);
+      if (value != null) {
+        sb.append("  ").append(key);
+        if (!entry.getValue().isSwitch()) sb.append(" ").append(value);
+        sb.append('\n');
+      }
+    }
+    return sb.toString();
+  }
 }

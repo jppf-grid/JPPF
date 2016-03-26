@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * A map cache with a LRU eviction policy nased on a specified capacity.
+ * A map cache with a LRU eviction policy based on a specified capacity.
  * @param <K> the type of keys.
  * @param <V> the type of values.
  * @author Laurent Cohen

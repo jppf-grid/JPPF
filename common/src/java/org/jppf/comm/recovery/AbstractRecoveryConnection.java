@@ -29,8 +29,7 @@ import org.slf4j.*;
  * Common abstract super class for a connection dedicated to recovery from hardware failure of a remote peer.
  * @author Laurent Cohen
  */
-public abstract class AbstractRecoveryConnection extends ThreadSynchronization implements Runnable
-{
+public abstract class AbstractRecoveryConnection extends ThreadSynchronization implements Runnable {
   /**
    * Logger for this class.
    */
@@ -80,8 +79,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @return the message that was received.
    * @throws Exception if any error occurs.
    */
-  protected String receiveMessage() throws Exception
-  {
+  protected String receiveMessage() throws Exception {
     return receiveMessage(this.maxRetries, this.socketReadTimeout);
   }
 
@@ -95,23 +93,18 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @return the message that was received.
    * @throws Exception if any error occurs.
    */
-  protected String receiveMessage(final int maxRetries, final int socketReadTimeout) throws Exception
-  {
+  protected String receiveMessage(final int maxRetries, final int socketReadTimeout) throws Exception {
     String message = null;
     JPPFBuffer buffer = null;
     int retries = 0;
     boolean success = false;
-    while ((retries < maxRetries) && !success)
-    {
-      try
-      {
+    while ((retries < maxRetries) && !success) {
+      try {
         buffer = socketWrapper.receiveBytes(socketReadTimeout);
         success = true;
         message = buffer.asString();
         if (traceEnabled) log.trace("received '{}' for {}", message, this);
-      }
-      catch (SocketTimeoutException e)
-      {
+      } catch (SocketTimeoutException e) {
         retries++;
         if (debugEnabled) log.debug("retry #{} failed for {}", retries, this);
       }
@@ -125,8 +118,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * @param message the message to send.
    * @throws Exception if any error occurs while sending the message.
    */
-  public void sendMessage(final String message) throws Exception
-  {
+  public void sendMessage(final String message) throws Exception {
     JPPFBuffer buffer = new JPPFBuffer(message);
     socketWrapper.sendBytes(buffer);
     if (traceEnabled) log.trace("sent '{}' from {}", message, this);
@@ -141,8 +133,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * Get the uuid of the remote peer.
    * @return the uuid as a string.
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
@@ -150,8 +141,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * Determine whether this connection is ok after is has been checked.
    * @return true if the connection is ok, false otherwise.
    */
-  public synchronized boolean isOk()
-  {
+  public synchronized boolean isOk() {
     return ok;
   }
 
@@ -159,8 +149,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * Specify whether this connection is ok after is has been checked.
    * @param ok true if the connection is ok, false otherwise.
    */
-  public synchronized void setOk(final boolean ok)
-  {
+  public synchronized void setOk(final boolean ok) {
     this.ok = ok;
   }
 
@@ -168,8 +157,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * Determine whether the initial handshake has been performed.
    * @return <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
    */
-  public synchronized boolean isInitialized()
-  {
+  public synchronized boolean isInitialized() {
     return initialized;
   }
 
@@ -177,14 +165,12 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
    * Specify whether the initial handshake has been performed.
    * @param initialized <code>true</code> if the initial handshake was done, <code>false</code> otherwise.
    */
-  public synchronized void setInitialized(final boolean initialized)
-  {
+  public synchronized void setInitialized(final boolean initialized) {
     this.initialized = initialized;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("socketWrapper=").append(socketWrapper);
     sb.append(", maxRetries=").append(maxRetries);

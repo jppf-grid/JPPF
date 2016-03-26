@@ -141,7 +141,7 @@ public class AbstractMBeanStaticProxy {
   }
 
   /**
-   * Get the MBean otification information.
+   * Get the MBean notification information.
    * @return an array of {@link MBeanNotificationInfo} instances.
    */
   public MBeanNotificationInfo[] getNotificationInfo() {

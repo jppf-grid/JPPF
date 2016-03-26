@@ -25,8 +25,7 @@ import javax.management.NotificationEmitter;
  * MBean interface for sending log and trace messages as JMX notifications.
  * @author Laurent Cohen
  */
-public interface JmxLogger extends NotificationEmitter
-{
+public interface JmxLogger extends NotificationEmitter {
   /**
    * Name of the driver's logger MBean.
    */

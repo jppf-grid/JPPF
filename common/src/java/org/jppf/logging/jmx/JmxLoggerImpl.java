@@ -23,11 +23,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.management.*;
 
 /**
- * Implementation of a  simple logger that sends logged messages as JMX notifications.
+ * Implementation of a simple logger that sends logged messages as JMX notifications.
  * @author Laurent Cohen
  */
-public class JmxLoggerImpl extends NotificationBroadcasterSupport implements JmxLogger
-{
+public class JmxLoggerImpl extends NotificationBroadcasterSupport implements JmxLogger {
   /**
    * The mbrean object name sent with the notifications.
    */
@@ -40,8 +39,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
   /**
    * Default constructor.
    */
-  public JmxLoggerImpl()
-  {
+  public JmxLoggerImpl() {
   }
 
   /**
@@ -49,8 +47,7 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
    * @param message the message to log.
    */
   @Override
-  public void log(final String message)
-  {
+  public void log(final String message) {
     Notification notif = new Notification("JmxLogNotification", OBJECT_NAME, sequence.incrementAndGet(), message);
     sendNotification(notif);
   }
@@ -59,14 +56,10 @@ public class JmxLoggerImpl extends NotificationBroadcasterSupport implements Jmx
    * Create the {@link ObjectName} used as source of the notifications.
    * @return an {@link ObjectName} instance.
    */
-  private static ObjectName makeObjectName()
-  {
-    try
-    {
+  private static ObjectName makeObjectName() {
+    try {
       return new ObjectName(JmxLogger.DEFAULT_MBEAN_NAME);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       System.out.println("Error: failed to send JMX log notification (" + e.getMessage() + ')');
     }
     return null;
