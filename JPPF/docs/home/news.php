@@ -127,6 +127,7 @@
       <h1><?php echo $title ?></h1>
       <?php echo $line["desc"] ?>
       <?php echo $line["content"]	?>
+      <br>
     </div>
 		<br>
 	<?php

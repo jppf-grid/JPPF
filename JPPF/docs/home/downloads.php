@@ -105,7 +105,7 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.1.2";
+        $ver1 = "5.1.3";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -113,7 +113,7 @@
   <h2>&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
 </div>
       <h3>Web Installer</h3>
-      <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
+      <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
       <ul class="samplesList" style="margin-top: 0pt">
         <li>double-clicking the downloaded file</li>
         <li>typing "<b>java -jar <?php echo 'JPPF-' . $ver1 . '-Web-Installer.jar'; ?></b>"</li>
@@ -173,7 +173,7 @@
   <h2>&nbsp;<img src="images/icons/download.png" class="titleWithIcon"/>JPPF <?php echo $ver1 ?></h2>
 </div>
       <h3>Web Installer</h3>
-      <a href="<?php echo $base . 'web_installer/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
+      <a href="<?php echo '/download/' . $ver1 . '/JPPF-' . $ver1 . '-Web-Installer.jar'; ?>">Download the web installer jar</a> and run it by either:
       <ul class="samplesList" style="margin-top: 0pt">
         <li>double-clicking the downloaded file</li>
         <li>typing "<b>java -jar <?php echo 'JPPF-' . $ver1 . '-Web-Installer.jar'; ?></b>"</li>
