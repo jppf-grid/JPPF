@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.jppf.classloader.DelegationModel;
 import org.jppf.management.diagnostics.DiagnosticsMBean;
+import org.jppf.node.provisioning.JPPFNodeProvisioningMBean;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -237,5 +238,35 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
       if (debugEnabled) log.debug(String.format("error invoking %s on MBean %s: %s", ReflectionUtils.getCurrentMethodName(), JPPFNodeAdminMBean.MBEAN_NAME, ExceptionUtils.getStackTrace(e)));
     }
     return false;
+  }
+
+  /**
+   * A shortcut method for {@code getProxy(JPPFNodeMaintenanceMBean.MBEAN_NAME, JPPFNodeMaintenanceMBean.class)}.
+   * @return a dynamic proxy implementing the {@link JPPFNodeMaintenanceMBean} interface.
+   * @throws Exception if any error occurs.
+   * @since 5.2
+   */
+  public JPPFNodeMaintenanceMBean getJPPFNodeMaintenanceMProxy() throws Exception {
+    return getProxy(JPPFNodeMaintenanceMBean.MBEAN_NAME, JPPFNodeMaintenanceMBean.class);
+  }
+
+  /**
+   * A shortcut method for {@code getProxy(JPPFNodeTaskMonitorMBean.MBEAN_NAME, JPPFNodeTaskMonitorMBean.class)}.
+   * @return a dynamic proxy implementing the {@link JPPFNodeTaskMonitorMBean} interface.
+   * @throws Exception if any error occurs.
+   * @since 5.2
+   */
+  public JPPFNodeTaskMonitorMBean getJPPFNodeTaskMonitorProxy() throws Exception {
+    return getProxy(JPPFNodeTaskMonitorMBean.MBEAN_NAME, JPPFNodeTaskMonitorMBean.class);
+  }
+
+  /**
+   * A shortcut method for {@code getProxy(JPPFNodeProvisioningMBean.MBEAN_NAME, JPPFNodeProvisioningMBean.class)}.
+   * @return a dynamic proxy implementing the {@link JPPFNodeProvisioningMBean} interface.
+   * @throws Exception if any error occurs.
+   * @since 5.2
+   */
+  public JPPFNodeProvisioningMBean getJPPFNodeProvisioningProxy() throws Exception {
+    return getProxy(JPPFNodeProvisioningMBean.MBEAN_NAME, JPPFNodeProvisioningMBean.class);
   }
 }
