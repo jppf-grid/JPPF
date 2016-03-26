@@ -142,7 +142,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Check whether the bundler held by this context is up to date by comparison with the specified bundler.<br>
    * If it is not, then it is replaced with a copy of the specified bundler, with a timestamp taken at creation time.
-   * @param serverBundler the bundler to compare with.
+   * @param factory the factory obec tthat creates {@link Bundler} instances.
    * @param jppfContext execution context.
    * @return true if the bundler is up to date, false if it wasn't and has been updated.
    */
