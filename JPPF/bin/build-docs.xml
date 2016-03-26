@@ -40,6 +40,10 @@
     <attribute name="source"/>
     <attribute name="dest"/>
     <attribute name="templates"/>
+    <attribute name="fi" default="html,php"/>
+    <attribute name="fe" default=""/>
+    <attribute name="di" default=""/>
+    <attribute name="de" default=""/>
     <sequential>
       <java fork="yes" classname="org.jppf.doc.HtmlDocGenerator" classpathref="run.classpath">
         <jvmarg value="-Xmx128m"/>
@@ -50,6 +54,8 @@
         <arg value="-t"/>
         <arg value="@{templates}"/>
         <arg value="-r"/>
+        <arg value="-fi"/>
+        <arg value="html,php"/>
       </java>
     </sequential>
   </macrodef>
@@ -153,17 +159,19 @@
   </target>
 
   <target name="javadoc.package" description="Package the javadoc for deployment on the web site">
-    <code.doc.tgz dir="javadoc/5.2" filename="javadoc-5.2"/>
-    <code.doc.tgz dir="csdoc/5.2" filename="csdoc-5.2"/>
+    <code.doc.tgz dir="javadoc" vname="5.2"/>
+    <code.doc.tgz dir="csdoc" vname="5.2"/>
   </target>
 
   <macrodef name="code.doc.tgz">
     <attribute name="dir"/>
-    <attribute name="filename"/>
+    <attribute name="vname"/>
     <sequential>
-      <delete file="${docs}/@{filename}.tar.gz" quiet="true"/>
-      <tar destfile="${docs}/@{filename}.tar.gz" compression="gzip">
-        <tarfileset prefix="@{dir}" dir="${home}/@{dir}" includes="**/*.*, package-list"/>
+      <local name="filename"/>
+      <property name="filename" value="@{dir}-@{vname}"/>
+      <delete file="${docs}/${filename}.tar.gz" quiet="true"/>
+      <tar destfile="${docs}/${filename}.tar.gz" compression="gzip">
+        <tarfileset prefix="@{vname}" dir="${home}/@{dir}/@{vname}" includes="**/*.*, package-list"/>
       </tar>
     </sequential>
   </macrodef>
