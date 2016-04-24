@@ -24,7 +24,7 @@ import java.util.*;
 import org.slf4j.*;
 
 /**
- * Utility class that provides method to discover the network configuration of the current machine.
+ * Utility class that provides methods to discover the network configuration of the current machine.
  * @author Laurent Cohen
  * @exclude
  */
@@ -58,7 +58,7 @@ public final class NetworkUtils {
    * @return the ipv4 address as a string.
    */
   public static String getNonLocalHostAddress() {
-    List<InetAddress> allAddresses = getNonLocalIPV4Addresses();
+    List<InetAddress> allAddresses = getNonLocalIPAddresses();
     return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
   }
 
