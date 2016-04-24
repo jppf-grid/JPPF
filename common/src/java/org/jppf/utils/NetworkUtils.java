@@ -59,7 +59,7 @@ public final class NetworkUtils {
    * @return the ipv4 address as a string.
    */
   public static String getNonLocalHostAddress() {
-    List<InetAddress> allAddresses = getNonLocalIPV4Addresses();
+    List<InetAddress> allAddresses = getNonLocalIPAddresses();
     return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
   }
 
