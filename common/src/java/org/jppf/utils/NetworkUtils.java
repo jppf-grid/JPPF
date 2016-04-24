@@ -58,7 +58,7 @@ public final class NetworkUtils {
    * @return the ipv4 address as a string.
    */
   public static String getNonLocalHostAddress() {
-    List<InetAddress> allAddresses = getNonLocalIPV4Addresses();
+    List<InetAddress> allAddresses = getNonLocalIPAddresses();
     return allAddresses.isEmpty() ? null : allAddresses.get(0).getHostAddress();
   }
 
@@ -171,7 +171,7 @@ public final class NetworkUtils {
   public static String getManagementHost() {
     TypedProperties props = JPPFConfiguration.getProperties();
     String host = NetworkUtils.getNonLocalHostAddress();
-    if (debugEnabled) log.debug("JMX host from NetworkUtils: "+host);
+    if (debugEnabled) log.debug("JMX host from NetworkUtils: " + host);
     if (host == null) host = "localhost";
     host = props.getString("jppf.management.host", host);
     if (debugEnabled) log.debug("computed JMX host: "+host);

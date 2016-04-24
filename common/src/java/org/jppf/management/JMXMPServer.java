@@ -92,10 +92,10 @@ public class JMXMPServer extends AbstractJMXServer {
       env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
       boolean found = false;
       JMXServiceURL url = null;
+      InetAddress addr = InetAddress.getByName(managementHost);
+      String host = String.format((addr instanceof Inet6Address) ? "[%s]" : "%s", addr.getHostAddress());
       while (!found) {
         try {
-          InetAddress addr = InetAddress.getByName(managementHost);
-          String host = (addr instanceof Inet6Address) ? "[" + managementHost + "]" : managementHost;
           url = new JMXServiceURL("service:jmx:jmxmp://" + host + ':' + managementPort);
           connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
           connectorServer.start();
