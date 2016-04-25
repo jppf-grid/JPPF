@@ -77,6 +77,7 @@ class WaitingResultsState extends NodeServerState {
   public NodeTransition process(final BundleResults received, final AbstractNodeContext context) throws Exception {
     ServerTaskBundleNode nodeBundle = context.getBundle();
     server.getDispatchExpirationHandler().cancelAction(ServerTaskBundleNode.makeKey(nodeBundle));
+    //server.getNodeReservationHandler().removeReservation(context);
     boolean requeue = false;
     try {
       TaskBundle newBundle = received.bundle();

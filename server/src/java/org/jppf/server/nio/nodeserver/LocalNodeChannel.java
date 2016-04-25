@@ -24,14 +24,12 @@ import org.jppf.nio.AbstractLocalChannelWrapper;
  * Wrapper implementation for a local node's communication channel.
  * @author Laurent Cohen
  */
-public class LocalNodeChannel extends AbstractLocalChannelWrapper<LocalNodeMessage, LocalNodeContext>
-{
+public class LocalNodeChannel extends AbstractLocalChannelWrapper<LocalNodeMessage, LocalNodeContext> {
   /**
    * Initialize this channel wrapper with the specified node context.
    * @param context the node context used as channel.
    */
-  public LocalNodeChannel(final LocalNodeContext context)
-  {
+  public LocalNodeChannel(final LocalNodeContext context) {
     super(context);
   }
 }

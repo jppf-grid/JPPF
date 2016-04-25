@@ -63,10 +63,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   private final List<JobTasksListener> taskReturnListeners = new CopyOnWriteArrayList<>();
   /**
-   * Reference to the driver.
-   */
-  private final JPPFDriver driver = JPPFDriver.getInstance();
-  /**
    * Count of notifications in the executor's quueue.
    */
   private final AtomicInteger notifCount = new AtomicInteger(0);
@@ -148,9 +144,10 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     String jobUuid = bundle.getUuid();
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
     submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
-    driver.getStatistics().addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
+    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+    stats.addValue(JPPFStatisticsHelper.JOB_TOTAL, 1);
+    stats.addValue(JPPFStatisticsHelper.JOB_COUNT, 1);
+    stats.addValue(JPPFStatisticsHelper.JOB_TASKS, bundle.getTaskCount());
   }
 
   /**
@@ -169,7 +166,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
     }
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
     submitEvent(JobEventType.JOB_ENDED, serverJob, null);
-    JPPFStatistics stats = driver.getStatistics();
+    JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);
     stats.addValue(JPPFStatisticsHelper.JOB_TIME, time);
   }
@@ -266,7 +263,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
 
   @Override
   public String getEmitterUuid() {
-    return driver.getUuid();
+    return JPPFDriver.getInstance().getUuid();
   }
 
   /**

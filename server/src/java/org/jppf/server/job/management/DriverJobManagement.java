@@ -68,6 +68,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     if (serverJob != null) {
       if (debugEnabled) log.debug("Request to cancel job '{}'", serverJob.getJob().getName());
       serverJob.cancel(false);
+      //driver.getNodeNioServer().getNodeReservationHandler().onJobCancelled(serverJob);
       JPPFStatistics stats = driver.getStatistics();
       stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, -serverJob.getTaskCount());
     } else if (debugEnabled) log.debug("Could not find job with uuid = '" + jobUuid + '\'');
@@ -136,7 +137,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
   @Override
   public String[] getAllJobUuids() throws Exception {
-    Set<String> ids = ((JPPFPriorityQueue) JPPFDriver.getQueue()).getAllJobIds();
+    Set<String> ids = JPPFDriver.getInstance().getQueue().getAllJobIds();
     return ids.toArray(new String[ids.size()]);
   }
 
@@ -171,7 +172,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
   @Override
   public void updatePriority(final String jobUuid, final Integer newPriority) {
     if (debugEnabled) log.debug("Updating priority of jobId = '" + jobUuid + "' to: " + newPriority);
-    ((JPPFPriorityQueue) JPPFDriver.getQueue()).updatePriority(jobUuid, newPriority);
+    JPPFDriver.getInstance().getQueue().updatePriority(jobUuid, newPriority);
   }
 
   /**
@@ -286,7 +287,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @return a set of uuids, possibly empty.
    */
   private Set<String> selectJobUuids(final JobSelector selector) {
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     if ((selector == null) || (selector instanceof AllJobsSelector)) return queue.getAllJobIds();
     if (selector instanceof JobUuidSelector) {
       Set<String> allUuids = queue.getAllJobIds();
@@ -307,13 +308,13 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
    * @return a <code>ServerJob</code> instance, or null if the job is not queued anymore.
    */
   private ServerJob getServerJob(final String jobUuid) {
-    return ((JPPFPriorityQueue) JPPFDriver.getQueue()).getBundleForJob(jobUuid);
+    return driver.getQueue().getBundleForJob(jobUuid);
   }
 
   @Override
   public void updateJobs(final JobSelector selector, final JobSLA sla, final JobMetadata metadata) {
     if ((sla == null) && (metadata == null)) return;
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     List<ServerJob> jobs = queue.selectJobs(selector);
     if (debugEnabled) log.debug("updating sla and metadata for " + jobs.size() + " jobs");
     if (jobs.isEmpty()) return;

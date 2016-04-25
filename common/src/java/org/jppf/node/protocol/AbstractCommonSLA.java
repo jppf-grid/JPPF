@@ -35,15 +35,15 @@ public abstract class AbstractCommonSLA implements JobCommonSLA {
   /**
    * The tasks execution policy.
    */
-  protected ExecutionPolicy executionPolicy = null;
+  ExecutionPolicy executionPolicy = null;
   /**
    * The job start schedule configuration.
    */
-  protected JPPFSchedule jobSchedule = null;
+  JPPFSchedule jobSchedule = null;
   /**
    * The job expiration schedule configuration.
    */
-  protected JPPFSchedule jobExpirationSchedule = null;
+  JPPFSchedule jobExpirationSchedule = null;
 
   /**
    * Default constructor.

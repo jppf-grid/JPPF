@@ -164,7 +164,7 @@ class PeerNode extends AbstractCommonNode implements ClientConnectionListener {
           if (debugEnabled) log.debug("uuid path=" + bundle.getUuidPath().getList());
           bundleWrapper.addCompletionListener(resultSender);
           resultSender.bundle = bundleWrapper;
-          JPPFDriver.getQueue().addBundle(bundleWrapper);
+          JPPFDriver.getInstance().getQueue().addBundle(bundleWrapper);
           resultSender.waitForExecution();
           resultSender.sendResults(bundleWrapper);
           setTaskCount(getTaskCount() + bundleWrapper.getTaskCount());

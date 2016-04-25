@@ -30,7 +30,6 @@ import org.jppf.node.protocol.*;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.classloader.client.*;
 import org.jppf.server.protocol.*;
-import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.slf4j.*;
@@ -265,7 +264,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
-        ServerJob job = ((JPPFPriorityQueue) driver.getQueue()).getJob(clientBundle.getUuid());
+        ServerJob job = driver.getQueue().getJob(clientBundle.getUuid());
         if (job != null) {
           // count the tasks from the client bundle that are dispatched to nodes
           for (ServerTaskBundleNode nodeBundle: job.getDispatchSet()) {

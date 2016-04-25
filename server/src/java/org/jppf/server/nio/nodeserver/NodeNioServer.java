@@ -113,6 +113,10 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * The peer handler.
    */
   private final PeerAttributesHandler peerHandler = new PeerAttributesHandler();
+  /**
+   * Handles reservation of nodes to jobs.
+   */
+  private final NodeReservationHandler nodeReservationHandler;
 
   /**
    * Initialize this node server.
@@ -137,7 +141,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
     INITIAL_BUNDLE_UUID = driver.getUuid();
     this.driver = driver;
     this.selectTimeout = NioConstants.DEFAULT_SELECT_TIMEOUT;
-    taskQueueChecker = new TaskQueueChecker<>(queue, driver.getStatistics(), bundlerFactory);
+    taskQueueChecker = new TaskQueueChecker<>(this, queue, driver.getStatistics(), bundlerFactory);
     this.queue.addQueueListener(new QueueListenerAdapter<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode>() {
       @Override
       public void bundleAdded(final QueueEvent<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> event) {
@@ -146,6 +150,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
       }
     });
     initialServerJob = createInitialServerJob();
+    nodeReservationHandler = new NodeReservationHandler(this);
     new Thread(taskQueueChecker, "TaskQueueChecker").start();
   }
 
@@ -161,7 +166,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Add the specified connection wrapper to the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to add.
    */
-  public void addConnection(final AbstractNodeContext nodeContext) {
+  private void addConnection(final AbstractNodeContext nodeContext) {
     try {
       if (nodeContext == null) throw new IllegalArgumentException("nodeContext is null");
       if (nodeContext.getChannel() == null) throw new IllegalArgumentException("channel is null");
@@ -183,7 +188,7 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * Remove the specified connection wrapper from the list of connections handled by this manager.
    * @param nodeContext the connection wrapper to remove.
    */
-  public void removeConnection(final AbstractNodeContext nodeContext) {
+  private void removeConnection(final AbstractNodeContext nodeContext) {
     if (nodeContext == null) throw new IllegalArgumentException("wrapper is null");
     if (debugEnabled) log.debug("removing connection {}", nodeContext.getChannel());
     try {
@@ -207,10 +212,9 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    * @param uuid the id of the connection to remove.
    * @return the context of th channel that was removed, or <code>null</code> if the channel was not found.
    */
-  public AbstractNodeContext removeConnection(final String uuid) {
+  private AbstractNodeContext removeConnection(final String uuid) {
     final AbstractNodeContext nodeContext = getConnection(uuid);
-    if (nodeContext == null) return null;
-    removeConnection(nodeContext);
+    if (nodeContext != null) removeConnection(nodeContext);
     return nodeContext;
   }
 
@@ -497,5 +501,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
    */
   public PeerAttributesHandler getPeerHandler() {
     return peerHandler;
+  }
+
+  /**
+   * Get the object that handles reservation of nodes to jobs.
+   * @return a {@link NodeReservationHandler} instance.
+   */
+  public NodeReservationHandler getNodeReservationHandler() {
+    return nodeReservationHandler;
   }
 }

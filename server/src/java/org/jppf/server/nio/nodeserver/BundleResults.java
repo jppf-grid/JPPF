@@ -28,16 +28,13 @@ import org.jppf.utils.Pair;
  * Convenience class to simplify and improve readability of the code.
  * @author Laurent Cohen
  */
-public class BundleResults extends Pair<TaskBundle, List<DataLocation>>
-{
-
+class BundleResults extends Pair<TaskBundle, List<DataLocation>> {
   /**
    * Initialize with the specified task bundle and task data.
    * @param bundle the header received from the node.
    * @param data a list of {@link DataLocation} instances.
    */
-  public BundleResults(final TaskBundle bundle, final List<DataLocation> data)
-  {
+  BundleResults(final TaskBundle bundle, final List<DataLocation> data) {
     super(bundle, data);
   }
 
@@ -45,8 +42,7 @@ public class BundleResults extends Pair<TaskBundle, List<DataLocation>>
    * Get the task bundle.
    * @return a {@link TaskBundle} instance.
    */
-  public TaskBundle bundle()
-  {
+  TaskBundle bundle() {
     return first();
   }
 
@@ -54,8 +50,7 @@ public class BundleResults extends Pair<TaskBundle, List<DataLocation>>
    * Return the task data.
    * @return a list of {@link DataLocation} instances.
    */
-  public List<DataLocation> data()
-  {
+  List<DataLocation> data() {
     return second();
   }
 }

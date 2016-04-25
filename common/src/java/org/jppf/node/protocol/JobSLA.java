@@ -211,4 +211,18 @@ public interface JobSLA extends JobCommonSLA {
    * @since 5.2
    */
   void setGridExecutionPolicy(ExecutionPolicy policy);
+
+  /**
+   * Get the configuration of the node(s) this job should be executed on,
+   * forcing a restart of the node with appropriate configuration overrides if there is no such node. 
+   * @return the desired configuration as a {@link JPPFNodeConfigSpec} object.
+   */
+  JPPFNodeConfigSpec getDesiredNodeConfiguration();
+
+  /**
+   * Set the configuration of the node(s) this job should be executed on,
+   * forcing a restart of the node with appropriate configuration overrides if there is no such node. 
+   * @param nodeConfigurationSpec the desired configuration as a {@link JPPFNodeConfigSpec} object.
+   */
+  void setDesiredNodeConfiguration(JPPFNodeConfigSpec nodeConfigurationSpec);
 }

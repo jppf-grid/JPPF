@@ -23,13 +23,11 @@ import org.jppf.server.nio.AbstractTaskBundleMessage;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
 
-
 /**
  * Context associated with a channel serving tasks to a local (in-VM) node.
  * @author Laurent Cohen
  */
-public class LocalNodeContext extends AbstractNodeContext
-{
+public class LocalNodeContext extends AbstractNodeContext {
   /**
    * Logger for this class.
    */
@@ -43,27 +41,24 @@ public class LocalNodeContext extends AbstractNodeContext
    * Default constructor.
    * @param transitionManager instance of transition manager used by this node context.
    */
-  public LocalNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager)
-  {
+  public LocalNodeContext(final StateTransitionManager<NodeState, NodeTransition> transitionManager) {
     super(transitionManager);
   }
 
   @Override
-  public AbstractTaskBundleMessage newMessage()
-  {
+  public AbstractTaskBundleMessage newMessage() {
     return new LocalNodeMessage(getChannel());
   }
 
   @Override
-  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception
-  {
+  public boolean readMessage(final ChannelWrapper<?> channel) throws Exception {
     if (debugEnabled) log.debug("reading message from " + channel);
     LocalNodeChannel handler = (LocalNodeChannel) channel;
     handler.getServerLock().wakeUp();
     LocalNodeMessage lnm;
-    synchronized(handler.getServerLock())
-    {
-      while ((lnm = handler.getServerResource()) == null) handler.getServerLock().goToSleep();
+    synchronized (handler.getServerLock()) {
+      while ((lnm = handler.getServerResource()) == null)
+        handler.getServerLock().goToSleep();
       setMessage(lnm);
       handler.setServerResource(null);
     }
@@ -71,8 +66,7 @@ public class LocalNodeContext extends AbstractNodeContext
   }
 
   @Override
-  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception
-  {
+  public boolean writeMessage(final ChannelWrapper<?> channel) throws Exception {
     LocalNodeChannel handler = (LocalNodeChannel) channel;
     if (debugEnabled) log.debug("wrote " + message + " to " + channel);
     handler.setNodeResource((LocalNodeMessage) message);
@@ -80,8 +74,7 @@ public class LocalNodeContext extends AbstractNodeContext
   }
 
   @Override
-  public void setMessage(final NioMessage nodeMessage)
-  {
+  public void setMessage(final NioMessage nodeMessage) {
     super.setMessage(nodeMessage);
     ((LocalNodeChannel) getChannel()).wakeUp();
   }
@@ -92,8 +85,7 @@ public class LocalNodeContext extends AbstractNodeContext
   }
 
   @Override
-  protected boolean isOffline()
-  {
+  protected boolean isOffline() {
     return false;
   }
 }

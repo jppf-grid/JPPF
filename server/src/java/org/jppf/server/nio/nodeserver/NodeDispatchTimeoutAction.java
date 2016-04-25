@@ -30,7 +30,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class NodeDispatchTimeoutAction implements Runnable {
+class NodeDispatchTimeoutAction implements Runnable {
   /**
    * Logger for this class.
    */
@@ -58,7 +58,7 @@ public class NodeDispatchTimeoutAction implements Runnable {
    * @param nodeBundle the bundle sent to the node.
    * @param context the context for the dispatch node, may be null  for an offline node.
    */
-  public NodeDispatchTimeoutAction(final NodeNioServer server, final ServerTaskBundleNode nodeBundle, final AbstractNodeContext context) {
+  NodeDispatchTimeoutAction(final NodeNioServer server, final ServerTaskBundleNode nodeBundle, final AbstractNodeContext context) {
     if (server == null) throw new IllegalArgumentException("server cannot be null");
     if (nodeBundle == null) throw new IllegalArgumentException("node bundle cannot be null");
     this.server = server;

@@ -44,7 +44,7 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   /**
    * The priority of this job, used by the server to prioritize queued jobs.
    */
-  protected int priority = 0;
+  private int priority = 0;
   /**
    * Determines whether this job is initially suspended.
    * If it is, it will have to be resumed, using either the admin console or the JMX APIs.
@@ -69,15 +69,15 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   /**
    * The expiration schedule for any subset of the job dispatched to a node.
    */
-  protected JPPFSchedule dispatchExpirationSchedule = null;
+  private JPPFSchedule dispatchExpirationSchedule;
   /**
    * The number of times a dispatched task can expire before it is finally cancelled.
    */
-  protected int maxDispatchExpirations = 0;
+  private int maxDispatchExpirations = 0;
   /**
    * Maximum number of times a task can rsubmit itself via {@link org.jppf.node.protocol.AbstractTask#setResubmit(boolean) AbstractTask.setResubmit(boolean)}.
    */
-  protected int maxTaskResubmits = 1;
+  private int maxTaskResubmits = 1;
   /**
    * Whether the max resubmits limit for tasks is also applied when tasks are resubmitted due to a node error.
    */
@@ -90,7 +90,12 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
    * The global execution policy which applies to the driver only.
    * @since 5.2
    */
-  protected ExecutionPolicy gridExecutionPolicy = null;
+  private ExecutionPolicy gridExecutionPolicy;
+  /**
+   * The configuration of the node(s) this job should be executed on.
+   * @since 5.2
+   */
+  private JPPFNodeConfigSpec nodeConfigurationSpec;
 
   /**
    * Default constructor.
@@ -318,5 +323,23 @@ public class JPPFJobSLA extends AbstractCommonSLA implements JobSLA {
   @Override
   public void setGridExecutionPolicy(final ExecutionPolicy gridExecutionPolicy) {
     this.gridExecutionPolicy = gridExecutionPolicy;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.2
+   */
+  @Override
+  public JPPFNodeConfigSpec getDesiredNodeConfiguration() {
+    return nodeConfigurationSpec;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @since 5.2
+   */
+  @Override
+  public void setDesiredNodeConfiguration(final JPPFNodeConfigSpec nodeConfigurationSpec) {
+    this.nodeConfigurationSpec = nodeConfigurationSpec;
   }
 }

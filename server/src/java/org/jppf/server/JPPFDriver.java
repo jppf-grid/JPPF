@@ -30,8 +30,8 @@ import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JPPFSystemInformation;
 import org.jppf.nio.NioServer;
 import org.jppf.node.initialization.OutputRedirectHook;
+import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.process.LauncherListener;
-import org.jppf.queue.JPPFQueue;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.server.job.JPPFJobManager;
 import org.jppf.server.nio.acceptor.AcceptorNioServer;
@@ -42,7 +42,7 @@ import org.jppf.server.nio.client.ClientNioServer;
 import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.node.JPPFNode;
 import org.jppf.server.node.local.*;
-import org.jppf.server.protocol.*;
+import org.jppf.server.protocol.ServerJob;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.startup.JPPFDriverStartupSPI;
 import org.jppf.utils.*;
@@ -74,8 +74,9 @@ public class JPPFDriver {
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * Flag indicating whether collection of debug information is available via JMX.
+   * @exclude
    */
-  public static final boolean JPPF_DEBUG = JPPFConfiguration.getProperties().getBoolean("jppf.debug.enabled", false);
+  public static final boolean JPPF_DEBUG = JPPFConfiguration.get(JPPFProperties.DEBUG_ENABLED);
   /**
    * Singleton instance of the JPPFDriver.
    */
@@ -119,7 +120,7 @@ public class JPPFDriver {
   /**
    * Holds the statistics monitors.
    */
-  private final JPPFStatistics statistics = createServerStatistics();
+  private final JPPFStatistics statistics;
   /**
    * Manages and monitors the jobs throughout their processing within this driver.
    */
@@ -146,7 +147,6 @@ public class JPPFDriver {
    * @exclude
    */
   protected JPPFDriver() {
-    instance = this;
     config = JPPFConfiguration.getProperties();
     String s;
     this.uuid = (s = config.getString("jppf.driver.uuid", null)) == null ? JPPFUuid.normalUUID() : s;
@@ -155,6 +155,7 @@ public class JPPFDriver {
     new OutputRedirectHook().initializing(new UnmodifiableTypedProperties(config));
     VersionUtils.logVersionInformation("driver", uuid);
     SystemUtils.printPidAndUuid("driver", uuid);
+    statistics = createServerStatistics();
     systemInformation = new JPPFSystemInformation(uuid, false, true, statistics);
     statistics.addListener(new StatsSystemInformationUpdater(systemInformation));
     jobManager = new JPPFJobManager();
@@ -217,8 +218,8 @@ public class JPPFDriver {
    * @return a JPPFQueue instance.
    * @exclude
    */
-  public static JPPFQueue<ServerJob, ServerTaskBundleClient, ServerTaskBundleNode> getQueue() {
-    return getInstance().taskQueue;
+  public JPPFPriorityQueue getQueue() {
+    return taskQueue;
   }
 
   /**
@@ -281,6 +282,16 @@ public class JPPFDriver {
    */
   public String getUuid() {
     return uuid;
+  }
+
+  /**
+   * Get a server-side representation of a job from its uuid.
+   * @param uuid the uuid of the job to lookup.
+   * @return a {@link JPPFDistributedJob} instance, or {@code null} if there is no job with the specified uuid.
+   */
+  public JPPFDistributedJob getJob(final String uuid) {
+    ServerJob serverJob = this.getQueue().getJob(uuid);
+    return (serverJob == null) ? null : serverJob.getJob();
   }
 
   /**
@@ -361,6 +372,7 @@ public class JPPFDriver {
   /**
    * Start the JPPF server.
    * @param args not used.
+   * @exclude
    */
   public static void main(final String...args) {
     try {
@@ -371,7 +383,7 @@ public class JPPFDriver {
         int port = Integer.parseInt(args[0]);
         new LauncherListener(port).start();
       }
-      new JPPFDriver().run();
+      (instance = new JPPFDriver()).run();
     } catch(Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);

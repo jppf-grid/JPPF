@@ -26,8 +26,7 @@ import java.util.*;
  * @param <V> the type of values in the collections mapped to the keys.
  * @author Laurent Cohen
  */
-public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollectionMap<K, V>
-{
+public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollectionMap<K, V> implements CollectionSortedMap<K, V> {
   /**
    * Comparator used to sort the keys.
    */
@@ -36,8 +35,7 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
   /**
    * Default cosntructor.
    */
-  public AbstractCollectionSortedMap()
-  {
+  public AbstractCollectionSortedMap() {
     this(null);
   }
 
@@ -45,35 +43,25 @@ public abstract class AbstractCollectionSortedMap<K, V> extends AbstractCollecti
    * Initialize this collection sorted map with the specified comparator.
    * @param comparator comparator used to sort the keys.
    */
-  public AbstractCollectionSortedMap(final Comparator<K> comparator)
-  {
+  public AbstractCollectionSortedMap(final Comparator<K> comparator) {
     this.comparator = comparator;
     map = createMap();
   }
 
   @Override
-  protected Map<K, Collection<V>> createMap()
-  {
+  protected Map<K, Collection<V>> createMap() {
     return comparator == null ? new TreeMap<K, Collection<V>>() : new TreeMap<K, Collection<V>>(comparator);
   }
 
-  /**
-   * Get the last key in this sorted map.
-   * @return the last key based on the order of the map.
-   */
+  @Override
   @SuppressWarnings("unchecked")
-  public K firstKey()
-  {
+  public K firstKey() {
     return ((SortedMap<K, V>) map).firstKey();
   }
 
-  /**
-   * Get the last key in this sorted map.
-   * @return the last key based on the order of the map.
-   */
+  @Override
   @SuppressWarnings("unchecked")
-  public K lastKey()
-  {
+  public K lastKey() {
     return ((SortedMap<K, V>) map).lastKey();
   }
 }

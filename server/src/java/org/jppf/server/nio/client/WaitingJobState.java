@@ -85,7 +85,7 @@ class WaitingJobState extends ClientServerState {
         context.jobEnded();
         return TO_WAITING_JOB;
       }
-      JPPFDriver.getQueue().addBundle(clientBundle);
+      JPPFDriver.getInstance().getQueue().addBundle(clientBundle);
       return TO_IDLE;
     }
     return TO_WAITING_JOB;

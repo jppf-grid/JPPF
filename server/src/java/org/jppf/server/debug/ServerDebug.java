@@ -129,7 +129,7 @@ public class ServerDebug implements ServerDebugMBean {
   @Override
   public String dumpQueue() {
     JPPFDriver.getInstance();
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     Set<String> set = queue.getAllJobIds();
     StringBuilder sb = new StringBuilder();
     for (String uuid: set) sb.append(queue.getJob(uuid)).append('\n');
@@ -139,14 +139,14 @@ public class ServerDebug implements ServerDebugMBean {
   @Override
   public String dumpQueueDetails() {
     JPPFDriver.getInstance();
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     return dumpJobDetails(queue.getAllJobIds());
   }
 
   @Override
   public String dumpQueueDetailsFromPriorityMap() {
     JPPFDriver.getInstance();
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     return dumpJobDetails(queue.getAllJobIdsFromPriorityMap());
   }
 
@@ -156,7 +156,7 @@ public class ServerDebug implements ServerDebugMBean {
    * @return .
    */
   private String dumpJobDetails(final Set<String> set) {
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     StringBuilder sb = new StringBuilder();
     String hr = StringUtils.padRight("", '-', 80) + '\n';
     for (String uuid: set) {
@@ -241,5 +241,17 @@ public class ServerDebug implements ServerDebugMBean {
   @Override
   public int getJobNotifPeak() {
     return driver.getJobManager().getNotifMax();
+  }
+
+  @Override
+  public String[] getReservedJobs() {
+    Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedJobs();
+    return set.toArray(new String[set.size()]);
+  }
+
+  @Override
+  public String[] getReservedNodes() {
+    Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
+    return set.toArray(new String[set.size()]);
   }
 }

@@ -53,10 +53,6 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Reference to the driver.
-   */
-  protected static final JPPFDriver driver = JPPFDriver.getInstance();
-  /**
    * The task bundle to send or receive.
    */
   protected ServerTaskBundleNode bundle = null;
@@ -100,6 +96,14 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Execution status for the node.
    */
   protected ExecutorStatus executionStatus = ExecutorStatus.DISABLED;
+  /**
+   * Whether to remove any job reservation for this node.
+   */
+  NodeReservationHandler.Transition reservationTansition = NodeReservationHandler.Transition.REMOVE;
+  /**
+   * The latest computed score for a given desired configuration.
+   */
+  int reservationScore = 0;
 
   /**
    * Initialized abstract node context.
@@ -224,6 +228,9 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    */
   void cleanup() {
     if (debugEnabled) log.debug("handling cleanup for {}", channel);
+    NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
+    //if (shouldRemoveReservation) server.getNodeReservationHandler().removeReservation(this);
+    if (reservationTansition == NodeReservationHandler.Transition.REMOVE) server.getNodeReservationHandler().removeReservation(this);
     Bundler bundler = getBundler();
     if (bundler != null) {
       bundler.dispose();
@@ -239,7 +246,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @param wrapper channel wrapper for this context.
    * @throws Exception if any error occurs.
    */
-  public void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception {
+  void serializeBundle(final ChannelWrapper<?> wrapper) throws Exception {
     bundle.checkTaskCount();
     TaskBundle taskBundle = bundle.getJob();
     AbstractTaskBundleMessage message = newMessage();
@@ -259,7 +266,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a pairing of the received result head and the serialized tasks.
    * @throws Exception if an error occurs during the deserialization.
    */
-  public BundleResults deserializeBundle() throws Exception {
+  BundleResults deserializeBundle() throws Exception {
     List<DataLocation> locations = ((AbstractTaskBundleMessage) message).getLocations();
     TaskBundle bundle = ((AbstractTaskBundleMessage) message).getBundle();
     List<DataLocation> tasks = new ArrayList<>();
@@ -416,7 +423,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Get the object that provides access to the management functions of the driver.
    * @return a <code>JMXConnectionWrapper</code> instance.
    */
-  public JMXDriverConnectionWrapper getPeerJmxConnection() {
+  JMXDriverConnectionWrapper getPeerJmxConnection() {
     return peerJmxConnection;
   }
 
@@ -427,7 +434,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * @return a <code>true</code> when cancel was successful <code>false</code> otherwise.
    * @throws Exception if any error occurs.
    */
-  public boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
+  boolean cancelJob(final String jobId, final boolean requeue) throws Exception {
     if (debugEnabled) log.debug("cancelling job uuid=" + jobId + " from " + this + ", jmxConnection=" + jmxConnection);
     if (jmxConnection != null && jmxConnection.isConnected()) {
       try {
@@ -514,7 +521,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   private void updateInStats() {
     if (message != null) {
       long n = message.getChannelCount();
-      if (n > 0) driver.getStatistics().addValue(peer ? PEER_IN_TRAFFIC : NODE_IN_TRAFFIC, n);
+      if (n > 0) JPPFDriver.getInstance().getStatistics().addValue(peer ? PEER_IN_TRAFFIC : NODE_IN_TRAFFIC, n);
     }
   }
 
@@ -524,7 +531,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   private void updateOutStats() {
     if (message != null) {
       long n = message.getChannelCount();
-      if (n > 0) driver.getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC, n);
+      if (n > 0) JPPFDriver.getInstance().getStatistics().addValue(peer ? PEER_OUT_TRAFFIC : NODE_OUT_TRAFFIC, n);
     }
   }
 

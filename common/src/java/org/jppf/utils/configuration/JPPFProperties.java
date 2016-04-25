@@ -362,6 +362,12 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> DEFAULT_SCROLLBAR_THICKNESS = new IntProperty("jppf.ui.default.scrollbar.thickness", 10);
   /** Whether a node is idle. This property is only set within a server */
   public static final JPPFProperty<Boolean> NODE_IDLE = new BooleanProperty("jppf.node.idle", true);
+  /** UUID of the job for which a node is reserved */
+  public static final JPPFProperty<String> NODE_RESERVED_JOB = new StringProperty("jppf.node.reserved.job", null);
+  /** UUID of the node beofre restart, when it has a job reserved */
+  public static final JPPFProperty<String> NODE_RESERVED_UUID = new StringProperty("jppf.node.reserved.uuid", null);
+  /** Whether debug mbean is enabled, defaults to false */
+  public static final JPPFProperty<Boolean> DEBUG_ENABLED = new BooleanProperty("jppf.debug.enabled", false);
   /** The list of all predefined properties */
   private static List<JPPFProperty<?>> properties;
 
