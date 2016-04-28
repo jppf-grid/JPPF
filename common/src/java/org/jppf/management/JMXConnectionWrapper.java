@@ -233,16 +233,19 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   @Override
   public void close() throws Exception {
-    if (connected.compareAndSet(true, false)) {
+    //if (connected.compareAndSet(true, false)) {
+      connected.compareAndSet(true, false);
       listeners.clear();
       JMXConnectionThread jct = connectionThread.get();
-      if (jct != null) jct.close();
-      connectionThread.set(null);
-      if (jmxc != null) { 
+      if (jct != null) {
+        jct.close();
+        connectionThread.set(null);
+      }
+      if (jmxc != null) {
         jmxc.close();
         jmxc = null;
       }
-    }
+    //}
   }
 
   /**

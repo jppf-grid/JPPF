@@ -461,8 +461,8 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
 
   @Override
   public synchronized void close() {
-    super.close();
     jmxPool.close();
+    super.close();
   }
 
   /**
