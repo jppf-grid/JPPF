@@ -39,13 +39,18 @@ public class ConfigurationOverridesHandler {
    * @param overrides the config overrides to save.
    */
   public void save(final TypedProperties overrides) {
+    if ((overrides == null) || overrides.isEmpty()) return;
     try {
       File file = JPPFConfiguration.get(JPPFProperties.CONFIG_OVERRIDES_PATH);
-      if ((file != null) && file.exists()) file.delete();
-      if ((overrides == null) || overrides.isEmpty()) return;
-      try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
-        overrides.store(bos, "JPPF configuration overrides");
+      if (file != null) {
+        file = file.getAbsoluteFile();
+        if (file.exists()) file.delete();
+        else if (file.getParentFile() != null) file.getParentFile().mkdirs();
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file))) {
+          overrides.store(bos, "JPPF configuration overrides");
+        }
       }
+      else log.error("config overrides file is null");
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
