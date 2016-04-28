@@ -41,7 +41,7 @@ class DockingMouseAdapter extends MouseAdapter {
    * @param comp the component to move.
    * @return a popup menu.
    */
-  protected JPopupMenu createPopupMenu(final Component comp) {
+  private JPopupMenu createPopupMenu(final Component comp) {
     DockingManager dm = DockingManager.getInstance();
     DetachableComponentDescriptor desc = dm.getComponentFromListenerComp(comp);
     Component realComp = desc.getComponent().getUIComponent();
