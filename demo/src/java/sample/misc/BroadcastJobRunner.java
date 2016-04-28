@@ -53,7 +53,7 @@ public class BroadcastJobRunner {
   private static void submitJob() throws Exception {
     boolean remoteEnabled = true;
     JPPFConfiguration.set(DISCOVERY_ENABLED, false)
-      .set(DRIVERS, "driver1")
+      .set(DRIVERS, new String[] {"driver1"})
       .setString("driver1.jppf.server.host", "localhost")
       .setInt("driver1.jppf.server.port", 11111)
       .set(REMOTE_EXECUTION_ENABLED, remoteEnabled)

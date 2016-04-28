@@ -8,6 +8,6 @@
 </listAttribute>
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.jppf.doc.HtmlDocGenerator"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="docs/home/doc-source docs/home/ docs/home/templates/"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-s C:\Workspaces\SourceForgeSVN\JPPF/docs/home/doc-source/home -d C:\Workspaces\SourceForgeSVN\JPPF/docs/home/ -t C:\Workspaces\SourceForgeSVN\JPPF/docs/home/doc-source/templates/ -r"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="common"/>
 </launchConfiguration>

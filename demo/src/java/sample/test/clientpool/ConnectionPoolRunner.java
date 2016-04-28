@@ -143,7 +143,7 @@ public class ConnectionPoolRunner {
         .setInt(name + '.' + JPPFProperties.POOL_SIZE.getName(), 1)
         .setInt(name + ".jppf.priority", 1);
     }
-    config.set(JPPFProperties.DRIVERS, sb.toString());
+    config.set(JPPFProperties.DRIVERS, new String[] {sb.toString()});
   }
 
   /**

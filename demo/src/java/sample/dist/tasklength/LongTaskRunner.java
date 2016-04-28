@@ -328,7 +328,7 @@ public class LongTaskRunner {
    * @throws Exception if any error occurs.
    */
   private static DriverJobManagementMBean getJobManagement() throws Exception {
-    return getJmxConnection().getProxy(DriverJobManagementMBean.MBEAN_NAME, DriverJobManagementMBean.class);
+    return getJmxConnection().getJobManager();
   }
 
   /**

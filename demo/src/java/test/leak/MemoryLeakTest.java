@@ -230,7 +230,7 @@ public class MemoryLeakTest {
         .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 1)
         // server connection
         .set(JPPFProperties.DISCOVERY_ENABLED, false)
-        .set(JPPFProperties.DRIVERS, "driver1")
+        .set(JPPFProperties.DRIVERS, new String[] {"driver1"})
         .setString("driver1.jppf.server.host", "localhost")
         .setInt("driver1.jppf.server.port", 11111);
     }
