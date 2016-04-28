@@ -29,7 +29,7 @@ public class BundleDataHolder {
   /**
    * Holds the samples required for calculating the moving average.
    */
-  private LinkedList<BundlePerformanceSample> samples = new LinkedList<>();
+  private final LinkedList<BundlePerformanceSample> samples = new LinkedList<>();
   /**
    * Current value of the moving average.
    */
@@ -144,6 +144,13 @@ public class BundleDataHolder {
    */
   public long getNbSamples() {
     return nbSamples;
+  }
+
+  /**
+   * Remove all entries in the performance samples list.
+   */
+  public void clear() {
+    samples.clear();
   }
 
   @Override

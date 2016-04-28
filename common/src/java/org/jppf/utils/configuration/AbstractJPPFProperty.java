@@ -88,6 +88,8 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
     sb.append("name=").append(name);
     sb.append(", default=").append(defaultValue);
     sb.append(", aliases=").append(Arrays.asList(aliases));
+    sb.append(", valueType=").append(valueType());
+    if ((possibleValues != null) && (possibleValues.length > 0)) sb.append(", possibleValues=").append(Arrays.asList(possibleValues));
     sb.append(", description=").append(getDocumentation());
     sb.append(']');
     return sb.toString();

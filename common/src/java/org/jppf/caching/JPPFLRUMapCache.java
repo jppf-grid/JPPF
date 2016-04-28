@@ -31,7 +31,7 @@ public class JPPFLRUMapCache<K, V> extends AbstractJPPFMapCache<K, V> {
   /**
    * The capacity of this cache.
    */
-  private int capacity = 1024;
+  private final int capacity;
 
   /**
    * Initialize this cache with an initial capacity of 1024.
@@ -57,21 +57,5 @@ public class JPPFLRUMapCache<K, V> extends AbstractJPPFMapCache<K, V> {
         return size() > capacity;
       }
     };
-  }
-
-  /**
-   * Get the capacity of this cache.
-   * @return the capacity as an {@code int}.
-   */
-  public int getCapacity() {
-    return capacity;
-  }
-
-  /**
-   * Set the capacity of this cache.
-   * @param capacity the capacity as an {@code int}.
-   */
-  public void setCapacity(final int capacity) {
-    this.capacity = capacity;
   }
 }

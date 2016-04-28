@@ -24,9 +24,7 @@ package org.jppf.nio;
  * @param <S> the type of states associated with this context.
  * @author Laurent Cohen
  */
-public interface NioContext<S extends Enum<S>>
-{
-
+public interface NioContext<S extends Enum<S>> {
   /**
    * Get the current state of the channel this context is associated with.
    * @return a state enum value.

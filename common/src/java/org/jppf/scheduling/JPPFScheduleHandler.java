@@ -49,13 +49,17 @@ public class JPPFScheduleHandler {
    */
   private static AtomicInteger instanceCount = new AtomicInteger(0);
   /**
+   * Instance number for this object.
+   */
+  private final int instanceNumber = instanceCount.incrementAndGet();
+  /**
    * Mapping of timer tasks to a key.
    */
   private Map<Object, ScheduledFuture<?>> futureMap = new Hashtable<>();
   /**
    * The name given to this schedule handler's internal timer.
    */
-  private String name = null;
+  private final String name;
   /**
    * Used to debug date information.
    */
@@ -65,7 +69,7 @@ public class JPPFScheduleHandler {
    * Initialize this schedule handler with a default name.
    */
   public JPPFScheduleHandler() {
-    this("JPPFScheduleHandler timer - " + instanceCount.incrementAndGet());
+    this(null);
   }
 
   /**
@@ -73,7 +77,7 @@ public class JPPFScheduleHandler {
    * @param name the name given to this schedule handler.
    */
   public JPPFScheduleHandler(final String name) {
-    this.name = name;
+    this.name = (name != null) ? name : "JPPFScheduleHandler timer - " + instanceCount.incrementAndGet();
     createExecutor();
   }
 

@@ -88,7 +88,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
   }
 
   /**
-   * Submit the sdpecified runnable to the executor.
+   * Submit the specified runnable to the executor.
    * @param runnable the runnable to submit.
    */
   public void submit(final Runnable runnable) {

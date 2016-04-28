@@ -127,6 +127,7 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
     synchronized (bundlers) {
       bundlers.remove(this);
     }
+    dataHolder.clear();
   }
 
   /**
