@@ -36,8 +36,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-class ForwardingNotificationDispatcher
-{
+class ForwardingNotificationDispatcher {
   /**
    * Logger for this class.
    */
@@ -80,8 +79,7 @@ class ForwardingNotificationDispatcher
    * Initialize this dispatcher with the specified node uuid.
    * @param node connection to the node.
    */
-  public ForwardingNotificationDispatcher(final AbstractNodeContext node)
-  {
+  public ForwardingNotificationDispatcher(final AbstractNodeContext node) {
     this.node = node;
     this.nodeUuid = node.getUuid();
   }
@@ -91,32 +89,25 @@ class ForwardingNotificationDispatcher
    * @param mBeanName the name of the MBean from which to receive notifications.
    * @return <code>true</code> if the listener was sucessfully added, <code>false</code> otherwise.
    */
-  public boolean addNotificationListener(final String mBeanName)
-  {
+  public boolean addNotificationListener(final String mBeanName) {
     lock.lock();
-    try
-    {
+    try {
       if (handlerMap.containsKey(mBeanName)) return false;
       JMXNodeConnectionWrapper jmx = node.getJmxConnection();
-      if (jmx != null)
-      {
+      if (jmx != null) {
         ForwardingNotificationHandler handler = new ForwardingNotificationHandler(mBeanName);
-        try
-        {
+        try {
           if (debugEnabled) log.debug("mBeanName={}, handler={}", mBeanName, handler);
           jmx.addNotificationListener(mBeanName, handler);
           handlerMap.put(mBeanName, handler);
           return true;
-        }
-        catch(Exception e)
-        {
-          if (debugEnabled) log.debug(e.getMessage(), e);
-          else log.info(ExceptionUtils.getMessage(e));
+        } catch (Exception e) {
+          String format = "failed to add notification listener for node=%s : exception=%s";
+          if (debugEnabled) log.debug(String.format(format, node, ExceptionUtils.getStackTrace(e)));
+          else log.info(String.format(format, node, ExceptionUtils.getMessage(e)));
         }
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
     return false;
@@ -127,30 +118,22 @@ class ForwardingNotificationDispatcher
    * @param mBeanName the name of the MBean from which to receive notifications.
    * @return <code>true</code> if the listener was sucessfully added, <code>false</code> otherwise.
    */
-  public boolean removeNotificationListener(final String mBeanName)
-  {
+  public boolean removeNotificationListener(final String mBeanName) {
     lock.lock();
-    try
-    {
+    try {
       ForwardingNotificationHandler handler = handlerMap.remove(mBeanName);
       if (handler == null) return false;
       JMXNodeConnectionWrapper jmx = node.getJmxConnection();
-      if (jmx != null)
-      {
-        try
-        {
+      if (jmx != null) {
+        try {
           jmx.removeNotificationListener(mBeanName, handler);
           return true;
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.info(ExceptionUtils.getMessage(e));
         }
       }
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
     return false;
@@ -160,15 +143,11 @@ class ForwardingNotificationDispatcher
    * Determine whether this dispatcher is listening to notifications from any Mbean.
    * @return true if any notification listener is active, false otherwise.
    */
-  public boolean hasNotificationListener()
-  {
+  public boolean hasNotificationListener() {
     lock.lock();
-    try
-    {
+    try {
       return !handlerMap.isEmpty();
-    }
-    finally
-    {
+    } finally {
       lock.unlock();
     }
   }
@@ -177,10 +156,8 @@ class ForwardingNotificationDispatcher
    * Add a listner to the list of listeners.
    * @param listener the listener to add.
    */
-  public void addForwardingNotificationEventListener(final ForwardingNotificationEventListener listener)
-  {
-    synchronized(listenerList)
-    {
+  public void addForwardingNotificationEventListener(final ForwardingNotificationEventListener listener) {
+    synchronized (listenerList) {
       listenerList.add(listener);
       listenerArray = listenerList.toArray(new ForwardingNotificationEventListener[listenerList.size()]);
     }
@@ -190,10 +167,8 @@ class ForwardingNotificationDispatcher
    * Remove a listner from the list of listeners.
    * @param listener the listener to add.
    */
-  public void removeForwardingNotificationEventListener(final ForwardingNotificationEventListener listener)
-  {
-    synchronized(listenerList)
-    {
+  public void removeForwardingNotificationEventListener(final ForwardingNotificationEventListener listener) {
+    synchronized (listenerList) {
       if (listenerList.remove(listener)) listenerArray = listenerList.toArray(new ForwardingNotificationEventListener[listenerList.size()]);
     }
   }
@@ -203,22 +178,19 @@ class ForwardingNotificationDispatcher
    * @param mBeanName the name of the MBean form which the notification was received.
    * @param notification the notification to dispatch.
    */
-  public void fireNotificationEvent(final String mBeanName, final Notification notification)
-  {
+  public void fireNotificationEvent(final String mBeanName, final Notification notification) {
     ForwardingNotificationEvent event = new ForwardingNotificationEvent(nodeUuid, mBeanName, notification);
     ForwardingNotificationEventListener[] tmp;
-    synchronized(listenerList)
-    {
+    synchronized (listenerList) {
       tmp = listenerArray;
     }
-    for (ForwardingNotificationEventListener listener: tmp) listener.notificationReceived(event);
+    for (ForwardingNotificationEventListener listener : tmp) listener.notificationReceived(event);
   }
 
   /**
    * 
    */
-  private class ForwardingNotificationHandler implements NotificationListener
-  {
+  private class ForwardingNotificationHandler implements NotificationListener {
     /**
      * The name of the MBean to receive notifications from.
      */
@@ -228,15 +200,13 @@ class ForwardingNotificationDispatcher
      * Initiialize this listener with the specified MBean name.
      * @param mBeanName the name of the MBean to receive notifications from.
      */
-    public ForwardingNotificationHandler(final String mBeanName)
-    {
+    public ForwardingNotificationHandler(final String mBeanName) {
       this.mBeanName = mBeanName;
     }
 
     @Override
-    public void handleNotification(final Notification notification, final Object handback)
-    {
-      if (debugEnabled) log.debug("received notification from node=" +  nodeUuid + ", mbean='" + mBeanName + "' : " + notification + ", handback=" + handback);
+    public void handleNotification(final Notification notification, final Object handback) {
+      if (debugEnabled) log.debug("received notification from node=" + nodeUuid + ", mbean='" + mBeanName + "' : " + notification + ", handback=" + handback);
       fireNotificationEvent(mBeanName, notification);
     }
   }

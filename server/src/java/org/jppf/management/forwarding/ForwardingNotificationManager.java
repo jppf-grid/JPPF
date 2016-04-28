@@ -199,7 +199,7 @@ public class ForwardingNotificationManager implements NodeConnectionListener, Fo
     JPPFManagementInfo info = event.getNodeInformation();
     if (debugEnabled) log.debug("handling new connected node {}", info);
     if ((info == null) || (info.getPort() < 0) || (info.getHost() == null)) return;
-    String uuid = event.getNodeInformation().getUuid();
+    String uuid = info.getUuid();
     AbstractNodeContext node = forwarder.driver.getNodeNioServer().getConnection(uuid);
     if (debugEnabled) log.debug("new connected node {}", node);
     if (node == null) return;
