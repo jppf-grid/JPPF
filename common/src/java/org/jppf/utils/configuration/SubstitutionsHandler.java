@@ -18,7 +18,7 @@
 
 package org.jppf.utils.configuration;
 
-import java.util.Set;
+import java.util.*;
 import java.util.regex.*;
 
 import org.jppf.utils.TypedProperties;
@@ -72,10 +72,17 @@ public class SubstitutionsHandler {
    */
   private final TypedProperties resolvedProps = new TypedProperties();
   /**
-   * Number of properties resolved at each iteration, used as a
-   * stop conidition for the resolution loop.
+   * Stores the properties whose values are fully resolved.
+   */
+  private final Set<String> unresolvedProps = new HashSet<>();
+  /**
+   * Number of properties resolved at each iteration, used as a stop condition for the resolution loop.
    */
   private int resolutionCount;
+  /**
+   * Number of properties still resolved at each iteration, used as a stop condition for the resolution loop.
+   */
+  private int unresolvedCount;
   /**
    *
    */
@@ -97,17 +104,20 @@ public class SubstitutionsHandler {
     int i = 0;
     if (traceEnabled) log.trace("starting substitution handling");
     Set<String> set = props.stringPropertyNames();
-    resolutionCount = 1;
-    while (resolutionCount > 0) {
+    do {
       resolutionCount = 0;
+      unresolvedCount = 0;
       i++;
       for (String key: set) {
-        String value = evaluateProp(key, props.getProperty(key));
-        props.setProperty(key, value);
+        if (!resolvedProps.containsKey(key)) {
+          String value = evaluateProp(key, props.getProperty(key));
+          props.setProperty(key, value);
+        }
       }
-      if (traceEnabled) log.trace("iteration {} : resolutionCount = {}", i, resolutionCount);
-    }
+      if (traceEnabled) log.trace(String.format("iteration %d : unresolvedCount=%d, resolutionCount=%d", i, unresolvedCount, resolutionCount));
+    } while ((resolutionCount > 0) && (unresolvedCount > 0));
     resolvedProps.clear();
+    unresolvedProps.clear();
     return props;
   }
 
@@ -152,6 +162,7 @@ public class SubstitutionsHandler {
             resolvedProps.put(name, resolvedValue);
           } else {
             if (traceEnabled) log.trace("  unresolved property [name={}, value={}]", name, resolvedValue);
+            unresolvedProps.add(name);
           }
         }
         sb.append(resolvedValue);
@@ -161,7 +172,14 @@ public class SubstitutionsHandler {
     if (pos < value.length()) sb.append(value.substring(pos, value.length()));
     String s = sb.toString();
     if (resolvedRefCount > 0) resolutionCount++;
-    if ((matches <= 0) || (resolvedRefCount >= matches)) resolvedProps.put(key, s);
+    if (matches - resolvedRefCount > 0) unresolvedCount++;
+    if ((matches <= 0) || (matches - resolvedRefCount <= 0)) {
+      resolvedProps.put(key, s);
+      if (unresolvedProps.contains(key)) {
+        unresolvedProps.remove(key);
+        resolutionCount++;
+      }
+    }
     if (traceEnabled) log.trace("final value [key={}, value={}]", key, s);
     return s;
   }
@@ -204,11 +222,11 @@ public class SubstitutionsHandler {
     /**
      * The prefix of the properties to substitute.
      */
-    public final String prefix;
+    private final String prefix;
     /**
      * Only used in trace logging.
      */
-    public final String mapName;
+    private final String mapName;
 
     /**
      * Initialize this provider.
@@ -225,6 +243,6 @@ public class SubstitutionsHandler {
      * @param key the name of the property or variable to lookup^.
      * @return the vakue for th espeicifed key or {@code null} if the value could not be found.
      */
-    public abstract String getValue(final String key);
+    abstract String getValue(final String key);
   }
 }
