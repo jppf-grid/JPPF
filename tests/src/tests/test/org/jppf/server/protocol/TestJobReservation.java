@@ -87,6 +87,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @After
   public void tearDown() throws Exception {
     jmx.removeNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myListener);
+    myListener.map.clear();
   }
 
   /**
@@ -301,7 +302,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     final Map<String, AtomicInteger> map = new ConcurrentHashMap<>();
 
     @Override
-    public void handleNotification(final Notification notif, final Object handback) {
+    public synchronized void handleNotification(final Notification notif, final Object handback) {
       JPPFManagementInfo info = (JPPFManagementInfo) notif.getUserData();
       switch (notif.getType()) {
         case JPPFNodeConnectionNotifierMBean.CONNECTED:

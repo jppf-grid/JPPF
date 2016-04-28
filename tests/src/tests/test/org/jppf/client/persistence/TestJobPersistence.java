@@ -43,8 +43,7 @@ public class TestJobPersistence extends Setup1D1N {
    * Test the recovery of a job by closing the JPPF client before it completes.
    * @throws Exception if any error occurs.
    */
-  @Test
-  //@Test(timeout=20000)
+  @Test(timeout=20000)
   public void testJobRecovery() throws Exception {
     String key = null;
     JobPersistence<String> pm = null;

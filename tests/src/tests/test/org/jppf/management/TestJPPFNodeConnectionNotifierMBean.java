@@ -37,7 +37,7 @@ import test.org.jppf.test.setup.*;
  */
 public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetup implements NotificationListener {
   /**
-   * 
+   *
    */
   private final List<Notification> notifList = new ArrayList<>();
 
@@ -58,6 +58,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
   public void testConnectionNotifications() throws Exception {
     int nbSlaves = 2;
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
+    while (driver.nbNodes() < 1) Thread.sleep(10L);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
     forwarder.provisionSlaveNodes(NodeSelector.ALL_NODES, nbSlaves);
@@ -71,6 +72,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
     int connectedCount = 0;
     int disconnectedCount = 0;
     for (Notification notif: notifList) {
+      System.out.printf("notifList[%d] = %s, %s%n", (connectedCount + disconnectedCount), notif.getType(), notif.getUserData());
       assertEquals(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, notif.getSource());
       switch(notif.getType()) {
         case JPPFNodeConnectionNotifierMBean.CONNECTED:
@@ -90,6 +92,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
 
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
+    if (((JPPFManagementInfo) notification.getUserData()).isMasterNode()) return;
     synchronized(notifList) {
       notifList.add(notification);
     }

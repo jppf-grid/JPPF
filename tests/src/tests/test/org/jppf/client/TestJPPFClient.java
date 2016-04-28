@@ -129,8 +129,7 @@ public class TestJPPFClient extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @Test(timeout=10000)
-  public void testLocalExecutionNbThreads() throws Exception
-  {
+  public void testLocalExecutionNbThreads() throws Exception {
     int nbThreads = 2;
     JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, nbThreads);
     try (JPPFClient client = new JPPFClient()) {
@@ -392,6 +391,7 @@ public class TestJPPFClient extends Setup1D1N {
   }
 
   /**
+   * Overrides {@link #initRemotePools(TypedProperties)} to make it public.
    */
   public static class MyClient extends JPPFClient {
     /**

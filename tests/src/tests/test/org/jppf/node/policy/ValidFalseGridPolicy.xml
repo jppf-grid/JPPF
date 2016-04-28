@@ -3,7 +3,7 @@
     We expect the number of nodes matching the nested policy to be GREATER than 1.
     in clear language: "if there is more than 1 node with at least 1 processing thread ..."
   -->
-  <NodesMatching operator="GREATER" expected="4">
+  <NodesMatching operator="MORE_THAN" expected="4">
     <AtLeast>
       <Property>jppf.processing.threads</Property>
       <Value>1</Value>

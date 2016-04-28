@@ -162,7 +162,7 @@ public class TestJPPFNodeTaskMonitorMBean {
     try {
       nodeMonitorProxy.addNotificationListener(listener, null, null);
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks - 1, LifeCycleTask.class, duration);
-      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task " + nbTasks);
+      job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + "-task " + nbTasks);
       List<Task<?>> result = client.submitJob(job);
       assertNull(listener.exception);
       assertEquals(nbTasks + 1, listener.notifs.size());
@@ -173,7 +173,7 @@ public class TestJPPFNodeTaskMonitorMBean {
           return o1.getId().compareTo(o2.getId());
         }
       });
-      for (int i = 0; i < nbTasks; i++) {
+      for (int i=0; i<nbTasks; i++) {
         Task<?> task = result.get(i);
         TaskInformation ti = listener.notifs.get(i);
         assertEquals(job.getUuid(), ti.getJobId());

@@ -31,7 +31,7 @@ public class TestJMXConnectionWrapper {
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539051&group_id=135654&atid=733518">3539051 - JMX: performConnection is blocking connectAndWait</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
+  @Test(timeout=30000)
   public void testConnectAnWaitNonReachableServer() throws Exception {
     //make sure the host is on an unreachable network
     final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("10.1.1.2", 12345, false);
@@ -44,7 +44,7 @@ public class TestJMXConnectionWrapper {
         public void run() {
           long start = System.nanoTime();
           jmx.connectAndWait(duration);
-          long elapsed = (System.nanoTime() - start) / 1000000L;
+          long elapsed = (System.nanoTime() - start) / 1_000_000L;
           System.out.println("[" + getName() + "] connectAndWait() actually waited " + elapsed + " ms");
         }
       };
@@ -52,5 +52,6 @@ public class TestJMXConnectionWrapper {
     for (int i=0; i<nbThreads; i++) threads[i].start();
     for (int i=0; i<nbThreads; i++) threads[i].join();
     jmx.close();
+    boolean breakpoint = true;
   }
 }

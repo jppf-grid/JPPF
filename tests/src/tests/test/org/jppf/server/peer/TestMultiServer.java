@@ -19,7 +19,7 @@
 package test.org.jppf.server.peer;
 
 import org.jppf.node.policy.Equal;
-import org.jppf.utils.JPPFConfiguration;
+import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
@@ -37,7 +37,6 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   public static void setup() throws Exception {
     client = BaseSetup.setup(2, 2, true, createConfig("p2p"));
     awaitPeersInitialized();
-    System.out.println("configuration: " + JPPFConfiguration.getProperties());
   }
 
   /**
@@ -46,7 +45,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @Test(timeout = 10000)
   public void testSimpleJob() throws Exception {
-    super.testSimpleJob(new Equal("jppf.server.port", 11101));
+    super.testSimpleJob(new Equal(JPPFProperties.SERVER_PORT.getName(), 11101));
   }
 
   @Override

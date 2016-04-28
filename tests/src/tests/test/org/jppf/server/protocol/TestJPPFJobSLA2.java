@@ -109,8 +109,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       Thread.sleep(1000L);
       assertNotNull(listener.notifs);
       assertEquals(3, listener.notifs.size());
-      for (Notification notification: listener.notifs)
-      {
+      for (Notification notification: listener.notifs) {
         assertTrue(notification instanceof JPPFNodeForwardingNotification);
         JPPFNodeForwardingNotification outerNotif = (JPPFNodeForwardingNotification) notification;
         assertEquals(NodeTestMBean.MBEAN_NAME, outerNotif.getMBeanName());

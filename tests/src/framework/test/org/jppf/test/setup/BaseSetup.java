@@ -38,7 +38,7 @@ public class BaseSetup {
   /**
    * The default configuratin used when none is specified.
    */
-  private static final Configuration DEFAULT_CONFIG = createDefaultConfiguration();
+  public static final Configuration DEFAULT_CONFIG = createDefaultConfiguration();
   /**
    * The name of the JMX remote jar file.
    */
@@ -97,29 +97,6 @@ public class BaseSetup {
    */
   public static JPPFClient setup(final int nbNodes) throws Exception {
     return setup(1, nbNodes, true, DEFAULT_CONFIG);
-  }
-
-  /**
-   * Launches a driver and node and start the client.
-   * @param nbNodes the number of nodes to launch.
-   * @param initClient if true then start a client.
-   * @return an instance of <code>JPPFClient</code>.
-   * @throws Exception if a process could not be started.
-   */
-  public static JPPFClient setup(final int nbNodes, final boolean initClient) throws Exception {
-    return setup(1, nbNodes, initClient, DEFAULT_CONFIG);
-  }
-
-  /**
-   * Launches a driver and node and start the client.
-   * @param nbDrivers the number of drivers to launch.
-   * @param nbNodes the number of nodes to launch.
-   * @param initClient if true then start a client.
-   * @return an instance of <code>JPPFClient</code>.
-   * @throws Exception if a process could not be started.
-   */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean initClient) throws Exception {
-    return setup(nbDrivers, nbNodes, initClient, DEFAULT_CONFIG);
   }
 
   /**

@@ -92,9 +92,12 @@ public class BaseTestHelper {
     job.setName(name);
     int nbArgs = (params == null) ? 0 : params.length;
     Constructor constructor = findConstructor(taskClass, nbArgs);
+    // 0 padding of task number
+    int nbDigits = Integer.toString(nbTasks).length();
+    String format = "%s-task %0" + nbDigits + "d";
     for (int i=1; i<=nbTasks; i++) {
       Object o = constructor.newInstance(params);
-      job.add(o).setId(job.getName() + " - task " + i);
+      job.add(o).setId(String.format(format, job.getName(), i));
     }
     job.setBlocking(blocking);
     job.getSLA().setBroadcastJob(broadcast);

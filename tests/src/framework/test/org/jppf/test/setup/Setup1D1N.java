@@ -32,7 +32,7 @@ public class Setup1D1N {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    BaseSetup.setup(1, false);
+    BaseSetup.setup(1, 1, false, BaseSetup.DEFAULT_CONFIG);
   }
 
   /**

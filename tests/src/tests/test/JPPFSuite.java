@@ -21,9 +21,8 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.serialization.TestJPPFSerialization;
-import test.org.jppf.server.peer.*;
-import test.org.jppf.server.protocol.TestLocation;
+import test.org.jppf.management.TestJPPFNodeTaskMonitorMBean;
+import test.org.jppf.server.peer.TestMultiServerWithSSL;
 
 
 
@@ -32,7 +31,6 @@ import test.org.jppf.server.protocol.TestLocation;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestLocation.class, TestMultiServerWithOrphan.class, TestJPPFSerialization.class })
-public class JPPFSuite
-{
+@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestJPPFNodeTaskMonitorMBean.class })
+public class JPPFSuite {
 }

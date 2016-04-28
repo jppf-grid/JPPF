@@ -1,6 +1,6 @@
 
-Total tests: 250, successful: 247, failed: 0, ignored: 3
-Start time: Fri Feb 05 23:24:00 CET 2016, total elapsed: 00:07:08.744
+Total tests: 264, successful: 261, failed: 0, ignored: 3
+Start time: Thu Apr 28 05:37:32 CEST 2016, total elapsed: 00:06:21.662
 
 Tests results:
 
@@ -18,21 +18,21 @@ class test.org.jppf.client.TestConnectionPool
 class test.org.jppf.client.TestJPPFClient
   testCancelJob() : OK
   testNotSerializableExceptionFromNode() : OK
-  testSubmit() : OK
-  testLocalExecutionContextClassLoader() : OK
-  testRemoteExecutionContextClassLoader() : OK
-  testNotSerializableExceptionFromClient() : OK
   testDefaultConstructor() : OK
   testConstructorWithUuid() : OK
   testLocalExecutionNbThreads() : OK
+  testLocalExecutionContextClassLoader() : OK
+  testRemoteExecutionContextClassLoader() : OK
+  testSubmit() : OK
+  testNotSerializableExceptionFromClient() : OK
   testNoJMXConnectionThreadsLeak() : OK
 class test.org.jppf.client.TestJPPFJob
+  testCancelWithInterruptFlagFalse() : OK
+  testIsCancelledClientSideExpiration() : OK
+  testCancel() : OK
   testGetWithTimeout() : OK
   testJobListenerLocalExecution() : OK
   testGetTaskObject() : OK
-  testCancel() : OK
-  testCancelWithInterruptFlagFalse() : OK
-  testIsCancelledClientSideExpiration() : OK
 class test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
   testSubmitCallableWithJobTimeout() : OK
   testSubmitWithClientExecutionPolicy() : OK
@@ -41,11 +41,14 @@ class test.org.jppf.client.concurrent.TestExecutorServiceConfiguration
   testResetConfiguration() : OK
   testSubmitWithJobListener() : OK
 class test.org.jppf.client.concurrent.TestJPPFCompletionService
+  testPoll() : OK
+  testSubmitCallables() : OK
   testSubmitRunnables() : OK
   testPollWithTimeout() : OK
-  testSubmitCallables() : OK
-  testPoll() : OK
 class test.org.jppf.client.concurrent.TestJPPFExecutorService
+  testInvokeAll() : OK
+  testInvokeAny() : OK
+  testShutdown() : OK
   testSubmitRunnable() : OK
   testSubmitRunnableWithResult() : OK
   testSubmitCallable() : OK
@@ -54,10 +57,9 @@ class test.org.jppf.client.concurrent.TestJPPFExecutorService
   testShutdownNow() : OK
   testAwaitTermination() : OK
   testAwaitTermination2() : OK
-  testInvokeAll() : OK
-  testInvokeAny() : OK
-  testShutdown() : OK
 class test.org.jppf.client.event.TestJobListener
+  testJobListenerSingleLocalConnection() : OK
+  testJobListenerMultipleRemoteConnections() : OK
   testJobListenerNotificationsUponRequeue() : OK
 class test.org.jppf.client.persistence.TestJobPersistence
   testJobRecovery() : OK
@@ -66,9 +68,7 @@ class test.org.jppf.io.TestFileDataLocation
 class test.org.jppf.management.TestJMXConnectionWrapper
   testConnectAnWaitNonReachableServer() : OK
 class test.org.jppf.management.TestJPPFDriverAdminMBean
-  testGetLoadBalancerInformation() : OK
-  testSetLoadBalancerInformation() : OK
-  testNodesMatchingExecutionPolicy() : OK
+  testNbNodes() : OK
   testGetStatistics() : OK
   testResetStatistics() : OK
   testNodesInformation() : OK
@@ -76,9 +76,12 @@ class test.org.jppf.management.TestJPPFDriverAdminMBean
   testNbIdleNodes() : OK
   testToggleActiveState() : OK
   testGetAndSetActiveState() : OK
-  testNbNodes() : OK
+  testGetLoadBalancerInformation() : OK
+  testSetLoadBalancerInformation() : OK
+  testNodesMatchingExecutionPolicy() : OK
 class test.org.jppf.management.TestJPPFNodeAdminMBean
   testCancelJob() : OK
+  testState() : OK
   testUpdateThreadPoolSize() : OK
   testUpdateThreadPriority() : OK
   testResetTaskCounter() : OK
@@ -87,7 +90,6 @@ class test.org.jppf.management.TestJPPFNodeAdminMBean
   testUpdateConfiguration() : OK
   testGetDelegationModel() : OK
   testSetDelegationModel() : OK
-  testState() : OK
 class test.org.jppf.management.TestJPPFNodeConnectionNotifierMBean
   testConnectionNotifications() : OK
 class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
@@ -96,6 +98,7 @@ class test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
   testNotifications() : OK
 class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
   testCancelJob() : OK
+  testState() : OK
   testUpdateThreadPoolSize() : OK
   testUpdateThreadPriority() : OK
   testResetTaskCounter() : OK
@@ -104,12 +107,11 @@ class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean
   testUpdateConfiguration() : OK
   testGetDelegationModel() : OK
   testSetDelegationModel() : OK
-  testState() : OK
 class test.org.jppf.management.forwarding.TestJPPFNodeForwardingMBean2
-  testNoNotifcationReceivedExecutionPolicySelector() : OK
   testNotifcationsExecutionPolicySelector() : OK
   testNoNotifcationReceivedAllNodesSelector() : OK
   testNoNotifcationReceivedUuidSelector() : OK
+  testNoNotifcationReceivedExecutionPolicySelector() : OK
   testNotifcationsUuidSelector() : OK
   testNotifcationsAllNodes() : OK
 class test.org.jppf.node.TestOfflineNode
@@ -118,25 +120,33 @@ class test.org.jppf.node.TestOfflineNode
   testJobDispatchExpiration() : OK
 class test.org.jppf.node.policy.TestExecutionPolicy
   testMatches() : OK
-class test.org.jppf.node.policy.TestIsInIPv4Subnet
-  testInvalidXML() : OK
-  testMatches() : OK
+class test.org.jppf.node.policy.TestGridPolicy
   testValidXML() : OK
-class test.org.jppf.node.policy.TestIsInIPv6Subnet
   testInvalidXML() : OK
-  testMatches() : OK
-  testValidXML() : OK
-class test.org.jppf.node.policy.TestPreferencePolicy
-  testInvalidXML() : OK
-  testValidXML() : OK
-  testTrueXMLPolicy() : OK
+  testTrueXmlPolicy() : OK
+  testFalseXmlPolicy() : OK
   testTrueJavaPolicy() : OK
-  testFalseXMLPolicy() : OK
   testFalseJavaPolicy() : OK
-class test.org.jppf.node.policy.TestScriptedPolicy
+  testWorkingFalseJavaPolicy() : OK
+class test.org.jppf.node.policy.TestIsInIPv4Subnet
+  testMatches() : OK
+  testValidXML() : OK
   testInvalidXML() : OK
+class test.org.jppf.node.policy.TestIsInIPv6Subnet
+  testMatches() : OK
+  testValidXML() : OK
+  testInvalidXML() : OK
+class test.org.jppf.node.policy.TestPreferencePolicy
+  testValidXML() : OK
+  testInvalidXML() : OK
+  testTrueJavaPolicy() : OK
+  testFalseJavaPolicy() : OK
+  testTrueXMLPolicy() : OK
+  testFalseXMLPolicy() : OK
+class test.org.jppf.node.policy.TestScriptedPolicy
   testValidXML() : OK
   testInClient() : OK
+  testInvalidXML() : OK
   testSimpleTruePolicy() : OK
   testSimpleFalsePolicy() : OK
   testComplexPolicyGroovy() : OK
@@ -160,6 +170,9 @@ class test.org.jppf.serialization.TestKryo
   testForwardingMBean() : OK
 class test.org.jppf.server.job.management.TestDriverJobManagementMBean
   testCancelJob() : OK
+  testUpdatePriorityAndMaxNodesWithAllJobsSelector() : OK
+  testUpdatePriorityAndMaxNodesWithJobUuidSelector() : OK
+  testUpdatePriorityAndMaxNodesWithScriptedJobSelector() : OK
   testCancelJobsWithAllJobsSelector() : OK
   testCancelJobsWithJobUuidSelector() : OK
   testCancelJobsWithScriptedJobSelector() : OK
@@ -175,9 +188,6 @@ class test.org.jppf.server.job.management.TestDriverJobManagementMBean
   testResumeAndCancelSuspendedJob() : OK
   testCancelJobAfterCompletion() : OK
   testUpdateJobSLAAndMetadata() : OK
-  testUpdatePriorityAndMaxNodesWithAllJobsSelector() : OK
-  testUpdatePriorityAndMaxNodesWithJobUuidSelector() : OK
-  testUpdatePriorityAndMaxNodesWithScriptedJobSelector() : OK
 class test.org.jppf.server.peer.TestMultiServer
   testSimpleJob() : OK
   testCancelJob() : OK
@@ -223,8 +233,8 @@ class test.org.jppf.server.protocol.TestJPPFJobSLA2
   testDispatchExpirationSchedule() : OK
   testMaxDispatchExpirations() : OK
 class test.org.jppf.server.protocol.TestJPPFJobSLA3
-  testOnlineJob() : OK
   testOfflineJob() : OK
+  testOnlineJob() : OK
 class test.org.jppf.server.protocol.TestJPPFTask
   testComputeCallableThrowingException() : OK
   testMaxTaskResubmitsWithTaskOverride() : OK
@@ -240,6 +250,12 @@ class test.org.jppf.server.protocol.TestJPPFTask
   testTaskResubmit() : OK
   testMaxTaskResubmits() : OK
   testUninterruptibleTask() : OK
+class test.org.jppf.server.protocol.TestJobReservation
+  testCancelledJobReservationSingleNodeWithRestart() : OK
+  testExpiredJobReservationSingleNodeWithRestart() : OK
+  testJobReservationSingleNodeWithRestart() : OK
+  testJobReservationTwoNodesWithRestart() : OK
+  testJobReservationSingleNodeNoRestart() : OK
 class test.org.jppf.server.protocol.TestLocation
   testCopyTo() : OK
 class test.org.jppf.ssl.TestSSL
@@ -266,11 +282,11 @@ class test.org.jppf.utils.TestJPPFConfiguration
 class test.org.jppf.utils.TestJPPFUuid
   testUuidCollisions() : OK
 class test.org.jppf.utils.TestRange
-  testIncludes() : OK
-  testMerge() : OK
   testIsValueInRange() : OK
   testIntersects() : OK
   testIntersection() : OK
+  testIncludes() : OK
+  testMerge() : OK
 class test.org.jppf.utils.TestTypedProperties
   testEmptyPropertyNameSubstitutions() : OK
   testEnvironmentVariableSubstitution() : OK
@@ -291,11 +307,11 @@ class test.org.jppf.utils.TestTypedProperties
   testSubstitutionsWithCycle() : OK
   testScriptedValues() : OK
 class test.org.jppf.utils.stats.TestJPPFStatistics
+  testTaskAndJobCountUponClientCloseWithoutCancel() : OK
   testLatestQueueTaskCountUponNodeRestart() : OK
   testLatestQueueTaskCountUponTaskResubmit() : OK
   testTaskAndJobCountUponClientClose() : OK
   testTaskAndJobCountUponCompletion() : OK
-  testTaskAndJobCountUponClientCloseWithoutCancel() : OK
   testTaskAndJobCountUponCancel() : OK
 class test.org.jppf.utils.stats.TestJPPFStatisticsListener
   testSimpleListener() : OK

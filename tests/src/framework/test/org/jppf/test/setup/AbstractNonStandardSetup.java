@@ -70,7 +70,8 @@ public class AbstractNonStandardSetup {
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
     commonCP.add("../JPPF/lib/LZ4/lz4-1.3.0.jar");
-    commonCP.add("../JPPF/lib/jmxremote/" + BaseSetup.JMX_REMOTE_JAR);
+    //commonCP.add("../JPPF/lib/jmxremote/" + BaseSetup.JMX_REMOTE_JAR);
+    commonCP.add("../jmxremote/classes");
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
@@ -106,6 +107,7 @@ public class AbstractNonStandardSetup {
    * @throws Exception if any error occurs
    */
   protected void testSimpleJob(final ExecutionPolicy policy) throws Exception {
+    System.out.printf("driver load balancing config: %s%n", BaseSetup.getJMXConnection().loadBalancerInformation());
     int tasksPerNode = 5;
     int nbNodes = BaseSetup.nbNodes();
     int nbTasks = tasksPerNode * nbNodes;
@@ -135,7 +137,7 @@ public class AbstractNonStandardSetup {
   }
 
   /**
-   * Test multiple non-blocking jobs can be sent asynchronously.
+   * Test that multiple non-blocking jobs can be sent asynchronously.
    * @throws Exception if any error occurs
    */
   protected void testMultipleJobs() throws Exception {

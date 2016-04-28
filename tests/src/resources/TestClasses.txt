@@ -17,6 +17,7 @@ test.org.jppf.management.TestJPPFNodeAdminMBean
 test.org.jppf.management.TestJPPFNodeConnectionNotifierMBean
 test.org.jppf.management.TestJPPFNodeTaskMonitorMBean
 test.org.jppf.node.policy.TestExecutionPolicy
+test.org.jppf.node.policy.TestGridPolicy
 test.org.jppf.node.policy.TestIsInIPv4Subnet
 test.org.jppf.node.policy.TestIsInIPv6Subnet
 test.org.jppf.node.policy.TestPreferencePolicy
@@ -29,6 +30,7 @@ test.org.jppf.server.job.management.TestDriverJobManagementMBean
 test.org.jppf.server.peer.TestMultiServer
 test.org.jppf.server.peer.TestMultiServerWithOrphan
 test.org.jppf.server.peer.TestMultiServerWithSSL
+test.org.jppf.server.protocol.TestJobReservation
 test.org.jppf.server.protocol.TestJPPFJobClientSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA
 test.org.jppf.server.protocol.TestJPPFJobSLA2
