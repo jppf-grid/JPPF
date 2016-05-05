@@ -9,7 +9,9 @@ function langFromExtension(name) {
 var fs = project.createDataType("fileset");
 var dir = new java.io.File(project.getProperty("basedir") + "/../samples-pack/" + attributes.get("sample"));
 fs.setDir(dir);
-fs.setIncludes("**/*.java,**/*.properties,**/*.xml");
+var includes = attributes.get("include");
+if (includes == null) includes = "**/*.java,**/*.properties,**/*.xml,**/*.txt";
+fs.setIncludes(includes);
 fs.setExcludes("**/package-info.java");
 self.log("converting files from " + dir.getCanonicalPath());
 var ds = fs.getDirectoryScanner();

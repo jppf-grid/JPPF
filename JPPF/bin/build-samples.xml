@@ -24,19 +24,9 @@
 
   <taskdef name="java2html" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${lib}/java2html_50/java2html.jar"/>
 
-  <!-- Convert source files to HTML -->
-  <!--
-  <macrodef name="include.code">
-    <attribute name="sample"/>
-    <sequential>
-      <java2html srcdir="${samples-pack}/@{sample}" destdir="${samples-pack}/@{sample}" includes="**/*.java" excludes="**/package-info.java"
-        style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false"/>
-    </sequential>
-  </macrodef>
-  -->
-  
   <scriptdef name="include.code" language="javascript" manager="javax" src="${basedir}/bin/HTMLSourceScript.js">
     <attribute name="sample"/>
+    <attribute name="include"/>
   </scriptdef>
   
   <macrodef name="tohtml">
@@ -76,6 +66,7 @@
     <include.code sample="FTPServer"/>
     <include.code sample="GPU"/>
     <include.code sample="InitializationHook"/>
+    <include.code sample="JobDependencies" include="**/*.java,**/*.txt"/>
     <include.code sample="JobRecovery"/>
     <include.code sample="KryoSerializer"/>
     <include.code sample="NodeLifeCycle"/>
@@ -123,6 +114,7 @@
         <include name="GPU/**/*.c"/>
         <include name="Fractals/src/icons/*.gif"/>
         <include name="Fractals/src/icons/*.png"/>
+        <include name="JobDependencies/**/*.gif"/>
         <include name="PluggableView/**/*.gif"/>
         <include name="PluggableView/**/*.png"/>
       </fileset>

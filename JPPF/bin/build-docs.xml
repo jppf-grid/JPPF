@@ -94,9 +94,12 @@
   <target name="user.guide">
     <property name="user.guide.file" value="${build}/JPPF-${version.number}-User-Guide.zip"/>
     <delete file="${user.guide.file}" quiet="true"/>
+    <copy tofile="${build}/JPPF-${version.number}-User-Guide.pdf" file="${docs}/manual/JPPF-User-Guide.pdf"/>
     <zip destfile="${user.guide.file}">
-      <zipfileset dir="${docs}/manual" includes="JPPF-User-Guide.pdf" prefix="JPPF-${version.number}-User-Guide"/>
+      <zipfileset dir="${build}" includes="JPPF-${version.number}-User-Guide.pdf"/>
+      <!--<zipfileset dir="${docs}/manual" includes="JPPF-${version.number}-User-Guide.pdf" prefix="JPPF-${version.number}-User-Guide"/>-->
     </zip>
+    <delete file="${build}/JPPF-${version.number}-User-Guide.pdf" quiet="true"/>
   </target>
 
   <!-- ========================================================================= -->

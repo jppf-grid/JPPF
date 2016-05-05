@@ -58,8 +58,8 @@
 		<pathelement location="${classes.dir}/j2eeclient"/>
 		<pathelement location="${ejb.client.jar}"/>
 		<fileset dir="${lib.dir}">
-			<include name="jppf-common.jar"/>
-			<include name="jppf-client.jar"/>
+			<include name="jppf-common-${version.number}.jar"/>
+			<include name="jppf-client-${version.number}.jar"/>
 		</fileset>
 	</path>
 
@@ -313,8 +313,8 @@
           <include name="jppf-jca.jar"/>
         </zipfileset>
         <zipfileset dir="${lib.dir}">
-          <include name="jppf-common.jar"/>
-          <include name="jppf-client.jar"/>
+          <include name="jppf-common-${version.number}.jar"/>
+          <include name="jppf-client-${version.number}.jar"/>
           <include name="jppf-jmxremote_optional-1.1.1.jar"/>
           <include name="lz4-1.3.0.jar"/>
           <include name="slf4j-api-1.6.1.jar"/>

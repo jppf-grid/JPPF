@@ -39,8 +39,8 @@
         <zipfileset dir="${basedir}" prefix="${@{module}.prefix}" includes="${license.file}"/>
         <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" excludes="**/*.sh,JPPFDriver,JPPFNode"/>
         <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755"/>
-        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common.jar"/>
-        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src.jar"/>
+        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.1.1.jar"/>
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
@@ -56,8 +56,8 @@
   <target name="application.template">
     <package-module module="application-template">
       <module-elements>
-        <zipfileset dir="${build}" prefix="${application-template.prefix}/lib" includes="jppf-client.jar"/>
-        <zipfileset dir="${build}" prefix="${application-template.prefix}/lib-src" includes="jppf-client-src.jar"/>
+        <zipfileset dir="${build}" prefix="${application-template.prefix}/lib" includes="jppf-client-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${application-template.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar"/>
         <zipfileset dir="${application.template}/src" prefix="${application-template.prefix}/src" includes="**/*.*"/>
         <zipfileset dir="${application.template}/classes" prefix="${application-template.prefix}/classes" includes="**/*.*"/>
       </module-elements>
@@ -70,8 +70,8 @@
     <package-module module="driver">
       <module-elements>
         <zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
-        <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node.jar,jppf-server.jar"/>
-        <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src.jar,jppf-server-src.jar"/>
+        <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node.jar,jppf-server-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src.jar,jppf-server-src-${version.number}.jar"/>
       </module-elements>
     </package-module>
   </target>
@@ -81,8 +81,8 @@
   <target name="runtime.node">
     <package-module module="node">
       <module-elements>
-        <zipfileset dir="${build}" prefix="${node.prefix}/lib" includes="jppf-node.jar"/>
-        <zipfileset dir="${build}" prefix="${node.prefix}/lib-src" includes="jppf-node-src.jar"/>
+        <zipfileset dir="${build}" prefix="${node.prefix}/lib" includes="jppf-node-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${node.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/JNA" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
       </module-elements>
     </package-module>
@@ -93,8 +93,8 @@
   <target name="runtime.gui">
     <package-module module="gui" zip-prefix="admin-ui">
       <module-elements>
-        <zipfileset dir="${build}" prefix="${gui.prefix}/lib" includes="jppf-client.jar,jppf-admin.jar"/>
-        <zipfileset dir="${build}" prefix="${gui.prefix}/lib-src" includes="jppf-client-src.jar,jppf-admin-src.jar"/>
+        <zipfileset dir="${build}" prefix="${gui.prefix}/lib" includes="jppf-client-${version.number}.jar,jppf-admin-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${gui.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar,jppf-admin-src-${version.number}.jar"/>
         <zipfileset dir="${lib}/JFreeChart" prefix="${gui.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/JGoodies" prefix="${gui.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/Groovy" prefix="${gui.prefix}/lib" includes="*.jar"/>

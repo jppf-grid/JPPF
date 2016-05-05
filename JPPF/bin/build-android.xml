@@ -26,7 +26,7 @@
   
   <target name="update.android.dependencies" depends="build" description="update dependencies of the android projects">
     <jar destfile="${build}/jppf-node-android.jar">
-      <zipfileset src="${build}/jppf-node.jar">
+      <zipfileset src="${build}/jppf-node-${version.number}.jar">
         <exclude name="**/screensaver/**/*.*"/>
         <exclude name="**/*.gif"/>
         <exclude name="**/*.png"/>
@@ -35,10 +35,16 @@
       </zipfileset>
     </jar>
     <!--<checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>-->
+    <copy tofile="${node-android}/events/libs/jppf-common.jar" file="${build}/jppf-common-${version.number}.jar"/>
+    <copy tofile="${node-android}/events/libs/jppf-server.jar" file="${build}/jppf-server-${version.number}.jar"/>
+    <copy tofile="${node-android}/events/libs/jppf-node-android.jar" file="${build}/jppf-node-android.jar"/>
+    <copy tofile="${node-android}/events/libs/lz4-1.3.0.jar" file="${lib}/LZ4/lz4-1.3.0.jar"/>
+    <!--
     <copy toDir="${node-android}/events/libs">
-      <fileset dir="${build}" includes="jppf-common.jar,jppf-node-android.jar,jppf-server.jar"/>
+      <fileset dir="${build}" includes="jppf-common-${version.number}.jar,jppf-node-android.jar,jppf-server-${version.number}.jar"/>
       <fileset dir="${lib}/LZ4" includes="lz4-1.3.0.jar"/>
     </copy>
+    -->
   </target>
 
   <!-- ========================================================================= -->

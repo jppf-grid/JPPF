@@ -78,11 +78,11 @@ limitations under the License.
     <sequential>
       <copy todir="@{todir}">
         <fileset dir="${build}">
-          <include name="jppf-node.jar"/>
-          <include name="jppf-common.jar"/>
-          <include name="jppf-client.jar"/>
-          <include name="jppf-admin.jar"/>
-          <include name="jppf-server.jar"/>
+          <include name="jppf-node-${version.number}.jar"/>
+          <include name="jppf-common-${version.number}.jar"/>
+          <include name="jppf-client-${version.number}.jar"/>
+          <include name="jppf-admin-${version.number}.jar"/>
+          <include name="jppf-server-${version.number}.jar"/>
         </fileset>
       </copy>
     </sequential>
@@ -110,7 +110,7 @@ limitations under the License.
     <attribute name="module"/>
     <attribute name="jar" default="@{module}"/>
     <sequential>
-      <jar jarfile="${build}/jppf-@{jar}.jar" index="true">
+      <jar jarfile="${build}/jppf-@{jar}-${version.number}.jar" index="true">
         <fileset dir="${basedir}/../@{module}/classes" excludes="**/package-info.class"/>
         <manifest>
           <attribute name="JPPF-Version" value="${version.number}"/>
@@ -146,7 +146,7 @@ limitations under the License.
     <attribute name="module"/>
     <attribute name="jar" default="@{module}"/>
     <sequential>
-      <jar jarfile="${build}/jppf-@{jar}-src.jar" index="true">
+      <jar jarfile="${build}/jppf-@{jar}-src-${version.number}.jar" index="true">
         <fileset dir="${basedir}/../@{module}/src/java"/>
         <fileset dir="${basedir}/../@{module}/src/resources"/>
         <fileset file="${bin}/build.number"/>

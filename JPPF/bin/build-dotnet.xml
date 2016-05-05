@@ -42,8 +42,8 @@
         <zipfileset dir="${basedir}/config/dotnet-bridge/config/client" prefix="${dotnet-bridge.prefix}" includes="*.config"/>
         <zipfileset dir="${dotnet-bridge}/build" prefix="${dotnet-bridge.prefix}" includes="JPPFDotnetDemo.exe,*.dll"/>
         <zipfileset dir="${dotnet-bridge}/build" prefix="${dotnet-bridge.prefix}/lib" includes="*.jar"/>
-        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib" includes="jppf-client.jar"/>
-        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib-src" includes="jppf-client-src.jar"/>
+        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib" includes="jppf-client-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${dotnet-bridge.prefix}/lib-src" includes="jppf-client-src-${version.number}.jar"/>
         <zipfileset dir="${dotnet-bridge}/jni4net/cs" prefix="${dotnet-bridge.prefix}/src" includes="jppf.dotnet.demo.tasks/**/*.*,jppf.dotnet.demo/**/*.*"/>
       </module-elements>
     </package-module>
@@ -63,8 +63,8 @@
     <zip destfile="${dotnet.node.dist.file}">
       <zipfileset dir="${build}/temp/${app.ver}-node" prefix="${app.ver}-node-dotnet" includes="**/*.*,**/JPPFNode"/>
       <zipfileset dir="${dotnet-bridge}/build" prefix="${app.ver}-node-dotnet/lib" includes="*.dll,*.jar"/>
-      <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib" includes="jppf-client.jar"/>
-      <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib-src" includes="jppf-client-src.jar"/>
+      <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib" includes="jppf-client-${version.number}.jar"/>
+      <zipfileset dir="${build}" prefix="${app.ver}-node-dotnet/lib-src" includes="jppf-client-src-${version.number}.jar"/>
     </zip>
     <delete quiet="true" dir="${build}/temp"/>
   </target>

@@ -86,7 +86,7 @@
         <link href="https://docs.oracle.com/javase/7/docs/api/"/>
         <link href="https://docs.oracle.com/javaee/6/api/"/>
         <link href="http://xstream.codehaus.org/javadoc"/>
-        <link href="http://www.jppf.org/api-5"/>
+        <link href="http://www.jppf.org/javadoc/5.2"/>
         <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
         <header><![CDATA[<table><tr><td valign="center">
             <a href="http://www.jppf.org" target="_top"><img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/></a>
@@ -106,8 +106,8 @@
       <jar jarfile="${javadoc.file}"><fileset dir="${maven.dist.javadoc}" /></jar>
       <delete dir="${maven.dist.javadoc}" quiet="true"/>
       <delete file="${pom.file}" quiet="true"/>
-      <copy file="${build}/jppf-@{file}.jar" toFile="${maven.dist}/${artifact.prefix}.jar"/>
-      <copy file="${build}/jppf-@{file}-src.jar" toFile="${maven.dist}/${artifact.prefix}-sources.jar"/>
+      <copy file="${build}/jppf-@{file}-${version.number}.jar" toFile="${maven.dist}/${artifact.prefix}.jar"/>
+      <copy file="${build}/jppf-@{file}-src-${version.number}.jar" toFile="${maven.dist}/${artifact.prefix}-sources.jar"/>
       <copy toFile="${pom.file}" file="${bin}/maven/jppf-@{file}.xml"/>
       <replace file="${pom.file}" token="@version@" value="${maven.version}"/>
       <replace file="${pom.file}">
