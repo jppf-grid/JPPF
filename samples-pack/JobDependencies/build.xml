@@ -1,0 +1,105 @@
+<!--
+  JPPF
+  Copyright (C) 2005-2015 JPPF Team. 
+  http://www.jppf.org
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<project name='JobDependencies' basedir="." default="build">
+
+  <!-- ========================================================================= -->
+  <!-- Property definitions                                                      -->
+  <!-- ========================================================================= -->
+
+  <property name="lib"     value="${basedir}/../shared/lib"/>
+  <property name="config"  value="${basedir}/config"/>
+  <property name="classes" value="${basedir}/classes"/>
+  <property name="src"     value="${basedir}/src"/>
+
+  <!-- ========================================================================= -->
+  <!-- Classpath definitions                                                     -->
+  <!-- ========================================================================= -->
+
+  <path id="project.classpath">
+    <pathelement location="${classes}"/>
+    <pathelement location="${config}"/>
+    <fileset dir="${lib}" includes="**/*.jar"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!-- Clean                                                                     -->
+  <!-- ========================================================================= -->
+
+  <target name="clean">
+    <delete quiet="true">
+      <fileset dir="${classes}" includes="**/*.*"/>
+    </delete>
+  </target>               
+
+  <!-- ========================================================================= -->
+  <!-- Init                                                                      -->
+  <!-- ========================================================================= -->
+
+  <target name="init" description="Initialize ressources">
+  </target>
+
+
+  <!-- ========================================================================= -->
+  <!-- Build                                                                     -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="jar" description="build the jar"/>
+
+  <!-- ========================================================================= -->
+  <!-- Compile                                                                   -->
+  <!-- ========================================================================= -->
+
+  <target name="compile" depends="clean, init">
+    <javac srcdir="" destdir="${classes}" source="1.7" target="1.7"
+      debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="project.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${src}"/>
+    </javac>
+    <copy todir="${classes}">
+      <fileset dir="${src}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Jar                                                                       -->
+  <!-- ========================================================================= -->
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${basedir}/${ant.project.name}.jar" index="true">
+      <fileset dir="${classes}"/>
+    </jar>
+    <echo message="*** The file ${ant.project.name}.jar is now ready to be deployed ***"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!-- Run the sample application                                                -->
+  <!-- ========================================================================= -->
+
+  <target name="run" depends="build" description="run the demo">
+    <echo message="Job Dependencies demo"/>
+    <java fork="yes" classname="org.jppf.example.job.dependencies.JobDependenciesRunner" classpathref="project.classpath">
+      <jvmarg value="-Xmx256m"/>
+      <jvmarg value="-Djppf.config=jppf.properties"/>
+      <jvmarg value="-Dlog4j.configuration=log4j.properties"/>
+      <jvmarg value="-Djava.util.logging.config.file=config/logging.properties"/>
+    </java>       
+  </target>
+
+</project> 

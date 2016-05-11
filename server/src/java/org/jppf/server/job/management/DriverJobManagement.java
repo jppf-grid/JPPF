@@ -105,6 +105,7 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
     }
     if (debugEnabled) log.debug("Request to resume jobId = '" + bundleWrapper.getJob().getName() + '\'');
     bundleWrapper.setSuspended(false, false);
+    driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
 
   /**
@@ -328,5 +329,6 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
       }
       job.update(sla, metadata);
     }
+    driver.getNodeNioServer().getTaskQueueChecker().wakeUp();
   }
 }

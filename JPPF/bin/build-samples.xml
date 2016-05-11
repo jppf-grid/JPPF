@@ -120,7 +120,7 @@
       </fileset>
     </copy>
     <!-- remove HTML-converted files after the zip is created -->
-    <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html"/></delete>
+    <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html,**/*.txt.html"/></delete>
     <delete file="${build}/header.txt" quiet="true"/>
     <delete file="${build}/temp.java" quiet="true"/>
     <delete dir="${build}/samples-pack" quiet="true"/>

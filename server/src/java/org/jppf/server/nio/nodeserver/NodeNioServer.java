@@ -510,4 +510,13 @@ public class NodeNioServer extends NioServer<NodeState, NodeTransition> implemen
   public NodeReservationHandler getNodeReservationHandler() {
     return nodeReservationHandler;
   }
+
+  /**
+   * Get the task that dispatches queued jobs to available nodes.
+   * @return a {@link TaskQueueChecker} object.
+   * @exclude
+   */
+  public TaskQueueChecker<AbstractNodeContext> getTaskQueueChecker() {
+    return taskQueueChecker;
+  }
 }

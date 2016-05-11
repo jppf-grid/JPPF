@@ -15,6 +15,7 @@
 	<classpathentry kind="src" output="FTPServer/classes" path="FTPServer/src"/>
 	<classpathentry kind="src" output="GPU/classes" path="GPU/src"/>
 	<classpathentry kind="src" output="InitializationHook/classes" path="InitializationHook/src"/>
+	<classpathentry kind="src" output="JobDependencies/classes" path="JobDependencies/src"/>
 	<classpathentry kind="src" path="JobRecovery/src"/>
 	<classpathentry kind="src" output="KryoSerializer/classes" path="KryoSerializer/src"/>
 	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
