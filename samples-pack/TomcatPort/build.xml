@@ -39,8 +39,8 @@
   <path id="project.classpath">
     <pathelement location="${classes.dir}"/>
     <fileset dir="${lib.dir}">
-      <include name="jppf-common.jar"/>
-      <include name="jppf-client.jar"/>
+      <include name="jppf-common*.jar"/>
+      <include name="jppf-client*.jar"/>
       <include name="commons-logging-1.1.jar"/>
       <include name="slf4j-api-1.6.1.jar"/>
       <include name="slf4j-jdk14-1.6.1.jar"/>
@@ -105,8 +105,8 @@
     <war warfile="${build.dir}/${war.file}" webxml="${web.inf.dir}/web.xml">
       <zipfileset dir="${docroot.dir}" includes="**/*.*"/>
       <lib dir="${lib.dir}">
-        <include name="jppf-common.jar"/>
-        <include name="jppf-client.jar"/>
+        <include name="jppf-common*.jar"/>
+        <include name="jppf-client*.jar"/>
         <include name="commons-logging-1.1.jar"/>
         <include name="slf4j-api-1.6.1.jar"/>
 	      <include name="jppf-jmxremote_optional-1.1.1.jar"/>

@@ -124,9 +124,9 @@
     <delete file="${zip.file}" quiet="true"/>
     <zip destfile="${zip.file}">
       <zipfileset dir="${shared.lib}" prefix="${prefix}/lib">
-        <include name="jppf-node.jar"/>
-        <include name="jppf-common.jar"/>
-        <include name="jppf-server.jar"/>
+        <include name="jppf-node*.jar"/>
+        <include name="jppf-common*.jar"/>
+        <include name="jppf-server*.jar"/>
         <include name="log4j-1.2.15.jar"/>
         <include name="slf4j-api-1.6.1.jar"/>
         <include name="slf4j-log4j12-1.6.1.jar"/>
@@ -148,9 +148,9 @@
     <delete file="${tar.gz.file}" quiet="true"/>
     <tar destfile="${tar.gz.file}" compression="gzip" excludes="**/*.*">
       <tarfileset dir="${shared.lib}" prefix="${prefix}/lib">
-        <include name="jppf-node.jar"/>
-        <include name="jppf-common.jar"/>
-        <include name="jppf-server.jar"/>
+        <include name="jppf-node*.jar"/>
+        <include name="jppf-common*.jar"/>
+        <include name="jppf-server*.jar"/>
         <include name="log4j-1.2.15.jar"/>
         <include name="slf4j-api-1.6.1.jar"/>
         <include name="slf4j-log4j12-1.6.1.jar"/>
