@@ -66,7 +66,7 @@ public abstract class AbstractBundler<T extends LoadBalancingProfile> implements
   /**
    * This implementation does nothing and should be overridden in subclasses that compute the bundle size based on the feedback from the nodes.
    * @param bundleSize the number of tasks retruning from execution on a node.
-   * @totalTime the total round-trip time of the tasks, from the server to the node and back.
+   * @param totalTime the total round-trip time of the tasks, from the server to the node and back.
    */
   @Override
   public void feedback(final int bundleSize, final double totalTime) {
