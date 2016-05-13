@@ -265,7 +265,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       count += bundle.getTaskCount();
       pendingCount += bundle.getPendingTasksCount();
     }
-    if (((clientBundle = getInitialBundleWrapper()) != null) && (getState() != ClientState.SENDING_RESULTS)) {
+    if ((clientBundle = getInitialBundleWrapper()) != null) {
       TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
