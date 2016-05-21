@@ -160,13 +160,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
     List<String> command = new ArrayList<>();
     command.add(computeJavaExecPath(config));
     command.add("-cp");
-    StringBuilder sb = new StringBuilder();
-    String sep = System.getProperty("path.separator");
-    for (int i=0; i<cpElements.size(); i++) {
-      if (i > 0) sb.append(sep);
-      sb.append(cpElements.get(i));
-    }
-    command.add(sb.toString());
+    command.add(buildClasspath(cpElements));
     for (String opt: jvmOptions) command.add(opt);
     s = System.getProperty(JPPFConfiguration.CONFIG_PROPERTY);
     if (s != null) command.add("-D" + JPPFConfiguration.CONFIG_PROPERTY + '=' + s);

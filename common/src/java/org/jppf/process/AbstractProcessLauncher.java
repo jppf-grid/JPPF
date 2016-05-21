@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.net.ServerSocket;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.*;
 
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
@@ -39,6 +40,10 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
    * Logger for this class.
    */
   private static Logger log = LoggerFactory.getLogger(AbstractProcessLauncher.class);
+  /**
+   *
+   */
+  private static final Pattern JVM_OPTIONS_PATTERN = Pattern.compile("([^\"\\s]*\"[^\"]*\"[^\"\\s]*|[^\"\\s]*)\\s*");
   /**
    * A reference to the JPPF driver subprocess, used to kill it when the driver launcher exits.
    */
@@ -71,53 +76,48 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
 
   /**
    * Parse the specified String as a list of JVM options.
-   * @param s the string to parse.
+   * @param source the string to parse.
    * @return A list of jvm options.
    */
-  protected Pair<List<String>, List<String>> parseJvmOptions(final String s) {
-    List<String> jvmOptions = new ArrayList<>();
-    List<String> cpElements = new ArrayList<>();
-    Pair<List<String>, List<String>> result = new Pair<>(jvmOptions, cpElements);
-    if (s != null) {
-      if (log.isTraceEnabled()) log.trace("options = " + s);
-      List<String> list = new ArrayList<>();
-      String source = s.trim();
-      boolean end = false;
-      int pos = 0;
-      String rep = "_-_";
-      StringBuilder sb = new StringBuilder();
-      while (pos < source.length()) {
-        int idx = source.indexOf("\"", pos);
-        if (idx >= 0) {
-          sb.append(source.substring(pos, idx));
-          int idx2 = source.indexOf("\"", idx + 1);
-          if (idx2 >= 0) {
-            sb.append(source.substring(idx, idx2 + 1).replaceAll("\\s", rep));
-            pos = idx2 + 1;
-          } else {
-            sb.append(source.substring(idx).replaceAll("\\s", rep));
-            break;
-          }
-        } else {
-          sb.append(source.substring(pos));
-          break;
-        }
-      }
-      String[] options = RegexUtils.SPACES_PATTERN.split(sb.toString());
-      for (int i=0; i<options.length; i++) options[i] = options[i].replaceAll(rep, " ").replace("\\", "\\\\")/*.replaceAll("\"", "\\\"")*/;
-      if (log.isTraceEnabled()) {
-        StringBuilder sb2 = new StringBuilder("options after split =");
-        for (String option: options) sb2.append('\n').append(option);
-        log.trace(sb2.toString());
-      }
-      int count = 0;
-      while (count < options.length) {
-        String option = options[count++];
-        if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options[count++]/*.replace("\\", "/")*/);
-        else jvmOptions.add(option);
+  protected Pair<List<String>, List<String>> parseJvmOptions(final String source) {
+    List<String> options = new ArrayList<>();
+    Matcher matcher = JVM_OPTIONS_PATTERN.matcher(source);
+    while (matcher.find()) {
+      String s = matcher.group(1);
+      if (s != null) {
+        s = s.trim();
+        if (!s.isEmpty()) options.add(s);
       }
     }
-    return result;
+    log.debug("options={}", options);
+    List<String> jvmOptions = new ArrayList<>();
+    List<String> cpElements = new ArrayList<>();
+    int count = 0;
+    while (count < options.size()) {
+      String option = options.get(count++);
+      if ("-cp".equalsIgnoreCase(option) || "-classpath".equalsIgnoreCase(option)) cpElements.add(options.get(count++));
+      else jvmOptions.add(option);
+    }
+    log.debug("jvm options={}, cp elements={}", jvmOptions, cpElements);
+    return new Pair<>(jvmOptions, cpElements);
+  }
+
+  /**
+   * Build the ful classpath based onthe current process's classpath and the provided classpath elements.
+   * @param cpElements the classpath elements to add to the classpath of the current process
+   * @return a classpath string using the platform's path separator, eventually anclosed within double quotes if
+   * any class path element contains one or more spaces.
+   */
+  protected String buildClasspath(final List<String> cpElements) {
+    StringBuilder sb = new StringBuilder();
+    String sep = System.getProperty("path.separator");
+    for (int i=0; i<cpElements.size(); i++) {
+      if (i > 0) sb.append(sep);
+      sb.append(cpElements.get(i));
+    }
+    String cp = sb.toString().replace("\"", "");
+    if (RegexUtils.SPACES_PATTERN.matcher(cp).find()) cp = "\"" + cp + "\"";
+    return cp;
   }
 
   /**
@@ -244,13 +244,13 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
   /**
    * Compute the path to the Java executable, based on the JPPF configuration.
    * <p>if the property "{@code jppf.java.path}" is defined, then it will be used,
-   * otherwise the value of the system property "java.home" will be used with a "/bin/java" suffix. 
+   * otherwise the value of the system property "java.home" will be used with a "/bin/java" suffix.
    * @param config the configuration to use.
    * @return the full path to the java executable.
    */
   protected String computeJavaExecPath(final TypedProperties config) {
     String path = config.get(JPPFProperties.JAVA_PATH);
-    if ((path == null) || path.trim().isEmpty()) path = System.getProperty("java.home") + "/bin/java"; 
+    if ((path == null) || path.trim().isEmpty()) path = System.getProperty("java.home") + "/bin/java";
     return path;
   }
 

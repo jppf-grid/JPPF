@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.*;
 
 import org.jppf.process.AbstractProcessLauncher;
-import org.jppf.utils.TypedProperties;
+import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
@@ -129,21 +129,20 @@ public class SlaveNodeLauncher extends AbstractProcessLauncher {
     }
     if (log.isDebugEnabled()) log.debug("{} read config {} : {}", new Object[] {name, configFile, config});
     List<String> jvmOptions = new ArrayList<>();
+    List<String> cpElements = new ArrayList<>(classpath);
     String s = config.get(JPPFProperties.JVM_OPTIONS);
-    jvmOptions.addAll(parseJvmOptions(s).first());
+    Pair<List<String>, List<String>> parsed = parseJvmOptions(s);
+    jvmOptions.addAll(parsed.first());
+    cpElements.addAll(parsed.second());
     s = config.get(JPPFProperties.PROVISIONING_SLAVE_JVM_OPTIONS);
-    jvmOptions.addAll(parseJvmOptions(s).first());
+    parsed = parseJvmOptions(s);
+    jvmOptions.addAll(parsed.first());
+    cpElements.addAll(parsed.second());
     if (log.isDebugEnabled()) log.debug("JVM options: " + jvmOptions);
     List<String> command = new ArrayList<>();
     command.add(computeJavaExecPath(config));
     command.add("-cp");
-    String pathSeparator = System.getProperty("path.separator");
-    StringBuilder sb = new StringBuilder();
-    for (int i=0; i<classpath.size(); i++) {
-      if (i > 0) sb.append(pathSeparator);
-      sb.append(classpath.get(i));
-    }
-    command.add(sb.toString());
+    command.add(buildClasspath(cpElements));
     for (String opt: jvmOptions) command.add(opt);
     command.add("-Djppf.config=" + SLAVE_LOCAL_CONFIG_PATH);
     command.add(MAIN_CLASS);
