@@ -72,6 +72,10 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    * The number of tasks remaining to send.
    */
   private int nbTasksToSend = 0;
+  /**
+   * The job uuid.
+   */
+  private String jobUuid;
 
   /**
    * Get the task bundle to send or receive.
@@ -147,6 +151,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
   public ServerTaskBundleClient deserializeBundle() throws Exception {
     List<DataLocation> locations = ((ClientMessage) message).getLocations();
     TaskBundle bundle = ((ClientMessage) message).getBundle();
+    this.jobUuid = bundle.getUuid();
     if (locations.size() <= 2) return new ServerTaskBundleClient(bundle, locations.get(1));
     return new ServerTaskBundleClient(bundle, locations.get(1), locations.subList(2, locations.size()));
   }
@@ -264,27 +269,34 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);
       if (header.getSLA().isCancelUponClientDisconnect()) {
-        ServerJob job = driver.getQueue().getJob(clientBundle.getUuid());
-        if (job != null) {
-          // count the tasks from the client bundle that are dispatched to nodes
-          for (ServerTaskBundleNode nodeBundle: job.getDispatchSet()) {
-            for (ServerTask task: nodeBundle.getTaskList()) {
-              if (task.getBundle() == clientBundle) n++;
+        try {
+          ServerJob job = driver.getQueue().getJob(clientBundle.getUuid());
+          if (job != null) {
+            // count the tasks from the client bundle that are dispatched to nodes
+            for (ServerTaskBundleNode nodeBundle: job.getDispatchSet()) {
+              for (ServerTask task: nodeBundle.getTaskList()) {
+                if (task.getBundle() == clientBundle) n++;
+              }
             }
           }
+          if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {nbTasksToSend, n, job});
+          JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
+          stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, n - nbTasksToSend);
+          clientBundle.cancel();
+          clientBundle.bundleEnded();
+          //log.info("case 1: removing {}, jobUuid={}", job, jobUuid);
+          driver.getQueue().removeBundle(job);
+          setInitialBundleWrapper(null);
+        } catch(Exception e) {
+          log.error(e.getMessage(), e);
         }
-        if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {nbTasksToSend, n, job});
-        JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
-        stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, n - nbTasksToSend);
-        clientBundle.cancel();
-        clientBundle.bundleEnded();
-        setInitialBundleWrapper(null);
       }
+    } else if (jobUuid != null) {
+      ServerJob job = driver.getQueue().getJob(jobUuid);
+      if (job == null) job = driver.getQueue().getJobFromPriorityMap(jobUuid);
+      if (debugEnabled) log.debug("case 2: removing {}, jobUuid={}", job, jobUuid);
+      if ((job != null) && job.getSLA().isCancelUponClientDisconnect()) driver.getQueue().removeBundle(job);
     }
-    /*
-    log.info(String.format("null initial bundle; count=%4d; pendingCount=%4d; nbTasksToSend=%4d; n=%4d; connectionUuid=%s; state=%s",
-      count, pendingCount, nbTasksToSend, n, connectionUuid, getState()));
-    */
   }
 
   /**

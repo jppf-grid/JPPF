@@ -212,7 +212,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
           jobManager.jobEnded(serverJob);
         }
       }
-      if (debugEnabled) log.debug("removing bundle from queue, jobId= " + serverJob.getName() + ", removeFromJobMap=" + removeFromJobMap);
+      if (debugEnabled) log.debug("removing bundle from queue, jobName= " + serverJob.getName() + ", removeFromJobMap=" + removeFromJobMap);
       priorityMap.removeValue(serverJob.getSLA().getPriority(), serverJob);
       for (ServerTaskBundleClient clientBundle : serverJob.getCompletionBundles()) {
         if (debugEnabled) log.debug("adding completion bundle for jobId={} : {}", serverJob.getName(), clientBundle);
@@ -285,6 +285,23 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     lock.lock();
     try {
       return jobMap.get(jobId);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Get the job for the jobId.
+   * @param jobId the uuid of the job.
+   * @return a <code>ServerJob</code> instance.
+   */
+  public ServerJob getJobFromPriorityMap(final String jobId) {
+    lock.lock();
+    try {
+      for (ServerJob job: priorityMap) {
+        if (job.getUuid().equals(jobId)) return job;
+      }
+      return null;
     } finally {
       lock.unlock();
     }
