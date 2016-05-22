@@ -37,7 +37,11 @@ public class CodeEditorOption extends AbstractOption {
   /**
    * Default theme to use.
    */
-  private static final Theme THEME = loadTheme();
+  private static final Theme THEME = loadTheme("org/jppf/ui/filtering/jppf_theme.xml");
+  /**
+   * Theme to use when the editor is disabled.
+   */
+  private static final Theme DISABLED_THEME = loadTheme("org/jppf/ui/filtering/jppf_disabled_theme.xml");
   /**
    * The underlying UI component used to edit the value of this option.
    */
@@ -190,6 +194,7 @@ public class CodeEditorOption extends AbstractOption {
   @Override
   public void setEnabled(final boolean enabled) {
     textArea.setEnabled(enabled);
+    (enabled ? THEME : DISABLED_THEME).apply(textArea);
   }
 
   /**
@@ -217,13 +222,14 @@ public class CodeEditorOption extends AbstractOption {
   }
 
   /**
-   * Load the default syntax theme.
+   * Load the specified syntax theme.
+   * @param path path to the XML theme resource to laod.
    * @return a {@link Theme} instance.
    */
-  private static Theme loadTheme() {
+  private static Theme loadTheme(final String path) {
     Theme theme = null;
     try {
-      InputStream is = CodeEditorOption.class.getClassLoader().getResourceAsStream("org/jppf/ui/filtering/jppf_theme.xml");
+      InputStream is = CodeEditorOption.class.getClassLoader().getResourceAsStream(path);
       theme = Theme.load(is);
     } catch (Exception e) {
       e.printStackTrace();
