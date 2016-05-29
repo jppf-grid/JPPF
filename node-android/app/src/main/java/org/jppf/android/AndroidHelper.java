@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.jppf.android.activities.MainActivity;
+import org.jppf.android.node.AndroidSerializationExceptionHook;
 import org.jppf.node.NodeRunner;
 import org.jppf.android.node.JPPFAndroidNode;
 import org.jppf.utils.JPPFConfiguration;
@@ -138,6 +139,7 @@ public class AndroidHelper {
       config.setString("jppf.ssl.configuration.source", SSLConfigSource.class.getName());
       config.setBoolean("jppf.ssl.enabled", true);
       config.setString("jppf.resource.cache.storage", "memory");
+      config.setString("jppf.serialization.exception.hook", AndroidSerializationExceptionHook.class.getName());
     } catch(Exception e) {
       Log.e(LOG_TAG, "exception in changeConfigFromPrefs() : ", e);
     }
