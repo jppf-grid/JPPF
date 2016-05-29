@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.jppf.android.activities.MainActivity;
+import org.jppf.android.node.AndroidSerializationExceptionHook;
 import org.jppf.android.node.JPPFAndroidNode;
 import org.jppf.node.NodeRunner;
 import org.jppf.server.node.JPPFNode;
@@ -164,7 +165,8 @@ public class AndroidHelper {
         .set(JPPFProperties.NODE_CLASS, JPPFAndroidNode.class.getName())
         .set(JPPFProperties.SSL_CONFIGURATION_SOURCE, SSLConfigSource.class.getName())
         .set(JPPFProperties.SSL_ENABLED, true)
-        .set(JPPFProperties.RESOURCE_CACHE_STORAGE, "memory");
+        .set(JPPFProperties.RESOURCE_CACHE_STORAGE, "memory")
+        .set(JPPFProperties.SERIALIZATION_EXCEPTION_HOOK, AndroidSerializationExceptionHook.class.getName());
       SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
       for (String key: PreferenceUtils.PREF_KEYS) changeConfigFromPrefs(prefs, key);
     } catch(Exception e) {
