@@ -28,7 +28,7 @@ import org.jppf.utils.ExceptionUtils;
  * <p>When such an error occurs, an instance of this class will be sent instead of the initial JPPF task.
  * @author Laurent Cohen
  */
-public final class JPPFExceptionResult extends AbstractTask<Object>
+public class JPPFExceptionResult extends AbstractTask<Object>
 {
   /**
    * Explicit serialVersionUID.

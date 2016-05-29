@@ -69,7 +69,11 @@
 
   <!-- create a jar with only the classes required for the JPPF tasks -->
   <target name="jar" depends="compile">
-    <jar jarfile="demo.jar" includes="${classes}/**/*.*" excludes="${classes}/**/Runner.*"/>
+    <delete file="demo.jar" quiet="true"/>
+    <jar jarfile="demo.jar">
+      <!--<fileset dir="${classes}" excludes="${classes}/**/Runner.*"/>-->
+      <fileset dir="${classes}" excludes="**/*.*"/>
+    </jar>
   </target>
   
   <!-- create a jar in dex format from the previously generated Java jar file -->
