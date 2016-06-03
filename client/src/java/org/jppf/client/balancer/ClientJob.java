@@ -251,8 +251,9 @@ public class ClientJob extends AbstractClientJob {
     synchronized (tasks) {
       for (int i=0; i<results.size(); i++) {
         Task<?> task = results.get(i);
-        Throwable t = null;
+        taskStateMap.put(task.getPosition(), TaskState.RESULT);
         if (task instanceof JPPFExceptionResult) {
+          Throwable t = null;
           Task<?> originalTask = job.getJobTasks().get(task.getPosition());
           if (task instanceof JPPFExceptionResultEx) {
             JPPFExceptionResultEx result = (JPPFExceptionResultEx) task;

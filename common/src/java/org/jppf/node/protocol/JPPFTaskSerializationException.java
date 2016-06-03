@@ -22,14 +22,24 @@ package org.jppf.node.protocol;
  *
  * @author Laurent Cohen
  */
-public class JPPFTaskSerializationException extends Exception {
+public class JPPFTaskSerializationException extends Throwable {
   /**
-   * 
+   * Initialize this exception.
    * @param message the exception message.
    * @param stackTrace the stack trace to set onto this exception.
    */
   public JPPFTaskSerializationException(final String message, final StackTraceElement[] stackTrace) {
     super(message, null, false, true);
+    if (stackTrace != null) setStackTrace(stackTrace);
+  }
+
+  /**
+   * Initialize this exception from the specified {@code Throwable}.
+   * @param throwable the {@code Throwable} to get information from.
+   */
+  public JPPFTaskSerializationException(final Throwable throwable) {
+    super(String.format("[%s: %s]", throwable.getClass().getName(), throwable.getMessage()), null, false, true);
+    StackTraceElement[] stackTrace = throwable.getStackTrace();
     if (stackTrace != null) setStackTrace(stackTrace);
   }
 }

@@ -52,9 +52,10 @@ public class DemoAndroidTask extends AbstractTask<String> {
     System.out.println("I am a demo Android task !!!");
     try {
       Thread.sleep(duration);
+      setResult("demo Android task successful");
     } catch (Exception e) {
+      setThrowable(e);
     }
-    setResult("demo Android task successful");
   }
 
   @Override
