@@ -197,7 +197,17 @@ public class AndroidHelper {
         break;
 
       case THREADS_KEY:
-        config.set(JPPFProperties.PROCESSING_THREADS, prefs.getInt(key, 1));
+        int n = 1;
+        try {
+          n = prefs.getInt(key, 1);
+        } catch(Exception e) {
+          try {
+            String s = prefs.getString(key, "1");
+            n = Integer.valueOf(s);
+          } catch(Exception ignore) {
+          }
+        }
+        config.set(JPPFProperties.PROCESSING_THREADS, n);
         break;
 
       case BATTERY_MONITORING_ENABLED_KEY:

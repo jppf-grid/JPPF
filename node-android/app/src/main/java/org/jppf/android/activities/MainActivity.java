@@ -26,6 +26,8 @@ import android.view.MenuItem;
 
 import org.jppf.android.AndroidHelper;
 import org.jppf.android.R;
+import org.jppf.android.node.DelegatingNodeEventHandler;
+import org.jppf.android.node.JPPFAndroidNode;
 
 /**
  * Main activity for this app. Provides a main screen updated with the node activity and a settings button to configure the node.
@@ -46,8 +48,13 @@ public class MainActivity extends Activity {
     AndroidHelper.setUncaughtExceptionHandler();
     AndroidHelper.setDefaultUncaughtExceptionHandler();
     setContentView(R.layout.activity_main);
-    Log.v(LOG_TAG, "onCreate(), thread = " + Thread.currentThread());
-    AndroidHelper.launchNode(this);
+    DelegatingNodeEventHandler handler = JPPFAndroidNode.getHandler();
+    Log.v(LOG_TAG, String.format("onCreate(), thread=%s, handler=%s", Thread.currentThread(), handler));
+    if (handler != null) {
+      handler.setActivity(this);
+      handler.resetUI();
+    }
+    else AndroidHelper.launchNode(this);
   }
 
   @Override

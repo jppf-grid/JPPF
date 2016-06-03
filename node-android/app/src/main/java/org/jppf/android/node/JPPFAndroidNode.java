@@ -31,6 +31,7 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
    * Tag used for logging.
    */
   private final static String LOG_TAG = JPPFAndroidNode.class.getSimpleName();
+
   /**
    * Delegates node events to another, dynamically loaded event handler, if any.
    */
@@ -70,5 +71,13 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
   @Override
   public boolean isAndroid() {
     return true;
+  }
+
+  /**
+   * Get the object that delegates node events to another, dynamically loaded event handler, if any.
+   * @return a {@link DelegatingNodeEventHandler} instance, or {@code null} if hasn't yet been created.
+   */
+  public static DelegatingNodeEventHandler getHandler() {
+    return handler;
   }
 }
