@@ -71,8 +71,7 @@
   <target name="jar" depends="compile">
     <delete file="demo.jar" quiet="true"/>
     <jar jarfile="demo.jar">
-      <!--<fileset dir="${classes}" excludes="${classes}/**/Runner.*"/>-->
-      <fileset dir="${classes}" excludes="**/*.*"/>
+      <fileset dir="${classes}" excludes="**/Runner.*"/>
     </jar>
   </target>
   

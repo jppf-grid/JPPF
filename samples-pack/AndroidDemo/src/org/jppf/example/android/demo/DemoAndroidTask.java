@@ -26,7 +26,6 @@ import org.jppf.node.protocol.AbstractTask;
  * @author Laurent Cohen
  */
 public class DemoAndroidTask extends AbstractTask<String> {
-
   @Override
   public void run() {
     // converted to Log.i("system.out", "I am a demo Android task !!!") Logcat call

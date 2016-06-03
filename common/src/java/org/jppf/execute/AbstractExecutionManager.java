@@ -243,7 +243,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
    * @param taskWrapper the task that just ended.
    * @exclude
    */
-  private void taskEnded(final NodeTaskWrapper taskWrapper) {
+  protected void taskEnded(final NodeTaskWrapper taskWrapper) {
     long elapsedTime = taskWrapper.getElapsedTime();
     accumulatedElapsed.addAndGet(elapsedTime);
     ExecutionInfo info = taskWrapper.getExecutionInfo();

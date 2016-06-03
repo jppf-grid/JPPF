@@ -21,7 +21,7 @@ package org.jppf.server.node;
 import java.util.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.execute.AbstractExecutionManager;
+import org.jppf.execute.*;
 import org.jppf.management.NodeConfigNotifier;
 import org.jppf.node.NodeInternal;
 import org.jppf.node.event.LifeCycleEventHandler;
@@ -75,6 +75,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param bundle the bundle whose tasks are to be executed.
    * @param taskList the list of tasks to execute.
    */
+  @Override
   @SuppressWarnings("unchecked")
   protected void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
     taskNotificationDispatcher.setBundle(this.bundle = bundle);
@@ -100,6 +101,7 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   /**
    * Cleanup method invoked when all tasks for the current bundle have completed.
    */
+  @Override
   @SuppressWarnings("unchecked")
   protected void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
@@ -130,5 +132,16 @@ public class NodeExecutionManager extends AbstractExecutionManager {
   public void triggerConfigChanged() {
     super.triggerConfigChanged();
     NodeConfigNotifier.getInstance().sendNotification(node.getUuid(), JPPFConfiguration.getProperties());
+  }
+
+  @Override
+  protected void taskEnded(final NodeTaskWrapper taskWrapper) {
+    // Workaoround for the Android issue https://code.google.com/p/android/issues/detail?id=211596
+    Task<?> task = taskWrapper.getTask();
+    Throwable t = task.getThrowable();
+    if (node.isAndroid() && (t instanceof ReflectiveOperationException)) {
+      task.setThrowable(new JPPFTaskSerializationException(t));
+    }
+    super.taskEnded(taskWrapper);
   }
 }
