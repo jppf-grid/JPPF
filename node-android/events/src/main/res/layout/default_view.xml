@@ -23,22 +23,28 @@
   <!-- the fields labels -->
   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
     android:layout_width="wrap_content" android:layout_height="match_parent" android:padding="4dp">
-    <TextView android:text="@string/node_state_label"      android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:text="@string/execution_state_label" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:text="@string/current_job_label"     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:text="@string/current_tasks_label"   android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <TextView android:text="@string/total_tasks_label"     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <TextView android:text="@string/node_state_label"      android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="@dimen/default_text_size"/>
+    <TextView android:text="@string/execution_state_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="@dimen/default_text_size"/>
+    <TextView android:text="@string/current_job_label"     android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="@dimen/default_text_size"/>
+    <TextView android:text="@string/current_tasks_label"   android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="@dimen/default_text_size"/>
+    <TextView android:text="@string/total_tasks_label"     android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="@dimen/default_text_size"/>
   </LinearLayout>
 
   <!-- the fields updated during the node life cycle and the execution of the jobs -->
+  <!--
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:padding="4dp" android:layout_gravity="fill_horizontal" android:gravity="end">
+  -->
   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
     android:layout_width="match_parent" android:layout_height="match_parent" android:padding="4dp" android:layout_gravity="fill_horizontal" android:gravity="end">
     <ImageView android:id="@+id/node_state"      android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="end" android:src="@mipmap/off"/>
     <ImageView android:id="@+id/execution_state" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="end" android:src="@mipmap/idle"/>
-    <org.jppf.android.node.views.GlowingTextView android:id="@+id/current_job"   android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="end" android:text="@string/n_slash_a"/>
+    <org.jppf.android.node.views.GlowingTextView android:id="@+id/current_job"   android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:gravity="end" android:text="@string/n_slash_a" android:textSize="@dimen/default_text_size"/>
     <org.jppf.android.node.views.ProgressTextView android:id="@+id/current_tasks" android:layout_width="match_parent" android:layout_height="wrap_content"
-      android:gravity="end" android:text="@string/int_zero"/>
-    <TextView android:id="@+id/total_tasks"      android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="end" android:text="@string/int_zero"/>
+      android:gravity="end" android:text="@string/int_zero" android:textSize="@dimen/default_text_size"/>
+    <TextView android:id="@+id/total_tasks"      android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:gravity="end" android:text="@string/int_zero" android:textSize="@dimen/default_text_size"/>
   </LinearLayout>
 
 </LinearLayout>
