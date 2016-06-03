@@ -21,7 +21,7 @@
 
   <EditTextPreference android:defaultValue="1"
     android:key="pref_threads"
-    android:numeric="integer"
+    android:inputType="number"
     android:summary="@string/pref_threads_sum"
     android:title="@string/pref_threads_title"/>
 

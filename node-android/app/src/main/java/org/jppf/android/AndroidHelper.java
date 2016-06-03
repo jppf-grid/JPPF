@@ -130,16 +130,16 @@ public class AndroidHelper {
         PreferenceUtils.SSL_ENGINE_PROTOCOL_KEY, PreferenceUtils.ENABLED_CIPHER_SUITES_KEY
       };
       for (String key: keys) changeConfigFromPrefs(prefs, key);
-      config.setBoolean("jppf.node.android", true);
-      config.setBoolean("jppf.node.offline", true);
-      config.setInt("jppf.classloader.cache.size", 1);
-      config.setBoolean("jppf.discovery.enabled", false);
-      config.setString("jppf.server.connection.strategy", AndroidNodeConnectionStrategy.class.getName());
-      config.setString("jppf.node.class", JPPFAndroidNode.class.getName());
-      config.setString("jppf.ssl.configuration.source", SSLConfigSource.class.getName());
-      config.setBoolean("jppf.ssl.enabled", true);
-      config.setString("jppf.resource.cache.storage", "memory");
-      config.setString("jppf.serialization.exception.hook", AndroidSerializationExceptionHook.class.getName());
+      config.setBoolean("jppf.node.android", true)
+        .setBoolean("jppf.node.offline", true)
+        .setInt("jppf.classloader.cache.size", 1)
+        .setBoolean("jppf.discovery.enabled", false)
+        .setString("jppf.server.connection.strategy", AndroidNodeConnectionStrategy.class.getName())
+        .setString("jppf.node.class", JPPFAndroidNode.class.getName())
+        .setString("jppf.ssl.configuration.source", SSLConfigSource.class.getName())
+        .setBoolean("jppf.ssl.enabled", true)
+        .setString("jppf.resource.cache.storage", "memory")
+        .setString("jppf.serialization.exception.hook", AndroidSerializationExceptionHook.class.getName());
     } catch(Exception e) {
       Log.e(LOG_TAG, "exception in changeConfigFromPrefs() : ", e);
     }
@@ -168,7 +168,17 @@ public class AndroidHelper {
         break;
 
       case PreferenceUtils.THREADS_KEY:
-        config.setString("jppf.processing.threads", prefs.getString(key, "1"));
+        int n = 1;
+        try {
+          n = prefs.getInt(key, 1);
+        } catch(Exception e) {
+          try {
+            String s = prefs.getString(key, "1");
+            n = Integer.valueOf(s);
+          } catch(Exception ignore) {
+          }
+        }
+        config.setInt("jppf.processing.threads", n);
         break;
 
       case PreferenceUtils.TRUST_STORE_LOCATION_KEY:
@@ -211,7 +221,7 @@ public class AndroidHelper {
   private static void setSSLProperty(final String configKey, final String valuePrefix, final SharedPreferences prefs, final String key) {
     String rep = "//data/data/org.jppf.android/files";
     String s = (valuePrefix == null) || "".equals(valuePrefix.trim()) ? "" : valuePrefix;
-    String prefValue = null;
+    String prefValue;
     if (PreferenceUtils.SSL_ENGINE_PROTOCOL_KEY.equals(key) || PreferenceUtils.ENABLED_CIPHER_SUITES_KEY.equals(key))
       prefValue = StringUtils.collectionToString(" ", null, null, prefs.getStringSet(key, Collections.<String>emptySet()));
     else {
@@ -220,7 +230,7 @@ public class AndroidHelper {
         prefValue = prefValue.replace(rep, "");
         SharedPreferences.Editor edit = prefs.edit();
         edit.putString(key, prefValue);
-        edit.commit();
+        edit.apply();
       }
     }
     String value = s + prefValue;

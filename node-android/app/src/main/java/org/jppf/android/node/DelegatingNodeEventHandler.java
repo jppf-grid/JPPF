@@ -79,7 +79,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
   }
 
   @Override
-  void setActivity(final Activity activity) {
+  public void setActivity(final Activity activity) {
     super.setActivity(activity);
     AndroidNodeIntegrationAdapter adapter = getDelegate();
     if (adapter != null) adapter.setActivity(activity);
@@ -130,7 +130,7 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
   /**
    * Remove the previous view if any, and set the new view if possible.
    */
-  void resetUI() {
+  public void resetUI() {
     if (delegate == null) return;
     final ViewGroup group = (ViewGroup) activity.findViewById(R.id.main_layout);
     final View newView = delegate.getContentView();
@@ -138,7 +138,9 @@ public class DelegatingNodeEventHandler extends AndroidNodeIntegrationAdapter {
     if (newView != null) activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        if ((view != null) && (view.getParent() == group)) group.removeView(view);
+        group.removeAllViews();
+        if ((view != null) && (view.getParent() != null)) ((ViewGroup) view.getParent()).removeView(view);
+        if (newView.getParent() == group) group.removeView(newView);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         group.addView(newView, params);
         view = newView;

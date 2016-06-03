@@ -60,4 +60,12 @@ public class JPPFAndroidNode extends AbstractRemoteNode {
   public boolean isAndroid() {
     return true;
   }
+
+  /**
+   * Get the object that delegates node events to another, dynamically loaded event handler, if any.
+   * @return a {@link DelegatingNodeEventHandler} instance, or {@code null} if hasn't yet been created.
+   */
+  public static DelegatingNodeEventHandler getHandler() {
+    return handler;
+  }
 }
