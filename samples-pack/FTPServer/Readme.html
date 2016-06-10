@@ -5,7 +5,7 @@ The FTP server implementation is <a href="http://mina.apache.org/ftpserver/">Apa
 
 <h3>Related source files</h3>
 <ul>
-  <li><a href="src/org/jppf/example/ftp/service/FTPServerStartup.java.html">FTPServerStartup.java</a> : This is a <a href="http://www.jppf.org/doc/v5/index.php?title=JPPF_startup_classes#Server_startup_classes">JPPF driver startup class</a>, which starts an Apache Mina FTPd server instance at driver startup time</li>
+  <li><a href="src/org/jppf/example/ftp/service/FTPServerStartup.java.html">FTPServerStartup.java</a> : This is a <a href="http://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes#Server_startup_classes">JPPF driver startup class</a>, which starts an Apache Mina FTPd server instance at driver startup time</li>
   <li><a href="src/org/jppf/example/ftp/service/CommandLineExt.java.html">CommandLineExt.java</a> : a utility class that reads the FTP server's configuration file and launches it</li>
   <li><a href="src/org/jppf/example/ftp/service/FTPClientWrapper.java.html">FTPClientWrapper.java</a> : a wrapper around the Apache Commons-Net FTP client, as a convenience to easily upload and download files</li>
   <li><a href="src/org/jppf/example/ftp/runner/FTPTask.java.html">FTPTask.java</a> : a JPPF task which downloads a file from the driver, processes it, then uploads a transformed file back to the server</li>
@@ -14,7 +14,7 @@ The FTP server implementation is <a href="http://mina.apache.org/ftpserver/">Apa
 
 <h3>How do I run the sample?</h3>
 Before running this sample application, you need to install a JPPF driver and at least one node.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and node, perform the following steps:
 <ol>
   <li>open a command prompt in JPPF-x.y-samples-pack/FTPServer</li>
@@ -31,6 +31,6 @@ Once you have installed a server and node, perform the following steps:
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

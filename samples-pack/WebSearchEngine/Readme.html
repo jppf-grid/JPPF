@@ -8,7 +8,7 @@ The search and page indexing are implemented thanks to the <a href="http://lucen
 
 <h3>How do I run it?</h3>
 Before running this sample application, you must have a JPPF server and at least one node running.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have a server and node, from a command prompt, type: <b>&quot;ant run&quot;</b>
 
 <h3>How do I use it?</h3>
@@ -53,6 +53,6 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

@@ -42,16 +42,16 @@ The application can function in 2 distinct modes:
   <li>the market data objects are stored in a Hazelcast distributed map that is accessed by the application and all the nodes</li>
   <li>the trades are distributed among a number of distinct distributed maps, each of them accessed by the application and a single node only. This constitutes a partitioning of the set of trades according to the nodes</li>
 </ul>
-<p>A <a href="http://www.jppf.org/doc/v5/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> is also used to initialize the Hazelcast data structures in each node at startup time, and provides a convenient API for the tasks to access the distributed data.
+<p>A <a href="http://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> is also used to initialize the Hazelcast data structures in each node at startup time, and provides a convenient API for the tasks to access the distributed data.
 <p>To make it easy to simulate various scenarios, the application provides a configuration property for most of the the parameters it uses:
 number of market data pieces, number of trades, number of market data dependencies per trade, interval between ticker events, event vs. snapshot run mode, duration of each trade computation, etc...
 <p>As all events and resulting job submissions are fully asynchronous, the application relies on a pool of connections to the JPPF driver, rather than on a single connection.
-See <a href="http://www.jppf.org/doc/v5/index.php?title=Client_and_administration_console_configuration#Server_discovery">server discovery</a> and
-<a href="http://www.jppf.org/doc/v5/index.php?title=Client_and_administration_console_configuration#Manual_network_configuration">manual configuration</a> in the JPPF documentation for details on how to do this.
+See <a href="http://www.jppf.org/doc/5.2/index.php?title=Client_and_administration_console_configuration#Server_discovery">server discovery</a> and
+<a href="http://www.jppf.org/doc/5.2/index.php?title=Client_and_administration_console_configuration#Manual_network_configuration">manual configuration</a> in the JPPF documentation for details on how to do this.
 
 <h3>How do I run it?</h3>
 Before running this sample application, you need to install a JPPF server and at least one node.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and one or multiple nodes, perform the following steps:
 <ol class="samplesList">
   <li>build the archive that will contain the libraries to deploy in the JPPF driver's class path: run either the Ant target "<b>zip</b>" which will generate the file "<b>DataDependency.zip</b>",
@@ -117,10 +117,10 @@ snapshotInterval = 3250
 <h3>What features of JPPF are demonstrated?</h3>
 <ul>
   <li>Integration with a <a href="http://www.hazelcast.com">Hazelcast</a> data grid</li>
-  <li>Use of a <a href="http://www.jppf.org/doc/v5/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> to facilitate the integration</li>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Job_Service_Level_Agreement#Execution_policy">Execution policy</a> (to specify on which nodes the trades are computed)</li>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Dealing_with_jobs#Non-blocking_jobs">Asynchronous job submissions</a></li>
-  <li>Extension of the <a href="http://www.jppf.org/doc/v5/index.php?title=The_JPPF_configuration_API">JPPF configuration</a> to application-specific parameters</li>
+  <li>Use of a <a href="http://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes#Node_startup_classes">node startup class</a> to facilitate the integration</li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Service_Level_Agreement#Execution_policy">Execution policy</a> (to specify on which nodes the trades are computed)</li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Dealing_with_jobs#Non-blocking_jobs">Asynchronous job submissions</a></li>
+  <li>Extension of the <a href="http://www.jppf.org/doc/5.2/index.php?title=The_JPPF_configuration_API">JPPF configuration</a> to application-specific parameters</li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -128,6 +128,6 @@ snapshotInterval = 3250
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

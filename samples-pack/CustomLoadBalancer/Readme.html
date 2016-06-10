@@ -1,6 +1,6 @@
 $template{name="sample-readme-html-header" title="Custom Load Balancer demo"}$
 <h3>What does the sample do?</h3>
-This sample illustrates the implementation of a <a href="http://www.jppf.org/doc/v5/index.php?title=Creating_a_custom_load-balancer">custom load-balancer</a> that uses information about the nodes and the submitted jobs, to dispatch JPPF tasks to the nodes.
+This sample illustrates the implementation of a <a href="http://www.jppf.org/doc/5.2/index.php?title=Creating_a_custom_load-balancer">custom load-balancer</a> that uses information about the nodes and the submitted jobs, to dispatch JPPF tasks to the nodes.
 
 <h3>Description of the problem to solve</h3>
 We are in a situation where we need to submit two types of jobs for execution in the JPPF grid:
@@ -48,7 +48,7 @@ Here is a set of links to the source of each Java class in this sample:
 
 <h3>How do I run it?</h3>
 Before running this sample, you need to install a JPPF server and at least two nodes.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>To configure the two nodes, there are 2 predefined node configurations we will use:
@@ -91,11 +91,11 @@ Once you have installed a server and node, perform the following steps:
 
 <h3>What features of JPPF are demonstrated?</h3>
 <ul>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Creating_a_custom_load-balancer">Creating a custom load-balancer</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Creating_a_custom_load-balancer#Node-aware_load_balancers">Node-aware load-balancers</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Creating_a_custom_load-balancer#Job-aware_load_balancers">Job-aware load-balancer</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Job_Service_Level_Agreement#Execution_policy">Execution policies</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/index.php?title=Job_Metadata">Job metadata</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Creating_a_custom_load-balancer">Creating a custom load-balancer</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Creating_a_custom_load-balancer#Node-aware_load_balancers">Node-aware load-balancers</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Creating_a_custom_load-balancer#Job-aware_load_balancers">Job-aware load-balancer</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Service_Level_Agreement#Execution_policy">Execution policies</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Metadata">Job metadata</a></li>
 </ul>
 
 <h3>I have additional questions and comments, where can I go?</h3>
@@ -103,6 +103,6 @@ Once you have installed a server and node, perform the following steps:
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

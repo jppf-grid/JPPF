@@ -1,6 +1,6 @@
 $template{name="sample-readme-html-header" title="Kryo Serialization sample"}$
 <h3>What does the sample do?</h3>
-This sample provides an implementation of a <a href="http://www.jppf.org/doc/v5/index.php?title=Specifying_alternate_serialization_schemes">custom serialization scheme</a> which uses the <a href="https://github.com/EsotericSoftware/kryo">Kryo</a> library for serializing and deserializing Java objects.
+This sample provides an implementation of a <a href="http://www.jppf.org/doc/5.2/index.php?title=Specifying_alternate_serialization_schemes">custom serialization scheme</a> which uses the <a href="https://github.com/EsotericSoftware/kryo">Kryo</a> library for serializing and deserializing Java objects.
 
 <h3>How do I use it?</h3>
 <ol class="samplesList">
@@ -26,6 +26,6 @@ jppf.object.serialization.class = org.jppf.serialization.kryo.KryoSerialization
 <p>There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

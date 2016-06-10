@@ -7,7 +7,7 @@ Only the part of the job that hadn't completed will be executed.
 
 <h3>How do I run it?</h3>
 <ol class="samplesList">
-  <li>Before running this sample application, you must have a JPPF server and one node running. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5">JPPF documentation</a>.</li>
+  <li>Before running this sample application, you must have a JPPF server and one node running. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2">JPPF documentation</a>.</li>
   <li>Once you have a server and node, you can either run the "<b>run.bat</b>" script (on Windows), "<b>./run.sh</b>" script (on Linux/Unix) or, from a command prompt, type: <b>&quot;ant run&quot;</b>.</li>
   <li>A the first execution, the application will show that no job exists in the job perisstence store, with a message similar to this:
 <pre class="samples">no job found in persistence store, creating a new job with 10 tasks</pre>
@@ -42,6 +42,6 @@ To generate the Javadoc, from a command prompt, type: <b>&quot;ant javadoc&quot;
 <p>In addition, There are 2 privileged places you can go to:
 <ul class="samplesList">
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

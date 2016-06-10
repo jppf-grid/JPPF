@@ -4,7 +4,7 @@ $template{name="sample-readme-html-header" title="Android demo"}$
 
 <h3>How do I run it?</h3>
 <ol class="samplesList">
-  <li>Install a JPPF server and start it. For information on how to set up a server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.</li>
+  <li>Install a JPPF server and start it. For information on how to set up a server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.</li>
   <li>Install a JPPF node on a physical or virtual Android device. For instructions on how to do this, please refer to this documentation section: TBD</li>
   <li>open a command prompt in JPPF-x.y-samples-pack/AndroidDemo</li>
   <li>build the sample: type "<b>ant dex.jar</b>"; this will create a file named <b>dex-demo.jar</b>, intended to be dynamically loaded by the Android node</li>
@@ -23,6 +23,6 @@ $template{name="sample-readme-html-header" title="Android demo"}$
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$
