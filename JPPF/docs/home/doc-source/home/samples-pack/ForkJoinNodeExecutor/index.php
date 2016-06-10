@@ -39,6 +39,6 @@ To generate the Javadoc, from a command prompt type: <b>&quot;ant javadoc&quot;<
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

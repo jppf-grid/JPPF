@@ -1,13 +1,13 @@
 $template{name="sample-readme-html-header" title="Concurrent Jobs demo"}$
 <h3>What does the sample do?</h3>
-<p>This sample demonstrates fully working implementations of the patterns explored in the <a href="http://www.jppf.org/doc/v5/index.php?title=Submitting_multiple_jobs_concurrently"><i>Submitting multiple jobs concurrently</i></a> section of the documentation.
+<p>This sample demonstrates fully working implementations of the patterns explored in the <a href="http://www.jppf.org/doc/5.2/index.php?title=Submitting_multiple_jobs_concurrently"><i>Submitting multiple jobs concurrently</i></a> section of the documentation.
 
 <h3>How do I run it?</h3>
 <p><b>1. Grid setup</b>
 <ul class="samplesList">
-  <li>you will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.</li>
+  <li>you will first need to start a JPPF server and one node. For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.</li>
   <li>start a JPPF administration console</li>
-  <li>once you can see the driver and node in the console's topology view, select the node, then click on the "<a href="http://www.jppf.org/doc/v5/index.php?title=Node_provisioning#Provisioning_with_the_administration_console">node provisioning"</a>
+  <li>once you can see the driver and node in the console's topology view, select the node, then click on the "<a href="http://www.jppf.org/doc/5.2/index.php?title=Node_provisioning#Provisioning_with_the_administration_console">node provisioning"</a>
   (<img src="images/provisioning.png"/>) button. Enter 3 for the number of slave nodes, then click "Ok". You should see 3 additional nodes starting. Lastly, switch to the "Job data" view</li>
 </ul>
 <p><b>2. Running the demo</b>
@@ -38,6 +38,6 @@ $template{name="sample-readme-html-header" title="Concurrent Jobs demo"}$
 <p>In addition, There are 2 privileged places you can go to:
 <ul>
   <li><a href="http://www.jppf.org/forums"/>The JPPF Forums</a></li>
-  <li><a href="http://www.jppf.org/doc/v5/">The JPPF documentation</a></li>
+  <li><a href="http://www.jppf.org/doc/5.2/">The JPPF documentation</a></li>
 </ul>
 $template{name="sample-readme-html-footer"}$

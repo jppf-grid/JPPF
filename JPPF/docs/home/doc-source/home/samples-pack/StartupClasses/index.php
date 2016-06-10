@@ -5,7 +5,7 @@ Startup classes are wrappers around any arbitrary code that is executed at serve
 
 <h3>How do I run it?</h3>
 Before running this sample, you need to install a JPPF server and at least one node.<br>
-For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/v5/index.php?title=Introduction">JPPF documentation</a>.<br>
+For information on how to set up a node and server, please refer to the <a href="http://www.jppf.org/doc/5.2/index.php?title=Introduction">JPPF documentation</a>.<br>
 Once you have installed a server and node, perform the following steps:
 <ol class="samplesList">
   <li>open a command prompt in JPPF-x.y-samples-pack/StartupClasses</li>
@@ -19,7 +19,7 @@ Once you have installed a server and node, perform the following steps:
 Pluggable startup classes for JPPF nodes and servers.<br>
 Dynamic code deployment from the server to a node.
 For a detailed explanation, please refer to the related documentation in the
-<a href="http://www.jppf.org/doc/v5/index.php?title=JPPF_startup_classes">JPPF startup classes</a> section.
+<a href="http://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes">JPPF startup classes</a> section.
 
 <h3>I have additional questions and comments, where can I go?</h3>
 <p>If you need more insight into the code of this demo, you can consult the Java source files located in the <b>CustomMBeans/src</b> folder.
