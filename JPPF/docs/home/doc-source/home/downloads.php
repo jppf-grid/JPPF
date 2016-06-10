@@ -107,7 +107,7 @@ $template{name="about-page-header" title="Downloads"}$
     <br>
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/emblem-what.png" title="Feeling curious or adventurous?" heading="h3"}$
-      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 alpha</a>.
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 beta</a>.
       <br><br>
       <p align="center"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>

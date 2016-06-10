@@ -1,10 +1,10 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "5.2-alpha";
+  $ver1 = "5.2-beta";
   $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 5.2 alpha preview</h1>
+  <h1 align="center">Downloads - JPPF 5.2 beta preview</h1>
 
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
@@ -23,12 +23,6 @@ $template{name="about-page-header" title="Downloads - unstable"}$
       <h3>Android Node</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a><br>
-      <!--
-      You may also download the node APK directly to a device:<br><br>
-      <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
-        <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;&nbsp;Download the node APK</span>
-      </a><br><div style="height: 15px"></div>
-      -->
       <div style="height: 10px"></div>
       <table cellpadding="3"><tr>
         <td valign="middle">
@@ -62,7 +56,7 @@ $template{name="about-page-header" title="Downloads - unstable"}$
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Please note" heading="h2"}$
-      <p style="font-style: italic; font-weight: bold">JPPF 5.2 alpha is a preview release and is not intended for deployment in production.
+      <p style="font-style: italic; font-weight: bold">JPPF 5.2 beta is a preview release and is not intended for deployment in production.
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>
