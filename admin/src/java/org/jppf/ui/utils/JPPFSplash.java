@@ -42,6 +42,10 @@ public class JPPFSplash extends Window {
     for (int i=1; i<=4; i++) add("/org/jppf/ui/resources/splash" + i + ".gif");
   }};
   /**
+   * The default text color.
+   */
+  private static final Color DEFAULT_FOREGROUND = new Color(64, 64, 128);
+  /**
    * Contains the images displayed by the splash screen.
    */
   private final List<ImageIcon> images = new ArrayList<>();
@@ -82,7 +86,20 @@ public class JPPFSplash extends Window {
     label.setHorizontalTextPosition(SwingConstants.CENTER);
     label.setVerticalTextPosition(SwingConstants.CENTER);
     label.setText(message);
-    label.setForeground(new Color(64, 64, 128));
+    Color color = DEFAULT_FOREGROUND;
+    String s = JPPFConfiguration.get(JPPFProperties.UI_SPLASH_MESSAGE_COLOR);
+    if ((s != null) && !s.trim().isEmpty()) {
+      String[] comps = s.split(",");
+      if ((comps != null) && (comps.length >= 3)) {
+        int rgb[] = new int[comps.length];
+        try {
+          for (int i=0; i<comps.length; i++) rgb[i] = Integer.valueOf(comps[i].trim());
+          color = (rgb.length == 3) ? new Color(rgb[0], rgb[1], rgb[2]) : new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
+        } catch(Exception ignore) {
+        }
+      }
+    }
+    label.setForeground(color);
     Font tmp = label.getFont();
     label.setFont(new Font(tmp.getFamily(), Font.BOLD, 24));
     setLayout(new MigLayout("fill, ins 4 4 4 4"));
@@ -119,8 +136,6 @@ public class JPPFSplash extends Window {
         task.cancel();
         timer.purge();
         dispose();
-        getOwner().setVisible(true);
-        getOwner().dispose();
       }
     };
     new Thread(r).start();

@@ -352,9 +352,9 @@ public final class GuiUtils {
   /**
    * Get the component used in the tab to which the specified option belongs.
    * @param option the option for which to find the tab component.
-   * @return the tab component as a {@link JLabel}, or {@code null} if the option is not in a tab.
+   * @return the tab component, or {@code null} if the option is not in a tab.
    */
-  public static JLabel getTabComponent(final OptionElement option) {
+  public static Component getTabComponent(final OptionElement option) {
     Component comp = option.getUIComponent();
     while ((comp != null) && (comp.getParent() != null)) {
       Component parent = comp.getParent();
