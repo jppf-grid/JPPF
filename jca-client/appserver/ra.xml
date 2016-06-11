@@ -4,7 +4,7 @@
   <display-name>JPPF</display-name>
   <vendor-name>JPPF.org</vendor-name>
   <eis-type>JPPF</eis-type>
-  <resourceadapter-version>JPPF 2.0</resourceadapter-version>
+  <resourceadapter-version>JPPF 5.1</resourceadapter-version>
 
   <license>
     <description></description>
