@@ -98,7 +98,7 @@ public class JPPFConnectionFactory implements ConnectionFactory {
   }
 
   /**
-   * Determine whether there is a least one workibng connection to a remote JPPF driver.
+   * Determine whether there is a least one working connection to a remote JPPF driver.
    * @return {@code true} if there is a working connection, {@code false} otherwise.
    */
   public boolean isJPPFDriverAvailable() {
