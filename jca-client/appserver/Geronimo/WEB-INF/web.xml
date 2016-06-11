@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+     "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<!-- ============================================================= -->
+<!-- Deployement descriptor for the "jppftest" Web Application.    -->
+<!-- ============================================================= -->
+
+<web-app>
+  <display-name>jppftest</display-name>
+  <description>jppftest</description>
+
+  <!-- Establish the default list of welcome files -->
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+	<resource-ref>
+		<description>JPPF Connection Factory</description>
+		<res-ref-name>eis/JPPFConnectionFactory</res-ref-name>
+		<res-type>javax.resource.cci.ConnectionFactory</res-type>
+		<res-auth>Application</res-auth>
+		<!--<res-sharing-scope>Unshareable</res-sharing-scope>-->
+	</resource-ref>
+
+</web-app>

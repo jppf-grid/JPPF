@@ -1,0 +1,181 @@
+<!--
+JPPF
+  Copyright (C) 2005-2015 JPPF Team. 
+http://www.jppf.org
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<project name="JPPF-compile-jar" basedir="..">
+
+  <!-- ==================================================================== -->
+  <!--                         Compile the application                      -->
+  <!-- ==================================================================== -->
+
+  <target name="compile" depends="init, i18n" unless="compile.done">
+    <compile.module path="${common}"/>
+    <compile.module path="${node}"/>
+    <compile.module path="${client}"/>
+    <compile.module path="${admin}"/>
+    <compile.module path="${server}"/>
+    <compile.module path="${demo}"/>
+    <property name="compile.done" value="true"/>
+  </target>
+
+  <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
+
+  <!--
+    Compile a project/module.
+    Attributes:
+    - path: the root path of the project or module
+  -->
+  <macrodef name="compile.module">
+    <attribute name="path"/>
+    <sequential>
+      <echo message="compiling module '@{path}'"/>
+      <checkstyle  config="${basedir}/CheckStyle_JPPF_config.xml">
+        <fileset dir="@{path}/src/java" includes="**/*.java"/>
+      </checkstyle>
+      <mkdir dir="@{path}/classes"/>
+      <javac srcdir="" destdir="@{path}/classes" source="1.7" target="1.7"
+        debug="on" deprecation="off" optimize="on" includes="**/*.java">
+        <classpath refid="project.classpath"/>
+        <compilerarg line="-Xlint:none"/>
+        <src path="@{path}/src/java"/>
+        <src path="@{path}/src/resources"/>
+      </javac>
+      <copy todir="@{path}/classes">
+        <fileset dir="@{path}/src/resources" excludes="**/package.html"/>
+      </copy>
+    </sequential>
+  </macrodef>
+
+  <!-- ==================================================================== -->
+  <!--              Convert native translations to ascii                    -->
+  <!-- ==================================================================== -->
+
+  <target name="i18n" depends="init">
+    <property name="i18n.dir" value="${admin}/src/resources/org/jppf/ui/i18n"/>
+    <native2ascii encoding="windows-1251" src="${i18n.dir}/native/ru" dest="${i18n.dir}" includes="**/*.properties"/>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!--                     Build the jar files                              -->
+  <!-- ==================================================================== -->
+
+  <macrodef name="copy.jppf.jars">
+    <attribute name="todir"/>
+    <sequential>
+      <copy todir="@{todir}">
+        <fileset dir="${build}">
+          <include name="jppf-node.jar"/>
+          <include name="jppf-common.jar"/>
+          <include name="jppf-client.jar"/>
+          <include name="jppf-admin.jar"/>
+          <include name="jppf-server.jar"/>
+        </fileset>
+      </copy>
+    </sequential>
+  </macrodef>
+
+  <target name="jar" depends="compile" unless="jar.done">
+    <jar.module module="node"/>
+    <jar.module module="common"/>
+    <jar.module module="client"/>
+    <jar.module module="admin"/>
+    <jar.module module="server"/>
+    <jar.module module="demo"/>
+    <property name="jar.done" value="true"/>
+    <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
+  </target>
+
+  <!--
+    Jar a project/module.
+    Attributes:
+    - module: the root path of the project or module
+    - jar: the suffix of the generated jar file name jppf-@{jar}.jar
+           defaults to the value of the "module" attribute
+  -->
+  <macrodef name="jar.module">
+    <attribute name="module"/>
+    <attribute name="jar" default="@{module}"/>
+    <sequential>
+      <jar jarfile="${build}/jppf-@{jar}.jar" index="true">
+        <fileset dir="${basedir}/../@{module}/classes" excludes="**/package-info.class"/>
+        <manifest>
+          <attribute name="JPPF-Version" value="${version.number}"/>
+          <attribute name="JPPF-Build" value="${build.number}"/>
+          <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+        </manifest>
+      </jar>
+    </sequential>
+  </macrodef>
+
+  <!-- ==================================================================== -->
+  <!--                     Build the source jar files                       -->
+  <!-- ==================================================================== -->
+
+  <target name="jar.src" depends="compile" unless="jar.src.done">
+    <jar.src.module module="common"/>
+    <jar.src.module module="node"/>
+    <jar.src.module module="admin"/>
+    <jar.src.module module="client"/>
+    <jar.src.module module="server"/>
+    <jar.src.module module="demo"/>
+    <property name="jar.src.done" value="true"/>
+  </target>
+
+  <!--
+    Build the source jar of a project/module.
+    Attributes:
+    - module: the root path of the project or module
+    - jar: the suffix of the generated jar file name jppf-@{jar}.jar
+           defaults to the value of the "module" attribute
+  -->
+  <macrodef name="jar.src.module">
+    <attribute name="module"/>
+    <attribute name="jar" default="@{module}"/>
+    <sequential>
+      <jar jarfile="${build}/jppf-@{jar}-src.jar" index="true">
+        <fileset dir="${basedir}/../@{module}/src/java"/>
+        <fileset dir="${basedir}/../@{module}/src/resources"/>
+        <fileset file="${bin}/build.number"/>
+        <manifest>
+          <attribute name="JPPF-Version" value="${version.number}"/>
+          <attribute name="JPPF-Build" value="${build.number}"/>
+          <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+        </manifest>
+      </jar>
+    </sequential>
+  </macrodef>
+
+  <!-- ==================================================================== -->
+  <!--               Build the logging formatter jar                        -->
+  <!-- ==================================================================== -->
+
+  <target name="jar.logging" depends="compile">
+    <jar jarfile="${build}/jppf-logging-formatter.jar" index="true">
+      <fileset dir="${basedir}/../node/classes">
+        <include name="**/JPPFFileHandler.class"/>
+        <include name="**/JPPFLogFormatter.class"/>
+        <include name="**/StringUtils.class"/>
+      </fileset>
+      <manifest>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+</project>
