@@ -18,11 +18,14 @@
 
 package org.jppf.jca.cci;
 
+import java.util.List;
+
 import javax.naming.*;
 import javax.resource.ResourceException;
 import javax.resource.cci.*;
 import javax.resource.spi.ConnectionManager;
 
+import org.jppf.client.*;
 import org.jppf.jca.spi.*;
 
 /**
@@ -30,8 +33,7 @@ import org.jppf.jca.spi.*;
  * the JPPF resource adapter.
  * @author Laurent Cohen
  */
-public class JPPFConnectionFactory implements ConnectionFactory
-{
+public class JPPFConnectionFactory implements ConnectionFactory {
   /**
    * The default managed factory.
    */
@@ -41,7 +43,7 @@ public class JPPFConnectionFactory implements ConnectionFactory
    */
   private ConnectionManager manager = new JPPFConnectionManager();
   /**
-   * 
+   *
    */
   private Reference ref;
 
@@ -49,8 +51,7 @@ public class JPPFConnectionFactory implements ConnectionFactory
    * Default constructor.
    * @exclude
    */
-  public JPPFConnectionFactory()
-  {
+  public JPPFConnectionFactory() {
   }
 
   /**
@@ -59,47 +60,65 @@ public class JPPFConnectionFactory implements ConnectionFactory
    * @param manager the connection manager to use.
    * @exclude
    */
-  public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager)
-  {
+  public JPPFConnectionFactory(final JPPFManagedConnectionFactory factory, final ConnectionManager manager) {
     this.factory = factory;
     this.manager = manager;
   }
 
   @Override
-  public Connection getConnection() throws ResourceException
-  {
+  public Connection getConnection() throws ResourceException {
     JPPFConnection conn = (JPPFConnection) manager.allocateConnection(factory, null);
     if (conn == null) return null;
     return conn;
   }
 
   @Override
-  public Connection getConnection(final ConnectionSpec spec) throws ResourceException
-  {
+  public Connection getConnection(final ConnectionSpec spec) throws ResourceException {
     return getConnection();
   }
 
   @Override
-  public ResourceAdapterMetaData getMetaData() throws ResourceException
-  {
+  public ResourceAdapterMetaData getMetaData() throws ResourceException {
     return new JPPFResourceAdapterMetaData();
   }
 
   @Override
-  public RecordFactory getRecordFactory() throws ResourceException
-  {
+  public RecordFactory getRecordFactory() throws ResourceException {
     return new JPPFRecordFactory();
   }
 
   @Override
-  public void setReference(final Reference ref)
-  {
+  public void setReference(final Reference ref) {
     this.ref = ref;
   }
 
   @Override
-  public Reference getReference() throws NamingException
-  {
+  public Reference getReference() throws NamingException {
     return ref;
+  }
+
+  /**
+   * Determine whether there is a least one working connection to a remote JPPF driver.
+   * @return {@code true} if there is a working connection, {@code false} otherwise.
+   */
+  public boolean isJPPFDriverAvailable() {
+    if (factory == null) return false;
+    AbstractGenericClient client = factory.retrieveJppfClient();
+    if (client != null) {
+      List<JPPFConnectionPool> list = client.findConnectionPools(JPPFClientConnectionStatus.ACTIVE, JPPFClientConnectionStatus.EXECUTING);
+      return (list != null) && !list.isEmpty();
+    }
+    return false;
+  }
+
+  /**
+   * Enable or disable local (in-JVM) execution of the jobs.
+   * @param enabled {@code true} to enable local execution, {@code false} false ot disable it.
+   */
+  public void enableLocalExecution(final boolean enabled) {
+    if (factory != null) {
+      AbstractGenericClient client = factory.retrieveJppfClient();
+      if (client != null) client.setLocalExecutionEnabled(enabled);
+    }
   }
 }
