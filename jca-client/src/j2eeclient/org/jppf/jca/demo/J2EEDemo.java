@@ -21,15 +21,14 @@ package org.jppf.jca.demo;
 import java.util.*;
 
 import org.jppf.client.*;
-import org.jppf.jca.cci.JPPFConnection;
+import org.jppf.jca.cci.*;
 import org.jppf.node.protocol.Task;
 
 /**
  * Instances of this class encapsulate a simple call to the JPPF resource adapter.
  * @author Laurent Cohen
  */
-public class J2EEDemo
-{
+public class J2EEDemo {
   /**
    * JNDI name of the JPPFConnectionFactory.
    */
@@ -39,8 +38,7 @@ public class J2EEDemo
    * Initialize this test object with a specified jndi location for the connection factory.
    * @param jndiBinding JNDI name of the JPPFConnectionFactory.
    */
-  public J2EEDemo(final String jndiBinding)
-  {
+  public J2EEDemo(final String jndiBinding) {
     this.jndiBinding = jndiBinding;
   }
 
@@ -50,19 +48,15 @@ public class J2EEDemo
    * @return a string reporting either the task execution result or an error message.
    * @throws Exception if the call to JPPF failed.
    */
-  public String testConnector(final int duration) throws Exception
-  {
+  public String testConnector(final int duration) throws Exception {
     JPPFConnection connection = null;
     String id = null;
-    try
-    {
+    try {
       connection = JPPFHelper.getConnection(jndiBinding);
       JPPFJob job = new JPPFJob();
       job.add(new DemoTask(duration));
       id = connection.submit(job);
-    }
-    finally
-    {
+    } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return id;
@@ -76,26 +70,21 @@ public class J2EEDemo
    * @return a string reporting either the task execution result or an error message.
    * @throws Exception if the call to JPPF failed.
    */
-  public String testConnector(final String jobId, final long duration, final int nbTasks) throws Exception
-  {
+  public String testConnector(final String jobId, final long duration, final int nbTasks) throws Exception {
     JPPFConnection connection = null;
     JPPFJob job = null;
     String id = null;
-    try
-    {
+    try {
       connection = JPPFHelper.getConnection(jndiBinding);
       job = new JPPFJob();
       job.setName(jobId);
-      for (int i=0; i<nbTasks; i++)
-      {
+      for (int i=0; i<nbTasks; i++) {
         DemoTask task = new DemoTask(duration);
-        task.setId(jobId + " task #" + (i+1));
+        task.setId(jobId + " task #" + (i + 1));
         job.add(task);
       }
       id = connection.submit(job);
-    }
-    finally
-    {
+    } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
     JPPFHelper.getStatusMap().put(id, job);
@@ -112,8 +101,7 @@ public class J2EEDemo
    * @return a string reporting either the task execution result or an error message.
    * @throws Exception if the call to JPPF failed.
    */
-  public String testMultipleJobs(final int nbJobs, final String jobNamePrefix, final long duration, final int nbTasks, final boolean blocking) throws Exception
-  {
+  public String testMultipleJobs(final int nbJobs, final String jobNamePrefix, final long duration, final int nbTasks, final boolean blocking) throws Exception {
     if (nbJobs <= 0) return "Error: the number of jobs must be >= 1";
     if (nbTasks <= 0) return "Error: the number of tasks must be >= 1";
     if (duration <= 0L) return "Error: the duration must be >= 1";
@@ -121,24 +109,25 @@ public class J2EEDemo
     JPPFConnection connection = null;
     String id = null;
     List<String> idList = new ArrayList<>();
-    try
-    {
-      connection = JPPFHelper.getConnection(jndiBinding);
-      for (int n=1; n<=nbJobs; n++)
-      {
+    try {
+      JPPFConnectionFactory factory = JPPFHelper.getConnectionFactory(jndiBinding);
+      boolean available = factory.isJPPFDriverAvailable();
+      // enable local execution, depending on whether a remote connection is available or not.
+      if (!available) System.out.println("No available JPPF driver, jobs will be executed locally");
+      factory.enableLocalExecution(!available);
+      connection = (JPPFConnection) factory.getConnection();
+      for (int n=1; n<=nbJobs; n++) {
         JPPFJob job = new JPPFJob();
         String name = jobNamePrefix + ' ' + n;
         job.setName(name);
         job.setBlocking(false);
-        for (int i=1; i<nbTasks; i++) job.add(new DemoTask(duration)).setId(name + " task " + i);
+        for (int i=1; i<=nbTasks; i++) job.add(new DemoTask(duration)).setId(name + " task " + i);
         id = connection.submit(job);
         idList.add(id);
         JPPFHelper.getStatusMap().put(id, job);
         if (blocking) connection.awaitResults(id);
       }
-    }
-    finally
-    {
+    } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return "success";
@@ -153,28 +142,23 @@ public class J2EEDemo
    * @return a string reporting either the task execution result or an error message.
    * @throws Exception if the call to JPPF failed.
    */
-  public String testConnectorBlocking(final String jobId, final long duration, final int nbTasks) throws Exception
-  {
+  public String testConnectorBlocking(final String jobId, final long duration, final int nbTasks) throws Exception {
     JPPFConnection connection = null;
     JPPFJob job = null;
     String id = null;
-    try
-    {
+    try {
       connection = JPPFHelper.getConnection(jndiBinding);
       job = new JPPFJob();
       job.setName(jobId);
-      for (int i=0; i<nbTasks; i++)
-      {
+      for (int i=0; i<nbTasks; i++) {
         DemoTask task = new DemoTask(duration);
-        task.setId(jobId + " task #" + (i+1));
+        task.setId(jobId + " task #" + (i + 1));
         job.add(task);
       }
       id = connection.submit(job);
       List<Task<?>> results = connection.awaitResults(id);
       System.out.println("received " + results.size() + " results for job '" + job.getName() + "'");
-    }
-    finally
-    {
+    } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
     JPPFHelper.getStatusMap().put(id, job);
@@ -186,23 +170,18 @@ public class J2EEDemo
    * @return a map of ids to statuses as strings.
    * @throws Exception if the call to JPPF failed.
    */
-  public Map getStatusMap() throws Exception
-  {
+  public Map getStatusMap() throws Exception {
     Map<String, String> map = new HashMap<>();
     JPPFConnection connection = null;
-    try
-    {
+    try {
       connection = JPPFHelper.getConnection(jndiBinding);
       Collection<String> coll = connection.getAllJobIds();
-      for (String id: coll)
-      {
+      for (String id: coll) {
         JobStatus status = connection.getJobStatus(id);
         String s = (status == null) ? "Unknown" : status.toString();
         map.put(id, s);
       }
-    }
-    finally
-    {
+    } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return map;
@@ -214,29 +193,23 @@ public class J2EEDemo
    * @return a string reporting either the task execution result or an error message.
    * @throws Exception if the call to JPPF failed.
    */
-  public String getMessage(final String id) throws Exception
-  {
+  public String getMessage(final String id) throws Exception {
     JPPFConnection connection = null;
     String msg = null;
-    try
-    {
+    try {
       connection = JPPFHelper.getConnection(jndiBinding);
       List<Task<?>> results = connection.getResults(id);
       if (results == null) msg = "submission is not in queue anymore";
-      else
-      {
+      else {
         StringBuilder sb = new StringBuilder();
-        for (Task task: results)
-        {
+        for (Task task: results) {
           if (task.getThrowable() == null) sb.append(task.getResult());
           else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
           sb.append("<br/>");
         }
         msg = sb.toString();
       }
-    }
-    finally
-    {
+    } finally {
       if (connection != null) JPPFHelper.closeConnection(connection);
     }
     return msg;

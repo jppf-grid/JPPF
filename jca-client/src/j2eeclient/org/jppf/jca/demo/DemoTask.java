@@ -18,8 +18,6 @@
 
 package org.jppf.jca.demo;
 
-import java.text.DecimalFormat;
-
 import org.jppf.node.protocol.AbstractTask;
 
 /**
@@ -32,34 +30,39 @@ public class DemoTask extends AbstractTask<String> {
    */
   private static final long serialVersionUID = -6106765904127535863L;
   /**
-   * Duration of this task in seconds.
+   * Duration of this task in milliseconds.
    */
-  private long duration = 1;
+  private final long duration;
 
   /**
    * Initialize this task withe specified duration.
    * @param duration duration of this task in milliseconds.
    */
   public DemoTask(final long duration) {
-    this.duration = duration;
+    this.duration = duration < 1L ? 1L : duration;
   }
 
   /**
    * Run this task.
-   * @see java.lang.Runnable#run()
    */
   @Override
   public void run() {
-    DecimalFormat nf = new DecimalFormat("0.###");
-    String res = nf.format(duration / 1000.0f);
+    String execType = isInNode() ? "remotely" : "locally";
+    long start = System.nanoTime();
     try {
-      Thread.sleep(duration);
-      String s = "JPPF task [" + getId() + "] successfully completed after " + res + " seconds";
+      synchronized(this) {
+        wait(duration);
+      }
+      double elapsed = (System.nanoTime() - start) / 1e9d;
+      String s = String.format("JPPF task [%s] successfully completed %s after %.3f seconds", getId(), execType, elapsed);
       System.out.println(s);
       setResult(s);
     } catch (InterruptedException e) {
+      double elapsed = (System.nanoTime() - start) / 1e9d;
       setThrowable(e);
-      setResult("Exception for task [" + getId() + "] with specified duration of " + res + " seconds: " + e.getMessage());
+      String s = String.format("Exception for task [%s] executed %s after %.3f seconds : %s: %s", getId(), execType, elapsed, e.getClass().getName(), e.getMessage());
+      setResult(s);
+      System.out.println(s);
     }
   }
 }

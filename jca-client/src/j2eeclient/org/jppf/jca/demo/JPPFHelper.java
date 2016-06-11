@@ -27,13 +27,21 @@ import javax.resource.cci.ConnectionFactory;
 import org.jppf.client.*;
 import org.jppf.jca.cci.*;
 import org.jppf.node.protocol.Task;
+import org.slf4j.*;
 
 /**
  * Utility class for obtaining and releasing Resource adapter connections.
  * @author Laurent Cohen
  */
-public class JPPFHelper
-{
+public class JPPFHelper {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFHelper.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = log.isDebugEnabled();
   /**
    * 
    */
@@ -57,8 +65,7 @@ public class JPPFHelper
    * @throws NamingException if the connection factory lookup failed.
    * @throws ResourceException if a connection could not be obtained.
    */
-  public static JPPFConnection getConnection() throws NamingException, ResourceException
-  {
+  public static JPPFConnection getConnection() throws NamingException, ResourceException {
     return getConnection(JNDI_NAME);
   }
 
@@ -66,18 +73,31 @@ public class JPPFHelper
    * Obtain a JPPF connection from the resource adapter's connection pool.
    * The obtained connection must be closed by the caller of this method, once it is done using it.
    * @param jndiName the jNDI name of the JPPF connection factory (application server-dependent).
-   * @return a <code>JPPFConnection</code> instance.
+   * @return a {@code JPPFConnection} instance.
    * @throws NamingException if the connection factory lookup failed.
    * @throws ResourceException if a connection could not be obtained.
    */
-  public static JPPFConnection getConnection(final String jndiName) throws NamingException, ResourceException
-  {
+  public static JPPFConnection getConnection(final String jndiName) throws NamingException, ResourceException {
+    JPPFConnection c = (JPPFConnection) getConnectionFactory(jndiName).getConnection();
+    if (debugEnabled) log.debug("got connection {}", c);
+    return c;
+  }
+
+  /**
+   * Obtain a JPPF connection factory from the resource adapter.
+   * @param jndiName the jNDI name of the JPPF connection factory (application server-dependent).
+   * @return a {@code JPPFConnectionFactory} instance.
+   * @throws NamingException if the connection factory lookup failed.
+   * @throws ResourceException if a connection could not be obtained.
+   */
+  public static JPPFConnectionFactory getConnectionFactory(final String jndiName) throws NamingException, ResourceException {
     InitialContext context = new InitialContext();
     Object objref = context.lookup(jndiName);
     JPPFConnectionFactory cf;
     if (objref instanceof JPPFConnectionFactory) cf = (JPPFConnectionFactory) objref;
     else cf = (JPPFConnectionFactory) javax.rmi.PortableRemoteObject.narrow(objref, ConnectionFactory.class);
-    return (JPPFConnection) cf.getConnection();
+    if (debugEnabled) log.debug("got connection factory {} from '{}'", cf, jndiName);
+    return cf;
   }
 
   /**
@@ -85,8 +105,7 @@ public class JPPFHelper
    * @param connection the connection to close.
    * @throws ResourceException if the connection could not be closed.
    */
-  public static void closeConnection(final JPPFConnection connection) throws ResourceException
-  {
+  public static void closeConnection(final JPPFConnection connection) throws ResourceException {
     connection.close();
   }
 
@@ -94,8 +113,7 @@ public class JPPFHelper
    * Get the map used to lookup the jobs status.
    * @return a mapping of jobs to their uuid.
    */
-  public static Map<String, JPPFJob> getStatusMap()
-  {
+  public static Map<String, JPPFJob> getStatusMap() {
     return statusMap;
   }
 
@@ -104,8 +122,7 @@ public class JPPFHelper
    * @param uuid the job uuid.
    * @return a mapping of jobs to their uuid.
    */
-  public static String getStatus(final String uuid)
-  {
+  public static String getStatus(final String uuid) {
     JPPFJob job = statusMap.get(uuid);
     if (job == null) return "no job with this uuid";
     JobStatus status = job.getStatus();
@@ -117,8 +134,7 @@ public class JPPFHelper
    * @param uuid the job uuid.
    * @return a mapping of jobs to their uuid.
    */
-  public static String getJobName(final String uuid)
-  {
+  public static String getJobName(final String uuid) {
     JPPFJob job = statusMap.get(uuid);
     if (job == null) return "no job with this uuid";
     return job.getName();
@@ -129,19 +145,16 @@ public class JPPFHelper
    * @param uuid the uuid of the job.
    * @return the formatted resutls as a string.
    */
-  public static String getMessage(final String uuid)
-  {
+  public static String getMessage(final String uuid) {
     JPPFConnection connection = null;
     String msg = null;
     JPPFJob job = statusMap.remove(uuid);
     if (job == null) return "no job with this id";
     List<Task<?>> results = job.getAllResults();
     if (results == null) msg = "job is not in queue anymore";
-    else
-    {
+    else {
       StringBuilder sb = new StringBuilder();
-      for (Task task: results)
-      {
+      for (Task task : results) {
         if (task.getThrowable() == null) sb.append(task.getResult());
         else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
         sb.append("<br/>");
