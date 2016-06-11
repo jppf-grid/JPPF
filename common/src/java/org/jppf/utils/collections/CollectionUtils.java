@@ -159,4 +159,24 @@ public final class CollectionUtils {
     sb.append("\n}");
     return sb.toString();
   }
+
+  /**
+   * Fetermine whether the specified source is equal to one of the specified elements.
+   * @param <T> the type of the values to compare.
+   * @param source the source to check.
+   * @param elements the values to compare the source with.
+   * @return {@code true} if one of the elements is equal to the source, {@code false} otherwise.
+   */
+  public static <T> boolean isOneof(final T source, final T...elements) {
+    if (source == null) {
+      for (T element: elements) {
+        if (element == null) return true;
+      }
+    } else {
+      for (T element: elements) {
+        if (source.equals(element)) return true;
+      }
+    }
+    return false;
+  }
 }

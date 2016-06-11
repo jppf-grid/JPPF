@@ -355,9 +355,11 @@ public class ServerTaskBundleClient {
    * @param completedTasks the task whose results to send.
    */
   private void fireTasksCompleted(final List<ServerTask> completedTasks) {
-    ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
-    if (debugEnabled) log.debug("created bundle id=" + bundle.id + " for " + this);
-    for (CompletionListener listener : listenerList) listener.taskCompleted(bundle, completedTasks);
+    if (completedTasks != null) {
+      ServerTaskBundleClient bundle = new ServerTaskBundleClient(this, completedTasks);
+      if (debugEnabled) log.debug("created bundle id=" + bundle.id + " for " + this);
+      for (CompletionListener listener : listenerList) listener.taskCompleted(bundle, completedTasks);
+    }
   }
 
   /**

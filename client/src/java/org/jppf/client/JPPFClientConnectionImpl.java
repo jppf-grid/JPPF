@@ -62,8 +62,10 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
     configure(uuid, name, 0);
     displayName = name + '[' + getHost() + ':' + getPort() + ']';
     pool.add(this);
+    if (debugEnabled) log.debug("added {} to {}", this, pool);
     int jmxPort = ssl ? info.sslManagementPort : info.managementPort;
     if (jmxPort >= 0) pool.setJmxPort(jmxPort);
+    if (debugEnabled) log.debug("added {} configured", pool);
   }
 
   /**

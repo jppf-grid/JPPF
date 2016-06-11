@@ -22,7 +22,7 @@
   <!--             Package the j2ee connector for deployment                     -->
   <!-- ========================================================================= -->
 
-  <target name="j2ee.connector" depends="j2ee.connector.build">
+  <target name="j2ee.connector" depends="j2ee.connector.build" description="build the J2EE connector">
     <ant antfile="${basedir}/../jca-client/build.xml" target="build" inheritall="false"/>
     <property name="j2ee.prefix" value="${app.ver}-j2ee-connector"/>
     <property name="connector.release.file" value="${build}/${j2ee.prefix}.zip"/>

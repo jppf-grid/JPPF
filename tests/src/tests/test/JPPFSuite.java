@@ -21,8 +21,7 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.client.persistence.TestJobPersistence;
-import test.org.jppf.server.peer.TestMultiServerWithSSL;
+import test.org.jppf.management.TestJPPFNodeConnectionNotifierMBean;
 
 
 
@@ -31,7 +30,7 @@ import test.org.jppf.server.peer.TestMultiServerWithSSL;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestJobPersistence.class })
+@Suite.SuiteClasses({ TestJPPFNodeConnectionNotifierMBean.class })
 public class JPPFSuite
 {
 }

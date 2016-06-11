@@ -57,6 +57,7 @@ public class TestJPPFNodeConnectionNotifierMBean extends AbstractNonStandardSetu
   @Test(timeout = 15000)
   public void testConnectionNotifications() throws Exception {
     int nbSlaves = 2;
+    Thread.sleep(1000L);
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection(client);
     driver.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, this);
     JPPFNodeForwardingMBean forwarder = driver.getNodeForwarder();
