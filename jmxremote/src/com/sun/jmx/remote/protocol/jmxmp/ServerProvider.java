@@ -69,19 +69,33 @@ package com.sun.jmx.remote.protocol.jmxmp;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Map;
+import java.util.*;
 
 import javax.management.MBeanServer;
 import javax.management.remote.*;
+import javax.management.remote.generic.*;
 import javax.management.remote.jmxmp.JMXMPConnectorServer;
 
 /**
  * 
  */
 public class ServerProvider implements JMXConnectorServerProvider {
+  /**
+   * Handles the envrionment providers that allow adding to, or overriding, the environment properties
+   * passed to each new JMX connector server instance.  
+   */
+  private static final EnvironmentProviderHandler<ServerEnvironmentProvider> ENV_HANDLER = new EnvironmentProviderHandler<>(ServerEnvironmentProvider.class);
+
   @Override
   public JMXConnectorServer newJMXConnectorServer(final JMXServiceURL serviceURL, final Map<String, ?> environment, final MBeanServer mbeanServer) throws IOException {
     if (!serviceURL.getProtocol().equals("jmxmp")) throw new MalformedURLException("Protocol not jmxmp: " + serviceURL.getProtocol());
-    return new JMXMPConnectorServer(serviceURL, environment, mbeanServer);
+    Map<String, Object> env = new HashMap<>(environment);
+    for (ServerEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
+      if (provider != null) {
+        Map<String, Object> map = provider.getEnvironment();
+        if ((map != null) && !map.isEmpty()) env.putAll(map);
+      }
+    }
+    return new JMXMPConnectorServer(serviceURL, env, mbeanServer);
   }
 }
