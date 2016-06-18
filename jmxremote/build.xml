@@ -244,10 +244,11 @@
     <copy toDir="../JPPF/lib/jmxremote">
       <fileset dir="${build}" includes="${app.ver}*.jar"/>
     </copy>
-    <!--
-    <copy todir="../../JPPF-b4.0/JPPF/lib/jmxremote">
-      <fileset dir="${basedir}" includes="jppf*.jar"/>
+    <copy toDir="../samples-packa/shared/lib">
+      <fileset dir="${build}" includes="${app.ver}.jar"/>
     </copy>
-    -->
+    <copy toDir="../jca-client/lib">
+      <fileset dir="${build}" includes="${app.ver}.jar"/>
+    </copy>
   </target>
 </project> 

@@ -21,6 +21,7 @@ package org.jppf.comm.recovery;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
@@ -81,11 +82,16 @@ public class ClientConnection extends AbstractRecoveryConnection {
     runThread = Thread.currentThread();
     try {
       configure();
-      if (debugEnabled) log.debug("initializing recovery client connection " + socketWrapper);
+      if (debugEnabled) log.debug("initializing recovery client connection {}", socketWrapper);
       socketInitializer = new SocketInitializerImpl();
       socketInitializer.initializeSocket(socketWrapper);
       if (!socketInitializer.isSuccessful()) {
-        log.error("Could not initialize recovery client connection " + socketWrapper);
+        log.error("Could not initialize recovery client connection: {}", socketWrapper);
+        close();
+        return;
+      }
+      if (!InterceptorHandler.invokeOnConnect(socketWrapper)) {
+        log.error("recovery client connection denied by interceptor: {}", socketWrapper);
         close();
         return;
       }

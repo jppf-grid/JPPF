@@ -94,6 +94,10 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   protected AtomicBoolean connected = new AtomicBoolean(false);
   /**
+   * Determines whether this connection has been closed by a all to the {@link #close()} method.
+   */
+  protected AtomicBoolean closed = new AtomicBoolean(false);
+  /**
    * Determines whether the connection to the JMX server has been established.
    */
   protected boolean local = false;
@@ -159,6 +163,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Initialize the connection to the remote MBean server.
    */
   public void connect() {
+    if (closed.get()) return;
     if (isConnected()) return;
     if (local) {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
@@ -233,7 +238,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   @Override
   public void close() throws Exception {
-    //if (connected.compareAndSet(true, false)) {
+    if (closed.compareAndSet(true, false)) {
       connected.compareAndSet(true, false);
       listeners.clear();
       JMXConnectionThread jct = connectionThread.get();
@@ -245,7 +250,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
         jmxc.close();
         jmxc = null;
       }
-    //}
+    }
   }
 
   /**
@@ -527,7 +532,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder().append(getClass().getSimpleName()).append('[');
-    //sb.append(", idString=").append( idString);
     sb.append("url=").append( url);
     sb.append(", connected=").append( connected);
     sb.append(", local=").append( local);
@@ -556,8 +560,14 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Notify all listeners that the connection was successful.
    */
   protected void fireConnected() {
-    JMXWrapperEvent event = new JMXWrapperEvent(this);
-    for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
+    final JMXWrapperEvent event = new JMXWrapperEvent(this);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        for (JMXWrapperListener listener: listeners) listener.jmxWrapperConnected(event);
+      }
+    };
+    new Thread(r, getDisplayName() + " connection notifier").start();
   }
 
   /**

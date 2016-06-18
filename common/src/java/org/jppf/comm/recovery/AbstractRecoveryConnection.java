@@ -181,4 +181,12 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
     sb.append(']');
     return sb.toString();
   }
+
+  /**
+   * Get the object wrapping the connection.
+   * @return a {@link SocketWrapper} object.
+   */
+  public SocketWrapper getSocketWrapper() {
+    return socketWrapper;
+  }
 }

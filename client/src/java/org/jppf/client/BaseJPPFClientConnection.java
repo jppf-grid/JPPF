@@ -184,7 +184,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug(this.toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
+    if (debugEnabled) log.debug(toDebugString() + " sending handshake job, uuidPath=" + uuidPath);
     header.setUuid(new JPPFUuid().toString());
     header.setName("handshake job");
     header.setHandshake(true);
@@ -196,9 +196,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     IOHelper.sendData(socketClient, header, ser);
     IOHelper.sendData(socketClient, null, ser); // null data provider
     socketClient.flush();
-    ClassLoader loader = getClass().getClassLoader();
-    ser = makeHelper(loader).getSerializer();
-    return receiveBundleAndResults(ser, loader).first();
+    return receiveBundleAndResults(ser, getClass().getClassLoader()).first();
   }
 
   /**
@@ -211,7 +209,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     TraversalList<String> uuidPath = new TraversalList<>();
     uuidPath.add(pool.getClient().getUuid());
     header.setUuidPath(uuidPath);
-    if (debugEnabled) log.debug(this.toDebugString() + " sending close command job, uuidPath=" + uuidPath);
+    if (debugEnabled) log.debug(toDebugString() + " sending close command job, uuidPath=" + uuidPath);
     header.setName("close command job");
     header.setUuid("close command job");
     header.setParameter("connection.uuid", connectionUuid);
@@ -248,7 +246,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       int count = bundle.getTaskCount();
       int[] positions = bundle.getParameter(BundleParameter.TASK_POSITIONS);
       if (debugEnabled) {
-        log.debug(this.toDebugString() + " : received bundle " + bundle + ", positions=" + StringUtils.buildString(positions));
+        log.debug(toDebugString() + " : received bundle " + bundle + ", positions=" + StringUtils.buildString(positions));
       }
       if (SEQUENTIAL_DESERIALIZATION) lock.lock();
       try {
@@ -266,7 +264,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
       // if an exception prevented the node from executing the tasks
       Throwable t = bundle.getParameter(BundleParameter.NODE_EXCEPTION_PARAM);
       if (t != null) {
-        if (debugEnabled) log.debug(this.toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
+        if (debugEnabled) log.debug(toDebugString() + " : server returned exception parameter in the header for job '" + bundle.getName() + "' : " + t);
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         for (Task<?> task : taskList) task.setThrowable(e);
       }

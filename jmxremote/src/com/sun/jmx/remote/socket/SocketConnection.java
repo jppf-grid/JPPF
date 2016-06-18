@@ -211,7 +211,10 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
         if (logger.traceOn()) logger.trace("connect", "First time to connect to the server.");
         state = CONNECTING;
         stateLock.notifyAll();
-        if (sock == null) sock = new Socket(addr, port);
+        if (sock == null) {
+          sock = new Socket(addr, port);
+          if (!InterceptorHandlerProxy.invokeOnConnect(sock)) throw new IllegalStateException("Connection denied by interceptor: " + sock);
+        }
         replaceStreams(sock.getInputStream(), sock.getOutputStream());
         if (env != null) defaultClassLoader = (ClassLoader) env.get(JMXConnectorFactory.DEFAULT_CLASS_LOADER);
         state = CONNECTED;
@@ -232,6 +235,7 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
         state = CONNECTING;
         stateLock.notifyAll();
         sock = new Socket(addr, port);
+        if (!InterceptorHandlerProxy.invokeOnConnect(sock)) throw new IllegalStateException("Connection denied by interceptor: " + sock);
         replaceStreams(sock.getInputStream(), sock.getOutputStream());
         state = CONNECTED;
         stateLock.notifyAll();

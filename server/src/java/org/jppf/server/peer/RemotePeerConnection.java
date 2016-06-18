@@ -22,6 +22,7 @@ import java.net.InetAddress;
 
 import org.jppf.JPPFException;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
 import org.jppf.node.AbstractNodeConnection;
 import org.jppf.serialization.SerializationHelper;
@@ -91,6 +92,7 @@ public class RemotePeerConnection extends AbstractNodeConnection<SocketWrapper> 
         System.out.println("Connecting to  " + name);
         socketInitializer.initializeSocket(channel);
         if (!socketInitializer.isSuccessful()) throw new JPPFException("Unable to reconnect to " + name);
+        if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFException("peer connection denied by interceptor");
         if (debugEnabled) log.debug(name + " sending channel identifier");
         channel.writeInt(JPPFIdentifiers.NODE_JOB_DATA_CHANNEL);
         System.out.println("Reconnected to " + name);

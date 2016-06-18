@@ -23,6 +23,7 @@ import static org.jppf.utils.StringUtils.build;
 import java.io.IOException;
 
 import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
 import org.jppf.node.connection.*;
 import org.jppf.serialization.ObjectSerializer;
@@ -83,6 +84,7 @@ public class RemoteClassLoaderConnection extends AbstractClassLoaderConnection<S
             channel = null;
             throw new JPPFNodeReconnectionNotification("the JPPF class loader could not reconnect to the server", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           }
+          if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.CLASSLOADER_INIT_ERROR);
           performHandshake();
           System.out.println(build(getClass().getSimpleName(), ": Reconnected to the class server"));
         } finally {

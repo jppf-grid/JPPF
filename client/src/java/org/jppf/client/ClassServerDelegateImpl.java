@@ -20,6 +20,7 @@ package org.jppf.client;
 import static org.jppf.client.JPPFClientConnectionStatus.*;
 
 import org.jppf.JPPFException;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -71,13 +72,12 @@ class ClassServerDelegateImpl extends AbstractClassServerDelegate {
       handshakeDone = false;
       setStatus(CONNECTING);
       if (socketClient == null) initSocketClient();
-      String msg = "[client: " + getName() + "] Attempting connection to the class server at " + host + ':' + port;
+      String msg = String.format("[client: %s] Attempting connection to the class server at %s:%d", getName(), host, port);
       System.out.println(msg);
       log.info(msg);
       socketInitializer.initializeSocket(socketClient);
-      if (!socketInitializer.isSuccessful() && !socketInitializer.isClosed()) {
-        throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
-      }
+      if (!socketInitializer.isSuccessful() && !socketInitializer.isClosed()) throw new JPPFException('[' + getName() + "] Could not reconnect to the class server");
+      if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException('[' + getName() + "] Could not reconnect to the class server due to interceptor failure");
       if (!socketInitializer.isClosed()) {
         msg = "[client: " + getName() + "] Reconnected to the class server";
         System.out.println(msg);

@@ -42,7 +42,7 @@ public class BaseSetup {
   /**
    * The name of the JMX remote jar file.
    */
-  public static final String JMX_REMOTE_JAR = "jppf-jmxremote_optional-1.1.1.jar";
+  public static final String JMX_REMOTE_JAR = "jppf-jmxremote_optional-1.2.jar";
   /**
    * The jppf client to use.
    */

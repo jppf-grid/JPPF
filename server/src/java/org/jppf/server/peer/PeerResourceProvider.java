@@ -20,8 +20,9 @@ package org.jppf.server.peer;
 import java.net.*;
 import java.nio.channels.SocketChannel;
 
-import org.jppf.JPPFRuntimeException;
+import org.jppf.*;
 import org.jppf.comm.discovery.JPPFConnectionInformation;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
 import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.nio.classloader.client.*;
@@ -93,6 +94,7 @@ class PeerResourceProvider {
     if (debugEnabled) log.debug("Attempting connection " + msg);
     socketInitializer.initializeSocket(socketClient);
     if (!socketInitializer.isSuccessful()) throw new ConnectException("could not connect " + msg);
+    if (!InterceptorHandler.invokeOnConnect(socketClient)) throw new JPPFException("peer connection denied by interceptor");
     if (debugEnabled) log.debug("Connected " + msg);
     postInit();
   }
@@ -103,11 +105,10 @@ class PeerResourceProvider {
    */
   private void postInit() throws Exception {
     try {
-      context = (ClientClassContext) server.createNioContext();
-      context.setPeer(true);
       SocketChannel socketChannel = socketClient.getChannel();
       socketClient.setChannel(null);
-      //ChannelWrapper<?> channel = server.getTransitionManager().registerChannel(socketChannel, context);
+      context = (ClientClassContext) server.createNioContext();
+      context.setPeer(true);
       ChannelWrapper<?> channel = server.accept(socketChannel, null, secure);
       if (debugEnabled) log.debug("registered class server channel " + channel);
       if (secure) context.setSsl(true);

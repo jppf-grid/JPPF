@@ -96,6 +96,12 @@ limitations under the License.
     <jar.module module="server"/>
     <jar.module module="demo"/>
     <property name="jar.done" value="true"/>
+    <delete quiet="true">
+      <fileset dir="${samples-pack}/shared/lib">
+        <include name="jppf-*.jar"/>
+        <exclude name="jppf-jmxremote*.jar"/>
+      </fileset>
+    </delete>
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
   </target>
 

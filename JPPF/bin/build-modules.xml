@@ -41,7 +41,7 @@
         <zipfileset dir="${config}/@{module}" prefix="${@{module}.prefix}" includes="**/*.sh,JPPFDriver,JPPFNode" filemode="755"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib" includes="jppf-common-${version.number}.jar"/>
         <zipfileset dir="${build}" prefix="${@{module}.prefix}/lib-src" includes="jppf-common-src-${version.number}.jar"/>
-        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.1.1.jar"/>
+        <zipfileset dir="${lib}/jmxremote" prefix="${@{module}.prefix}/lib" includes="jppf-jmxremote_optional-1.2.jar"/>
         <zipfileset dir="${lib}/ApacheCommons" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/log4j" prefix="${@{module}.prefix}/lib" includes="*.jar"/>
         <zipfileset dir="${lib}/slf4j" prefix="${@{module}.prefix}/lib" includes="slf4j-api-*.jar,slf4j-${slf4j.bindings}-*.jar"/>
@@ -70,8 +70,8 @@
     <package-module module="driver">
       <module-elements>
         <zipfileset dir="${config}/node/config" prefix="${driver.prefix}/config" includes="jppf.policy"/>
-        <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node.jar,jppf-server-${version.number}.jar"/>
-        <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src.jar,jppf-server-src-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${driver.prefix}/lib" includes="jppf-node-${version.number}.jar,jppf-server-${version.number}.jar"/>
+        <zipfileset dir="${build}" prefix="${driver.prefix}/lib-src" includes="jppf-node-src-${version.number}.jar,jppf-server-src-${version.number}.jar"/>
       </module-elements>
     </package-module>
   </target>

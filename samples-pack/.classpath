@@ -20,6 +20,7 @@
 	<classpathentry kind="src" output="KryoSerializer/classes" path="KryoSerializer/src"/>
 	<classpathentry kind="src" output="MatrixMultiplication/classes" path="MatrixMultiplication/src"/>
 	<classpathentry kind="src" output="Nbody/classes" path="Nbody/src"/>
+	<classpathentry kind="src" output="NetworkInterceptor/classes" path="NetworkInterceptor/src"/>
 	<classpathentry kind="src" path="NodeConnectionEvents/src"/>
 	<classpathentry kind="src" output="NodeLifeCycle/classes" path="NodeLifeCycle/src"/>
 	<classpathentry kind="src" output="NodeTray/classes" path="NodeTray/src"/>

@@ -19,8 +19,9 @@
 package org.jppf.server.node.remote;
 
 import org.jppf.JPPFNodeReconnectionNotification;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.comm.socket.*;
-import org.jppf.node.*;
+import org.jppf.node.AbstractNodeConnection;
 import org.jppf.node.connection.*;
 import org.jppf.serialization.ObjectSerializer;
 import org.jppf.ssl.SSLHelper;
@@ -82,6 +83,7 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
         if (debugEnabled) log.debug("socket initializer failed");
         throw new JPPFNodeReconnectionNotification("the JPPF node job channel could not reconnect to the driver", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       }
+      if (!InterceptorHandler.invokeOnConnect(channel)) throw new JPPFNodeReconnectionNotification("connection denied by interceptor", null, ConnectionReason.JOB_CHANNEL_INIT_ERROR);
       //if (!NodeRunner.isOffline())
       System.out.println("Reconnected to the node server");
       if (debugEnabled) log.debug("sending channel identifier");

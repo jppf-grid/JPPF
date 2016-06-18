@@ -193,8 +193,9 @@ public class SocketConnectionServer implements MessageConnectionServer {
     if (logger.traceOn()) {
       logger.trace("accept", "Waiting a new connection...");
     }
-
-    MessageConnection mc = new SocketConnection(ss.accept());
+    Socket sock = ss.accept();
+    if (!InterceptorHandlerProxy.invokeOnAccept(sock)) throw new IOException("Connection denied by interceptor: " + sock);
+    MessageConnection mc = new SocketConnection(sock);
     return mc;
   }
 

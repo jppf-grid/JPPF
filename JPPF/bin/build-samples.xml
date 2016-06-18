@@ -57,20 +57,21 @@
     <!-- Copy the JPPF jars to the shared/lib directory -->
     <copy.jppf.jars todir="${samples-pack}/shared/lib"/>
     <!-- Convert sources to HTML and include them in the designated samples -->
-    <include.code sample="AdaptiveGrid"/>
-    <include.code sample="AndroidDemo"/>
-    <include.code sample="ConcurrentJobs"/>
-    <include.code sample="CustomLoadBalancer"/>
-    <include.code sample="DataEncryption"/>
-    <include.code sample="ExtendedClassLoading"/>
-    <include.code sample="FTPServer"/>
-    <include.code sample="GPU"/>
-    <include.code sample="InitializationHook"/>
+    <include.code sample="AdaptiveGrid" include="**/*.java"/>
+    <include.code sample="AndroidDemo" include="**/*.java,build.xml"/>
+    <include.code sample="ConcurrentJobs" include="**/*.java"/>
+    <include.code sample="CustomLoadBalancer" include="**/*.java"/>
+    <include.code sample="DataEncryption" include="**/*.java"/>
+    <include.code sample="ExtendedClassLoading" include="**/*.java"/>
+    <include.code sample="FTPServer" include="**/*.java"/>
+    <include.code sample="GPU" include="**/*.java,**/*.c"/>
+    <include.code sample="InitializationHook" include="**/*.java,**/driver.properties"/>
     <include.code sample="JobDependencies" include="**/*.java,**/*.txt"/>
-    <include.code sample="JobRecovery"/>
+    <include.code sample="JobRecovery" include="**/*.java"/>
     <include.code sample="KryoSerializer"/>
-    <include.code sample="NodeLifeCycle"/>
-    <include.code sample="PluggableView"/>
+    <include.code sample="NetworkInterceptor" include="**/*.java"/>
+    <include.code sample="NodeLifeCycle" include="**/*.java,**/jppf-client.properties"/>
+    <include.code sample="PluggableView" include="**/*.java"/>
     <!-- Generate the samples pack zip file -->
     <property name="samples.pack.prefix" value="${app.ver}-samples-pack"/>
     <property name="samples.pack.file" value="${build}/${samples.pack.prefix}.zip"/>
@@ -120,7 +121,7 @@
       </fileset>
     </copy>
     <!-- remove HTML-converted files after the zip is created -->
-    <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html,**/*.txt.html"/></delete>
+    <delete><fileset dir="${samples-pack}" includes="**/*.java.html,**/*.properties.html,**/*.xml.html,**/*.txt.html,**/*.c.html"/></delete>
     <delete file="${build}/header.txt" quiet="true"/>
     <delete file="${build}/temp.java" quiet="true"/>
     <delete dir="${build}/samples-pack" quiet="true"/>

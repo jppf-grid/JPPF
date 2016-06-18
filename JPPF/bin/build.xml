@@ -32,7 +32,7 @@
   <property name="demo"                  value="${basedir}/../demo"/>
   <property name="dotnet-bridge"         value="${basedir}/../dotnet-bridge"/>
   <property name="jca-client"            value="${basedir}/../jca-client"/>
-  <property name="jmxremote"             value="${basedir}/../jmxxremote"/>
+  <property name="jmxremote"             value="${basedir}/../jmxremote"/>
   <property name="application.template"  value="${basedir}/../application-template"/>
   <property name="samples-pack"          value="${basedir}/../samples-pack"/>
   <property name="tests"                 value="${basedir}/../tests"/>
@@ -113,10 +113,21 @@
     <delete quiet="true">
       <fileset dir="${build}">
         <include name="*.zip"/>
+        <include name="*.apk"/>
+        <!--
         <exclude name="*${app.ver}*.zip"/>
+        -->
       </fileset>
     </delete>
     <delete dir="${runtime}" quiet="true"/>
+  </target>               
+
+  <target name="clean.jars">
+    <delete quiet="true">
+      <fileset dir="${build}">
+        <include name="jppf*.jar"/>
+      </fileset>
+    </delete>
   </target>               
 
   <!-- ========================================================================= -->
@@ -124,7 +135,7 @@
   <!-- ========================================================================= -->
 
   <target name="init">
-     <mkdir dir="${build}"/>
+    <mkdir dir="${build}"/>
     <available type="dir" file="${basedir}/../samples-pack" property="samples.pack.present"/>
     <!-- Format the build number to a 4 figures integer with leading zeroes if required -->
     <!-- The build number is also incremented by 1                                      -->
@@ -170,9 +181,9 @@
   <target name="build" depends="init, compile, jar, jar.src, j2ee.connector.build, tests.build"/>
   -->
   <!-- build binary and souurce jars without cleanup -->
-  <target name="build" depends="init, compile, jar, jar.src" description=""/>
+  <target name="build" depends="clean.jars, init, compile, jar, jar.src" description=""/>
   <!-- build the JEE connector -->
-  <target name="build.j2ee.connector" depends="init, compile, jar, jar.src, j2ee.connector" description=""/>
+  <target name="build.j2ee.connector" depends="clean.jars, init, compile, jar, jar.src, j2ee.connector" description=""/>
   <!-- build binary and souurce jars from scratch -->
   <target name="rebuild" depends="clean.all, build" description=""/>
   <!-- build the whole JPPF distribution -->

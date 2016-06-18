@@ -27,6 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.*;
 
+import org.jppf.JPPFException;
+import org.jppf.comm.interceptor.InterceptorHandler;
 import org.jppf.io.IO;
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -513,6 +515,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
         channel.socket().setReceiveBufferSize(IO.SOCKET_BUFFER_SIZE);
         channel.socket().setTcpNoDelay(IO.SOCKET_TCP_NODELAY);
         channel.socket().setKeepAlive(IO.SOCKET_KEEPALIVE);
+        intercept();
         if (channel.isBlocking()) channel.configureBlocking(false);
       } catch (Exception e) {
         log.error(e.getMessage(), e);
@@ -520,6 +523,17 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
         return;
       }
       accept(channel, null, ssl);
+    }
+
+    /**
+     * Invoke the interceptors for the channel.
+     * @throws Exception if any error occurs.
+     */
+    private void intercept() throws Exception {
+      if (InterceptorHandler.hasInterceptor()) {
+        channel.configureBlocking(true);
+        if (!InterceptorHandler.invokeOnAccept(channel)) throw new JPPFException("connection denied by interceptor: " + channel);
+      }
     }
   }
 
