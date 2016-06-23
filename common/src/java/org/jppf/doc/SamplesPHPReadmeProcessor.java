@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.*;
 
 import org.jppf.utils.FileUtils;
-import org.jppf.utils.streams.StreamUtils;
 
 /**
  * This utility generates the doc-source php files for the samples pack from the readme in each sample.
@@ -84,13 +83,15 @@ public class SamplesPHPReadmeProcessor implements Runnable {
     int len = sourceDir.getCanonicalPath().length();
     String s = file.getParentFile().getCanonicalPath().substring(len);
     if (s.startsWith("/") || s.startsWith("\\")) s = s.substring(1);
+    String content = FileUtils.readTextFile(file);
+    content = content.replace("/Readme.html", "");
     //String[] filenames = { "/index.php", "/Readme.php" };
     String[] filenames = { "/index.php" };
     for (String name: filenames) {
       File outFile = new File(destDir, s + name);
       FileUtils.mkdirs(outFile);
-      StreamUtils.copyFile(file, outFile);
-      System.out.println("writing output file " + outFile);
+      FileUtils.writeTextFile(outFile, content);
+      System.out.println("wrote output file " + outFile);
     }
   }
 
