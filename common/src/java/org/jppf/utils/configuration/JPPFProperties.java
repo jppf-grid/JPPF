@@ -332,6 +332,8 @@ public class JPPFProperties {
   public static final JPPFProperty<String> UI_SPLASH_IMAGES = new StringProperty("jppf.ui.splash.images", null);
   /** The fixed text displayed at center of the splash screen */
   public static final JPPFProperty<String> UI_SPLASH_MESSAGE = new StringProperty("jppf.ui.splash.message", "");
+  /** The color of the splash screen message */
+  public static final JPPFProperty<String> UI_SPLASH_MESSAGE_COLOR = new StringProperty("jppf.ui.splash.message.color", "64, 64, 128");
   /** @exclude */
   public static final JPPFProperty<Long> NIO_SELECT_TIMEOUT = new LongProperty("jppf.nio.select.timeout", 1000L);
   /** Ratio of available heap over the size of an object to deserialize, below which disk overflow is triggered */
