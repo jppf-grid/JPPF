@@ -63,5 +63,6 @@
 /**
  * <p>Message definitions for JMXMP. This package is an <em>optional package</em> of the JMX Remote API.</p>
  * @since 1.0
+ * @exclude
  */
 package javax.management.remote.message;

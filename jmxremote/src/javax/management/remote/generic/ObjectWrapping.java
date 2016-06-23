@@ -85,6 +85,7 @@ import java.io.IOException;
  * <p> An instance of this class can be communicated to the Generic Connector or Generic Connector Server using the attribute {@link GenericConnector#OBJECT_WRAPPING}.
  * <p> The default <code>ObjectWrapping</code> wraps objects in a byte array that contains the output of
  * {@link java.io.ObjectOutputStream#writeObject(Object) ObjectOutputStream.writeObject} for the given object in a new <code>ObjectOutputStream</code>.
+ * @exclude
  */
 public interface ObjectWrapping {
   /**

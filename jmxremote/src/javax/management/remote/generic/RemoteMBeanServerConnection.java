@@ -74,7 +74,7 @@ import javax.management.*;
 import javax.security.auth.Subject;
 
 /**
- * 
+ * @exclude
  */
 class RemoteMBeanServerConnection implements MBeanServerConnection {
   /**

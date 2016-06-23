@@ -83,6 +83,7 @@ import javax.management.remote.message.Message;
  * GenericConnector#MESSAGE_CONNECTION} in the <code>Map</code> passed
  * to the constructor or the {@link GenericConnector#connect(Map)
  * connect} method.</p>
+ * @exclude
  */
 public interface MessageConnection {
   /**

@@ -72,6 +72,7 @@ import java.io.IOException;
 /**
  * Thrown by a connection server when it receives a request for a connection that it has decided to close.
  * The client reacts by opening a new connection. This reconnection happens inside the connector client. User code should never see this exception.
+ * @exclude
  */
 public class ConnectionClosedException extends IOException {
   /**

@@ -78,7 +78,7 @@ import com.sun.jmx.remote.generic.*;
 import com.sun.jmx.remote.opt.util.*;
 
 /**
- *
+ * @exclude
  */
 class ClientIntermediary extends AbstractClientIntermediary {
   /** */

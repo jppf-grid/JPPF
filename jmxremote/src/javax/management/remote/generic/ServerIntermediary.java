@@ -82,7 +82,7 @@ import com.sun.jmx.remote.opt.internal.*;
 import com.sun.jmx.remote.opt.util.*;
 
 /**
- *
+ * @exclude
  */
 class ServerIntermediary extends AbstractServerIntermediary {
   /** */

@@ -81,7 +81,7 @@ import com.sun.jmx.remote.opt.security.*;
 import com.sun.jmx.remote.opt.util.*;
 
 /**
- * 
+ * @exclude
  */
 abstract class AbstractServerIntermediary {
   /** */

@@ -85,10 +85,29 @@ import com.sun.jmx.remote.opt.util.*;
  * so that users can implicitly instantiate the GenericConnector (or a subclass of it) through the {@link JMXServiceURL} provided when creating it.
  * <p> The specific connector protocol to be used by an instance of this class is specified by attributes in the <code>Map</code> passed to the constructor. The attribute
  * {@link #MESSAGE_CONNECTION_SERVER} is the standard way to define the transport. An implementation can recognize other attributes to define the transport differently.
+ * @exclude
  */
 public class GenericConnectorServer extends JMXConnectorServer {
   /** */
   private static final ClassLogger logger = new ClassLogger("javax.management.remote.generic", "GenericConnectorServer");
+  /** */
+  private static Timer cancelConnecting = new Timer(true);
+  /**
+   * Name of the attribute that specifies the object wrapping for parameters whose deserialization requires special treatment.
+   * The value associated with this attribute, if any, must be an object that implements the interface {@link ObjectWrapping}.
+   */
+  public static final String OBJECT_WRAPPING = "jmx.remote.object.wrapping";
+  /**
+   * Name of the attribute that specifies how connections are made to this connector server.
+   * The value associated with this attribute, if any, must be an object that implements the interface {@link MessageConnectionServer}.
+   */
+  public static final String MESSAGE_CONNECTION_SERVER = "jmx.remote.message.connection.server";
+  /** */
+  private static final int CREATED = 0;
+  /** */
+  private static final int STARTED = 1;
+  /** */
+  private static final int STOPPED = 2;
   /** */
   private Receiver receiver;
   /** */
@@ -104,40 +123,15 @@ public class GenericConnectorServer extends JMXConnectorServer {
   /** */
   private static final int DEFAULT_NOTIF_BUFFER_SIZE = 1000;
   /** */
-  private static final int CREATED = 0;
-  /** */
-  private static final int STARTED = 1;
-  /** */
-  private static final int STOPPED = 2;
-  /** */
   private int state = CREATED;
   /** */
   private int[] lock = new int[0];
-  /**
-   * client id
-   */
-  //private static long clientIDCount = 0;
-  /** */
-  //private static final int[] clientIDCountLock = new int[0];
   /** */
   private NotificationBuffer notifBuffer;
   /**
    * client connecting control
    */
   private final long connectingTimeout;
-  //private final int maxConnecting;
-  /** */
-  private static Timer cancelConnecting = new Timer(true);
-  /**
-   * Name of the attribute that specifies the object wrapping for parameters whose deserialization requires special treatment.
-   * The value associated with this attribute, if any, must be an object that implements the interface {@link ObjectWrapping}.
-   */
-  public static final String OBJECT_WRAPPING = "jmx.remote.object.wrapping";
-  /**
-   * Name of the attribute that specifies how connections are made to this connector server.
-   * The value associated with this attribute, if any, must be an object that implements the interface {@link MessageConnectionServer}.
-   */
-  public static final String MESSAGE_CONNECTION_SERVER = "jmx.remote.message.connection.server";
 
   /**
    * Constructs a <code>GenericConnectorServer</code> attached to the given MBean server.
@@ -360,7 +354,6 @@ public class GenericConnectorServer extends JMXConnectorServer {
     }
 
     /**
-     * 
      * @param stopper .
      */
     public void setStopper(final ConnectingStopper stopper) {
@@ -421,12 +414,9 @@ public class GenericConnectorServer extends JMXConnectorServer {
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   private class ConnectingStopper extends TimerTask {
-    /**
-     */
+    /** */
     private final ClientCreation cc;
 
     /**

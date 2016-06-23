@@ -67,5 +67,6 @@
  * and the object wrapping also uses Java object serialization.</p>
  * <p>The JMXMP Connector is described in detail in the document <em>JMX Remote API</em>.</p>
  * @since 1.0
+ * @exclude
  */
 package javax.management.remote.jmxmp;

@@ -76,6 +76,7 @@ import javax.management.remote.JMXServiceURL;
  * <p>Interface specifying how a connector server creates new connections to clients.</p>
  * <p>An instance of this interface can be communicated to the Generic Connector Server using the attribute
  * {@link GenericConnectorServer#MESSAGE_CONNECTION_SERVER} in the <code>Map</code> passed to its constructor.</p>
+ * @exclude
  */
 public interface MessageConnectionServer {
   /**

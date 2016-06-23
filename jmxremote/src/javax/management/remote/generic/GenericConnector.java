@@ -86,74 +86,15 @@ import com.sun.jmx.remote.opt.util.*;
  * <p>The specific connector protocol to be used by an instance of this class is specified by attributes in the <code>Map</code>
  * passed to the constructor or the {@link #connect(Map) connect} method. The attribute {@link #MESSAGE_CONNECTION} is the standard
  * way to define the transport. An implementation can recognize other attributes to define the transport differently.
+ * @exclude
  */
 public class GenericConnector implements JMXConnector {
   // -------------------------------------------------------------------
   // WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING
-  // SERIALIZATION ISSUES
-  // All private variables must be defined transient.
+  // SERIALIZATION ISSUES All private variables must be defined transient.
   // Do not put any initialization here. If a specific initialization is needed, put it in the empty default constructor.
   // -------------------------------------------------------------------
-  /**
-   * 
-   */
-  private transient ClientSynchroMessageConnection connection;
-  /**
-   * 
-   */
-  private transient ObjectWrapping objectWrapping;
-  /**
-   * 
-   */
-  private transient Map<String, ?> env;
-  /**
-   * 
-   */
-  private transient ClientIntermediary clientMBeanServer;
-  /**
-   * 
-   */
-  private transient WeakHashMap<Subject, RemoteMBeanServerConnection> rmbscMap;
-  /**
-   * 
-   */
-  private transient String connectionId;
-  /**
-   * 
-   */
-  private transient RequestHandler requestHandler;
-  /**
-   * 
-   */
-  private transient final NotificationBroadcasterSupport connectionBroadcaster;
-  // state
-  /**
-   * 
-   */
-  private static final int CREATED = 1;
-  /**
-   * 
-   */
-  private static final int CONNECTED = 2;
-  /**
-   * 
-   */
-  private static final int CLOSED = 3;
-  /**
-   * default value is 0.
-   */
-  private transient int state;
-  /**
-   * 
-   */
-  private transient int[] lock;
-  /**
-   * 
-   */
-  private transient long clientNotifID = 0;
-  /**
-   * 
-   */
+  /** */
   private static final ClassLogger logger = new ClassLogger("javax.management.remote.generic", "GenericConnector");
   /**
    * Name of the attribute that specifies the object wrapping for parameters whose deserialization requires special treatment.
@@ -165,6 +106,39 @@ public class GenericConnector implements JMXConnector {
    * The value associated with this attribute, if any, must be an object that implements the interface {@link MessageConnection}.
    */
   public static final String MESSAGE_CONNECTION = "jmx.remote.message.connection";
+  // state
+  /** */
+  private static final int CREATED = 1;
+  /** */
+  private static final int CONNECTED = 2;
+  /** */
+  private static final int CLOSED = 3;
+  /** */
+  private transient ClientSynchroMessageConnection connection;
+  /** */
+  private transient ObjectWrapping objectWrapping;
+  /** */
+  private transient Map<String, ?> env;
+  /** */
+  private transient Object envLock;
+  /** */
+  private transient ClientIntermediary clientMBeanServer;
+  /** */
+  private transient WeakHashMap<Subject, RemoteMBeanServerConnection> rmbscMap;
+  /** */
+  private transient String connectionId;
+  /** */
+  private transient RequestHandler requestHandler;
+  /** */
+  private transient final NotificationBroadcasterSupport connectionBroadcaster;
+  /**
+   * default value is 0.
+   */
+  private transient int state;
+  /** */
+  private transient int[] lock;
+  /** */
+  private transient long clientNotifID = 0;
 
   /**
    * Default no-arg constructor.
@@ -178,10 +152,11 @@ public class GenericConnector implements JMXConnector {
   /**
    * Constructor specifying connection attributes.
    * @param env the attributes of the connection.
-   **/
+   */
   public GenericConnector(final Map<String, ?> env) {
     //  WARNING - WARNING - WARNING - WARNING - WARNING - WARNING
     // Initialize transient variables. All transient variables that need a specific initialization must be initialized here.
+    envLock = new Object();
     rmbscMap = new WeakHashMap<>();
     lock = new int[0];
     state = CREATED;
@@ -243,11 +218,23 @@ public class GenericConnector implements JMXConnector {
       objectWrapping = (ObjectWrapping) tmpEnv.get(OBJECT_WRAPPING);
       if (objectWrapping == null) objectWrapping = new ObjectWrappingImpl();
       clientMBeanServer = new ClientIntermediary(connection, objectWrapping, this, tmpEnv);
-      this.env = tmpEnv;
+      synchronized(envLock) {
+        this.env = tmpEnv;
+      }
       state = CONNECTED;
       if (tracing) logger.trace("connect", idstr + " " + connectionId + " Connected.");
     }
     sendNotification(new JMXConnectionNotification(JMXConnectionNotification.OPENED, this, connectionId, clientNotifID++, null, null));
+  }
+
+  /**
+   * Get the environment properties that configure this connector.
+   * @return a {@link Map} of string keys to property values.
+   */
+  public Map<String, ?> getEnv() {
+    synchronized(envLock) {
+      return env;
+    }
   }
 
   @Override
@@ -279,7 +266,6 @@ public class GenericConnector implements JMXConnector {
   }
 
   /**
-   * 
    * @param local .
    * @param msg .
    * @throws IOException .
@@ -375,9 +361,7 @@ public class GenericConnector implements JMXConnector {
     ThreadService.getShared().handoff(job);
   }
 
-  /**
-   * 
-   */
+  /** */
   private class RequestHandler implements SynchroCallback {
     @Override
     public Message execute(final Message msg) {
@@ -433,27 +417,18 @@ public class GenericConnector implements JMXConnector {
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   private static class ResponseMsgWrapper {
-    /**
-     * 
-     */
+    /** */
     public boolean got = false;
-    /**
-     * 
-     */
+    /** */
     public Message msg = null;
 
-    /**
-     * 
-     */
+    /** */
     public ResponseMsgWrapper() {
     }
 
     /**
-     * 
      * @param msg .
      */
     public void setMsg(final Message msg) {
@@ -479,7 +454,6 @@ public class GenericConnector implements JMXConnector {
   }
 
   /**
-   * 
    * @throws IOException .
    */
   private void checkState() throws IOException {
