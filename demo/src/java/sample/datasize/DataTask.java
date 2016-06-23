@@ -82,4 +82,3 @@ public class DataTask extends AbstractTask<String>
     }
   }
 }
-

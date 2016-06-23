@@ -21,7 +21,7 @@ package sample.test.deadlock;
 import org.jppf.node.protocol.AbstractTask;
 
 /**
- * This task deliberately triggers a dealock from its {@code run()} method.
+ * This task deliberately triggers a deadlock from its {@code run()} method.
  * @author Laurent Cohen
  */
 public class DeadlockingTask extends AbstractTask<String> {

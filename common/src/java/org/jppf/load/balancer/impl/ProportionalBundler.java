@@ -59,10 +59,6 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
    * Bounded memory of the past performance updates.
    */
   private final BundleDataHolder dataHolder;
-  /**
-   * 
-   */
-  private Random rand = new Random(System.nanoTime());
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.

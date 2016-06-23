@@ -33,7 +33,6 @@ import org.jppf.server.nio.nodeserver.*;
 import org.jppf.server.protocol.*;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.*;
-import org.jppf.utils.collections.LinkedListSortedMap;
 import org.jppf.utils.stats.JPPFStatisticsHelper;
 import org.slf4j.*;
 
@@ -83,10 +82,6 @@ public class BroadcastManager {
    * 
    */
   private final Map<String, ServerJob> jobMap; 
-  /**
-   * 
-   */
-  private final LinkedListSortedMap<Integer, ServerJob> priorityMap;
 
   /**
    * 
@@ -96,7 +91,6 @@ public class BroadcastManager {
     this.queue = queue;
     this.lock = queue.getLock();
     this.jobMap = queue.getJobMap();
-    this.priorityMap = queue.getPriorityMap();
   }
 
   /**

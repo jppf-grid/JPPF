@@ -32,10 +32,6 @@ public class ButtonOption extends AbstractOption {
    * Determines whether this object is a <code>JToggleButton</code> or a simple <code>JButton</code>.
    */
   private boolean toggle = false;
-  /**
-   * WHther the toggle button is selected or not.
-   */
-  private boolean selected = false;
 
   /**
    * Constructor provided as a convenience to facilitate the creation of

@@ -18,8 +18,6 @@
 
 package org.jppf.utils.stats;
 
-import org.slf4j.*;
-
 /**
  * In this implementation, {@code getLatest()} is computed as the cumulated sum of all values added to the snapshot.
  * If values are only added, and not removed, then it will always return the same value as getTotal().
@@ -30,10 +28,6 @@ public class CumulativeSnapshot extends AbstractJPPFSnapshot {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(CumulativeSnapshot.class);
 
   /**
    * Initialize this snapshot with a specified title.

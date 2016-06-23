@@ -20,18 +20,12 @@ package org.jppf.serialization;
 
 import java.util.*;
 
-import org.slf4j.*;
-
 /**
  * Instances of this class handle the caching and lookup of class descriptors and objects during deserialization.
  * @author Laurent Cohen
  * @exclude
  */
 class DeserializationCaches {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(DeserializationCaches.class);
   /**
    * Mapping of handles to corresponding classes.
    */

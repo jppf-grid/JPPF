@@ -66,6 +66,10 @@ public class RunOptions {
    */
   public JobStreamingCallback callback;
   /**
+   * Total number of jobs to execute.
+   */
+  public final int closeClientAfter = config.getInt("deadlock.closeClientAfter", -1);
+  /**
    * The task-specific options.
    */
   public final TaskOptions taskOptions;

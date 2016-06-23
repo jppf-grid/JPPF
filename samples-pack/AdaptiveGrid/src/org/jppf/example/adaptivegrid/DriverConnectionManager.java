@@ -31,10 +31,6 @@ import org.jppf.utils.TypedProperties;
  */
 public class DriverConnectionManager implements AutoCloseable {
   /**
-   * The signature of the provisioning method in the nodes provisioning MBeans.
-   */
-  private static final String[] PROVISIONING_SIGNATURE = {int.class.getName(), TypedProperties.class.getName()};
-  /**
    * A proxy to the driver MBean which forwards management requests to the nodes.
    */
   private JPPFNodeForwardingMBean forwarder;

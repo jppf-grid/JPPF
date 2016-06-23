@@ -18,7 +18,7 @@
 
 package org.jppf.nio;
 
-import org.jppf.utils.SimpleObjectLock;
+import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
@@ -56,15 +56,15 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   /**
    * Object used to synchronize threads when reading/writing the node message.
    */
-  protected final SimpleObjectLock nodeLock = new SimpleObjectLock();
+  protected final ThreadSynchronization nodeLock = new ThreadSynchronization();
   /**
    * Object used to synchronize threads when reading/writing the server message.
    */
-  protected final SimpleObjectLock serverLock = new SimpleObjectLock();
+  protected final ThreadSynchronization serverLock = new ThreadSynchronization();
   /**
    * Object used to synchronize threads when reading/writing the keyOps or readyOps.
    */
-  protected final SimpleObjectLock opsLock = new SimpleObjectLock();
+  protected final ThreadSynchronization opsLock = new ThreadSynchronization();
 
   /**
    * Initialize this I/O handler with the specified context.
@@ -190,18 +190,18 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
 
   /**
    * Get the object used to synchronize threads when reading/writing the node resource.
-   * @return a {@link SimpleObjectLock} instance.
+   * @return a {@link ThreadSynchronization} instance.
    */
-  public SimpleObjectLock getNodeLock()
+  public ThreadSynchronization getNodeLock()
   {
     return nodeLock;
   }
 
   /**
    * Get the object used to synchronize threads when reading/writing the server resource.
-   * @return a {@link SimpleObjectLock} instance.
+   * @return a {@link ThreadSynchronization} instance.
    */
-  public SimpleObjectLock getServerLock()
+  public ThreadSynchronization getServerLock()
   {
     return serverLock;
   }

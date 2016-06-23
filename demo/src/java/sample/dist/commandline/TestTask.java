@@ -33,10 +33,6 @@ public class TestTask extends CommandLineTaskEx
    * Directory in which to list the files.
    */
   private String number = null;
-  /**
-   * Determines whether this task should run on a linux or windows host.
-   */
-  private boolean linux = true;
 
   /**
    * Initialize the script's parameters.

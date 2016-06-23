@@ -76,7 +76,7 @@ public class NodeRunner {
   /**
    * Used to synchronize start and stop methods when the node is run as a service.
    */
-  private static SimpleObjectLock serviceLock = new SimpleObjectLock();
+  private static ThreadSynchronization serviceLock = new ThreadSynchronization();
   /**
    * This node's universal identifier.
    */

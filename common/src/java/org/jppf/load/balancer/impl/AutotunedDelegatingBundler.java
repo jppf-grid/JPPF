@@ -41,10 +41,6 @@ public class AutotunedDelegatingBundler extends AbstractBundler<AnnealingTunePro
    * Used to synchronize multiple threads when creating the simple bundler.
    */
   private final static ReentrantLock lock = new ReentrantLock();
-  /**
-   * Parameters of the auto-tuning algorithm, grouped as a performance analysis profile.
-   */
-  private AnnealingTuneProfile profile;
 
   /**
    * Creates a new instance with the initial size of bundle as the start size.

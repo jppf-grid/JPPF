@@ -47,10 +47,6 @@ public class RLBundler extends AbstractAdaptiveBundler<RLProfile> {
    * Bounded memory of the past performance updates.
    */
   private BundleDataHolder dataHolder = null;
-  /**
-   * The previous bundle size.
-   */
-  private int prevBundleSize = 1;
 
   /**
    * Creates a new instance with the specified parameters.
@@ -90,7 +86,6 @@ public class RLBundler extends AbstractAdaptiveBundler<RLProfile> {
   protected void computeBundleSize() {
     double diff = dataHolder.getPreviousMean() - dataHolder.getMean();
     double threshold = profile.getPerformanceVariationThreshold() * dataHolder.getPreviousMean();
-    prevBundleSize = bundleSize;
     if (action == 0) action = (int) -Math.signum(diff);
     if ((diff < -threshold) || (diff > threshold)) action = (int) Math.signum(action) * (int) Math.round(diff / threshold);
     else action = 0;

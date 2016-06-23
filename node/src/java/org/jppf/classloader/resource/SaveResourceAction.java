@@ -32,14 +32,6 @@ import org.jppf.utils.configuration.JPPFProperties;
 public class SaveResourceAction implements PrivilegedAction<Location>
 {
   /**
-   * Indicates storage is on the file system, with fallback to memory storage.
-   */
-  private static final String FILE_STORAGE = "file";
-  /**
-   * Indicates storage is in memory, with no fallback.
-   */
-  private static final String MEMORY_STORAGE = "memory";
-  /**
    * Determines whether resources should be stored in memory.
    */
   private static final boolean IS_MEMORY_STORAGE = isMemoryStorageType();
@@ -163,6 +155,6 @@ public class SaveResourceAction implements PrivilegedAction<Location>
   private static boolean isMemoryStorageType()
   {
     String s = JPPFConfiguration.get(JPPFProperties.RESOURCE_CACHE_STORAGE);
-    return MEMORY_STORAGE.equalsIgnoreCase(s);
+    return "memory".equalsIgnoreCase(s);
   }
 }

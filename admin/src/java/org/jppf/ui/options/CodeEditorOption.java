@@ -143,13 +143,6 @@ public class CodeEditorOption extends AbstractOption {
   }
 
   /**
-   * Clear the text.
-   */
-  private void clear() {
-    setValue("");
-  }
-
-  /**
    * Add a listener to the underlying text document, to receive and propagate change events.
    */
   @Override

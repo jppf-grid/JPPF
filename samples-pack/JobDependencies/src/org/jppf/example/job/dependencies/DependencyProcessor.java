@@ -28,7 +28,6 @@ import org.jppf.node.protocol.JPPFDistributedJob;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.startup.JPPFDriverStartupSPI;
-import org.slf4j.*;
 
 /**
  * This job dependency processor is deployed as a <a href="http://www.jppf.org/doc/5.2/index.php?title=JPPF_startup_classes#Server_startup_classes">driver startup class</a>.
@@ -43,17 +42,9 @@ import org.slf4j.*;
  */
 public class DependencyProcessor implements NotificationListener, JPPFDriverStartupSPI {
   /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(DependencyProcessor.class);
-  /**
    * Proxy to the job management MBean, used to suspend/resume jobs and register for job notifications.
    */
   DriverJobManagementMBean jobManager;
-  /**
-   * Indicator that lazy initialization occurred once.
-   */
-  private boolean initialized = false;
 
   /**
    * Default contructor.
@@ -125,7 +116,6 @@ public class DependencyProcessor implements NotificationListener, JPPFDriverStar
   @Override
   public final void run() {
     Utils.print("processor: Initializing %s", getClass().getSimpleName());
-    initialized = true;
     try {
       // create a connection to the local (same JVM as the server) JMX server
       JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper();

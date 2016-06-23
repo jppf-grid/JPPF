@@ -155,8 +155,8 @@ public final class Helper {
    * @return the provider name.
    */
   public static String getProvider() {
-    // jceks is the only ootb provider that allows storing a secret key
-    return "jceks";
+    // pkcs12 and jceks are the only ootb providers that allow storing a secret key
+    return "PKCS12";
   }
 
   /**

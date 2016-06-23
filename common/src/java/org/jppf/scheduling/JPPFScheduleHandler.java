@@ -49,10 +49,6 @@ public class JPPFScheduleHandler {
    */
   private static AtomicInteger instanceCount = new AtomicInteger(0);
   /**
-   * Instance number for this object.
-   */
-  private final int instanceNumber = instanceCount.incrementAndGet();
-  /**
    * Mapping of timer tasks to a key.
    */
   private Map<Object, ScheduledFuture<?>> futureMap = new Hashtable<>();

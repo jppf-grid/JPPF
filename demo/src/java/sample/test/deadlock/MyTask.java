@@ -56,12 +56,16 @@ public class MyTask extends AbstractTask<String> {
   @Override
   public void run() {
     try {
-      if (!useCPU) {
-        Thread.sleep(duration);
-      } else {
-        for (long elapsed=0L, taskStart=System.nanoTime(); elapsed<duration; elapsed=(System.nanoTime()-taskStart) / 1_000_000L) {
-          String s = "";
-          for (int i=0; i<10; i++) s += "A10";
+      if (duration > 0L) {
+        if (!useCPU) {
+          synchronized(this) {
+            wait(duration);
+          }
+        } else {
+          for (long elapsed=0L, taskStart=System.nanoTime(); elapsed<duration; elapsed=(System.nanoTime()-taskStart) / 1_000_000L) {
+            String s = "";
+            for (int i=0; i<10; i++) s += "A10";
+          }
         }
       }
       setResult("execution success for " + message);

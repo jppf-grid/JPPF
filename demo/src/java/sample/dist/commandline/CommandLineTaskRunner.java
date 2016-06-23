@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
 /**
@@ -38,10 +37,6 @@ public class CommandLineTaskRunner
    * JPPF client used to submit execution requests.
    */
   private static JPPFClient jppfClient = null;
-  /**
-   * Separator for each test.
-   */
-  private static String banner = '\n' + StringUtils.padLeft("", '-', 80) + '\n';
 
   /**
    * Entry point for this class, performs a matrix multiplication a number of times.

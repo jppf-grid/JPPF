@@ -28,10 +28,6 @@ import org.jppf.utils.stats.*;
  */
 class StatsSystemInformationUpdater implements JPPFStatisticsListener {
   /**
-   * The system information to keep up to date with statistics events.
-   */
-  private final JPPFSystemInformation info;
-  /**
    * 
    */
   private final TypedProperties statsProperties;
@@ -41,7 +37,6 @@ class StatsSystemInformationUpdater implements JPPFStatisticsListener {
    * @param info he system information to keep up to date with statistics events.
    */
   StatsSystemInformationUpdater(final JPPFSystemInformation info) {
-    this.info = info;
     this.statsProperties = info.getStats();
   }
 

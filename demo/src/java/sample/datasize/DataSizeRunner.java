@@ -17,11 +17,9 @@
  */
 package sample.datasize;
 
-import java.util.*;
-import java.util.concurrent.Future;
+import java.util.List;
 
 import org.jppf.client.*;
-import org.jppf.client.concurrent.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -111,65 +109,6 @@ public class DataSizeRunner
     }
     output("Computation time: " + StringUtils.toStringDuration(totalTime/1000000L));
   }
-
-  /**
-   * Perform the test.
-   * @throws Exception if an error is raised during the execution.
-   */
-  private static void perform2() throws Exception
-  {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    boolean inNodeOnly = config.getBoolean("datasize.inNodeOnly", false);
-    int datasize = config.getInt("datasize.size", 1);
-    int nbTasks = config.getInt("datasize.nbTasks", 10);
-    String unit = config.getString("datasize.unit", "b").toLowerCase();
-    if ("k".equals(unit)) datasize *= KILO;
-    else if ("m".equals(unit)) datasize *= MEGA;
-
-    JPPFExecutorService executor = new JPPFExecutorService(jppfClient);
-    executor.setBatchSize(100);
-    executor.setBatchTimeout(30L);
-
-    output("Running datasize demo with data size = " + datasize + " with " + nbTasks + " tasks");
-    long totalTime = System.nanoTime();
-    List<Future<?>> futureList = new ArrayList<>();
-    for (int i=0; i<nbTasks; i++) futureList.add(executor.submit(new DataTask(datasize, inNodeOnly)));
-    for (Future<?> f: futureList)
-    {
-      f.get();
-      Task t = ((JPPFTaskFuture<?>) f).getTask();
-      if (t.getThrowable() != null) System.out.println("task error: " +  t.getThrowable().getMessage());
-      else System.out.println("task result: " + t.getResult());
-    }
-    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
-    output("Computation time: " + StringUtils.toStringDuration(totalTime));
-    executor.shutdownNow();
-  }
-
-  /**
-   * Perform the test.
-   * @throws Exception if an error is raised during the execution.
-   */
-  private static void perform3() throws Exception
-  {
-    TypedProperties config = JPPFConfiguration.getProperties();
-    int iterations = config.getInt("datasize.iterations", 1);
-    output("Running test for " + iterations + " iterations");
-    long totalTime = System.nanoTime();
-    for (int n=1; n<=iterations; n++)
-    {
-      jppfClient = new JPPFClient();
-      JPPFJob job = new JPPFJob();
-      job.setName("job " + n);
-      job.add(new DataTask(10, true));
-      List<Task<?>> results = jppfClient.submitJob(job);
-      if (n % 1000 == 0) output("executed " + n + " jobs");
-      jppfClient.close();
-    }
-    totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
-    output("Computation time: " + StringUtils.toStringDuration(totalTime));
-  }
-
   /**
    * Print a message to the console and/or log file.
    * @param message the message to print.

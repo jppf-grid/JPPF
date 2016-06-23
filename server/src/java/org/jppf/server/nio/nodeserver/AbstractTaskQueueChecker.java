@@ -47,10 +47,6 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
    */
   private static final boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * Determines whether TRACE logging level is enabled.
-   */
-  private static final boolean traceEnabled = log.isTraceEnabled();
-  /**
    * Whether to allow dispatching to peer drivers without any node attached, defaults to {@code false}.
    */
   static final boolean disptachtoPeersWithoutNode = JPPFConfiguration.get(JPPFProperties.PEER_ALLOW_ORPHANS);

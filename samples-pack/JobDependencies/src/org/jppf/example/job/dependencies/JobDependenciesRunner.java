@@ -22,8 +22,6 @@ import java.util.*;
 
 import org.jppf.client.*;
 import org.jppf.client.event.*;
-import org.jppf.example.job.dependencies.management.DependencyManagerMBean;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 
@@ -107,22 +105,5 @@ public class JobDependenciesRunner {
       if (task.getThrowable() != null) Utils.print("runner:   got exception: %s", ExceptionUtils.getStackTrace(task.getThrowable()));
       else Utils.print("runner:   got result: %s", task.getResult());
     }
-  }
-
-  /**
-   * CLear the dependency graph in the server. This is a demonstration of how
-   * the {@link DependencyManagerMBean} API can be used.
-   * @param client the JPPF client that provides acces to the management APIs.
-   * @throws Exception if any error occurs.
-   */
-  private static void clearDependencyGraph(final JPPFClient client) throws Exception {
-    JMXDriverConnectionWrapper jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-    // get a proxy to the dependency manager MBean
-    DependencyManagerMBean dependencyManager = jmx.getProxy(DependencyManagerMBean.MBEAN_NAME, DependencyManagerMBean.class);
-    // get the set of remaining nodes int he dependency graph
-    String[] jobIds = dependencyManager.getNodeIds();
-    Utils.print("remaining nodes in the dependency graph: %s", Arrays.asList(jobIds));
-    // clear the dependency graph
-    if ((jobIds != null) && (jobIds.length > 0)) dependencyManager.removeNodes(jobIds);
   }
 }

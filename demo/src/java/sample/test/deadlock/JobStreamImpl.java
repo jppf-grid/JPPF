@@ -97,5 +97,9 @@ public class JobStreamImpl extends AbstractJPPFJobStream {
   public void jobEnded(final JobEvent event) {
     super.jobEnded(event);
     if (options.callback != null) options.callback.jobCompleted(event.getJob(), this);
+    if ((options.closeClientAfter > 0) && (getExecutedJobCount() >= options.closeClientAfter)) {
+      DeadlockRunner.printf("terminating after %d jobs", options.closeClientAfter);
+      System.exit(0);
+    }
   }
 }

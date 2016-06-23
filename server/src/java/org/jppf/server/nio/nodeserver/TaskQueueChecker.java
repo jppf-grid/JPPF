@@ -396,18 +396,4 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     int n = scoreMap.firstKey();
     return (scoreMap.isEmpty()) ? Collections.<C>emptyList() : new ArrayList<>(scoreMap.getValues(n));
   }
-
-  /**
-   * Check whether the specified node is eligible for reservation to the specified job.
-   * @param job the job for which to check eligibility of the node.
-   * @param node the node to check.
-   * @return {@code true} if the node is eligible, {@code false} otherwise.
-   */
-  private boolean checkNodeEligibleForReservation(final ServerJob job, final C node) {
-    JPPFNodeConfigSpec spec =  job.getSLA().getDesiredNodeConfiguration();
-    if (spec != null) {
-      if (node.isLocal() || node.isOffline()) return false;
-    }
-    return true;
-  }
 }

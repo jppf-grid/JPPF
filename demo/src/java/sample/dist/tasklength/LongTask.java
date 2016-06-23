@@ -18,17 +18,12 @@
 package sample.dist.tasklength;
 
 import org.jppf.node.protocol.AbstractTask;
-import org.slf4j.*;
 
 /**
  * Instances of this class are defined as tasks with a predefined execution length, specified at their creation.
  * @author Laurent Cohen
  */
 public class LongTask extends AbstractTask<String> {
-  /**
-   * Logger.
-   */
-  private static Logger log = LoggerFactory.getLogger(LongTask.class);
   /**
    * Determines how long this task will run.
    */
@@ -38,14 +33,6 @@ public class LongTask extends AbstractTask<String> {
    * do some make-do work that uses the cpu.
    */
   private final boolean useCPU;
-  /**
-   * Whether this task was cancelled.
-   */
-  private boolean cancelled = false;
-  /**
-   * Whether this task timeout.
-   */
-  private boolean timeout = false;
 
   /**
    * Default constructor.
