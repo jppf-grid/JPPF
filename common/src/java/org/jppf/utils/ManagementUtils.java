@@ -21,6 +21,7 @@ package org.jppf.utils;
 import java.lang.reflect.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
 /**
@@ -150,10 +151,10 @@ public class ManagementUtils {
 
       m = factoryClass.getDeclaredMethod("getPlatformMBeanServer");
       PLATFORM_SERVER = m.invoke(null);
-      log.info("management successfully initialized");
+      log.debug("management successfully initialized");
     } catch (Exception e) {
       managementAvailable = false;
-      log.error("management could not be initialized, exception: ", ExceptionUtils.getStackTrace(e));
+      if (!JPPFConfiguration.get(JPPFProperties.NODE_ANDROID)) log.error("management could not be initialized, exception: {}", ExceptionUtils.getStackTrace(e));
       //e.printStackTrace();
     }
   }

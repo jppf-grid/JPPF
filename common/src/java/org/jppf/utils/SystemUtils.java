@@ -392,7 +392,7 @@ public final class SystemUtils {
   }
 
   /**
-   * Capture the specified {@code long} attribute into the specified TypedProperties object.
+   * Capture the specified attribute into the specified TypedProperties object.
    * @param name the attribute name.
    * @param props the properties holding the attribute and its value.
    * @param type the type of the attribute.

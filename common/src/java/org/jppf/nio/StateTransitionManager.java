@@ -284,7 +284,7 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     if (globalExecutor == null) {
       int n = NioConstants.THREAD_POOL_SIZE;
       globalExecutor = Executors.newFixedThreadPool(n, new JPPFThreadFactory("JPPF NIO"));
-      log.info("globalExecutor={}, maxSize={}", globalExecutor, ((ThreadPoolExecutor) globalExecutor).getMaximumPoolSize());
+      if (debugEnabled) log.debug("globalExecutor={}, maxSize={}", globalExecutor, ((ThreadPoolExecutor) globalExecutor).getMaximumPoolSize());
     }
     return globalExecutor;
   }

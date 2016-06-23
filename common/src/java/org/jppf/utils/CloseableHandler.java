@@ -29,8 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class CloseableHandler
-{
+public class CloseableHandler {
   /**
    * Logger for this class.
    */
@@ -56,27 +55,19 @@ public class CloseableHandler
    * Close() all the closeables.
    * @param name the type of closeable to handle.
    */
-  public static void handleCloseables(final String name)
-  {
+  public static void handleCloseables(final String name) {
     Collection<Closeable> coll = handlerMap.getValues(name);
     if (coll == null) return;
-    try
-    {
-      for (Closeable c: coll)
-      {
-        try
-        {
+    try {
+      for (Closeable c : coll) {
+        try {
           if (c != null) c.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           if (debugEnabled) log.debug(e.getMessage(), e);
           else log.warn(ExceptionUtils.getMessage(e));
         }
       }
-    }
-    finally
-    {
+    } finally {
       coll.clear();
       handlerMap.removeKey(name);
     }
@@ -87,8 +78,7 @@ public class CloseableHandler
    * @param handlerName the type of closeable to add.
    * @param c the {@link Closeable} object to add.
    */
-  public static void addResetCloseable(final String handlerName, final Closeable c)
-  {
+  public static void addResetCloseable(final String handlerName, final Closeable c) {
     handlerMap.putValue(handlerName, c);
   }
 }
