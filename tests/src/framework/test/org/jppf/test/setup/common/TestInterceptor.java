@@ -23,12 +23,22 @@ import java.net.Socket;
 import java.nio.channels.SocketChannel;
 
 import org.jppf.comm.interceptor.AbstractNetworkConnectionInterceptor;
+import org.jppf.utils.LoggingUtils;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TestInterceptor.class);
+  /**
+   * Determines whether debug-level logging is enabled.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
    * The text of the message sent by the client.
    */
@@ -52,33 +62,44 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
 
   @Override
   protected boolean onAccept(final InputStream is, final OutputStream os) {
+    if (debugEnabled) log.debug("start");
     DataInputStream dis = new DataInputStream(is);
     try {
       String msg = dis.readUTF();
+      if (debugEnabled) log.debug("read '{}'", msg);
       clientMessage = msg;
       if (CLIENT_MESSAGE.equals(msg)) {
         DataOutputStream dos = new DataOutputStream(os);
         dos.writeUTF(SERVER_MESSAGE);
         dos.flush();
+        if (debugEnabled) log.debug("wrote '{}'", SERVER_MESSAGE);
         return true;
       }
     } catch (Exception e) {
+      if (debugEnabled) log.debug(e.getMessage(), e);
+      //e.printStackTrace();
     }
+    if (debugEnabled) log.debug("failed");
     return false;
   }
 
   @Override
   protected boolean onConnect(final InputStream is, final OutputStream os) {
+    if (debugEnabled) log.debug("start");
     DataOutputStream dos = new DataOutputStream(os);
     try {
       dos.writeUTF(CLIENT_MESSAGE);
       dos.flush();
+      if (debugEnabled) log.debug("wrote '{}'", CLIENT_MESSAGE);
       DataInputStream dis = new DataInputStream(is);
       String msg = dis.readUTF();
+      if (debugEnabled) log.debug("read '{}'", msg);
       serverMessage = msg;
       if (SERVER_MESSAGE.equals(msg)) return true;
     } catch (Exception e) {
+      e.printStackTrace();
     }
+    if (debugEnabled) log.debug("failed");
     return false;
   }
 

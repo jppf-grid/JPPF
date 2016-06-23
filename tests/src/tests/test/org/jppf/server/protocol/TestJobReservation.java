@@ -133,7 +133,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
     client.submitJob(job);
-    Thread.sleep(4000L);
+    Thread.sleep(5000L);
     job.cancel();
     List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
@@ -177,7 +177,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       .setString("reservation.prop.2", "abcdef"); // node1 : "a" ; node2 : "abc" ; node3 : "abcde"
     job.getSLA().setDesiredNodeConfiguration(new JPPFNodeConfigSpec(props));
     job.getSLA().setMaxNodes(1);
-    job.getSLA().setJobExpirationSchedule(new JPPFSchedule(4000L));
+    job.getSLA().setJobExpirationSchedule(new JPPFSchedule(5000L));
     List<Task<?>> result = client.submitJob(job);
     assertNotNull(result);
     assertFalse(result.isEmpty());

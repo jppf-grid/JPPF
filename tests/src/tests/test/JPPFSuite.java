@@ -21,8 +21,7 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import test.org.jppf.management.TestJPPFNodeTaskMonitorMBean;
-import test.org.jppf.server.peer.TestMultiServerWithSSL;
+import test.org.jppf.server.protocol.TestJobReservation;
 
 
 
@@ -31,6 +30,6 @@ import test.org.jppf.server.peer.TestMultiServerWithSSL;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestMultiServerWithSSL.class, TestJPPFNodeTaskMonitorMBean.class })
+@Suite.SuiteClasses({ TestJobReservation.class })
 public class JPPFSuite {
 }

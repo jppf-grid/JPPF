@@ -27,7 +27,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
-import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup;
 import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 

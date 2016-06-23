@@ -18,8 +18,8 @@
 
 package test.org.jppf.utils.stats;
 
-import static org.junit.Assert.*;
 import static org.jppf.utils.stats.JPPFStatisticsHelper.*;
+import static org.junit.Assert.*;
 
 import java.util.*;
 

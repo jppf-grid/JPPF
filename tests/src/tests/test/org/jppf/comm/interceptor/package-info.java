@@ -17,7 +17,7 @@
  */
 
 /**
- * Unit tests for package <code>org.jppf.client.event</code>.
+ * Unit tests for package {@code org.jppf.comm.interceptor}.
  * @exclude
  */
 package test.org.jppf.comm.interceptor;

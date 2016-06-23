@@ -24,7 +24,9 @@ import java.net.*;
 import java.nio.channels.*;
 
 import org.jppf.comm.interceptor.InterceptorHandler;
+import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
+import org.slf4j.*;
 
 import test.org.jppf.test.setup.common.TestInterceptor;
 
@@ -34,6 +36,10 @@ import test.org.jppf.test.setup.common.TestInterceptor;
  */
 public class TestNetworkCommunicationInterceptor {
   /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TestNetworkCommunicationInterceptor.class);
+  /**
    * 
    */
   private static final int PORT = 4444;
@@ -42,8 +48,9 @@ public class TestNetworkCommunicationInterceptor {
    * Test that the interceptor works with a Socket / ServerSocket.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 5000)
   public void testSocketClientAndServer() throws Exception {
+    log.debug("********** {}() **********", ReflectionUtils.getCurrentMethodName());
     SocketServer server = null;
     Socket client = null;
     try {
@@ -80,8 +87,9 @@ public class TestNetworkCommunicationInterceptor {
    * Test that the interceptor works with a SocketChannel / ServerSocketChannel.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 5000)
   public void testSocketChannelClientAndServer() throws Exception {
+    log.debug("********** {}() **********", ReflectionUtils.getCurrentMethodName());
     ChannelServer server = null;
     SocketChannel client = null;
     try {
@@ -120,7 +128,7 @@ public class TestNetworkCommunicationInterceptor {
    * Test that the interceptor works with a SocketChannel / ServerSocket.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 5000)
   public void testSocketChannelClientAndSocketServer() throws Exception {
     SocketServer server = null;
     SocketChannel client = null;
@@ -160,7 +168,7 @@ public class TestNetworkCommunicationInterceptor {
    * Test that the interceptor works with a Socket / ServerSocketChannel.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 10000)
+  @Test(timeout = 5000)
   public void testSocketClientAndSocketChannelServer() throws Exception {
     ChannelServer server = null;
     Socket client = null;
@@ -199,6 +207,10 @@ public class TestNetworkCommunicationInterceptor {
    */
   private static class SocketServer implements Runnable {
     /**
+     * Logger for this class.
+     */
+    private static Logger log = LoggerFactory.getLogger(SocketServer.class.getSimpleName());
+    /**
      * The result of calling the interceptor on the accepted socket.
      */
     public boolean result;
@@ -209,10 +221,14 @@ public class TestNetworkCommunicationInterceptor {
 
     @Override
     public void run() {
+      log.debug("start");
       try {
         server = new ServerSocket(PORT);
+        log.debug("server bound to port {}", server.getLocalPort());
         Socket socket = server.accept();
+        log.debug("accepted socket {}", socket);
         result = InterceptorHandler.invokeOnAccept(socket);
+        log.debug("result = {}", result);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -234,6 +250,10 @@ public class TestNetworkCommunicationInterceptor {
    */
   private static class ChannelServer implements Runnable {
     /**
+     * Logger for this class.
+     */
+    private static Logger log = LoggerFactory.getLogger(ChannelServer.class.getSimpleName());
+    /**
      * The result of calling the interceptor on the accepted socket channel.
      */
     public boolean result;
@@ -245,13 +265,17 @@ public class TestNetworkCommunicationInterceptor {
     @Override
     public void run() {
       try {
+        log.debug("start");
         server = ServerSocketChannel.open();
         InetSocketAddress addr = new InetSocketAddress(PORT);
         server.bind(addr);
+        log.debug("server bound to port {}", ((InetSocketAddress) server.getLocalAddress()).getPort());
         server.configureBlocking(true);
         SocketChannel channel = server.accept();
+        log.debug("accepted channel {}", channel);
         channel.configureBlocking(true);
         result = InterceptorHandler.invokeOnAccept(channel);
+        log.debug("result = {}", result);
       } catch (Exception e) {
         e.printStackTrace();
       }
