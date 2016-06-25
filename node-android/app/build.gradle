@@ -20,7 +20,7 @@ apply plugin: 'com.android.application'
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "23.0.0"
+  buildToolsVersion "${jppfBuildToolsVersion}"
   defaultConfig {
     applicationId "org.jppf.android"
     minSdkVersion 19
