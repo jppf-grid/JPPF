@@ -87,7 +87,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
         osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
       } catch (Exception e) {
         osMXBeanAvailable = false;
-        //System.out.println("OperatingSystemMXBean not avaialble!");
+        log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
       }
       if (!osMXBeanAvailable) {
         cpuTimeCollector = new CPUTimeCollector();
