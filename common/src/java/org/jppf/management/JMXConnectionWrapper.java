@@ -163,7 +163,6 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    * Initialize the connection to the remote MBean server.
    */
   public void connect() {
-    if (closed.get()) return;
     if (isConnected()) return;
     if (local) {
       mbeanConnection.set(ManagementFactory.getPlatformMBeanServer());
@@ -238,18 +237,16 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
    */
   @Override
   public void close() throws Exception {
-    if (closed.compareAndSet(true, false)) {
-      connected.compareAndSet(true, false);
-      listeners.clear();
-      JMXConnectionThread jct = connectionThread.get();
-      if (jct != null) {
-        jct.close();
-        connectionThread.set(null);
-      }
-      if (jmxc != null) {
-        jmxc.close();
-        jmxc = null;
-      }
+    connected.compareAndSet(true, false);
+    listeners.clear();
+    JMXConnectionThread jct = connectionThread.get();
+    if (jct != null) {
+      jct.close();
+      connectionThread.set(null);
+    }
+    if (jmxc != null) {
+      jmxc.close();
+      jmxc = null;
     }
   }
 
@@ -576,5 +573,13 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
   protected void fireTimeout() {
     JMXWrapperEvent event = new JMXWrapperEvent(this);
     for (JMXWrapperListener listener: listeners) listener.jmxWrapperTimeout(event);
+  }
+
+  /**
+   * The JMX client connector.
+   * @return a {@link JMXConnector} instance.
+   */
+  public JMXConnector getJmxconnector() {
+    return jmxc;
   }
 }

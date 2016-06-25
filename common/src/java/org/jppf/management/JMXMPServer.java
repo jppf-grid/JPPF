@@ -23,7 +23,6 @@ import java.net.*;
 import java.util.*;
 
 import javax.management.remote.*;
-import javax.management.remote.generic.GenericConnector;
 
 import org.jppf.ssl.SSLHelper;
 import org.jppf.utils.*;
@@ -83,7 +82,7 @@ public class JMXMPServer extends AbstractJMXServer {
       // remove the "JMX server connection timeout Thread-*" threads. See bug http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-249
       env.put("jmx.remote.x.server.connection.timeout", Long.MAX_VALUE);
       if (ssl) SSLHelper.configureJMXProperties(env);
-      env.put(GenericConnector.OBJECT_WRAPPING, new CustomWrapping());
+      env.put("jmx.remote.object.wrapping", new CustomWrapping());
       boolean found = false;
       JMXServiceURL url = null;
       InetAddress addr = InetAddress.getByName(managementHost);

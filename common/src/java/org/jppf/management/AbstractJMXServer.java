@@ -93,4 +93,12 @@ public abstract class AbstractJMXServer implements JMXServer {
   public String getManagementHost() {
     return managementHost;
   }
+
+  /**
+   * Get the JMX connector server.
+   * @return a {@link JMXConnectorServer} instance.
+   */
+  public JMXConnectorServer getConnectorServer() {
+    return connectorServer;
+  }
 }
