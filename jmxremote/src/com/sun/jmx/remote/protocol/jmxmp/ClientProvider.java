@@ -91,7 +91,7 @@ public class ClientProvider implements JMXConnectorProvider {
     Map<String, Object> env = new HashMap<>(environment);
     for (ClientEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
       if (provider != null) {
-        Map<String, Object> map = provider.getEnvironment();
+        Map<String, ?> map = provider.getEnvironment();
         if ((map != null) && !map.isEmpty()) env.putAll(map);
       }
     }

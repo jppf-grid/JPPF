@@ -81,7 +81,7 @@ import javax.management.remote.jmxmp.JMXMPConnectorServer;
  */
 public class ServerProvider implements JMXConnectorServerProvider {
   /**
-   * Handles the envrionment providers that allow adding to, or overriding, the environment properties
+   * Handles the environment providers that allow adding to, or overriding, the environment properties
    * passed to each new JMX connector server instance.  
    */
   private static final EnvironmentProviderHandler<ServerEnvironmentProvider> ENV_HANDLER = new EnvironmentProviderHandler<>(ServerEnvironmentProvider.class);
@@ -92,7 +92,7 @@ public class ServerProvider implements JMXConnectorServerProvider {
     Map<String, Object> env = new HashMap<>(environment);
     for (ServerEnvironmentProvider provider: ENV_HANDLER.getProviders()) {
       if (provider != null) {
-        Map<String, Object> map = provider.getEnvironment();
+        Map<String, ?> map = provider.getEnvironment();
         if ((map != null) && !map.isEmpty()) env.putAll(map);
       }
     }

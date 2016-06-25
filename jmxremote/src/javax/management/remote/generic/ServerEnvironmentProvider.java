@@ -21,13 +21,15 @@ package javax.management.remote.generic;
 import java.util.Map;
 
 /**
- * 
+ * Implementations of this interface provide environment properties to add to or override those passed to
+ * {@link javax.management.remote.JMXConnectorServerFactory#newJMXConnectorServer(javax.management.remote.JMXServiceURL, Map, javax.management.MBeanServer)
+ * JMXConnectorServerFactory.newJMXConnectorServer()} when the a remote connector server is started.
  * @author Laurent Cohen
  */
 public interface ServerEnvironmentProvider {
   /**
-   * 
+   * Get a set of environment properties add to or override those passed to each new remote connector server.
    * @return an environment map.
    */
-  Map<String, Object> getEnvironment();
+  Map<String, ?> getEnvironment();
 }

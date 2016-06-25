@@ -21,13 +21,15 @@ package javax.management.remote.generic;
 import java.util.Map;
 
 /**
- * 
+ * Implementations of this interface provide environment properties to add to or override those passed to
+ * {@link javax.management.remote.JMXConnectorFactory#newJMXConnector(javax.management.remote.JMXServiceURL, Map)
+ * JMXConnectorFactory.newJMXConnector()} when the client side of a JMX connection is attempted.
  * @author Laurent Cohen
  */
 public interface ClientEnvironmentProvider {
   /**
-   * 
+   * Get a set of environment properties add to or override those passed to each new client-side connection.
    * @return an environment map.
    */
-  Map<String, Object> getEnvironment();
+  Map<String, ?> getEnvironment();
 }
