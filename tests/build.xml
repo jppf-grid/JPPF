@@ -178,6 +178,8 @@
 
   <target name="run.junit.tests">
     <echo message="Running the tests"/>
+    <delete dir="${report}" quiet="true"/>
+    <mkdir dir="${report}"/>
     <junit printsummary="yes" fork="yes" failureproperty="tests.failed">
       <classpath>
         <path refid="tests.classpath"/>
