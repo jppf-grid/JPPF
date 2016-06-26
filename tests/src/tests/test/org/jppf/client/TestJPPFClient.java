@@ -24,14 +24,19 @@ import static org.junit.Assert.*;
 import java.io.NotSerializableException;
 import java.lang.management.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+
+import javax.management.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.execute.AbstractThreadManager;
+import org.jppf.job.*;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.junit.Test;
 import org.slf4j.*;
@@ -104,22 +109,28 @@ public class TestJPPFClient extends Setup1D1N {
   public void testCancelJob() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-      int i = 0;
-      for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
-      ExecutingJobStatusListener statusListener = new ExecutingJobStatusListener();
-      job.getResultCollector().addJobStatusListener(statusListener);
-      client.submitJob(job);
-      statusListener.await();
-      client.cancelJob(job.getUuid());
-      List<Task<?>> results = job.awaitResults();
-      assertNotNull(results);
-      assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
-      int count = 0;
-      for (Task<?> task: results) {
-        if (task.getResult() == null) count++;
+      JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
+      DriverJobManagementMBean jobManager = driver.getJobManager();
+      MyNotifListener listener = new MyNotifListener();
+      try {
+        jobManager.addNotificationListener(listener, null, null);
+        JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+        int i = 0;
+        for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
+        client.submitJob(job);
+        listener.await();
+        client.cancelJob(job.getUuid());
+        List<Task<?>> results = job.awaitResults();
+        assertNotNull(results);
+        assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
+        int count = 0;
+        for (Task<?> task: results) {
+          if (task.getResult() == null) count++;
+        }
+        assertTrue(count > 0);
+      } finally {
+        jobManager.removeNotificationListener(listener);
       }
-      assertTrue(count > 0);
     }
   }
 
@@ -404,6 +415,28 @@ public class TestJPPFClient extends Setup1D1N {
     @Override
     public void initRemotePools(final TypedProperties props) {
       super.initRemotePools(props);
+    }
+  }
+
+  /** */
+  private static class MyNotifListener implements NotificationListener {
+    /** */
+    final AtomicBoolean flag = new AtomicBoolean(false);
+
+    @Override
+    public void handleNotification(final Notification notification, final Object handback) {
+      JobNotification notif = (JobNotification) notification;
+      if (notif.getEventType() == JobEventType.JOB_DISPATCHED) flag.set(true);
+    }
+
+    /**
+     * Wait until the executing flag is set to {@code true}.
+     */
+    public void await() {
+      try {
+        while (!flag.get()) Thread.sleep(10L);
+      } catch(InterruptedException ignore) {
+      }
     }
   }
 }
