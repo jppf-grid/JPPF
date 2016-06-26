@@ -21,6 +21,7 @@ package test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import test.org.jppf.client.TestJPPFJob;
 import test.org.jppf.server.protocol.TestJobReservation;
 
 
@@ -30,6 +31,6 @@ import test.org.jppf.server.protocol.TestJobReservation;
  * @author Laurent Cohen
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TestJobReservation.class })
+@Suite.SuiteClasses({ TestJPPFJob.class, TestJobReservation.class })
 public class JPPFSuite {
 }

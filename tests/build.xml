@@ -35,6 +35,7 @@
   <property name="tests.classes"      value="${classes}/tests"/>
   <property name="addons.classes"     value="${classes}/addons"/>
   <property name="build"              value="${basedir}/build"/>
+  <property name="report"             value="${basedir}/report"/>
 
   <!-- JPPF modules -->
   <property name="client"             value="${basedir}/../client"/>
@@ -161,6 +162,7 @@
 
   <target name="run"            depends="compile, generate.tests.list, runtests" description=""/>
   <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
+  <target name="run.junit"      depends="compile, run.junit.tests"               description=""/>
 
   <target name="runtests">
     <echo message="Running the tests"/>
@@ -172,6 +174,34 @@
       <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
       <arg value="-s"/>
     </java>
+  </target>
+
+  <target name="run.junit.tests">
+    <echo message="Running the tests"/>
+    <junit printsummary="yes" fork="yes" failureproperty="tests.failed">
+      <classpath>
+        <path refid="tests.classpath"/>
+      </classpath>
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
+      <formatter type="xml"/>
+      <batchtest fork="yes" todir="${report}" skipNonTests="true">
+        <fileset dir="${tests.src}">
+          <include name="**/*.java"/>
+          <exclude name="**/JPPFSuite.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <junitreport todir="${report}">
+      <fileset dir="${report}">
+        <include name="*.xml"/>
+      </fileset>
+      <report format="frames" todir="${report}"/>
+    </junitreport>
+    <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
 
 </project> 
