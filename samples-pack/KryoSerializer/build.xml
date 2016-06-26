@@ -18,64 +18,63 @@
 
 <project name='KryoSerializer' basedir="." default="jar">
 
-	<!-- ========================================================================= -->
-	<!--                          Property definitions                             -->
-	<!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
 
-	<property name="shared"      value="${basedir}/../shared"/>
-	<property name="shared.lib"  value="${shared}/lib"/>
-	<property name="shared.img"  value="${shared}/images"/>
-	<property name="config.dir"  value="${basedir}/config"/>
-	<property name="classes.dir" value="${basedir}/classes"/>	
-	<property name="src.dir"     value="${basedir}/src"/>
-	<property name="javadoc"     value="${basedir}/javadoc"/>
+  <property name="shared"      value="${basedir}/../shared"/>
+  <property name="shared.lib"  value="${shared}/lib"/>
+  <property name="shared.img"  value="${shared}/images"/>
+  <property name="config.dir"  value="${basedir}/config"/>
+  <property name="classes.dir" value="${basedir}/classes"/>
+  <property name="src.dir"     value="${basedir}/src"/>
+  <property name="javadoc"     value="${basedir}/javadoc"/>
   <property name="jar.file"    value="KryoSerializer.jar"/>
 
-	<!-- ========================================================================= -->
-	<!--                           Classpath definitions                           -->
-	<!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
 
-	<path id="project.classpath">
-		<pathelement location="${classes.dir}"/>
+  <path id="project.classpath">
+    <pathelement location="${classes.dir}"/>
     <pathelement location="${config.dir}"/>
     <fileset dir="${basedir}/lib" includes="*.jar"/>
-    <pathelement location="${shared.lib}/jppf-common*.jar"/>
+    <fileset dir="${shared.lib}" includes="jppf-common*.jar"/>
     <pathelement location="${shared.lib}/slf4j-api-1.6.1-.jar"/>
-	</path>
-
-  <path id="javadoc.classpath">
-		<pathelement location="${shared.img}"/>
-    <path refid="project.classpath"/>	
   </path>
 
-	<!-- ========================================================================= -->
-	<!--                                    Clean                                  -->
-	<!-- ========================================================================= -->
+  <path id="javadoc.classpath">
+    <pathelement location="${shared.img}"/>
+    <path refid="project.classpath"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                                    Clean                                  -->
+  <!-- ========================================================================= -->
 
   <target name="clean">
     <delete dir="${classes.dir}" quiet="true"/>
-  </target>               
+  </target>
 
-	<!-- ========================================================================= -->
-	<!--                                    Init                                   -->
-	<!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!--                                    Init                                   -->
+  <!-- ========================================================================= -->
 
-	<target name="init" description="Initialize ressources">
- 		<mkdir dir="${classes.dir}"/>
-	</target>
+  <target name="init" description="Initialize ressources">
+    <mkdir dir="${classes.dir}"/>
+  </target>
 
 
-	<!-- ========================================================================= -->
-	<!--                                  Compile                                  -->
-	<!-- ========================================================================= -->
+  <!-- ========================================================================= -->
+  <!--                                  Compile                                  -->
+  <!-- ========================================================================= -->
 
-	<target name="compile" depends="clean, init">
-		<javac srcdir="" destdir="${classes.dir}"
-			debug="on" deprecation="off" optimize="on" includes="**/*.java">
-	    <classpath refid="project.classpath"/>
-	    <compilerarg line="-Xlint:unchecked"/>
-			<src path="${src.dir}"/>
-		</javac>
+  <target name="compile" depends="clean, init">
+    <javac srcdir="" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="project.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${src.dir}"/>
+    </javac>
   </target>
 
   <!-- ========================================================================= -->
@@ -90,39 +89,45 @@
     <echo message="*** The file ${jar.file} is now ready to be deployed ***"/>
     <echo/>
   </target>
-  
-	<!-- ========================================================================= -->
-	<!--                        Generate the Javadoc                               -->
-	<!-- ========================================================================= -->
 
-	<target name="javadoc" description="Generate all javadoc">
+  <!-- ========================================================================= -->
+  <!--                        Generate the Javadoc                               -->
+  <!-- ========================================================================= -->
+
+  <target name="javadoc" description="Generate all javadoc">
     <delete dir="${javadoc}" quiet="true"/>
     <mkdir dir="${javadoc}"/>
-		<javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF"
-			packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true"
-			stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
-			<packageset dir="${src.dir}"/>
+    <javadoc destdir="${javadoc}" access="private" Windowtitle="JPPF" packagenames="**/*.*" classpathref="javadoc.classpath" verbose="false" use="true" stylesheetfile="${shared.img}/javadoc.css" additionalparam="-quiet">
+      <packageset dir="${src.dir}"/>
       <link href="https://docs.oracle.com/javase/7/docs/api"/>
       <link href="http://www.jppf.org/api"/>
-			<doctitle><![CDATA[JPPF - Kryo Serializer Sample]]></doctitle>
-			<header>
-				<![CDATA[
-					<table><tr><td valign="center">
-						<a href="http://www.jppf.org" target="_top">
-							<img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
-						</a>
-					</td></tr></table>
+      <doctitle>
+        <![CDATA[JPPF - Kryo Serializer Sample]]>
+      </doctitle>
+      <header>
+        <![CDATA[
+					<table>
+        <tr>
+          <td valign="center">
+            <a href="http://www.jppf.org" target="_top">
+              <img src="http://www.jppf.org/images/jppf_group_large.gif" border="0"/>
+            </a>
+          </td>
+        </tr>
+      </table>
 				]]>
 			</header>
-			<bottom>
-				<![CDATA[
-					<font face="Arial" size=2 color="#6D78B6"><i>Copyright &copy; 2005-2015 JPPF Team.</i></font>
+    <bottom>
+      <![CDATA[
+					<font face="Arial" size=2 color="#6D78B6">
+      <i>Copyright &copy; 2005-2015 JPPF Team.</i>
+    </font>
 				]]>
 			</bottom>
-		</javadoc>
-		<copy todir="${javadoc}/resources" overwrite="true">
-			<fileset dir="${shared.img}" includes="inherit.gif"/>
-		</copy>
-	</target>
+    </javadoc>
+    <copy todir="${javadoc}/resources" overwrite="true">
+      <fileset dir="${shared.img}" includes="inherit.gif"/>
+    </copy>
+  </target>
 
-</project> 
+</project>
