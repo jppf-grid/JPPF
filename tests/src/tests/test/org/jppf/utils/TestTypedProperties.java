@@ -58,7 +58,7 @@ public class TestTypedProperties {
     StringBuilder sb = new StringBuilder();
     sb.append("prop.1 = prop.1.value\n");
     File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
-    sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
+    sb.append("#!include url ").append(StringUtils.getDecodedURLPath(file.toURI().toURL())).append('\n');
     sb.append("prop.2 = prop.2.value\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
@@ -100,7 +100,7 @@ public class TestTypedProperties {
     sb.append("#!include class ").append(TestConfigurationSourceReader.class.getName()).append('\n');
     sb.append("prop.2 = prop.2.value\n");
     File file = new File("classes/tests/test/org/jppf/utils/URLInclude.properties");
-    sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
+    sb.append("#!include url ").append(StringUtils.getDecodedURLPath(file.toURI().toURL())).append('\n');
     sb.append("#!include file test/org/jppf/utils/FileInclude.properties\n");
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
@@ -126,7 +126,7 @@ public class TestTypedProperties {
     sb.append("prop.1 = prop.1.value\n");
     sb.append("prop.2 = prop.2.value\n");
     File file = new File("classes/tests/test/org/jppf/utils/NestedURLInclude.properties");
-    sb.append("#!include url ").append(file.toURI().toURL()).append('\n');
+    sb.append("#!include url ").append(StringUtils.getDecodedURLPath(file.toURI().toURL())).append('\n');
     try (Reader r = new StringReader(sb.toString())) {
       TypedProperties props = new TypedProperties().loadAndResolve(r);
       checkProperty(props, "prop.1", "prop.1.value");

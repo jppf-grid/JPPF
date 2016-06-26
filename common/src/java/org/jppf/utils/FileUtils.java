@@ -505,4 +505,17 @@ public final class FileUtils {
       return null;
     }
   }
+
+  /**
+   * Transform a file path into a URL in non URL-ncoded form.
+   * @param path the path to transform.
+   * @return the a string representing the decoded URL.
+   */
+  public static String getDecodedURLFromFilePath(final File path) {
+    try {
+      return URLDecoder.decode(path.toURI().toURL().toString(), "UTF-8");
+    } catch (MalformedURLException|UnsupportedEncodingException ignore) {
+      return null;
+    }
+  }
 }

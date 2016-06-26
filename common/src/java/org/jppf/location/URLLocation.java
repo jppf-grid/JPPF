@@ -29,8 +29,7 @@ import org.slf4j.*;
  * This implementation of the {@link Location} interface allows writing to and reading from a URL.
  * @author Laurent Cohen
  */
-public class URLLocation extends AbstractLocation<URL>
-{
+public class URLLocation extends AbstractLocation<URL> {
   /**
    * Explicit serialVersionUID.
    */
@@ -47,7 +46,7 @@ public class URLLocation extends AbstractLocation<URL>
    * The size of the artifact pointed to by this URL location.
    * We attempt to cache it to avoid looking it up by opening a connection every time.
    */
-  private long size =-1L;
+  private long size = -1L;
   /**
    * Determines whether an attempt to obtain the size of the content has already been made.
    * This attribute is transient so that it is "reset" whenever it is deserialized in a remote JVM.
@@ -59,8 +58,7 @@ public class URLLocation extends AbstractLocation<URL>
    * Initialize this location with the specified file path.
    * @param url a {@link URL}.
    */
-  public URLLocation(final URL url)
-  {
+  public URLLocation(final URL url) {
     super(url);
   }
 
@@ -69,24 +67,23 @@ public class URLLocation extends AbstractLocation<URL>
    * @param url a URL in string format.
    * @throws MalformedURLException if the url is malformed.
    */
-  public URLLocation(final String url) throws MalformedURLException
-  {
+  public URLLocation(final String url) throws MalformedURLException {
     super(new URL(url));
   }
 
   @Override
-  public InputStream getInputStream() throws Exception
-  {
-    if ("file".equalsIgnoreCase(path.getProtocol())) return new BufferedInputStream(new FileInputStream(path.getPath()));
+  public InputStream getInputStream() throws Exception {
+    if ("file".equalsIgnoreCase(path.getProtocol())) {
+      return new BufferedInputStream(new FileInputStream(StringUtils.getDecodedURLPath(path)));
+    }
     return path.openStream();
   }
 
   @Override
-  public OutputStream getOutputStream() throws Exception
-  {
+  public OutputStream getOutputStream() throws Exception {
     // URLConnection.getOutputStream() throws an UnknownServiceException for file urls.
     // see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4485313
-    if ("file".equalsIgnoreCase(path.getProtocol())) return new BufferedOutputStream(new FileOutputStream(path.getPath()));
+    if ("file".equalsIgnoreCase(path.getProtocol())) return new BufferedOutputStream(new FileOutputStream(StringUtils.getDecodedURLPath(path)));
     URLConnection conn = path.openConnection();
     conn.setDoOutput(true);
     return conn.getOutputStream();
@@ -98,34 +95,24 @@ public class URLLocation extends AbstractLocation<URL>
    * @return the content size if it is available, or -1 if it isn't.
    */
   @Override
-  public long size()
-  {
-    if ((size < 0L) && !sizeAttemptMade)
-    {
-      try
-      {
+  public long size() {
+    if ((size < 0L) && !sizeAttemptMade) {
+      try {
         // for file URLs, opening a connection causes an input stream
         // to be created, which is never released
-        if ("file".equalsIgnoreCase(path.getProtocol()))
-        {
-          File file = new File(path.getPath());
+        if ("file".equalsIgnoreCase(path.getProtocol())) {
+          File file = new File(StringUtils.getDecodedURLPath(path));
           size = file.length();
-        }
-        else
-        {
+        } else {
           URLConnection c = path.openConnection();
           c.connect();
           size = c.getContentLengthLong();
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         String msg = "Error while trying to get the content length of {} : {}";
         if (debugEnabled) log.debug(msg, this, ExceptionUtils.getStackTrace(e));
         else log.warn(msg, this, ExceptionUtils.getMessage(e));
-      }
-      finally
-      {
+      } finally {
         sizeAttemptMade = true;
       }
     }

@@ -17,6 +17,7 @@
  */
 package org.jppf.utils;
 
+import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.text.*;
@@ -458,5 +459,18 @@ public final class StringUtils {
   public static String[] parseStringArray(final String source, final String separator, final boolean regex) {
     List<String> list = parseStrings(source, separator, regex);
     return list.toArray(new String[list.size()]);
+  }
+
+  /**
+   * Transform a file path into a URL in non URL-ncoded form.
+   * @param url the URL to transform.
+   * @return a string representing the decoded URL.
+   */
+  public static String getDecodedURLPath(final URL url) {
+    try {
+      return URLDecoder.decode(url.getPath(), "UTF-8");
+    } catch (UnsupportedEncodingException ignore) {
+      return null;
+    }
   }
 }

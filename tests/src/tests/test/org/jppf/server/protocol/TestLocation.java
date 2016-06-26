@@ -43,7 +43,7 @@ public class TestLocation {
     byte[] buf = new byte[size];
     for (byte i=0; i<(byte) size; i++) buf[i] = i;
     checkCopy(new MemoryLocation(buf), size);
-    File file = new File("tmpSrc.loc");
+    File file = new File("tmp Src.loc");
     try {
       FileUtils.writeBytesToFile(buf, file);
       checkCopy(new FileLocation(file), size);
