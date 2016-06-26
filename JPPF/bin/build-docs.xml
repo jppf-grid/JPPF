@@ -129,7 +129,7 @@
       <link href="https://docs.oracle.com/javaee/6/api/"/>
       <link href="http://junit.sourceforge.net/javadoc"/>
       <link href="http://x-stream.github.io/javadoc"/>
-      <link offline="true" href="http://d.android.com/reference" packagelistURL="file:/${android.home}/docs/reference"/>
+      <link offline="true" href="http://d.android.com/reference" packagelistURL="file:${env.ANDROID_HOME}/docs/reference"/>
       <doctitle><![CDATA[JPPF v${version.number}]]></doctitle>
       <header>
         <![CDATA[

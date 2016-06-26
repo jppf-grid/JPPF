@@ -38,6 +38,7 @@
   <property name="tests"                 value="${basedir}/../tests"/>
   <property name="stress-tests"          value="${basedir}/../stress-tests"/>
 
+  <property environment="env"/>
   <property name="build.properties.file" value="${basedir}/bin/build.properties"/>
   <property file="${build.properties.file}"/>
   <property name="build.number.file"     value="${basedir}/bin/build.number"/>
@@ -63,6 +64,7 @@
   <property name="app.ver"               value="${ant.project.name}-${version.number}"/>
   <property name="build.sysclasspath"    value="last"/>
 
+
   <!-- ========================================================================= -->
   <!--                           Classpath definitions                           -->
   <!-- ========================================================================= -->
@@ -81,7 +83,7 @@
 
   <path id="javadoc.classpath">
     <pathelement location="${bin}"/>
-    <pathelement location="${android.home}/platforms/android-19/android.jar"/>
+    <pathelement location="${env.ANDROID_HOME}/platforms/android-19/android.jar"/>
     <path refid="project.classpath"/>  
   </path>
 
