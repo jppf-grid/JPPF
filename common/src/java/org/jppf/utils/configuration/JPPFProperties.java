@@ -88,11 +88,10 @@ public class JPPFProperties {
   /** Server discovery: UDP multicast port */
   public static final JPPFProperty<Integer> DISCOVERY_PORT = new IntProperty("jppf.discovery.port", 11111);
   /** Server discovery timeout in milliseconds */
-  public static final JPPFProperty<Integer> DISCOVERY_TIMEOUT = new IntProperty("jppf.discovery.timeout", 5000);
+  public static final JPPFProperty<Integer> DISCOVERY_TIMEOUT = new IntProperty("jppf.discovery.timeout", 1000);
   /** Priority assigned to discovered server connections (client/admiin console) */
   public static final JPPFProperty<Integer> DISCOVERY_PRIORITY = new IntProperty("jppf.discovery.priority", 0);
   /** Names of the manually configured servers in the client */
-  //public static final JPPFProperty<String> DRIVERS = new StringProperty("jppf.drivers", null);
   public static final JPPFProperty<String[]> DRIVERS = new StringArrayProperty("jppf.drivers", " ", new String[] {"default-driver"});
   /** UI refresh mode for the job data panel: 'immediate_notifications' | 'deferred_notifications' | 'polling' */
   public static final JPPFProperty<String> GUI_PUBLISH_MODE = new StringProperty("jppf.gui.publish.mode", "immediate_notifications");

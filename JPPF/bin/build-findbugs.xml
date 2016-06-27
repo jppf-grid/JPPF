@@ -25,7 +25,7 @@
   <!-- It must point to the root installation directory of findbugs              -->
   <!-- ========================================================================= -->
 
-  <target name="findbugs" depends="check.findbugs.present, findbugs.package"/>
+  <target name="findbugs" depends="check.findbugs.present, findbugs.package" description="findbugs checks"/>
 
   <target name="check.findbugs.present">
     <available file="${findbugs.home}/lib/findbugs-ant.jar" property="findbugs.present"/>
@@ -56,6 +56,7 @@
     <findbugs.module path="admin"/>
     <findbugs.module path="server"/>
     <findbugs.module path="demo"/>
+    <findbugs.module path="jmxremote"/>
     <findbugs.generic foutput="application-template" fsrc="${application.template}/src" fclass="${application.template}/classes"/>
     <findbugs.generic foutput="jca-client-jca" fsrc="${jca-client}/src/java" fclass="${jca-client}/classes/jca"/>
     <findbugs.generic foutput="jca-client-j2eeclient" fsrc="${jca-client}/src/j2eeclient" fclass="${jca-client}/classes/j2eeclient"/>
