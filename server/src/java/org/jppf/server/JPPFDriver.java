@@ -28,7 +28,7 @@ import org.jppf.comm.recovery.*;
 import org.jppf.job.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
 import org.jppf.management.JPPFSystemInformation;
-import org.jppf.nio.NioServer;
+import org.jppf.nio.*;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.process.LauncherListener;
 import org.jppf.queue.JPPFQueue;
@@ -307,6 +307,7 @@ public class JPPFDriver {
    */
   public void shutdown() {
     log.info("Shutting down");
+    StateTransitionManager.shutdown(true);
     initializer.stopBroadcaster();
     initializer.stopPeerDiscoveryThread();
     initializer.stopJmxServer();
@@ -368,7 +369,7 @@ public class JPPFDriver {
     } catch(Exception e) {
       e.printStackTrace();
       log.error(e.getMessage(), e);
-      System.exit(1);
+      if (JPPFConfiguration.getProperties().getBoolean("jppf.server.exitOnShutdown", true)) System.exit(1);
     }
   }
 

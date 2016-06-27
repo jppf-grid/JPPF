@@ -20,6 +20,7 @@ package org.jppf.server;
 import java.util.*;
 
 import org.jppf.JPPFError;
+import org.jppf.utils.JPPFConfiguration;
 import org.slf4j.*;
 
 /**
@@ -27,8 +28,7 @@ import org.slf4j.*;
  * Both shutdown and restart operations can be performed with a specified delay.
  * @exclude
  */
-class ShutdownRestartTask extends TimerTask
-{
+class ShutdownRestartTask extends TimerTask {
   /**
    * Logger for this class.
    */
@@ -61,11 +61,9 @@ class ShutdownRestartTask extends TimerTask
    * A value of 0 or less means the server is restarted immediately after the shutdown is complete.
    * @param driver reference to the driver.
    */
-  public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay, final JPPFDriver driver)
-  {
+  public ShutdownRestartTask(final Timer timer, final boolean restart, final long restartDelay, final JPPFDriver driver) {
     if (timer == null) throw new IllegalArgumentException("timer is null");
     if (driver == null) throw new IllegalArgumentException("driver is null");
-
     this.timer = timer;
     this.restart = restart;
     this.restartDelay = restartDelay;
@@ -77,37 +75,30 @@ class ShutdownRestartTask extends TimerTask
    * @see java.util.TimerTask#run()
    */
   @Override
-  public void run()
-  {
+  public void run() {
     log.info("Initiating shutdown");
     driver.shutdown();
-    if (!restart)
-    {
-      log.info("Performing requested exit");
-      System.exit(0);
-    }
-    else
-    {
-      TimerTask task = new TimerTask()
-      {
-        @Override
-        public void run()
-        {
-          try
-          {
-            log.info("Initiating restart");
-            cancel();
-            System.exit(2);
+    if (JPPFConfiguration.getProperties().getBoolean("jppf.server.exitOnShutdown", true)) {
+      if (!restart) {
+        log.info("Performing requested exit");
+        System.exit(0);
+      } else {
+        TimerTask task = new TimerTask() {
+          @Override
+          public void run() {
+            try {
+              log.info("Initiating restart");
+              cancel();
+              System.exit(2);
+            } catch (Exception e) {
+              log.error(e.getMessage(), e);
+              throw new JPPFError("Could not restart the JPPFDriver");
+            }
           }
-          catch(Exception e)
-          {
-            log.error(e.getMessage(), e);
-            throw new JPPFError("Could not restart the JPPFDriver");
-          }
-        }
-      };
-      cancel();
-      timer.schedule(task, restartDelay);
+        };
+        cancel();
+        timer.schedule(task, restartDelay);
+      }
     }
   }
 }
