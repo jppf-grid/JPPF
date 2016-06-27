@@ -288,4 +288,13 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
     }
     return globalExecutor;
   }
+
+  /**
+   * Shutdown the global executor for all transition managers.
+   * @param now if {@code true} then call {@code shutownNow()} on the executor, otherwise, call {@code shutown()}.
+   */
+  public static void shutdown(final boolean now) {
+    if (now) globalExecutor.shutdownNow();
+    else globalExecutor.shutdown();
+  }
 }
