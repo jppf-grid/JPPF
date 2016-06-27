@@ -31,7 +31,8 @@ public class TestJMXConnectionWrapper {
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539051&group_id=135654&atid=733518">3539051 - JMX: performConnection is blocking connectAndWait</a>
    * @throws Exception if any error occurs
    */
-  @Test(timeout=30000)
+  //@Test(timeout=30000)
+  @Test
   public void testConnectAnWaitNonReachableServer() throws Exception {
     //make sure the host is on an unreachable network
     final JMXNodeConnectionWrapper jmx = new JMXNodeConnectionWrapper("10.1.1.2", 12345, false);

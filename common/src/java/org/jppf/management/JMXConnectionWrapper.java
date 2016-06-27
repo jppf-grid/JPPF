@@ -245,8 +245,19 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       connectionThread.set(null);
     }
     if (jmxc != null) {
-      jmxc.close();
+      final JMXConnector connector = jmxc;
       jmxc = null;
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          try {
+            connector.close();
+          } catch (Exception e) {
+            if (debugEnabled) log.debug(e.getMessage(), e);
+          }
+        }
+      };
+      new Thread(r, getDisplayName() + " closing").start();
     }
   }
 

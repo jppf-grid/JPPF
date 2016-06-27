@@ -23,18 +23,16 @@ import static org.junit.Assert.*;
 
 import java.io.NotSerializableException;
 import java.lang.management.*;
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
 
 import javax.management.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
-import org.jppf.client.event.*;
 import org.jppf.execute.AbstractThreadManager;
 import org.jppf.job.*;
-import org.jppf.management.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
@@ -247,7 +245,8 @@ public class TestJPPFClient extends Setup1D1N {
 
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
-      List<Task<?>> results = client.submitJob(job);
+      List<Task<?>> results = client.submitJob(job);    //TypedProperties config = JPPFConfiguration.getProperties();
+
       assertNotNull(results);
       assertEquals(1, results.size());
       Task<?> task = results.get(0);
@@ -259,126 +258,6 @@ public class TestJPPFClient extends Setup1D1N {
   }
 
   /**
-   * Test that JMX connection threads are properly terminated when the JPPF connection fails.
-   * This relates to the bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-131">JPPF-131 JPPF client does not release JMX thread upon connection failure</a>
-   * @throws Exception if any error occurs
-   */
-  @Test(timeout=20000)
-  public void testNoJMXConnectionThreadsLeak() throws Exception {
-    String name = Thread.currentThread().getName();
-    MyClient client = null;
-    //TypedProperties config = JPPFConfiguration.getProperties();
-    try {
-      Thread.currentThread().setName("JPPF-test");
-      int poolSize = 2;
-      long maxReconnect = 3;
-      JPPFConfiguration.set(RECONNECT_INITIAL_DELAY, 0L)
-        .set(RECONNECT_MAX_TIME, maxReconnect)
-        .set(DISCOVERY_ENABLED, false)
-        .set(DRIVERS, new String[] {"test"})
-        .setString("test.jppf.server.host", "localhost")
-        .setInt("test.jppf.server.port", 11101)
-        .setInt("test.jppf.pool.size", poolSize)
-        .setInt("test.jppf.management.port", 11201);
-      log.info("configured client with: {}", JPPFConfiguration.getProperties());
-      ConnectionPoolListener listener = new ConnectionPoolListenerAdapter() {
-        @Override public void connectionAdded(final ConnectionPoolEvent event) {
-          TestUtils.printf(log, "connectionAdded(%s) : connectionCount = %d", event .getConnection(), event.getConnectionPool().getClient().getAllConnectionsCount());
-        }
-        @Override public void connectionRemoved(final ConnectionPoolEvent event) {
-          TestUtils.printf(log, "connectionRemoved(%s) : connectionCount = %d", event.getConnection(), event.getConnectionPool().getClient().getAllConnectionsCount());
-        }
-        @Override public void connectionPoolAdded(final ConnectionPoolEvent event) {
-          TestUtils.printf(log, "connectionPoolAdded() : added pool %s", event.getConnectionPool());
-        }
-        @Override public void connectionPoolRemoved(final ConnectionPoolEvent event) {
-          TestUtils.printf(log, "connectionPoolRemoved() : removed pool %s, call stack:%n%s", event.getConnectionPool(), ExceptionUtils.getCallStack());
-        }
-      };
-      client = new MyClient(listener);
-      waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
-      restartDriver(client, poolSize, 1_000L * maxReconnect + 1500L);
-      String[] threads = threadNames("^" + JMXConnectionWrapper.CONNECTION_NAME_PREFIX + ".*");
-      assertEquals(0, threads.length);
-    } catch(Exception e) {
-      e.printStackTrace();
-      throw e;
-    } finally {
-      if (client != null) client.close();
-      JPPFConfiguration.reset();
-      Thread.currentThread().setName(name);
-    }
-  }
-
-  /**
-   * Restart the driver.
-   * @param client the JPPF client.
-   * @param poolSize the number of expected connections.
-   * @param restartDelay the driver restart delay in milliseconds.
-   * @throws Exception if any error occurs.
-   */
-  private void restartDriver(final MyClient client, final int poolSize, final long restartDelay) throws Exception {
-    JMXDriverConnectionWrapper jmx = getJmxConnection(client);
-    TestUtils.printf(log, "***** restarting driver with restartDelay = %d ms *****", restartDelay);
-    jmx.restartShutdown(100L, restartDelay);
-    TestUtils.printf(log, "***** driver restart requested *****", restartDelay);
-    waitForNbConnections(client, 0, JPPFClientConnectionStatus.ACTIVE);
-    waitForNbConnections(client, 0, null);
-    Runnable r = new Runnable() {
-      @Override
-      public void run() {
-        client.initRemotePools(JPPFConfiguration.getProperties());
-      }
-    };
-    new Thread(r, "InitPools").start();
-    waitForNbConnections(client, poolSize, JPPFClientConnectionStatus.ACTIVE);
-  }
-
-  /**
-   * Wait until the client has the specified number of connections.
-   * @param client the JPPF client.
-   * @param status the expected status of each connection.
-   * @param nbConnections the number of connections to reach.
-   * @throws Exception if any error occurs.
-   */
-  private void waitForNbConnections(final JPPFClient client, final int nbConnections, final JPPFClientConnectionStatus status) throws Exception {
-    if (status != null) client.awaitConnectionPools(Operator.EQUAL, nbConnections, 0L, status);
-    else {
-      int n = -1;
-      while ((n = client.getAllConnectionsCount()) != nbConnections) Thread.sleep(1L);
-    }
-    if (nbConnections > 0) getJmxConnection(client);
-  }
-
-  /**
-   * Get a connected JMX connection for the specified client.
-   * @param client the JPPF client.
-   * @return a {@link JMXDriverConnectionWrapper} instance.
-   * @throws Exception if any error occurs.
-   */
-  private JMXDriverConnectionWrapper getJmxConnection(final JPPFClient client) throws Exception {
-    return client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
-  }
-
-  /**
-   * Get the names of all threads in this JVM matching the specified regex pattern.
-   * @param pattern the pattern to match against.
-   * @return an array of thread names.
-   */
-  private String[] threadNames(final String pattern) {
-    Pattern p = pattern == null ? null : Pattern.compile(pattern);
-    ThreadMXBean threadsBean = ManagementFactory.getThreadMXBean();
-    long[] ids = threadsBean.getAllThreadIds();
-    ThreadInfo[] infos = threadsBean.getThreadInfo(ids, 0);
-    List<String> result = new ArrayList<>(infos.length);
-    for (int i=0; i<infos.length; i++) {
-      if ((p == null) || p.matcher(infos[i].getThreadName()).matches())
-        result.add(infos[i].getThreadName());
-    }
-    return result.toArray(new String[result.size()]);
-  }
-
-  /**
    * A task that checks the current thread context class loader during its execution.
    */
   public static class ThreadContextClassLoaderTask extends AbstractTask<String> {
@@ -387,8 +266,7 @@ public class TestJPPFClient extends Setup1D1N {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
       if (cl == null) throw new IllegalStateException("thread context class loader is null for " + (isInNode() ? "remote" : "local")  + " execution");
       if (isInNode()) {
-        if (!(cl instanceof AbstractJPPFClassLoader))
-          throw new IllegalStateException("thread context class loader for remote execution should be an AbstractJPPFClassLoader, but is " + cl);
+        if (!(cl instanceof AbstractJPPFClassLoader)) throw new IllegalStateException("thread context class loader for remote execution should be an AbstractJPPFClassLoader, but is " + cl);
         AbstractJPPFClassLoader ajcl2 = (AbstractJPPFClassLoader) getTaskClassLoader();
         if (cl != ajcl2) {
           throw new IllegalStateException("thread context class loader and task class loader do not match:\n" +
@@ -398,23 +276,6 @@ public class TestJPPFClient extends Setup1D1N {
         if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
       }
       setResult(cl.toString());
-    }
-  }
-
-  /**
-   * Overrides {@link #initRemotePools(TypedProperties)} to make it public.
-   */
-  public static class MyClient extends JPPFClient {
-    /**
-     * @param listener .
-     */
-    public MyClient(final ConnectionPoolListener listener) {
-      super(listener);
-    }
-
-    @Override
-    public void initRemotePools(final TypedProperties props) {
-      super.initRemotePools(props);
     }
   }
 
