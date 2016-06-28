@@ -22,8 +22,9 @@ import static org.junit.Assert.*;
 
 import java.net.*;
 import java.nio.channels.*;
+import java.util.List;
 
-import org.jppf.comm.interceptor.InterceptorHandler;
+import org.jppf.comm.interceptor.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
 import org.slf4j.*;
@@ -34,11 +35,11 @@ import test.org.jppf.test.setup.common.TestInterceptor;
  * Test the network interceptor feature.
  * @author Laurent Cohen
  */
-public class TestNetworkCommunicationInterceptor {
+public class TestNetworkConnectionInterceptor {
   /**
    * Logger for this class.
    */
-  private static Logger log = LoggerFactory.getLogger(TestNetworkCommunicationInterceptor.class);
+  private static Logger log = LoggerFactory.getLogger(TestNetworkConnectionInterceptor.class);
   /**
    * 
    */
@@ -54,6 +55,11 @@ public class TestNetworkCommunicationInterceptor {
     SocketServer server = null;
     Socket client = null;
     try {
+      List<NetworkConnectionInterceptor> interceptors = NetworkConnectionInterceptor.INTERCEPTORS;
+      assertNotNull(interceptors);
+      assertEquals(1, interceptors.size());
+      NetworkConnectionInterceptor interceptor = interceptors.get(0);
+      assertTrue(interceptor instanceof TestInterceptor);
       TestInterceptor.active = true;
       server = new SocketServer();
       Thread serverThread = new Thread(server, "socket server thread");

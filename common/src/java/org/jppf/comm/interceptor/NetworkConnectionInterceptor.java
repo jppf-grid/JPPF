@@ -20,6 +20,7 @@ package org.jppf.comm.interceptor;
 
 import java.net.*;
 import java.nio.channels.*;
+import java.util.*;
 
 /**
  * Implementations of this interface enable user-defined code to use the underlying network connection
@@ -28,6 +29,12 @@ import java.nio.channels.*;
  * @since 5.2
  */
 public interface NetworkConnectionInterceptor {
+  /**
+   * The list of interceptors loaded via SPI, possibly empty. This list is unmodifiable and any attempt
+   * to modify it will raise an {@code UnsupportOperationException}.
+   */
+  List<NetworkConnectionInterceptor> INTERCEPTORS = InterceptorHandler.INTERCEPTORS;
+
   /**
    * Called when a {@link Socket} is accepted by a {@link ServerSocket} on the server side of a connection.
    * @param acceptedSocket the socket that was just accepted.

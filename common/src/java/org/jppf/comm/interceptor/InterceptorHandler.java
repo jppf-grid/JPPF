@@ -35,7 +35,7 @@ public class InterceptorHandler {
   /**
    * The list of interceptors loaded via SPI.
    */
-  private static final List<NetworkConnectionInterceptor> INTERCEPTORS = Collections.unmodifiableList(loadInterceptors());
+  static final List<NetworkConnectionInterceptor> INTERCEPTORS = Collections.unmodifiableList(loadInterceptors());
 
   /**
    * Load the interceptors via the SPI mechanism.
