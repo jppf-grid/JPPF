@@ -27,7 +27,7 @@ import org.jppf.comm.discovery.JPPFConnectionInformation;
 import org.jppf.comm.recovery.*;
 import org.jppf.job.*;
 import org.jppf.logging.jmx.JmxMessageNotifier;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 import org.jppf.nio.*;
 import org.jppf.node.initialization.OutputRedirectHook;
 import org.jppf.node.protocol.JPPFDistributedJob;
@@ -483,5 +483,14 @@ public class JPPFDriver {
    */
   public static ObjectSerializer getSerializer() {
     return serializer;
+  }
+
+  /**
+   * Get the jmx server used to manage and monitor this driver.
+   * @param secure specifies whether to get the ssl-based connector server. 
+   * @return a {@link JMXServer} instance.
+   */
+  public JMXServer getJMXServer(final boolean secure) {
+    return initializer.getJmxServer(secure);
   }
 }

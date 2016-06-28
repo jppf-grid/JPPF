@@ -19,6 +19,7 @@
 package org.jppf.management;
 
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
@@ -47,12 +48,17 @@ public class JMXMPServer extends AbstractJMXServer {
    * An ordered set of configuration properties to use for looking up the desired management port.
    */
   private final JPPFProperty<Integer> portProperty;
+  /**
+   * An optional {@link MBeanServerForwarder} associated with the {@code JMXConnectorServer}.
+   */
+  private MBeanServerForwarder forwarder;
 
   /**
    * Initialize this JMX server with the specified uuid.
    * @param id the unique id of the driver or node holding this jmx server.
    * @param ssl specifies whether JMX should be used over an SSL/TLS connection.
    * @param portProperty an ordered set of configuration properties to use for looking up the desired management port.
+   * @exclude
    */
   public JMXMPServer(final String id, final boolean ssl, final JPPFProperty<Integer> portProperty) {
     this.id = id;
@@ -61,6 +67,10 @@ public class JMXMPServer extends AbstractJMXServer {
     else this.portProperty = portProperty;
   }
 
+  /**
+   * {@inheritDoc]}
+   * @exclude
+   */
   @Override
   public void start(final ClassLoader cl) throws Exception {
     if (debugEnabled) log.debug("starting remote connector server");
@@ -71,7 +81,6 @@ public class JMXMPServer extends AbstractJMXServer {
       server = ManagementFactory.getPlatformMBeanServer();
       TypedProperties config = JPPFConfiguration.getProperties();
       managementHost = NetworkUtils.getManagementHost();
-      //managementPort = new ConfigurationHelper(config).getInt(ssl ? 11193 : 11198, 1024, 65535, portProperty);
       managementPort = config.get(portProperty);
       if (debugEnabled) log.debug("managementPort={}, portProperties={}", managementPort, Arrays.asList(portProperty));
       Map<String, Object> env = new HashMap<>();
@@ -93,6 +102,8 @@ public class JMXMPServer extends AbstractJMXServer {
           connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, env, server);
           connectorServer.start();
           found = true;
+          forwarder = createMBeanServerForwarder();
+          if (forwarder != null) connectorServer.setMBeanServerForwarder(forwarder);
         } catch(Exception e) {
           String s = e.getMessage();
           if ((e instanceof BindException) || ((s != null) && (s.toLowerCase().contains("bind")))) {
@@ -108,5 +119,86 @@ public class JMXMPServer extends AbstractJMXServer {
       lock.unlock();
       Thread.currentThread().setContextClassLoader(tmp);
     }
+  }
+
+  /**
+   * Create an MBeanServerForwarder to associate witht he remote connector server,
+   * based on the JPPF configuration.
+   * @return an {@link MBeanServerForwarder} instance, or {@code null} if none is defined in the configuration or if it couldn't be created.
+   */
+  private MBeanServerForwarder createMBeanServerForwarder() {
+    String[] configDef = JPPFConfiguration.get(JPPFProperties.MANAGEMENT_SERVER_FORWARDER);
+    if ((configDef == null) || (configDef.length <= 0)) return null;
+    Class<?> clazz = null;
+    try {
+      clazz = Class.forName(configDef[0]);
+    } catch (ClassNotFoundException e) {
+      log.error(String.format("The MBeanServerForwarder class %s was not found, no fowrader will be set. Error is: %s", configDef[0], ExceptionUtils.getStackTrace(e)));
+      return null;
+    }
+    if (!MBeanServerForwarder.class.isAssignableFrom(clazz)) {
+      log.error(String.format("The configured class '%s' for property '%s' does not implement %s, no forwarder will be set.",
+        clazz.getName(), JPPFProperties.MANAGEMENT_SERVER_FORWARDER.getName(), MBeanServerForwarder.class.getName()));
+      return null;
+    }
+    MBeanServerForwarder forwarder = null;
+    Object[] params = null;
+    if (configDef.length > 1) {
+      params = new String[configDef.length - 1];
+      for (int i=1; i<configDef.length; i++) {
+        params[i-1] = configDef[i];
+      }
+    }
+    Constructor c = null;
+    if (params != null) {
+      try {
+        c = clazz.getConstructor(String[].class);
+      } catch (NoSuchMethodException ignore) {
+      }
+      if (c != null) {
+        try {
+          return (MBeanServerForwarder) c.newInstance((Object) params);
+        } catch (Exception e) {
+          log.error(String.format("The constructor '%s.<init>(String[])' raised an exception: %s", clazz.getName(), ExceptionUtils.getStackTrace(e)));
+          return null;
+        }
+      }
+    }
+    try {
+      forwarder = (MBeanServerForwarder) clazz.newInstance();
+    } catch (Exception e) {
+      log.error(String.format("Could not instantiate '%s' : %s", clazz.getName(), ExceptionUtils.getStackTrace(e)));
+      return null;
+    }
+    if (params != null) {
+      Method m = null;
+      try {
+        m = clazz.getMethod("setParameters", String[].class);
+      } catch (Exception ignore) {
+      }
+      if (m != null) {
+        try {
+          m.invoke(forwarder, (Object) params);
+        } catch (Exception e) {
+          log.error(String.format("Invoking %s.setParameters(String[]) failed : %s", clazz.getName(), ExceptionUtils.getStackTrace(e)));
+        }
+      }
+    }
+    return forwarder;
+  }
+
+  @Override
+  public MBeanServerForwarder getMBeanServerForwarder() {
+    return  forwarder;
+  }
+
+  /**
+   * {@inheritDoc}
+   * @exclude
+   */
+  @Override
+  public void stop() throws Exception {
+    super.stop();
+    forwarder = null;
   }
 }

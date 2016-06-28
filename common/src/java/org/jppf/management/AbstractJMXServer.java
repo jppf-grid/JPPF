@@ -67,10 +67,11 @@ public abstract class AbstractJMXServer implements JMXServer {
   public void stop() throws Exception {
     stopped = true;
     connectorServer.stop();
+    connectorServer = null;
   }
 
   @Override
-  public MBeanServer getServer() {
+  public MBeanServer getMBeanServer() {
     return server;
   }
 

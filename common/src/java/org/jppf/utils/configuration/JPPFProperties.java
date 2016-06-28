@@ -149,6 +149,8 @@ public class JPPFProperties {
   public static final JPPFProperty<Integer> MANAGEMENT_PORT_NODE = new IntProperty("jppf.node.management.port", 11198, 1024, 65535, "jppf.management.port");
   /** Node secure management port (to distinguish from server management port when local node is on) */
   public static final JPPFProperty<Integer> MANAGEMENT_SSL_PORT_NODE = new IntProperty("jppf.node.management.ssl.port", 93, 1024, 65535, "jppf.management.ssl.port");
+  /** Fully qualifed class name of a MBeanServerForwarder implementation with optional space-separated string parameters */
+  public static final JPPFProperty<String[]> MANAGEMENT_SERVER_FORWARDER = new StringArrayProperty("jppf.management.server.forwarder", " ", null);
   /** Size of the pool of threads used to process node forwarding requests and notifications */
   public static final JPPFProperty<Integer> NODE_FORWARDING_POOL_SIZE = new IntProperty("jppf.node.forwarding.pool.size", Runtime.getRuntime().availableProcessors());
   /** enable/disable network connection checks on write operations */

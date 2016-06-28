@@ -19,24 +19,25 @@
 package org.jppf.management;
 
 import javax.management.MBeanServer;
+import javax.management.remote.MBeanServerForwarder;
 
 /**
  * Interface for JMX remote servers associated to drivers and nodes.
  * @author Laurent Cohen
- * @exclude
  */
-public interface JMXServer
-{
+public interface JMXServer {
   /**
    * Start the MBean server and associated resources.
    * @param cl - the default classloader to be used by the JMX remote connector.
    * @throws Exception if an error occurs when starting the server or one of its components.
+   * @exclude
    */
   void start(ClassLoader cl) throws Exception;
 
   /**
    * Stop the MBean server and associated resources.
    * @throws Exception if an error occurs when stopping the server or one of its components.
+   * @exclude
    */
   void stop() throws Exception;
 
@@ -44,7 +45,7 @@ public interface JMXServer
    * Get a reference to the MBean server.
    * @return an <code>MBeanServer</code> instance.
    */
-  MBeanServer getServer();
+  MBeanServer getMBeanServer();
 
   /**
    * Determine whether this JMX server is stopped.
@@ -69,4 +70,10 @@ public interface JMXServer
    * @return the port number as an int.
    */
   int getManagementPort();
+
+  /**
+   * Get an optional {@link MBeanServerForwarder} associated with the underlying remote connector server.
+   * @return an {@link MBeanServerForwarder} instance, or {@code null} if node is associated with this jmx server.
+   */
+  MBeanServerForwarder getMBeanServerForwarder();
 }

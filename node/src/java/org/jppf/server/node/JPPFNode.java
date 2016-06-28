@@ -427,7 +427,6 @@ public abstract class JPPFNode extends AbstractCommonNode implements ClassLoader
    * Get the jmx server that handles administration and monitoring functions for this node.
    * @return a <code>JMXServerImpl</code> instance.
    * @throws Exception if any error occurs.
-   * @exclude
    */
   @Override
   public JMXServer getJmxServer() throws Exception {

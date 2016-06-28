@@ -18,14 +18,13 @@
 package org.jppf.node;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
-import org.jppf.management.JPPFSystemInformation;
+import org.jppf.management.*;
 
 /**
  * Interface for a node that provides information about its activity.
  * @author Laurent Cohen
  */
-public interface Node extends Runnable
-{
+public interface Node extends Runnable {
   /**
    * Get this node's UUID.
    * @return the uuid as a string.
@@ -80,4 +79,11 @@ public interface Node extends Runnable
    * @return {@code true} if this node runs on Androis, {@code false} otherwise.
    */
   boolean isAndroid();
+
+  /**
+   * Get the JMX connector server associated with the node.
+   * @return a JMXServer instance.
+   * @throws Exception if any error occurs.
+   */
+  JMXServer getJmxServer() throws Exception;
 }
