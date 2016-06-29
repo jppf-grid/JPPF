@@ -37,8 +37,9 @@ import test.org.jppf.test.setup.common.*;
  * Unit tests for the {@link ScriptedTask} class.
  * @author Laurent Cohen
  */
-public class TestJPPFStatistics extends Setup1D1N1C
-{
+public class TestJPPFStatistics extends Setup1D1N1C {
+  /** */
+  private static long WAIT_TIME = 3000L;
   /**
    * Test that the latest queue size is zero, after a job has completed and during whose execution the node was restarted.
    * @throws Exception if any error occurs.
@@ -54,7 +55,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     jmx.getNodeForwarder().restart(NodeSelector.ALL_NODES);
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
-    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
 
   /**
@@ -71,7 +72,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     client.submitJob(job);
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
-    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
 
   /**
@@ -94,7 +95,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
       client = BaseSetup.createClient(null);
     }
     jmx = BaseSetup.getJMXConnection();
-    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
 
   /**
@@ -122,7 +123,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     long waitTime = duration - elapsed + 500L;
     // make sure the job has time to complete
     if (waitTime > 0L) Thread.sleep(waitTime);
-    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
 
   /**
@@ -137,7 +138,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     jmx.resetStatistics();
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
-    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
 
   /**
@@ -156,7 +157,7 @@ public class TestJPPFStatistics extends Setup1D1N1C
     jmx.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
-    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), 1500L);
+    BaseTestHelper.waitForTest(new TaskAndJobCountTester(jmx), WAIT_TIME);
   }
 
   /**
