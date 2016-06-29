@@ -105,7 +105,7 @@
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <?php
-        $ver1 = "5.1.3";
+        $ver1 = "5.1.4";
         $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/jppf%20" . $ver1 . "/";
       ?>
       <a name="<?php echo $ver1 ?>"></a>
@@ -203,7 +203,7 @@
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h3>&nbsp;<img src="images/icons/emblem-what.png" class="titleWithIcon"/>Feeling curious or adventurous?</h3>
 </div>
-      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 alpha</a>.
+      <br><b>Try our latest (unstable) version</b><br>last update: <a href="/downloads-unstable.php" style="font-weight: 900">JPPF 5.2 beta 2</a>.
       <br><br>
       <p align="center"><span class="yh" style="color: black; background-color: yellow">Not recommended for production environments</span><br>&nbsp;
     </div>

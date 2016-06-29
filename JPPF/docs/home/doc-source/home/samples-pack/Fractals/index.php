@@ -39,7 +39,7 @@ image.height = 600
 </pre>
 <h4 style="font-style: italic; font-weight: bolder">Recording and replaying parameters sets</h4>
 The sample allows recording multiple sets of parameters (x, y, diameter and iterations) so they can be replayed later, and eventually saved and loaded as CSV files.
-The saved files can also be reused by the <a href="../FractalMovieGenerator/Readme.html">Mandelbrot movie generator sample</a>.
+The saved files can also be reused by the <a href="../FractalMovieGenerator">Mandelbrot movie generator sample</a>.
 <p>The possible actions are:
 <ul class="samplesList">
   <li><img src="src/icons/record.gif" border="0" alt="record"/> toggle recording: this switches from recording mode "off" to "on" and vice versa. When recording is on, any newly generated image will have its parameters added to the record set</li>

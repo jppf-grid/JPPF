@@ -1,8 +1,8 @@
 $template{name="sample-readme-html-header" title="Generation of Mandelbrot Fractal Movies"}$
 <h3>What does the sample do?</h3>
 This sample demonstrates a JPPF grid based on a volunteer computing model.
-Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals/Readme.html">Fractals</a> sample.
-<p>For this, we will reuse the code and artifacts of the <a href="../Fractals/Readme.html">Fractals</a> sample, since it already implements JPPF tasks for the Mandelbrot computations, along with the code to submit the corresponding JPPF jobs.
+Its goal is to generate AVI movies made of fractal images (Mandelbrot set) individually computed as in the <a href="../Fractals">Fractals</a> sample.
+<p>For this, we will reuse the code and artifacts of the <a href="../Fractals">Fractals</a> sample, since it already implements JPPF tasks for the Mandelbrot computations, along with the code to submit the corresponding JPPF jobs.
 The movie file itself is created using the <a href="http://www.randelshofer.ch/monte/">Monte Media Library</a>.
 <p>Additionally, we will also generate a specific node distribution, with the following extensions and customizations:
 <ul class="samplesList">

@@ -1,6 +1,6 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "5.2-alpha";
+  $ver1 = "5.2-beta2";
   $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 <html>
@@ -105,7 +105,7 @@
         <br/>
 				</div>
 				<div class="jppf_content">
-  <h1 align="center">Downloads - JPPF 5.2 alpha preview</h1>
+  <h1 align="center">Downloads - JPPF 5.2 beta 2 preview</h1>
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
       <a name="<?php echo $ver1 ?>"></a>
@@ -123,12 +123,6 @@
       <h3>Android Node</h3>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-redist.zip/download'; ?>">Android node app binaries and dependencies</a><br>
       <a href="<?php echo $base . 'JPPF-' . $ver1 . '-node-android-src.zip/download'; ?>">Full source as a Gradle/Android Studio project</a><br>
-      <!--
-      You may also download the node APK directly to a device:<br><br>
-      <a class="yhd" href="<?php echo $base . 'JPPF-' . $ver1 . '-AndroidNode.apk/download'; ?>">
-        <img style="vertical-align: middle" src="images/jppf_icon_48x48.png"/><span style="vertical-align: middle">&nbsp;&nbsp;Download the node APK</span>
-      </a><br><div style="height: 15px"></div>
-      -->
       <div style="height: 10px"></div>
       <table cellpadding="3"><tr>
         <td valign="middle">
@@ -160,7 +154,7 @@
       <div align="left" style="border-bottom: solid 1px #B5C0E0; padding: 0px; margin-left: -5px; margin-right: -8px">
   <h2>&nbsp;<img src="images/icons/warning.png" class="titleWithIcon"/>Please note</h2>
 </div>
-      <p style="font-style: italic; font-weight: bold">JPPF 5.2 alpha is a preview release and is not intended for deployment in production.
+      <p style="font-style: italic; font-weight: bold">JPPF 5.2 beta 2 is a preview release and is not intended for deployment in production.
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>

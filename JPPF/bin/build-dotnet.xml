@@ -72,9 +72,9 @@
   <!-- build the .Net bridge -->
   <target name="dotnet.build" if="csc.present">
     <ant antfile="${dotnet-bridge}/build.xml" target="build" inheritall="false"/>
-    <delete quiet="true" dir="${home}/csdoc-5"/>
-    <mkdir dir="${home}/csdoc-5"/>
-    <copy todir="${home}/csdoc-5">
+    <delete quiet="true" dir="${home}/csdoc/5.2"/>
+    <mkdir dir="${home}/csdoc/5.2"/>
+    <copy todir="${home}/csdoc/5.2">
       <fileset dir="${dotnet-bridge}/csdoc/html"/>
     </copy>
   </target>

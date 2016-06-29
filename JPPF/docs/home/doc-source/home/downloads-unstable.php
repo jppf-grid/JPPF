@@ -1,10 +1,10 @@
 <?php
   $currentPage = "Download";
-  $ver1 = "5.2-beta";
+  $ver1 = "5.2-beta2";
   $base = "http://sourceforge.net/projects/jppf-project/files/jppf-project/latest-unstable/";
 ?>
 $template{name="about-page-header" title="Downloads - unstable"}$
-  <h1 align="center">Downloads - JPPF 5.2 beta preview</h1>
+  <h1 align="center">Downloads - JPPF 5.2 beta 2 preview</h1>
 
   <div class="column_left" style="text-align: justify; padding: 0px">
     <div class="blockWithHighlightedTitle">
@@ -56,7 +56,7 @@ $template{name="about-page-header" title="Downloads - unstable"}$
   <div class="column_right" style="text-align: justify; padding: 0px;">
     <div class="blockWithHighlightedTitle">
       $template{name="highlighted-title-with-icon" img="images/icons/warning.png" title="Please note" heading="h2"}$
-      <p style="font-style: italic; font-weight: bold">JPPF 5.2 beta is a preview release and is not intended for deployment in production.
+      <p style="font-style: italic; font-weight: bold">JPPF 5.2 beta 2 is a preview release and is not intended for deployment in production.
       <p>You are welcome to try it and provide feedback in our <a href="/forums">user forums</a>, as well as register bugs or enhancement requests in our <a href="/tracker/tbg/jppf/issues/find/saved_search/8/search/1">issue tracker</a>,
       so we have a chance to improve it before the final release.
     </div>
