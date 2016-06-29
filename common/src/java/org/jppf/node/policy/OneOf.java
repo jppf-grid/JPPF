@@ -109,11 +109,11 @@ public class OneOf extends ExecutionPolicy {
         else if (numberValues != null) sb.append("numeric");
         sb.append("\" ignoreCase=\"").append(ignoreCase).append("\">\n");
         toStringIndent++;
-        sb.append(indent()).append(xmlElement("<Property>", propertyName)).append('\n');
+        sb.append(indent()).append(xmlElement("Property", propertyName)).append('\n');
         if (stringValues != null) {
-          for (String s : stringValues) sb.append(indent()).append(xmlElement("<Value>", s)).append('\n');
+          for (String s : stringValues) sb.append(indent()).append(xmlElement("Value", s)).append('\n');
         } else {
-          for (double d : numberValues) sb.append(indent()).append(xmlElement("<Value>", d)).append('\n');
+          for (double d : numberValues) sb.append(indent()).append(xmlElement("Value", d)).append('\n');
         }
         toStringIndent--;
         sb.append(indent()).append("</OneOf>\n");
