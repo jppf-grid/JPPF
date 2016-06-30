@@ -279,6 +279,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       action.call();
     } finally {
       log.info("setting pool size to 1");
+      pool.awaitActiveConnections(Operator.EQUAL, jobs.size());
       pool.setSize(1);
       pool.awaitWorkingConnections(Operator.EQUAL, 1);
     }
