@@ -47,13 +47,12 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
     if (selector instanceof AllNodesSelector) return true;
     if (node.isPeer()) return false;
-    else if (selector instanceof UuidSelector) return ((UuidSelector) selector).getUuids().contains(node.getUuid());
-    else if (selector instanceof ExecutionPolicySelector) {
+    if (selector instanceof ExecutionPolicySelector) {
       ExecutionPolicy policy = ((ExecutionPolicySelector) selector).getPolicy();
       TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
       return policy.accepts(node.getSystemInformation());
     }
-    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
+    return selector.accepts(node.getManagementInfo());
   }
 
   @Override
@@ -81,50 +80,32 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    */
   public Set<AbstractNodeContext> getChannels(final NodeSelector selector, final boolean includePeers) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof AllNodesSelector) {
-      Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
-      Set<AbstractNodeContext> result = new HashSet<>();
-      for (AbstractNodeContext ctx : fullSet) {
-        if (hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) result.add(ctx);
-      }
-      return result;
-    } else if (selector instanceof UuidSelector) return getChannels(new HashSet<>(((UuidSelector) selector).getUuids()), includePeers);
-    else if (selector instanceof ExecutionPolicySelector) return getChannels(((ExecutionPolicySelector) selector).getPolicy(), includePeers);
-    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
-  }
-
-  /**
-   * Get the available channels with the specified node uuids.
-   * @param uuids the node uuids for which we want a channel reference.
-   * @param includePeers whether peer drivers should be counted as nodes and included.
-   * @return a {@link Set} of {@link AbstractNodeContext} instances.
-   */
-  private Set<AbstractNodeContext> getChannels(final Set<String> uuids, final boolean includePeers) {
+    if (selector instanceof ExecutionPolicySelector) return getChannels((ExecutionPolicySelector) selector, includePeers);
+    Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     Set<AbstractNodeContext> result = new HashSet<>();
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-    for (AbstractNodeContext context : allChannels) {
-      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
-      if (uuids.contains(context.getUuid())) result.add(context);
+    for (AbstractNodeContext ctx : fullSet) {
+      if ((hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) && selector.accepts(ctx.getManagementInfo())) result.add(ctx);
     }
     return result;
   }
 
   /**
    * Get the available channels for the specified nodes.
-   * @param policy an execution to match against the nodes.
+   * @param selector an execution policy selector to match against the nodes.
    * @param includePeers whether peer drivers should be counted as nodes and included.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
-  private Set<AbstractNodeContext> getChannels(final ExecutionPolicy policy, final boolean includePeers) {
+  private Set<AbstractNodeContext> getChannels(final ExecutionPolicySelector selector, final boolean includePeers) {
+    ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     Set<AbstractNodeContext> result = new HashSet<>();
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
       if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
-      JPPFSystemInformation info = context.getSystemInformation();
+      JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) continue;
-      if (policy.accepts(info)) result.add(context);
+      if (selector.accepts(info)) result.add(context);
     }
     return result;
   }
@@ -137,50 +118,32 @@ public class NodeSelectionHelper implements NodeSelectionProvider {
    */
   public int getNbChannels(final NodeSelector selector, final boolean includePeers) {
     if (selector == null) throw new IllegalArgumentException("selector cannot be null");
-    if (selector instanceof AllNodesSelector) {
-      Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
-      int result = 0;
-      for (AbstractNodeContext ctx : fullSet) {
-        if (hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) result++;
-      }
-      return result;
-    } else if (selector instanceof UuidSelector) return getNbChannels(new HashSet<>(((UuidSelector) selector).getUuids()), includePeers);
-    else if (selector instanceof ExecutionPolicySelector) return getNbChannels(((ExecutionPolicySelector) selector).getPolicy(), includePeers);
-    throw new IllegalArgumentException("unknown selector type: " + selector.getClass().getName());
-  }
-
-  /**
-   * Get the number available channels whose uuids are in a specified set.
-   * @param uuids the node uuids for which we want a channel reference.
-   * @param includePeers whether peer drivers should be counted as nodes and included.
-   * @return a {@link Set} of {@link AbstractNodeContext} instances.
-   */
-  private int getNbChannels(final Set<String> uuids, final boolean includePeers) {
+    if (selector instanceof ExecutionPolicySelector) return getNbChannels((ExecutionPolicySelector) selector, includePeers);
+    Set<AbstractNodeContext> fullSet = getNodeNioServer().getAllChannelsAsSet();
     int result = 0;
-    List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
-    for (AbstractNodeContext context : allChannels) {
-      if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
-      if (uuids.contains(context.getUuid())) result++;
+    for (AbstractNodeContext ctx : fullSet) {
+      if ((hasWorkingJmxConnection(ctx) || (ctx.isPeer() && includePeers)) && selector.accepts(ctx.getManagementInfo())) result++;
     }
     return result;
   }
 
   /**
    * Get the number of available channels that match the specified execution policy.
-   * @param policy an execution to match against the nodes.
+   * @param selector an execution policy selector to match against the nodes.
    * @param includePeers whether peer drivers should be counted as nodes and included.
    * @return a {@link Set} of {@link AbstractNodeContext} instances.
    */
-  private int getNbChannels(final ExecutionPolicy policy, final boolean includePeers) {
+  private int getNbChannels(final ExecutionPolicySelector selector, final boolean includePeers) {
+    ExecutionPolicy policy = selector.getPolicy();
     if (policy.getContext() == null) TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     int result = 0;
     List<AbstractNodeContext> allChannels = getNodeNioServer().getAllChannels();
     TaskQueueChecker.preparePolicy(policy, null, driver.getStatistics(), 0);
     for (AbstractNodeContext context : allChannels) {
       if (!hasWorkingJmxConnection(context) && !(context.isPeer() && includePeers)) continue;
-      JPPFSystemInformation info = context.getSystemInformation();
+      JPPFManagementInfo info = context.getManagementInfo();
       if (info == null) continue;
-      if (policy.accepts(info)) result++;
+      if (selector.accepts(info)) result++;
     }
     return result;
   }

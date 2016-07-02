@@ -25,7 +25,7 @@ import org.jppf.utils.*;
 import org.slf4j.*;
 
 /**
- * A job selector that uses a script to accept jobs. The script is evaluated using the {@code javax.script.*} API (JSR-223).
+ * Base class for implementing and embedding all sorts of scripted logic. Scripts are evaluated using the {@code javax.script.*} API (JSR-223).
  * @author Laurent Cohen
  * @since 5.2
  */

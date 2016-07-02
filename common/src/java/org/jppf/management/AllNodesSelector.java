@@ -28,4 +28,9 @@ public class AllNodesSelector implements NodeSelector {
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+
+  @Override
+  public boolean accepts(final JPPFManagementInfo nodeInfo) {
+    return nodeInfo != null;
+  }
 }

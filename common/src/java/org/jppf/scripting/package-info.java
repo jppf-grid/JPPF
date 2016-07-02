@@ -24,6 +24,5 @@
  * where each line contains the fully qualified name of a class implementing {@link org.jppf.scripting.ScriptRunner ScriptRunner} with a no-args constructor</li>
  * <li>the discovered script runners are grouped by language and can be accessed via the {@link org.jppf.scripting.ScriptRunnerFactory ScriptRunnerFactory} static methods</li>
  * </ul>  
- * @exclude
  */
 package org.jppf.scripting;

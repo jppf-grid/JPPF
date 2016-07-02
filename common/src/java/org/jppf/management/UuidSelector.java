@@ -57,4 +57,9 @@ public class UuidSelector implements NodeSelector, DriverSelector {
   public Collection<String> getUuids() {
     return uuids;
   }
+
+  @Override
+  public boolean accepts(final JPPFManagementInfo nodeInfo) {
+    return (nodeInfo != null) && uuids.contains(nodeInfo.getUuid());
+  }
 }

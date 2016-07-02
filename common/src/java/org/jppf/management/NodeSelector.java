@@ -34,6 +34,13 @@ public interface NodeSelector extends Serializable {
   NodeSelector ALL_NODES = new org.jppf.management.AllNodesSelector();
 
   /**
+   * Determine whether a node is accepted by this selector.
+   * @param nodeInfo information on the node.
+   * @return {@code true} if the node is accepted, {@code false} otherwise.
+   */
+  boolean accepts(JPPFManagementInfo nodeInfo);
+
+  /**
    * Selects all nodes.
    * @deprecated use {@link org.jppf.management.AllNodesSelector} instead.
    */

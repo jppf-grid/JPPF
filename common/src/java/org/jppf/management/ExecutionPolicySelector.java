@@ -49,4 +49,9 @@ public class ExecutionPolicySelector implements NodeSelector, DriverSelector {
   public ExecutionPolicy getPolicy() {
     return policy;
   }
+
+  @Override
+  public boolean accepts(final JPPFManagementInfo nodeInfo) {
+    return policy.accepts(nodeInfo.getSystemInfo());
+  }
 }
