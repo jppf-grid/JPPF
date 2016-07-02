@@ -30,7 +30,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class JVMHealthRefreshHandler extends AbstractRefreshHandler {
+class JVMHealthRefreshHandler extends AbstractRefreshHandler {
   /**
    * Logger for this class.
    */
