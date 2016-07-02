@@ -31,7 +31,7 @@ import org.slf4j.*;
  * ScriptRunner wrapper around a JSR-223 compliant script engine.
  * @author Laurent Cohen
  */
-public class ScriptRunnerImpl implements ScriptRunner {
+class ScriptRunnerImpl implements ScriptRunner {
   /**
    * Logger for this class.
    */
@@ -74,7 +74,7 @@ public class ScriptRunnerImpl implements ScriptRunner {
    * @param language the language supported by this script engine.
    * @throws JPPFScriptingException if the engine oculd not be created.
    */
-  public ScriptRunnerImpl(final String language) throws JPPFScriptingException {
+  ScriptRunnerImpl(final String language) throws JPPFScriptingException {
     this.language = language;
     this.engine = createEngine();
   }
@@ -117,7 +117,7 @@ public class ScriptRunnerImpl implements ScriptRunner {
         } catch (Exception e) {
           throw buildScriptingException(e);
         }
-      } else cacheRequests.incrementAndGet();
+      } else cacheHits.incrementAndGet();
     }
     if (debugEnabled) log.debug(String.format("script cache statistics for '%s': requests=%d, hits=%d, misses=%d", language, cacheRequests.get(), cacheHits.get(), cacheMisses.get()));
     try {

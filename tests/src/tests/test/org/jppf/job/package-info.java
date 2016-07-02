@@ -16,21 +16,7 @@
  * limitations under the License.
  */
 
-package test;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-import test.org.jppf.classloader.TestResourceLookup;
-import test.org.jppf.server.protocol.*;
-
-
-
 /**
- * A suite of JUnit tests.
- * @author Laurent Cohen
+ * Unit tests for {@link org.jppf.job} code.
  */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ TestJPPFTask.class, TestResourceLookup.class })
-public class JPPFSuite {
-}
+package test.org.jppf.job;

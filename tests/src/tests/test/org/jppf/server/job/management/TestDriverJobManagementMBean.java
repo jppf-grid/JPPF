@@ -272,17 +272,15 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   private void testJobSelectorAction(final JobSelectorAction action) throws Exception {
     List<JPPFJob> jobs = action.getJobs();
     JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-    try {
-      pool.setSize(jobs.size());
-      pool.awaitWorkingConnections(Operator.EQUAL, jobs.size());
-      for (JPPFJob job: jobs) client.submitJob(job);
-      action.call();
-    } finally {
-      log.info("setting pool size to 1");
-      pool.awaitActiveConnections(Operator.EQUAL, jobs.size());
-      pool.setSize(1);
-      pool.awaitWorkingConnections(Operator.EQUAL, 1);
-    }
+    pool.setSize(jobs.size());
+    pool.awaitWorkingConnections(Operator.EQUAL, jobs.size());
+    for (JPPFJob job: jobs) client.submitJob(job);
+    action.call();
+    log.info("waiting for " + jobs.size() + " active connections");
+    pool.awaitActiveConnections(Operator.EQUAL, jobs.size());
+    log.info("setting pool size to 1");
+    pool.setSize(1);
+    pool.awaitWorkingConnections(Operator.EQUAL, 1);
   }
 
   /**

@@ -198,7 +198,8 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
             boolean ssl = config.getBoolean(name + '.' + JPPFProperties.SSL_ENABLED.getName(), false);
             JPPFProperty<String> serverProp = JPPFProperties.SERVER_HOST;
             info.host = config.getString(name + '.' + serverProp.getName(), serverProp.getDefaultValue());
-            JPPFProperty<Integer> portProp = ssl ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT;
+            //JPPFProperty<Integer> portProp = ssl ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT;
+            JPPFProperty<Integer> portProp = JPPFProperties.SERVER_PORT;
             int port = config.getInt(name + '.' + portProp.getName(), portProp.getDefaultValue());
             if (!ssl) info.serverPorts = new int[] { port };
             else info.sslServerPorts = new int[] { port };

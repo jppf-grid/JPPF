@@ -237,7 +237,9 @@ public class DriverJobManagement extends NotificationBroadcasterSupport implemen
 
   @Override
   public void cancelJobs(final JobSelector selector) throws Exception {
-    for (String uuid: selectJobUuids(selector)) cancelJob(uuid);
+    Set<String> uuids = selectJobUuids(selector);
+    if (debugEnabled) log.debug("request to cancel jobs with these uuids: {}, job selector = {}", uuids, selector);
+    for (String uuid: uuids) cancelJob(uuid);
   }
 
   @Override

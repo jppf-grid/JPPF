@@ -53,7 +53,8 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
    */
   @Test(timeout=10000)
   public void resourcesLookup() throws Exception {
-    //URL url = getClass().getClassLoader().getResource("client-resource-1.txt");
+    URL url = getClass().getClassLoader().getResource("client-resource-1.txt");
+    System.out.println("local url = " + url);
     String name = ReflectionUtils.getCurrentMethodName();
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, MyTask.class));
     assertNotNull(results);
@@ -68,26 +69,10 @@ public class TestResourceLookup extends AbstractNonStandardSetup {
     assertNull(task.clientResource2);
   }
 
-  /**
-   *
-   */
+  /** */
   public static class MyTask extends AbstractTask<String> {
-    /**
-     *
-     */
-    public String driverResource1 = null;
-    /**
-     *
-     */
-    public String driverResource2 = null;
-    /**
-     *
-     */
-    public String clientResource1 = null;
-    /**
-     *
-     */
-    public String clientResource2 = null;
+    /** */
+    public String driverResource1 = null, driverResource2 = null, clientResource1 = null, clientResource2 = null;
 
     @Override
     public void run() {

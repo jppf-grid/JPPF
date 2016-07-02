@@ -58,9 +58,14 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testDefaultConstructor() throws Exception {
+    Exception exception = null;
     try (JPPFClient client = new JPPFClient()) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
+    } catch(Exception e) {
+      exception = e;
+      e.printStackTrace();
     }
+    if (exception != null) throw exception;
   }
 
   /**
@@ -242,11 +247,9 @@ public class TestJPPFClient extends Setup1D1N {
    */
   @Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception {
-
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
-      List<Task<?>> results = client.submitJob(job);    //TypedProperties config = JPPFConfiguration.getProperties();
-
+      List<Task<?>> results = client.submitJob(job);
       assertNotNull(results);
       assertEquals(1, results.size());
       Task<?> task = results.get(0);

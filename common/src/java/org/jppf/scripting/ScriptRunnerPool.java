@@ -24,7 +24,7 @@ import org.jppf.utils.pooling.AbstractObjectPoolQueue;
  * 
  * @author Laurent Cohen
  */
-public class ScriptRunnerPool extends AbstractObjectPoolQueue<ScriptRunner> {
+class ScriptRunnerPool extends AbstractObjectPoolQueue<ScriptRunner> {
   /**
    * The script engine language to use.
    */
@@ -34,7 +34,7 @@ public class ScriptRunnerPool extends AbstractObjectPoolQueue<ScriptRunner> {
    * Initialize this pool for the specified script language.
    * @param language the script engine language to use.
    */
-  public ScriptRunnerPool(final String language) {
+  ScriptRunnerPool(final String language) {
     this.language = language;
   }
 

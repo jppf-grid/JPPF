@@ -77,7 +77,7 @@ public class BaseSetup {
    * @throws Exception if a JMX connection could not be obtained.
    */
   public static JMXDriverConnectionWrapper getJMXConnection(final JPPFClient client) throws Exception {
-    return client.awaitWorkingConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
+    return client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
   }
 
   /**
@@ -124,6 +124,7 @@ public class BaseSetup {
    */
   public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes, final Configuration config) throws Exception {
     System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (createClient ? " and 1 client" : ""));
+    ConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
