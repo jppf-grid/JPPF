@@ -40,6 +40,18 @@ import test.org.jppf.test.setup.common.*;
  */
 public class TestJobPersistence extends Setup1D1N {
   /**
+   * @throws Exception if any error occurs.
+   */
+  //@Test(timeout = 100 * 1000)
+  public void testInLoop() throws Exception {
+    for (int i=1; i<=10; i++) {
+      System.out.println("testing job recovery iteration #" + i);
+      testJobRecovery();
+      System.out.println("==> job recovery iteration #" + i + " done");
+    }
+  }
+
+  /**
    * Test the recovery of a job by closing the JPPF client before it completes.
    * @throws Exception if any error occurs.
    */
