@@ -68,7 +68,7 @@ public class TestNetworkConnectionInterceptor {
       client = new Socket("localhost", PORT);
       assertTrue(client.isConnected());
       assertTrue(InterceptorHandler.invokeOnConnect(client));
-      assertTrue(server.result);
+      assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
     } finally {
@@ -109,7 +109,7 @@ public class TestNetworkConnectionInterceptor {
       assertTrue(client.isConnected());
       client.configureBlocking(true);
       assertTrue(InterceptorHandler.invokeOnConnect(client));
-      assertTrue(server.result);
+      assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
     } finally {
@@ -149,7 +149,7 @@ public class TestNetworkConnectionInterceptor {
       assertTrue(client.isConnected());
       client.configureBlocking(true);
       assertTrue(InterceptorHandler.invokeOnConnect(client));
-      assertTrue(server.result);
+      assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
     } finally {
@@ -187,7 +187,7 @@ public class TestNetworkConnectionInterceptor {
       client = new Socket("localhost", PORT);
       assertTrue(client.isConnected());
       assertTrue(InterceptorHandler.invokeOnConnect(client));
-      assertTrue(server.result);
+      assertTrue(server.isResult());
       assertEquals(TestInterceptor.CLIENT_MESSAGE, TestInterceptor.clientMessage);
       assertEquals(TestInterceptor.SERVER_MESSAGE, TestInterceptor.serverMessage);
     } finally {
@@ -219,7 +219,8 @@ public class TestNetworkConnectionInterceptor {
     /**
      * The result of calling the interceptor on the accepted socket.
      */
-    public boolean result;
+    private boolean result;
+
     /**
      * 
      */
@@ -233,7 +234,9 @@ public class TestNetworkConnectionInterceptor {
         log.debug("server bound to port {}", server.getLocalPort());
         Socket socket = server.accept();
         log.debug("accepted socket {}", socket);
-        result = InterceptorHandler.invokeOnAccept(socket);
+        synchronized(this) {
+          result = InterceptorHandler.invokeOnAccept(socket);
+        }
         log.debug("result = {}", result);
       } catch (Exception e) {
         e.printStackTrace();
@@ -249,6 +252,13 @@ public class TestNetworkConnectionInterceptor {
       } catch (Exception ignore) {
       }
     }
+
+    /**
+     * @return the result.
+     */
+    public synchronized boolean isResult() {
+      return result;
+    }
   }
 
   /**
@@ -262,7 +272,7 @@ public class TestNetworkConnectionInterceptor {
     /**
      * The result of calling the interceptor on the accepted socket channel.
      */
-    public boolean result;
+    private boolean result;
     /**
      * 
      */
@@ -280,7 +290,9 @@ public class TestNetworkConnectionInterceptor {
         SocketChannel channel = server.accept();
         log.debug("accepted channel {}", channel);
         channel.configureBlocking(true);
-        result = InterceptorHandler.invokeOnAccept(channel);
+        synchronized(this) {
+          result = InterceptorHandler.invokeOnAccept(channel);
+        }
         log.debug("result = {}", result);
       } catch (Exception e) {
         e.printStackTrace();
@@ -295,6 +307,13 @@ public class TestNetworkConnectionInterceptor {
         if (server != null) server.close();        
       } catch (Exception ignore) {
       }
+    }
+
+    /**
+     * @return the result.
+     */
+    public synchronized boolean isResult() {
+      return result;
     }
   }
 }
