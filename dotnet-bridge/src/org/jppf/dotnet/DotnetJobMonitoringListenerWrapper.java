@@ -47,42 +47,42 @@ public class DotnetJobMonitoringListenerWrapper extends AbstractDotnetListenerWr
   }
 
   @Override
-  public void driverAdded(JobMonitoringEvent event) {
+  public void driverAdded(final JobMonitoringEvent event) {
     if (debugEnabled) log.debug(event.toString());
     delegate(event, "DriverAdded");
   }
 
   @Override
-  public void driverRemoved(JobMonitoringEvent event) {
+  public void driverRemoved(final JobMonitoringEvent event) {
     if (debugEnabled) log.debug(event.toString());
     delegate(event, "DriverRemoved");
   }
 
   @Override
-  public void jobAdded(JobMonitoringEvent event) {
+  public void jobAdded(final JobMonitoringEvent event) {
     if (debugEnabled) log.debug(event.toString());
     delegate(event, "JobAdded");
   }
 
   @Override
-  public void jobRemoved(JobMonitoringEvent event) {
+  public void jobRemoved(final JobMonitoringEvent event) {
     if (debugEnabled) log.debug(event.toString());
     delegate(event, "JobRemoved");
   }
 
   @Override
-  public void jobUpdated(JobMonitoringEvent event) {
+  public void jobUpdated(final JobMonitoringEvent event) {
     if (debugEnabled) log.debug(event.toString());
     delegate(event, "JobUpdated");
   }
 
   @Override
-  public void jobDispatchAdded(JobMonitoringEvent event) {
+  public void jobDispatchAdded(final JobMonitoringEvent event) {
     delegate(event, "JobDispatchAdded");
   }
 
   @Override
-  public void jobDispatchRemoved(JobMonitoringEvent event) {
+  public void jobDispatchRemoved(final JobMonitoringEvent event) {
     if (debugEnabled) log.debug(event.toString());
     delegate(event, "JobDispatchRemoved");
   }

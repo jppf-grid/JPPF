@@ -55,6 +55,7 @@ public class AbstractDotnetListenerWrapper {
 
   /**
    * Initialize this wrapper with the .Net dispatcher and names of notification methods.
+   * @param debugEnabled whether debug output is enabledr.
    * @param dotnetDispatcher the object which propagates event notifications to the actual .Net listener.
    * @param methodNames the names of the .Net listener notification methods.
    */
@@ -80,7 +81,7 @@ public class AbstractDotnetListenerWrapper {
   /**
    * Delegate the specified event to the specified .Net method
    * @param event the event to send.
-   * @param method name the name of the method to invoke on the proxy to the .Net listener.
+   * @param methodName the name of the method to invoke on the proxy to the .Net listener.
    */
   protected void delegate(final Object event, final String methodName) {
     if (dotnetDispatcher == null) return;
