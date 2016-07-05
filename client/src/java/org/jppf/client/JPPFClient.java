@@ -177,6 +177,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public void reset() {
     if (isClosed()) return;
+    if (debugEnabled) log.debug("resetting client");
     if (resetting.compareAndSet(false, true)) {
       close(true);
       JPPFConfiguration.reset();
@@ -193,6 +194,7 @@ public class JPPFClient extends AbstractGenericClient {
    */
   public void reset(final TypedProperties configuration) {
     if (isClosed()) return;
+    if (debugEnabled) log.debug("resetting client");
     if (resetting.compareAndSet(false, true)) {
       close(true);
       init(configuration);

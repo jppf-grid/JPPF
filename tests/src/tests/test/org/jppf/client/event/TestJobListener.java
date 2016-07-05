@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
+import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.Test;
@@ -92,11 +93,15 @@ public class TestJobListener extends Setup1D1N {
       configure(true, false, 1);
       client = BaseSetup.createClient(null, false);
       CountingJobListener listener = new CountingJobListener();
+      AwaitDispatchNotificationListener jmxListener = new AwaitDispatchNotificationListener();
+      DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
+      jobManager.addNotificationListener(jmxListener, null, null);
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L);
       job.addJobListener(listener);
-      client.submitJob(job);
-      Thread.sleep(2000L);
+      //Thread.sleep(2000L);
+      jmxListener.await();
+      jobManager.removeNotificationListener(jmxListener);
       client.reset();
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
@@ -119,7 +124,7 @@ public class TestJobListener extends Setup1D1N {
    * @return the execution results.
    * @throws Exception if any error occurs
    */
-  public List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
+  private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
     client = BaseSetup.createClient(null, false);
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);

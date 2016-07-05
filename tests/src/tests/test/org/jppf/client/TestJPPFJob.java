@@ -23,12 +23,8 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.management.*;
 
 import org.jppf.client.*;
-import org.jppf.job.*;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
@@ -95,7 +91,7 @@ public class TestJPPFJob extends Setup1D1N {
       int nbTasks = 10;
       JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
       DriverJobManagementMBean jobManager = driver.getJobManager();
-      MyNotifListener listener = new MyNotifListener();
+      AwaitDispatchNotificationListener listener = new AwaitDispatchNotificationListener();
       try {
         jobManager.addNotificationListener(listener, null, null);
         JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
@@ -130,7 +126,7 @@ public class TestJPPFJob extends Setup1D1N {
       int nbTasks = 1;
       JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
       DriverJobManagementMBean jobManager = driver.getJobManager();
-      MyNotifListener listener = new MyNotifListener();
+      AwaitDispatchNotificationListener listener = new AwaitDispatchNotificationListener();
       try {
         jobManager.addNotificationListener(listener, null, null);
         JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
@@ -189,28 +185,6 @@ public class TestJPPFJob extends Setup1D1N {
       assertEquals(1, count);
       assertTrue(job.isCancelled());
       assertTrue(job.isDone());
-    }
-  }
-
-  /** */
-  private static class MyNotifListener implements NotificationListener {
-    /** */
-    final AtomicBoolean flag = new AtomicBoolean(false);
-
-    @Override
-    public void handleNotification(final Notification notification, final Object handback) {
-      JobNotification notif = (JobNotification) notification;
-      if (notif.getEventType() == JobEventType.JOB_DISPATCHED) flag.set(true);
-    }
-
-    /**
-     * Wait until the executing flag is set to {@code true}.
-     */
-    public void await() {
-      try {
-        while (!flag.get()) Thread.sleep(10L);
-      } catch(InterruptedException ignore) {
-      }
     }
   }
 }
