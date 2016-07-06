@@ -63,7 +63,7 @@ public class BaseTest {
 
     @Override
     protected void finished(final Description description) {
-      print("***** finished class %s() *****", description.getClassName());
+      print("***** finished class %s *****", description.getClassName());
       zipLogs(description.getClassName());
     }
   };
@@ -100,6 +100,12 @@ public class BaseTest {
   private static void print(final String format, final Object...params) {
     String message = String.format(format, params);
     System.out.println(message);
+    StringBuilder sb = new StringBuilder("*****");
+    for (int i=0; i<message.length()-10; i++) sb.append('-');
+    sb.append("*****");
+    String s = sb.toString();
+    log.info(s);
     log.info(message);
+    log.info(s);
   }
 }
