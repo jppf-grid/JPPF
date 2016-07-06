@@ -55,8 +55,10 @@ public class BaseTest {
       // delete the drivers and nodes log files if they exist
       File dir = new File(System.getProperty("user.dir"));
       File[] logFiles = dir.listFiles(logFileFilter);
-      for (File file: logFiles) {
-        if (file.exists() && !file.delete()) System.err.printf("Could not delete %s%n", file);
+      if (logFiles != null) {
+        for (File file: logFiles) {
+          if (file.exists() && !file.delete()) System.err.printf("Could not delete %s%n", file);
+        }
       }
     }
 
