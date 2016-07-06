@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import org.jppf.client.*;
+import org.jppf.job.JobEventType;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
@@ -74,7 +75,6 @@ public class TestJPPFJob extends Setup1D1N {
       CountingJobListener listener = new CountingJobListener();
       job.addJobListener(listener);
       client.submitJob(job);
-      //Thread.sleep(500L);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
     }
@@ -91,12 +91,12 @@ public class TestJPPFJob extends Setup1D1N {
       int nbTasks = 10;
       JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
       DriverJobManagementMBean jobManager = driver.getJobManager();
-      AwaitDispatchNotificationListener listener = new AwaitDispatchNotificationListener();
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
       try {
         jobManager.addNotificationListener(listener, null, null);
         JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
         client.submitJob(job);
-        listener.await();
+        listener.await(JobEventType.JOB_DISPATCHED);
         boolean cancelled = job.cancel(true);
         assertTrue(cancelled);
         List<Task<?>> results = job.get();
@@ -126,12 +126,12 @@ public class TestJPPFJob extends Setup1D1N {
       int nbTasks = 1;
       JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
       DriverJobManagementMBean jobManager = driver.getJobManager();
-      AwaitDispatchNotificationListener listener = new AwaitDispatchNotificationListener();
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
       try {
         jobManager.addNotificationListener(listener, null, null);
         JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
         client.submitJob(job);
-        listener.await();
+        listener.await(JobEventType.JOB_DISPATCHED);
         boolean cancelled = job.cancel(false);
         assertFalse(cancelled);
         List<Task<?>> results = job.get();

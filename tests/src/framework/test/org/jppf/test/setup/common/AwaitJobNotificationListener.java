@@ -23,26 +23,33 @@ import javax.management.*;
 import org.jppf.job.*;
 
 /**
- * This notification listener waits until a job is dispatched to a node.
+ * This notification listener waits until a specified job lifecycle event is received.
  */
-public class AwaitDispatchNotificationListener implements NotificationListener {
+public class AwaitJobNotificationListener implements NotificationListener {
+  /**
+   * The expected event.
+   */
+  private JobEventType expectedEvent = JobEventType.JOB_DISPATCHED; 
+
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     JobNotification jobNotif = (JobNotification) notification;
     String uuid = jobNotif.getJobInformation().getJobUuid();
-    if (jobNotif.getEventType() == JobEventType.JOB_DISPATCHED) {
-      try {
-        synchronized(this) {
-          notifyAll();
-        }
-      } catch (Exception ignore) {
-        ignore.printStackTrace();
+    try {
+      synchronized(this) {
+        if (jobNotif.getEventType() == expectedEvent) notifyAll();
       }
+    } catch (Exception ignore) {
+      ignore.printStackTrace();
     }
   }
 
-  /** */
-  public synchronized void await() {
+  /**
+   * Await the specified event.
+   * @param eventType the type of event to wait for.
+   */
+  public synchronized void await(final JobEventType eventType) {
+    this.expectedEvent = eventType;
     try {
       wait();
     } catch (Exception e) {

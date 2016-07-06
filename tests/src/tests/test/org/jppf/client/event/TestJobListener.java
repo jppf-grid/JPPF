@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jppf.client.*;
+import org.jppf.job.JobEventType;
 import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
@@ -93,14 +94,13 @@ public class TestJobListener extends Setup1D1N {
       configure(true, false, 1);
       client = BaseSetup.createClient(null, false);
       CountingJobListener listener = new CountingJobListener();
-      AwaitDispatchNotificationListener jmxListener = new AwaitDispatchNotificationListener();
+      AwaitJobNotificationListener jmxListener = new AwaitJobNotificationListener();
       DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
       jobManager.addNotificationListener(jmxListener, null, null);
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L);
       job.addJobListener(listener);
-      //Thread.sleep(2000L);
-      jmxListener.await();
+      jmxListener.await(JobEventType.JOB_DISPATCHED);
       jobManager.removeNotificationListener(jmxListener);
       client.reset();
       List<Task<?>> results = job.awaitResults();
