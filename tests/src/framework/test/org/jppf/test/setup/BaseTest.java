@@ -23,12 +23,17 @@ import java.io.*;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.slf4j.*;
 
 /**
  *
  * @author Laurent Cohen
  */
 public class BaseTest {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger("TEST");
   /** */
   private static String name;
   /** */
@@ -46,7 +51,7 @@ public class BaseTest {
   public static TestWatcher classWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      System.out.printf("***** start of class %s *****%n", description.getClassName());
+      print("***** start of class %s *****", description.getClassName());
       File dir = new File(System.getProperty("user.dir"));
       File[] logFiles = dir.listFiles(logFileFIlter);
       for (File file: logFiles) {
@@ -58,7 +63,7 @@ public class BaseTest {
 
     @Override
     protected void finished(final Description description) {
-      System.out.printf("***** finished class %s() *****%n", description.getClassName());
+      print("***** finished class %s() *****", description.getClassName());
       zipLogs(description.getClassName());
     }
   };
@@ -68,17 +73,12 @@ public class BaseTest {
   public TestWatcher instanceWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      System.out.printf("***** start of method %s() *****%n", description.getMethodName());
-    }
-
-    @Override
-    protected void finished(final Description description) {
-      //System.out.printf("***** finished method %s() *****%n", description.getMethodName());
+      print("***** start of method %s() *****", description.getMethodName());
     }
   };
 
   /**
-   * 
+   *
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
@@ -90,5 +90,16 @@ public class BaseTest {
     String[] logPaths = new String[logFiles.length];
     for (int i=0; i<logFiles.length; i++) logPaths[i] = logFiles[i].getPath();
     ZipUtils.zipFile(outZip.getPath(), logPaths);
+  }
+
+  /**
+   *
+   * @param format the format.
+   * @param params the parmaters values.
+   */
+  private static void print(final String format, final Object...params) {
+    String message = String.format(format, params);
+    System.out.println(message);
+    log.info(message);
   }
 }
