@@ -42,7 +42,7 @@ import test.org.jppf.test.setup.common.*;
  * Base test setup for a grid with multiple servers in p2p.
  * @author Laurent Cohen
  */
-public class AbstractNonStandardSetup {
+public class AbstractNonStandardSetup extends BaseTest {
   /**
    * The jppf client to use.
    */

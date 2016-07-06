@@ -26,11 +26,13 @@ import org.jppf.node.policy.*;
 import org.jppf.utils.JPPFUuid;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * 
  * @author Laurent Cohen
  */
-public class TestIsInIPv4Subnet {
+public class TestIsInIPv4Subnet extends BaseTest {
   /**
    * A valid XML representation of an {@code IsInIPv4Subnet} policy.
    */

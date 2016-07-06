@@ -27,7 +27,7 @@ import org.jppf.node.protocol.*;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
@@ -37,7 +37,7 @@ import test.org.jppf.test.setup.common.*;
  * as specified in the job SLA.
  * @author Laurent Cohen
  */
-public class TestJPPFJobSLA3 {
+public class TestJPPFJobSLA3 extends BaseTest {
   /**
    * The client to use.
    */

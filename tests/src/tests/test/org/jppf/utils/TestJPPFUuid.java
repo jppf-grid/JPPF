@@ -26,11 +26,13 @@ import java.util.concurrent.*;
 import org.jppf.utils.JPPFUuid;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for the <code>JPPFUuid</code> class.
  * @author Laurent Cohen
  */
-public class TestJPPFUuid {
+public class TestJPPFUuid extends BaseTest {
   /**
    * Test that JPPFuuid does not generate uuid collisions in multithreaded execution.<br/>
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-207">JPPF-207 JPPFUuid generates uuid collisions in multithreaded mode</a>

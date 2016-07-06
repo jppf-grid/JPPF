@@ -33,11 +33,13 @@ import org.jppf.utils.collections.CollectionUtils;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for the the JMXMPServer class.
  * @author Laurent Cohen
  */
-public class TestJMXMPServer {
+public class TestJMXMPServer extends BaseTest {
   /** */
   private static final String[] PARAMS = {"param1", "param2", "param3"};
   /** */

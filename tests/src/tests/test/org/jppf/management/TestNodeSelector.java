@@ -28,11 +28,13 @@ import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for the node selectors.
  * @author Laurent Cohen
  */
-public class TestNodeSelector {
+public class TestNodeSelector extends BaseTest {
   /**
    * @throws Exception if any error occurs
    */

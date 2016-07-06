@@ -27,13 +27,14 @@ import org.jppf.utils.*;
 import org.jppf.utils.stats.*;
 import org.junit.*;
 
+import test.org.jppf.test.setup.BaseTest;
 import test.org.jppf.test.setup.common.*;
 
 /**
  * Test for functions commons to all execution policies.
  * @author Laurent Cohen
  */
-public class TestExecutionPolicy {
+public class TestExecutionPolicy extends BaseTest {
   /** used for testing logical policies */
   private final ExecutionPolicy truePolicy1 = new Equal("int.1", 1);
   /** used for testing logical policies */

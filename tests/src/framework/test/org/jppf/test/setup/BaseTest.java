@@ -18,38 +18,31 @@
 
 package test.org.jppf.test.setup;
 
-import org.jppf.client.JPPFClient;
 import org.junit.*;
-
-
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 /**
- * Basic setup for 1 driver, 1 node and 1 client.
+ *
  * @author Laurent Cohen
  */
-public class Setup1D1N1C extends BaseTest {
-  /**
-   * The jppf client to use.
-   */
-  protected static JPPFClient client = null;
+public class BaseTest {
+  /** */
+  private static String name;
+  /** */
+  @Rule
+  public TestWatcher testWatcher = new TestWatcher() {
 
-  /**
-   * Launches a driver and node and start the client.
-   * @throws Exception if a process could not be started.
-   */
-  @BeforeClass
-  public static void setup() throws Exception
-  {
-    client = BaseSetup.setup(1);
-  }
-
-  /**
-   * Stops the driver and node and close the client.
-   * @throws Exception if a process could not be stopped.
-   */
-  @AfterClass
-  public static void cleanup() throws Exception
-  {
-    BaseSetup.cleanup();
-  }
+    @Override
+    protected void starting(final Description description) {
+      String className = description.getClassName();
+      if (!className.equals(name)) {
+        name = className;
+        System.out.printf("***** test class %s *****%n", className);
+      }
+      if (description.isTest()) {
+        System.out.printf("***** start of %s() *****%n", description.getMethodName());
+      }
+    }
+  };
 }

@@ -25,11 +25,13 @@ import java.io.*;
 import org.jppf.utils.*;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit test for the <code>TypedProperties</code> class.
  * @author Laurent Cohen
  */
-public class TestTypedProperties {
+public class TestTypedProperties extends BaseTest {
   /**
    * Test including a file within a properties file.
    * @throws Exception if any error occurs.

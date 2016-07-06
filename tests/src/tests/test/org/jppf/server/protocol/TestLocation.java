@@ -28,11 +28,13 @@ import org.jppf.location.*;
 import org.jppf.utils.FileUtils;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for the {@link Location} API.
  * @author Laurent Cohen
  */
-public class TestLocation {
+public class TestLocation extends BaseTest {
   /**
    * Test the copy from one location to another.
    * @throws Exception if any error occurs.

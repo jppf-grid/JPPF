@@ -95,12 +95,12 @@ public class JPPFTestRunner {
     try {
       BaseSetup.Configuration config = new BaseSetup.Configuration();
       List<String> commonCP = new ArrayList<>();
+      commonCP.add("../jmxremote/classes");
       commonCP.add("../lib/jppf-common.jar");
       commonCP.add("../lib/jppf-node.jar");
       commonCP.add("../lib/slf4j-api-1.6.1.jar");
       commonCP.add("../lib/slf4j-log4j12-1.6.1.jar");
       commonCP.add("../lib/log4j-1.2.15.jar");
-      commonCP.add("../lib/" + BaseSetup.JMX_REMOTE_JAR);
       config.driverJppf = "config/driver.template.properties";
       config.driverLog4j = "config/log4j-driver.template.properties";
       config.driverClasspath.addAll(commonCP);

@@ -23,11 +23,13 @@ import static org.junit.Assert.*;
 import org.jppf.client.Operator;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Tests for the {@link Operator} class.
  * @author Laurent Cohen
  */
-public class TestOperator {
+public class TestOperator extends BaseTest {
   /**
    * @throws Exception if any error occurs.
    */

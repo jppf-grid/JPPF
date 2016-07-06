@@ -27,11 +27,13 @@ import org.jppf.utils.stats.*;
 import org.jppf.utils.stats.JPPFStatistics.Filter;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for {@link JPPFStatisticsListener} and {@link JPPFFilteredStatisticsListener}.
  * @author Laurent Cohen
  */
-public class TestJPPFStatisticsListener {
+public class TestJPPFStatisticsListener extends BaseTest {
   /**
    * Labels of stats snapshots used in the tests.
    */

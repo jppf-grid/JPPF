@@ -40,10 +40,6 @@ public class BaseSetup {
    */
   public static final Configuration DEFAULT_CONFIG = createDefaultConfiguration();
   /**
-   * The name of the JMX remote jar file.
-   */
-  public static final String JMX_REMOTE_JAR = "jppf-jmxremote_optional-1.2.jar";
-  /**
    * The jppf client to use.
    */
   protected static JPPFClient client = null;
@@ -252,7 +248,6 @@ public class BaseSetup {
     for (Map.Entry<Integer, JPPFConnectionPool> entry: connectionMap.entrySet()) {
       JMXDriverConnectionWrapper wrapper = entry.getValue().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
       if (!wrapperMap.containsKey(wrapper.getURL())) {
-        //while (!wrapper.isConnected()) wrapper.connectAndWait(10L);
         wrapperMap.put(wrapper.getURL(), wrapper);
       }
     }
@@ -322,12 +317,12 @@ public class BaseSetup {
     commonCP.add("classes/tests/config");
     commonCP.add("../node/classes");
     commonCP.add("../common/classes");
+    commonCP.add("../jmxremote/classes");
     commonCP.add("../JPPF/lib/slf4j/slf4j-api-1.6.1.jar");
     commonCP.add("../JPPF/lib/slf4j/slf4j-log4j12-1.6.1.jar");
     commonCP.add("../JPPF/lib/log4j/log4j-1.2.15.jar");
     commonCP.add("../JPPF/lib/LZ4/lz4-1.3.0.jar");
     commonCP.add("../JPPF/lib/ApacheCommons/commons-io-2.4.jar");
-    commonCP.add("../JPPF/lib/jmxremote/" + JMX_REMOTE_JAR);
     List<String> driverCP = new ArrayList<>(commonCP);
     driverCP.add("../server/classes");
     driverCP.add("../JPPF/lib/Groovy/groovy-all-1.6.5.jar");
@@ -345,9 +340,7 @@ public class BaseSetup {
     return config;
   }
 
-  /**
-   * 
-   */
+  /** */
   public static class Configuration {
     /**
      * Path to the driver JPPF config
@@ -381,9 +374,7 @@ public class BaseSetup {
      * Node JVM options.
      */
     public List<String> nodeJvmOptions = new ArrayList<>();
-    /**
-     * 
-     */
+    /** */
     public String clientConfig = "classes/tests/config/client.properties";
 
     /**
@@ -405,9 +396,7 @@ public class BaseSetup {
     }
   }
 
-  /**
-   * 
-   */
+  /** */
   public static class ConfigSource implements JPPFConfiguration.ConfigurationSourceReader {
     /**
      * Path to the client configuration file.

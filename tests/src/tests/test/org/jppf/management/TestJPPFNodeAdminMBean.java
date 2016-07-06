@@ -30,7 +30,7 @@ import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -38,8 +38,7 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the functionality of the JPPFNodeAdminMBean from the client point of view.
  * @author Laurent Cohen
  */
-public class TestJPPFNodeAdminMBean
-{
+public class TestJPPFNodeAdminMBean extends BaseTest {
   /**
    * Connection to the node's JMX server.
    */
@@ -59,16 +58,14 @@ public class TestJPPFNodeAdminMBean
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     client = BaseSetup.setup(1);
     driverJmx = BaseSetup.getJMXConnection(client);
     Collection<JPPFManagementInfo> coll = driverJmx.nodesInformation();
     JPPFManagementInfo info = coll.iterator().next();
     nodeJmx = new JMXNodeConnectionWrapper(info.getHost(), info.getPort(), info.isSecure());
     nodeJmx.connectAndWait(5000L);
-    if (!nodeJmx.isConnected())
-    {
+    if (!nodeJmx.isConnected()) {
       nodeJmx = null;
       throw new Exception("could not connect to the node's JMX server");
     }
@@ -79,29 +76,23 @@ public class TestJPPFNodeAdminMBean
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass
-  public static void cleanup() throws Exception
-  {
-    if (nodeJmx != null)
-    {
-      try
-      {
+  public static void cleanup() throws Exception {
+    if (nodeJmx != null) {
+      try {
         nodeJmx.close();
-      }
-      finally
-      {
+      } finally {
         nodeJmx = null;
       }
     }
     BaseSetup.cleanup();
   }
-  
+
   /**
    * Test getting the node state.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testState() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testState() throws Exception {
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
@@ -123,26 +114,22 @@ public class TestJPPFNodeAdminMBean
     assertEquals(JPPFNodeState.ExecutionState.IDLE, state.getExecutionStatus());
     nodeJmx.resetTaskCounter();
   }
-  
+
   /**
    * Test updating the number of processing threads.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testUpdateThreadPoolSize() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testUpdateThreadPoolSize() throws Exception {
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(1, state.getThreadPoolSize());
-    try
-    {
+    try {
       nodeJmx.updateThreadPoolSize(3);
       state = nodeJmx.state();
       assertNotNull(state);
       assertEquals(3, state.getThreadPoolSize());
-    }
-    finally
-    {
+    } finally {
       nodeJmx.updateThreadPoolSize(1);
     }
   }
@@ -151,21 +138,17 @@ public class TestJPPFNodeAdminMBean
    * Test updating the priority of processing threads.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testUpdateThreadPriority() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testUpdateThreadPriority() throws Exception {
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(Thread.NORM_PRIORITY, state.getThreadPriority());
-    try
-    {
+    try {
       nodeJmx.updateThreadsPriority(Thread.MAX_PRIORITY);
       state = nodeJmx.state();
       assertNotNull(state);
       assertEquals(Thread.MAX_PRIORITY, state.getThreadPriority());
-    }
-    finally
-    {
+    } finally {
       nodeJmx.updateThreadsPriority(Thread.NORM_PRIORITY);
     }
   }
@@ -174,9 +157,8 @@ public class TestJPPFNodeAdminMBean
    * Test resetting the tasks counter.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testResetTaskCounter() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testResetTaskCounter() throws Exception {
     int nbTasks = 12;
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
@@ -196,9 +178,8 @@ public class TestJPPFNodeAdminMBean
    * Test setting the tasks counter to a given value.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testSetTaskCounter() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testSetTaskCounter() throws Exception {
     JPPFNodeState state = nodeJmx.state();
     assertNotNull(state);
     assertEquals(0, state.getNbTasksExecuted());
@@ -216,9 +197,8 @@ public class TestJPPFNodeAdminMBean
    * Test getting the node system information.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testSystemInformation() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testSystemInformation() throws Exception {
     JPPFSystemInformation info = nodeJmx.systemInformation();
     assertNotNull(info);
     assertNotNull(info.getEnv());
@@ -238,14 +218,12 @@ public class TestJPPFNodeAdminMBean
     assertFalse(info.getSystem().isEmpty());
   }
 
-
   /**
    * Test updating the ndoe's configuration.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testUpdateConfiguration() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testUpdateConfiguration() throws Exception {
     JPPFSystemInformation info = nodeJmx.systemInformation();
     assertNotNull(info);
     TypedProperties config = info.getJppf();
@@ -270,9 +248,8 @@ public class TestJPPFNodeAdminMBean
    * Test cancelling a job executing in the node.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testCancelJob() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testCancelJob() throws Exception {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, 1, LifeCycleTask.class, 5000L);
     String uuid = job.getUuid();
     client.submitJob(job);
@@ -291,9 +268,8 @@ public class TestJPPFNodeAdminMBean
    * Test getting the class loader's delegation model.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testGetDelegationModel() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testGetDelegationModel() throws Exception {
     DelegationModel model = nodeJmx.getDelegationModel();
     assertEquals(DelegationModel.PARENT_FIRST, model);
   }
@@ -302,9 +278,8 @@ public class TestJPPFNodeAdminMBean
    * Test setting the class loader's delegation model.
    * @throws Exception if any error occurs.
    */
-  @Test(timeout=5000)
-  public void testSetDelegationModel() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testSetDelegationModel() throws Exception {
     DelegationModel model = nodeJmx.getDelegationModel();
     assertEquals(DelegationModel.PARENT_FIRST, model);
     nodeJmx.setDelegationModel(DelegationModel.URL_FIRST);

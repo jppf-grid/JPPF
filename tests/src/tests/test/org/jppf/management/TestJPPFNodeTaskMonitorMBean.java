@@ -30,7 +30,7 @@ import org.jppf.node.protocol.Task;
 import org.jppf.utils.ReflectionUtils;
 import org.junit.*;
 
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -38,7 +38,7 @@ import test.org.jppf.test.setup.common.*;
  * In this class, we test that the functionality of the JPPFNodeAdminMBean from the client point of view.
  * @author Laurent Cohen
  */
-public class TestJPPFNodeTaskMonitorMBean {
+public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
   /**
    * Connection to the node's JMX server.
    */

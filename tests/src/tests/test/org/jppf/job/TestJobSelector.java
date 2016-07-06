@@ -29,13 +29,14 @@ import org.jppf.serialization.ObjectSerializer;
 import org.jppf.utils.*;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
 import test.org.jppf.test.setup.common.*;
 
 /**
  *
  * @author Laurent Cohen
  */
-public class TestJobSelector {
+public class TestJobSelector extends BaseTest {
   /**
    * @throws Exception if any error occurs
    */

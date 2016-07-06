@@ -21,14 +21,11 @@ package test.org.jppf.test.setup;
 import org.jppf.client.JPPFClient;
 import org.junit.*;
 
-
-
 /**
  * Basic setup for 1 driver, 2 nodes and 1 client.
  * @author Laurent Cohen
  */
-public class Setup1D2N1C
-{
+public class Setup1D2N1C extends BaseTest {
   /**
    * The jppf client to use.
    */
@@ -39,8 +36,7 @@ public class Setup1D2N1C
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     client = BaseSetup.setup(2);
   }
 
@@ -49,8 +45,7 @@ public class Setup1D2N1C
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass
-  public static void cleanup() throws Exception
-  {
+  public static void cleanup() throws Exception {
     BaseSetup.cleanup();
   }
 }

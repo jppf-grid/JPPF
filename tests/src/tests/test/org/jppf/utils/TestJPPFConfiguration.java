@@ -25,14 +25,13 @@ import java.io.*;
 import org.jppf.utils.*;
 import org.junit.*;
 
-import test.org.jppf.test.setup.BaseSetup;
+import test.org.jppf.test.setup.*;
 
 /**
  * Unit test for the <code>JPPFConfiguration</code> class.
  * @author Laurent Cohen
  */
-public class TestJPPFConfiguration
-{
+public class TestJPPFConfiguration extends BaseTest {
   /**
    * Value of the {@code JPPFConfiguration.CONFIG_PROPERTY} system property.
    */
@@ -67,9 +66,8 @@ public class TestJPPFConfiguration
    * Test reading the configuration from a {@link JPPFConfiguration.ConfigurationSource} plugin.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testAlternateConfigurationSource() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testAlternateConfigurationSource() throws Exception {
     JPPFConfiguration.ConfigurationSource source = new TestConfigurationSource();
     System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
     System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
@@ -85,9 +83,8 @@ public class TestJPPFConfiguration
    * Test reading the configuration from a {@link JPPFConfiguration.ConfigurationSourceReader} plugin.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testAlternateConfigurationSourceReader() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testAlternateConfigurationSourceReader() throws Exception {
     JPPFConfiguration.ConfigurationSourceReader source = new TestConfigurationSourceReader();
     System.setProperty(JPPFConfiguration.CONFIG_PROPERTY, "");
     System.setProperty(JPPFConfiguration.CONFIG_PLUGIN_PROPERTY, source.getClass().getName());
@@ -102,11 +99,9 @@ public class TestJPPFConfiguration
   /**
    * Test implementation of alternate configuration source.
    */
-  public static class TestConfigurationSource implements JPPFConfiguration.ConfigurationSource
-  {
+  public static class TestConfigurationSource implements JPPFConfiguration.ConfigurationSource {
     @Override
-    public InputStream getPropertyStream() throws IOException
-    {
+    public InputStream getPropertyStream() throws IOException {
       String props = "jppf.config.source.origin = stream";
       JPPFBuffer buffer = new JPPFBuffer(props);
       return new ByteArrayInputStream(buffer.getBuffer());
@@ -116,11 +111,9 @@ public class TestJPPFConfiguration
   /**
    * Test implementation of alternate configuration source.
    */
-  public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader
-  {
+  public static class TestConfigurationSourceReader implements JPPFConfiguration.ConfigurationSourceReader {
     @Override
-    public Reader getPropertyReader() throws IOException
-    {
+    public Reader getPropertyReader() throws IOException {
       String props = "jppf.config.source.reader.origin = reader";
       return new StringReader(props);
     }

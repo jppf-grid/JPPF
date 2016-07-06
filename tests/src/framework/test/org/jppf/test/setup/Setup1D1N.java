@@ -25,7 +25,7 @@ import org.junit.*;
  * Basic setup for 1 driver, 1 node and no client.
  * @author Laurent Cohen
  */
-public class Setup1D1N {
+public class Setup1D1N extends BaseTest {
   /**
    * Launches a driver and node.
    * @throws Exception if a process could not be started.

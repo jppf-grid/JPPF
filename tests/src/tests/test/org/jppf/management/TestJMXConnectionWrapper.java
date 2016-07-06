@@ -21,11 +21,13 @@ package test.org.jppf.management;
 import org.jppf.management.JMXNodeConnectionWrapper;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for the class <code>JMXConnectionWrapper</code>.
  * @author Laurent Cohen
  */
-public class TestJMXConnectionWrapper {
+public class TestJMXConnectionWrapper extends BaseTest {
   /**
    * Testing that connectAndWait() isn't blocking more than the specified timeout.
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539051&group_id=135654&atid=733518">3539051 - JMX: performConnection is blocking connectAndWait</a>

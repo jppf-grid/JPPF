@@ -29,13 +29,14 @@ import org.jppf.utils.JPPFConfiguration;
 import org.jppf.utils.configuration.*;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
 import test.org.jppf.test.setup.common.*;
 
 /**
  * Unit tests for the the JMX environment providers.
  * @author Laurent Cohen
  */
-public class TestEnvironmentProviders {
+public class TestEnvironmentProviders extends BaseTest {
   /**
    * Test that the client environment provider adds the expected proeprties.
    * @throws Exception if any error occurs

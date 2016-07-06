@@ -29,13 +29,14 @@ import org.jppf.utils.ReflectionUtils;
 import org.junit.Test;
 import org.slf4j.*;
 
+import test.org.jppf.test.setup.BaseTest;
 import test.org.jppf.test.setup.common.TestInterceptor;
 
 /**
  * Test the network interceptor feature.
  * @author Laurent Cohen
  */
-public class TestNetworkConnectionInterceptor {
+public class TestNetworkConnectionInterceptor extends BaseTest {
   /**
    * Logger for this class.
    */

@@ -137,6 +137,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addClasspathElement("../jmxremote/classes");
     addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
@@ -144,7 +145,6 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "LZ4/lz4-1.3.0.jar");
-    addClasspathElement(libDir + "jmxremote/" + BaseSetup.JMX_REMOTE_JAR);
     addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");
   }
 
@@ -158,6 +158,7 @@ public class GenericProcessLauncher implements Runnable {
   public GenericProcessLauncher(final int n, final String processType, final String jppfTemplate, final String log4jTemplate) {
     this.n = n;
     this.name = "[" + processType + '-' + n + "] ";
+    addClasspathElement("../jmxremote/classes");
     addClasspathElement("../common/classes");
     addClasspathElement("../node/classes");
     String libDir = "../JPPF/lib/";
@@ -167,7 +168,6 @@ public class GenericProcessLauncher implements Runnable {
     addClasspathElement(libDir + "slf4j/slf4j-log4j12-1.6.1.jar");
     addClasspathElement(libDir + "log4j/log4j-1.2.15.jar");
     addClasspathElement(libDir + "LZ4/lz4-1.3.0.jar");
-    addClasspathElement(libDir + "jmxremote/" + BaseSetup.JMX_REMOTE_JAR);
     addClasspathElement(libDir + "ApacheCommons/commons-io-2.4.jar");
     updateJvmOptionsFromConfig();
   }

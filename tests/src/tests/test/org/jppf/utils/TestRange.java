@@ -23,19 +23,19 @@ import static org.junit.Assert.*;
 import org.jppf.utils.Range;
 import org.junit.Test;
 
+import test.org.jppf.test.setup.BaseTest;
+
 /**
  * Unit tests for the <code>Range</code> class.
  * @author Laurent Cohen
  */
-public class TestRange
-{
+public class TestRange extends BaseTest {
   /**
    * Test of <code>Range.isValueInRange()</code> methods.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testIsValueInRange() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testIsValueInRange() throws Exception {
     Range<Integer> range = new Range<>(10, 23);
     assertTrue(range.isValueInRange(10));
     assertFalse(range.isValueInRange(10, false));
@@ -53,9 +53,8 @@ public class TestRange
    * Test of <code>Range.intersects()</code> methods.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testIntersects() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testIntersects() throws Exception {
     Range<Double> r1 = new Range<>(10d, 23d);
     Range<Double> other = new Range<>(-10d, 2.5d);
     assertFalse(other.intersects(r1));
@@ -81,9 +80,8 @@ public class TestRange
    * Test of <code>Range.includes()</code> methods.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testIncludes() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testIncludes() throws Exception {
     Range<Double> r1 = new Range<>(10d, 23d);
     Range<Double> other = new Range<>(11d, 22d);
     assertFalse(other.includes(r1));
@@ -100,9 +98,8 @@ public class TestRange
    * Test of <code>Range.merge()</code> methods.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testMerge() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testMerge() throws Exception {
     Range<Integer> r1 = new Range<>(10, 23);
     assertEquals(new Range<>(10, 23), r1.merge(new Range<>(10, 23)));
     assertEquals(new Range<>(10, 23), r1.merge(new Range<>(12, 21)));
@@ -111,13 +108,13 @@ public class TestRange
     assertEquals(new Range<>(-5, 23), r1.merge(new Range<>(-5, 15)));
     assertEquals(new Range<>(10, 40), r1.merge(new Range<>(20, 40)));
   }
+
   /**
    * Test of <code>Range.intersection()</code> methods.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=5000)
-  public void testIntersection() throws Exception
-  {
+  @Test(timeout = 5000)
+  public void testIntersection() throws Exception {
     Range<Integer> r1 = new Range<>(10, 23);
     assertEquals(new Range<>(10, 23), r1.intersection(new Range<>(10, 23)));
     assertEquals(new Range<>(12, 21), r1.intersection(new Range<>(12, 21)));
