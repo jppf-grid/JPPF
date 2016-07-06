@@ -101,7 +101,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that a job is executed on the node closest ot its desired node config spec after restart of this node.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 15000)
+  @Test(timeout = 15000)
   public void testJobReservationSingleNodeWithRestart() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
@@ -174,7 +174,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that when a job with reservation expires, all node reservations are removed.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 15000)
+  @Test(timeout = 15000)
   public void testExpiredJobReservationSingleNodeWithRestart() throws Exception {
     int nbTasksPerNode = 5;
     int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
@@ -217,7 +217,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * Test that a job is executed on the 2 nodes closest ot its desired node config spec after restart of these nodes.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 15000)
+  @Test(timeout = 15000)
   public void testJobReservationTwoNodesWithRestart() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     Set<String> expectedNodes = new TreeSet<>(Arrays.asList("n2", "n3"));
@@ -259,7 +259,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    * with this node being restarted only when its configuration does not match the desired one.
    * @throws Exception if any error occurs.
    */
-  //@Test(timeout = 15000)
+  @Test(timeout = 15000)
   public void testJobReservationSingleNodeNoRestart() throws Exception {
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 1L);
