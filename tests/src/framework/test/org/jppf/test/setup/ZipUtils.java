@@ -22,13 +22,13 @@ import java.io.*;
 import java.util.zip.*;
 
 /**
- * Utility methods used in the geofencing demo.
+ * Utility methods for zipping/unzipping files.
  * @author Laurent Cohen
  */
 public class ZipUtils {
   /**
-   * Zip the specified file to a new file suffixed with '.zip'.
-   * @param zipPath the path of the zip file to cretae.
+   * Zip the specified files into the specified zip.
+   * @param zipPath the path of the zip file to create.
    * @param paths the paths of the files to add to the zip.
    * @return the path to the zipped file, or {@code null} if an I/O error occurred.
    */
@@ -50,7 +50,7 @@ public class ZipUtils {
       zos.finish();
       return zipPath;
     } catch(Exception e) {
-      //log.debug(String.format("to zip '%s' to '%s'", path, zipPath), e);
+      e.printStackTrace();
     }
     return null;
   }

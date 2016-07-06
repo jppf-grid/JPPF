@@ -37,7 +37,7 @@ public class BaseTest {
   /** */
   private static String name;
   /** */
-  private static FileFilter logFileFIlter = new FileFilter() {
+  private static FileFilter logFileFilter = new FileFilter() {
     @Override
     public boolean accept(final File path) {
       if (path.isDirectory()) return false;
@@ -52,12 +52,11 @@ public class BaseTest {
     @Override
     protected void starting(final Description description) {
       print("***** start of class %s *****", description.getClassName());
+      // delete the drivers and nodes log files if they exist
       File dir = new File(System.getProperty("user.dir"));
-      File[] logFiles = dir.listFiles(logFileFIlter);
+      File[] logFiles = dir.listFiles(logFileFilter);
       for (File file: logFiles) {
-        if (file.exists()) {
-          if (!file.delete()) System.err.printf("Could not delete %s%n", file);
-        }
+        if (file.exists() && !file.delete()) System.err.printf("Could not delete %s%n", file);
       }
     }
 
@@ -78,15 +77,16 @@ public class BaseTest {
   };
 
   /**
-   *
+   * Zip the drivers and nodes log files into the file {@code logs/<className>.zip}.
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
     File dir = new File(System.getProperty("user.dir"));
+    File[] logFiles = dir.listFiles(logFileFilter);
+    if ((logFiles == null) || (logFiles.length <= 0)) return;
     File logDir = new File(dir, "logs/");
     if (!logDir.exists()) logDir.mkdirs();
     File outZip = new File(logDir, className + ".zip");
-    File[] logFiles = dir.listFiles(logFileFIlter);
     String[] logPaths = new String[logFiles.length];
     for (int i=0; i<logFiles.length; i++) logPaths[i] = logFiles[i].getPath();
     ZipUtils.zipFile(outZip.getPath(), logPaths);
@@ -95,7 +95,7 @@ public class BaseTest {
   /**
    *
    * @param format the format.
-   * @param params the parmaters values.
+   * @param params the parameter values.
    */
   private static void print(final String format, final Object...params) {
     String message = String.format(format, params);
