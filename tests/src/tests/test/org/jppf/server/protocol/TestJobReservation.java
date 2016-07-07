@@ -199,7 +199,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     job.getSLA().setMaxNodes(1);
     client.submitJob(job);
     jobNotificationListener.await(JobEventType.JOB_RETURNED);
-    job.getSLA().setJobExpirationSchedule(new JPPFSchedule(2000L));
+    job.getSLA().setJobExpirationSchedule(new JPPFSchedule(1000L));
     jmx.getJobManager().updateJobs(new JobUuidSelector(job.getUuid()), job.getSLA(), null);
     List<Task<?>> result = job.awaitResults();
     assertNotNull(result);
@@ -220,7 +220,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     assertEquals(1, myNodeListener.map.size());
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
-    assertEquals(2, n.get());
+    assertTrue(n.get() < BaseSetup.nbNodes());
     String[]  reservedJobs = (String[]) jmx.getAttribute("org.jppf:name=debug,type=driver", "ReservedJobs");
     assertNotNull(reservedJobs);
     assertEquals(0, reservedJobs.length);

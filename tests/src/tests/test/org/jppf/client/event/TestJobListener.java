@@ -28,9 +28,10 @@ import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
-import org.junit.Test;
+import org.junit.*;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup.Configuration;
 import test.org.jppf.test.setup.common.*;
 
 /**
@@ -38,11 +39,22 @@ import test.org.jppf.test.setup.common.*;
  * (connection pool size > 1).
  * @author Laurent Cohen
  */
-public class TestJobListener extends Setup1D1N {
+public class TestJobListener extends AbstractNonStandardSetup {
   /**
    * The JPPF client.
    */
   private JPPFClient client = null;
+
+  /**
+   * Launches 1 driver with 3 nodes and start the client.
+   * @throws Exception if a process could not be started.
+   */
+  @BeforeClass
+  public static void setup() throws Exception {
+    Configuration cfg = createConfig(null);
+    cfg.driverLog4j = "classes/tests/config/job_reservation/log4j-driver-TestJobListener.properties";
+    BaseSetup.setup(1, 1, false, cfg);
+  }
 
   /**
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 1</code>.
