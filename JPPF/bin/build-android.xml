@@ -56,6 +56,7 @@
     <condition property="cmdname" value="gradlew.bat" else="gradlew">
       <os family="windows"/>
     </condition>
+    <chmod file="${node-android}/${cmdname}" perm="+x" osfamily="unix"/>
     <exec executable="${node-android}/${cmdname}" dir="${node-android}" failonerror="true" searchpath="false">
       <arg value="assemble"/>
     </exec>
@@ -74,7 +75,7 @@
     <delete file="${samples-pack}/Fractals/data/android-fractal-demo.apk" quiet="true"/>
     <copy file="${node-android}/demo/build/outputs/apk/demo-release-unsigned.apk" tofile="${samples-pack}/Fractals/data/android-fractal-demo.apk" quiet="true" force="true"/>
   </target>
-  
+
   <!-- ========================================================================= -->
   <!-- Package the Android project source                                        -->
   <!-- ========================================================================= -->
