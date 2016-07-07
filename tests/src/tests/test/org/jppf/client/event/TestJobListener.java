@@ -39,7 +39,7 @@ import test.org.jppf.test.setup.common.*;
  * (connection pool size > 1).
  * @author Laurent Cohen
  */
-public class TestJobListener extends AbstractNonStandardSetup {
+public class TestJobListener extends BaseTest {
   /**
    * The JPPF client.
    */

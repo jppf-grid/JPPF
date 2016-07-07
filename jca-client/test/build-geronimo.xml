@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name="J2EE Connector Tests" default="build" basedir=".">
+<project name="J2EE Connector Tests Geronimo" default="build" basedir=".">
 
   <property name="geronimo.name" value="geronimo-tomcat7-javaee6-3.0.0"/>
   <property name="geronimo.dir"  value="${user.home}/geronimo"/>

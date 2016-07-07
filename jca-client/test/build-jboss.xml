@@ -16,7 +16,7 @@
 	limitations under the License.
 -->
 
-<project name="J2EE Connector Tests - JBoss" default="build" basedir=".">
+<project name="J2EE Connector Tests JBoss" default="build" basedir=".">
 
   <property name="jboss.name" value="JBoss-5.1.0.GA"/>
   <property name="jboss.dir"  value="${user.home}/jboss"/>
