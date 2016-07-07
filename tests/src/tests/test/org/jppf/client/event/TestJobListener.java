@@ -51,8 +51,8 @@ public class TestJobListener extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    Configuration cfg = createConfig(null);
-    cfg.driverLog4j = "classes/tests/config/job_reservation/log4j-driver-TestJobListener.properties";
+    Configuration cfg = BaseSetup.DEFAULT_CONFIG.copy();
+    cfg.driverLog4j = "classes/tests/config/log4j-driver.TestJobListener.properties";
     BaseSetup.setup(1, 1, false, cfg);
   }
 
@@ -112,6 +112,7 @@ public class TestJobListener extends AbstractNonStandardSetup {
       int nbTasks = 1;
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L);
       job.addJobListener(listener);
+      client.submitJob(job);
       jmxListener.await(JobEventType.JOB_DISPATCHED);
       jobManager.removeNotificationListener(jmxListener);
       client.reset();
