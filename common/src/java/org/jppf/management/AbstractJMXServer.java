@@ -66,8 +66,10 @@ public abstract class AbstractJMXServer implements JMXServer {
   @Override
   public void stop() throws Exception {
     stopped = true;
-    connectorServer.stop();
-    connectorServer = null;
+    if (connectorServer != null) {
+      connectorServer.stop();
+      connectorServer = null;
+    }
   }
 
   @Override

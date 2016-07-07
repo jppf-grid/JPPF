@@ -34,17 +34,10 @@
         <exclude name="META-INF/services/org.jppf.node.initialization.InitializationHook"/>
       </zipfileset>
     </jar>
-    <!--<checksum file="${build}/jppf-node-android.jar" algorithm="SHA-256"/>-->
     <copy tofile="${node-android}/events/libs/jppf-common.jar" file="${build}/jppf-common-${version.number}.jar"/>
     <copy tofile="${node-android}/events/libs/jppf-server.jar" file="${build}/jppf-server-${version.number}.jar"/>
     <copy tofile="${node-android}/events/libs/jppf-node-android.jar" file="${build}/jppf-node-android.jar"/>
     <copy tofile="${node-android}/events/libs/lz4-1.3.0.jar" file="${lib}/LZ4/lz4-1.3.0.jar"/>
-    <!--
-    <copy toDir="${node-android}/events/libs">
-      <fileset dir="${build}" includes="jppf-common-${version.number}.jar,jppf-node-android.jar,jppf-server-${version.number}.jar"/>
-      <fileset dir="${lib}/LZ4" includes="lz4-1.3.0.jar"/>
-    </copy>
-    -->
   </target>
 
   <!-- ========================================================================= -->
@@ -60,8 +53,8 @@
     <exec executable="${node-android}/${cmdname}" dir="${node-android}" failonerror="true" searchpath="false">
       <arg value="assemble"/>
     </exec>
-    <copy file="${node-android}/app/build/outputs/apk/app-release.apk" tofile="${build}/${app.ver}-AndroidNode.apk" quiet="true"/>
-    <copy file="${node-android}/events/build/outputs/aar/events-release.aar" tofile="${build}/${app.ver}-AndroidNodeEvents.aar" quiet="true"/>
+    <copy file="${node-android}/app/build/outputs/apk/app-release.apk" tofile="${build}/${app.ver}-AndroidNode.apk"/>
+    <copy file="${node-android}/events/build/outputs/aar/events-release.aar" tofile="${build}/${app.ver}-AndroidNodeEvents.aar"/>
     <property name="android.redist.prefix" value="JPPF-${version.number}-node-android-redist"/>
     <delete file="${build}/${android.redist.prefix}.zip" quiet="true"/>
     <zip destfile="${build}/${android.redist.prefix}.zip">
@@ -70,10 +63,9 @@
       <zipfileset dir="${build}" prefix="${android.redist.prefix}/libs" includes="*.aar"/>
     </zip>
     <echo message="deleting apk and aar"/>
-    <!--<delete file="${build}/${app.ver}-AndroidNode.apk" quiet="true"/>-->
     <delete file="${build}/${app.ver}-AndroidNodeEvents.aar" quiet="true"/>
     <delete file="${samples-pack}/Fractals/data/android-fractal-demo.apk" quiet="true"/>
-    <copy file="${node-android}/demo/build/outputs/apk/demo-release-unsigned.apk" tofile="${samples-pack}/Fractals/data/android-fractal-demo.apk" quiet="true" force="true"/>
+    <copy file="${node-android}/demo/build/outputs/apk/demo-release-unsigned.apk" tofile="${samples-pack}/Fractals/data/android-fractal-demo.apk" force="true"/>
   </target>
 
   <!-- ========================================================================= -->

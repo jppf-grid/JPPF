@@ -233,15 +233,29 @@
     <delete file="${release.file}" quiet="true"/>
     <zip destfile="${release.file}">
       <zipfileset dir="${basedir}" prefix="${zip.prefix}/JPPF">
+        <include name="*.*"/>
         <include name="build/jppf*.jar"/>
         <include name="bin/**/*.*"/>
         <include name="config/**/*.*"/>
+        <include name="src/**/*.*"/>
+        <include name="classes/**/*.*"/>
         <!--<include name="docs/api/**/*.*"/>-->
         <include name="lib/**/*.*"/>
         <include name="${license.file}"/>
         <include name="JPPF-3rd-party.html"/>
+        <include name="docs/manual/*.odt"/>
+        <include name="docs/manual/*.pdf"/>
+        <include name="docs/manual/*.odm"/>
+        <include name="docs/home/*.*"/>
+        <include name="docs/home/doc-source/**/*.*"/>
+        <include name="docs/home/images/**/*.*"/>
+        <include name="docs/home/images/**/*.*"/>
+        <include name="docs/home/schemas/**/*.*"/>
+        <include name="docs/home/scripts/**/*.*"/>
         <exclude name="docs/home/db_settings.inc.php"/>
+        <exclude name="**/*.zip"/>
       </zipfileset>
+      <zipfileset dir="${jmxremote}" prefix="${zip.prefix}/jmxremote" excludes="**/*.zip,**/*.jar"/>
       <zipfileset dir="${node}" prefix="${zip.prefix}/node"/>
       <zipfileset dir="${common}" prefix="${zip.prefix}/common"/>
       <zipfileset dir="${client}" prefix="${zip.prefix}/client"/>
@@ -250,8 +264,9 @@
       <zipfileset dir="${demo}" prefix="${zip.prefix}/demo" excludes="*.log"/>
       <zipfileset dir="${jca-client}" prefix="${zip.prefix}/jca-client"/>
       <zipfileset dir="${application.template}" prefix="${zip.prefix}/application-template"/>
-      <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log"/>
+      <zipfileset dir="${dotnet-bridge}" prefix="${zip.prefix}/dotnet-bridge" excludes="**/*.log, csdoc/**/*.*"/>
       <zipfileset dir="${node-android}" prefix="${zip.prefix}/node-android" excludes="**/build/**/*.*"/>
+      <zipfileset dir="${samples-pack}" prefix="${zip.prefix}/samples-pack" excludes="**/*.zip,**/*.log"/>
       <zipfileset dir="${tests}" prefix="${zip.prefix}/tests" excludes="*.log"/>
       <zipfileset dir="${stress-tests}" prefix="${zip.prefix}/stress-tests">
         <exclude name="**/*.log"/>
