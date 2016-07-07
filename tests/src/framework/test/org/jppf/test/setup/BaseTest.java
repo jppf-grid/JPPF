@@ -95,7 +95,7 @@ public class BaseTest {
   }
 
   /**
-   *
+   * Print a formatted message to the shell output and to the log file.
    * @param format the format.
    * @param params the parameter values.
    */

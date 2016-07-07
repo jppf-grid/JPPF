@@ -20,20 +20,25 @@ package org.jppf.server.debug;
 
 import java.util.*;
 
-import org.jppf.nio.*;
+import org.jppf.nio.ChannelWrapper;
 import org.jppf.server.JPPFDriver;
 import org.jppf.server.nio.nodeserver.AbstractNodeContext;
 import org.jppf.server.protocol.*;
 import org.jppf.server.queue.JPPFPriorityQueue;
 import org.jppf.utils.StringUtils;
+import org.slf4j.*;
 
 /**
- * 
+ *
  * @author Laurent Cohen
  */
 public class ServerDebug implements ServerDebugMBean {
   /**
-   * 
+   * Logger for this class.
+   */
+  private static final Logger log = LoggerFactory.getLogger(ServerDebug.class);
+  /**
+   *
    */
   private final JPPFDriver driver = JPPFDriver.getInstance();
 
@@ -151,8 +156,8 @@ public class ServerDebug implements ServerDebugMBean {
   }
 
   /**
-   * 
-   * @param set the set of job uuids. 
+   *
+   * @param set the set of job uuids.
    * @return .
    */
   private String dumpJobDetails(final Set<String> set) {
@@ -253,5 +258,12 @@ public class ServerDebug implements ServerDebugMBean {
   public String[] getReservedNodes() {
     Set<String> set = driver.getNodeNioServer().getNodeReservationHandler().getReservedNodes();
     return set.toArray(new String[set.size()]);
+  }
+
+  @Override
+  public void log(final String... messages) {
+    if (messages != null) {
+      for (String message: messages) log.info(message);
+    }
   }
 }

@@ -434,4 +434,15 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
     }
     return list;
   }
+
+  /**
+   * Update the start and expiration schedules of an existing job. Normally called when a job's SLA is updated.
+   * @param job the job to update.
+   */
+  public void updateSchedules(final ServerJob job) {
+    JobSLA sla = job.getSLA();
+    scheduleManager.clearSchedules(job.getUuid());
+    if (sla.getJobSchedule() != null) scheduleManager.handleStartJobSchedule(job);
+    if (sla.getJobExpirationSchedule() != null) scheduleManager.handleExpirationJobSchedule(job);
+  }
 }

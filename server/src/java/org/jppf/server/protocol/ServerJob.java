@@ -310,6 +310,7 @@ public class ServerJob extends AbstractServerJobBase {
       if (sla != null) {
         this.sla = sla;
         job.setSLA(sla);
+        JPPFDriver.getInstance().getQueue().updateSchedules(this);
         updated = true;
       }
       if (metadata != null) {

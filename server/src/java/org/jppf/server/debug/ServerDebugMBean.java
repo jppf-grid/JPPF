@@ -125,4 +125,10 @@ public interface ServerDebugMBean extends Serializable {
    * @return an array of job uuids.
    */
   String[] getReservedNodes();
+
+  /**
+   * Print the specified messages to the server's log.
+   * @param messages the messages ot print.
+   */
+  void log(String...messages);
 }
