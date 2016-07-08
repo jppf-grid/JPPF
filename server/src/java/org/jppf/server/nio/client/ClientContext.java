@@ -278,13 +278,14 @@ public class ClientContext extends AbstractNioContext<ClientState> {
                 if (task.getBundle() == clientBundle) n++;
               }
             }
+            if (debugEnabled) log.debug("cancelling job {}", job);
+            job.cancel(true);
           }
           if (debugEnabled) log.debug("pending={}, n={}, serverJob={}", new Object[] {nbTasksToSend, n, job});
           JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
           stats.addValue(JPPFStatisticsHelper.TASK_QUEUE_COUNT, n - nbTasksToSend);
-          clientBundle.cancel();
-          clientBundle.bundleEnded();
-          //log.info("case 1: removing {}, jobUuid={}", job, jobUuid);
+          //clientBundle.cancel();
+          //clientBundle.bundleEnded();
           driver.getQueue().removeBundle(job);
           setInitialBundleWrapper(null);
         } catch(Exception e) {

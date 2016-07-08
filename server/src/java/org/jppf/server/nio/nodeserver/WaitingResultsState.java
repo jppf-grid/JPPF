@@ -115,6 +115,8 @@ class WaitingResultsState extends NodeServerState {
       if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
       nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
       nodeBundle.resultsReceived(t);
+    } else if (nodeBundle.isCancelled()) {
+      if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks for already cancelled bundle : " + received.bundle());
     } else {
       if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
       nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);

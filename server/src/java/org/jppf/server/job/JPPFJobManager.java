@@ -131,6 +131,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
         log.info("attempt to remove node " + channel + " but JobManager shows no node for jobId = " + bundle.getName());
       } else if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' : removed node " + channel);
     }
+    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     submitEvent(JobEventType.JOB_RETURNED, bundle, channel);
     fireJobTasksEvent(channel, nodeBundle, false);
   }
@@ -165,6 +166,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
       jobMap.removeValues(jobUuid);
     }
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' ended");
+    //if (debugEnabled) log.debug("call stack:\n{}", ExceptionUtils.getCallStack());
     submitEvent(JobEventType.JOB_ENDED, serverJob, null);
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
     stats.addValue(JPPFStatisticsHelper.JOB_COUNT, -1);

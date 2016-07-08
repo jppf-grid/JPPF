@@ -181,8 +181,8 @@ public class ServerTaskBundleNode {
    * @param results the list of tasks whose results have been received from the server.
    */
   public void resultsReceived(final List<DataLocation> results) {
-    job.resultsReceived(this, results);
     taskCompleted(null);
+    job.resultsReceived(this, results);
   }
 
   /**

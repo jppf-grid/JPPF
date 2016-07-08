@@ -23,7 +23,7 @@ import java.util.concurrent.FutureTask;
 import org.jppf.utils.ExceptionUtils;
 
 /**
- * Fuiture associated with a context which handles the job cancellation.
+ * Future associated with a context which handles the job cancellation.
  */
 class NodeContextFuture extends FutureTask<Object> {
   /**

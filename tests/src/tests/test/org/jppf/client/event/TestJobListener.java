@@ -22,10 +22,12 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import javax.management.*;
+
 import org.jppf.client.*;
-import org.jppf.job.JobEventType;
+import org.jppf.management.*;
+import org.jppf.management.forwarding.JPPFNodeForwardingNotification;
 import org.jppf.node.protocol.Task;
-import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
@@ -100,22 +102,24 @@ public class TestJobListener extends BaseTest {
    * Test that the <code>JobListener</code> receives a jobStarted() notification when a job is requeued.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=20000)
+  @Test(timeout = 20000)
   public void testJobListenerNotificationsUponRequeue() throws Exception {
     try {
       configure(true, false, 1);
       client = BaseSetup.createClient(null, false);
       CountingJobListener listener = new CountingJobListener();
-      AwaitJobNotificationListener jmxListener = new AwaitJobNotificationListener();
-      DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
-      jobManager.addNotificationListener(jmxListener, null, null);
+      String startNotification = "start notification";
+      MyTaskListener taskListener = new MyTaskListener(startNotification);
+      JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
+      String listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, taskListener, null, null);
       int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
       job.addJobListener(listener);
       client.submitJob(job);
-      jmxListener.await(JobEventType.JOB_DISPATCHED);
-      jobManager.removeNotificationListener(jmxListener);
+      taskListener.await();
+      jmx.unregisterForwardingNotificationListener(listenerId);
       client.reset();
+      client = BaseSetup.createClient(null, false);
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
@@ -155,14 +159,9 @@ public class TestJobListener extends BaseTest {
    * @param poolSize the size of the connection pool.
    */
   private void configure(final boolean remoteEnabled, final boolean localEnabled, final int poolSize) {
-    JPPFConfiguration.getProperties()
-    .set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled)
-    .set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
-    .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4)
-    .set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual")
-    .set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
-    .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5)
-    .set(JPPFProperties.POOL_SIZE, poolSize);
+    JPPFConfiguration.getProperties().set(JPPFProperties.REMOTE_EXECUTION_ENABLED, remoteEnabled).set(JPPFProperties.LOCAL_EXECUTION_ENABLED, localEnabled)
+    .set(JPPFProperties.LOCAL_EXECUTION_THREADS, 4).set(JPPFProperties.LOAD_BALANCING_ALGORITHM, "manual").set(JPPFProperties.LOAD_BALANCING_PROFILE, "manual")
+    .setInt(JPPFProperties.LOAD_BALANCING_PROFILE.getName() + ".manual.size", 5).set(JPPFProperties.POOL_SIZE, poolSize);
   }
 
   /**
@@ -174,5 +173,46 @@ public class TestJobListener extends BaseTest {
       client = null;
     }
     JPPFConfiguration.reset();
+  }
+
+  /**
+   *
+   */
+  public static class MyTaskListener implements NotificationListener {
+    /**
+     * A message we expect to receive as a notification.
+     */
+    private final String expectedMessage;
+
+    /**
+     * Intiialize with an expected message.
+     * @param expectedMessage a message we expect to receive as a notification.
+     */
+    public MyTaskListener(final String expectedMessage) {
+      this.expectedMessage = expectedMessage;
+    }
+
+    @Override
+    public void handleNotification(final Notification notification, final Object handback) {
+      JPPFNodeForwardingNotification wrapping = (JPPFNodeForwardingNotification) notification;
+      TaskExecutionNotification actualNotif = (TaskExecutionNotification) wrapping.getNotification();
+      Object data = actualNotif.getUserData();
+      if (expectedMessage.equals(data)) {
+        synchronized(this) {
+          notifyAll();
+        }
+      }
+    }
+
+    /**
+     * Wait for the epxected message to be received.
+     */
+    public synchronized void await() {
+      try {
+        wait();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

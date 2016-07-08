@@ -83,6 +83,10 @@ public class LifeCycleTask extends AbstractTask<String> {
    * Whether to set the job metadata onto this task.
    */
   protected boolean fetchMetadata = false;
+  /**
+   * A message to send via JMX.
+   */
+  protected String startNotification;
 
   /**
    * Initialize this task.
@@ -95,7 +99,7 @@ public class LifeCycleTask extends AbstractTask<String> {
    * @param duration specifies the duration of this task.
    */
   public LifeCycleTask(final long duration) {
-    this.duration = duration;
+    this(duration, true, null);
   }
 
   /**
@@ -104,8 +108,19 @@ public class LifeCycleTask extends AbstractTask<String> {
    * @param interruptible whether this task can be interrupted upon cancellation or timeout.
    */
   public LifeCycleTask(final long duration, final boolean interruptible) {
+    this(duration, interruptible, null);
+  }
+
+  /**
+   * Initialize this task.
+   * @param duration specifies the duration of this task.
+   * @param interruptible whether this task can be interrupted upon cancellation or timeout.
+   * @param startNotification a message to send via JMX.
+   */
+  public LifeCycleTask(final long duration, final boolean interruptible, final String startNotification) {
     this.duration = duration;
     this.interruptible = interruptible;
+    this.startNotification = startNotification;
   }
 
   @Override
@@ -116,7 +131,7 @@ public class LifeCycleTask extends AbstractTask<String> {
     start = System.currentTimeMillis();
     //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);
     start *= ONE_MILLION;
-
+    if (startNotification != null) fireNotification(startNotification, true);
     try {
       executedInNode = isInNode();
       TypedProperties config = JPPFConfiguration.getProperties();

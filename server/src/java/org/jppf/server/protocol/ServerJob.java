@@ -111,7 +111,7 @@ public class ServerJob extends AbstractServerJobBase {
       List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
       if (isJobExpired() || isCancelled()) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
-      } else {
+      } else if (results != null) {
         for (int i=0; i<bundleTasks.size(); i++) {
           ServerTask task = bundleTasks.get(i);
           if (task.getState() == TaskState.RESUBMIT) {
@@ -216,17 +216,20 @@ public class ServerJob extends AbstractServerJobBase {
    * Perform the necessary actions for when this job has been cancelled.
    */
   protected void handleCancelledStatus() {
-    if (debugEnabled) log.debug("cancelling dispatches for {}", this);
     List<Future> futureList;
     Map<Long, ServerTaskBundleNode> map;
     synchronized (dispatchSet) {
       map = new HashMap<>(dispatchSet);
     }
+    if (debugEnabled) log.debug("cancelling {} dispatches for {}", map.size(), this);
     for (Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) {
       try {
         ServerTaskBundleNode nodeBundle = entry.getValue();
         Future future = nodeBundle.getFuture();
-        if (!future.isDone()) future.cancel(false);
+        if (!future.isDone()) {
+          future.cancel(false);
+          nodeBundle.resultsReceived((List<DataLocation>) null);
+        }
       } catch (Exception e) {
         log.error("Error cancelling job " + this, e);
       }
