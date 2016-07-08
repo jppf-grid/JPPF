@@ -200,9 +200,18 @@
       <fileset dir="${report}">
         <include name="TEST-*.xml"/>
       </fileset>
-      <report format="frames" todir="${report}"/>
+      <report format="frames" todir="${report}" styledir="${tests.classes}"/>
     </junitreport>
     <fail if="tests.failed">Test failure, aborting build</fail>
   </target>
 
+  <target name="junit.report">
+    <junitreport todir="${report}">
+      <fileset dir="${report}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${report}" styledir="${tests.classes}"/>
+    </junitreport>
+    <fail if="tests.failed">Test failure, aborting build</fail>
+  </target>
 </project> 
