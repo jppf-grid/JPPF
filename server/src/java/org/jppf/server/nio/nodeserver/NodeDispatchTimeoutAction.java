@@ -75,7 +75,6 @@ class NodeDispatchTimeoutAction implements Runnable {
       if (context == null) {
         server.getOfflineNodeHandler().removeNodeBundle(jobUuid, nodeBundle.getId());
         nodeBundle.setJobReturnReason(JobReturnReason.DISPATCH_TIMEOUT);
-        nodeBundle.taskCompleted(null);
         nodeBundle.resultsReceived((List<DataLocation>) null);
       } else {
         try {

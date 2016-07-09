@@ -45,6 +45,8 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     Configuration testConfig = createConfig("offline_node");
+    testConfig.nodeClasspath.add("../server/classes");
+    testConfig.driverLog4j = "classes/tests/config/offline_node/log4j-driver.properties";
     client = BaseSetup.setup(1, 2, true, false, testConfig);
   }
 

@@ -109,7 +109,7 @@ public class ServerJob extends AbstractServerJobBase {
     lock.lock();
     try {
       List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
-      if (isJobExpired() || isCancelled()) {
+      if (isJobExpired() || isCancelled() || bundle.isExpired()) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
       } else if (results != null) {
         for (int i=0; i<bundleTasks.size(); i++) {
@@ -125,10 +125,13 @@ public class ServerJob extends AbstractServerJobBase {
             map.putValue(task.getBundle(), task);
           }
         }
+      } else {
+        if (debugEnabled) log.debug("results are null, job is neither expired nor cancelled, node bundle not expired: {}", bundle);
       }
     } finally {
       lock.unlock();
     }
+    if (debugEnabled) log.debug("client bundle map has {} entries: {}", map.size(), map.keySet());
     for (Map.Entry<ServerTaskBundleClient, Collection<ServerTask>> entry: map.entrySet()) entry.getKey().resultReceived(entry.getValue());
     taskCompleted(bundle, null);
   }
