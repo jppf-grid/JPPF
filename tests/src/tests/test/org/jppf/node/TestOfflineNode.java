@@ -37,16 +37,14 @@ import test.org.jppf.test.setup.common.*;
  * Unit test for nodes in offline mode.
  * @author Laurent Cohen
  */
-public class TestOfflineNode extends AbstractSetupOfflineNode
-{
+public class TestOfflineNode extends AbstractNonStandardSetup {
   /**
    * Launches a driver and 2 nodes and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
-    Configuration testConfig = createConfig();
+  public static void setup() throws Exception {
+    Configuration testConfig = createConfig("offline_node");
     client = BaseSetup.setup(1, 2, true, false, testConfig);
   }
 
@@ -55,17 +53,15 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
    * and that this error is handled properly.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSimpleJobDeserializationError() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSimpleJobDeserializationError() throws Exception {
     int nbTasks = 5;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
     job.getSLA().getClassPath().setForceClassLoaderReset(true);
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results)
-    {
+    for (Task<?> task : results) {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();
       assertNotNull("throwable for task '" + task.getId() + "' is null", t);
@@ -77,9 +73,8 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
    * Test that a simple job is normally executed.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testSimpleJob() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testSimpleJob() throws Exception {
     int nbTasks = 5;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
     Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
@@ -87,8 +82,7 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results)
-    {
+    for (Task<?> task : results) {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);
@@ -101,9 +95,8 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
    * Test that a simple job expires and is cancelled upon first dispatch.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
-  public void testJobDispatchExpiration() throws Exception
-  {
+  @Test(timeout = 10000)
+  public void testJobDispatchExpiration() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 5000L);
     Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
@@ -112,8 +105,7 @@ public class TestOfflineNode extends AbstractSetupOfflineNode
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
     assertEquals(nbTasks, results.size());
-    for (Task<?> task: results)
-    {
+    for (Task<?> task : results) {
       assertTrue("task = " + task, task instanceof LifeCycleTask);
       Throwable t = task.getThrowable();
       assertNull("throwable for task '" + task.getId() + "' : " + ExceptionUtils.getStackTrace(t), t);

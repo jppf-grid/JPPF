@@ -215,7 +215,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * Perform the necessary actions for when this job has been cancelled.
    */
-  protected void handleCancelledStatus() {
+  private void handleCancelledStatus() {
     List<Future> futureList;
     Map<Long, ServerTaskBundleNode> map;
     synchronized (dispatchSet) {
@@ -239,7 +239,7 @@ public class ServerJob extends AbstractServerJobBase {
   /**
    * Perform the necessary actions for when this job has been cancelled.
    */
-  protected void handleCancelledTasks() {
+  private void handleCancelledTasks() {
     if (debugEnabled) log.debug("cancelling tasks for {}", this);
     CollectionMap<ServerTaskBundleClient, ServerTask> clientMap = new SetIdentityMap<>();
     for (ServerTask task: tasks) {

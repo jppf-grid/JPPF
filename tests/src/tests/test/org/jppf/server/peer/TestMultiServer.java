@@ -23,6 +23,7 @@ import org.jppf.utils.configuration.JPPFProperties;
 import org.junit.*;
 
 import test.org.jppf.test.setup.*;
+import test.org.jppf.test.setup.BaseSetup.Configuration;
 
 /**
  * Test a multi-server topology with 2 servers, 1 node attached to each server and 1 client.
@@ -35,12 +36,13 @@ public class TestMultiServer extends AbstractNonStandardSetup {
    */
   @BeforeClass
   public static void setup() throws Exception {
-    client = BaseSetup.setup(2, 2, true, createConfig("p2p"));
+    Configuration config = createConfig("p2p");
+    config.driverLog4j = "classes/tests/config/p2p/log4j-driver.properties";
+    client = BaseSetup.setup(2, 2, true, config);
     awaitPeersInitialized();
   }
 
   /**
-   *
    * @throws Exception if any error occurs.
    */
   @Test(timeout = 10000)
@@ -58,6 +60,7 @@ public class TestMultiServer extends AbstractNonStandardSetup {
   @Test(timeout = 10000)
   public void testCancelJob() throws Exception {
     super.testCancelJob();
+    //StreamUtils.waitKeyPressed();
   }
 
   @Override

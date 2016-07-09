@@ -24,15 +24,11 @@ import static org.junit.Assert.*;
 import java.io.NotSerializableException;
 import java.lang.management.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.management.*;
 
 import org.jppf.classloader.AbstractJPPFClassLoader;
 import org.jppf.client.*;
 import org.jppf.execute.AbstractThreadManager;
-import org.jppf.job.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.job.JobEventType;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
@@ -56,7 +52,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testDefaultConstructor() throws Exception {
     Exception exception = null;
     try (JPPFClient client = new JPPFClient()) {
@@ -72,7 +68,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testConstructorWithUuid() throws Exception {
     try (JPPFClient client = new JPPFClient("some_uuid")) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
@@ -83,7 +79,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Test the submission of a job.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testSubmit() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
@@ -108,31 +104,34 @@ public class TestJPPFClient extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @SuppressWarnings("deprecation")
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
+  @Test
   public void testCancelJob() throws Exception {
+    String name = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
-      JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-      DriverJobManagementMBean jobManager = driver.getJobManager();
-      MyNotifListener listener = new MyNotifListener();
-      try {
-        jobManager.addNotificationListener(listener, null, null);
-        JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-        int i = 0;
-        for (Task<?> task: job.getJobTasks()) task.setId("" + i++);
-        client.submitJob(job);
-        listener.await();
-        client.cancelJob(job.getUuid());
-        List<Task<?>> results = job.awaitResults();
-        assertNotNull(results);
-        assertTrue("results size should be " + nbTasks + " but is " + results.size(), results.size() == nbTasks);
-        int count = 0;
-        for (Task<?> task: results) {
-          if (task.getResult() == null) count++;
-        }
-        assertTrue(count > 0);
-      } finally {
-        jobManager.removeNotificationListener(listener);
+      DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
+      jobManager.addNotificationListener(listener, null, null);
+      JPPFJob job = BaseTestHelper.createJob(name + "-1", false, false, nbTasks, LifeCycleTask.class, 5000L);
+      client.submitJob(job);
+      listener.await(JobEventType.JOB_DISPATCHED);
+      jobManager.removeNotificationListener(listener);
+      client.cancelJob(job.getUuid());
+      List<Task<?>> results = job.awaitResults();
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      int count = 0;
+      for (Task<?> task: results) {
+        if (task.getResult() == null) count++;
+      }
+      assertTrue(count > 0);
+      JPPFJob job2 = BaseTestHelper.createJob(name + "-2", true, false, nbTasks, LifeCycleTask.class, 1L);
+      results = client.submitJob(job2);
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      for (Task<?> task: results) {
+        assertEquals(BaseTestHelper.EXECUTION_SUCCESSFUL_MESSAGE, task.getResult());
       }
     }
   }
@@ -142,7 +141,7 @@ public class TestJPPFClient extends Setup1D1N {
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539111&group_id=135654&atid=733518">3539111 - Local execution does not use configured number of threads</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testLocalExecutionNbThreads() throws Exception {
     int nbThreads = 2;
     JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, nbThreads);
@@ -183,7 +182,7 @@ public class TestJPPFClient extends Setup1D1N {
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-174">JPPF-174 Thread context class loader is null for client-local execution</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testLocalExecutionContextClassLoader() throws Exception {
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
     try (JPPFClient client = new JPPFClient()) {
@@ -205,7 +204,7 @@ public class TestJPPFClient extends Setup1D1N {
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution</a>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testRemoteExecutionContextClassLoader() throws Exception {
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_ENABLED, false);
     try (JPPFClient client = new JPPFClient()) {
@@ -228,7 +227,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Test that a {@link java.io.NotSerializableException} occurring when submitting a job to a driver is properly handled.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testNotSerializableExceptionFromClient() throws Exception {
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, true);
@@ -245,7 +244,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception {
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
@@ -279,28 +278,6 @@ public class TestJPPFClient extends Setup1D1N {
         if (!ajcl2.isClientClassLoader()) throw new IllegalStateException("class loader is not a client class loader:" + ajcl2);
       }
       setResult(cl.toString());
-    }
-  }
-
-  /** */
-  private static class MyNotifListener implements NotificationListener {
-    /** */
-    final AtomicBoolean flag = new AtomicBoolean(false);
-
-    @Override
-    public void handleNotification(final Notification notification, final Object handback) {
-      JobNotification notif = (JobNotification) notification;
-      if (notif.getEventType() == JobEventType.JOB_DISPATCHED) flag.set(true);
-    }
-
-    /**
-     * Wait until the executing flag is set to {@code true}.
-     */
-    public void await() {
-      try {
-        while (!flag.get()) Thread.sleep(10L);
-      } catch(InterruptedException ignore) {
-      }
     }
   }
 }

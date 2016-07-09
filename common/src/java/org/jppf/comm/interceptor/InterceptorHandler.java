@@ -109,6 +109,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnConnect(final SocketWrapper socketWrapper) {
+    if (socketWrapper == null) return true;
     return hasInterceptor() ? invokeOnConnect(socketWrapper.getSocket()) : true;
   }
 
@@ -118,6 +119,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnAccept(final SocketWrapper socketWrapper) {
+    if (socketWrapper == null) return true;
     return hasInterceptor() ? invokeOnAccept(socketWrapper.getSocket()) : true;
   }
 }

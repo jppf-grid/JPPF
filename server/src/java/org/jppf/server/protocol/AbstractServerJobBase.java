@@ -23,6 +23,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.jppf.io.DataLocation;
 import org.jppf.node.protocol.TaskBundle;
+import org.jppf.server.JPPFDriver;
 import org.jppf.server.submission.SubmissionStatus;
 import org.jppf.utils.LoggingUtils;
 import org.slf4j.*;
@@ -283,26 +284,30 @@ public class AbstractServerJobBase extends AbstractServerJob {
     @Override
     public void taskCompleted(final ServerTaskBundleClient bundle, final List<ServerTask> results) {
       if (bundle == null) throw new IllegalArgumentException("bundle is null");
-      //if (bundle.isCancelled()) setCancelled(false);
     }
 
     @Override
     public void bundleEnded(final ServerTaskBundleClient bundle) {
       if (bundle == null) throw new IllegalArgumentException("bundle is null");
-      if (debugEnabled) log.debug("bundle ended: {}", bundle);
-      lock.lock();
-      try {
-        bundle.removeCompletionListener(this);
-        clientBundles.remove(bundle);
-        tasks.removeAll(bundle.getTaskList());
-        if (completionBundles != null) completionBundles.remove(bundle);
-        //if (clientBundles.isEmpty() && tasks.isEmpty() && getSubmissionStatus() == SubmissionStatus.COMPLETE) setSubmissionStatus(SubmissionStatus.ENDED);
-        if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
-      } catch(Exception e) {
-        if (debugEnabled) log.debug(e.getMessage(), e);
-      } finally {
-        lock.unlock();
-      }
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          if (debugEnabled) log.debug("bundle ended: {}", bundle);
+          lock.lock();
+          try {
+            bundle.removeCompletionListener(BundleCompletionListener.this);
+            clientBundles.remove(bundle);
+            tasks.removeAll(bundle.getTaskList());
+            if (completionBundles != null) completionBundles.remove(bundle);
+            if (clientBundles.isEmpty() && tasks.isEmpty()) setSubmissionStatus(SubmissionStatus.ENDED);
+          } catch(Exception e) {
+            if (debugEnabled) log.debug(e.getMessage(), e);
+          } finally {
+            lock.unlock();
+          }
+        }
+      };
+      JPPFDriver.getInstance().getNodeNioServer().getTransitionManager().submit(r);
     }
   }
 }
