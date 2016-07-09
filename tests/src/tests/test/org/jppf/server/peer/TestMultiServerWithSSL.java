@@ -37,6 +37,14 @@ public class TestMultiServerWithSSL extends AbstractNonStandardSetup {
   @BeforeClass
   public static void setup() throws Exception {
     client = BaseSetup.setup(2, 2, true, createConfig("ssl2_p2p"));
+  }
+
+  /**
+   * Wait until each driver has 1 idle node.
+   * @throws Exception if any error occurs.
+   */
+  @Before
+  public void instanceSetup() throws Exception {
     awaitPeersInitialized();
   }
 

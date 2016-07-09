@@ -68,4 +68,14 @@ public class ConnectionPoolEvent extends EventObject {
   public JPPFClientConnection getConnection() {
     return connection;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName())
+      .append('[')
+      .append("pool=").append(getConnectionPool())
+      .append(", connection=").append(connection)
+      .append(']');;
+    return sb.toString();
+  }
 }

@@ -19,12 +19,14 @@
 package test.org.jppf.test.setup.common;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.jppf.JPPFError;
-import org.jppf.client.JPPFJob;
+import org.jppf.client.*;
+import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
-import org.jppf.utils.DateTimeUtils;
+import org.jppf.utils.*;
 
 /**
  * Helper methods for setting up and cleaning the environment before and after testing.
@@ -35,6 +37,10 @@ public class BaseTestHelper {
    * Message used for successful task execution.
    */
   public static final String EXECUTION_SUCCESSFUL_MESSAGE = "execution successful";
+  /**
+   * Prefix and suffix of messages to send to the serevr log.
+   */
+  public static final String STARS = "*****";
 
   /**
    * Find a constructor with the specfied number of parameters for the specified class.
@@ -148,6 +154,37 @@ public class BaseTestHelper {
       } else {
         throwable = null;
         Thread.sleep(10L);
+      }
+    }
+  }
+
+  /**
+   * Print a formatted to the server log via the server debug mbean on all connected servers.
+   * @param client JPPF client holding the server connections.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToServers(final JPPFClient client, final String format, final Object...params) {
+    List<JPPFConnectionPool> pools = client .findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
+    if ((pools == null) || pools.isEmpty()) return;
+    System.out.println("printToServers() : pools = " + pools);
+
+    String fmt = String.format("%s %s %s", STARS, format, STARS);
+    String msg = String.format(fmt, params);
+    StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
+    for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
+    String s = sb.append(' ').append(STARS).toString();
+    String[] messages = { s, msg, s };
+    
+    for (JPPFConnectionPool pool: pools) {
+      List<JMXDriverConnectionWrapper> jmxConnections = pool.awaitJMXConnections(Operator.AT_LEAST, 1, 1000L, true);
+      if (!jmxConnections.isEmpty()) {
+        JMXDriverConnectionWrapper jmx = jmxConnections.get(0);
+        try {
+          jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+        } catch (Exception e) {
+          System.err.printf("error invoking remote logging on %s:%n%s%n", jmx, ExceptionUtils.getStackTrace(e));
+        }
       }
     }
   }

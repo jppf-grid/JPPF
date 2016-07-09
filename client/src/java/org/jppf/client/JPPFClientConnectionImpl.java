@@ -94,10 +94,6 @@ public class JPPFClientConnectionImpl extends AbstractJPPFClientConnection {
       JPPFClientConnectionStatus status = getStatus();
       if (debugEnabled) log.debug("connection [" + name + "] status=" + status);
       if (pool.getClient().isClosed()) close();
-      else if ((status == ACTIVE) || (status == EXECUTING)) {
-        pool.getClient().addClientConnection(this);
-        if (debugEnabled) log.debug("connection [" + name + "] added to the client pool");
-      }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       setStatus(FAILED);

@@ -26,7 +26,7 @@ import java.util.List;
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -40,7 +40,20 @@ public class TestConnectionPool extends Setup1D1N {
   /**
    * The JPPF client.
    */
-  private JPPFClient client = null;
+  private static JPPFClient client = null;
+
+  /**
+   * Reset the confiugration.
+   * @throws Exception if any error occurs
+   */
+  @After
+  public void reset() throws Exception {
+    if (client != null) {
+      client.close();
+      client = null;
+    }
+    JPPFConfiguration.reset();
+  }
 
   /**
    * Test job submission with <code>jppf.pool.size = 2</code> and local execution disabled.
@@ -48,16 +61,12 @@ public class TestConnectionPool extends Setup1D1N {
    */
   @Test(timeout = 10000)
   public void testSubmitJobMultipleConnections() throws Exception {
-    try {
-      configure(0);
-      client = BaseSetup.createClient(null, false);
-      int nbTasks = 100;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-      List<Task<?>> results = client.submitJob(job);
-      testJobResults(nbTasks, results);
-    } finally {
-      reset();
-    }
+    configure(0);
+    client = BaseSetup.createClient(null, false);
+    int nbTasks = 100;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    List<Task<?>> results = client.submitJob(job);
+    testJobResults(nbTasks, results);
   }
 
   /**
@@ -66,16 +75,12 @@ public class TestConnectionPool extends Setup1D1N {
    */
   @Test(timeout = 10000)
   public void testSubmitJobMultipleConnectionsAndLocalExec() throws Exception {
-    try {
-      configure(2);
-      client = BaseSetup.createClient(null, false);
-      int nbTasks = 100;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-      List<Task<?>> results = client.submitJob(job);
-      testJobResults(nbTasks, results);
-    } finally {
-      reset();
-    }
+    configure(2);
+    client = BaseSetup.createClient(null, false);
+    int nbTasks = 100;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    List<Task<?>> results = client.submitJob(job);
+    testJobResults(nbTasks, results);
   }
 
   /**
@@ -84,19 +89,28 @@ public class TestConnectionPool extends Setup1D1N {
    */
   @Test(timeout = 10000)
   public void testSubmitJobMultipleRemoteChannels() throws Exception {
-    try {
-      configure(0);
-      client = BaseSetup.createClient(null, false);
-      while (client.getAllConnectionsCount() < 2) Thread.sleep(10L);
-      int nbTasks = 100;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
-      // default max channels is 1 for backward compatibility with previous versions of the client.
-      job.getClientSLA().setMaxChannels(10);
-      List<Task<?>> results = client.submitJob(job);
-      testJobResults(nbTasks, results);
-    } finally {
-      reset();
-    }
+    configure(0);
+    client = BaseSetup.createClient(null, false);
+    while (client.getAllConnectionsCount() < 2) Thread.sleep(10L);
+    int nbTasks = 100;
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 0L);
+    // default max channels is 1 for backward compatibility with previous versions of the client.
+    job.getClientSLA().setMaxChannels(10);
+    List<Task<?>> results = client.submitJob(job);
+    testJobResults(nbTasks, results);
+  }
+
+  /**
+   * Check that the expected number of pools have been created.
+   * @throws Exception if any error occurs
+   */
+  @Test(timeout = 10000)
+  public void testNumberOfPools() throws Exception {
+    client = BaseSetup.createClient(null, false);
+    BaseSetup.checkDriverAndNodesInitialized(client, 1, 1);
+    List<JPPFConnectionPool> pools = client.getConnectionPools();
+    assertNotNull(pools);
+    assertEquals(1, pools.size());
   }
 
   /**
@@ -106,21 +120,17 @@ public class TestConnectionPool extends Setup1D1N {
   @Test(timeout = 10000)
   public void testSetPoolSizeByAPI() throws Exception {
     client = BaseSetup.createClient(null, false);
-    try {
-      for (int i=1; i<=10; i++) {
-        JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
-        try {
-          pool.setSize(2);
-          pool.awaitWorkingConnections(Operator.EQUAL, 2);
-          assertEquals(2, pool.getSize());
-        } finally {
-          pool.setSize(1);
-          pool.awaitWorkingConnections(Operator.EQUAL, 1);
-          assertEquals(1, pool.getSize());
-        }
+    for (int i=1; i<=10; i++) {
+      JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
+      try {
+        pool.setSize(2);
+        pool.awaitWorkingConnections(Operator.EQUAL, 2);
+        assertEquals(2, pool.getSize());
+      } finally {
+        pool.setSize(1);
+        pool.awaitWorkingConnections(Operator.EQUAL, 1);
+        assertEquals(1, pool.getSize());
       }
-    } finally {
-      reset();
     }
   }
 
@@ -129,19 +139,12 @@ public class TestConnectionPool extends Setup1D1N {
    * @param localThreads a value greater than 0 to enable local execution with this number of threads, 0 or less otherwise.
    */
   private void configure(final int localThreads) {
-    JPPFConfiguration.set(LOAD_BALANCING_ALGORITHM, "proportional").set(LOAD_BALANCING_PROFILE, "test").setInt(LOAD_BALANCING_PROFILE.getName() + ".test.initialSize", 10).set(POOL_SIZE, 2);
+    JPPFConfiguration
+      .set(LOAD_BALANCING_ALGORITHM, "proportional")
+      .set(LOAD_BALANCING_PROFILE, "test")
+      .setInt(LOAD_BALANCING_PROFILE.getName() + ".test.initialSize", 10)
+      .setInt("driver1." + POOL_SIZE.getName(), 2);
     if (localThreads > 0) JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, localThreads);
-  }
-
-  /**
-   * Reset the confiugration.
-   */
-  private void reset() {
-    if (client != null) {
-      client.close();
-      client = null;
-    }
-    JPPFConfiguration.reset();
   }
 
   /**

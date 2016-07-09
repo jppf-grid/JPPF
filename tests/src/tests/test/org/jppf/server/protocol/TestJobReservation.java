@@ -50,10 +50,6 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   private final MyNodeConnectionListener myNodeListener = new MyNodeConnectionListener();
   /**
-   * Prefix and suffix of messages to send to the serevr log.
-   */
-  private final static String STARS = "*****";
-  /**
    * Waits for a JOB_DISPATCHED notification.
    */
   private final AwaitJobNotificationListener jobNotificationListener = new AwaitJobNotificationListener();
@@ -111,7 +107,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Test(timeout = 15000)
   public void testJobReservationSingleNodeWithRestart() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
-    printToServer("start of %s()", name);
+    BaseTestHelper.printToServers(client, "start of %s()", name);
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
     TypedProperties props = new TypedProperties()
@@ -141,7 +137,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Test(timeout = 15000)
   public void testCancelledJobReservationSingleNodeWithRestart() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
-    printToServer("start of %s()", name);
+    BaseTestHelper.printToServers(client, "start of %s()", name);
     int nbTasksPerNode = 5;
     int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 500L);
@@ -188,7 +184,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Test(timeout = 15000)
   public void testExpiredJobReservationSingleNodeWithRestart() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
-    printToServer("start of %s()", name);
+    BaseTestHelper.printToServers(client, "start of %s()", name);
     int nbTasksPerNode = 5;
     int nbTasks = nbTasksPerNode * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 600L);
@@ -236,7 +232,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Test(timeout = 15000)
   public void testJobReservationTwoNodesWithRestart() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
-    printToServer("start of %s()", name);
+    BaseTestHelper.printToServers(client, "start of %s()", name);
     int nbTasks = 5 * BaseSetup.nbNodes();
     Set<String> expectedNodes = new TreeSet<>(Arrays.asList("n2", "n3"));
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
@@ -280,7 +276,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   @Test(timeout = 15000)
   public void testJobReservationSingleNodeNoRestart() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
-    printToServer("start of %s()", name);
+    BaseTestHelper.printToServers(client, "start of %s()", name);
     int nbTasks = 5 * BaseSetup.nbNodes();
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 1L);
     TypedProperties props = new TypedProperties()
@@ -301,25 +297,6 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     AtomicInteger n = myNodeListener.map.get("n3");
     assertNotNull(n);
     assertEquals(1, n.get());
-  }
-
-  /**
-   * Print a formatted to the server log via the server debug mbean.
-   * @param format the parameterized format.
-   * @param params the parameters of the message.
-   */
-  private void printToServer(final String format, final Object...params) {
-    String fmt = String.format("%s %s %s", STARS, format, STARS);
-    String msg = String.format(fmt, params);
-    StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
-    for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
-    String s = sb.append(' ').append(STARS).toString();
-    String[] messages = { s, msg, s };
-    try {
-      jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 
   /**

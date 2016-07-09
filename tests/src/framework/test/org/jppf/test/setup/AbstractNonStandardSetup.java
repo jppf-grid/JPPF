@@ -268,18 +268,16 @@ public class AbstractNonStandardSetup extends BaseTest {
     List<JPPFConnectionPool> pools = client.awaitConnectionPools(Operator.AT_LEAST, 2, 5000L, JPPFClientConnectionStatus.workingStatuses());
     for (JPPFConnectionPool pool: pools) {
       final JMXDriverConnectionWrapper jmx = pool.awaitWorkingJMXConnection();
-      long timeout = 5000L;
-      long time = System.nanoTime();
       ConcurrentUtils.awaitCondition(new Condition() {
         @Override
         public boolean evaluate() {
           try {
-            return jmx.nbNodes() < 2;
+            return jmx.nbIdleNodes() == 1;
           } catch (Exception e) {
             return false;
           }
         }
-      }, timeout, true);
+      }, 5000L, true);
     }
   }
 }

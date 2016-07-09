@@ -307,12 +307,12 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("name=").append(name);
     sb.append(", id=").append(id);
-    sb.append(", maxSize=").append(size);
+    sb.append(", size=").append(size);
     sb.append(", priority=").append(priority);
     sb.append(", driverHost=").append(hostIP != null ? hostIP.hostName() : null);
     sb.append(", driverPort=").append(driverPort);
     sb.append(", sslEnabled=").append(sslEnabled);
-    sb.append(", client=").append(client);
+    //sb.append(", client=").append(client);
     sb.append(']');
     return sb.toString();
   }
@@ -455,12 +455,12 @@ public class JPPFConnectionPool extends AbstractConnectionPool<JPPFClientConnect
    * @return a list of {@link JMXDriverConnectionWrapper} instances.
    * @since 4.2
    */
-  public synchronized List<JMXDriverConnectionWrapper> getJMXConnections() {
+  public List<JMXDriverConnectionWrapper> getJMXConnections() {
     return jmxPool.getConnections();
   }
 
   @Override
-  public synchronized void close() {
+  public void close() {
     jmxPool.close();
     super.close();
   }

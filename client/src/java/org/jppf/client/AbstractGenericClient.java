@@ -239,7 +239,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
         pool.setDriverPort(ssl ? info.sslServerPorts[0] : info.serverPorts[0]);
         synchronized(pools) {
           pools.putValue(priority, pool);
-          pendingPools.add(pool);
         }
         HostIP hostIP = new HostIP(info.host, info.host);
         if (JPPFConfiguration.getProperties().get(JPPFProperties.RESOLVE_ADDRESSES)) hostIP = NetworkUtils.getHostIP(info.host);

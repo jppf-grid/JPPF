@@ -24,6 +24,7 @@ import java.util.*;
 import javax.management.remote.JMXServiceURL;
 
 import org.jppf.client.*;
+import org.jppf.client.event.ConnectionPoolListener;
 import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.ssl.SSLHelper;
@@ -115,10 +116,12 @@ public class BaseSetup {
    * @param createClient if true then start a client.
    * @param checkDriversAndNodes if true then check that all drivers and nodes are connected before returning.
    * @param config the driver and node configuration to use.
+   * @param listeners the listeners to add to the JPPF client to receive notifications of new connections.
    * @return an instance of <code>JPPFClient</code>.
    * @throws Exception if a process could not be started.
    */
-  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes, final Configuration config) throws Exception {
+  public static JPPFClient setup(final int nbDrivers, final int nbNodes, final boolean createClient, final boolean checkDriversAndNodes,
+    final Configuration config, final ConnectionPoolListener... listeners) throws Exception {
     System.out.println("performing setup with " + nbDrivers + " drivers, " + nbNodes + " nodes" + (createClient ? " and 1 client" : ""));
     ConfigSource.setClientConfig(config.clientConfig);
     Thread.setDefaultUncaughtExceptionHandler(new JPPFDefaultUncaughtExceptionHandler());
@@ -136,7 +139,7 @@ public class BaseSetup {
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
     if (createClient) {
-      client = createClient(null, true, config);
+      client = createClient(null, true, config, listeners);
       if (checkDriversAndNodes) checkDriverAndNodesInitialized(nbDrivers, nbNodes);
     }
     return client;
@@ -168,14 +171,16 @@ public class BaseSetup {
    * @param uuid if null, let the client generate its uuid.
    * @param reset if <code>true</code>, the JPPF configuration is reloaded.
    * @param config the configuration to use.
+   * @param listeners the listeners to add to the JPPF client to receive notifications of new connections.
    * @return a <code>JPPFClient</code> instance.
    * @throws Exception if any error occurs.
    */
-  public static JPPFClient createClient(final String uuid, final boolean reset, final Configuration config) throws Exception {
+  public static JPPFClient createClient(final String uuid, final boolean reset, final Configuration config, final ConnectionPoolListener... listeners) throws Exception {
     ConfigSource.setClientConfig(config.clientConfig);
     if (reset) JPPFConfiguration.reset();
     else SSLHelper.resetConfig();
-    client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
+    if ((listeners == null) || (listeners.length <= 0)) client = (uuid == null) ? new JPPFClient() : new JPPFClient(uuid);
+    else client = (uuid == null) ? new JPPFClient(listeners) : new JPPFClient(uuid, listeners);
     while (!client.hasAvailableConnection()) Thread.sleep(10L);
     return client;
   }

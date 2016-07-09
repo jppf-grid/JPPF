@@ -63,10 +63,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   final CollectionMap<Integer, JPPFConnectionPool> pools = new LinkedListSortedMap<>(new DescendingIntegerComparator());
   /**
-   * Keeps inactive connection ppols, that is the pools who do not yet have an active connection.
-   */
-  final Set<JPPFConnectionPool> pendingPools = new HashSet<>();
-  /**
    * Unique universal identifier for this JPPF client.
    */
   private String uuid = null;
@@ -217,21 +213,6 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
   protected abstract void connectionFailed(final JPPFClientConnection c);
 
   /**
-   * Add a new connection to the set of connections handled by this client.
-   * @param connection the connection to add.
-   * @exclude
-   */
-  void addClientConnection(final JPPFClientConnection connection) {
-    if (connection == null) throw new IllegalArgumentException("connection is null");
-    if (debugEnabled) log.debug("adding connection {}", connection);
-    int priority = connection.getPriority();
-    JPPFConnectionPool pool = connection.getConnectionPool();
-    synchronized (pools) {
-      if (pendingPools.remove(pool)) pools.putValue(priority, pool);
-    }
-  }
-
-  /**
    * Remove a connection from the set of connections handled by this client.
    * @param connection the connection to remove.
    * @return {@code true} if the pool holding the connection became empty and was also removed, {@code false} otherwise.
@@ -244,12 +225,12 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
     JPPFConnectionPool pool = connection.getConnectionPool();
     boolean poolRemoved = false;
     if (pool != null) {
-      synchronized (pools) {
-        pool.remove(connection);
-        if (pool.isEmpty()) {
+      pool.remove(connection);
+      if (pool.isEmpty()) {
+        synchronized (pools) {
           pools.removeValue(pool.getPriority(), pool);
-          poolRemoved = true;
         }
+        poolRemoved = true;
       }
     }
     return poolRemoved;
@@ -260,8 +241,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    */
   @Override
   public void close() {
-    List<JPPFConnectionPool> pools = getConnectionPools();
-    for (JPPFConnectionPool pool: pools) pool.close();
+    for (JPPFConnectionPool pool: getConnectionPools()) pool.close();
     this.pools.clear();
   }
 
