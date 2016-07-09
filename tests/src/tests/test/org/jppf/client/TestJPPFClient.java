@@ -52,7 +52,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testDefaultConstructor() throws Exception {
     Exception exception = null;
     try (JPPFClient client = new JPPFClient()) {
@@ -68,7 +68,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Invocation of the <code>JPPFClient(String uuid)</code> constructor.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testConstructorWithUuid() throws Exception {
     try (JPPFClient client = new JPPFClient("some_uuid")) {
       while (!client.hasAvailableConnection()) Thread.sleep(10L);
@@ -79,7 +79,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Test the submission of a job.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testSubmit() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
@@ -104,8 +104,7 @@ public class TestJPPFClient extends Setup1D1N {
    * @throws Exception if any error occurs
    */
   @SuppressWarnings("deprecation")
-  //@Test(timeout=10000)
-  @Test
+  @Test(timeout=10000)
   public void testCancelJob() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = BaseSetup.createClient(null)) {
@@ -141,7 +140,7 @@ public class TestJPPFClient extends Setup1D1N {
    * See bug <a href="http://sourceforge.net/tracker/?func=detail&aid=3539111&group_id=135654&atid=733518">3539111 - Local execution does not use configured number of threads</a>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testLocalExecutionNbThreads() throws Exception {
     int nbThreads = 2;
     JPPFConfiguration.set(LOCAL_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_THREADS, nbThreads);
@@ -182,7 +181,7 @@ public class TestJPPFClient extends Setup1D1N {
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-174">JPPF-174 Thread context class loader is null for client-local execution</a>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testLocalExecutionContextClassLoader() throws Exception {
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, false).set(LOCAL_EXECUTION_ENABLED, true);
     try (JPPFClient client = new JPPFClient()) {
@@ -204,7 +203,7 @@ public class TestJPPFClient extends Setup1D1N {
    * See bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-153">JPPF-153 In the node, context class loader and task class loader do not match after first job execution</a>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testRemoteExecutionContextClassLoader() throws Exception {
     JPPFConfiguration.set(REMOTE_EXECUTION_ENABLED, true).set(LOCAL_EXECUTION_ENABLED, false);
     try (JPPFClient client = new JPPFClient()) {
@@ -227,7 +226,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Test that a {@link java.io.NotSerializableException} occurring when submitting a job to a driver is properly handled.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testNotSerializableExceptionFromClient() throws Exception {
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, true);
@@ -244,7 +243,7 @@ public class TestJPPFClient extends Setup1D1N {
    * Test that a {@link java.io.NotSerializableException} occurring when a node returns execution results is properly handled.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testNotSerializableExceptionFromNode() throws Exception {
     try (JPPFClient client = new JPPFClient()) {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, 1, NotSerializableTask.class, false);
