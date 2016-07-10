@@ -25,6 +25,7 @@ import java.util.*;
 import javax.management.Notification;
 
 import org.jppf.client.JPPFJob;
+import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.*;
 import org.jppf.node.protocol.Task;
@@ -52,7 +53,11 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
     String listenerId = null;
     checkNodes();
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
+    LoadBalancingInformation lbInfo = jmx.loadBalancerInformation();
     try {
+      Map<Object, Object> map = new HashMap<>();
+      map.put("size", "1");
+      jmx.changeLoadBalancerSettings("manual", map);
       NotifyingTaskListener listener = new NotifyingTaskListener();
       listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeTestMBean.MBEAN_NAME, listener, null, "testing");
       JPPFJob job = BaseTestHelper.createJob2(ReflectionUtils.getCurrentMethodName(), true, false, new NotifyingTask(100L), new NotifyingTask(5000L));
@@ -81,6 +86,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       task = (Task<?>) job.getJobTasks().get(0);
       assertEquals(NotifyingTask.END_PREFIX + task.getId(), userObject.taskId);
     } finally {
+      jmx.changeLoadBalancerSettings(lbInfo.getAlgorithm(), lbInfo.getParameters());
       if (listenerId != null) jmx.unregisterForwardingNotificationListener(listenerId);
     }
   }

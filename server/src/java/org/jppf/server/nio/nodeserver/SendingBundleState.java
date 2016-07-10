@@ -71,6 +71,7 @@ class SendingBundleState extends NodeServerState {
       TaskBundle bundle = (nodeBundle == null) ? null : nodeBundle.getJob();
       if (bundle != null) {
         if (debugEnabled) log.debug("got bundle " + nodeBundle + " from the queue for " + channel);
+        nodeBundle.setOffline(context.isOffline());
         // to avoid cycles in peer-to-peer routing of jobs.
         if (bundle.getUuidPath().contains(context.getUuid())) {
           if (debugEnabled) log.debug("cycle detected in peer-to-peer bundle routing: " + bundle.getUuidPath());

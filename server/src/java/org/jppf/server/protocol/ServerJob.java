@@ -105,11 +105,13 @@ public class ServerJob extends AbstractServerJobBase {
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("received {} results from {}", (results == null ? "null" : results.size()), bundle);
     if ((results != null) && results.isEmpty()) return;
+    //boolean offline = bundle.getJob().getSLA().i
     CollectionMap<ServerTaskBundleClient, ServerTask> map = new SetIdentityMap<>();
     lock.lock();
     try {
       List<ServerTask> bundleTasks = (bundle == null) ? new ArrayList<>(tasks) : bundle.getTaskList();
-      if (isJobExpired() || isCancelled() || bundle.isExpired()) {
+      //if (isJobExpired() || isCancelled() || bundle.isExpired()) {
+      if (isJobExpired() || isCancelled() || (bundle.isExpired() && bundle.isOffline())) {
         for (ServerTask task : bundleTasks) map.putValue(task.getBundle(), task);
       } else if (results != null) {
         for (int i=0; i<bundleTasks.size(); i++) {

@@ -115,30 +115,32 @@ class WaitingResultsState extends NodeServerState {
       if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
       nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
       nodeBundle.resultsReceived(t);
-    } else if (nodeBundle.isCancelled()) {
+    } else if (nodeBundle.getServerJob().isCancelled()) {
       if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks for already cancelled bundle : " + received.bundle());
     } else {
       if (debugEnabled) log.debug("received bundle with " + received.second().size() + " tasks, taskCount=" + newBundle.getTaskCount() + " : " + received.bundle());
-      nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
-      Set<Integer> resubmitSet = null;
-      int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
-      if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
-      if (resubmitPositions != null) {
-        resubmitSet = new HashSet<>();
-        for (int n: resubmitPositions) resubmitSet.add(n);
-        if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
-      }
-      boolean anyResubmit = resubmitSet != null;
-      int count = 0;
-      for (ServerTask task: nodeBundle.getTaskList()) {
-        if (anyResubmit && resubmitSet.contains(task.getJobPosition())) {
-          if (task.incResubmitCount() <= task.getMaxResubmits()) {
-            task.resubmit();
-            count++;
+      if (nodeBundle.getJobReturnReason() == null) nodeBundle.setJobReturnReason(JobReturnReason.RESULTS_RECEIVED);
+      if (!nodeBundle.isExpired()) {
+        Set<Integer> resubmitSet = null;
+        int[] resubmitPositions = newBundle.getParameter(BundleParameter.RESUBMIT_TASK_POSITIONS, null);
+        if (debugEnabled) log.debug("resubmitPositions = {} for {}", resubmitPositions, newBundle);
+        if (resubmitPositions != null) {
+          resubmitSet = new HashSet<>();
+          for (int n: resubmitPositions) resubmitSet.add(n);
+          if (debugEnabled) log.debug("resubmitSet = {} for {}", resubmitSet, newBundle);
+        }
+        boolean anyResubmit = resubmitSet != null;
+        int count = 0;
+        for (ServerTask task: nodeBundle.getTaskList()) {
+          if (anyResubmit && resubmitSet.contains(task.getJobPosition())) {
+            if (task.incResubmitCount() <= task.getMaxResubmits()) {
+              task.resubmit();
+              count++;
+            }
           }
         }
-      }
-      if (count > 0) context.updateStatsUponTaskResubmit(count);
+        if (count > 0) context.updateStatsUponTaskResubmit(count);
+      } else if (debugEnabled) log.debug("bundle has expired: {}", nodeBundle);
       nodeBundle.resultsReceived(received.data());
       long elapsed = System.nanoTime() - nodeBundle.getJob().getExecutionStartTime();
       updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);

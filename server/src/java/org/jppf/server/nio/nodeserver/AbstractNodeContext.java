@@ -452,6 +452,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   @Override
   public Future<?> submit(final ServerTaskBundleNode nodeBundle) throws Exception {
     setBundle(nodeBundle);
+    nodeBundle.setOffline(isOffline());
     nodeBundle.setChannel(this);
     transitionManager.transitionChannel(getChannel(), NodeTransition.TO_SENDING_BUNDLE);
     if (getChannel().getSelector() != null) getChannel().getSelector().wakeUp();

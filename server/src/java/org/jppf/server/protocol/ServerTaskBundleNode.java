@@ -98,6 +98,10 @@ public class ServerTaskBundleNode {
    * The reason why the task results are reeived.
    */
   private JobReturnReason jobReturnReason = null;
+  /**
+   * Offline node indicator.
+   */
+  private boolean offline  = false;
 
   /**
    * Initialize this task bundle and set its build number.
@@ -123,11 +127,19 @@ public class ServerTaskBundleNode {
   }
 
   /**
-   * Get the job this submission is for.
+   * Get the task bundle this node bundle is for.
    * @return a {@link TaskBundle} instance.
    */
   public TaskBundle getJob() {
     return taskBundle;
+  }
+
+  /**
+   * Get the job this node bundle is a dispatch of.
+   * @return a {@link ServerJob} instance.
+   */
+  public ServerJob getServerJob() {
+    return job;
   }
 
   /**
@@ -380,5 +392,21 @@ public class ServerTaskBundleNode {
    */
   public void setJobReturnReason(final JobReturnReason jobReturnReason) {
     this.jobReturnReason = jobReturnReason;
+  }
+
+  /**
+   * Get the offline node indicator.
+   * @return {@code true} if the corresponding node is offline, {@code false} otherwise.
+   */
+  public boolean isOffline() {
+    return offline;
+  }
+
+  /**
+   * Set the offline node indicator.
+   * @param offline {@code true} if the corresponding node is offline, {@code false} otherwise.
+   */
+  public void setOffline(final boolean offline) {
+    this.offline = offline;
   }
 }
