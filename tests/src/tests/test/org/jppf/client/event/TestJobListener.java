@@ -62,7 +62,7 @@ public class TestJobListener extends BaseTest {
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 1</code>.
    * @throws Exception if any error occurs
    */
-  @Test(timeout=10000)
+  //@Test(timeout=10000)
   public void testJobListenerSingleLocalConnection() throws Exception {
     try {
       configure(false, true, 1);
@@ -102,24 +102,26 @@ public class TestJobListener extends BaseTest {
    * Test that the <code>JobListener</code> receives a jobStarted() notification when a job is requeued.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 20000)
+  @Test(timeout = 15000)
   public void testJobListenerNotificationsUponRequeue() throws Exception {
     try {
+      String name = ReflectionUtils.getCurrentMethodName();
       configure(true, false, 1);
       client = BaseSetup.createClient(null, false);
+      BaseTestHelper.printToServers(client, "start of %s()", name);
       CountingJobListener listener = new CountingJobListener();
       String startNotification = "start notification";
       MyTaskListener taskListener = new MyTaskListener(startNotification);
       JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection(client);
       String listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, JPPFNodeTaskMonitorMBean.MBEAN_NAME, taskListener, null, null);
       int nbTasks = 1;
-      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
+      JPPFJob job = BaseTestHelper.createJob(name, false, false, nbTasks, LifeCycleTask.class, 3000L, true, startNotification);
       job.addJobListener(listener);
       client.submitJob(job);
       taskListener.await();
       jmx.unregisterForwardingNotificationListener(listenerId);
       client.reset();
-      client = BaseSetup.createClient(null, false);
+      //client = BaseSetup.createClient(null, false);
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);
       assertEquals(nbTasks, results.size());
@@ -143,6 +145,7 @@ public class TestJobListener extends BaseTest {
    */
   private List<Task<?>> runJob(final String name, final CountingJobListener listener, final int nbTasks) throws Exception {
     client = BaseSetup.createClient(null, false);
+    BaseTestHelper.printToServers(client, "start of %s()", name);
     JPPFJob job = BaseTestHelper.createJob(name, true, false, nbTasks, LifeCycleTask.class, 0L);
     if (listener != null) job.addJobListener(listener);
     List<Task<?>> results = client.submitJob(job);

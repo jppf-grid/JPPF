@@ -20,6 +20,7 @@ package test.org.jppf.test.setup;
 
 import java.io.*;
 
+import org.jppf.location.*;
 import org.junit.*;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -83,6 +84,12 @@ public class BaseTest {
    * @param className the name of the class for which to zip the logs.
    */
   private static void zipLogs(final String className) {
+    FileLocation src = new FileLocation("jppf-client.log");
+    try {
+      src.copyTo(new FileLocation(new File("client.log")));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     File dir = new File(System.getProperty("user.dir"));
     File[] logFiles = dir.listFiles(logFileFilter);
     if ((logFiles == null) || (logFiles.length <= 0)) return;
