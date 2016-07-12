@@ -398,7 +398,10 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   @Override
   public void reset() {
     synchronized(allConnections) {
-      for (ChannelWrapper channel: allConnections) channel.close();
+      for (ChannelWrapper channel: allConnections) {
+        channel.setResetting(true);
+        channel.close();
+      }
       allConnections.clear();
       if (taskQueueChecker != null) taskQueueChecker.clearChannels();
     }

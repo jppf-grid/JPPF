@@ -526,9 +526,7 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
      */
     @Override
     public int compare(final Integer o1, final Integer o2) {
-      if (o1 < o2) return 1;
-      if (o1 > o2) return -1;
-      return 0;
+      return -o1.compareTo(o2);
     }
   }
 

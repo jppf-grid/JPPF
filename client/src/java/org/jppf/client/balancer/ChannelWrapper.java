@@ -50,15 +50,15 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * Represents the system information.
    */
-  protected JPPFSystemInformation systemInfo = null;
+  JPPFSystemInformation systemInfo = null;
   /**
    * Represents the management information.
    */
-  protected JPPFManagementInfo managementInfo = null;
+  JPPFManagementInfo managementInfo = null;
   /**
    * Executor for submitting bundles for processing.
    */
-  protected ExecutorService executor;
+  ExecutorService executor;
   /**
    * List of execution status listeners for this channel.
    */
@@ -66,7 +66,11 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * The priority assigned to this channel.
    */
-  protected int priority = 0;
+  int priority = 0;
+  /**
+   * Whether the client is resetting.
+   */
+  boolean resetting = false;
 
   /**
    * Default constructor.
@@ -231,4 +235,20 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @return {@code true} if the job is effectively cancelled, {@code false} otherwise.
    */
   public abstract boolean cancel(ClientTaskBundle bundle);
+
+  /**
+   * Determine whether the client is resetting.
+   * @return {@code true} if the client is resetting, {@code false} otherwise.
+   */
+  public boolean isResetting() {
+    return resetting;
+  }
+
+  /**
+   * Specify whether the client is resetting.
+   * @param resetting {@code true} if the client is resetting, {@code false} otherwise.
+   */
+  public void setResetting(final boolean resetting) {
+    this.resetting = resetting;
+  }
 }

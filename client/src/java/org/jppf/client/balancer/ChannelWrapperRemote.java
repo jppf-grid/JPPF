@@ -34,6 +34,7 @@ import org.slf4j.*;
 /**
  * Context associated with a remote channel serving state and tasks submission.
  * @author Martin JANDA
+ * @author Laurent Cohen
  */
 public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnectionStatusHandler {
   /**
@@ -226,25 +227,29 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
           }
           completed = true;
         }
-
         double elapsed = System.nanoTime() - start;
         bundler.feedback(tasks.size(), elapsed);
       } catch (Throwable t) {
         if (debugEnabled) log.debug(t.getMessage(), t);
         else log.warn(ExceptionUtils.getMessage(t));
-        if (channel.isClosed() && !channel.getPool().getClient().isResetting()) return;
+        boolean channelClosed = channel.isClosed();
+        if (debugEnabled) log.debug("channelClosed={}, resetting={}", channelClosed, resetting);
+        if (channelClosed && !resetting) return;
         exception = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         if ((t instanceof NotSerializableException) || (t instanceof InterruptedException)) {
           clientBundle.resultsReceived(t);
           return;
         }
-        if (!channel.isClosed() || channel.getPool().getClient().isResetting()) {
+        if (!channelClosed || resetting) {
+          if (debugEnabled) log.debug("resubmitting {}", clientBundle);
           clientBundle.resubmit();
           reconnect();
         }
       } finally {
         try {
-          if (!channel.isClosed() || channel.getPool().getClient().isResetting()) clientBundle.taskCompleted(exception);
+          boolean channelClosed = channel.isClosed();
+          if (debugEnabled) log.debug("finally: channelClosed={}, resetting={}", channelClosed, resetting);
+          if (!channelClosed || resetting) clientBundle.taskCompleted(exception);
           clientBundle.getClientJob().removeChannel(ChannelWrapperRemote.this);
           if (getStatus() == JPPFClientConnectionStatus.EXECUTING) setStatus(JPPFClientConnectionStatus.ACTIVE);
         } catch (Exception e) {

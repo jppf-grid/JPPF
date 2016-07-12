@@ -272,10 +272,6 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
     } catch (AsynchronousCloseException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
-    } catch (Exception|Error e) {
-      if (debugEnabled) log.debug(e.getMessage(), e);
-      else log.error(ExceptionUtils.getMessage(e));
-      throw e;
     } finally {
       Thread.currentThread().setContextClassLoader(ctxCl);
     }

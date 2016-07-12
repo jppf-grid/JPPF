@@ -62,7 +62,7 @@ public class TestJobListener extends BaseTest {
    * Test the <code>JobListener</code> notifications with <code>jppf.pool.size = 1</code>.
    * @throws Exception if any error occurs
    */
-  //@Test(timeout=10000)
+  @Test(timeout=10000)
   public void testJobListenerSingleLocalConnection() throws Exception {
     try {
       configure(false, true, 1);
@@ -102,7 +102,7 @@ public class TestJobListener extends BaseTest {
    * Test that the <code>JobListener</code> receives a jobStarted() notification when a job is requeued.
    * @throws Exception if any error occurs
    */
-  @Test(timeout = 15000)
+  @Test(timeout = 10000)
   public void testJobListenerNotificationsUponRequeue() throws Exception {
     try {
       String name = ReflectionUtils.getCurrentMethodName();

@@ -95,6 +95,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @param configuration the configuration to use with this client.
    */
   protected void init(final TypedProperties configuration) {
+    if (debugEnabled) log.debug("initializing client");
     closed.set(false);
     resetting.set(false);
     this.config = initConfig(configuration);
@@ -104,7 +105,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
       log.error(e.getMessage(), e);
     }
     if (jobManager == null) jobManager = createJobManager();
-    //System.out.println("jobManager = " + jobManager);
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -142,8 +142,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     int coreThreads = Runtime.getRuntime().availableProcessors();
-    //LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(coreThreads);
-    //BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>();
     BlockingQueue<Runnable> queue = new SynchronousQueue<>();
     executor = new ThreadPoolExecutor(coreThreads, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, queue, new JPPFThreadFactory("JPPF Client"));
     executor.allowCoreThreadTimeOut(true);
