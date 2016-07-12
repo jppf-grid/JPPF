@@ -22,7 +22,6 @@ import static org.jppf.utils.ReflectionUtils.getCurrentMethodName;
 import static org.junit.Assert.*;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.*;
 
@@ -34,7 +33,9 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
@@ -54,6 +55,16 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * A "short" duration for this test.
    */
   private static final long TIME_SHORT = 1000L;
+
+  /** */
+  @Rule
+  public TestWatcher instanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToServers(client, "start of method %s()", description.getMethodName());
+    }
+  };
+
 
   /**
    * We test a job with 1 task, and attempt to cancel it before completion.
@@ -335,14 +346,11 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
     int nbTasks = 2;
     JMXDriverConnectionWrapper driver = BaseSetup.getJMXConnection();
     assertNotNull(driver);
-    LoadBalancingInformation info = driver.loadBalancerInformation();
-    assertNotNull(info);
+    LoadBalancingInformation lbInfo = driver.loadBalancerInformation();
+    assertNotNull(lbInfo);
     try {
-      TypedProperties props = new TypedProperties();
-      props.setInt("size", 1);
-      driver.changeLoadBalancerSettings("manual", props);
-      JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), false, false, nbTasks, LifeCycleTask.class, 2000L);
-      for (Task<?> t: job) ((LifeCycleTask) t).setFetchMetadata(true);
+      driver.changeLoadBalancerSettings("manual", new TypedProperties().setInt("size", 1));
+      JPPFJob job = BaseTestHelper.createJob(getCurrentMethodName(), true, false, nbTasks, LifeCycleTask.class, 2000L);
       final JobSLA sla = job.getSLA();
       final JobMetadata metadata = job.getMetadata();
       sla.setMaxNodes(1);
@@ -350,26 +358,12 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       metadata.setParameter("node.uuid", "n1");
       final DriverJobManagementMBean jobManager = driver.getJobManager();
       assertNotNull(jobManager);
-      final AtomicInteger count = new AtomicInteger(0);
-      jobManager.addNotificationListener(new NotificationListener() {
-        @Override
-        public void handleNotification(final Notification notification, final Object handback) {
-          JobNotification notif = (JobNotification) notification;
-          if (notif.getEventType() == JobEventType.JOB_DISPATCHED) {
-            int n = count.incrementAndGet();
-            String actualUuid = notif.getNodeInfo().getUuid();
-            String expectedUuid = "n" + n;
-            assertEquals(String.format("job should have been dispatched to node '%s' but was dispatched to '%s'", expectedUuid, actualUuid), expectedUuid, actualUuid);
-            if (n == 1) {
-              sla.setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
-              metadata.setParameter("node.uuid", "n2");
-              jobManager.updateJobs(JobSelector.ALL_JOBS, sla, metadata);
-            }
-          }
-        }
-      }, null, null);
-      client.submitJob(job);
-      List<Task<?>> results = job.awaitResults();
+      MyNotifListener listener = new MyNotifListener(job);
+      jobManager.addNotificationListener(listener, null, null);
+      List<Task<?>> results = client.submitJob(job);
+      listener.await();
+      jobManager.removeNotificationListener(listener);
+      assertEquals("n2", listener.actualUuid);
       assertEquals(nbTasks, results.size());
       List<String> nodeUuids = new ArrayList<>();
       for (int i=0; i<nbTasks; i++) {
@@ -379,14 +373,66 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
         assertNotNull(task.getResult());
         assertNull(task.getThrowable());
         nodeUuids.add(task.getNodeUuid());
-        assertNotNull(task.getMetadata());
-        assertEquals(task.getNodeUuid(), task.getMetadata().getParameter("node.uuid"));
+        assertEquals("n" + (i+1), task.getNodeUuid());
       }
       Collections.sort(nodeUuids);
       assertEquals(nbTasks, nodeUuids.size());
-      for (int i=0; i<nbTasks; i++) assertEquals("n" + (i + 1), nodeUuids.get(i));
     } finally {
-      driver.changeLoadBalancerSettings(info.getAlgorithm(), info.getParameters());
+      driver.changeLoadBalancerSettings(lbInfo.getAlgorithm(), lbInfo.getParameters());
+    }
+  }
+
+  /** */
+  public static class MyNotifListener implements NotificationListener {
+    /** */
+    public String actualUuid;
+    /** */
+    public int count;
+    /** */
+    private final JPPFJob job;
+
+    /**
+     * Intiialize with a job.
+     * @param job the job to use.
+     */
+    public MyNotifListener(final JPPFJob job) {
+      this.job = job;
+    }
+    
+    @Override
+    public void handleNotification(final Notification notification, final Object handback) {
+      JobNotification notif = (JobNotification) notification;
+      if (notif.getEventType() == JobEventType.JOB_DISPATCHED) {
+        synchronized(this) {
+          count++;
+          if (count == 2) {
+            actualUuid = notif.getNodeInfo().getUuid();
+            notifyAll();
+          } else if (count == 1) {
+            job.getSLA().setExecutionPolicy(new Equal("jppf.node.uuid", false, "n2"));
+            job.getMetadata().setParameter("node.uuid", "n2");
+            try {
+              BaseSetup.getJobManagementProxy(client).updateJobs(JobSelector.ALL_JOBS, job.getSLA(), job.getMetadata());
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * @return .
+     */
+    public String await() {
+      synchronized(this) {
+        try {
+          while (count < 2) wait(1L);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+      return actualUuid;
     }
   }
 }

@@ -165,17 +165,15 @@ public class BaseTestHelper {
    * @param params the parameters of the message.
    */
   public static void printToServers(final JPPFClient client, final String format, final Object...params) {
-    List<JPPFConnectionPool> pools = client .findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
+    List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
-    System.out.println("printToServers() : pools = " + pools);
-
+    //System.out.println("printToServers() : pools = " + pools);
     String fmt = String.format("%s %s %s", STARS, format, STARS);
     String msg = String.format(fmt, params);
     StringBuilder sb = new StringBuilder(msg.length()).append(STARS).append(' ');
     for (int i=0; i<msg.length() - 2 * (STARS.length() + 1); i++) sb.append('-');
     String s = sb.append(' ').append(STARS).toString();
     String[] messages = { s, msg, s };
-    
     for (JPPFConnectionPool pool: pools) {
       List<JMXDriverConnectionWrapper> jmxConnections = pool.awaitJMXConnections(Operator.AT_LEAST, 1, 1000L, true);
       if (!jmxConnections.isEmpty()) {

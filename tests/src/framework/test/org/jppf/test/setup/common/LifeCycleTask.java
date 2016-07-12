@@ -126,7 +126,7 @@ public class LifeCycleTask extends AbstractTask<String> {
   @Override
   public void run() {
     // System.nanoTime() has a different origin on different JVM instances
-    // so this value can't be used to compute the start time.
+    // so this value can't be used to compute the start time., null, null
     long nanoStart = System.nanoTime();
     start = System.currentTimeMillis();
     //start = (start * ONE_MILLION) + (nanoStart % ONE_MILLION);
@@ -255,41 +255,5 @@ public class LifeCycleTask extends AbstractTask<String> {
    */
   public boolean isInterrupted() {
     return interrupted;
-  }
-
-  /**
-   * Whether to set the job metadata onto this task.
-   */
-
-  /**
-   * Get the job metadata.
-   * @return a {@link JobMetadata} object.
-   */
-  public JobMetadata getMetadata() {
-    return metadata;
-  }
-
-  /**
-   * Set the job metadata.
-   * @param metadata a {@link JobMetadata} object.
-   */
-  public void setMetadata(final JobMetadata metadata) {
-    this.metadata = metadata;
-  }
-
-  /**
-   * Determine whether to set the job metadata onto this task.
-   * @return {@code true} to indicate that the metadata should be set, {@code false} otherwise.
-   */
-  public boolean isFetchMetadata() {
-    return fetchMetadata;
-  }
-
-  /**
-   * Specify whether to set the job metadata onto this task.
-   * @param fetchMetadata {@code true} to indicate that the metadata should be set, {@code false} otherwise.
-   */
-  public void setFetchMetadata(final boolean fetchMetadata) {
-    this.fetchMetadata = fetchMetadata;
   }
 }
