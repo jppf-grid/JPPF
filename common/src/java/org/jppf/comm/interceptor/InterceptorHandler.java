@@ -23,7 +23,8 @@ import java.nio.channels.SocketChannel;
 import java.util.*;
 
 import org.jppf.comm.socket.SocketWrapper;
-import org.jppf.utils.ServiceFinder;
+import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * This class loads, and provides access to, the {@link NetworkConnectionInterceptor}s discovered via SPI.
@@ -32,6 +33,15 @@ import org.jppf.utils.ServiceFinder;
  * @exclude
  */
 public class InterceptorHandler {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(InterceptorHandler.class);
+  /**
+   * Determines whether the debug level is enabled in the logging configuration, without the cost of a method call.
+   */
+  private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
+
   /**
    * The list of interceptors loaded via SPI.
    */
@@ -44,6 +54,7 @@ public class InterceptorHandler {
   private static List<NetworkConnectionInterceptor> loadInterceptors() {
     ServiceFinder sf = new ServiceFinder();
     List<NetworkConnectionInterceptor> result = sf.findProviders(NetworkConnectionInterceptor.class);
+    if (debugEnabled) log.debug("found {} interceptors in the classpath", result.size());
     return result;
   }
 
@@ -61,6 +72,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnConnect(final Socket connectedSocket) {
+    if (debugEnabled) log.debug("invoking onConnect() on {}", connectedSocket);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onConnect(connectedSocket)) return false;
     }
@@ -73,6 +85,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onConnect()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnConnect(final SocketChannel connectedChannel) {
+    if (debugEnabled) log.debug("invoking onConnect() on {}", connectedChannel);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onConnect(connectedChannel)) return false;
     }
@@ -85,6 +98,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnAccept(final Socket acceptedSocket) {
+    if (debugEnabled) log.debug("invoking onAccept() on {}", acceptedSocket);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onAccept(acceptedSocket)) return false;
     }
@@ -97,6 +111,7 @@ public class InterceptorHandler {
    * @return {@code true} if all {@code onAccept()} invocations returned {@code true}, {@code false} otherwise.
    */
   public static boolean invokeOnAccept(final SocketChannel acceptedChannel) {
+    if (debugEnabled) log.debug("invoking onAccept() on {}", acceptedChannel);
     for (NetworkConnectionInterceptor interceptor: INTERCEPTORS) {
       if (!interceptor.onAccept(acceptedChannel)) return false;
     }
