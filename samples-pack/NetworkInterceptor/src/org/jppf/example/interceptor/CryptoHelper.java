@@ -189,7 +189,7 @@ final class CryptoHelper {
     // obtain a cipher input stream
     try (DataInputStream cis = new DataInputStream(
       new CipherInputStream(new ByteArrayInputStream(encrypted), cipher))) {
-      // finally, decrypt the message 
+      // finally, decrypt the message
       return cis.readUTF();
     }
   }

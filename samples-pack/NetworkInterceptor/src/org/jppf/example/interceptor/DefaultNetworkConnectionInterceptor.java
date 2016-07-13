@@ -19,6 +19,7 @@
 package org.jppf.example.interceptor;
 
 import java.io.*;
+import java.net.*;
 
 import org.jppf.comm.interceptor.AbstractNetworkConnectionInterceptor;
 
@@ -31,22 +32,32 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
    * The name of the system property that holds the user name to validate against.
    */
   private static final String USER_NAME_PROPERTY = "jppf.user.name";
+  /**
+   * Timeout for socket read() opearations.
+   */
+  private static final int SOCKET_TIMEOUT = 6000;
 
   /**
    * Perform the interceptor's job on the specified accepted {@code Socket} or {@code SocketChannel} streams.
    * <p>Here we are on the server side of a connection so we check that the credentials sent by the client are
    * valid and send a response accordingly.
-   * @param is the channel's input stream to read from.
-   * @param os the channel's output stream to write to.
+   * @param acceptedSocket the to read from and write to.
    * @return {@code true} to accept the connection {@code false} to deny it.
    */
   @Override
-  protected boolean onAccept(final InputStream is, final OutputStream os) {
+  public boolean onAccept(final Socket acceptedSocket) {
+    int prevTimeout = -1;
     try {
+      // set a timeout on read operations and store the previous setting, if any
+      prevTimeout = acceptedSocket.getSoTimeout();
+      acceptedSocket.setSoTimeout(SOCKET_TIMEOUT);
+
+      InputStream is = acceptedSocket.getInputStream();
+      OutputStream os = acceptedSocket.getOutputStream();
       String userName = CryptoHelper.readAndDecrypt(is);
       String localUser = System.getProperty(USER_NAME_PROPERTY);
       if (!userName.equals(localUser)) {
-        print("invalid user name from client: %s", userName);
+        print("invalid user name '%s' from client side, source is %s", userName);
         // send invalid user response
         CryptoHelper.encryptAndWrite("invalid user name", os);
       } else {
@@ -55,22 +66,40 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
         print("successful server authentication");
         return true;
       }
+    } catch (SocketTimeoutException e) {
+      print("unable to get a response from the client after %,d ms", SOCKET_TIMEOUT);
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      if (prevTimeout >= 0) {
+        try {
+          // restore the initial SO_TIMEOUT setting
+          acceptedSocket.setSoTimeout(prevTimeout);
+        } catch(Exception e) {
+          e.printStackTrace();
+        }
+      }
     }
     return false;
   }
+
   /**
    * Perform the interceptor's job on the specified connected {@code Socket} or {@code SocketChannel} streams.
    * <p>Here we are on the client side of a connection, so we send credentials and obtain the confirmation
    * from the server side that they are valid.
-   * @param is the channel's input stream to read from.
-   * @param os the channel's output stream to write to.
+   * @param connectedSocket the to read from and write to.
    * @return {@code true} to accept the connection {@code false} to deny it.
    */
   @Override
-  protected boolean onConnect(final InputStream is, final OutputStream os) {
+  public boolean onConnect(final Socket connectedSocket) {
+    int prevTimeout = -1;
     try {
+      // set a timeout on read operations and store the previous setting, if any
+      prevTimeout = connectedSocket.getSoTimeout();
+      connectedSocket.setSoTimeout(SOCKET_TIMEOUT);
+
+      InputStream is = connectedSocket.getInputStream();
+      OutputStream os = connectedSocket.getOutputStream();
       // send the user name to the server
       CryptoHelper.encryptAndWrite(System.getProperty(USER_NAME_PROPERTY), os);
       // read the server reponse
@@ -81,8 +110,19 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
         print("successful client authentication");
         return true;
       }
+    } catch (SocketTimeoutException e) {
+      print("unable to get a response from the server after %,d ms", SOCKET_TIMEOUT);
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      if (prevTimeout >= 0) {
+        try {
+          // restore the initial SO_TIMEOUT setting
+          connectedSocket.setSoTimeout(prevTimeout);
+        } catch(Exception e) {
+          e.printStackTrace();
+        }
+      }
     }
     // the client side process terminates if authentication fails
     print("authentication failed, terminating");

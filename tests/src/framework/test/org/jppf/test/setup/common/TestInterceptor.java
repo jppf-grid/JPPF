@@ -20,7 +20,6 @@ package test.org.jppf.test.setup.common;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.channels.SocketChannel;
 
 import org.jppf.comm.interceptor.AbstractNetworkConnectionInterceptor;
 import org.jppf.utils.LoggingUtils;
@@ -61,10 +60,13 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
   public static String serverMessage;
 
   @Override
-  protected boolean onAccept(final InputStream is, final OutputStream os) {
+  public boolean onAccept(final Socket acceptedSocket) {
+    if (!active) return true;
     if (debugEnabled) log.debug("start");
-    DataInputStream dis = new DataInputStream(is);
     try {
+      InputStream is = acceptedSocket.getInputStream();
+      OutputStream os = acceptedSocket.getOutputStream();
+      DataInputStream dis = new DataInputStream(is);
       String msg = dis.readUTF();
       if (debugEnabled) log.debug("read '{}'", msg);
       clientMessage = msg;
@@ -84,10 +86,13 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
   }
 
   @Override
-  protected boolean onConnect(final InputStream is, final OutputStream os) {
+  public boolean onConnect(final Socket connectedSocket) {
+    if (!active) return true;
     if (debugEnabled) log.debug("start");
-    DataOutputStream dos = new DataOutputStream(os);
     try {
+      InputStream is = connectedSocket.getInputStream();
+      OutputStream os = connectedSocket.getOutputStream();
+      DataOutputStream dos = new DataOutputStream(os);
       dos.writeUTF(CLIENT_MESSAGE);
       dos.flush();
       if (debugEnabled) log.debug("wrote '{}'", CLIENT_MESSAGE);
@@ -101,26 +106,6 @@ public class TestInterceptor extends AbstractNetworkConnectionInterceptor {
     }
     if (debugEnabled) log.debug("failed");
     return false;
-  }
-
-  @Override
-  public boolean onAccept(final Socket acceptedSocket) {
-    return !active || super.onAccept(acceptedSocket);
-  }
-
-  @Override
-  public boolean onAccept(final SocketChannel acceptedChannel) {
-    return !active || super.onAccept(acceptedChannel);
-  }
-
-  @Override
-  public boolean onConnect(final Socket connectedSocket) {
-    return !active || super.onConnect(connectedSocket);
-  }
-
-  @Override
-  public boolean onConnect(final SocketChannel connectedChannel) {
-    return !active || super.onConnect(connectedChannel);
   }
 
   /**

@@ -18,11 +18,7 @@
 
 package org.jppf.comm.interceptor;
 
-import java.io.*;
-import java.net.Socket;
 import java.nio.channels.SocketChannel;
-
-import org.jppf.utils.streams.*;
 
 /**
  * An abstract interceptor implementation which creates or obtains streams from the Socket or SocketChannel
@@ -30,47 +26,13 @@ import org.jppf.utils.streams.*;
  * @author Laurent Cohen
  */
 public abstract class AbstractNetworkConnectionInterceptor implements NetworkConnectionInterceptor {
-  /**
-   * Perform the interceptor's job on the specified accepted {@link Socket} or {@link SocketChannel} streams.
-   * @param is the channel's input stream to read from.
-   * @param os the channel's output stream to write to.
-   * @return {@code true} to accept the connection {@code false} to deny it.
-   */
-  protected abstract boolean onAccept(final InputStream is, final OutputStream os);
-
-  /**
-   * Perform the interceptor's job on the specified connected {@link Socket} or {@link SocketChannel} streams.
-   * @param is the channel's input stream to read from.
-   * @param os the channel's output stream to write to.
-   * @return {@code true} to accept the connection {@code false} to deny it.
-   */
-  protected abstract boolean onConnect(final InputStream is, final OutputStream os);
-
-  @Override
-  public boolean onAccept(final Socket acceptedSocket) {
-    try {
-      return onAccept(acceptedSocket.getInputStream(), acceptedSocket.getOutputStream());
-    } catch(IOException e) {
-      return false;
-    }
-  }
-
   @Override
   public boolean onAccept(final SocketChannel acceptedChannel) {
-    return onAccept(new ChannelInputStream(acceptedChannel), new ChannelOutputStream(acceptedChannel));
-  }
-
-  @Override
-  public boolean onConnect(final Socket connectedSocket) {
-    try {
-      return onConnect(connectedSocket.getInputStream(), connectedSocket.getOutputStream());
-    } catch (Exception e) {
-      return false;
-    }
+    return onAccept(acceptedChannel.socket());
   }
 
   @Override
   public boolean onConnect(final SocketChannel connectedChannel) {
-    return onConnect(new ChannelInputStream(connectedChannel), new ChannelOutputStream(connectedChannel));
+    return onConnect(connectedChannel.socket());
   }
 }

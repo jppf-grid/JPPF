@@ -250,7 +250,8 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     public void close() {
       try {
         if (server != null) server.close();        
-      } catch (Exception ignore) {
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
 
@@ -306,7 +307,8 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
     public void close() {
       try {
         if (server != null) server.close();        
-      } catch (Exception ignore) {
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
 
