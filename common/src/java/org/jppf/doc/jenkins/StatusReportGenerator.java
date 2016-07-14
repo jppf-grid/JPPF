@@ -19,10 +19,11 @@
 package org.jppf.doc.jenkins;
 
 import java.io.*;
+import java.util.*;
 
 import javax.xml.parsers.*;
 
-import org.jppf.utils.*;
+import org.jppf.utils.FileUtils;
 
 /**
  *
@@ -68,6 +69,12 @@ public class StatusReportGenerator {
         build.setNumber(buildNumber);
         project.getBuilds().add(build);
       }
+      Collections.sort(project.getBuilds(), new Comparator<Build>() {
+        @Override
+        public int compare(final Build o1, final Build o2) {
+          return ((Integer) o2.getNumber()).compareTo(o1.getNumber());
+        }
+      });
       System.out.printf("results: %s%n", project);
       String html = new HTMLPrinter().generate(project);
       String template = FileUtils.readTextFile(templatePath);
