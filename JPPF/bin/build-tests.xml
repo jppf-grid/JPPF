@@ -32,9 +32,13 @@
     <ant antfile="${jca-client}/test/build.xml" target="build" inheritall="false"/>
   </target>
 
-  <target name="tests.run">
+  <target name="tests.run" depends="tests.build" description="">
+    <!-- compile the Kryo serializer sample -->
+    <ant antfile="${samples-pack}/KryoSerializer/build.xml" target="compile" inheritall="false"/>
     <!-- run the standalone unit tests -->
-    <ant antfile="${tests}/build.xml" target="run" inheritall="false"/>
+    <ant antfile="build.xml" dir="${tests}" target="run.junit.tests" inheritall="false">
+      <property name="user.dir" value="${tests}"/>
+    </ant>
   </target>
 
 </project> 

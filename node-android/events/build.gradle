@@ -22,7 +22,7 @@ def copyDone = false
 
 android {
   compileSdkVersion 19
-  buildToolsVersion "23.0.0"
+  buildToolsVersion "${jppfBuildToolsVersion}"
   defaultConfig {
     minSdkVersion 19
     targetSdkVersion 19

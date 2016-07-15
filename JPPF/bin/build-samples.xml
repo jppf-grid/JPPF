@@ -47,10 +47,10 @@
       <delete file="@{in}.html" quiet="true"/>
       <local name="src.lang"/>
       <property name="src.lang" value="@{lang}"/>
-      <copy file="${basedir}/bin/html_source_header.txt" toFile="${build}/header.txt" quiet="true" overwrite="true"/>
+      <copy file="${basedir}/bin/html_source_header.txt" toFile="${build}/header.txt" overwrite="true"/>
       <replace file="${build}/header.txt" token="@lang@" value="@{lang}"/>
       <replace file="${build}/header.txt" token="@title@" value="@{title}"/>
-      <copy file="@{in}" toFile="${build}/temp.java" quiet="true" overwrite="true"/>
+      <copy file="@{in}" toFile="${build}/temp.java" overwrite="true"/>
       <replace file="${build}/temp.java">
         <replacetoken><![CDATA[<]]></replacetoken>
         <replacevalue><![CDATA[&lt;]]></replacevalue>
