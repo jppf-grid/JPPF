@@ -164,6 +164,7 @@
   <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
   <target name="run.junit"      depends="compile, run.junit.tests"               description=""/>
 
+  <!-- Run the tests with a custom JUnit runner -->
   <target name="runtests">
     <echo message="Running the tests"/>
     <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
@@ -176,6 +177,7 @@
     </java>
   </target>
 
+  <!-- Run the tests with the Ant Junit runner -->
   <target name="run.junit.tests">
     <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
     <delete dir="${report}" quiet="true"/>

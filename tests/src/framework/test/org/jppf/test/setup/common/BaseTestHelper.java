@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 
 import org.jppf.JPPFError;
 import org.jppf.client.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
+import org.jppf.management.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 
@@ -165,6 +165,19 @@ public class BaseTestHelper {
    * @param params the parameters of the message.
    */
   public static void printToServers(final JPPFClient client, final String format, final Object...params) {
+    printToServersAndNodes(client, true, false, format, params);
+  }
+
+  /**
+   * Print a formatted to the server log via the server debug mbean on all connected servers.
+   * @param client JPPF client holding the server connections.
+   * @param toServers whether to log to the discovered servers.
+   * @param toNodes whether to log to the nodes attached to the discovered servers.
+   * @param format the parameterized format.
+   * @param params the parameters of the message.
+   */
+  public static void printToServersAndNodes(final JPPFClient client, final boolean toServers, final boolean toNodes, final String format, final Object...params) {
+    if (!toServers && !toNodes) return;
     List<JPPFConnectionPool> pools = client.findConnectionPools(JPPFClientConnectionStatus.workingStatuses());
     if ((pools == null) || pools.isEmpty()) return;
     //System.out.println("printToServers() : pools = " + pools);
@@ -178,10 +191,19 @@ public class BaseTestHelper {
       List<JMXDriverConnectionWrapper> jmxConnections = pool.awaitJMXConnections(Operator.AT_LEAST, 1, 1000L, true);
       if (!jmxConnections.isEmpty()) {
         JMXDriverConnectionWrapper jmx = jmxConnections.get(0);
-        try {
-          jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
-        } catch (Exception e) {
-          System.err.printf("error invoking remote logging on %s:%n%s%n", jmx, ExceptionUtils.getStackTrace(e));
+        if (toServers) {
+          try {
+            jmx.invoke("org.jppf:name=debug,type=driver", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+          } catch (Exception e) {
+            System.err.printf("error invoking remote logging on %s:%n%s%n", jmx, ExceptionUtils.getStackTrace(e));
+          }
+        }
+        if (toNodes) {
+          try {
+            jmx.forwardInvoke(NodeSelector.ALL_NODES, "org.jppf:name=debug,type=node", "log", new Object[] { messages }, new String[] { String[].class.getName() });
+          } catch (Exception e) {
+            System.err.printf("error invoking remote logging on the nodes of %s:%n%s%n", jmx, ExceptionUtils.getStackTrace(e));
+          }
         }
       }
     }

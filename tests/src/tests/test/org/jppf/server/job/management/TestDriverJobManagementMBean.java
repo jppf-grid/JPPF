@@ -61,7 +61,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   public TestWatcher instanceWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
-      BaseTestHelper.printToServers(client, "start of method %s()", description.getMethodName());
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
     }
   };
 
@@ -91,7 +91,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, new AllJobsSelector()));
   }
 
@@ -101,7 +101,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentMethodName(), false);
     List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, new JobUuidSelector(uuids)));
@@ -113,7 +113,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    String prefix = ReflectionUtils.getCurrentMethodName();
     List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, prefix, false);
     JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, selector));
@@ -125,7 +125,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testResumeJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, new AllJobsSelector()));
   }
 
@@ -135,7 +135,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testResumeJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
     List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, new JobUuidSelector(uuids)));
@@ -147,7 +147,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testResumeJobsWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    String prefix = ReflectionUtils.getCurrentMethodName();
     List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, prefix, true);
     JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, selector));
@@ -159,7 +159,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testSuspendJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, new AllJobsSelector()));
   }
 
@@ -169,7 +169,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testSuspendJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentMethodName(), false);
     List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, new JobUuidSelector(uuids)));
@@ -181,7 +181,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testSuspendJobsWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    String prefix = ReflectionUtils.getCurrentMethodName();
     List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, prefix, false);
     JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.SuspendAction(jobs, selector));
@@ -193,7 +193,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testGetNodeInfoWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, new AllJobsSelector()));
   }
 
@@ -203,7 +203,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testGetNodeInfoWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentClassAndMethod(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, ReflectionUtils.getCurrentMethodName(), false);
     List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, new JobUuidSelector(uuids)));
@@ -215,7 +215,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testGetNodeInfoWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    String prefix = ReflectionUtils.getCurrentMethodName();
     List<JPPFJob> jobs = createMultipleJobs(2, 4, 500L, prefix, false);
     JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.NodeJobInformationAction(jobs, selector));
@@ -227,7 +227,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testUpdatePriorityAndMaxNodesWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new AllJobsSelector()));
   }
 
@@ -237,7 +237,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testUpdatePriorityAndMaxNodesWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentClassAndMethod(), true);
+    List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, ReflectionUtils.getCurrentMethodName(), true);
     List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, new JobUuidSelector(uuids)));
@@ -249,7 +249,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testUpdatePriorityAndMaxNodesWithScriptedJobSelector() throws Exception {
-    String prefix = ReflectionUtils.getCurrentClassAndMethod();
+    String prefix = ReflectionUtils.getCurrentMethodName();
     List<JPPFJob> jobs = createMultipleJobs(2, 4, 1L, prefix, true);
     JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.UpdatePriorityAndMaxNodesAction(jobs, selector));
