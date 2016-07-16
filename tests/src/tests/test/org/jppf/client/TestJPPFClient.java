@@ -30,7 +30,6 @@ import org.jppf.client.*;
 import org.jppf.execute.AbstractThreadManager;
 import org.jppf.job.JobEventType;
 import org.jppf.node.protocol.*;
-import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.junit.Test;
 import org.slf4j.*;
@@ -109,13 +108,10 @@ public class TestJPPFClient extends Setup1D1N {
     String name = ReflectionUtils.getCurrentMethodName();
     try (JPPFClient client = BaseSetup.createClient(null)) {
       int nbTasks = 10;
-      DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
-      jobManager.addNotificationListener(listener, null, null);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
       JPPFJob job = BaseTestHelper.createJob(name + "-1", false, false, nbTasks, LifeCycleTask.class, 5000L);
       client.submitJob(job);
       listener.await(JobEventType.JOB_DISPATCHED);
-      jobManager.removeNotificationListener(listener);
       client.cancelJob(job.getUuid());
       List<Task<?>> results = job.awaitResults();
       assertNotNull(results);

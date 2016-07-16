@@ -26,10 +26,8 @@ import java.util.concurrent.*;
 
 import org.jppf.client.*;
 import org.jppf.job.JobEventType;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.node.protocol.Task;
 import org.jppf.scheduling.JPPFSchedule;
-import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
 import org.junit.Test;
 
@@ -89,29 +87,22 @@ public class TestJPPFJob extends Setup1D1N {
   public void testCancel() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
       int nbTasks = 10;
-      JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-      DriverJobManagementMBean jobManager = driver.getJobManager();
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
-      try {
-        jobManager.addNotificationListener(listener, null, null);
-        JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
-        client.submitJob(job);
-        listener.await(JobEventType.JOB_DISPATCHED);
-        boolean cancelled = job.cancel(true);
-        assertTrue(cancelled);
-        List<Task<?>> results = job.get();
-        assertNotNull(results);
-        assertEquals(nbTasks, results.size());
-        int count = 0;
-        for (Task<?> task: results) {
-          if (task.getResult() == null) count++;
-        }
-        assertTrue(count > 0);
-        assertTrue(job.isCancelled());
-        assertTrue(job.isDone());
-      } finally {
-        jobManager.removeNotificationListener(listener);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 5000L);
+      client.submitJob(job);
+      listener.await(JobEventType.JOB_DISPATCHED);
+      boolean cancelled = job.cancel(true);
+      assertTrue(cancelled);
+      List<Task<?>> results = job.get();
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      int count = 0;
+      for (Task<?> task: results) {
+        if (task.getResult() == null) count++;
       }
+      assertTrue(count > 0);
+      assertTrue(job.isCancelled());
+      assertTrue(job.isDone());
     }
   }
 
@@ -124,29 +115,22 @@ public class TestJPPFJob extends Setup1D1N {
   public void testCancelWithInterruptFlagFalse() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
       int nbTasks = 1;
-      JMXDriverConnectionWrapper driver = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
-      DriverJobManagementMBean jobManager = driver.getJobManager();
-      AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
-      try {
-        jobManager.addNotificationListener(listener, null, null);
-        JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
-        client.submitJob(job);
-        listener.await(JobEventType.JOB_DISPATCHED);
-        boolean cancelled = job.cancel(false);
-        assertFalse(cancelled);
-        List<Task<?>> results = job.get();
-        assertNotNull(results);
-        assertEquals(nbTasks, results.size());
-        int count = 0;
-        for (Task<?> task: results) {
-          if (task.getResult() == null) count++;
-        }
-        assertEquals(0, count);
-        assertFalse(job.isCancelled());
-        assertTrue(job.isDone());
-      } finally {
-        jobManager.removeNotificationListener(listener);
+      AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+      JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 3000L);
+      client.submitJob(job);
+      listener.await(JobEventType.JOB_DISPATCHED);
+      boolean cancelled = job.cancel(false);
+      assertFalse(cancelled);
+      List<Task<?>> results = job.get();
+      assertNotNull(results);
+      assertEquals(nbTasks, results.size());
+      int count = 0;
+      for (Task<?> task: results) {
+        if (task.getResult() == null) count++;
       }
+      assertEquals(0, count);
+      assertFalse(job.isCancelled());
+      assertTrue(job.isDone());
     }
   }
 

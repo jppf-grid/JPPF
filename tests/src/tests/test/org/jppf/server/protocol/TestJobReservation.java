@@ -52,7 +52,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   /**
    * Waits for a JOB_DISPATCHED notification.
    */
-  private final AwaitJobNotificationListener jobNotificationListener = new AwaitJobNotificationListener();
+  private AwaitJobNotificationListener jobNotificationListener;
   /**
    * 
    */
@@ -84,8 +84,8 @@ public class TestJobReservation extends AbstractNonStandardSetup {
     client.submitJob(job);
     jmx = client.awaitWorkingConnectionPool().awaitWorkingJMXConnection();
     jmx.addNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myNodeListener);
-    jmx.getJobManager().addNotificationListener(jobNotificationListener, null, null);
     while (jmx.nbIdleNodes() < BaseSetup.nbNodes()) Thread.sleep(10L);
+    jobNotificationListener = new AwaitJobNotificationListener(client);
     //System.out.println("nb idle nodes: " + nbIdle); 
   }
 
@@ -95,8 +95,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
    */
   @After
   public void tearDown() throws Exception {
-    jmx.removeNotificationListener(JPPFNodeConnectionNotifierMBean.MBEAN_NAME, myNodeListener);
-    jmx.getJobManager().removeNotificationListener(jobNotificationListener);
+    if (!jobNotificationListener.isListenerRemoved()) jmx.getJobManager().removeNotificationListener(jobNotificationListener);
     myNodeListener.map.clear();
   }
 

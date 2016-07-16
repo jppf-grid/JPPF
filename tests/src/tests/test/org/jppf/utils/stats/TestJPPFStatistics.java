@@ -20,14 +20,13 @@ package test.org.jppf.utils.stats;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.job.JobEventType;
 import org.jppf.management.*;
 import org.jppf.node.protocol.*;
-import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.ReflectionUtils;
 import org.jppf.utils.stats.*;
 import org.junit.Test;
@@ -90,12 +89,9 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(true);
     job.getSLA().setSuspended(true);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
-    DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
-    jobManager.addNotificationListener(listener, null, null);
+    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
     client.submitJob(job);
     listener.await(JobEventType.JOB_QUEUED);
-    jobManager.removeNotificationListener(listener);
     try {
       client.close();
     } finally {
@@ -117,13 +113,10 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
     job.getSLA().setCancelUponClientDisconnect(false);
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
-    DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
-    jobManager.addNotificationListener(listener, null, null);
+    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
     client.submitJob(job);
     long start = System.nanoTime();
     listener.await(JobEventType.JOB_DISPATCHED);
-    jobManager.removeNotificationListener(listener);
     try {
       client.close();
     } finally {
@@ -163,12 +156,9 @@ public class TestJPPFStatistics extends Setup1D1N1C {
     job.getSLA().setSuspended(true);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener();
-    DriverJobManagementMBean jobManager = BaseSetup.getJobManagementProxy(client);
-    jobManager.addNotificationListener(listener, null, null);
+    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
     client.submitJob(job);
     listener.await(JobEventType.JOB_QUEUED);
-    jobManager.removeNotificationListener(listener);
     jmx.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);
