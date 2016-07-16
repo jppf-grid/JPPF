@@ -33,9 +33,7 @@ import org.jppf.node.policy.Equal;
 import org.jppf.node.protocol.*;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.jppf.utils.*;
-import org.junit.*;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.Test;
 import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
@@ -55,16 +53,6 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    * A "short" duration for this test.
    */
   private static final long TIME_SHORT = 1000L;
-
-  /** */
-  @Rule
-  public TestWatcher instanceWatcher = new TestWatcher() {
-    @Override
-    protected void starting(final Description description) {
-      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
-    }
-  };
-
 
   /**
    * We test a job with 1 task, and attempt to cancel it before completion.

@@ -20,8 +20,10 @@ package test.org.jppf.test.setup;
 
 import org.jppf.client.JPPFClient;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
-
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Basic setup for 1 driver, 1 node and 1 client.
@@ -33,13 +35,21 @@ public class Setup1D1N1C extends BaseTest {
    */
   protected static JPPFClient client = null;
 
+  /** */
+  @Rule
+  public TestWatcher instanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
+
   /**
    * Launches a driver and node and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
-  public static void setup() throws Exception
-  {
+  public static void setup() throws Exception {
     client = BaseSetup.setup(1);
   }
 
@@ -48,8 +58,7 @@ public class Setup1D1N1C extends BaseTest {
    * @throws Exception if a process could not be stopped.
    */
   @AfterClass
-  public static void cleanup() throws Exception
-  {
+  public static void cleanup() throws Exception {
     BaseSetup.cleanup();
   }
 }

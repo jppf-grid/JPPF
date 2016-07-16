@@ -152,13 +152,13 @@ public class TestJPPFStatistics extends Setup1D1N1C {
   @Test(timeout=10000)
   public void testTaskAndJobCountUponCancel() throws Exception {
     int nbTasks = 1;
-    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L);
-    job.getSLA().setSuspended(true);
+    String notif = "task notif";
+    JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), false, false, nbTasks, LifeCycleTask.class, 2000L, true, notif);
     JMXDriverConnectionWrapper jmx = BaseSetup.getJMXConnection();
     jmx.resetStatistics();
-    AwaitJobNotificationListener listener = new AwaitJobNotificationListener(client);
+    AwaitTaskNotificationListener taskListener = new AwaitTaskNotificationListener(client, notif);
     client.submitJob(job);
-    listener.await(JobEventType.JOB_QUEUED);
+    taskListener.await();
     jmx.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
     assertNotNull(results);

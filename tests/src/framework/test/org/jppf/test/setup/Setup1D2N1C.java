@@ -20,6 +20,10 @@ package test.org.jppf.test.setup;
 
 import org.jppf.client.JPPFClient;
 import org.junit.*;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+
+import test.org.jppf.test.setup.common.BaseTestHelper;
 
 /**
  * Basic setup for 1 driver, 2 nodes and 1 client.
@@ -30,6 +34,15 @@ public class Setup1D2N1C extends BaseTest {
    * The jppf client to use.
    */
   protected static JPPFClient client = null;
+
+  /** */
+  @Rule
+  public TestWatcher instanceWatcher = new TestWatcher() {
+    @Override
+    protected void starting(final Description description) {
+      BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
+    }
+  };
 
   /**
    * Launches a driver and 2 nodes and start the client.

@@ -35,10 +35,6 @@ public class AwaitJobNotificationListener implements NotificationListener {
    */
   private JobEventType expectedEvent = JobEventType.JOB_DISPATCHED;
   /**
-   * The JPPF client.
-   */
-  private final transient JPPFClient client;
-  /**
    * 
    */
   private final DriverJobManagementMBean jobManager;
@@ -53,7 +49,6 @@ public class AwaitJobNotificationListener implements NotificationListener {
    * @throws Exception if any error occurs.
    */
   public AwaitJobNotificationListener(final JPPFClient client) throws Exception {
-    this.client = client;
     jobManager = BaseSetup.getJobManagementProxy(client);
     jobManager.addNotificationListener(this, null, null);
   }
