@@ -47,12 +47,10 @@ public class AwaitJobNotificationListener implements NotificationListener {
   /**
    * Await the specified event.
    * @param eventType the type of event to wait for.
+   * @throws Exception if any error occurs.
    */
-  public synchronized void await(final JobEventType eventType) {
+  public synchronized void await(final JobEventType eventType) throws Exception {
     this.expectedEvent = eventType;
-    try {
-      wait();
-    } catch (Exception e) {
-    }
+    wait();
   }
 }

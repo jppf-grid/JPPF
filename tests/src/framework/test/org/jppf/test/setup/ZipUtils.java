@@ -30,9 +30,8 @@ public class ZipUtils {
    * Zip the specified files into the specified zip.
    * @param zipPath the path of the zip file to create.
    * @param paths the paths of the files to add to the zip.
-   * @return the path to the zipped file, or {@code null} if an I/O error occurred.
    */
-  static String zipFile(final String zipPath, final String...paths) {
+  static void zipFile(final String zipPath, final String...paths) {
     File zipFile = new File(zipPath);
     try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)))) {
       byte[] buffer = new byte[2048];
@@ -48,10 +47,8 @@ public class ZipUtils {
         }
       }
       zos.finish();
-      return zipPath;
     } catch(Exception e) {
       e.printStackTrace();
     }
-    return null;
   }
 }
