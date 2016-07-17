@@ -24,11 +24,15 @@ import java.io.Serializable;
  * 
  * @author Laurent Cohen
  */
-public interface NodeDebugMBean extends Serializable
-{
+public interface NodeDebugMBean extends Serializable {
   /**
-   * Get the string representation of the bundle currently being executed.
-   * @return a string representing a <code>JPPFTaskBundle</code>.
+   * The name of this mbean.
    */
-  String currentBundle();
+  String MBEAN_NAME = "org.jppf:name=debug,type=node";
+
+  /**
+   * Print the specified messages to the server's log.
+   * @param messages the messages ot print.
+   */
+  void log(String...messages);
 }
