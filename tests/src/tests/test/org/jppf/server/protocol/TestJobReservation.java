@@ -76,7 +76,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
 
   /** */
   @Rule
-  public TestWatcher instanceWatcher = new MyWatcher();
+  public TestWatcher testJobReservationWatcher = new MyWatcher();
 
   /**
    * Remove the jmx notification listener.

@@ -37,7 +37,7 @@ public class Setup1D1N1C extends BaseTest {
 
   /** */
   @Rule
-  public TestWatcher instanceWatcher = new TestWatcher() {
+  public TestWatcher setup1D1N1CWatcher = new TestWatcher() {
     @Override
     protected void starting(final Description description) {
       BaseTestHelper.printToServersAndNodes(client, true, true, "start of method %s()", description.getMethodName());
