@@ -122,12 +122,22 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    *
    */
   private final List<JComponent> visibleTableComps = new ArrayList<>();
+  /**
+   * The aximum width of a label in the first column in each table.
+   */
+  private int maxLabelWidth = 0;
 
   /**
    * Default constructor.
    */
   public MonitoringPanel() {
     this.statsHandler = StatsHandler.getInstance();
+    JTable tmp = new JTable();
+    FontMetrics metrics = tmp.getFontMetrics(tmp.getFont());
+    for (Map.Entry<String, Fields[]> entry: allTablesMap.entrySet()) {
+      int n = computeMaxWidth(entry.getValue(), metrics);
+      if (n > maxLabelWidth) maxLabelWidth = n;
+    }
     WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
     wl.setAlignOnBaseline(true);
     setLayout(wl);
@@ -213,8 +223,8 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     rend0.setHorizontalAlignment(SwingConstants.LEFT);
     rend0.setOpaque(true);
     table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-    table.getColumnModel().getColumn(0).setMinWidth(200);
-    table.getColumnModel().getColumn(0).setMaxWidth(300);
+    table.getColumnModel().getColumn(0).setMinWidth(maxLabelWidth + 10);
+    //table.getColumnModel().getColumn(0).setMaxWidth(300);
     tableModels.add(model);
     panel.add(table, "growx, pushx");
     table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -286,6 +296,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
           clearTablesFromView();
           addTables();
           MonitoringPanel.this.repaint();
+          MonitoringPanel.this.updateUI();
         }
       };
       applyBtn.addActionListener(applyAction);
@@ -372,5 +383,20 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     public String toString() {
       return label;
     }
+  }
+
+  /**
+   * Compute the maximum width of the fileds names in the given font.
+   * @param fields the fields to compute from.
+   * @param metrics the font used to compute the width.
+   * @return the maximum width in pixels.
+   */
+  private int computeMaxWidth(final Fields[] fields, final FontMetrics metrics) {
+    int max = 0;
+    for (Fields field: fields) {
+      int n = metrics.stringWidth(field.toString());
+      if (n > max) max = n;
+    }
+    return max;
   }
 }
