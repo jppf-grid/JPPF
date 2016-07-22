@@ -17,20 +17,20 @@
  */
 package org.jppf.ui.monitoring;
 
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
-
-import net.miginfocom.swing.MigLayout;
 
 import org.jppf.ui.layout.WrapLayout;
 import org.jppf.ui.monitoring.data.*;
 import org.jppf.ui.monitoring.event.*;
 import org.jppf.utils.LocalizationUtils;
 import org.slf4j.*;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This class provides a graphical interface for monitoring the status and health
@@ -56,6 +56,10 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
    * Holds a list of table models to update when new stats are received.
    */
   private java.util.List<MonitorTableModel> tableModels = new ArrayList<>();
+  /**
+   * The aximum width of a label in the first column in each table.
+   */
+  private int maxLabelWidth = 0;
 
   /**
    * Default constructor.
@@ -65,16 +69,25 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     WrapLayout wl = new WrapLayout(FlowLayout.LEADING);
     wl.setAlignOnBaseline(true);
     setLayout(wl);
-    addTablePanel(EXECUTION_PROPS, "ExecutionTable");
-    addTablePanel(NODE_EXECUTION_PROPS, "NodeExecutionTable");
-    addTablePanel(TRANSPORT_PROPS, "NetworkOverheadTable");
-    addTablePanel(CONNECTION_PROPS, "ConnectionsTable");
-    addTablePanel(QUEUE_PROPS, "QueueTable");
-    addTablePanel(JOB_PROPS, "JobTable");
-    addTablePanel(NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable");
-    addTablePanel(CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable");
-    addTablePanel(INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable");
-    addTablePanel(OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable");
+    Map<Fields[], String> map = new LinkedHashMap<>();
+    map.put(EXECUTION_PROPS, "ExecutionTable");
+    map.put(NODE_EXECUTION_PROPS, "NodeExecutionTable");
+    map.put(TRANSPORT_PROPS, "NetworkOverheadTable");
+    map.put(CONNECTION_PROPS, "ConnectionsTable");
+    map.put(QUEUE_PROPS, "QueueTable");
+    map.put(JOB_PROPS, "JobTable");
+    map.put(NODE_CL_REQUEST_TIME_PROPS, "NodeClassLoadingRequestTable");
+    map.put(CLIENT_CL_REQUEST_TIME_PROPS, "ClientClassLoadingRequestTable");
+    map.put(INBOUND_NETWORK_TRAFFIC_PROPS, "InboundTrafficTable");
+    map.put(OUTBOUND_NETWORK_TRAFFIC_PROPS, "OutboundTrafficTable");
+    JTable tmp = new JTable();
+    FontMetrics metrics = tmp.getFontMetrics(tmp.getFont());
+    for (Map.Entry<Fields[], String> entry: map.entrySet()) {
+      int n = computeMaxWidth(entry.getKey(), metrics);
+      if (n > maxLabelWidth) maxLabelWidth = n;
+    }
+    System.out.printf("MonitoringPanel() maxLabelWidth = %d%n", maxLabelWidth);
+    for (Map.Entry<Fields[], String> entry: map.entrySet()) addTablePanel(entry.getKey(), entry.getValue());
     statsHandler.addStatsHandlerListener(this);
     addComponentListener(new ComponentAdapter() {
       @Override
@@ -113,11 +126,11 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
 
   /**
    * Create a chartPanel displaying a group of values.
-   * @param props the names of the values to display.
+   * @param fields the names of the values to display.
    * @param title the title of the chartPanel.
    * @return a <code>JComponent</code> instance.
    */
-  private JComponent makeTablePanel(final Fields[] props, final String title) {
+  private JComponent makeTablePanel(final Fields[] fields, final String title) {
     JPanel panel = new JPanel();
     panel.setAlignmentY(0f);
     panel.setLayout(new MigLayout("fill"));
@@ -128,7 +141,7 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
         return false;
       }
     };
-    MonitorTableModel model = new MonitorTableModel(props);
+    MonitorTableModel model = new MonitorTableModel(fields);
     table.setModel(model);
     table.setOpaque(true);
     DefaultTableCellRenderer rend1 = new DefaultTableCellRenderer();
@@ -139,13 +152,28 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     rend0.setHorizontalAlignment(SwingConstants.LEFT);
     rend0.setOpaque(true);
     table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-    table.getColumnModel().getColumn(0).setMinWidth(200);
-    table.getColumnModel().getColumn(0).setMaxWidth(300);
+    FontMetrics metrics = table.getFontMetrics(table.getFont());
+    table.getColumnModel().getColumn(0).setMinWidth(maxLabelWidth + 10);
     tableModels.add(model);
     panel.add(table, "growx, pushx");
-    table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.doLayout();
     table.setShowGrid(false);
     return panel;
+  }
+
+  /**
+   * Compute the maximum width of the fileds names in the given font.
+   * @param fields the fields to compute from.
+   * @param metrics the font used to compute the width.
+   * @return the maximum width in pixels.
+   */
+  private int computeMaxWidth(final Fields[] fields, final FontMetrics metrics) {
+    int max = 0;
+    for (Fields field: fields) {
+      int n = metrics.stringWidth(field.toString());
+      if (n > max) max = n;
+    }
+    return max;
   }
 }
