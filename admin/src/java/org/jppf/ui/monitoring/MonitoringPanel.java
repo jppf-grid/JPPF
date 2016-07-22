@@ -86,7 +86,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
       int n = computeMaxWidth(entry.getKey(), metrics);
       if (n > maxLabelWidth) maxLabelWidth = n;
     }
-    System.out.printf("MonitoringPanel() maxLabelWidth = %d%n", maxLabelWidth);
     for (Map.Entry<Fields[], String> entry: map.entrySet()) addTablePanel(entry.getKey(), entry.getValue());
     statsHandler.addStatsHandlerListener(this);
     addComponentListener(new ComponentAdapter() {
@@ -152,7 +151,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
     rend0.setHorizontalAlignment(SwingConstants.LEFT);
     rend0.setOpaque(true);
     table.getColumnModel().getColumn(0).setCellRenderer(rend0);
-    FontMetrics metrics = table.getFontMetrics(table.getFont());
     table.getColumnModel().getColumn(0).setMinWidth(maxLabelWidth + 10);
     tableModels.add(model);
     panel.add(table, "growx, pushx");
