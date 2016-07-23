@@ -106,15 +106,28 @@ public class BaseTest {
    * @param format the format.
    * @param params the parameter values.
    */
-  private static void print(final String format, final Object...params) {
+  public static void print(final String format, final Object...params) {
+    print(true, format, params);
+  }
+
+  /**
+   * Print a formatted message to the shell output and to the log file.
+   * @param decorate whether to add decorations around the message.
+   * @param format the format.
+   * @param params the parameter values.
+   */
+  public static void print(final boolean decorate, final String format, final Object...params) {
     String message = String.format(format, params);
     System.out.println(message);
-    StringBuilder sb = new StringBuilder("*****");
-    for (int i=0; i<message.length()-10; i++) sb.append('-');
-    sb.append("*****");
-    String s = sb.toString();
-    log.info(s);
+    String s = "";
+    if (decorate) {
+      StringBuilder sb = new StringBuilder("*****");
+      for (int i=0; i<message.length()-10; i++) sb.append('-');
+      sb.append("*****");
+      s = sb.toString();
+    }
+    if (decorate) log.info(s);
     log.info(message);
-    log.info(s);
+    if (decorate) log.info(s);
   }
 }

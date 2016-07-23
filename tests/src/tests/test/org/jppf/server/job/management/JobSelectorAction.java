@@ -156,7 +156,7 @@ abstract class JobSelectorAction implements Callable<Void> {
     @Override
     public void performCall() throws Exception {
       jobManager.suspendJobs(selector, true);
-      Thread.sleep(SLEEP_TIME / 2);
+      Thread.sleep(SLEEP_TIME);
       JobInformation[] jobInfos = jobManager.getJobInformation(selector);
       assertNotNull(jobInfos);
       assertEquals(jobs.size(), jobInfos.length);
@@ -166,8 +166,8 @@ abstract class JobSelectorAction implements Callable<Void> {
         assertTrue(info.isSuspended());
         assertTrue(jobUuids.contains(info.getJobUuid()));
       }
-      jobManager.resumeJobs(selector);
-      checkResults(false);
+      jobManager.cancelJobs(selector);
+      checkResults(true);
     }
   }
 
@@ -202,7 +202,8 @@ abstract class JobSelectorAction implements Callable<Void> {
         assertFalse(nodeUuids.contains(nodeInfo.getUuid()));
         nodeUuids.add(nodeInfo.getUuid());
       }
-      checkResults(false);
+      jobManager.cancelJobs(selector);
+      checkResults(true);
     }
   }
 
@@ -226,15 +227,15 @@ abstract class JobSelectorAction implements Callable<Void> {
       }
       jobManager.updatePriority(selector, 100);
       jobManager.updateMaxNodes(selector, 10);
-      Thread.sleep(SLEEP_TIME / 2);
+      Thread.sleep(SLEEP_TIME);
       jobInfos = jobManager.getJobInformation(selector);
       assertEquals(jobs.size(), jobInfos.length);
       for (JobInformation info: jobInfos) {
         assertEquals(100, info.getPriority());
         assertEquals(10, info.getMaxNodes());
       }
-      jobManager.resumeJobs(selector);
-      checkResults(false);
+      jobManager.cancelJobs(selector);
+      checkResults(true);
     }
   }
 }
