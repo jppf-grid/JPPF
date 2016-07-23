@@ -29,11 +29,7 @@ import org.jppf.utils.TypedProperties;
  * and its attached nodes via the JMX-based management APIs.
  * @author Laurent Cohen
  */
-public class DriverConnectionManager implements AutoCloseable {
-  /**
-   * The signature of the provisioning method in the nodes provisioning MBeans.
-   */
-  private static final String[] PROVISIONING_SIGNATURE = {int.class.getName(), TypedProperties.class.getName()};
+public class DriverConnectionManager {
   /**
    * A proxy to the driver MBean which forwards management requests to the nodes.
    */
@@ -46,27 +42,77 @@ public class DriverConnectionManager implements AutoCloseable {
    * A node selector that only selects master nodes.
    */
   private final NodeSelector masterSelector;
+  /**
+   * The maximum number of nodes that can be running on the host.
+   */
+  private final int maxAllowedNodes;
+  /**
+   * The maximum allowed number of connections in the pool.
+   */
+  private final int maxAllowedPoolSize;
+  /**
+   * The current number of nodes. We attempt to store and maintain it locally because
+   * obtaining it from the server is a costly operation that requires a remote method call.
+   */
+  private int currentNodes;
 
   /**
-   * Initialize this manager with the specified JPPF client and connection pool.
+   * Initialize this manager with the specified JPPF client.
    * @param client the client to use.
-   * @param poolName the name of the connection pool to use.
+   * @param maxAllowedNodes the maximum number of nodes that can be running on the host.
+   * @param maxAllowedPoolSize the maximum allowed number of connections in the pool.
    * @throws Exception if any error occurs.
    */
-  public DriverConnectionManager(final JPPFClient client, final String poolName) throws Exception {
-    // wait until there is a connection pool with the expected name and at least one active connection to the driver
-    connectionPool = client.awaitConnectionPools(Long.MAX_VALUE, new ConnectionPoolFilter<JPPFConnectionPool>() {
-      @Override
-      public boolean accepts(final JPPFConnectionPool pool) {
-        return poolName.equals(pool.getName()) && (pool.connectionCount(JPPFClientConnectionStatus.ACTIVE) > 0);
-      }
-    }).get(0);
+  public DriverConnectionManager(final JPPFClient client, final int maxAllowedNodes, final int maxAllowedPoolSize) throws Exception {
+    // wait until there is a connection pool with the at least one active connection to the driver
+    connectionPool = client.awaitActiveConnectionPool();
     // wait until at least one JMX connection wrapper is established
     JMXDriverConnectionWrapper jmx = connectionPool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
     this.forwarder = jmx.getNodeForwarder();
     // create a node selector that only selects master nodes
     ExecutionPolicy masterPolicy = new Equal("jppf.node.provisioning.master", true);
     this.masterSelector = new ExecutionPolicySelector(masterPolicy);
+    this.maxAllowedNodes = maxAllowedNodes;
+    this.maxAllowedPoolSize = maxAllowedPoolSize;
+    this.currentNodes = 1;
+  }
+
+  /**
+   * Update the connection pool and number of slave nodes based
+   * on the specified number of jobs to submit concurrently.
+   * @param nbJobs the number of jobs to submit.
+   */
+  public void updateGridSetup(final int nbJobs) {
+    // Adjust the connection pool size
+    int newPoolSize = computePoolSize(nbJobs);
+    if (newPoolSize > maxAllowedPoolSize) newPoolSize = maxAllowedPoolSize;
+    int currentPoolSize = connectionPool.connectionCount();
+    if (newPoolSize != currentPoolSize) {
+      AdaptiveGridDemo.print("%screasing the number of server connections to %d", (newPoolSize > currentPoolSize) ? "in" : "de", newPoolSize);
+      connectionPool.setSize(newPoolSize);
+      // wait until all requested connections are established
+      connectionPool.awaitWorkingConnections(Operator.EQUAL, newPoolSize);
+    }
+
+    // Adjust the number of nodes
+    int newNbNodes = computeNbNodes(nbJobs);
+    if (newNbNodes != currentNodes) {
+      AdaptiveGridDemo.print("%screasing the number of nodes to %d", (newNbNodes > currentNodes) ? "in" : "de", newNbNodes);
+      try {
+        // -1 because the master node is counted as a an execution node
+        updateSlaveNodes(newNbNodes - 1);
+        currentNodes = newNbNodes;
+      } catch(Exception e) {
+        e.printStackTrace();
+        // We don't know how many nodes were actually started,
+        // so we have to ask the server
+        try {
+          currentNodes = connectionPool.getJmxConnection().nbNodes();
+        } catch(Exception e2) {
+          e2.printStackTrace();
+        }
+      }
+    }
   }
 
   /**
@@ -75,7 +121,7 @@ public class DriverConnectionManager implements AutoCloseable {
    * @param configOverrides optional overrides to the slave nodes' configuration.
    * @throws Exception if any error occurs.
    */
-  public void updateSlaveNodes(final int nbSlaves, final TypedProperties configOverrides) throws Exception {
+  private void updateSlaveNodes(final int nbSlaves, final TypedProperties configOverrides) throws Exception {
     // request that <nbSlaves> slave nodes be provisioned
     forwarder.provisionSlaveNodes(masterSelector, nbSlaves, configOverrides);
   }
@@ -85,28 +131,30 @@ public class DriverConnectionManager implements AutoCloseable {
    * @param nbSlaves the number of slave nodes to reach.
    * @throws Exception if any error occurs.
    */
-  public void updateSlaveNodes(final int nbSlaves) throws Exception {
+  private void updateSlaveNodes(final int nbSlaves) throws Exception {
     updateSlaveNodes(nbSlaves, null);
   }
 
   /**
-   * Get the number of nodes in the grid.
-   * @return the number of nodes currently attached to the driver.
-   * @throws Exception if any error occurs.
+   * Compute the desired connection pool size for the specified number of jobs.
+   * @param nbJobs the number of jobs to submit concurrently.
+   * @return the new size of the connection pool, in the range [1, maxAllowedPoolSize].
    */
-  public int getNbNodes() throws Exception {
-    return connectionPool.getJmxConnection().nbNodes();
+  private int computePoolSize(final int nbJobs) {
+    // We apply a simple rule that makes the connection pool as large as the
+    // number of jobs, up to the maximum allowed pool size.
+    return Math.max(1, Math.min(nbJobs, maxAllowedPoolSize));
   }
 
   /**
-   * The client connection pool holding the connections to the driver.
-   * @return a {@link JPPFConnectionPool} instance.
+   * Compute the desired number of nodes for the specified number of jobs.
+   * @param nbJobs the number of jobs to submit concurrently.
+   * @return the new desired number of nodes, always in the range [1, maxAllowedNodes].
    */
-  public JPPFConnectionPool getConnectionPool() {
-    return connectionPool;
-  }
-
-  @Override
-  public void close() {
+  private int computeNbNodes(final int nbJobs) {
+    // Since nodes take a lot of system resourcess, we can't have too many.
+    // Here we apply a rule that there should be 1 node for every 5 jobs in
+    // the queue, up to the allowed maximum number of nodes.
+    return Math.min(1 + nbJobs / 5, maxAllowedNodes);
   }
 }
