@@ -53,7 +53,7 @@ public class JobDependenciesRunner {
       int n = Math.max(dependencies.size(), 1);
       JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
       pool.setSize(n);
-      // wait until all connections are intiialized
+      // wait until all connections are initialized
       pool.awaitWorkingConnections(Operator.AT_LEAST, n);
 
       // Create the jobs according to the dependency graph
@@ -87,7 +87,7 @@ public class JobDependenciesRunner {
     job.setBlocking(false);
     // the job MUST be suspended before submission
     job.getSLA().setSuspended(true);
-    // add a single task
+    // add a single task and give it a readable id
     job.add(new MyTask()).setId(spec.getId() + "-task");
     // the job listener is not required, we just want to print a message when a job completes on the client side
     job.addJobListener(JOB_LISTENER);
@@ -99,7 +99,7 @@ public class JobDependenciesRunner {
    * @param job the job whose results to print out.
    */
   private static void printJobResults(final JPPFJob job) {
-    Utils.print("runner: ***** results for '%s' *****", job.getName());
+    Utils.print("runner: ***** awaiting results for '%s' *****", job.getName());
     List<Task<?>> results = job.awaitResults();
     for (Task<?> task : results) {
       if (task.getThrowable() != null) Utils.print("runner:   got exception: %s", ExceptionUtils.getStackTrace(task.getThrowable()));

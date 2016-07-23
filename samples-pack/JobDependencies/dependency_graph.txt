@@ -27,7 +27,7 @@ Job A ==>
 # example graph with cycle                                                    #
 # in the server output, a message similar to this will be printed:            #
 # cycle detected while adding dependency 'Job C' to 'Job A' :                 #
-#   Job A ==> Job C ==> Job B ==> Job A                                       #
+# Job A ==> Job C ==> Job B ==> Job A                                         #
 #-----------------------------------------------------------------------------#
 
 #Job C ==> Job B

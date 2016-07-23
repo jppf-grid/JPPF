@@ -138,7 +138,7 @@ public class DependencyNode {
   }
 
   /**
-   * Determine whther the specified node has a direct or idirect dependency on this node.
+   * Determine whther the specified node has a direct or indirect dependency on this node.
    * @param node the node to check.
    * @param visited the set of already visited nodes in the dependency graph.
    * @param path the full cycle path, if there is a cycle (for debugging purposes).
