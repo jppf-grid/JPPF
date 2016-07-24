@@ -61,7 +61,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   private static JMXDriverConnectionWrapper jmx;
 
   /**
-   * Launches 1 driver with 3 nodes and start the client.
+   * Launch 1 driver with 3 nodes and start the client.
    * @throws Exception if a process could not be started.
    */
   @BeforeClass
@@ -77,6 +77,24 @@ public class TestJobReservation extends AbstractNonStandardSetup {
   /** */
   @Rule
   public TestWatcher testJobReservationWatcher = new MyWatcher();
+
+  /**
+   * @throws Exception if any error occurs.
+   */
+  @Before
+  public void showIdleNodes() throws Exception {
+    BaseTest.print(false, "nb idle nodes = %d", jmx.nbIdleNodes());
+    ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
+      @Override
+      public boolean evaluate() {
+        try {
+          return jmx.nbIdleNodes() == BaseSetup.nbNodes();
+        } catch(Exception e) {
+          return false;
+        }
+      }
+    }, 5000L, true);
+  }
 
   /**
    * Remove the jmx notification listener.

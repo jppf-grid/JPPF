@@ -55,7 +55,6 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   private static final long TIME_SHORT = 1000L;
 
   /**
-   * 
    * @throws Exception if any error occurs.
    */
   @Before
@@ -100,7 +99,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithAllJobsSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentMethodName(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, JobSelector.ALL_JOBS));
   }
 
@@ -110,7 +109,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
    */
   @Test(timeout = 15000L)
   public void testCancelJobsWithJobUuidSelector() throws Exception {
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, ReflectionUtils.getCurrentMethodName(), false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, ReflectionUtils.getCurrentMethodName(), false);
     List<String> uuids = new ArrayList<>();
     for (JPPFJob job: jobs) uuids.add(job.getUuid());
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, new JobUuidSelector(uuids)));
@@ -123,7 +122,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   @Test(timeout = 15000L)
   public void testCancelJobsWithScriptedJobSelector() throws Exception {
     String prefix = ReflectionUtils.getCurrentMethodName();
-    List<JPPFJob> jobs = createMultipleJobs(2, 10, 5000L, prefix, false);
+    List<JPPFJob> jobs = createMultipleJobs(2, 1, 4000L, prefix, false);
     JobSelector selector = new ScriptedJobSelector("javascript", "jppfJob.getName().startsWith('" + prefix + "')");
     testJobSelectorAction(new JobSelectorAction.CancelAction(jobs, selector));
   }
@@ -136,7 +135,6 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
   public void testResumeJobsWithAllJobsSelector() throws Exception {
     List<JPPFJob> jobs = createMultipleJobs(2, 10, 1L, ReflectionUtils.getCurrentMethodName(), true);
     testJobSelectorAction(new JobSelectorAction.ResumeAction(jobs, JobSelector.ALL_JOBS));
-    assertEquals(2, (int) BaseSetup.getJMXConnection(client).nbIdleNodes());
   }
 
   /**
