@@ -286,9 +286,35 @@ public final class SlaveNodeManager implements ProcessLauncherListener {
     int n = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_SLAVES);
     if (n > 0) {
       String msg = "starting " + n + " slave nodes";
+      TypedProperties props = null;
+      File file = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_OVERRIDES_FILE);
+      if ((file != null) && file.exists()) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+          props = new TypedProperties().loadAndResolve(reader);
+        } catch(Exception e) {
+          log.error("slave startup config overrides file {} could not be loaded: {}", file, ExceptionUtils.getStackTrace(e));
+        }
+      } else {
+        String source = JPPFConfiguration.get(JPPFProperties.PROVISIONING_STARTUP_OVERRIDES_SOURCE);
+        if ((source != null) && !source.trim().isEmpty()) {
+          try {
+            Class<?> c = Class.forName(source);
+            if (JPPFConfiguration.ConfigurationSource.class.isAssignableFrom(c)) {
+              JPPFConfiguration.ConfigurationSource configReader = (JPPFConfiguration.ConfigurationSource) c.newInstance();
+              props = new TypedProperties().loadAndResolve(new InputStreamReader(configReader.getPropertyStream()));
+            } else {
+              JPPFConfiguration.ConfigurationSourceReader configReader = (JPPFConfiguration.ConfigurationSourceReader) c.newInstance();
+              props = new TypedProperties().loadAndResolve(configReader.getPropertyReader());
+            }
+          } catch (Exception e) {
+            log.error("slave startup config overrides source {} could not be instantiated: {}", source, ExceptionUtils.getStackTrace(e));
+          }
+        }
+      }
+      if (props != null) msg += " with config overrides = " + props;
       log.info(msg);
       System.out.println(msg);
-      INSTANCE.shrinkOrGrowSlaves(n, true, null);
+      INSTANCE.shrinkOrGrowSlaves(n, true, props);
     }
   }
 
