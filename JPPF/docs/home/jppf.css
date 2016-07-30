@@ -53,7 +53,7 @@ div { margin: 0px; padding; 0px; }
 .headerMenuItem, .headerMenuItem2 {
   font-family: Arial, Helvetica, sans-serif
 }
-.headerMenuItem, a.headerMenuItem:visited {
+.headerMenuItem, a.headerMenuItem, a.headerMenuItem:visited {
   color: white;
   font-size: 12pt;
   background-color: #6D78B6;
