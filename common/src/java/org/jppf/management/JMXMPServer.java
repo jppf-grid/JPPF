@@ -68,7 +68,7 @@ public class JMXMPServer extends AbstractJMXServer {
   }
 
   /**
-   * {@inheritDoc]}
+   * {@inheritDoc}
    * @exclude
    */
   @Override
