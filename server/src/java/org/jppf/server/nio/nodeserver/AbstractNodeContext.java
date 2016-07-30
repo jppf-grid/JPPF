@@ -104,6 +104,10 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * The latest computed score for a given desired configuration.
    */
   int reservationScore = 0;
+  /**
+   * Determines whether the node is idle or not.
+   */
+  AtomicBoolean idle = new AtomicBoolean(false);
 
   /**
    * Initialized abstract node context.

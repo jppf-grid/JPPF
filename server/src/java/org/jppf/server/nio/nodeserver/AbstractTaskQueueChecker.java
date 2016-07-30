@@ -146,6 +146,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
           synchronized(idleChannels) {
             if (!reservationHandler.transitionReservation(channel)) reservationHandler.removeReservation(channel);
             if (idleChannels.add(channel)) {
+              channel.idle.set(true);
               JPPFSystemInformation info = channel.getSystemInformation();
               if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, true);
               stats.addValue(JPPFStatisticsHelper.IDLE_NODES, 1);
@@ -167,6 +168,7 @@ abstract class AbstractTaskQueueChecker<C extends AbstractNodeContext> extends T
     if (debugEnabled) log.debug("Removing idle channel " + channel);
     synchronized(idleChannels) {
       if (idleChannels.remove(channel)) {
+        channel.idle.set(false);
         JPPFSystemInformation info = channel.getSystemInformation();
         if (info != null) info.getJppf().set(JPPFProperties.NODE_IDLE, false);
         stats.addValue(JPPFStatisticsHelper.IDLE_NODES, -1);
