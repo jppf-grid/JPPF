@@ -19,6 +19,7 @@ package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
 import java.io.*;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.prefs.*;
 
@@ -184,7 +185,6 @@ public final class OptionsHandler {
     try {
       for (OptionElement elt: pageList) {
         OptionNode node = buildPersistenceGraph(elt);
-        //savePreferences(node, getPreferences());
         savePreferences(node, JPPF_PREFERENCES);
       }
       getPreferences().flush();
@@ -204,7 +204,14 @@ public final class OptionsHandler {
       for (OptionNode child: node.children) savePreferences(child, p);
     } else if (node.elt instanceof Option) {
       Option option = (Option) node.elt;
-      if (option.isPersistent()) prefs.put(option.getName(), String.valueOf(option.getValue()));
+      log.trace("persisting option {}", option);
+      if (option.isPersistent()) {
+        Object value = option.getValue();
+        String s = null;
+        if (value instanceof Number) s = NumberFormat.getInstance().format(value);
+        else s = String.valueOf(value);
+        prefs.put(option.getName(), s);
+      }
     }
   }
 
@@ -214,7 +221,6 @@ public final class OptionsHandler {
   public static void loadPreferences() {
     for (OptionElement elt: pageList) {
       OptionNode node = buildPersistenceGraph(elt);
-      //loadPreferences(node, getPreferences());
       loadPreferences(node, JPPF_PREFERENCES);
     }
   }
