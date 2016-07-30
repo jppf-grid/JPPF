@@ -50,7 +50,7 @@ public class DriverInitializer {
   /**
    * Logger for this class.
    */
-  static Logger log = LoggerFactory.getLogger(JPPFDriver.class);
+  static Logger log = LoggerFactory.getLogger(DriverInitializer.class);
   /**
    * Determines whether debug-level logging is enabled.
    */
@@ -377,7 +377,7 @@ public class DriverInitializer {
          Notification notif = ((JPPFNodeForwardingNotification) notification).getNotification();
          String nodeUuid = (String) notif.getSource();
          TypedProperties nodeConfig = (TypedProperties) notif.getUserData();
-         log.info("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
+         if (debugEnabled) log.debug("received notification for node {}, nb threads={}", nodeUuid, nodeConfig.get(JPPFProperties.PROCESSING_THREADS));
          AbstractNodeContext node = driver.getNodeNioServer().getConnection(nodeUuid);
          if (node == null) return;
          synchronized(node.getMonitor()) {

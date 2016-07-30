@@ -121,7 +121,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    */
   @Override
   public void restart(final Boolean interruptIfRunning) throws Exception {
-    if (debugEnabled) log.debug("node restart requested");
+    if (debugEnabled) log.debug("node restart requested with interruptIfRunning={}", interruptIfRunning);
     boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
     shutdownOrRestart(interrupt, true);
   }
@@ -141,7 +141,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
    */
   @Override
   public void shutdown(final Boolean interruptIfRunning) throws Exception {
-    if (debugEnabled) log.debug("node shutdown requested");
+    if (debugEnabled) log.debug("node shutdown requested with interruptIfRunning={}", interruptIfRunning);
     boolean interrupt = (interruptIfRunning == null) ? true : interruptIfRunning;
     shutdownOrRestart(interrupt, false);
   }

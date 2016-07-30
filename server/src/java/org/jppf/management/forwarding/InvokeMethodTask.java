@@ -62,7 +62,7 @@ class InvokeMethodTask extends AbstractForwardingTask {
   protected Pair<String, Object> execute() throws Exception {
     String uuid = context.getUuid();
     JMXNodeConnectionWrapper wrapper = context.getJmxConnection();
-    if (debugEnabled) log.debug("invoking {}() on mbean={} for node={} with jmx=", new Object[] {memberName, mbeanName, uuid, wrapper});
+    if (debugEnabled) log.debug(String.format("invoking %s() on mbean=%s for node=%s with jmx=%s", memberName, mbeanName, uuid, wrapper));
     Object o = wrapper.invoke(mbeanName, memberName, params, signature);
     return new Pair<>(uuid, o);
   }
