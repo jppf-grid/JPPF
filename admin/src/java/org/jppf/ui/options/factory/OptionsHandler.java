@@ -19,6 +19,7 @@ package org.jppf.ui.options.factory;
 
 import java.awt.Frame;
 import java.io.*;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.prefs.*;
 
@@ -185,7 +186,6 @@ public final class OptionsHandler {
     try {
       for (OptionElement elt: pageList) {
         OptionNode node = buildPersistenceGraph(elt);
-        //savePreferences(node, getPreferences());
         savePreferences(node, JPPF_PREFERENCES);
       }
       getPreferences().flush();
@@ -207,7 +207,13 @@ public final class OptionsHandler {
     } else if (node.elt instanceof Option) {
       Option option = (Option) node.elt;
       log.trace("persisting option {}", option);
-      if (option.isPersistent()) prefs.put(option.getName(), String.valueOf(option.getValue()));
+      if (option.isPersistent()) {
+        Object value = option.getValue();
+        String s = null;
+        if (value instanceof Number) s = NumberFormat.getInstance().format(value);
+        else s = String.valueOf(value);
+        prefs.put(option.getName(), s);
+      }
     } else log.trace("persisting node {}", node.elt.getName());
   }
 
@@ -217,7 +223,6 @@ public final class OptionsHandler {
   public static void loadPreferences() {
     for (OptionElement elt: pageList) {
       OptionNode node = buildPersistenceGraph(elt);
-      //loadPreferences(node, getPreferences());
       loadPreferences(node, JPPF_PREFERENCES);
     }
   }
@@ -228,7 +233,6 @@ public final class OptionsHandler {
    * @param prefs the preferences node in which to save the values.
    */
   public static void loadPreferences(final OptionNode node, final Preferences prefs) {
-    //if (node == null) return;
     if (!node.children.isEmpty()) {
       Preferences p = prefs.node(node.elt.getName());
       for (OptionNode child: node.children) loadPreferences(child, p);
@@ -338,6 +342,7 @@ public final class OptionsHandler {
     try {
       pref.flush();
     } catch(BackingStoreException e) {
+      log.error(e.getMessage(), e);
     }
   }
 
