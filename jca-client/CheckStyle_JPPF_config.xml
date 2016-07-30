@@ -29,7 +29,10 @@
       <property name="severity" value="ignore"/>
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
-    <module name="RedundantModifier"/>
+    <module name="RedundantModifier">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
     <module name="MissingOverride"/>

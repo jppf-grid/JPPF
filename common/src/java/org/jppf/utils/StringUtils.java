@@ -389,7 +389,9 @@ public final class StringUtils {
     if (source == null) return def;
     NumberFormat nf = NumberFormat.getInstance();
     try {
-      return nf.parse(source);
+      Number n = nf.parse(source);
+      //System.out.printf("source=%s, n=%s, locale=%s%n", source, n, Locale.getDefault());
+      return n;
     } catch (ParseException ignore) {
     }
     return null;

@@ -65,7 +65,7 @@ public class DeadlockRunner {
     MasterNodeMonitoringThread mnmt = null;
     try (JPPFClient client = new JPPFClient(); JobStreamImpl jobProvider = new JobStreamImpl(ro)) {
       getJmxConnection(client);
-      ro.callback = new MyCallback(client);
+      //ro.callback = new MyCallback(client);
       ensureSufficientConnections(client, ro.clientConnections);
       if (ro.slaves >= 0) updateSlaveNodes(client, ro.slaves);
       if (ro.simulateNodeCrashes) {
