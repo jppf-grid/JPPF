@@ -31,7 +31,8 @@ public class HTMLPrinter {
   /**
    * 
    */
-  static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss z");
+  //static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss z");
+  static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
   /**
    * 
    */
@@ -42,36 +43,46 @@ public class HTMLPrinter {
   private String indentString = "";
 
   /**
-   * Genrate the HTML source for the pseicfied project.
+   * Generate the HTML source for the pseicfied project.
    * @param project the project top explore.
    * @return an html representation of the project.
    */
   public String generate(final Project project) {
     StringBuilder sb = new StringBuilder();
     //sb.append(prologue(project));
-    sb.append(indent()).append("<table cellpadding='5px'>\n");
+    sb.append(indent()).append("<div class=\"blockWithHighlightedTitle\" align='center'>\n");
+    sb.append(incIndent()).append("<table><tr><td align='left'>\n");
+    sb.append(indent()).append(String.format("<h2><img src='images/icons/monitoring.png' class='titleWithIcon'/>%s</h2>", project.getName())).append('\n');
+    sb.append(incIndent()).append("<table cellpadding='3px' cellspacing='0'>\n");
     sb.append(incIndent()).append("<tr>\n");
-    sb.append(incIndent()).append("<th align='center' valign='top'>Build #</th>\n");
-    sb.append(indent()).append("<th align='center' valign='top'>Result</th>\n");
-    sb.append(indent()).append("<th align='center' valign='top'>Start</th>\n");
-    sb.append(indent()).append("<th align='center' valign='top'>Duration</th>\n");
-    sb.append(indent()).append("<th align='center' valign='middle'>Tests:<br>total/failed/skipped</th>\n");
+    String style1a = "border: 1px solid #6D78B6; border-right: 0px";
+    String style1b = "border: 1px solid #6D78B6;";
+    String style2a = "border: 1px solid #6D78B6; border-top: 0px; border-right: 0px;";
+    String style2b = "border: 1px solid #6D78B6; border-top: 0px;";
+    sb.append(incIndent()).append("<th align='center' valign='top' style='" + style1a + "'>Build #</th>\n");
+    //sb.append(indent()).append("<th align='center' valign='top'>Result</th>\n");
+    sb.append(indent()).append("<th align='center' valign='top' style='" + style1a + "'>Start</th>\n");
+    sb.append(indent()).append("<th align='center' valign='top' style='" + style1a + "'>Duration</th>\n");
+    //sb.append(indent()).append("<th align='center' valign='middle'>Tests:<br>total/failed/skipped</th>\n");
+    sb.append(indent()).append("<th align='center' style='" + style1b + "'>Tests</th>\n");
     sb.append(decIndent()).append("</tr>\n");
     for (Build build: project.getBuilds()) {
       TestResults res = build.getTestResults();
       sb.append(indent()).append("<tr>\n");
       String icon = "http://www.jppf.org/images/icons/" + ("SUCCESS".equals(build.getResult()) ? "default.png" : "bug1.png");
-      sb.append(incIndent()).append("<td align='left' valign='bottom'>").append("<img width='16' height='16' src='" + icon + "'/> ").append(build.getNumber()).append("</td>\n");
-      sb.append(indent()).append("<td align='center' valign='bottom'>").append(build.getResult()).append("</td>\n");
-      sb.append(indent()).append("<td align='right' valign='bottom'>").append(SDF.format(new Date(build.getStartTime()))).append("</td>\n");
-      sb.append(indent()).append("<td align='right' valign='bottom'>").append(StringUtils.toStringDuration(build.getDuration())).append("</td>\n");
-      sb.append(indent()).append("<td align='right' valign='bottom'>");
+      sb.append(incIndent()).append("<td align='left' valign='bottom' style='" + style2a + "'>").append("<img width='16' height='16' src='" + icon + "'/> ").append(build.getNumber()).append("</td>\n");
+      //sb.append(indent()).append("<td align='center' valign='bottom'>").append(build.getResult()).append("</td>\n");
+      sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2a + "'>").append(SDF.format(new Date(build.getStartTime()))).append("</td>\n");
+      sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2a + "'>").append(StringUtils.toStringDuration(build.getDuration())).append("</td>\n");
+      sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2b + "'>");
       if (res == null) sb.append("N/A");
       else sb.append(String.format("%,4d / %,4d / %,4d", res.getTotalCount(), res.getFailures(), res.getSkipped()));
       sb.append("</td>\n");
       sb.append(decIndent()).append("</tr>\n");
     }
     sb.append(decIndent()).append("</table>\n");
+    sb.append(decIndent()).append("</td></tr></table>");
+    sb.append(decIndent()).append("<br></div><br>\n");
     //sb.append(epilogue());
     return sb.toString();
   }

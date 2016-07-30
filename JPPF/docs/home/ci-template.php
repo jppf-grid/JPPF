@@ -105,13 +105,15 @@
 				</div>
 				<div class="jppf_content">
   <h1 align="center">JPPF continuous integration</h1>
-	<div align="justify">
-    <br><div class="blockWithHighlightedTitle">
-    <h2><img src="images/icons/monitoring.png" class="titleWithIcon"/>@@project@@</h2>
-    @@results_here@@
-    <br></div>
-	</div>
-	<br>
+  <div class="column_left" style="text-align: justify">
+    @@column_left@@
+    <br>
+  </div>
+  <div class="column_right" style="text-align: justify">
+    @@column_right@@
+    <br>
+  </div>
+  <br>
 </div>
 				</td>
 				</tr>
