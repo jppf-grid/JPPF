@@ -20,7 +20,7 @@
 <!--
   XML descriptor for the tabbed pane that contains the user-defined charts.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ChartsPage" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="ChartsPage" type="page" i18n="org.jppf.ui.i18n.ChartsConfigPage">
 	<!-- test comment for save -->
 	<property name="label" value="Charts"/>
   <property name="icon" value="/org/jppf/ui/resources/chart-curve-go.png"/>

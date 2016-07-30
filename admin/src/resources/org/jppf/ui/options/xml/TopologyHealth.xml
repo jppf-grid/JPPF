@@ -38,19 +38,6 @@
     <child name="health.thread.dump" type="Button"/>
     <child name="health.heap.dump" type="Button"/>
 
-		<!--
-		<child name="sep2" type="ToolbarSeparator"/>
-		<child name="health.button.refresh" type="Button">
-			<property name="icon" value="/org/jppf/ui/resources/refresh.gif"/>
-			<listener type="script">
-				<script language="groovy">
-				  def graph = option.findFirstWithName("/health.treetable");
-				  //graph.populate();
-				</script>
-			</listener>
-		</child>
-		-->
-
     <child name="sep2" type="ToolbarSeparator"/>
     <child name="health.update.thresholds" type="Button"/>
 

@@ -20,7 +20,7 @@
 <!-- 
   XML descriptor for the jobs data view in the admin console.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobDataPage" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobDataPage" type="page" i18n="org.jppf.ui.i18n.JobDataPage">
 	<!-- test comment for save -->
 	<property name="label" value="Job Data"/>
   <property name="icon" value="/org/jppf/ui/resources/preferences-contact-list.png"/>

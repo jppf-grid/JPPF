@@ -20,7 +20,7 @@
 <!--
   XML descriptor for the status bar in the admin console.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatusBar" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="StatusBar" type="page" i18n="org.jppf.ui.i18n.JPPFAdminTool">
 	<property name="layoutConstraints" value="fillx, insets 2 2 2 2"/>
 	<property name="componentConstraints" value="pushy 0, growx, pushx, h 26!"/>
 	<property name="bordered" value="false"/>

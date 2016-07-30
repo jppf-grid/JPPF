@@ -20,7 +20,7 @@
 <!--
   XML descriptor for the tabbed pane which contains the user-defined charts and the chart configuration view.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="TabbedChartsPage" type="TabbedPane">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="TabbedChartsPage" type="TabbedPane" i18n="org.jppf.ui.i18n.ChartsConfigPage">
 	<property name="componentConstraints" value="push, grow"/>
 	<property name="layoutConstraints" value="fill"/>
   <property name="bordered" value="false"/>

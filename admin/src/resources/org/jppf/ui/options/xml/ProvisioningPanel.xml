@@ -20,7 +20,7 @@
 <!--
   XML descriptor for the node provisioning dialog.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="nodeProvisioningPanel" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="nodeProvisioningPanel" type="page" i18n="org.jppf.ui.i18n.Provisioning">
 	<property name="label" value="Node provisioning"/>
 	<property name="layoutConstraints" value="flowy, fill"/>
 	<property name="componentConstraints" value=""/>

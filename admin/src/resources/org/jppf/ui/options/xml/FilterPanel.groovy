@@ -2,7 +2,10 @@ import org.jppf.management.*
 import org.jppf.ui.monitoring.data.*
 import org.jppf.node.policy.*
 import org.jppf.ui.utils.*
+import org.jppf.utils.LocalizationUtils
 import java.awt.*
+
+BASE = "org.jppf.ui.i18n.FilterPanel"
 
 void init() {
   def editor = option.findFirstWithName("/ExecutionPolicy")
@@ -42,7 +45,9 @@ void loadOrSave(loadFlag) {
 void updateTabColor(activeOption) {
   def label = GuiUtils.getTabComponent(activeOption)
   if (label != null) {
-    if (activeOption.getValue()) label.setText("<html>Filter <font color=\"green\">on </font</html>")
-    else label.setText("<html>Filter <font color=\"red\">off</font</html>")
+    def filter = LocalizationUtils.getLocalized(BASE, "FilterPanel.label");
+    def state = LocalizationUtils.getLocalized(BASE, "FilterPanel." + (activeOption.getValue() ? "on" : "off"))
+    def color = activeOption.getValue() ? "green" : "red";
+    label.setText("<html>" + filter + " <font color='" + color + "'>" + state + "</font</html>")
   }
 }

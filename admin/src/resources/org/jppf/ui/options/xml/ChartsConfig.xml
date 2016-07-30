@@ -20,7 +20,7 @@
 <!--
   XML descriptor for the chart configuration view of the admin console.
 -->
-<opt:main name="ChartsConfiguration" type="page" xmlns:opt="http://www.jppf.org/Options.xsd">
+<opt:main name="ChartsConfiguration" type="page" xmlns:opt="http://www.jppf.org/Options.xsd" i18n="org.jppf.ui.i18n.ChartsConfigPage">
 	<property name="label" value="Charts Configuration"/>
 	<property name="scrollable" value="true"/>
   <property name="icon" value="/org/jppf/ui/resources/chart-curve-edit.png"/>
