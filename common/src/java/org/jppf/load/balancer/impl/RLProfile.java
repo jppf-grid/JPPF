@@ -23,6 +23,7 @@ import org.jppf.utils.TypedProperties;
 
 /**
  * Parameters profile for a proportional bundler.
+ * @deprecated use {@link RL2Profile} with {@link RL2Bundler} instead.
  * @author Laurent Cohen
  */
 public class RLProfile extends AbstractLoadBalancingProfile {

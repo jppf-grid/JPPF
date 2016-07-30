@@ -24,28 +24,27 @@ import org.jppf.utils.TypedProperties;
 
 /**
  * Provider implementation for the reinforcement learning load-balancing algorithm.
- * @deprecated use {@link RL2BundlerProvider} with {@link RL2Profile} and {@link RL2Bundler} instead.
  * @author Laurent Cohen
  */
-public class RLBundlerProvider implements JPPFBundlerProvider<RLProfile> {
+public class RL2BundlerProvider implements JPPFBundlerProvider<RL2Profile> {
   /**
    * Create a bundler instance using the specified parameters profile.
    * @param profile encapsulates the parameters of this algorithm.
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final RLProfile profile) {
-    return new RLBundler(profile);
+  public Bundler createBundler(final RL2Profile profile) {
+    return new RL2Bundler(profile);
   }
 
   /**
    * Create a bundler profile containing the parameters of the algorithm.
    * @param configuration a set of properties defining the algorithm's parameters.
-   * @return an {@link RLProfile} instance.
+   * @return an {@link RL2Profile} instance.
    */
   @Override
-  public RLProfile createProfile(final TypedProperties configuration) {
-    return new RLProfile(configuration);
+  public RL2Profile createProfile(final TypedProperties configuration) {
+    return new RL2Profile(configuration);
   }
 
   /**
@@ -54,6 +53,6 @@ public class RLBundlerProvider implements JPPFBundlerProvider<RLProfile> {
    */
   @Override
   public String getAlgorithmName() {
-    return "rl";
+    return "rl2";
   }
 }

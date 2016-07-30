@@ -24,6 +24,7 @@ import org.slf4j.*;
 
 /**
  * Bundler based on a reinforcement learning algorithm.
+ * @deprecated use {@link RL2Profile} with {@link RL2Bundler} instead.
  * @author Laurent Cohen
  */
 public class RLBundler extends AbstractAdaptiveBundler<RLProfile> {
