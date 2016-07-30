@@ -57,6 +57,7 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
    */
   public UpdateMaxNodesAction() {
     setupIcon("/org/jppf/ui/resources/impl_co.gif");
+    BASE = "org.jppf.ui.i18n.JobDataPage";
     putValue(NAME, localize("job.update.max.nodes.label"));
   }
 
@@ -91,23 +92,26 @@ public class UpdateMaxNodesAction extends AbstractJobAction {
 
       JButton okBtn = (JButton) panel.findFirstWithName("/job.max.nodes.OK").getUIComponent();
       JButton cancelBtn = (JButton) panel.findFirstWithName("/job.max.nodes.Cancel").getUIComponent();
-      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Enter the number of threads and their priority", false);
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("JobMaxNodesPanel.label"), false);
       dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
-      okBtn.addActionListener(new ActionListener() {
+      AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
           dialog.dispose();
           doOK();
         }
-      });
-      cancelBtn.addActionListener(new ActionListener() {
+      };
+      AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
           dialog.dispose();
         }
-      });
+      };
+      okBtn.addActionListener(okAction);
+      cancelBtn.addActionListener(cancelAction);
+      setOkCancelKeys(panel, okAction, cancelAction);
       dialog.getContentPane().add(panel.getUIComponent());
       dialog.pack();
       dialog.setLocationRelativeTo(null);

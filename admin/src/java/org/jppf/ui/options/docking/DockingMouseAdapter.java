@@ -50,7 +50,8 @@ class DockingMouseAdapter extends MouseAdapter {
       menu.add(new JMenuItem(new DockToInitialContainerAction(realComp, DockingManager.localize("attach.to.initial.container"))));
     menu.add(new JMenuItem(new DockToNewViewAction(realComp, DockingManager.localize("attach.to.new.view"))));
     Map<String, ViewDescriptor> viewMap = dm.getViewMap();
-    if (viewMap.size() > 1) {
+    // exclude current and main view
+    if (viewMap.size() > 2) {
       JMenu subMenu = new JMenu(DockingManager.localize("attach.to.existing.view"));
       menu.add(subMenu);
       for (String id: viewMap.keySet()) {

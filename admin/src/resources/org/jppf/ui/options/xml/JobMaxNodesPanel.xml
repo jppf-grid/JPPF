@@ -21,7 +21,7 @@
   XML descriptor for the dialog used to set the maximum number of nodes of a job,
   in the jobs data view of the admin console.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobMaxNodesPanel" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="JobMaxNodesPanel" type="page" i18n="org.jppf.ui.i18n.JobDataPage">
 	<property name="label" value="Update number of threads and priority"/>
 	<property name="layoutConstraints" value="flowy"/>
 	<property name="componentConstraints" value=""/>

@@ -92,21 +92,24 @@ public class UpdatePriorityAction extends AbstractJobAction {
       JButton cancelBtn = (JButton) panel.findFirstWithName("/job.priority.Cancel").getUIComponent();
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Enter the new job priority", false);
       dialog.setIconImage(((ImageIcon) getValue(Action.SMALL_ICON)).getImage());
-      okBtn.addActionListener(new ActionListener() {
+      AbstractAction okAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
           dialog.dispose();
           doOK();
         }
-      });
-      cancelBtn.addActionListener(new ActionListener() {
+      };
+      AbstractAction cancelAction = new AbstractAction() {
         @Override
         public void actionPerformed(final ActionEvent event) {
           dialog.setVisible(false);
           dialog.dispose();
         }
-      });
+      };
+      okBtn.addActionListener(okAction);
+      cancelBtn.addActionListener(cancelAction);
+      setOkCancelKeys(panel, okAction, cancelAction);
       dialog.getContentPane().add(panel.getUIComponent());
       dialog.pack();
       dialog.setLocationRelativeTo(null);
