@@ -84,7 +84,7 @@ public class JPPFBundlerFactory {
   /**
    * Map of all registered providers.
    */
-  private final Map<String, JPPFBundlerProvider> providerMap = new HashMap<>();
+  private final Map<String, JPPFBundlerProvider> providerMap = new TreeMap<>();
   /**
    * The default values to use if nothing is specified in the JPPF configuration.
    */
