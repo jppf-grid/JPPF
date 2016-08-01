@@ -42,7 +42,7 @@ public enum NodePendingAction {
   /**
    * Base name for the localization resource bundles.
    */
-  private static final String I18N = "org.jppf.server.i18n.messages";
+  private static final String I18N = "org.jppf.server.i18n.server_messages";
   /**
    * The name to display.
    */
@@ -53,11 +53,11 @@ public enum NodePendingAction {
    * @param msg the display name ot localize.
    */
   private NodePendingAction(final String msg) {
-    displayName = LocalizationUtils.getLocalized(I18N, msg);
+    displayName = msg;
   }
 
   @Override
   public String toString() {
-    return displayName;
+    return LocalizationUtils.getLocalized(I18N, displayName);
   }
 }

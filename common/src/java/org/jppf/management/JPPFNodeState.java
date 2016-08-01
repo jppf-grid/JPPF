@@ -31,7 +31,7 @@ public class JPPFNodeState implements Serializable {
   /**
    * Base name for the localization resource bundles.
    */
-  private static final String I18N = "org.jppf.server.i18n.messages";
+  private static final String I18N = "org.jppf.server.i18n.server_messages";
 
   /**
    * Enumeration of connection states.
@@ -60,12 +60,12 @@ public class JPPFNodeState implements Serializable {
      * @param msg the display name or localize.
      */
     private ConnectionState(final String msg) {
-      displayName = LocalizationUtils.getLocalized(I18N, msg);
+      displayName = msg;
     }
 
     @Override
     public String toString() {
-      return displayName;
+      return LocalizationUtils.getLocalized(I18N, displayName);
     }
   }
 
@@ -96,12 +96,12 @@ public class JPPFNodeState implements Serializable {
      * @param msg the display name ot localize.
      */
     private ExecutionState(final String msg) {
-      displayName = LocalizationUtils.getLocalized(I18N, msg);
+      displayName = msg;
     }
 
     @Override
     public String toString() {
-      return displayName;
+      return LocalizationUtils.getLocalized(I18N, displayName);
     }
   }
 

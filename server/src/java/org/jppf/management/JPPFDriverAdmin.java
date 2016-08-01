@@ -168,7 +168,7 @@ public class JPPFDriverAdmin implements JPPFDriverAdminMBean {
         currentLoadBalancingInformation = new LoadBalancingInformation(algorithm, props, loadBalancerInformation().getAlgorithmNames());
         factory.setAndGetCurrentInfo(currentLoadBalancingInformation);
       }
-      return localize("load.balancing.updated") + " (" + algorithm + ")";
+      return "load.balancing.updated";
     } catch(Exception e) {
       log.error(e.getMessage(), e);
       return "Error : " + e.getMessage();
