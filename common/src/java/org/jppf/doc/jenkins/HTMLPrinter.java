@@ -29,21 +29,20 @@ import org.jppf.utils.StringUtils;
  */
 public class HTMLPrinter {
   /**
-   * 
+   * Format of the displayed dates.
    */
-  //static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss z");
   static final SimpleDateFormat SDF = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
   /**
-   * 
+   * Indent level.
    */
   private int indentLevel = 0;
   /**
-   * 
+   * Indent string corresponding to the indent level.
    */
   private String indentString = "";
 
   /**
-   * Generate the HTML source for the pseicfied project.
+   * Generate the HTML source for the specified project.
    * @param project the project top explore.
    * @return an html representation of the project.
    */
@@ -60,10 +59,8 @@ public class HTMLPrinter {
     String style2a = "border: 1px solid #6D78B6; border-top: 0px; border-right: 0px;";
     String style2b = "border: 1px solid #6D78B6; border-top: 0px;";
     sb.append(incIndent()).append("<th align='center' valign='top' style='" + style1a + "'>Build #</th>\n");
-    //sb.append(indent()).append("<th align='center' valign='top'>Result</th>\n");
     sb.append(indent()).append("<th align='center' valign='top' style='" + style1a + "'>Start</th>\n");
     sb.append(indent()).append("<th align='center' valign='top' style='" + style1a + "'>Duration</th>\n");
-    //sb.append(indent()).append("<th align='center' valign='middle'>Tests:<br>total/failed/skipped</th>\n");
     sb.append(indent()).append("<th align='center' style='" + style1b + "'>Tests</th>\n");
     sb.append(decIndent()).append("</tr>\n");
     for (Build build: project.getBuilds()) {
@@ -71,7 +68,6 @@ public class HTMLPrinter {
       sb.append(indent()).append("<tr>\n");
       String icon = "http://www.jppf.org/images/icons/" + ("SUCCESS".equals(build.getResult()) ? "default.png" : "bug1.png");
       sb.append(incIndent()).append("<td align='left' valign='bottom' style='" + style2a + "'>").append("<img width='16' height='16' src='" + icon + "'/> ").append(build.getNumber()).append("</td>\n");
-      //sb.append(indent()).append("<td align='center' valign='bottom'>").append(build.getResult()).append("</td>\n");
       sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2a + "'>").append(SDF.format(new Date(build.getStartTime()))).append("</td>\n");
       sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2a + "'>").append(StringUtils.toStringDuration(build.getDuration())).append("</td>\n");
       sb.append(indent()).append("<td align='right' valign='bottom' style='" + style2b + "'>");
