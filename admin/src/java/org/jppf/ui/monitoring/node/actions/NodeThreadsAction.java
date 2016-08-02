@@ -62,6 +62,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
    * Initialize this action.
    */
   public NodeThreadsAction() {
+    BASE = "org.jppf.ui.i18n.NodeDataPage";
     setupIcon("/org/jppf/ui/resources/threads.gif");
     setupNameAndTooltip("update.threads");
   }
@@ -96,7 +97,7 @@ public class NodeThreadsAction extends AbstractTopologyAction {
 
       JButton okBtn = (JButton) panel.findFirstWithName("/nodeThreadsOK").getUIComponent();
       JButton cancelBtn = (JButton) panel.findFirstWithName("/nodeThreadsCancel").getUIComponent();
-      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Enter the number of threads and their priority", false);
+      final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("NodeThreadPoolPanel.label"), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/threads.gif").getImage());
       AbstractAction okAction = new AbstractAction() {
         @Override

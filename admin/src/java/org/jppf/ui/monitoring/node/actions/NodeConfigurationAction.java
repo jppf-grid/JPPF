@@ -58,6 +58,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
    * Initialize this action.
    */
   public NodeConfigurationAction() {
+    BASE = "org.jppf.ui.i18n.NodeDataPage";
     setupIcon("/org/jppf/ui/resources/update.gif");
     setupNameAndTooltip("update.configuration");
   }
@@ -88,7 +89,7 @@ public class NodeConfigurationAction extends AbstractTopologyAction {
     AbstractTopologyComponent data = dataArray[0];
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/updateConfigOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/updateConfigCancel").getUIComponent();
-    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), "Update the JPPF configuration of node " + TreeTableUtils.getDisplayName(data), false);
+    final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("nodeConfigurationUpdatePanel.label") + " " + TreeTableUtils.getDisplayName(data), false);
     dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/update.gif").getImage());
     AbstractAction okAction = new AbstractAction() {
       @Override

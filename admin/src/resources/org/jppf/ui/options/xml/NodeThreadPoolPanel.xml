@@ -20,7 +20,7 @@
 <!--
   XML descriptor for the thread pool size and priority update dialog.
 -->
-<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeThreadPoolPanel" type="page">
+<opt:main xmlns:opt="http://www.jppf.org/Options.xsd" name="NodeThreadPoolPanel" type="page" i18n="org.jppf.ui.i18n.NodeDataPage">
 	<property name="label" value="Update number of threads and priority"/>
 	<property name="layoutConstraints" value="flowy"/>
 	<property name="componentConstraints" value=""/>
