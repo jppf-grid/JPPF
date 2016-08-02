@@ -1,0 +1,40 @@
+#-----------------------------------------------------------------------------#
+# This file is the definition of the dependencies graph used in the demo      #
+# It is expressed as a sequence of lines, where each line defines             #
+# a job id and the ids of the other jobs it depends on, with this format:     #
+#    jobId ==> dependencyId_1, ..., dependencyId_N | remove                   #
+# '==>' means 'depends on' and the list of dependcyId is comma-separated      #
+# and may be empty (i.e. no dependency) The optional '| remove' means that    #
+# the job and all its dependencies should be recursively removed from the     #
+# dependency graph upon its completion                                        #
+#                                                                             #
+# The jobs are submitted in the same order as they are defined in this file   #
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+# Here we define the jobs deliberately in reverse order                       #
+# of the dependencies to better illustrate how dependencies are resolved      #
+#-----------------------------------------------------------------------------#
+
+Job F ==> Job A, Job B, Job E | remove
+Job E ==> Job C, Job D
+Job D ==> Job B, Job C
+Job C ==> Job A
+Job B ==> Job A
+Job A ==>
+
+#-----------------------------------------------------------------------------#
+# example graph with cycle                                                    #
+# in the server output, a message similar to this will be printed:            #
+# cycle detected while adding dependency 'Job C' to 'Job A' :                 #
+# Job A ==> Job C ==> Job B ==> Job A                                         #
+#-----------------------------------------------------------------------------#
+
+#Job C ==> Job B
+#Job B ==> Job A
+#Job A ==> Job C
+
+#-----------------------------------------------------------------------------#
+# feel free to define your own dependency graph, you can make it as complex   #
+# as you wish                                                                 #
+#-----------------------------------------------------------------------------#

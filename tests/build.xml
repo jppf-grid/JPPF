@@ -1,0 +1,242 @@
+<!--
+	JPPF
+  Copyright (C) 2005-2016 JPPF Team. 
+	http://www.jppf.org
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+-->
+
+<project name="JPPF-tests" basedir="." default="build">
+
+  <!-- ========================================================================= -->
+  <!--                          Property definitions                             -->
+  <!-- ========================================================================= -->
+
+  <property name="build.sysclasspath" value="last"/>
+  <property name="jppf"               value="${basedir}/../JPPF"/>
+  <property name="lib"                value="${jppf}/lib"/>
+  <property name="src"                value="${basedir}/src"/>
+  <property name="framework.src"      value="${src}/framework"/>
+  <property name="tests.src"          value="${src}/tests"/>
+  <property name="addons.src"         value="${src}/addons"/>
+  <property name="resources.src"      value="${src}/resources"/>
+  <property name="classes"            value="${basedir}/classes"/>
+  <property name="framework.classes"  value="${classes}/framework"/>
+  <property name="tests.classes"      value="${classes}/tests"/>
+  <property name="addons.classes"     value="${classes}/addons"/>
+  <property name="build"              value="${basedir}/build"/>
+  <property name="report"             value="${basedir}/report"/>
+
+  <!-- JPPF modules -->
+  <property name="client"             value="${basedir}/../client"/>
+  <property name="common"             value="${basedir}/../common"/>
+  <property name="node"               value="${basedir}/../node"/>
+  <property name="samples-pack"       value="${basedir}/../samples-pack"/>
+
+  <property file="${jppf}/bin/build.properties"/>
+  <property file="${jppf}/bin/build.number"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Classpath definitions                           -->
+  <!-- ========================================================================= -->
+
+  <path id="tests.classpath">
+    <pathelement location="${tests.classes}/config"/>
+    <pathelement location="${basedir}/test-resources/client1"/>
+    <pathelement location="${framework.classes}"/>
+    <pathelement location="${tests.classes}"/>
+    <pathelement location="${addons.classes}"/>
+    <pathelement location="${client}/classes"/>
+    <pathelement location="${common}/classes"/>
+    <pathelement location="${node}/classes"/>
+    <pathelement location="${lib}/Groovy/groovy-all-1.6.5.jar"/>
+    <pathelement location="${lib}/LZ4/lz4-1.3.0.jar"/>
+    <pathelement location="${lib}/slf4j/slf4j-api-1.6.1.jar"/>
+    <pathelement location="${lib}/slf4j/slf4j-log4j12-1.6.1.jar"/>
+    <pathelement location="${lib}/log4j/log4j-1.2.15.jar"/>
+    <pathelement location="${lib}/JUnit/junit-4.10.jar"/>
+    <pathelement location="${lib}/jmxremote/jppf-jmxremote_optional-1.2.jar"/>
+    <pathelement location="${samples-pack}/KryoSerializer/classes"/>
+    <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-2.22-all.jar"/>
+    <pathelement location="${samples-pack}/KryoSerializer/lib/kryo-serializers-0.26.jar"/>
+  </path>
+
+  <!-- ========================================================================= -->
+  <!--                     Build and run the JUnit tests                         -->
+  <!-- ========================================================================= -->
+
+  <target name="build" depends="compile, jar"/>
+
+  <!-- ========================================================================= -->
+  <!--                           Compile the JUnit tests                         -->
+  <!-- ========================================================================= -->
+
+  <taskdef resource="checkstyletask.properties" classpath="${lib}/Checkstyle/checkstyle-5.5-all.jar"/>
+
+  <target name="compile">
+    <checkstyle config="${jppf}/CheckStyle_JPPF_config.xml">
+      <fileset dir="${framework.src}" includes="**/*.java"/>
+      <fileset dir="${addons.src}" includes="**/*.java"/>
+      <fileset dir="${tests.src}" includes="**/*.java"/>
+    </checkstyle>
+    <delete dir="${framework.classes}" quiet="true" includes="**/*.*"/>
+    <delete dir="${addons.classes}" quiet="true" includes="**/*.*"/>
+    <delete dir="${tests.classes}" quiet="true" includes="**/*.*"/>
+    <mkdir dir="${framework.classes}"/>
+    <mkdir dir="${tests.classes}"/>
+    <echo message="compiling framework classes"/>
+    <echo message="compiling addons classes : addons.classes=${addons.classes}"/>
+    <javac destdir="${addons.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${addons.src}"/>
+    </javac>
+    <copy todir="${addons.classes}">
+      <fileset dir="${addons.src}" excludes="**/*.class"/>
+    </copy>
+    <javac destdir="${framework.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${framework.src}"/>
+    </javac>
+    <echo message="compiling unit test classes : tests.classes=${tests.classes}"/>
+    <javac destdir="${tests.classes}" source="1.7" target="1.7" debug="on" deprecation="off" optimize="on" includes="**/*.java">
+      <classpath refid="tests.classpath"/>
+      <compilerarg line="-Xlint:unchecked"/>
+      <src path="${tests.src}"/>
+    </javac>
+    <copy todir="${tests.classes}">
+      <fileset dir="${resources.src}"/>
+      <fileset dir="${tests.src}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                    Create the test framework jar file                     -->
+  <!-- ========================================================================= -->
+
+  <target name="jar">
+    <tstamp>
+      <format property="readable.now" pattern="yyyy-MM-dd hh:mm z"/>
+    </tstamp>
+    <jar jarfile="${build}/jppf-test-framework.jar" index="true">
+      <fileset dir="${framework.classes}"/>
+      <fileset file="${jppf}/bin/build.number"/>
+      <manifest>
+        <attribute name="JPPF-Description" value="JPPF Test Framework"/>
+        <attribute name="JPPF-Version" value="${version.number}"/>
+        <attribute name="JPPF-Build" value="${build.number}"/>
+        <attribute name="JPPF-BuildDate" value="${readable.now}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                     Generates the list of test classes                     -->
+  <!-- ========================================================================= -->
+
+  <target name="generate.tests.list">
+    <echo message="Generating the list of test classes"/>
+    <java fork="yes" classname="test.org.jppf.test.runner.TestListBuilder" classpathref="tests.classpath">
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx64m"/>
+      <arg value="${tests.classes}"/>
+      <arg value="${tests.classes}/TestClasses.txt"/>
+    </java>
+    <copy todir="${resources.src}" file="${tests.classes}/TestClasses.txt" overwrite="true"/>
+  </target>
+
+  <!-- ========================================================================= -->
+  <!--                           Run the JUnit tests                             -->
+  <!-- ========================================================================= -->
+
+  <target name="run"            depends="compile, generate.tests.list, runtests" description=""/>
+  <target name="run.nogenerate" depends="compile,                      runtests" description=""/>
+  <target name="run.junit"      depends="compile, run.junit.tests"               description=""/>
+
+  <!-- Run the tests with a custom JUnit runner -->
+  <target name="runtests">
+    <echo message="Running the tests"/>
+    <java fork="true" classname="test.org.jppf.test.runner.JPPFTestRunner" classpathref="tests.classpath" failonerror="true">
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
+      <arg value="-s"/>
+    </java>
+  </target>
+
+  <!-- Run all the tests with the Ant Junit runner -->
+  <target name="run.junit.tests">
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <delete dir="${report}" quiet="true"/>
+    <mkdir dir="${report}"/>
+    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed">
+      <classpath refid="tests.classpath"/>
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Duser.dir=${basedir}"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
+      <formatter type="xml"/>
+      <batchtest fork="yes" todir="${report}" skipNonTests="true">
+        <fileset dir="${tests.src}">
+          <include name="**/*.java"/>
+          <exclude name="**/JPPFSuite.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <antcall target="junit.report"/>
+    <fail if="tests.failed">Test failure, aborting build</fail>
+  </target>
+  
+  <!-- ========================================================================= -->
+  <!-- Run a the test classes whose name are specified as an include pattern in  -->
+  <!-- a system property Example: to run test.org.jppf.client.TestJPPFClient use -->
+  <!-- the command 'ant test.pattern -Dpattern=**/TestJPPFClient.java'           -->
+  <!-- ========================================================================= -->
+  <target name="test.pattern">
+    <echo message="Running the tests in basedir=${basedir}, user.dir=${user.dir}"/>
+    <delete dir="${report}" quiet="true"/>
+    <mkdir dir="${report}"/>
+    <junit printsummary="yes" fork="yes" dir="${basedir}" failureproperty="tests.failed" enableTestListenerEvents="true" showoutput="true">
+      <classpath refid="tests.classpath"/>
+      <jvmarg value="-server"/>
+      <jvmarg value="-Xmx512m"/>
+      <jvmarg value="-Duser.dir=${basedir}"/>
+      <jvmarg value="-Djppf.config.plugin=test.org.jppf.test.setup.BaseSetup$ConfigSource"/>
+      <jvmarg value="-Dlog4j.configuration=log4j-client.properties"/>
+      <jvmarg value="-Djava.util.logging.config.file=${tests.classes}/config/logging-client.properties"/>
+      <formatter type="xml"/>
+      <batchtest fork="yes" todir="${report}" skipNonTests="true">
+        <fileset dir="${tests.src}">
+          <include name="${pattern}"/>
+        </fileset>
+      </batchtest>
+    </junit>
+    <antcall target="junit.report"/>
+    <fail if="tests.failed">Test failure, aborting build</fail>
+  </target>
+  
+  <target name="junit.report">
+    <junitreport todir="${report}">
+      <fileset dir="${report}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${report}" styledir="${tests.classes}"/>
+    </junitreport>
+    <fail if="tests.failed">Test failure, aborting build</fail>
+  </target>
+</project> 
