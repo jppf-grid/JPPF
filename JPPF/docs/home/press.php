@@ -1,5 +1,5 @@
 <?php $currentPage="Press" ?>
-<?php $jppfVersion="5.1" ?>
+<?php $jppfVersion="5.2" ?>
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	  <head>
     <title>JPPF Press Kit
@@ -74,16 +74,16 @@
         <?php if ($currentPage == "License") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/license.php" class="<?php echo $itemClass; ?>">&raquo; License</a><br></div>
         <hr/>
                 <?php if ($currentPage == "All docs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc" class="<?php echo $itemClass; ?>">&raquo; All docs</a><br></div>
-        <?php if ($currentPage == "v5.2 (beta)") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2 (beta)</a><br></div>
+        <?php if ($currentPage == "v5.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php if ($currentPage == "v5.1") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php if ($currentPage == "v4.2") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/doc/4.2" class="<?php echo $itemClass; ?>">v4.2</a><br></div>
         <?php if ($currentPage == "All Javadoc") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc/#javadoc" class="<?php echo $itemClass; ?>">&raquo; All Javadoc</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/javadoc/4.2" class="<?php echo $itemClass; ?>">v4.2</a><br></div>
         <?php if ($currentPage == "All .Net APIs") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/doc#csdoc" class="<?php echo $itemClass; ?>">&raquo; All .Net APIs</a><br></div>
-        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.2" class="<?php echo $itemClass; ?>">v5.2 (beta)</a><br></div>
+        <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.2" class="<?php echo $itemClass; ?>">v5.2</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.1" class="<?php echo $itemClass; ?>">v5.1</a><br></div>
         <?php $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/csdoc/5.0" class="<?php echo $itemClass; ?>">v5.0</a><br></div>
         <hr/>
@@ -95,7 +95,7 @@
         <?php if ($currentPage == "maintenance") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>">&nbsp;&nbsp;&nbsp;<a href="/tracker/tbg/jppf/issues/find/saved_search/22/search/1" class="<?php echo $itemClass; ?>">maintenance</a><br></div>
         <hr/>
         <?php if ($currentPage == "Press") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/press.php" class="<?php echo $itemClass; ?>">&raquo; Press</a><br></div>
-        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.1" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
+        <?php if ($currentPage == "Release notes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/release_notes.php?version=5.2" class="<?php echo $itemClass; ?>">&raquo; Release notes</a><br></div>
         <?php if ($currentPage == "Quotes") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/quotes.php" class="<?php echo $itemClass; ?>">&raquo; Quotes</a><br></div>
         <?php if ($currentPage == "Screenshots") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/screenshots" class="<?php echo $itemClass; ?>">&raquo; Screenshots</a><br></div>
         <?php if ($currentPage == "News") $itemClass = 'aboutMenuItem'; else $itemClass = 'aboutMenuItem2'; ?><div class="<?php echo $itemClass; ?>"><a href="/news.php" class="<?php echo $itemClass; ?>">&raquo; News</a><br></div>
@@ -109,6 +109,21 @@
   <h1>JPPF Press Kit</h1>
   <div class="blockWithHighlightedTitle">
   <h3>Content</h3>
+  <table>
+    <tr>
+      <td style="padding: 5 10 5 10">
+        <a href="/release_notes.php?version=<?php echo $jppfVersion ?>">Text of the original release</a><br>
+        <a href="#downloads">Where to download</a><br>
+        <a href="#license">License</a><br>
+      </td>
+      <td style="padding: 5 10 5 10">
+        <a href="#features">Features</a><br>
+        <a href="#documentation">Documentation</a><br>
+        <a href="#contacts">Contacts</a><br>
+      </td>
+    </tr>
+  </table>
+  <!--
   <div class="u_link" style="margin-left: 10px">
     <a href="/release_notes.php?version=<?php echo $jppfVersion ?>">Text of the original release</a><br>
     <a href="#features">Features</a><br>
@@ -117,6 +132,7 @@
     <a href="#license">License</a><br>
     <a href="#contacts">Contacts</a><br>
   </div>
+  -->
   <br>
   </div>
   <br><div class="blockWithHighlightedTitle">
@@ -125,43 +141,61 @@
 <!-- start version-specific content -->
 <!-- ============================== -->
 <h3><img src="images/icons/news.png" class="titleWithIcon"/>Press release: JPPF <?php echo $jppfVersion ?></h3>
-<p><b>Android integration</b>
-<p>The main focus of this release, the <a href="/doc/v5/index.php?title=Android_Node">Android node</a> for JPPF, enables execution of Java or Android workloads on Android devices.
+<p><b>Administration console:</b>
 <ul class="samplesList">
-  <li>Execute <a href="/doc/v5/index.php?title=Android_Node#Creating_and_submitting_jobs">arbitrary Java workloads</a> on Android Kitkat or later devices</li>
-  <li><a href="/doc/v5/index.php?title=Android_Node#Getting_and_providing_feedback_from_the_node_and_tasks.">customize the visual feedback</a> on the device based on tasks notifications and node events</li>
-  <li>Secure all operations with <a href="/doc/v5/index.php?title=Android_Node#Using_SSL_.2F_TLS">dedicated SSL/TLS settings</a></li>
-  <li>Includes a dedicated demo that works with the <a href="/samples-pack/Fractals/Readme.php">Mandelbrot fractal sample</a></li>
-  <li><a href="/samples-pack/AndroidDemo/Readme.php">Dedicated sample</a> illustrating how to package a Java workload for execution on Android</li>
+  <li><a href="http://www.jppf.org/screenshots/gallery-images/NodeFiltering-Active.gif">node filtering</a> with an execution policy editor with import/export capabilities</li>
+  <li>ability to <a href="http://www.jppf.org/screenshots/gallery-images/VisibleServerStatistics.png">select the visible statistics</a> in the server statiscs view</li>
+  <li>syntax hihghlighting in all the editors: properties/node filtering</li>
+  <li>the admin console splash screen is now <a href="http://www.jppf.org/doc/5.2/index.php?title=Client_and_administration_console_configuration#Customizing_the_administration_console.27s_splash_screen">customizable</a> via the configuration</li>
+  <li>The administration console is now fully localized, with full <a href="http://www.jppf.org/screenshots/gallery-images/UpdateNodeConfiguration.gif">English</a> and <a href="http://www.jppf.org/screenshots/gallery-images/UpdateNodeConfigurationFrench.gif">French</a> translations available
 </ul>
-<p><b>Client-side Job monitoring API</b>
-<p>A new <a href="/doc/v5/index.php?title=Job_monitoring_API">job monitoring API</a>, which builds on, and complements, the <a href="/doc/v5/index.php?title=Grid_topology_monitoring">topology monitoring</a>, provides an automatically updated view of the jobs hierarchy by server / jobs / node dispatches.
+<p><b>Configuration:</b>
 <ul class="samplesList">
-  <li>Navigate and manipulate the <a href="/doc/v5/index.php?title=Job_monitoring_API#Job_monitor_and_jobs_hierarchy">job hierarchy</a></li>
-  <li>Receive <a href="/doc/v5/index.php?title=Job_monitoring_API#Receiving_job_monitoring_events">notifications</a> of job events</li>
-  <li>Configure the <a href="/doc/v5/index.php?title=Job_monitoring_API#Update_modes">granularity and frequency of updates</a> for an optimal tradeoff between accuracy and performance</li>
-  <li>The administration console's code was refactored to use the job monitoring API, with update mode settings in its <a href="/doc/v5/index.php?title=Client_and_administration_console_configuration#UI_refresh_intervals_in_the_administration_tool">configuration</a></li>
+  <li>all documented properties are now defined as <a href="http://www.jppf.org/javadoc/5.2/index.html?org/jppf/utils/configuration/JPPFProperties.html">constants</a></li>
+  <li>a new and elegant <a href="http://www.jppf.org/doc/5.2/index.php?title=The_JPPF_configuration_API#Predefined_JPPF_properties">API</a> was created to handle them easily</li>
+  <li>it is now possible to specify in the configuration which JVM to use for the nodes and servers. This also applies to master and slave nodes when they are (re)started</li>
 </ul>
-<p><b>Management and monitoring</b>
+<p><b>Customization/extension:</b>
 <ul class="samplesList">
-  <li>Job monitoring and management operations now accept a <a href="/doc/v5/index.php?title=Server_management#Job_selectors">job selector</a> parameter, allowing bulk operations with fine-grained filtering</li>
-  <li>It is now possible to dynamically <a href="/doc/v5/index.php?title=Server_management#Updating_the_job_SLA_and_metadata">update the SLA and metadata</a> of a job, even while it is executing</li>
-  <li>Node connection events can now be received as remote <a href="/doc/v5/index.php?title=Receiving_node_connection_events_in_the_server#JMX_notifications">JMX notifications</a></li>
-  <li>The <a href="/api-5/index.html?org/jppf/management/forwarding/JPPFNodeForwardingMBean.html">node forwarding MBean</a> now has dedicated methods for node provisioning, providing a much less cumbersome API</li>
+  <li>ability to <a href="http://www.jppf.org/doc/5.2/index.php?title=Composite_serialization">chain serialization schemes</a> to provide compression or encryption over actual serialization</li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Specifying_alternate_serialization_schemes#Generic_JPPF_serialization">the JPPF serialization</a> scheme was thouroughly optimized and is now faster than the Java serialization</li>
+  <li>it is now possible to register for <a href="http://www.jppf.org/doc/5.2/index.php?title=Receiving_server_statistics_events">statistics change events</a> in the server</li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Network_interceptors">Network communication interceptors</a> enable user-defined code to be executed on both sides of each new connection</li>
+  <li>A <a href="http://www.jppf.org/doc/5.2/index.php?title=Pluggable_MBeanServerForwarder">pluggable MBeanServerForwarder</a> can now be associated to the JMX remote connector servers created by JPPF drivers and nodes</li>
+  <li><a href="http://www.jppf.org/doc/5.2/index.php?title=Environment_providers_for_JMX_remote_connections">Pluggable environment providers</a> for JMX remote connector clients and servers</li>
 </ul>
-<p><b>Server extensions and improvements</b>
+<p><b>Android node:</b>
 <ul class="samplesList">
-  <li>It is now possible to receive notifications of <a href="/doc/v5/index.php?title=Receiving_the_status_of_tasks_dispatched_to_or_returned_from_the_nodes">tasks status at dispatch time</a> in the server</li>
-  <li>Servers are now notified in real time of node connection events in other servers, and may decide to <a href="/doc/v5/index.php?title=Configuring_a_JPPF_server#Orphan_servers">exclude orphan servers</a> from job scheduling</li>
+  <li>It is now possible to configure the node to stop working or terminate <a href="http://www.jppf.org/doc/5.2/index.php?title=Android_Node#Battery_state_monitoring">when the device's battery is low</a></li></li>
+  <li>Improved the <a href="http://www.jppf.org/screenshots/gallery-images/AndroidMainScreenBusy.gif">default feedback screen</a></li>
 </ul>
-<p><b>Other enhancements</b>
+<p><b>Job SLA:</b>
 <ul class="samplesList">
-  <li>The <a href="/doc/v5/index.php?title=The_JPPF_configuration_API">configuration API</a> now has a fluent interface for setting properties with typed values</li>
-  <li><a href="/doc/v5/index.php?title=Creating_a_custom_load-balancer#Job-aware_load_balancers">Job-aware</a> load balancers now have full access to the information provided by the <a href="/api-5/index.html?org/jppf/node/protocol/JPPFDistributedJob.html">JPPFDistributedJob</a> interface</li>
-  <li>The "nodethreads" load-balancing algorithm now takes into account the sum of the threads in all the nodes attached to a peer server</li>
+  <li>The job SLA can now specifiy <a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Service_Level_Agreement#Grid_policy">filtering rules</a> based on the server properties and the number of nodes satisfying one or more conditions<br>
+  Example: "execute when the server has at least 2 GB of heap memory and at least 3 nodes with more than 4 cores each"</li>
+  <li>The job SLA can <a href="http://www.jppf.org/doc/5.2/index.php?title=Job_Service_Level_Agreement#Specifying_the_desired_node_configuration">specify the desired configuration</a>
+  of the nodes on which it will execute and force the nodes to reconfigure themselves accordingly</li>
+  <li>execution policies based on server properties now have <a href="http://www.jppf.org/doc/5.2/index.php?title=Execution_policy_properties#Server_statistics">access to the server statistics</a>
 </ul>
-<p><b>Documentation improvements</b>
-<p>All code in the online documentation and samples now benefits from a full-fledged syntax highlighting, in the hope of making your reading experience an even more pleasant one.
+<p><b>Management and Monitoring</b>
+<p>Two new types of node selectors are now available: <a href="http://www.jppf.org/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Scripted_node_selector">scripted node selector</a> and <a href="http://www.jppf.org/doc/5.2/index.php?title=Nodes_management_and_monitoring_via_the_driver#Custom_node_selector">custom node selector</a>
+<p><b>Load-balancing</b>
+<p>A <a href="http://www.jppf.org/doc/5.2/index.php?title=Built-in_algorithms#.22rl2.22">new load-balancing algorithm</a>, named "rl2", was implemented
+<p><b>Documentation</b>
+<p>Added a complete section on <a href="http://www.jppf.org/doc/5.2/index.php?title=Load_Balancing">load balancing</a>
+<p><b>Samples</b>
+<ul class="samplesList">
+  <li>A new sample was added, illustrating a full-fledged management of <a href="http://www.jppf.org/samples-pack/JobDependencies">dependencies between jobs</a></li>
+  <li>The <a href="http://www.jppf.org/samples-pack/NetworkInterceptor">Network Interceptor sample</a> shows how a network connection interceptor can be used to implement a simple authentication mechanism with symetric encryption</li>
+</ul>
+<p><b>Packaging</b>
+<p>The JPPF jar files now include the version number in their name, e.g. jppf-common-5.2.jar
+<p><b>Continuous Integration</b>
+<ul class="samplesList">
+  <li>A large amount of time and effort was invested in setting up a continuous integration environment based on Jenkins</li>
+  <li>Automated builds are now in place with <a href="http://www.jppf.org/ci.php">results</a> automatically published to the JPPF web site</li>
+  <li>Automated tests coverage was largely improved</li>
+</ul>
 <!-- ============================== -->
 <!-- end version-specific content   -->
 <!-- ============================== -->
