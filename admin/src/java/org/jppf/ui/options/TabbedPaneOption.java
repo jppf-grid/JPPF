@@ -56,6 +56,7 @@ public class TabbedPaneOption extends AbstractOptionContainer {
    * @param element the component to add.
    * @param index the index at which to add the component.
    */
+  @Override
   public void add(final OptionElement element, final int index) {
     add(element, index, null);
   }

@@ -102,7 +102,6 @@ public class ListOption extends AbstractOption {
    * Create the UI components for this option.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void createUI() {
     list = new JList<>();
     if (toolTipText != null) list.setToolTipText(toolTipText);

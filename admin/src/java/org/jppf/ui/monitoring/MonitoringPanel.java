@@ -291,7 +291,6 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
       AbstractAction applyAction = new AbstractAction() {
         @Override public void actionPerformed(final ActionEvent event) {
           visibleItems.clear();
-          @SuppressWarnings("unchecked")
           List<Object> picked = option.getPickList().getPickedItems();
           List<Item> value = (picked == null) ? new ArrayList<Item>() : new ArrayList<Item>(picked.size());
           for (Object o: picked) value.add((Item) o);

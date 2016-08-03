@@ -170,7 +170,6 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    * Refresh the load balancer settings view for the currently slected driver.
    * @return {@code true} to indicate success, {@code false} otherwise.
    */
-  @SuppressWarnings("unchecked")
   public boolean refreshLoadBalancer() {
     OptionElement option = OptionsHandler.getPage("JPPFAdminTool");
     if (option == null) {

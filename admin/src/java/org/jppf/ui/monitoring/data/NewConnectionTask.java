@@ -64,7 +64,6 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void run() {
     synchronized(statsHandler) {
       if (statsHandler.dataHolderMap.get(driver.getUuid()) != null) return;
@@ -91,7 +90,6 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
     @Override
     public void run() {
       OptionElement serverList = clientHandler.getServerListOption();
-      @SuppressWarnings("unchecked")
       JComboBox<Object> box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
       if (box != null) {
         int count = box.getItemCount();

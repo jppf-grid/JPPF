@@ -68,7 +68,6 @@ public class ComboBoxOption extends AbstractOption {
    * Create the UI components for this option.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void createUI() {
     combo = new JComboBox<>();
     if (items != null) {
@@ -151,7 +150,6 @@ public class ComboBoxOption extends AbstractOption {
    * Set the list of items in the combo box.
    * @param items a list of <code>Object</code> instances.
    */
-  @SuppressWarnings("unchecked")
   public void setItems(final List<? extends Object> items) {
     this.items = items;
     if (combo != null) {

@@ -310,7 +310,6 @@ public class PickList<T> extends JPanel {
    */
   public List<T> getPickedItems() {
     List<T> list = new ArrayList<>();
-    @SuppressWarnings("unchecked")
     DefaultListModel<T> model = (DefaultListModel<T>) pickedList.getModel();
     Enumeration<T> en = model.elements();
     while (en.hasMoreElements()) list.add(en.nextElement());
