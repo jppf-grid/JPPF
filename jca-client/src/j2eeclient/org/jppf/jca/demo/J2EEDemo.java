@@ -105,7 +105,6 @@ public class J2EEDemo {
     if (nbJobs <= 0) return "Error: the number of jobs must be >= 1";
     if (nbTasks <= 0) return "Error: the number of tasks must be >= 1";
     if (duration <= 0L) return "Error: the duration must be >= 1";
-    String prefix = (jobNamePrefix == null) ? "(No name)" : jobNamePrefix;
     JPPFConnection connection = null;
     String id = null;
     List<String> idList = new ArrayList<>();
@@ -170,7 +169,7 @@ public class J2EEDemo {
    * @return a map of ids to statuses as strings.
    * @throws Exception if the call to JPPF failed.
    */
-  public Map getStatusMap() throws Exception {
+  public Map<String, String> getStatusMap() throws Exception {
     Map<String, String> map = new HashMap<>();
     JPPFConnection connection = null;
     try {
@@ -202,7 +201,7 @@ public class J2EEDemo {
       if (results == null) msg = "submission is not in queue anymore";
       else {
         StringBuilder sb = new StringBuilder();
-        for (Task task: results) {
+        for (Task<?> task: results) {
           if (task.getThrowable() == null) sb.append(task.getResult());
           else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
           sb.append("<br/>");

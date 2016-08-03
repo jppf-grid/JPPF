@@ -55,7 +55,7 @@ public class TestJPPFConnection {
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
-      Task task = results.get(0);
+      Task<?> task = results.get(0);
       assertNotNull(task);
       assertNull(task.getThrowable());
       assertNotNull(task.getResult());
@@ -92,7 +92,7 @@ public class TestJPPFConnection {
       int n = results.size();
       assertEquals("results size should be " + nbTasks + " but is " + n, nbTasks, n);
       int count = 0;
-      for (Task task: results) {
+      for (Task<?> task: results) {
         assertNotNull("task" + count + " is null", task);
         Throwable e = task.getThrowable();
         assertNull(task.getId() + " exception should be null but is '" + (e == null ? "" : ExceptionUtils.getMessage(e)) + "'", e);
@@ -149,7 +149,7 @@ public class TestJPPFConnection {
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
-      Task task = results.get(0);
+      Task<?> task = results.get(0);
       assertNotNull(task);
       assertNull(task.getThrowable());
       assertNull("task result should be null but is '" + task.getResult() + "'" , task.getResult());
@@ -177,7 +177,7 @@ public class TestJPPFConnection {
       assertNotNull(results);
       int n = results.size();
       assertTrue("results size should be 1 but is " + n, n == 1);
-      Task task = results.get(0);
+      Task<?> task = results.get(0);
       assertNotNull(task);
       assertNull(task.getThrowable());
       assertNotNull(task.getResult());
@@ -213,7 +213,7 @@ public class TestJPPFConnection {
       int n = results.size();
       assertEquals("results size should be " + nbTasks + " but is " + n, nbTasks, n);
       int count = 0;
-      for (Task task: results) {
+      for (Task<?> task: results) {
         assertNotNull("task" + count + " is null", task);
         Throwable e = task.getThrowable();
         assertNull(task.getId() + " exception should be null but is '" + (e == null ? "" : ExceptionUtils.getMessage(e)) + "'", e);

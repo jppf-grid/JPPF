@@ -46,11 +46,11 @@ public class JcaSerializationHelperImpl extends SerializationHelperImpl {
   public ObjectSerializer getSerializer() throws Exception {
     if (serializer == null) {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      Class clazz = null;
+      Class<?> clazz = null;
       if (cl != null) {
         try {
           clazz = cl.loadClass(SERIALIZER_CLASS_NAME);
-        } catch (ClassNotFoundException ignore) {
+        } catch (@SuppressWarnings("unused") ClassNotFoundException ignore) {
         }
       }
       if (clazz == null) {

@@ -146,7 +146,6 @@ public class JPPFHelper {
    * @return the formatted resutls as a string.
    */
   public static String getMessage(final String uuid) {
-    JPPFConnection connection = null;
     String msg = null;
     JPPFJob job = statusMap.remove(uuid);
     if (job == null) return "no job with this id";
@@ -154,7 +153,7 @@ public class JPPFHelper {
     if (results == null) msg = "job is not in queue anymore";
     else {
       StringBuilder sb = new StringBuilder();
-      for (Task task : results) {
+      for (Task<?> task: results) {
         if (task.getThrowable() == null) sb.append(task.getResult());
         else sb.append("task [").append(task.getId()).append("] ended in error: ").append(task.getThrowable().getMessage());
         sb.append("<br/>");

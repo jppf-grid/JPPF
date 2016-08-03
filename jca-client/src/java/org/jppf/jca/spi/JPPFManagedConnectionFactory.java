@@ -95,7 +95,7 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   }
 
   @Override
-  public ManagedConnection matchManagedConnections(final Set set, final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
+  public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") final Set set, final Subject subject, final ConnectionRequestInfo cri) throws ResourceException
   {
     if (!set.isEmpty()) return (ManagedConnection) set.iterator().next();
     return null;
@@ -160,6 +160,6 @@ public class JPPFManagedConnectionFactory extends JPPFAccessorImpl implements Ma
   {
     if (jppfClient == null) return;
     TypedProperties config = new JPPFConfigurationParser(getConfigurationSource()).parse();
-    ((JPPFClient) jppfClient).reset(config);
+    jppfClient.reset(config);
   }
 }
