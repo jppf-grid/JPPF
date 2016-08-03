@@ -264,7 +264,6 @@ public abstract class AbstractJPPFClassLoader extends AbstractJPPFClassLoaderLif
    * @throws IOException if an error occurs.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public Enumeration<URL> findResources(final String name) throws IOException {
     List<URL> urlList = new ArrayList<>();
     if (!notFoundCache.has(name)) {

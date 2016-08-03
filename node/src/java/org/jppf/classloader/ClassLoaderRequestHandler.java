@@ -27,14 +27,12 @@ import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
 
-
 /**
  * This class manages the batching of class loading requests at regular intervals.
  * @author Laurent Cohen
  * @exclude
  */
-public class ClassLoaderRequestHandler
-{
+public class ClassLoaderRequestHandler {
   /**
    * Logger for this class.
    */
@@ -77,8 +75,7 @@ public class ClassLoaderRequestHandler
    * Initialize this request handler.
    * @param requestRunner the periodic task submitted to the scheduled executor.
    */
-  public ClassLoaderRequestHandler(final ResourceRequestRunner requestRunner)
-  {
+  public ClassLoaderRequestHandler(final ResourceRequestRunner requestRunner) {
     this.nextRequest = new CompositeResourceWrapper();
     this.requestRunner = requestRunner;
     periodicThread = new Thread(periodicTask, "PeriodicTask");
@@ -90,14 +87,12 @@ public class ClassLoaderRequestHandler
    * @param resource the resource request to add.
    * @return a future for getting the respone at a later time.
    */
-  public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource)
-  {
+  public Future<JPPFResourceWrapper> addRequest(final JPPFResourceWrapper resource) {
     if (resource == null) throw new IllegalArgumentException("resource is null");
 
     resource.preProcess();
     Future<JPPFResourceWrapper> f;
-    synchronized(periodicTask)
-    {
+    synchronized (periodicTask) {
       f = nextRequest.addResource(resource);
     }
     periodicTask.wakeUp();
@@ -108,8 +103,7 @@ public class ClassLoaderRequestHandler
    * Close this request handler and release its resources.
    * @return the {@link ResourceRequestRunner}.
    */
-  public ResourceRequestRunner close()
-  {
+  public ResourceRequestRunner close() {
     if (debugEnabled) log.debug("closing request handler");
     periodicTask.setStopped(true);
     periodicThread.interrupt();
@@ -124,25 +118,18 @@ public class ClassLoaderRequestHandler
   /**
    * 
    */
-  private class PeriodicTask extends ThreadSynchronization implements Runnable
-  {
+  private class PeriodicTask extends ThreadSynchronization implements Runnable {
     @Override
-    @SuppressWarnings("unchecked")
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         long elapsed = 0L;
-        while (!isStopped())
-        {
+        while (!isStopped()) {
           CompositeResourceWrapper request = null;
           long start = System.nanoTime();
-          synchronized(this)
-          {
+          synchronized (this) {
             while (nextRequest.getFutureMap().isEmpty() && !isStopped()) goToSleep();
-            while (((elapsed = System.nanoTime() - start) < MAX_WAIT) && !isStopped()) 
-            {
-              goToSleep((MAX_WAIT-elapsed) / NANO_RANGE, (int) ((MAX_WAIT-elapsed) % NANO_RANGE));
+            while (((elapsed = System.nanoTime() - start) < MAX_WAIT) && !isStopped()) {
+              goToSleep((MAX_WAIT - elapsed) / NANO_RANGE, (int) ((MAX_WAIT - elapsed) % NANO_RANGE));
             }
             if (isStopped()) return;
             request = nextRequest;
@@ -150,8 +137,7 @@ public class ClassLoaderRequestHandler
           }
           Map<JPPFResourceWrapper, Future<JPPFResourceWrapper>> futureMap = request.getFutureMap();
           int n = futureMap.size();
-          if (n > maxBatchSize)
-          {
+          if (n > maxBatchSize) {
             maxBatchSize = n;
             log.info(build("maxBatchSize = ", maxBatchSize));
           }
@@ -162,16 +148,13 @@ public class ClassLoaderRequestHandler
           Throwable t = requestRunner.getThrowable();
           CompositeResourceWrapper response = (CompositeResourceWrapper) requestRunner.getResponse();
           if (debugEnabled) log.debug(build("got response ", response));
-          if (response != null)
-          {
-            for (JPPFResourceWrapper rw: response.getResources())
-            {
+          if (response != null) {
+            for (JPPFResourceWrapper rw : response.getResources()) {
               ResourceFuture<JPPFResourceWrapper> f = (ResourceFuture<JPPFResourceWrapper>) futureMap.remove(rw);
               if (f != null) f.setDone(rw);
             }
           }
-          for (Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry: futureMap.entrySet())
-          {
+          for (Map.Entry<JPPFResourceWrapper, Future<JPPFResourceWrapper>> entry : futureMap.entrySet()) {
             ResourceFuture<JPPFResourceWrapper> future = (ResourceFuture<JPPFResourceWrapper>) entry.getValue();
             if (t != null) future.setThrowable(t);
             else future.setDone(null);
@@ -181,9 +164,7 @@ public class ClassLoaderRequestHandler
           start = System.nanoTime();
           elapsed = 0L;
         }
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
         if (debugEnabled) log.debug(e.getMessage(), e);
         else log.warn(ExceptionUtils.getMessage(e));
       }
@@ -194,8 +175,7 @@ public class ClassLoaderRequestHandler
    * Get the bject which sends the class loading requets to the driver and receives the response.
    * @return a {@link ResourceRequestRunner} instance.
    */
-  public ResourceRequestRunner getRequestRunner()
-  {
+  public ResourceRequestRunner getRequestRunner() {
     return requestRunner;
   }
 }

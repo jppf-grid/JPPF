@@ -97,7 +97,6 @@ public class ResourceCache {
    * @param name the name of the resource to lookup.
    * @return a list of file paths, or null if the resource is not found in the cache.
    */
-  @SuppressWarnings("unchecked")
   public synchronized List<Location<?>> getResourcesLocations(final String name) {
     return enabled ? (List<Location<?>>) cache.getValues(name) : null;
   }

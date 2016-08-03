@@ -28,13 +28,6 @@ public interface NodeIntegration extends org.jppf.node.event.NodeIntegration<JPP
   /**
    * Provide a reference to the screen saver.
    * @param screensaver a {@link JPPFScreenSaver} instance.
-   * @since 5.1
-   */
-  void setUiComponent(JPPFScreenSaver screensaver);
-
-  /**
-   * Provide a reference to the screen saver.
-   * @param screensaver a {@link JPPFScreenSaver} instance.
    * @deprecated use {@link #setUiComponent(JPPFScreenSaver)} instead.
    */
   void setScreenSaver(JPPFScreenSaver screensaver);

@@ -76,7 +76,6 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * @param taskList the list of tasks to execute.
    */
   @Override
-  @SuppressWarnings("unchecked")
   protected void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
     taskNotificationDispatcher.setBundle(this.bundle = bundle);
     this.taskList = taskList;
@@ -102,7 +101,6 @@ public class NodeExecutionManager extends AbstractExecutionManager {
    * Cleanup method invoked when all tasks for the current bundle have completed.
    */
   @Override
-  @SuppressWarnings("unchecked")
   protected void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     ClassLoader cl = usedClassLoader.getClassLoader();
