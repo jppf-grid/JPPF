@@ -115,17 +115,17 @@ public class ExcludeDoclet
    * @param expect the expected class of the element.
    * @return a proxy to the element to process, if the element is a javadoc element (implementing the <code>Doc</code> interface).
    */
-  private static Object process(final Object obj, final Class expect)
+  private static Object process(final Object obj, final Class<?> expect)
   {
     if (obj == null) return null;
-    Class cls = obj.getClass();
+    Class<?> cls = obj.getClass();
     if (cls.getName().startsWith("com.sun."))
     {
       return Proxy.newProxyInstance(cls.getClassLoader(), cls.getInterfaces(), new ExcludeHandler(obj));
     }
     else if (obj instanceof Object[])
     {
-      Class componentType = expect.getComponentType();
+      Class<?> componentType = expect.getComponentType();
       Object[] array = (Object[]) obj;
       List<Object> list = new ArrayList<>(array.length);
       for (int i = 0; i < array.length; i++)
