@@ -268,7 +268,7 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
         Exception e = (t instanceof Exception) ? (Exception) t : new JPPFException(t);
         for (Task<?> task : taskList) task.setThrowable(e);
       }
-      return new Pair(bundle, taskList);
+      return new Pair<>(bundle, taskList);
     } catch (AsynchronousCloseException e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
@@ -334,13 +334,14 @@ abstract class BaseJPPFClientConnection implements JPPFClientConnection {
    */
   public SerializationHelper makeHelper(final ClassLoader classLoader, final String helperClassName) throws Exception {
     ClassLoader[] clArray = { classLoader, Thread.currentThread().getContextClassLoader(), getClass().getClassLoader() };
-    Class clazz = null;
+    Class<?> clazz = null;
     for (ClassLoader cl: clArray) {
       try {
         if (cl == null) continue;
         clazz = Class.forName(helperClassName, true, cl);
         break;
       } catch (Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
       }
       if (clazz == null) throw new IllegalStateException("could not load class " + helperClassName + " from any of these class loaders: " + Arrays.asList(clArray));
     }

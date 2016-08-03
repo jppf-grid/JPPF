@@ -366,8 +366,8 @@ public abstract class AbstractJPPFClient implements ClientConnectionStatusListen
    * @return a {@link JPPFConnectionPool} instance, or {@code null} if no pool witht he specified id could be found.
    * @since 4.1
    */
-  public ConnectionPool findConnectionPool(final int priority, final int poolId) {
-    ConnectionPool pool = null;
+  public ConnectionPool<?> findConnectionPool(final int priority, final int poolId) {
+    ConnectionPool<?> pool = null;
     synchronized (pools) {
       Collection<JPPFConnectionPool> priorityPools = pools.getValues(priority);
       if (priorityPools != null) {

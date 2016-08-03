@@ -24,7 +24,7 @@ package org.jppf.client;
  * @author Laurent Cohen
  * @since 4.2
  */
-public interface ConnectionPoolFilter<E extends ConnectionPool> {
+public interface ConnectionPoolFilter<E extends ConnectionPool<?>> {
   /**
    * Determine whether this filter accepts the specified connection pool.
    * @param pool the connection pool to check.

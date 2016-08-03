@@ -138,7 +138,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
    */
   public void reconnect() {
     if (channel.isClosed()) return;
-    TaskServerConnectionHandler handler = channel.getTaskServerConnection();
     Runnable r = new Runnable() {
       @Override
       public void run() {
@@ -197,7 +196,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
     public void run() {
       Exception exception = null;
       List<Task<?>> tasks = this.clientBundle.getTasksL();
-      JPPFClient client = connection.getClient();
       String uuid = clientBundle.getClientJob().getUuid();
       try {
         long start = System.nanoTime();

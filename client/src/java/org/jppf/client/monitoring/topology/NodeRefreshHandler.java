@@ -111,7 +111,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
         node = info.isPeer() ? new TopologyPeer(info) : new TopologyNode(info);
         manager.nodeAdded(driver, node);
       } else {
-        TopologyNode node = (TopologyNode) manager.getNodeOrPeer(uuid);
+        TopologyNode node = manager.getNodeOrPeer(uuid);
         if (node != null) {
           if (info.isActive() != node.getManagementInfo().isActive()) {
             node.getManagementInfo().setIsActive(entry.getValue().isActive());

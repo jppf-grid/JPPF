@@ -56,7 +56,7 @@ public class JobEvent extends EventObject {
   /**
    * The channel to which a job is dispatched or from which it returns.
    */
-  private final ExecutorChannel channel;
+  private final ExecutorChannel<?> channel;
   /**
    * The tasks that were dispatched or returned.
    */
@@ -78,7 +78,7 @@ public class JobEvent extends EventObject {
    * @param tasks the tasks that were dispatched or returned.
    * @exclude
    */
-  public JobEvent(final JPPFJob source, final ExecutorChannel channel, final List<Task<?>> tasks) {
+  public JobEvent(final JPPFJob source, final ExecutorChannel<?> channel, final List<Task<?>> tasks) {
     super(source);
     this.channel = channel;
     this.tasks = tasks;

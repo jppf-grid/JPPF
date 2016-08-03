@@ -137,12 +137,12 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
     List<Future<T>> futureList = new ArrayList<>(tasks.size());
     for (Callable<T> task : tasks) {
       if (task == null) throw new NullPointerException("a task cannot be null");
-      JPPFTaskFuture future = new JPPFTaskFuture<T>(job, position);
+      JPPFTaskFuture<T> future = new JPPFTaskFuture<>(job, position);
       futureList.add(future);
       long elapsed = (System.nanoTime() - start) / 1_000_000L;
       try {
         future.getResult(millis - elapsed);
-      } catch (TimeoutException ignore) {
+      } catch (@SuppressWarnings("unused") TimeoutException ignore) {
       }
       position++;
     }
@@ -181,7 +181,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   public <T> T invokeAny(final Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
     try {
       return invokeAny(tasks, Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-    } catch (TimeoutException e) {
+    } catch (@SuppressWarnings("unused") TimeoutException e) {
       return null;
     }
   }
@@ -252,7 +252,7 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
   public <T> Future<T> submit(final Runnable task, final T result) {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (task instanceof Task<?>) return batchHandler.addTask((Task<?>) task, result);
-    return batchHandler.addTask((Runnable) task, result);
+    return batchHandler.addTask(task, result);
   }
 
   /**

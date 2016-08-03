@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.jppf.JPPFException;
+import org.jppf.client.balancer.ClientTaskBundle;
 import org.jppf.client.event.*;
 import org.jppf.client.persistence.JobPersistence;
 import org.jppf.client.taskwrapper.JPPFAnnotatedTask;
@@ -118,7 +119,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   public Task<?> add(final Object taskObject, final Object...args) throws JPPFException {
     if (taskObject == null) throw new JPPFException("null tasks are not accepted");
     Task<?> jppfTask = null;
-    if (taskObject instanceof Task) jppfTask = (Task) taskObject;
+    if (taskObject instanceof Task) jppfTask = (Task<?>) taskObject;
     else jppfTask = new JPPFAnnotatedTask(taskObject, args);
     tasks.add(jppfTask);
     jppfTask.setPosition(tasks.size()-1);
@@ -251,7 +252,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @param tasks the tasks that were dispatched or returned.
    * @exclude
    */
-  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel channel, final List<Task<?>> tasks) {
+  public void fireJobEvent(final JobEvent.Type type, final ExecutorChannel<ClientTaskBundle> channel, final List<Task<?>> tasks) {
     if (log.isDebugEnabled()) log.debug(String.format("firing %s event with %d tasks for %s", type, (tasks == null ? 0 : tasks.size()), this));
     JobEvent event = new JobEvent(this, channel, tasks);
     switch(type) {
@@ -328,7 +329,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
   public List<Task<?>> awaitResults(final long timeout) {
     try {
       await(timeout, false);
-    } catch (TimeoutException ignore) {
+    } catch (@SuppressWarnings("unused") TimeoutException ignore) {
     }
     return results.getResultsList();
   }
@@ -349,8 +350,7 @@ public class JPPFJob extends AbstractJPPFJob implements Iterable<Task<?>>, Futur
    * @since 4.2
    */
   public JobStatus getStatus() {
-    if (resultCollector instanceof JobStatusHandler) return ((JobStatusHandler) resultCollector).getStatus();
-    return null;
+    return resultCollector.getStatus();
   }
 
   /**

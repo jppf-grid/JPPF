@@ -328,7 +328,7 @@ public class JPPFClient extends AbstractGenericClient {
    * @return a list of {@link JPPFConnectionPool} instances, possibly empty but never null.
    * @since 5.0
    */
-  public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final ConnectionPoolFilter filter) {
+  public List<JPPFConnectionPool> awaitConnectionPools(final long timeout, final ConnectionPoolFilter<JPPFConnectionPool> filter) {
     final MutableReference<List<JPPFConnectionPool>> ref = new MutableReference<>();
     ConcurrentUtils.awaitCondition(new ConcurrentUtils.Condition() {
       @Override public boolean evaluate() {

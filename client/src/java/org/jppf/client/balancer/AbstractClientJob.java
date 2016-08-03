@@ -355,7 +355,7 @@ public abstract class AbstractClientJob {
    * Add a channel to this job.
    * @param channel the channel to add.
    */
-  public void addChannel(final ExecutorChannel channel) {
+  public void addChannel(final ExecutorChannel<?> channel) {
     channelsCount.incrementAndGet();
   }
 
@@ -363,7 +363,7 @@ public abstract class AbstractClientJob {
    * Add a channel to this job.
    * @param channel the channel to add.
    */
-  public void removeChannel(final ExecutorChannel channel) {
+  public void removeChannel(final ExecutorChannel<?> channel) {
     channelsCount.decrementAndGet();
   }
 
@@ -374,7 +374,7 @@ public abstract class AbstractClientJob {
    * @param channel the channel to check for acceptance.
    * @return <code>true</code> if the channel is accepted, <code>false</code> otherwise.
    */
-  public boolean acceptsChannel(final ExecutorChannel channel) {
+  public boolean acceptsChannel(final ExecutorChannel<?> channel) {
     if (traceEnabled) log.trace(String.format("job '%s' : pending=%b, expired=%b, nb channels=%d, max channels=%d", job.getName(), isPending(), isJobExpired(), channelsCount.get(), clientSla.getMaxChannels()));
     if (isPending() || isJobExpired() || (channelsCount.get() >= clientSla.getMaxChannels())) return false;
     ExecutionPolicy policy = clientSla.getExecutionPolicy();

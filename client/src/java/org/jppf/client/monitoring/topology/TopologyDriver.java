@@ -104,7 +104,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
     if ((jmx != null) && jmx.isConnected()) {
       try {
         return jmx.getNodeForwarder();
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
     }
     return null;
@@ -119,7 +119,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
     if ((jmx != null) && jmx.isConnected()) {
       try {
         return jmx.getJobManager();
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
     }
     return null;
@@ -134,7 +134,7 @@ public class TopologyDriver extends AbstractTopologyComponent {
     if ((jmx != null) && jmx.isConnected()) {
       try {
         return jmx.getDiagnosticsProxy();
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
     }
     return null;
@@ -142,7 +142,6 @@ public class TopologyDriver extends AbstractTopologyComponent {
 
   @Override
   public String toString() {
-    JMXDriverConnectionWrapper jmx = getJmx();
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     sb.append("connection=").append(connection);
     sb.append(", managementInfo=").append(managementInfo);

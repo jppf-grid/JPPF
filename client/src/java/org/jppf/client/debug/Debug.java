@@ -55,7 +55,7 @@ public class Debug implements DebugMBean {
     for (JPPFConnectionPool pool: all) {
       for (JPPFClientConnection c: pool.getConnections()) {
         if (count > 0) sb.append('\n');
-        sb.append(pool.toString());
+        sb.append(c.toString());
         count++;
       }
     }

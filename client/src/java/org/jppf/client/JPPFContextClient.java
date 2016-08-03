@@ -18,6 +18,7 @@
 
 package org.jppf.client;
 
+import org.jppf.client.balancer.*;
 import org.jppf.load.balancer.JPPFContext;
 import org.jppf.queue.JPPFQueue;
 
@@ -30,13 +31,13 @@ public class JPPFContextClient extends JPPFContext
   /**
    * Reference to the job queue.
    */
-  private final JPPFQueue queue;
+  private final JPPFQueue<ClientJob, ClientJob, ClientTaskBundle> queue;
 
   /**
    * Default initializer.
    * @param queue        the reference queue to use.
    */
-  public JPPFContextClient(final JPPFQueue queue)
+  public JPPFContextClient(final JPPFQueue<ClientJob, ClientJob, ClientTaskBundle> queue)
   {
     if (queue == null) throw new IllegalArgumentException("queue is null");
 

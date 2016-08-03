@@ -27,6 +27,7 @@ import java.util.*;
  * @author Laurent Cohen
  * @since 5.1
  */
+@SuppressWarnings("rawtypes")
 public abstract class AbstractComponent<E extends AbstractComponent> {
   /**
    * The children of this component.
@@ -96,6 +97,7 @@ public abstract class AbstractComponent<E extends AbstractComponent> {
    * @param child the child component to add.
    * @exclude
    */
+  @SuppressWarnings("unchecked")
   public synchronized void add(final E child) {
     children.put(child.getUuid(), child);
     child.setParent(this);
@@ -106,6 +108,7 @@ public abstract class AbstractComponent<E extends AbstractComponent> {
    * @param child the child component to remove.
    * @exclude
    */
+  @SuppressWarnings("unchecked")
   public synchronized void remove(final E child) {
     children.remove(child.getUuid());
     child.setParent(null);
@@ -140,7 +143,7 @@ public abstract class AbstractComponent<E extends AbstractComponent> {
     if (this == obj) return true;
     if (obj == null) return false;
     if (getClass() != obj.getClass()) return false;
-    AbstractComponent other = (AbstractComponent) obj;
+    AbstractComponent<?> other = (AbstractComponent<?>) obj;
     if (uuid == null) return other.getUuid() == null;
     return uuid.equals(other.getUuid());
   }

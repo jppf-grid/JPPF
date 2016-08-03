@@ -81,7 +81,7 @@ public class JPPFResultCollector implements JobStatusHandler {
     if (tasks != null) {
       jobResults.addResults(tasks);
       if (debugEnabled) log.debug(String.format("Received results for %d tasks, pendingCount=%d, count=%d, jobResults=%s", tasks.size(), job.unexecutedTaskCount(), job.getJobTasks().size(), jobResults));
-      JobPersistence pm = job.getPersistenceManager();
+      JobPersistence<Object> pm = job.getPersistenceManager();
       if ((job != null) && (pm != null)) {
         try {
           pm.storeJob(pm.computeKey(job), job, tasks);

@@ -38,25 +38,25 @@ public interface TaskConfiguration
    * Get the delegate for the <code>onCancel()</code> method.
    * @return a {@link JPPFTaskCallback} instance.
    */
-  JPPFTaskCallback getOnCancelCallback();
+  JPPFTaskCallback<Object> getOnCancelCallback();
 
   /**
    * Set the delegate for the <code>onCancel()</code> method.
    * @param cancelCallback a {@link JPPFTaskCallback} instance.
    */
-  void setOnCancelCallback(final JPPFTaskCallback cancelCallback);
+  void setOnCancelCallback(final JPPFTaskCallback<Object> cancelCallback);
 
   /**
    * Get the delegate for the <code>onTimeout()</code> method.
    * @return a {@link JPPFTaskCallback} instance.
    */
-  JPPFTaskCallback getOnTimeoutCallback();
+  JPPFTaskCallback<Object> getOnTimeoutCallback();
 
   /**
    * Set the delegate for the <code>onTimeout()</code> method.
    * @param timeoutCallback a {@link JPPFTaskCallback} instance.
    */
-  void setOnTimeoutCallback(final JPPFTaskCallback timeoutCallback);
+  void setOnTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback);
 
   /**
    * Get the timeout set on the task.

@@ -46,7 +46,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
-  Bundler bundler = null;
+  Bundler<?> bundler = null;
   /**
    * Represents the system information.
    */
@@ -116,7 +116,7 @@ public abstract class ChannelWrapper implements ExecutorChannel<ClientTaskBundle
    * @return a {@link Bundler} instance.
    */
   @Override
-  public Bundler getBundler() {
+  public Bundler<?> getBundler() {
     return bundler;
   }
 

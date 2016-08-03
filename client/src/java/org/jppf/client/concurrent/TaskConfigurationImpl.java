@@ -21,21 +21,19 @@ package org.jppf.client.concurrent;
 import org.jppf.client.taskwrapper.JPPFTaskCallback;
 import org.jppf.scheduling.JPPFSchedule;
 
-
 /**
  * Configuration for tasks submitted by a <code>JPPFExecutorService</code> which do not extend <code>JPPFTask</code>.
  * @author Laurent Cohen
  */
-class TaskConfigurationImpl implements TaskConfiguration
-{
+class TaskConfigurationImpl implements TaskConfiguration {
   /**
    * A delegate for the <code>onCancel()</code> method.
    */
-  private JPPFTaskCallback cancelCallback = null;
+  private JPPFTaskCallback<Object> cancelCallback = null;
   /**
    * A delegate for the <code>onTimeout()</code> method.
    */
-  private JPPFTaskCallback timeoutCallback = null;
+  private JPPFTaskCallback<Object> timeoutCallback = null;
   /**
    * The task timeout schedule configuration.
    */
@@ -44,43 +42,36 @@ class TaskConfigurationImpl implements TaskConfiguration
   /**
    * Default constructor.
    */
-  TaskConfigurationImpl()
-  {
+  TaskConfigurationImpl() {
   }
 
   @Override
-  public JPPFTaskCallback getOnCancelCallback()
-  {
+  public JPPFTaskCallback<Object> getOnCancelCallback() {
     return cancelCallback;
   }
 
   @Override
-  public void setOnCancelCallback(final JPPFTaskCallback cancelCallback)
-  {
+  public void setOnCancelCallback(final JPPFTaskCallback<Object> cancelCallback) {
     this.cancelCallback = cancelCallback;
   }
 
   @Override
-  public JPPFTaskCallback getOnTimeoutCallback()
-  {
+  public JPPFTaskCallback<Object> getOnTimeoutCallback() {
     return timeoutCallback;
   }
 
   @Override
-  public void setOnTimeoutCallback(final JPPFTaskCallback timeoutCallback)
-  {
+  public void setOnTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback) {
     this.timeoutCallback = timeoutCallback;
   }
 
   @Override
-  public JPPFSchedule getTimeoutSchedule()
-  {
+  public JPPFSchedule getTimeoutSchedule() {
     return timeoutSchedule;
   }
 
   @Override
-  public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule)
-  {
+  public void setTimeoutSchedule(final JPPFSchedule timeoutSchedule) {
     this.timeoutSchedule = timeoutSchedule;
   }
 }

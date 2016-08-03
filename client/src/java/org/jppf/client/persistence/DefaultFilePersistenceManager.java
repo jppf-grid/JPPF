@@ -184,7 +184,7 @@ public class DefaultFilePersistenceManager implements JobPersistence<String> {
         int size = 0;
         try {
           size = SerializationUtils.readInt(is);
-        } catch(IOException ingore) {
+        } catch(@SuppressWarnings("unused") IOException ingore) {
         }
         if (size > 0) {
           List<Task<?>> tasks = new ArrayList<>(size);

@@ -245,7 +245,7 @@ class DeferredJobNotificationsHandler extends AbstractJobNotificationsHandler {
    * Represents an aggregated job / dispatch notification.
    * @param <N> the type of notification.
    */
-  static abstract class AbstractJobNotification<N extends AbstractJobNotification> {
+  static abstract class AbstractJobNotification<N extends AbstractJobNotification<N>> {
     /**
      * The job or dispatch information.
      */

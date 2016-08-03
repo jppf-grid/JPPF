@@ -207,7 +207,6 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
     if (!closed.compareAndSet(false, true)) return;
     setStatus(CLOSED);
     if (debugEnabled) log.debug("closing connection " + toDebugString());
-    List<JPPFJob> list = null;
     listeners.clear();
     try {
       sendCloseConnectionCommand();
@@ -225,7 +224,6 @@ abstract class AbstractJPPFClientConnection extends BaseJPPFClientConnection {
       if (debugEnabled) log.debug('[' + name + "] " + e.getMessage(), e);
       else log.error('[' + name + "] " + e.getMessage());
     }
-    if (list == null) list = Collections.emptyList();
     if (debugEnabled) log.debug("connection " + toDebugString() + " closed");
   }
 

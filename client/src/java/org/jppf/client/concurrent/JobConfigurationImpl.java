@@ -40,7 +40,7 @@ class JobConfigurationImpl extends AbstractJobConfiguration {
    * @param metadata the metadata configuration to use.
    * @param persistenceManager the persistence manager to use.
    */
-  JobConfigurationImpl(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager) {
+  JobConfigurationImpl(final JobSLA sla, final JobMetadata metadata, final JobPersistence<?> persistenceManager) {
     super(sla, metadata, persistenceManager);
   }
 

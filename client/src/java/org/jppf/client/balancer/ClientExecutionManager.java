@@ -33,8 +33,7 @@ import org.slf4j.*;
  * @author Paul Woodward
  * @exclude
  */
-public class ClientExecutionManager extends AbstractExecutionManager
-{
+public class ClientExecutionManager extends AbstractExecutionManager {
   /**
    * Logger for this class.
    */
@@ -82,7 +81,6 @@ public class ClientExecutionManager extends AbstractExecutionManager
   @SuppressWarnings("unchecked")
   protected void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
-    ClassLoader cl = usedClassLoader.getClassLoader();
     this.dataProvider = null;
     usedClassLoader.dispose();
     usedClassLoader = null;

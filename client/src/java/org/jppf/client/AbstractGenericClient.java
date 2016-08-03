@@ -491,7 +491,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @since 4.1
    */
   @Override
-  public void bundleAdded(final QueueEvent event) {
+  public void bundleAdded(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
     fireQueueEvent(event, true);
   }
 
@@ -501,7 +501,7 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @since 4.1
    */
   @Override
-  public void bundleRemoved(final QueueEvent event) {
+  public void bundleRemoved(final QueueEvent<ClientJob, ClientJob, ClientTaskBundle> event) {
     fireQueueEvent(event, false);
   }
 }

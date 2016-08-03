@@ -29,8 +29,7 @@ import org.slf4j.*;
  * Instances of this class hold and manage the results of a job.
  * @author Laurent Cohen
  */
-public class JobResults extends ThreadSynchronization implements Serializable
-{
+public class JobResults extends ThreadSynchronization implements Serializable {
   /**
    * Explicit serialVersionUID.
    */
@@ -57,8 +56,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * Get the current number of received results.
    * @return the number of results as an int.
    */
-  public synchronized int size()
-  {
+  public synchronized int size() {
     return resultMap.size();
   }
 
@@ -67,8 +65,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * @param position the task position to check.
    * @return <code>true</code> if a result was received, <code>false</code> otherwise.
    */
-  public synchronized boolean hasResult(final int position)
-  {
+  public synchronized boolean hasResult(final int position) {
     return resultMap.containsKey(position);
   }
 
@@ -77,8 +74,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * @param position the position of the task to get.
    * @return a <code>Task</code> instance, or null if no result was received for a task at this position.
    */
-  public synchronized Task<?> getResultTask(final int position)
-  {
+  public synchronized Task<?> getResultTask(final int position) {
     return resultMap.get(position);
   }
 
@@ -86,25 +82,21 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * Add the specified results to this job.
    * @param tasks the list of tasks for which results were received.
    */
-  public synchronized void addResults(final List<Task<?>> tasks)
-  {
+  public synchronized void addResults(final List<Task<?>> tasks) {
     if (debugEnabled) log.debug("adding {} results", tasks.size());
-    for (Task<?> task : tasks)
-    {
+    for (Task<?> task : tasks) {
       int pos = task.getPosition();
       if (traceEnabled) log.debug("adding result at positon {}", pos);
       if (hasResult(pos)) log.warn("position {} (out of {}) already has a result", pos, tasks.size());
       resultMap.put(pos, task);
     }
-    //wakeUp();
   }
 
   /**
    * Get all the tasks received as results for this job.
    * @return a collection of {@link Task} instances.
    */
-  public synchronized Collection<Task<?>> getAllResults()
-  {
+  public synchronized Collection<Task<?>> getAllResults() {
     return Collections.unmodifiableCollection(resultMap.values());
   }
 
@@ -112,18 +104,16 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * Get all the tasks received as results for this job.
    * @return a collection of {@link Task} instances.
    */
-  public synchronized List<Task<?>> getResultsList()
-  {
+  public synchronized List<Task<?>> getResultsList() {
     return new ArrayList<>(resultMap.values());
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(getClass().getSimpleName()).append('[');
     sb.append("size=").append(size());
-    synchronized(this) {
+    synchronized (this) {
       sb.append(", positions=").append(resultMap.keySet());
     }
     sb.append(']');
@@ -135,8 +125,7 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * @param position the position of the task in the job it is a part of.
    * @return the task whose results were received, or null if the timeout expired before it was received.
    */
-  public synchronized Task<?> waitForTask(final int position)
-  {
+  public synchronized Task<?> waitForTask(final int position) {
     return waitForTask(position, Long.MAX_VALUE);
   }
 
@@ -146,11 +135,9 @@ public class JobResults extends ThreadSynchronization implements Serializable
    * @param timeout maximum number of milliseconds to wait.
    * @return the task whose results were received, or null if the timeout expired before it was received.
    */
-  public synchronized Task<?> waitForTask(final int position, final long timeout)
-  {
+  public synchronized Task<?> waitForTask(final int position, final long timeout) {
     long start = System.nanoTime();
-    long elapsed = 0L;
-    while (((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout) && !hasResult(position)) goToSleep(1L);
+    while (((System.nanoTime() - start) / 1_000_000L < timeout) && !hasResult(position)) goToSleep(1L);
     return getResultTask(position);
   }
 

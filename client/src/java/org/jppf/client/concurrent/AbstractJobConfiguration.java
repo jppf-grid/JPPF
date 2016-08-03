@@ -71,7 +71,7 @@ abstract class AbstractJobConfiguration implements JobConfiguration {
    * @param metadata the metadata configuration to use.
    * @param persistenceManager the persistence manager to use.
    */
-  AbstractJobConfiguration(final JobSLA sla, final JobMetadata metadata, final JobPersistence persistenceManager) {
+  AbstractJobConfiguration(final JobSLA sla, final JobMetadata metadata, final JobPersistence<?> persistenceManager) {
     this.jobSLA = sla;
     this.jobMetadata = metadata;
     this.persistenceManager = persistenceManager;

@@ -136,7 +136,6 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
       } else {
         if (debugEnabled) log.debug("removing " + nbTasks + " tasks from bundle");
         result = bundleWrapper.copy(nbTasks);
-        int newSize = bundleWrapper.getTaskCount();
         incrementSizeCount(size);
         // to ensure that other jobs with same priority are also processed without waiting
         priorityMap.moveToEndOfList(bundleWrapper.getSLA().getPriority(), bundleWrapper);
@@ -362,7 +361,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
     lock.lock();
     try {
       int size = priorityMap.size();
-      if (size <= 0) return Collections.EMPTY_LIST;
+      if (size <= 0) return Collections.<JPPFJob>emptyList();
       List<JPPFJob> list = new ArrayList<>(size);
       for (ClientJob clientJob: priorityMap) list.add(clientJob.getJob());
       return list;

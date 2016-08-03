@@ -102,7 +102,7 @@ class JMXConnectionPool extends AbstractConnectionPool<JMXDriverConnectionWrappe
         if (debugEnabled) log.debug("removing connection {} from pool {}", c, this);
         try {
           c.close();
-        } catch(Exception ignore) {
+        } catch(@SuppressWarnings("unused") Exception ignore) {
         }
         remove(c);
         actual++;
