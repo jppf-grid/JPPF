@@ -159,7 +159,7 @@ public class DefaultConfig {
     long l;
     try {
       l = EnvHelp.getIntegerAttribute(env, SERVER_SIDE_CONNECTING_TIMEOUT, 0, 0, Long.MAX_VALUE);
-    } catch (IllegalArgumentException iae) {
+    } catch (@SuppressWarnings("unused") IllegalArgumentException iae) {
       l = 0;
     }
     return l;

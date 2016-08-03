@@ -228,7 +228,7 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
           stateLock.notifyAll();
           try {
             sock.close();
-          } catch (IOException ioe) {
+          } catch (@SuppressWarnings("unused") IOException ioe) {
             // OK. We are closing the socket.
           }
         }
@@ -333,7 +333,7 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
       if (sock instanceof javax.net.ssl.SSLSocket) {
         try {
           Thread.sleep(1000);
-        } catch (InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") InterruptedException ire) {
           // OK: we are closing
         }
       }
@@ -390,7 +390,7 @@ public class SocketConnection implements SocketConnectionIf, MessageConnection {
       while (state != CONNECTED && state != TERMINATED && waitingTime > 0) {
         try {
           stateLock.wait(waitingTime);
-        } catch (InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") InterruptedException ire) {
           break;
         }
         waitingTime = endTime - System.currentTimeMillis();

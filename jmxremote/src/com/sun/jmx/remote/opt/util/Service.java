@@ -303,7 +303,7 @@ public final class Service {
       nextName = null;
       try {
         return (E) Class.forName(cn, true, loader).newInstance();
-      } catch (ClassNotFoundException x) {
+      } catch (@SuppressWarnings("unused") ClassNotFoundException x) {
         fail(service, "Provider " + cn + " not found");
       } catch (Exception x) {
         fail(service, "Provider " + cn + " could not be instantiated: " + x, x);

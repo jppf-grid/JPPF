@@ -174,7 +174,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
         // closed by another thread
         try {
           connection.close();
-        } catch (Exception e) {
+        } catch (@SuppressWarnings("unused") Exception e) {
           // OK Already closed.
         }
         throw new IOException("The connecting is stooped by another thread.");
@@ -277,7 +277,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
           ThreadService.getShared().handoff(new RemoteJob(msg));
           if (msg instanceof CloseMessage) break;
         }
-      } catch (Exception eee) {
+      } catch (@SuppressWarnings("unused") Exception eee) {
         // need to stop
         if (logger.traceOn()) logger.trace("MessageReader.run", "stops.");
       }
@@ -368,7 +368,7 @@ public class ServerSynchroMessageConnectionImpl implements ServerSynchroMessageC
       while (state == CONNECTING && waitConnectedState > 0) {
         try {
           stateLock.wait(remainingTime);
-        } catch (InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") InterruptedException ire) {
           break;
         }
         remainingTime = waitConnectedState - ((System.nanoTime() - startTime) / 1_000_000L);

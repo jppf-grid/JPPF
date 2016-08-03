@@ -215,7 +215,7 @@ public class ServerNotifForwarder {
     final long t = Math.min(connectionTimeout, timeout);
     try {
       nr = notifBuffer.fetchNotifications(listenerList, startSequenceNumber, t, maxNotifications);
-    } catch (InterruptedException ire) {
+    } catch (@SuppressWarnings("unused") InterruptedException ire) {
       nr = new NotificationResult(0L, 0L, new TargetedNotification[0]);
     }
     if (logger.traceOn())logger.trace("fetchNotifs", "Forwarding the notifs: " + nr);

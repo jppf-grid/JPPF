@@ -268,7 +268,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
             try {
               checkState();
               synchronized(mwrapper) { mwrapper.wait(1000L); }
-            } catch (InterruptedException ie) {
+            } catch (@SuppressWarnings("unused") InterruptedException ie) {
               break; // OK. This is a user thread, so it is possible that the user wants to stop waiting.
             }
           }
@@ -374,7 +374,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
             if (stopped()) break;
             try {
               callback.connectionException(e);
-            } catch (Exception ee) { // OK. We have already informed the admin.
+            } catch (@SuppressWarnings("unused") Exception ee) { // OK. We have already informed the admin.
             }
             // if reconnected, a new reader should be created.
             break;
@@ -403,7 +403,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
           } else ThreadService.getShared().handoff(new RemoteJob(msg)); // unknown message, protocol error
           if (msg instanceof CloseMessage) break;
         }
-      } catch (Exception eee) {
+      } catch (@SuppressWarnings("unused") Exception eee) {
         // need to stop
         if (logger.traceOn()) logger.trace("MessageReader-run", "stops.");
       }
@@ -505,7 +505,7 @@ public class ClientSynchroMessageConnectionImpl implements ClientSynchroMessageC
       while (state != CONNECTED && state != TERMINATED && remainingTime > 0) {
         try {
           stateLock.wait(remainingTime);
-        } catch (InterruptedException ire) {
+        } catch (@SuppressWarnings("unused") InterruptedException ire) {
           break;
         }
         remainingTime = waitConnectedState - ((System.nanoTime() - startTime) / 1_000_000L);

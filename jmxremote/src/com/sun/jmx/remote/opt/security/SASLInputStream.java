@@ -130,7 +130,7 @@ public class SASLInputStream extends InputStream {
     if (str != null) {
       try {
         recvMaxBufSize = Integer.parseInt(str);
-      } catch (NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") NumberFormatException e) {
         throw new IOException(Sasl.MAX_BUFFER + " property must be numeric string: " + str);
       }
     }
@@ -153,7 +153,7 @@ public class SASLInputStream extends InputStream {
     if (str != null) {
       try {
         recvMaxBufSize = Integer.parseInt(str);
-      } catch (NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") NumberFormatException e) {
         throw new IOException(Sasl.MAX_BUFFER + " property must be numeric string: " + str);
       }
     }

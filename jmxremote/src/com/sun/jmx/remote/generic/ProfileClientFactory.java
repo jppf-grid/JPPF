@@ -193,7 +193,7 @@ public final class ProfileClientFactory {
       String className = (pkg + "." + p + ".ClientProvider");
       try {
         providerClass = loader.loadClass(className);
-      } catch (ClassNotFoundException e) {
+      } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
         continue;
       }
       try {
@@ -221,7 +221,7 @@ public final class ProfileClientFactory {
     if (environment != null) {
       try {
         loader = (ClassLoader) environment.get(PROFILE_PROVIDER_CLASS_LOADER);
-      } catch (ClassCastException e) {
+      } catch (@SuppressWarnings("unused") ClassCastException e) {
         final String msg = "ClassLoader not an instance of java.lang.ClassLoader : " + loader.getClass().getName();
         throw new IllegalArgumentException(msg);
       }

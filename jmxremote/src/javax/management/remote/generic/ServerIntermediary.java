@@ -291,7 +291,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
     if (serverNotifForwarder != null) serverNotifForwarder.terminate(); // stopping listening
     try { // close the transport protocol
       connection.close();
-    } catch (Exception ce) { // OK. We are closing, so ignore it.
+    } catch (@SuppressWarnings("unused") Exception ce) { // OK. We are closing, so ignore it.
     }
     if (serverCommunicatorAdmin != null) serverCommunicatorAdmin.terminate();
     myServer.clientClosing(this, clientId, "The method terminate is called.", null); // inform the server of termination
@@ -354,7 +354,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
       Object wrapped;
       try {
         wrapped = serialization.wrap(result);
-      } catch (NotSerializableException e) {
+      } catch (@SuppressWarnings("unused") NotSerializableException e) {
         // This presumably means that at least one of the notifications is unserializable, for example because it contains an unserializable object in its userData.
         // This should not happen often (Notification itself is serializable).
         wrapped = serialization.wrap(purgeUnserializable(result));
@@ -477,7 +477,7 @@ class ServerIntermediary extends AbstractServerIntermediary {
         try {
           serialization.wrap(trialnr);
           tnList.add(tn);
-        } catch (IOException e1) { // OK. too bad, at least we have logged it
+        } catch (@SuppressWarnings("unused") IOException e1) { // OK. too bad, at least we have logged it
         }
       }
     }

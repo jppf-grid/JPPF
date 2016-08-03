@@ -124,7 +124,7 @@ public class TLSServerHandler implements ProfileServer {
       setEnabledProtocols = SSLSocket.class.getMethod("setEnabledProtocols", new Class[] { String[].class });
       getWantClientAuth = SSLSocket.class.getMethod("getWantClientAuth", new Class[0]);
       setWantClientAuth = SSLSocket.class.getMethod("setWantClientAuth", new Class[] { Boolean.TYPE });
-    } catch (Throwable t) {
+    } catch (@SuppressWarnings("unused") Throwable t) {
       // Running with a J2SE prior to J2SE 1.4
       error = true;
     }

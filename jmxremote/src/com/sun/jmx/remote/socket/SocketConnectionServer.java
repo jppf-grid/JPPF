@@ -153,7 +153,7 @@ public class SocketConnectionServer implements MessageConnectionServer {
         Constructor<?> ct = c.getDeclaredConstructor(new Class[] { String.class, int.class });
         o = ct.newInstance(new Object[] { host, new Integer(port) });
       }
-    } catch (Exception ee) {
+    } catch (@SuppressWarnings("unused") Exception ee) {
       // OK. we are using JDK1.3 or earlier
     }
     if (o != null && DefaultConfig.getServerReuseAddress(newEnv)) {

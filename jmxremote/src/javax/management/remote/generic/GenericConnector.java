@@ -292,7 +292,7 @@ public class GenericConnector implements JMXConnector {
               connection.sendOneWay(new CloseMessage(msg));
               Thread.sleep(100);
             }
-          } catch (InterruptedException ire) { // OK
+          } catch (@SuppressWarnings("unused") InterruptedException ire) { // OK
           } catch (Exception e1) {
             closeException = e1; // error trace
             if (tracing) logger.trace("close", idstr + " failed to send close message: " + e1);
@@ -354,7 +354,7 @@ public class GenericConnector implements JMXConnector {
       public void run() {
         try {
           connectionBroadcaster.sendNotification(n);
-        } catch (Exception e) { // OK. should never
+        } catch (@SuppressWarnings("unused") Exception e) { // OK. should never
         }
       }
     };
@@ -371,11 +371,11 @@ public class GenericConnector implements JMXConnector {
           com.sun.jmx.remote.opt.internal.ClientCommunicatorAdmin admin = clientMBeanServer.getCommunicatorAdmin();
           admin.gotIOException(new IOException(""));
           return null;
-        } catch (IOException ioe) { // OK. the server has been closed.
+        } catch (@SuppressWarnings("unused") IOException ioe) { // OK. the server has been closed.
         }
         try {
           GenericConnector.this.close(true, null);
-        } catch (IOException ie) { // OK never
+        } catch (@SuppressWarnings("unused") IOException ie) { // OK never
         }
       } else {
         logger.warning("RequestHandler.execute", ((msg == null) ? "null" : msg.getClass().getName()) + ": Bad message type.");
@@ -400,7 +400,7 @@ public class GenericConnector implements JMXConnector {
           com.sun.jmx.remote.opt.internal.ClientCommunicatorAdmin admin = clientMBeanServer.getCommunicatorAdmin();
           admin.gotIOException((IOException) e);
           return;
-        } catch (IOException ioe) { // OK. closing at the following steps
+        } catch (@SuppressWarnings("unused") IOException ioe) { // OK. closing at the following steps
         }
       }
       synchronized (lock) {

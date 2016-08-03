@@ -117,7 +117,7 @@ public class SASLOutputStream extends OutputStream {
     if (str != null) {
       try {
         rawSendSize = Integer.parseInt(str);
-      } catch (NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") NumberFormatException e) {
         throw new IOException(Sasl.RAW_SEND_SIZE + " property must be numeric string: " + str);
       }
     }
@@ -138,7 +138,7 @@ public class SASLOutputStream extends OutputStream {
     if (str != null) {
       try {
         rawSendSize = Integer.parseInt(str);
-      } catch (NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") NumberFormatException e) {
         throw new IOException(Sasl.RAW_SEND_SIZE + " property must be numeric string: " + str);
       }
     }

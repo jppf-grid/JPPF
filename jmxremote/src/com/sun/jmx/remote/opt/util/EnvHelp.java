@@ -223,7 +223,7 @@ public class EnvHelp {
     try {
       java.lang.reflect.Method initCause = t.getClass().getMethod("initCause", new Class[] { Throwable.class });
       initCause.invoke(t, new Object[] { cause });
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       // OK. too bad, no debugging info
     }
     return t;
@@ -239,7 +239,7 @@ public class EnvHelp {
     try {
       java.lang.reflect.Method getCause = t.getClass().getMethod("getCause", (Class[]) null);
       ret = (Throwable) getCause.invoke(t, (Object[]) null);
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       // OK. it must be older than 1.4.
     }
     return (ret != null) ? ret : t;
