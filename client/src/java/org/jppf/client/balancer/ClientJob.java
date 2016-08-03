@@ -26,6 +26,7 @@ import java.util.*;
 import org.jppf.JPPFException;
 import org.jppf.client.*;
 import org.jppf.client.event.JobEvent;
+import org.jppf.client.event.JobEvent.Type;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -416,9 +417,8 @@ public class ClientJob extends AbstractClientJob {
   public void setJobStatus(final JobStatus jobStatus) {
     if (this.jobStatus == jobStatus) return;
     this.jobStatus = jobStatus;
-    resultCollector.setStatus(this.jobStatus);
-    //if (resultCollector instanceof JobStatusHandler) ((JobStatusHandler) resultCollector).setStatus(this.jobStatus);
-    //else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob()) job.fireJobEvent(Type.JOB_END, null, tasks);
+    if (resultCollector != null) ((JobStatusHandler) resultCollector).setStatus(this.jobStatus);
+    else if (((jobStatus == JobStatus.COMPLETE) || (jobStatus == JobStatus.FAILED)) && isChildBroadcastJob()) job.fireJobEvent(Type.JOB_END, null, tasks);
   }
 
   @Override
