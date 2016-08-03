@@ -175,7 +175,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
    * @param nodeBundle the job to dispatch.
    * @throws Exception if any error occurs.
    */
-  @SuppressWarnings("unchecked")
   private void dispatchJobToChannel(final C channel, final ServerTaskBundleNode nodeBundle) throws Exception {
     if (debugEnabled) log.debug(String.format("dispatching %d tasks of job '%s' to node %s", nodeBundle.getTaskCount(), nodeBundle.getJob().getName(), channel.getUuid()));
     synchronized(channel.getMonitor()) {

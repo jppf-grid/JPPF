@@ -160,6 +160,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * Get all the provider connections handled by this server.
    * @return a list of connection channels.
    */
+  @Override
   public List<ChannelWrapper<?>> getAllConnections() {
     Collection<ChannelWrapper<?>> channels = providerConnections.allValues();
     return channels == null ? null : new ArrayList<>(channels);

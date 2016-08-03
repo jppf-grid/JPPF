@@ -168,7 +168,6 @@ public class JPPFDriver {
    * @throws Exception if the initialization fails.
    * @exclude
    */
-  @SuppressWarnings("unchecked")
   public void run() throws Exception {
     JPPFConnectionInformation info = initializer.getConnectionInformation();
     initializer.registerDebugMBean();

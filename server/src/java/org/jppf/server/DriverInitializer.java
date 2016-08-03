@@ -134,7 +134,6 @@ public class DriverInitializer {
    * Register all MBeans defined through the service provider interface.
    * @throws Exception if the registration failed.
    */
-  @SuppressWarnings("unchecked")
   void registerProviderMBeans() throws Exception {
     MBeanServer server = ManagementFactory.getPlatformMBeanServer();
     new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);

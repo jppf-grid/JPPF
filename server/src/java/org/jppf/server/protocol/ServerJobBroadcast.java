@@ -184,7 +184,6 @@ public class ServerJobBroadcast extends ServerJob {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("received results for {}", this);
     pendingTasksCount -= bundle.getTaskCount();

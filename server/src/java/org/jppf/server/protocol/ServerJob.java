@@ -101,7 +101,6 @@ public class ServerJob extends AbstractServerJobBase {
    * @param bundle  the executing job.
    * @param results the list of tasks whose results have been received from the server.
    */
-  @SuppressWarnings("unchecked")
   public void resultsReceived(final ServerTaskBundleNode bundle, final List<DataLocation> results) {
     if (debugEnabled) log.debug("received {} results from {}", (results == null ? "null" : results.size()), bundle);
     if ((results != null) && results.isEmpty()) return;
@@ -282,7 +281,6 @@ public class ServerJob extends AbstractServerJobBase {
    * Get a list of objects describing the nodes to which the whole or part of a job was dispatched.
    * @return array of <code>NodeManagementInfo</code> instances.
    */
-  @SuppressWarnings("unchecked")
   public NodeJobInformation[] getNodeJobInformation() {
     ServerTaskBundleNode[] entries;
     synchronized (dispatchSet) {

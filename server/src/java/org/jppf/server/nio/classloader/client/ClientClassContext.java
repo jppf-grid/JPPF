@@ -87,7 +87,6 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    * @param request the request as a <code>SelectionKey</code> instance.
    * @throws Exception if any error occurs.
    */
-  @SuppressWarnings("unchecked")
   public void addRequest(final ResourceRequest request) throws Exception {
     String uuid = request.getResource().getUuidPath().getFirst();
     if (!driver.getClientClassServer().addResourceRequest(uuid, request)) {

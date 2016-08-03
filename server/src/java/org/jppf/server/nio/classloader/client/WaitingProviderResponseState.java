@@ -61,7 +61,6 @@ class WaitingProviderResponseState extends ClientClassServerState {
    * @see org.jppf.nio.NioState#performTransition(java.nio.channels.SelectionKey)
    */
   @Override
-  @SuppressWarnings("unchecked")
   public ClientClassTransition performTransition(final ChannelWrapper<?> channel) throws Exception {
     ClientClassContext context = (ClientClassContext) channel.getContext();
     if (context.readMessage(channel)) {

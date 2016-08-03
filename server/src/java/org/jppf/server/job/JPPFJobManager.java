@@ -89,7 +89,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param jobUuid the id of the job.
    * @return a list of <code>SelectableChannel</code> instances.
    */
-  @SuppressWarnings("unchecked")
   public List<ChannelJobPair> getNodesForJob(final String jobUuid) {
     if (jobUuid == null) return Collections.emptyList();
     synchronized(jobMap) {
