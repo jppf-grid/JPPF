@@ -85,7 +85,7 @@ public class ServerTaskBundleNode {
   /**
    * Channel to which is this bundle dispatched.
    */
-  private ExecutorChannel channel = null;
+  private ExecutorChannel<?> channel = null;
   /**
    * The future from channel dispatch.
    */
@@ -170,7 +170,7 @@ public class ServerTaskBundleNode {
    * Set the node channel onto this job dispatch.
    * @param channel the node to which the job is dispatched.
    */
-  public void setChannel(final ExecutorChannel channel) {
+  public void setChannel(final ExecutorChannel<?> channel) {
     if (channel == null) throw new IllegalArgumentException("channel is null for " + this);
     this.channel = channel;
   }
@@ -180,7 +180,7 @@ public class ServerTaskBundleNode {
    * @param channel the node to which the job is dispatched.
    * @param future  future assigned to bundle execution.
    */
-  public void jobDispatched(final ExecutorChannel channel, final Future<?> future) {
+  public void jobDispatched(final ExecutorChannel<?> channel, final Future<?> future) {
     if (channel == null) throw new IllegalArgumentException("channel is null for " + this);
     if (future == null) throw new IllegalArgumentException("future is null for " + this);
     this.channel = channel;
@@ -284,7 +284,7 @@ public class ServerTaskBundleNode {
    * Get the channel to which the job is dispatched.
    * @return an <code>ExecutorChannel</code> instance.
    */
-  public ExecutorChannel getChannel() {
+  public ExecutorChannel<?> getChannel() {
     return channel;
   }
 

@@ -99,7 +99,7 @@ class WaitingJobState extends ClientServerState {
   private ClientTransition closeChannel(final ChannelWrapper<?> channel) {
     try {
       channel.getContext().handleException(channel, null);
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       if (debugEnabled) log.debug("exception while trying to close the channel {}" + channel);
     }
     return null;

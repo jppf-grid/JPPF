@@ -70,7 +70,6 @@ public class RemoteNodeConnection extends AbstractNodeConnection<SocketWrapper> 
     lock.lock();
     try {
       if (debugEnabled) log.debug("Initializing socket");
-      TypedProperties config = JPPFConfiguration.getProperties();
       channel = new SocketClient();
       channel.setHost(connectionInfo.getHost());
       channel.setPort(connectionInfo.getPort());

@@ -70,7 +70,7 @@ class IdentifyingPeerState extends AcceptorServerState
       if (!(channel instanceof SelectionKeyWrapper)) return null;
       int id = context.getId();
       if (debugEnabled) log.debug("read identifier '{}' for {}", JPPFIdentifiers.asString(id), channel);
-      NioServer newServer = null;
+      NioServer<?, ?> newServer = null;
       switch(id)
       {
         case JPPFIdentifiers.CLIENT_CLASSLOADER_CHANNEL:

@@ -57,7 +57,7 @@ public class JobEventTask implements Runnable {
    * @param job the job data.
    * @param channel the id of the job source of the event.
    */
-  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final TaskBundle bundle, final ServerJob job, final ExecutorChannel channel) {
+  public JobEventTask(final JobNotificationEmitter jobManager, final JobEventType eventType, final TaskBundle bundle, final ServerJob job, final ExecutorChannel<?> channel) {
     this.jobManager = jobManager;
     this.eventType = eventType;
     JobSLA sla = null;

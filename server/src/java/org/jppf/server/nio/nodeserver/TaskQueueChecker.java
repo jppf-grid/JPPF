@@ -341,7 +341,7 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
   @SuppressWarnings("deprecation")
   private void updateBundler(final TaskBundle taskBundle, final C context) {
     context.checkBundler(bundlerFactory, jppfContext);
-    Bundler ctxBundler = context.getBundler();
+    Bundler<?> ctxBundler = context.getBundler();
     if (ctxBundler instanceof JobAwareness) ((JobAwareness) ctxBundler).setJobMetadata(taskBundle.getMetadata());
     else if (ctxBundler instanceof JobAwarenessEx) ((JobAwarenessEx) ctxBundler).setJob(taskBundle);
   }
@@ -375,7 +375,6 @@ public class TaskQueueChecker<C extends AbstractNodeContext> extends AbstractTas
     if (debugEnabled) log.debug(String.format("computing scores for job '%s', uuid=%s", job.getName(), job.getUuid()));
     for (C channel: channels) {
       if (!channel.isLocal() && !channel.isOffline() && !channel.isPeer()) {
-        boolean jobReservation = false;
         String reservedJobUuid = server.getNodeReservationHandler().getPendingJobUUID(channel);
         if ((reservedJobUuid != null) && reservedJobUuid.equals(job.getUuid())) continue;
         else {

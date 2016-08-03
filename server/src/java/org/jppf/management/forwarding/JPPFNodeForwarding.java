@@ -312,7 +312,7 @@ public class JPPFNodeForwarding extends NotificationBroadcasterSupport implement
         default:
           continue;
       }
-      if (task != null) futures.add(executor.submit(task));
+      futures.add(executor.submit(task));
     }
     for (Future<Pair<String, Object>> f: futures) {
       Pair<String, Object> result = f.get();

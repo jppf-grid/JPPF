@@ -111,7 +111,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public void jobDispatched(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle) {
+  public void jobDispatched(final AbstractServerJob serverJob, final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
     TaskBundle bundle = nodeBundle.getJob();
     String jobUuid = bundle.getUuid();
     synchronized(jobMap) {
@@ -123,7 +123,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
   }
 
   @Override
-  public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle) {
+  public synchronized void jobReturned(final AbstractServerJob serverJob, final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
     TaskBundle bundle = nodeBundle.getJob();
     String jobUuid = bundle.getUuid();
     synchronized(jobMap) {
@@ -142,7 +142,6 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    */
   public void jobQueued(final ServerJob serverJob) {
     TaskBundle bundle = serverJob.getJob();
-    String jobUuid = bundle.getUuid();
     if (debugEnabled) log.debug("jobId '" + bundle.getName() + "' queued");
     submitEvent(JobEventType.JOB_QUEUED, serverJob, null);
     JPPFStatistics stats = JPPFDriver.getInstance().getStatistics();
@@ -190,7 +189,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param bundle the job data.
    * @param channel the id of the job source of the event.
    */
-  private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel channel) {
+  private void submitEvent(final JobEventType eventType, final TaskBundle bundle, final ExecutorChannel<?> channel) {
     executor.submit(new JobEventTask(this, eventType, bundle, null, channel));
     if (JPPFDriver.JPPF_DEBUG) incNotifCount();
   }
@@ -201,7 +200,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param job the job data.
    * @param channel the id of the job source of the event.
    */
-  private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel channel) {
+  private void submitEvent(final JobEventType eventType, final ServerJob job, final ExecutorChannel<?> channel) {
     executor.submit(new JobEventTask(this, eventType, null, job, channel));
     if (JPPFDriver.JPPF_DEBUG) incNotifCount();
   }
@@ -312,7 +311,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param nodeBundle the task bundle returned from the node.
    * @param isDispatch whether this is a dispatch event notification.
    */
-  private void fireJobTasksEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle, final boolean isDispatch) {
+  private void fireJobTasksEvent(final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle, final boolean isDispatch) {
     if (!taskReturnListeners.isEmpty()) {
       JobTasksEvent event = createJobTasksEvent(channel, nodeBundle);
       for (JobTasksListener listener: taskReturnListeners) {
@@ -328,7 +327,7 @@ public class JPPFJobManager implements ServerJobChangeListener, JobNotificationE
    * @param nodeBundle the task bundle returned from the node.
    * @return an instance of {@link TaskReturnEvent}.
    */
-  private JobTasksEvent createJobTasksEvent(final ExecutorChannel channel, final ServerTaskBundleNode nodeBundle) {
+  private JobTasksEvent createJobTasksEvent(final ExecutorChannel<?> channel, final ServerTaskBundleNode nodeBundle) {
     List<ServerTask> tasks = nodeBundle.getTaskList();
     List<ServerTaskInformation> taskInfos = new ArrayList<>(tasks.size());
     for (ServerTask task: tasks) taskInfos.add(new ServerTaskInformation(

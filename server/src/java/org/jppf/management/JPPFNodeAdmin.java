@@ -226,7 +226,7 @@ public class JPPFNodeAdmin implements JPPFNodeAdminMBean {
     if (debugEnabled) log.debug(String.format("node request to change configuration, restart=%b, interruptIfRunning=%b", restart, interruptIfRunning));
     // we don't allow the node uuid to be overriden
     if (configOverrides.containsKey("jppf.node.uuid")) configOverrides.remove("jppf.node.uuid");
-    TypedProperties overrides = (configOverrides != null) && !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
+    TypedProperties overrides = !configOverrides.isEmpty() ? new TypedProperties(configOverrides) : new TypedProperties();
     JPPFConfiguration.getProperties().putAll(overrides);
     new ConfigurationOverridesHandler().save(overrides);
     node.triggerConfigChanged();

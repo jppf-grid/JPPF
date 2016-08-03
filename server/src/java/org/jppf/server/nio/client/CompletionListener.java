@@ -44,7 +44,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
   /**
    * The transition manager for the server to client channels.
    */
-  private final StateTransitionManager transitionManager;
+  private final StateTransitionManager<ClientState, ClientTransition> transitionManager;
   /**
    * The client channel.
    */
@@ -55,7 +55,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
    * @param channel the client channel.
    * @param transitionManager the channel's transition manager.
    */
-  public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager transitionManager) {
+  public CompletionListener(final ChannelWrapper<?> channel, final StateTransitionManager<ClientState, ClientTransition> transitionManager) {
     if (channel == null) throw new IllegalArgumentException("channel is null");
     if (transitionManager == null) throw new IllegalArgumentException("transitionManager is null");
 
@@ -117,7 +117,7 @@ public class CompletionListener implements ServerTaskBundleClient.CompletionList
    */
   private void removeJobFromQueue(final ServerTaskBundleClient bundle) {
     String uuid = bundle.getUuid();
-    JPPFPriorityQueue queue = (JPPFPriorityQueue) JPPFDriver.getInstance().getQueue();
+    JPPFPriorityQueue queue = JPPFDriver.getInstance().getQueue();
     ServerJob job = queue.getBundleForJob(uuid);
     if (job != null) {
       if (debugEnabled) log.debug("job {} : status={}, submissionStatus={}", new Object[] {job.getName(), job.getStatus(), job.getSubmissionStatus()});

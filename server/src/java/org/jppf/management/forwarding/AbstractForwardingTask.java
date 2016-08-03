@@ -57,7 +57,7 @@ abstract class AbstractForwardingTask implements Callable<Pair<String, Object>> 
     try {
       return execute();
     } catch (Exception e) {
-     return new Pair<>(context.getUuid(), (Object) e);
+     return new Pair<String, Object>(context.getUuid(), e);
     }
   }
 

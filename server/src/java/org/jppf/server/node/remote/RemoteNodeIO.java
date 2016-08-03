@@ -127,7 +127,7 @@ public class RemoteNodeIO extends AbstractNodeIO {
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
     futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont.getSerializer(), cont.getClassLoader())));
-    for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
+    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
     OutputDestination dest = new SocketWrapperOutputDestination(socketWrapper);
     int count = 0;
     for (Future<DataLocation> f: futureList) {
@@ -147,14 +147,14 @@ public class RemoteNodeIO extends AbstractNodeIO {
   private void waitChannelClosed(final SocketWrapper socketWrapper) {
     try {
       socketWrapper.readInt();
-    } catch (Exception ignore) {
+    } catch (@SuppressWarnings("unused") Exception ignore) {
     } catch (Error e) {
       if (debugEnabled) log.debug("error closing socket: ", e);
     }
     if (traceEnabled) log.trace("server closed the connection");
     try {
       node.closeDataChannel();
-    } catch (Exception ignore) {
+    } catch (@SuppressWarnings("unused") Exception ignore) {
     } catch (Error e) {
       if (debugEnabled) log.debug("error closing data channel: ", e);
     }

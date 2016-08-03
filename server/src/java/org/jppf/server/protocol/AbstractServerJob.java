@@ -463,7 +463,7 @@ public abstract class AbstractServerJob {
    * @param channel the node to which the job is dispatched.
    * @param bundleNode the bundle for job event.
    */
-  protected void fireJobDispatched(final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
+  protected void fireJobDispatched(final ExecutorChannel<?> channel, final ServerTaskBundleNode bundleNode) {
     if (notificationEmitter != null) notificationEmitter.jobDispatched(this, channel, bundleNode);
   }
 
@@ -472,7 +472,7 @@ public abstract class AbstractServerJob {
    * @param channel the node from which the job is returned.
    * @param bundleNode the bundle for job event.
    */
-  protected void fireJobReturned(final ExecutorChannel channel, final ServerTaskBundleNode bundleNode) {
+  protected void fireJobReturned(final ExecutorChannel<?> channel, final ServerTaskBundleNode bundleNode) {
     if (notificationEmitter != null) notificationEmitter.jobReturned(this, channel, bundleNode);
   }
 

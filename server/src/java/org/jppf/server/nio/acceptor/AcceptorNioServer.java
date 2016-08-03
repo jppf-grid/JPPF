@@ -83,7 +83,7 @@ public class AcceptorNioServer extends NioServer<AcceptorState, AcceptorTransiti
   }
 
   @Override
-  public NioContext createNioContext()
+  public NioContext<AcceptorState> createNioContext()
   {
     AcceptorContext context = new AcceptorContext();
     return context;

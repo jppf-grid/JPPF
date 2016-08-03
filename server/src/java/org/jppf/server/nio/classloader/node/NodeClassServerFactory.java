@@ -36,7 +36,7 @@ final class NodeClassServerFactory extends NioServerFactory<NodeClassState, Node
    * Initialize this factory with the specified server.
    * @param server the server for which to initialize.
    */
-  public NodeClassServerFactory(final ClassNioServer server) {
+  public NodeClassServerFactory(final ClassNioServer<NodeClassState, NodeClassTransition> server) {
     super(server);
   }
 

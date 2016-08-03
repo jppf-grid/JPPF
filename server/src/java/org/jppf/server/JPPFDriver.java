@@ -399,7 +399,7 @@ public class JPPFDriver {
    * @param <T> the type of the server to start
    * @return started nioServer
    */
-  private static <T extends NioServer> T startServer(final RecoveryServer recoveryServer, final T nioServer) {
+  private static <T extends NioServer<?, ?>> T startServer(final RecoveryServer recoveryServer, final T nioServer) {
     if(nioServer == null) throw new IllegalArgumentException("nioServer is null");
     if(recoveryServer != null && nioServer instanceof ReaperListener) {
       Reaper reaper = recoveryServer.getReaper();

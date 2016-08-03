@@ -282,7 +282,7 @@ public class NodeReservationHandler {
             node.getSystemInformation().getJppf().putAll(config);
             transitionReservation(node);
           }
-        } catch (Exception e) {
+        } catch (@SuppressWarnings("unused") Exception e) {
           log.error(String.format("error reserving node %s for job %s", node, job));
         }
       }

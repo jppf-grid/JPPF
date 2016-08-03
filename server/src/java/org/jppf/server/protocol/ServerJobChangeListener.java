@@ -46,12 +46,12 @@ public interface ServerJobChangeListener
    * @param channel the node to which the job is dispatched.
    * @param bundleNode the bundle for job event.
    */
-  void jobDispatched(final AbstractServerJob source, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode);
+  void jobDispatched(final AbstractServerJob source, final ExecutorChannel<?> channel, final ServerTaskBundleNode bundleNode);
   /**
    * Called when all or part of a job has returned from a node.
    * @param source the returned job.
    * @param channel the node to which the job is dispatched.
    * @param bundleNode the bundle for job event.
    */
-  void jobReturned(final AbstractServerJob source, final ExecutorChannel channel, final ServerTaskBundleNode bundleNode);
+  void jobReturned(final AbstractServerJob source, final ExecutorChannel<?> channel, final ServerTaskBundleNode bundleNode);
 }

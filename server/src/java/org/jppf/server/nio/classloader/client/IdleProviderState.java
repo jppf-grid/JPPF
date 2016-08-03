@@ -49,7 +49,7 @@ public class IdleProviderState extends ClientClassServerState {
     ClientClassContext context = (ClientClassContext) channel.getContext();
     if (channel.isReadable() && !channel.isLocal())
     {
-      ((ClientClassNioServer) server).removeProviderConnection(context.getUuid(), channel);
+      server.removeProviderConnection(context.getUuid(), channel);
       throw new ConnectException("provider " + channel + " has been disconnected");
     }
     if (context.hasPendingRequest()) return TO_SENDING_PROVIDER_REQUEST;

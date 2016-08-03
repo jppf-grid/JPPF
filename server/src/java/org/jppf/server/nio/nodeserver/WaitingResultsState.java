@@ -110,7 +110,7 @@ class WaitingResultsState extends NodeServerState {
     ServerTaskBundleNode nodeBundle = context.getBundle();
     // if an exception prevented the node from executing the tasks or sending back the results
     Throwable t = newBundle.getParameter(NODE_EXCEPTION_PARAM);
-    Bundler bundler = context.getBundler();
+    Bundler<?> bundler = context.getBundler();
     if (t != null) {
       if (debugEnabled) log.debug("node " + context.getChannel() + " returned exception parameter in the header for bundle " + newBundle + " : " + ExceptionUtils.getMessage(t));
       nodeBundle.setJobReturnReason(JobReturnReason.NODE_PROCESSING_ERROR);
@@ -146,7 +146,7 @@ class WaitingResultsState extends NodeServerState {
       updateStats(newBundle.getTaskCount(), elapsed / 1_000_000L, newBundle.getNodeExecutionTime() / 1_000_000L);
       if (bundler instanceof BundlerEx) {
         long accumulatedTime = newBundle.getParameter(NODE_BUNDLE_ELAPSED_PARAM, -1L);
-        ((BundlerEx) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
+        ((BundlerEx<?>) bundler).feedback(newBundle.getTaskCount(), elapsed, accumulatedTime, elapsed - newBundle.getNodeExecutionTime());
       } else bundler.feedback(newBundle.getTaskCount(), elapsed);
     }
     boolean requeue = newBundle.isRequeue();

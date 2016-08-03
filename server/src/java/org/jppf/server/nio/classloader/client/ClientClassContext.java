@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
-import org.jppf.classloader.*;
+import org.jppf.classloader.JPPFResourceWrapper;
 import org.jppf.classloader.JPPFResourceWrapper.State;
 import org.jppf.io.*;
 import org.jppf.nio.*;
@@ -69,7 +69,6 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
 
   @Override
   public boolean setState(final ClientClassState state) {
-    ClientClassState oldState = this.state;
     boolean b = super.setState(state);
     if (ClientClassState.IDLE_PROVIDER.equals(state)) {
       try {
@@ -182,7 +181,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
       if (!pendingList.isEmpty()) {
         if (debugEnabled) log.debug("provider: {} sending null response(s) for disconnected provider", getChannel());
         ClientClassNioServer clientClassServer = driver.getClientClassServer();
-        ClassNioServer nodeClassServer = driver.getNodeClassServer();
+        NodeClassNioServer nodeClassServer = driver.getNodeClassServer();
         Set<ChannelWrapper<?>> nodeSet = new HashSet<>();
         for (ResourceRequest mainRequest : pendingList) {
           Collection<ResourceRequest> coll = clientClassServer.removeResourceRequest(uuid, getResourceName(mainRequest.getResource()));
@@ -206,7 +205,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
    * @param channel the requesting node channel to reset.
    * @param server the server handling the node.
    */
-  private void resetNodeState(final ChannelWrapper<?> channel, final ClassNioServer server) {
+  private void resetNodeState(final ChannelWrapper<?> channel, final NodeClassNioServer server) {
     try {
       if (debugEnabled) log.debug(build("resetting channel state for node ", channel));
       server.getTransitionManager().transitionChannel(channel, NodeClassTransition.TO_NODE_WAITING_PROVIDER_RESPONSE, true);
@@ -247,7 +246,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName()).append('[');
     try {
       sb.append("channel=").append(channel.getClass().getSimpleName());
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       sb.append("???[");
     }
     sb.append("[id=").append(channel.getId()).append(']');
@@ -275,7 +274,7 @@ public class ClientClassContext extends AbstractClassContext<ClientClassState> {
     String uuid = request.getResource().getUuidPath().getFirst();
     ClientClassNioServer server = driver.getClientClassServer();
     Collection<ResourceRequest> allRequests = server.removeResourceRequest(uuid, getResourceName(resource));
-    StateTransitionManager tm = driver.getNodeClassServer().getTransitionManager();
+    StateTransitionManager<NodeClassState, NodeClassTransition> tm = driver.getNodeClassServer().getTransitionManager();
     for (ResourceRequest req: allRequests) {
       ChannelWrapper<?> nodeChannel = req.getChannel();
       NodeClassContext nodeContext = (NodeClassContext) nodeChannel.getContext();

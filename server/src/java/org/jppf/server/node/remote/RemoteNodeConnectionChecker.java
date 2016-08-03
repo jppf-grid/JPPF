@@ -128,7 +128,7 @@ public class RemoteNodeConnectionChecker extends AbstractNodeConnectionChecker {
         long start = System.nanoTime();
         try {
           socketWrapper.receiveBytes(1);
-        } catch (SocketTimeoutException ignore) {
+        } catch (@SuppressWarnings("unused") SocketTimeoutException ignore) {
           double elapsed = (System.nanoTime() - start) / 1e6d;
           if (debugEnabled) log.debug("receive time: " + elapsed);
         } catch (Exception e) {

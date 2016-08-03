@@ -66,7 +66,7 @@ class WaitingInitialNodeRequestState extends NodeClassServerState {
       if (debugEnabled) log.debug("received node init request for uuid = {}", uuid);
       if (uuid != null) {
         context.setUuid(uuid);
-        ((NodeClassNioServer) server).addNodeConnection(uuid, wrapper);
+        server.addNodeConnection(uuid, wrapper);
       }
       // send the uuid of this driver to the node or node peer.
       resource.setState(JPPFResourceWrapper.State.NODE_RESPONSE);

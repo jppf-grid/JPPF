@@ -56,7 +56,6 @@ public class NodeClassContext extends AbstractClassContext<NodeClassState> {
 
   @Override
   public boolean setState(final NodeClassState state) {
-    NodeClassState oldState = this.state;
     boolean b = super.setState(state);
     if (NodeClassState.IDLE_NODE.equals(state)) {
       synchronized(getChannel()) {

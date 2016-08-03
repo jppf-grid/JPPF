@@ -99,7 +99,7 @@ public class ClientContext extends AbstractNioContext<ClientState> {
       if (debugEnabled && (e != null)) log.debug("exception on channel {} :\n{}", channel, ExceptionUtils.getStackTrace(e));
       ClientNioServer.closeClient(channel);
       if (uuid != null) {
-        ClientClassNioServer classServer = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
+        ClientClassNioServer classServer = JPPFDriver.getInstance().getClientClassServer();
         List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
         String s = getClass().getSimpleName() + '[' + "channelId=" + channel.getId() + ']'; 
         if (debugEnabled) log.debug("{} found {} provider connections for clientUuid={}", new Object[] {s, list == null ? 0 : list.size(), uuid});
@@ -257,14 +257,8 @@ public class ClientContext extends AbstractNioContext<ClientState> {
    */
   synchronized void cancelJobOnClose() {
     ServerTaskBundleClient clientBundle;
-    int count = 0;
-    int pendingCount = 0;
     int nbTasksToSend = this.nbTasksToSend;
     int n = 0;
-    for (ServerTaskBundleClient bundle: completedBundles) {
-      count += bundle.getTaskCount();
-      pendingCount += bundle.getPendingTasksCount();
-    }
     if ((clientBundle = getInitialBundleWrapper()) != null) {
       TaskBundle header = clientBundle.getJob();
       if (debugEnabled) log.debug("cancelUponClientDisconnect={} for {}", header.getSLA().isCancelUponClientDisconnect(), header);

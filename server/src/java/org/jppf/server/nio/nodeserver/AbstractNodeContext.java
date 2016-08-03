@@ -59,7 +59,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   /**
    * Bundler used to schedule tasks for the corresponding node.
    */
-  protected Bundler bundler = null;
+  protected Bundler<?> bundler = null;
   /**
    * Represents the node system information.
    */
@@ -135,7 +135,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   }
 
   @Override
-  public Bundler getBundler() {
+  public Bundler<?> getBundler() {
     return bundler;
   }
 
@@ -143,7 +143,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
    * Set the bundler used to schedule tasks for the corresponding node.
    * @param bundler a {@link Bundler} instance.
    */
-  public void setBundler(final Bundler bundler) {
+  public void setBundler(final Bundler<?> bundler) {
     this.bundler = bundler;
   }
 
@@ -177,7 +177,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
   public void handleException(final ChannelWrapper<?> channel, final Exception exception) {
     if (closed.compareAndSet(false, true)) {
       if (debugEnabled) {
-        if (exception != null) log.debug("handling '{}' for {}", exception == null ? "null" : ExceptionUtils.getMessage(exception), channel);
+        if (exception != null) log.debug("handling '{}' for {}", ExceptionUtils.getMessage(exception), channel);
         else log.debug("handling null for {}, call stack:\n{}", channel, ExceptionUtils.getCallStack());
       }
       ServerTaskBundleNode tmpBundle = bundle;
@@ -235,7 +235,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
     NodeNioServer server = JPPFDriver.getInstance().getNodeNioServer();
     //if (shouldRemoveReservation) server.getNodeReservationHandler().removeReservation(this);
     if (reservationTansition == NodeReservationHandler.Transition.REMOVE) server.getNodeReservationHandler().removeReservation(this);
-    Bundler bundler = getBundler();
+    Bundler<?> bundler = getBundler();
     if (bundler != null) {
       bundler.dispose();
       if (bundler instanceof ContextAwareness) ((ContextAwareness) bundler).setJPPFContext(null);
@@ -386,7 +386,7 @@ public abstract class AbstractNodeContext extends AbstractNioContext<NodeState> 
         @Override public void run() {
           try {
             jmx.close();
-          } catch (Exception ignore) {
+          } catch (@SuppressWarnings("unused") Exception ignore) {
           }
         }
       };

@@ -240,7 +240,7 @@ public class PeerAttributesHandler implements NotificationListener {
       if (jmx != null) {
         try {
           jmx.removeNotificationListener(PeerDriverMBean.MBEAN_NAME, this, null, context);
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
     }
@@ -266,7 +266,7 @@ public class PeerAttributesHandler implements NotificationListener {
       if (jmx != null) {
         try {
           jmx.addNotificationListener(PeerDriverMBean.MBEAN_NAME, this, null, context);
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
     }

@@ -131,7 +131,7 @@ public class LocalNodeIO extends AbstractNodeIO {
     List<Future<DataLocation>> futureList = new ArrayList<>(tasks.size() + 1);
     JPPFContainer cont = node.getContainer(bundle.getUuidPath().getList());
     futureList.add(executor.submit(new ObjectSerializationTask(bundle, cont.getSerializer(), cont.getClassLoader())));
-    for (Task task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
+    for (Task<?> task : tasks) futureList.add(executor.submit(new ObjectSerializationTask(task, cont.getSerializer(), cont.getClassLoader())));
     LocalNodeContext ctx = channel.getChannel();
     LocalNodeMessage message = (LocalNodeMessage) ctx.newMessage();
     for (Future<DataLocation> f: futureList) {

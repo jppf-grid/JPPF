@@ -75,7 +75,7 @@ class WaitingHandshakeState extends ClientServerState
       String uuid = header.getUuidPath().getCurrentElement();
       context.setUuid(uuid);
       // wait until a class loader channel is up for the same client uuid
-      ClientClassNioServer classServer = (ClientClassNioServer) driver.getClientClassServer();
+      ClientClassNioServer classServer = driver.getClientClassServer();
       List<ChannelWrapper<?>> list = classServer.getProviderConnections(uuid);
       while ((list == null) || list.isEmpty())
       {

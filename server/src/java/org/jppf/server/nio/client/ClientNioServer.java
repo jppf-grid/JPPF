@@ -89,7 +89,7 @@ public class ClientNioServer extends NioServer<ClientState, ClientTransition>
   }
 
   @Override
-  public NioContext createNioContext() {
+  public NioContext<ClientState> createNioContext() {
     return new ClientContext();
   }
 

@@ -315,7 +315,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
   public Set<String> getAllJobIds() {
     lock.lock();
     try {
-      return new HashSet(jobMap.keySet());
+      return new HashSet<>(jobMap.keySet());
     } finally {
       lock.unlock();
     }
@@ -387,7 +387,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ServerJob, ServerTaskBu
    * 
    * @return the priority map.
    */
-  LinkedListSortedMap getPriorityMap() {
+  LinkedListSortedMap<Integer, ServerJob> getPriorityMap() {
     return priorityMap;
   }
 

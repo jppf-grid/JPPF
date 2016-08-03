@@ -168,7 +168,7 @@ public class BroadcastManager {
     List<AbstractNodeContext> connections;
     try {
       connections = callableAllConnections.call();
-    } catch (Throwable e) {
+    } catch (@SuppressWarnings("unused") Throwable e) {
       connections = Collections.emptyList();
     }
     if (connections.isEmpty()) return;
@@ -190,7 +190,6 @@ public class BroadcastManager {
     JobSLA sla = broadcastJob.getSLA();
     List<ServerJobBroadcast> jobList = new ArrayList<>(connections.size());
     Set<String> uuidSet = new HashSet<>();
-    int count = 0;
     for (AbstractNodeContext connection : connections) {
       ExecutorStatus status = connection.getExecutionStatus();
       if (status == ExecutorStatus.ACTIVE || status == ExecutorStatus.EXECUTING) {

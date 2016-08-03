@@ -62,7 +62,7 @@ class WaitingPeerInitiationResponseState extends ClientClassServerState {
       String uuid = resource.getProviderUuid();
       if (debugEnabled) log.debug("read initial response from peer " + channel + ", providerUuid=" + uuid);
       context.setUuid(uuid);
-      ((ClientClassNioServer) server).addProviderConnection(uuid, channel);
+      server.addProviderConnection(uuid, channel);
       return context.isPeer() ? TO_IDLE_PEER_PROVIDER : TO_IDLE_PROVIDER;
     }
     return TO_WAITING_PEER_INITIATION_RESPONSE;

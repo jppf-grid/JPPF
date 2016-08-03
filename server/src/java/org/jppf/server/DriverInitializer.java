@@ -137,7 +137,7 @@ public class DriverInitializer {
   @SuppressWarnings("unchecked")
   void registerProviderMBeans() throws Exception {
     MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-    JPPFMBeanProviderManager mgr = new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
+    new JPPFMBeanProviderManager<>(JPPFDriverMBeanProvider.class, null, server);
     registerNodeConfigListener();
   }
 
@@ -389,7 +389,7 @@ public class DriverInitializer {
          }
        }
      };
-     String listenerId = jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);
+     jmx.registerForwardingNotificationListener(NodeSelector.ALL_NODES, NodeConfigNotifierMBean.MBEAN_NAME, listener, null, null);
    } catch (Exception e) {
      if (debugEnabled) log.debug(e.getMessage(), e);
      else log.warn(ExceptionUtils.getMessage(e));
@@ -409,7 +409,7 @@ public class DriverInitializer {
       try {
         int n = Integer.valueOf(strPorts[i].trim());
         portsList.add(n);
-      } catch(NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
         if (debugEnabled) log.debug("invalid port number value '" + strPorts[i] + "'");
       }
     }

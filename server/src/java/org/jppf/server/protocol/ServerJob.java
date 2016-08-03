@@ -120,10 +120,8 @@ public class ServerJob extends AbstractServerJobBase {
             if (traceEnabled) log.trace("task to resubmit: {}", task);
             task.setState(TaskState.PENDING);
           } else {
-            if (results != null) {
-              DataLocation location = results.get(i);
-              task.resultReceived(location);
-            }
+            DataLocation location = results.get(i);
+            task.resultReceived(location);
             map.putValue(task.getBundle(), task);
           }
         }
@@ -221,7 +219,6 @@ public class ServerJob extends AbstractServerJobBase {
    * Perform the necessary actions for when this job has been cancelled.
    */
   private void handleCancelledStatus() {
-    List<Future> futureList;
     Map<Long, ServerTaskBundleNode> map;
     synchronized (dispatchSet) {
       map = new HashMap<>(dispatchSet);
@@ -230,7 +227,7 @@ public class ServerJob extends AbstractServerJobBase {
     for (Map.Entry<Long, ServerTaskBundleNode> entry: map.entrySet()) {
       try {
         ServerTaskBundleNode nodeBundle = entry.getValue();
-        Future future = nodeBundle.getFuture();
+        Future<?> future = nodeBundle.getFuture();
         if (!future.isDone()) {
           future.cancel(false);
           nodeBundle.resultsReceived((List<DataLocation>) null);

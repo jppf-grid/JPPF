@@ -30,13 +30,13 @@ public class JPPFContextDriver extends JPPFContext
   /**
    * Reference to the job queue.
    */
-  private final JPPFQueue queue;
+  private final JPPFQueue<?, ?, ?> queue;
 
   /**
    * Default initializer.
    * @param queue        the reference queue to use.
    */
-  public JPPFContextDriver(final JPPFQueue queue)
+  public JPPFContextDriver(final JPPFQueue<?, ?, ?> queue)
   {
     if (queue == null) throw new IllegalArgumentException("queue is null");
 

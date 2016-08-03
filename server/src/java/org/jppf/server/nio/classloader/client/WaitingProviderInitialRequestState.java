@@ -64,7 +64,7 @@ class WaitingProviderInitialRequestState extends ClientClassServerState {
       if (debugEnabled) log.debug("initiating provider: " + wrapper);
       String uuid = resource.getUuidPath().getFirst();
       // it is a provider
-      ((ClientClassNioServer) server).addProviderConnection(uuid, wrapper);
+      server.addProviderConnection(uuid, wrapper);
       context.setUuid(uuid);
       context.setConnectionUuid((String) resource.getData(ResourceIdentifier.CONNECTION_UUID));
       context.setMessage(null);

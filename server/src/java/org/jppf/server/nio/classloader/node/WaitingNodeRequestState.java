@@ -106,7 +106,6 @@ class WaitingNodeRequestState extends NodeClassServerState {
    * @throws Exception if any error occurs.
    */
   private boolean processResource(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
-    TraversalList<String> uuidPath = resource.getUuidPath();
     boolean dynamic = resource.isDynamic();
     if (!dynamic || (resource.getRequestUuid() == null)) return processNonDynamic(channel, resource);
     return processDynamic(channel, resource);
@@ -122,7 +121,6 @@ class WaitingNodeRequestState extends NodeClassServerState {
   private boolean processNonDynamic(final ChannelWrapper<?> channel, final JPPFResourceWrapper resource) throws Exception {
     byte[] b = null;
     String name = resource.getName();
-    NodeClassContext context = (NodeClassContext) channel.getContext();
     TraversalList<String> uuidPath = resource.getUuidPath();
     String uuid = (uuidPath.size() > 0) ? uuidPath.getCurrentElement() : null;
     if (((uuid == null) || uuid.equals(driver.getUuid())) && (resource.getCallable() == null)) {
@@ -202,7 +200,7 @@ class WaitingNodeRequestState extends NodeClassServerState {
    */
   private ChannelWrapper<?> findProviderConnection(final String uuid) throws Exception {
     ChannelWrapper<?> result = null;
-    ClientClassNioServer clientClassServer = (ClientClassNioServer) driver.getClientClassServer();
+    ClientClassNioServer clientClassServer = driver.getClientClassServer();
     List<ChannelWrapper<?>> connections = clientClassServer.getProviderConnections(uuid);
     if (connections == null) return null;
     int minRequests = Integer.MAX_VALUE;

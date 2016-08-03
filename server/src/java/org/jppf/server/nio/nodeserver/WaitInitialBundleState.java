@@ -84,7 +84,7 @@ class WaitInitialBundleState extends NodeServerState {
       if (debugEnabled) log.debug("read bundle for {}, bundle={}", channel, bundle);
       String uuid = bundle.getParameter(NODE_UUID_PARAM);
       context.setUuid(uuid);
-      Bundler bundler = server.getBundlerFactory().newBundler();
+      Bundler<?> bundler = server.getBundlerFactory().newBundler();
       boolean isPeer = bundle.getParameter(IS_PEER, false);
       context.setPeer(isPeer);
       JPPFSystemInformation systemInfo = bundle.getParameter(SYSTEM_INFO_PARAM);
@@ -158,7 +158,7 @@ class WaitInitialBundleState extends NodeServerState {
         if (log.isTraceEnabled()) log.trace("resolved host from reverse DNS lookup: host={}, ip={}", host, ip);
         return new HostIP(host, ip);
       }
-    } catch (UnknownHostException ignore) {
+    } catch (@SuppressWarnings("unused") UnknownHostException ignore) {
     }
     // if host couldn't be resolved via reverse DNS lookup
     JPPFSystemInformation info = ((AbstractNodeContext) channel.getContext()).getSystemInformation();

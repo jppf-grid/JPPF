@@ -72,7 +72,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
   }
 
   @Override
-  public NioContext<?> createNioContext() {
+  public NioContext<ClientClassState> createNioContext() {
     return new ClientClassContext();
   }
 
@@ -108,7 +108,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
       log.warn("attempt to close null channel - skipping this step");
       return;
     }
-    ClientClassNioServer server = (ClientClassNioServer) JPPFDriver.getInstance().getClientClassServer();
+    ClientClassNioServer server = JPPFDriver.getInstance().getClientClassServer();
     ClientClassContext context = (ClientClassContext) channel.getContext();
     if (debugEnabled) log.debug("closing {}", context);
     String uuid = context.getUuid();
@@ -141,7 +141,7 @@ public class ClientClassNioServer extends ClassNioServer<ClientClassState, Clien
    * @param uuid the provider uuid as a string.
    * @param channel the provider's communication channel.
    */
-  public void removeProviderConnection(final String uuid, final ChannelWrapper channel) {
+  public void removeProviderConnection(final String uuid, final ChannelWrapper<?> channel) {
     if (debugEnabled) log.debug("removing provider connection: uuid=" + uuid + ", channel=" + channel);
     providerConnections.removeValue(uuid, channel);
   }

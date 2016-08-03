@@ -41,7 +41,7 @@ public abstract class AbstractSocketChannelHandler {
   /**
    * The NioServer to which the channel is registered.
    */
-  protected ClassNioServer server = null;
+  protected ClassNioServer<?, ?> server = null;
   /**
    * Wrapper around the underlying socket connection.
    */
@@ -55,7 +55,7 @@ public abstract class AbstractSocketChannelHandler {
    * Initialize this socket channel handler.
    * @param server the NioServer to which the channel is registered.
    */
-  public AbstractSocketChannelHandler(final ClassNioServer server) {
+  public AbstractSocketChannelHandler(final ClassNioServer<?, ?> server) {
     this.server = server;
   }
 
