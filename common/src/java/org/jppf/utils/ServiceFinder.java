@@ -61,7 +61,6 @@ public class ServiceFinder {
     for (String s: lines) {
       if (alreadyLoaded.contains(s)) continue;
       try {
-        @SuppressWarnings("unchecked")
         Class<? extends T> clazz = (Class<? extends T>) cl.loadClass(s);
         list.add(clazz);
         if (single) break;
@@ -82,7 +81,6 @@ public class ServiceFinder {
    * @param single determines whether only the first looked up provider should be returned, or all the providers found.
    * @return a list of concrete providers of the specified type.
    */
-  @SuppressWarnings("unchecked")
   public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl, final boolean single) {
     List<Class<? extends T>> classes = findProviderClassess(providerClass, cl, single);
     List<T> list = new ArrayList<>();
@@ -105,7 +103,6 @@ public class ServiceFinder {
    * @param cl the class loader to user for the lookup.
    * @return a list of concrete providers of the specified type.
    */
-  @SuppressWarnings("unchecked")
   public <T> List<T> findProviders(final Class<T> providerClass, final ClassLoader cl) {
     return findProviders(providerClass, cl, false);
   }

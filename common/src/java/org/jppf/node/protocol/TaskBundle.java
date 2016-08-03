@@ -53,12 +53,6 @@ public interface TaskBundle extends JPPFDistributedJob, Metadata
   void setNodeExecutionTime(long nodeExecutionTime);
 
   /**
-   * Get the number of tasks in this bundle.
-   * @return the number of tasks as an int.
-   */
-  int getTaskCount();
-
-  /**
    * Set the number of tasks in this bundle.
    * @param taskCount the number of tasks as an int.
    */

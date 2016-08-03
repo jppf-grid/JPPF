@@ -142,7 +142,6 @@ class Deserializer {
    * @return the class object whose handle was read.
    * @throws Exception if any error occurs.
    */
-  @SuppressWarnings("unchecked")
   private Object readClassObject(final byte header) throws Exception {
     String handle = readString();
     return caches.getClassFromHandle(handle, classloader);

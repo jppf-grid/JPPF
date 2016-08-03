@@ -34,7 +34,6 @@ public class JcaJobManager extends JobManagerClient {
   /**
    * Mapping of jobs to their uuid.
    */
-  @SuppressWarnings("deprecation")
   private Map<String, JPPFJob> jobMap = new Hashtable<>();
 
   /**

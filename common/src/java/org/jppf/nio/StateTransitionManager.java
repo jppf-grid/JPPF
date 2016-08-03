@@ -209,7 +209,6 @@ public class StateTransitionManager<S extends Enum<S>, T extends Enum<T>> {
    * @param context the context attached to the channel.
    * @return a {@link ChannelWrapper} instance.
    */
-  @SuppressWarnings("unchecked")
   private ChannelWrapper<?> registerChannel(final SocketChannel channel, final int interestOps, final NioContext<?> context) {
     ChannelWrapper<?> wrapper = null;
     try {

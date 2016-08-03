@@ -99,7 +99,6 @@ public class CompositeResourceWrapper extends JPPFResourceWrapper
     return futureMap;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public String toString()
   {

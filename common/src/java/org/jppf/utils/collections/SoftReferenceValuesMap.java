@@ -84,7 +84,6 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public V put(final K key, final V value) {
     cleanup();
     SoftReference<V> ref = map.put(key, new SoftValue<>(key, value, refQueue));

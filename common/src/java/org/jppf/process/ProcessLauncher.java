@@ -192,6 +192,7 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
    * @param n the exit value of the subprocess.
    * @return true if this launcher is to be terminated, false if it should re-launch the subprocess.
    */
+  @Override
   protected boolean onProcessExit(final int n) {
     String s = getOutput(process, "std").trim();
     if (s.length() > 0) {

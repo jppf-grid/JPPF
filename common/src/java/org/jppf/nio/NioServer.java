@@ -280,7 +280,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * It accept and put it in a state to define what type of peer is.
    * @param key the selection key that represents the channel's registration with the selector.
    */
-  @SuppressWarnings("unchecked")
   private void doAccept(final SelectionKey key) {
     ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
     boolean ssl = (Boolean) key.attachment();
@@ -306,7 +305,6 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * @param ssl specifies whether an <code>SSLHandler</code> should be initialized for the channel.
    * @return a wrapper for the newly registered channel.
    */
-  @SuppressWarnings("unchecked")
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
     NioContext<?> context = createNioContext();
@@ -344,7 +342,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
    * Define a context for a newly created channel.
    * @return an <code>NioContext</code> instance.
    */
-  public abstract NioContext<?> createNioContext();
+  public abstract NioContext<S> createNioContext();
 
   /**
    * Close the underlying server socket and stop this socket server.

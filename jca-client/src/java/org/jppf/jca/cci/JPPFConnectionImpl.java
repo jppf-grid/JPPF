@@ -108,7 +108,6 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public String submit(final JPPFJob job, final JobStatusListener listener) throws Exception
   {
     job.setBlocking(false);
@@ -118,7 +117,6 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void addJobStatusListener(final String jobUuid, final JobStatusListener listener)
   {
     JPPFJob res = getJob(jobUuid);
@@ -126,7 +124,6 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void removeJobStatusListener(final String jobUuid, final JobStatusListener listener)
   {
     JPPFJob res = getJob(jobUuid);
@@ -166,7 +163,7 @@ public class JPPFConnectionImpl implements JPPFConnection
    * @param jobUuid the id of the job to find.
    * @return a {@link JPPFJob} instance, or null if no job can be found for the specified uuid.
    */
-  private @SuppressWarnings("deprecation") JPPFJob getJob(final String jobUuid)
+  private JPPFJob getJob(final String jobUuid)
   {
     return ((JcaJobManager) managedConnection.retrieveJppfClient().getJobManager()).peekJob(jobUuid);
   }
@@ -194,7 +191,6 @@ public class JPPFConnectionImpl implements JPPFConnection
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public List<Task<?>> awaitResults(final String jobUuid) throws Exception
   {
     JPPFJob job = getJob(jobUuid);
