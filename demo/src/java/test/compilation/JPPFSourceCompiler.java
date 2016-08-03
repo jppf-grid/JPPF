@@ -22,34 +22,25 @@ import static test.compilation.TestCompilation.*;
 
 import java.util.*;
 
-import javax.tools.Diagnostic;
+import javax.tools.*;
 
 import org.jppf.client.*;
 import org.jppf.node.protocol.Task;
 import org.jppf.utils.ExceptionUtils;
 import org.jppf.utils.compilation.SourceCompiler;
-import org.slf4j.*;
 
 /**
  * Build a JPPTask class from its source stored in a string,
  * then execute it in a JPPF grid.
  * @author Laurent Cohen
  */
-public class JPPFSourceCompiler
-{
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(JPPFSourceCompiler.class);
-
+public class JPPFSourceCompiler {
   /**
    * Entry point for this demo.
    * @param args not used.
    */
-  public static void main(final String[] args)
-  {
-    try
-    {
+  public static void main(final String[] args) {
+    try {
       //String className = "test.compilation.MyTask";
       String taskClassName = null;
       // an array of the sources - the first element is the one executed as a task
@@ -57,43 +48,34 @@ public class JPPFSourceCompiler
       CharSequence[] srcArray = { buildSourceCode(), buildSourceCode2() };
       // build the map of sources to compile
       Map<String, CharSequence> sources = new HashMap<>();
-      for (CharSequence seq: srcArray)
-      {
+      for (CharSequence seq : srcArray) {
         String name = classNameFromSource(seq);
         output("adding source for " + name);
         if (taskClassName == null) taskClassName = name;
         sources.put(name, seq);
       }
       SourceCompiler compiler = null;
-      try
-      {
+      try {
         compiler = new SourceCompiler();
         // receive the map of generated classes bytecode
         Map<String, byte[]> bytecodeMap = compiler.compileToMemory(sources);
         output("bytecode map = " + bytecodeMap);
         byte[] bytecode = bytecodeMap.get(taskClassName);
         output("got bytecode = " + (bytecode == null ? "null" : "[length=" + bytecode.length + "]"));
-        if (bytecode == null)
-        {
-          List<Diagnostic> diags = compiler.getDiagnostics();
+        if (bytecode == null) {
+          List<Diagnostic<JavaFileObject>> diags = compiler.getDiagnostics();
           output("diagnostics: ");
-          for (Diagnostic d: diags) output("  " + d);
-        }
-        else
-        {
+          for (Diagnostic<JavaFileObject> d : diags) output("  " + d);
+        } else {
           // load the class
           Class<?> clazz = compiler.getClassloader().loadClass(taskClassName);
-          Object task = (Object) clazz.newInstance();
+          Object task = clazz.newInstance();
           executeJob(task);
         }
-      }
-      finally
-      {
+      } finally {
         compiler.close();
       }
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -103,21 +85,17 @@ public class JPPFSourceCompiler
    * @param task the task to execute.
    * @throws Exception if any error occurs.
    */
-  private static void executeJob(final Object task) throws Exception
-  {
+  private static void executeJob(final Object task) throws Exception {
     JPPFClient client = new JPPFClient();
-    try
-    {
+    try {
       JPPFJob job = new JPPFJob();
       job.setName("compiled class job");
       job.add(task);
       List<Task<?>> results = client.submitJob(job);
-      Task result = results.get(0);
+      Task<?> result = results.get(0);
       if (result.getThrowable() != null) output("got exception: " + ExceptionUtils.getStackTrace(result.getThrowable()));
       else output("got result: " + result.getResult());
-    }
-    finally
-    {
+    } finally {
       client.close();
     }
   }
