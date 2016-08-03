@@ -28,24 +28,21 @@ import org.jppf.node.protocol.Task;
  * to write an application using JPPF.
  * @author Laurent Cohen
  */
-public class NativeLibRunner
-{
+public class NativeLibRunner {
   /**
    * The JPPF client, handles all communications with the server.
    * It is recommended to only use one JPPF client per JVM, so it
    * should generally be created and used as a singleton.
    */
-  private static JPPFClient jppfClient =  null;
+  private static JPPFClient jppfClient = null;
 
   /**
    * The entry point for this application runner to be run from a Java command line.
    * @param args by default, we do not use the command line arguments,
    * however nothing prevents us from using them if need be.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       // create the JPPFClient. This constructor call causes JPPF to read the configuration file
       // and connect with one or multiple JPPF drivers.
       jppfClient = new JPPFClient();
@@ -53,25 +50,20 @@ public class NativeLibRunner
       // create a runner instance.
       NativeLibRunner runner = new NativeLibRunner();
 
-      for (int i=0; i<3; i++)
-      {
-        System.out.println("submitting job #" + (i+1) + " ...");
+      for (int i = 0; i < 3; i++) {
+        System.out.println("submitting job #" + (i + 1) + " ...");
         // Create a job
         JPPFJob job = runner.createJob();
-        job.setName("" + (i+1));
+        job.setName("" + (i + 1));
 
         // execute a blocking job
         runner.executeBlockingJob(job);
       }
       // execute a non-blocking job
       //runner.executeNonBlockingJob(job);
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -81,8 +73,7 @@ public class NativeLibRunner
    * @return an instance of the {@link org.jppf.client.JPPFJob JPPFJob} class.
    * @throws Exception if an error occurs while creating the job or adding tasks.
    */
-  public JPPFJob createJob() throws Exception
-  {
+  public JPPFJob createJob() throws Exception {
     // create a JPPF job
     JPPFJob job = new JPPFJob();
 
@@ -107,8 +98,7 @@ public class NativeLibRunner
    * @param job the JPPF job to execute.
    * @throws Exception if an error occurs while executing the job.
    */
-  public void executeBlockingJob(final JPPFJob job) throws Exception
-  {
+  public void executeBlockingJob(final JPPFJob job) throws Exception {
     // set the job in blocking mode.
     job.setBlocking(true);
 
@@ -118,17 +108,13 @@ public class NativeLibRunner
     List<Task<?>> results = jppfClient.submitJob(job);
 
     // process the results
-    for (Task task: results)
-    {
+    for (Task<?> task : results) {
       // if the task execution resulted in an exception
-      if (task.getThrowable() != null)
-      {
+      if (task.getThrowable() != null) {
         // process the exception here ...
         System.out.println("Caught exception:");
         task.getThrowable().printStackTrace();
-      }
-      else
-      {
+      } else {
         // process the result here ...
         System.out.println("Result:" + task.getResult());
       }
@@ -141,8 +127,7 @@ public class NativeLibRunner
    * @param job the JPPF job to execute.
    * @throws Exception if an error occurs while executing the job.
    */
-  public void executeNonBlockingJob(final JPPFJob job) throws Exception
-  {
+  public void executeNonBlockingJob(final JPPFJob job) throws Exception {
     // set the job in non-blocking (or asynchronous) mode.
     job.setBlocking(false);
 
@@ -160,15 +145,11 @@ public class NativeLibRunner
     List<Task<?>> results = job.awaitResults();
 
     // process the results
-    for (Task task: results)
-    {
+    for (Task<?> task : results) {
       // if the task execution resulted in an exception
-      if (task.getThrowable() != null)
-      {
+      if (task.getThrowable() != null) {
         // process the exception here ...
-      }
-      else
-      {
+      } else {
         // process the result here ...
       }
     }

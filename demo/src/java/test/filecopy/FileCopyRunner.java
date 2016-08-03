@@ -44,7 +44,7 @@ public class FileCopyRunner {
       if (task.getThrowable() != null) System.out.println("got exception: " + ExceptionUtils.getStackTrace(task.getThrowable()));
       else System.out.println("result: " + task.getResult());
       TimeMarker marker = new TimeMarker().start();
-      Location in = new FileLocation("client.txt");
+      Location<?> in = new FileLocation("client.txt");
       in.copyTo(new FileLocation("node.txt"));
       System.out.printf("local copy done in %s%n", marker.stop().getLastElapsedAsString());
     } catch (Exception e) {

@@ -17,8 +17,6 @@
  */
 package sample.test.profiling;
 
-import java.net.URL;
-
 import org.jppf.node.protocol.AbstractTask;
 
 /**
@@ -31,10 +29,12 @@ public class EmptyTask extends AbstractTask<String>
   /**
    * The data size in KB.
    */
+  @SuppressWarnings("unused")
   private int dataSize = 0;
   /**
    * The data in this task.
    */
+  @SuppressWarnings("unused")
   private byte[] data = null;
   /**
    * Initialize with the specified data size.
@@ -57,7 +57,7 @@ public class EmptyTask extends AbstractTask<String>
     ClassLoader cl = getClass().getClassLoader();
     for (String s: res)
     {
-      URL url = cl.getResource(s);
+      cl.getResource(s);
       //System.out.println("url for '" + s + "' : " + url);
     }
   }

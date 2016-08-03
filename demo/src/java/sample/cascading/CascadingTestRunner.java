@@ -71,7 +71,7 @@ public class CascadingTestRunner
     job.add(new Task1());
     job.getSLA().setExecutionPolicy(new Equal("id", 1));
     List<Task<?>> results = jppfClient.submitJob(job);
-    for (Task task: results)
+    for (Task<?> task: results)
     {
       if (task.getThrowable() != null) task.getThrowable().printStackTrace();
       else System.out.println("result: " + task.getResult());

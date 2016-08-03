@@ -50,6 +50,7 @@ public class BroadcastJobRunner {
    * Submit a broadcast job.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void submitJob() throws Exception {
     boolean remoteEnabled = true;
     JPPFConfiguration.set(DISCOVERY_ENABLED, false)
@@ -98,7 +99,7 @@ public class BroadcastJobRunner {
     int nbTasks = 10;
     JPPFExecutorService executor = new JPPFExecutorService(client);
     executor.setBatchSize(nbTasks);
-    JPPFCompletionService completionService = new JPPFCompletionService(executor);
+    JPPFCompletionService<?> completionService = new JPPFCompletionService<>(executor);
     ExecutorServiceConfiguration cfg = executor.getConfiguration();
     JobConfiguration jobConfig = cfg.getJobConfiguration();
     jobConfig.getClientSLA().setMaxChannels(2);

@@ -48,7 +48,6 @@ public class RegexRunner {
     TypedProperties config = new TypedProperties();
     //props.setString("jppf.script.default.language", "$script{ 'groo' + 'vy' }$");
     config.setString("jppf.script.default.language", "$script::url{ http://localhost:8880/test.js }$");
-    int count = 0;
     config.setString("prop.0", "hello miscreant world");
     config.setString("prop.1", "hello $script:javascript{ 2 + 3 }$ world");
     config.setString("prop.2", "hello $script:glouglou:{ 2 + 3 }$ world");
@@ -69,6 +68,7 @@ public class RegexRunner {
    * Test regular expressios.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void performRegex() throws Exception {
     //Pattern p = Pattern.compile("\\$script\\:(.*)\\:(.*)\\{(.*)\\}\\$");
     //Pattern p = Pattern.compile("\\$script(?:\\:(.*))?(?:\\:(.*))?\\{(.*)\\}\\$");

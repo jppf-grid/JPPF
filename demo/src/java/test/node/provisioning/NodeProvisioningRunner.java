@@ -57,6 +57,7 @@ public class NodeProvisioningRunner {
    * @param client the lcient to use.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void perform1(final JPPFClient client) throws Exception {
     JPPFConnectionPool pool = client.awaitWorkingConnectionPool();
     JMXDriverConnectionWrapper jmxDriver = pool.awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
@@ -113,15 +114,14 @@ public class NodeProvisioningRunner {
       System.out.printf("iteration %d: provisioning %d slaves%n", i, nbSlaves);
       long start = System.nanoTime();
       forwarder.provisionSlaveNodes(masterSelector, nbSlaves, true);
-      int n = 0;
-      while ((n = jmx.nbIdleNodes()) != nbSlaves + 1) Thread.sleep(1L);
+      while (jmx.nbIdleNodes() != nbSlaves + 1) Thread.sleep(1L);
       long elapsed = System.nanoTime() - start;
       totalElapsed += elapsed;
       System.out.printf("iteration %d: provisioning %d slaves took %,d ms%n", i, nbSlaves, elapsed/1_000_000L);
       System.out.printf("iteration %d: un-provisioning %d slaves%n", i, nbSlaves);
       start = System.nanoTime();
       forwarder.provisionSlaveNodes(masterSelector, 0, true);
-      while ((n = jmx.nbIdleNodes()) != 1) Thread.sleep(1L);
+      while (jmx.nbIdleNodes() != 1) Thread.sleep(1L);
       elapsed = System.nanoTime() - start;
       totalElapsed += elapsed;
       System.out.printf("iteration %d: un-provisioning %d slaves took %,d ms%n", i, nbSlaves, elapsed/1_000_000L);

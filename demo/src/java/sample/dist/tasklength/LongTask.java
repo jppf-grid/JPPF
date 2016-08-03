@@ -68,6 +68,7 @@ public class LongTask extends AbstractTask<String> {
         for (; elapsed < taskLength; elapsed = (System.nanoTime() - taskStart) / 1_000_000L) {
           String s = "";
           for (int i=0; i<10; i++) s += "A10";
+          s.toString();
         }
       } else {
         if (taskLength > 0) Thread.sleep(taskLength);

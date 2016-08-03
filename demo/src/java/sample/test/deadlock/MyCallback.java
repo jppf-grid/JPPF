@@ -32,10 +32,12 @@ class MyCallback extends JobStreamingCallback.Adapter {
   /**
    *
    */
+  @SuppressWarnings("unused")
   private final JPPFClient client;
   /**
    *
    */
+  @SuppressWarnings("unused")
   private final AtomicBoolean done = new AtomicBoolean(false);
 
   /**
@@ -66,7 +68,7 @@ class MyCallback extends JobStreamingCallback.Adapter {
     ClassPath cp = job.getSLA().getClassPath();
     File file = new File(filename);
     try {
-      Location loc = new FileLocation(file).copyTo(new MemoryLocation(file.length()));
+      Location<?> loc = new FileLocation(file).copyTo(new MemoryLocation(file.length()));
       cp.add(filename, loc);
     } catch (Exception e) {
       throw new IllegalStateException(e.getMessage(), e);

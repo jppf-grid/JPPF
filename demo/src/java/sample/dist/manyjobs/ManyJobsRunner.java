@@ -17,10 +17,7 @@
  */
 package sample.dist.manyjobs;
 
-import java.util.List;
-
 import org.jppf.client.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
 import org.slf4j.*;
@@ -99,7 +96,7 @@ public class ManyJobsRunner
     }
     print("submitted " + nbJobs + " jobs");
     for (int n=0; n<nbJobs; n++) {
-      List<Task<?>> results = jobs[n].awaitResults();
+      jobs[n].awaitResults();
     }
     long elapsed = (System.nanoTime() - start) / 1_000_000L;
     print("got all " + nbJobs + " result lists in " + StringUtils.toStringDuration(elapsed));

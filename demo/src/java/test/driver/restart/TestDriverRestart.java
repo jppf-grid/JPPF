@@ -102,6 +102,7 @@ public class TestDriverRestart {
   }
 
   /** */
+  @SuppressWarnings("unused")
   private static class KillDriverTask extends TimerTask {
     @Override
     public void run() {
@@ -124,6 +125,7 @@ public class TestDriverRestart {
 
   /** */
   private static class ProxySettingTask implements Runnable {
+    @SuppressWarnings("unused")
     @Override
     public void run() {
       try {

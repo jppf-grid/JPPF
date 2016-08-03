@@ -18,10 +18,7 @@
 
 package sample;
 
-import java.util.Date;
-
 import org.jppf.node.protocol.AbstractTask;
-import org.jppf.utils.Pair;
 
 /**
  * This task implementation encapsulates base functionality for demonstration tasks, such as start and end event notifications.
@@ -36,7 +33,6 @@ public abstract class BaseDemoTask extends AbstractTask<Object>
   @Override
   public void run()
   {
-    Pair<String, Date> p = new Pair<>("hellow", new Date());
     //fireNotification("start exec");
     try
     {

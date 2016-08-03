@@ -28,8 +28,7 @@ import org.jppf.utils.ExceptionUtils;
  * 
  * @author Laurent Cohen
  */
-public class JBossTestRunner
-{
+public class JBossTestRunner {
   /**
    * The JPPF client.
    */
@@ -39,20 +38,14 @@ public class JBossTestRunner
    * Entry point into the test.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       System.out.println("Starting ...");
       client = new JPPFClient();
       perform();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (client != null) client.close();
     }
     System.out.println("... done");
@@ -62,21 +55,17 @@ public class JBossTestRunner
    * Submit non-blocking tasks.
    * @throws Exception if any error occurs.
    */
-  public static void perform() throws Exception
-  {
+  public static void perform() throws Exception {
     JPPFJob job = new JPPFJob("JBoss Runner");
     job.add(new JBossTask("C:/Tools/jboss-5.1.0.GA", "jppf"));
     job.setBlocking(false);
     job.getSLA().setBroadcastJob(true);
     client.submitJob(job);
     List<Task<?>> results = job.awaitResults();
-    Task task = results.get(0);
-    if (task.getThrowable() != null)
-    {
+    Task<?> task = results.get(0);
+    if (task.getThrowable() != null) {
       System.out.println("task ended with exception:\n" + ExceptionUtils.getStackTrace(task.getThrowable()));
-    }
-    else
-    {
+    } else {
       System.out.println("task result: " + task.getResult());
     }
   }

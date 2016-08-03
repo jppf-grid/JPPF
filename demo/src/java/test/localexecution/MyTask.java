@@ -27,16 +27,11 @@ import org.jppf.utils.collections.CollectionUtils;
  * Test task.
  * @author Laurent Cohen
  */
-public class MyTask extends AbstractTask<String>
-{
+public class MyTask extends AbstractTask<String> {
   /**
    * Explicit serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * Path to some jar on the client side.
-   */
-  private static final String JAR_PATH = "../samples-pack/shared/lib/hazelcast-1.9.3.jar";
   /**
    * Path to some jar on the client side.
    */
@@ -50,23 +45,19 @@ public class MyTask extends AbstractTask<String>
    * {@inheritDoc}
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       System.out.println("starting task");
       AbstractJPPFClassLoader cl = (AbstractJPPFClassLoader) getClass().getClassLoader();
       if (!initialized) loadJars(cl);
-      Class c = cl.loadClass("com.hazelcast.core.Hazelcast");
+      Class<?> c = cl.loadClass("com.hazelcast.core.Hazelcast");
       System.out.println("found class " + c);
       c = cl.loadClass("jaligner.Sequence");
       System.out.println("found class " + c);
       c = cl.loadClass("org.mozilla.javascript.Evaluator");
       System.out.println("found class " + c);
       setResult("ok");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
       setThrowable(e);
     }
@@ -77,18 +68,16 @@ public class MyTask extends AbstractTask<String>
    * @param cl the class loader to use to load the jars.
    * @throws Exception if any error occurs.
    */
-  private static synchronized void loadJars(final AbstractJPPFClassLoader cl) throws Exception
-  {
+  private static synchronized void loadJars(final AbstractJPPFClassLoader cl) throws Exception {
     if (initialized) return;
     initialized = true;
     System.out.println("loading jars");
-    /*
-		URL url = cl.getResource(JAR_PATH);
-		System.out.println("got URL: " + url);
-		if (url != null) cl.addURL(url);
-     */
+    /* URL url = cl.getResource(JAR_PATH);
+     * System.out.println("got URL: " + url);
+     * if (url != null) cl.addURL(url); */
     URL[] urls = cl.getMultipleResources(JAR_PATHS);
     System.out.println("got URLs: " + CollectionUtils.list(urls));
-    for (URL url: urls) if (url != null) cl.addURL(url);
+    for (URL url : urls)
+      if (url != null) cl.addURL(url);
   }
 }

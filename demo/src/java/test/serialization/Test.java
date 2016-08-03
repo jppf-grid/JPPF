@@ -55,8 +55,7 @@ public class Test {
    * Perform a test.
    * @throws Exception if any error occurs.
    */
-  public static void test() throws Exception
-  {
+  public static void test() throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName("my job id");
     Task<String> task = new LongTask(1000);
@@ -66,7 +65,7 @@ public class Test {
     job.add(task);
     Test test = new Test();
     byte[] data = test.serialize(job);
-    JPPFJob job2 = (JPPFJob) test.deserialize(data);
+    test.deserialize(data);
     print("the end");
   }
 
@@ -74,18 +73,18 @@ public class Test {
    * Perform a test.
    * @throws Exception if any error occurs.
    */
-  public static void test2() throws Exception
-  {
+  public static void test2() throws Exception {
     TaskBundle bundle = new JPPFTaskBundle();
     bundle.setName("server handshake");
     bundle.setUuid("job uuid");
     bundle.setUuid("0");
     bundle.getUuidPath().add("driver_uuid");
     bundle.setTaskCount(0);
-    bundle.setHandshake(true);;
+    bundle.setHandshake(true);
+    ;
     Test test = new Test();
     byte[] data = test.serialize(bundle);
-    TaskBundle bundle2 = (TaskBundle) test.deserialize(data);
+    test.deserialize(data);
     print("the end 2");
   }
 
@@ -93,17 +92,13 @@ public class Test {
    * Perform a test.
    * @throws Exception if any error occurs.
    */
-  public static void test3() throws Exception
-  {
+  public static void test3() throws Exception {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Hello hello = new Hello();
-    try
-    {
+    try {
       oos.writeObject(hello);
-    }
-    finally
-    {
+    } finally {
       oos.close();
     }
   }
@@ -112,8 +107,7 @@ public class Test {
    * Print a string.
    * @param s the string to print.
    */
-  private static void print(final String s)
-  {
+  private static void print(final String s) {
     System.out.println(s);
   }
 
@@ -123,8 +117,7 @@ public class Test {
    * @return the serialized object as a byte array.
    * @throws Exception if any error occurs.
    */
-  public byte[] serialize(final Object o) throws Exception
-  {
+  public byte[] serialize(final Object o) throws Exception {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     JPPFObjectOutputStream joos = new JPPFObjectOutputStream(baos);
     joos.writeObject(o);
@@ -137,8 +130,7 @@ public class Test {
    * @return an Object.
    * @throws Exception if any error occurs.
    */
-  public Object deserialize(final byte[] data) throws Exception
-  {
+  public Object deserialize(final byte[] data) throws Exception {
     ByteArrayInputStream bais = new ByteArrayInputStream(data);
     JPPFObjectInputStream jois = new JPPFObjectInputStream(bais);
     return jois.readObject();

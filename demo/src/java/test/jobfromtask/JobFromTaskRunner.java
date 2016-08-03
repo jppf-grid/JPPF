@@ -61,7 +61,7 @@ public class JobFromTaskRunner
       job.add(new SourceTask()).setId("source");
       job.getSLA().setMaxNodes(1);
       List<Task<?>> results = jppfClient.submitJob(job);
-      for (Task t: results)
+      for (Task<?> t: results)
       {
         Throwable e = t.getThrowable();
         if (e != null) throw e;

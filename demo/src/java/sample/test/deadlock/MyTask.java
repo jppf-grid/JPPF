@@ -39,6 +39,7 @@ public class MyTask extends AbstractTask<String> {
   /**
    * Some dummy data to simulate a specified memory footprint.
    */
+  @SuppressWarnings("unused")
   private final byte[] dummyData;
 
   /**
@@ -65,6 +66,7 @@ public class MyTask extends AbstractTask<String> {
           for (long elapsed=0L, taskStart=System.nanoTime(); elapsed<duration; elapsed=(System.nanoTime()-taskStart) / 1_000_000L) {
             String s = "";
             for (int i=0; i<10; i++) s += "A10";
+            s.toString();
           }
         }
       }

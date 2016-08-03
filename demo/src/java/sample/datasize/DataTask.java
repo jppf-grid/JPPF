@@ -29,6 +29,7 @@ public class DataTask extends AbstractTask<String>
   /**
    * The data this task owns.
    */
+  @SuppressWarnings("unused")
   private byte[] data = null;
   /**
    * If true, the array is created at execution time, otherwise at construction time.

@@ -86,6 +86,7 @@ public class LargeInt implements Serializable
    * @param position the position from which to start in the array.
    * @return the result of the multiplication.
    */
+  @SuppressWarnings("unused")
   private byte[] multiply(final int operand, final int position)
   {
     if (operand == 0) return ZERO;
@@ -185,6 +186,7 @@ public class LargeInt implements Serializable
    * @param biggerLength the actual length of the bigger array.
    * @return an array of byte, 2's complement representation of the addition.
    */
+  @SuppressWarnings("unused")
   private byte[] subtract(final byte[] smaller, final int smallerLength, final byte[] bigger, final int biggerLength)
   {
     byte[] temp = new byte[biggerLength];

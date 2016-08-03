@@ -118,13 +118,6 @@ public class Main
     private int number;
 
     /**
-     * Default constructor.
-     */
-    public SimpleCountTask()
-    {
-    }
-
-    /**
      * Initialize this task with its number.
      * @param number the task number.
      */

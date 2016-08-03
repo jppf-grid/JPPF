@@ -95,8 +95,8 @@ public class MatrixRunner {
         for (String path: paths) {
           String p = path.trim();
           String name = new File(p).getName();
-          Location fileLoc = new FileLocation(p);
-          Location jar = fileLoc.copyTo(new MemoryLocation((int) fileLoc.size()));
+          Location<?> fileLoc = new FileLocation(p);
+          Location<?> jar = fileLoc.copyTo(new MemoryLocation((int) fileLoc.size()));
           classpath.add(name, jar);
         }
       }
@@ -173,7 +173,7 @@ public class MatrixRunner {
     Matrix c = new Matrix(size);
     // Get the matrix values from the tasks results
     int rowIdx = 0;
-    for (Task matrixTask : results) {
+    for (Task<?> matrixTask : results) {
       if (matrixTask.getThrowable() != null) {
         StreamUtils.printf(log, "got exception: " + ExceptionUtils.getStackTrace(matrixTask.getThrowable()));
         throw new JPPFException(matrixTask.getThrowable());

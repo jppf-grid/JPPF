@@ -83,7 +83,7 @@ public class TestCompilation
       compiler = new SourceCompiler();
       compiler.compileToFile(sources, classesDir);
       Class<?> clazz = compiler.getClassloader().loadClass(className);
-      Callable task = (Callable) clazz.newInstance();
+      Callable<?> task = (Callable<?>) clazz.newInstance();
       output("result: " + task.call());
     }
     finally
@@ -114,7 +114,7 @@ public class TestCompilation
       // load the class
       Class<?> clazz = compiler.getClassloader().loadClass(className);
       // create an instance and execute it
-      Callable task = (Callable) clazz.newInstance();
+      Callable<?> task = (Callable<?>) clazz.newInstance();
       output("result: " + task.call());
     }
     finally

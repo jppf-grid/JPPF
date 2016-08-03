@@ -175,6 +175,7 @@ public class DeadlockRunner {
    * @param client the JPPF client to get a JMX connection from.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void requestNodeShutdown(final JPPFClient client) throws Exception {
     printf("requesting node shutdown ...");
     JMXDriverConnectionWrapper jmx = getJmxConnection(client);
@@ -198,6 +199,7 @@ public class DeadlockRunner {
    * @param client the client which submits the job.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void submitDeadlockingJob(final JPPFClient client) throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName("Deadlocking job");

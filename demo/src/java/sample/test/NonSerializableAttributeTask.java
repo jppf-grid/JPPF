@@ -30,6 +30,7 @@ public class NonSerializableAttributeTask extends AbstractTask<String>
   /**
    * Non-serializable attribute, must be null before the task execution..
    */
+  @SuppressWarnings("unused")
   private NonSerializable ns = null;
 
   /**

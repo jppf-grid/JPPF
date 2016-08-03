@@ -37,6 +37,7 @@ public class MyCallable implements JPPFCallable<String>
   /**
    * 
    */
+  @SuppressWarnings("unused")
   private byte[] data = null;
   /**
    * Size of the data to create.

@@ -99,7 +99,7 @@ public class TestCounters {
     sb.append("\"threads\"");
     for (String name: nameSet) sb.append(String.format(",\"%1$s\",\"%1$s\"", name));
     sb.append('\n');
-    for (String name: nameSet) sb.append(",\"time\",\"% cpu\"");
+    for (int i=0; i<nameSet.size(); i++) sb.append(",\"time\",\"% cpu\"");
     sb.append('\n');
     for (int i=0; i<threadCounts.length; i++) {
       sb.append(threadCounts[i]);

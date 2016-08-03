@@ -98,7 +98,7 @@ public class HelloJPPF implements Serializable
       Iterator<Task<?>> it = results.iterator();
       while (it.hasNext())
       {
-        Task t = it.next();
+        Task<?> t = it.next();
         System.out.println("Result object: " + t);
         System.out.println("Result: " + t.getResult() + ", Exception: " + t.getThrowable());
         if (null != t.getThrowable())

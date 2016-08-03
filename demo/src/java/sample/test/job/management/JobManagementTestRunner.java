@@ -32,8 +32,7 @@ import sample.dist.tasklength.LongTask;
  * 
  * @author Laurent Cohen
  */
-public class JobManagementTestRunner
-{
+public class JobManagementTestRunner {
   /**
    * The JPPF client.
    */
@@ -48,22 +47,20 @@ public class JobManagementTestRunner
    * @param jobName name given to the job.
    * @throws Exception if any error occurs.
    */
-  public void runTest1(final String jobName) throws Exception
-  {
+  public void runTest1(final String jobName) throws Exception {
     TypedProperties props = JPPFConfiguration.getProperties();
     int nbTasks = props.getInt("job.management.nbTasks", 2);
     long duration = props.getLong("job.management.duration", 1000L);
     JPPFJob job = new JPPFJob(jobName);
     job.setName(jobName);
     job.setBlocking(false);
-    for (int i=0; i<nbTasks; i++) job.add(new LongTask(duration)).setId(jobName + " - task " + i);
+    for (int i = 0; i < nbTasks; i++) job.add(new LongTask(duration)).setId(jobName + " - task " + i);
     client.submitJob(job);
     // wait to ensure the job has been dispatched to the nodes
     Thread.sleep(1000);
     driver.cancelJob(job.getUuid());
     List<Task<?>> results = job.awaitResults();
-    for (Task task: results)
-    {
+    for (Task<?> task : results) {
       Throwable e = task.getThrowable();
       if (e != null) System.out.println("" + task.getId() + " has an exception: " + ExceptionUtils.getStackTrace(e));
       else System.out.println("Result for " + task.getId() + ": " + task.getResult());
@@ -75,21 +72,18 @@ public class JobManagementTestRunner
    * Run the first test.
    * @throws Exception if any error occurs.
    */
-  public void runTest2() throws Exception
-  {
+  public void runTest2() throws Exception {
     JMXNodeConnectionWrapper[] nodes = null;
-    try
-    {
+    try {
       Collection<JPPFManagementInfo> coll = driver.nodesInformation();
       nodes = new JMXNodeConnectionWrapper[2];
       int count = 0;
-      for (JPPFManagementInfo info: coll)
-      {
+      for (JPPFManagementInfo info : coll) {
         JMXNodeConnectionWrapper node = new JMXNodeConnectionWrapper(info.getHost(), info.getPort());
         node.connectAndWait(0L);
         nodes[count++] = node;
       }
-      for (JMXNodeConnectionWrapper node: nodes) node.updateThreadPoolSize(4);
+      for (JMXNodeConnectionWrapper node : nodes) node.updateThreadPoolSize(4);
       Thread.sleep(500L);
       client.submitJob(createJob("broadcast1"));
       Thread.sleep(500L);
@@ -102,10 +96,8 @@ public class JobManagementTestRunner
       Thread.sleep(500L);
       n = driver.nbNodes(selector);
       System.out.println("found " + n + " nodes, expected = 1");
-    }
-    finally
-    {
-      if (nodes != null) for (JMXNodeConnectionWrapper node: nodes) node.close();
+    } finally {
+      if (nodes != null) for (JMXNodeConnectionWrapper node : nodes) node.close();
     }
   }
 
@@ -115,8 +107,7 @@ public class JobManagementTestRunner
    * @return a <code>JPPFJob</code> instance.
    * @throws Exception if any error occurs.
    */
-  protected JPPFJob createJob(final String id) throws Exception
-  {
+  protected JPPFJob createJob(final String id) throws Exception {
     JPPFJob job = new JPPFJob(id);
     job.setName(id);
     job.add(new MyBroadcastTask());
@@ -128,37 +119,29 @@ public class JobManagementTestRunner
    * Entry point.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       System.out.println("Initializing client ...");
       client = new JPPFClient("client");
       System.out.println("Awaiting server connection ...");
-      while (!client.hasAvailableConnection()) Thread.sleep(100L);
+      while (!client.hasAvailableConnection())
+        Thread.sleep(100L);
       System.out.println("Awaiting JMX connection ...");
       driver = client.getConnectionPool().getJmxConnection();
-      while (!driver.isConnected()) driver.connectAndWait(100L);
+      while (!driver.isConnected())
+        driver.connectAndWait(100L);
       JobManagementTestRunner runner = new JobManagementTestRunner();
       System.out.println("Running test 1 ...");
       runner.runTest1("job1");
       System.out.println("Running test 2 ...");
       runner.runTest1("job2");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
-      if (driver != null)
-      {
-        try
-        {
+    } finally {
+      if (driver != null) {
+        try {
           driver.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
           e.printStackTrace();
         }
       }
@@ -169,11 +152,9 @@ public class JobManagementTestRunner
   /**
    * A simple task.
    */
-  public static class MyBroadcastTask extends AbstractTask<String>
-  {
+  public static class MyBroadcastTask extends AbstractTask<String> {
     @Override
-    public void run()
-    {
+    public void run() {
       System.out.println("broadcast of " + getClass().getName());
     }
   }

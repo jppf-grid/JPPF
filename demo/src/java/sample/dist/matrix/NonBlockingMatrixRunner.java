@@ -114,7 +114,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter
         // submit the tasks for execution
         jppfClient.submitJob(job);
         waitForResults();
-        List<Task> results = new ArrayList<>();
+        List<Task<?>> results = new ArrayList<>();
         for (final Map.Entry<Integer, Task<?>> entry : resultMap.entrySet()) results.add(entry.getValue());
         // initialize the resulting matrix
         Matrix c = new Matrix(size);

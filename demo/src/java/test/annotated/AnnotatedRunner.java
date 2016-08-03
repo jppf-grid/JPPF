@@ -68,6 +68,7 @@ public class AnnotatedRunner
    * Perform the test.
    * @throws Exception if an error is raised during the execution.
    */
+  @SuppressWarnings("unused")
   private static void perform() throws Exception
   {
     int nbJobs = 50;
@@ -88,7 +89,7 @@ public class AnnotatedRunner
     for (JPPFJob job: jobs)
     {
       List<Task<?>> results = job.awaitResults();
-      Task t = results.get(0);
+      Task<?> t = results.get(0);
       output((String) t.getResult());
     }
     totalTime = (System.nanoTime() - totalTime) / 1_000_000L;
@@ -124,7 +125,7 @@ public class AnnotatedRunner
     for (JPPFJob job: jobs)
     {
       List<Task<?>> results = job.awaitResults();
-      Task t = results.get(0);
+      Task<?> t = results.get(0);
       output((String) t.getResult());
     }
     totalTime = (System.nanoTime() - totalTime) / 1_000_000L;

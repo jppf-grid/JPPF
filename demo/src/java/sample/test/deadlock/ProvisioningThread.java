@@ -102,7 +102,7 @@ public class ProvisioningThread extends ThreadSynchronization implements Runnabl
     }
     try {
       forwarder.provisionSlaveNodes(masterSelector, 0);
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       //e.printStackTrace();
       return;
     }

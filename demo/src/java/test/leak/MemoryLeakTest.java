@@ -174,6 +174,7 @@ public class MemoryLeakTest {
 
   /**
    */
+  @SuppressWarnings("unused")
   private static class MyQueueListener implements ClientQueueListener {
     @Override
     public void jobAdded(final ClientQueueEvent event) {

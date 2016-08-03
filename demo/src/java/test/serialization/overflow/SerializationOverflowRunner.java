@@ -28,8 +28,7 @@ import org.slf4j.*;
  * Runner class for the matrix multiplication demo.
  * @author Laurent Cohen
  */
-public class SerializationOverflowRunner
-{
+public class SerializationOverflowRunner {
   /**
    * Logger for this class.
    */
@@ -43,19 +42,14 @@ public class SerializationOverflowRunner
    * Entry point for this class.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       jppfClient = new JPPFClient();
-      for (int i=1; i<=1; i++) perform(i);
-    }
-    catch(Exception e)
-    {
+      for (int i = 1; i <= 1; i++)
+        perform(i);
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -65,11 +59,10 @@ public class SerializationOverflowRunner
    * @param i number of iterations
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform(final int i) throws Exception
-  {
+  private static void perform(final int i) throws Exception {
     output("Start of iteration " + i);
     long totalTime = System.nanoTime();
-    submitJob("SerializationOverflow-"+ i + "/1", 1, 0L, true);
+    submitJob("SerializationOverflow-" + i + "/1", 1, 0L, true);
     //submitJob(" job " + i + "/2",   2, 1L, false);
     totalTime = DateTimeUtils.elapsedFrom(totalTime);
     //output("Computation time for iteration " + i + ": " + StringUtils.toStringDuration(totalTime));
@@ -83,31 +76,25 @@ public class SerializationOverflowRunner
    * @param blocking whether the job is blocking.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void submitJob(final String name, final int nbTasks, final long time, final boolean blocking) throws Exception
-  {
+  private static void submitJob(final String name, final int nbTasks, final long time, final boolean blocking) throws Exception {
     JPPFJob job = new JPPFJob();
     job.setName(name);
-    for (int j=1; j<=nbTasks; j++) job.add(new SerializationOverflowTask(time, j));
+    for (int j = 1; j <= nbTasks; j++)
+      job.add(new SerializationOverflowTask(time, j));
     job.setBlocking(blocking);
-    if (blocking)
-    {
+    if (blocking) {
       output("* submitting job '" + job.getName() + "'");
       List<Task<?>> results = jppfClient.submitJob(job);
       output("+ got results for job " + job.getName());
-      for (Task task: results)
-      {
+      for (Task<?> task : results) {
         Throwable e = task.getThrowable();
-        if (e != null)
-        {
+        if (e != null) {
           output("task got exception: " + ExceptionUtils.getStackTrace(e));
           output("result is: " + task.getResult());
-        }
-        else output("task result: " + task.getResult());
+        } else output("task result: " + task.getResult());
       }
       //for (JPPFTask t: results) output((String) t.getResult());
-    }
-    else
-    {
+    } else {
       job.getSLA().setCancelUponClientDisconnect(true);
       jppfClient.submitJob(job);
       output("job '" + job.getName() + "' submitted");
@@ -118,8 +105,7 @@ public class SerializationOverflowRunner
    * Print a message to the console and/or log file.
    * @param message the message to print.
    */
-  private static void output(final String message)
-  {
+  private static void output(final String message) {
     System.out.println(message);
     log.info(message);
   }

@@ -30,6 +30,7 @@ public class MyCallable implements Callable<String>, Serializable
   /**
    * The id of this task.
    */
+  @SuppressWarnings("unused")
   private String id = null;
 
   /**

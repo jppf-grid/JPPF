@@ -75,7 +75,7 @@ public class CommandLineTaskRunner
     */
 
     List<Task<?>> results = jppfClient.submitJob(job);
-    for (Task task: results)
+    for (Task<?> task: results)
     {
       if (task.getThrowable() != null) task.getThrowable().printStackTrace();
       System.out.println("result: " + task.getResult());

@@ -33,7 +33,7 @@ import org.jppf.utils.ExceptionUtils;
  * This task simply prints a message.
  * @author Laurent Cohen
  */
-public class JBossTask extends CommandLineTask
+public class JBossTask extends CommandLineTask<Object>
 {
   /**
    * The location of the JBoss root installation.
@@ -103,7 +103,7 @@ public class JBossTask extends CommandLineTask
       System.out.println(s);
       setResult(s);
     }
-    catch (InterruptedException e)
+    catch (@SuppressWarnings("unused") InterruptedException e)
     {
       // this excception is normally raised when the task
       // is cancelled from a separate thread so it's considered "normal"

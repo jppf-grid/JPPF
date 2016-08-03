@@ -52,6 +52,7 @@ public class MyTask extends AbstractTask<String> {
     /**
      * 
      */
+    @SuppressWarnings("unused")
     private MyTask task;
 
     /**

@@ -17,10 +17,7 @@
  */
 package sample.datasize;
 
-import java.util.List;
-
 import org.jppf.client.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.utils.*;
 import org.slf4j.*;
 
@@ -95,7 +92,7 @@ public class DataSizeRunner
       JPPFJob job = new JPPFJob();
       job.setName("Datasize job " + i);
       for (int j=0; j<nbTasks; j++) job.add(new DataTask(datasize, inNodeOnly));
-      List<Task<?>> results = jppfClient.submitJob(job);
+      jppfClient.submitJob(job);
       /*
 			for (JPPFTask t: results)
 			{

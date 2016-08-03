@@ -28,8 +28,7 @@ import org.slf4j.*;
  * 
  * @author Laurent Cohen
  */
-public class SocketPerformance
-{
+public class SocketPerformance {
   /**
    * Logger for this class.
    */
@@ -51,17 +50,13 @@ public class SocketPerformance
    * Main entry point.
    * @param args no used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       JPPFConfiguration.getProperties();
       if ((args == null) || (args.length < 1)) perform();
       else if ("server".equalsIgnoreCase(args[0])) performServer();
       else if ("client".equalsIgnoreCase(args[0])) performClient();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -70,8 +65,7 @@ public class SocketPerformance
    * Start server and client in the same JVM.
    * @throws Exception if any error occurs.
    */
-  private static void perform() throws Exception
-  {
+  private static void perform() throws Exception {
     Server server = new Server();
     server.start();
     Thread.sleep(500L);
@@ -83,8 +77,7 @@ public class SocketPerformance
    * Start the server.
    * @throws Exception if any error occurs.
    */
-  private static void performServer() throws Exception
-  {
+  private static void performServer() throws Exception {
     System.out.println("starting server");
     Server server = new Server();
     server.start();
@@ -96,8 +89,7 @@ public class SocketPerformance
    * Start server and client in the same JVM.
    * @throws Exception if any error occurs.
    */
-  private static void performClient() throws Exception
-  {
+  private static void performClient() throws Exception {
     System.out.println("starting client");
     Client client = new Client();
     client.start();
@@ -108,13 +100,11 @@ public class SocketPerformance
   /**
    * Server thread.
    */
-  private static class Server extends Thread
-  {
+  private static class Server extends Thread {
     /**
      * Default constructor.
      */
-    public Server()
-    {
+    public Server() {
       super("Server");
       setDaemon(true);
     }
@@ -124,25 +114,19 @@ public class SocketPerformance
      * @see java.lang.Thread#run()
      */
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         ServerSocket server = new ServerSocket(15555);
-        while (true)
-        {
+        while (true) {
           Socket s = server.accept();
           Connection c = new Connection(s);
           c.start();
-          if (clientStarted)
-          {
+          if (clientStarted) {
             c.join();
             break;
           }
         }
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         e.printStackTrace();
       }
     }
@@ -151,8 +135,7 @@ public class SocketPerformance
   /**
    * Server connection thread.
    */
-  private static class Connection extends Thread
-  {
+  private static class Connection extends Thread {
     /**
      * Socket wrapper.
      */
@@ -163,8 +146,7 @@ public class SocketPerformance
      * @param s - the socket to write to.
      * @throws Exception if any error occurs.
      */
-    public Connection(final Socket s) throws Exception
-    {
+    public Connection(final Socket s) throws Exception {
       socketWrapper = new SocketClient(s);
       setDaemon(true);
     }
@@ -174,10 +156,8 @@ public class SocketPerformance
      * @see java.lang.Thread#run()
      */
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         TypedProperties props = JPPFConfiguration.getProperties();
         int datasize = props.getInt("datasize.size", 1);
         int nbTasks = props.getInt("datasize.nbTasks", 10);
@@ -185,36 +165,30 @@ public class SocketPerformance
         if ("k".equals(unit)) datasize *= KILO;
         else if ("m".equals(unit)) datasize *= MEGA;
         byte[] data = new byte[datasize];
-        for (int i=0; i<nbTasks; i++)
-        {
+        for (int i = 0; i < nbTasks; i++) {
           //log.info("Server: writing datasize");
           socketWrapper.writeInt(datasize);
           //log.info("Server: writing data");
-          long start = System.nanoTime();
+          //long start = System.nanoTime();
           socketWrapper.write(data, 0, datasize);
-          long elapsed = DateTimeUtils.elapsedFrom(start);
+          //long elapsed = DateTimeUtils.elapsedFrom(start);
           //log.info("Server: data written in " + elapsed + " ms");
         }
         socketWrapper.writeInt(0);
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }
   }
 
-
   /**
    * Client thread.
    */
-  private static class Client extends Thread
-  {
+  private static class Client extends Thread {
     /**
      * Default constructor.
      */
-    public Client()
-    {
+    public Client() {
       super("Client");
       setDaemon(true);
       clientStarted = true;
@@ -225,18 +199,14 @@ public class SocketPerformance
      * @see java.lang.Thread#run()
      */
     @Override
-    public void run()
-    {
-      try
-      {
+    public void run() {
+      try {
         SocketClient sc = new SocketClient("lolo-quad", 15555);
         byte[] data = null;
-        while (true)
-        {
+        while (true) {
           //log.info("Client: reading next datasize");
           int datasize = sc.readInt();
-          if (datasize == 0)
-          {
+          if (datasize == 0) {
             log.info("Client: terminating");
             break;
           }
@@ -247,9 +217,7 @@ public class SocketPerformance
           long elapsed = DateTimeUtils.elapsedFrom(start);
           log.info("Client: read data size = " + datasize + " in " + elapsed + " ms");
         }
-      }
-      catch(Exception e)
-      {
+      } catch (Exception e) {
         log.error(e.getMessage(), e);
       }
     }

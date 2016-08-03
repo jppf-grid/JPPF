@@ -117,7 +117,6 @@ public class ConnectionPoolRunner {
    */
   private static void printJobResults(final JPPFJob job) {
     List<Task<?>> results = job.awaitResults();
-    long elapsed = (System.nanoTime() - start) / 1_000_000L;
     print("[" + getElapsed() + "] ***** results for job %s :", job.getName());
     for (Task<?> task: results) {
       String id = task.getId();
@@ -165,6 +164,7 @@ public class ConnectionPoolRunner {
    * @param timeout the timeout in millis.
    * @throws IllegalStateException if the wait timed out.
    */
+  @SuppressWarnings("unused")
   private static void waitForNbConnections(final JPPFConnectionPool pool, final int n, final long timeout) {
     long elapsed = 0L;
     long start = System.nanoTime();
@@ -199,6 +199,7 @@ public class ConnectionPoolRunner {
    * @return a {@code JMXDriverConnectionWrapper} instance.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static JMXDriverConnectionWrapper getJmx(final JPPFConnectionPool pool) throws Exception {
     JMXDriverConnectionWrapper jmx = null;
     while ((jmx = pool.getJmxConnection()) == null) Thread.sleep(10L);

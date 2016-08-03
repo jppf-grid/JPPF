@@ -51,15 +51,11 @@ public class TestUuid {
       long elapsed_2 = 0L;
       TestUuid tu = new TestUuid();
       long start = System.nanoTime();
-      for (int i = 0; i < nbIter; i++) {
-        String s = tu.generate1();
-      }
+      for (int i = 0; i < nbIter; i++) tu.generate1();
       elapsed_1 = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Test 1 : " + elapsed_1 + " ms");
       start = System.nanoTime();
-      for (int i = 0; i < nbIter; i++) {
-        String s = tu.generate2();
-      }
+      for (int i = 0; i < nbIter; i++) tu.generate2();
       elapsed_2 = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Test 2 : " + elapsed_2 + " ms");
     } catch (Exception e) {

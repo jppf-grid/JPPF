@@ -32,6 +32,7 @@ public class TestTask extends CommandLineTaskEx
   /**
    * Directory in which to list the files.
    */
+  @SuppressWarnings("unused")
   private String number = null;
 
   /**

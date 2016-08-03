@@ -20,18 +20,15 @@ package sample.test;
 
 import org.jppf.scheduling.JPPFSchedule;
 
-
 /**
  * Test task to check that the timeout period triggers the task's abortion.
  * @author Laurent Cohen
  */
-public class TimeoutTask extends JPPFTestTask
-{
+public class TimeoutTask extends JPPFTestTask {
   /**
    * Initialize this task.
    */
-  public TimeoutTask()
-  {
+  public TimeoutTask() {
     setTimeoutSchedule(new JPPFSchedule(2000L));
   }
 
@@ -39,14 +36,10 @@ public class TimeoutTask extends JPPFTestTask
    * Execute the task
    * @see java.lang.Runnable#run()
    */
-  public void test()
-  {
-    try
-    {
+  public void test() {
+    try {
       Thread.sleep(5000L);
-    }
-    catch(InterruptedException e)
-    {
+    } catch (@SuppressWarnings("unused") InterruptedException e) {
     }
   }
 
@@ -54,8 +47,7 @@ public class TimeoutTask extends JPPFTestTask
    * Called when this task times out.
    */
   @Override
-  public void onTimeout()
-  {
+  public void onTimeout() {
     setResult("this task timed out");
   }
 }

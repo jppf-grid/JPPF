@@ -96,7 +96,7 @@ public class TestTaskRunner
       JPPFJob job = new JPPFJob();
       job.add(new ExceptionTestTask());
       List<Task<?>> results = jppfClient.submitJob(job);
-      Task resultTask = results.get(0);
+      Task<?> resultTask = results.get(0);
       if (resultTask.getThrowable() != null)
       {
         System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getThrowable()));
@@ -125,7 +125,7 @@ public class TestTaskRunner
       JPPFJob job = new JPPFJob();
       job.add(new FileDownloadTestTask("http://www.jppf.org/Options.xsd"));
       List<Task<?>> results = jppfClient.submitJob(job);
-      Task resultTask = results.get(0);
+      Task<?> resultTask = results.get(0);
       if (resultTask.getThrowable() != null)
       {
         System.out.println("Exception was caught:" + ExceptionUtils.getStackTrace(resultTask.getThrowable()));
@@ -158,7 +158,7 @@ public class TestTaskRunner
       JPPFJob job = new JPPFJob();
       job.add(new SecurityTestTask());
       List<Task<?>> results = jppfClient.submitJob(job);
-      Task resultTask = results.get(0);
+      Task<?> resultTask = results.get(0);
       System.out.println("Result is:\n"+resultTask);
     }
     catch(Exception e)
@@ -237,7 +237,7 @@ public class TestTaskRunner
       JPPFJob job = new JPPFJob();
       job.add(new ClassNotFoundTestTask());
       List<Task<?>> results = jppfClient.submitJob(job);
-      Task resultTask = results.get(0);
+      Task<?> resultTask = results.get(0);
       if (resultTask.getThrowable() != null)
       {
         System.out.println("Exception was caught: "+ExceptionUtils.getStackTrace(resultTask.getThrowable()));
@@ -263,7 +263,7 @@ public class TestTaskRunner
   static void performInnerTask()
   {
     System.out.println(banner);
-    System.out.println("Starting InnerTask task testing...");
+    System.out.println("Starting InnerTask<?> task testing...");
     HelloJPPF h = new HelloJPPF();
     JPPFJob job = new JPPFJob();
     try
@@ -274,7 +274,7 @@ public class TestTaskRunner
       // show results
       System.out.println("Got "+results.size()+" results: ");
       System.out.println("Result is:");
-      for (Task t: results)
+      for (Task<?> t: results)
       {
         System.out.println(""+t.getResult());
         if  (null != t.getThrowable())
@@ -289,7 +289,7 @@ public class TestTaskRunner
     }
     finally
     {
-      System.out.println("InnerTask task testing complete.");
+      System.out.println("InnerTask<?> task testing complete.");
     }
   }
 
@@ -383,7 +383,7 @@ public class TestTaskRunner
       job.add(new TestAnnotatedTask(), 11, "test string");
       job.add(TestAnnotatedStaticTask.class, 22, "test string (static method)");
       List<Task<?>> results = jppfClient.submitJob(job);
-      Task res = results.get(0);
+      Task<?> res = results.get(0);
       if (res.getThrowable() != null) throw res.getThrowable();
       System.out.println("result is : " + res.getResult());
     }
@@ -435,7 +435,7 @@ public class TestTaskRunner
       job.setDataProvider(dp);
       for (Object task: tasks) job.add(task);
       List<Task<?>> results = jppfClient.submitJob(job);
-      Task res = results.get(0);
+      Task<?> res = results.get(0);
       if (res.getThrowable() != null) throw res.getThrowable();
       System.out.println("result is : " + res.getResult());
     }

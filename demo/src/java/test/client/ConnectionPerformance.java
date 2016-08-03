@@ -84,6 +84,7 @@ public class ConnectionPerformance extends ConnectionPoolListenerAdapter impleme
   /** */
   private static class ConnectionInfo {
     /** */
+    @SuppressWarnings("unused")
     public JPPFClientConnection connection;
     /** */
     public long lastStatusTime = 0L;

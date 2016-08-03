@@ -32,10 +32,6 @@ public class PrimeTask extends AbstractTask<Integer> {
    */
   private static final BigInteger ZERO = BigInteger.ZERO;
   /**
-   * BigInteger representation of 1.
-   */
-  private static final BigInteger ONE = BigInteger.ONE;
-  /**
    * BigInteger representation of 2.
    */
   private static final BigInteger TWO = new BigInteger("2");
@@ -65,7 +61,6 @@ public class PrimeTask extends AbstractTask<Integer> {
     elapsed1 = (System.nanoTime() - elapsed1) / 1_000_000L;
     System.out.println("elapsed1 = " + elapsed1);
     */
-    long elapsed2 = System.nanoTime();
     int n1 = exponent / 8;
     int n2 = exponent % 8;
     int n3 = n2 == 0 ? n1 : n1 + 1;

@@ -27,6 +27,7 @@ public class TemplateJPPFTask extends AbstractTask<String>
   /**
    * Some Id.
    */
+  @SuppressWarnings("unused")
   private int taskId = 0;
 
   /**

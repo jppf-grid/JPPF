@@ -51,7 +51,7 @@ public class HelloWorldRunner
       job.add(new HelloWorldCallable());
       List<Task<?>> results = client.submitJob(job);
       System.out.println("********** Results: **********");
-      for (Task task: results)
+      for (Task<?> task: results)
       {
         if (task.getThrowable() != null)
         {

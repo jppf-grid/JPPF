@@ -34,8 +34,7 @@ import org.slf4j.*;
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class LargeDataRunner
-{
+public class LargeDataRunner {
   /**
    * Logger for this class.
    */
@@ -97,11 +96,9 @@ public class LargeDataRunner
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
+  public static void main(final String... args) {
     SubmitQueue queue = null;
-    try
-    {
+    try {
       nf.setGroupingUsed(true);
       TypedProperties config = JPPFConfiguration.getProperties();
       dataFile = config.getString("largedata.file");
@@ -117,32 +114,27 @@ public class LargeDataRunner
       t.start();
       System.out.println("Processing '" + dataFile + "' with " + nf.format(nbArticles) + " articles per task, " + nf.format(nbTasks) + " tasks per job, nb channels = " + nbChannels);
       reader = new DataReader(dataFile);
-      boolean end = false;
       long start = System.nanoTime();
       JPPFJob job;
-      while ((job = nextJob()) != null)
-      {
+      while ((job = nextJob()) != null) {
         queue.submit(job);
         //List<JPPFTask> results = queue.fetchResults();
       }
       Object lock = new Object();
       //while (queue.getResultCount() < jobCount)
-      while (totalTasksProcessed.get() < totalTasksSent)
-      {
-        synchronized(lock)
-        {
+      while (totalTasksProcessed.get() < totalTasksSent) {
+        synchronized (lock) {
           lock.wait(1L);
         }
       }
       executor.shutdown();
-      while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS));
+      while (!executor.awaitTermination(1L, TimeUnit.MILLISECONDS))
+        ;
       long elapsed = (System.nanoTime() - start) / 1000000L;
-      System.out.println("processed " + jobCount + " jobs for " + nf.format(totalArticles) +
-          " articles in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms)");
+      System.out.println("processed " + jobCount + " jobs for " + nf.format(totalArticles) + " articles in " + StringUtils.toStringDuration(elapsed) + " (" + nf.format(elapsed) + " ms)");
       BufferedWriter writer = new BufferedWriter(new FileWriter("CountResults.txt"));
-      System.out.println("writing results ..."); 
-      for (Map.Entry<String, Long> entry: mergedResults.entrySet())
-      {
+      System.out.println("writing results ...");
+      for (Map.Entry<String, Long> entry : mergedResults.entrySet()) {
         writer.write(StringUtils.padRight(entry.getKey(), ' ', 26, false));
         writer.write(": ");
         writer.write(StringUtils.padLeft(nf.format(entry.getValue()), ' ', 12));
@@ -150,14 +142,10 @@ public class LargeDataRunner
       }
       writer.flush();
       writer.close();
-      System.out.println("done"); 
-    }
-    catch(Exception e)
-    {
+      System.out.println("done");
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (queue != null) queue.setStopped(true);
       if (jppfClient != null) jppfClient.close();
       if (reader != null) reader.close();
@@ -169,34 +157,29 @@ public class LargeDataRunner
    * @return a <code>JPPFJob</code>.
    * @throws Exception if any error occurs.
    */
-  private static JPPFJob nextJob() throws Exception
-  {
-    int taskCount  = 0;
+  private static JPPFJob nextJob() throws Exception {
+    int taskCount = 0;
     int totalJobArticles = 0;
     JPPFJob job = new JPPFJob();
     job.setName("job-" + (jobCount + 1));
     job.getClientSLA().setMaxChannels(nbChannels);
-    while (!reader.isClosed() && (taskCount < nbTasks))
-    {
+    while (!reader.isClosed() && (taskCount < nbTasks)) {
       int articleCount = 0;
       String article = null;
       List<String> list = new ArrayList<>(nbArticles);
-      while (!reader.isClosed() && (articleCount < nbArticles))
-      {
+      while (!reader.isClosed() && (articleCount < nbArticles)) {
         article = reader.nextArticle();
         if (article == null) break;
         list.add(article);
         articleCount++;
       }
-      if (articleCount > 0)
-      {
+      if (articleCount > 0) {
         job.add(new LargeDataTask(list));
         totalJobArticles += articleCount;
         taskCount++;
       }
     }
-    if (taskCount > 0)
-    {
+    if (taskCount > 0) {
       totalArticles += totalJobArticles;
       jobCount++;
       totalTasksSent += taskCount;
@@ -210,8 +193,8 @@ public class LargeDataRunner
   /**
    * 
    */
-  private static class SubmitTask implements Callable<List<Task<?>>>
-  {
+  @SuppressWarnings("unused")
+  private static class SubmitTask implements Callable<List<Task<?>>> {
     /**
      * The job to submit.
      */
@@ -221,14 +204,12 @@ public class LargeDataRunner
      * Initialize with the specified job.
      * @param job the job to submit.
      */
-    public SubmitTask(final JPPFJob job)
-    {
+    public SubmitTask(final JPPFJob job) {
       this.job = job;
     }
 
     @Override
-    public List<Task<?>> call() throws Exception
-    {
+    public List<Task<?>> call() throws Exception {
       return jppfClient.submitJob(job);
     }
   }
@@ -236,11 +217,9 @@ public class LargeDataRunner
   /**
    * 
    */
-  private static class MyJobListener extends JobListenerAdapter
-  {
+  private static class MyJobListener extends JobListenerAdapter {
     @Override
-    public synchronized void jobReturned(final JobEvent event)
-    {
+    public synchronized void jobReturned(final JobEvent event) {
       //System.out.println("received " + event.getTaskList().size() + " task results");
       executor.submit(new MergerTask(event.getJobTasks()));
     }
@@ -249,8 +228,7 @@ public class LargeDataRunner
   /**
    * 
    */
-  private static class MergerTask implements Runnable
-  {
+  private static class MergerTask implements Runnable {
     /**
      * 
      */
@@ -260,29 +238,25 @@ public class LargeDataRunner
      * 
      * @param tasks the tasks to process.
      */
-    public MergerTask(final List<Task<?>> tasks)
-    {
+    public MergerTask(final List<Task<?>> tasks) {
       this.tasks = tasks;
     }
 
     @Override
-    public void run()
-    {
-      for (Task task: tasks)
-      {
+    public void run() {
+      for (Task<?> task : tasks) {
         @SuppressWarnings("unchecked")
         Map<String, Long> map = (Map<String, Long>) task.getResult();
         if (map == null) continue;
         task.setResult(null);
-        for (Map.Entry<String, Long> entry: map.entrySet())
-        {
+        for (Map.Entry<String, Long> entry : map.entrySet()) {
           Long n = mergedResults.get(entry.getKey());
           if (n == null) n = entry.getValue();
           else n += entry.getValue();
           mergedResults.put(entry.getKey(), n);
         }
       }
-      int n = totalTasksProcessed.addAndGet(tasks.size());
+      totalTasksProcessed.addAndGet(tasks.size());
       //System.out.println("processed " + n + " tasks");
     }
   }

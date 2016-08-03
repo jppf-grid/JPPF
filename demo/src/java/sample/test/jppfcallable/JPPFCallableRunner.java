@@ -23,7 +23,6 @@ import org.jppf.client.*;
 import org.jppf.client.event.*;
 import org.jppf.logging.jmx.JmxLogger;
 import org.jppf.management.JMXDriverConnectionWrapper;
-import org.jppf.node.protocol.Task;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
 
@@ -109,7 +108,7 @@ public class JPPFCallableRunner {
     callableResult = "from MyCallable";
     for (JPPFJob job: jobList) jppfClient.submitJob(job);
     for (JPPFJob job: jobList) {
-      List<Task<?>> results = job.awaitResults();
+      job.awaitResults();
       print("got results for job '" + job.getName() + "'");
     }
     if (loggingHandler != null) loggingHandler.unregister(jmxLogger);
@@ -136,6 +135,7 @@ public class JPPFCallableRunner {
    * @param restartDelay .
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void restartDriver(final long shutdownDelay, final long restartDelay) throws Exception {
     JMXDriverConnectionWrapper jmx = getDriverJmx();
     try {
@@ -150,7 +150,7 @@ public class JPPFCallableRunner {
 
   /**
    * Get a driver JMX connection.
-   * @return a {@link JMXDriverConnectionWrapper} instance.
+   * @return a {@link org.jppf.management.JMXDriverConnectionWrapper} instance.
    * @throws Exception if any error occurs.
    */
   private static JMXDriverConnectionWrapper getDriverJmx() throws Exception {

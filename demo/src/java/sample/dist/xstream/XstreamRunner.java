@@ -50,7 +50,7 @@ public class XstreamRunner
       List<Task<?>> results = jppfClient.submitJob(job);
       long elapsed = (System.nanoTime() - start) / 1_000_000L;
       System.out.println("Task executed in " + elapsed + " ms");
-      Task result = results.get(0);
+      Task<?> result = results.get(0);
       if (result.getThrowable() != null) throw result.getThrowable();
       System.out.println("Task execution result: " + result.getResult());
     }

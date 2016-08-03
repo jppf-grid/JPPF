@@ -39,6 +39,7 @@ public class SubmitQueue extends ThreadSynchronization implements Runnable
   /**
    * 
    */
+  @SuppressWarnings("unused")
   private List<Task<?>> results = null;
   /**
    * 

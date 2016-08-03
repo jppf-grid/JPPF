@@ -59,7 +59,7 @@ public class GenericRunner
       job.addJobListener(jobListener);
       client.submitJob(job);
       results = job.awaitResults();
-      for (Task task: results)
+      for (Task<?> task: results)
       {
         System.out.println("*****************************************");
         System.out.println("Result: " + task.getResult());
@@ -97,7 +97,7 @@ public class GenericRunner
     String[] classnames = text.split("\n");
     for (String s: classnames)
     {
-      Class clazz = Class.forName(s);
+      Class<?> clazz = Class.forName(s);
       Object o = clazz.newInstance();
       job.add(o);
     }

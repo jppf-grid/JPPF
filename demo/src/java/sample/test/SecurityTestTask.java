@@ -27,21 +27,18 @@ import org.jppf.utils.configuration.JPPFProperties;
  * This task is intended for testing the framework only.
  * @author Laurent Cohen
  */
-public class SecurityTestTask extends JPPFTestTask
-{
+public class SecurityTestTask extends JPPFTestTask {
   /**
    * Initialize this task.
    */
-  public SecurityTestTask()
-  {
+  public SecurityTestTask() {
   }
 
   /**
    * Try exiting the JVM through a <code>System.exit(int)</code> call.
    * @throws SecurityException if the security manager prevents from exiting the JVM.
    */
-  public void testExitVM() throws SecurityException
-  {
+  public void testExitVM() throws SecurityException {
     System.exit(0);
   }
 
@@ -49,15 +46,11 @@ public class SecurityTestTask extends JPPFTestTask
    * Try connecting to a non authorized host through a TCP/IP socket.
    * @throws SecurityException if the security manager prevents from connecting to the host.
    */
-  public void testConnectForbiddenHost() throws SecurityException
-  {
-    try
-    {
+  public void testConnectForbiddenHost() throws SecurityException {
+    try {
       Socket s = new Socket("www.apache.org", 8000);
       s.close();
-    }
-    catch(IOException e)
-    {
+    } catch (@SuppressWarnings("unused") IOException e) {
     }
   }
 
@@ -65,16 +58,12 @@ public class SecurityTestTask extends JPPFTestTask
    * Try connecting to a non authorized port on the JPPF server.
    * @throws SecurityException if the security manager prevents from connecting on the specified port.
    */
-  public void testConnectForbiddenPort() throws SecurityException
-  {
-    try
-    {
+  public void testConnectForbiddenPort() throws SecurityException {
+    try {
       String host = JPPFConfiguration.get(JPPFProperties.SERVER_HOST);
       Socket s = new Socket(host, 1001);
       s.close();
-    }
-    catch(IOException e)
-    {
+    } catch (@SuppressWarnings("unused") IOException e) {
     }
   }
 
@@ -82,16 +71,12 @@ public class SecurityTestTask extends JPPFTestTask
    * Try writing a dummy file.
    * @throws SecurityException if the security manager prevents from writing the file.
    */
-  public void testWriteFile() throws SecurityException
-  {
-    try
-    {
+  public void testWriteFile() throws SecurityException {
+    try {
       FileWriter writer = new FileWriter("foo.bar");
       writer.write("Hello");
       writer.close();
-    }
-    catch(IOException e)
-    {
+    } catch (@SuppressWarnings("unused") IOException e) {
     }
   }
 
@@ -99,25 +84,19 @@ public class SecurityTestTask extends JPPFTestTask
    * Try reading a non-authorized file.
    * @throws SecurityException if the security manager prevents from writing the file.
    */
-  public void testReadFile() throws SecurityException
-  {
-    try
-    {
+  public void testReadFile() throws SecurityException {
+    try {
       File file = new File("/");
       File[] dirList = file.listFiles();
-      for (File f: dirList)
-      {
-        if (!f.isDirectory())
-        {
+      for (File f : dirList) {
+        if (!f.isDirectory()) {
           FileInputStream fis = new FileInputStream(f);
           fis.read();
           fis.close();
           break;
         }
       }
-    }
-    catch(IOException e)
-    {
+    } catch (@SuppressWarnings("unused") IOException e) {
     }
   }
 }

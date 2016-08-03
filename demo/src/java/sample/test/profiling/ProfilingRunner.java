@@ -29,8 +29,7 @@ import org.slf4j.*;
  * Runner class for the &quot;Long Task&quot; demo.
  * @author Laurent Cohen
  */
-public class ProfilingRunner
-{
+public class ProfilingRunner {
   /**
    * Logger for this class.
    */
@@ -48,10 +47,8 @@ public class ProfilingRunner
    * Entry point for this class, submits the tasks with a set duration to the server.
    * @param args not used.
    */
-  public static void main(final String...args)
-  {
-    try
-    {
+  public static void main(final String... args) {
+    try {
       TypedProperties config = JPPFConfiguration.getProperties();
       int nbTask = config.getInt("profiling.nbTasks");
       int iterations = config.getInt("profiling.iterations");
@@ -64,13 +61,9 @@ public class ProfilingRunner
       //performSequential(nbTask, false);
       perform(nbTask, iterations);
       //StreamUtils.waitKeyPressed();
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       if (jppfClient != null) jppfClient.close();
     }
   }
@@ -81,17 +74,15 @@ public class ProfilingRunner
    * @param iterations the number of times the the tasks will be sent.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void perform(final int nbTask, final int iterations) throws Exception
-  {
-    for (int iter=1; iter<=iterations; iter++)
-    {
+  private static void perform(final int nbTask, final int iterations) throws Exception {
+    for (int iter = 1; iter <= iterations; iter++) {
       long start = System.nanoTime();
       JPPFJob job = new JPPFJob();
       job.setName("profiling-" + iter);
-      for (int i=0; i<nbTask; i++) job.add(new EmptyTask(dataSize));
-      List<Task<?>> results = jppfClient.submitJob(job);
+      for (int i = 0; i < nbTask; i++) job.add(new EmptyTask(dataSize));
+      jppfClient.submitJob(job);
       long elapsed = System.nanoTime() - start;
-      System.out.println("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed/1000000));
+      System.out.println("Iteration #" + iter + " performed in " + StringUtils.toStringDuration(elapsed / 1000000));
     }
   }
 
@@ -101,13 +92,13 @@ public class ProfilingRunner
    * @param silent determines whether results should be displayed on the console.
    * @throws Exception if an error is raised during the execution.
    */
-  private static void performSequential(final int nbTask, final boolean silent) throws Exception
-  {
+  @SuppressWarnings("unused")
+  private static void performSequential(final int nbTask, final boolean silent) throws Exception {
     long start = System.nanoTime();
     List<Task<?>> tasks = new ArrayList<>();
-    for (int i=0; i<nbTask; i++) tasks.add(new EmptyTask(dataSize));
-    for (Task<?> task: tasks) task.run();
+    for (int i = 0; i < nbTask; i++) tasks.add(new EmptyTask(dataSize));
+    for (Task<?> task : tasks) task.run();
     long elapsed = System.nanoTime() - start;
-    if (!silent) System.out.println("Sequential iteration performed in "+StringUtils.toStringDuration(elapsed/1000000));
+    if (!silent) System.out.println("Sequential iteration performed in " + StringUtils.toStringDuration(elapsed / 1000000));
   }
 }

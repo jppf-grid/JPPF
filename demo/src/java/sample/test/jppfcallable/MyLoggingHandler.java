@@ -32,8 +32,7 @@ import org.jppf.utils.streams.StreamUtils;
  * 
  * @author Laurent Cohen
  */
-public class MyLoggingHandler extends ThreadSynchronization implements NotificationListener, Runnable
-{
+public class MyLoggingHandler extends ThreadSynchronization implements NotificationListener, Runnable {
   /**
    * The path of the file to which the logging statement arte printed.
    */
@@ -51,31 +50,25 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
    * Default constructor.
    * @throws Exception if any error occurs.
    */
-  public MyLoggingHandler() throws Exception
-  {
+  public MyLoggingHandler() throws Exception {
     writer = new BufferedWriter(new FileWriter(outputFileNazme));
     new Thread(this, "LoggingHandler").start();
   }
 
   @Override
-  public void handleNotification(final Notification notification, final Object handback)
-  {
+  public void handleNotification(final Notification notification, final Object handback) {
     String message = notification.getMessage();
     queue.offer(message);
     wakeUp();
   }
 
   @Override
-  public void run()
-  {
+  public void run() {
     String msg = null;
-    try
-    {
-      while (!isStopped())
-      {
+    try {
+      while (!isStopped()) {
         int count = 0;
-        while ((msg = queue.poll()) != null)
-        {
+        while ((msg = queue.poll()) != null) {
           writer.write(msg);
           count++;
         }
@@ -83,13 +76,9 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
         if (isStopped()) break;
         goToSleep(1L, 0);
       }
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       e.printStackTrace();
-    }
-    finally
-    {
+    } finally {
       StreamUtils.closeSilent(writer);
     }
   }
@@ -98,8 +87,7 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
    * Register this logging handler to receive notifications from the specified MBean.
    * @param jmxLogger a proxy to the MBean which emits the notifications.
    */
-  public void register(final JmxLogger jmxLogger)
-  {
+  public void register(final JmxLogger jmxLogger) {
     queue.offer(StringUtils.padRight("", '-', 80) + '\n');
     jmxLogger.addNotificationListener(this, null, null);
   }
@@ -108,14 +96,10 @@ public class MyLoggingHandler extends ThreadSynchronization implements Notificat
    * Unregister this logging handler from the specified MBean.
    * @param jmxLogger a proxy to the MBean which emits the notifications.
    */
-  public void unregister(final JmxLogger jmxLogger)
-  {
-    try
-    {
+  public void unregister(final JmxLogger jmxLogger) {
+    try {
       jmxLogger.removeNotificationListener(this);
-    }
-    catch (ListenerNotFoundException ignore)
-    {
+    } catch (@SuppressWarnings("unused") ListenerNotFoundException ignore) {
     }
   }
 }

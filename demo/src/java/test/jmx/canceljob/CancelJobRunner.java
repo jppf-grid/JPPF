@@ -23,7 +23,6 @@ import org.jppf.client.*;
 import org.jppf.job.JobSelector;
 import org.jppf.management.*;
 import org.jppf.management.forwarding.JPPFNodeForwardingMBean;
-import org.jppf.node.protocol.Task;
 import org.jppf.server.job.management.DriverJobManagementMBean;
 import org.slf4j.*;
 
@@ -40,10 +39,6 @@ public class CancelJobRunner {
    * JPPF client used to submit execution requests.
    */
   private static JPPFClient client = null;
-  /**
-   * Used to test JPPFTask.compute(JPPFCallable) in method {@link #testComputeCallable()}.
-   */
-  private static String callableResult = "";
 
   /**
    * Entry point for this class, submits the tasks with a set duration to the server.
@@ -81,7 +76,7 @@ public class CancelJobRunner {
       jobManager.cancelJobs(JobSelector.ALL_JOBS);
       print("jobs cancel request submitted, waiting for results");
       for (JPPFJob job: jobs) {
-        List<Task<?>> results = job.awaitResults();
+        job.awaitResults();
         /*
         print("********** got results for job '" + job.getName() + "' **********");
         for (Task task : results) {

@@ -45,7 +45,7 @@ public class SourceTask extends AbstractTask<String>
     {
       long start = System.nanoTime();
       print("submitting new remote job");
-      String result = compute(new MyCallable());
+      compute(new MyCallable());
       long elapsed = System.nanoTime() - start;
       String s = "processing  performed in "+StringUtils.toStringDuration(elapsed/1000000L);
       print(s);

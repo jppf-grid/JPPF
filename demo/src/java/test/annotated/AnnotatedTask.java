@@ -17,17 +17,13 @@
  */
 package test.annotated;
 
-import java.util.Enumeration;
-
 import org.jppf.node.protocol.AbstractTask;
-
 
 /**
  * This task is for testing the network transfer of task with various data sizes.
  * @author Laurent Cohen
  */
-public class AnnotatedTask extends AbstractTask<String>
-{
+public class AnnotatedTask extends AbstractTask<String> {
   /**
    * The time this task will sleep.
    */
@@ -44,8 +40,7 @@ public class AnnotatedTask extends AbstractTask<String>
    * @param time .
    * @param id .
    */
-  public AnnotatedTask(final long time, final int id)
-  {
+  public AnnotatedTask(final long time, final int id) {
     this.time = time;
     this.id = id;
   }
@@ -55,23 +50,17 @@ public class AnnotatedTask extends AbstractTask<String>
    * @see sample.BaseDemoTask#doWork()
    */
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       if (time > 0L) Thread.sleep(time);
-      for (int i=0; i<3; i++)
-      {
-        Enumeration<?> en = getClass().getClassLoader().getResources("META-INF/services/xxx");
+      for (int i = 0; i < 3; i++) {
+        getClass().getClassLoader().getResources("META-INF/services/xxx");
       }
       setResult("task #" + id + " execution successful");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       setThrowable(e);
       setResult("task #" + id + ' ' + e.getMessage());
     }
     //System.out.print(StringUtils.padRight(result, ' ', 250));
   }
 }
-

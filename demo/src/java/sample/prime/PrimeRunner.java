@@ -80,7 +80,7 @@ public class PrimeRunner {
         for (int i = 0; i < nbTasks; i++) job.add(new PrimeTask(count++));
         pending -= nbTasks;
         List<Task<?>> results = jppfClient.submitJob(job);
-        for (Task t : results) {
+        for (Task<?> t : results) {
           if (t.getResult() != null) output("Found Mersenne prime for exponent = " + t.getResult());
         }
       }

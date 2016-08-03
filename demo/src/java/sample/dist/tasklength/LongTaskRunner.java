@@ -81,7 +81,7 @@ public class LongTaskRunner {
       for (int i=0; i<nbTasks; i++) job.add(new LongTask(length)).setId("" + iter + ':' + (i+1));
       // submit the tasks for execution
       List<Task<?>> results = jppfClient.submitJob(job);
-      for (Task task: results) {
+      for (Task<?> task: results) {
         Throwable e = task.getThrowable();
         if (e != null) {
           if (e instanceof Exception) throw (Exception) e;
@@ -111,13 +111,13 @@ public class LongTaskRunner {
     /**
      * The task to run.
      */
-    private AbstractTask task = null;
+    private AbstractTask<?> task = null;
 
     /**
      * Initialize this callable with the specified jppf task.
      * @param task a <code>JPPFTask</code> instance.
      */
-    public JPPFTaskCallable(final AbstractTask task) {
+    public JPPFTaskCallable(final AbstractTask<?> task) {
       this.task = task;
     }
 

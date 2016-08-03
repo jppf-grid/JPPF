@@ -56,7 +56,6 @@ public class TestJMX {
    * @param args not used.
    */
   public static void main(final String... args) {
-    JPPFNodeForwardingMBean forwarder = null;
     try {
       client = new JPPFClient();
       driverJmx = client.awaitActiveConnectionPool().awaitJMXConnections(Operator.AT_LEAST, 1, true).get(0);
@@ -74,6 +73,7 @@ public class TestJMX {
    * Test diagnostics.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void perform1() throws Exception {
     DiagnosticsMBean diag = driverJmx.getDiagnosticsProxy();
     ThreadDump td = diag.threadDump();
@@ -90,6 +90,7 @@ public class TestJMX {
    * Test notification forwarding.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unused")
   private static void perform2() throws Exception {
     Thread.sleep(500L);
     NodeNotificationListener listener = new NodeNotificationListener();
