@@ -36,7 +36,6 @@ public class CallableTaskExecutionListener implements TaskExecutionListener {
     //process(event);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void taskNotification(final TaskExecutionEvent event) {
     process(event);

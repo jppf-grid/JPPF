@@ -96,7 +96,6 @@ public class TestJPPFClient extends Setup1D1N {
    * Test the cancellation of a job.
    * @throws Exception if any error occurs
    */
-  @SuppressWarnings("deprecation")
   @Test(timeout=10000)
   public void testCancelJob() throws Exception {
     String name = ReflectionUtils.getCurrentMethodName();

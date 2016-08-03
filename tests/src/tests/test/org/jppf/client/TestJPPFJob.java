@@ -82,7 +82,6 @@ public class TestJPPFJob extends Setup1D1N {
    * Test that a job can cancel itself.
    * @throws Exception if any error occurs
    */
-  @SuppressWarnings("deprecation")
   @Test(timeout=10000)
   public void testCancel() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
@@ -110,7 +109,6 @@ public class TestJPPFJob extends Setup1D1N {
    * Test that a job isn't cancelled and {@code job.cancel(false)} is invoked while it is executing.
    * @throws Exception if any error occurs.
    */
-  @SuppressWarnings("deprecation")
   @Test(timeout=15000)
   public void testCancelWithInterruptFlagFalse() throws Exception {
     try (JPPFClient client = BaseSetup.createClient(null, true)) {
