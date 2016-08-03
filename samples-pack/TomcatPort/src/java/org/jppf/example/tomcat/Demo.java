@@ -50,7 +50,7 @@ public class Demo
       {
         Thread.sleep(500L);
       }
-      catch(InterruptedException e) { }
+      catch(@SuppressWarnings("unused") InterruptedException e) { }
     }
     return jppfClient;
   }

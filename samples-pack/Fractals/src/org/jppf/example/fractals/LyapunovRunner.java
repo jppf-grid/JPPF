@@ -73,7 +73,7 @@ public class LyapunovRunner extends AbstractRunner {
     // compute the min and max lambda
     for (int j = 0; j < config.width; j++) {
       LyapunovTask task = (LyapunovTask) taskList.get(j);
-      double[] values = (double[]) task.getResult();
+      double[] values = task.getResult();
       for (int i = 0; i < config.height; i++) {
         if (values[i] > max) max = values[i];
         if (values[i] < min) min = values[i];
@@ -83,7 +83,7 @@ public class LyapunovRunner extends AbstractRunner {
     BufferedImage image = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_RGB);
     for (int j = 0; j < config.width; j++) {
       LyapunovTask task = (LyapunovTask) taskList.get(j);
-      double[] values = (double[]) task.getResult();
+      double[] values = task.getResult();
       for (int i = 0; i < config.height; i++) {
         int rgb = computeLyapunovRGB(values[i], min, max);
         image.setRGB(j, config.height - i - 1, rgb);

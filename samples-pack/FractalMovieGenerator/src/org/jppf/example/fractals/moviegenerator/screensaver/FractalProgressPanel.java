@@ -65,7 +65,6 @@ public class FractalProgressPanel extends JPanel {
     setMinimumSize(dim);
     label = new JLabel(df.format(ratio));
     label.setForeground(Color.WHITE);
-    double d = 0d;
     g.setConstraints(label, c);
     add(label);
   }

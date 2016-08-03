@@ -54,7 +54,7 @@ public class ClassPathHelper {
   public static String computeSignature(final String filename) {
     try {
       return computeSignature(FileUtils.getFileInputStream(filename));
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       return null;
     }
   }
@@ -67,7 +67,7 @@ public class ClassPathHelper {
   public static String computeSignature(final File file) {
     try {
       return computeSignature(new BufferedInputStream( new FileInputStream(file)));
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       return null;
     }
   }
@@ -80,7 +80,7 @@ public class ClassPathHelper {
   public static String computeSignature(final URL url) {
     try {
       return computeSignature(url.openStream());
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       return null;
     }
   }

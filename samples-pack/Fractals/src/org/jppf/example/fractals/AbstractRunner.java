@@ -436,7 +436,7 @@ public abstract class AbstractRunner {
       semaphore = new Semaphore(records.size());
       for (AbstractFractalConfiguration config: records) {
         try {
-          final Future<GeneratedImage> future = submitExecution(0, config, 2000L);
+          submitExecution(0, config, 2000L);
         } catch (Exception e) {
           e.printStackTrace();
         }

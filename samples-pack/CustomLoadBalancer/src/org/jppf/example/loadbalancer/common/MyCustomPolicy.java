@@ -48,7 +48,7 @@ public class MyCustomPolicy extends CustomPolicy {
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     // get the number of processing threads in the node
     long nbThreads = info.getProperties("jppf").get(JPPFProperties.PROCESSING_THREADS);
     // get the node's max heap size

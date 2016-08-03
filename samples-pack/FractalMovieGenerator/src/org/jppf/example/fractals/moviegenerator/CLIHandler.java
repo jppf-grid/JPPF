@@ -54,7 +54,7 @@ public class CLIHandler {
           try {
             n = Integer.valueOf(s2);
             map.put(s, n);
-          } catch(NumberFormatException e) {
+          } catch(@SuppressWarnings("unused") NumberFormatException e) {
             errors.add("invalid number format for the value '" + s2 + "' of option '" + s + "'");
           }
         }

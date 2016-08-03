@@ -149,6 +149,7 @@ public class CrawlerTask extends AbstractTask<String> {
     index.addField("contents", pageData.getData().toString(), new StandardAnalyzer());
     IndexSearcher searcher = index.createSearcher();
     Hits hits = searcher.search(q);
+    @SuppressWarnings("rawtypes")
     Iterator it = hits.iterator();
     float relevance = 0f;
     if (it.hasNext()) {

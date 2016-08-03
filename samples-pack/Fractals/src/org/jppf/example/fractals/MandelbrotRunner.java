@@ -41,7 +41,7 @@ public class MandelbrotRunner extends AbstractRunner {
   /**
    * The android demo apk in memory, so it can be sent with a job to run on an Android node.
    */
-  private static final Location androidApk = initApk();
+  private static final Location <?>androidApk = initApk();
 
   /**
    * Initialize this runner.
@@ -79,11 +79,9 @@ public class MandelbrotRunner extends AbstractRunner {
   @Override
   protected BufferedImage generateImage(final List<Task<?>> taskList, final AbstractFractalConfiguration cfg) throws Exception {
     MandelbrotConfiguration config = (MandelbrotConfiguration) cfg;
-    int max = config.maxIterations;
     BufferedImage image = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_RGB);
     for (int j=0; j<config.height; j++) {
       MandelbrotTask task = (MandelbrotTask) taskList.get(j);
-      int[] values = task.getResult();
       int[] colors = task.getColors();
       for (int i=0; i<config.width; i++) image.setRGB(i, config.height - j - 1, colors[i]);
     }
@@ -96,7 +94,7 @@ public class MandelbrotRunner extends AbstractRunner {
       records.clear();
       List<String> list = FileUtils.textFileAsLines(new FileReader(filename));
       for (String csv: list) records.add(new MandelbrotConfiguration(csv));
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
   }
 
@@ -104,9 +102,9 @@ public class MandelbrotRunner extends AbstractRunner {
    * Load the android demo apk in memory, so it can be sent with a job to run on an Android node.
    * @return the apk as a {@link Location} object transportable in a job.
    */
-  private static Location initApk() {
+  private static Location<?> initApk() {
     try {
-      Location file = new FileLocation("data/android-fractal-demo.apk");
+      Location<?> file = new FileLocation("data/android-fractal-demo.apk");
       return file.copyTo(new MemoryLocation((int) file.size()));
     } catch(Exception e) {
       log.error(e.getMessage(), e);

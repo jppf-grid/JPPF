@@ -66,7 +66,7 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
         print("successful server authentication");
         return true;
       }
-    } catch (SocketTimeoutException e) {
+    } catch (@SuppressWarnings("unused") SocketTimeoutException e) {
       print("unable to get a response from the client after %,d ms", SOCKET_TIMEOUT);
     } catch (Exception e) {
       e.printStackTrace();
@@ -110,7 +110,7 @@ public class DefaultNetworkConnectionInterceptor extends AbstractNetworkConnecti
         print("successful client authentication");
         return true;
       }
-    } catch (SocketTimeoutException e) {
+    } catch (@SuppressWarnings("unused") SocketTimeoutException e) {
       print("unable to get a response from the server after %,d ms", SOCKET_TIMEOUT);
     } catch (Exception e) {
       e.printStackTrace();

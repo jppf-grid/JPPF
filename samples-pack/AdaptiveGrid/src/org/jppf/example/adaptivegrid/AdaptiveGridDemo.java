@@ -162,7 +162,7 @@ public class AdaptiveGridDemo implements Runnable {
         int n = Integer.valueOf(token);
         if (n <= 0) System.out.printf(errorMessage, token, position);
         else result.add(n);
-      } catch (NumberFormatException e) {
+      } catch (@SuppressWarnings("unused") NumberFormatException e) {
         print(errorMessage, token, position);
       }
     }

@@ -67,6 +67,7 @@ public class DiscoveryHook implements InitializationHook {
    * @return a {@link Queue} of <i<>host:port</i> strings.
    */
   private Queue<String> populateServers() {
+    @SuppressWarnings("unchecked")
     Queue<String> queue = (Queue<String>) NodeRunner.getPersistentData("jppf.servers");
     if (queue == null) {
       queue = new ConcurrentLinkedQueue<>();

@@ -39,9 +39,10 @@ public class KryoSerialization implements JPPFSerialization {
   /**
    * Strategy used to instantiate objects during desrialization.
    */
+  @SuppressWarnings("unused")
   private static InstantiatorStrategy str = new InstantiatorStrategy() {
     @Override
-    public ObjectInstantiator newInstantiatorOf(final Class c) {
+    public ObjectInstantiator newInstantiatorOf(@SuppressWarnings("rawtypes") final Class c) {
       return new JPPFInstantiator(c);
     }
   };
@@ -90,13 +91,13 @@ public class KryoSerialization implements JPPFSerialization {
     /**
      * The class to instantiate.
      */
-    private final Class c;
+    private final Class<?> c;
 
     /**
      * Initialize this instantiator with the specified class.
      * @param c the class to instantiate.
      */
-    public JPPFInstantiator(final Class c) {
+    public JPPFInstantiator(final Class<?> c) {
       this.c = c;
     }
 

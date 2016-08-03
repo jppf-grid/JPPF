@@ -144,7 +144,7 @@ public class SequenceAlignmentRunner {
         String msg = "Exception in task #"+task.getNumber()+ ", sequence:\n"+task.getSequence();
         log.info(msg, task.getThrowable());
       }
-      float score = (Float) task.getResult();
+      float score = task.getResult();
       if (score > maxScore) {
         maxScore = score;
         maxTask = task;

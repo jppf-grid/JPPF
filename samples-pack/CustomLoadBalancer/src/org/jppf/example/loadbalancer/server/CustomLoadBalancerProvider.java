@@ -26,14 +26,14 @@ import org.jppf.utils.TypedProperties;
  * Provider implementation for the custom load-balancing algorithm.
  * @author Laurent Cohen
  */
-public class CustomLoadBalancerProvider implements JPPFBundlerProvider {
+public class CustomLoadBalancerProvider implements JPPFBundlerProvider<LoadBalancingProfile> {
   /**
    * Create a bundler instance using the specified parameters profile.
    * @param profile no used in this implementation.
    * @return an instance of {@link CustomLoadBalancer}.
    */
   @Override
-  public Bundler createBundler(final LoadBalancingProfile profile) {
+  public Bundler<LoadBalancingProfile> createBundler(final LoadBalancingProfile profile) {
     return new CustomLoadBalancer(profile);
   }
 

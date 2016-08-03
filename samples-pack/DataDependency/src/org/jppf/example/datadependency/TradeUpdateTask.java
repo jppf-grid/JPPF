@@ -62,6 +62,7 @@ public class TradeUpdateTask extends AbstractTask<String> {
     for (; elapsed < taskDuration; elapsed = DateTimeUtils.elapsedFrom(taskStart)) {
       String s = "";
       for (int i = 0; i < 10; i++) s += "A" + "10";
+      s.toString();
     }
     msg = "updated trade " + tradeId + " in " + elapsed + " ms";
     setResult(msg);

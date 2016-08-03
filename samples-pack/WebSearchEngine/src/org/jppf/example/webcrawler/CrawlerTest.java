@@ -74,6 +74,7 @@ public class CrawlerTest {
    * Simple crawler test.
    * @throws Exception if an error is thrown while executing.
    */
+  @SuppressWarnings("rawtypes")
   public static void simpleCrawl() throws Exception {
     Crawler crawler = new Crawler();
     crawler.setLinkFilter(new ServerFilter(server));

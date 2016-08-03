@@ -165,7 +165,6 @@ public class RepositoryImpl implements Repository {
 
   @Override
   public void delete(final RepositoryFilter filter) {
-    int count = 0;
     try {
       File dir = new File(rootDir + "/");
       // get the list of all jar files in the repository
@@ -207,7 +206,7 @@ public class RepositoryImpl implements Repository {
       // transform the text file into a set of  strings and close the reader.
       filesToDelete = new HashSet<>(FileUtils.textFileAsLines(reader));
       deleteFilesToDelete();
-    } catch (IOException ignore) {
+    } catch (@SuppressWarnings("unused") IOException ignore) {
     }
   }
 
@@ -224,7 +223,7 @@ public class RepositoryImpl implements Repository {
       try {
         writer = new BufferedWriter(new FileWriter(file));
         for (String s: filesToDelete) writer.write(s + '\n');
-      } catch (IOException ignore) {
+      } catch (@SuppressWarnings("unused") IOException ignore) {
       } finally {
         StreamUtils.closeSilent(writer);
       }

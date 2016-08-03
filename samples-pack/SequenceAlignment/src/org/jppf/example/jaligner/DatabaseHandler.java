@@ -84,7 +84,7 @@ public class DatabaseHandler
     {
       length = dis.readInt();
     }
-    catch(EOFException e)
+    catch(@SuppressWarnings("unused") EOFException e)
     {
       eof = true;
       StreamUtils.closeSilent(dis);

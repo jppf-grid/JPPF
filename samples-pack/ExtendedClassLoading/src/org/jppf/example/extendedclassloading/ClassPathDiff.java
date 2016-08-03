@@ -105,7 +105,6 @@ public class ClassPathDiff {
       }
     }
     // compute which elements were added
-    Map<String, String> targetMap = target.elements();
     for (Map.Entry<String, String> targetEntry : target.elements().entrySet()) {
       String name = targetEntry.getKey();
       String sourceSignature = source.getElementSignature(name);

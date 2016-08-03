@@ -89,11 +89,9 @@ public class FractalPreviewPanel extends JPanel
 
   @Override
   public void paint(final Graphics g) {
-    boolean draw = false;
     if (reset.compareAndSet(true, false)) {
       gb.setColor(getBackground());
       gb.fillRect(0, 0, 400, 400);
-      draw = true;
     }
     int size = queueSize.get();
     if (size > 0) {
@@ -104,7 +102,6 @@ public class FractalPreviewPanel extends JPanel
         gb.setColor(new Color(point.rgb));
         gb.fillRect(point.x, 400 - point.y - 1, rectSize, rectSize);
       }
-      draw = true;
     }
     //if (draw) g.drawImage(buffer, 0, 0, null);
     g.drawImage(buffer, 0, 0, null);
@@ -132,11 +129,9 @@ public class FractalPreviewPanel extends JPanel
    */
   public void doReset() {
     int size = queueSize.get();
-    int count = 0;
     for (int i=0; i<size; i++) {
       if (queue.poll() == null) break;
       queueSize.decrementAndGet();
-      count++;
     }
     reset.compareAndSet(false, true);
   }
@@ -147,6 +142,6 @@ public class FractalPreviewPanel extends JPanel
    */
   public void addPoint(final FractalPoint point) {
     queue.offer(point.scale(scale));
-    int size = queueSize.incrementAndGet();
+    queueSize.incrementAndGet();
   }
 }

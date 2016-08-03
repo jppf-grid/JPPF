@@ -38,7 +38,7 @@ import org.slf4j.*;
  * </ul>
  * @author Laurent Cohen
  */
-public class CustomLoadBalancer extends AbstractBundler implements ChannelAwareness, JobAwarenessEx {
+public class CustomLoadBalancer extends AbstractBundler<LoadBalancingProfile> implements ChannelAwareness, JobAwarenessEx {
   /**
    * Logger for this class.
    */

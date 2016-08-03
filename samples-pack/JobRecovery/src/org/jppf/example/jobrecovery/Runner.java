@@ -72,7 +72,7 @@ public class Runner {
           public void run() {
             try {
               Thread.sleep(6000L);
-            } catch (Exception e) {
+            } catch (@SuppressWarnings("unused") Exception e) {
             }
             System.exit(1);
           }

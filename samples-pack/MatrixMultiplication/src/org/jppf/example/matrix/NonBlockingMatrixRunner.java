@@ -116,7 +116,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter {
         // Get the matrix values from the tasks results
         for (int i = 0; i < results.size(); i++) {
           MatrixTask matrixTask = (MatrixTask) results.get(i);
-          double[] row = (double[]) matrixTask.getResult();
+          double[] row = matrixTask.getResult();
           for (int j = 0; j < row.length; j++)
             c.setValueAt(i, j, row[j]);
         }
@@ -171,7 +171,7 @@ public class NonBlockingMatrixRunner extends JobListenerAdapter {
         // Get the matrix values from the tasks results
         for (int i = 0; i < results.size(); i++) {
           MatrixTask matrixTask = (MatrixTask) results.get(i);
-          double[] row = (double[]) matrixTask.getResult();
+          double[] row = matrixTask.getResult();
           for (int j = 0; j < row.length; j++) c.setValueAt(i, j, row[j]);
         }
         long elapsed = DateTimeUtils.elapsedFrom(start);
