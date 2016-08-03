@@ -84,7 +84,7 @@ public final class ReflectionHelper {
    * @return the result of the method's invocation, or null if the method's return type is void,
    * or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object invokeMethod(final Class clazz, final Object instance, final String methodName) {
+  public static Object invokeMethod(final Class<?> clazz, final Object instance, final String methodName) {
     return invokeMethod(clazz, instance, methodName, null, (Object[]) null);
   }
 
@@ -141,7 +141,7 @@ public final class ReflectionHelper {
    */
   public static Object newInstance(final String className) {
     try {
-      Class c = getCurrentClassLoader().loadClass(className);
+      Class<?> c = getCurrentClassLoader().loadClass(className);
       return c.newInstance();
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -187,7 +187,7 @@ public final class ReflectionHelper {
    * @param fieldName the name of the field to get the value  of.
    * @return the value of the field, or a <code>JPPFException</code> if the invocation failed.
    */
-  public static Object getField(final Class clazz, final Object instance, final String fieldName) {
+  public static Object getField(final Class<?> clazz, final Object instance, final String fieldName) {
     try {
       Field f = clazz.getField(fieldName);
       return f.get(instance);
@@ -223,10 +223,10 @@ public final class ReflectionHelper {
    * @param classNames the names of the classes to find.
    * @return n array of <code>Class</code> objects, or null if one of the classes could not be found.
    */
-  public static Class[] getClasses(final String...classNames) {
+  public static Class<?>[] getClasses(final String...classNames) {
     try {
       if ((classNames == null) || (classNames.length <= 0)) return new Class[0];
-      Class[] classes = new Class[classNames.length];
+      Class<?>[] classes = new Class[classNames.length];
       ClassLoader cl = getCurrentClassLoader();
       for (int i=0; i<classNames.length; i++) classes[i] = Class.forName(classNames[i], true, cl);
       return classes;
@@ -241,7 +241,7 @@ public final class ReflectionHelper {
    * @param className the name of the class to find.
    * @return a <code>Class</code>, or null if the classe could not be found.
    */
-  public static Class getClass0(final String className) {
+  public static Class<?> getClass0(final String className) {
     try {
       return Class.forName(className, true, getCurrentClassLoader());
     } catch(Exception e) {
@@ -277,7 +277,6 @@ public final class ReflectionHelper {
       if (m.getName().equals(methodName) && (formalParams.length == p.length)) {
         boolean mismatch = false;
         for (int i=0; i<formalParams.length; i++) {
-          Class<?> paramClass = formalParams[i];
           if ((p[i] != null) && !formalParams[i].isAssignableFrom(p[i].getClass())) {
             mismatch = true;
             break;

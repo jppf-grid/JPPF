@@ -32,6 +32,7 @@ import org.jppf.server.job.management.NodeJobInformation;
  * Generated static proxy for the {@link org.jppf.server.job.management.DriverJobManagementMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DriverJobManagementMBeanStaticProxy extends AbstractMBeanStaticProxy implements DriverJobManagementMBean {
   /**
    * Initialize this MBean static proxy.

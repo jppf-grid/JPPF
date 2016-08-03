@@ -57,7 +57,7 @@ public interface CollectionMap<K, V> extends Iterable<V>, Serializable
    * @param key the key to which to add the values.
    * @param values the values to add to the key.
    */
-  void addValues(final K key, final V... values);
+  void addValues(final K key, @SuppressWarnings("unchecked") final V... values);
 
   /**
    * Remove the specified values from the specified key. This is a bulk operation.
@@ -65,7 +65,7 @@ public interface CollectionMap<K, V> extends Iterable<V>, Serializable
    * @param values the values to remove.
    * @return the number of values that were actually removed, possibly zero.
    */
-  int removeValues(final K key, final V... values);
+  int removeValues(final K key, @SuppressWarnings("unchecked") final V... values);
 
   /**
    * Remove the specified key from this map.

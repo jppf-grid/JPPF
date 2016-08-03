@@ -97,7 +97,7 @@ class Deserializer {
     if (type == Serializer.NULL_OBJECT_HEADER) return null;
     else if (type == Serializer.CLASS_OBJECT_HEADER) return readClassObject(header);
     int handle = readHandle(header);
-    if (traceEnabled) try { log.trace("read object header={}, handle={}", header, handle); } catch(Exception e) {}
+    if (traceEnabled) try { log.trace("read object header={}, handle={}", header, handle); } catch(@SuppressWarnings("unused") Exception e) {}
     Object obj = caches.handleToObjectMap.get(handle);
     if (obj != null) return obj;
     //if (traceEnabled) try { log.trace("reading object handle = " + handle); } catch(Exception e) {}
@@ -123,6 +123,7 @@ class Deserializer {
     else if (cd.enumType) {
       String name = readString();
       //if (traceEnabled) try { log.trace("reading enum[" + cd.signature + "] : " + name); } catch(Exception e) {}
+      @SuppressWarnings("rawtypes")
       Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) cd.clazz, name);
       caches.handleToObjectMap.put(handle, val);
     } else {
@@ -155,7 +156,7 @@ class Deserializer {
    */
   void readFields(final ClassDescriptor cd, final Object obj) throws Exception {
     ClassDescriptor tmpDesc = cd;
-    if (traceEnabled) try { log.trace("reading fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(Exception e) {}
+    if (traceEnabled) try { log.trace("reading fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") Exception e) {}
     Deque<ClassDescriptor> stack = new LinkedBlockingDeque<>();
     while (tmpDesc != null) {
       stack.addFirst(tmpDesc);
@@ -166,7 +167,7 @@ class Deserializer {
       if (handler != null) handler.readDeclaredFields(this, desc, obj);
       else if (desc.hasReadWriteObject) {
         Method m = desc.readObjectMethod;
-        if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(Exception e) {}
+        if (traceEnabled) try { log.trace("invoking readObject() for object = {}, class = {}", StringUtils.toIdentityString(obj), desc); } catch(@SuppressWarnings("unused") Exception e) {}
         try {
           tmpDesc = currentClassDescriptor;
           currentClassDescriptor = desc;
@@ -188,7 +189,7 @@ class Deserializer {
    */
   @SuppressWarnings("unchecked")
   void readDeclaredFields(final ClassDescriptor cd, final Object obj) throws Exception {
-    if (traceEnabled) try { log.trace("reading declared fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(Exception e) {}
+    if (traceEnabled) try { log.trace("reading declared fields for object = {}, class = {}", StringUtils.toIdentityString(obj), cd); } catch(@SuppressWarnings("unused") Exception e) {}
     for (FieldDescriptor fd: cd.fields) {
       //if (traceEnabled) try { log.trace("reading field '" + fd.name + "' of object " + obj); } catch(Exception e) {}
       ClassDescriptor typeDesc = fd.type;
@@ -209,6 +210,7 @@ class Deserializer {
       } else if (typeDesc.enumType) {
         String name = (String) readObject();
         //if (traceEnabled) try { log.trace("reading enum[" + typeDesc.signature + "] : " + name); } catch(Exception e) {}
+        @SuppressWarnings("rawtypes")
         Object val = (name == null) ? null : Enum.valueOf((Class<? extends Enum>) field.getType(), name);
         field.set(obj, val);
       } else {
@@ -256,6 +258,7 @@ class Deserializer {
       for (int i=0; i<len; i++) {
         String name = (String) readObject();
         //if (traceEnabled) try { log.trace("writing enum[" + eltDesc.signature + "] : " + name); } catch(Exception e) {}
+        @SuppressWarnings("rawtypes")
         Object val = (name == null) ? null : Enum.valueOf((Class<Enum>) compCd.clazz, name);
         Array.set(obj, i, val);
       }

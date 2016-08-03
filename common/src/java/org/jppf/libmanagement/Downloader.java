@@ -70,9 +70,9 @@ public class Downloader {
         System.out.println("The files are already present in the destination folder");
         return;
       }
-      Location source = new URLLocation(sourceUrl);
+      Location<?> source = new URLLocation(sourceUrl);
       tmp = File.createTempFile("jppf_", ".tmp");
-      Location dest = new FileLocation(tmp);
+      Location<?> dest = new FileLocation(tmp);
       System.out.println("downloading " + source);
       LocationEventListener l = listener;
       if (l == null) l = new LocationEventListener() {
@@ -100,7 +100,7 @@ public class Downloader {
         StreamUtils.copyStream(is, os);
         System.out.println("extracted " + entry.getName() + " to " + f);
       }
-      if (l != null) source.removeLocationEventListener(l);
+      source.removeLocationEventListener(l);
     } finally {
       if (tmp != null) tmp.delete();
     }

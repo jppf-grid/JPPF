@@ -57,7 +57,6 @@ public class ChannelOutputDestination implements OutputDestination {
     try {
       tmpBuffer = DirectBufferPool.provideBuffer();
       int cap = tmpBuffer.capacity();
-      boolean end = false;
       int count = 0;
       while (count < len) {
         tmpBuffer.clear();

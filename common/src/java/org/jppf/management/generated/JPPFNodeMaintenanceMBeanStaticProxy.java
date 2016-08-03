@@ -26,6 +26,7 @@ import org.jppf.management.JPPFNodeMaintenanceMBean;
  * Generated static proxy for the {@link org.jppf.management.JPPFNodeMaintenanceMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class JPPFNodeMaintenanceMBeanStaticProxy extends AbstractMBeanStaticProxy implements JPPFNodeMaintenanceMBean {
   /**
    * Initialize this MBean static proxy.

@@ -134,12 +134,10 @@ public final class ProcessWrapper {
         boolean end = false;
         int bufferSize = 8*1024;
         StringBuilder sb = new StringBuilder(bufferSize);
-        int count = 0;
         while (!end) {
           int c = reader.read();
           if (c == -1) break;      // end of file (the process has exited)
           if (c == '\r') continue; // skip the line feed
-          count++;
           sb.append((char) c);
           if ((sb.length() >= bufferSize) || (c == '\n')) {
             fireStreamEvent(output, sb.toString());
@@ -147,7 +145,7 @@ public final class ProcessWrapper {
           }
         }
         Thread.sleep(1);
-      } catch(IOException ignore) {
+      } catch(@SuppressWarnings("unused") IOException ignore) {
       } catch(Throwable t) {
         t.printStackTrace();
       }

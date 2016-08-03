@@ -18,8 +18,6 @@
 
 package org.jppf.doc.jenkins;
 
-import java.util.*;
-
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -28,10 +26,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Laurent Cohen
  */
 public class Handler extends DefaultHandler {
-  /**
-   * The set of aceepted elements.
-   */
-  private static final Set<String> elements = new HashSet<>(Arrays.asList("failCount", "skipCount", "totalCount", "startTime", "result", "duration"));
   /**
    * The build to parse.
    */

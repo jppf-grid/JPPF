@@ -33,7 +33,7 @@ class DeserializationCaches {
   /**
    * Mapping of classes to their descriptor.
    */
-  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap();
+  Map<Class<?>, ClassDescriptor> classToDescMap = new HashMap<>();
   /**
    * Mapping of handles to corresponding objects.
    */

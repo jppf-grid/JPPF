@@ -210,6 +210,7 @@ public final class StringUtils {
    * @param array the array from which to build a string representation.
    * @return the array's content as a string.
    */
+  @SafeVarargs
   public static <T> String arrayToString(final T...array) {
     return arrayToString(",", "[", "]", array);
   }
@@ -223,6 +224,7 @@ public final class StringUtils {
    * @param suffix the suffix to use at the end of the resulting string. If null, no suffix is used.
    * @return the array's content as a string.
    */
+  @SafeVarargs
   public static <T> String arrayToString(final String sep, final String prefix, final String suffix, final T...array) {
     StringBuilder sb = new StringBuilder();
     if (array == null) sb.append("null");
@@ -249,7 +251,7 @@ public final class StringUtils {
       try {
         int n = Integer.valueOf(strPorts[i].trim());
         ports[i] = n;
-      } catch(NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
         return null;
       }
     }
@@ -326,7 +328,7 @@ public final class StringUtils {
   private static Charset makeUTF8() {
     try {
       return Charset.forName("UTF-8");
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       return null;
     }
   }
@@ -392,7 +394,7 @@ public final class StringUtils {
       Number n = nf.parse(source);
       //System.out.printf("source=%s, n=%s, locale=%s%n", source, n, Locale.getDefault());
       return n;
-    } catch (ParseException ignore) {
+    } catch (@SuppressWarnings("unused") ParseException ignore) {
     }
     return null;
   }
@@ -471,7 +473,7 @@ public final class StringUtils {
   public static String getDecodedURLPath(final URL url) {
     try {
       return URLDecoder.decode(url.getPath(), "UTF-8");
-    } catch (UnsupportedEncodingException ignore) {
+    } catch (@SuppressWarnings("unused") UnsupportedEncodingException ignore) {
       return null;
     }
   }

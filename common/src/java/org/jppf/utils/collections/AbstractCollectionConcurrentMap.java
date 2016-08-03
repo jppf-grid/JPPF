@@ -53,7 +53,7 @@ public abstract class AbstractCollectionConcurrentMap<K, V> extends AbstractColl
   }
 
   @Override
-  public void addValues(final K key, final V... values)
+  public void addValues(final K key, @SuppressWarnings("unchecked") final V... values)
   {
     Collection<V> newColl = newCollection();
     Collection<V> coll = ((ConcurrentHashMap<K, Collection<V>>) map).putIfAbsent(key, newColl);

@@ -249,7 +249,7 @@ public final class FileUtils {
     String filePath = null;
     try {
       filePath = file.getCanonicalPath();
-    } catch(IOException e) {
+    } catch(@SuppressWarnings("unused") IOException e) {
       return null;
     }
     int idx = filePath.lastIndexOf('.');
@@ -301,7 +301,7 @@ public final class FileUtils {
     int size = 0;
     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String s = "";
-      while (s != null) {
+      while (true) {
         if (writer == null) {
           String name = file + '.' + count;
           System.out.println("creating file " + name);
@@ -391,7 +391,7 @@ public final class FileUtils {
     for (int i=0; i<files.length; i++) {
       try {
         urls[i] = files[i].toURI().toURL();
-      } catch(MalformedURLException ignored) {
+      } catch(@SuppressWarnings("unused") MalformedURLException ignored) {
       }
     }
     return urls;
@@ -461,7 +461,7 @@ public final class FileUtils {
       if (!childrenOnly) {
         if (!path.delete()) success = false;
       }
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       success = false;
     }
     return success;
@@ -488,7 +488,7 @@ public final class FileUtils {
     File file = new File(path);
     try {
       return file.toURI().toURL();
-    } catch (MalformedURLException ignore) {
+    } catch (@SuppressWarnings("unused") MalformedURLException ignore) {
     }
     return null;
   }
@@ -501,7 +501,7 @@ public final class FileUtils {
   public static URL getURLFromFilePath(final File path) {
     try {
       return path.toURI().toURL();
-    } catch (MalformedURLException ignore) {
+    } catch (@SuppressWarnings("unused") MalformedURLException ignore) {
       return null;
     }
   }
@@ -514,7 +514,7 @@ public final class FileUtils {
   public static String getDecodedURLFromFilePath(final File path) {
     try {
       return URLDecoder.decode(path.toURI().toURL().toString(), "UTF-8");
-    } catch (MalformedURLException|UnsupportedEncodingException ignore) {
+    } catch (@SuppressWarnings("unused") MalformedURLException|UnsupportedEncodingException ignore) {
       return null;
     }
   }

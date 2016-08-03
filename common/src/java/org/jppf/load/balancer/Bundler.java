@@ -54,7 +54,7 @@ public interface Bundler<T extends LoadBalancingProfile> {
    * @return a new <code>Bundler</code> instance.
    * @deprecated this method is not needed anymore, all Bundler instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
    */
-  Bundler copy();
+  Bundler<?> copy();
 
   /**
    * Get the timestamp at which this bundler was created.

@@ -57,11 +57,11 @@ public final class JPPFInitializer {
         System.setProperty(protocolHandlerProperty, s);
       }
       // warmup System.nanoTime() for JIT
-      long start = System.nanoTime();
+      //long start = System.nanoTime();
       for (int i = 0; i < 20_000; i++) {
-        long t = System.nanoTime();
+        System.nanoTime();
       }
-      long elapsed = System.nanoTime() - start;
+      //long elapsed = System.nanoTime() - start;
       //System.out.printf("System.nanoTime() warmup in %,d ns%n", elapsed);
     } catch (Exception e) {
       e.printStackTrace();

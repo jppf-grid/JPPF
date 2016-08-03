@@ -117,7 +117,7 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
   }
 
   @Override
-  public String changeLoadBalancerSettings(final String algorithm, final Map parameters) throws Exception {
+  public String changeLoadBalancerSettings(final String algorithm, final Map<Object, Object> parameters) throws Exception {
     return (String) invoke(MBEAN_NAME, "changeLoadBalancerSettings", new Object[] {algorithm, parameters}, new String[] {String.class.getName(), Map.class.getName()});
   }
 
@@ -299,7 +299,6 @@ public class JMXDriverConnectionWrapper extends JMXConnectionWrapper implements 
     String listenerID = (String) invoke(JPPFNodeForwardingMBean.MBEAN_NAME, "registerForwardingNotificationListener", new Object[] {selector, mBeanName}, FORWARDING_LISTENER_SIGNATURE);
     InternalNotificationFilter internalFilter = new InternalNotificationFilter(listenerID, filter);
     addNotificationListener(JPPFNodeForwardingMBean.MBEAN_NAME, listener, internalFilter, handback);
-    ListenerWrapper wrapper = new ListenerWrapper(listener, internalFilter, handback);
     synchronized(listeners) {
       Map<String, ListenerWrapper> map = listeners.get(getId());
       if (map == null) {

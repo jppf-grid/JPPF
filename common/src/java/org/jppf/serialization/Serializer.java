@@ -109,13 +109,13 @@ class Serializer {
    */
   void writeObject(final Object obj) throws Exception {
     if (obj == null) out.writeByte(NULL_OBJECT_HEADER);
-    else if (obj instanceof Class) writeClassObject((Class) obj);
+    else if (obj instanceof Class) writeClassObject((Class<?>) obj);
     else {
       Integer handle = caches.objectHandleMap.get(obj);
       boolean isString = obj instanceof String;
       if (handle == null) {
         handle = caches.newObjectHandle(obj);
-        if (traceEnabled) try { log.trace("writing handle = {}, object = {}", handle, StringUtils.toIdentityString(obj)); } catch(Exception e) {}
+        if (traceEnabled) try { log.trace("writing handle = {}, object = {}", handle, StringUtils.toIdentityString(obj)); } catch(@SuppressWarnings("unused") Exception e) {}
         if (isString) {
           writeHeaderAndHandle(STRING_HEADER, handle);
           writeString((String) obj);
@@ -142,7 +142,7 @@ class Serializer {
     writeString(cd.signature);
     //if (traceEnabled) try { log.trace("writing object " + obj + ", handle=" + handle + ", class=" + obj.getClass() + ", cd=" + cd); } catch(Exception e) {}
     if (cd.array) writeArray(obj, cd);
-    else if (cd.enumType) writeString(((Enum) obj).name());
+    else if (cd.enumType) writeString(((Enum<?>) obj).name());
     else writeFields(obj, cd);
   }
 
@@ -154,7 +154,7 @@ class Serializer {
   private void writeClassObject(final Class<?> obj) throws Exception {
     Map<Class<?>, ClassDescriptor> cdMap = new IdentityHashMap<>();
     ClassDescriptor cd = caches.getClassDescriptor(obj, cdMap);
-    Integer handle = caches.objectHandleMap.get(obj);
+    caches.objectHandleMap.get(obj);
     currentObject = obj;
     currentClassDescriptor = cd;
     out.writeByte(CLASS_OBJECT_HEADER);
@@ -215,7 +215,7 @@ class Serializer {
           case 'Z': out.writeBoolean((Boolean) val); break;
         }
       }
-      else if (fd.type.enumType) writeObject(val == null ? null : ((Enum) val).name());
+      else if (fd.type.enumType) writeObject(val == null ? null : ((Enum<?>) val).name());
       else writeObject(val);
     }
   }
@@ -244,7 +244,7 @@ class Serializer {
     } else if (eltDesc.enumType) {
       for (int i=0; i<n; i++) {
         Object val = Array.get(obj, i);
-        String name = (val == null) ? null : ((Enum) val).name();
+        String name = (val == null) ? null : ((Enum<?>) val).name();
         writeObject(name);
       }
     } else {

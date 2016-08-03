@@ -29,8 +29,7 @@ import org.jppf.utils.ThreadSynchronization;
  * @param <S> the type of wrapped channel.
  * @author Laurent Cohen
  */
-public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization implements ChannelWrapper<S>
-{
+public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization implements ChannelWrapper<S> {
   /**
    * Count of instances of this class.
    */
@@ -52,34 +51,29 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * Initialize this channel wrapper with the specified channel.
    * @param channel the channel to wrap.
    */
-  public AbstractChannelWrapper(final S channel)
-  {
+  public AbstractChannelWrapper(final S channel) {
     this.channel = channel;
   }
 
   @Override
-  public S getChannel()
-  {
+  public S getChannel() {
     return channel;
   }
 
   @Override
-  public void close() throws Exception
-  {
+  public void close() throws Exception {
   }
 
   @Override
-  public abstract NioContext getContext();
+  public abstract NioContext<?> getContext();
 
   @Override
-  public boolean isOpen()
-  {
+  public boolean isOpen() {
     return true;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     return ((channel == null) ? 0 : channel.hashCode());
   }
 
@@ -89,22 +83,19 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * @return true if this object is equal to the other one, false otherwise.
    * @see java.lang.Object#equals(java.lang.Object)
    */
-  /*
-	@Override
-	public boolean equals(final Object obj)
-	{
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
-		AbstractChannelWrapper other = (AbstractChannelWrapper) obj;
-		if (channel == null) return (other.channel == null);
-		return channel.equals(other.channel);
-	}
-   */
+  /* @Override
+   * public boolean equals(final Object obj)
+   * {
+   * if (this == obj) return true;
+   * if (obj == null) return false;
+   * if (getClass() != obj.getClass()) return false;
+   * AbstractChannelWrapper other = (AbstractChannelWrapper) obj;
+   * if (channel == null) return (other.channel == null);
+   * return channel.equals(other.channel);
+   * } */
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder(1000);
     sb.append(getClass().getSimpleName());
     sb.append('[');
@@ -117,37 +108,31 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
   }
 
   @Override
-  public int getInterestOps()
-  {
+  public int getInterestOps() {
     return 0;
   }
 
   @Override
-  public void setInterestOps(final int keyOps)
-  {
+  public void setInterestOps(final int keyOps) {
   }
 
   @Override
-  public boolean isReadable()
-  {
+  public boolean isReadable() {
     return (getReadyOps() & OP_READ) != 0;
   }
 
   @Override
-  public boolean isWritable()
-  {
+  public boolean isWritable() {
     return (getReadyOps() & OP_WRITE) != 0;
   }
 
   @Override
-  public boolean isAcceptable()
-  {
+  public boolean isAcceptable() {
     return (getReadyOps() & OP_ACCEPT) != 0;
   }
 
   @Override
-  public boolean isConnectable()
-  {
+  public boolean isConnectable() {
     return (getReadyOps() & OP_CONNECT) != 0;
   }
 
@@ -157,8 +142,7 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * @see org.jppf.nio.ChannelWrapper#getSelector()
    */
   @Override
-  public ChannelSelector getSelector()
-  {
+  public ChannelSelector getSelector() {
     return selector;
   }
 
@@ -169,18 +153,16 @@ public abstract class AbstractChannelWrapper<S> extends ThreadSynchronization im
    * @see org.jppf.nio.ChannelWrapper#setSelector(org.jppf.nio.ChannelSelector)
    */
   @Override
-  public void setSelector(final ChannelSelector selector)
-  {
+  public void setSelector(final ChannelSelector selector) {
     this.selector = selector;
   }
 
   /**
    * Get this channel's id.
-   * @return  the id as a long value.
+   * @return the id as a long value.
    */
   @Override
-  public long getId()
-  {
+  public long getId() {
     return id;
   }
 }

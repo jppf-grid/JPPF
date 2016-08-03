@@ -28,7 +28,7 @@ import java.io.Serializable;
 public interface PropertiesCollection<E> extends Serializable
 {
   /**
-   * Add the psecified properties with the specified keys.
+   * Add the specified properties with the specified keys.
    * @param key the key to use.
    * @param properties the properties to add.
    */

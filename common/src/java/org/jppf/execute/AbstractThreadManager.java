@@ -75,7 +75,7 @@ public abstract class AbstractThreadManager implements ThreadManager {
   private static boolean determineCpuTimeEnabled() {
     try {
       return CpuTimeCollector.isCpuTimeEnabled();
-    } catch(Exception|NoClassDefFoundError e) {
+    } catch(@SuppressWarnings("unused") Exception|NoClassDefFoundError e) {
       return false;
     }
   }

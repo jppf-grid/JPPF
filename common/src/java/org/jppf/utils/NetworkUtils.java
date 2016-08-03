@@ -194,7 +194,7 @@ public final class NetworkUtils {
     try {
       InetAddress a = InetAddress.getByName(ip);
       return a.getHostName();
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       return ip;
     }
   }
@@ -209,7 +209,7 @@ public final class NetworkUtils {
     try {
       InetAddress a = InetAddress.getByName(hostOrIP);
       return new HostIP(a.getHostName(), a.getHostAddress());
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       return new HostIP(hostOrIP, hostOrIP);
     }
   }
@@ -259,7 +259,6 @@ public final class NetworkUtils {
    */
   public static int[] toIntArray(final InetAddress addr) {
     try {
-      byte[] bytes = addr.getAddress();
       String ip = addr.getHostAddress();
       int[] result = null;
       if (addr instanceof Inet6Address) {
@@ -275,7 +274,7 @@ public final class NetworkUtils {
         for (int i=0; i<comp.length; i++) result[i] = Integer.valueOf(comp[i]);
       }
       return result;
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
       return null;
     }
   }
@@ -289,7 +288,7 @@ public final class NetworkUtils {
     try {
       InetAddress addr = InetAddress.getByName(host);
       if ((addr instanceof Inet6Address) && addr.getHostAddress().equals(host)) return true;
-    } catch (UnknownHostException ignore) {
+    } catch (@SuppressWarnings("unused") UnknownHostException ignore) {
     }
     return false;
   }

@@ -117,7 +117,7 @@ public final class SystemUtils {
           return System.getProperties();
         }
       });
-      Enumeration en = sysProps.propertyNames();
+      Enumeration<?> en = sysProps.propertyNames();
       while (en.hasMoreElements()) {
         String name = (String) en.nextElement();
         try {
@@ -402,7 +402,7 @@ public final class SystemUtils {
     Object value = null;
     try {
       value = ManagementUtils.getAttribute(ManagementUtils.getPlatformServer(), "java.lang:type=OperatingSystem", name);
-    } catch(Exception ignore) {
+    } catch(@SuppressWarnings("unused") Exception ignore) {
       return;
     }
     switch(type) {

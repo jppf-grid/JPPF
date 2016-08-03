@@ -253,12 +253,12 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
     while (it.hasNext()) {
       SelectionKey key = it.next();
       it.remove();
-      NioContext context = null;
+      NioContext<?> context = null;
       try {
         if (!key.isValid()) continue;
         if (key.isAcceptable()) doAccept(key);
         else {
-          context = (NioContext) key.attachment();
+          context = (NioContext<?>) key.attachment();
           transitionManager.submitTransition(context.getChannel());
         }
       } catch (Exception e) {
@@ -309,7 +309,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
   @SuppressWarnings("unchecked")
   public ChannelWrapper<?> accept(final SocketChannel channel, final SSLHandler sslHandler, final boolean ssl) {
     if (debugEnabled) log.debug("{} performing accept() of channel {}, ssl={}", new Object[] {this, channel, ssl});
-    NioContext context = createNioContext();
+    NioContext<?> context = createNioContext();
     SelectionKeyWrapper wrapper = null;
     lock.lock();
     try {
@@ -393,7 +393,7 @@ public abstract class NioServer<S extends Enum<S>, T extends Enum<T>> extends Th
       selector.wakeup();
       Set<SelectionKey> keySet = selector.keys();
       for (SelectionKey key: keySet) {
-        NioContext ctx = (NioContext) key.attachment();
+        NioContext<?> ctx = (NioContext<?>) key.attachment();
         channels.add(ctx.getChannel());
       }
     } catch (Exception e) {

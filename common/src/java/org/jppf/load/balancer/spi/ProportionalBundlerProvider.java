@@ -33,7 +33,7 @@ public class ProportionalBundlerProvider implements JPPFBundlerProvider<Proporti
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final ProportionalProfile profile) {
+  public Bundler<ProportionalProfile> createBundler(final ProportionalProfile profile) {
     return new ProportionalBundler(profile);
   }
 

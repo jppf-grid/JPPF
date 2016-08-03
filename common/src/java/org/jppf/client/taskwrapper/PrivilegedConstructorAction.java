@@ -28,14 +28,14 @@ class PrivilegedConstructorAction extends AbstractPrivilegedAction<Object>
   /**
    * The method to invoke.
    */
-  private Constructor constructor = null;
+  private Constructor<?> constructor = null;
 
   /**
    * Initialize this privileged action with the specified constructor and parameters.
    * @param constructor the constructor to invoke.
    * @param args the parameters of the constructor to invoke.
    */
-  public PrivilegedConstructorAction(final Constructor constructor, final Object[] args)
+  public PrivilegedConstructorAction(final Constructor<?> constructor, final Object[] args)
   {
     this.constructor = constructor;
     this.args = args;

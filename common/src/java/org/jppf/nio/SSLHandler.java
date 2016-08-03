@@ -116,7 +116,7 @@ public class SSLHandler {
     do {
       flush();
       if (sslEngine.isInboundDone()) return count > 0 ? count : -1;
-      int readCount = doRead();
+      doRead();
       channelReceiveBuffer.flip();
       sslEngineResult = sslEngine.unwrap(channelReceiveBuffer, applicationReceiveBuffer);
       channelReceiveBuffer.compact();

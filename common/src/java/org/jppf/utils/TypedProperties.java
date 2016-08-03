@@ -108,10 +108,10 @@ public class TypedProperties extends Properties {
       val = val.trim();
       try {
         intVal = Integer.valueOf(val);
-      } catch(NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
         try {
           intVal = Double.valueOf(val).intValue();
-        } catch(NumberFormatException ignore) {
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
         }
       }
     }
@@ -151,10 +151,10 @@ public class TypedProperties extends Properties {
       val = val.trim();
       try {
         longVal = Long.valueOf(val);
-      } catch(NumberFormatException ignore) {
+      } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
         try {
           longVal = Double.valueOf(val).longValue();
-        } catch(NumberFormatException ignore2) {
+        } catch(@SuppressWarnings("unused") NumberFormatException ignore2) {
         }
       }
     }
@@ -193,7 +193,7 @@ public class TypedProperties extends Properties {
     if (val != null) {
       try {
         floatVal = Float.parseFloat(val.trim());
-      } catch(NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
       }
     }
     return floatVal;
@@ -232,7 +232,7 @@ public class TypedProperties extends Properties {
     if (val != null) {
       try {
         doubleVal = Double.parseDouble(val.trim());
-      } catch(NumberFormatException e) {
+      } catch(@SuppressWarnings("unused") NumberFormatException e) {
       }
     }
     return doubleVal;
@@ -417,7 +417,7 @@ public class TypedProperties extends Properties {
       TypedProperties res = new TypedProperties();
       res.load(is);
       return res;
-    } catch(IOException e) {
+    } catch(@SuppressWarnings("unused") IOException e) {
       return def;
     }
   }
@@ -442,7 +442,7 @@ public class TypedProperties extends Properties {
     if (val == null) return def;
     try {
       return InetAddress.getByName(val);
-    } catch(UnknownHostException e) {
+    } catch(@SuppressWarnings("unused") UnknownHostException e) {
       return def;
     }
   }
@@ -544,6 +544,7 @@ public class TypedProperties extends Properties {
    * @return the old value of the property, or {@code null} if it wasn't defined.
    * @since 5.2
    */
+  @SuppressWarnings("unchecked")
   public <T> T remove(final JPPFProperty<T> property) {
     return (T) remove(property.getName());
   }

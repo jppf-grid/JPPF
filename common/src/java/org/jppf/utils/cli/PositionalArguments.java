@@ -43,10 +43,10 @@ public class PositionalArguments extends AbstractCLIArguments<PositionalArgument
 
   @Override
   public PositionalArguments parseArguments(final String...clArgs)  throws Exception {
-    boolean end = false;
     int pos = 0;
     try {
-      for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+      //for (Map.Entry<String, CLIArgument> entry: argDefs.entrySet()) {
+      for (int i=0; i<argDefs.size(); i++) {
         if (pos >= clArgs.length) break;
         setString(Integer.toString(pos), clArgs[pos++]);
       }

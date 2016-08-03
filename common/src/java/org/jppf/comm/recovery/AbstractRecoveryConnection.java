@@ -104,7 +104,7 @@ public abstract class AbstractRecoveryConnection extends ThreadSynchronization i
         success = true;
         message = buffer.asString();
         if (traceEnabled) log.trace("received '{}' for {}", message, this);
-      } catch (SocketTimeoutException e) {
+      } catch (@SuppressWarnings("unused") SocketTimeoutException e) {
         retries++;
         if (debugEnabled) log.debug("retry #{} failed for {}", retries, this);
       }

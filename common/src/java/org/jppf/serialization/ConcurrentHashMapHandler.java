@@ -28,14 +28,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConcurrentHashMapHandler implements SerializationHandler {
   @Override
   public void writeDeclaredFields(final Serializer serializer, final ClassDescriptor cd, final Object obj) throws Exception {
-    Map map = (Map) obj;
+    Map<?, ?> map = (Map<?, ?>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = serializer.currentClassDescriptor;
       serializer.currentClassDescriptor = cd;
       serializer.writeInt(map.size());
       for (Object o: map.entrySet()) {
-        Map.Entry entry = (Map.Entry) o;
+        Map.Entry<?, ?> entry = (Map.Entry<?, ?>) o;
         serializer.writeObject(entry.getKey());
         serializer.writeObject(entry.getValue());
       }
@@ -46,13 +46,14 @@ public class ConcurrentHashMapHandler implements SerializationHandler {
 
   @Override
   public void readDeclaredFields(final Deserializer deserializer, final ClassDescriptor cd, final Object obj) throws Exception {
-    Map map = (Map) obj;
+    @SuppressWarnings("unchecked")
+    Map<? super Object, ? super Object> map = (Map<? super Object, ? super Object>) obj;
     ClassDescriptor tmpDesc = null;
     try {
       tmpDesc = deserializer.currentClassDescriptor;
       deserializer.currentClassDescriptor = cd;
       if (map instanceof ConcurrentHashMap) {
-        ConcurrentHashMap tmp = new ConcurrentHashMap();
+        ConcurrentHashMap<? super Object, ? super Object> tmp = new ConcurrentHashMap<>();
         for (FieldDescriptor fd: cd.fields) {
           Object val = fd.field.get(tmp);
           fd.field.set(map, val);

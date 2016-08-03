@@ -73,7 +73,6 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
   /**
    * Define a membership test using ipv4.addresses property to determine if a
    * node or driver is in one of the specified subnets.
-   *
    * @param subnets
    *        One or more strings representing either a valid IPv4 subnet in CIDR
    *        notation or IP address range pattern as defined in
@@ -87,7 +86,6 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
   /**
    * Define a membership test using ipv6.addresses property to determine if a
    * node is in one of the specified subnets.
-   *
    * @param subnets
    *        One or more strings representing either a valid IPv4 subnet in CIDR
    *        notation or IP address range pattern as defined in
@@ -100,14 +98,11 @@ public class IsInIPv4Subnet extends ExecutionPolicy {
 
   /**
    * Determines whether this policy accepts the specified node.
-   *
-   * @param info
-   *        system information for the node on which the tasks will run if
-   *        accepted.
+   * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     // Build list of subnet netmasks
     synchronized(this) {
       if (netmasks == null) {

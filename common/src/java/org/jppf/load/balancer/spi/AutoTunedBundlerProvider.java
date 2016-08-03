@@ -33,7 +33,7 @@ public class AutoTunedBundlerProvider implements JPPFBundlerProvider<AnnealingTu
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final AnnealingTuneProfile profile) {
+  public Bundler<AnnealingTuneProfile> createBundler(final AnnealingTuneProfile profile) {
     return new AutoTunedBundler(profile);
     //return new AutotunedDelegatingBundler(profile);
   }

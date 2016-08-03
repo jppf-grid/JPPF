@@ -85,7 +85,7 @@ public class Diagnostics implements DiagnosticsMBean, Closeable {
       try {
         Class.forName("com.sun.management.OperatingSystemMXBean");
         osMXBeanName = new ObjectName("java.lang", "type", "OperatingSystem");
-      } catch (Exception e) {
+      } catch (@SuppressWarnings("unused") Exception e) {
         osMXBeanAvailable = false;
         log.info("OperatingSystemMXBean not avaialble, an approximation of the process CPU load will be computed");
       }

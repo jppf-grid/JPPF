@@ -48,7 +48,6 @@ public class HTMLPrinter {
    */
   public String generate(final Project project) {
     StringBuilder sb = new StringBuilder();
-    //sb.append(prologue(project));
     sb.append(indent()).append("<div class=\"blockWithHighlightedTitle\" align='center'>\n");
     sb.append(incIndent()).append("<table><tr><td align='left'>\n");
     sb.append(indent()).append(String.format("<h2><img src='images/icons/monitoring.png' class='titleWithIcon'/>%s</h2>", project.getName())).append('\n');
@@ -79,34 +78,8 @@ public class HTMLPrinter {
     sb.append(decIndent()).append("</table>\n");
     sb.append(decIndent()).append("</td></tr></table>");
     sb.append(decIndent()).append("<br></div><br>\n");
-    //sb.append(epilogue());
     return sb.toString();
   }
-
-  /**
-   * Write the prologue of the HTML source.
-   * @param project the project to get information from.
-   * @return the html prologue as a string.
-   */
-  private String prologue(final Project project) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<html>\n");
-    sb.append(incIndent()).append("<body>\n");
-    sb.append(incIndent()).append("<h1>").append(project.getName()).append("</h1>\n");
-    return sb.toString();
-  }
-
-  /**
-   * Write the epilogue of the HTML source.
-   * @return the html epilogue as a string.
-   */
-  private String epilogue() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(decIndent()).append("</body>\n");
-    sb.append(decIndent()).append("</html>\n");
-    return sb.toString();
-  }
-
   /**
    * Increment the indent level and update the indent accordingly.
    * @return the new indent string.

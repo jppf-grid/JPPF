@@ -30,6 +30,7 @@ import org.jppf.utils.TypedProperties;
  * Generated static proxy for the {@link org.jppf.management.forwarding.JPPFNodeForwardingMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class JPPFNodeForwardingMBeanStaticProxy extends AbstractMBeanStaticProxy implements JPPFNodeForwardingMBean {
   /**
    * Initialize this MBean static proxy.

@@ -32,7 +32,7 @@ public class NodeThreadsBundlerProvider implements JPPFBundlerProvider<NodeThrea
    * @return an instance of {@link NodeThreadsBundler}.
    */
   @Override
-  public Bundler createBundler(final NodeThreadsProfile profile) {
+  public Bundler<NodeThreadsProfile> createBundler(final NodeThreadsProfile profile) {
     return new NodeThreadsBundler(profile);
   }
 

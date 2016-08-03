@@ -34,13 +34,13 @@ public class CallableTaskWrapper extends AbstractTaskObjectWrapper
   /**
    * The callable object to execute.
    */
-  private Callable callable = null;
+  private Callable<?> callable = null;
 
   /**
    * Initialize this wrapper with the specified <code>Runnable</code> object.
    * @param callable the callable object to execute.
    */
-  public CallableTaskWrapper(final Callable callable)
+  public CallableTaskWrapper(final Callable<?> callable)
   {
     this.callable = callable;
   }

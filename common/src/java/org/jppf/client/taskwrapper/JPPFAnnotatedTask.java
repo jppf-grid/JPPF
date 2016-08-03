@@ -41,11 +41,11 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
   /**
    * A delegate for the <code>onCancel()</code> method.
    */
-  protected JPPFTaskCallback cancelCallback = null;
+  protected JPPFTaskCallback<Object> cancelCallback = null;
   /**
    * A delegate for the <code>onTimeout()</code> method.
    */
-  protected JPPFTaskCallback timeoutCallback = null;
+  protected JPPFTaskCallback<Object> timeoutCallback = null;
 
   /**
    * Initialize this task with an object whose class is either annotated with {@link org.jppf.node.protocol.JPPFRunnable JPPFRunnable},
@@ -57,7 +57,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
   public JPPFAnnotatedTask(final Object taskObject, final Object...args) throws JPPFException
   {
     if (taskObject instanceof Runnable) taskObjectWrapper = new RunnableTaskWrapper((Runnable) taskObject);
-    else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable) taskObject);
+    else if (taskObject instanceof Callable) taskObjectWrapper = new CallableTaskWrapper((Callable<?>) taskObject);
     else taskObjectWrapper = new AnnotatedTaskWrapper(taskObject, args);
   }
 
@@ -104,7 +104,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * Set the delegate for the <code>onCancel()</code> method.
    * @param cancelCallback a {@link JPPFTaskCallback} instance.
    */
-  public void setCancelCallback(final JPPFTaskCallback cancelCallback)
+  public void setCancelCallback(final JPPFTaskCallback<Object> cancelCallback)
   {
     this.cancelCallback = cancelCallback;
   }
@@ -113,7 +113,7 @@ public class JPPFAnnotatedTask extends AbstractTask<Object>
    * Set the delegate for the <code>onTimeout()</code> method.
    * @param timeoutCallback a {@link JPPFTaskCallback} instance.
    */
-  public void setTimeoutCallback(final JPPFTaskCallback timeoutCallback)
+  public void setTimeoutCallback(final JPPFTaskCallback<Object> timeoutCallback)
   {
     this.timeoutCallback = timeoutCallback;
   }

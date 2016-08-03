@@ -284,7 +284,7 @@ public final class SerializationReflectionHelper {
       rfClass = Class.forName("sun.reflect.ReflectionFactory");
       rf = initializeRF();
       if (rf != null) rfMethod = initializeRFMethod();
-    } catch (Throwable t) {
+    } catch (@SuppressWarnings("unused") Throwable t) {
     }
   }
 
@@ -298,7 +298,7 @@ public final class SerializationReflectionHelper {
     try {
       Method m = rfClass.getDeclaredMethod("getReflectionFactory");
       return m.invoke(null);
-    } catch (Throwable t) {
+    } catch (@SuppressWarnings("unused") Throwable t) {
     }
     return null;
   }
@@ -313,7 +313,7 @@ public final class SerializationReflectionHelper {
     try {
       Method m = rfClass.getDeclaredMethod("newConstructorForSerialization", Class.class, Constructor.class);
       return m;
-    } catch (Throwable t) {
+    } catch (@SuppressWarnings("unused") Throwable t) {
     }
     return null;
   }
@@ -321,7 +321,7 @@ public final class SerializationReflectionHelper {
   /**
    * A cache of constructors used for deserialization.
    */
-  private static final Map<Class<?>, Constructor> CONSTRUCTOR_MAP = new ConcurrentSoftReferenceValuesMap<>();
+  private static final Map<Class<?>, Constructor<?>> CONSTRUCTOR_MAP = new ConcurrentSoftReferenceValuesMap<>();
 
   /**
    * Create an object without calling any of its class constructors if the JVM supports it,
@@ -344,12 +344,12 @@ public final class SerializationReflectionHelper {
    */
   static Object create(final Class<?> clazz, final Class<?> parent) throws Exception {
     try {
-      Constructor constructor = CONSTRUCTOR_MAP.get(clazz);
+      Constructor<?> constructor = CONSTRUCTOR_MAP.get(clazz);
       if (constructor == null) {
         //==> ReflectionFactory rf = ReflectionFactory.getReflectionFactory();
-        Constructor superConstructor = parent.getDeclaredConstructor();
+        Constructor<?> superConstructor = parent.getDeclaredConstructor();
         //==> constructor = rf.newConstructorForSerialization(clazz, superConstructor);
-        constructor = (Constructor) rfMethod.invoke(rf, clazz, superConstructor);
+        constructor = (Constructor<?>) rfMethod.invoke(rf, clazz, superConstructor);
         CONSTRUCTOR_MAP.put(clazz, constructor);
       }
       return clazz.cast(constructor.newInstance());

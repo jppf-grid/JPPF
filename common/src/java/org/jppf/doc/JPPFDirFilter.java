@@ -23,8 +23,7 @@ import java.io.File;
  * Filter that only accepts directories.
  * It is possible to include or excluded specific directory names, in which case the including filter is applied before the excluding one.
  */
-public class JPPFDirFilter extends AbstractFileFilter
-{
+public class JPPFDirFilter extends AbstractFileFilter {
   /**
    * Default excluded directory names.
    */
@@ -33,8 +32,7 @@ public class JPPFDirFilter extends AbstractFileFilter
   /**
    * Initialize a filter accepting all directory names except those excluded by default.
    */
-  public JPPFDirFilter()
-  {
+  public JPPFDirFilter() {
     includes = null;
     excludes = DEFAULT_EXCLUDES;
   }
@@ -43,8 +41,7 @@ public class JPPFDirFilter extends AbstractFileFilter
    * Initialize a filter accepting the specified directory names and excluding those specified by {@link #DEFAULT_EXCLUDES DEFAULT_EXCLUDES}.
    * @param includes the included directory names; if null all are included. Null values are ignored.
    */
-  public JPPFDirFilter(final String[] includes)
-  {
+  public JPPFDirFilter(final String[] includes) {
     this.includes = includes;
     this.excludes = DEFAULT_EXCLUDES;
   }
@@ -54,8 +51,7 @@ public class JPPFDirFilter extends AbstractFileFilter
    * @param includes the included directory names; if null all are included. Null values are ignored.
    * @param excludes the excluded directory names; if null none are excluded. Null values are ignored.
    */
-  public JPPFDirFilter(final String[] includes, final String[] excludes)
-  {
+  public JPPFDirFilter(final String[] includes, final String[] excludes) {
     this.includes = includes;
     this.excludes = (excludes == null) || (excludes.length <= 0) ? DEFAULT_EXCLUDES : excludes;
   }
@@ -67,14 +63,9 @@ public class JPPFDirFilter extends AbstractFileFilter
    * @see java.io.FileFilter#accept(java.io.File)
    */
   @Override
-  public boolean accept(final File path)
-  {
+  public boolean accept(final File path) {
     if (!path.isDirectory()) return false;
     String name = path.getName();
-    if ("CVS".equals(name))
-    {
-      int breakpoint = 0;
-    }
     return included(name, true) && !excluded(name, true);
   }
 }

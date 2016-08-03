@@ -49,7 +49,6 @@ public class NamedArguments extends AbstractCLIArguments<NamedArguments> {
 
   @Override
   public NamedArguments parseArguments(final String...clArgs)  throws Exception {
-    boolean end = false;
     int pos = 0;
     try {
       while (pos < clArgs.length) {

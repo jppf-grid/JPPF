@@ -121,7 +121,7 @@ public interface JPPFSnapshot extends Serializable {
      */
     protected LabelBasedFilter(final boolean includeFlag, final Collection<String> labels) {
       this.includeFlag = includeFlag;
-      this.labels = new HashSet(labels);
+      this.labels = new HashSet<>(labels);
     }
 
     @Override

@@ -163,7 +163,7 @@ public abstract class AbstractProcessLauncher extends ThreadSynchronization impl
       Thread thread = new Thread(slaveSocketWrapper, getName() + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       if (processServer != null) StreamUtils.closeSilent(processServer);
       if (slaveSocketWrapper != null) StreamUtils.closeSilent(slaveSocketWrapper);
     }

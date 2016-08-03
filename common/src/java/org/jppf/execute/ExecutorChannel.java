@@ -46,7 +46,7 @@ public interface ExecutorChannel<T> extends AutoCloseable {
    * Get the bundler used to schedule tasks for the corresponding node.
    * @return a {@link Bundler} instance.
    */
-  Bundler getBundler();
+  Bundler<?> getBundler();
 
   /**
    * Check whether the bundler held by this context is up to date by comparison

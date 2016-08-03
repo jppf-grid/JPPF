@@ -210,10 +210,6 @@ public class SchemaValidator {
      */
     public int fatalCount = 0;
     /**
-     * Number of warnings.
-     */
-    public int warningCount = 0;
-    /**
      * Used to collect validation error and warning messages.
      */
     public JPPFErrorReporter reporter = null;
@@ -255,7 +251,6 @@ public class SchemaValidator {
      */
     @Override
     public void warning(final SAXParseException exception) throws SAXException {
-      warningCount++;
       reporter.warnings.add(printSAXParseException(exception, reporter.name));
     }
   }

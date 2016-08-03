@@ -27,7 +27,7 @@ import org.jppf.utils.*;
  * @param <T> the type of this set of arguments.
  * @author Laurent Cohen
  */
-abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends TypedProperties {
+abstract class AbstractCLIArguments<T extends AbstractCLIArguments<?>> extends TypedProperties {
   /**
    * The argument definitions.
    */
@@ -43,6 +43,7 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends Type
    * @param usage a string describing the argument's usage.
    * @return return this object.
    */
+  @SuppressWarnings("unchecked")
   public T addArg(final String name, final String usage) {
     argDefs.put(name, new CLIArgument(name, false, usage));
     return (T) this;
@@ -55,6 +56,7 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends Type
    * @param usage a string describing the argument's usage.
    * @return return this object.
    */
+  @SuppressWarnings("unchecked")
   T addSwitch(final String name, final String usage) {
     argDefs.put(name, new CLIArgument(name, true, usage));
     return (T) this;
@@ -64,7 +66,7 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends Type
    * Print usage of the arguments.
    * @return this object.
    */
-  public abstract AbstractCLIArguments printUsage();
+  public abstract AbstractCLIArguments<?> printUsage();
 
   /**
    * Parse the specified command line arguments.
@@ -72,7 +74,7 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends Type
    * @throws Exception if any error occurs.
    * @return this object.
    */
-  public abstract AbstractCLIArguments parseArguments(final String...clArgs)  throws Exception;
+  public abstract AbstractCLIArguments<?> parseArguments(final String...clArgs)  throws Exception;
 
   /**
    * Print an error to the console.
@@ -100,6 +102,7 @@ abstract class AbstractCLIArguments<T extends AbstractCLIArguments> extends Type
    * @param title the title as a string.
    * @return this object.
    */
+  @SuppressWarnings("unchecked")
   public T setTitle(final String title) {
     this.title = title;
     return (T) this;

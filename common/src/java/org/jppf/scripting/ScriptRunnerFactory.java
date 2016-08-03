@@ -51,7 +51,7 @@ public final class ScriptRunnerFactory {
         pool = new ScriptRunnerPool(language);
         runnerMap.put(language, pool);
       }
-      return pool == null ? null : pool.get();
+      return pool.get();
     }
   }
 

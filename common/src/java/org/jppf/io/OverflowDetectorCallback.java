@@ -31,7 +31,7 @@ public class OverflowDetectorCallback implements NotifyingStreamCallback {
   /**
    * Maximum Integer expressed as a Long to ensure no implicit coversion has to be odne at runtime.
    */
-  private static long MAX_VALUE = (long) Integer.MAX_VALUE;
+  private static long MAX_VALUE = Integer.MAX_VALUE;
   /**
    * The cumulated size of data written to the stream.
    */

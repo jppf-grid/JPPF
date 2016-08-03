@@ -38,6 +38,7 @@ public final class CollectionUtils {
    * @param array the array to convert.
    * @return a set of elements with the same type as that of the array element type.
    */
+  @SafeVarargs
   public static <T> Set<T> set(final T... array) {
     Set<T> newSet = new HashSet<>(array.length);
     for (T element : array) newSet.add(element);
@@ -50,6 +51,7 @@ public final class CollectionUtils {
    * @param array the array to convert.
    * @return a list of elements with the same type as that of the array element type.
    */
+  @SafeVarargs
   public static <T> List<T> list(final T... array) {
     List<T> list = new ArrayList<>(array.length);
     for (T element : array) list.add(element);
@@ -120,6 +122,7 @@ public final class CollectionUtils {
    * @param elts the elements of the array.
    * @return an array of the specified type.
    */
+  @SafeVarargs
   public static <T> T[] array(final T... elts) {
     return elts;
   }

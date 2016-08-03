@@ -222,7 +222,7 @@ public class JMXConnectionWrapper extends ThreadSynchronization implements JPPFA
       mbeanConnection.set(jmxc.getMBeanServerConnection());
       try {
         setHost(InetAddress.getByName(host).getHostName());
-      } catch (UnknownHostException e) {
+      } catch (@SuppressWarnings("unused") UnknownHostException e) {
       }
     }
     connected.set(true);

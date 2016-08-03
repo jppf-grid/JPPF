@@ -68,9 +68,7 @@ public abstract class AbstractAdaptiveBundler<T extends LoadBalancingProfile> ex
   public void setChannelConfiguration(final JPPFSystemInformation nodeConfiguration) {
     this.channelConfiguration = nodeConfiguration;
     TypedProperties jppf = nodeConfiguration.getJppf();
-    boolean isPeer = jppf.getBoolean("jppf.peer.driver", false);
-    //JPPFProperty prop = isPeer ? JPPFProperties.PEER_PROCESSING_THREADS : JPPFProperties.PROCESSING_THREADS;
-    JPPFProperty prop = JPPFProperties.PROCESSING_THREADS;
+    JPPFProperty<?> prop = JPPFProperties.PROCESSING_THREADS;
     nbThreads = jppf.getInt(prop.getName(), 1);
   }
 

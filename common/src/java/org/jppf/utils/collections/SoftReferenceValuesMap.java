@@ -87,7 +87,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
   @SuppressWarnings("unchecked")
   public V put(final K key, final V value) {
     cleanup();
-    SoftReference<V> ref = map.put(key, new SoftValue(key, value, refQueue));
+    SoftReference<V> ref = map.put(key, new SoftValue<>(key, value, refQueue));
     return ref == null ? null : ref.get();
   }
 
@@ -115,7 +115,7 @@ public class SoftReferenceValuesMap<K, V> extends AbstractMap<K, V> {
   @SuppressWarnings("unchecked")
   private void cleanup() {
     SoftValue<K, V> ref;
-    while ((ref = (SoftValue) refQueue.poll()) != null) {
+    while ((ref = (SoftValue<K, V>) refQueue.poll()) != null) {
       // NPE on this line ==>
       K key = ref.key;
       if (key == null) continue;

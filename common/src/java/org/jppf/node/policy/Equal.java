@@ -89,7 +89,7 @@ public class Equal extends ExecutionPolicy {
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     try {
       String s = getProperty(info, propertyName);
       if (numberValue != null) return Double.valueOf(s).doubleValue() == numberValue.doubleValue();
@@ -97,7 +97,7 @@ public class Equal extends ExecutionPolicy {
         return ignoreCase ? stringValue.equalsIgnoreCase(s) : stringValue.equals(s);
       } else if (booleanValue != null) return Boolean.valueOf(s).booleanValue() == booleanValue.booleanValue();
       else return s == null;
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
     return false;
   }

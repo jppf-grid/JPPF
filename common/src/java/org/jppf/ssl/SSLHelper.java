@@ -253,7 +253,7 @@ public final class SSLHelper {
     Constructor<? extends Callable<E>> c = null;
     try {
       c = clazz.getConstructor(String[].class);
-    } catch (NoSuchMethodException ignore) {
+    } catch (@SuppressWarnings("unused") NoSuchMethodException ignore) {
     }
     Callable<E> callable = c == null ? clazz.newInstance() : c.newInstance((Object) args);
     return callable.call();

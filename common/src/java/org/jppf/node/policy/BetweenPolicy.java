@@ -73,14 +73,14 @@ public abstract class BetweenPolicy extends ExecutionPolicy {
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     try {
       String s = getProperty(info, propertyName);
       if (s != null) {
         double value = Double.valueOf(s);
         return accepts(value);
       }
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
     }
     return false;
   }

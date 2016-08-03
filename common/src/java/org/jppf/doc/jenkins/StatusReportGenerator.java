@@ -58,7 +58,7 @@ public class StatusReportGenerator {
             int buildNumber = -1;
             try {
               buildNumber = Integer.valueOf(file.getName());
-            } catch(NumberFormatException ignore) {
+            } catch(@SuppressWarnings("unused") NumberFormatException ignore) {
             }
             return buildNumber >= 0;
           }
@@ -92,7 +92,6 @@ public class StatusReportGenerator {
         template = template.replace("@@column_right@@", htmlRight);
         FileUtils.writeTextFile(outputPath, template);
       }
-      boolean breakpoint = true;
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -106,7 +105,6 @@ public class StatusReportGenerator {
    */
   private static Build parseBuild(final File buildFile) throws Exception {
     SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-    String path = "C:/Temp/JPPF/builds/jobs/JPPF trunk/builds/202/build.xml";
     Handler handler = new Handler();
     parser.parse(buildFile, handler);
     Build build = handler.build;

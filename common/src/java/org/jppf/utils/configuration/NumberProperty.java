@@ -55,6 +55,7 @@ abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> 
    * @param minValue the minimum accepted value for this property.
    * @param maxValue the maximum accepted value for this property.
    */
+  @SuppressWarnings("unchecked")
   public NumberProperty(final String name, final T defaultValue, final T minValue, final T maxValue, final String... aliases) {
     super(name, defaultValue, aliases);
     if ((minValue == null) || (maxValue == null)) throw new IllegalArgumentException(String.format("min and max values cannot be nuul (name=%s; min=%s; max=%s", name, minValue, minValue));
@@ -67,6 +68,7 @@ abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> 
    * Get the minimum accepted value for this property.
    * @return the minimum value.
    */
+  @SuppressWarnings("unchecked")
   public T getMinValue() {
     return (T) minValue;
   }
@@ -75,6 +77,7 @@ abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> 
    * Get the maximum accepted value for this property.
    * @return the maximum value.
    */
+  @SuppressWarnings("unchecked")
   public T getMaxValue() {
     return (T) maxValue;
   }
@@ -92,6 +95,7 @@ abstract class NumberProperty<T extends Number> extends AbstractJPPFProperty<T> 
    * @param value the value to validate.
    * @return the default value if the value is < minValue or > maxValue, or the value itself otherwise.
    */
+  @SuppressWarnings("unchecked")
   T validate(final T value) {
     Comparable<T> cv = (Comparable<T>) value;
     if ((value != null) && hasMinAndMax() && ((cv.compareTo((T) minValue) < 0) || (cv.compareTo((T) maxValue) > 0))) return getDefaultValue();

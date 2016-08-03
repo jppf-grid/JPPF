@@ -31,6 +31,7 @@ import org.jppf.management.NodePendingAction;
  * Generated static proxy for the {@link org.jppf.management.JPPFNodeAdminMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class JPPFNodeAdminMBeanStaticProxy extends AbstractMBeanStaticProxy implements JPPFNodeAdminMBean {
   /**
    * Initialize this MBean static proxy.

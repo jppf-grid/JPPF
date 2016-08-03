@@ -71,11 +71,11 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
           Object mbean = hookInstance.invoke("createMBean", createParams);
           if (mbean == null) continue;
           String infName = (String) hookInstance.invoke("getMBeanInterfaceName");
-          Class inf = Class.forName((String) infName, true, loader);
+          Class<?> inf = Class.forName(infName, true, loader);
           String mbeanName = (String) hookInstance.invoke("getMBeanName");
           boolean b = registerProviderMBean(mbean, inf, mbeanName);
           if (debugEnabled) log.debug("MBean registration " + (b ? "succeeded" : "failed") + " for [" + mbeanName + ']');
-          if (b) registeredMBeanNames.add((String) mbeanName);
+          if (b) registeredMBeanNames.add(mbeanName);
         } catch (Exception e) {
           String message = "error processing MBean provider {} : {}";
           if (debugEnabled) log.debug(message, concrete, ExceptionUtils.getStackTrace(e));
@@ -89,13 +89,12 @@ public class JPPFMBeanProviderManager<S extends JPPFMBeanProvider> {
 
   /**
    * Register the specified MBean.
-   * @param <T> the type of the MBean interface.
    * @param impl the MBean implementation.
    * @param intf the MBean exposed interface.
    * @param name the MBean name.
    * @return true if the registration succeeded, false otherwise.
    */
-  private <T> boolean registerProviderMBean(final T impl, final Class<T> intf, final String name) {
+  private boolean registerProviderMBean(final Object impl, final Class<?> intf, final String name) {
     try {
       if (debugEnabled) log.debug("found MBean provider: [name="+name+", inf="+intf+", impl="+impl.getClass().getName()+ ']');
       ObjectName objectName = new ObjectName(name);

@@ -59,7 +59,7 @@ public class ReflectionUtils {
     sb.append('[');
     Method[] methods = clazz.getMethods();
     // we want the attributes in ascending alphabetical order
-    Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap() : new HashMap(names.length);
+    Map<String, Object> attrMap = fieldNames.isEmpty() ? new TreeMap<String, Object>() : new HashMap<String, Object>(names.length);
     for (Method method : methods) {
       if (isGetter(method) && !"getClass".equals(method.getName())) {
         String attrName = null;
@@ -109,7 +109,7 @@ public class ReflectionUtils {
    * @return {@code true} if the method is a getter, {@code false} otherwise.
    */
   public static boolean isGetter(final Method meth) {
-    Class type = meth.getReturnType();
+    Class<?> type = meth.getReturnType();
     if (Void.TYPE.equals(type)) return false;
     if (!StringUtils.startsWithOneOf(meth.getName(), false, "get", "is")) return false;
     if (meth.getName().startsWith("is")) {
@@ -117,7 +117,7 @@ public class ReflectionUtils {
     }
     int mod = meth.getModifiers();
     if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
-    Class[] paramTypes = meth.getParameterTypes();
+    Class<?>[] paramTypes = meth.getParameterTypes();
     return ((paramTypes == null) || (paramTypes.length <= 0));
   }
 
@@ -127,12 +127,12 @@ public class ReflectionUtils {
    * @return {@code true} if the method is a setter, {@code false} otherwise.
    */
   public static boolean isSetter(final Method meth) {
-    Class type = meth.getReturnType();
+    Class<?> type = meth.getReturnType();
     if (!Void.TYPE.equals(type)) return false;
     if (!meth.getName().startsWith("set")) return false;
     int mod = meth.getModifiers();
     if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) return false;
-    Class[] paramTypes = meth.getParameterTypes();
+    Class<?>[] paramTypes = meth.getParameterTypes();
     return ((paramTypes != null) && (paramTypes.length == 1));
   }
 
@@ -142,7 +142,7 @@ public class ReflectionUtils {
    * @param name the name of the getter to look for.
    * @return a <code>Method</code> object, or null if the class has no getter with the specified name.
    */
-  public static Method getGetter(final Class clazz, final String name) {
+  public static Method getGetter(final Class<?> clazz, final String name) {
     Method[] methods = clazz.getMethods();
     Method getter = null;
     for (Method method : methods) {
@@ -160,7 +160,7 @@ public class ReflectionUtils {
    * @param name the name of the setter to look for.
    * @return a <code>Method</code> object, or null if the class has no setter with the specified name.
    */
-  public static Method getSetter(final Class clazz, final String name) {
+  public static Method getSetter(final Class<?> clazz, final String name) {
     Method[] methods = clazz.getMethods();
     Method setter = null;
     for (Method method : methods) {
@@ -179,7 +179,7 @@ public class ReflectionUtils {
    * @return a <code>Method</code> object, or null if the class has no getter for the specified
    * instance variable name.
    */
-  public static Method getGetterForAttribute(final Class clazz, final String attrName) {
+  public static Method getGetterForAttribute(final Class<?> clazz, final String attrName) {
     String basename = attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
     Method method = getGetter(clazz, "get"+basename);
     if (method == null) method = getGetter(clazz, "is"+basename);
@@ -193,7 +193,7 @@ public class ReflectionUtils {
    * @return a <code>Method</code> object, or null if the class has no setter for the specified
    * instance variable name.
    */
-  public static Method getSetterForAttribute(final Class clazz, final String attrName) {
+  public static Method getSetterForAttribute(final Class<?> clazz, final String attrName) {
     String basename = attrName.substring(0, 1).toUpperCase() + attrName.substring(1);
     return getSetter(clazz, "set"+basename);
   }
@@ -204,7 +204,7 @@ public class ReflectionUtils {
    * @param getters if true, indicates that the getters should be looked up, otherwise it should be the setters.
    * @return an array of <code>Method</code> instances.
    */
-  public static Method[] getAllBeanMethods(final Class clazz, final boolean getters) {
+  public static Method[] getAllBeanMethods(final Class<?> clazz, final boolean getters) {
     List<Method> methodList = new ArrayList<>();
     Method[] allMethods = clazz.getMethods();
     for (Method meth: allMethods) {
@@ -230,8 +230,8 @@ public class ReflectionUtils {
    * @param args the arguments of the method.
    * @return a matching <code>Method</code> instance, or null if no match could be found.
    */
-  public static Method getMatchingMethod(final Class clazz, final String name, final Object[] args) {
-    Class[] argTypes = createTypeArray(args);
+  public static Method getMatchingMethod(final Class<?> clazz, final String name, final Object[] args) {
+    Class<?>[] argTypes = createTypeArray(args);
     Method[] methods = clazz.getDeclaredMethods();
     for (Method m: methods) {
       if (!m.getName().equals(name)) continue;
@@ -247,10 +247,10 @@ public class ReflectionUtils {
    * @param args the arguments of the method.
    * @return a matching <code>Constructor</code> instance, or null if no match could be found.
    */
-  public static Constructor getMatchingConstructor(final Class clazz, final Object[] args) {
-    Class[] argTypes = createTypeArray(args);
-    Constructor[] constructors = clazz.getDeclaredConstructors();
-    for (Constructor c: constructors) {
+  public static Constructor<?> getMatchingConstructor(final Class<?> clazz, final Object[] args) {
+    Class<?>[] argTypes = createTypeArray(args);
+    Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    for (Constructor<?> c: constructors) {
       if (matchingTypes(argTypes, c.getParameterTypes())) return c;
     }
     return null;
@@ -278,7 +278,7 @@ public class ReflectionUtils {
    * @param type a primitive type.
    * @return a <code>Class</code> instance.
    */
-  public static Class mapPrimitveType(final Class type) {
+  public static Class<?> mapPrimitveType(final Class<?> type) {
     if (Boolean.TYPE.equals(type)) return Boolean.class;
     else if (Character.TYPE.equals(type)) return Character.class;
     else if (Byte.TYPE.equals(type)) return Byte.class;
@@ -296,9 +296,9 @@ public class ReflectionUtils {
    * @param args the arguments to get the types from.
    * @return an array of <code>Class</code> instances.
    */
-  public static Class[] createTypeArray(final Object[] args) {
+  public static Class<?>[] createTypeArray(final Object[] args) {
     if ((args == null) || (args.length == 0)) return new Class[0];
-    Class[] argTypes = new Class[args.length];
+    Class<?>[] argTypes = new Class[args.length];
     for (int i=0; i<args.length; i++) {
       argTypes[i] = (args[i] != null) ? args[i].getClass() : null;
     }

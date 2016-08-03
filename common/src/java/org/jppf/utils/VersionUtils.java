@@ -52,7 +52,6 @@ public final class VersionUtils {
    * @return a {@link Version} instance.
    */
   private static Version createVersionInfo() {
-    String result = null;
     TypedProperties props = new TypedProperties();
     Version v = null;
     try {

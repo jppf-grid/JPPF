@@ -153,11 +153,10 @@ public class ScriptHandler {
   private String evaluate(final String name, final String value) {
     if (value == null) return null;
     Matcher matcher = SCRIPT_PATTERN.matcher(value);
-    boolean found = false;
     StringBuilder sb = new StringBuilder();
     int pos = 0;
     int matches = 0;
-    while (found = matcher.find()) {
+    while (matcher.find()) {
       matches++;
       if (matcher.start() > pos) sb.append(value.substring(pos, matcher.start()));
       String matched = value.substring(matcher.start(), matcher.end());
@@ -227,7 +226,7 @@ public class ScriptHandler {
         break;
       case URL:
         try {
-          Location location = new URLLocation(source);
+          Location<?> location = new URLLocation(source);
           Reader reader = new InputStreamReader(location.getInputStream());
           script = FileUtils.readTextFile(reader);
         } catch (Exception e) {

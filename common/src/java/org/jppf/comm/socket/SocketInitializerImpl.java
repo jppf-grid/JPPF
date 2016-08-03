@@ -68,7 +68,7 @@ public class SocketInitializerImpl extends AbstractSocketInitializer
     try {
       if (debugEnabled) log.debug("{} about to close socket wrapper", name);
       socketWrapper.close();
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
     }
     long delay = 1000L * JPPFConfiguration.get(JPPFProperties.RECONNECT_INITIAL_DELAY);
     if (delay <= 0L) delay = 1L + rand.nextInt(10);

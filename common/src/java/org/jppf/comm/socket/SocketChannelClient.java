@@ -260,7 +260,7 @@ public class SocketChannelClient implements SocketWrapper {
       while (!channel.finishConnect()) {
         try {
           Thread.sleep(1);
-        } catch (InterruptedException e) {
+        } catch (@SuppressWarnings("unused") InterruptedException e) {
         }
       }
     }

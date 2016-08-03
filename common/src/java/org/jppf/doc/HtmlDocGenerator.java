@@ -249,9 +249,7 @@ public class HtmlDocGenerator {
     StringBuilder sb = new StringBuilder();
     try {
       String s = "";
-      while (s != null) {
-        s = bufferedReader.readLine();
-        if (s == null) break;
+      while ((s = bufferedReader.readLine()) != null) {
         String s2 = s.trim();
         if ("".equals(s2) || s2.startsWith(COMMENT)) continue;
         sb.append(s).append('\n');
@@ -361,7 +359,6 @@ public class HtmlDocGenerator {
    * @throws Exception if any error occurs.
    */
   private static void allDirsRecursive(final File root, final List<File> list, final NamedArguments parameters) throws Exception {
-    String[] dirs = parameters.getStringArray(DIR_INCLUDES, ",");
     JPPFDirFilter filter = new JPPFDirFilter(parameters.getStringArray(DIR_INCLUDES, ","), parameters.getStringArray(DIR_EXCLUDES, ","));
     for (File file : root.listFiles(filter)) {
       list.add(file);

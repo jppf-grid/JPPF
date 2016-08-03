@@ -52,7 +52,7 @@ public final class ExceptionUtils {
         char c = result.charAt(n-1);
         if ((c == '\n') || (c == '\r')) result.setLength(n-1);
       }
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       result = new StringBuilder(getStackTrace2(t));
     }
     return result.toString();
@@ -159,13 +159,14 @@ public final class ExceptionUtils {
    * or <code>null</code> if an exception of this class cannot be constructed. 
    * @since 4.0
    */
+  @SuppressWarnings("unchecked")
   public static <E extends Exception> E toException(final Throwable throwable, final Class<E> clazz) {
     if (clazz == null) return null;
     try {
       if ((throwable != null) && clazz.isAssignableFrom(throwable.getClass())) return (E) throwable;
       Constructor<E> constructor = clazz.getConstructor(Throwable.class);
       return constructor.newInstance(throwable);
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
     return null;
   }
@@ -185,7 +186,7 @@ public final class ExceptionUtils {
     try {
       Constructor<E> constructor = clazz.getConstructor(String.class, Throwable.class);
       return constructor.newInstance(message, throwable);
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
     return null;
   }

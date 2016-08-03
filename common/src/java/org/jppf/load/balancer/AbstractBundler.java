@@ -138,7 +138,7 @@ public abstract class AbstractBundler<T extends LoadBalancingProfile> implements
    * @deprecated this method is not needed anymore, all bundler and profile instantiations are done via the declared {@link org.jppf.load.balancer.spi.JPPFBundlerProvider JPPFBundlerProvider}s.
    */
   @Override
-  public Bundler copy() {
+  public Bundler<?> copy() {
     return null;
   }
 }

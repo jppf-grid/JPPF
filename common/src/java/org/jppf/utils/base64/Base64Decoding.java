@@ -195,6 +195,7 @@ public final class Base64Decoding
    * @throws NullPointerException if <tt>s</tt> is null
    * @since 1.4
    */
+  @SuppressWarnings("unused")
   public static byte[] decode( final String s, final int options ) throws IOException {
     if( s == null ) throw new NullPointerException( "Input string was null." );
     byte[] bytes;
@@ -266,6 +267,7 @@ public final class Base64Decoding
    * @throws ClassNotFoundException if the decoded object is of a class that cannot be found by the JVM
    * @since 2.3.4
    */
+  @SuppressWarnings("unused")
   public static Object decodeToObject(final String encodedObject, final int options, final ClassLoader loader ) throws IOException, java.lang.ClassNotFoundException {
     // Decode and gunzip if necessary
     byte[] objBytes = decode( encodedObject, options );
@@ -282,7 +284,7 @@ public final class Base64Decoding
           @Override
           public Class<?> resolveClass(final ObjectStreamClass streamClass)
           throws IOException, ClassNotFoundException {
-            Class c = Class.forName(streamClass.getName(), false, loader);
+            Class<?> c = Class.forName(streamClass.getName(), false, loader);
             if( c == null ) return super.resolveClass(streamClass);
             else return c;   // Class loader knows of this class.
           }   // end resolveClass
@@ -326,7 +328,7 @@ public final class Base64Decoding
       throw e; // Catch and throw to execute finally{} block
     }   // end catch: IOException
     finally {
-      try{ bos.close(); } catch( Exception e ){}
+      try{ bos.close(); } catch( @SuppressWarnings("unused") Exception e ){}
     }   // end finally
   }   // end encodeToFile
 
@@ -349,7 +351,7 @@ public final class Base64Decoding
       throw e; // Catch and throw to execute finally{} block
     }   // end catch: IOException
     finally {
-      try{ bos.close(); } catch( Exception e ){}
+      try{ bos.close(); } catch( @SuppressWarnings("unused") Exception e ){}
     }   // end finally
   }   // end decodeToFile
 
@@ -388,7 +390,7 @@ public final class Base64Decoding
       throw e; // Catch and release to execute finally{}
     }   // end catch: IOException
     finally {
-      try{ bis.close(); } catch( Exception e) {}
+      try{ bis.close(); } catch( @SuppressWarnings("unused") Exception e) {}
     }   // end finally
     return decodedData;
   }   // end decodeFromFile
@@ -421,7 +423,7 @@ public final class Base64Decoding
       throw e; // Catch and release to execute finally{}
     }   // end catch: IOException
     finally {
-      try{ bis.close(); } catch( Exception e) {}
+      try{ bis.close(); } catch( @SuppressWarnings("unused") Exception e) {}
     }   // end finally
     return encodedData;
   }   // end encodeFromFile
@@ -445,7 +447,7 @@ public final class Base64Decoding
     }   // end catch
     finally {
       try { out.close(); }
-      catch( Exception ex ){}
+      catch( @SuppressWarnings("unused") Exception ex ){}
     }   // end finally
   }   // end encodeFileToFile
 
@@ -468,7 +470,7 @@ public final class Base64Decoding
     }   // end catch
     finally {
       try { out.close(); }
-      catch( Exception ex ){}
+      catch( @SuppressWarnings("unused") Exception ex ){}
     }   // end finally
   }   // end decodeFileToFile
 }

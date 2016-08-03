@@ -70,7 +70,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @param info system information for the node on which the tasks will run if accepted.
    * @return true if the node is accepted, false otherwise.
    */
-  public abstract boolean accepts(PropertiesCollection info);
+  public abstract boolean accepts(PropertiesCollection<String> info);
 
   /**
    * Create an execution policy that is a logical "AND" combination of this policy and the one specified as operand.
@@ -214,7 +214,7 @@ public abstract class ExecutionPolicy implements Serializable {
    * @param name the name of the property to look for.
    * @return the value of the property, or null if it could not be found.
    */
-  public String getProperty(final PropertiesCollection info, final String name) {
+  public String getProperty(final PropertiesCollection<String> info, final String name) {
     for (TypedProperties props: info.getPropertiesArray()) {
       String value = props.getString(name);
       if (value != null) return value;
@@ -282,7 +282,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return true if and only if the 2 operands' accepts() method return true or an empty or null operand list was specified.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info) {
+    public boolean accepts(final PropertiesCollection<String> info) {
       if ((children == null) || (children.length <= 0)) return true;
       boolean b = true;
       for (ExecutionPolicy child: children) {
@@ -326,7 +326,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return true if at least one of the operands' accepts() method returns true.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info) {
+    public boolean accepts(final PropertiesCollection<String> info) {
       if ((children == null) || (children.length <= 0)) return true;
       boolean b = false;
       for (ExecutionPolicy child: children) {
@@ -369,7 +369,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return true if and only if the operands' accepts() method return different values.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info) {
+    public boolean accepts(final PropertiesCollection<String> info) {
       if ((children == null) || (children.length <= 0)) return true;
       boolean b = children[0].accepts(info);
       if (children.length >= 1) for (int i=1; i<children.length; i++) b = (b != children[i].accepts(info));
@@ -410,7 +410,7 @@ public abstract class ExecutionPolicy implements Serializable {
      * @return true if and only if the 2 operands' accepts() method return true.
      */
     @Override
-    public boolean accepts(final PropertiesCollection info) {
+    public boolean accepts(final PropertiesCollection<String> info) {
       return !children[0].accepts(info);
     }
 

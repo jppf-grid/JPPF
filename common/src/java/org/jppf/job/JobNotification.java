@@ -126,7 +126,7 @@ public class JobNotification extends Notification {
     ObjectName name = null;
     try {
       name = new ObjectName(DriverJobManagementMBean.MBEAN_NAME);
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
     return name;
   }

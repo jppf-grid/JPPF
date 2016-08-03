@@ -190,8 +190,7 @@ public class ProportionalBundler extends AbstractAdaptiveBundler<ProportionalPro
    */
   public double normalize(final double x) {
     double r = 1.0d;
-    for (int i = 0; i < ((ProportionalProfile) profile).getProportionalityFactor(); i++)
-      r *= x;
+    for (int i = 0; i < profile.getProportionalityFactor(); i++) r *= x;
     return 1.0d / r;
   }
 }

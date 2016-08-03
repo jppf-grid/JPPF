@@ -132,7 +132,7 @@ public class ManagementUtils {
       Class<?> jmxClass = Class.forName("javax.management.JMX");
       NEW_PROXY_METHOD = jmxClass.getDeclaredMethod("newMBeanProxy", serverConnectionClass, OBJECT_NAME_CLASS, Class.class, boolean.class);
       Class<?> mbeanInfoClass = Class.forName("javax.management.MBeanInfo");
-      Class<?> mbeanNotificationInfoClass = Class.forName("javax.management.MBeanNotificationInfo");
+      Class.forName("javax.management.MBeanNotificationInfo");
       GET_MBEAN_INFO_METHOD = serverConnectionClass.getDeclaredMethod("getMBeanInfo", OBJECT_NAME_CLASS);
       GET_MBEAN_NOTIFICATIONS_INFO_METHOD = mbeanInfoClass.getDeclaredMethod("getNotifications");
 
@@ -224,6 +224,7 @@ public class ManagementUtils {
    * @return a proxy instance of the the psecified interface, or {@code null} if management is not available.
    * @throws Exception if any error occurs.
    */
+  @SuppressWarnings("unchecked")
   public static <T> T newProxy(final Object connection, final Object mbeanName, final Class<T> inf) throws Exception {
     if (!isManagementAvailable()) return null;
     return (T) NEW_PROXY_METHOD.invoke(null, connection, mbeanName, inf, true);
@@ -332,7 +333,7 @@ public class ManagementUtils {
     if (!isManagementAvailable()) return -1L;
     try {
       return (Long) GET_THREAD_CPU_TIME_METHOD.invoke(THREAD_MXBEAN, threadID);
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       return -1L;
     }
   }
@@ -346,7 +347,7 @@ public class ManagementUtils {
     if (!isManagementAvailable()) return -1L;
     try {
       return (Long) GET_THREAD_USER_TIME_METHOD.invoke(THREAD_MXBEAN, threadID);
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       return -1L;
     }
   }

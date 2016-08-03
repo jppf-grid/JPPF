@@ -65,6 +65,7 @@ public class NodeTaskWrapper implements Runnable {
   /**
    * The task to execute within a try/catch block.
    */
+  @SuppressWarnings("rawtypes")
   private final Task task;
   /**
    * The future created by the executor service.
@@ -94,7 +95,7 @@ public class NodeTaskWrapper implements Runnable {
    * @param timeoutHandler handles the timeout for this task.
    * @param cpuTimeEnabled whether cpu time is supported/enabled.
    */
-  public NodeTaskWrapper(final Task task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler, final boolean cpuTimeEnabled) {
+  public NodeTaskWrapper(final Task<?> task, final ClassLoader taskClassLoader, final JPPFScheduleHandler timeoutHandler, final boolean cpuTimeEnabled) {
     this.task = task;
     this.taskClassLoader = taskClassLoader;
     this.timeoutHandler = timeoutHandler;
@@ -108,7 +109,7 @@ public class NodeTaskWrapper implements Runnable {
     this.cancelled = true;
     this.callOnCancel |= callOnCancel;
     if (task instanceof Future) {
-      Future future = (Future) task;
+      Future<?> future = (Future<?>) task;
       if (!future.isDone()) future.cancel(true);
     } else if (task instanceof CancellationHandler) {
       try {
@@ -127,7 +128,7 @@ public class NodeTaskWrapper implements Runnable {
     this.timeout |= !this.cancelled;
     if (!this.cancelled && !started) cancelTimeoutAction();
     if (task instanceof Future) {
-      Future future = (Future) task;
+      Future<?> future = (Future<?>) task;
       if (!future.isDone()) future.cancel(true);
     } else if (task instanceof TimeoutHandler) {
       try {
@@ -142,6 +143,7 @@ public class NodeTaskWrapper implements Runnable {
   /**
    * Execute the task within a try/catch block.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void run()
   {
@@ -169,7 +171,7 @@ public class NodeTaskWrapper implements Runnable {
         if (executionInfo != null) executionInfo = CpuTimeCollector.computeExecutionInfo(id).subtract(executionInfo);
       } catch(JPPFReconnectionNotification t) {
         if (reconnectionNotification == null) reconnectionNotification = t;
-      } catch(Throwable ignore) {
+      } catch(@SuppressWarnings("unused") Throwable ignore) {
       }
       try {
         silentTimeout();
@@ -188,7 +190,7 @@ public class NodeTaskWrapper implements Runnable {
    * Get the task this wrapper executes within a try/catch block.
    * @return the task as a <code>JPPFTask</code> instance.
    */
-  public Task getTask() {
+  public Task<?> getTask() {
     return task;
   }
 

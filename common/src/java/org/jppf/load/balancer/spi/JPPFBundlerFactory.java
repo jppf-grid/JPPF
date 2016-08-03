@@ -84,7 +84,7 @@ public class JPPFBundlerFactory {
   /**
    * Map of all registered providers.
    */
-  private final Map<String, JPPFBundlerProvider> providerMap = new TreeMap<>();
+  private final Map<String, JPPFBundlerProvider<?>> providerMap = new TreeMap<>();
   /**
    * The default values to use if nothing is specified in the JPPF configuration.
    */
@@ -104,7 +104,7 @@ public class JPPFBundlerFactory {
   /**
    * The fallback bundler.
    */
-  private final Bundler fallback = createFallbackBundler();
+  private final Bundler<?> fallback = createFallbackBundler();
 
   /**
    * Default constructor.
@@ -129,8 +129,10 @@ public class JPPFBundlerFactory {
    * Create an instance of the bundler with the specified name and parameters.
    * @return a new <code>Bundler</code> instance.
    */
-  public Bundler newBundler() {
+  @SuppressWarnings("unchecked")
+  public Bundler<?> newBundler() {
     LoadBalancingInformation info = getCurrentInfo();
+    @SuppressWarnings("rawtypes")
     JPPFBundlerProvider provider = getBundlerProvider(info.getAlgorithm());
     LoadBalancingProfile profile = provider.createProfile(info.getParameters());
     return provider.createBundler(profile);
@@ -167,7 +169,7 @@ public class JPPFBundlerFactory {
    * @param name the name of the bundler provider to retrieve.
    * @return a <code>JPPFBundlerProvider</code> instance or null if the provider could not be found.
    */
-  public JPPFBundlerProvider getBundlerProvider(final String name) {
+  public JPPFBundlerProvider<?> getBundlerProvider(final String name) {
     return providerMap.get(name);
   }
 
@@ -189,9 +191,10 @@ public class JPPFBundlerFactory {
     final boolean isDiff = (oldCL != currentCL);
     ClassLoader[] loaders = (isDiff) ? new ClassLoader[] { currentCL, oldCL } : new ClassLoader[] { oldCL };
     for (ClassLoader cl: loaders) {
+      @SuppressWarnings("rawtypes")
       Iterator<JPPFBundlerProvider> it = ServiceFinder.lookupProviders(JPPFBundlerProvider.class, cl);
       while (it.hasNext()) {
-        JPPFBundlerProvider provider = it.next();
+        JPPFBundlerProvider<?> provider = it.next();
         providerMap.put(provider.getAlgorithmName(), provider);
         if (debugEnabled) log.debug("registering new load-balancing algorithm provider '" + provider.getAlgorithmName() + '\'');
       }
@@ -298,7 +301,7 @@ public class JPPFBundlerFactory {
    * Get the fallback bundler.
    * @return a {@link Bundler} instance.
    */
-  public Bundler getFallbackBundler() {
+  public Bundler<?> getFallbackBundler() {
     return fallback;
   }
 
@@ -306,7 +309,7 @@ public class JPPFBundlerFactory {
    * Create new instance of default bundler.
    * @return a new {@link Bundler} instance.
    */
-  private Bundler createFallbackBundler() {
+  private Bundler<?> createFallbackBundler() {
     FixedSizeProfile profile = new FixedSizeProfile(new TypedProperties().setInt("size", 1));
     return new FixedSizeBundler(profile);
   }

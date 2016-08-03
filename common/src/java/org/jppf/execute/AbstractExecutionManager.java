@@ -123,7 +123,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     String s = config.get(JPPFProperties.THREAD_MANAGER_CLASS);
     if (!"default".equalsIgnoreCase(s) && !ThreadManagerThreadPool.class.getName().equals(s) && s != null) {
       try {
-        Class clazz = Class.forName(s);
+        Class<?> clazz = Class.forName(s);
         Object instance = ReflectionHelper.invokeConstructor(clazz, new Class[]{Integer.TYPE}, poolSize);
         if (instance instanceof ThreadManager) {
           result = (ThreadManager) instance;
@@ -154,12 +154,12 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
       if (!isJobCancelled()) {
         int count = 0;
         ExecutorCompletionService<NodeTaskWrapper> ecs = new ExecutorCompletionService<>(getExecutor());
-        for (Task task : taskList) {
+        for (Task<?> task : taskList) {
           if (!(task instanceof JPPFExceptionResult)) {
-            if (task instanceof AbstractTask) ((AbstractTask) task).setExecutionDispatcher(taskNotificationDispatcher);
+            if (task instanceof AbstractTask) ((AbstractTask<?>) task).setExecutionDispatcher(taskNotificationDispatcher);
             NodeTaskWrapper taskWrapper = new NodeTaskWrapper(task, usedClassLoader.getClassLoader(), timeoutHandler, threadManager.isCpuTimeEnabled());
             taskWrapperList.add(taskWrapper);
-            Future<NodeTaskWrapper> f =  ecs.submit(taskWrapper, taskWrapper);
+            ecs.submit(taskWrapper, taskWrapper);
             count++;
           }
         }
@@ -245,7 +245,7 @@ public abstract class AbstractExecutionManager implements ExecutionManager {
     accumulatedElapsed.addAndGet(elapsedTime);
     ExecutionInfo info = taskWrapper.getExecutionInfo();
     long cpuTime = (info == null) ? 0L : (info.cpuTime / 1000000L);
-    Task task = taskWrapper.getTask();
+    Task<?> task = taskWrapper.getTask();
     taskNotificationDispatcher.fireTaskEnded(task, getCurrentJobId(), getCurrentJobName(), cpuTime, elapsedTime/1000000L, task.getThrowable() != null);
   }
 

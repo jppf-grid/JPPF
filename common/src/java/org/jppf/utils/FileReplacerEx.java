@@ -45,7 +45,7 @@ public class FileReplacerEx {
    */
   public static void main(final String[] args) {
     try {
-      boolean searchOnly = Boolean.valueOf(args[0]);
+      //boolean searchOnly = Boolean.valueOf(args[0]);
       for (int i=0; i<arguments.length; i++) {
         String root = arguments[i][0];
         String ext = arguments[i][2];

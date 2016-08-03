@@ -33,7 +33,7 @@ public class FixedSizeBundlerProvider implements JPPFBundlerProvider<FixedSizePr
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final FixedSizeProfile profile) {
+  public Bundler<FixedSizeProfile> createBundler(final FixedSizeProfile profile) {
     return new FixedSizeBundler(profile);
   }
 

@@ -23,7 +23,7 @@ package org.jppf.nio;
  * @param <S> the type of states this transition goes to.
  * @author Laurent Cohen
  */
-public class NioTransition<S extends Enum> {
+public class NioTransition<S extends Enum<S>> {
   /**
    * The new state after the transition.
    */

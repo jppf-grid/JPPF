@@ -120,7 +120,7 @@ class SerializationCaches {
   int newObjectHandle(final Object o) {
     int handle = objectHandleCount.incrementAndGet();
     objectHandleMap.put(o, handle);
-    if (traceEnabled) try { log.trace("created handle " + handle  + " for o=" + o); } catch(Exception e) {}
+    if (traceEnabled) try { log.trace("created handle " + handle  + " for o=" + o); } catch(@SuppressWarnings("unused") Exception e) {}
     return handle;
   }
 

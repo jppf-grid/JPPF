@@ -34,7 +34,7 @@ public class RLBundlerProvider implements JPPFBundlerProvider<RLProfile> {
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final RLProfile profile) {
+  public Bundler<RLProfile> createBundler(final RLProfile profile) {
     return new RLBundler(profile);
   }
 

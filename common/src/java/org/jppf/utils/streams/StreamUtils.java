@@ -164,8 +164,7 @@ public final class StreamUtils {
    */
   public static void waitKeyPressed(final char c, final String message) throws Exception {
     System.out.println(message);
-    char c2 = 0;
-    while ((c2 = (char) System.in.read()) != c);
+    while ((char) System.in.read() != c);
   }
 
   /**

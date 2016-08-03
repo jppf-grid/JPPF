@@ -101,6 +101,7 @@ public interface JPPFSerialization {
     /**
      * Initialize the serialization.
      */
+    @SuppressWarnings("unchecked")
     private static void configure() {
       JPPFProperty<String> prop = JPPFProperties.OBJECT_SERIALIZATION_CLASS;
       String className = null;

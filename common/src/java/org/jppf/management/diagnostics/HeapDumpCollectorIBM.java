@@ -29,8 +29,7 @@ import org.slf4j.*;
  * @author Laurent Cohen
  * @exclude
  */
-public class HeapDumpCollectorIBM implements HeapDumpCollector
-{
+public class HeapDumpCollectorIBM implements HeapDumpCollector {
   /**
    * Logger for this class.
    */
@@ -45,15 +44,11 @@ public class HeapDumpCollectorIBM implements HeapDumpCollector
   private static Method heapdumpMethod = getDumpMethod();
 
   @Override
-  public String dumpHeap() throws Exception
-  {
-    try
-    {
+  public String dumpHeap() throws Exception {
+    try {
       if (heapdumpMethod == null) throw new JPPFException("Dump class is not avaialable - no heap dump taken");
       heapdumpMethod.invoke(null, (Object[]) null);
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       if (debugEnabled) log.debug(e.getMessage(), e);
       throw e;
     }
@@ -64,15 +59,11 @@ public class HeapDumpCollectorIBM implements HeapDumpCollector
    * Get the method to invoke to get a heap dump.
    * @return a {@link Method} instance, or null if the method could not be found.
    */
-  private static Method getDumpMethod()
-  {
-    try
-    {
+  private static Method getDumpMethod() {
+    try {
       Class<?> clazz = Class.forName("com.ibm.jvm.Dump");
       return clazz.getDeclaredMethod("HeapDump", (Class<?>[]) null);
-    }
-    catch (Exception e)
-    {
+    } catch (@SuppressWarnings("unused") Exception e) {
       return null;
     }
   }

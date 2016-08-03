@@ -177,6 +177,7 @@ public final class Base64Encoding
    * @throws IOException if there is an error
    * @since 2.0
    */
+  @SuppressWarnings("unused")
   public static String encodeObject( final Serializable serializableObject, final int options ) throws IOException {
     if( serializableObject == null ){
       throw new NullPointerException( "Cannot serialize a null object." );
@@ -319,7 +320,7 @@ public final class Base64Encoding
     try {
       return new String( encoded, PREFERRED_ENCODING );
     }   // end try
-    catch (UnsupportedEncodingException uue) {
+    catch (@SuppressWarnings("unused") UnsupportedEncodingException uue) {
       return new String( encoded );
     }   // end catch
   }   // end encodeBytes
@@ -357,6 +358,7 @@ public final class Base64Encoding
    * @throws IllegalArgumentException if source array, offset, or length are invalid
    * @since 2.3.1
    */
+  @SuppressWarnings("unused")
   public static byte[] encodeBytesToBytes( final byte[] source, final int off, final int len, final int options ) throws IOException {
     if( source == null ) throw new NullPointerException( "Cannot serialize a null array." );
     if( off < 0 ) throw new IllegalArgumentException( "Cannot have negative offset: " + off );

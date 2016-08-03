@@ -60,7 +60,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
   public AnnotatedTaskWrapper(final Object taskObject, final Object...args) throws JPPFException
   {
     boolean isClass = taskObject instanceof Class;
-    Class clazz = isClass ? (Class) taskObject : taskObject.getClass();
+    Class<?> clazz = isClass ? (Class<?>) taskObject : taskObject.getClass();
     AnnotatedElement elt = getJPPFAnnotatedElement(clazz);
     if (elt == null) throw new JPPFException("object '" + taskObject + "' is not a JPPFTask nor JPPF-annotated");
     if (elt instanceof Method)
@@ -93,13 +93,13 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
   @Override
   public Object execute() throws Exception
   {
-    Class clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
+    Class<?> clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
     Object result = null;
     AbstractPrivilegedAction<?> action = null;
     switch(methodType)
     {
       case CONSTRUCTOR:
-        Constructor c = (Constructor) getJPPFAnnotatedElement(clazz);
+        Constructor<?> c = (Constructor<?>) getJPPFAnnotatedElement(clazz);
         action = new PrivilegedConstructorAction(c, args);
         break;
 
@@ -138,7 +138,7 @@ class AnnotatedTaskWrapper extends AbstractTaskObjectWrapper
     {
       if (isJPPFAnnotated(m)) return m;
     }
-    for (Constructor c: clazz.getDeclaredConstructors())
+    for (Constructor<?> c: clazz.getDeclaredConstructors())
     {
       if (isJPPFAnnotated(c)) return c;
     }

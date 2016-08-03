@@ -65,7 +65,7 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
     this.method = method;
     if (taskObject instanceof Class)
     {
-      Class clazz = (Class) taskObject;
+      Class<?> clazz = (Class<?>) taskObject;
       if (method.equals(clazz.getSimpleName())) methodType = CONSTRUCTOR;
       else methodType = STATIC;
       this.className = clazz.getName();
@@ -87,13 +87,13 @@ public class PojoTaskWrapper extends AbstractTaskObjectWrapper
   @Override
   public Object execute() throws Exception
   {
-    Class clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
+    Class<?> clazz = INSTANCE.equals(methodType) ? taskObject.getClass() : Class.forName(className);
     Object result = null;
     AbstractPrivilegedAction<Object> action = null;
     switch(methodType)
     {
       case CONSTRUCTOR:
-        Constructor c = ReflectionUtils.getMatchingConstructor(clazz, args);
+        Constructor<?> c = ReflectionUtils.getMatchingConstructor(clazz, args);
         action = new PrivilegedConstructorAction(c, args);
         break;
 

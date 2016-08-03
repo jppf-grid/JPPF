@@ -66,6 +66,7 @@ public class Hook<E> {
     String fqn = JPPFConfiguration.get(property);
     if ((fqn != null) && !"".equals(fqn.trim())) {
       try {
+        @SuppressWarnings("unchecked")
         Class<E> clazz = (Class<E>) Class.forName(fqn, true, cl);
         processConcreteInstance(clazz.newInstance(), false);
       } catch (Exception e) {
@@ -127,7 +128,7 @@ public class Hook<E> {
         break;
       case SPI_MULTIPLE_INSTANCES:
         if (!instances.isEmpty()) {
-          for (HookInstance instance : instances) results.add(instance.invoke(methodName, parameters));
+          for (HookInstance<?> instance : instances) results.add(instance.invoke(methodName, parameters));
         }
         break;
     }
@@ -153,7 +154,7 @@ public class Hook<E> {
    */
   private void processConcreteInstance(final E concrete, final boolean isDefault) {
     if ((concrete != null) && (!isDefault || instances.isEmpty())) {
-      instances.add(new HookInstance(concrete));
+      instances.add(new HookInstance<>(concrete));
     }
   }
 

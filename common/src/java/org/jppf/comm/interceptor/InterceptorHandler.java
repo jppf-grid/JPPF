@@ -163,7 +163,7 @@ public class InterceptorHandler {
     if (logDebugMethod != null) {
       try {
         logDebugMethod.invoke(log, String.format(format, params));
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
     }
   }

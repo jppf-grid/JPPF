@@ -322,7 +322,7 @@ public class PolicyBuilder {
    * @throws Exception if an error occurs while generating the custom policy object.
    */
   private ExecutionPolicy buildCustomPolicy(final PolicyDescriptor desc) throws Exception {
-    Class clazz = Class.forName(desc.className);
+    Class<?> clazz = Class.forName(desc.className);
     CustomPolicy policy = (CustomPolicy) clazz.newInstance();
     policy.setArgs(desc.arguments.toArray(new String[desc.arguments.size()]));
     policy.initialize();

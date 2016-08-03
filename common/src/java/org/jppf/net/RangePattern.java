@@ -29,8 +29,7 @@ import org.jppf.utils.*;
  * A pattern represents a single value or a range of values for each component of an IP address.<br/>
  * @author Laurent Cohen
  */
-public class RangePattern
-{
+public class RangePattern {
   /**
    * The list of ranges constituting this address pattern.
    */
@@ -46,8 +45,7 @@ public class RangePattern
    * @param config the configuration used for this pattern.
    * @throws IllegalArgumentException if the pattern is null or invalid.
    */
-  public RangePattern(final String source, final PatternConfiguration config) throws IllegalArgumentException
-  {
+  public RangePattern(final String source, final PatternConfiguration config) throws IllegalArgumentException {
     this.config = config;
     convertSource(source);
   }
@@ -57,8 +55,7 @@ public class RangePattern
    * @param source the source pattern as a string.
    * @throws IllegalArgumentException if the pattern is null or invalid.
    */
-  protected void convertSource(final String source) throws IllegalArgumentException
-  {
+  protected void convertSource(final String source) throws IllegalArgumentException {
     if (source == null) throw new IllegalArgumentException("pattern cannot be null");
     String src = preProcess(source);
     src = RegexUtils.SPACES_PATTERN.matcher(src).replaceAll("");
@@ -66,16 +63,14 @@ public class RangePattern
     String[] rangeArray = config.compSeparatorPattern.split(src);
     if ((rangeArray == null) || (rangeArray.length == 0)) throw new IllegalArgumentException("invalid empty pattern");
     if (rangeArray.length > config.nbComponents) throw new IllegalArgumentException("pattern describes more than " + config.nbComponents + " components : \"" + source + '\"');
-    try
-    {
-      for (String s: rangeArray) ranges.add(parseRangePattern(s));
-      if (rangeArray.length < config.nbComponents)
-      {
-        for (int i=rangeArray.length; i<config.nbComponents; i++) ranges.add(config.fullRange);
+    try {
+      for (String s : rangeArray)
+        ranges.add(parseRangePattern(s));
+      if (rangeArray.length < config.nbComponents) {
+        for (int i = rangeArray.length; i < config.nbComponents; i++)
+          ranges.add(config.fullRange);
       }
-    }
-    catch(IllegalArgumentException e)
-    {
+    } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(build("error in pattern \"", source, "\" : ", e.getMessage()));
     }
   }
@@ -85,8 +80,7 @@ public class RangePattern
    * @param source the pattern source to process.
    * @return a new processed string.
    */
-  protected String preProcess(final String source)
-  {
+  protected String preProcess(final String source) {
     return source;
   }
 
@@ -95,8 +89,7 @@ public class RangePattern
    * @param source the pattern source to process.
    * @return a new processed string.
    */
-  protected String postProcess(final String source)
-  {
+  protected String postProcess(final String source) {
     return source;
   }
 
@@ -106,15 +99,13 @@ public class RangePattern
    * @param values the ip address to match as a array of values representing its components.
    * @return true if the address matches this pattern, false otherwise.
    */
-  public boolean matches(final int...values)
-  {
-    try
-    {
+  public boolean matches(final int... values) {
+    try {
       if ((values == null) || (values.length != ranges.size())) return false;
-      for (int i=0; i<values.length; i++) if (!ranges.get(i).isValueInRange(values[i])) return false;
-    }
-    catch (Exception e)
-    {
+      for (int i = 0; i < values.length; i++) {
+        if (!ranges.get(i).isValueInRange(values[i])) return false;
+      }
+    } catch (@SuppressWarnings("unused") Exception e) {
       return false;
     }
     return true;
@@ -126,8 +117,7 @@ public class RangePattern
    * @return a <code>Range</code> instance, or null if the pattern is invalid.
    * @throws IllegalArgumentException if the pattern is invalid.
    */
-  private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException
-  {
+  private Range<Integer> parseRangePattern(final String src) throws IllegalArgumentException {
     if ((src == null) || "".equals(src)) return config.fullRange;
     if (src.indexOf('-') < 0) return new Range<>(parseValue(src));
     String[] vals = RegexUtils.MINUS_PATTERN.split(src);
@@ -135,21 +125,15 @@ public class RangePattern
     if (vals.length > 2) throw new IllegalArgumentException(build("invalid range pattern (pattern: ", src, ")"));
     int lower = 0;
     int upper = 0;
-    if (vals.length == 1)
-    {
-      if (src.startsWith("-"))
-      {
+    if (vals.length == 1) {
+      if (src.startsWith("-")) {
         lower = config.minValue;
         upper = parseValue(vals[0]);
-      }
-      else
-      {
+      } else {
         lower = parseValue(vals[0]);
         upper = config.maxValue;
       }
-    }
-    else
-    {
+    } else {
       lower = "".equals(vals[0]) ? config.minValue : parseValue(vals[0]);
       upper = "".equals(vals[1]) ? config.maxValue : parseValue(vals[1]);
     }
@@ -163,27 +147,21 @@ public class RangePattern
    * @return the value as an int
    * @throws IllegalArgumentException if the string is not a valid number format or the value is out of allowed bounds.
    */
-  private int parseValue(final String src) throws IllegalArgumentException
-  {
-    try
-    {
+  private int parseValue(final String src) throws IllegalArgumentException {
+    try {
       int value = Integer.decode(config.valuePrefix + src.toLowerCase());
       if ((value < config.minValue) || (value > config.maxValue))
-        throw new IllegalArgumentException(build("value must be in [" , config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
+        throw new IllegalArgumentException(build("value must be in [", config.minValue, " ... ", config.maxValue, "] range (value: ", src, ")"));
       return value;
-    }
-    catch(NumberFormatException e)
-    {
+    } catch (@SuppressWarnings("unused") NumberFormatException e) {
       throw new IllegalArgumentException(build("invalid value format (value: ", src, ")"));
     }
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
-    for (int i=0; i<ranges.size(); i++)
-    {
+    for (int i = 0; i < ranges.size(); i++) {
       if (i > 0) sb.append(config.getCompSeparator());
       sb.append(ranges.get(i));
     }

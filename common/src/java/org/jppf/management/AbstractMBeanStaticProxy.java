@@ -146,7 +146,7 @@ public class AbstractMBeanStaticProxy {
    */
   public MBeanNotificationInfo[] getNotificationInfo() {
     try {
-      return (MBeanNotificationInfo[]) connection.getNotificationInfo(mbeanName);
+      return connection.getNotificationInfo(mbeanName);
     } catch (Exception e) {
       if (debugEnabled) log.debug(connection.getId() + " : error getting MBeanNotificationInfo[]", e);
     }

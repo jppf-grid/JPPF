@@ -151,7 +151,7 @@ public class JPPFMulticastReceiver extends ThreadSynchronization {
   private synchronized void addConnectionInfo(final JPPFConnectionInformation info) {
     try {
       if ((ipFilter != null) && !ipFilter.isAddressAccepted(InetAddress.getByName(info.host))) return;
-    } catch (UnknownHostException e) {
+    } catch (@SuppressWarnings("unused") UnknownHostException e) {
       return;
     }
     infoList.remove(info);

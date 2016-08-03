@@ -86,7 +86,7 @@ public class NodesMatching extends ExecutionPolicy {
   }
 
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     int nbNodes = 0;
     try (JMXDriverConnectionWrapper jmx = new JMXDriverConnectionWrapper()) {
       jmx.connect();

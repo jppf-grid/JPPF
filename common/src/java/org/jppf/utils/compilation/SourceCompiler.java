@@ -42,11 +42,11 @@ public class SourceCompiler implements Closeable
   /**
    * The file manager used to store the destination class "files".
    */
-  private final InMemoryFileManager toMemoryManager;
+  private final InMemoryFileManager<?> toMemoryManager;
   /**
    * Reports the errors and warning that occur at compilation.
    */
-  private final ErrorReporter errorReporter = new ErrorReporter();
+  private final ErrorReporter<JavaFileObject> errorReporter = new ErrorReporter<>();
   /**
    * Used to load the compiled classes.
    */
@@ -72,7 +72,7 @@ public class SourceCompiler implements Closeable
     if (!isCompilerAvailable()) throw new UnsupportedOperationException("no compiler is available for this platform");
     compiler = ToolProvider.getSystemJavaCompiler();
     this.toFileManager = compiler.getStandardFileManager(null, null, null);
-    this.toMemoryManager = new InMemoryFileManager(toFileManager);
+    this.toMemoryManager = new InMemoryFileManager<>(toFileManager);
     this.classloader = new CustomClassLoader(null, null, parentCL);
   }
 
@@ -147,7 +147,7 @@ public class SourceCompiler implements Closeable
    * @return a list of {@link Diagnostic} objects.
    */
   @SuppressWarnings("unchecked")
-  public List<Diagnostic> getDiagnostics()
+  public List<Diagnostic<JavaFileObject>> getDiagnostics()
   {
     return errorReporter.getErrors();
   }

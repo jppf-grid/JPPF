@@ -169,7 +169,8 @@ public class Range<T extends Comparable<T>> {
   @Override
   public boolean equals(final Object obj) {
     if (!(obj instanceof Range)) return false;
-    Range other = (Range) obj; 
+    @SuppressWarnings("unchecked")
+    Range<T> other = (Range<T>) obj; 
     return lower.equals(other.lower) && upper.equals(other.upper);
   }
 }

@@ -309,7 +309,7 @@ public final class IOHelper {
     DataLocation dl = null;
     try {
       dl = serializeDataToMemory(o, ser);
-    } catch(OutOfMemoryError e) {
+    } catch(@SuppressWarnings("unused") OutOfMemoryError e) {
       dl = serializeDataToFile(o, ser);
     }
     return dl;

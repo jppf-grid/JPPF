@@ -29,7 +29,7 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
   /**
    * The channel polled by this selector.
    */
-  private AbstractLocalChannelWrapper channel = null;
+  private AbstractLocalChannelWrapper<?, ?> channel = null;
 
   /**
    * Initialize this selector with the specified channel.
@@ -37,7 +37,7 @@ public class LocalChannelSelector extends ThreadSynchronization implements Chann
    */
   public LocalChannelSelector(final ChannelWrapper<?> channel)
   {
-    this.channel = (AbstractLocalChannelWrapper) channel;
+    this.channel = (AbstractLocalChannelWrapper<?, ?>) channel;
   }
 
   @Override

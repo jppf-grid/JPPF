@@ -151,6 +151,7 @@ public class MBeanStaticProxyGenerator {
     printIndent().print(  " * Generated static proxy for the {@link ").print(inf.getName()).println("} MBean interface.");
     printIndent().println(" * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java");
     printIndent().println(" */");
+    printIndent().println("@SuppressWarnings({\"rawtypes\", \"unchecked\"})");
     importSet.add(AbstractMBeanStaticProxy.class.getName());
     importSet.add(JMXConnectionWrapper.class.getName());
     String pkg = inf.getPackage().getName();

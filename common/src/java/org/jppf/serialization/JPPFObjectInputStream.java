@@ -233,7 +233,7 @@ public class JPPFObjectInputStream extends ObjectInputStream {
     for (int i=0; i<n; i++) {
       Object o = deserializer.readObject();
       String name = (String) o;
-      Object value = (Object) deserializer.readObject();
+      Object value = deserializer.readObject();
       map.put(name, value);
     }
   }

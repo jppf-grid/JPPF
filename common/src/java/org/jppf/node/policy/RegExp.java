@@ -66,7 +66,7 @@ public class RegExp extends ExecutionPolicy {
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     if (regExp == null) return false;
     String s = getProperty(info, propertyName);
     if (s == null) return false;

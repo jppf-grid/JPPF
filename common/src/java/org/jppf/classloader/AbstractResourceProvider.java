@@ -99,11 +99,11 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
   @Override
   public byte[] computeCallable(final byte[] serializedCallable) {
     if (debugEnabled) log.debug("before deserialization");
-    JPPFCallable callable = null;
+    JPPFCallable<?> callable = null;
     ObjectSerializer ser = new ObjectSerializerImpl();
     Object result = null;
     try {
-      callable = (JPPFCallable) ser.deserialize(serializedCallable);
+      callable = (JPPFCallable<?>) ser.deserialize(serializedCallable);
       result = callable.call();
     } catch(Throwable t) {
       result = (t instanceof Exception) ? t : new JPPFException(t);
@@ -143,7 +143,7 @@ public abstract class AbstractResourceProvider implements ResourceProvider {
         InputStream is = cl.getResourceAsStream(name);
         if (is != null) {
           byte[] b = StreamUtils.getInputStreamAsByte(is);
-          if (result == null) result = new ArrayList<>();
+          result = new ArrayList<>();
           result.add(b);
         }
       }

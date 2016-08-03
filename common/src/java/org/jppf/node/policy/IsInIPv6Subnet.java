@@ -107,7 +107,7 @@ public class IsInIPv6Subnet extends ExecutionPolicy {
    * @return true if the node is accepted, false otherwise.
    */
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     // Build list of subnet netmasks
     synchronized(this) {
       if (netmasks == null) {

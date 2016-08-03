@@ -50,7 +50,7 @@ public abstract class AbstractCollectionHashtable<K, V> extends AbstractCollecti
   }
 
   @Override
-  public void addValues(final K key, final V... values)
+  public void addValues(final K key, @SuppressWarnings("unchecked") final V... values)
   {
     Collection<V> coll = createOrGetCollectionSynchronized(key);
     for (V value: values) coll.add(value);

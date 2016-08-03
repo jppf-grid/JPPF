@@ -149,11 +149,11 @@ public class JMXMPServer extends AbstractJMXServer {
         params[i-1] = configDef[i];
       }
     }
-    Constructor c = null;
+    Constructor<?> c = null;
     if (params != null) {
       try {
         c = clazz.getConstructor(String[].class);
-      } catch (NoSuchMethodException ignore) {
+      } catch (@SuppressWarnings("unused") NoSuchMethodException ignore) {
       }
       if (c != null) {
         try {
@@ -174,7 +174,7 @@ public class JMXMPServer extends AbstractJMXServer {
       Method m = null;
       try {
         m = clazz.getMethod("setParameters", String[].class);
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
       if (m != null) {
         try {

@@ -64,13 +64,13 @@ public abstract class AbstractCollectionMap<K, V> implements CollectionMap<K, V>
   }
 
   @Override
-  public void addValues(final K key, final V...values) {
+  public void addValues(final K key, @SuppressWarnings("unchecked") final V...values) {
     Collection<V> coll = createOrGetCollection(key);
     for (V value: values) coll.add(value);
   }
 
   @Override
-  public int removeValues(final K key, final V...values) {
+  public int removeValues(final K key, @SuppressWarnings("unchecked") final V...values) {
     Collection<V> coll = map.get(key);
     if (coll != null) {
       int count = 0;

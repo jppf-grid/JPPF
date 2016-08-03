@@ -36,9 +36,9 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   }
 
   @Override
-  public NioContext getContext()
+  public NioContext<?> getContext()
   {
-    return (NioContext) channel.attachment();
+    return (NioContext<?>) channel.attachment();
   }
 
   /**
@@ -48,7 +48,7 @@ public class SelectionKeyWrapper extends AbstractChannelWrapper<SelectionKey>
   @Override
   public void close() throws Exception
   {
-    SelectableChannel ch = (SelectableChannel) channel.channel();
+    SelectableChannel ch = channel.channel();
     channel.cancel();
     ch.close();
   }

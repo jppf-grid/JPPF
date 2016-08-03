@@ -33,7 +33,7 @@ public class RL2BundlerProvider implements JPPFBundlerProvider<RL2Profile> {
    * @return an instance of the bundler implementation defined by this provider.
    */
   @Override
-  public Bundler createBundler(final RL2Profile profile) {
+  public Bundler<RL2Profile> createBundler(final RL2Profile profile) {
     return new RL2Bundler(profile);
   }
 

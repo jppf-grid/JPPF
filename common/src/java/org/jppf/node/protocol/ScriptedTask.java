@@ -113,6 +113,7 @@ public class ScriptedTask<T> extends AbstractTask<T> {
       if (runner != null) {
         Map<String, Object> bnd = new HashMap<>(bindings);
         bnd.put("jppfTask", this);
+        @SuppressWarnings("unchecked")
         T result = (T) runner.evaluate(reusableId, script, bnd);
         if (result != null) {
           System.out.println("language=" + language + ", result=" + result + ", class=" + result.getClass().getName());

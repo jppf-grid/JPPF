@@ -34,8 +34,7 @@ import org.slf4j.*;
  * This class is used to generate and obtain the permissions that constitute the security policy for a JPPF node.
  * @author Laurent Cohen
  */
-public final class PermissionsFactory
-{
+public final class PermissionsFactory {
   /**
    * Logger for this class.
    */
@@ -60,16 +59,14 @@ public final class PermissionsFactory
   /**
    * Instantiation of this class is not permitted.
    */
-  private PermissionsFactory()
-  {
+  private PermissionsFactory() {
   }
 
   /**
    * Reset the current permissions to enable their reload.
    * @see java.security.Permissions
    */
-  public static synchronized void resetPermissions()
-  {
+  public static synchronized void resetPermissions() {
     permList = null;
   }
 
@@ -79,10 +76,8 @@ public final class PermissionsFactory
    * @return a Permissions object.
    * @see java.security.Permissions
    */
-  public static synchronized PermissionCollection getPermissions(final ClassLoader classLoader)
-  {
-    if (permList == null)
-    {
+  public static synchronized PermissionCollection getPermissions(final ClassLoader classLoader) {
+    if (permList == null) {
       ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
       createPermissions(cl);
       if (debugEnabled) log.debug("created normal permissions");
@@ -97,10 +92,8 @@ public final class PermissionsFactory
    * @return a Permissions object.
    * @see java.security.Permissions
    */
-  public static synchronized PermissionCollection getExtendedPermissions(final ClassLoader classLoader)
-  {
-    if (permList == null)
-    {
+  public static synchronized PermissionCollection getExtendedPermissions(final ClassLoader classLoader) {
+    if (permList == null) {
       ClassLoader cl = (classLoader == null) ? PermissionsFactory.class.getClassLoader() : classLoader;
       createPermissions(cl);
       if (debugEnabled) log.debug("created extended permissions");
@@ -113,8 +106,7 @@ public final class PermissionsFactory
    * Initialize the permissions granted to a node.
    * @param classLoader the ClassLoader used to retrieve the policy file.
    */
-  private static synchronized void createPermissions(final ClassLoader classLoader)
-  {
+  private static synchronized void createPermissions(final ClassLoader classLoader) {
     if (permList != null) return;
     permList = new ArrayList<>();
     createDynamicPermissions();
@@ -122,8 +114,7 @@ public final class PermissionsFactory
     readStaticPermissions(classLoader);
     normalPermissions = new JPPFPermissions();
     extendedPermissions = new JPPFPermissions();
-    for (Permission p: permList)
-    {
+    for (Permission p : permList) {
       normalPermissions.add(p);
       extendedPermissions.add(p);
     }
@@ -134,23 +125,19 @@ public final class PermissionsFactory
   /**
    * Initialize the permissions that depend on the JPPF configuration.
    */
-  private static void createDynamicPermissions()
-  {
-    try
-    {
+  private static void createDynamicPermissions() {
+    try {
       TypedProperties config = JPPFConfiguration.getProperties();
       String host = config.get(JPPFProperties.SERVER_HOST);
       boolean sslEnabled = config.get(JPPFProperties.SSL_ENABLED);
       // for backward compatibility with v2.x configurations
       //int port = config.getInt("jppf.server.port", sslEnabled ? 11111 : 11143);
-      int port = config.get(sslEnabled ? JPPFProperties.SERVER_SSL_PORT: JPPFProperties.SERVER_PORT);
+      int port = config.get(sslEnabled ? JPPFProperties.SERVER_SSL_PORT : JPPFProperties.SERVER_PORT);
       addPermission(new SocketPermission(host + ':' + port, "connect,listen"), "dynamic");
       host = config.get(JPPFProperties.DISCOVERY_GROUP);
       //port = props.getInt("jppf.discovery.port", 11111);
       addPermission(new SocketPermission(host + ":0-", "accept,connect,listen,resolve"), "dynamic");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -158,10 +145,8 @@ public final class PermissionsFactory
   /**
    * Initialize the permissions for the JMX-based management of the node.
    */
-  private static void createManagementPermissions()
-  {
-    try
-    {
+  private static void createManagementPermissions() {
+    try {
       TypedProperties props = JPPFConfiguration.getProperties();
       //String host = props.getString("jppf.management.host", "localhost");
       int port = props.get(JPPFProperties.MANAGEMENT_PORT);
@@ -173,9 +158,7 @@ public final class PermissionsFactory
       addPermission(new MBeanPermission("*", "*", new ObjectName("*:*"), "*"), "management");
       // TODO: find a way to be more restrictive on RMI permissions
       addPermission(new SocketPermission("*:1024-", "accept,connect,listen,resolve"), "management");
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
     }
   }
@@ -184,50 +167,37 @@ public final class PermissionsFactory
    * Read the static permissions stored in a policy file, if any is defined.
    * @param classLoader the ClassLoader used to retrieve the policy file.
    */
-  private static void readStaticPermissions(final ClassLoader classLoader)
-  {
+  private static void readStaticPermissions(final ClassLoader classLoader) {
     InputStream is = null;
     LineNumberReader reader = null;
-    try
-    {
+    try {
       String file = JPPFConfiguration.get(JPPFProperties.POLICY_FILE);
       if (file == null) return;
-      try
-      {
+      try {
         is = new FileInputStream(file);
-      }
-      catch(FileNotFoundException e)
-      {
-        if (debugEnabled) log.debug("jppf policy file '" + file + "' not found locally");
+      } catch (FileNotFoundException e) {
+        if (debugEnabled) log.debug("jppf policy file '{}' not found locally: {}", file, e);
       }
       if (is == null) is = classLoader.getResourceAsStream(file);
-      if (is == null)
-      {
+      if (is == null) {
         if (debugEnabled) log.debug("jppf policy file '" + file + "' not found on the driver side");
         return;
       }
       reader = new LineNumberReader(new InputStreamReader(is));
       int count = 0;
       boolean end = false;
-      while (!end)
-      {
+      while (!end) {
         String line = reader.readLine();
         if (line == null) break;
         count++;
         line = line.trim();
         if ("".equals(line) || line.startsWith("//")) continue;
-        if (!line.startsWith("permission"))
-        {
+        if (!line.startsWith("permission")) {
           err(file, count, " should start with \"permission\"");
           continue;
         }
         line = line.substring("permission".length());
-        if (line.contains("PropertyPermission"))
-        {
-          String breakpoint = "pause here";
-        }
-        if (!line.endsWith(";"))
-        {
+        if (!line.endsWith(";")) {
           err(file, count, " should end with \";\"");
           continue;
         }
@@ -236,13 +206,9 @@ public final class PermissionsFactory
         Permission p = parsePermission(line, file, count);
         if (p != null) addPermission(p, "static");
       }
-    }
-    catch(Exception e)
-    {
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
-    }
-    finally
-    {
+    } finally {
       StreamUtils.closeSilent(reader);
     }
   }
@@ -253,8 +219,7 @@ public final class PermissionsFactory
    * @param type the type of permission, static, dynamic or mbean.
    * @throws Exception if an error is raised when adding the permission.
    */
-  private static void addPermission(final Permission p, final String type) throws Exception
-  {
+  private static void addPermission(final Permission p, final String type) throws Exception {
     if (debugEnabled) log.debug("adding " + type + " permission: " + p);
     permList.add(p);
   }
@@ -266,15 +231,13 @@ public final class PermissionsFactory
    * @param line the line number at which the permission entry is.
    * @return a <code>Permission</code> object built from the permission entry.
    */
-  private static Permission parsePermission(final String source, final String file, final int line)
-  {
+  private static Permission parsePermission(final String source, final String file, final int line) {
     String className = null;
     String name = null;
     String actions = null;
 
     int idx = source.indexOf('"');
-    if (idx < 0)
-    {
+    if (idx < 0) {
       err(file, line, "permission entry has no name/action, or missing opening quote");
       return null;
     }
@@ -282,20 +245,17 @@ public final class PermissionsFactory
 
     idx++;
     int idx2 = source.indexOf('"', idx);
-    if (idx2 < 0)
-    {
+    if (idx2 < 0) {
       err(file, line, "missing closing quote on permission name");
       return null;
     }
     name = source.substring(idx, idx2);
 
-    idx = source.indexOf('"', idx2+1);
-    if (idx >= 0)
-    {
+    idx = source.indexOf('"', idx2 + 1);
+    if (idx >= 0) {
       idx++;
       idx2 = source.indexOf('"', idx);
-      if (idx2 < 0)
-      {
+      if (idx2 < 0) {
         err(file, line, "missing closing quote on permission action");
         return null;
       }
@@ -303,8 +263,7 @@ public final class PermissionsFactory
     }
     name = expandProperties(name, file, line);
     if (name == null) return null;
-    if (actions != null)
-    {
+    if (actions != null) {
       actions = expandProperties(actions, file, line);
       if (actions == null) return null;
     }
@@ -320,61 +279,43 @@ public final class PermissionsFactory
    * @param line the line number at which the permission entry is.
    * @return a <code>Permission</code> object built from the permission components.
    */
-  private static Permission instantiatePermission(final String className, final String name, final String actions, final String file, final int line)
-  {
+  private static Permission instantiatePermission(final String className, final String name, final String actions, final String file, final int line) {
     Permission permission = null;
     Class<?> c = null;
-    try
-    {
+    try {
       c = Class.forName(className);
-    }
-    catch(ClassNotFoundException e)
-    {
+    } catch (@SuppressWarnings("unused") ClassNotFoundException e) {
       return new UnresolvedPermission(className, name, actions, null);
     }
 
-    Constructor constructor = null;
+    Constructor<?> constructor = null;
     Object[] params = null;
     Exception ex = null;
     String msg = null;
-    try
-    {
-      if (actions != null)
-      {
+    try {
+      if (actions != null) {
         constructor = c.getConstructor(String.class, String.class);
         params = new Object[] { name, actions };
-      }
-      else
-      {
+      } else {
         constructor = c.getConstructor(String.class);
         params = new Object[] { name };
       }
       permission = (Permission) constructor.newInstance(params);
-    }
-    catch(InstantiationException e)
-    {
+    } catch (InstantiationException e) {
       ex = e;
       msg = "could not instantiate";
-    }
-    catch(IllegalAccessException e)
-    {
+    } catch (IllegalAccessException e) {
       ex = e;
       msg = "could not instantiate";
-    }
-    catch(InvocationTargetException e)
-    {
+    } catch (InvocationTargetException e) {
       ex = e;
       msg = "could not instantiate";
-    }
-    catch(NoSuchMethodException e)
-    {
+    } catch (NoSuchMethodException e) {
       ex = e;
       msg = "could not find a proper constructor for";
     }
-    if (ex != null)
-    {
-      msg = msg + " permission with class=\"" + className + "\", name=\"" + name + "\", actions=\"" +
-      actions + "\" [" + ex.getMessage() + "]";
+    if (ex != null) {
+      msg = msg + " permission with class=\"" + className + "\", name=\"" + name + "\", actions=\"" + actions + "\" [" + ex.getMessage() + "]";
       err(file, line, msg);
       return null;
     }
@@ -388,24 +329,20 @@ public final class PermissionsFactory
    * @param line the line number at which the permission entry is.
    * @return the token with its properties expanded.
    */
-  private static String expandProperties(final String source, final String file, final int line)
-  {
+  private static String expandProperties(final String source, final String file, final int line) {
     StringBuilder sb = new StringBuilder();
     int length = source.length();
     int pos = 0;
-    while (pos < length)
-    {
+    while (pos < length) {
       int idx = source.indexOf("${", pos);
-      if (idx < 0)
-      {
+      if (idx < 0) {
         if (pos <= length - 1) sb.append(source.substring(pos));
         break;
       }
       if (idx > pos) sb.append(source.substring(pos, idx));
       pos = idx + 2;
       idx = source.indexOf('}', pos);
-      if (idx < 0)
-      {
+      if (idx < 0) {
         err(file, line, "missing closing \"}\" on property expansion");
         return null;
       }
@@ -427,8 +364,7 @@ public final class PermissionsFactory
    * @param line the line number at which the error was detected.
    * @param msg the error description.
    */
-  private static void err(final String file, final int line, final String msg)
-  {
-    System.err.println("Policy file '"+file+"', line "+line+" : "+msg);
+  private static void err(final String file, final int line, final String msg) {
+    System.err.println("Policy file '" + file + "', line " + line + " : " + msg);
   }
 }

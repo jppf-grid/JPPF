@@ -156,10 +156,11 @@ public class TraversalList<E> implements Serializable {
     return sb.toString();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(final Object obj) {
     if (!(obj instanceof TraversalList)) return false;
-    return list.equals(((TraversalList) obj).list);
+    return list.equals(((TraversalList<E>) obj).list);
   }
 
   @Override

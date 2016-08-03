@@ -108,7 +108,7 @@ abstract class AbstractJPPFProperty<T> implements JPPFProperty<T> {
    * @param possibleValues an array of the possible values.
    * @return this property.
    */
-  public JPPFProperty<T> setPossibleValues(final T... possibleValues) {
+  public JPPFProperty<T> setPossibleValues(@SuppressWarnings("unchecked") final T... possibleValues) {
     this.possibleValues = possibleValues;
     return this;
   }

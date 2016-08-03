@@ -100,7 +100,7 @@ public class ScriptedPolicy extends ExecutionPolicy {
   }
 
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     if ((script == null) || evaluationError) return false;
     Map<String, Object> variables = new HashMap<>();
     variables.put("jppfSystemInfo", info);

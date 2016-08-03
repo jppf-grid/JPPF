@@ -31,6 +31,7 @@ public class MetadataImpl implements Metadata
    */
   protected final Map<Object, Object> parameters = new Hashtable<>();
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T getParameter(final Object key)
   {
@@ -40,6 +41,7 @@ public class MetadataImpl implements Metadata
   @Override
   public <T> T getParameter(final Object key, final T defaultValue)
   {
+    @SuppressWarnings("unchecked")
     T res = (T) parameters.get(key);
     return res == null ? defaultValue : res;
   }
@@ -50,6 +52,7 @@ public class MetadataImpl implements Metadata
     parameters.put(key, value);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T removeParameter(final Object key)
   {

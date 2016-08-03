@@ -27,6 +27,7 @@ import org.jppf.utils.TypedProperties;
  * Generated static proxy for the {@link org.jppf.management.PeerDriverMBean} MBean interface.
  * @author /common/src/java/org/jppf/utils/generator/MBeanStaticProxyGenerator.java
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class PeerDriverMBeanStaticProxy extends AbstractMBeanStaticProxy implements PeerDriverMBean {
   /**
    * Initialize this MBean static proxy.

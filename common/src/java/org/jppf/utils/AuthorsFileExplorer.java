@@ -63,10 +63,9 @@ public class AuthorsFileExplorer extends FileExplorer {
   @Override
   public void afterReadFile(final File file, final String content) {
     Matcher matcher = AUTHOR_PATTERN.matcher(content);
-    boolean found = false;
     int count = 0;
     Set<String> temp = new HashSet<>();
-    while (found = matcher.find()) {
+    while (matcher.find()) {
       String author = matcher.group(1);
       if (!authors.contains(author)) {
         count++;

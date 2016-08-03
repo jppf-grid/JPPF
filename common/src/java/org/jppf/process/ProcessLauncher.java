@@ -122,7 +122,6 @@ public class ProcessLauncher extends AbstractProcessLauncher implements ProcessW
         if (process != null) process.destroy();
         if (!end) {
           JPPFConfiguration.reset();
-          TypedProperties config = JPPFConfiguration.getProperties();
           TypedProperties overrides = new ConfigurationOverridesHandler().load(false);
           if (overrides != null) JPPFConfiguration.getProperties().putAll(overrides);
         }

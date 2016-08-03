@@ -43,11 +43,11 @@ public class Preference extends LogicalRule {
    */
   public Preference(final List<ExecutionPolicy> policies) {
     super(policies.toArray(new ExecutionPolicy[policies.size()]));
-    if ((policies == null) || policies.isEmpty()) throw new IllegalArgumentException("there must be at least one policy in the list");
+    if (policies.isEmpty()) throw new IllegalArgumentException("there must be at least one policy in the list");
   }
 
   @Override
-  public boolean accepts(final PropertiesCollection info) {
+  public boolean accepts(final PropertiesCollection<String> info) {
     for (ExecutionPolicy policy: children) {
       if ((policy == null) || policy.accepts(info)) return true;
     }

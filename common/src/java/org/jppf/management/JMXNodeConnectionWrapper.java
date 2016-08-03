@@ -175,7 +175,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * @throws Exception if an error is raised when invoking the node mbean.
    */
   @Override
-  public void updateConfiguration(final Map configOverrides, final Boolean restart) throws Exception {
+  public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart) throws Exception {
     updateConfiguration(configOverrides, restart, true);
   }
 
@@ -189,7 +189,7 @@ public class JMXNodeConnectionWrapper extends JMXConnectionWrapper implements JP
    * @since 5.2
    */
   @Override
-  public void updateConfiguration(final Map configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
+  public void updateConfiguration(final Map<Object, Object> configOverrides, final Boolean restart, final Boolean interruptIfRunning) throws Exception {
     invoke(JPPFNodeAdminMBean.MBEAN_NAME, "updateConfiguration",
         new Object[] { configOverrides, restart, interruptIfRunning }, new String[] { "java.util.Map", "java.lang.Boolean", "java.lang.Boolean" });
   }

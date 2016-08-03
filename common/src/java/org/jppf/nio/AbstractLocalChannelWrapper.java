@@ -27,7 +27,7 @@ import org.slf4j.*;
  * @param <T> The type of context used by the channel on the server side of the communication.
  * @author Laurent Cohen
  */
-public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extends AbstractChannelWrapper<T>
+public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext<?>> extends AbstractChannelWrapper<T>
 {
   /**
    * Logger for this class.
@@ -77,7 +77,7 @@ public class AbstractLocalChannelWrapper<S, T extends AbstractNioContext> extend
   }
 
   @Override
-  public NioContext getContext()
+  public NioContext<?> getContext()
   {
     return getChannel();
   }

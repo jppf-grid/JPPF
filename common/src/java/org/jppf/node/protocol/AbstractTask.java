@@ -206,7 +206,7 @@ public class AbstractTask<T> implements Task<T> {
         Method m = null;
         try {
           m = clClass.getMethod("computeCallable", JPPFCallable.class);
-        } catch(Exception e) {
+        } catch(@SuppressWarnings("unused") Exception e) {
           throw new JPPFException("the task class loader cannot send a computation request to the client, method 'computeCallable' is missing");
         }
         result = (V) m.invoke(cl, callable);

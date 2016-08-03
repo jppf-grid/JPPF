@@ -47,11 +47,8 @@ public final class ConcurrentUtils {
     if (millis < 0L) throw new IllegalArgumentException("millis cannot be negative");
     long timeout = (millis > 0L) ? millis : Long.MAX_VALUE;
     boolean fulfilled = false;
-    long elapsed = 0L;
     final long start = System.nanoTime();
-    while (!(fulfilled = condition.evaluate()) && ((elapsed = (System.nanoTime() - start) / 1_000_000L) < timeout)) {
-      monitor.goToSleep(1L);
-    }
+    while (!(fulfilled = condition.evaluate()) && ((System.nanoTime() - start) / 1_000_000L < timeout)) monitor.goToSleep(1L);
     return fulfilled;
   }
 
