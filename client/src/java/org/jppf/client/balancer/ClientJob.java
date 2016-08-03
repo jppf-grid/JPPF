@@ -105,7 +105,6 @@ public class ClientJob extends AbstractClientJob {
    * @param parentJob instance of parent broadcast job.
    * @param broadcastUUID the broadcast UUID, i.e. the uuid of the connection the job is broadcast to.
    */
-  @SuppressWarnings("deprecation")
   protected ClientJob(final JPPFJob job, final List<Task<?>> tasks, final ClientJob parentJob, final String broadcastUUID) {
     super(job);
     if (tasks == null) throw new IllegalArgumentException("tasks is null");
@@ -297,7 +296,6 @@ public class ClientJob extends AbstractClientJob {
    * @param throwable an eventual {@link Throwable} that may have been raised while the tasks were executing.
    * @see <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-257">JPPF-257 Better exception handling for overriden or custom TaskResultListener implementations</a>
    */
-  @SuppressWarnings("deprecation")
   private void callResultListener(final List<Task<?>> results, final Throwable throwable) {
     JPPFResultCollector listener = resultCollector;
     if (listener != null) {

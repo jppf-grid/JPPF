@@ -43,7 +43,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    */
   private static boolean debugEnabled = LoggingUtils.isDebugEnabled(log);
   /**
-   * The topology manager to which topology change notifications are to be sent. 
+   * The topology manager to which topology change notifications are to be sent.
    */
   private final TopologyManager manager;
 
@@ -62,6 +62,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
    * Refresh the tree structure.
    * @exclude
    */
+  @Override
   protected synchronized void performRefresh() {
     for (TopologyDriver driver: manager.getDrivers()) {
       refreshNodes(driver);
@@ -133,7 +134,7 @@ class NodeRefreshHandler extends AbstractRefreshHandler {
     // refresh the nodes execution states
     Map<String, TopologyNode> uuidMap = new HashMap<>();
     for (AbstractTopologyComponent child: children) {
-      if (child.isNode()) uuidMap.put(child.getUuid(), (TopologyNode) child); 
+      if (child.isNode()) uuidMap.put(child.getUuid(), (TopologyNode) child);
     }
     Map<String, Object> result = null;
     try {

@@ -56,7 +56,7 @@ public class ClientExecutionManager extends AbstractExecutionManager {
    * @param bundle the bundle whose tasks are to be executed.
    * @param taskList the list of tasks to execute.
    */
-  @SuppressWarnings("unchecked")
+  @Override
   protected void setup(final TaskBundle bundle, final List<Task<?>> taskList) {
     taskNotificationDispatcher.setBundle(this.bundle = bundle);
     this.taskList = taskList;
@@ -78,7 +78,7 @@ public class ClientExecutionManager extends AbstractExecutionManager {
   /**
    * Cleanup method invoked when all tasks for the current bundle have completed.
    */
-  @SuppressWarnings("unchecked")
+  @Override
   protected void cleanup() {
     bundle.setParameter(BundleParameter.NODE_BUNDLE_ELAPSED_PARAM, accumulatedElapsed.get());
     this.dataProvider = null;

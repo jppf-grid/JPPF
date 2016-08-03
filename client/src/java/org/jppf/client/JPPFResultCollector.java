@@ -76,7 +76,6 @@ public class JPPFResultCollector implements JobStatusHandler {
    * @param throwable the throwable that was raised while receiving the results.
    * @param sendJobEvent whether to emit a {@link org.jppf.client.event.JobEvent JobEvent} notification.
    */
-  @SuppressWarnings("unchecked")
   public synchronized void resultsReceived(final List<Task<?>> tasks, final Throwable throwable, final boolean sendJobEvent) {
     if (tasks != null) {
       jobResults.addResults(tasks);

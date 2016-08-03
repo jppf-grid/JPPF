@@ -317,7 +317,6 @@ public class JobManagerClient extends ThreadSynchronization implements JobManage
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public String submitJob(final JPPFJob job, final JobStatusListener listener) {
     if (closed.get()) throw new IllegalStateException("this jobmanager was closed");
     List<Task<?>> pendingTasks = new ArrayList<>();

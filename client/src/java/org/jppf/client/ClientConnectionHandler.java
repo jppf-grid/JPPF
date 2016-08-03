@@ -50,6 +50,7 @@ interface ClientConnectionHandler extends ClientConnectionStatusHandler, AutoClo
   /**
    * Close and cleanup this connection handler.
    */
+  @Override
   void close();
 
   /**

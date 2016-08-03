@@ -119,7 +119,6 @@ public class ChannelWrapperRemote extends ChannelWrapper implements ClientConnec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Future<?> submit(final ClientTaskBundle bundle) {
     setStatus(JPPFClientConnectionStatus.EXECUTING);
     Runnable task = new RemoteRunnable(bundle, channel);

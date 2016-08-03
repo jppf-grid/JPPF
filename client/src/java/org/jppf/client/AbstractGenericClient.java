@@ -138,7 +138,6 @@ public abstract class AbstractGenericClient extends AbstractJPPFClient implement
    * @exclude
    */
   @Override
-  @SuppressWarnings("unchecked")
   protected void initPools(final TypedProperties config) {
     if (debugEnabled) log.debug("initializing connections");
     int coreThreads = Runtime.getRuntime().availableProcessors();

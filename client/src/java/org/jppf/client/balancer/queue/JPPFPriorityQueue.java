@@ -21,7 +21,7 @@ package org.jppf.client.balancer.queue;
 import static org.jppf.utils.collections.CollectionUtils.formatSizeMapInfo;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jppf.client.*;
 import org.jppf.client.balancer.*;
@@ -163,6 +163,7 @@ public class JPPFPriorityQueue extends AbstractJPPFQueue<ClientJob, ClientJob, C
    * @param bundleWrapper the bundle to get the size from.
    * @return the bundle size as an int.
    */
+  @Override
   protected int getSize(final ClientJob bundleWrapper) {
     //return bundle.getTaskCount();
     return bundleWrapper.getJob().getJobTasks().size();

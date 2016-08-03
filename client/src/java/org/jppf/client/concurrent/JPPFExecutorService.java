@@ -124,7 +124,6 @@ public class JPPFExecutorService extends JobListenerAdapter implements ExecutorS
    * @see java.util.concurrent.ExecutorService#invokeAll(java.util.Collection, long, java.util.concurrent.TimeUnit)
    */
   @Override
-  @SuppressWarnings("unchecked")
   public <T> List<Future<T>> invokeAll(final Collection<? extends Callable<T>> tasks, final long timeout, final TimeUnit unit) throws InterruptedException {
     if (shuttingDown.get()) throw new RejectedExecutionException("Shutdown has already been requested");
     if (timeout < 0) throw new IllegalArgumentException("timeout cannot be negative");

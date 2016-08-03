@@ -251,7 +251,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
       Future<T> future = null;
       JPPFJob job = nextJobRef.get();
       try {
-        @SuppressWarnings("deprecation")
         JPPFAnnotatedTask t = (JPPFAnnotatedTask) job.add(task);
         t.setResult(result);
         configureTask(t);
@@ -280,7 +279,6 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
       Future<T> future = null;
       JPPFJob job = nextJobRef.get();
       try {
-        @SuppressWarnings("deprecation")
         JPPFAnnotatedTask jppfTask = (JPPFAnnotatedTask) job.add(task);
         configureTask(jppfTask);
         future = new JPPFTaskFuture<>(job, jppfTask.getPosition());
@@ -301,14 +299,12 @@ public class BatchHandler extends ThreadSynchronization implements Runnable {
    * @param tasks the tasks to submit.
    * @return a pair representing the result collector used in the current job, along with the position of the first task.
    */
-  @SuppressWarnings("unchecked")
   <T> Pair<JPPFJob, Integer> addTasks(final Collection<? extends Callable<T>> tasks) {
     lock.lock();
     try {
       if (debugEnabled) log.debug("submitting " + tasks.size() + " Callable Tasks");
       Pair<JPPFJob, Integer> pair = null;
       JPPFJob job = nextJobRef.get();
-      @SuppressWarnings("deprecation")
       int start = 0;
       try {
         List<Task<?>> jobTasks = job.getJobTasks();

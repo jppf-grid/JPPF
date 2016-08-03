@@ -29,6 +29,7 @@ interface ClassServerDelegate extends Runnable, ClientConnectionHandler
    * Determine whether the socket connection is closed
    * @return true if the socket connection is closed, false otherwise
    */
+  @Override
   boolean isClosed();
 
   /**

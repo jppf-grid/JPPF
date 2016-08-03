@@ -120,7 +120,6 @@ public class ChannelWrapperLocal extends ChannelWrapper implements ClientConnect
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Future<?> submit(final ClientTaskBundle bundle) {
     if (debugEnabled) log.debug("locally submitting {}", bundle);
     setStatus(JPPFClientConnectionStatus.EXECUTING);
