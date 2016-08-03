@@ -67,7 +67,7 @@ public class SpinnerNumberOption extends AbstractOption {
 
   @Override
   public void createUI() {
-    SpinnerNumberModel model = new SpinnerNumberModel((Number) value, (Comparable) min, (Comparable) max, step);
+    SpinnerNumberModel model = new SpinnerNumberModel((Number) value, (Comparable<?>) min, (Comparable<?>) max, step);
     spinner = new JSpinner(model);
     JSpinner.NumberEditor editor = (JSpinner.NumberEditor) spinner.getEditor();
     editor.getFormat().applyPattern(pattern);

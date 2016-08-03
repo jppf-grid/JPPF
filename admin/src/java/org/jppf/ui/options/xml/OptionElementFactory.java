@@ -399,7 +399,7 @@ public class OptionElementFactory {
     PickListOption option = new PickListOption();
     builder.initCommonOptionAttributes(option, desc);
     option.createUI();
-    PickList pickList = option.getPickList();
+    PickList<?> pickList = option.getPickList();
     String s = desc.getProperty("leftTitle", null);
     if (s != null) pickList.setLeftTitle(LocalizationUtils.getLocalized(builder.getBaseName(), s));
     s = desc.getProperty("rightTitle", null);
@@ -497,7 +497,7 @@ public class OptionElementFactory {
    */
   public Option buildCustomOption(final OptionDescriptor desc) throws Exception {
     String className = desc.getString("impl.class");
-    Class clazz = Class.forName(className);
+    Class<?> clazz = Class.forName(className);
     AbstractOption option = (AbstractOption) clazz.newInstance();
     builder.initCommonOptionAttributes(option, desc);
     option.createUI();

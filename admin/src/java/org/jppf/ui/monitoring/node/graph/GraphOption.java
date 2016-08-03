@@ -100,7 +100,7 @@ public class GraphOption extends AbstractOption implements ActionHolder {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public synchronized void createUI() {
     if (graphHandler == null) {
       if (debugEnabled) log.debug("creating UI");
@@ -111,8 +111,8 @@ public class GraphOption extends AbstractOption implements ActionHolder {
       viewer = new VisualizationViewer<>(layoutFactory.createLayout(layout));
       layoutFactory.setViewer(viewer);
       viewer.setBackground(Color.white);
-      viewer.setPickedVertexState(new MultiPickedState());
-      viewer.setPickSupport(new ShapePickSupport(viewer));
+      viewer.setPickedVertexState(new MultiPickedState<AbstractTopologyComponent>());
+      viewer.setPickSupport(new ShapePickSupport<>(viewer));
       VertexLabelAsShapeRenderer<AbstractTopologyComponent, Number> vlasr = new VertexLabelAsShapeRenderer<>(viewer.getRenderContext());
       viewer.getRenderer().setVertexLabelRenderer(vlasr);
       viewer.getRenderContext().setVertexShapeTransformer(vlasr);

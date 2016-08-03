@@ -28,12 +28,17 @@ import org.jppf.ui.actions.*;
 import org.jppf.ui.options.AbstractOption;
 import org.jppf.ui.options.factory.OptionsHandler;
 import org.jppf.utils.*;
+import org.slf4j.*;
 
 /**
  * Abstract implementation of a tree table-based option.
  * @author Laurent Cohen
  */
 public abstract class AbstractTreeTableOption extends AbstractOption implements ActionHolder {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractTreeTableOption.class);
   /**
    * Base name for localization bundle lookups.
    */
@@ -126,6 +131,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
         try {
           width = Integer.valueOf(wStr[i]);
         } catch(NumberFormatException e) {
+          log.debug(e.getMessage(), e);
         }
         treeTable.getColumnModel().getColumn(i).setPreferredWidth(width);
       }
@@ -139,6 +145,7 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
         try {
           pos = Integer.valueOf(str);
         } catch(NumberFormatException e) {
+          log.debug(e.getMessage(), e);
         }
         if (pos > 0) hideColumn(pos);
       }
@@ -202,7 +209,6 @@ public abstract class AbstractTreeTableOption extends AbstractOption implements 
    * @param positions the positions of the columns position in the tree table model (<i>not</i> the table column model).
    */
   public void hideColumns(final Collection<Integer> positions) {
-    Set<Integer> set = new TreeSet<>(positions);
     for (int n: positions) hideColumn(n);
   }
 

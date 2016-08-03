@@ -91,7 +91,8 @@ class NewConnectionTask extends ThreadSynchronization implements Runnable {
     @Override
     public void run() {
       OptionElement serverList = clientHandler.getServerListOption();
-      JComboBox box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
+      @SuppressWarnings("unchecked")
+      JComboBox<Object> box = (serverList == null) ? null : ((ComboBoxOption) serverList).getComboBox();
       if (box != null) {
         int count = box.getItemCount();
         boolean found = false;

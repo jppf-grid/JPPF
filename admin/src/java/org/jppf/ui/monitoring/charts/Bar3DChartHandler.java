@@ -88,13 +88,13 @@ public class Bar3DChartHandler implements ChartHandler {
     invokeMethod(rend.getClass(), rend, "setBaseItemLabelGenerator", labelGenerator);
 
     //ItemLabelPosition labelPos = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_CENTER);
-    Class itemLabelAnchorClass = getClass0("org.jfree.chart.labels.ItemLabelAnchor");
-    Class textAnchorClass = getClass0("org.jfree.ui.TextAnchor");
+    Class<?> itemLabelAnchorClass = getClass0("org.jfree.chart.labels.ItemLabelAnchor");
+    Class<?> textAnchorClass = getClass0("org.jfree.ui.TextAnchor");
     Object labelPos = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),
         new Class[] {itemLabelAnchorClass, textAnchorClass},
         getField(itemLabelAnchorClass, null, "CENTER"), getField(textAnchorClass, null, "BOTTOM_CENTER"));
     //rend.setBasePositiveItemLabelPosition(labelPos);
-    Class labelPositionClass = getClass0("org.jfree.chart.labels.ItemLabelPosition");
+    Class<?> labelPositionClass = getClass0("org.jfree.chart.labels.ItemLabelPosition");
     invokeMethod(rend.getClass(), rend, "setBasePositiveItemLabelPosition", new Class[] {labelPositionClass}, labelPos);
     //ItemLabelPosition labelPos2 = new ItemLabelPosition(ItemLabelAnchor.CENTER, TextAnchor.BOTTOM_LEFT);
     Object labelPos2 = invokeConstructor(getClass0("org.jfree.chart.labels.ItemLabelPosition"),

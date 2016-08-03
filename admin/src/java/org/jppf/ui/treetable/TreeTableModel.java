@@ -87,7 +87,7 @@ public interface TreeTableModel extends TreeModel
    * @param column the column number.
    * @return the type of the column.
    */
-  Class getColumnClass(int column);
+  Class<?> getColumnClass(int column);
 
   /**
    * Returns the value to be displayed for node <code>node</code>, at column number <code>column</code>.

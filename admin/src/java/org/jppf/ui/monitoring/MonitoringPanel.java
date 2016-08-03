@@ -284,14 +284,17 @@ public class MonitoringPanel extends JPanel implements StatsHandlerListener, Sta
       Point location = ((btn != null) && btn.isShowing()) ? location = btn.getLocationOnScreen() : new Point(0, 0);
       OptionElement panel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/VisibleStatsPanel.xml");
       final PickListOption option = (PickListOption) panel.findFirstWithName("visible.stats.selection");
-      option.populate(new ArrayList<>(allItems.values()), visibleItems);
+      option.populate(new ArrayList<Object>(allItems.values()), new ArrayList<Object>(visibleItems));
       final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), LocalizationUtils.getLocalized(BASE, "visible.stats.panel.label"), false);
       dialog.setIconImage(GuiUtils.loadIcon("/org/jppf/ui/resources/table-column-hide.png").getImage());
       JButton applyBtn = (JButton) panel.findFirstWithName("/visible.stats.apply").getUIComponent();
       AbstractAction applyAction = new AbstractAction() {
         @Override public void actionPerformed(final ActionEvent event) {
           visibleItems.clear();
-          List<Item> value = (List<Item>) option.getPickList().getPickedItems();
+          @SuppressWarnings("unchecked")
+          List<Object> picked = option.getPickList().getPickedItems();
+          List<Item> value = (picked == null) ? new ArrayList<Item>() : new ArrayList<Item>(picked.size());
+          for (Object o: picked) value.add((Item) o);
           visibleItems.addAll(value);
           clearTablesFromView();
           addTables();

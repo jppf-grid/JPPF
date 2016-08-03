@@ -50,7 +50,7 @@ public class RingChartHandler extends Pie3DChartHandler
   {
     Object ds = createDataset(config);
     //JFreeChart chart = ChartFactory.createRingChart(config.name, ds, false, true, Locale.getDefault());
-    Class[] classes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE};
+    Class<?>[] classes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE};
     Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createRingChart", classes,
         config.name, ds, false, true, false);
     invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE );

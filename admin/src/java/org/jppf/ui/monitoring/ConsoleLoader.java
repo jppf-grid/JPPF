@@ -83,9 +83,10 @@ public class ConsoleLoader {
    */
   private static boolean checkChartClassesAvailable() {
     try {
-      Class clazz = Class.forName("org.jfree.chart.ChartFactory");
+      Class.forName("org.jfree.chart.ChartFactory");
       return true;
     } catch(ClassNotFoundException e) {
+      log.error(e.getMessage(), e);
       return false;
     }
   }

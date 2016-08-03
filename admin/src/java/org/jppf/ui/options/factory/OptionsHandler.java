@@ -265,7 +265,7 @@ public final class OptionsHandler {
       for (OptionElement child: page.getChildren()) {
         OptionNode childNode = buildPersistenceGraph(child);
         if (childNode != null) {
-          if (node == null) node = new OptionNode(elt);
+          node = new OptionNode(elt);
           node.children.add(childNode);
         }
       }

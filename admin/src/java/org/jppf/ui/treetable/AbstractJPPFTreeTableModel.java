@@ -21,12 +21,17 @@ package org.jppf.ui.treetable;
 import javax.swing.tree.*;
 
 import org.jppf.utils.LocalizationUtils;
+import org.slf4j.*;
 
 /**
  * Abstract tree table model implementation for tree table-based options.
  * @author Laurent Cohen
  */
 public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(AbstractJPPFTreeTableModel.class);
   /**
    * Base name for localization bundle lookups.
    */
@@ -72,6 +77,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
     try {
       return ((TreeNode) parent).getChildAt(index);
     } catch (Exception e) {
+      log.debug(e.getMessage(), e);
       return null;
     }
   }
@@ -124,7 +130,7 @@ public abstract class AbstractJPPFTreeTableModel extends AbstractTreeTableModel 
    * @return a <code>Class</code> instance.
    */
   @Override
-  public Class getColumnClass(final int column) {
+  public Class<?> getColumnClass(final int column) {
     return (column == 0) ? TreeTableModel.class : String.class;
   }
 

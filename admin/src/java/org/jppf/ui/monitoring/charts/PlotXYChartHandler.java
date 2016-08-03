@@ -66,7 +66,7 @@ public class PlotXYChartHandler implements ChartHandler
     Object plot = invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "getXYPlot");
     //XYItemRenderer rend = plot.getRenderer();
     Object rend = invokeMethod(getClass0("org.jfree.chart.plot.XYPlot"), plot, "getRenderer");
-    Class rendClass = getClass0("org.jfree.chart.renderer.xy.XYItemRenderer");
+    Class<?> rendClass = getClass0("org.jfree.chart.renderer.xy.XYItemRenderer");
     //rend.setBaseSeriesVisibleInLegend(true);
     invokeMethod(rendClass, rend, "setBaseSeriesVisibleInLegend", new Class[] {Boolean.TYPE}, true);
     //rend.setLegendItemLabelGenerator(new LegendLabelGenerator());
@@ -114,7 +114,7 @@ public class PlotXYChartHandler implements ChartHandler
     //XYSeriesCollection ds= (XYSeriesCollection) config.dataset;
     Object ds = config.dataset;
     //List list = ds.getSeries();
-    List list = (List) invokeMethod(ds.getClass(), ds, "getSeries");
+    List<?> list = (List<?>) invokeMethod(ds.getClass(), ds, "getSeries");
     for (Object o: list)
     {
       //((XYSeries) o).clear();

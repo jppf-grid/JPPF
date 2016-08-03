@@ -22,6 +22,8 @@ import java.text.*;
 
 import javax.swing.*;
 
+import org.slf4j.*;
+
 /**
  * Option class for numbers formatted using a pattern, as defined in class
  * {@link java.text.DecimalFormat}.
@@ -29,6 +31,10 @@ import javax.swing.*;
  */
 public class FormattedNumberOption extends AbstractOption
 {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(FormattedNumberOption.class);
   /**
    * The field used to edit the value.
    */
@@ -136,6 +142,7 @@ public class FormattedNumberOption extends AbstractOption
       }
       catch(NumberFormatException e)
       {
+        log.debug(e.getMessage(), e);
         val = 0;
       }
     }

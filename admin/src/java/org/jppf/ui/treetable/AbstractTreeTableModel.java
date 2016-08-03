@@ -245,7 +245,7 @@ public abstract class AbstractTreeTableModel implements TreeTableModel {
   //
 
   @Override
-  public Class getColumnClass(final int column) {
+  public Class<?> getColumnClass(final int column) {
     return Object.class;
   }
 

@@ -30,7 +30,7 @@ public class ComboBoxOption extends AbstractOption {
   /**
    * The combo box used to select one among several.
    */
-  private JComboBox combo = null;
+  private JComboBox<Object> combo = null;
   /**
    * Label associated with the combo box.
    */
@@ -38,7 +38,7 @@ public class ComboBoxOption extends AbstractOption {
   /**
    * The items in the drop down list.
    */
-  protected List items = null;
+  protected List<? extends Object> items = null;
 
   /**
    * Constructor provided as a convenience to facilitate the creation of
@@ -70,7 +70,7 @@ public class ComboBoxOption extends AbstractOption {
   @Override
   @SuppressWarnings("unchecked")
   public void createUI() {
-    combo = new JComboBox();
+    combo = new JComboBox<>();
     if (items != null) {
       for (Object o : items)
         combo.addItem(o);
@@ -143,7 +143,7 @@ public class ComboBoxOption extends AbstractOption {
    * Get the list of items in the combo box.
    * @return a list of <code>Object</code> instances.
    */
-  public List getItems() {
+  public List<? extends Object> getItems() {
     return items;
   }
 
@@ -152,7 +152,7 @@ public class ComboBoxOption extends AbstractOption {
    * @param items a list of <code>Object</code> instances.
    */
   @SuppressWarnings("unchecked")
-  public void setItems(final List items) {
+  public void setItems(final List<? extends Object> items) {
     this.items = items;
     if (combo != null) {
       combo.removeAllItems();
@@ -175,7 +175,7 @@ public class ComboBoxOption extends AbstractOption {
    * Get the combo box used to select one among several items.
    * @return a <code>JComboBox</code> instance.
    */
-  public JComboBox getComboBox() {
+  public JComboBox<Object> getComboBox() {
     return combo;
   }
 }

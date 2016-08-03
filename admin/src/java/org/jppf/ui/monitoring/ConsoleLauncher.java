@@ -214,7 +214,6 @@ public class ConsoleLauncher {
     @Override
     public void hierarchyChanged(final HierarchyEvent event) {
       if (frameFound) return;
-      long flags = event.getChangeFlags();
       Frame frame = getTopFrame(event.getChanged());
       if (frame != null) {
         frameFound = true;

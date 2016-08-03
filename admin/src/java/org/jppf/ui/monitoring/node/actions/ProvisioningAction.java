@@ -94,7 +94,6 @@ public class ProvisioningAction extends AbstractTopologyAction {
     thisPanel = OptionsHandler.loadPageFromXml("org/jppf/ui/options/xml/ProvisioningPanel.xml");
     OptionsHandler.OptionNode optionNode = OptionsHandler.buildPersistenceGraph(thisPanel);
     OptionsHandler.loadPreferences(optionNode, OptionsHandler.getPreferences());
-    CodeEditorOption editorOption = (CodeEditorOption) thisPanel.findFirstWithName("configOverrides");
     JButton okBtn = (JButton) thisPanel.findFirstWithName("/provisioningOK").getUIComponent();
     JButton cancelBtn = (JButton) thisPanel.findFirstWithName("/provisioningCancel").getUIComponent();
     final JDialog dialog = new JDialog(OptionsHandler.getMainWindow(), localize("provisioning.frame.caption"), false);
@@ -141,8 +140,6 @@ public class ProvisioningAction extends AbstractTopologyAction {
       if (data.getParent() == null) continue;
       map.putValue((TopologyDriver) data.getParent(), data.getUuid());
     }
-    final Object[] params = {nbSlaves, interruptIfRunning, props};
-    final String[] signature = {int.class.getName(), boolean.class.getName(), TypedProperties.class.getName()};
     Runnable r = new Runnable() {
       @Override public void run() {
         for (Map.Entry<TopologyDriver, Collection<String>> en: map.entrySet()) {

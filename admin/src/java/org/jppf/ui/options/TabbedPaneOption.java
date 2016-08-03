@@ -97,7 +97,6 @@ public class TabbedPaneOption extends AbstractOptionContainer {
   public void remove(final OptionElement element) {
     super.remove(element);
     UIComponent.remove(element.getUIComponent());
-    Component comp = null;
   }
 
   /**

@@ -37,12 +37,12 @@ public final class TreeTableUtils {
    * @param comp the driver to insert.
    * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
    */
-  public static int insertIndex(final DefaultMutableTreeNode parent, final AbstractComponent comp) {
+  public static int insertIndex(final DefaultMutableTreeNode parent, final AbstractComponent<?> comp) {
     //if (findComponent(root, comp.getUuid()) == null) return -1;
     int n = parent.getChildCount();
     for (int i=0; i<n; i++) {
       DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
-      AbstractComponent childData = (AbstractComponent) child.getUserObject();
+      AbstractComponent<?> childData = (AbstractComponent<?>) child.getUserObject();
       if (childData == null) return -1;
       if (childData.getUuid().equals(comp.getUuid())) return -1;
       else if (comp.getDisplayName().compareTo(childData.getDisplayName()) < 0) return i;
@@ -60,7 +60,7 @@ public final class TreeTableUtils {
     if (uuid == null) return null;
     for (int i=0; i<parent.getChildCount(); i++) {
       DefaultMutableTreeNode child = (DefaultMutableTreeNode) parent.getChildAt(i);
-      AbstractComponent data = (AbstractComponent) child.getUserObject();
+      AbstractComponent<?> data = (AbstractComponent<?>) child.getUserObject();
       if (data == null) continue;
       if (data.getUuid().equals(uuid)) return child;
     }

@@ -163,6 +163,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
             treeTable.expand(getTreeTableRoot());
             treeTable.expand(driverNode);
           } catch (Exception e) {
+            log.debug(e.getMessage(), e);
           }
         }
       };
@@ -275,7 +276,7 @@ public class JobDataPanel extends AbstractTreeTableOption implements JobMonitori
    * @param comp the driver to insert.
    * @return the index at which to insert the driver, or -1 if the driver is already in the tree.
    */
-  int insertIndex(final DefaultMutableTreeNode root, final AbstractComponent comp) {
+  int insertIndex(final DefaultMutableTreeNode root, final AbstractComponent<?> comp) {
     if (TreeTableUtils.findComponent(root, comp.getUuid()) != null) return -1;
     return TreeTableUtils.insertIndex(root, comp);
   }

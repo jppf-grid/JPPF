@@ -20,12 +20,17 @@ package org.jppf.ui.options;
 import javax.swing.*;
 import javax.swing.text.*;
 
+import org.slf4j.*;
+
 /**
  * Text option displayed as a text field.
  * @author Laurent Cohen
  */
-public abstract class TextOption extends AbstractOption
-{
+public abstract class TextOption extends AbstractOption {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TextOption.class);
   /**
    * Text field containing the option value as text.
    */
@@ -39,8 +44,7 @@ public abstract class TextOption extends AbstractOption
    * Constructor provided as a convenience to facilitate the creation of
    * option elements through reflexion.
    */
-  public TextOption()
-  {
+  public TextOption() {
   }
 
   /**
@@ -50,8 +54,7 @@ public abstract class TextOption extends AbstractOption
    * @param tooltip the tooltip associated with the checkbox.
    * @param value the initial value of this component.
    */
-  public TextOption(final String name, final String label, final String tooltip, final String value)
-  {
+  public TextOption(final String name, final String label, final String tooltip, final String value) {
     this.name = name;
     this.label = label;
     setToolTipText(tooltip);
@@ -62,13 +65,11 @@ public abstract class TextOption extends AbstractOption
    * Create the UI components for this option.
    */
   @Override
-  public void createUI()
-  {
+  public void createUI() {
     fieldLabel = new JLabel(label);
     field = createField();
     field.setColumns(10);
-    if (toolTipText != null)
-    {
+    if (toolTipText != null) {
       field.setToolTipText(toolTipText);
       fieldLabel.setToolTipText(toolTipText);
     }
@@ -88,15 +89,12 @@ public abstract class TextOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#getValue()
    */
   @Override
-  public Object getValue()
-  {
+  public Object getValue() {
     Document doc = field.getDocument();
-    try
-    {
+    try {
       value = doc.getText(0, doc.getLength());
-    }
-    catch(BadLocationException e)
-    {
+    } catch (BadLocationException e) {
+      log.debug(e.getMessage(), e);
     }
     return value;
   }
@@ -106,8 +104,7 @@ public abstract class TextOption extends AbstractOption
    * @see org.jppf.ui.options.AbstractOption#setupValueChangeNotifications()
    */
   @Override
-  protected void setupValueChangeNotifications()
-  {
+  protected void setupValueChangeNotifications() {
   }
 
   /**
@@ -116,8 +113,7 @@ public abstract class TextOption extends AbstractOption
    * @see org.jppf.ui.options.Option#setEnabled(boolean)
    */
   @Override
-  public void setEnabled(final boolean enabled)
-  {
+  public void setEnabled(final boolean enabled) {
     field.setEnabled(enabled);
     fieldLabel.setEnabled(enabled);
   }

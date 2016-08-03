@@ -29,12 +29,17 @@ import javax.swing.text.Document;
 
 import org.jppf.ui.monitoring.diagnostics.ThreadDumpAction;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * An option that uses a <code>JTextArea</code> to edit its value.
  * @author Laurent Cohen
  */
 public class TextAreaOption extends AbstractOption {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(TextAreaOption.class);
   /**
    * The underlying UI component used to edit the value of this option.
    */
@@ -240,7 +245,6 @@ public class TextAreaOption extends AbstractOption {
      */
     @Override
     public void mousePressed(final MouseEvent event) {
-      Component comp = event.getComponent();
       int x = event.getX();
       int y = event.getY();
       int button = event.getButton();
@@ -253,6 +257,7 @@ public class TextAreaOption extends AbstractOption {
               Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
               clip.setContents(new StringSelection(textArea.getText()), null);
             } catch (Exception e2) {
+              log.debug(e2.getMessage(), e2);
             }
           }
         };

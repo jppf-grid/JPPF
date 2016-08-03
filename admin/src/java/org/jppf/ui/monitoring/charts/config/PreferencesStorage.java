@@ -185,6 +185,7 @@ public class PreferencesStorage {
     try {
       field = Fields.valueOf(name);
     } catch (IllegalArgumentException e) {
+      log.error(e.getMessage(), e);
       for (Fields f: Fields.values()) {
         if (name.equals(f.toString())) {
           field = f;

@@ -51,8 +51,9 @@ public class PickListEvent<T> extends EventObject {
    * Get the pick list component source of this event.
    * @return a {@link PickList} object.
    */
+  @SuppressWarnings("unchecked")
   public PickList<T> getPickList() {
-    return (PickList) getSource();
+    return (PickList<T>) getSource();
   }
 
   /**

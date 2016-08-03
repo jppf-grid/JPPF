@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 import org.jppf.client.monitoring.topology.*;
+import org.slf4j.*;
 
 import edu.uci.ics.jung.algorithms.layout.AbstractLayout;
 import edu.uci.ics.jung.graph.Graph;
@@ -42,6 +43,10 @@ import edu.uci.ics.jung.graph.Graph;
  * @author Laurent Cohen
  */
 public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Number> {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(RadialLayout.class);
   /**
    * The default radius factor to use when none is specified.
    */
@@ -129,6 +134,7 @@ public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Numb
       }
       return drivers;
     } catch(Exception e) {
+      log.debug(e.getMessage(), e);
       return Collections.<TopologyDriver>emptyList();
     }
   }
@@ -147,6 +153,7 @@ public class RadialLayout extends AbstractLayout<AbstractTopologyComponent, Numb
       }
       return nodes;
     } catch(Exception e) {
+      log.debug(e.getMessage(), e);
       return Collections.<TopologyNode>emptyList();
     }
   }

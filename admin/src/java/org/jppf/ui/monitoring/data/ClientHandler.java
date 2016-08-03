@@ -195,7 +195,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
       log.debug("info = {}", info);
       if (info != null) {
         ComboBoxOption combo = (ComboBoxOption) lbOption.findFirstWithName("/Algorithm");
-        List items = combo.getItems();
+        List<? extends Object> items = combo.getItems();
         if ((items == null) || items.isEmpty()) combo.setItems(info.getAlgorithmNames());
         combo.setValue(info.getAlgorithm());
         AbstractOption params = (AbstractOption) lbOption.findFirstWithName("/LoadBalancingParameters");
@@ -203,7 +203,8 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
         return true;
       }
     }
-    catch(Exception ignore) {
+    catch(Exception e) {
+      log.error(e.getMessage(), e);
     }
     return false;
   }
@@ -232,7 +233,7 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
    */
   public synchronized void setServerListOption(final OptionElement serverListOption) {
     this.serverListOption = serverListOption;
-    JComboBox box = ((ComboBoxOption) serverListOption).getComboBox();
+    JComboBox<?> box = ((ComboBoxOption) serverListOption).getComboBox();
     box.setRenderer(new DefaultListCellRenderer() {
       @Override
       public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
@@ -297,7 +298,6 @@ public class ClientHandler extends TopologyListenerAdapter implements AutoClosea
   private Object[] getMeterIntervals(final Thresholds.Name...names) {
     if ((names != null) && (names.length > 0)) {
       try {
-        double lastValue = 0d;
         int len = names.length + 2;
         double[] values = new double[len];
         // convert from [name1, ..., nameN] to [0, value1, ..., valueN, 100]

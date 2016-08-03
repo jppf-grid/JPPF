@@ -58,6 +58,8 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 
+import org.slf4j.*;
+
 /**
  * This example shows how to create a simple JTreeTable component, by using a JTree as a renderer (and editor) for the
  * cells in a particular column in the JTable.
@@ -68,6 +70,10 @@ import javax.swing.tree.*;
  * @author Scott Violet
  */
 public class JTreeTable extends JTable {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JTreeTable.class);
   /**
    * A subclass of JTree.
    */
@@ -224,7 +230,8 @@ public class JTreeTable extends JTable {
       g.translate(0, -visibleRow * getRowHeight());
       try {
         super.paint(g);
-      } catch(Exception ignore) {
+      } catch(Exception e) {
+        log.debug(e.getMessage(), e);
       }
     }
 

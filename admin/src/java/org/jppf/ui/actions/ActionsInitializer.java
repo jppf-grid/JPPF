@@ -21,11 +21,16 @@ import javax.swing.*;
 
 import org.jppf.ui.options.*;
 import org.jppf.ui.utils.GuiUtils;
+import org.slf4j.*;
 
 /**
  * Task that sets the actions in the toolbar.
  */
 public class ActionsInitializer implements Runnable {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(ActionsInitializer.class);
   /**
    * The panel to which the actions apply.
    */
@@ -72,6 +77,7 @@ public class ActionsInitializer implements Runnable {
       try {
         Thread.sleep(100L);
       } catch(final InterruptedException e) {
+        log.error(e.getMessage(), e);
       }
       if (page != null) {
         for (OptionElement elt: page.getChildren()) {

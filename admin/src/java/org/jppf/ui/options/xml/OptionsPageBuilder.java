@@ -159,11 +159,10 @@ public class OptionsPageBuilder {
    */
   private static void triggerLifeCycleEvents(final OptionElement elt, final boolean initial) {
     if (elt == null) return;
-    if ((elt instanceof OptionProperties) && initial) {
-      OptionProperties op = (OptionProperties) elt;
-      JComponent comp = op.getUIComponent();
+    if (initial) {
+      JComponent comp = elt.getUIComponent();
       if (comp != null) {
-        MouseListener listener = op.getMouseListener();
+        MouseListener listener = elt.getMouseListener();
         if (listener != null) comp.addMouseListener(listener);
       }
     }
@@ -175,8 +174,7 @@ public class OptionsPageBuilder {
       }
     }
     if ((elt instanceof AbstractOptionElement) && initial) {
-      OptionProperties op = (OptionProperties) elt;
-      JComponent comp = op.getUIComponent();
+      JComponent comp = elt.getUIComponent();
       if (comp != null) comp.setName(elt.getStringPath());
     }
   }
@@ -234,7 +232,7 @@ public class OptionsPageBuilder {
     ValueChangeListener listener = null;
     if (listenerDesc != null) {
       if ("java".equals(listenerDesc.type)) {
-        Class clazz = Class.forName(listenerDesc.className);
+        Class<?> clazz = Class.forName(listenerDesc.className);
         listener = (ValueChangeListener) clazz.newInstance();
       } else {
         ScriptDescriptor script = listenerDesc.script;
@@ -255,7 +253,7 @@ public class OptionsPageBuilder {
     MouseListener listener = null;
     if (listenerDesc != null) {
       if ("java".equals(listenerDesc.type)) {
-        Class clazz = Class.forName(listenerDesc.className);
+        Class<?> clazz = Class.forName(listenerDesc.className);
         listener = (MouseListener) clazz.newInstance();
       } else {
         ScriptDescriptor script = listenerDesc.script;

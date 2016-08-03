@@ -55,7 +55,7 @@ public class Pie3DChartHandler implements ChartHandler
   public ChartConfiguration createChart(final ChartConfiguration config)
   {
     Object ds = createDataset(config);
-    Class[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
+    Class<?>[] paramTypes = { String.class, getClass0("org.jfree.data.general.PieDataset"), Boolean.TYPE, Boolean.TYPE, Boolean.TYPE };
     Object chart = invokeMethod(getClass0("org.jfree.chart.ChartFactory"), null, "createPieChart3D", paramTypes,
         config.name, ds, false, true, false);
     invokeMethod(getClass0("org.jfree.chart.JFreeChart"), chart, "setBackgroundPaint", Color.WHITE );

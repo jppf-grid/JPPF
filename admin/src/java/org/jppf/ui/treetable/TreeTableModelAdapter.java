@@ -166,7 +166,7 @@ public class TreeTableModelAdapter extends AbstractTableModel {
    * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
    */
   @Override
-  public Class getColumnClass(final int column) {
+  public Class<?> getColumnClass(final int column) {
     return treeTableModel.getColumnClass(column);
   }
 

@@ -128,7 +128,7 @@ public class PluggableViewHandler {
     TypedProperties fullConfig = JPPFConfiguration.getProperties();
     final Pattern pattern = Pattern.compile("jppf\\.admin\\.console\\.view\\.(.+)\\..+");
     final Set<String> names = new HashSet<>();
-    TypedProperties config = fullConfig.filter(new TypedProperties.Filter() {
+    fullConfig.filter(new TypedProperties.Filter() {
       @Override
       public boolean accepts(final String name, final String value) {
         Matcher matcher = pattern.matcher(name);

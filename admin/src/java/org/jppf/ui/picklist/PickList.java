@@ -205,8 +205,8 @@ public class PickList<T> extends JPanel {
    */
   private void doRight() {
     int[] indices = availableList.getSelectedIndices();
-    DefaultListModel<T> availableModel = (DefaultListModel) availableList.getModel();
-    DefaultListModel<T> pickedModel = (DefaultListModel) pickedList.getModel();
+    DefaultListModel<T> availableModel = (DefaultListModel<T>) availableList.getModel();
+    DefaultListModel<T> pickedModel = (DefaultListModel<T>) pickedList.getModel();
     List<T> addedItems = new ArrayList<>(indices.length);
     for (int i=indices.length-1; i>= 0; i--) {
       T item = availableModel.remove(indices[i]);
@@ -221,8 +221,8 @@ public class PickList<T> extends JPanel {
    */
   private void doLeft() {
     int[] indices = pickedList.getSelectedIndices();
-    DefaultListModel<T> availableModel = (DefaultListModel) availableList.getModel();
-    DefaultListModel<T> pickedModel = (DefaultListModel) pickedList.getModel();
+    DefaultListModel<T> availableModel = (DefaultListModel<T>) availableList.getModel();
+    DefaultListModel<T> pickedModel = (DefaultListModel<T>) pickedList.getModel();
     List<T> removedItems = new ArrayList<>(indices.length);
     for (int i=indices.length-1; i>= 0; i--) {
       T item = pickedModel.remove(indices[i]);
@@ -247,7 +247,7 @@ public class PickList<T> extends JPanel {
    */
   private void doUp() {
     int[] indices = pickedList.getSelectedIndices();
-    DefaultListModel<T> pickedModel = (DefaultListModel) pickedList.getModel();
+    DefaultListModel<T> pickedModel = (DefaultListModel<T>) pickedList.getModel();
     for (int n: indices) {
       T item = pickedModel.remove(n);
       pickedModel.add(n-1, item);
@@ -261,7 +261,7 @@ public class PickList<T> extends JPanel {
    */
   private void doDown() {
     int[] indices = pickedList.getSelectedIndices();
-    DefaultListModel<T> pickedModel = (DefaultListModel) pickedList.getModel();
+    DefaultListModel<T> pickedModel = (DefaultListModel<T>) pickedList.getModel();
     for (int n: indices) {
       T item = pickedModel.remove(n);
       pickedModel.add(n+1, item);
@@ -276,6 +276,7 @@ public class PickList<T> extends JPanel {
    * @param allItems the list of all items.
    * @param pickedItems the items that are already picked, if any.
    */
+  @SuppressWarnings("unchecked")
   public void resetItems(final List<T> allItems, final List<T> pickedItems) {
     this.allItems.clear();
     this.allItems.addAll(allItems);
@@ -293,10 +294,10 @@ public class PickList<T> extends JPanel {
     }
     List<T> availableItems = new ArrayList<>(allItems);
     availableItems.removeAll(pickedItems);
-    DefaultListModel model = (DefaultListModel) availableList.getModel();
+    DefaultListModel<Object> model = (DefaultListModel<Object>) availableList.getModel();
     model.removeAllElements();
     for (Object o: availableItems) model.addElement(o);
-    model = (DefaultListModel) pickedList.getModel();
+    model = (DefaultListModel<Object>) pickedList.getModel();
     model.removeAllElements();
     for (Object o: pickedItems) model.addElement(o);
     availableList.setPrototypeCellValue(maxItem);
@@ -309,7 +310,8 @@ public class PickList<T> extends JPanel {
    */
   public List<T> getPickedItems() {
     List<T> list = new ArrayList<>();
-    DefaultListModel<T> model = (DefaultListModel) pickedList.getModel();
+    @SuppressWarnings("unchecked")
+    DefaultListModel<T> model = (DefaultListModel<T>) pickedList.getModel();
     Enumeration<T> en = model.elements();
     while (en.hasMoreElements()) list.add(en.nextElement());
     return list;
@@ -415,10 +417,10 @@ public class PickList<T> extends JPanel {
       JFrame frame = new JFrame("testing pick-list");
       MigLayout layout = new MigLayout("flowx, flowy");
       frame.setLayout(layout);
-      PickList plist = new PickList();
-      List<String> allItems = new ArrayList<>();
+      PickList<Object> plist = new PickList<>();
+      List<Object> allItems = new ArrayList<>();
       for (int i=1; i<=10; i++) allItems.add("pickable item " + i);
-      List<String> pickedItems = Arrays.asList(allItems.get(1), allItems.get(3), allItems.get(5), allItems.get(7));
+      List<Object> pickedItems = Arrays.asList(allItems.get(1), allItems.get(3), allItems.get(5), allItems.get(7));
       plist.setLeftTitle("Available");
       plist.setRightTitle("Selected");
       plist.resetItems(allItems, pickedItems);

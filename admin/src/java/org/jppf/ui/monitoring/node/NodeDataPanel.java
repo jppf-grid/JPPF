@@ -22,7 +22,6 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jppf.client.monitoring.topology.*;
-import org.jppf.management.JMXDriverConnectionWrapper;
 import org.jppf.ui.actions.*;
 import org.jppf.ui.monitoring.data.StatsHandler;
 import org.jppf.ui.monitoring.event.*;
@@ -166,7 +165,6 @@ public class NodeDataPanel extends AbstractTreeTableOption implements TopologyLi
       if (!driver.getConnection().getStatus().isWorkingStatus()) return;
       String uuid = driver.getUuid();
       if (TreeTableUtils.findComponent(treeTableRoot, uuid) != null) return;
-      JMXDriverConnectionWrapper jmx = driver.getJmx();
       int index = TreeTableUtils.insertIndex(treeTableRoot, driver);
       if (index < 0) return;
       DefaultMutableTreeNode driverNode = new DefaultMutableTreeNode(driver);

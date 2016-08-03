@@ -31,15 +31,15 @@ public class PickListOption extends AbstractOption {
   /**
    * The pick list UI component.
    */
-  private PickList pickList;
+  private PickList<Object> pickList;
   /**
    *
    */
-  private PickListListener pickListListener;
+  private PickListListener<Object> pickListListener;
 
   @Override
   public void createUI() {
-    pickList = new PickList();
+    pickList = new PickList<>();
     setUIComponent(pickList);
   }
 
@@ -68,7 +68,7 @@ public class PickListOption extends AbstractOption {
    * @param allItems the list of all possible items.
    * @param pickedItems the selected items.
    */
-  public void populate(final List<?> allItems, final List<?> pickedItems) {
+  public void populate(final List<Object> allItems, final List<Object> pickedItems) {
     pickList.resetItems(allItems, pickedItems);
     if ((pickListListener == null) || !isEventsEnabled()) {
       setValue(pickedItems);
@@ -79,7 +79,7 @@ public class PickListOption extends AbstractOption {
    * Get the pick list.
    * @return a {@link PickList} object.
    */
-  public PickList getPickList() {
+  public PickList<Object> getPickList() {
     return pickList;
   }
 }

@@ -27,6 +27,7 @@ import javax.swing.*;
 
 import org.jppf.utils.*;
 import org.jppf.utils.configuration.JPPFProperties;
+import org.slf4j.*;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -35,6 +36,10 @@ import net.miginfocom.swing.MigLayout;
  * @author Laurent Cohen
  */
 public class JPPFSplash extends Window {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(JPPFSplash.class);
   /**
    * The default list of images to use if none is specified in the configuration.
    */
@@ -95,7 +100,8 @@ public class JPPFSplash extends Window {
         try {
           for (int i=0; i<comps.length; i++) rgb[i] = Integer.valueOf(comps[i].trim());
           color = (rgb.length == 3) ? new Color(rgb[0], rgb[1], rgb[2]) : new Color(rgb[0], rgb[1], rgb[2], rgb[3]);
-        } catch(Exception ignore) {
+        } catch(Exception e) {
+          log.debug(e.getMessage(), e);
         }
       }
     }

@@ -111,7 +111,6 @@ public class TextStatsExporter implements StatsExporter
    */
   private void updateMaxLengths(final Map<Fields, String> map, final Fields[]...fieldsArrays)
   {
-    Map<String, String> nameValueMap = new HashMap<>();
     for (Fields[] fields: fieldsArrays)
     {
       for (Fields field: fields)

@@ -59,6 +59,8 @@ package org.jppf.ui.treetable;
 import java.io.File;
 import java.util.*;
 
+import org.slf4j.*;
+
 /**
  * FileSystemModel is a TreeTableModel representing a hierarchical file system. Nodes in the FileSystemModel are
  * FileNodes which, when they are directory nodes, cache their children to avoid repeatedly querying the real file
@@ -69,8 +71,11 @@ import java.util.*;
  * @author Philip Milne
  * @author Scott Violet
  */
-public class FileSystemModel extends AbstractTreeTableModel
-{
+public class FileSystemModel extends AbstractTreeTableModel {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(FileSystemModel.class);
   /**
    * Names of the columns.
    */
@@ -79,7 +84,7 @@ public class FileSystemModel extends AbstractTreeTableModel
   /**
    * Types of the columns.
    */
-  static Class[] cTypes = { TreeTableModel.class, Integer.class, String.class, Date.class };
+  static Class<?>[] cTypes = { TreeTableModel.class, Integer.class, String.class, Date.class };
 
   /**
    * The the returned file length for directories.
@@ -89,8 +94,7 @@ public class FileSystemModel extends AbstractTreeTableModel
   /**
    * Default constructor.
    */
-  public FileSystemModel()
-  {
+  public FileSystemModel() {
     super(new FileNode(new File(File.separator)));
   }
 
@@ -99,8 +103,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * @param node the node to get the file from.
    * @return a <code>File</code> instance.
    */
-  protected File getFile(final Object node)
-  {
+  protected File getFile(final Object node) {
     FileNode fileNode = ((FileNode) node);
     return fileNode.getFile();
   }
@@ -110,8 +113,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * @param node the node to get the children of.
    * @return the children as an array of objects
    */
-  protected Object[] getChildren(final Object node)
-  {
+  protected Object[] getChildren(final Object node) {
     FileNode fileNode = ((FileNode) node);
     return fileNode.getChildren();
   }
@@ -124,8 +126,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public int getChildCount(final Object node)
-  {
+  public int getChildCount(final Object node) {
     Object[] children = getChildren(node);
     return (children == null) ? 0 : children.length;
   }
@@ -134,8 +135,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public Object getChild(final Object node, final int i)
-  {
+  public Object getChild(final Object node, final int i) {
     return getChildren(node)[i];
   }
 
@@ -143,8 +143,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public boolean isLeaf(final Object node)
-  {
+  public boolean isLeaf(final Object node) {
     // The superclass's implementation would work, but this is more efficient.
     return getFile(node).isFile();
   }
@@ -157,8 +156,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public int getColumnCount()
-  {
+  public int getColumnCount() {
     return cNames.length;
   }
 
@@ -166,8 +164,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public String getColumnName(final int column)
-  {
+  public String getColumnName(final int column) {
     return cNames[column];
   }
 
@@ -175,8 +172,7 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public Class getColumnClass(final int column)
-  {
+  public Class<?> getColumnClass(final int column) {
     return cTypes[column];
   }
 
@@ -184,13 +180,10 @@ public class FileSystemModel extends AbstractTreeTableModel
    * {@inheritDoc}
    */
   @Override
-  public Object getValueAt(final Object node, final int column)
-  {
+  public Object getValueAt(final Object node, final int column) {
     File file = getFile(node);
-    try
-    {
-      switch (column)
-      {
+    try {
+      switch (column) {
         case 0:
           return file.getName();
         case 1:
@@ -200,9 +193,8 @@ public class FileSystemModel extends AbstractTreeTableModel
         case 3:
           return new Date(file.lastModified());
       }
-    }
-    catch (SecurityException se)
-    {
+    } catch (SecurityException se) {
+      log.debug(se.getMessage(), se);
     }
 
     return null;
@@ -214,8 +206,11 @@ public class FileSystemModel extends AbstractTreeTableModel
  * is used to maintain a cache of a directory's children and therefore avoid repeated access to the underlying file
  * system during rendering.
  */
-class FileNode
-{
+class FileNode {
+  /**
+   * Logger for this class.
+   */
+  private static Logger log = LoggerFactory.getLogger(FileSystemModel.class);
   /**
    * The referenced file.
    */
@@ -229,8 +224,7 @@ class FileNode
    * Initialize this node with the specified file.
    * @param file the referenced file.
    */
-  public FileNode(final File file)
-  {
+  public FileNode(final File file) {
     this.file = file;
   }
 
@@ -238,8 +232,7 @@ class FileNode
    * {@inheritDoc}
    */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return file.getName();
   }
 
@@ -247,8 +240,7 @@ class FileNode
    * Get the referenced file.
    * @return a {@link File} instance.
    */
-  public File getFile()
-  {
+  public File getFile() {
     return file;
   }
 
@@ -256,30 +248,24 @@ class FileNode
    * Loads the children, caching the results in the children ivar.
    * @return the children as an array.
    */
-  protected Object[] getChildren()
-  {
-    if (children != null)
-    {
+  protected Object[] getChildren() {
+    if (children != null) {
       return children;
     }
-    try
-    {
+    try {
       String[] files = file.list();
-      if (files != null)
-      {
+      if (files != null) {
         Arrays.sort(files);
         // fileMS.sort(files);
         children = new FileNode[files.length];
         String path = file.getPath();
-        for (int i = 0; i < files.length; i++)
-        {
+        for (int i = 0; i < files.length; i++) {
           File childFile = new File(path, files[i]);
           children[i] = new FileNode(childFile);
         }
       }
-    }
-    catch (SecurityException se)
-    {
+    } catch (SecurityException se) {
+      log.debug(se.getMessage(), se);
     }
     return children;
   }

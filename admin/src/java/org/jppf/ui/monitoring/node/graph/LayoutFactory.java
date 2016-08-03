@@ -19,7 +19,6 @@
 package org.jppf.ui.monitoring.node.graph;
 
 import java.awt.Dimension;
-import java.util.Collection;
 
 import org.jppf.client.monitoring.topology.AbstractTopologyComponent;
 
@@ -62,7 +61,6 @@ class LayoutFactory
    */
   Layout<AbstractTopologyComponent, Number> createLayout(final String name)
   {
-    Layout<AbstractTopologyComponent, Number> layout = null;
     if ("Circle".equals(name)) return createCircleLayout();
     else if ("Fruchterman-Reingold".equals(name)) return createFRLayout();
     else if ("Fruchterman-Reingold-2".equals(name)) return createFRLayout2();
@@ -180,7 +178,6 @@ class LayoutFactory
    */
   private StaticLayout<AbstractTopologyComponent, Number> createStaticLayout()
   {
-    Collection<AbstractTopologyComponent> vertices = initialGraph.getVertices();
     StaticLayout<AbstractTopologyComponent, Number> layout = new StaticLayout<>(initialGraph);
     return layout;
   }

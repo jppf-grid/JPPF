@@ -80,7 +80,7 @@ public class PopupMenuMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
    * @param point the location of the mouse right-click.
    * @return the created popup menu.
    */
-  private JPopupMenu createMenu(final V vertex, final VisualizationViewer viewer, final Point point)
+  private JPopupMenu createMenu(final V vertex, final VisualizationViewer<?, ?> viewer, final Point point)
   {
     JPopupMenu menu = new JPopupMenu();
     menu.add(createMenuItem(actionHandler.getAction("graph.show.information"), point));

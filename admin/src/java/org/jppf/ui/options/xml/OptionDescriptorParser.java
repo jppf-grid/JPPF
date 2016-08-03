@@ -234,6 +234,7 @@ public class OptionDescriptorParser {
           }
         }
       } catch(Exception e) {
+        if (debugEnabled) log.debug(e.getMessage(), e);
       }
     }
     return desc;

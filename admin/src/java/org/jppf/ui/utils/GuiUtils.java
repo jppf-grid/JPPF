@@ -341,7 +341,6 @@ public final class GuiUtils {
    */
   private static String loadDefaultEmptyFilter() {
     try {
-      ClassLoader cl = GuiUtils.class.getClassLoader();
       return FileUtils.readTextFile("org/jppf/ui/filtering/empty_policy.xml");
     } catch (Exception e) {
       if (log.isDebugEnabled()) log.debug("Could not load default empty policy", e);
@@ -362,7 +361,7 @@ public final class GuiUtils {
         JTabbedPane tabbedPane = (JTabbedPane) parent;
         int index = tabbedPane.indexOfComponent(comp);
         Component tabComp = tabbedPane.getTabComponentAt(index);
-        if (tabComp instanceof JLabel) return (JLabel) tabComp;
+        if (tabComp instanceof JLabel) return tabComp;
         break;
       }
       comp = parent;

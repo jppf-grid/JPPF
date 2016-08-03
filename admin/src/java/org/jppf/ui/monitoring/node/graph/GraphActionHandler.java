@@ -44,7 +44,7 @@ public class GraphActionHandler extends AbstractActionHandler
   public GraphActionHandler(final VisualizationViewer<AbstractTopologyComponent, Number> graph)
   {
     this.graph = graph;
-    MultiPickedState mps = (MultiPickedState) graph.getPickedVertexState();
+    MultiPickedState<?> mps = (MultiPickedState<?>) graph.getPickedVertexState();
     mps.addItemListener(new ItemListener()
     {
       @Override

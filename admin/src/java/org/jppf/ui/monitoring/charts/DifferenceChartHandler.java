@@ -124,7 +124,8 @@ public class DifferenceChartHandler implements ChartHandler
     Object ds = config.dataset;
     if (ds == null) return config;
     //List list = ds.getSeries();
-    List list = (List) invokeMethod(ds.getClass(), ds, "getSeries");
+    @SuppressWarnings("unchecked")
+    List<Object> list = (List<Object>) invokeMethod(ds.getClass(), ds, "getSeries");
     for (Object o: list)
     {
       //((XYSeries) o).clear();

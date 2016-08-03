@@ -67,7 +67,6 @@ public class CodeEditorOption extends AbstractOption {
   @Override
   public void createUI() {
     textArea = new RSyntaxTextArea();
-    Object o = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
     textArea.setSyntaxEditingStyle(language);
     textArea.setCodeFoldingEnabled(false);
     textArea.setCloseCurlyBraces(false);

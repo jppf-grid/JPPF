@@ -38,11 +38,11 @@ public class ListOption extends AbstractOption {
   /**
    * The underlying JList component.
    */
-  protected JList list = null;
+  protected JList<Object> list = null;
   /**
    * The items contained in the list.
    */
-  protected List items = null;
+  protected List<Object> items = null;
   /**
    * The selection mode for the list.
    */
@@ -104,9 +104,9 @@ public class ListOption extends AbstractOption {
   @Override
   @SuppressWarnings("unchecked")
   public void createUI() {
-    list = new JList();
+    list = new JList<>();
     if (toolTipText != null) list.setToolTipText(toolTipText);
-    DefaultListModel model = new DefaultListModel();
+    DefaultListModel<Object> model = new DefaultListModel<>();
     list.setModel(model);
     list.setSelectionMode(selMode);
     JComponent comp = list;
@@ -135,8 +135,8 @@ public class ListOption extends AbstractOption {
     if (list == null) return;
     list.removeListSelectionListener(selectionListener);
     list.clearSelection();
-    DefaultListModel model = (DefaultListModel) list.getModel();
-    if (value == null) value = new ArrayList();
+    DefaultListModel<Object> model = (DefaultListModel<Object>) list.getModel();
+    if (value == null) value = new ArrayList<>();
     else if (value instanceof String) {
       List<Object> tmpList = new ArrayList<>();
       String[] names = RegexUtils.COMMA_PATTERN.split((String) value);
@@ -151,7 +151,7 @@ public class ListOption extends AbstractOption {
       }
       value = tmpList;
     }
-    List selectedItems = (List) value;
+    List<Object> selectedItems = (List<Object>) value;
     model.removeAllElements();
     for (Object item : items)
       model.addElement(item);
@@ -190,7 +190,7 @@ public class ListOption extends AbstractOption {
    * Get the items in the list.
    * @return a list of <code>Object</code> instances.
    */
-  public List getItems() {
+  public List<Object> getItems() {
     return items;
   }
 
@@ -198,7 +198,7 @@ public class ListOption extends AbstractOption {
    * Set the items in the list.
    * @param items a list of <code>Object</code> instances.
    */
-  public void setItems(final List items) {
+  public void setItems(final List<Object> items) {
     this.items = items;
     populateList();
     fireValueChanged();
@@ -224,7 +224,7 @@ public class ListOption extends AbstractOption {
    * Get the list component.
    * @return a <code>JList</code> instance.
    */
-  public JList getList() {
+  public JList<Object> getList() {
     return list;
   }
 }
