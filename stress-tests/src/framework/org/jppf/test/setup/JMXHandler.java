@@ -94,7 +94,7 @@ public class JMXHandler {
       JMXDriverConnectionWrapper wrapper = entry.getValue();
       try {
         if (wrapper.isConnected()) wrapper.close();
-      } catch (Exception ingore) {
+      } catch (@SuppressWarnings("unused") Exception ingore) {
       }
     }
     wrapperMap.clear();

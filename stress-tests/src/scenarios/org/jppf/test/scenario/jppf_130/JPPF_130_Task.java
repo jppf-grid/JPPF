@@ -18,16 +18,13 @@
 
 package org.jppf.test.scenario.jppf_130;
 
-import java.net.URL;
-
 import org.jppf.node.protocol.AbstractTask;
 
 /**
  * Task for reproducing bug <a href="http://www.jppf.org/tracker/tbg/jppf/issues/JPPF-130">JPPF-130</a>.
  * @author Laurent Cohen
  */
-public class JPPF_130_Task extends AbstractTask<String>
-{
+public class JPPF_130_Task extends AbstractTask<String> {
   /**
    * Number of class loader lookups to perform.
    */
@@ -37,32 +34,23 @@ public class JPPF_130_Task extends AbstractTask<String>
    * Create a new instance.
    * @param nbLookups the number of class loader lookups to perform.
    */
-  public JPPF_130_Task(final int nbLookups)
-  {
+  public JPPF_130_Task(final int nbLookups) {
     this.nbLookups = nbLookups;
   }
 
   @Override
-  public void run()
-  {
-    try
-    {
+  public void run() {
+    try {
       ClassLoader cl = getClass().getClassLoader();
-      for (int i=0; i<nbLookups; i++)
-      {
-        try
-        {
-          URL url = cl.getResource("test.SomeResource" + i);
+      for (int i = 0; i < nbLookups; i++) {
+        try {
+          cl.getResource("test.SomeResource" + i);
           //Class<?> clazz = cl.loadClass("test.SomeResource" + i);
-        }
-        catch (Exception e)
-        {
+        } catch (@SuppressWarnings("unused") Exception e) {
         }
       }
       setResult("success");
-    }
-    catch (Exception e)
-    {
+    } catch (Exception e) {
       setThrowable(e);
     }
   }

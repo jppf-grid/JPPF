@@ -161,7 +161,7 @@ public class RestartableProcessLauncher extends GenericProcessLauncher {
         File file = new File(outputName);
         result = new PrintStream(new FileOutputStream(file));
       }
-    } catch (Exception e) {
+    } catch (@SuppressWarnings("unused") Exception e) {
     }
     return result;
   }

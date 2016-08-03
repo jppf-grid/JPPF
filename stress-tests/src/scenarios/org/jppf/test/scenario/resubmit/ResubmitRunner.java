@@ -18,12 +18,10 @@
 
 package org.jppf.test.scenario.resubmit;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jppf.client.JPPFJob;
 import org.jppf.client.event.*;
-import org.jppf.node.protocol.Task;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.StringUtils;
 import org.slf4j.*;
@@ -56,7 +54,7 @@ public class ResubmitRunner extends AbstractScenarioRunner
       getSetup().getClient().submitJob(job);
       while (!dispatched.get()) Thread.sleep(1000L);
       getSetup().getDriverManagementProxy().restartShutdown(1L, 1L);
-      List<Task<?>> results = job.awaitResults();
+      job.awaitResults();
       long elapsed = System.nanoTime() - start;
       output("total time: " + StringUtils.toStringDuration(elapsed/1000000L));
     }

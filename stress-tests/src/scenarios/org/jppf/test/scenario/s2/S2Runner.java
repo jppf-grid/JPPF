@@ -18,10 +18,7 @@
 
 package org.jppf.test.scenario.s2;
 
-import java.util.List;
-
 import org.jppf.client.JPPFJob;
-import org.jppf.node.protocol.Task;
 import org.jppf.test.scenario.AbstractScenarioRunner;
 import org.jppf.utils.*;
 import org.slf4j.*;
@@ -57,7 +54,7 @@ public class S2Runner extends AbstractScenarioRunner
       {
         long start = System.nanoTime();
         JPPFJob job = BaseTestHelper.createJob("S2-job-" + i, true, false, nbTasks, LifeCycleTask.class, 0L);
-        List<Task<?>> results = getSetup().getClient().submitJob(job);
+        getSetup().getClient().submitJob(job);
         long elapsed = (System.nanoTime() - start) / 1000000L;
         if (elapsed < min) min = elapsed;
         if (elapsed > max) max = elapsed;

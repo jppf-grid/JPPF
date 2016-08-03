@@ -52,7 +52,7 @@ public class Runner extends AbstractScenarioRunner
       DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("list", list);
       job.setDataProvider(dp);
-      List<Task<?>> results = getSetup().getClient().submitJob(job);
+      getSetup().getClient().submitJob(job);
       long elapsed = System.nanoTime() - start;
       output(job.getName() + " done in " + StringUtils.toStringDuration(elapsed/1000000L));
     }
