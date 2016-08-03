@@ -151,7 +151,7 @@ public class TextResultRenderer extends AbstractTestResultRenderer {
         if ((c == '\n') || (c == '\r')) sb.deleteCharAt(sb.length()-1);
         else break;
       }
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
     } finally {
       if (reader != null) StreamUtils.closeSilent(reader);
     }

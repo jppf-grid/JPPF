@@ -107,7 +107,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       assertEquals(Long.valueOf(0L), nodeMonitorProxy.getTotalTaskElapsedTime());
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
-      List<Task<?>> result = client.submitJob(job);
+      client.submitJob(job);
       assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksSucessfull());
@@ -131,7 +131,7 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
     try {
       JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, false, 1, LifeCycleTask.class, duration);
       job.add(new ErrorLifeCycleTask(duration, true)).setId(job.getName() + " - task 2");
-      List<Task<?>> result = client.submitJob(job);
+      client.submitJob(job);
       assertEquals(Integer.valueOf(2), nodeMonitorProxy.getTotalTasksExecuted());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksInError());
       assertEquals(Integer.valueOf(1), nodeMonitorProxy.getTotalTasksSucessfull());
@@ -244,11 +244,10 @@ public class TestJPPFNodeTaskMonitorMBean extends BaseTest {
       fireNotification("starting task " + getId(), true);
       fireNotification("non-JMX notification for " + getId(), false);
       Random rand = new Random(start);
-      long elapsed = 0L;
-      String s = "";
       while ((elapsed = System.nanoTime() - start) < duration * 1_000_000L) {
         double d = Math.exp(35525.36789d * rand.nextDouble());
-        s = String.valueOf(d) + (d < 100d ? " < 100" : " >= 100");
+        String s = String.valueOf(d) + (d < 100d ? " < 100" : " >= 100");
+        s.toString();
       }
       if (raiseException) throw new IllegalStateException("this error is thrown deliberately");
     }

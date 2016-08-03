@@ -56,7 +56,6 @@ public class AwaitJobNotificationListener implements NotificationListener {
   @Override
   public void handleNotification(final Notification notification, final Object handback) {
     JobNotification jobNotif = (JobNotification) notification;
-    String uuid = jobNotif.getJobInformation().getJobUuid();
     try {
       synchronized(this) {
         if (jobNotif.getEventType() == expectedEvent) notifyAll();

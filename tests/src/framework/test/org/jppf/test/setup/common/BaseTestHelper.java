@@ -49,10 +49,10 @@ public class BaseTestHelper {
    * @return a <code>constructor</code> instance.
    * @throws Exception if any error occurs if a construcotr could not be found.
    */
-  public static Constructor findConstructor(final Class<?> taskClass, final int nbParams) throws Exception {
-    Constructor[] constructors = taskClass.getConstructors();
-    Constructor constructor = null;
-    for (Constructor c: constructors) {
+  public static Constructor<?> findConstructor(final Class<?> taskClass, final int nbParams) throws Exception {
+    Constructor<?>[] constructors = taskClass.getConstructors();
+    Constructor<?> constructor = null;
+    for (Constructor<?> c: constructors) {
       if (c.getParameterTypes().length == nbParams) {
         constructor = c;
         break;
@@ -74,9 +74,9 @@ public class BaseTestHelper {
    */
   public static Object createTask(final String id, final Class<?> taskClass, final Object...params) throws Exception {
     int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Constructor<?> constructor = findConstructor(taskClass, nbArgs);
     Object o = constructor.newInstance(params);
-    if (o instanceof Task) ((Task) o).setId(id);
+    if (o instanceof Task) ((Task<?>) o).setId(id);
     return o;
   }
 
@@ -97,7 +97,7 @@ public class BaseTestHelper {
     JPPFJob job = new JPPFJob();
     job.setName(name);
     int nbArgs = (params == null) ? 0 : params.length;
-    Constructor constructor = findConstructor(taskClass, nbArgs);
+    Constructor<?> constructor = findConstructor(taskClass, nbArgs);
     // 0 padding of task number
     int nbDigits = Integer.toString(nbTasks).length();
     String format = "%s-task %0" + nbDigits + "d";

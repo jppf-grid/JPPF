@@ -197,7 +197,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
     for (int i = 0; i < nbTasks; i++) futures.add(executor.submit(new MyCallableTask(1L)));
     assertEquals(nbTasks, futures.size());
     for (Future<String> future : futures) {
-      String s = future.get();
+      future.get();
       assertTrue(future.isDone());
       assertFalse(future.isCancelled());
     }
@@ -213,7 +213,7 @@ public class TestExecutorServiceConfiguration extends Setup1D1N1C {
   /**
    * A callback used in lieu of JPPFTask.onCancel() and JPPFTask.onTimeout().
    */
-  private static class MyTaskCallback extends JPPFTaskCallback<String> {
+  private static class MyTaskCallback extends JPPFTaskCallback<Object> {
     /**
      * A message that will be set as the task's result.
      */

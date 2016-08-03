@@ -83,7 +83,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
       assertTrue(notif.getUserData() instanceof UserObject);
       UserObject userObject = (UserObject) notif.getUserData();
       assertNotNull(userObject.nodeUuid);
-      task = (Task<?>) job.getJobTasks().get(0);
+      task = job.getJobTasks().get(0);
       assertEquals(NotifyingTask.END_PREFIX + task.getId(), userObject.taskId);
     } finally {
       jmx.changeLoadBalancerSettings(lbInfo.getAlgorithm(), lbInfo.getParameters());
@@ -123,7 +123,7 @@ public class TestJPPFJobSLA2 extends Setup1D2N1C {
         assertTrue(notif.getUserData() instanceof UserObject);
         UserObject userObject = (UserObject) notif.getUserData();
         assertNotNull(userObject.nodeUuid);
-        task = (Task<?>) job.getJobTasks().get(0);
+        task = job.getJobTasks().get(0);
         assertEquals(NotifyingTask.START_PREFIX + task.getId(), userObject.taskId);
       }
     } finally {

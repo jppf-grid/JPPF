@@ -67,7 +67,6 @@ public class TestMultiServerWithOrphan extends AbstractNonStandardSetup {
     assertEquals(nbTasks, results.size());
     for (Task<?> t: results) {
       assertTrue("task = " + t, t instanceof LifeCycleTask);
-      LifeCycleTask task = (LifeCycleTask) t;
       Throwable throwable = t.getThrowable();
       assertNull("throwable for task '" + t.getId() + "' : " + ExceptionUtils.getStackTrace(throwable), throwable);
       assertNotNull(t.getResult());

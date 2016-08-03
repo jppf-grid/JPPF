@@ -76,13 +76,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -117,13 +117,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -157,13 +157,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       TestInterceptor.active = false;
@@ -195,13 +195,13 @@ public class TestNetworkConnectionInterceptor extends BaseTest {
       if (client != null) {
         try {
           client.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       if (server != null) {
         try {
           server.close();
-        } catch (Exception ignore) {
+        } catch (@SuppressWarnings("unused") Exception ignore) {
         }
       }
       TestInterceptor.active = false;

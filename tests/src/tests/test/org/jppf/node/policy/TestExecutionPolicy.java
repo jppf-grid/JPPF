@@ -324,7 +324,7 @@ public class TestExecutionPolicy extends BaseTest {
    */
   public static class TestCustomPolicy extends CustomPolicy {
     @Override
-    public boolean accepts(final PropertiesCollection info) {
+    public boolean accepts(final PropertiesCollection<String> info) {
       return false;
     }
   }

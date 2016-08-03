@@ -128,14 +128,12 @@ public class BaseSetup {
     createShutdownHook();
     drivers = new DriverProcessLauncher[nbDrivers];
     for (int i=0; i<nbDrivers; i++) {
-      if (config == null) drivers[i] = new DriverProcessLauncher(i+1);
-      else drivers[i] = new DriverProcessLauncher(i+1, config.driverJppf, config.driverLog4j, config.driverClasspath, config.driverJvmOptions);
+      drivers[i] = new DriverProcessLauncher(i+1);
       new Thread(drivers[i], drivers[i].getName() + "process launcher").start();
     }
     nodes = new NodeProcessLauncher[nbNodes];
     for (int i=0; i<nbNodes; i++) {
-      if (config == null) nodes[i] = new NodeProcessLauncher(i+1);
-      else nodes[i] = new NodeProcessLauncher(i+1, config.nodeJppf, config.nodeLog4j, config.nodeClasspath, config.nodeJvmOptions);
+      nodes[i] = new NodeProcessLauncher(i+1);
       new Thread(nodes[i], nodes[i].getName() + "process launcher").start();
     }
     if (createClient) {
@@ -288,7 +286,7 @@ public class BaseSetup {
       public void run() {
         try {
           close();
-        } catch(Exception ignore) {
+        } catch(@SuppressWarnings("unused") Exception ignore) {
         }
       }
     };

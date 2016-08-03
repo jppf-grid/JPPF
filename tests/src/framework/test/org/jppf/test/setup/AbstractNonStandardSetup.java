@@ -253,7 +253,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         assertEquals(BaseSetup.nbNodes(), result.size());
         for (Map.Entry<String, Object> entry: result.entrySet()) assertTrue(entry.getValue() instanceof JPPFNodeState);
         ready = true;
-      } catch (Exception|AssertionError e) {
+      } catch (@SuppressWarnings("unused") Exception|AssertionError e) {
         Thread.sleep(100L);
       }
     }
@@ -273,7 +273,7 @@ public class AbstractNonStandardSetup extends BaseTest {
         public boolean evaluate() {
           try {
             return jmx.nbIdleNodes() == 1;
-          } catch (Exception e) {
+          } catch (@SuppressWarnings("unused") Exception e) {
             return false;
           }
         }

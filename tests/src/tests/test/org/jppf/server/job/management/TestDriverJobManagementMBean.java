@@ -66,7 +66,7 @@ public class TestDriverJobManagementMBean extends Setup1D2N1C {
       public boolean evaluate() {
         try {
           return jmx.nbIdleNodes() == 2;
-        } catch(Exception e) {
+        } catch(@SuppressWarnings("unused") Exception e) {
           return false;
         }
       }

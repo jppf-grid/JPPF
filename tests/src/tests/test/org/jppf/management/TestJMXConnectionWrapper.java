@@ -55,6 +55,5 @@ public class TestJMXConnectionWrapper extends BaseTest {
     for (int i=0; i<nbThreads; i++) threads[i].start();
     for (int i=0; i<nbThreads; i++) threads[i].join();
     jmx.close();
-    boolean breakpoint = true;
   }
 }

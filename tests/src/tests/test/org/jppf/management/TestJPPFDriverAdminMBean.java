@@ -193,7 +193,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
     assertNotNull(params);
     String profile = driverConfig.get(JPPFProperties.LOAD_BALANCING_PROFILE);
     String prefix = JPPFProperties.LOAD_BALANCING_PROFILE.getName() + "." + profile + '.';
-    for (Map.Entry entry : driverConfig.entrySet()) {
+    for (Map.Entry<Object, Object> entry : driverConfig.entrySet()) {
       if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
       String name = (String) entry.getKey();
       if (!name.startsWith(prefix)) continue;
@@ -229,7 +229,7 @@ public class TestJPPFDriverAdminMBean extends Setup1D2N1C {
       assertEquals(lbi.getAlgorithm(), "autotuned");
       TypedProperties params = lbi.getParameters();
       assertNotNull(params);
-      for (Map.Entry entry : newConfig.entrySet()) {
+      for (Map.Entry<Object, Object> entry : newConfig.entrySet()) {
         if (!(entry.getKey() instanceof String) || !(entry.getValue() instanceof String)) continue;
         String name = (String) entry.getKey();
         String value = (String) entry.getValue();

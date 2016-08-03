@@ -54,7 +54,7 @@ public class TestJPPFStatisticsListener extends BaseTest {
   @Test(timeout=5000)
   public void testSimpleListener() throws Exception {
     MyStatsListener listener = new MyStatsListener(null);
-    JPPFStatistics stats = createAndPopulateStats(listener);
+    createAndPopulateStats(listener);
     int expectedCount = LABELS.length;
     checkCounts(listener, expectedCount);
     for (String label: LABELS) assertTrue(listener.labels.contains(label));
@@ -78,7 +78,7 @@ public class TestJPPFStatisticsListener extends BaseTest {
       }
     };
     MyStatsListener listener = new MyStatsListener(filter);
-    JPPFStatistics stats = createAndPopulateStats(listener);
+    createAndPopulateStats(listener);
     checkCounts(listener, expectedCount);
     for (int i=0; i<expectedCount; i++) {
       if (i != excludedIndex) assertTrue(listener.labels.contains(LABELS[i]));

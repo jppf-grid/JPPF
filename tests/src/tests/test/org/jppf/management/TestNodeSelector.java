@@ -167,7 +167,7 @@ public class TestNodeSelector extends BaseTest {
   private void checkSerialization(final NodeSelector selector) throws Exception {
     ObjectSerializer ser = new ObjectSerializerImpl();
     JPPFBuffer buf = ser.serialize(selector);
-    NodeSelector selector2 = (NodeSelector) ser.deserialize(buf);
+    ser.deserialize(buf);
   }
 
   /** */
@@ -192,7 +192,7 @@ public class TestNodeSelector extends BaseTest {
       int n = -1;
       try {
         n = Integer.valueOf(ip.substring(idx + 1));
-      } catch (Exception ignore) {
+      } catch (@SuppressWarnings("unused") Exception ignore) {
       }
       return n % 2 == 0;
     }

@@ -36,8 +36,6 @@ public class BaseTest {
    */
   private static Logger log = LoggerFactory.getLogger("TEST");
   /** */
-  private static String name;
-  /** */
   private static FileFilter logFileFilter = new FileFilter() {
     @Override
     public boolean accept(final File path) {

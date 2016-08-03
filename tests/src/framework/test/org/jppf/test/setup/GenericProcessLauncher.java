@@ -373,13 +373,13 @@ public class GenericProcessLauncher implements Runnable {
       if (socketClient != null) {
         try {
             socketClient.close();
-          } catch (Exception ignore) {
+          } catch (@SuppressWarnings("unused") Exception ignore) {
           }
       }
       synchronized(this) {
         try {
           wait(100L);
-        } catch (Exception e) {
+        } catch (@SuppressWarnings("unused") Exception e) {
         }
       }
       process.destroy();
@@ -416,7 +416,7 @@ public class GenericProcessLauncher implements Runnable {
       Thread thread = new Thread(r, name + "ServerSocket");
       thread.setDaemon(true);
       thread.start();
-    } catch(Exception e) {
+    } catch(@SuppressWarnings("unused") Exception e) {
       if (processServer != null) StreamUtils.closeSilent(processServer);
       processServer = null;
     }

@@ -79,7 +79,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   public void testSimpleJob() throws Exception {
     int nbTasks = 5;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 10L);
-    Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
+    Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
     List<Task<?>> results = client.submitJob(job);
     assertNotNull(results);
@@ -101,7 +101,7 @@ public class TestOfflineNode extends AbstractNonStandardSetup {
   public void testJobDispatchExpiration() throws Exception {
     int nbTasks = 1;
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentClassAndMethod(), true, false, nbTasks, LifeCycleTask.class, 5000L);
-    Location loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
+    Location<?> loc = new MemoryLocation(new FileLocation("build/jppf-test-framework.jar").toByteArray());
     job.getSLA().getClassPath().add("jppf-test-framework.jar", loc);
     job.getSLA().setDispatchExpirationSchedule(new JPPFSchedule(2000L));
     List<Task<?>> results = client.submitJob(job);

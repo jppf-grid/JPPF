@@ -89,7 +89,7 @@ public class TestJobReservation extends AbstractNonStandardSetup {
       public boolean evaluate() {
         try {
           return jmx.nbIdleNodes() == BaseSetup.nbNodes();
-        } catch(Exception e) {
+        } catch(@SuppressWarnings("unused") Exception e) {
           return false;
         }
       }

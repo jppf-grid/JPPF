@@ -392,7 +392,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     JPPFJob job = BaseTestHelper.createJob(ReflectionUtils.getCurrentMethodName(), true, true, 1, FileTask.class, suffix, true);
     job.getSLA().setMaxNodes(2);
     job.getSLA().setExecutionPolicy(new Equal("jppf.uuid", false, "no node has this as uuid!"));
-    List<Task<?>> results = client.submitJob(job);
+    client.submitJob(job);
     for (int i=1; i<=2; i++) {
       File file = new File("node-n" + i + ".tmp");
       try {
@@ -431,7 +431,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
             try {
               Thread.sleep(500L);
               forwarder.forwardInvoke(new UuidSelector("n1"), JPPFNodeAdminMBean.MBEAN_NAME, "restart");
-            } catch (Exception ignore) {
+            } catch (@SuppressWarnings("unused") Exception ignore) {
               //ignore.printStackTrace();
             }
           }
@@ -496,7 +496,7 @@ public class TestJPPFJobSLA extends Setup1D2N1C {
     };
     job.addJobListener(listener);
     job.getSLA().setResultsStrategy(strategyName);
-    List<Task<?>> results = client.submitJob(job);
+    client.submitJob(job);
     assertEquals(expectedReturnedCount, returnedCount.get());
   }
 

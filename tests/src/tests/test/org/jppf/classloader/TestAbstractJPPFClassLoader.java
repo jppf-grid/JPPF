@@ -66,7 +66,6 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
   {
     int nbLookups = 3;
     String name = ReflectionUtils.getCurrentMethodName();
-    String resource = "some_dummy_resource-" + JPPFUuid.normalUUID() + ".dfg";
     List<Task<?>> results = client.submitJob(BaseTestHelper.createJob(name, true, false, 1, ResourceLoadingTask.class, nbLookups));
     assertNotNull(results);
     assertEquals(1, results.size());
@@ -149,7 +148,7 @@ public class TestAbstractJPPFClassLoader extends Setup1D1N1C
         ClassLoader cl2 = getClass().getClassLoader();
         taskClassLoaderStr = cl2 == null ? "null" : cl2.toString();
         classLoaderMatch = cl1 == cl2;
-        Enumeration<URL> res = getClass().getClassLoader().getResources(resource);
+        getClass().getClassLoader().getResources(resource);
         setResult("success");
       } catch(Exception e) {
         setThrowable(e);

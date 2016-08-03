@@ -32,7 +32,6 @@ import org.jppf.job.JobEventType;
 import org.jppf.node.protocol.*;
 import org.jppf.utils.*;
 import org.junit.Test;
-import org.slf4j.*;
 
 import test.org.jppf.test.setup.*;
 import test.org.jppf.test.setup.common.*;
@@ -42,11 +41,6 @@ import test.org.jppf.test.setup.common.*;
  * @author Laurent Cohen
  */
 public class TestJPPFClient extends Setup1D1N {
-  /**
-   * Logger for this class.
-   */
-  private static Logger log = LoggerFactory.getLogger(TestJPPFClient.class);
-
   /**
    * Invocation of the <code>JPPFClient()</code> constructor.
    * @throws Exception if any error occurs

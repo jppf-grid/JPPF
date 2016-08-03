@@ -151,7 +151,7 @@ public class TestListBuilder {
     try {
       File srcDir = new File(args[0]);
       TestListBuilder builder = new TestListBuilder(srcDir);
-      List<String> classNames = builder.buildList();
+      builder.buildList();
       File dest = new File(args[1]);
       builder.writeTestList(dest);
     } catch (Exception e) {

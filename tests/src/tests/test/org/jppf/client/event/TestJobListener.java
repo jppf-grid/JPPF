@@ -64,7 +64,7 @@ public class TestJobListener extends BaseTest {
       configure(false, true, 1);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
-      List<Task<?>> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
+      runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());
@@ -84,7 +84,7 @@ public class TestJobListener extends BaseTest {
       configure(true, false, 2);
       CountingJobListener listener = new CountingJobListener();
       int nbTasks = 20;
-      List<Task<?>> results = runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
+      runJob(ReflectionUtils.getCurrentMethodName(), listener, nbTasks);
       assertEquals(1, listener.startedCount.get());
       assertEquals(1, listener.endedCount.get());
       assertEquals(4, listener.dispatchedCount.get());

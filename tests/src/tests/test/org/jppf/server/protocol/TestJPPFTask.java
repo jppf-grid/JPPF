@@ -235,7 +235,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     assertEquals(results.size(), nbTasks);
     NotifyingTask task = (NotifyingTask) results.get(0);
     assertTrue(task.getResult() instanceof List);
-    List list = (List) task.getResult();
+    List<?> list = (List<?>) task.getResult();
     assertEquals(3, list.size());
     for (int i=0; i<3; i++) assertEquals("task notification " + (i+1), list.get(i));
   }
@@ -287,7 +287,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     ResubmittingTask task = (ResubmittingTask) results.get(0);
-    assertTrue(task.getResult() instanceof Integer);
+    assertNotNull(task.getResult());
     assertEquals(Integer.valueOf(nbRuns), task.getResult());
   }
 
@@ -311,7 +311,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     ResubmittingTask task = (ResubmittingTask) results.get(0);
-    assertTrue(task.getResult() instanceof Integer);
+    assertNotNull(task.getResult());
     assertEquals(Integer.valueOf(maxResubmits + 1), task.getResult());
   }
 
@@ -337,7 +337,7 @@ public class TestJPPFTask extends Setup1D1N1C {
     assertNotNull(results);
     assertEquals(results.size(), nbTasks);
     ResubmittingTask task = (ResubmittingTask) results.get(0);
-    assertTrue(task.getResult() instanceof Integer);
+    assertNotNull(task.getResult());
     assertEquals(Integer.valueOf(taskMaxResubmits + 1), task.getResult());
   }
 

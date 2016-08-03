@@ -78,9 +78,9 @@ public abstract class AbstractTestJPPFNodeForwardingMBean extends BaseTest {
         Map<String, Object> result = nodeForwarder.state(selector);
         checkNodes(result, JPPFNodeState.class, allNodes.toArray(array));
         ready = true;
-      } catch (Exception e) {
+      } catch (@SuppressWarnings("unused") Exception e) {
         Thread.sleep(100L);
-      } catch (AssertionError e) {
+      } catch (@SuppressWarnings("unused") AssertionError e) {
         Thread.sleep(100L);
       }
     }

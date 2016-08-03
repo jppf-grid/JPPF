@@ -20,8 +20,6 @@ package test.org.jppf.io;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.List;
-
 import org.jppf.client.JPPFJob;
 import org.jppf.load.balancer.LoadBalancingInformation;
 import org.jppf.management.*;
@@ -57,7 +55,7 @@ public class TestFileDataLocation extends Setup1D1N1C {
       DataProvider dp = new MemoryMapDataProvider();
       dp.setParameter("bytes", new byte[size]);
       job.setDataProvider(dp);
-      List<Task<?>> results = client.submitJob(job);
+      client.submitJob(job);
     } finally {
       resetLoadBalancing();
     }
